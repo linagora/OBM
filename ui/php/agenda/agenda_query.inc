@@ -1,9 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : agenda_query.inc                                            //
-//     - Desc  : Agenda query File                                           //
-// Created     : 2001-06-27 by Francois Bloque                               //
-// Last update : 2001-07-25                                                  //
+// OBM - File : agenda_query.inc                                             //
+//     - Desc : Agenda query File                                            //
+// Created    : 2001-06-27 by Francois Bloque                                //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,7 +24,6 @@
 //   - $p_repeat_interval : frequence of repetition 
 //   - $p_repeatdays : days of repetition (when its a weekly repetition) 
 //   - $p_endrepeat : date of repetition end 
-//
 // Return : event's id ??????
 //////////////////////////////////////////////////////////////////////////////
 function run_query_event_insert($p_event_id,$p_title,$p_category_id,$p_priority,$p_privacy,$p_datebegin,$p_dateend,$p_description,$p_origin,$p_occupied_day,$p_repeatkind,$p_repeat_interval,$p_repeatdays,$p_endrepeat) {
@@ -186,11 +184,11 @@ function run_query_event_contact_insert($p_contact_id,$p_event_id,$p_begindate,$
    // if a user enters a new event for himself, it's considered as "Accepted"
    // else it's considered as "Waiting to be approved" 
    
-   $query = "select * from EventUser where eventuser_contact_id='$p_contact_id' and eventuser_event_id='$p_event_id'";
+   $query = "select * from EventUser where eventuser_user_id='$p_contact_id' and eventuser_event_id='$p_event_id'";
    display_debug_msg($query, $cdg_sql);
    $obm_db->query($query);
    if ($obm_db->nf()==0) { 
-     $query = "insert into EventUser (eventuser_event_id,eventuser_contact_id,eventuser_group_id,eventuser_state) values ('$p_event_id','$p_contact_id',null,'$p_state')";
+     $query = "insert into EventUser (eventuser_event_id,eventuser_user_id,eventuser_group_id,eventuser_state) values ('$p_event_id','$p_contact_id',null,'$p_state')";
      display_debug_msg($query, $cdg_sql);
      $obm_db->query($query); 
    }  
@@ -238,7 +236,7 @@ function run_query_event_group_insert($group_id,$event_id,$p_begindate,$p_enddat
     display_debug_msg($query, $cdg_sql);
     $obm_db->query($query);
     if ($obm_db->nf()==0) { 
-      $query = "insert into EventUser (eventuser_event_id,eventuser_contact_id,eventuser_group_id,eventuser_state) values ('$event_id',null,'$group_id','A')";
+      $query = "insert into EventUser (eventuser_event_id,eventuser_user_id,eventuser_group_id,eventuser_state) values ('$event_id',null,'$group_id','A')";
       display_debug_msg($query, $cdg_sql);
       $obm_db->query($query); 
     }  
@@ -278,7 +276,7 @@ function run_query_event_list($p_date_begin,$p_date_end,$contacts_array,$groups_
                  calendarevent_datebegin,
                  calendarevent_dateend,
                  eventcategory_label,
-                 eventuser_contact_id
+                 eventuser_user_id
             from CalendarEvent,EventCategory,EventUser
             where calendarevent_category_id=eventcategory_id
               and eventuser_state <> 'R'
@@ -293,7 +291,7 @@ function run_query_event_list($p_date_begin,$p_date_end,$contacts_array,$groups_
   }
 
   if ( ($contacts_array) && (count($contacts_array)>0) ) {
-    $query .= "eventuser_contact_id in ('";
+    $query .= "eventuser_user_id in ('";
     $query .= $contacts_array[0];
     for ($i=1; $i<count($contacts_array); $i++) {
       $query.= "','".$contacts_array[$i];
@@ -401,7 +399,7 @@ function run_query_get_eventgroups($p_event_id) {
 function run_query_get_eventcontacts($p_event_id) {
   global $cdg_sql;
 
-  $query="select contact_id,contact_lastname,contact_firstname,eventuser_state from EventUser,Contact where contact_id = eventuser_contact_id and eventuser_event_id='$p_event_id'";
+  $query="select contact_id,contact_lastname,contact_firstname,eventuser_state from EventUser,Contact where contact_id = eventuser_user_id and eventuser_event_id='$p_event_id'";
   $obm_db = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -431,7 +429,7 @@ function run_query_event_group_delete($p_event_id,$p_group_id) {
           where (eventuser_group_id=".$p_group_id;
 
   if ($id_array && count($id_array>0)) {
-    $query.= " or eventuser_contact_id in (".$id_array[0];
+    $query.= " or eventuser_user_id in (".$id_array[0];
     for ($i=1;$i<count($id_array);$i++) {
       $query.=",".$id_array[$i];
     }
@@ -457,7 +455,7 @@ function run_query_event_group_delete($p_event_id,$p_group_id) {
 function run_query_event_contact_delete($p_event_id,$p_contact_id) {
   global $cdg_sql;
 
-  $query = "delete from EventUser where eventuser_contact_id='$p_contact_id' and eventuser_event_id='$p_event_id'";
+  $query = "delete from EventUser where eventuser_user_id='$p_contact_id' and eventuser_event_id='$p_event_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -476,7 +474,7 @@ function run_query_event_contact_delete($p_event_id,$p_contact_id) {
 function run_query_event_state_update($p_event_id,$p_contact_id,$p_state) {
   global $cdg_sql;
 
-  $query = "update EventUser set eventuser_state='$p_state' where eventuser_event_id='$p_event_id' and eventuser_contact_id='$p_contact_id'";
+  $query = "update EventUser set eventuser_state='$p_state' where eventuser_event_id='$p_event_id' and eventuser_user_id='$p_contact_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -496,7 +494,7 @@ function run_query_get_waiting_events($contact_id) {
   $query="select calendarevent_id, calendarevent_title, calendarevent_datebegin,calendarevent_dateend  
           from CalendarEvent,EventUser 
           where calendarevent_id=eventuser_event_id 
-            and eventuser_contact_id='$contact_id'
+            and eventuser_user_id='$contact_id'
             and eventuser_state='W'
           order by calendarevent_datebegin";
   display_debug_msg($query, $cdg_sql);
@@ -520,7 +518,7 @@ function run_query_get_rejected_events($p_user_id) {
   $query = "select calendarevent_id, calendarevent_title, calendarevent_datebegin,calendarevent_dateend, contact_lastname, contact_firstname  
           from CalendarEvent,EventUser, Contact 
           where calendarevent_id=eventuser_event_id 
-            and contact_id=eventuser_contact_id 
+            and contact_id=eventuser_user_id 
             and eventuser_state='R'
             and calendarevent_usercreate='$p_user_id'
           order by calendarevent_datebegin";
@@ -544,7 +542,7 @@ function run_query_get_contactlayer(/*$owner_id,*/$contact_id) {
 
    
   $query = "select calendarlayer_color from CalendarLayer
-            where calendarlayer_contact_id='$contact_id'";
+            where calendarlayer_user_id='$contact_id'";
   // and calendarlayer_owner_id=$owner_id
 
   display_debug_msg($query, $cdg_sql);
@@ -593,14 +591,14 @@ function run_query_get_eventcategories() {
 }
 
 
-/////////////////////////////////////////////////////////////////////////
-// Get all groups of contacts in th company using obm
-/////////////////////////////////////////////////////////////////////////
-function run_query_get_mylists() {
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get all User Groups
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_usergroups() {
   global $cdg_sql;
 
   $query = "select * from List order by list_name";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg("run_query_get_usergroups() : not implemented".$query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   return $obm_db;
@@ -670,7 +668,7 @@ function run_query_get_max_event_id () {
 function run_query_is_attendee($p_event_id,$p_contact_id) {
   global $cdg_sql;
 
-  $query = "select * from EventUser where eventuser_contact_id='$p_contact_id' and eventuser_event_id='$p_event_id'";
+  $query = "select * from EventUser where eventuser_user_id='$p_contact_id' and eventuser_event_id='$p_event_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);

@@ -232,7 +232,7 @@ function display_bookmarks($path="..") {
      ".substr($last_payment_name,0,30)."</a></font> 
      </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult_contract&amp;param_contract=".$last_contract)."\">
+     <a href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">
      ".substr($last_contract_name,0,30)."</a></font>
     </td><td>
      <font size=-2>

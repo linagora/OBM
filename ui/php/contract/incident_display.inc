@@ -397,7 +397,7 @@ echo "
     <TD><FONT SIZE=-2>$l_contract_label&nbsp;&nbsp;&nbsp;&nbsp; </FONT></TD>
     <TD>
 <A HREF=\"".
-      $sess->url("../contract/contract_index.php?action=detailconsult_contract&amp;param_contract=$c_id") . "\">$c_name";
+      $sess->url("../contract/contract_index.php?action=detailconsult&amp;param_contract=$c_id") . "\">$c_name";
   echo "</A><INPUT TYPE=hidden NAME=param_contract value=\"$param_contract\">
       <INPUT TYPE=hidden NAME=contract_new_id value=\"$c_new_id\">
       <a href=\"\" onclick=\"window.open('../contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_incident_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
@@ -562,7 +562,7 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
               <table bgcolor=\"#$col_label\">
               <tr>
                 <td bgcolor=\"#$col_table\" colspan=2>
-                  <A HREF=\"".$sess->url("contract_index.php?action=detailconsult_contract&amp;param_contract=$con_id") . "\"><font color=\"#$col_textem\">$con_label</font></a>
+                  <A HREF=\"".$sess->url("contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\"><font color=\"#$col_textem\">$con_label</font></a>
                   <br>$l_contract_num : $con_num
                   <br>$l_from $con_debut $l_to $con_exp
                 </td>

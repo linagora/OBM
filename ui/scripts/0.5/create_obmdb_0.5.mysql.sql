@@ -474,7 +474,7 @@ CREATE TABLE ContactList (
 --
 CREATE TABLE EventUser (
        eventuser_event_id	int(8) NOT NULL,
-       eventuser_contact_id	int(8),
+       eventuser_user_id	int(8),
        eventuser_group_id	int(8),
        eventuser_state		char(1)
 );
@@ -484,7 +484,7 @@ CREATE TABLE EventUser (
 -- Table structure for the table  'CalendarLayer'
 --
 CREATE TABLE CalendarLayer (
-       calendarlayer_contact_id	int(8),
+       calendarlayer_user_id	int(8),
        calendarlayer_group_id	int(8),
        calendarlayer_color	char(7)
 );

@@ -136,7 +136,7 @@ if ($action == "index") {
   $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
   dis_contract_display_pref($pref_q);
 
-} elseif ($action == "detailconsult_contract")  {
+} elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contract > 0) {
     $contract_q = run_query_detail($param_contract);
@@ -215,7 +215,7 @@ if ($action == "index") {
     display_err_msg($l_type_delete_error);
     echo $obm_q->num_rows() . " " . $l_deal . $l_type_del_verif_error . "<P>\n"; 
     while ($obm_q->next_record()) {
-      echo "<A HREF=\"contract_index.php?action=detailconsult_contract&amp;param_contract=" . $obm_q->f("contract_id") ."\">" . $obm_q->f("contract_label") . "</A><BR>\n";
+      echo "<A HREF=\"contract_index.php?action=detailconsult&amp;param_contract=" . $obm_q->f("contract_id") ."\">" . $obm_q->f("contract_label") . "</A><BR>\n";
     }
   } else {
     $query = query_type_delete(); 

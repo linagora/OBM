@@ -19,7 +19,7 @@
 //   $obm_q_affected_contacts  : list of contacts assigned to the event
 //   $obm_q_affected_groups : list of groups assigned to the event 
 //   $param_event       : id of the event to delete or update
-//   $contact_list      : list of user records 
+//   $usr_q         : DBO : userobm list
 //   $group_list        : list of user's groups records 
 //   $category_list     : list of event categories records
 // ( when new :   )
@@ -39,7 +39,7 @@
 //   $p_repeat_end      : date and time of end repeat, like "yyyymmddhhmmss" (year/month/day/hour/minute/second)
 //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_event_form($action,$obm_q_event,$obm_q_affected_contacts,$obm_q_affected_groups,$param_event,$contact_list,$group_list,$category_list,$p_title,$p_contacts_array,$p_groups_array,$p_category_id,$p_priority,$p_privacy,$p_datebegin,$p_dateend,$p_description,$p_occupied_day,$p_repeat_kind,$p_repeat_interval,$p_repeat_days,$p_repeat_end) {
+function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_affected_groups, $param_event, $usr_q, $group_list,$category_list,$p_title,$p_contacts_array,$p_groups_array,$p_category_id,$p_priority,$p_privacy,$p_datebegin,$p_dateend,$p_description,$p_occupied_day,$p_repeat_kind,$p_repeat_interval,$p_repeat_days,$p_repeat_end) {
 
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$col_a_table;
@@ -80,11 +80,69 @@ function dis_event_form($action,$obm_q_event,$obm_q_affected_contacts,$obm_q_aff
   // groups assigned to the event 
   if ($p_groups) {
     $groups=$p_groups;
-  } else if ($obm_q_affected_groups->nf())  {
+  } else if ($obm_q_affected_groups->nf() > 0)  {
     while ($obm_q_affected_groups->next_record()) {
       $groups[] = $obm_q_affected_groups->f("eventuser_group_id");
     }
   } 
+
+  // UserObm Select
+  $sel_user = "<select name=\"sel_user_id[]\" size=6 multiple>";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $u_lname = $usr_q->f("userobm_lastname");
+    $u_fname = $usr_q->f("userobm_firstname");
+    $sel_user .= "\n<option value=\"$u_id\"";
+       
+    if (count($contacts_array)>0) {
+      $tag_user = "";
+      while ( (list($key, $user_id) = each($contacts_array) )
+              && ($tag_user == "") ) {
+	if ($u_id == $user_id ) {
+	  $tag_user = " selected";
+	}
+      }
+      reset($contacts_array);
+    }
+    
+    $sel_user .= " $tag_user>$u_lname $u_fname</option>";
+  } 
+  $sel_user .= "</select>";
+
+  // Group Select
+  $sel_group = "<select name=\"sel_group_id[]\" size=6 multiple>";
+  while ($group_list->next_record()) {
+    $g_id = $group_list->f("list_id");      // To become group_id... XXXXXX
+    $g_name = $group_list->f("list_name");
+    $sel_group .= "\n<option value=\"$g_id\"";
+
+    if (count($groups)>0) {
+      $tag_group = "";
+      while ((list($key, $group_id) = each ($groups)) && ($tag_group == "") ) {
+	if ($g_id == $group_id ) {
+	  $tag_group = " selected";
+	}
+      }
+      reset($groups);
+    }
+    $sel_group .= " $tag_group>$g_name</option>";
+  }
+  $sel_group .= "</select>";
+
+  // EventCategory Select
+  $sel_cat = "<select name=\"sel_category_id\">"; 
+  while ($category_list->next_record()) {
+    $c_id = $category_list->f("eventcategory_id");
+    $c_label = $category_list->f("eventcategory_label");
+    $sel_cat .= "<option value=\"$c_id\"";
+    if ($c_id == $category_id) {
+      $sel_cat .= " selected";
+    }
+    $sel_cat .= ">$c_label</option>";
+  }
+  $sel_cat .= "</select>";
+
+
 
   // current, last and next years
   $current_year=date("Y");
@@ -109,77 +167,40 @@ function dis_event_form($action,$obm_q_event,$obm_q_affected_contacts,$obm_q_aff
   $hour_end=substr($timeend,0,2);
   $minute_end=substr($timeend,2,2);
   
-  echo "<FORM name=\"form_event\" method=POST onSubmit=\"if (check_insert_event(this)) return true; else return false;\" action=\"".$sess->url("agenda_index.php")."\" onSubmit=\"\">"; 
-  echo "<TABLE border=0 width=80%>       
-        <TR><TD align=center>";
-
-  echo "<TABLE border=0>
-        <TR><TD colspan=2>";   
-  // Title 
-  echo "<FONT COLOR=\"#$col_label\">".$l_title."</FONT><BR>
-       <INPUT type=text name=\"tf_event_title\" value=\"".$title."\" size=50>"; 
-
-  echo "</TD></TR>
-        <TR><TD>";
-  // Available Contacts 
-  echo "<FONT COLOR=\"#$col_label\">".$l_users."</FONT><BR>";
-  echo "<SELECT name=\"sel_user_id[]\" size=6 multiple>";
-  while ($contact_list->next_record()) {
-    echo "\n<OPTION value=".$contact_list->f("contact_id");
-       
-    if (count($contacts_array)>0) {
-       $tag_user="";
-       while ( (list($key, $user_id) = each($contacts_array) ) && (strcmp($tag_user,"")==0)) {
-	 if ($contact_list->f("contact_id") == $user_id ) {
-	   $tag_user=" selected";
-	 }
-       }
-       reset($contacts_array);
-    }
-    
-    echo " ".$tag_user.">".$contact_list->f("contact_lastname")." ".$contact_list->f("contact_firstname")."</OPTION>";
-  } 
-  echo "</SELECT>";
-
-  echo "</TD><TD>"; 
-  // Available Groups 
-  echo "<FONT COLOR=\"#$col_label\">".$l_groups."</FONT><BR>";
-  echo "<SELECT name=\"sel_group_id[]\" size=6 multiple>";
-  while ($group_list->next_record()) {
-    echo "\n<OPTION value=".$group_list->f("list_id");
-
-    if (count($groups)>0) {
-      $tag_group="";
-      while ((list($key, $group_id) = each ($groups)) && (strcmp($tag_group,"")==0)) {
-	if ($group_list->f("list_id") == $group_id ) {
-	  $tag_group=" selected";
-	}
-      }
-      reset($groups);
-    }
-
-    echo " ".$tag_group.">".$group_list->f("list_name")."</OPTION>";
-  }
-  echo "</SELECT>";
-
-  echo " </TD></TR>
-        <TR><TD colspan=2 align=center>";  
- 
-  echo "<TABLE border=0 width=100%>
-        <TR><TD>";
-  // Available Event Categories 
-  echo  "<FONT COLOR=\"#$col_label\">".$l_category."</FONT><br>
-        <SELECT name=\"sel_category_id\">"; 
-  while ($category_list->next_record()) {
-    echo "<OPTION value=".$category_list->f("eventcategory_id");
-    if ($category_list->f("eventcategory_id")==$category_id) {
-      echo " selected";
-    }
-    echo ">".$category_list->f("eventcategory_label")."</OPTION>";
-  }
-  echo "</SELECT>";
- 
-  echo "</TD><TD>";
+  echo "<form name=\"form_event\" method=post onSubmit=\"if (check_insert_event(this)) return true; else return false;\" action=\"".$sess->url("agenda_index.php")."\" onSubmit=\"\"> 
+    <table border=0 width=80%>       
+    <tr>
+      <td align=center>
+        <table border=0>
+        <tr>
+          <td colspan=2>
+<!--  // Title // -->
+            <font color=\"#$col_label\">$l_title</font><br>
+            <input type=text name=\"tf_event_title\" value=\"$title\" size=50>
+          </td>
+        </tr>
+        <tr>
+          <td>
+<!--  // Available UserObm -->
+            <font color=\"#$col_label\">$l_users</font>
+            <br>$sel_user
+          </td>
+          <td>
+<!--  // Available Groups  --> 
+            <font color=\"#$col_label\">$l_groups</font>
+            <br>$sel_group
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2 align=center>
+            <table border=0 width=100%>
+            <tr>
+              <td>
+<!--  // Available Event Categories  --> 
+                <font color=\"#$col_label\">$l_category</font>
+                <br>$sel_cat
+              </td>
+              <td>";
   
   // Priorities 
   if ($priority != '') {
@@ -903,7 +924,7 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_contact_id,$contact
     $current_end_time=mktime(substr($obm_q_events->f("calendarevent_dateend"),8,2),substr($obm_q_events->f("calendarevent_dateend"),10,2),0,substr($obm_q_events->f("calendarevent_dateend"),4,2),substr($obm_q_events->f("calendarevent_dateend"),6,2),substr($obm_q_events->f("calendarevent_dateend"),0,4));
     if ($current_end_time > $end_occupied_time) {
       $end_occupied_time=$current_end_time;
-      if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+      if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	$end_occupied_attend=1;
       } else {
 	$end_occupied_attend=0;
@@ -923,7 +944,7 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_contact_id,$contact
 	$flag_event=0;
 	while ( ($cpt_rows<$num_rows) && ($obm_q_events->f("calendarevent_datebegin")>=date("YmdHis",$current_time)) && ($obm_q_events->f("calendarevent_datebegin")< date("YmdHis",$current_time_next)) ) {
 	  $flag_event=1;
-	  if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+	  if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	      $attend=1;
 	  }
 	  $events_array[$d][]=$cpt_rows; // number of the record 
@@ -931,7 +952,7 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_contact_id,$contact
 	  if ($current_end_time > $end_occupied_time) {
 	    $end_occupied_time=$current_end_time;
 	    // is the user attend to the event ? 
-	    if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+	    if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	      $end_occupied_attend=1;
 	    } else {
 	      $end_occupied_attend=0;
@@ -1045,7 +1066,7 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_contact_id,$contact
 	    echo "<A href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=".$obm_q_events->f("calendarevent_id"))."\">";
 	    // private event's title doesn't appear
 	    if ($obm_q_events->f("calendarevent_privacy")==1) {
-	      if (($user_contact_id == $obm_q_events->f("eventuser_contact_id")) || ($auth->auth["uid"] == $obm_q_events->f("calendarevent_usercreate")) ) {
+	      if (($user_contact_id == $obm_q_events->f("eventuser_user_id")) || ($auth->auth["uid"] == $obm_q_events->f("calendarevent_usercreate")) ) {
 		echo $obm_q_events->f("calendarevent_title")."</A><br>";
 	      } else {
 		echo $l_private."</A><br>";
@@ -1153,7 +1174,7 @@ function dis_day_planning($p_start_date,$obm_q_events,$user_contact_id,$contacts
     $current_end_time=mktime(substr($obm_q_events->f("calendarevent_dateend"),8,2),substr($obm_q_events->f("calendarevent_dateend"),10,2),0,substr($obm_q_events->f("calendarevent_dateend"),4,2),substr($obm_q_events->f("calendarevent_dateend"),6,2),substr($obm_q_events->f("calendarevent_dateend"),0,4));
     if ($current_end_time > $end_occupied_time) {
       $end_occupied_time=$current_end_time;
-      if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+      if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	$end_occupied_attend=1;
       } else {
 	$end_occupied_attend=0;
@@ -1176,7 +1197,7 @@ function dis_day_planning($p_start_date,$obm_q_events,$user_contact_id,$contacts
 	$flag_event=0;
 	while ( ($cpt_rows<$num_rows) && ($obm_q_events->f("calendarevent_datebegin")>=date("YmdHis",$current_time)) && ($obm_q_events->f("calendarevent_datebegin")< date("YmdHis",$current_time_next)) ) {
 	  $flag_event=1;
-	  if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+	  if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	      $attend=1;
 	  }
 	  $events_array[]=$cpt_rows; // number of the record 
@@ -1184,7 +1205,7 @@ function dis_day_planning($p_start_date,$obm_q_events,$user_contact_id,$contacts
 	  if ($current_end_time > $end_occupied_time) {
 	    $end_occupied_time=$current_end_time;
 	    // is the user attend to the event ? 
-	    if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+	    if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	      $end_occupied_attend=1;
 	    } else {
 	      $end_occupied_attend=0;
@@ -1250,7 +1271,7 @@ function dis_day_planning($p_start_date,$obm_q_events,$user_contact_id,$contacts
 	  echo "<A href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=".$obm_q_events->f("calendarevent_id"))."\">";
 	  // private event's title doesn't appear
 	  if ($obm_q_events->f("calendarevent_privacy")==1) {
-	    if (($user_contact_id == $obm_q_events->f("eventuser_contact_id")) || ($auth->auth["uid"] == $obm_q_events->f("calendarevent_usercreate")) ) {
+	    if (($user_contact_id == $obm_q_events->f("eventuser_user_id")) || ($auth->auth["uid"] == $obm_q_events->f("calendarevent_usercreate")) ) {
 	      echo $obm_q_events->f("calendarevent_title")."</A><br>";
 	    } else {
 	      echo $l_private."</A><br>";
@@ -1389,7 +1410,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_contact_id,$conta
     $current_end_time=mktime(substr($obm_q_events->f("calendarevent_dateend"),8,2),substr($obm_q_events->f("calendarevent_dateend"),10,2),0,substr($obm_q_events->f("calendarevent_dateend"),4,2),substr($obm_q_events->f("calendarevent_dateend"),6,2),substr($obm_q_events->f("calendarevent_dateend"),0,4));
     if ($current_end_time > $end_occupied_time) {
       $end_occupied_time=$current_end_time;
-      if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+      if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	$end_occupied_attend=1;
       } else {
 	$end_occupied_attend=0;
@@ -1410,7 +1431,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_contact_id,$conta
       $flag_event=0;
       while ( ($cpt_rows<$num_rows) && ($obm_q_events->f("calendarevent_datebegin")>=date("YmdHis",$current_time)) && ($obm_q_events->f("calendarevent_datebegin")< date("YmdHis",$current_time_next)) ) {
 	$flag_event=1;
-	if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+	if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	  $attend=1;
 	}
 	$events_array[]=$cpt_rows; // number of the record 
@@ -1418,7 +1439,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_contact_id,$conta
 	if ($current_end_time > $end_occupied_time) {
 	  $end_occupied_time=$current_end_time;
 	  // is the user attend to the event ? 
-	  if ($user_contact_id == $obm_q_events->f("eventuser_contact_id")) {
+	  if ($user_contact_id == $obm_q_events->f("eventuser_user_id")) {
 	    $end_occupied_attend=1;
 	  } else {
 	    $end_occupied_attend=0;
@@ -1510,7 +1531,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_contact_id,$conta
 	  echo "<A href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=".$obm_q_events->f("calendarevent_id"))."\">";
 	  // private event's title doesn't appear
 	  if ($obm_q_events->f("calendarevent_privacy")==1) {
-	    if (($user_contact_id == $obm_q_events->f("eventuser_contact_id")) || ($auth->auth["uid"] == $obm_q_events->f("calendarevent_usercreate")) ) {
+	    if (($user_contact_id == $obm_q_events->f("eventuser_user_id")) || ($auth->auth["uid"] == $obm_q_events->f("calendarevent_usercreate")) ) {
 	      echo $obm_q_events->f("calendarevent_title")."</A><br>";
 	    } else {
 	      echo $l_private."</A><br>";
@@ -1881,7 +1902,7 @@ function dis_conflict_events_form($action,$p_event_id,$events_array,$contacts_co
 	  echo "<A href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=".$obm_q_events->f("calendarevent_id"))."\">";
 	  // private event's title doesn't appear
 	  if ($obm_q_events->f("calendarevent_privacy")==1) {
-	    if (($user_contact_id != $obm_q_events->f("eventuser_contact_id")) && ($auth->auth["uid"] != $obm_q_events->f("calendarevent_usercreate")) ) {
+	    if (($user_contact_id != $obm_q_events->f("eventuser_user_id")) && ($auth->auth["uid"] != $obm_q_events->f("calendarevent_usercreate")) ) {
 	      echo $l_private."</A><br>";
 	    } else {
 	      echo $obm_q_events->f("calendarevent_title")."</A><br>";
@@ -1948,7 +1969,7 @@ function dis_conflict_events_form($action,$p_event_id,$events_array,$contacts_co
 	  echo "<A href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=".$obm_q_events->f("calendarevent_id"))."\">";
 	   // private event's title doesn't appear
 	  if ($obm_q_events->f("calendarevent_privacy")==1) {
-	    if (($user_contact_id != $obm_q_events->f("eventuser_contact_id")) && ($auth->auth["uid"] != $obm_q_events->f("calendarevent_usercreate")) ) {
+	    if (($user_contact_id != $obm_q_events->f("eventuser_user_id")) && ($auth->auth["uid"] != $obm_q_events->f("calendarevent_usercreate")) ) {
 	      echo $l_private."</A><br>";
 	    } else {
 	      echo $obm_q_events->f("calendarevent_title")."</A><br>";

@@ -1,10 +1,10 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : agenda_index.php                                           //
-//     - Desc  : Agenda Index File                                           //
+// OBM - File : agenda_index.php                                             //
+//     - Desc : Agenda Index File                                            //
 // created 2001-06-28 by Francois Bloque                                     //
 ///////////////////////////////////////////////////////////////////////////////
-// Last update 2001-07-26                                                    //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,10 +38,11 @@ display_bookmarks();       // Links to last visited contact,and company
 //////////////////////////////////////////////////////////////////////////////
 
 require("agenda_js.inc");
+$uid = $auth->auth["uid"];
 
 
 if ($action == "index") {
-  //////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   
   $obm_q_waiting_events=run_query_get_waiting_events(run_query_contactid_user($auth->auth["uid"]));
   if ($obm_q_waiting_events->nf()>0) {
@@ -68,13 +69,13 @@ if ($action == "index") {
     $weekstart=date("YmdHis",$weekstart);  
     $action="view_week";
     dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
     
   }
 
 
 } else if ($action == "approve") {
-  //////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   
   // accepted events id
   reset($HTTP_POST_VARS);
@@ -94,16 +95,14 @@ if ($action == "index") {
 
 
 
-
 } else if ($action == "new") {
-  //////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
  
   $p_current_date=date("YmdHis",mktime(9,0,0,date("m"),date("d"),date("Y")));
   $p_date_begin=($param_begin_date ? $param_begin_date : $p_current_date);
   $p_date_end=($param_end_date ? $param_end_date : $p_current_date);
  
-  dis_event_form($action,new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_mylists(), run_query_get_eventcategories(),'',array(run_query_contactid_user($auth->auth["uid"])),'','','','',$p_date_begin,$p_date_end,'','',"0",'','','');
+  dis_event_form($action,new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_userobm(), run_query_get_usergroups(), run_query_get_eventcategories(),'',array($uid),'','','','',$p_date_begin,$p_date_end,'','',"0",'','','');
     
         
 
@@ -143,13 +142,13 @@ if ($action == "index") {
   if (($nb_contact_chosen<=0) && ($nb_group_chosen<=0)) {
     // no contacts to assign to the event 
     echo "<FONT color=#$col_error>".$l_select_contacts."</FONT><BR>";
-    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_mylists(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
+    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_usergroups(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
   
 
   } else if ((strcmp($repeat_days,"0000000")==0) && (strcmp($sel_repeat_kind,"weekly")==0))  {
     // no day is selected     
     echo "<FONT color=#$col_error>".$l_select_repeat_day."</FONT><BR>";
-    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_mylists(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
+    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_usergroups(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
 
 
 
@@ -299,7 +298,7 @@ if ($action == "index") {
       $weekstart=date("YmdHis",$weekstart);
       $action="view_week";
       dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
   
   
     }  else {
@@ -339,7 +338,7 @@ if ($action == "index") {
     $weekstart=date("YmdHis",$weekstart);
     $action="view_week";
     dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
       
   }
 
@@ -432,7 +431,7 @@ if ($action == "index") {
     $weekstart=date("YmdHis",$weekstart);
     $action="view_week";
     dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
     
   }
   
@@ -475,7 +474,7 @@ if ($action == "index") {
     // a user can modify an event if he's concerned by the event or if he's the creator 
     if (($obm_q_event->f("calendarevent_usercreate") == $auth->auth["uid"]) || (run_query_is_attendee($param_event,run_query_contactid_user($auth->auth["uid"])))) {
       $p_current_date=date("YmdHis",mktime(9,0,0,date("m"),date("d"),date("Y")));
-      dis_event_form($action,$obm_q_event,$obm_q_contacts,$obm_q_groups,$param_event,run_query_get_mycontacts(), run_query_get_mylists(), run_query_get_eventcategories(),'','','','','','','','','','',"0",'','','');
+      dis_event_form($action,$obm_q_event,$obm_q_contacts,$obm_q_groups,$param_event,run_query_get_mycontacts(), run_query_get_usergroups(), run_query_get_eventcategories(),'','','','','','','','','','',"0",'','','');
     } else {
       // the user has not rights to modify this event 
       display_error_permission();  
@@ -629,7 +628,7 @@ if ($action == "index") {
 	$weekstart=date("YmdHis",$weekstart);
 	$action="view_week";
 	dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-	dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+	dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
       
 	
 	
@@ -679,7 +678,7 @@ if ($action == "index") {
     $weekstart=date("YmdHis",$weekstart);
     $action="view_week";
     dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+    dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
       
   }
   
@@ -828,7 +827,7 @@ if ($action == "index") {
       $weekstart=date("YmdHis",$weekstart);
       $action="view_week";
       dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
       
 
 
@@ -874,7 +873,7 @@ if ($action == "index") {
       $weekstart=date("YmdHis",$weekstart);
       $action="view_week";
       dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
       
 
 
@@ -917,7 +916,7 @@ if ($action == "index") {
       $weekstart=date("YmdHis",$weekstart);
       $action="view_week";
       dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
       
 
 
@@ -984,7 +983,7 @@ if ($action == "index") {
   $weekstart=date("YmdHis",$weekstart);
   $action="view_week";
   dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-  dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);  
+  dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
 
 
 
@@ -1035,7 +1034,7 @@ if ($action == "index") {
   $daystart=date("YmdHis",$daystart);
   
   dis_day_planning($daystart, run_query_event_list($daystart,$dayend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-  dis_planning_contacts($action,$daystart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);
+  dis_planning_contacts($action,$daystart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);
  
 
 
@@ -1083,7 +1082,7 @@ if ($action == "index") {
   $monthend=date("YmdHis",mktime(0,0,0,$p_month+1,1,$p_year));
   
   dis_month_planning($monthstart, run_query_event_list($monthstart,$monthend,$p_contact_array,$p_group_array),run_query_contactid_user($auth->auth["uid"]),$p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-  dis_planning_contacts($action,$monthstart,run_query_get_mycontacts(), run_query_get_mylists(),$p_contact_array,$p_group_array);
+  dis_planning_contacts($action,$monthstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);
 }
  
   

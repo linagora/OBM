@@ -83,13 +83,14 @@ UPDATE Contract set tmp=contract_comment;
 ALTER table Contract drop column contract_comment;
 ALTER table Contract change tmp contract_comment text;
 
--- add a link with the deal table
+-- add column reference to one deal
 ALTER table Contract add column contract_deal_id int(8) after contract_label;
+
 
 -------------------------------------------------------------------------------
 -- Incident Update
 -------------------------------------------------------------------------------
--- update column name "etat" to "state
+-- update column name "etat" to "state"
 ALTER table Incident change column incident_etat incident_state enum('OPEN','CALL','WAITCALL','PAUSED','CLOSED');
 
 -- move text columns at the row end
@@ -108,3 +109,16 @@ ALTER table Incident add column tmp int(8) after incident_usercreate;
 UPDATE Incident set tmp=incident_contract_id;
 ALTER table Incident drop column incident_contract_id;
 ALTER table Incident change tmp incident_contract_id int(8) NOT NULL;
+
+
+-------------------------------------------------------------------------------
+-- EventUser Update
+-------------------------------------------------------------------------------
+-- update column name "contact_id" to "user_id"
+ALTER table EventUser change column eventuser_contact_id eventuser_user_id int(8);
+
+-------------------------------------------------------------------------------
+-- CalendarLayer Update
+-------------------------------------------------------------------------------
+-- update column name "contact_id" to "user_id"
+ALTER table CalendarLayer change column calendarlayer_contact_id calendarlayer_user_id int(8);

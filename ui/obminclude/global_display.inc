@@ -665,7 +665,7 @@ class OBM_DISPLAY {
 	// For the contracts 
 	//------------------------------
         else if ($fieldname == "contract_label") {
-	  $url = "../contract/contract_index.php?action=detailconsult_contract&amp;param_contract=".$this->data_set->f("contract_id");
+	  $url = "../contract/contract_index.php?action=detailconsult&amp;param_contract=".$this->data_set->f("contract_id");
 	}
        	else if ($fieldname == "contract_company_name") {
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contract_company_id");

@@ -50,16 +50,19 @@ while (list ($cid, $uid) = each ($users)) {
 }
 
 // fill userobm names
-update_userobm_names();
+//update_userobm_names();
 // Update deal managers
-update_deal_managers();
+//update_deal_managers();
 // Update Parentdeal managers
-update_parentdeal_managers();
+//update_parentdeal_managers();
 // Update contract managers
-update_contract_managers();
+//update_contract_managers();
 // Update contract managers
-update_incident_managers();
-
+//update_incident_managers();
+// No need to update Time management as userobm id where already stored
+// Update Eventuser
+update_eventuser_contact();
+// No need to update CalendarLayer : empty
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - User list                                               //
@@ -182,6 +185,22 @@ function get_incident_list() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution - EventUser list                                          //
+///////////////////////////////////////////////////////////////////////////////
+function get_eventuser_list() {
+  global $cdg_sql;
+
+  $query = "select * from EventUser";
+
+  display_debug_msg($query, $cdg_sql);
+
+  $d_q = new DB_OBM;
+  $d_q->query($query);
+  return $d_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Update Deal marketing and technical managers                              //
 ///////////////////////////////////////////////////////////////////////////////
 function update_deal_managers() {
@@ -279,7 +298,7 @@ function update_incident_managers() {
 
   $d_q = get_incident_list();
   $nb = $d_q->num_rows();
-  echo "Migrating Incident looger and owner : #Incident : $nb\n";
+  echo "Migrating Incident logger and owner : #Incident : $nb\n";
 
   while($d_q->next_record()) {
     $id = $d_q->f("incident_id");
@@ -292,6 +311,34 @@ function update_incident_managers() {
 		set incident_owner='$new_owner',
 		    incident_logger='$new_logger'
 		where incident_id = '$id'";
+
+    display_debug_msg($query, $cdg_sql);
+  
+    $d2_q = new DB_OBM;
+    $d2_q->query($query);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update EventUser Contact                                                  //
+///////////////////////////////////////////////////////////////////////////////
+function update_eventuser_contact() {
+  global $cdg_sql, $users;
+
+  $d_q = get_eventuser_list();
+  $nb = $d_q->num_rows();
+  echo "Migrating EventUser Contact : #EventUser : $nb\n";
+
+  while($d_q->next_record()) {
+    $id = $d_q->f("eventuser_event_id");
+    $con = $d_q->f("eventuser_user_id");
+    $new_user = $users["$con"]; 
+
+    $query = "update EventUser
+		set eventuser_user_id='$new_user'
+		where eventuser_event_id = '$id'
+                  and eventuser_user_id = '$con'";
 
     display_debug_msg($query, $cdg_sql);
   
