@@ -841,7 +841,7 @@ function make_query($list) {
 	     left join ContactCategory1Link on contact_id = contactcategory1link_contact_id
 	     left join ContactCategory2Link on contact_id = contactcategory2link_contact_id
 	     left join Subscription on subscription_contact_id = contact_id
-	     left join Publication on publication_id = subscription_publication_id";  
+	     left join Publication on subscription_publication_id = publication_id";  
   
 /*
   if(is_array($criteria)) {

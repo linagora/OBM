@@ -81,7 +81,7 @@ ALTER TABLE Contact RENAME COLUMN temp_contact_address3 TO contact_address3;
 -------------------------------------------------------------------------------
 -- Change column : publication_lang varchar(20)
 
-DROP table IF EXISTS Publication;
+DROP table Publication;
 
 CREATE TABLE Publication (
   publication_id             serial,
@@ -102,7 +102,7 @@ CREATE TABLE Publication (
 -------------------------------------------------------------------------------
 -- Change column : subscription_renewal int(1)
 
-DROP table IF EXISTS Subscription;
+DROP table Subscription;
 
 CREATE TABLE Subscription (
   subscription_publication_id 	integer NOT NULL,
