@@ -151,3 +151,68 @@ VALUES (0,'project_new','project_initlabel',1,2),
 --       (0,'time_ttuser','total_before',3,1),
 --       (0,'time_ttuser','total_after',4,1)
 ;
+
+
+-------------------------------------------------------------------------------
+-- Group module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'UGroup' (cause Group is a reserved keyword)
+--
+CREATE TABLE UGroup (
+   group_id int(8) NOT NULL auto_increment,
+   group_timeupdate timestamp(14),
+   group_timecreate timestamp(14),
+   group_userupdate int(8),
+   group_usercreate int(8),
+   group_name varchar(32) NOT NULL,
+   group_desc varchar(128),
+   group_email varchar(128),
+   PRIMARY KEY (group_id),
+   UNIQUE group_name (group_name)
+);
+
+
+--
+-- Table structure for table 'UserObmGroup'
+--
+CREATE TABLE UserObmGroup (
+   userobmgroup_groupid int(8) DEFAULT '0' NOT NULL,
+   userobmgroup_userobmid int(8) DEFAULT '0' NOT NULL
+);
+
+
+--
+-- Table structure for table 'GroupGroup'
+--
+CREATE TABLE GroupGroup (
+   groupgroup_parentid int(8) DEFAULT '0' NOT NULL,
+   groupgroup_childid int(8) DEFAULT '0' NOT NULL
+);
+
+
+-- module 'group'
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'group_name', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'group_desc', 2, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'group_email', 3, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'group_nb_user', 4, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'usercreate', 5, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'timecreate', 6, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'userupdate', 7, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group', 'timeupdate', 8, 1);
+
+-- module 'group_user'
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_user', 'group_user_lastname', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_user', 'group_user_firstname', 2, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_user', 'group_user_phone', 3, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_user', 'group_user_email', 4, 1);
+
+-- module 'group_group'
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_group', 'group_name', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_group', 'group_desc', 2, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_group', 'group_email', 3, 1);
+
+

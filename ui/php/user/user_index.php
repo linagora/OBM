@@ -38,7 +38,7 @@ require("user_display.inc");
 require("user_query.inc");
 
 //There is no page_close(). yes, at the end
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
 $perm->check();
@@ -63,7 +63,7 @@ if ($action == "ext_get_ids") {
   }
 }
 
-if ($action == "index" || $action == "") {
+elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_user_search_form($obm_user);
   if ($set_display == "yes") {
@@ -240,6 +240,7 @@ function get_param_user() {
   return $obm_user;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // User Action 
 ///////////////////////////////////////////////////////////////////////////////
@@ -343,4 +344,4 @@ function get_user_action() {
 
 }
 
-</SCRIPT>
+</script>

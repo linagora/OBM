@@ -205,7 +205,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
     </p>
     </form>
     <p align=\"right\">
-    <a href=\"\" onclick='window.close();'>$l_close</a>";
+    <a href=\"\" onclick='window.close();'>$l_close</a></p>";
   }
 
   return $block;

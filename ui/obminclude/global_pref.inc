@@ -119,9 +119,9 @@ $c_export_format[3]["template"] = true;
 $c_export_format[3]["url"] = "addresses.php?fmt=xls&amp;form=table";
 $c_export_format[3]["icon"] = $ico_excel;
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Menu item defintion : Sections
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 $menus["COM"]    = array('Name' => $l_header_com,
                          'Url'  => "$path/company/company_index.php",
                          'Right'=> $com_read);
@@ -138,9 +138,9 @@ $menus["ADMINS"] = array('Name' => $l_header_admins,
                          'Url'  => "$path/admin/admin_index.php?mode=html",
                          'Right'=> $admins_read);
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Menu item defintion : Modules
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 if ($section == "COM") {
 
   $menus["COM"]["COMPANY"] = array('Name'=> $l_header_company,
@@ -230,5 +230,9 @@ if ($section == "COM") {
                                       'Ico' => "$ico_user",
 			              'Url' => "$path/user/user_index.php",
 			              'Right'=> $user_read);
+  $menus["USERS"]["GROUP"]    = array('Name'=> $l_header_group,
+                                      'Ico' => "$ico_group",
+			              'Url' => "$path/group/group_index.php",
+			              'Right'=> $group_read);
 
 }

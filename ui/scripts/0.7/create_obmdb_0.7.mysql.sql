@@ -307,41 +307,6 @@ CREATE TABLE DealType (
   PRIMARY KEY (dealtype_id)
 );
 
--------------------------------------------------------------------------------
--- Project module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'ProjectStat'
---
-CREATE TABLE ProjectStat (
-  projectstat_deal_id int(8) NOT NULL,
-  projectstat_date timestamp(14) NOT NULL,
-  projectstat_timeupdate timestamp(14) NOT NULL,
-  projectstat_timecreate timestamp(14) NOT NULL,
-  projectstat_userupdate int(8) default NULL,
-  projectstat_usercreate int(8) default NULL,
-  projectstat_useddays int(8) default NULL,
-  projectstat_remainingdays int(8) default NULL,
-  PRIMARY KEY (projectstat_deal_id, projectstat_date)
-);
-
---
--- Table structure for table 'ProjectUser'
---
-CREATE TABLE ProjectUser (
-  projectuser_deal_id int(8) NOT NULL,
-  projectuser_userobm_id int(8) NOT NULL,
-  projectuser_timeupdate timestamp(14) NOT NULL,
-  projectuser_timecreate timestamp(14) NOT NULL,
-  projectuser_userupdate int(8) default NULL,
-  projectuser_usercreate int(8) default NULL,
-  projectuser_projectedtime int(8) default NULL,
-  projectuser_missingtime int(8) default NULL,
-  projectuser_validity timestamp(14) default NULL,
-  projectuser_soldprice int(8) default NULL,
-  projectuser_manager int(1) default NULL,
-  PRIMARY KEY (projectuser_deal_id, projectuser_userobm_id)
-);
 
 -------------------------------------------------------------------------------
 -- List module tables
@@ -370,7 +335,6 @@ CREATE TABLE ContactList (
    ContactList_listid int(8) DEFAULT '0' NOT NULL,
    ContactList_contactid int(8) DEFAULT '0' NOT NULL
 );
-
 
 
 -------------------------------------------------------------------------------
@@ -448,6 +412,180 @@ CREATE TABLE RepeatKind (
   PRIMARY KEY(repeatkind_id)	
 );
 
+
+-------------------------------------------------------------------------------
+-- Timemanagement tables
+-------------------------------------------------------------------------------
+--
+-- Task table
+--
+CREATE TABLE Task (
+  task_id int(8) NOT NULL auto_increment,
+  task_timeupdate timestamp(14) NOT NULL,
+  task_timecreate timestamp(14) NOT NULL,
+  task_userupdate int(8) default NULL,
+  task_usercreate int(8) default NULL,
+  task_user_id int(8) default NULL,
+  task_date timestamp(14) NOT NULL,
+  task_deal_id int(8) default NULL,
+  task_length int(2) default NULL,
+  task_tasktype_id int(8) default NULL,
+  task_label varchar(255) default NULL,
+  task_status int(1) default NULL,
+  PRIMARY KEY  (task_id)
+) TYPE=MyISAM;
+
+
+--
+-- TaskType table
+--
+CREATE TABLE TaskType (
+  tasktype_id int(8) NOT NULL auto_increment,
+  tasktype_timeupdate timestamp(14) NOT NULL,
+  tasktype_timecreate timestamp(14) NOT NULL,
+  tasktype_userupdate int(8) default NULL,
+  tasktype_usercreate int(8) default NULL,
+  tasktype_internal int(1) NOT NULL,
+  tasktype_label varchar(32) default NULL,
+  PRIMARY KEY  (tasktype_id)
+) TYPE=MyISAM;
+
+
+-------------------------------------------------------------------------------
+-- Project module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'ProjectStat'
+--
+CREATE TABLE ProjectStat (
+  projectstat_deal_id int(8) NOT NULL,
+  projectstat_date timestamp(14) NOT NULL,
+  projectstat_timeupdate timestamp(14) NOT NULL,
+  projectstat_timecreate timestamp(14) NOT NULL,
+  projectstat_userupdate int(8) default NULL,
+  projectstat_usercreate int(8) default NULL,
+  projectstat_useddays int(8) default NULL,
+  projectstat_remainingdays int(8) default NULL,
+  PRIMARY KEY (projectstat_deal_id, projectstat_date)
+);
+
+--
+-- Table structure for table 'ProjectUser'
+--
+CREATE TABLE ProjectUser (
+  projectuser_deal_id int(8) NOT NULL,
+  projectuser_userobm_id int(8) NOT NULL,
+  projectuser_timeupdate timestamp(14) NOT NULL,
+  projectuser_timecreate timestamp(14) NOT NULL,
+  projectuser_userupdate int(8) default NULL,
+  projectuser_usercreate int(8) default NULL,
+  projectuser_projectedtime int(8) default NULL,
+  projectuser_missingtime int(8) default NULL,
+  projectuser_validity timestamp(14) default NULL,
+  projectuser_soldprice int(8) default NULL,
+  projectuser_manager int(1) default NULL,
+  PRIMARY KEY (projectuser_deal_id, projectuser_userobm_id)
+);
+
+
+-------------------------------------------------------------------------------
+-- Support tables
+-------------------------------------------------------------------------------
+--
+-- New table 'Contract'
+--
+CREATE TABLE Contract (
+  contract_id int(8) NOT NULL auto_increment,
+  contract_timeupdate timestamp(14) NOT NULL,
+  contract_timecreate timestamp(14) NOT NULL,
+  contract_userupdate int(8) default NULL,
+  contract_usercreate int(8) default NULL,
+  contract_label varchar(40) default NULL,
+  contract_deal_id int(8) default NULL,
+  contract_company_id int(8) default NULL,
+  contract_number varchar(20) default NULL,
+  contract_datebegin date default NULL,
+  contract_dateexp date default NULL,
+  contract_type_id int(8) default NULL,
+  contract_contact1_id int(8) default NULL,
+  contract_contact2_id int(8) default NULL,
+  contract_techmanager_id int(8) default NULL,
+  contract_marketmanager_id int(8) default NULL,
+  contract_clause text,
+  contract_comment text,
+  PRIMARY KEY  (contract_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'ContractType'
+--
+
+CREATE TABLE ContractType (
+  contracttype_id int(8) NOT NULL auto_increment,
+  contracttype_timeupdate timestamp(14) NOT NULL,
+  contracttype_timecreate timestamp(14) NOT NULL,
+  contracttype_userupdate int(8) default NULL,
+  contracttype_usercreate int(8) default NULL,
+  contracttype_label varchar(40) default NULL,
+  PRIMARY KEY  (contracttype_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'Incident'
+--
+CREATE TABLE Incident (
+  incident_id int(8) NOT NULL auto_increment,
+  incident_timeupdate timestamp(14) NOT NULL,
+  incident_timecreate timestamp(14) NOT NULL,
+  incident_userupdate int(8) default NULL,
+  incident_usercreate int(8) default NULL,
+  incident_contract_id int(8) NOT NULL,
+  incident_label varchar(100) default NULL,
+  incident_date date default NULL,
+  incident_priority_id int(8) default NULL,
+  incident_status_id int(8) default NULL,
+  incident_logger int(8) default NULL,
+  incident_owner int(8) default NULL,
+  incident_duration char(4) default '0',
+  incident_archive char(1) NOT NULL default '0',
+  incident_description text,
+  incident_resolution text,
+  PRIMARY KEY  (incident_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'IncidentPriority'
+--
+CREATE TABLE IncidentPriority (
+  incidentpriority_id int(8) NOT NULL auto_increment,
+  incidentpriority_timeupdate timestamp(14) NOT NULL,
+  incidentpriority_timecreate timestamp(14) NOT NULL,
+  incidentpriority_userupdate int(8) default NULL,
+  incidentpriority_usercreate int(8) default NULL,
+  incidentpriority_order int(2),
+  incidentpriority_color char(6),
+  incidentpriority_label varchar(32) default NULL,
+  PRIMARY KEY (incidentpriority_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'IncidentStatus'
+--
+CREATE TABLE IncidentStatus (
+  incidentstatus_id int(8) NOT NULL auto_increment,
+  incidentstatus_timeupdate timestamp(14) NOT NULL,
+  incidentstatus_timecreate timestamp(14) NOT NULL,
+  incidentstatus_userupdate int(8) default NULL,
+  incidentstatus_usercreate int(8) default NULL,
+  incidentstatus_order int(2),
+  incidentstatus_label varchar(32) default NULL,
+  PRIMARY KEY (incidentstatus_id)
+) TYPE=MyISAM;
+    
 
 -------------------------------------------------------------------------------
 -- Accounting Section tables
@@ -613,137 +751,38 @@ CREATE TABLE  PaymentTemp (
 
 
 -------------------------------------------------------------------------------
--- Support tables
+-- Group module tables
 -------------------------------------------------------------------------------
 --
--- New table 'Contract'
+-- Table structure for table 'UGroup' (cause Group is a reserved keyword)
 --
-CREATE TABLE Contract (
-  contract_id int(8) NOT NULL auto_increment,
-  contract_timeupdate timestamp(14) NOT NULL,
-  contract_timecreate timestamp(14) NOT NULL,
-  contract_userupdate int(8) default NULL,
-  contract_usercreate int(8) default NULL,
-  contract_label varchar(40) default NULL,
-  contract_deal_id int(8) default NULL,
-  contract_company_id int(8) default NULL,
-  contract_number varchar(20) default NULL,
-  contract_datebegin date default NULL,
-  contract_dateexp date default NULL,
-  contract_type_id int(8) default NULL,
-  contract_contact1_id int(8) default NULL,
-  contract_contact2_id int(8) default NULL,
-  contract_techmanager_id int(8) default NULL,
-  contract_marketmanager_id int(8) default NULL,
-  contract_clause text,
-  contract_comment text,
-  PRIMARY KEY  (contract_id)
-) TYPE=MyISAM;
+CREATE TABLE UGroup (
+   group_id int(8) NOT NULL auto_increment,
+   group_timeupdate timestamp(14),
+   group_timecreate timestamp(14),
+   group_userupdate int(8),
+   group_usercreate int(8),
+   group_name varchar(32) NOT NULL,
+   group_desc varchar(128),
+   group_email varchar(128),
+   PRIMARY KEY (group_id),
+   UNIQUE group_name (group_name)
+);
 
 
 --
--- New table 'ContractType'
+-- Table structure for table 'UserObmGroup'
 --
-
-CREATE TABLE ContractType (
-  contracttype_id int(8) NOT NULL auto_increment,
-  contracttype_timeupdate timestamp(14) NOT NULL,
-  contracttype_timecreate timestamp(14) NOT NULL,
-  contracttype_userupdate int(8) default NULL,
-  contracttype_usercreate int(8) default NULL,
-  contracttype_label varchar(40) default NULL,
-  PRIMARY KEY  (contracttype_id)
-) TYPE=MyISAM;
+CREATE TABLE UserObmGroup (
+   userobmgroup_groupid int(8) DEFAULT '0' NOT NULL,
+   userobmgroup_userobmid int(8) DEFAULT '0' NOT NULL
+);
 
 
 --
--- New table 'Incident'
+-- Table structure for table 'GroupGroup'
 --
-CREATE TABLE Incident (
-  incident_id int(8) NOT NULL auto_increment,
-  incident_timeupdate timestamp(14) NOT NULL,
-  incident_timecreate timestamp(14) NOT NULL,
-  incident_userupdate int(8) default NULL,
-  incident_usercreate int(8) default NULL,
-  incident_contract_id int(8) NOT NULL,
-  incident_label varchar(100) default NULL,
-  incident_date date default NULL,
-  incident_priority_id int(8) default NULL,
-  incident_status_id int(8) default NULL,
-  incident_logger int(8) default NULL,
-  incident_owner int(8) default NULL,
-  incident_duration char(4) default '0',
-  incident_archive char(1) NOT NULL default '0',
-  incident_description text,
-  incident_resolution text,
-  PRIMARY KEY  (incident_id)
-) TYPE=MyISAM;
-
-
---
--- New table 'IncidentPriority'
---
-CREATE TABLE IncidentPriority (
-  incidentpriority_id int(8) NOT NULL auto_increment,
-  incidentpriority_timeupdate timestamp(14) NOT NULL,
-  incidentpriority_timecreate timestamp(14) NOT NULL,
-  incidentpriority_userupdate int(8) default NULL,
-  incidentpriority_usercreate int(8) default NULL,
-  incidentpriority_order int(2),
-  incidentpriority_color char(6),
-  incidentpriority_label varchar(32) default NULL,
-  PRIMARY KEY (incidentpriority_id)
-) TYPE=MyISAM;
-
-
---
--- New table 'IncidentStatus'
---
-CREATE TABLE IncidentStatus (
-  incidentstatus_id int(8) NOT NULL auto_increment,
-  incidentstatus_timeupdate timestamp(14) NOT NULL,
-  incidentstatus_timecreate timestamp(14) NOT NULL,
-  incidentstatus_userupdate int(8) default NULL,
-  incidentstatus_usercreate int(8) default NULL,
-  incidentstatus_order int(2),
-  incidentstatus_label varchar(32) default NULL,
-  PRIMARY KEY (incidentstatus_id)
-) TYPE=MyISAM;
-    
-
--------------------------------------------------------------------------------
--- Timemanagement tables
--------------------------------------------------------------------------------
---
--- Task table
---
-CREATE TABLE Task (
-  task_id int(8) NOT NULL auto_increment,
-  task_timeupdate timestamp(14) NOT NULL,
-  task_timecreate timestamp(14) NOT NULL,
-  task_userupdate int(8) default NULL,
-  task_usercreate int(8) default NULL,
-  task_user_id int(8) default NULL,
-  task_date timestamp(14) NOT NULL,
-  task_deal_id int(8) default NULL,
-  task_length int(2) default NULL,
-  task_tasktype_id int(8) default NULL,
-  task_label varchar(255) default NULL,
-  task_status int(1) default NULL,
-  PRIMARY KEY  (task_id)
-) TYPE=MyISAM;
-
-
---
--- TaskType table
---
-CREATE TABLE TaskType (
-  tasktype_id int(8) NOT NULL auto_increment,
-  tasktype_timeupdate timestamp(14) NOT NULL,
-  tasktype_timecreate timestamp(14) NOT NULL,
-  tasktype_userupdate int(8) default NULL,
-  tasktype_usercreate int(8) default NULL,
-  tasktype_internal int(1) NOT NULL,
-  tasktype_label varchar(32) default NULL,
-  PRIMARY KEY  (tasktype_id)
-) TYPE=MyISAM;
+CREATE TABLE GroupGroup (
+   groupgroup_parentid int(8) DEFAULT '0' NOT NULL,
+   groupgroup_childid int(8) DEFAULT '0' NOT NULL
+);

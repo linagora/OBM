@@ -230,13 +230,19 @@ $users_write 		= 8192;
 $users_admin_read	= 16384;
 $users_admin_write	= 32768;
 			////////////
-			//USER    //
+			// USER   //
 			////////////
-$user_read		= $users_admin_read;
-$user_write	 	= $users_admin_read + $users_admin_write;
+$user_read		= $users_read;
+$user_write	 	= $users_read + $users_write;
 $user_admin_read 	= $users_admin_read;
 $user_admin_write	= $users_admin_read + $users_admin_write;
-
+			////////////
+			// GROUP  //
+			////////////
+$group_read		= $users_read;
+$group_write	 	= $users_read + $users_write;
+$group_admin_read 	= $users_admin_read;
+$group_admin_write	= $users_admin_read + $users_admin_write;
 			////////////
 			//SETTINGS//
 			////////////

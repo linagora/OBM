@@ -42,15 +42,18 @@ $ico_company        = "ico_company.gif";         // Company Icon
 $ico_change_company = "ico_change_company.gif";  // Contract Icon
 $ico_list           = "ico_list.gif";            // List Icon
 $ico_agenda         = "ico_agenda.gif";          // Agenda Icon
+
+$ico_time           = "ico_time.gif";
+$ico_project        = "ico_project.gif";
 $ico_contract       = "ico_phone.gif";
 $ico_incident       = "ico_incident.gif";
+
 $ico_account        = "ico_account.gif";
 $ico_invoice        = "ico_invoice.gif";
 $ico_payment        = "ico_payment.gif";
 
-$ico_time           = "ico_time.gif";
-$ico_project        = "ico_project.gif";
 $ico_user           = "ico_user.gif";
+$ico_group          = "ico_group.gif";
 $ico_setting        = "ico_setting.gif";
 
 $ico_admin          = "ico_admin.gif";
