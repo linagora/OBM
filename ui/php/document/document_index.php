@@ -346,8 +346,8 @@ if (! $document["popup"]) {
   $display["header"] = generate_menu($menu, $section);
 }
 $display["end"] = display_end();
-display_page($display);
 
+display_page($display);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Company parameters transmited in $document hash

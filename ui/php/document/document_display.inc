@@ -1255,8 +1255,7 @@ function dis_document_display_pref($display_pref_q) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_documents_tree($document,$display_file) {
-  global $document_path,$l_close;
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $l_close;
   $popup = $document["popup"];
   $obm_d = run_query_get_tree($display_file);
   if($popup) {
@@ -1272,7 +1271,158 @@ function html_documents_tree($document,$display_file) {
   if($popup) {
     $fill = " onclick=\"fill_ext_form('$realpath');return false;\"";
   }
-  
+  if($display_file == "true") {
+    while($obm_d->next_record()) {
+      $id = $obm_d->f("document_id");
+      $kind = $obm_d->f("document_kind");
+      $doc_info = array("name" =>$obm_d->f("document_name"),
+                      "title" =>$obm_d->f("document_title"),
+		      "author" => $obm_d->f("document_author"));
+      $tree[$obm_d->f("document_path")][$kind][$id] = $doc_info;
+    }
+  }
+  else {
+    while($obm_d->next_record()) {
+      $id = $obm_d->f("document_id");
+      $kind = $obm_d->f("document_kind");
+      if($kind == 0) {
+       	$doc_info = array("name" =>$obm_d->f("document_name"),
+                      "title" =>$obm_d->f("document_title"),
+		      "author" => $obm_d->f("document_author"));
+        $tree[$obm_d->f("document_path")][$id] = $doc_info;
+      }
+    }
+  }
+  if($display_file == "true") {
+    $block = @display_tree($tree,'/','/',0);
+  }
+  else {
+    $block = @display_popup_tree($tree,'/','/',0);
+  }
+
+  return $block;
+} 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function display_tree($tree,$current_directory,$name,$indent) {
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $popup;
+  $directories = $tree[$current_directory][0];
+  $files = $tree[$current_directory][1];
+  $indent_file = $indent + 15;
+  foreach($directories as $id => $info) {
+    $content.= display_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file);
+    $bool = true;
+  }
+  foreach($files as $id => $info) {
+    $realpath = $current_directory.$info["name"];
+    $bool = true;
+    $content.= 
+    "<table class=\"document\">
+       <tr>
+	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">
+	 <a  href=\"document_index.php?action=detailconsult&amp;param_document=$id\" >
+	  <img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
+	 </a>
+	 <a class=\"documentFile\" 
+	  href=\"document_index.php?action=accessfile&amp;tf_path=$current_directory&amp;fi_file_name=".$info["name"]."&amp;popup=1\" 
+	  target=\"_blank\" >
+	  ".$info["name"]."
+	 </a>
+	</td>
+	<td class=\"documentInfo\">&nbsp;".$info["title"]."</td>
+	<td class=\"documentInfo\">&nbsp;".$info["author"]."</td>
+       </tr>
+      </table>";
+  }
+  if($bool) {
+    $block= 
+    "<table class=\"document\">
+       <tr>
+	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 <a href=\"\" onclick=\"show_hide_repo('$current_directory');return false;\"> 
+	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
+	 </a>
+	 ".$name."
+	</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+       </tr>
+      </table>
+      <div id='$current_directory' style=\"display:none;\" >
+       $content
+      </div>";
+
+  }
+  else {
+    $block= 
+    "<table class=\"document\">
+       <tr>
+	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory\" alt=\"[File]\"/>
+	 ".$name."
+	</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+       </tr>
+      </table>";
+  }
+  return $block;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+
+function display_popup_tree($tree,$current_directory,$name,$indent) {
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $popup;
+  $indent_file = $indent + 15;
+  $directories = $tree[$current_directory];
+  foreach($directories as $id => $info) {
+    $content.= display_popup_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file);
+    $bool = true;
+  }
+  if($bool == true) {
+    $block= 
+    "<table class=\"document\">
+       <tr>
+	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 <a href=\"\" onclick=\"show_hide_repo('$current_directory');return false;\" 
+	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	 </a>
+	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('$current_directory');return false;\">
+	  $name
+	 </a>	 
+	</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+       </tr>
+      </table>
+      <div id='$current_directory' style=\"display:none;\" >
+       $content
+      </div>";
+  }
+  else {
+    $block= 
+    "<table class=\"document\">
+       <tr>
+	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('$current_directory');return false;\">
+	  $name
+	 </a>
+	</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+	<td class=\"documentInfo\">&nbsp;</td>
+       </tr>
+      </table>";
+  }
+  return $block;
+}
+/*  
   while($obm_d->next_record()) {
     $path = $obm_d->f("document_path");
     $begin_group ="";
@@ -1387,7 +1537,7 @@ function html_documents_tree($document,$display_file) {
   return $block;
   
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////////
 // Consult File
 /////////////////////////////////////////////////////////////////////////////

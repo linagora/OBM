@@ -103,8 +103,6 @@ function html_data_index($actions, $modules) {
 ";
 
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display data inconsistency for the modules selected
 // Parameters:
@@ -122,6 +120,8 @@ function dis_data($action, $mode, $module) {
     dis_data_company($action, $mode);
   } else if ($module == "deal") {
     dis_data_deal($action, $mode);
+  } else if ($module == "document") {
+    dis_data_document($action, $mode);
   } else {
     echo "No data inconsistency to check here... bye.";
   }
@@ -375,6 +375,279 @@ function dis_data_deal($action, $mode) {
     echo "<tr>
         <td class=\"adminLabel\" colspan=\"8\">
           Deal : $nb_deal to parse, $cpt_du inconsistencies</td>
+      </tr>
+      </table>";
+  }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display (/and update) data inconsistency for the Document module
+// Parametres:
+//   - $action : data_show || data_update (proceed the update)
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_document($action, $mode) {
+  global $debug, $c_all, $php_regexp_number,$document_path;
+
+  // Get the deal list
+  $d_q = get_document_list();
+  $f_q = get_file_list("$document_path/");
+  $cpt_du = 0;
+  $nb_document = $d_q->num_rows();
+  $db = new DB_OBM;
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Document : $nb_document to parse in database and
+at least as much in the file system.
+------------------------------------------------------------------------------
+";
+  } else {
+    if ($action == "data_update") {
+      $update = "<td class=\"adminHead\">Update</td>";
+    } else {
+      $update = "";
+    }
+    echo "
+      <table class=\"admin\">
+       <tr>
+	<td class=\"adminHead\">Document($nb_document)</td>
+        <td class=\"adminHead\">Document Path</td>
+        <td class=\"adminHead\">Document Name</td>
+        <td class=\"adminHead\">Document Kind</td>
+	<td class=\"adminHead\">Missing <br> in Database</td>
+        <td class=\"adminHead\">Missing <br> in File System</td>
+        $update
+      </tr>";
+  }
+  if($mode == "html") {
+    $bool_bd = $d_q->next_record();
+    $bool_fs = true;
+    while ($bool_bd || $bool_fs) {
+      $fs_err ="";
+      $bd_err = "";
+      $cur_f = current($f_q);
+      $file_name = $cur_f[1];
+      $file_path = $cur_f[0];
+      $kind = $d_q->f("document_kind");
+      $id = $d_q->f("document_id");
+      $fpath = $d_q->f("document_path");
+      $name = $d_q->f("document_name");
+      if($kind == 0) {
+	$type = "Repository";
+      }
+      elseif($kind == 1) {
+	$type = "File";
+      }
+      elseif($kind == 2) {
+	$type = "Link";
+      }
+
+      if($fpath != $file_path || $file_name != $name) {
+	if(($f_q[$fpath.$name][0] == "" || !$bool_fs) && $bool_bd) {
+	  $cpt_du ++;
+	  $fs_err = "X";
+	  $bool_bd = $d_q->next_record();
+	  $url = "<a href=\"$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$id\">$id</a>";
+	  if($action == "data_update") {
+	    $update = "<td class=\"adminText\">Manual</td>";
+	  }
+	}
+	else {
+	  $cpt_du ++;
+	  $bd_err = "X";
+	  $bool_fs = next($f_q);
+	  $name = $file_name;
+	  $fpath = $file_path;
+	  if(is_dir($document_path.$file_path.$file_name)) { 
+	    $type = "Repository";
+	    $kind = 0;
+	    $author = "";
+	    $bd_name = "";
+	  }
+	  else {
+	    $type = "File";
+	    $kind = 1;
+	    $author = "System";
+	    $bd_name = $file_name;
+	  }
+	  $url ="";
+	  if($action == "data_update") {
+	    $query = "insert into Document (
+	      document_timeupdate,
+	      document_timecreate,
+	      document_userupdate,
+	      document_usercreate,
+	      document_title,
+	      document_author,
+	      document_name,
+	      document_path,
+	      document_kind,
+	      document_size,
+	      document_category1,
+	      document_category2,
+	      document_mimetype,
+	      document_private
+	    )
+	    values (
+	      null,
+	      '" . date("Y-m-d H:i:s") . "',
+	      null,
+	      '0',
+	      '$bd_name',
+	      '$author',
+	      '$file_name',
+	      '$file_path',
+	      '$kind',
+	      '',
+	      '',
+	      '',
+	      '',
+	      '0'
+	    )";
+	    
+	    if($db->query($query)) {
+	      $update = "<td class=\"adminText\">Updated</td>";
+	    }
+	    else {
+	      $update = "<td class=\"adminText\">Error</td>";
+	    }
+	  }
+	}
+	
+	echo "<tr>
+	 <td class=\"adminText\">$url</td>
+	 <td class=\"adminText\" style=\"text-align:left;\" >$fpath</td>
+	 <td class=\"adminText\">$name</td>
+	 <td class=\"adminText\">$type</td>
+	 <td class=\"adminText\">$bd_err</td>
+	 <td class=\"adminText\">$fs_err</td>
+	 $update
+	 </tr>";
+      }
+      else {
+	$bool_fs = next($f_q);
+	$bool_bd = $d_q->next_record();
+      }
+    } 
+  }
+  if($mode == "txt") {
+    $bool_bd = $d_q->next_record();
+    $bool_fs = true;
+    while ($bool_bd || $bool_fs) {
+     $fs_err ="";
+      $bd_err = "";
+      $cur_f = current($f_q);
+      $file_name = $cur_f[1];
+      $file_path = $cur_f[0];
+      $kind = $d_q->f("document_kind");
+      $id = $d_q->f("document_id");
+      $fpath = $d_q->f("document_path");
+      $name = $d_q->f("document_name");
+      if($kind == 0) {
+	$type = "Repository";
+      }
+      elseif($kind == 1) {
+	$type = "File";
+      }
+      elseif($kind == 2) {
+	$type = "Link";
+      }
+
+      if($fpath != $file_path || $file_name != $name) {
+	if(($f_q[$fpath.$name][0] == "" || !$bool_fs) && $bool_bd) {
+	  $cpt_du ++;
+	  $err = "FS inconsistencie";
+	  $bool_bd = $d_q->next_record();
+	  $url = "(id=$id)";
+	  if($action == "data_update") {
+	    $update = "Have to update manually";
+	  }
+	}
+	else {
+	  $cpt_du ++;
+	  $err = "DB inconsistencie";
+	  $bool_fs = next($f_q);
+	  $name = $file_name;
+	  $fpath = $file_path ;
+	  if(is_dir($document_path.$file_path.$file_name)) { 
+	    $type = "Repository";
+	    $kind = 0;
+	    $author = "";
+	    $bd_name = "";
+	  }
+	  else {
+	    $type = "File";
+	    $kind = 1;
+	    $author = "System";
+	    $bd_name = $file_name;
+	  }
+	  $url ="";
+	  if($action == "data_update") {
+	    $query = "insert into Document (
+	      document_timeupdate,
+	      document_timecreate,
+	      document_userupdate,
+	      document_usercreate,
+	      document_title,
+	      document_author,
+	      document_name,
+	      document_path,
+	      document_kind,
+	      document_size,
+	      document_category1,
+	      document_category2,
+	      document_mimetype,
+	      document_private
+	    )
+	    values (
+	      null,
+	      '" . date("Y-m-d H:i:s") . "',
+	      null,
+	      '0',
+	      '$bd_name',
+	      '$author',
+	      '$file_name',
+	      '$file_path',
+	      '$kind',
+	      '',
+	      '',
+	      '',
+	      '',
+	      '0'
+	    )";
+	    
+	    if($db->query($query)) {
+	      $update = "Updated";
+	    }
+	    else {
+	      $update = "Error during the update";
+	    }
+	  }
+
+	}
+	echo "\Document (id=$id) : File : $fpath  $name Kind : $type Status : $err  $update\n";
+
+      }
+      else {
+	$bool_fs = next($f_q);
+	$bool_bd = $d_q->next_record();
+      }
+    } 
+  }
+  if ($mode == "txt") {
+
+    echo "
+------------------------------------------------------------------------------
+*** Document : $nb_document to parse, $cpt_du inconsistencies
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<tr>
+        <td class=\"adminLabel\" colspan=\"8\">
+          Document : $nb_document to parse, $cpt_du inconsistencies</td>
       </tr>
       </table>";
   }

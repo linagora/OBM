@@ -27,8 +27,14 @@ require("admin_data_display.inc");
 require("admin_data_query.inc");
 
 $debug=0;
+$db = new DB_OBM;
+$query = "select globalpref_value from GlobalPref where
+          globalpref_option ='document_path'";
+$db->query($query);
+$db->next_record();
 
-$modules = array ('company', 'deal');
+$document_path = $db->f("globalpref_value");	
+$modules = array ('company', 'deal','document');
 //$modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update');
 

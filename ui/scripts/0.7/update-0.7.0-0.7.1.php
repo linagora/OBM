@@ -129,7 +129,6 @@ function dis_repository_rec($repository) {
 	  )";
 	  $db->query($query);
 	}
-	echo "Repository Stored : $path\n";
 	dis_repository_rec($path);
       }
       else {

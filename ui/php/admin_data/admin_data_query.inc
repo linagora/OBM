@@ -93,3 +93,55 @@ function update_one_deal($id, $hitrate) {
   $retour = $u_q->query($query);
   return $retour;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - document list                                            //
+///////////////////////////////////////////////////////////////////////////////
+function get_document_list() {
+  global $cdg_sql;
+
+  $query = "select document_id,
+      document_path,
+      document_name,
+      document_kind
+      from Document order by
+      BINARY CONCAT(document_path,
+	     document_name
+  )";
+
+  display_debug_msg($query, $cdg_sql);
+
+  $c_q = new DB_OBM;
+  $c_q->query($query);
+  return $c_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - document list                                            //
+///////////////////////////////////////////////////////////////////////////////
+function get_file_list($repository) {
+  global $document_path;
+  $root_handler = opendir($repository);
+  $relative_path = substr($repository,strlen($document_path));
+  while($file = readdir($root_handler)) {
+    $path = "$repository$file";
+    if($file != ".." && $file != ".") {
+      $ret[$path] =$file;
+    }
+  }
+  closedir($root_handler);
+  if($ret) {
+    ksort($ret);
+    foreach($ret as $path=>$file) {
+      $tree[$relative_path.$file] = array($relative_path,$file);;
+      if(is_dir($path)) {
+	  $result =  get_file_list("$path/");
+	if($result) {
+	  $tree = array_merge($tree,$result);
+	}
+      }
+    }
+    return $tree;
+  }
+}
+
