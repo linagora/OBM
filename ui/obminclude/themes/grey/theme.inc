@@ -31,6 +31,7 @@ $ico_contact        = "contact.gif";            // Contact Icon
 $ico_obm            = "obm.jpg";                    // OBM icon
 $ico_validate	    = "oui2.gif";
 $ico_cancel	    = "non2.gif";
+$ico_add 	    = "ico_select04.gif";
 
 // Menus Icons
 $ico_contact        = "ico_contact.gif";         // Contact Icon

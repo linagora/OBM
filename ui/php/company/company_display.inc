@@ -471,7 +471,7 @@ function html_company_consult($co_q, $cat_q) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $cat_q, $compcat,$ctry_q, $company) {
-  global $display, $auth, $set_dsrc, $l_none;
+  global $display, $auth, $set_dsrc, $l_none,$ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
@@ -694,7 +694,8 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
 	  $sel_cat 
 	</td><td>
 	  <a href=\"javascript: return false;\" style=\"float:right;\"
-	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> AA+</a>
+	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	   <img src=\"/images/$set_theme/$ico_add\" /></a>
 	</td></tr>
        </table>
       </td>
