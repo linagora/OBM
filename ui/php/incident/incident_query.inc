@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : incident_query.inc                                           //
 //     - Desc : Incident query File                                          //
@@ -30,6 +30,10 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $datebefore = $incident["date_before"];
   $archive = $incident["archive"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $req = "select
       Incident.incident_id as Id,
       incident_id,
@@ -60,7 +64,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       AND Incident.incident_status_id = IncidentStatus.incidentstatus_id";
 
   if ($lincident != "") {
-     $req .= " and Incident.incident_label like '$lincident%'";
+     $req .= " and Incident.incident_label $like '$lincident%'";
   }
   if (($priority != $c_all) && ($priority != "")) { 
      $req .= " and Incident.incident_priority_id = '$priority'";
@@ -78,10 +82,10 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
      $req .=" and (Incident.incident_date <= '$datebefore') ";
   }
   if ($company != "") {
-     $req .= " and Company.company_name like '$company%'";
+     $req .= " and Company.company_name $like '$company%'";
   }
   if ($lcontract != "") {
-     $req .= " and Contract.contract_label like '$lcontract%'";
+     $req .= " and Contract.contract_label $like '$lcontract%'";
   }
   if (($status != $c_all) && ($status != "")) { 
      $req .= " and Incident.incident_status_id = '$status'";
@@ -94,11 +98,10 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_order";
   $req .= " order by $order $p_order_dir, incidentpriority_order";
 
-  $obm_db=new DB_OBM;
-  $obm_db->query($req);
+  $obm_q->query($req);
   display_debug_msg($req, $cdg_sql);
   
-  return $obm_db;
+  return $obm_q;
 }
 
 

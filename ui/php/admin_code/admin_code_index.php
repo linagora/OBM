@@ -43,7 +43,7 @@ switch ($mode) {
    //   $debug = $set_debug;
    if($action == "") $action = "index";
    get_admin_code_action();
-   $perm->check();
+   $perm->check_permissions($menu, $action);
    $display["head"] = display_head("Admin_Code");
    $display["header"] = generate_menu($menu, $section);
    echo $display["head"] . $display["header"];
@@ -175,34 +175,34 @@ function parse_arg($argv) {
 function get_admin_code_action() {
   global $actions, $path;
   global $l_header_index,$l_header_help, $l_header_amp, $l_header_func_unused;
-  global $admin_code_read,$admin_code_write;
+  global $cright_read_admin, $cright_write_admin;
 
   // index : launch form
   $actions["ADMIN_CODE"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_code/admin_code_index.php?action=index&amp;mode=html",
-     'Right'    => $admin_code_read,
+     'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                     	 );
   // help
   $actions["ADMIN_CODE"]["help"]	= array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_code/admin_code_index.php?action=help&amp;mode=html",
-     'Right'    => $admin_code_read,
+     'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                         );
   // show_amp : show & (&amp; use). & alone shouldn't be used in url
   $actions["ADMIN_CODE"]["show_amp"]	= array (
      'Name'     => $l_header_amp,
      'Url'      => "$path/admin_code/admin_code_index.php?action=show_amp&amp;mode=html",
-     'Right'    => $admin_code_write,
+     'Right'    => $cright_write_admin,
      'Condition'=> array ('index') 
                                         );
   // func_unused : show unused functions
   $actions["ADMIN_CODE"]["func_unused"]	= array (
      'Name'     => $l_header_func_unused,
      'Url'      => "$path/admin_code/admin_code_index.php?action=func_unused&amp;mode=html",
-     'Right'    => $admin_code_write,
+     'Right'    => $cright_write_admin,
      'Condition'=> array ('index') 
                                         );
 
@@ -210,7 +210,7 @@ function get_admin_code_action() {
   $actions["ADMIN_CODE"]["func_unused"]	= array (
      'Name'     => $l_header,
      'Url'      => "$path/admin_code/admin_code_index.php?action=function_uses&amp;mode=html",
-     'Right'    => $admin_code_write,
+     'Right'    => $cright_write_admin,
      'Condition'=> array ('index') 
                                         );
 

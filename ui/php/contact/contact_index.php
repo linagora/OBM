@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms  Management                                            //
+// Session, Auth, Perms Management                                           //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
@@ -63,7 +63,7 @@ page_close();
 if ($action == "") $action = "index";
 $contact = get_param_contact();
 get_contact_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 
 if (! $contact["popup"]) {
@@ -558,20 +558,20 @@ function get_contact_action() {
   global $contact, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display, $l_header_admin;
-  global $contact_read, $contact_write, $contact_admin_read, $contact_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["CONTACT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=index",
-    'Right'    => $contact_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                         );
 
 // Search
   $actions["CONTACT"]["search"] = array (
     'Url'      => "$path/contact/contact_index.php?action=search",
-    'Right'    => $contact_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	);
 
@@ -579,7 +579,7 @@ function get_contact_action() {
   $actions["CONTACT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
-    'Right'    => $contact_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('','index','search','new','detailconsult','update','admin','display') 
                                      );
 
@@ -587,7 +587,7 @@ function get_contact_action() {
  $actions["CONTACT"]["detailconsult"]   = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
-    'Right'    => $contact_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                     		 );
 
@@ -595,21 +595,21 @@ function get_contact_action() {
   $actions["CONTACT"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
-    'Right'    => $contact_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      		 );
 
 // Insert
   $actions["CONTACT"]["insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=insert",
-    'Right'    => $contact_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	);
 
 // Update
   $actions["CONTACT"]["update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=update",
-    'Right'    => $contact_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	);
 
@@ -617,14 +617,14 @@ function get_contact_action() {
   $actions["CONTACT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
-    'Right'    => $contact_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete
   $actions["CONTACT"]["delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=delete",
-    'Right'    => $contact_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	);
 
@@ -632,119 +632,119 @@ function get_contact_action() {
   $actions["CONTACT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/contact/contact_index.php?action=admin",
-    'Right'    => $contact_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                       		 );
 
 // Function Insert
   $actions["CONTACT"]["function_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_insert",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Function Update
   $actions["CONTACT"]["function_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_update",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Function Check Link
   $actions["CONTACT"]["function_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_checklink",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Function Delete
   $actions["CONTACT"]["function_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_delete",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Kind Insert
   $actions["CONTACT"]["kind_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_insert",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
   $actions["CONTACT"]["kind_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_update",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
   $actions["CONTACT"]["kind_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_checklink",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
   $actions["CONTACT"]["kind_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_delete",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
   $actions["DOCUMENT"]["cat1_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_insert",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
   $actions["CONTACT"]["cat1_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_update",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
   $actions["CONTACT"]["cat1_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_checklink",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
   $actions["CONTACT"]["cat1_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_delete",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
   $actions["CONTACT"]["cat2_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_insert",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
   $actions["CONTACT"]["cat2_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_update",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
   $actions["CONTACT"]["cat2_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_checklink",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
   $actions["CONTACT"]["cat2_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_delete",
-    'Right'    => $contact_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
@@ -752,21 +752,21 @@ function get_contact_action() {
   $actions["CONTACT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contact/contact_index.php?action=display",
-    'Right'    => $contact_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 
 // Dispay Preferences
   $actions["CONTACT"]["displref_level"]	= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_display",
-    'Right'    => $contact_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	        );
 
 // Dispay Level
   $actions["CONTACT"]["displref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
-    'Right'    => $contact_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       		 );
 

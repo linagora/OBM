@@ -32,6 +32,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $dateexp = sql_date_format($type, "contract_dateexp", "contract_dateexp");
 
@@ -60,10 +61,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
     $query .= " and contract_type_id = '$p_type'";
 
   if ($p_num != "")
-    $query .= " and (contract_number like '%$p_num%')";
+    $query .= " and (contract_number $like '%$p_num%')";
   
   if ($comp != "")
-    $query .= " and (company_name like '%$comp%')";
+    $query .= " and (company_name $like '%$comp%')";
 
   if ($p_dateafter != "")
     $query .= " and (contract_dateexp >= '$p_dateafter')";
@@ -72,7 +73,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
     $query .= " and (contract_dateexp <= '$p_datebefore')";
 
   if ($p_label != "")
-    $query .= " and (contract_label like '%$p_label%')";
+    $query .= " and (contract_label $like '%$p_label%')";
   
   if (($manager != $c_all) && ($manager != "")) {
     $query .= " and (contract_techmanager_id='$manager'

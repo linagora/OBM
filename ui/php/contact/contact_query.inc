@@ -61,6 +61,10 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   $func = $contact["function"];
   $archive = $contact["archive"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $query = "select
       contact_id as Id,
       contact_id,
@@ -87,21 +91,21 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
 
   // If a contact indication has been specified, get it 
   if ($lname != "") {
-    $query .= " contact_lastname like '$lname%' and";
+    $query .= " contact_lastname $like '$lname%' and";
   }
   // If a phone number hes been specified, get it 
   if ($phone != "") {
-    $query .= " (contact_phone like '$phone%' or
-                 contact_homephone like '$phone%' or
-                 contact_mobilephone like '$phone%') and";
+    $query .= " (contact_phone $like '$phone%' or
+                 contact_homephone $like '$phone%' or
+                 contact_mobilephone $like '$phone%') and";
   }
   // If an email indication has been specified, get it 
   if ($email != "") {
-    $query .= " contact_email like '$email%' and";
+    $query .= " contact_email $like '$email%' and";
   }
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {
-    $query .= " company_name like '$company%' and";
+    $query .= " company_name $like '$company%' and";
   }
   // If a company was sent as parameter, get it
   if ($company_id != "") {
@@ -131,9 +135,8 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   $query .= " order by $order $p_order_dir";
   
   display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q->query($query);
+  return $obm_q;
 }
 
 

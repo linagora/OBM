@@ -436,11 +436,9 @@ function html_group_form($action, $group_q, $group) {
 function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   //-- Themes
   global $ico_mail;
-  //-- Label
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
-  //Variable
-  global $display, $perm, $action;
+  global $display, $perm, $menu, $action, $cright_write;
 
   $id = $group_q->f("group_id");
   $usercreate = $group_q->f("group_usercreate");
@@ -493,7 +491,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "top";
 
-    if ($perm->have_perm("editor")) {
+    if ($perm->check_right($menu, $cright_write)) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "child_id";
       $dis_infos->data_cb_name = "cb_g";
@@ -503,7 +501,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
 
     $block .= $dis_infos->display("dis_data_group");
 
-    if ($perm->have_perm("editor")) {
+    if ($perm->check_right($menu, $cright_write)) {
       $block .= "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
@@ -537,7 +535,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";
 
-    if ($perm->have_perm("editor")) {
+    if ($perm->check_right($menu, $cright_write)) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "group_user_id";
       $dis_infos->data_cb_name = "cb_u";
@@ -547,7 +545,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
 
     $block .= $dis_infos->display("dis_data_group");
 
-    if ($perm->have_perm("editor")) {
+    if ($perm->check_right($menu, $cright_write)) {
       $block .= "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">

@@ -46,7 +46,7 @@ switch ($mode) {
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
    get_admin_pref_action();
-   $perm->check();
+   $perm->check_permissions($menu, $action);
    $display["head"] = display_head("Admin_Pref");
    $display["header"] = generate_menu($menu, $section);
    echo $display["head"] . $display["header"];
@@ -246,40 +246,40 @@ function get_param_pref() {
 function get_admin_pref_action() {
   global $actions, $path;
   global $l_header_index,$l_header_pref_update,$l_header_help;
-  global $admin_pref_read, $admin_pref_write;
+  global $cright_read_admin, $cright_write_admin;
 
   // index : lauch forms
   $actions["ADMIN_PREF"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=index&amp;mode=html",
-     'Right'    => $admin_pref_read,
+     'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                     	 );
   // help
   $actions["ADMIN_PREF"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=help&amp;mode=html",
-     'Right' 	=> $admin_pref_read,
+     'Right' 	=> $cright_read_admin,
      'Condition'=> array ('all') 
                                     	);
   // user_pref_update : update (set to default) all users prefs
   $actions["ADMIN_PREF"]["user_pref_update"] = array (
      'Name'     => $l_header_pref_update,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update&amp;mode=html",
-     'Right' 	=> $admin_pref_write,
+     'Right' 	=> $cright_write_admin,
      'Condition'=> array ('index') 
                                     	);
   // user_pref_update_one : update (set to default) one pref for all users
   $actions["ADMIN_PREF"]["user_pref_update_one"] = array (
      'Name'     => $l_header_pref_update,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update_one&amp;mode=html",
-     'Right' 	=> $admin_pref_write,
+     'Right' 	=> $cright_write_admin,
      'Condition'=> array ('None') 
                                     	);
   // global_pref_update : global preferences update
   $actions["ADMIN_PREF"]["global_pref_update"] = array (
      'Url'     => "$path/admin_pref/admin_pref_index.php?action=global_pref_update&amp;mode=html",
-     'Right' 	=> $admin_pref_write,
+     'Right' 	=> $cright_write_admin,
      'Condition'=> array ('None') 
                                     	);
 

@@ -118,7 +118,6 @@ function display_head($p_module) {
 ///////////////////////////////////////////////////////////////////////////////
 function generate_menu($menu, $section) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
-  global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
   global $auth, $obminclude, $display; 
   global $path, $obm_version;
@@ -162,14 +161,83 @@ function generate_menu($menu, $section) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display : Returns the section display block
+// Parameters:
+//   - $section : active section
+///////////////////////////////////////////////////////////////////////////////
+function display_sections($section) {
+  global $sections, $perm;
+  
+  $ret = "<div class='section'>\n";
+  foreach ($sections as $key => $value) {
+    $section_name = $value["Name"];
+    $section_right = $perm->get_section_rights($key); 
+    if (($section_right & $value["Right"]) == $value["Right"]) {
+      if ($key == $section) {
+	$ret .= "<p class='actif'>$section_name</p>\n";
+      }	else {
+	$ret .= "<p class='inactif'><a href='".$value["Url"]."'>$section_name</a></p>\n";
+      }
+    }
+  }
+  $ret .= "</div>";
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display : Returns the section menus display block
+// Parameters:
+//   - $section : selected section
+///////////////////////////////////////////////////////////////////////////////
+function display_menus($section) {
+  global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
+  global $path, $menus, $perm;
+
+  if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
+    $fico = true;
+  else $fico = false;
+
+  if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
+    $ftext = true;
+  else $ftext = false;
+
+  if (is_array($menus[$section])) {
+    $block .= "<ul class='menu'>\n";
+
+    foreach ($menus[$section] as $module => $value) {
+      $menu_name = $value["Name"];
+      $module_right = $perm->get_module_rights($module); 
+      if (($module_right & $value["Right"]) == $value["Right"]) {
+        $block .= "<li>";
+	if ($fico) {
+	  $ico = $value["Ico"];
+	  if ($ico) {
+	    $block .= "<a href='".$value["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='$menu_name' /></a> ";
+	  }
+	}
+	$block .= "<a href='".$value["Url"]."'>";
+	if ($ftext) $block .= $menu_name;
+        $block .= "</a></li>\n";
+      }
+    }
+    $block .= "</ul>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display : Returns the action display block of the selected module         //
 // Parameters:
 //   - $section : selected section
 //   - $menu    : selected menu (module)
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu_bar($section, $menu) {
-  global $set_theme, $menus, $action, $popup_height, $perm ;
-  global $actions, $popup_width, $auth;
+  global $set_theme, $menus, $action, $popup_height;
+  global $actions, $popup_width, $perm;
 
   $name = $menus[$section][$menu]["Name"];
   $ico = $menus[$section][$menu]["Ico"];
@@ -185,104 +253,40 @@ function display_menu_bar($section, $menu) {
     <td class=\"menuBarLabel\">$dico$name</td>
     <td class=\"menuBarText\">";
 
-   if (is_array($actions[$menu])) {
-     foreach ($actions[$menu] as $key => $value){
-       if (in_array("all",$value["Condition"])
-           || in_array($action,$value["Condition"])) {
-         if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
-           if ($value["Popup"] == 1) {
-	     if ($value["Target"]) {
-	       $wtarget = "window.name='" . $value['Target'] . "';";
-	     }
-             $ret .= "
+  if (is_array($actions[$menu])) {
+    $module_right = $perm->get_module_rights($menu); 
+    
+    foreach ($actions[$menu] as $key => $value) {
+
+      // If the current action has this action in target
+      if (in_array("all", $value["Condition"])
+	  || in_array($action, $value["Condition"])) {
+
+	if (($module_right & $value["Right"]) == $value["Right"]) {
+
+	  if ($value["Popup"] == 1) {
+	    if ($value["Target"]) {
+	      $wtarget = "window.name='" . $value['Target'] . "';";
+	    }
+	    $ret .= "
               <a href=\"\" class=\"menuBar\" 
               onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
-           } else {
-	     $ret .= "
+	  } else {
+	    $ret .= "
                <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
-           }
-         }
-       }
-     }
-   }
+	  }
+	}
+      }
+    }
+  }
    
-   $ret .= "
+  $ret .= "
     </td>
     <td><img class=\"menuBarIconD\" src=\"/images/$set_theme/barre_d.gif\" alt=\"\" /></td>
   </tr>
   </table>
 ";
-
-   return $ret;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the section menus display block
-// Parameters:
-//   - $section : selected section
-///////////////////////////////////////////////////////////////////////////////
-function display_menus($section) {
-  global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
-  global $path, $menus, $perm, $auth;
-
-  if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
-    $fico = true;
-  else $fico = false;
-
-  if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
-    $ftext = true;
-  else $ftext = false;
-
-  if(is_array($menus[$section]))
-    {
-    $block .= "<ul class='menu'>\n";
-    foreach($menus[$section] as $key => $value)
-      {
-      if(($key != "Name" && $key != "Url" && $key != "Right") && (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]))
-        {
-        $block .= "<li>";
-          if ($fico)
-          {
-           $ico = $value["Ico"];
-           if ($ico)
-             {
-             $block .= "<a href='".$value["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='".$value["Name"]."' /></a> ";
-             }
-          }
-	$block .= "<a href='".$value["Url"]."'>";
-	if($ftext)	$block .= $value["Name"];
-        $block .= "</a></li>\n";
-        }
-      }
-    $block .= "</ul>";
-   }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the section display block
-// Parameters:
-//   - $section : active section
-///////////////////////////////////////////////////////////////////////////////
-function display_sections($section) {
-  global $menus, $auth, $perm;
-  global $perm_admin;
-  
-  $ret = "<div class='section'>\n";
-  foreach ($menus as $key => $value) {
-    if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
-      if ($key == $section) {
-	$ret .= "<p class='actif'>".$value["Name"]."</p>\n";
-      }	else {
-	$ret .= "<p class='inactif'><a href='".$value["Url"]."'>".$value["Name"]."</a></p>\n";
-      }
-    }
-  }
-  $ret .= "</div>";
 
   return $ret;
 }
@@ -505,7 +509,6 @@ function display_warn_msg($msg) {
 // Display an OK message
 ////////////////////////////////////////////////////////////////////////////
 function display_ok_msg($msg) {
-  //  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
   return "<p class=\"messageOk\">$msg</p>";
 }
 

@@ -25,6 +25,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $lastaccess = sql_date_format($type, "userobm_timelastaccess", "userobm_timelastaccess");
 
@@ -36,7 +37,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
   // If a login indication has been specified, get it
   if (trim($login) != "") {
-     $where .= " userobm_login like '$login%'";
+     $where .= " userobm_login $like '$login%'";
   }
 
   // If a user perms indication has been specified, get it
@@ -48,7 +49,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   // If a name indication has been specified, get it
   if (trim($lname) != "") {
      if (trim($where) != "") $where .= " and";
-     $where .= " userobm_lastname like '$lname%'";
+     $where .= " userobm_lastname $like '$lname%'";
   }
 
   if ($archive != "1") {
@@ -89,6 +90,7 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
 
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $lastaccess = sql_date_format($type, "userobm_timelastaccess", "userobm_timelastaccess");
 
@@ -104,7 +106,7 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
 
   // If a login indication has been specified, get it
   if (trim($login) != "") {
-    $where .= " userobm_login like '$login%'";
+    $where .= " userobm_login $like '$login%'";
   }
 
   // If a user perms indication has been specified, get it
@@ -116,7 +118,7 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
   // If a name indication has been specified, get it
   if (trim($lname) != "") {
     if (trim($where) != "") $where .= " and";
-    $where .= " userobm_lastname like '$lname%'";
+    $where .= " userobm_lastname $like '$lname%'";
   }
 
   if ($archive != "1") {
@@ -325,17 +327,20 @@ function check_user_context($p_id, $user) {
 function run_query_check_user($p_id, $login) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   if ($p_id) {
     $where_user = "and userobm_id != '$p_id'";
   }
 
   $query = "select distinct userobm_id, userobm_login
             from UserObm
-            where userobm_login like '$login%'
+            where userobm_login $like '$login%'
               $where_user";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;

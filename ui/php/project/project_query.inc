@@ -28,6 +28,10 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $archive = $project["archive"];
   $date = $project["datebegin"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $query = "select distinct
       project_id,
       project_name,
@@ -67,11 +71,11 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   }
 
   if ($name != "") {
-    $query .= " and project_name like '$name%'";
+    $query .= " and project_name $like '$name%'";
   }
 
   if ($company_name != "") {
-    $query .= " and company_name like '$company_name%'";
+    $query .= " and company_name $like '$company_name%'";
   }
 
   if ($tt != 0) {
@@ -99,10 +103,9 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql, "run_query_search");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
   
-  return $obm_db;
+  return $obm_q;
 }
 
 

@@ -30,10 +30,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
-
 include("$obminclude/global_pref.inc");
-
 require("incident_query.inc");
 require("incident_display.inc");
 
@@ -54,7 +51,7 @@ page_close();
 if($action == "") $action = "index";
 $incident = get_param_incident();
 get_incident_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Programe principal                                                        //
@@ -321,20 +318,20 @@ function get_incident_action() {
   global $incident, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_admin, $l_header_display;
-  global $incident_read, $incident_write, $incident_admin_write, $incident_admin_read;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 //  Index
   $actions["INCIDENT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/incident/incident_index.php?action=index",
-    'Right'    => $incident_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                 	);
 
 //  Search
   $actions["INCIDENT"]["search"] = array (
     'Url'      => "$path/incident/incident_index.php?action=search",
-    'Right'    => $incident_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                 	);
 
@@ -342,7 +339,7 @@ function get_incident_action() {
   $actions["INCIDENT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/incident/incident_index.php?action=new",
-    'Right'    => $incident_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('','search','index','detailconsult','display') 
                     		       );
 
@@ -350,7 +347,7 @@ function get_incident_action() {
   $actions["INCIDENT"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$incident["id"]."",
-    'Right'    => $incident_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                 	       );
 
@@ -358,21 +355,21 @@ function get_incident_action() {
   $actions["INCIDENT"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/incident/incident_index.php?action=detailupdate&amp;param_incident=".$incident["id"]."",
-    'Right'    => $incident_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	        );
 
 // Insert
   $actions["INCIDENT"]["insert"] = array (
     'Url'      => "$path/incident/incident_index.php?action=insert",
-    'Right'    => $incident_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Update
   $actions["INCIDENT"]["update"] = array (
     'Url'      => "$path/incident/incident_index.php?action=update",
-    'Right'    => $incident_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
@@ -380,14 +377,14 @@ function get_incident_action() {
   $actions["INCIDENT"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/incident/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
-    'Right'    => $incident_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
 // Admin
   $actions["INCIDENT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/incident/incident_index.php?action=admin",
-    'Right'    => $incident_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                        );
 
@@ -395,24 +392,24 @@ function get_incident_action() {
   $actions["INCIDENT"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/incident/incident_index.php?action=display",
-     'Right'    => $incident_read,
+     'Right'    => $cright_read,
      'Condition'=> array ('all') 
                                       	   );
 
 // Display Préférence
   $actions["INCIDENT"]["dispref_display"] = array (
      'Url'      => "$path/incident/incident_index.php?action=dispref_display",
-     'Right'    => $incident_read,
+     'Right'    => $cright_read,
      'Condition'=> array ('None') 
                                       	   );
 
 // Display level
   $actions["INCIDENT"]["dispref_level"] = array (
      'Url'      => "$path/incident/incident_index.php?action=dispref_level",
-     'Right'    => $incident_read,
+     'Right'    => $cright_read,
      'Condition'=> array ('None') 
                                       	   );
 
 }
 
-</SCRIPT>
+</script>

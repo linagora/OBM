@@ -77,6 +77,9 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
   $entity =$document["entity"];
   $entity_id = $document["entity_id"];  
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   if ($entity != "") {
     $leftjoin = "LEFT JOIN DocumentEntity on document_id = documententity_documentid";
@@ -103,11 +106,11 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
       
 
   if ($title != "") {
-    $where .= "and document_title like '%$title%'";
+    $where .= "and document_title $like '%$title%'";
   }
   
   if ($name != "") {
-    $where .= "and document_name like '%$name%'";
+    $where .= "and document_name $like '%$name%'";
   }
 
   if (($cat1 != $c_all) && ($cat1 != "")) { 
@@ -119,7 +122,7 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
   }
   
   if (($author != $c_all) && ($author != "")) { 
-    $where .= " and document_author like '%$author%'";
+    $where .= " and document_author $like '%$author%'";
   }
   
   if (($mime != $c_all) && ($mime != "")) { 
@@ -462,6 +465,7 @@ function run_query_document_links($document_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_repository_links($document_id) {
   global $cdg_sql,$default_path;
+
   $obm_q = new DB_OBM;
   $query = "select * from Document where document_id = $document_id";
   $obm_q->query($query);
@@ -473,7 +477,7 @@ function run_query_repository_links($document_id) {
     return 1;
   }
   $query = "select count(document_id) as nb from Document 
-  where document_path LIKE  '$path%'";
+  where document_path LIKE '$path%'";
   $obm_q->query($query);
   $obm_q->next_record();  
   return $obm_q->f("nb");

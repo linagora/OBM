@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : account_query.inc                                            //
 //     - Desc : account query File                                           //
@@ -25,24 +25,28 @@ function run_query_search ($account, $p_new_order, $p_order_dir) {
   $bank = $account["bank"];
   $number = $account["number"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "account_bank";
   
   $query = "select *, account_id as Id from Account ";
   $query .= " where 1 > 0 ";
+
   if ($label != "") {
-    $query .= " and account_label like '$label%' ";
+    $query .= " and account_label $like '$label%' ";
   }
 
   if ($bank != "") {
-    $query .= $flag." and account_bank like '%$bank%' ";
+    $query .= $flag." and account_bank $like '%$bank%' ";
   }
   if ($number != "") 
-    $query .= " and account_number like '%$number%' ";
+    $query .= " and account_number $like '%$number%' ";
 
   $query .= " order by $order $p_order_dir";
   
   display_debug_msg("<b>run_query_search() : </b>$query", $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   
   return ($obm_q);

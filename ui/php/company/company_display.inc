@@ -116,14 +116,36 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     if ($OD->data_set->f("company_town") != "" ) {
       $res["name"] .= $OD->data_set->f("company_town");
     }
+    if ($OD->data_set->f("country_name") != "" ) {
+      $res["name"] .= "&nbsp;" . $OD->data_set->f("country_name");
+    }
     $res["txt_name"] = trim($OD->data_set->f("company_address1") . " " .
                        $OD->data_set->f("company_address2") . " " .
                        $OD->data_set->f("company_address3") . " " .
                        $OD->data_set->f("company_zipcode") . " " .
-		       $OD->data_set->f("company_town"));
+                       $OD->data_set->f("company_town") . " " .
+		       $OD->data_set->f("country_name"));
   }
 
   return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Deal index page                                                   //
+// Parameters:
+//   - $deal[] : hash with deal and parent deal values
+///////////////////////////////////////////////////////////////////////////////
+function dis_company_search_form($company="") {
+  global $display;
+
+  $type_q = run_query_companytype();
+  $act_q = run_query_companyactivity();
+  $usr_q = run_query_userobm_active();
+  $ctry_q = run_query_country();
+  $block .= html_company_search_form($type_q, $act_q, $usr_q, $ctry_q, $company);
+
+  return $block;
 }
 
 
@@ -133,19 +155,23 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 //   - $kind_q    : database object with kind list
 //   - $act_q     : database object with activity list
 //   - $usr_q     : database object with userobm list
+//   - $ctry_q    : database object with country list
 //   - $company[] : default form values
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
+function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   global $l_company_name, $l_company_kind, $l_postcode, $l_archive, $l_phone;
-  global $l_all, $l_find, $l_market, $l_activity; 
+  global $l_all, $l_find, $l_market, $l_activity, $l_country, $l_town; 
   global $c_all;
-  $popup=$company["popup"];
+
+  $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
   $name = stripslashes($company["name"]);
   $phone = stripslashes($company["phone"]);
+  $town = stripslashes($company["town"]);
   $kind = $company["kind"];
   $act = $company["activity"];
+  $ctry = $company["country"];
   $mark = $company["marketing_manager"];
   $zip = stripslashes($company["zip"]);
 
@@ -171,10 +197,21 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
   }
   $sel_act .= "</select>";
 
+  // Country select
+  $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($ctry_q->next_record()) {
+    $ctry_id = $ctry_q->f("country_id");
+    $sel_ctry .= "\n<option value=\"$ctry_id\"";
+    if ($ctry_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+  }
+  $sel_ctry .= "</select>";
+
   // Marketing manager select
   $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
     <option value=\"$c_all\">$l_all</option>";
-  while($usr_q->next_record()) {
+  while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
     if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
@@ -220,6 +257,13 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
     <div class=\"searchLabel\">$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
+    </div>
+    <div class=\"searchLabel\">$l_town<br />
+      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"8\"
+      value=\"$town\" />
+    </div>
+    <div class=\"searchLabel\">$l_country<br />
+      $sel_ctry
     </div>
     <div class=\"searchLabel\">$l_market<br />
       $sel_market
@@ -584,7 +628,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   if (isset($company["zip"])) { $zip = stripslashes($company["zip"]); }
   if (isset($company["town"])) { $town = stripslashes($company["town"]); }
   if (isset($company["cdx"])) { $cdx = stripslashes($company["cdx"]); }
-  if (isset($company["ctry"])) { $ctry = $company["ctry"]; }
+  if (isset($company["country"])) { $ctry = $company["country"]; }
   if (isset($company["phone"])) { $phone = stripslashes($company["phone"]); }
   if (isset($company["fax"])) { $fax = stripslashes($company["fax"]); }
   if (isset($company["web"])) { $web = stripslashes($company["web"]); }
@@ -1000,7 +1044,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $zip = $company["zip"];
   $town = $company["town"];
   $cdx = $company["cdx"];
-  $ctry = $company["ctry"];
+  $ctry = $company["country"];
   $phone = $company["phone"];
   $fax = $company["fax"];
   $web = $company["web"];

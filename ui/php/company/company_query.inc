@@ -22,6 +22,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $archive = $company["archive"];
   $name = $company["name"];
   $phone = $company["phone"];
+  $town = $company["town"];
+  $ctry = $company["country"];
   $kind = $company["kind"];
   $act = $company["activity"];
   $market = $company["marketing_manager"];
@@ -32,6 +34,10 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $auto_aka = reduce_name($name);
     $sound = phonetic_key($name);
   }
+
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $req = "select
       company_id as Id,
@@ -56,14 +62,16 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_deal_number,
       company_deal_total,
       companytype_label,
-      companyactivity_label
+      companyactivity_label,
+      country_name
     from Company
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
-         LEFT JOIN CompanyType on company_type_id=companytype_id";
+         LEFT JOIN CompanyType on company_type_id=companytype_id
+         LEFT JOIN Country on company_country_id=country_id";
 
   $and = "";
   if ($name != "") {
-    $where_name = " company_name like '$name%'";
+    $where_name = " company_name $like '$name%'";
     $and = "and";
   }
   if (($kind != $c_all) && ($kind != "")) { 
@@ -79,11 +87,19 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $and = "and";
   }
   if ($phone != "") {
-    $where .= " $and company_phone like '$phone%'";
+    $where .= " $and company_phone $like '$phone%'";
+    $and = "and";
+  }
+  if ($town != "") {
+    $where .= " $and company_town $like '$town%'";
+    $and = "and";
+  }
+  if (($ctry != $c_all) && ($ctry != "")) { 
+    $where .= " $and company_country_id='$ctry'";
     $and = "and";
   }
   if ($zip != "") {
-    $where .= " $and company_zipcode like '$zip%'";
+    $where .= " $and company_zipcode $like '$zip%'";
     $and = "and";
   }
 
@@ -108,20 +124,19 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $query = "$req $whereq order by $order $p_order_dir";
 
   display_debug_msg("company_search(1) : $query", $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
 
-  if ( ($obm_db->num_rows() == 0) && ($name != "") ) {
-    $where_name = " (company_aka like '%$auto_aka%'
+  if ( ($obm_q->num_rows() == 0) && ($name != "") ) {
+    $where_name = " (company_aka $like '%$auto_aka%'
                  or company_sound = '$sound')";
     $whereq = " where $where_name $where";
     $query = "$req $whereq order by $order $p_order_dir";
     display_debug_msg("company_search(2) : $query", $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
   }
 
-  return $obm_db;
+  return $obm_q;
 }
 
 
@@ -194,7 +209,7 @@ function run_query_insert($company) {
   $zip = $company["zip"];
   $town = $company["town"];
   $cdx = $company["cdx"];
-  $ctry = $company["ctry"];
+  $ctry = $company["country"];
   $phone = $company["phone"];
   $fax = $company["fax"];
   $web = $company["web"];
@@ -319,7 +334,7 @@ function run_query_update($cid, $company) {
   $zip = $company["zip"];
   $town = $company["town"];
   $cdx = $company["cdx"];
-  $ctry = $company["ctry"];
+  $ctry = $company["country"];
   $phone = $company["phone"];
   $fax = $company["fax"];
   $web = $company["web"];
@@ -516,9 +531,12 @@ function run_query_check_company($p_id, $name, $zip) {
     $where_id = "and company_id!='$p_id'";
   }
   $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $query = "select distinct company_id, company_name, company_zipcode 
             from Company
-            where company_name like '$name%'
+            where company_name $like '$name%'
               $where_id";
 
   display_debug_msg($query, $cdg_sql);

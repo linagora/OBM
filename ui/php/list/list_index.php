@@ -60,11 +60,11 @@ if ( ($param_list == $last_list) && (strcmp($action,"delete")==0) ) {
   $last_list_name = run_query_global_list_name($last_list);
 }
 
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $list = get_param_list();
 get_list_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 // ses_list is the session array of lists id to export
 if (sizeof($ses_list) >= 1) {
@@ -191,51 +191,39 @@ else if ($action == "insert") {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($perm->have_perm("editor")) {
-    $retour = run_query_delete($hd_list_id);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
-    } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
-    }
-    $display["search"] = html_list_search_form("");
+  $retour = run_query_delete($hd_list_id);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
-   $display["msg"] .= display_err_msg($l_error_permission);
+    $display["msg"] .= display_err_msg($l_delete_error);
   }
+  $display["search"] = html_list_search_form("");
 
 } elseif ($action == "contact_add")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($perm->have_perm("editor")) {
-    if ($list["con_nb"] > 0) {
-      $nb = run_query_contactlist_insert($list);
-      $display["msg"] .= display_ok_msg("$nb $l_contact_added");
-    } else {
-      $display["msg"] .= display_err_msg("no contact to add");
-    }
-    $list_q = run_query_detail($list["id"]);
-    $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list);
-    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+  if ($list["con_nb"] > 0) {
+    $nb = run_query_contactlist_insert($list);
+    $display["msg"] .= display_ok_msg("$nb $l_contact_added");
   } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
+    $display["msg"] .= display_err_msg("no contact to add");
   }
+  $list_q = run_query_detail($list["id"]);
+  $pref_con_q = run_query_display_pref($uid, "list_contact");
+  $con_q = run_query_contacts_list($list);
+  $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
 
 } elseif ($action == "contact_del")  {
 ///////////////////////////////////////////////////////////////////////////////
-if ($perm->have_perm("editor")) {
   if ($list["con_nb"] > 0) {
     $nb = run_query_contactlist_delete($list);
-      $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
-    } else {
-      $display["msg"] .= display_err_msg("no contact to delete");
-    }
-    $list_q = run_query_detail($list["id"]);
-    $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list);
-    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+    $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
   } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
+    $display["msg"] .= display_err_msg("no contact to delete");
   }
+  $list_q = run_query_detail($list["id"]);
+  $pref_con_q = run_query_display_pref($uid, "list_contact");
+  $con_q = run_query_contacts_list($list);
+  $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -393,20 +381,20 @@ function get_list_action() {
   global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
   global $l_header_consult, $l_header_add_contact;
   global $l_select_list, $l_add_contact,$l_list_wizard;
-  global $list_read, $list_write, $list_admin_read, $list_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["LIST"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/list/list_index.php?action=index",
-    'Right'    => $list_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     );
 
 // Search
   $actions["LIST"]["search"] = array (
     'Url'      => "$path/list/list_index.php?action=search",
-    'Right'    => $list_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       );
 
@@ -414,21 +402,21 @@ function get_list_action() {
   $actions["LIST"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/list/list_index.php?action=new",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('','search','index','detailconsult','admin','display') 
                                   );
 
 // New
   $actions["LIST"]["new_criterion"] = array (
     'Url'      => "$path/list/list_index.php?action=new_criterion",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                   );				  
 // Detail Consult
   $actions["LIST"]["detailconsult"] = array (
-     'Name'     => $l_header_consult,
-     'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
-    'Right'    => $list_read,
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                       );
 
@@ -436,21 +424,21 @@ function get_list_action() {
   $actions["LIST"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
-     'Right'    => $list_write,
+     'Right'    => $cright_write,
      'Condition'=> array ('detailconsult','contact_add','contact_del', 'update') 
                                            );
 
 // Insert
   $actions["LIST"]["insert"] = array (
     'Url'      => "$path/list/list_index.php?action=insert",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
 
 // Update
   $actions["LIST"]["update"] = array (
     'Url'      => "$path/list/list_index.php?action=update",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
 
@@ -458,14 +446,14 @@ function get_list_action() {
   $actions["LIST"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/list/list_index.php?action=check_delete&amp;hd_list_id=".$list["id"]."",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
                                            );
 
 // Delete
   $actions["LIST"]["delete"] = array (
     'Url'      => "$path/list/list_index.php?action=delete",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
 
@@ -473,7 +461,7 @@ function get_list_action() {
   $actions["LIST"]["sel_list_contact"] = array (
     'Name'     => $l_header_add_contact,
     'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_list,
     'Condition'=> array ('detailconsult','update','contact_add','contact_del') 
@@ -482,13 +470,13 @@ function get_list_action() {
 // Contact ADD
   $actions["LIST"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                           );
 // Contact Del
   $actions["LIST"]["contact_del"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_del",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                           );
 
@@ -496,7 +484,7 @@ function get_list_action() {
   $actions["LIST"]["export_add"] = array (
     'Name'     => $l_header_export,
     'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
                                      	 );
 
@@ -504,7 +492,7 @@ function get_list_action() {
   $actions["LIST"]["export"] = array (
     'Name'     => $l_header_global_export,
     'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
-    'Right'    => $list_write,
+    'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_list,
     'Condition'=> array ('all') 
@@ -514,21 +502,21 @@ function get_list_action() {
   $actions["LIST"]["display"] = array (
    'Name'     => $l_header_display,
    'Url'      => "$path/list/list_index.php?action=display",
-   'Right'    => $list_read,
+   'Right'    => $cright_read,
    'Condition'=> array ('all') 
                                       );
 
 // Display Préférence
   $actions["LIST"]["dispref_display"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_display",
-   'Right'    => $list_write,
+   'Right'    => $cright_read,
    'Condition'=> array ('None') 
                                                );
 
 // Display level
   $actions["LIST"]["dispref_level"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_level",
-   'Right'    => $list_write,
+   'Right'    => $cright_read,
    'Condition'=> array ('None') 
                                             );
 

@@ -39,6 +39,28 @@ function sql_date_format($db_type, $field, $as="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the sql word corresponding to case incensitive like
+// Parameters:
+//   - $db_type : DB type
+// Returns:
+//   - sql word "ilike"
+///////////////////////////////////////////////////////////////////////////////
+function sql_casei_like($db_type) {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    $ret = "like";
+  } elseif ($db_type == $db_type_pgsql) {
+    $ret = "ilike";
+  } else {
+    $ret = "like";
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login / pass
 // Parameters:
 //   - $login  : login
@@ -1134,7 +1156,7 @@ function get_modules_array() {
   $modules = array();
 
   $mod_dir = dir("$path");
-  while($entry=$mod_dir->read()) {
+  while ($entry=$mod_dir->read()) {
     if (! in_array ($entry, $exclude) && is_dir($mod_dir->path."/".$entry)) {
       array_push($modules, $entry);
     }

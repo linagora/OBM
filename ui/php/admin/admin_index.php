@@ -37,9 +37,9 @@ switch ($mode) {
  case "html":
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
-   if($action == "") $action = "index";
+   if ($action == "") $action = "index";
    get_admin_action();
-   $perm->check();
+   $perm->check_permissions($menu, $action);
    $display["head"] = display_head("Admin");
    $display["header"] = generate_menu($menu, $section);
    echo $display["head"] . $display["header"];
@@ -145,41 +145,41 @@ function parse_arg($argv) {
 function get_admin_action() {
   global $actions, $path;
   global $l_header_clear_sess,$l_header_index,$l_header_help;
-  global $admin_read, $admin_write;
+  global $cright_read_admin, $cright_write_admin;
 
   // Index 
   $actions["ADMIN"]["index"] = array (
     'Name'     => $l_header_index,   
     'Url'      => "$path/admin/admin_index.php?action=index&amp;mode=html",
-    'Right'    => $admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                      );
   // data_show 
   $actions["ADMIN"]["data_show"] = array (
     'Url'      => "$path/admin/admin_index.php?action=data_show&amp;mode=html",
-    'Right'    => $admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('None') 
                                      );
   // Data Update 
   $actions["ADMIN"]["data_update"] = array (
     'Url'      => "$path/admin/admin_index.php?action=data_update&amp;mode=html",
-    'Right'    => $admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
   // Help
   $actions["ADMIN"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin/admin_index.php?action=help&amp;mode=html",
-     'Right'    => $admin_read,
+     'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                     );
   // Clear Session
   $actions["ADMIN"]["clear_sess"] = array (
      'Name'     => $l_header_clear_sess,
      'Url'      => "$path/admin/admin_index.php?action=clear_sess&amp;mode=html",
-     'Right'    => $admin_write,
+     'Right'    => $cright_write_admin,
      'Condition'=> array ('index') 
                                     );
 }
 
-</SCRIPT>
+</script>

@@ -24,12 +24,13 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
 
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $timeupdate = sql_date_format($type, "import_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type, "import_timecreate", "timecreate");
 
   if ($email != '') {
-    $where .= " and list_email like '%$email%'";
+    $where .= " and list_email $like '%$email%'";
   }
 
   $query = "select distinct import_id as Id,
@@ -46,7 +47,7 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
     Import LEFT JOIN DataSource ON import_datasource_id=datasource_id
     LEFT JOIN UserObm as A ON Import.import_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON Import.import_userupdate=B.userobm_id
-  where import_name like '$name%'
+  where import_name $like '$name%'
     $where";
 
   // ORDER construction
@@ -231,12 +232,16 @@ function run_query_check_import($import) {
   $name = $import["name"];
   $dsrc = $import["datasource"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   if ($id != "") {
     $where_id = "import_id != '$id' and ";
   }
 
   // We search for a similar name (as same name is already excluded)
-  $wname = "import_name like '%$name%'";
+  $wname = "import_name $like '%$name%'";
 
   // We search for the same datasource
   $wdsrc = "import_datasource_id = '$dsrc'";
@@ -249,7 +254,6 @@ function run_query_check_import($import) {
        ($wname and $wdsrc)";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;

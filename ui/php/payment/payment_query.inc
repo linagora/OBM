@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : payment_query.inc 
 //     - Desc : payment query File
@@ -26,7 +26,10 @@ function run_query_search($p_payment, $p_new_order="") {
   $company = $p_payment["company"];
   $checked = $p_payment["checked"];
 
-  $go = new DB_OBM;
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $order = (strcmp($p_new_order,"")!=0) ? $p_new_order : "payment_label";
   // attention : 
   // if any payment already in the database hase payment_paymentkind_id == -1 
@@ -49,10 +52,10 @@ function run_query_search($p_payment, $p_new_order="") {
   ", paymentkind_shortlabel, paymentkind_longlabel ".
   ", account_id, account_label as payment_account_lbl"; //lbl == label...
 
-  $query .= " from Payment ".
-  " left outer join Account on (Payment.payment_account_id = account_id) ,".
-  " Payment P2 ".
-  " left outer join PaymentKind on (paymentkind_id = P2.payment_paymentkind_id) ";
+  $query .= " from Payment
+    left outer join Account on (Payment.payment_account_id = account_id),
+    Payment P2
+    left outer join PaymentKind on (paymentkind_id = P2.payment_paymentkind_id)";
   if ($deal != "" || $company != "") {
     $query .= ", Payment P4, PaymentInvoice, Invoice, DealInvoice, Deal ";
     if ($company != "") {
@@ -62,10 +65,10 @@ function run_query_search($p_payment, $p_new_order="") {
   $query .= " where  Payment.payment_id = P2.payment_id ";
   // search criterias :
   if ($label) {
-    $query .= " and Payment.payment_label like '$label%'";
+    $query .= " and Payment.payment_label $like '$label%'";
   }
   if ($number) {
-    $query .= " and Payment.payment_number like '%$number%'";
+    $query .= " and Payment.payment_number $like '%$number%'";
   }
   if ($amount) {
     $query .= " and Payment.payment_amount ='$amount'";
@@ -76,28 +79,28 @@ function run_query_search($p_payment, $p_new_order="") {
   if ($date_before) {
     $query .= " and Payment.payment_date <='$date_before'";
   }
-  if (($inout != "")&&($inout != "_TOUT_")) {
+  if (($inout != "") && ($inout != "_TOUT_")) {
     $query .= " and Payment.payment_inout ='$inout'";
   }
-  if (($paid != "")&&($paid != "_TOUT_")) {
+  if (($paid != "") && ($paid != "_TOUT_")) {
     $query .= " and Payment.payment_paid = '$paid'";
   }
-  if (($kind != "")&&($kind!="$c_all")) {
+  if (($kind != "") && ($kind!="$c_all")) {
     $query .= " and Payment.payment_paymentkind_id ='$kind'";
   }
-  if (($account != "")&&($account != "$c_all")) {
+  if (($account != "") && ($account != "$c_all")) {
     $query .= " and Payment.payment_account_id ='$account'";
   }
   if ($deal != "" || $company != "" ) {
-    $query .= " and dealinvoice_deal_id = deal_id ".
-    " and dealinvoice_invoice_id = invoice_id ".
-    " and paymentinvoice_invoice_id = invoice_id ".
-    " and paymentinvoice_payment_id = P4.payment_id ".
-    " and Payment.payment_id = P4.payment_id ".
-    " and deal_label like '$deal%'";
+    $query .= " and dealinvoice_deal_id = deal_id
+      and dealinvoice_invoice_id = invoice_id
+      and paymentinvoice_invoice_id = invoice_id
+      and paymentinvoice_payment_id = P4.payment_id
+      and Payment.payment_id = P4.payment_id
+      and deal_label $like '$deal%'";
     if ($company != "") {
       $query .= " and deal_company_id = company_id ".
-	 " and company_name like '$company%'";
+	 " and company_name $like '$company%'";
     }
   }
   if ($checked != 'y') {
@@ -107,10 +110,9 @@ function run_query_search($p_payment, $p_new_order="") {
   $query .= " order by ".$order;
 
   display_debug_msg ("<b>run_query_search() : </b>$query", $cdg_sql);
+  $obm_q->query($query);
 
-  $go->query($query);
-
-  return ($go);
+  return ($obm_q);
 }
 
 
@@ -311,7 +313,9 @@ function run_query_delete ($p_payment_id){
 function run_query_search_connectable_invoices ($payment) {
   global $cdg_sql;
 
-  $go = new DB_OBM;
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   // we must exclude every invoice already connected 
   // to that payment if they are paid :
@@ -320,13 +324,13 @@ function run_query_search_connectable_invoices ($payment) {
      "where paymentinvoice_payment_id ='".$payment["payment"]."'".
      " and paymentinvoice_amount = '0.0'";
   display_debug_msg ("<b>run_query_search_connectable_invoices() : </b>$query", $cdg_sql);
-  $go->query($query);
+  $obm_q->query($query);
 
-  if ($go->nf() > 0) {
-    $go->next_record();
-    $invoices_to_skip = $go->f("paymentinvoice_invoice_id");
-    while ($go->next_record()) {
-      $invoices_to_skip .= ",".$go->f("paymentinvoice_invoice_id");
+  if ($obm_q->nf() > 0) {
+    $obm_q->next_record();
+    $invoices_to_skip = $obm_q->f("paymentinvoice_invoice_id");
+    while ($obm_q->next_record()) {
+      $invoices_to_skip .= ",".$obm_q->f("paymentinvoice_invoice_id");
     }
   }
 
@@ -358,12 +362,12 @@ function run_query_search_connectable_invoices ($payment) {
      " and company_id = deal_company_id ".
      " and invoice_inout = '".$payment["inout"]."'";
   if ($payment["invoice_company"] != "") {
-    $query .= " and company_name like '".$payment["invoice_company"]."%'";
+    $query .= " and company_name $like '".$payment["invoice_company"]."%'";
   }
   if ($payment["invoice_label"] != "") {
-    $query.= " and invoice_label like '%".$payment["invoice_label"]."%'";
+    $query.= " and invoice_label $like '%".$payment["invoice_label"]."%'";
   }
-  if ($go->nf() > 0) {
+  if ($obm_q->nf() > 0) {
     $query .= " and invoice_id not in (".$invoices_to_skip.")";
   }
   
@@ -371,9 +375,9 @@ function run_query_search_connectable_invoices ($payment) {
 
   display_debug_msg ("<b>run_query_search_connectable_invoices () : </b>$query", $cdg_sql);
 
-  $go->query($query);
+  $obm_q->query($query);
 
-  return $go;
+  return $obm_q;
 }
 
 

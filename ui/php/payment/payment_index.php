@@ -38,7 +38,8 @@ page_close();
 if($action == "")  $action = "index";
 $payment = get_param_payment();
 get_payment_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +50,7 @@ $display["header"] = generate_menu($menu, $section);
 // ACTIONS :
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action =="new") {
+if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
     $display["msg"] = display_debug_msg("FIXME PERMISSIONS", $cdg_param);
@@ -632,40 +633,39 @@ function get_invoices_data ($nb) {
 //////////////////////////////////////////////////////////////////////////////
 // Invoice actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_payment_action() {
   global $payment, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_reconcile,$l_header_admin;
   global $l_header_dupplicate;
-  global $payment_read, $payment_write, $payment_admin_read, $payment_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 //Index
   $actions["PAYMENT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/payment/payment_index.php?action=index",
-    'Right'    => $payment_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                         );
 
 // New With Invoice
   $actions["PAYMENT"]["new_with_invoice"] = array (
     'Url'      => "$path/payment/payment_index.php?action=new_whith_invoice",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                         );
 
 // New With Invoice
   $actions["PAYMENT"]["insert_with_invoice"] = array (
     'Url'      => "$path/payment/payment_index.php?action=new_whith_invoice",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                         );
 
 // Search
   $actions["PAYMENT"]["search"] = array (
     'Url'      => "$path/payment/payment_index.php?action=search",
-    'Right'    => $payment_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
 
@@ -673,7 +673,7 @@ function get_payment_action() {
   $actions["PAYMENT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/payment/payment_index.php?action=new",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('search','admin','index','detailconsult','display') 
                                      );
 
@@ -681,7 +681,7 @@ function get_payment_action() {
   $actions["PAYMENT"]["reconcile"] = array (
     'Name'     => $l_header_reconcile,
     'Url'      => "$path/payment/payment_index.php?action=reconcile",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('admin','search','index','detailconsult','display') 
                                            );
 
@@ -689,14 +689,14 @@ function get_payment_action() {
   $actions["PAYMENT"]["duplicate"] = array (
      'Name'     => $l_header_dupplicate,
      'Url'      => "$path/payment/payment_index.php?action=duplicate&amp;param_payment=".$payment["payment"]."",
-     'Right'    => $payment_write,
+     'Right'    => $cright_write,
      'Condition'=> array ('detailconsult') 
                                            );
 
 // Detail Consult
   $actions["PAYMENT"]["detailconsult"] = array (
     'Url'      => "$path/payment/payment_index.php?action=detailconsult",
-    'Right'    => $payment_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
 
@@ -704,49 +704,49 @@ function get_payment_action() {
   $actions["PAYMENT"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=".$payment["payment"]."",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
 
 // Search Invoice
   $actions["PAYMENT"]["search_invoice"] = array (
     'Url'      => "$path/payment/payment_index.php?action=search_invoice",
-    'Right'    => $payment_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                                 );
 
 // Search Invoice New
   $actions["PAYMENT"]["search_invoice_new"] = array (
     'Url'      => "$path/payment/payment_index.php?action=search_invoice_new",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Add Invoices
   $actions["PAYMENT"]["add_invoices"] = array (
     'Url'      => "$path/payment/payment_index.php?action=add_invoices",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Check banking
   $actions["PAYMENT"]["check_banking"] = array (
     'Url'      => "$path/payment/payment_index.php?action=check_banking",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Insert
   $actions["PAYMENT"]["insert"] = array (
     'Url'      => "$path/payment/payment_index.php?action=insert",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Update
   $actions["PAYMENT"]["update"] = array (
     'Url'      => "$path/payment/payment_index.php?action=update",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                                 );
 
@@ -754,21 +754,21 @@ function get_payment_action() {
   $actions["PAYMENT"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$payment["payment"]."",
-    'Right'    => $incident_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
 
 // Break Association
   $actions["PAYMENT"]["break_asso"] = array (
     'Url'      => "$path/payment/payment_index.php?action=break_asso",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                              );
 
 // Do Break Association
   $actions["PAYMENT"]["do_break_asso"] = array (
     'Url'      => "$path/payment/payment_index.php?action=do_break_asso",
-    'Right'    => $payment_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                              );
 
@@ -776,28 +776,28 @@ function get_payment_action() {
   $actions["PAYMENT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/payment/payment_index.php?action=admin",
-    'Right'    => $payment_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                        );
 
 // Import Reconcile
   $actions["PAYMENT"]["reconcile_import"] = array (
     'Url'      => "$path/payment/payment_index.php?action=reconcile_import",
-    'Right'    => $payment_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       		 );
 
 // Select Reconcile
   $actions["PAYMENT"]["select_reconcile"] = array (
     'Url'      => "$path/payment/payment_index.php?action=select_reconcile",
-    'Right'    => $payment_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       		 );
 
 // Do Reconcile
   $actions["PAYMENT"]["do_reconcile"] = array (
     'Url'      => "$path/payment/payment_index.php?action=do_reconcile",
-    'Right'    => $payment_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       		 );
 
@@ -805,21 +805,21 @@ function get_payment_action() {
   $actions["PAYMENT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/payment/payment_index.php?action=display",
-    'Right'    => $payment_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 
 // Display Préférences
   $actions["PAYMENT"]["display_dispref"] = array (
     'Url'      => "$path/payment/payment_index.php?action=display_dispref",
-    'Right'    => $payment_read, 
+    'Right'    => $cright_read, 
     'Condition'=> array ('None') 
                                       	 );
 
 // Display Level
   $actions["PAYMENT"]["display_level"] = array (
     'Url'      => "$path/payment/payment_index.php?action=display_level",
-    'Right'    => $payment_read, 
+    'Right'    => $cright_read, 
     'Condition'=> array ('None') 
                                       	        );
 

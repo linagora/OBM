@@ -18,7 +18,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-
 require("account_display.inc");
 require("account_query.inc");
 
@@ -38,8 +37,7 @@ page_close();
 if ($action == "") $action = "index";
 $account = get_param_account();
 get_account_action();
-$perm->check();
-
+$perm->check_permissions($menu, $action);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,20 +247,20 @@ function get_account_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_compute_balance;
   global $l_header_consult;
-  global $account_read, $account_write, $account_admin_read, $account_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["ACCOUNT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/account/account_index.php?action=index",
-    'Right'    => $account_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                        );
 
 // Search
   $actions["ACCOUNT"]["search"] = array (
     'Url'      => "$path/account/account_index.php?action=search",
-    'Right'    => $account_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                        );
 
@@ -270,14 +268,14 @@ function get_account_action() {
   $actions["ACCOUNT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/account/account_index.php?action=new",
-    'Right'    => $account_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('','search','index','detailconsult','display') 
      		                     );
 
 // Insert
   $actions["ACCOUNT"]["insert"] = array (
     'Url'      => "$path/account/account_index.php?action=insert",
-    'Right'    => $account_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
@@ -285,7 +283,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/account/account_index.php?action=detailconsult&amp;param_account=".$account["account"]."",
-    'Right'    => $account_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('compute_balance') 
                                        );
 
@@ -293,7 +291,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["compute_balance"] = array (
     'Name'     => $l_header_compute_balance,
     'Url'      => "$path/account/account_index.php?action=compute_balance&amp;param_account=".$account["account"]."",
-    'Right'    => $account_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      		 );
 
@@ -301,14 +299,14 @@ function get_account_action() {
   $actions["ACCOUNT"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/account/account_index.php?action=detailupdate&amp;param_account=".$account["account"]."",
-    'Right'    => $account_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
 
 // Update
   $actions["ACCOUNT"]["update"] = array (
     'Url'      => "$path/account/account_index.php?action=update",
-    'Right'    => $account_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
@@ -316,7 +314,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/account/account_index.php?action=delete&amp;param_account=".$account["account"]."",
-    'Right'    => $account_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate') 
                                      	);
 
@@ -324,7 +322,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/account/account_index.php?action=admin",
-    'Right'    => $account_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                       );
 
@@ -332,7 +330,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/account/account_index.php?action=display",
-    'Right'    => $account_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 
@@ -340,7 +338,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["dispref_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/account/account_index.php?action=dispref_display",
-    'Right'    => $account_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 
@@ -348,9 +346,10 @@ function get_account_action() {
   $actions["ACCOUNT"]["level_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/account/account_index.php?action=level_display",
-    'Right'    => $account_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 
 }
-</SCRIPT>
+
+</script>

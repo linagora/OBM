@@ -31,7 +31,7 @@ page_close();
 if ($action == "") $action = "index";
 $document = get_param_document();
 get_document_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -427,15 +427,14 @@ function get_param_document() {
 function get_document_action() {
   global $document, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_tree;
-  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_repository;
-  global $document_read, $document_write, $document_admin_read, $document_admin_write;
-  global $l_header_delete;
+  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_repository, $l_header_delete;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Display Level
   $actions["DOCUMENT"]["tree"]  = array (
     'Name'     => $l_header_tree,
     'Url'      => "$path/document/document_index.php?action=tree",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                      		 );
 
@@ -443,14 +442,14 @@ function get_document_action() {
   $actions["DOCUMENT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/document/document_index.php?action=index",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
 
 // Search
   $actions["DOCUMENT"]["search"] = array (
     'Url'      => "$path/document/document_index.php?action=search",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
@@ -458,16 +457,15 @@ function get_document_action() {
   $actions["DOCUMENT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/document/document_index.php?action=new",
-    'Right'    => $document_write,
-    'Condition'=> array ('search','index','detailconsult','new_repository','insert','insert_repository',
-                         'tree','update','admin','display') 
+    'Right'    => $cright_write,
+    'Condition'=> array ('search','index','detailconsult','new_repository','insert','insert_repository', 'tree','update','admin','display') 
                                      );
 
 // New Repository
   $actions["DOCUMENT"]["new_repository"] = array (
     'Name'     => $l_header_new_repository,
     'Url'      => "$path/document/document_index.php?action=new_repository",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('search','index','detailconsult','new','insert','insert_repository','update',
                          'tree','admin','display') 
                                      );
@@ -477,7 +475,7 @@ function get_document_action() {
   $actions["DOCUMENT"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/document/document_index.php?action=detailconsult&amp;param_document=".$document["id"]."",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                      		 );
 
@@ -485,13 +483,13 @@ function get_document_action() {
   $actions["DOCUMENT"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/document/document_index.php?action=detailupdate&amp;param_document=".$document["id"]."",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 // Update
   $actions["DOCUMENT"]["update"] = array (
     'Url'      => "$path/document/document_index.php?action=update",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	      );
 
@@ -499,20 +497,20 @@ function get_document_action() {
   $actions["DOCUMENT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/document/document_index.php?action=check_delete&amp;param_document=".$document["id"]."",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 
 // Update
   $actions["DOCUMENT"]["delete"] = array (
     'Url'      => "$path/document/document_index.php?action=delete",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	      );
 // Insert
   $actions["DOCUMENT"]["insert"] = array (
     'Url'      => "$path/document/document_index.php?action=insert",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );  
 
@@ -520,119 +518,119 @@ function get_document_action() {
 // Repository Insert
   $actions["DOCUMENT"]["insert_repository"] = array (
     'Url'      => "$path/document/document_index.php?action=insert_repository",
-    'Right'    => $document_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );  
 // Admin
   $actions["DOCUMENT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/document/document_index.php?action=admin",
-    'Right'    => $document_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
    					);
 
 // Category Insert
   $actions["DOCUMENT"]["cat1_insert"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_insert",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
   $actions["DOCUMENT"]["cat1_update"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_update",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
   $actions["DOCUMENT"]["cat1_checklink"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_checklink",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
   $actions["DOCUMENT"]["cat1_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_delete",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
   $actions["DOCUMENT"]["cat2_insert"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_insert",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
   $actions["DOCUMENT"]["cat2_update"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_update",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
   $actions["DOCUMENT"]["cat2_checklink"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_checklink",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
   $actions["DOCUMENT"]["cat2_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_delete",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Mime Insert
   $actions["DOCUMENT"]["mime_insert"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_insert",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Mime Update
   $actions["DOCUMENT"]["mime_update"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_update",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Mime Check Link
   $actions["DOCUMENT"]["mime_checklink"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_checklink",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Mime Delete
   $actions["DOCUMENT"]["mime_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_delete",
-    'Right'    => $document_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
   // Display
   $actions["DOCUMENT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/document/document_index.php?action=display",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 
 // Display Préférences
   $actions["DOCUMENT"]["dispref_display"] = array (
     'Url'      => "$path/document/document_index.php?action=dispref_display",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
   $actions["DOCUMENT"]["dispref_level"]  = array (
     'Url'      => "$path/document/document_index.php?action=dispref_level",
-    'Right'    => $document_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 }

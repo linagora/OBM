@@ -81,8 +81,7 @@ page_close();
 if ($action == "") $action = "index";
 $deal = get_param_deal();
 get_deal_action();
-$perm->check();
-
+$perm->check_permissions($menu, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -641,27 +640,27 @@ function get_deal_action() {
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $l_header_new_child, $l_header_new_parent;
   global $l_deal_select_company;
-  global $deal_read, $deal_write, $deal_admin_read, $deal_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   // Index
   $actions["DEAL"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/deal/deal_index.php?action=index",
-    'Right'    => $deal_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     );
 
   // Search
   $actions["DEAL"]["search"] = array (
     'Url'      => "$path/deal/deal_index.php?action=search",
-    'Right'    => $deal_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      );
 
   // Parent Search
   $actions["DEAL"]["parent_search"] = array (
     'Url'      => "$path/deal/deal_index.php?action=parent_search",
-    'Right'    => $deal_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      );
 
@@ -669,7 +668,7 @@ function get_deal_action() {
   $actions["DEAL"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 
                                   );
@@ -679,7 +678,7 @@ function get_deal_action() {
   $actions["DEAL"]["new_child"] = array (
     'Name'     => $l_header_new_child,
     'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=$ret_url",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('parent_detailconsult') 
                                   );
@@ -688,7 +687,7 @@ function get_deal_action() {
   $actions["DEAL"]["parent_new"] = array (
     'Name'     => $l_header_new_parent,
     'Url'      => "$path/deal/deal_index.php?action=parent_new",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('','search','parent_search','index',
                          'detailconsult','parent_detailconsult',
                          'admin','display') 
@@ -697,7 +696,7 @@ function get_deal_action() {
   // Detail Consult
   $actions["DEAL"]["detailconsult"] = array (
     'Url'      => "$path/deal/deal_index.php?action=detailconsult",
-    'Right'    => $deal_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	    );
 
@@ -705,7 +704,7 @@ function get_deal_action() {
   $actions["DEAL"]["parent_detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"]."",
-    'Right'    => $deal_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate')
                                     	    );
 
@@ -713,7 +712,7 @@ function get_deal_action() {
   $actions["DEAL"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"]."",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update','insert') 
                                      	    );
 
@@ -721,21 +720,21 @@ function get_deal_action() {
   $actions["DEAL"]["parent_detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"]."",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
                                      		  );
 
   // Insert
   $actions["DEAL"]["insert"] = array (
     'Url'      => "$path/deal/deal_index.php?action=insert",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
   // Parent insert
   $actions["DEAL"]["parent_insert"] = array (
     'Url'      => "$path/deal/deal_index.php?action=parent_insert",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                             );
 
@@ -743,14 +742,14 @@ function get_deal_action() {
   $actions["DEAL"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"]."",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update','insert') 
                                      );
 
 // Document add
   $actions["DEAL"]["document_add"] = array (
     'Url'      => "$path/deal/deal_index.php?action=document_add",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None')
   );
   
@@ -758,7 +757,7 @@ function get_deal_action() {
   $actions["DEAL"]["parent_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"]."",
-    'Right'    => $deal_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
                                      	     );
 
@@ -766,63 +765,63 @@ function get_deal_action() {
   $actions["DEAL"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/deal/deal_index.php?action=admin",
-    'Right'    => $deal_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                     );
 
   // Kind Insert
   $actions["DEAL"]["kind_insert"] = array (
     'Url'      => "$path/deal/deal_index.php?action=kind_insert",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                            );
 
   // Kind Update
   $actions["DEAL"]["kind_update"] = array (
     'Url'      => "$path/deal/deal_index.php?action=kind_update",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                            );
 
   // Kind checklink
   $actions["DEAL"]["kind_checklink"] = array (
     'Url'      => "$path/deal/deal_index.php?action=kind_checklink",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                              );
 
   // Kind delete
   $actions["DEAL"]["kind_delete"] = array (
     'Url'      => "$path/deal/deal_index.php?action=kind_delete",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 
   // Status Insert 
   $actions["DEAL"]["status_status"] = array (
     'Url'      => "$path/deal/deal_index.php?action=status_insert",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 
   // Status Update 
   $actions["DEAL"]["status_update"] = array (
     'Url'      => "$path/deal/deal_index.php?action=status_update",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 
   // Status Checklink 
   $actions["DEAL"]["status_checklink"] = array (
     'Url'      => "$path/deal/deal_index.php?action=status_checklink",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 
   // Status Delete 
   $actions["DEAL"]["status_delete"] = array (
     'Url'      => "$path/deal/deal_index.php?action=status_delete",
-    'Right'    => $deal_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 
@@ -830,21 +829,21 @@ function get_deal_action() {
   $actions["DEAL"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/deal/deal_index.php?action=display",
-    'Right'    => $deal_read, 
+    'Right'    => $cright_read, 
     'Condition'=> array ('all') 
                                       );
 
   // Display Preference
   $actions["DEAL"]["dispref_display"] = array (
     'Url'      => "$path/deal/deal_index.php?action=dispref_display",
-    'Right'    => $deal_read, 
+    'Right'    => $cright_read, 
     'Condition'=> array ('None') 
                                       );
 
   // Display Level
   $actions["DEAL"]["dispref_level"] = array (
     'Url'      => "$path/deal/deal_index.php?action=dispref_level",
-    'Right'    => $deal_read, 
+    'Right'    => $cright_read, 
     'Condition'=> array ('None') 
                                       );
 

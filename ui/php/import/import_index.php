@@ -77,7 +77,7 @@ if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $import = get_param_import();
 get_import_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 echo "<br>fi_file=$fi_file";
 echo "<br>fi_name=$fi_file_name";
@@ -111,39 +111,30 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-}
 
-else if ($action == "search") {
+} else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $dsrc_q = run_query_datasource();
   $display["search"] = html_import_search_form($import, $dsrc_q);
   $display["result"] = dis_import_search_list($import, $popup);
-}
 
-else if ($action == "new") {
+} else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($perm->have_perm("editor")) {
-    $dsrc_q = run_query_datasource();
-    $display["detail"] = html_import_form($action, $import, "", $dsrc_q);
-  } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
-}
+  $dsrc_q = run_query_datasource();
+  $display["detail"] = html_import_form($action, $import, "", $dsrc_q);
 
-else if ($action == "detailconsult") {
+} else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_detail($import["id"]);
   $display["detail"] = html_import_consult($import_q);
-}
 
-else if ($action == "detailupdate") {
+} else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($import["id"]);
   $dsrc_q = run_query_datasource();
   $display["detail"] = html_import_form($action, $import, $obm_q, $dsrc_q);
-}
 
-else if ($action == "insert") {
+} else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $import)) {
 
@@ -206,18 +197,14 @@ else if ($action == "insert") {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($perm->have_perm("editor")) {
-    $retour = run_query_delete($import["id"]);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
-    } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
-    }
-    $dsrc_q = run_query_datasource();
-    $display["search"] = html_import_search_form($import, $dsrc_q);
+  $retour = run_query_delete($import["id"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
-   $display["msg"] .= display_err_msg($l_error_permission);
+    $display["msg"] .= display_err_msg($l_delete_error);
   }
+  $dsrc_q = run_query_datasource();
+  $display["search"] = html_import_search_form($import, $dsrc_q);
 
 } elseif ($action == "test_file")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -534,20 +521,20 @@ function get_import_action() {
   global $l_import,$l_header_display,$l_header_test_file;
   global $l_header_consult, $l_header_add_contact;
   global $l_select_list, $l_add_contact;
-  global $import_read, $import_write, $import_admin_read, $import_admin_write;
+  global $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["IMPORT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/import/import_index.php?action=index",
-    'Right'    => $import_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                     );
 
 // Search
   $actions["IMPORT"]["search"] = array (
     'Url'      => "$path/import/import_index.php?action=search",
-    'Right'    => $import_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('None') 
                                       );
 
@@ -555,14 +542,14 @@ function get_import_action() {
   $actions["IMPORT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/import/import_index.php?action=new",
-    'Right'    => $import_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('','search','index','detailconsult','admin','display') 
                                   );
 // Detail Consult
   $actions["IMPORT"]["detailconsult"] = array (
      'Name'     => $l_header_consult,
      'Url'      => "$path/import/import_index.php?action=detailconsult&amp;param_import=".$import["id"]."",
-    'Right'    => $import_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('detailupdate') 
                                       );
 
@@ -570,21 +557,21 @@ function get_import_action() {
   $actions["IMPORT"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/import/import_index.php?action=detailupdate&amp;param_import=".$import["id"]."",
-     'Right'    => $import_write,
+     'Right'    => $cright_write_admin,
      'Condition'=> array ('detailconsult', 'update') 
                                            );
 
 // Insert
   $actions["IMPORT"]["insert"] = array (
     'Url'      => "$path/import/import_index.php?action=insert",
-    'Right'    => $import_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       );
 
 // Update
   $actions["IMPORT"]["update"] = array (
     'Url'      => "$path/import/import_index.php?action=update",
-    'Right'    => $import_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       );
 
@@ -592,14 +579,14 @@ function get_import_action() {
   $actions["IMPORT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/import/import_index.php?action=check_delete&amp;param_import=".$import["id"]."",
-    'Right'    => $import_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'update') 
                                            );
 
 // Delete
   $actions["IMPORT"]["delete"] = array (
     'Url'      => "$path/import/import_index.php?action=delete",
-    'Right'    => $import_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       );
 
@@ -607,20 +594,22 @@ function get_import_action() {
   $actions["IMPORT"]["test_file"] = array (
     'Name'     => $l_header_test_file,
     'Url'      => "$path/import/import_index.php?action=test_file&amp;param_import=".$import["id"]."",
-    'Right'    => $import_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
+
+
 
 // Contact ADD
   $actions["LIST"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",
-    'Right'    => $list_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 // Contact Del
   $actions["LIST"]["contact_del"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_del",
-    'Right'    => $list_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                           );
 
@@ -628,7 +617,7 @@ function get_import_action() {
   $actions["LIST"]["export_add"] = array (
     'Name'     => $l_header_export,
     'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
-    'Right'    => $list_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
                                      	 );
 
@@ -636,7 +625,7 @@ function get_import_action() {
   $actions["LIST"]["export"] = array (
     'Name'     => $l_header_global_export,
     'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
-    'Right'    => $list_write,
+    'Right'    => $cright_write_admin,
     'Popup'    => 1,
     'Target'   => $l_list,
     'Condition'=> array ('all') 
@@ -653,14 +642,14 @@ function get_import_action() {
 // Display Préférence
   $actions["LIST"]["dispref_display"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_display",
-   'Right'    => $list_write,
+   'Right'    => $cright_write_admin,
    'Condition'=> array ('None') 
                                                );
 
 // Display level
   $actions["LIST"]["dispref_level"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_level",
-   'Right'    => $list_write,
+   'Right'    => $cright_write_admin,
    'Condition'=> array ('None') 
                                             );
 

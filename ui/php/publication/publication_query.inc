@@ -27,6 +27,10 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   $market = $publication[""];
   $zip = $publication["zip"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   // If a title has been given we search its sound too
   $req = "select
       publication_id as Id,
@@ -41,7 +45,7 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
 
   $and = "";
   if ($title != "") {
-    $where_title = " publication_title like '$title%'";
+    $where_title = " publication_title $like '$title%'";
     $and = "and";
   }
   if (($type != $c_all) && ($type != "")) { 
@@ -50,12 +54,12 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   }
 
   if ($year != "") {
-    $where .= " $and publication_year like '$year%'";
+    $where .= " $and publication_year $like '$year%'";
     $and = "and";
   }
   
   if ($lang != "") {
-    $where .= " $and publication_lang like '$lang%'";
+    $where .= " $and publication_lang $like '$lang%'";
     $and = "and";
   }
 
@@ -70,9 +74,8 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   $query = "$req $whereq order by $order $p_order_dir";
 
   display_debug_msg("publication_search(1) : $query", $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q->query($query);
+  return $obm_q;
 }
 
 
@@ -340,15 +343,18 @@ function run_query_publication_contract_links($p_id) {
 function run_query_check_publication($p_id, $title, $lang) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $where_id = "";
   if ($p_id != "") {
     $where_id = "and publication_id!='$p_id'";
   }
-  $obm_q = new DB_OBM;
   $query = "select distinct publication_id, publication_title, publication_lang
-            from Publication
-            where publication_title like '$title%'and publication_lang like '$lang%'
-              $where_id";
+    from Publication
+    where publication_title $like '$title%'and publication_lang like '$lang%'
+          $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

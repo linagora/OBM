@@ -61,7 +61,7 @@ page_close();
 if ($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -72,10 +72,7 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   require("company_js.inc");  
-  $type_q = run_query_companytype();
-  $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm_active();
-  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+  $display["search"] = dis_company_search_form($company);
   if ($set_display == "yes") {
     $display["result"] = dis_company_search_list($company);
   } else {
@@ -83,7 +80,6 @@ if ($action == "ext_get_id") {
   }
 
 
-  
 /*  require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company);
@@ -104,10 +100,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $type_q = run_query_companytype();
-  $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm_active();
-  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+  $display["search"] = dis_company_search_form($company);
   if ($set_display == "yes") {
     $display["result"] = dis_company_search_list($company);
   } else {
@@ -116,11 +109,8 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");  
-  $type_q = run_query_companytype();
-  $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm_active();
-  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+  require("company_js.inc");
+  $display["search"] = dis_company_search_form($company);
   $display["result"] = dis_company_search_list($company);
 
 } elseif ($action == "new")  {
@@ -180,10 +170,7 @@ if ($action == "ext_get_id") {
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $type_q = run_query_companytype();
-      $act_q = run_query_companyactivity();
-      $usr_q = run_query_userobm_active();
-      $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+      $display["search"] = dis_company_search_form($company);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
       $obm_q = check_company_context("", $company);
@@ -196,10 +183,7 @@ if ($action == "ext_get_id") {
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
-        $type_q = run_query_companytype();
-	$act_q = run_query_companyactivity();
-        $usr_q = run_query_userobm_active();
-        $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+        $display["search"] = dis_company_search_form($company);
       }
     }
 
@@ -255,10 +239,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  $type_q = run_query_companytype();
-  $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm_active();
-  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+  $display["search"] = dis_company_search_form($company);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -490,7 +471,7 @@ function get_param_company() {
   if (isset ($tf_zip)) $company["zip"] = $tf_zip;
   if (isset ($tf_town)) $company["town"] = $tf_town;
   if (isset ($tf_cdx)) $company["cdx"] = $tf_cdx;
-  if (isset ($sel_ctry)) $company["ctry"] = $sel_ctry;
+  if (isset ($sel_ctry)) $company["country"] = $sel_ctry;
   if (isset ($tf_phone)) $company["phone"] = $tf_phone;
   if (isset ($tf_fax)) $company["fax"] = $tf_fax;
   if (isset ($tf_web)) $company["web"] = $tf_web;
@@ -528,20 +509,20 @@ function get_company_action() {
   global $company, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display,$l_header_admin;
-  global $company_read, $company_write, $company_admin_read, $company_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["COMPANY"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/company/company_index.php?action=index",
-    'Right'    => $company_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
 
 // Search
   $actions["COMPANY"]["search"] = array (
     'Url'      => "$path/company/company_index.php?action=search",
-    'Right'    => $company_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
@@ -549,7 +530,7 @@ function get_company_action() {
   $actions["COMPANY"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=new",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
                                      );
 
@@ -557,7 +538,7 @@ function get_company_action() {
   $actions["COMPANY"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"]."",
-    'Right'    => $company_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                      		 );
 
@@ -565,21 +546,21 @@ function get_company_action() {
   $actions["COMPANY"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 
 // Insert
   $actions["COMPANY"]["insert"] = array (
     'Url'      => "$path/company/company_index.php?action=insert",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Update
   $actions["COMPANY"]["update"] = array (
     'Url'      => "$path/company/company_index.php?action=update",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
@@ -587,14 +568,14 @@ function get_company_action() {
   $actions["COMPANY"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete
   $actions["COMPANY"]["delete"] = array (
     'Url'      => "$path/company/company_index.php?action=delete",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
@@ -602,91 +583,91 @@ function get_company_action() {
   $actions["COMPANY"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/company/company_index.php?action=admin",
-    'Right'    => $company_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                        );
 
 // Kind Insert
   $actions["COMPANY"]["kind_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_insert",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
   $actions["COMPANY"]["kind_update"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_update",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
   $actions["COMPANY"]["kind_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_checklink",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
   $actions["COMPANY"]["kind_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_delete",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
   $actions["COMPANY"]["cat_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_insert",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
   $actions["COMPANY"]["cat_update"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_update",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
   $actions["COMPANY"]["cat_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_checklink",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
   $actions["COMPANY"]["cat_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_delete",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Activity Insert
   $actions["COMPANY"]["activity_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_insert",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Activity Update
   $actions["COMPANY"]["activity_update"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_update",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Activity Check Link
   $actions["COMPANY"]["activity_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_checklink",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Activity Delete
   $actions["COMPANY"]["activity_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_delete",
-    'Right'    => $company_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
@@ -694,28 +675,28 @@ function get_company_action() {
   $actions["COMPANY"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/company/company_index.php?action=display",
-    'Right'    => $company_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 
 // Display Préférences
   $actions["COMPANY"]["dispref_display"] = array (
     'Url'      => "$path/company/company_index.php?action=dispref_display",
-    'Right'    => $company_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
   $actions["COMPANY"]["dispref_level"]  = array (
     'Url'      => "$path/company/company_index.php?action=dispref_level",
-    'Right'    => $company_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 					       
 // Document add
   $actions["DEAL"]["document_add"] = array (
     'Url'      => "$path/company/company_index.php?action=document_add",
-    'Right'    => $company_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None')
   );     
 

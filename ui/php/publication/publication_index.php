@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : publication_index.php                                            //
+// OBM - File : publication_index.php                                        //
 //     - Desc : Company Index File                                           //
 // 2004-01-28 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -10,8 +10,8 @@
 // - index (default)    -- search fields  -- show the publication search form
 // - search             -- search fields  -- show the result set of search
 // - new                --                -- show the new publication form
-// - detailconsult      -- $param_publication -- show the publication detail
-// - detailupdate       -- $param_publication -- show the publication detail form
+// - detailconsult      -- $param_publication -- show publication detail
+// - detailupdate       -- $param_publication -- show publication detail form
 // - insert             -- form fields    -- insert the publication
 // - update             -- form fields    -- update the publication
 // - check_delete       -- $param_publication -- check links before delete
@@ -52,7 +52,8 @@ page_close();
 if ($action == "") $action = "index";
 $publication = get_param_publication();
 get_publication_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -432,20 +433,20 @@ function get_publication_action() {
   global $publication, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display,$l_header_admin;
-  global $publication_read, $publication_write, $publication_admin_read, $publication_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["PUBLICATION"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/publication/publication_index.php?action=index",
-    'Right'    => $publication_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
 
 // Search
   $actions["PUBLICATION"]["search"] = array (
     'Url'      => "$path/publication/publication_index.php?action=search",
-    'Right'    => $publication_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
@@ -453,7 +454,7 @@ function get_publication_action() {
   $actions["PUBLICATION"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/publication/publication_index.php?action=new",
-    'Right'    => $publication_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
                                      );
 
@@ -461,7 +462,7 @@ function get_publication_action() {
   $actions["PUBLICATION"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$publication["id"]."",
-    'Right'    => $publication_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                      		 );
 
@@ -469,21 +470,21 @@ function get_publication_action() {
   $actions["PUBLICATION"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"]."",
-    'Right'    => $publication_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 
 // Insert
   $actions["PUBLICATION"]["insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=insert",
-    'Right'    => $publication_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Update
   $actions["PUBLICATION"]["update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=update",
-    'Right'    => $publication_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
@@ -491,14 +492,14 @@ function get_publication_action() {
   $actions["PUBLICATION"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/publication/publication_index.php?action=check_delete&amp;param_publication=".$publication["id"]."",
-    'Right'    => $publication_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete
   $actions["PUBLICATION"]["delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=delete",
-    'Right'    => $publication_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
@@ -506,110 +507,110 @@ function get_publication_action() {
   $actions["PUBLICATION"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/publication/publication_index.php?action=admin",
-    'Right'    => $publication_admin_read,
+    'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                        );
 
 // Kind Insert
   $actions["PUBLICATION"]["type_insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_insert",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
   $actions["PUBLICATION"]["type_update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_update",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
   $actions["PUBLICATION"]["type_checklink"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_checklink",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
   $actions["PUBLICATION"]["type_delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_delete",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 // Renewal Insert
   $actions["PUBLICATION"]["renew_insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=renew_insert",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Renewal Update
   $actions["PUBLICATION"]["renew_update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=renew_update",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Renewal Check Link
   $actions["PUBLICATION"]["renew_checklink"] = array (
     'Url'      => "$path/publication/publication_index.php?action=renew_checklink",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Renewal Delete
   $actions["PUBLICATION"]["renew_delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=renew_delete",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 // Reception Insert
   $actions["PUBLICATION"]["recept_insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_insert",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Reception Update
   $actions["PUBLICATION"]["recept_update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_update",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Reception Check Link
   $actions["PUBLICATION"]["recept_checklink"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_checklink",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Reception Delete
   $actions["PUBLICATION"]["recept_delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_delete",
-    'Right'    => $publication_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );					       
 // Display
   $actions["PUBLICATION"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/publication/publication_index.php?action=display",
-    'Right'    => $publication_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                       	 );
 
 // Display Préférences
   $actions["PUBLICATION"]["dispref_display"] = array (
     'Url'      => "$path/publication/publication_index.php?action=dispref_display",
-    'Right'    => $publication_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
   $actions["PUBLICATION"]["dispref_level"]  = array (
     'Url'      => "$path/publication/publication_index.php?action=dispref_level",
-    'Right'    => $publication_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 

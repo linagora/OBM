@@ -14,7 +14,7 @@ $path = "..";
 $section = "USER";
 $menu = "SETTINGS";
 $obminclude = getenv("OBM_INCLUDE_VAR");
-if($obminclude == "") $obminclude="obminclude";
+if ($obminclude == "") $obminclude="obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $uid = $auth->auth["uid"];
@@ -135,7 +135,7 @@ if ($set_csv_sep == $ccsvd_tab) $csvd_tab = "checked";
 
 if ($action == "") $action = "index";
 get_settings_actions();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
@@ -367,11 +367,11 @@ display_page($display);
 // Settings actions
 //////////////////////////////////////////////////////////////////////////////
 function get_settings_actions() {
-  global $actions, $settings_read;
+  global $actions, $cright_read;
 
   $actions["SETTINGS"]["index"] = array (
     'Url'      => "$path/settings/settings_index.php?action=index",
-    'Right'    => $settings_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	);
 }

@@ -29,12 +29,13 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 
   $timeupdate = sql_date_format($type, "list_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type, "list_timecreate", "timecreate");
+  $like = sql_casei_like($type);
 
   if ($contact != '') {
-    $where .= " and contact_lastname like '$contact%'";
+    $where .= " and contact_lastname $like '$contact%'";
   }
   if ($email != '') {
-    $where .= " and list_email like '%$email%'";
+    $where .= " and list_email $like '%$email%'";
   }
 
   $query = "select distinct List.*, list_id as Id,
@@ -47,7 +48,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
-  where list_name like '$name%'
+  where list_name $like '$name%'
     $where";
 
 
@@ -397,16 +398,20 @@ function get_list_name_exists($name, $id="") {
 function run_query_check_list($id, $name, $subject) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   if ($id != "") {
     $where_id = "list_id != '$id' and";
   }
 
   // We search for a similar name (as same name is already excluded)
-  $wname = "list_name like '%$name%'";
+  $wname = "list_name $like '%$name%'";
 
   // If subject is short, we test equality, else similarity
   if (strlen($subject)  > 2) {
-    $wsubject = "list_subject like '%$subject%'";
+    $wsubject = "list_subject $like '%$subject%'";
   } else {
     $wsubject = "list_subject = '$subject'";
   }
@@ -417,7 +422,6 @@ function run_query_check_list($id, $name, $subject) {
        ($wname or $wsubject)";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
@@ -718,10 +722,16 @@ function run_query_contacts_for_letter($list_ids) {
 ///////////////////////////////////////////////////////////////////////////////
 function make_query($list) {
   global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+
   $criteria = $list["criteria"]["modules"];
   $query_kind = $list["query_kind"];
   $bollean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
+
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $query = "
         SELECT DISTINCT
         contact_id,
@@ -783,7 +793,7 @@ function make_query($list) {
           if(is_array($criterion)) {
             foreach($criterion as $line => $value) {
               if($value != "") {
-                $condition[$line] .= $and[$line]." $field LIKE '$value%'";
+                $condition[$line] .= $and[$line]." $field $like '$value%'";
 		$and[$line] = " AND";
 	      }		
             }

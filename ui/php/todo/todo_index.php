@@ -37,7 +37,7 @@ $uid = $auth->auth["uid"];
 
 $todo = get_param_todo();
 get_todo_action();
-$perm->check();
+$perm->check_permissions($menu, $action);
 
 
 if ($action == "index" || $action == "") {
@@ -213,7 +213,7 @@ function get_param_todo() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_todo_action() {
   global $todo, $actions, $path;
-  global $todo_read, $todo_write, $todo_admin_read, $todo_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_todo_list, $l_header_delete, $l_header_update;
   global $l_header_admin, $l_header_display;
 
@@ -221,28 +221,28 @@ function get_todo_action() {
   $actions["TODO"]["index"] = array (
     'Name'     => $l_header_todo_list,
     'Url'      => "$path/todo/todo_index.php?action=index",
-    'Right'    => $todo_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
 
 // Search
   $actions["TODO"]["detailconsult"] = array (
     'Url'      => "$path/todo/todo_index.php?action=add",
-    'Right'    => $todo_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // Add a todo
   $actions["TODO"]["add"] = array (
     'Url'      => "$path/todo/todo_index.php?action=add",
-    'Right'    => $todo_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // Delete a list of todo
   $actions["TODO"]["delete"] = array (
     'Url'      => "$path/todo/todo_index.php?action=delete",
-    'Right'    => $todo_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
@@ -250,14 +250,14 @@ function get_todo_action() {
   $actions["TODO"]["update"]  = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/todo/todo_index.php?action=update&amp;param_todo=". $todo["id"],
-    'Right'    => $todo_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate') 
                                       );
 
 // Update
   $actions["TODO"]["detailupdate"]  = array (
     'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;param_todo=". $todo["id"],
-    'Right'    => $todo_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
 
@@ -265,7 +265,7 @@ function get_todo_action() {
   $actions["TODO"]["delete_unique"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/todo/todo_index.php?action=delete_unique&amp;param_todo=". $todo["id"],
-    'Right'    => $todo_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
 
                                      );
@@ -274,21 +274,21 @@ function get_todo_action() {
    $actions["TODO"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/todo/todo_index.php?action=display",
-     'Right'    => $todo_read,
+     'Right'    => $cright_read,
      'Condition'=> array ('all') 
                                        	 );
 
 // Display Préférences
    $actions["TODO"]["dispref_display"] = array (
     'Url'      => "$path/todo/todo_index.php?action=dispref_display",
-    'Right'    => $todo_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
    $actions["TODO"]["dispref_level"]  = array (
     'Url'      => "$path/todo/todo_index.php?action=dispref_level",
-    'Right'    => $todo_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 

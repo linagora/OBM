@@ -41,6 +41,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $type = $obm_q->type;
 
   $datealarm = sql_date_format($type, "deal_datealarm", "deal_datealarm");
+  $like = sql_casei_like($type);
 
   $query = "select 
       deal_id as Id,
@@ -79,7 +80,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
                       or deal_usercreate='" . $auth->auth["uid"] . "')";
   }
   if ($label != "") {
-    $query .= " and deal_label like '$label%'";
+    $query .= " and deal_label $like '$label%'";
   }
   if (($kind != $c_all) && ($kind != "")) {
     $query .= " and dealtype_id='$kind'";
@@ -88,10 +89,10 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $query .= " and deal_tasktype_id='$cat'";
   }
   if ($name != "") {
-    $query .= " and company_name like '$name%'";
+    $query .= " and company_name $like '$name%'";
   }
   if ($zip != "") {
-    $query .= " and company_zipcode like '$zip%'";
+    $query .= " and company_zipcode $like '$zip%'";
   }
   if ($company_id != "") {
     $query .= " and company_id='$company_id'";
@@ -1018,6 +1019,10 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
   $query = "select
       parentdeal_id as Id,
       parentdeal_id,
@@ -1034,7 +1039,7 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
       and parentdeal_marketingmanager_id=Marketing.userobm_id";
    
   if ($plabel != "") {
-    $query .= " and parentdeal_label like '$plabel%'";
+    $query .= " and parentdeal_label $like '$plabel%'";
   }
   if ($parchive != 1) {
     $query .= " and parentdeal_archive=0";
@@ -1050,7 +1055,6 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
 
   display_debug_msg($query, $cdg_sql);
 
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 }

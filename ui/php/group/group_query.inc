@@ -25,15 +25,16 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
 
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
 
   if ($user != '') {
-    $where .= " and C.userobm_lastname like '$user%'";
+    $where .= " and C.userobm_lastname $like '$user%'";
   }
   if ($email != '') {
-    $where .= " and group_email like '%$email%'";
+    $where .= " and group_email $like '%$email%'";
   }
   
 
@@ -47,7 +48,7 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
       LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobmid=C.userobm_id
       LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
-    where group_name like '$name%'
+    where group_name $like '$name%'
       $where";
 
   // ORDER construction
@@ -80,6 +81,7 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
 
   $obm_q = new DB_OBM;
   $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
@@ -87,10 +89,10 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
   // WHERE Clause
 
   if ($user != '') {
-    $where .= " and C.userobm_lastname like '$user%'";
+    $where .= " and C.userobm_lastname $like '$user%'";
   }
   if ($email != '') {
-    $where .= " and group_email like '%$email%'";
+    $where .= " and group_email $like '%$email%'";
   }
   while (list ($key, $g_id) = each($parents)) {
     $where .= " and group_id != '$g_id'";
@@ -106,7 +108,7 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
       LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobmid=C.userobm_id
       LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
-    where group_name like '$name%'
+    where group_name $like '$name%'
       and group_id != '$id'
       $where";
 
@@ -235,6 +237,14 @@ function run_query_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  // Delete all groups registration referencing this group
+  $query = "delete from GroupGroup
+    where groupgroup_childid='$p_id'
+      or groupgroup_parentid='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
   // Delete the Group
   $query = "delete from UGroup where group_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
@@ -359,7 +369,7 @@ function run_query_groupgroup_insert($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : UserObmGroup deletion                                   //
+// Query execution : GroupGroup deletion                                     //
 // Parameters:
 //   - $group[] : group hash info : keys used : id, group_nb, group_X
 // Return: number of groups deleted
@@ -559,9 +569,17 @@ function get_group_name_exists($name, $id="") {
 function run_query_check_group($id, $name, $desc) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
+
+  if ($id != "") {
+    $where_id = "group_id!='$id' and";
+  }
+
   // If name is short, we test equality, else similarity
   if (strlen($name) > 2) {
-    $wname = "group_name like '%$name%'";
+    $wname = "group_name $like '%$name%'";
   } else {
     $wname = "group_name = '$name'";
   }
@@ -569,7 +587,7 @@ function run_query_check_group($id, $name, $desc) {
   // If desc is short, we test equality, else similarity
   if (trim($desc) != "") {
     if (strlen($desc) > 2) {
-      $wdesc = "group_desc like '%$desc%'";
+      $wdesc = "group_desc $like '%$desc%'";
     } else {
       $wdesc = "group_desc = '$desc'";
     }
@@ -578,11 +596,10 @@ function run_query_check_group($id, $name, $desc) {
 
   $query = "select distinct group_id, group_name, group_desc
      from UGroup
-     where group_id!='$id'
-       and ($wname $wdesc)";
+     where $where_id
+       ($wname $wdesc)";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;

@@ -138,7 +138,7 @@ if (!(isset($time["date"])))
 if ( !isset($action)) $action = "index";
 
 get_time_actions();
-$perm->check("user");
+$perm->check_permissions($menu, $action);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -451,16 +451,16 @@ function get_param_time() {
 // Time actions
 //////////////////////////////////////////////////////////////////////////////
 function get_time_actions() {
-  global $time, $path;
+  global $time, $path, $actions;
   global $l_header_weeklyview, $l_header_monthlyview, $l_header_globalview;
   global $l_header_stats, $l_header_display;
-  global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
   $actions["TIME"]["index"] = array (
     'Name'     => "$l_header_weeklyview",
     'Url'      => "$path/time/time_index.php?action=index",
-    'Right'    => $time_read,
+    'Right'    => $cright_read,
     'Condition'=> array('all') 
                                     );
 
@@ -469,7 +469,7 @@ function get_time_actions() {
     'Name'     => "$l_header_monthlyview",
     'Url'      => "$path/time/time_index.php?action=viewmonth".
                   "&amp;wbegin=" . $time["date"],
-    'Right'    => $time_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all')
                                     );
 
@@ -478,21 +478,21 @@ function get_time_actions() {
     'Name'     => "$l_header_globalview",
     'Url'      => "$path/time/time_index.php?action=globalview".
                   "&amp;wbegin=" . $time["date"],
-    'Right'    => $time_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
                                     );
 
 // Validate
   $actions["TIME"]["validate"] = array (
     'Url'      => "$path/time/time_index.php?action=validate",
-    'Right'    => $time_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                     );
 
 // Cancel Validation
   $actions["TIME"]["unvalidate"] = array (
     'Url'      => "$path/time/time_index.php?action=unvalidate",
-    'Right'    => $time_admin_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                     );
 
@@ -500,28 +500,28 @@ function get_time_actions() {
   $actions["TIME"]["stats"] = array (
     'Name'     => "$l_header_stats",
     'Url'      => "$path/time/time_index.php?action=stats",
-    'Right'    => $time_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('all')
                                      );
 
 // Insert 
   $actions["TIME"]["insert"] = array (
     'Url'      => "$path/time/time_index.php?action=insert",
-    'Right'    => $time_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     );
 
 // Delete 
   $actions["TIME"]["delete"] = array (
     'Url'      => "$path/time/time_index.php?action=delete",
-    'Right'    => $time_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     );
 
 // Detail Update
   $actions["TIME"]["detailupdate"] = array (
     'Url'      => "$path/time/time_index.php?action=detailupdate",
-    'Right'    => $time_write,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     );
 
@@ -529,21 +529,21 @@ function get_time_actions() {
    $actions["TIME"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/time/time_index.php?action=display",
-     'Right'    => $time_read,
+     'Right'    => $cright_read,
      'Condition'=> array ('all') 
                                        	 );
 
 // Display Préférences
   $actions["TIME"]["dispref_display"] = array (
     'Url'      => "$path/time/time_index.php?action=dispref_display",
-    'Right'    => $time_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
   $actions["TIME"]["dispref_level"]  = array (
     'Url'      => "$path/time/time_index.php?action=dispref_level",
-    'Right'    => $time_read,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 }

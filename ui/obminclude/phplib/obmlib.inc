@@ -24,7 +24,6 @@ if ($obmdb_dbtype == $db_type_pgsql) {
 require("$obminclude/phplib/ct_sql.inc");
 require("$obminclude/phplib/session4.inc");
 require("$obminclude/phplib/auth.inc");
-require("$obminclude/phplib/perm.inc");
 require("$obminclude/phplib/page4.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,10 +148,9 @@ class OBM_Session extends Session {
 }
 
 
-
 class OBM_Challenge_Auth extends Auth {
   var $classname      = "OBM_Challenge_Auth";
-  var $lifetime       =  1200;
+  var $lifetime       = 1200;
   var $magic          = "Simsalabim";  // Challenge seed
   var $database_class = "DB_OBM";
   var $database_table = "UserObm";
@@ -171,8 +169,9 @@ class OBM_Challenge_Auth extends Auth {
     global $login, $password, $challenge, $response;
 
     if(isset($login)) {
-      $this->auth["uname"]=$login;     ## This provides access for "loginform.ihtml"
+      $this->auth["uname"]= $login; // This provides access for loginform.ihtml
     }
+
     $this->db->query(sprintf("select userobm_id,
       userobm_perms,
       userobm_password
@@ -182,14 +181,14 @@ class OBM_Challenge_Auth extends Auth {
                           $this->database_table,
                           addslashes($login)));
 
-    while($this->db->next_record()) {
-      $uid   = $this->db->f("userobm_id");
-      $perm  = $this->db->f("userobm_perms");
-      $pass  = $this->db->f("userobm_password");
+    while ($this->db->next_record()) {
+      $uid  = $this->db->f("userobm_id");
+      $perm = $this->db->f("userobm_perms");
+      $pass = $this->db->f("userobm_password");
     }
     $exspected_response = md5("$login:$pass:$challenge");
 
-    ## True when JS is disabled
+    // True when JS is disabled
     if ($response == "") {
       if ($password != $pass) {
         return false;
@@ -199,7 +198,7 @@ class OBM_Challenge_Auth extends Auth {
       }
     }
     
-    ## Response is set, JS is enabled
+    // Response is set, JS is enabled
     if ($exspected_response != $response) {
       return false;
     } else {
@@ -210,39 +209,149 @@ class OBM_Challenge_Auth extends Auth {
 }
 
 
-class OBM_Perm extends Perm {
-  var $classname = "OBM_Perm";
+///////////////////////////////////////////////////////////////////////////////
+// OBM_Perm Class                                                            //
+// Profile and right definitions                                             //
+///////////////////////////////////////////////////////////////////////////////
+class OBM_Perm {
+  var $classname      = "OBM_Perm";
+  var $mod_length     = 2;             // chars by module rights (1 byte = 2)
+  var $section_pos    = array();       // Section rights Position in profile 
+  var $mod_pos        = array();       // Module rights Position in profile 
 
-  function OBM_Perm (){
-    global $perm_user, $perm_editor ,$perm_admin;
-    $this-> permissions = array(
-                            "user"       => $perm_user,
-                            "author"     => 3,
-                            "editor"     => $perm_editor,
-                            "supervisor" => 15,
-                            "admin"      => $perm_admin
-                          );
+  function OBM_Perm () {
+    global $profiles;
+
+    // Section position in profile ------------------------------------------//
+    $this->section_pos["COM"] = 0;
+    $this->section_pos["PROD"] = 1;
+    $this->section_pos["COMPTA"] = 2;
+    $this->section_pos["USER"] = 3;
+    $this->section_pos["ADMIN"] = 4;
+    $this->section_pos["ALIAMIN"] = 5;
+
+    $mod_length = $this->mod_length;
+
+    // Module position in profile -------------------------------------------//
+    $this->mod_pos["COMPANY"] = 6;
+    $this->mod_pos["CONTACT"] = $this->mod_pos["COMPANY"] + $mod_length;
+    $this->mod_pos["DEAL"] = $this->mod_pos["CONTACT"] + $mod_length;
+    $this->mod_pos["LIST"] = $this->mod_pos["DEAL"] + $mod_length;
+    $this->mod_pos["AGENDA"] = $this->mod_pos["LIST"] + $mod_length;
+    $this->mod_pos["TODO"] = $this->mod_pos["AGENDA"] + $mod_length;
+    $this->mod_pos["PUBLICATION"] = $this->mod_pos["TODO"] + $mod_length;
+    $this->mod_pos["TIME"] = $this->mod_pos["PUBLICATION"] + $mod_length;
+    $this->mod_pos["PROJECT"] = $this->mod_pos["TIME"] + $mod_length;
+    $this->mod_pos["CONTRACT"] = $this->mod_pos["PROJECT"] + $mod_length;
+    $this->mod_pos["INCIDENT"] = $this->mod_pos["CONTRACT"] + $mod_length;
+    $this->mod_pos["DOCUMENT"] = $this->mod_pos["INCIDENT"] + $mod_length;
+    $this->mod_pos["ACCOUNT"] = $this->mod_pos["DOCUMENT"] + $mod_length;
+    $this->mod_pos["INVOICE"] = $this->mod_pos["ACCOUNT"] + $mod_length;
+    $this->mod_pos["PAYMENT"] = $this->mod_pos["INVOICE"] + $mod_length;
+    $this->mod_pos["SETTINGS"] = $this->mod_pos["PAYMENT"] + $mod_length;
+    $this->mod_pos["USER"] = $this->mod_pos["SETTINGS"] + $mod_length;
+    $this->mod_pos["GROUP"] = $this->mod_pos["USER"] + $mod_length;
+    $this->mod_pos["ADMIN"] = $this->mod_pos["GROUP"] + $mod_length;
+    $this->mod_pos["ADMIN_CODE"] = $this->mod_pos["ADMIN"] + $mod_length;
+    $this->mod_pos["ADMIN_PREFS"] = $this->mod_pos["ADMIN_CODE"] + $mod_length;
+    $this->mod_pos["ADMIN_DATA"] = $this->mod_pos["ADMIN_PREFS"] + $mod_length;
+    $this->mod_pos["ADMIN_LANG"] = $this->mod_pos["ADMIN_DATA"] + $mod_length;
+    $this->mod_pos["ADMIN_REF"] = $this->mod_pos["ADMIN_LANG"] + $mod_length;
+    $this->mod_pos["IMPORT"] = $this->mod_pos["ADMIN_REF"] + $mod_length;
+    $profile_length = $this->mod_pos["IMPORT"] + $mod_length;
+
+    // reader : 01 (bit 0) : can see data
+    // user   : 03 (bits 0+1) : can see data + insert or update his own data
+    // editor : 05 (bits 0+2) : can see data + write data
+    // admin  : 1D (bits 0+2+3+4) : can do everything
+    $perm_reader = "01";
+    $perm_user = "03";
+    $perm_editor = "05";
+    $perm_admin = "1D";
+
+    $profiles["reader"] = str_pad("110100", $profile_length, $perm_reader);
+    $profiles["user"] = str_pad("110101", $profile_length, $perm_user);
+    $profiles["editor"] = str_pad("110101", $profile_length, $perm_editor);
+    $profiles["admin"] = str_pad("111111", $profile_length, $perm_admin);
   }
 
-  function perm_invalid($does_have, $must_have) {
-     global $perm, $auth, $sess, $obminclude,$l_error, $l_invalid_perm;
-     global $perm_invalid,$menu,$section;
-     display_head($l_error);     // Head & Body 
-     generate_menu($menu,$section);         // Menu
-     display_err_msg($l_invalid_perm);
-     display_end();
+  //-------------------------------------------------------------------------//
+  // Return the profile access right of the section given as parameter       //
+  // Parameters:
+  //   - $section : section to return the right
+  //-------------------------------------------------------------------------//
+  function get_section_rights($section) {
+    global $profiles, $auth;
+
+    $profile = $auth->auth["perm"];
+    $rights = $profiles["$profile"];
+    $right_start = $this->section_pos["$section"];
+    $section_right = hexdec(substr($rights, $right_start, 1));
+    //    echo "<p>get_section_right: sec=$section, pro=$profile, rights=$rights, start=$right_start, sr=$section_right";
+
+    return $section_right;
   }
 
-  function check() {
-    global $auth;
-    global $actions, $action, $menu;
-    if(($this->permissions[$auth->auth["perm"]] & $actions[$menu][$action]["Right"]) != $actions[$menu][$action]["Right"]) {
-      $this->perm_invalid($auth->auth["perm"], $p);
+  //-------------------------------------------------------------------------//
+  // Return the profile access right of the module given as parameter        //
+  // Parameters:
+  //   - $menu : module to return the right
+  //-------------------------------------------------------------------------//
+  function get_module_rights($menu) {
+    global $profiles, $auth;
+
+    $profile = $auth->auth["perm"];
+    $rights = $profiles["$profile"];
+    $right_start = $this->mod_pos["$menu"];
+    $module_right = hexdec(substr($rights, $right_start, $this->mod_length));
+    // echo "<p>get_mod_right: menu=$menu, pro=$profile, rights=$rights, start=$right_start, mod_right=$module_right";
+
+    return $module_right;
+  }
+
+  //-------------------------------------------------------------------------//
+  // Check profile permissions for the module and action given as parameters //
+  // Parameters:
+  //   - $menu   : module to check
+  //   - $action : action right to check in the module
+  //-------------------------------------------------------------------------//
+  function check_permissions($menu, $action) {
+    global $actions;
+
+    $module_right = $this->get_module_rights($menu);
+    $action_right = $actions[$menu][$action]["Right"];
+
+    // If action right not defined or user has not access rights
+    if ( ( ($module_right & $action_right) != $action_right)
+         || ($action_right == "") ) {
+      echo "<p>check_perm : ACCESS DENIED action=$action, mod_right=$module_right, ac=$action_right";
       exit();
     }
   }
 
+  //-------------------------------------------------------------------------//
+  // Check if the current profile has the module right given as parameter    //
+  // Parameters:
+  //   - $menu  : module to check
+  //   - $right : right to check in the module
+  //-------------------------------------------------------------------------//
+  function check_right($menu, $right) {
+    global $actions;
+
+    $module_right = $this->get_module_rights($menu);
+
+    // If action right not defined or user has not access rights
+    if ( ( ($module_right & $right) != $right)
+         || ($right == "") ) {
+      echo "<p>check_right : ACCESS DENIED, mod_right=$module_right, right=$right";
+      exit();
+    } else {
+      return true;
+    }
+  }
+
 }
+
 
 
 //---------------------------------------------------------------------------//

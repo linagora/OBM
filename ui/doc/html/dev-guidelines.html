@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.7.5 - 2003-12-14<br>
+Version 0.8.0 - 2004-02-20<br>
 Pierre Baudracco
 </center>
 <p>
@@ -57,8 +57,7 @@ Each truncated line should be so with this constraint in mind.
 Of course some lines should not be truncated (function definitions, ...)
 
 <p>
-HTML should always be writen in lower caps letters (yes there is a big update
-here to do !)
+HTML (XHTML exactly) should always be writen in lower caps letters (yes there is a big update here to do !)
 <br>
 HTML output should always be separated from process logic and should only contain simple vars. 
 <p>
@@ -287,9 +286,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 include("$obminclude/global_pref.inc");
-
 require("company_query.inc");
 require("company_display.inc");
 </pre>
@@ -298,8 +295,24 @@ require("company_display.inc");
 <p>
 
 
-<h3>Main action branch switch</h3>
-<i>To do</i>
+<h3>Module Actions and permissions</h3>
+
+After the module includes bloc, permissions are checked.
+Parameters are retrieved and stored in the module hash, actions are defined and permissions are checked (against current action and user profile).
+
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+if ($action == "") $action = "index";
+$company = get_param_company();
+get_company_action();
+$perm->check_permissions($menu, $action);
+</pre>
+</td></tr>
+</table>
+<p>
+
 
 <h3>Parameters handling</h3>
 
@@ -345,6 +358,10 @@ function get_param_company() {
 With php set to <b>magic_quotes_gpc = On</b>, parameters strings are automatically backslashed (quotes).
 <p>
 <b>All the variable formatting must be done here</b>, but there is an exception : some code parts used backslashed var form (ex: in queries) and other not (eg: when value must be displayed in a text field). So some "stripslashes()" calls will remains in module_display.inc functions.
+
+
+<h3>Main action branch switch</h3>
+<i>To do</i>
 
 
 <h3>The module display file : module_display.inc</h3>

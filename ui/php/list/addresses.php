@@ -18,7 +18,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/global.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
+$perm->check_permissions($menu, $action);
 page_close(); //?usefull?
 
 include("$obminclude/global_pref.inc");

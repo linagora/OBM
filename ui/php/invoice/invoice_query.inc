@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_query.inc
 //     - Desc : invoice query File
@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Account search query :
+// Invoice search query :
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql;
@@ -24,6 +24,10 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   $company = $invoice["company"];
   $deal = $invoice["deal"];
   $archive = $invoice["archive"];
+
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
 
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
   
@@ -48,10 +52,10 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 
   // fields to use 
   if ($label != ""){
-    $query .= " and Invoice.invoice_label like'%$label%' ";
+    $query .= " and Invoice.invoice_label $like '%$label%' ";
   }
   if ($number != ""){
-    $query .= " and Invoice.invoice_number like '%$number%' ";
+    $query .= " and Invoice.invoice_number $like '%$number%' ";
   }
   if ($amount_HT != ""){
     $query .= " and Invoice.invoice_amount_HT ='$amount_HT' ";
@@ -72,10 +76,10 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
     $query .= " and Invoice.invoice_inout ='$inout' ";
   }
   if ($company != "") {
-    $query .= " and company_name like '$company%' ";
+    $query .= " and company_name $like '$company%' ";
   }
   if ($deal != "") {
-    $query .= " and deal_label like '$deal%' ";
+    $query .= " and deal_label $like '$deal%' ";
   }
   if ($archive != 'y') {
     $query .= " and Invoice.invoice_archive = '0' ";
@@ -85,7 +89,6 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   $query .= "order by $order $order_dir";
   
   display_debug_msg ("<b>run_query_search() :</b>$query", $cdg_sql); 
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 } 
@@ -305,22 +308,24 @@ function run_query_search_deal_invoice ($p_invoice) {
 function run_query_deal($q_invoice, $p_deal_label="",$p_deal_company="", $p_deal_archive = 0) {
   global $cdg_sql;
 
-  $go = new DB_OBM;
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $like = sql_casei_like($type);
     
   if (is_object ($q_invoice)) {
     // list all deals of this invoice
-    $query = "select ".
-    " dealinvoice_deal_id ".
-    " from DealInvoice ".
-    " where dealinvoice_invoice_id = '".$q_invoice->f("invoice_id")."'";
+    $query = "select
+        dealinvoice_deal_id
+      from DealInvoice
+      where dealinvoice_invoice_id = '".$q_invoice->f("invoice_id")."'";
     display_debug_msg("<b>run_query_deal() : </b>$query", $cdg_sql);
-    $go->query($query);
+    $obm_q->query($query);
     
-    if ($go->nf() > 0){
-      $go->next_record();
-      $deals_to_skip = $go->f("dealinvoice_deal_id");
-      while ($go->next_record ()){
-	$deals_to_skip .= ",".$go->f("dealinvoice_deal_id");
+    if ($obm_q->nf() > 0){
+      $obm_q->next_record();
+      $deals_to_skip = $obm_q->f("dealinvoice_deal_id");
+      while ($obm_q->next_record ()){
+	$deals_to_skip .= ",".$obm_q->f("dealinvoice_deal_id");
       } 
     }
   }
@@ -342,10 +347,10 @@ function run_query_deal($q_invoice, $p_deal_label="",$p_deal_company="", $p_deal
      " and deal_status_id = dealstatus_id ".
      " and dealtype_inout = '".$q_invoice->f("invoice_inout")."' ".
      " and deal_company_id = company_id ";
-  $query .= ($p_deal_label == "")? "":"and deal_label like '$p_deal_label%' ";
+  $query .= ($p_deal_label == "")? "":"and deal_label $like '$p_deal_label%' ";
   $query .= ($deals_to_skip == "")?"":"and deal_id not in ('$deals_to_skip')";
   if ($p_deal_company != "") {
-    $query .= " and company_name like '$p_deal_company%' ";
+    $query .= " and company_name $like '$p_deal_company%' ";
   }
   if ($p_deal_archive != 0) {
     $query .= " and deal_archive in ('1','0') ";
@@ -354,10 +359,11 @@ function run_query_deal($q_invoice, $p_deal_label="",$p_deal_company="", $p_deal
   }
 
   display_debug_msg ("<b>run_query_deal :</b>$query", $cdg_sql);
-  $go->query($query);
+  $obm_q->query($query);
   
-  return $go;
+  return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // getting all payments of invoice $p_invoice 
@@ -399,62 +405,6 @@ function run_query_search_payment_invoice ($p_invoice, $not_paid=0) {
   $connect->query($query);
   return $connect;
 }
-
-/*
-// récupération de tous les paiements de même type que $q_invoice mais
-// non entièrement concernés par une facture :
-// getting all payments of the same kind as $q_invoice, but
-// not completly connected with invoices
-function run_query_payment ($q_invoice, $p_payment_label="") { 
-  // trouble with date format with MySQL 
-  global $db_type_mysql, $db_type_pgsql, $cdg_sql; 
-
-  $go = new DB_OBM; 
-
-  if (is_object($q_invoice)) { 
-    // listing all invoice payments 
-    $query = "select ". 
-       "paymentinvoice_payment_id from PaymentInvoice ". 
-       " where paymentinvoice_invoice_id = '".$q_invoice->f("invoice_id")."'"; 
-    $go->query($query); 
-
-    // les payments à ne pas ramener sont ceux qui sont
-    // entièrement payés!! donc cette requête n'est pas bonne...
-    if ($go->nf()>0) { 
-      $go->next_record (); 
-      // pour chaque payment de la facture,
-      // calculer la somme des morceaux répartis sur des factures,
-      // récupérer le montant total du payment
-      // si les deux sont !=, on garde, 
-      // sinon on vire...
-      $payments_to_skip = $go->f("paymentinvoice_payment_id"); 
-      while ($go->next_record ()) { 
-	$payments_to_skip .= ",".$go->f("paymentinvoice_payment_id"); 
-      } 
-    } 
-  } 
-  $query = "select ". 
-     " payment_id as invoice_pay_id". 
-     ",payment_label as invoice_pay_label". 
-     ",payment_number as invoice_pay_number"; 
-  if ($go->type==$db_type_pgsql) {      
-    $query .= " ,payment_date as invoice_pay_date "; 
-      } 
-  elseif ($go->type ==$db_type_mysql) { 
-    $query .= " ,UNIX_TIMESTAMP(payment_date) as invoice_pay_date "; 
-  } 
-  $query.= ",payment_amount as invoice_pay_amount". 
-     " from Payment where ". 
-     " payment_inout = '".$q_invoice->f("invoice_inout")."'";
-  $query .= ($p_payment_label == "")? "":"and payment_label like '".$p_payment_label."%' ";
-  $query .= ($payments_to_skip == "")?"":"and payment_id not in (".$payments_to_skip.")";
-
-  display_debug_msg ($query, $cdg_sql);
-  $go->query($query);
-
-  return $go;
-}// run_query_payment
-*/
 
 
 ///////////////////////////////////////////////////////////////////////////////
