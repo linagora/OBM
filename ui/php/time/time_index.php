@@ -41,6 +41,9 @@ require("time_query.inc");
 
 $time = get_param_time();
 
+// We need to have first day of the month 
+//  Maybe should be set other way...
+$time["month_first"] = first_day_month($time, false);
 //echo "action $action, show_task_detail $st_detail <br>";
 
 $uid = $auth->auth["uid"]; //current user uid
@@ -90,12 +93,13 @@ page_close();
 // $popup = 2 => writing into a file
 if ($popup != 2) {
   require("time_js.inc");
-  get_time_actions();
 }
 
 if ($action == "" ) $action = "index";
+
 get_time_actions();
 $perm->check("user");
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
@@ -105,6 +109,11 @@ $stats_users = array( '6' , '7' , '8','23' ) ;
 
 
 if (debug_level_isset($cdg_param)) {
+  if ( $actions ) {
+    echo "<br>\$actions : <br>";
+    print_r($actions);
+  }
+
   if ( $time ) {
     echo "<br>\$time : <br>";
     debug_array($time);
@@ -158,7 +167,7 @@ if ($action == "index" || $action == "") {
 	$time["user_id"] == array($u_id);
   else if (sizeof($time["user_id"]) > 1) {
 	$tt = $time["user_id"];
-	$time["user_id"] == $tt[0];
+	$time["user_id"] == array($tt[0]);
   }
   else if (sizeof($time["user_id"]) == 0) {
     echo "erreur \$time[user_id] vide !!! <br>";
@@ -421,6 +430,7 @@ function get_param_time() {
 //////////////////////////////////////////////////////////////////////////////
 
 function get_time_actions() {
+  global $time;
   global $l_header_stats, $l_header_month;
 global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
@@ -428,7 +438,8 @@ global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
   $actions["TIME"]["index"] = array (
 	'Name'     => "$l_header_month",
-    'Url'      => "$path/time/time_index.php?action=index",
+    'Url'      => "$path/time/time_index.php?action=index&amp;param_begin=".
+	       $time["month_first"],
     'Right'    => $time_read,
     'Condition'=> array('all') 
                                     );

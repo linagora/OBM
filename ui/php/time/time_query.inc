@@ -815,7 +815,7 @@ function first_day_week(&$time) {
 //Parameters :
 // - $time : array with $time["date"] == current date 
 ///////////////////////////////////////////////////////////////////////////
-function first_day_month(&$time) {
+function first_day_month(&$time, $change=true) {
   global $cdg_sql;
 
   if ( isset($time["date"]) ) { 
@@ -825,7 +825,7 @@ function first_day_month(&$time) {
     $d_start_month=mktime(0,0,0,$month,1,$year);
     // According to doc, 0th day of a month is the last of the previous one
     $d_end_month=mktime(0,0,0,$month+1,0, $year);
-    
+    $date_start_month=date("Ymd",$d_start_month);
   }
   else {
     $today = date("Ymd");
@@ -836,13 +836,15 @@ function first_day_month(&$time) {
     // According to doc, 0th day of a month is the last of the previous one
     $d_end_month=mktime(0,0,0,$month+1,0, $year);
     //set $time["date"]
-    $time["date"] = date("Ymd",$d_start_month);  
+    $date_start_month=date("Ymd",$d_start_month);
+    $time["date"] = $date_start_month;  
   }
 
-  // Set last day of the month
-  $time["date_end"] = date("Ymd", $d_end_month);
-  
-  return ($time["date"]); 
+  if ($change) {
+    // Set last day of the month
+    $time["date_end"] = date("Ymd", $d_end_month);
+  }
+  return ($date_start_month); 
 
 }
 

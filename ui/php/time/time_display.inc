@@ -180,7 +180,6 @@ function dis_time_links (&$time, $type="all") {
       </FONT> </CENTER>    
         ";     
    }
-
 }
 
  
@@ -231,6 +230,11 @@ function dis_time_search_form ($time, $usr_q, $uid) {
     }
     $sel_user .= "</select>";
 
+    // Define the action to follow
+    if ($time["action"] == "index")
+	  $act = "index";
+    else
+	  $act = "search";
 
     echo "<br>
       <center>
@@ -250,7 +254,7 @@ function dis_time_search_form ($time, $usr_q, $uid) {
           <input type=hidden name=param_end value=\"".$time["date_end"]."\">
          <input type=hidden name=st_detail value=\"".
              $time["show_task_detail"]."\">
-          <input name=\"action\" type=hidden value=\"search\">
+          <input name=\"action\" type=hidden value=\"$act\">
           <input name=\"submit\" type=submit value=\"$l_see\">&nbsp;
         </td>
       </tr>
@@ -1196,15 +1200,9 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
   $last_day_sec = mktime(23,0,0,$month+1, $day-1, $year);
   $last_wday =date("w", $last_day_sec);
 
-  // Initialise our loop
-  // Build day array
-  //  $array_day = array("$first_wday $day");
-  //  $array_res = array($obm_dq->f("total_length"));
   $day_in_sec = $first_day_sec;
   $wday =date("w", $day_in_sec);
-  //  $array_res = array();
-  
-  //  echo "debut $day_in_sec, fin : $last_day_sec day $day<br>";
+
   while ($obm_dq->next_record())  {
 	  //echo "day $day, weekday $wday, \$i $day_in_sec  " .
 	  //" day_in_month " . intval($obm_dq->f("day_in_month")) ."<br>";
@@ -1214,8 +1212,10 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
 		//		  $obm_dq->f("total_length") . "<br>";
       if (intval($obm_dq->f("day_in_month")) != $day)
 		$array_res[$day]["length"] = 0;
-      else
+      else {
 		$array_res[$day]["length"] = $obm_dq->f("total_length");
+        $length_tot += $array_res[$day]["length"];
+	  }
       $array_res[$day]["wday"] = $wday;
 	  $day++;        
 	  $day_in_sec = mktime(0,0,0,$month, $day, $year);
@@ -1296,11 +1296,8 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
 
   if ($time["interval"] == "month") {
     echo "<tr><td>";
-	echo "Total jours pour $nb_users users : $res sur ".
-		get_nb_working_days($time["date"]) * $nb_users. " à remplir";
-	echo "</td></tr>";
-	echo "<tr><td>";
-	echo "jours ouvrés : ".get_nb_working_days($time["date"]);
+	echo "Total jours pour cet utilisateur : ".$length_tot/$c_day_fraction." sur ".
+		get_nb_working_days($time["date"]). "(jours ouvrés) à remplir";
 	echo "</td></tr>";
   }
   echo "       </table>";

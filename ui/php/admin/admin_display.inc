@@ -37,7 +37,6 @@ function dis_index($mode, $lifetime) {
     $nb_user_ses = get_usersession_number();
     $obm_u = run_query_active_user($lifetime);
     html_admin_status($lifetime, $nb_user_ses, $obm_u);
-    print_r($obm_u);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
