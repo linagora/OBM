@@ -526,8 +526,8 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
-  $show_service = (! $cgp_hide["contact"]["service"]);
-  $show_ad3 = (! $cgp_hide["contact"]["address3"]);
+  $show_service = (! $cgp_hide["contact"]["contact_service"]);
+  $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
 
   // Function field
   if ($show_func) {
@@ -1030,8 +1030,8 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
-  $show_service = (! $cgp_hide["contact"]["service"]);
-  $show_ad3 = (! $cgp_hide["contact"]["address3"]);
+  $show_service = (! $cgp_hide["contact"]["contact_service"]);
+  $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
 
   // some constants
   $csize_add = "48";

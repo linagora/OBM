@@ -695,13 +695,13 @@ function html_company_consult($co_q, $cat_q) {
   }
 
   // Conditionnal fields
-  $show_number = (! $cgp_hide["company"]["number"]);
-  $show_vat = (! $cgp_hide["company"]["vat"]);
+  $show_number = (! $cgp_hide["company"]["company_number"]);
+  $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
-  $show_ad3 = (! $cgp_hide["company"]["address3"]);
+  $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
 
   // Number field
   if ($show_number) {
@@ -918,13 +918,13 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (isset($company["cat"])) { $compcat = $company["cat"]; }
 
   // Conditionnal fields
-  $show_number = (! $cgp_hide["company"]["number"]);
-  $show_vat = (! $cgp_hide["company"]["vat"]);
+  $show_number = (! $cgp_hide["company"]["company_number"]);
+  $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
-  $show_ad3 = (! $cgp_hide["company"]["address3"]);
+  $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
 
   // some constants
   $csize_add = "48";

@@ -95,10 +95,13 @@ Par défaut tous les champs sont affichés et il faut donc préciser explicitement 
 Pour ne pas afficher un champ il faut insérer dans le fichier de configuration la ligne :
 
 \begin{verbatim}  
-$cgp_hide[``company''][``number''] = true;
+$cgp_hide[``company''][``company_number''] = true;
 \end{verbatim}  
 
 Lorsqu'un champ est caché, il n'est plus disponible dans les critères de recherche, dans les listes de résultats ni dans les fiches de détail.
+
+Les noms donnés aux champs du tableau \$cgp\_hide doivent être identiques aux noms des champs retournés par la requête des listes de résultat, car la classe OBM\_DISPLAY utilise ces noms pour déterminer si les champs doivent être affichés ou non.
+Si le champ n'est pas proposé dans un résultat de requête (catégories de société), il n'y a pas cette contrainte.
 
 
 \subsubsection{Les champs paramétrables du module \company}
@@ -107,13 +110,13 @@ Liste des champs paramétrables (masquables) du module \company :
 
 \begin{verbatim}
 // Company module
-$cgp_hide["company"]["number"] = true;                 // numéro
-$cgp_hide["company"]["vat"] = true;                    // numéro intracommunautaire
+$cgp_hide["company"]["company_number"] = true;         // numéro
+$cgp_hide["company"]["company_vat"] = true;            // numéro intracommunautaire
 $cgp_hide["company"]["companytype_label"] = true;      // type
 $cgp_hide["company"]["companyactivity_label"] = true;  // secteur d'activité
 $cgp_hide["company"]["companynafcode_code"] = true;    // code NAF
 $cgp_hide["company"]["category"] = true;               // catégorie
-$cgp_hide["company"]["address3"] = true;               // ligne adresse 3
+$cgp_hide["company"]["company_address3"] = true;       // ligne adresse 3
 \end{verbatim}  
 
 
@@ -127,8 +130,8 @@ $cgp_hide["contact"]["contact_function"] = true;  // fonction
 $cgp_hide["contact"]["contact_title"] = true;     // titre
 $cgp_hide["contact"]["category1"] = true;         // catégorie 1
 $cgp_hide["contact"]["category2"] = true;         // catégorie 2
-$cgp_hide["contact"]["service"] = true;           // ligne service
-$cgp_hide["contact"]["address3"] = true;          // ligne adresse 3
+$cgp_hide["contact"]["contact_service"] = true;   // ligne service
+$cgp_hide["contact"]["contact_address3"] = true;  // ligne adresse 3
 \end{verbatim}  
 
 

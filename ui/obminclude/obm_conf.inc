@@ -40,7 +40,7 @@ $cg_com = 2;
 $cg_prod = 3;
 
 // Tuning constants
-$ctu_sql_limit = false;
+//$ctu_sql_limit = true;
 
 // Todo lines to display
 $cgp_todo_nb = 5;
@@ -70,21 +70,21 @@ $cgp_show["section"]["aliamin"] = false;
 //$cgp_show["module"]["statistic"] = false;
 
 // Company module
-//$cgp_hide["company"]["number"] = true;
-//$cgp_hide["company"]["vat"] = true;
+$cgp_hide["company"]["company_number"] = true;
+$cgp_hide["company"]["company_vat"] = true;
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
 //$cgp_hide["company"]["companynafcode_code"] = true;
 //$cgp_hide["company"]["category"] = true;
-//$cgp_hide["company"]["address3"] = true;
+$cgp_hide["company"]["company_address3"] = true;
 
 // Contact module
 //$cgp_hide["contact"]["contact_function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["category1"] = true;
 //$cgp_hide["contact"]["category2"] = true;
-//$cgp_hide["contact"]["service"] = true;
-//$cgp_hide["contact"]["address3"] = true;
+//$cgp_hide["contact"]["contact_service"] = true;
+//$cgp_hide["contact"]["contact_address3"] = true;
 
 // Deal module
 

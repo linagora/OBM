@@ -140,6 +140,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_phone,
       contact_homephone,
       contact_mobilephone,
+      contact_fax,
       contact_email,
       contact_archive,
       contact_privacy,
