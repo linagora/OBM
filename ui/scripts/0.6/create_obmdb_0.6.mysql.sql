@@ -367,7 +367,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_length      varchar(14) NOT NULL default '',
   calendarevent_repeatkind  varchar(20) default NULL,
   calendarevent_repeatdays  varchar(7) default NULL,
-  calendarevent_endrepeat   timestamp(14) NOT NULL,
+  calendarevent_endrepeat   varchar(12) NOT NULL,
   PRIMARY KEY (calendarevent_id)
 );
 
