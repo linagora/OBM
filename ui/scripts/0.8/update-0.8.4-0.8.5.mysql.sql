@@ -51,3 +51,10 @@ ALTER TABLE CalendarEvent CHANGE calendarevent_privacy calendarevent_privacy int
 -- Clean Up UserObmPref table from Todo data
 -------------------------------------------------------------------------------
 DELETE FROM UserObmPref where userobmpref_option like 'todo_%';
+
+
+-------------------------------------------------------------------------------
+-- UserObm table
+-------------------------------------------------------------------------------
+-- Add column : userobm_datebegin
+ALTER TABLE UserObm ADD COLUMN userobm_datebegin date after userobm_archive;

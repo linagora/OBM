@@ -31,6 +31,7 @@ $fieldnames["kind_header"] = $l_letter;
 $fieldnames["kind_lang"] = $l_lang;
 $fieldnames["company_name"] = $l_company;
 $fieldnames["address"] = $l_address;
+$fieldnames["service"] = $l_service;
 $fieldnames["address1"] = "$l_address 1";
 $fieldnames["address2"] = "$l_address 2";
 $fieldnames["address3"] = "$l_address 3";
@@ -93,6 +94,10 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "address") {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_service") != "") {
+	$res["name"] .= $OD->data_set->f("contact_service")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_service") . " ";
+      }
       if ($OD->data_set->f("contact_address1") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("contact_address1") . " ";
@@ -120,6 +125,11 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 	$res["txt_name"] .= $OD->data_set->f("company_address3");
       }
     }
+  }
+
+  else if ($fieldname == "service") {
+    $res["name"] .= $OD->data_set->f("contact_service");
+    $res["txt_name"] .= $OD->data_set->f("contact_service");
   }
 
   else if ($fieldname == "address1") {
@@ -405,7 +415,7 @@ function dis_list_consult($list) {
 
   $list_q = run_query_detail($id);
   $pref_con_q = run_query_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($list, $entity);
+  $con_q = run_query_contacts_list($list, "list_contact");
   $block = html_list_consult($list_q, $pref_con_q, $con_q);
 
   return $block;

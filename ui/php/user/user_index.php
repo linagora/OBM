@@ -223,7 +223,7 @@ display_page($display);
 function get_param_user() {
   global $action, $cdg_param, $popup;
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
-  global $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
+  global $tf_datebegin, $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $ext_widget;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
@@ -235,6 +235,7 @@ function get_param_user() {
   if (isset ($tf_passwd)) $obm_user["passwd_crypt"] = md5($obm_user["passwd"]);
   if (isset ($sel_perms)) $obm_user["perms"] = $sel_perms;
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
+  if (isset ($tf_datebegin)) $obm_user["datebegin"] = $tf_datebegin;
   if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_firstname)) $obm_user["firstname"] = $tf_firstname;
   if (isset ($tf_phone)) $obm_user["phone"] = $tf_phone;

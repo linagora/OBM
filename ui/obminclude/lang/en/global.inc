@@ -150,7 +150,7 @@ $l_header_display = "Display";
 $l_header_global_export = "Export";
 $l_header_export = "Export";
 $l_header_consult = "Consult";
-
+$l_header_quickupdate = "Quick Update";
 $l_header_update = "Update";
 $l_header_delete = "Delete";
 $l_header_add_contact = "Add contact";

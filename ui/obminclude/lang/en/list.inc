@@ -43,6 +43,7 @@ $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_function = "Function";
 $l_company = "Company";
+$l_service = "Service";
 $l_hphone = "Home phone";
 $l_contact = "Contact";
 $l_status = "Status";

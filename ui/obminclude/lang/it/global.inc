@@ -159,6 +159,7 @@ $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";
 $l_header_find = "Trova";
 $l_header_consult = "Consulta";
+$l_header_quickupdate = "Modifica Rapida";
 $l_header_update = "Modifica";
 $l_header_delete =  "Elimina";
 $l_header_display = "Visualizza";

@@ -43,6 +43,7 @@ $l_mailing = "Mailing activé uniquement";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_function = "Fonction";
+$l_service = "Service";
 $l_company = "Société";
 $l_hphone = "Tél perso";
 $l_contact = "Contact";

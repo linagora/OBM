@@ -90,14 +90,11 @@ if (($action == "search") && ($deal["parent"])) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-
   require("deal_js.inc");
   $deal_q = run_query_deal($comp_id);
   $display["detail"] = html_select_deal($deal_q, stripslashes($title));
-}
 
-
-if ($action == "ext_get_ids") {
+} else if ($action == "ext_get_ids") {
   $display["search"] = html_deal_search_form($contact);
   if ($set_display == "yes") {
     $display["result"] = dis_deal_search_list($contact);
@@ -108,13 +105,12 @@ if ($action == "ext_get_ids") {
   $extra_css = "category.css";
   require("deal_js.inc");
   $display["detail"] =  html_category_list($contact);
-} 
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
-elseif (($action == "index") || ($action == "")) {
+} elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $display["search"] = dis_deal_index();
@@ -135,61 +131,43 @@ elseif (($action == "index") || ($action == "")) {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $usrc_q = run_query_all_users_from_group($cg_com);
-  $usrp_q = run_query_all_users_from_group($cg_prod);
-  $cat1_q = run_query_dealcategory();
-  $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, run_query_company_info($deal["company"]), run_query_contact_deal($deal["company"]), run_query_dealstatus(), $deal["company"], $deal);
+  $display["detail"] = dis_deal_form($deal);
 
 } elseif ($action == "detailconsult")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_deal_consult($deal);
+
+} elseif ($action == "quick_detail")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($deal["id"] > 0) {
     $deal_q = run_query_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
-    $cid = $deal_q->f("deal_company_id");
+    $usrc_q = run_query_all_users_from_group($cg_com, array($uid));
+    $sta_q = run_query_dealstatus();
     // we retrieve invoices data :
-    $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-    $pref_q = run_query_display_pref ($uid, "invoice");
-    $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, $pref_q);
+    $display["detail"] = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
   }
   
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($deal["id"] > 0) {
-    require("deal_js.inc");
-    $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $deal["company"] = $deal_q->f("deal_company_id");
-    $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
-    $usrc_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $cat1_q = run_query_dealcategory();
-    $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, "", run_query_contact_deal($deal["company"]), run_query_dealstatus(), $deal["company"], $deal);
-  }
-  
+  require("deal_js.inc");
+  $display["detail"] = dis_deal_form($deal);
+
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
     $deal["id"] = run_query_insert($deal);
     if ($deal["id"]) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
-      $deal_q = run_query_detail($deal["id"]);
-      $display["detailInfo"] = display_record_info($deal_q);
-      $cid = $deal_q->f("deal_company_id");
-      $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-      $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, "");
+      $display["detail"] = dis_deal_consult($deal);
     } else {
-      echo "<p>deal[id]=".$deal["id"]."; erreur ici</p>";
       $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
       $display["search"] = dis_deal_index($deal);
     }
   } else {
     require("deal_js.inc");
     $display["msg"] .= display_err_msg($err_msg);
-    $users = array($deal["market"], $deal["tech"]);
-    $usrc_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $cat1_q = run_query_dealcategory();
-    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, run_query_company_info($deal["company"]), run_query_contact_deal($deal["company"]), run_query_dealstatus(), $deal["company"], $deal);
+    $display["detail"] = dis_deal_form($deal);
   }
 
 } elseif ($action == "update")  {
@@ -201,20 +179,10 @@ elseif (($action == "index") || ($action == "")) {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $cid = $deal_q->f("deal_company_id");
-    $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-    $inv_q->next_record();
-    $invoices_options = run_query_display_pref ($uid, "invoice");
-    $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, $invoices_options);
+    $display["detail"] = dis_deal_consult($deal);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $users = array($deal["market"], $deal["tech"]);
-    $usrc_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $cat1_q = run_query_dealcategory();
-    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, "", run_query_contact_deal($deal["company"]), run_query_dealstatus(), $deal["company"], $deal);
+    $display["detail"] = dis_deal_form($deal);
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff == "archives") {
@@ -248,13 +216,7 @@ elseif (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $deal_q = run_query_detail($deal["id"]);
-  $display["detailInfo"] = display_record_info($deal_q);
-  $cid = $deal_q->f("deal_company_id");
-  $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-  $q_invoices->next_record();
-  $invoices_options = run_query_display_pref ($uid, "invoice");
-  $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
+  $display["detail"] = dis_deal_consult($deal);
 
 }  elseif ($action == "cat_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -433,7 +395,7 @@ $display["detail"] .= dis_cat_links($deal);
   if ($deal["parent"] > 0) {
     require("deal_js.inc");
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
+    $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $display["detailInfo"] = display_record_info($obm_q);
@@ -461,7 +423,7 @@ $display["detail"] .= dis_cat_links($deal);
   if (check_parent_has_deal($deal["parent"])) {
     $display["msg"] .= display_err_msg($l_err_parent_has_deal);
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
+    $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $display["detailInfo"] = display_record_info($obm_q);
@@ -493,7 +455,7 @@ $display["detail"] .= dis_cat_links($deal);
     $display["msg"] .= display_err_msg($err_msg);
     require("deal_js.inc");
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
+    $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
     $usrp_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $display["detailInfo"] = display_record_info($obm_q);
@@ -512,14 +474,7 @@ $display["detail"] .= dis_cat_links($deal);
     run_query_affect_deal_parentdeal($deal["id"], $deal);
     $display["msg"] .= display_ok_msg($l_updateaffect_ok); 
 
-    // then we display the deal
-    $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $cid = $deal_q->f("deal_company_id");
-    $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-    $q_invoices->next_record();
-    $invoices_options = run_query_display_pref ($uid,"invoice");
-    $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
+    $display["detail"] = dis_deal_consult($deal);
   }
 }
 
@@ -682,7 +637,7 @@ function get_deal_action() {
   global $deal, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
-  global $l_header_new_child, $l_header_new_parent;
+  global $l_header_new_child, $l_header_new_parent, $l_header_quickupdate;
   global $l_deal_select_company;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -711,7 +666,7 @@ function get_deal_action() {
   // New
   $actions["DEAL"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company="),
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 
@@ -739,16 +694,26 @@ function get_deal_action() {
 
   // Detail Consult
   $actions["DEAL"]["detailconsult"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=detailconsult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate', 'update', 'insert', 'quick_detail') 
+                                    	    );
+
+  // Quick Detail
+  $actions["DEAL"]["quick_detail"] = array (
+    'Name'     => $l_header_quickupdate,
+    'Url'      => "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=".$deal["id"],
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update') 
                                     	    );
 
   // Parent Detail Consult
   $actions["DEAL"]["parent_detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"]."",
+    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"],
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate')
                                     	    );
@@ -756,7 +721,7 @@ function get_deal_action() {
   // Detail Update
   $actions["DEAL"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"]."",
+    'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update','insert') 
@@ -764,7 +729,15 @@ function get_deal_action() {
 					    
   //  Update
   $actions["DEAL"]["update"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=update&amp;param_deal=".$deal["id"]."",
+    'Url'      => "$path/deal/deal_index.php?action=update&amp;param_deal=".$deal["id"],
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None') 
+                                     	    );
+
+  //  Quick Update
+  $actions["DEAL"]["quick_update"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=quick_update&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
@@ -773,14 +746,14 @@ function get_deal_action() {
   // Parent Detail Update
   $actions["DEAL"]["parent_detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"]."",
+    'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"],
     'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
                                      		  );
                                                                                                                                                              
   // Parent Update
   $actions["DEAL"]["parent_update"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=parent_update&amp;param_parent=".$deal["parent"]."",
+    'Url'      => "$path/deal/deal_index.php?action=parent_update&amp;param_parent=".$deal["parent"],
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                                   );
@@ -802,7 +775,7 @@ function get_deal_action() {
   // Check Delete
   $actions["DEAL"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"]."",
+    'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update','insert') 
@@ -826,7 +799,7 @@ function get_deal_action() {
   // Parent Delete
   $actions["DEAL"]["parent_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"]."",
+    'Url'      => "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"],
     'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
                                      	     );

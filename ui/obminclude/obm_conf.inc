@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -30,7 +30,7 @@ $cgp_mailing_default = true;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 3;
+$cg_com = 1;
 $cg_prod = 3;
 
 // Tuning constants

@@ -70,3 +70,9 @@ ALTER TABLE Incident ADD COLUMN incident_date TIMESTAMP;
 UPDATE Incident set incident_date = incident_datetmp;
 ALTER TABLE Incident DROP COLUMN incident_datetmp;
 
+
+-------------------------------------------------------------------------------
+-- UserObm table
+-------------------------------------------------------------------------------
+-- Add column : userobm_datebegin
+ALTER TABLE UserObm ADD COLUMN userobm_datebegin date;

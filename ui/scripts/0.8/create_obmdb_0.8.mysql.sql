@@ -76,6 +76,7 @@ CREATE TABLE UserObm (
   userobm_login           varchar(32) DEFAULT '' NOT NULL,
   userobm_password        varchar(32) DEFAULT '' NOT NULL,
   userobm_perms           varchar(254),
+  userobm_datebegin       date,
   userobm_archive         char(1) not null default '0',
   userobm_lastname        varchar(32),
   userobm_firstname       varchar(32),

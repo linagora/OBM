@@ -181,4 +181,3 @@ $l_renewal = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 $l_no_found_subscription = "No subscription found for this contact !";
-

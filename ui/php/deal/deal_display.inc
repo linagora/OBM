@@ -581,13 +581,38 @@ function html_deal_links($deal_q, $inv_nb) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Deal Detail screen
+// Parameters:
+//   - $deal[]    : deal search criteria
+//     keys used  : company_id, name, company
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_consult($deal) {
+  global $display, $uid, $action, $incl_arch;
+
+  if ($deal["id"] > 0) {
+    $deal_q = run_query_detail($deal["id"]);
+    $display["detailInfo"] = display_record_info($deal_q);
+    $cid = $deal_q->f("deal_company_id");
+    $con_q = run_query_contact_deal($cid);
+    // we retrieve invoices data :
+    $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
+    $pref_q = run_query_display_pref ($uid, "invoice");
+
+    $block = html_deal_consult($deal_q, $con_q, $inv_q, $pref_q);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display: Contact Consult                                                  //
 // Parameters :
 //   - $deal_q  : DBO : information about the deal
 //   - $con_q   : DBO : list of contact from the company 
 //   - $comp_id : id of the company concerned by the deal
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
+function html_deal_consult($deal_q, $con_q, $inv_q, $pref_inv_q) {
   global $set_theme,$ico_company, $ico_contact, $display;
   global $l_infos, $l_company, $l_contact, $l_label,$l_date_init,$l_kind;
   global $l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
@@ -617,6 +642,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
   $com = beautify_comment(nl2br($deal_q->f("deal_comment")));
+  $comp_id = $deal_q->f("company_id");
   $comp = $deal_q->f("company_name");
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
@@ -630,7 +656,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
 
-  $inv_nb = $q_invoices->num_rows ();
+  $inv_nb = $inv_q->num_rows ();
   $display["link"] = html_deal_links($deal_q, $inv_nb);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
    
@@ -786,9 +812,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   if ($inv_nb != 0) {
     $url = url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$id&amp;incl_arch=$incl_arch");
 
-    $dis_invoice_list = new OBM_DISPLAY("DATA", $invoices_options, "deal");
+    $dis_invoice_list = new OBM_DISPLAY("DATA", $pref_inv_q, "deal");
     $dis_invoice_list->display_entity = "invoice";
-    $dis_invoice_list->data_set = $q_invoices;
+    $dis_invoice_list->data_set = $inv_q;
     $dis_invoice_list->data_header = "top";
     $dis_invoice_list->data_url = $url;
 
@@ -855,7 +881,49 @@ function html_category_list($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal Form                   
+// Display the Deal form
+// Parameters:
+//   - $deal[]    : deal search criteria
+//     keys used  : company_id, name, company
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_form($deal) {
+  global $display, $uid, $action, $ctt_sales, $cg_com, $cg_prod;
+
+  if ($action == "detailupdate") {
+    $deal_q = run_query_detail($deal["id"]);
+    $display["detailInfo"] = display_record_info($deal_q);
+    $deal["company"] = $deal_q->f("deal_company_id");
+    $users = array($uid, $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
+  } else if ($action == "update") {
+    $users = array($uid, $deal["market"], $deal["tech"]);
+    $deal_q = "";
+  } else {
+    $deal_q = "";
+    $users = array($uid);
+  }
+  
+  if (($action == "new") || ($action == "insert")) {
+    $comp_q = run_query_company_info($deal["company"]);
+  } else {
+    $comp_q = "";
+  }
+
+  $type_q = run_query_dealtype();
+  $tt_q = run_query_tasktype($ctt_sales);
+  $cat1_q = run_query_dealcategory();
+  $usrc_q = run_query_all_users_from_group($cg_com, $users);
+  $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+  $sta_q = run_query_dealstatus();
+  $con_q = run_query_contact_deal($deal["company"]);
+
+  $block = html_deal_form($action, $deal_q, $type_q, $tt_q, $cat1_q, $usrc_q, $usrp_q, $comp_q, $con_q, $sta_q, $deal);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Deal Form                   
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
@@ -871,7 +939,7 @@ function html_category_list($deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
+function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format, $l_update,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
@@ -883,6 +951,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
 
   $ext_target = $deal["ext_target"];
   $uid = $auth->auth["uid"];
+  $comp_id = $deal["company"];
 
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -1302,25 +1371,24 @@ $js_state_loop
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $usrc_q    : DBO : list of userobm from system group Commercial
-//   - $usrp_q    : DBO : list of userobm from system group Production
 //   - $sta_q     : DBO : list of deal status
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_quick_form($action,$deal_q, $usrc_q,$usrp_q,$sta_q,$deal) {
+function html_deal_quick_form($action,$deal_q, $usrc_q,$sta_q,$deal) {
   global $c_php_isodate_format, $l_update, $l_none;
   global $l_deal, $l_infos, $l_label;
   global $l_date_alarm, $l_state, $l_hitrate, $l_todo;
   global $l_last_update,$l_comment,$l_add_comment,$l_upd_comment;
-  global $path, $action, $auth, $cgp_hide;
+  global $path, $display, $action, $auth, $cgp_hide;
 
   $uid = $auth->auth["uid"];
 
+  $id = $deal_q->f("deal_id");
+  $label = $deal_q->f("deal_label");
+
   // if update mode and first time, values are taken from db
-  if ($action == "detailupdate") {
-    $id = $deal_q->f("deal_id");
-    $usercreate = $deal_q->f("deal_usercreate");
-    $label = $deal_q->f("deal_label");
+  if ($action == "quick_detail") {
     $datealarm = isodate_format($deal_q->f("datealarm"), 1);
     $status = $deal_q->f("deal_status_id");
     $hitrate = $deal_q->f("deal_hitrate");
@@ -1334,13 +1402,9 @@ function html_deal_quick_form($action,$deal_q, $usrc_q,$usrp_q,$sta_q,$deal) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($deal["id"])) { $id = $deal["id"]; }
-  if (isset($deal["usercreate"])) { $usercreate = $deal["usercreate"]; }
-  if (isset($deal["label"])) { $label = stripslashes($deal["label"]); }
   if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
   if (isset($deal["state"])) { $status = $deal["state"]; }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
-  if (isset($deal["timeupdate"])) { $timeupdate = $deal["timeupdate"]; }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
   if (isset($deal["com"])) { $comment = stripslashes($deal["com"]); }
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
@@ -1400,22 +1464,13 @@ $js_state_loop
   }
   $sel_usercomment .= "</select>";
 
+  $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
  
   $block = "
     $js_state
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
-
-  <div class=\"detailHead\">$l_deal</div>
-
-    <table class=\"detail\">
-    <tr>
-      $dis_priv
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
-    </tr>
-    </table>
 
   <div class=\"detailHead\">$l_infos</div>
 
@@ -1442,12 +1497,12 @@ $js_state_loop
       <td class=\"detailLabel\">$l_add_comment</td>
       <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
     </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"8\" cols=\"78\">$add_comment</textarea></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_upd_comment</td>
       <td>&nbsp;</td>
     </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"10\" cols=\"78\">$comment</textarea></td>
     </tr>
     </table>
 
