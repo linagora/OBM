@@ -15,6 +15,10 @@
 
 function run_query_detail($param_event,$getdate) {
   $obm_db = new DB_OBM;
+  $date_time_d = strtotime($getdate);
+  $date_time_f = strtotime("+1 day",$date_time_d);
+  $getdate_d = date("YmdHi",$date_time_d); 
+  $getdate_f = date("YmdHi",$date_time_f); 
   $query = "SELECT DISTINCT
                    calendarevent_usercreate,
 		   calendarevent_userupdate,
@@ -35,11 +39,11 @@ function run_query_detail($param_event,$getdate) {
 	    WHERE calendarevent_category_id = calendarcategory_id
 	          AND calendarevent_id = $param_event
 	          AND calendarevent_id = cs1.calendarsegment_eventid
-	          AND calendarevent_id = cs2.calendarsegment_eventid
-		  AND cs1.calendarsegment_date LIKE '$getdate%'
-		  AND cs1.calendarsegment_flag = 'begin'
-		  AND cs2.calendarsegment_date LIKE '$getdate%'
-		  AND cs2.calendarsegment_flag = 'end'";
+		  AND calendarevent_id = cs2.calendarsegment_eventid		  
+		  AND cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $getdate_f
+	          AND UNIX_TIMESTAMP(CONCAT(cs1.calendarsegment_date,'00')) + calendarevent_length > $date_time_d 
+		  AND cs2.calendarsegment_flag = 'end' AND cs2.calendarsegment_date > $getdate_d
+		  AND UNIX_TIMESTAMP(CONCAT(cs2.calendarsegment_date,'00')) - calendarevent_length < $date_time_f";
     
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -348,8 +352,11 @@ function run_query_add_event($agenda,$contacts_array) {
 	  if(count($return_info) != 0) {
 	    $conflicts = run_query_get_conflicts_user($dates["date_begin"],$dates["date_end"],$user_id);
 	    run_query_delete_occurence($conflicts,$user_id);
+	    run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
 	  }
-  	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
+	  else {
+	    run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
+	  }
 	}
 	else{
 	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
@@ -460,9 +467,10 @@ function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
 
   $date_end_time = mktime(substr($date_end,8,2), substr($date_end,10,2), "00", substr($date_end,4,2), substr($date_end,6,2), substr($date_end,0,4));
 
-  $query = "SELECT DISTINCT calendarsegment_eventid ,calendarsegment_customerid,calendarsegment_date
-            FROM   CalendarEvent, CalendarSegment 
-	    WHERE calendarsegment_eventid = calendarevent_id AND
+  $query = "SELECT DISTINCT calendarsegment_eventid ,calendarsegment_customerid,calendarsegment_date,calendarevent_title,
+                   userobm_lastname,userobm_firstname
+            FROM   CalendarEvent, CalendarSegment, UserObm 
+	    WHERE calendarsegment_eventid = calendarevent_id AND userobm_id = calendarsegment_customerid AND
 	           (calendarsegment_flag = 'begin' AND calendarsegment_date < $date_end AND
 	            UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) + calendarevent_length > $date_begin_time)   	    	    
 	    ";  		  
@@ -475,7 +483,10 @@ function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   while ($obm_db->next_record()) {
-    $conflict_array[] = array("event_id" => $obm_db->f("calendarsegment_eventid"), "user_id" => $obm_db->f("calendarsegment_customerid"));
+    $conflict_array[] = array("event_id" => $obm_db->f("calendarsegment_eventid"),"event_title" => $obm_db->f("calendarevent_title"),
+    "user_id" => $obm_db->f("calendarsegment_customerid"),"user_name" => $obm_db->f("userobm_lastname")." 
+    ".$obm_db->f("userobm_firstname"),"date" => $obm_db->f("calendarsegment_date"));
+    $day_array="";
   }
   return $conflict_array;
 }
@@ -712,7 +723,7 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
   $s =0;
   $unix_time = mktime(substr($p_date_begin,8,2), substr($p_date_begin,10,2), "00", 
                       substr($p_date_begin,4,2), substr($p_date_begin,6,2), substr($p_date_begin,0,4));
-  for($current_time=$p_date_begin;$current_time<$p_date_end;
+  for($current_time=$p_date_begin;$current_time<=$p_date_end;
       $current_time=date("YmdHi",$unix_time)) {
     if(date("G",$unix_time) < $set_stop_time){
       $unix_time = strtotime("+$time_unit minutes",$unix_time);	
@@ -727,21 +738,39 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
 	$curent_event[$current_time] = $temp_array;
       }
     }
+    while($obm_q->f("calendarsegment_date") != "" && $obm_q->f("calendarsegment_date") < $current_time) {
+      $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = $obm_q->f("calendarevent_id");
+      $status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
+      $event_data[$obm_q->f("calendarevent_id")] = 
+        array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
+        "begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+        substr($obm_q->f("calendarsegment_date"),10,2),"status" => $status);
+      $obm_q->next_record(); 
+    }
     while($obm_q->f("calendarsegment_date") == $current_time) {
       if($obm_q->f("calendarsegment_flag") == "begin") {
 	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = $obm_q->f("calendarevent_id");
+	$status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
 	$event_data[$obm_q->f("calendarevent_id")] = 
   	array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
-	$obm_q->f("calendarsegment_flag")=>substr($obm_q->f("calendarsegment_date"),8,2).":".
-	substr($obm_q->f("calendarsegment_date"),10,2),"status"=>0);
+	"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+	substr($obm_q->f("calendarsegment_date"),10,2),"status" => $status);
 	$obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
 	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
+	$event_data[$obm_q->f("calendarevent_id")]["end"] = substr($obm_q->f("calendarsegment_date"),8,2).":".
+							   substr($obm_q->f("calendarsegment_date"),10,2);
 	$obm_q->next_record(); 
       }       
     }
     $past_time = $current_time;
   }    
+  do {
+    $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
+    $event_data[$obm_q->f("calendarevent_id")]["end"] = substr($obm_q->f("calendarsegment_date"),8,2).":".
+                                                        substr($obm_q->f("calendarsegment_date"),10,2);
+    }while($obm_q->next_record());
+
 }
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed events and of data event.(hashed by day for year
@@ -760,32 +789,53 @@ function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_
   $unix_time = strtotime($p_date_begin);
   for($current_time=$p_date_begin;$current_time<$p_date_end;$current_time=date("Ymd",$unix_time)) {
     $unix_time = strtotime("+1 day",$unix_time);	
-    if(is_array($curent_event[$past_time])) {
-      $temp_array = array_filter($curent_event[$past_time],"valid_event");
-      if(count($temp_array)>0){
-	$curent_event[$current_time] = $temp_array;
+    while($obm_q->f("calendarsegment_date") != "" && substr($obm_q->f("calendarsegment_date"),0,8) < $current_time) {
+      $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")][] = $obm_q->f("calendarevent_id");
+      $status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
+      $event_data[$obm_q->f("calendarevent_id")] = 
+        array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
+        "begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+        substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status);
+      $obm_q->next_record(); 
+    }
+    if(is_array($curent_event[$past_time])){
+      foreach($curent_event[$past_time] as $customer => $past_events) {
+	if(is_array($past_events)) {
+	  if(is_array($end_event)){
+	    if(count($curent_event[$current_time][$customer]=array_diff($past_events,$end_event))==0){
+	      $curent_event[$current_time][$customer]="";
+	    }
+	  }
+	  else {
+	    $curent_event[$current_time][$customer]=$past_events;
+	  }
+	}
       }
     }
+    $end_event ="";
     while(substr($obm_q->f("calendarsegment_date"),0,8) == $current_time) {
       if($obm_q->f("calendarsegment_flag") == "begin") {
-	$curent_event[$current_time][$obm_q->f("calendarevent_id")] = 1;
-	if(!is_array($event_data[$obm_q->f("calendarevent_id")])) {
+	  $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")][] = $obm_q->f("calendarevent_id");
+	  $status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
   	  $event_data[$obm_q->f("calendarevent_id")] = 
-  	  array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
-  	  $obm_q->f("calendarsegment_flag")=>substr($obm_q->f("calendarsegment_date"),8,2).":".
-  	  substr($obm_q->f("calendarsegment_date"),10,2),"status"=>0);
-	}
-	if(!@in_array($obm_q->f("calendarsegment_customerid"),$event_data[$obm_q->f("calendarevent_id")]["user_id"])) {
-	  $event_data[$obm_q->f("calendarevent_id")]["user_id"][] = $obm_q->f("calendarsegment_customerid");
-	}
-	$obm_q->next_record(); 
+  	    array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
+  	    "begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+  	    substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status);
+	  $obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
-	$curent_event[$current_time][$obm_q->f("calendarevent_id")] = -1;
-	$obm_q->next_record(); 
+	$end_event[] = $obm_q->f("calendarevent_id");
+        $event_data[$obm_q->f("calendarevent_id")]["end"] = substr($obm_q->f("calendarsegment_date"),8,2).":".
+  	                                                    substr($obm_q->f("calendarsegment_date"),10,2);
+	$obm_q->next_record();
       }       
     }
     $past_time = $current_time;
   }    
+  do {
+    $event_data[$obm_q->f("calendarevent_id")]["end"] = substr($obm_q->f("calendarsegment_date"),8,2).":".
+                                                        substr($obm_q->f("calendarsegment_date"),10,2);
+  }while($obm_q->next_record());
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -797,8 +847,13 @@ function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_
 /////////////////////////////////////////////////////////////////////////////
 
 function store_users($user_q) {
+  global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2,$ico_calendar_user3,$ico_calendar_user4;
+  global $ico_calendar_user5;
+  $i = 0;
   while($user_q->next_record()) {
-    $user_tab[$user_q->f("userobm_id")] = $user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname");
+    $user_tab[$user_q->f("userobm_id")] = array("name"=>$user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname"),
+	                                      "class"=>"agendaEventBg$i","image"=>${"ico_calendar_user".$i});
+    $i++;
   }
   return $user_tab;
 }
@@ -813,7 +868,7 @@ function store_users($user_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($agenda) {
   global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_incorect_datebegin, $l_incorect_dateend,$err_msg ;
-
+  global $l_incorect_begin_end ,$l_incorect_end_repeat, $l_incorect_repeat ;
   
   $title = $agenda["title"];
   $datebegin = substr($agenda["date_begin"],0,8);
@@ -864,7 +919,17 @@ function check_data_form($agenda) {
       return false;
     }  
   }
+
+  if($dateend<$datebegin) {
+    $err_msg =  $l_incorect_begin_end;
+    return false;
+  } 
   
+  if(trim($repeat_end) != "" && $dateend>$repeat_end) {
+    $err_msg =  $l_incorect_end_repeat;
+    return false;
+  }  
+    
   return true; 
 }
 
@@ -1043,4 +1108,3 @@ function dateOfWeek($Ymd, $day) {
 	return $ret;
  
 }
-

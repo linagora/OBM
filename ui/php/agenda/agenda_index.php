@@ -56,7 +56,12 @@ if($action == "") $action = "index";
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array =  array($auth->auth["uid"]);
+  if(count($sel_user_id) != 0){
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   $user_obm = run_query_userobm();  
@@ -90,7 +95,6 @@ elseif ($action == "view_week") {
 }
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
-var_dump($sel_user_id);
  if(count($sel_user_id) != 0){
     $p_user_array =  $sel_user_id;
   }
@@ -113,7 +117,7 @@ elseif ($action == "view_year") {
   $obm_q = run_query_year_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   $user_obm = run_query_userobm();  
-  dis_year_planning($agenda,$obm_q,$user_q,$user_obm);
+  dis_year_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 }
 elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,8 +144,16 @@ elseif ($action == "insert") {
       $user_obm = run_query_userobm();
       dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
     }
+    elseif($agenda["force"] == 1) {
+      html_dis_conflict($agenda,$conflict);
+    }
     else{
-      //html_dis_conflict($agenda,$conflict);
+      html_dis_conflict($agenda,$conflict);
+      $p_user_array =  array($auth->auth["uid"]);
+      $obm_q = run_query_week_event_list($agenda,$p_user_array);
+      $user_q = run_query_get_user_name($p_user_array);
+      $user_obm = run_query_userobm();
+      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
     }
   }
   else {
@@ -201,7 +213,8 @@ elseif ($action == "update") {
 
 function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
-  global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$tf_time_end,$tf_date_end,$sel_repeat_kind;
+  global $set_start_time, $set_stop_time,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
+  global $tf_date_end,$sel_repeat_kind;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update;
 
@@ -218,16 +231,20 @@ function get_param_agenda() {
   if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;
   if (isset($cb_force))  $agenda["force"] = $cb_force;
   if (isset($cb_privacy))  $agenda["privacy"] = $cb_privacy;
-  if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;  
+  if (isset($tf_repeat_end)){
+    ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_repeat_end , $day_array1);
+    $agenda["repeat_end"] =  $day_array1[1].$day_array1[2].$day_array1[3];
+    echo $tf_repeat_end;
+   }
   if (isset($cb_repeat_update)) $agenda["repeat_update"] = 1;
   if (isset($tf_date_begin)) {
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_begin , $day_array2);
     $agenda["date_begin"] .=  $day_array2[1].$day_array2[2].$day_array2[3];
-    if (isset($tf_time_begin)) {
-      $agenda["date_begin"] = $agenda["date_begin"].substr($tf_time_begin,0,2).substr($tf_time_begin,3,2);
+    if (isset($sel_time_begin) && isset($sel_min_begin)) {
+      $agenda["date_begin"] = $agenda["date_begin"].$sel_time_begin.$sel_min_begin;
     }
     else {
-      $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours", $agenda["date_begin"]));
+      $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",strtotime($agenda["date_begin"])));
     }
   }
   else {
@@ -235,12 +252,12 @@ function get_param_agenda() {
   }
   if (isset($tf_date_end)) {
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_end , $day_array);
-    $agenda["date_end"] .=  $day_array[1].$day_array[2].$day_array[3];
-    if (isset($tf_time_end)) {
-      $agenda["date_end"] =  $agenda["date_end"].substr($tf_time_end,0,2).substr($tf_time_end,3,2);
+    $agenda["date_end"] =  $day_array[1].$day_array[2].$day_array[3];
+    if (isset($sel_time_end) && isset($sel_min_end)) {
+      $agenda["date_end"] =  $agenda["date_end"].$sel_time_end.$sel_min_end;
     }
     else {
-      $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",$agenda["date_end"]));
+      $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($agenda["date_end"])));
     }
   }
   else {
@@ -273,10 +290,10 @@ function get_param_agenda() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function get_agenda_action() {
-  global $actions;
+  global $actions,$path;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_day,$l_header_week,$l_header_year,$l_header_admin;
-  global $l_header_month,$l_header_new_event,$param_event;
+  global $l_header_month,$l_header_new_event,$param_event,$param_date;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
   //Index
@@ -378,7 +395,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["detailupdate"] = array (
     'Name'     => $l_header_modify,
-    'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."",
+    'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."&amp;param_date=$param_date",
     'Right'    => $agenda_write,
     'Condition'=> array ('detailconsult') 
                                      		 );
@@ -432,4 +449,5 @@ function get_agenda_action() {
 display_end();
 
 ?>
+
 

@@ -93,6 +93,12 @@ $l_fill_datebegin = "Veuillez remplir le champ <Date de debut>";
 $l_incorect_datebegin = "Format du champ <Date de debut> incorrecte";
 $l_incorect_dateend = "Format du champ <Date de Fin> incorrecte";
 $l_incorect_repeat = "Format du champ <Date de fin de répétition> incorrecte";
+$l_incorect_begin_end = "La date de fin doit etre supérieure à la date de début";
+$l_incorect_end_repeat = "La fin de répétition doit etre supérieure à la date de fin";
+
+$l_conflicts = "Conflit(s) rencontré(s)";
+$l_date = "Date";
+$l_user = "Utilisateur";
 
 $l_monday="Lundi";
 $l_tuesday="Mardi";

@@ -392,6 +392,7 @@ table.OBMDisplayPref	 {
 	color:			#000000;
 	width:			auto;
 	border:			3px outset green;
+
 }
 
 td.OBMDisplayHead	 {
@@ -431,12 +432,9 @@ a.OBMDisplayHead:link	 { color: #ffff00; background-color: transparent;}
 a.OBMDisplayHead:active	 { color: #ffff00; background-color: transparent;}
 a.OBMDisplayHead:visited { color: #ffff00; background-color: transparent;}
 
-a.OBMDisplayText:link, a.OBMDisplayText:active, a.OBMDisplayText:visited {
-	color:            #0ba589;
-	text-decoration:  none;
-	background-color: transparent;
-}
-
+a.OBMDisplayText:link 	 { color: #0ba589; background-color: transparent;}
+a.OBMDisplayText:active  { color: #0ba589; background-color: transparent;}
+a.OBMDisplayText:visited { color: #0ba589; background-color: transparent;}
 
 /* //////////////////DETAILS///////////////// */
 /* ///// Details table style definition ///// */
@@ -446,6 +444,7 @@ table.details		{
         margin-left:		auto;
 	margin-right:		auto;
 	width:			auto;
+	
 }
 
 td.detailHead		{
@@ -463,6 +462,7 @@ td.detailLabel		{
 	font-weight:		bold;
 	color:			#59519e;
 	background-color:	#ffffff;
+	
 }
 
 td.detailText		{
@@ -470,14 +470,13 @@ td.detailText		{
 	font-size:		12px;
 	color:			#000000;
 	background-color:	#ffffff;
+	
 }
 
-a.detailText:link, a.detailText:active, a.detailText:visited {
-	color:            #0ba589;
-	font-weight:      bold;
-	text-decoration:  none;
-	background-color: transparent;
-}
+a.details:link 		{ color: #000000; background-color: transparent;}
+a.details:active 	{ color: #000000; background-color: transparent;}
+a.details:visited 	{ color: #000000; background-color: transparent;}
+
 
 /* //////////////////DIVERS////////////////// */
 /* ///// Diverstable style definition ////// */
@@ -574,8 +573,15 @@ table.agendaMonth	{
 
 table.agendaYear	{
         background-color:      #cccccc;
+        margin-left:		auto;
+	margin-right:		auto;		
 }
-
+table.agendaEventYear {
+	margin:			0;
+	padding:		0;
+	border:			0;	
+	border-spacing:		0;	
+	}
 td.agendaMonthReg	{
         margin-left:		auto;
 	margin-right:		auto;
@@ -674,25 +680,61 @@ td.agendaHead2		{
 	
 td.agendaEventHead	{ 
         background-color:       #336699;
-	border:                 1px #a1a4a8 solid; 
+		border:                 1px #a1a4a8 solid; 
+		text-align:				center;	
+		font-weight: 			800;		
 	}
+td.agendaEventBg0 	{ 
+	background-color: 	#b1d29d; 
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg1 	{ 
+	background-color: 	#33a457; 
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg2 	{ 
+	background-color: 	#005a53;  
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg3 	{ 
+	background-color: 	#33348e;  
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg4 	{ 
+	background-color: 	#608bc7;  
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg5 	{ 
+	background-color: 	#bbcdec;  
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}	
 
-.agendaEventBg2  	{ 
-        background-color:       #6699CC;
-        border-right:            1px solid #FFFFFF; }
-
+td.agendaEventYear {
+	width:				8px;
+	height:				8px;
+	margin:			0;
+	padding:		0;
+	border:			0;	
+	}
+			
 select.agendaQuery 	{ 
-	font-size:		11px; 
+	font-size:			11px; 
 	font-family: 		sans-serif;
-	width:                  156px; 
+	width:                156px; 
 	margin-bottom:          0;
 }
 
-
+			
+	
 
 a.agendaLink		{ text-decoration:	none; }
 a.agendaLink:link	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: transparent; }
-a.agendaLink:visited	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: transparent; }
+a.agendaLink:visited{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: transparent; }
 a.agendaLink:active	{ font-family: sans-serif; font-size: 11px;color: #3366cc; background-color: transparent; }
 a.agendaLink:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: transparent; }
 
@@ -708,8 +750,14 @@ a.agendaLink3:visited	{ font-family: sans-serif; font-size: 11px;color: #0066ff;
 a.agendaLink3:active	{ font-family: sans-serif; font-size: 11px;color: #3366cc background-color:  #ffcc00; }
 a.agendaLink3:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: #ffcc00; }
 
-.agendaEventHead	{ background-color: #336699; border: 1px #006699 solid; }
-.eventbg 	{ background-color: #6699CC; }
+a.agendaLink4	{ text-decoration:	none; }
+a.agendaLink4:link	{ font-family: sans-serif; font-size: 13px;color: #ffffff; background-color: transparent; }
+a.agendaLink4:visited	{ font-family: sans-serif; font-size: 13px;color: #ffffff; background-color: transparent; }
+a.agendaLink4:active	{ font-family: sans-serif; font-size: 13px;color: #ffffff background-color:  transparent; }
+a.agendaLink4:hover	{ font-family: sans-serif; font-size: 13px;color: #ffffff; background-color: transparent; }
+
+
+
 .eventbg2  	{ background-color: #6699CC; border-right: 1px solid #FFFFFF; }
 .eventbg2week 	{ background-color: #6699CC; border-right: 1px solid #A1A5A9; }
 .montheventtop	{ background-image: url(side_bg.gif); border-top: 1px solid #A1A5A9; }
