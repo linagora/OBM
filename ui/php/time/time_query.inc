@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Time search query execution                                            //
+// Time search query execution
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       interval, date, contact_id
@@ -343,7 +343,7 @@ function run_query_insert($task) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task modification query execution                                         //
+// Task modification query execution
 // Parameters:
 //   - $task[] : Entry's values
 //     keys used  : tasktype, project, time, label
