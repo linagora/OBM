@@ -26,7 +26,6 @@ DELETE FROM GlobalPref;
 -- Session lifetime
 INSERT INTO GlobalPref VALUES ('lifetime', '14400');
 INSERT INTO GlobalPref VALUES ('session_cookie', '1');
-INSERT INTO GlobalPref VALUES ('document_path', '/var/www/obm/documents');
 
 
 -------------------------------------------------------------------------------

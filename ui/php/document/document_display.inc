@@ -527,7 +527,7 @@ function html_repository_form($action, $document) {
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_consult($doc_q) {
-  global $display, $set_theme, $link_to;
+  global $display, $set_theme;
   global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
   global $l_author, $l_category1, $l_category2, $l_path, $l_name; 
   global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
@@ -1544,12 +1544,12 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Consult File
-/////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 function dis_file($doc_q) {
-  global $document_path,$link_to;
+  global $document_path;
   global $obm_version,$set_weekstart_default;
   $path = $doc_q->f("document_path");
   $name = $doc_q->f("document_name");  

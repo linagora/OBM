@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -38,6 +38,9 @@ $cgp_mailing_default = true;
 $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
+
+// Root of the document repository
+$document_path = "/var/www/obmdocuments";
 
 // Auto format fields
 $caf_company_name = true;

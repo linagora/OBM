@@ -14,12 +14,6 @@ $l_obm_title = "O.B.M.";
 // Document constants 
 $link_to = "Link : "; // Deprecated but necessary for update from older version
                      //Name of the prefix of a link document
-$default_mime = "application/octet-stream"; // Default Mime Type
-$default_path = "/Default"; // Default repository
-
-// Import constants
-$tmp_path = "/tmp";
-
 // Agenda constants
 $set_weekstart_default = "monday + 2 hours"; // First day of the week, 
 //english The +2 hours is a quick fix
@@ -63,6 +57,14 @@ $cak_end = "E";
 $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
+
+// Document constants 
+$document_path = "/var/www/obmdocuments";    // Root of the document repository
+$default_path = "/Default";                  // Default directory
+$default_mime = "application/octet-stream";  // Default Mime Type
+
+// Import constants
+$tmp_path = "/tmp";
 
 // Auto format fields
 $caf_company_name = false;

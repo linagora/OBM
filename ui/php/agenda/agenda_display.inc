@@ -1404,7 +1404,30 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
       </table>
      </div>
 
+     <div class=\"agendaBar\">
+      <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+       <tr>
+        <td width=\"1%\" class=\"agendaHead2\">
+         <img src=\"/images/$set_theme/$ico_spacer\" width=\"1\" height=\"20\" alt=\"\" />
+        </td>
+        <td width=\"98%\" class=\"agendaHead2\">$l_legend</td>
+	<td width=\"1%\" class=\"agendaHead2\"></td>
+       </tr>
+       <tr>
+        <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
+       </tr>
+       <tr>
+	<td colspan=\"3\" width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
+       </tr>	
+       $dis_leg_user
+       <tr>
+        <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"148\" height=\"6\" alt=\"\" /></td>
+       </tr>
+      </table>
+     </div>
+
 <!-- User select -->
+
      <div class=\"agendaBar\">
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
        <tr>
@@ -1431,28 +1454,6 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
       </table>
      </div>
      
-     <div class=\"agendaBar\">
-      <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-       <tr>
-        <td width=\"1%\" class=\"agendaHead2\">
-         <img src=\"/images/$set_theme/$ico_spacer\" width=\"1\" height=\"20\" alt=\"\" />
-        </td>
-        <td width=\"98%\" class=\"agendaHead2\">$l_legend</td>
-	<td width=\"1%\" class=\"agendaHead2\"></td>
-       </tr>
-       <tr>
-        <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
-       </tr>
-       <tr>
-	<td colspan=\"3\" width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
-       </tr>	
-       $dis_leg_user
-       <tr>
-        <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"148\" height=\"6\" alt=\"\" /></td>
-       </tr>
-      </table>
-     </div>
-
      <div class=\"agendaBar\">
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
        <tr>
