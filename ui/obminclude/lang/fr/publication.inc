@@ -11,12 +11,14 @@
 $l_publication_title = "Titre Publication";
 $l_type = "Type";
 $l_renew = "Mode de renouvellement";
+$l_auto_renew = "Renouvellement automatique";
 $l_recept = "Mode de réception";
 $l_publication_type = "Type Publication";
 $l_lang = "Langue";
 $l_year = "Année";
 $l_desc = "Description";
 $l_quantity = "Quantité";
+$l_header_new_auto = "Renouvellement";
 
 // Labels et textes
 $l_type_manage = "Gestion des Types de Publication";

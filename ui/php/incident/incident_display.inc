@@ -41,11 +41,11 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "incident_owner_lastname") {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("incident_owner");
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("incident_owner");
   }
 
   else if ($fieldname == "incident_logger_lastname") {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("incident_logger");
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("incident_logger");
   }
 
   else if ($fieldname == "incident_date") {

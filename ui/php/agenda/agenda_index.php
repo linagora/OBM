@@ -649,6 +649,16 @@ function get_agenda_action() {
 		
 //Detail Update
 
+  $actions["AGENDA"]["detailconsult"] = array (
+    'Name'     => $l_header_update,
+    'Url'      => "$path/agenda/agenda_index.php?action=detailconsult&amp;param_event=".$param_event."&amp;param_date=$param_date",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+		
+//Detail Update
+
   $actions["AGENDA"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."&amp;param_date=$param_date",

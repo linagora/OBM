@@ -820,7 +820,7 @@ function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$e
     $query.= ",'".$contacts_array[$i]."'";
   }
   $query.=")";
-  $query .= " ORDER BY cs1.calendarsegment_date, cs1.calendarsegment_customerid";
+  $query .= " ORDER BY datebegin, cs1.calendarsegment_customerid";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   while ($obm_db->next_record()) {
@@ -873,7 +873,7 @@ function run_query_insert_event_data($agenda) {
                          calendarevent_usercreate, calendarevent_title, calendarevent_description,
 			 calendarevent_category_id,calendarevent_priority,calendarevent_privacy, calendarevent_length,
 			 calendarevent_repeatkind,calendarevent_repeatdays,calendarevent_endrepeat)
-	         VALUES ($max_id,'".time()."',".$auth->auth["uid"].",'$title',
+	         VALUES ($max_id,'".date("Y-m-d H:i")."',".$auth->auth["uid"].",'$title',
 		         '$description',$category_id,$priority,$privacy,$length,
 			 '$repeat_kind','$repeat_days','".date("Y-m-d H:i",$repeat_end)."')";
 
@@ -990,7 +990,7 @@ function  run_query_update_deprecated_events($agenda) {
 		  ";
   if($repeat_update == 1) {
     $query .= ">= '$old_date_begin')";
-    $query2 = "UPDATE CalendarEvent Set calendarevent_endrepeat = $date_begin, calendarevent_userupdate = ".$auth->auth["uid"].", calendarevent_timeupdate = ".time()." WHERE calendarevent_id = $old_event_id";
+    $query2 = "UPDATE CalendarEvent Set calendarevent_endrepeat = '".date("Y-m-d H:i",$date_begin)."', calendarevent_userupdate = ".$auth->auth["uid"].", calendarevent_timeupdate = '".date("Y-m-d H:i")."' WHERE calendarevent_id = $old_event_id";
   }else{
     $query .= "= '$old_date_begin' OR calendarsegment_date = '$old_date_end')";
   }

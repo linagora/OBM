@@ -130,3 +130,7 @@ $ico_minus_off = "ico_minus_off.png";
 $ico_plus_on = "ico_plus_on.png";
 $ico_plus_off = "ico_plus_off.png";
 $ico_update = "modify.png";
+
+//Portal Icons 
+
+$ico_agenda_portal = "ico_portal_agenda.gif";

@@ -14,7 +14,7 @@ $l_lang = "Language";
 $l_year= "Year";
 $l_market = "Marketing manager";
 $l_desc = "Description";
-
+$l_header_new_auto = "Renewal";
 // Labels and texts
 $l_type_manage = "Publication Type Management";
 $l_type_exist = "Existing Types";
@@ -74,6 +74,7 @@ $l_publication_display = "Display options for publications lists";
 
 
 $l_renew = "Renewal mode";
+$l_auto_renew = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 

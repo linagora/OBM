@@ -82,11 +82,15 @@ function add_criterion(form,index) {
   cell = labels.insertCell(3); 
   values.insertCell(0);
   cell = values.insertCell(1);
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
+  if(index > 1) {
+    cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
+  }   
   cell = values.insertCell(2);  
   cell.style.borderRight = '1px solid #7B9EAD';
   cell.style.paddingRight = '5px';
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
+  if(index > 1) {
+    cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
+  }
   cell = values.insertCell(3);
   if(index > 1) {
     cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
@@ -109,12 +113,6 @@ function del_row(row) {
   table = row.parentNode;
   table.deleteRow(i-1);
   table.deleteRow(i-1);
-  if(i==1 && table.rows.length >= 1) {
-    row = table.rows[i];
-    row.cells[3].innerHTML = '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option></select>';
-    row.cells[3].innerHTML += '<input type=\"hidden\" name=\"sel_log_and[]\" value=\"\" />';
-
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -268,22 +266,22 @@ function company_criterion(form,labels,values,i) {
 function contact_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
-  if(form.tf_contact_lname.value != '') {    
+  if(form.tf_contact_lastname.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_lastname';    
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_lastname[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_lname.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_lastname[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_lastname.value+'\" />';
     i++;
   }
   else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_contact_lastname[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_fname.value != '') {
+  if(form.tf_contact_firstname.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_firstname';      
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_firstname[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_fname.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_firstname[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_firstname.value+'\" />';
     i++;
   }
   else {

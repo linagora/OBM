@@ -804,7 +804,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   
   // Cat select field
   if ($show_cat) {
-    $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;font-weight:400;\">";
+    $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
     $j =0;
     if (is_array($cat_a)) {
       foreach ($cat_a as $cat_info) {
@@ -827,7 +827,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     }
     $sel_cat .= "</select>";
 
-    $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
+    $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=sel_cat"; 
     $block_cat = "
     </tr><tr>
       <td class=\"detailLabel\">$l_category</td>

@@ -1,0 +1,104 @@
+.portal {
+	margin: auto;
+	width: 600px;
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+.portalPortal {
+	margin: 20px 5px;
+	width: 600px;
+}
+
+.portalModule {
+	margin: 10px;
+	background-color: #FFFFFF;
+	border: 1px solid #9CCBD6;
+	height: 200px;
+	width: 300px;
+
+}
+
+.portalModuleLeft {
+  	height: 200px;
+	width: 65px;	
+	background-image: url(bg_portal_module.gif);
+	background-position: left top;
+	float : left;
+}
+      
+.portalLook {
+	background-image: url(../images/logo01.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 65px;
+	width: 65px;
+}
+.portalTitle {
+	font-size: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
+	color: #009EC6;
+	background-color: #eff3f7;
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.portalContent {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #009EC6;
+	text-align: center;
+}
+.portalLink {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	text-align: center;
+}
+.portalPortal {
+	margin: 20px 5px;
+	width: 600px;
+}
+.portalModule02 {
+	background-color: #FFFFFF;
+	border: 2px solid #009EC6;
+	background-image: url(../images/logo02.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 200px;
+	padding-left: 70px;
+}
+.portalModule03 {
+	background-color: #FFFFFF;
+	border: 2px solid #009EC6;
+	background-image: url(../images/logo03.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 200px;
+	padding-left: 70px;
+}
+.portalModule04 {
+	background-color: #FFFFFF;
+	border: 2px solid #009EC6;
+	background-image: url(../images/logo04.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 200px;
+	padding-left: 70px;
+}
+.portalModule01 {
+	background-color: #FFFFFF;
+	border: 2px solid #009EC6;
+	background-image: url(../images/logo01.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 200px;
+	padding-left: 70px;
+}
+.portalReunion {
+	font-size: 10px;
+	line-height: 12px;
+}
+.portalAgenda {
+	font-size: 10px;
+	line-height: 12px;
+}
