@@ -93,7 +93,6 @@ if ($action == "index") {
     $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
   }
 } elseif($action == "decision") {
-/////////////////////////TODO : CONFLICTS//////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
   if (!$agenda["force"] && $conflicts = check_for_decision_conflict($agenda)) {      
@@ -184,7 +183,7 @@ if ($action == "index") {
   $grp_obm = run_query_group_writable();
   $cat_event = run_query_get_eventcategories();
   if($p_user_meeting==1) {
-    $p_user_array = $sel_user_id;
+    $p_user_array =  $agenda["user_meeting"] ;
   }else {
     $p_user_array = array($uid);
   }
@@ -280,7 +279,6 @@ if ($param_event > 0) {
     $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
 } elseif ($action == "update_decision") {
-/////////////////////////TODO : CONFLICTS//////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update_occurence_state($agenda["id"],$auth->auth["uid"],$agenda["decision_event"]);
   require("agenda_js.inc");

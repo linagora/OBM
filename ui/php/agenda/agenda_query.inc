@@ -1637,9 +1637,29 @@ class Day {
   }
  
   function have_events_between($start,$end) {
+    if(count($this->day_events) > 0) {
+      return true;
+    }
     foreach($this->events as $event) {
       $ev_start = $event["date"];
       $ev_end = $event["event"]->duration + $ev_start;
+      if($ev_start < $end && $ev_end > $start) {
+	return true;
+      }
+    }
+    return false;
+  }
+
+  function user_have_events_between($start,$end,$uid) {
+    if(count($this->day_events[$uid]) > 0) {
+      return true;
+    }
+    foreach($this->events as $event) {
+      $ev_start = $event["date"];
+      $ev_end = $event["event"]->duration + $ev_start;
+      if(!in_array($uid,$event["users"])) {
+	continue;
+      }            
       if($ev_start < $end && $ev_end > $start) {
 	return true;
       }
