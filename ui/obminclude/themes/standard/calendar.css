@@ -18,8 +18,9 @@ a.agendaHead:visited 	{ color: #ffff00; background-color: transparent;}
 
 
 div.agendaBar {
-	width:			170px;
+	width:			180px;
 	margin-bottom:		20px;
+	margin-left:		2px;
 }
 
 div.agendaHidden {
@@ -94,8 +95,6 @@ table.agendaCalMeeting		{
 }
 
 table.agendaCal		{
-        margin-left:		auto;
-	margin-right:		auto;
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
 	width:			100%;

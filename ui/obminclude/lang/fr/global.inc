@@ -199,7 +199,7 @@ $l_document_add = "Affecter un document";
 ////////////////////////////////////////////////////////
 
 $l_waiting_events = "Evémenement(s) en attente";
-$l_unfilled = "Jours non remplis";
+$l_unfilled = "Jour(s) non remplis";
 $l_youre_agenda = "Votre agenda";
 $l_youre_time = "Votre gestion du temps";
 

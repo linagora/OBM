@@ -712,7 +712,14 @@ function get_deal_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update','insert') 
                                      	    );
-
+					    
+  //  Update
+  $actions["DEAL"]["update"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=update&amp;param_deal=".$deal["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     	    );
+					    
   // Parent Detail Update
   $actions["DEAL"]["parent_detailupdate"] = array (
     'Name'     => $l_header_update,
@@ -720,6 +727,13 @@ function get_deal_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
                                      		  );
+                                                                                                                                                             
+  // Parent Update
+  $actions["DEAL"]["parent_update"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=parent_update&amp;param_parent=".$deal["parent"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                                  );
 
   // Insert
   $actions["DEAL"]["insert"] = array (

@@ -411,7 +411,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_private,$l_private_description;
-  
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
   $num = date('w', strtotime($set_weekstart_default));
@@ -481,8 +480,10 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	      $rowspan_event = 0;
 	      $event_head_display ="";
 	      $temp_array = array();
+	      $end_of_day = date("Ymd".$set_stop_time."00",$indice_time);
 	      do{
 		foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {
+		  
 	  	  if($is_title == FALSE) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $is_title = TRUE;
@@ -570,11 +571,12 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		$temp_array = $current_events[$indice_time][$id];
 		$temp_array2 = next($current_events);
 		$indice_time = key($current_events);
+		$now = date("YmdHi",$indice_time);
 	      } while (is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
-	             && date("H",$indice_time)<$set_stop_time);
+	             && $now < $end_of_day);
 	      $rowspan = "rowspan=\"$rowspan_event\"";
 	      $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
-	      $hour_day_list .= "</td>";		    
+	      $hour_day_list .= "</td>";	
 	    }
 	  }
 	  else {
@@ -615,6 +617,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		$rowspan_event = 0;
 		$event_head_display ="";
 		$temp_array = array();
+		$end_of_day = date("Ymd".$set_stop_time."00",$indice_time);
 		do {
 		  foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {
 	  	    if ($is_title == FALSE) {
@@ -701,8 +704,9 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	  	  $temp_array = $current_events[$indice_time][$id];
 	  	  $temp_array2 = next($current_events);
 	  	  $indice_time = key($current_events);
+		  $now = date("YmdHi",$indice_time);
 		}while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
-	               && date("H",$indice_time)<$set_stop_time);
+	               &&  $now < $end_of_day);
   		$rowspan = "rowspan=\"$rowspan_event\"";
 		$hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
 		$hour_day_list .= "</td>";	

@@ -194,6 +194,6 @@ $l_document_add = "Affect a document";
 
 //Portal labels
 $l_waiting_events = "Waiting event(s)";
-$l_unfilled = "Days unfilled";
+$l_unfilled = "Day(s) unfilled";
 $l_youre_agenda = "Your calendar";
 $l_youre_time = "Your time management";
