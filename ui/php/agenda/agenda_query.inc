@@ -1798,14 +1798,15 @@ function localizeDate($format, $timestamp) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function dateOfWeek($Ymd, $day) {
-	global $set_weekstart_default;
-	if (!isset($set_weekstart_default)) $set_weekstart_default = 'Sunday';
-	$timestamp = strtotime($Ymd);
-	$num = date('w', strtotime($set_weekstart_default));
-	$start_day_time = strtotime((date('w',$timestamp)==$num ? "$set_weekstart_default" : "last $set_weekstart_default"), $timestamp);
-	$ret_unixtime = strtotime($day,$start_day_time);
-	$ret_unixtime = strtotime('+12 hours', $ret_unixtime);
-	$ret = date('Ymd',$ret_unixtime);
-	return $ret;
- 
+  global $set_weekstart_default;
+  if (!isset($set_weekstart_default)) $set_weekstart_default = 'Sunday';
+  $timestamp = strtotime($Ymd);
+  $num = date('w', strtotime($set_weekstart_default));
+  $start_day_time = strtotime((date('w',$timestamp)==$num ? "$set_weekstart_default" : "last $set_weekstart_default"), $timestamp);
+  $ret_unixtime = strtotime($day,$start_day_time);
+  $ret_unixtime = strtotime('+12 hours', $ret_unixtime);
+  $ret = date('Ymd',$ret_unixtime);
+  return $ret;
+  
 }
+

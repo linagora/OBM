@@ -216,6 +216,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   $date = mktime(0,0,0,"$this_month","$this_day","$this_year");	
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);  
+ 
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $getdate, $day_array2);
   $this_day = $day_array2[3]; 
   $this_month = $day_array2[2];
@@ -234,6 +235,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   $nb_user = count($calendar_user);
   $td_width = floor(105/$nb_user);
   $td_colspan = $nb_user;
+    
   store_daily_events($obm_q, $current_events, $event_data,$first_of_month,$stop_of_month);
   //Display the day of a week
   for ($i=0; $i<7; $i++) {
@@ -259,7 +261,13 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	$bgclass="class=\"agendaMonthReg\"";
       }
     }
-    if ($i == 0) $dis_month_cal .= "<tr>\n";
+    if ($i == 0) {
+      $dis_month_cal .= "<tr>\n";
+      $num = date('w', strtotime($set_weekstart_default));
+      $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$sunday));
+      $week_num = date("W",strtotime("$delta_thursday days",$sunday));
+      $dis_month_cal .= "<td>$week_num</td>";
+    }
     $dis_month_cal .= "<td $bgclass width=\"105\" height=\"105\">\n";
     $dis_month_cal .= "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
     $dis_month_cal .= "<tr>\n";
@@ -284,7 +292,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	 $dis_month_cal .= "<td  valign=\"top\" width=\"$td_width\"><table heigth=\"100%\" width=\"$td_width\">";
 	 if(is_array($current_events[$current_time][$id]))
 	   foreach($current_events[$current_time][$id] as $event => $event_id) {
-	     $dis_month_cal .= "<tr>";  
+	     $dis_month_cal .= "<tr>"; 
 	     $dis_month_cal .= "<td class=\"".$data["class"]."\">";
 	     $dis_month_cal .= "
 	      <a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$event_id."&param_date=$daylink\" 
@@ -417,6 +425,9 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
+  $num = date('w', strtotime($set_weekstart_default));
+  $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$unix_time));
+  $week_num = date("W",strtotime("$delta_thursday days",$unix_time));
   $time_unit = 60 / $set_cal_interval;
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
@@ -737,7 +748,7 @@ echo "
 	  </tr>
 	  <tr>
 	   <td class=\"agendaCell\" width=\"60\">
-            <img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" />
+            $week_num<img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" />
            </td>
            <td width=\"1\">
            </td>
@@ -774,10 +785,14 @@ $hidden_div
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
-  global $set_start_time, $set_stop_time,$set_cal_interval,$l_description;
+  global $set_start_time, $set_stop_time,$set_cal_interval,$l_description,$set_weekstart_default;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
+  //Des tests sont necessaires car la fonction W de date bug...
+  $num = date('w', strtotime($set_weekstart_default));
+  $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$unix_time));
+  $week_num = date("W",strtotime("$delta_thursday days",$unix_time));
   $tomorrows_date = date( "Ymd", strtotime("+1 day",  $unix_time));
   $yesterdays_date = date( "Ymd", strtotime("-1 day",  $unix_time));
   $time_unit = 60 / $set_cal_interval; 
@@ -1046,7 +1061,8 @@ echo "
         </td>
        </tr>
        <tr>
-	<td colspan=\"3\" class=\"agendaHead\">
+	<td class=\"agendaHead\">$week_num</td>
+	<td colspan=\"2\" class=\"agendaHead\">
 	 <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" > <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /> </a>
 	</td>
        </tr>
@@ -1096,7 +1112,6 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
  
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
-
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
   $tomorrows_date = date( "Ymd", strtotime("+1 day",  $unix_time));
