@@ -14,7 +14,7 @@ $l_groups = "Groupes";
 $l_title = "Titre";
 $l_priority = "Priorité";
 $l_private = "Privé";
-$l_private_description = "Cet événement est personnel il vous est impossible d'en voire le détail.";
+$l_private_description = "Cet événement est personnel. Impossible de voir le détail.";
 $l_public  = "Public";
 $l_category = "Catégorie";
 $l_description = "Description";
@@ -131,13 +131,13 @@ $l_err_end_repeat2 = "La durée maximum d'une répétition est de 1 an";
 $l_err_end_repeat3 = "La durée maximum d'une répétition est de 10 ans lorsque la répétition est de type annuelle.";
 $l_err_days_repeat = "Vous devez spécifier des jours de répétitions.";
 $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins etre de 7 jours supérieure à celle de fin d'événement.";
-$l_monday="Lundi";
-$l_tuesday="Mardi";
-$l_wednesday="Mercredi";
-$l_thursday="Jeudi";
-$l_friday="Vendredi";
-$l_saturday="Samedi";
-$l_sunday="Dimanche";
+$l_monday = "Lundi";
+$l_tuesday = "Mardi";
+$l_wednesday = "Mercredi";
+$l_thursday = "Jeudi";
+$l_friday = "Vendredi";
+$l_saturday = "Samedi";
+$l_sunday = "Dimanche";
 $l_daysofweek = array (	'Dimanche',
 			'Lundi',
 			'Mardi',
@@ -163,14 +163,13 @@ $l_monthsofyear = array (	'Janvier','Février',
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
 			      'juil','aoû','sep','oct','nov','déc');
 
-			      
-$l_short_monday="Lun";
-$l_short_tuesday="Mar";
-$l_short_wednesday="Mer";
-$l_short_thursday="Jeu";
-$l_short_friday="Ven";
-$l_short_saturday="Sam";
-$l_short_sunday="Dim";
+$l_short_monday = "Lun";
+$l_short_tuesday = "Mar";
+$l_short_wednesday = "Mer";
+$l_short_thursday = "Jeu";
+$l_short_friday = "Ven";
+$l_short_saturday = "Sam";
+$l_short_sunday = "Dim";
 
 $l_category_manage = "Gestion des Categories d'évenements";
 $l_category_exist = "Categories existantes";
@@ -190,15 +189,15 @@ $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
 //MAIL
 
-$l_add_event_mail_head = "Un nouvel évenement a été programmé pour vous sur Obm.\nIl a pour titre : ";
-$l_update_event_mail_head = "Un événement vous concernant a été mis à jour sur Obm.\nIl a pour titre : ";
-$l_delete_event_mail_head = "Un événement vous concernant a été supprimé sur Obm.\nIl avait pour titre : ";
+$l_add_event_mail_head = "Nouvel événement dans Obm : ";
+$l_update_event_mail_head = "Evénement mis à jour dans Obm : ";
+$l_delete_event_mail_head = "Evénement supprimé dans Obm : ";
 
 $l_add_event_mail_subject = "Nouvel evenement sur Obm";
 $l_update_event_mail_subject = "Mise a jour d'un evenement sur Obm";
 $l_delete_event_mail_subject = "Suppression d'un evenement sur Obm";
 
-$l_event_mail_body = "Il aura lieu : ";
+$l_event_mail_body = "Date : ";
 $l_update_event_mail_body = "\nAu lieu de :";
 $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+envoie de mail";

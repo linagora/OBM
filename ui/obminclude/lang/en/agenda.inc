@@ -13,7 +13,7 @@ $l_groups = "Groups";
 $l_title = "Title";
 $l_priority = "Priority";
 $l_private = "Private";
-$l_private_description = "This is a private event, you cannot see the details.";
+$l_private_description = "This is a private event, you cannot see the details";
 $l_public  = "Public";
 $l_category = "Category";
 $l_description = "Description";
@@ -127,15 +127,15 @@ $l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun','jul',
 
 // Messages
 $l_sendamail = "Force the notification by mail.";
-$l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
-$l_select_repeat_day = "Vous devez s&eacute;lectionner le ou les jours de r&eacute;p&eacute;tition.";
-$l_conflict_events = "Le ou les cr&eacute;neaux horaires choisis sont occup&eacute;s pour "; 
+$l_select_contacts = "You have to select an user or group.";
+$l_select_repeat_day = "You have to select the repetition days.";
+$l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour "; 
 $l_fill_title = "You have to fill the [ $l_title ] field";
 $l_fill_dateend = "You have to fill the [ $l_dateend ] field";
 $l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";
-$l_err_datebegin = "[ $l_datebegin ] format incorrect !";
-$l_err_dateend = "[ $l_dateend ] format incorrect !";
-$l_err_repeat = "[ $l_use_endrepeat ] format incorrect !";
+$l_err_datebegin = "[ $l_datebegin ] invalid format !";
+$l_err_dateend = "[ $l_dateend ] invalid format !";
+$l_err_repeat = "[ $l_use_endrepeat ] invalid format !";
 $l_err_begin_end = "End date must be after begin date !";
 $l_err_end_repeat = "Repetion end must be after end date";
 $l_err_end_repeat2 = "The max duration of a repetition is one year";
@@ -173,13 +173,13 @@ $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
 
 //Mail
-$l_add_event_mail_head = "A new event has been set for you on the obm application.\nThis event title is :";
-$l_update_event_mail_head = "A event has been updated for you on the obm application.\nThis event title is :";
-$l_delete_event_mail_head = "A event has been deleted for you on the obm application.\nThis event title was :";
+$l_add_event_mail_head = "New event on OBM :";
+$l_update_event_mail_head = "Event updated on OBM :";
+$l_delete_event_mail_head = "Event deleted on OBM :";
 
-$l_event_mail_body = "This event will take place : ";
-$l_update_event_mail_body = "Instade of :";
-$l_delete_event_mail_body = "This event should have take place : ";
+$l_event_mail_body = "Date : ";
+$l_update_event_mail_body = "Instead of : ";
+$l_delete_event_mail_body = "Date : ";
 $l_confirm_mail = "Confirm+send a mail";
 $l_add_event_mail_subject = "New event on obm";
 $l_update_event_mail_subject = "Updated event on obm";

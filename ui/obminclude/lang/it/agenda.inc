@@ -7,16 +7,18 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
+$l_agenda = "Calendario";
 $l_users = "Contatti";
 $l_groups = "Gruppi";
 $l_title = "Titolo";
-$l_priority = "Priorit&eacute;";
+$l_priority = "Priorita";
 $l_private = "Privato";
+$l_private_description = "This is a private event, you cannot see the details";
 $l_public  = "Pubblico";
 $l_category = "Categoria";
 $l_description = "Descrizione";
 $l_state = "Stato";
+$l_back_mono = "Back to your own view";
 
 $l_high = "Alta";
 $l_low = "Bassa";
@@ -101,7 +103,7 @@ $l_unknown="Sconosciuto";
 
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$mj_fill_title_event = "\\n Scegli un titolo per l' appuntamento.";
+$mj_fill_title_event = "\\n Scegli un titolo per l'appuntamento.";
 $mj_fill_time_begin = "\\n Scegli ora di inizio.";
 $mj_fill_time_end = "\\n  Scegli ora di fine.";
 $mj_fill_valid_time_begin = "\\n  Scegli ora di inizio valida.";

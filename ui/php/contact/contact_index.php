@@ -27,6 +27,7 @@
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple contacts (return id) 
 ///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
@@ -247,7 +248,7 @@ function get_param_contact() {
   global $action;
   global $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_ad1, $tf_ad2;
   global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_func, $tf_phone, $tf_hphone;
-  global $tf_mphone, $tf_fax, $tf_email, $ta_com, $cb_vis, $cb_archive;
+  global $tf_mphone, $tf_fax, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
   global $ext_action, $ext_url, $ext_id, $ext_target;
@@ -276,6 +277,7 @@ function get_param_contact() {
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
   $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
   $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
+  $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
 
   // External param

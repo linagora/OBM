@@ -19,6 +19,7 @@ $l_minihphone = "(Home)";
 $l_mphone = "Mobile Phone";
 $l_minimphone = "(Mobile)";
 $l_email = "E-Mail";
+$l_mailing_ok = "Mailing enabled";
 $l_fax = "Fax";
 $l_address = "Adress";
 $l_postcode = "ZIP";

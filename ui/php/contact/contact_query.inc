@@ -200,6 +200,7 @@ function run_query_insert($contact) {
   $mphone = $contact["mphone"];
   $fax = $contact["fax"];
   $email = $contact["email"];
+  $mailok = $contact["mailok"];
   $com = $contact["com"];
   $arch = $contact["archive"];
   $vis = $contact["vis"];
@@ -224,6 +225,7 @@ function run_query_insert($contact) {
     contact_mobilephone,
     contact_fax,
     contact_email,
+    contact_mailing_ok,
     contact_archive,
     contact_visibility,
     contact_comment)
@@ -247,6 +249,7 @@ function run_query_insert($contact) {
     '$mphone',
     '$fax',
     '$email',
+    '$mailok',
     '$arch',
     '$vis',
     '$com')";
@@ -296,6 +299,7 @@ function run_query_update($contact) {
   $mphone = $contact["mphone"];
   $fax = $contact["fax"];
   $email = $contact["email"];
+  $mailok = $contact["mailok"];
   $com = $contact["com"];
   $arch = $contact["archive"];
   $vis = $contact["vis"];
@@ -319,6 +323,7 @@ function run_query_update($contact) {
     contact_mobilephone='$mphone',
     contact_fax='$fax',
     contact_email='$email',
+    contact_mailing_ok='$mailok',
     contact_archive='$arch',
     contact_visibility='$vis',
     contact_comment='$com'
@@ -346,9 +351,9 @@ function run_query_update($contact) {
 function run_query_contact_deal_links($p_id) {
   global $cdg_sql;
 
-  $query = "select distinct deal_id,deal_label 
-            from Deal,Contact
-            where  deal_contact1_id='$p_id'
+  $query = "select distinct deal_id, deal_label 
+            from Deal, Contact
+            where deal_contact1_id='$p_id'
               or deal_contact2_id='$p_id'
               or deal_marketingmanager_id='$p_id'
               or deal_technicalmanager_id='$p_id'";
@@ -434,8 +439,8 @@ function run_query_company_contact_dec($comp_id) {
   global $cdg_sql;
 
   $query = "update Company
-              set company_contact_number=company_contact_number-1
-              where company_id='$comp_id'";
+            set company_contact_number=company_contact_number-1
+            where company_id='$comp_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

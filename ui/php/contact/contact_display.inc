@@ -183,7 +183,7 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
 function html_contact_consult($co_q) {
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
   global $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode,$l_expresspostal;
-  global $l_town,$l_country,$l_email,$l_comment;
+  global $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
   global $l_public,$l_private,$l_archive,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme,  $ico_mail;
@@ -213,6 +213,7 @@ function html_contact_consult($co_q) {
   $mphone = $co_q->f("contact_mobilephone");
   $fax = $co_q->f("contact_fax");
   $email = $co_q->f("contact_email");
+  $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
   $com = nl2br($co_q->f("contact_comment"));
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
@@ -297,6 +298,9 @@ function html_contact_consult($co_q) {
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$link_email $email</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_mailing_ok</td>
+      <td class=\"detailText\">$mailok</td>
+    </tr><tr>
       <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
     </tr><tr>
       <td class=\"detailText\" colspan=\"2\">
@@ -322,7 +326,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   global $set_theme, $ico_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
-  global $l_town,$l_country,$l_email,$l_comment;
+  global $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
   global $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
@@ -349,6 +353,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     $mphone = $co_q->f("contact_mobilephone");
     $fax = $co_q->f("contact_fax");
     $email = $co_q->f("contact_email");
+    $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
     $vis = $co_q->f("contact_visibility");
     $com = $co_q->f("contact_comment");
@@ -388,6 +393,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   if (isset($contact["mphone"])) { $mphone = stripslashes($contact["mphone"]); }
   if (isset($contact["fax"])) { $fax = stripslashes($contact["fax"]); }
   if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
+  if (isset($contact["mailok"])) { $mailok = ($contact["mailok"] == 1 ? "checked" : ""); }
   if (isset($contact["com"])) { $com = stripslashes($contact["com"]); }
   if (isset($contact["vis"])) { $vis = stripslashes($contact["vis"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
@@ -502,6 +508,9 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
     <td><input type=\"text\" name=\"tf_email\" size=\"52\" value=\"$email\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_mailing_ok</td>
+    <td><input type=\"checkbox\" name=\"cb_mailok\" value=\"1\" $mailok /></td>
     </tr><tr>
     <td colspan =\"2\" class=\"detailHead\">$l_comment</td>
     </tr><tr>

@@ -19,6 +19,7 @@ $l_minihphone = "(Perso)";
 $l_mphone = "Tel mobile";
 $l_minimphone = "(Mobile)";
 $l_email = "@M";
+$l_mailing_ok = "Activé pour mailing";
 $l_fax = "Fax";
 $l_address = "Adresse";
 $l_postcode = "CP";
