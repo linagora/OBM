@@ -67,8 +67,8 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
   global $l_email, $perms_user, $perms_admin, $perms_editor;
-  global $l_perms_user, $l_perms_admin, $l_perms_editor;
-  global $display, $c_all;
+  global $l_add_users;
+  global $display, $c_all, $l_perms_user, $l_perms_admin, $l_perms_editor;
 
   $login = $user["login"];
   $perms = $user["perms"];
@@ -79,15 +79,20 @@ function html_user_search_form($user) {
 
   if ($popup) {
     $ext_action = $user["ext_action"];
-    $ext_title = $user["ext_title"];
+    $ext_title = stripslashes($user["ext_title"]);
     $ext_url = $user["ext_url"];
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
+    $ext_widget = $user["ext_widget"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    if ($ext_title == "") {
+      $ext_title = $l_add_users;
+    }
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
 
@@ -174,17 +179,19 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   $login = urlencode($user["login"]);
   $lname = urlencode($user["lastname"]);
   $perms = $user["perms"];
+  $email = $user["email"];
   $archive = $user["archive"];
 
   if ($popup) {
     $ext_action = $user["ext_action"];
-    $ext_target = $user["ext_target"];
     $ext_url = $user["ext_url"];
     $ext_id = $user["ext_id"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+    $ext_target = $user["ext_target"];
+    $ext_widget = $user["ext_widget"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;cb_archive=$archive$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
   if ($popup) {
@@ -192,166 +199,19 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
     $user_d->data_cb_name = "cb_u";
-    $display_popup_head = "
+    if ($ext_widget != "") {
+      $display_popup_head = "
+      <form onsubmit=\"fill_ext_form(this); return false;\">";
+    } else {
+      $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
     $display_popup_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </p>
-      </p>
-      </form>
-      <p>
-      <a href=\"\" onclick='window.close();'>$l_close</a>
-      </p>";
-  }
-  $user_d->data_set = $obm_q;
-  $user_d->data_header = "both";
-  $user_d->data_url = $url;
-
-  // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_info_msg("$nb_user $l_found");
-  $block = $display_popup_head;
-  $block .= $user_d->display("dis_data_user");
-  $block .= $display_popup_end;
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display User search form                                                  //
-// Parameters:
-//   - $user[]   : default form values
-//     keys used : login, lastname, perms, archive, popup
-///////////////////////////////////////////////////////////////////////////////
-function html_get_user_search_form($user) {
-  global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
-  global $perms_user, $perms_admin, $perms_editor;
-  global $l_perms_user, $l_perms_admin, $l_perms_editor;
-  global $display, $c_all;
-
-  $login = $user["login"];
-  $lname = $user["lastname"];
-  $perms = $user["perms"];
-  $archive = ($user["archive"] == "1" ? "checked" : "");
-  $popup = $user["popup"];
-
-  $ext_action = $user["ext_action"];
-  $ext_title = $user["ext_title"];
-  $ext_url = $user["ext_url"];
-  $ext_id = $user["ext_id"];
-  $ext_target = $user["ext_target"];
-  $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
-	  <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
-	  <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
-	  <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-	  <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-  $display["msg"] .= display_info_msg($ext_title);
-
-  $block = "
-  <form method=\"get\" name=\"f_user\"
-    action=\"". url_prepare("user_index.php")."\">
-
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_login<br />
-      <input type=\"text\" name=\"tf_login\" size=\"20\" maxlength=\"32\"
-      value=\"$login\" />
-    </div>
-    <div class=\"searchLabel\">$l_lastname<br />
-      <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"32\"
-      value=\"$lname\" />
-    </div>
-    <div class=\"searchLabel\">$l_user_perms<br />
-      <select type=\"text\" name=\"sel_perms\">
-        <option value=\"$c_all\" /> $l_all
-        <option value=\"$perms_user\" /> $l_perms_user
-        <option value=\"$perms_editor\" /> $l_perms_editor
-        <option value=\"$perms_admin\" /> $l_perms_admin
-      </select>
-    </div>
-    <div class=\"searchLabel\">$l_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive>
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"action\" type=\"hidden\" value=\"getsearch\">
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\">
-      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      $ext&nbsp;
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
-  </form>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the User search result                                            //
-// Parameters:
-//   - $user[]   : user search criteria
-//     keys used : name, perms
-///////////////////////////////////////////////////////////////////////////////
-function dis_get_user_search_list($user) {
-  global $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
-
-  $popup = $user["popup"];
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "user");
-//  $obm_q = run_query_get_search($user, $new_order, $order_dir);
-  $obm_q = run_query_search($user, $new_order, $order_dir);
-  $nb_user = $obm_q->num_rows();
-  if ($nb_user == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
-  } else {
-    $block = html_get_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup);
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the User Search result                                       //
-// Parameters:
-//   - $obm_q    : database result (user list)
-//   - $pref_q   : the fields which have to be displayed
-//   - $nb_user  : nb users returned by the search query
-//   - $user[]   : user search criteria
-//     keys used : login, lastname, pemrs
-//   - $popup    : if true, doesn't display links and display checkbox
-///////////////////////////////////////////////////////////////////////////////
-function html_get_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
-  global $display, $l_found, $l_close, $l_add;
-
-  $login = urlencode($user["login"]);
-  $lname = urlencode($user["lastname"]);
-  $perms = $user["perms"];
-  $archive = $user["archive"];
-
-  $ext_target = $user["ext_target"];
-
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
-
-  $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
-  if ($popup) {
-    $user_d->display_link = false;
-    $user_d->data_cb_text = "X";
-    $user_d->data_idfield = "userobm_id";
-    $user_d->data_cb_name = "cb_u";
-    $display_popup_head = "
-      <form onsubmit=\"fill_ext_form(this);return false;\">";
-    $display_popup_end = "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
-	<input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
-	<input name=\"popup\" type=\"hidden\" value=\"1\" />
-	<input name=\"action\" type=\"hidden\" value=\"ext_get_users\">
-        <input type=\"submit\" value=\"$l_add\" />
         </p>
       </p>
       </form>

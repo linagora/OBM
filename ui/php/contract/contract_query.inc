@@ -90,7 +90,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
     $query .= " and (contract_deal_id = '$p_deal')";
   }
   if ($archive != "1") {
-    $query .= " and contract_archive = 0";
+    $query .= " and contract_archive != '1'";
   }
 
   $query .= " order by $order $p_order_dir";

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : group.inc                                                //
@@ -69,3 +69,5 @@ $l_no_user_deleted = "No user to remove";
 $l_no_group_added = "No group to add";
 $l_no_group_deleted = "No group to remove";
 $l_check_samegroup = "These groups seem similar to the filled group";
+
+$l_add_groups = "Add groups";

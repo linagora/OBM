@@ -33,6 +33,7 @@ page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" 
 include("$obminclude/global_pref.inc");
 require("user_display.inc");
 require("user_query.inc");
+require("user_js.inc");
 
 //There is no page_close(). yes, at the end
 if ($action == "") $action = "index";
@@ -54,18 +55,8 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-}
-elseif ($action == "ext_get_users") {
-  $display["search"] = html_get_user_search_form($obm_user);
-  if ($set_display == "yes") {
-  include("user_js.inc");
-    $display["result"] = dis_get_user_search_list($obm_user);
-  } else {
-    $display["msg"] .= display_info_msg($l_no_display);
-  }
-}
 
-elseif ($action == "index" || $action == "") {
+} elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_user_search_form($obm_user);
   if ($set_display == "yes") {
@@ -79,15 +70,8 @@ elseif ($action == "index" || $action == "") {
   $display["search"] = html_user_search_form($obm_user);
   $display["result"] = dis_user_search_list($obm_user);
 
-}elseif ($action == "getsearch")  {
-///////////////////////////////////////////////////////////////////////////////
-  include("user_js.inc");
-  $display["search"] = html_get_user_search_form($obm_user);
-  $display["result"] = dis_get_user_search_list($obm_user);
-
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  include("user_js.inc");
   $display["detail"] = html_user_form(1,"",$obm_user);
 
 } elseif ($action == "detailconsult")  {
@@ -98,7 +82,6 @@ elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
-    include("user_js.inc");
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_user_form(1, $obm_q, $obm_user);
   } else {
@@ -170,7 +153,6 @@ elseif ($action == "index" || $action == "") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("user_js.inc");
   $display["detail"] = dis_check_links($obm_user["id"]);
 
 } elseif ($action == "delete")  {
@@ -243,6 +225,7 @@ function get_param_user() {
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $ext_widget;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
@@ -264,6 +247,7 @@ function get_param_user() {
   if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
   if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
   if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;
+  if (isset ($ext_widget)) $obm_user["ext_widget"] = $ext_widget;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -317,14 +301,6 @@ function get_user_action() {
 // Get Ids
   $actions["USER"]["ext_get_ids"] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_ids",
-    'Right'    => $cright_read,
-    'Condition'=> array ('none'),
-    'popup' => 1
-                                    );
-
-// Get Users
-  $actions["USER"]["ext_get_users"] = array (
-    'Url'      => "$path/user/user_index.php?action=ext_get_users",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
     'popup' => 1

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : JavaScript Embedded in PHP                               //
 //     - File     : check_js.inc                                             //
@@ -57,6 +57,3 @@ function check_money(field){
   return field.match($js_regexp_money);
 }
 ";
-
-
-

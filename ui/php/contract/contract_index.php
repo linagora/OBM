@@ -351,7 +351,7 @@ function get_contract_action() {
 // New
   $actions["CONTRACT"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('','search','index','detailconsult','admin','type_insert','type_update','type_delete','display')

@@ -51,6 +51,8 @@ $l_lname_error = "Nombre Inválido !";
 $l_exist_error = "Ya existe";
 $l_check_sameuser = "Estos usuarios lucen similar a la nueva entrada !";
 
+$l_add_users = "Adicionar Usuarios";
+
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_login = "Tiene que llenar el login antes de enviar.";
 $l_fill_password = "Tiene que llenar la contraseña antes de enviar.";

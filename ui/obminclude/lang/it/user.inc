@@ -54,6 +54,8 @@ $l_lname_error = "Nome non valido !";
 $l_exist_error = "già esistente";
 $l_check_sameuser = "Utenti simili a nuovo!";
 
+$l_add_users = "AAggiungi Utenti";
+
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_username = "Scrivi prima il nome utente.";
 $l_fill_password = "Scrivi prima la password.";

@@ -428,8 +428,8 @@ $display["detail"] .= dis_cat_links($deal);
   $pref_q = run_query_display_pref ($uid, "deal");
   $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
-
-  $display["detail"] = html_parentdeal_consult($obm_q,$deal_q,$deal,$pref_q,$num_rows,run_query_dealtype(),run_query_tasktype($ctt_sales),run_query_dealstatus(),run_query_userobm());
+  $cat_q = run_query_dealcategory();
+  $display["detail"] = html_parentdeal_consult($obm_q,$deal_q,$deal,$pref_q,$num_rows,run_query_dealtype(),run_query_tasktype($ctt_sales),$cat_q,run_query_dealstatus(),run_query_userobm());
 
 } elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -488,9 +488,10 @@ $display["detail"] .= dis_cat_links($deal);
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $pref_q = run_query_display_pref ($uid,"deal");
     $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
+    $cat_q = run_query_dealcategory();
     $num_rows = $deal_q->num_rows();
     $display["detail"] = html_parentdeal_consult($obm_q,$deal_q,$deal,$pref_q,$num_rows,run_query_dealtype(),      
-    run_query_tasktype($ctt_sales),run_query_dealstatus(),run_query_userobm());
+    run_query_tasktype($ctt_sales),$cat_q,run_query_dealstatus(),run_query_userobm());
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     require("deal_js.inc");
@@ -755,7 +756,7 @@ function get_deal_action() {
   // New
   $actions["DEAL"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 
@@ -765,7 +766,7 @@ function get_deal_action() {
   $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=". $deal["parent"] . "&amp;sel_market=" . $deal["pmarket"] . "&amp;sel_tech=" . $deal["ptech"] . "&amp;param_company=");
   $actions["DEAL"]["new_child"] = array (
     'Name'     => $l_header_new_child,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=$ret_url",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=$ret_url",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('parent_detailconsult') 

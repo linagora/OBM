@@ -31,7 +31,7 @@ Pour chaque appel, divers paramètres sont à fournir.\\
 \hline
 ext\_get\_ids & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer les entités sélectionnées par des cases à cocher à une url \\
 \hline
-ext\_get\_id & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer l'entité sélectionnée en cliquant dessus à une url \\
+ext\_get\_id & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer l'entité sélectionnée en cliquant dessus à une url ou dans un widget\\
 \hline
 ext\_get\_id\_url & Voir difference reelle avec ext\_get\_id ? uniquement param ext\_url ? \\
 \hline
@@ -68,9 +68,9 @@ ext\_url & Url appelée par la fenêtre externe & \$path/group/group\_index.php \\
 \hline
 ext\_id & Id de l'entité réceptionnant la réponse & Id du groupe origine \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Paramètres : retour par widget (select)}}\\
+\multicolumn{3}{|c|}{\textbf{Retour par widget (select) : fonction javascript fill\_ext\_form() }}\\
 \hline
-ext\_widget & Indique le widget (select) devant sélectionner les données \\
+ext\_widget & Indique le widget (select) devant sélectionner les données & \\
 \hline
 \end{tabular}
 
@@ -96,15 +96,15 @@ popup & (0 | 1) affichage en popup (sans menu) & 1 \\
 \hline
 ext\_title & Titre affiché dans la fenêtre externe & Sélectionner une société\\
 \hline
-\multicolumn{3}{|c|}{\textbf{Paramètres : retour par url + action}}\\
-\hline
-ext\_target & Fenêtre cible de retour (target) & Groupe \\
+\multicolumn{3}{|c|}{\textbf{Retour par url : fonction javascript check\_get\_id\_url()}}\\
 \hline
 ext\_url & Url appelée par la fenêtre externe (l'url n'est pas fermée car elle recevra l'id de l'entité sélectionnée) & \$path/deal/deal\_index.php? action=new\&amp; param\_company= \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Paramètres : retour par widget (select)}}\\
+\multicolumn{3}{|c|}{\textbf{Retour par widget : fonction javascript check\_get\_id()}}\\
 \hline
-ext\_widget & Indique le widget (select) devant sélectionner les données \\
+ext\_widget & Indique le widget (hidden) devant recevoir l'Id & f\_contact.company\_new\_id \\
+\hline
+ext\_widget\_text & Indique le widget (textfield) devant recevoir le label ou nom correspondant à l'Id sélectionné & f\_contact.company\_new\_name \\
 \hline
 \end{tabular}
 
@@ -165,11 +165,11 @@ Exemple : Ajouter des groupes au rendez-vous courant.\\
 \hline
 \textbf{Module} & \textbf{Depuis version OBM} \\
 \hline
-user & ext\_get\_ids \\
+\user & ext\_get\_ids \\
 \hline
-group & ext\_get\_ids \\
+\group & ext\_get\_ids \\
 \hline
-list & 0.8.2 \\
+\company & ext\_get\_id \\
 \hline
 \end{tabular}
 
@@ -231,8 +231,13 @@ De même, le code de génération du formulaire de récupération des données (ex: sé
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
     $user_d->data_cb_name = "cb_u";
-    $display_popup_head = "
+    if ($ext_widget != "") {
+      $display_popup_head = "
+      <form onsubmit=\"fill_ext_form(this); return false;\">";
+    } else {
+      $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
     $display_popup_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
@@ -269,6 +274,90 @@ Lorsque une navigation est possible dans une fenêtre externe (ex: cas de recherc
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login
 &amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
+\end{verbatim}
+\end{minipage}
+}
+
+\paragraph{Gestion du retour javascript}
+
+Une fois la ou les entités sélectionnées dans la fenêtre externe, l'appel retour est réalisé soit par l'url et l'action indiquées, soit à l'aide de fonctions javascript, telles que référencées dans les tableaux de spécifications des actions ext\_get\_ids et ext\_get\_id.
+
+
+\paragraph{action ext\_get\_ids, retour par widget}
+Cette fonction est définie uniquement si le paramètre \$ext\_widget est rempli afin d'éviter des erreurs javascript.
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+if ($ext_widget != "") {
+  $extra_js .= "
+
+function fill_ext_form(int_form) {
+   size = int_form.length;
+   ext_field = window.opener.document.$ext_widget;
+   for(i=0; i <size ; i++) {
+     if(int_form.elements[i].type == 'checkbox'){
+       if(int_form.elements[i].checked == true) {
+	 ext_size = ext_field.length;
+	 for(j=0; j< ext_size; j++) {
+	   if('cb_g' + ext_field.options[j].value == int_form.elements[i].name) {
+	     window.opener.document.$ext_widget.options[j].selected =true;
+	   }
+	 }
+       }
+     }
+   }
+}";
+}
+\end{verbatim}
+\end{minipage}
+}
+
+
+\paragraph{action ext\_get\_id, retour par widget}
+Cette fonction est définie uniquement si les paramètres \$ext\_widget sont remplis afin d'éviter des erreurs javascript.
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+if (($ext_widget != "") || ($ext_widget_text != "")) {
+  $extra_js .= "
+
+function check_get_id(valeur,text) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_company\");
+    return false;
+  } else {
+    window.opener.document.$ext_widget.value=valeur;
+    window.opener.document.$ext_widget_text.value=text;
+    window.close();
+    return true;
+  }
+}";
+}
+\end{verbatim}
+\end{minipage}
+}
+
+
+\paragraph{action ext\_get\_id, retour par url}
+L'id de l'entité sélectionnée est ajoutée à l'url de retour.
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+function check_get_id_url(p_url, valeur) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_company\");
+    return false;
+  } else {
+    new_url = p_url + valeur;
+    window.opener.location.href=new_url;
+    window.close();
+    return true;
+  }
+}
+
 \end{verbatim}
 \end{minipage}
 }

@@ -32,7 +32,7 @@ function dis_data_publication(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
   
   if ($fieldname == "publication_title") {
-    if($OD->data_specialfield == "ext_get_id") {
+    if($OD->display_ext == "ext_get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".addslashes($OD->data_set->f("publication_title"))."');";
     }
     else {    
@@ -191,7 +191,7 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
   $pub_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
   if ($popup) {
     $pub_d->display_link = false;
-    $pub_d->data_specialfield = "ext_get_id"; // ???????? XXXX
+    $pub_d->display_ext = "ext_get_id";
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -237,7 +237,7 @@ function html_subscription_search_list($comp_q, $pref_q, $nb_publication,$public
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
   if ($popup) {
-    $comp_d->data_specialfield = "ext_get_id";
+    $comp_d->display_ext = "ext_get_id";
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>

@@ -30,7 +30,6 @@
 // - dispref_level      --                -- update one field display position 
 // External API ---------------------------------------------------------------
 // - ext_get_id         -- $title         -- select a publication (return id) 
-// - ext_get_id_url     -- $url, $title   -- select a publication (id), load URL 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////

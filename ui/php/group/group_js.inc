@@ -12,7 +12,7 @@ $extra_js .= "
 
 require("obminclude/javascript/check_js.inc");
 
-// to avoid a javascript error
+// to avoid a javascript error when ext_widget is not defined
 if ($ext_widget != "") {
   $extra_js .= "
 
@@ -35,4 +35,4 @@ function fill_ext_form(int_form) {
 }
 
   $extra_js .= "
-</script>" ;
+</script>";

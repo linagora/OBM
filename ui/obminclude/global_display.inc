@@ -8,13 +8,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 class OBM_DISPLAY {
-  var $display_type;     // determines the type of display. possible values
+  var $display_type;      // determines the type of display. possible values
     // - PREFERENCES  : to set the display preference
     // - DATA         : to display all elements, for exemple all contacts
-  var $display_module;   // module where to find the entity in use
-  var $display_entity;   // entity used (deal, contact, parentdeal,...)
-  var $display_pref;     // User preferences : DB_OBM : query from PrefDisplay
-  var $display_link = 1; // If false, extern links aren't displayed
+  var $display_module;    // module where to find the entity in use
+  var $display_entity;    // entity used (deal, contact, parentdeal,...)
+  var $display_pref;      // User preferences : DB_OBM : query from PrefDisplay
+  var $display_link = 1;  // If false, extern links aren't displayed
+  var $display_ext = "";  // External action called (allow Special handling)
 
   //----------- TYPE SECTION : PREFERENCES --------//
   var $pref_title;       // title of the preference panel
@@ -34,7 +35,6 @@ class OBM_DISPLAY {
   var $data_cb_show = 1;      // To set visible
                               //   1 -> visible
                               //   "string" if ->f["string"] == 0 -> visible
-  var $data_specialfield = "";// Special field to signal special treatments which
                               // haven't been perform here 
   var $separator = ";";       // for file generation : .csv by default
 

@@ -14,29 +14,27 @@ $extra_js .= "
 
 require("$obminclude/javascript/check_js.inc");
 
-$extra_js .= "
+// to avoid a javascript error when ext_widget or ext_widget_label not defined
+if (($ext_widget != "") || ($ext_widget_text != "")) {
+  $extra_js .= "
 
 function check_get_id(valeur,text) {
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;
   } else {
-    window.opener.document.form_mod_contact.company_new_id.value=valeur;
-    window.opener.document.form_mod_contact.company_new_name.value=text;
+    window.opener.document.$ext_widget.value=valeur;
+    window.opener.document.$ext_widget_text.value=text;
     window.close();
     return true;
   }
+}";
 }
 
 
-function check_get_id_url(form, p_url) {
-  comp_pos = form.param_company.selectedIndex;
-  if (! (comp_pos >= 0)) {
-    alert (\"$l_j_select_company\");
-    return false;
-  }
-  valeur = form.param_company.options[comp_pos].value;
-  text = form.param_company.options[comp_pos].text;
+$extra_js .= "
+
+function check_get_id_url(p_url, valeur) {
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;

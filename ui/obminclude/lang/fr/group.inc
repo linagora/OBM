@@ -70,3 +70,5 @@ $l_no_group_added = "Pas de groupes à ajouter";
 $l_no_group_deleted = "Pas de groupes à supprimer";
 $l_check_samegroup = "Ces groupes sembles similaires au groupe saisi";
 $l_cant_delete_system = "Les groupes système ne peuvent être supprimés !";
+
+$l_add_groups = "Ajouter des groupes";

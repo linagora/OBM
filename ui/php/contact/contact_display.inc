@@ -1292,7 +1292,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   $block = "$script";
 
   $block .= "
-    <form method=\"get\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
+    <form method=\"get\" name=\"f_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
 
     <div class=\"detailHead\">$l_contact</div>
 
@@ -1323,7 +1323,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_contact.company_new_id&amp;ext_widget_text=f_contact.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
       <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>

@@ -15,7 +15,7 @@
 //   - $obm_q_events : list of event's records 
 //   - $contacts_array : array of selected contacts 
 //   - $groups_array : array of selected groups 
-/////////////////////sds//////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default,$l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;
@@ -1767,7 +1767,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   }
   $dis_min_e .= "</select>";
   $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
-  $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[5]";
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_agenda_select_group);
 
 
@@ -2506,7 +2506,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   }
   $dis_min_d .= "</select>";  
   $display["title"] = "<div class=\"title\">$l_header_meeting</div>"; 
-  $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[0]"; 
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[0]"; 
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_mod_calendar\"

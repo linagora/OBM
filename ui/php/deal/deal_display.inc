@@ -2296,7 +2296,7 @@ function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 //   - $state_q  : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$tt_q,$state_q,$usr_q) {
+function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$tt_q,$cat_q,$state_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_state;
@@ -2385,7 +2385,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $block .= display_info_msg($l_parentdeal_deals);
 
   //----- deal search form 
-  $block .= html_deal_search_form($deal, $kind_q, $tt_q, $state_q, $usr_q);
+  $block .= html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $state_q, $usr_q);
 
   //-----> deal list
   // if no record found, display it and stop

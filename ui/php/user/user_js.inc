@@ -8,11 +8,35 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_js .= "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script LANGUAGE=\"JavaScript\">
 <!--
 ";
 
 require("$obminclude/javascript/check_js.inc");
+
+// to avoid a javascript error when ext_widget is not defined
+if ($ext_widget != "") {
+  $extra_js .= "
+
+function fill_ext_form(int_form) {
+   size = int_form.length;
+   ext_field = window.opener.document.$ext_widget;
+   for(i=0; i <size ; i++) {
+     if(int_form.elements[i].type == 'checkbox'){
+       if(int_form.elements[i].checked == true) {
+	 ext_size = ext_field.length;
+	 for(j=0; j< ext_size; j++) {
+	   if('cb_u' + ext_field.options[j].value == int_form.elements[i].name) {
+	     window.opener.document.$ext_widget.options[j].selected =true;
+	   }
+	 }
+       }
+     }
+   }
+ 
+}";
+}
+
 
 $extra_js .= "
 function valider_suppression() {
@@ -45,25 +69,8 @@ function check_user(form) {
 
   return true;
 }
-function fill_ext_form(int_form) {
-   size = int_form.length;
-   ext_field = window.opener.document.$ext_target;
-   for(i=0; i <size ; i++) {
-     if(int_form.elements[i].type == 'checkbox'){
-       if(int_form.elements[i].checked == true) {
-	 ext_size = ext_field.length;
-	 for(j=0; j< ext_size; j++) {
-	   if('cb_u' + ext_field.options[j].value == int_form.elements[i].name) {
-	     window.opener.document.$ext_target.options[j].selected =true;
-	   }
-	 }
-       }
-     }
-   }
- 
-}
 
 // -->
-</SCRIPT>
+</script>
 ";
 

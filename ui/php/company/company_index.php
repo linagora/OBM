@@ -38,7 +38,6 @@
 // - dispref_level      --                -- update one field display position 
 // External API ---------------------------------------------------------------
 // - ext_get_id         -- $title         -- select a company (return id) 
-// - ext_get_id_url     -- $url, $title   -- select a company (id), load URL 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,12 +78,6 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_id_url") {
-///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
-  $comp_q = run_query_active_company();
-  $display["detail"] = html_select_company($comp_q, $company);
-  
 } elseif ($action == "ext_get_cat_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
@@ -465,8 +458,9 @@ function get_param_company() {
   global $tf_dateafter, $tf_datebefore, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
   global $tf_naf_code, $tf_naf_label, $cb_naf_title;
-  global $param_company, $cdg_param;
+  global $action, $param_company, $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
+  global $ext_widget, $ext_widget_text;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   if (isset ($popup)) $company["popup"] = $popup;
@@ -476,6 +470,8 @@ function get_param_company() {
   if (isset ($ext_id)) $company["id"] = $ext_id;
   if (isset ($ext_title)) $company["ext_title"] = stripslashes(urldecode($ext_title));
   if (isset ($ext_target)) $company["ext_target"] = $ext_target;
+  if (isset ($ext_widget)) $company["ext_widget"] = $ext_widget;
+  if (isset ($ext_widget_text)) $company["ext_widget_text"] = $ext_widget_text;
   
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -547,6 +543,7 @@ function get_param_company() {
   if (isset ($tf_cat)) $company["cat_label"] = $tf_cat;
 
   if (debug_level_isset($cdg_param)) {
+    echo "<br />action = $action";
     if ( $company ) {
       while ( list( $key, $val ) = each( $company ) ) {
         echo "<br />company[$key]=$val";
@@ -792,13 +789,6 @@ function get_company_action() {
 // Company Select 
   $actions["COMPANY"]["ext_get_id"]  = array (
     'Url'      => "$path/company/company_index.php?action=ext_get_id",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );
-
-// Category Select 
-  $actions["COMPANY"]["ext_get_id_url"]  = array (
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );

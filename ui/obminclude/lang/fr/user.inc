@@ -54,6 +54,8 @@ $l_check_sameuser = "Ces utilisateurs semblent similaires à cette nouvelle entré
 $l_exist_error = "Ce login est déjà utilisé !";
 $l_lname_error = "Le nom doit être correctement renseigné !";
 
+$l_add_users = "Ajouter des utilisateurs";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";
 $l_fill_password = "Vous devez renseigner le mot de passe avant de valider.";

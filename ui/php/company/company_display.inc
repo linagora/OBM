@@ -45,13 +45,16 @@ $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" 
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_company(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path, $company, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+
+  $ext_url = $company["ext_url"];
 
   if ($fieldname == "company_name") {
-    if ($OD->data_specialfield == "ext_get_id") {
+    if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".$OD->data_set->f("company_name")."');";
-    }
-    else {    
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
+    } else {    
       $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
     }
   }
@@ -183,7 +186,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
   global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_nafcode, $l_category;
-  global $c_all, $cgp_hide;
+  global $display, $c_all, $cgp_hide;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -312,15 +315,19 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   $url = url_prepare("company_index.php");
 
   if ($popup) {
-    $ext_action = $contact["ext_action"];
-    $ext_url = $contact["ext_url"];
-    $ext_id = $contact["ext_id"];
-    $ext_title = $contact["ext_title"];
-    $ext_target = $contact["ext_target"];
+    $ext_action = $company["ext_action"];
+    $ext_url = $company["ext_url"];
+    $ext_id = $company["ext_id"];
+    $ext_title = $company["ext_title"];
+    $ext_target = $company["ext_target"];
+    $ext_widget = $company["ext_widget"];
+    $ext_widget_text = $company["ext_widget_text"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
@@ -423,11 +430,13 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   global $display, $l_found,$l_close;
 
   if ($popup) {
-    $ext_action = $contact["ext_action"];
-    $ext_url = $contact["ext_url"];
-    $ext_id = $contact["ext_id"];
-    $ext_target = $contact["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;popup=1";
+    $ext_action = $company["ext_action"];
+    $ext_url = $company["ext_url"];
+    $ext_id = $company["ext_id"];
+    $ext_target = $company["ext_target"];
+    $ext_widget = $company["ext_widget"];
+    $ext_widget_text = $company["ext_widget_text"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
   // we urlencode to avoid breakage for space char
   $archive = $company["archive"];
@@ -443,14 +452,18 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $market = $company["marketing_manager"];
   $dsrc = $company["datasource"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc$url_ext");
 
   $comp_q->seek($first_row);
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
   if ($popup) {
     $comp_d->display_link = false;
-    $comp_d->data_specialfield = "ext_get_id";
+    if ($ext_url != "") {
+      $comp_d->display_ext = "get_id_url";
+    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $comp_d->display_ext = "get_id";
+    }
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>

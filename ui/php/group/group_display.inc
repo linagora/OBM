@@ -75,7 +75,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 //     keys used  : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
-  global $display, $l_name, $l_group_user, $l_email, $l_find;
+  global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
 
   $popup = $group["popup"];
 
@@ -96,6 +96,9 @@ function html_group_search_form ($group) {
       <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    if ($ext_title == "") {
+      $ext_title = $l_add_groups;
+    }
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
   
