@@ -15,6 +15,7 @@ $l_creator = "Creato da";
 $l_date_creation = "Creazione";
 $l_updater = "Ultima modificatore";
 $l_date_last_update = "Ultima Modifica";
+$l_static = "Static";
 
 // Labels and texts
 $l_list = "Lista";

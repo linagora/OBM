@@ -59,7 +59,7 @@ if (! check_privacy($menu, "List", $action, $list["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("list", $param_list, $action);
+  update_last_visit("list", $list["id"], $action);
 }
 
 // ses_list is the session array of lists id to export
@@ -77,9 +77,6 @@ require("list_js.inc");
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if (! $popup) {
-  $display["header"] = generate_menu($menu, $section); // Menu
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -118,18 +115,18 @@ if ($action == "new_criterion") {
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
-    $list["query"] = make_query($list);
+    $list["query"] = make_query_from_criteria($list);
   }
   if (check_data_form("", $list)) {
     // If the context (same list) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_insert($list);
-      if ($retour) {
+      $list["id"] = run_query_insert($list);
+      if ($list["id"] > 0) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $display["search"] = dis_list_search_form($list);
+      $display["detail"] = dis_list_consult($list);
 
     // If it is the first try, we warn the user if some lists seem similar
     } else {
@@ -137,13 +134,13 @@ if ($action == "new_criterion") {
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_list_warn_insert($obm_q, $list);
       } else {
-        $retour = run_query_insert($list);
-        if ($retour) {
+	$list["id"] = run_query_insert($list);
+        if ($list["id"] > 0) {
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
-        $display["search"] = dis_list_search_form($list);
+	$display["detail"] = dis_list_consult($list);
       }
     }
 
@@ -156,7 +153,7 @@ if ($action == "new_criterion") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
-    $list["query"] = make_query($list);
+    $list["query"] = make_query_from_criteria($list);
   }
   if (check_data_form($list["id"], $list)) {
     $retour = run_query_update($list);
@@ -174,11 +171,11 @@ if ($action == "new_criterion") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_warn_delete($hd_list_id);
+  $display["detail"] = dis_warn_delete($list["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($hd_list_id);
+  $retour = run_query_delete($list["id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
@@ -191,6 +188,7 @@ if ($action == "new_criterion") {
   if ($list["con_nb"] > 0) {
     $nb = run_query_contactlist_insert($list);
     run_query_list_update_sql($list["id"]);
+    run_query_list_update_static_nb($list["id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_added");
   } else {
     $display["msg"] .= display_err_msg("no contact to add");
@@ -202,6 +200,7 @@ if ($action == "new_criterion") {
   if ($list["con_nb"] > 0) {
     $nb = run_query_contactlist_delete($list);
     run_query_list_update_sql($list["id"]);
+    run_query_list_update_static_nb($list["id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
   } else {
     $display["msg"] .= display_err_msg("no contact to delete");
@@ -248,8 +247,13 @@ if ($action == "new_criterion") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
+// Update actions url in case some values have been updated (id after insert) 
+update_list_action_url();
 $display["head"] = display_head($l_list);
 $display["end"] = display_end();
+if (! $popup) {
+  $display["header"] = generate_menu($menu, $section);
+}
 
 display_page($display);
 exit(0);
@@ -425,7 +429,8 @@ function get_list_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                   );				  
-// Detail Consult
+
+  // Detail Consult
   $actions["LIST"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
@@ -461,7 +466,7 @@ function get_list_action() {
 // Check Delete
   $actions["LIST"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/list/list_index.php?action=check_delete&amp;hd_list_id=".$list["id"]."",
+    'Url'      => "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
@@ -539,6 +544,28 @@ function get_list_action() {
    'Right'    => $cright_read,
    'Condition'=> array ('None') 
                                             );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// List Actions URL updates (after processing, before displaying menu)  
+///////////////////////////////////////////////////////////////////////////////
+function update_list_action_url() {
+  global $list, $actions, $path;
+
+  if ($list["id"] > 0) {
+    // Detail Consult
+    $actions["LIST"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"];
+    $actions["LIST"]["detailconsult"]['Condition'] = array ('detailupdate', 'insert');
+
+    // Detail Update
+    $actions["LIST"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"];
+    $actions["LIST"]["detailupdate"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
+
+    // Check Delete
+    $actions["LIST"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"];
+    $actions["LIST"]["check_delete"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
+  }
 
 }
 

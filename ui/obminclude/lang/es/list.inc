@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : list.inc                                                 //
@@ -15,6 +15,7 @@ $l_creator = "Creador";
 $l_date_creation = "Creación";
 $l_updater = "Último en actualizar";
 $l_date_last_update = "Última actualización";
+$l_static = "Estáticos";
 
 // Labels and texts
 $l_list = "Lista";

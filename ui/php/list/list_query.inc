@@ -152,7 +152,42 @@ function run_query_insert($list) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  return $retour;
+  if ($retour) {
+    $id = get_list_id($list);
+  }
+
+  return $id;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the lsit id frol the list Infos
+// Parameters:
+//   - $list : list infos
+///////////////////////////////////////////////////////////////////////////////
+function get_list_id($list) {
+  global $cdg_sql;
+
+  $name = $list["name"];
+  $subject = $list["subject"];
+  $email = $list["email"];
+  $list_query = $list["query"];
+
+  $query = "select list_id
+    from List
+    where list_name='$name'
+      and list_subject='$subject'
+      and list_email='$email'
+      and list_query='$query'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $res = $obm_q->f("list_id");
+
+  return $res;
 }
 
 
@@ -202,17 +237,28 @@ function run_query_update($list) {
 function run_query_list_update_sql($id) {
   global $auth, $cdg_sql;
 
-  $list_query = make_query_from_db($id);
-
-  $query = "update List set
-    list_timeupdate='". date("Y-m-d H:i:s")."',
-    list_userupdate='".$auth->auth["uid"]."',
-    list_query='$list_query'
-  where list_id='$id'";
-
+  // Check that list has really a query (if not we do nothing)
+  $query = "select list_structure from List where list_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  $obm_q->next_record();
+  $structure = $obm_q->f("list_structure");
+  $criteria = unserialize($structure);
+
+  if ($criteria != "") {
+    $list_query = make_query_from_db($id);
+
+    $query = "update List set
+      list_timeupdate='". date("Y-m-d H:i:s")."',
+      list_userupdate='".$auth->auth["uid"]."',
+      list_query='$list_query'
+    where list_id='$id'";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  }
 
   return $retour;
 }
@@ -282,6 +328,7 @@ function run_query_contactlist_insert($list) {
       display_debug_msg($query, $cdg_sql);
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
+
       $cpt_ins++;
     }
   }
@@ -400,7 +447,7 @@ function run_query_contacts_list($list, $entity="") {
 // Parameters:
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
-function get_list_nb_contact($id) {
+function get_list_static_contact_nb($id) {
   global $cdg_sql;
 
   $query = "select count(*) from ContactList where contactlist_list_id='$id'";
@@ -411,6 +458,29 @@ function get_list_nb_contact($id) {
   $obm_q->next_record();
   $nb = $obm_q->f(0);
   return $nb;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update the dynamic rows number for the list                               //
+// Parameters:
+//   - $id : list_id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_list_update_static_nb($id) {
+  global $cdg_sql;
+
+  if ($id == "") {
+    return 0;
+  }
+
+  $nb = get_list_static_contact_nb($id);
+
+  $query = "update List set list_static_nb='$nb' where list_id='$id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+
+  return $ret;
 }
 
 
@@ -634,13 +704,13 @@ function get_list_info($id) {
 // Parameters:
 //   - $query : query to run
 ///////////////////////////////////////////////////////////////////////////////
-function get_query_num_rows($query="") {
+function get_list_query_num_rows($query="") {
   global $cdg_sql;
 
   // Construct count query to optimize performance (instead of counting rows)
   // Get the From ... Where clauses
   if (preg_match('/(FROM (.*)) (GROUP BY|$)/s', $query, $matches)) {
-     $query_c = "select count (contact_id) " . $matches[1];
+     $query_c = "select count(contact_id) " . $matches[1];
 
     display_debug_msg($query_c, $cdg_sql);
     $obm_q = new DB_OBM;
@@ -838,13 +908,13 @@ function run_query_subscriptionreception() {
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
 function make_query_from_db($id) {
-  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+  global $auth, $cdg_sql;
 
   $list_info = get_list_info($id);
   $structure = $list_info["structure"];
   $list_info["criteria"] = unserialize($structure);
 
-  $query = make_query($list_info);
+  $query = make_query_from_criteria($list_info);
 
   return $query;
 }
@@ -856,8 +926,8 @@ function make_query_from_db($id) {
 //   - $list[]   : list search criteria
 //     keys used : $criteria.
 ///////////////////////////////////////////////////////////////////////////////
-function make_query($list) {
-  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+function make_query_from_criteria($list) {
+  global $auth, $cdg_sql;
 
   $id = $list["id"];
   $criteria = $list["criteria"]["modules"];
@@ -1095,10 +1165,10 @@ function run_query_list_static_contact_id($id) {
 // Make a query with the dynamic and static contact.
 // Parameters:
 //   - $query  : Dynamic query
-//   - $cont_q : Statics users
+//   - $con_q  : Statics users
 ///////////////////////////////////////////////////////////////////////////////
 function make_final_query($query,$con_q) {
-  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+  global $auth, $cdg_sql;
 
   $nb_con = $con_q->num_rows();
   if ($nb_con == 0) {
@@ -1165,7 +1235,7 @@ function make_final_query($query,$con_q) {
 //   - database result set
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contacts_for_letter($list_ids) {
-  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+  global $auth, $cdg_sql;
 
   $connect_db = new DB_OBM;
   if($list_ids != "") {

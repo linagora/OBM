@@ -455,6 +455,10 @@ function run_query_contact_insert($contact) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   
+  if ($retour) {
+    run_query_company_contact_inc($comp_id);
+  }
+
   $query = "select contact_id
     from Contact
     where contact_lastname = '$lname'
@@ -494,10 +498,6 @@ function run_query_contact_insert($contact) {
     }
   }
   
-  if ($retour) {
-    run_query_company_contact_inc($comp_id);
-  }
-
   return $retour;
 }
 

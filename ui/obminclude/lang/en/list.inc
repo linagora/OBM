@@ -15,10 +15,11 @@ $l_creator = "Creator";
 $l_date_creation = "Creation";
 $l_updater = "Last updater";
 $l_date_last_update = "Last update";
+$l_static = "Static";
 
 // Labels and texts
 $l_list = "List";
-$l_nb_contact = "Number of contact";
+$l_nb_contact = "# contacts";
 $l_list_contact = "Having as contact";
 $l_list_display = "Display options for Lists list";
 $l_contact_display = "Display options for Contacts list";

@@ -136,6 +136,8 @@ function dis_data($action, $mode, $module) {
     dis_data_company($action, $mode);
   } else if ($module == "deal") {
     dis_data_deal($action, $mode);
+  } else if ($module == "list") {
+    dis_data_list($action, $mode);
   } else if ($module == "document") {
     dis_data_document($action, $mode);
   } else {
@@ -398,6 +400,152 @@ function dis_data_deal($action, $mode) {
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display (/and update) data inconsistency for the list module
+// This concerns dynamic queries generation
+// Parametres:
+//   - $action : data_show || data_update (proceed the update)
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_list($action, $mode) {
+  global $debug, $path, $c_all;
+
+  // To include specic list queries (make_query_from_criteria,...)
+  require_once("$path/list/list_query.inc");
+
+  // Get the list list
+  $l_q = get_list_list();
+  $cpt_l = 0;
+  $cpt_lu = 0;
+  $nb_l = $l_q->num_rows();
+  
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** List : $nb_l to parse
+------------------------------------------------------------------------------
+";
+  } else {
+    if ($action == "data_update") {
+      $update = "<td class=\"adminLabel\">Update</td>";
+    } else {
+      $update = "";
+    }
+    echo "
+      <table class=\"admin\">
+      <tr>
+        <td class=\"adminHead\" colspan=\"2\">List ($nb_l)</td>
+        <td class=\"adminHead\" colspan=\"2\"># Static Contact</td>
+        <td class=\"adminHead\" colspan=\"2\"># Query Contact</td>
+        <td class=\"adminHead\">Query Generation =</td>
+        $update
+      </tr><tr>
+        <td class=\"adminHead\">Id</td>
+        <td class=\"adminHead\">Name</td>
+        <td class=\"adminHead\">field</td>
+        <td class=\"adminHead\">calculated</td>
+        <td class=\"adminHead\">field</td>
+        <td class=\"adminHead\">calculated</td>
+        <td class=\"adminHead\">&nbsp;</td>
+        $update
+      </tr>";
+  }
+
+  while ($l_q->next_record()) {
+    $cpt_l++;
+
+    $id = $l_q->f("list_id");
+    $name = $l_q->f("list_name");
+    $sta_nb = $l_q->f("list_static_nb");
+    $dyn_nb = $l_q->f("list_query_nb");
+
+    $criteria = unserialize($l_q->f("list_structure"));
+    $list_info["criteria"] = $criteria;
+    $list_info["id"] = $id;
+    $list_info["mailing_ok"] = $l_q->f("list_mailing_ok");
+
+    if ($criteria != "") {
+      $query = stripslashes(make_query_from_criteria($list_info));
+    } else {
+      $query = $l_q->f("list_query");
+    }
+
+    if ($query != "") {
+      $query_nb = get_list_query_num_rows($query);
+      $query_txt = $query_nb;
+    } else {
+      $query_nb = "0";
+      $query_txt = "No";
+    }
+
+    $new_sta_nb = get_list_static_contact_nb($id);
+    $new_dyn_nb = $query_nb;
+
+    if ( ($sta_nb != $new_sta_nb) || ($dyn_nb != $new_dyn_nb) ) {
+      $cpt_lu++;
+      if ($mode == "txt") {
+	echo "\nList (id=$id), Contacts : Statiques ($sta_nb, $new_sta_nb) : Dynamiques ($dyn_nb, $new_dyn_nb)";
+      } else {
+	echo "<tr>
+          <td class=\"adminText\">$id</td>
+          <td class=\"adminText\">$name</td>
+          <td class=\"adminText\">$sta_nb</td>
+          <td class=\"adminText\">$new_sta_nb</td>
+          <td class=\"adminText\">$dyn_nb</td>
+          <td class=\"adminText\">$new_dyn_nb</td>
+          <td class=\"adminText\">Todo</td>";
+      }
+
+      if ($action == "data_update") {
+	$retour = update_one_list($id, $new_sta_nb, $new_dyn_nb);
+	if ($retour) {
+	  if ($mode == "txt") {
+	    echo "OK";
+	  } else {
+	    echo "<td class=\"adminLabel\">OK</td>";
+	  }
+	} else {
+	  if ($mode == "txt") {
+	    echo "Problem !";
+	  } else {
+	    echo "<td class=\"adminLabel\">Problem !</td>";
+	  }
+	}
+      }
+
+      if ($mode == "html") {
+	echo "</tr>";
+      }
+
+    }
+
+    if ($cpt_l % 100 == 0) {
+      if ($mode =="txt") {
+	echo ".";
+      } else {
+	echo "<tr>
+          <td class=\"adminLabel\" colspan=\"8\">$cpt_l</td>
+        </tr>";
+	flush();
+      }
+    }
+  }
+
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** List : $nb_l to parse, $cpt_lu inconsistencies
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<tr>
+        <td class=\"adminLabel\" colspan=\"8\">
+          List : $nb_l to parse, $cpt_lu inconsistencies</td>
+      </tr>
+      </table>";
+  }
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

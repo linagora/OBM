@@ -1472,69 +1472,6 @@ function run_query_global_todo_title($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the company contact number                                            //
-// Parameters:
-//   - $id : company id
-///////////////////////////////////////////////////////////////////////////////
-function get_company_contact_number($id) {
-  global $cdg_sql;
-
-  $query = "select count(contact_id) as nb from Contact
-            where contact_company_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("nb");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the company active (non archived) deal number                         //
-// Parameters:
-//   - $id : deal id
-///////////////////////////////////////////////////////////////////////////////
-function get_company_active_deal_number($id) {
-  global $cdg_sql;
-
-  $query = "select count(deal_id) as nb from Deal
-            where deal_company_id='$id' and deal_archive='0'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("nb");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the company total deal number
-// Parameters:
-//   - $id : deal id
-///////////////////////////////////////////////////////////////////////////////
-function get_company_total_deal_number($id) {
-  global $cdg_sql;
-
-  $query = "select count(deal_id) as nb from Deal
-            where deal_company_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("nb");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Get the module list                                                       //
 // Return : $modules : array of modules
 ///////////////////////////////////////////////////////////////////////////////

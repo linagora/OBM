@@ -21,7 +21,7 @@ $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
 $fieldnames["timeupdate"] = $l_date_last_update;
 // Calculated fields
-$fieldnames["list_nb_contact"] = "$l_nb_contact / $l_query";
+$fieldnames["list_nb_contact"] = "$l_nb_contact : $l_static / $l_query";
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
 $fieldnames["function_label"] = $l_function;
@@ -77,7 +77,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $query = "select count(*) from ContactList where contactlist_list_id='$id'";
     $nb_q->query($query);
     $nb_q->next_record();
-    $res["name"] = $nb_q->f(0) . " / " .$OD->data_set->f("list_query_nb");
+    $res["name"] = $nb_q->f(0) . " / " .$OD->data_set->f("list_static_nb"). " / " .$OD->data_set->f("list_query_nb");
     $res["txt_name"] = $res["name"];
     $res["align"] = "center";
   }
@@ -430,7 +430,7 @@ function dis_list_consult($list) {
 //   - $con_q      : contact database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
-  global $l_list, $l_name, $l_subject, $l_email, $l_query;
+  global $l_list, $l_name, $l_subject, $l_email, $l_query, $l_static;
   global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
   global $display, $perm, $menu, $cright_write, $ctu_sql_limit, $cdg_sql;
   global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
@@ -447,20 +447,36 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
+  $static_nb = $list_q->f("list_static_nb");
   
-  $crit_q = $list_q->f("list_structure");
-  $query = make_final_query($list_q->f("list_query"),$con_q);
-  $dis_query = nl2br($query);
-  $query_nb = get_query_num_rows($query);
-  if ($query_nb >= 0) {
-    run_query_update_num_rows($id, $query_nb);
+  $criteria = unserialize($list_q->f("list_structure"));
+  $list_info["criteria"] = $criteria;
+  $list_info["id"] = $id;
+  $list_info["mailing_ok"] = $list_q->f("list_mailing_ok");
+
+  if ($criteria != "") {
+    $query = stripslashes(make_query_from_criteria($list_info));
   } else {
-    $query_nb = $l_invalid_query;
+    $query = $list_q->f("list_query");
   }
-  if ($crit_q == "") {
-    $disp_query = "<tr>
+
+  if ($query != "") {
+    $query_nb = get_list_query_num_rows($query);
+    if ($query_nb >= 0) {
+      run_query_update_num_rows($id, $query_nb);
+    } else {
+      $query_nb = $l_invalid_query;
+    }
+  } else {
+    $query_nb = "0";
+  }
+
+  // If no search criteria, we display the query (empty or manual)
+  if ($criteria == "") {
+    $d_query = nl2br($query);
+    $dis_query = "<tr>
       <td class=\"detailLabel\">$l_query</td>
-      <td class=\"detailText\">$query</td>
+      <td class=\"detailText\">$d_query</td>
     </tr>";
   }
   $display["detailInfo"] = display_record_info($list_q);
@@ -485,11 +501,11 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
     </tr>
-    $disp_query
     <tr>
-      <td class=\"detailLabel\">$l_query $l_nb_contact</td>
-      <td class=\"detailText\">$query_nb</td>
+      <td class=\"detailLabel\">$l_nb_contact : $l_static / $l_query</td>
+      <td class=\"detailText\">$static_nb / $query_nb</td>
     </tr>
+    $dis_query
     </table>";
 
   // Static Contacts
@@ -1272,7 +1288,7 @@ function dis_list_display_pref($pref_list_q, $pref_contact_q) {
 function dis_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back;
 
-  $nb_con = get_list_nb_contact($id);
+  $nb_con = get_list_static_contact_nb($id);
 
   $display["msg"] .= display_warn_msg("$nb_con $l_warn_delete");
 
@@ -1282,7 +1298,7 @@ function dis_warn_delete($id) {
         <form method=\"get\" name=\"form_delete\"
           action=\"" .url_prepare("list_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"hd_list_id\" value=\"$id\" />
+        <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
         </form>
       </p>
@@ -1315,7 +1331,7 @@ function dis_list_warn_insert($list_q, $list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $query = stripslashes($list["query"]);
-  if(isset($list["criteria"])) {
+  if (isset($list["criteria"])) {
     $criteria = urlencode(serialize($list["criteria"]));
   }
   $display["msg"] .= display_warn_msg($l_check_samelist);

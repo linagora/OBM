@@ -76,3 +76,11 @@ ALTER TABLE Incident DROP COLUMN incident_datetmp;
 -------------------------------------------------------------------------------
 -- Add column : userobm_datebegin
 ALTER TABLE UserObm ADD COLUMN userobm_datebegin date;
+
+
+-------------------------------------------------------------------------------
+-- List table
+-------------------------------------------------------------------------------
+-- Add column : list_static_nb
+ALTER TABLE List ADD COLUMN list_static_nb integer;
+ALTER TABLE List ALTER COLUMN list_static_nb SET DEFAULT 0;

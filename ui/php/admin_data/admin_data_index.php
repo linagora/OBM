@@ -37,7 +37,7 @@ if ($mode != "html") {
   $document_path = $db->f("globalpref_value");	
 }
 
-$modules = array ('company', 'deal','document');
+$modules = array ('company', 'deal', 'list', 'document');
 //$modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 

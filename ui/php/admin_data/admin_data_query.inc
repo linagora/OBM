@@ -32,6 +32,69 @@ function get_company_list() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the company contact number                                            //
+// Parameters:
+//   - $id : company id
+///////////////////////////////////////////////////////////////////////////////
+function get_company_contact_number($id) {
+  global $cdg_sql;
+
+  $query = "select count(contact_id) as nb from Contact
+            where contact_company_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("nb");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the company active (non archived) deal number                         //
+// Parameters:
+//   - $id : deal id
+///////////////////////////////////////////////////////////////////////////////
+function get_company_active_deal_number($id) {
+  global $cdg_sql;
+
+  $query = "select count(deal_id) as nb from Deal
+            where deal_company_id='$id' and deal_archive='0'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("nb");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the company total deal number
+// Parameters:
+//   - $id : deal id
+///////////////////////////////////////////////////////////////////////////////
+function get_company_total_deal_number($id) {
+  global $cdg_sql;
+
+  $query = "select count(deal_id) as nb from Deal
+            where deal_company_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("nb");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution - Company Update
 // Parametres:
 //   - $id         : company id
@@ -90,6 +153,54 @@ function update_one_deal($id, $hitrate) {
   $query = "update Deal set
       deal_hitrate='$hitrate'
     where deal_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $u_q = new DB_OBM;
+  $retour = $u_q->query($query);
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - List list
+///////////////////////////////////////////////////////////////////////////////
+function get_list_list() {
+  global $cdg_sql;
+
+  $query = "select list_id,
+      list_name,
+      list_subject,
+      list_email,
+      list_mailing_ok,
+      list_static_nb,
+      list_query_nb,
+      list_query,
+      list_structure
+    from List
+    order by list_name";
+
+  display_debug_msg($query, $cdg_sql);
+
+  $l_q = new DB_OBM;
+  $l_q->query($query);
+  return $l_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - List Update
+// Parametres:
+//   - $id         : list id
+//   - $sta_nb : static contact number
+//   - $dyn_nb : dynamic contact number
+///////////////////////////////////////////////////////////////////////////////
+function update_one_list($id, $sta_nb, $dyn_nb) {
+  global $cdg_sql;
+
+  $query = "update List set
+      list_static_nb='$sta_nb',
+      list_query_nb='$syn_nb'
+    where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;

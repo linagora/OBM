@@ -58,3 +58,10 @@ DELETE FROM UserObmPref where userobmpref_option like 'todo_%';
 -------------------------------------------------------------------------------
 -- Add column : userobm_datebegin
 ALTER TABLE UserObm ADD COLUMN userobm_datebegin date after userobm_archive;
+
+
+-------------------------------------------------------------------------------
+-- List table
+-------------------------------------------------------------------------------
+-- Add column : list_static_nb
+ALTER TABLE List ADD COLUMN list_static_nb int(10) DEFAULT 0 after list_mailing_ok;
