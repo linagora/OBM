@@ -40,7 +40,7 @@ $l_cat_code = "Code";
 $l_act_manage = "Company Activity Management";
 $l_act_exist = "Existing Activities";
 $l_act_new = "New Activity";
-
+$l_add = "Add";
 // Titres
 $l_company = "Company";
 

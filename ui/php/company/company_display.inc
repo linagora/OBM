@@ -569,7 +569,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     for($i=0;$i<$length;$i++) {
       $label .= "&nbsp;";
     }
-    $label .= "-$c_label";
+    $label .= "$c_label";
     $sel_cat .= ">$label</option>";
   }
   $sel_kind .= "</select>";
@@ -636,7 +636,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   } else { $link_web = "&nbsp;"; }
 
   if (($action == "detailupdate") || ($action == "update")) {
-    //$links = html_company_links($id, $name, $con_num, $deal_num);
+    $links = html_company_links($co_q);
   }
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -688,9 +688,15 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_category</td>
-      <td class=\"detailForm\">$sel_cat
-        <a href=\"javascript: return false;\" 
-        onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> AA+</a>
+      <td class=\"detailForm\">    
+       <table>
+	<tr><td>
+	  $sel_cat 
+	</td><td>
+	  <a href=\"javascript: return false;\" style=\"float:right;\"
+	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> AA+</a>
+	</td></tr>
+       </table>
       </td>
     </tr><tr>      
       <td class=\"detailLabel\">$l_activity</td>
