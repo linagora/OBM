@@ -574,9 +574,10 @@ function run_query_get_contactcategory1($c_id) {
     global $cdg_sql;
 
   $query = "select contactcategory1_id
-  from ContactCategory1Link,ContactCategory1 where 
-  contactcategory1link_category_id = contactcategory1_id and  contactcategory1link_contact_id = '$c_id'
-  order by contactcategory1_id";     
+    from ContactCategory1Link, ContactCategory1
+    where contactcategory1link_category_id = contactcategory1_id
+      and contactcategory1link_contact_id = '$c_id'
+    order by contactcategory1_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -587,6 +588,7 @@ function run_query_get_contactcategory1($c_id) {
   }
   return $categories;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the contact

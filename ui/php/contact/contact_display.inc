@@ -1128,10 +1128,10 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_lname\" size=\"30\" value=\"$lname\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_lname\" size=\"30\" maxlength=\"64\" value=\"$lname\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" maxlength=\"64\" value=\"$fname\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\"> $sel_kind_lang $sel_kind_label $l_letter : $sel_kind_header </td>

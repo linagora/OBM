@@ -885,8 +885,8 @@ function make_query($list) {
                        left join Publication on subscription_publication_id = publication_id ",
     "companycategory_code" => " left join CompanyCategoryLink on company_id = companycategorylink_company_id 
           	                left join CompanyCategory on companycategory_id = companycategorylink_category_id ",
-    "contactcategory_1link_category_id" => " left join ContactCategory1Link on contact_id = contactcategory1link_contact_id ",
-    "contactcategory_2link_category_id" => " left join ContactCategory2Link on contact_id = contactcategory2link_contact_id ",
+    "contactcategory1link_category_id" => " left join ContactCategory1Link on contact_id = contactcategory1link_contact_id ",
+    "contactcategory2link_category_id" => " left join ContactCategory2Link on contact_id = contactcategory2link_contact_id ",
     "kind_lang" => " left join Kind on contact_kind_id = kind_id "
   );
   $add_select = array (
