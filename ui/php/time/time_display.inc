@@ -30,6 +30,36 @@ $fieldnames["contact_company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Time specific dataset fields                                      //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_time(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme;
+  global $time; // ???? Pour quoi ???
+
+  if (($fieldname == "task_id")
+      && ($OD->data_set->f("task_status")==0) ) {
+    $res["popup"] = true;
+    $res["popup_width"] = 970;
+    $res["popup_height"] = 270;
+    $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
+    $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\">";
+  }
+
+  else if ($fieldname == "task_id") {
+    $res["name"] = "&nbsp;";
+  }
+  
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HTML Display Array content
 // Parameters:
 //   - $array : any array

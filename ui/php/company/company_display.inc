@@ -28,7 +28,6 @@ $fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact
 $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" alt=\"D\" />";
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company specific dataset fields                                   //
 // Parameters:

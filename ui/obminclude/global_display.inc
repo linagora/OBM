@@ -266,8 +266,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
   function dis_data($dis_data_entity) {
-    global $cdg_id, $set_debug, $set_theme, $set_rows;
-    global $path, $time;
+    global $path, $cdg_id, $set_debug, $set_theme, $set_rows;
 
     $link_ok = $this->display_link;
 
@@ -317,7 +316,8 @@ class OBM_DISPLAY {
       // For each field in the data row we walk through the pref dbo ordered
       // and for each entry (field) we set special parameters and display it
       while ($this->display_pref->next_record()) {
-	$name = "";
+	// Default values
+	$name = $this->data_set->f($fieldname);
 	$url = "";
 	$popup = false;
 	$popup_width = 600;
@@ -339,35 +339,24 @@ class OBM_DISPLAY {
 	  $name = datetime_format($this->data_set->f($fieldname));
 	}
 
-
-        //------------------------------
-        // For the time management
-        //------------------------------
-        else if (($fieldname == "task_id")
-                  && ($this->data_set->f("task_status")==0) ) {
-	  $popup = true;
-	  $popup_width = 970;
-	  $popup_height = 270;
-	  $url = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
-	  $name = "<img border=0 src=\"/images/$set_theme/modify.png\">";
-	}
-	else if ($fieldname == "task_id")
-           $name = " ";
- 
-
-
         //--------------------------------------------------
         // We call module specific field display disposition
         //--------------------------------------------------
 	if (function_exists($dis_data_entity)) {
 	  $res = $dis_data_entity($this, $fieldname, $link_ok);
-	  $align = $res["align"];
 	  if ($res["name"] != "") $name = $res["name"];
 	  $url = $res["url"];
+	  $align = $res["align"];
 	  $style = $res["style"];
-	} else {
-	  $name = $this->data_set->f($fieldname);
+	  $popup = $res["popup"];
+	  $popup_width = $res["popup_width"];
+	  $popup_height = $res["popup_height"];
 	}	  
+
+        //--------------------------------------------------
+        // Column display
+        //--------------------------------------------------
+        $content = "";
 
 	// Set the style
 	if ($style != "") {
@@ -377,7 +366,6 @@ class OBM_DISPLAY {
 	} else {
 	  $td = "<td class=\"OBMDisplayText\">";
 	}
-        $content = "";
 	
 	// Pre cell display (open popup, link)
 	if ($popup) {
@@ -387,11 +375,7 @@ class OBM_DISPLAY {
 	}
 	
 	// Cell display
-	if ($name == "") {
-	  $content .= $this->data_set->f($fieldname);
-	} else {
-	  $content .= $name;
-	}
+	$content .= $name;
 	
 	// Post cell display (close link, popup)
 	if ($popup || ($url != "")) {
@@ -565,7 +549,6 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_file($sep) {
     global $cdg_id, $set_debug;
-    global $time;
 
     $this->dis_data_header_file($sep);
 
