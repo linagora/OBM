@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : project_query.inc                                            //
 //     - Desc : project query File                                           //
-// 2003-07-08 Bastien Continsouzas                                           //
+// 2003-07-08 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -186,13 +186,13 @@ function run_query_allocation_and_time($p_id) {
 
   // We first get Times from Allocated Tasks
   $query = "
-    select
+    SELECT
       userobm_id,
       projecttask_id,
       sum((timetask_length)/$frac) as used_time,
       projectuser_projectedtime as projected_time,
       projectuser_missingtime as missing_time
-    from ProjectUser
+    FROM ProjectUser
       left join ProjectTask
         on projectuser_projecttask_id = projecttask_id
       left join UserObm
@@ -200,10 +200,12 @@ function run_query_allocation_and_time($p_id) {
       left join TimeTask
         on timetask_projecttask_id = projecttask_id
         and timetask_user_id = userobm_id
-    where projectuser_project_id = '$p_id'
-      and projectuser_projectedtime != '0'
-      and projectuser_projectedtime is not null
-    group by userobm_id, projecttask_id, projected_time, missing_time
+    WHERE projectuser_project_id = '$p_id'
+      AND ( (projectuser_projectedtime != '0'
+             AND projectuser_projectedtime is not null)
+          OR (projectuser_missingtime != '0'
+             AND projectuser_missingtime is not null) )
+    GROUP BY userobm_id, projecttask_id, projected_time, missing_time
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time");
@@ -224,12 +226,12 @@ function run_query_allocation_and_time($p_id) {
   // We query TimeTask data filled but where no allocation is present anymore
   // We start by TimeTask and join to ProjectUser but ProjectUser must be empty
   $query = "
-    select
+    SELECT
       userobm_id,
       projecttask_id,
       projecttask_project_id, 
       sum((timetask_length)/$frac) as used_time
-    from TimeTask
+    FROM TimeTask
       left join ProjectTask
         on timetask_projecttask_id = projecttask_id
       left join UserObm
@@ -237,9 +239,10 @@ function run_query_allocation_and_time($p_id) {
       left join ProjectUser
         on projectuser_projecttask_id = projecttask_id
         and projectuser_user_id = userobm_id
-    where projecttask_project_id = '$p_id'
-      and projectuser_id is null
-    group by userobm_id, projecttask_id, projecttask_project_id
+    WHERE projecttask_project_id = '$p_id'
+      and projectuser_projectedtime is null
+      and projectuser_missingtime is null
+    GROUP BY userobm_id, projecttask_id, projecttask_project_id
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time (2)");
@@ -916,14 +919,14 @@ function run_query_allocate_update($project) {
   $date_now = date("Y-m-d H:i:s");
 
   $query = "
-    select
+    SELECT
       projectuser_user_id as mt_user,
       projectuser_projecttask_id as mt_task,
       projectuser_projectedtime as mt_proj,
       projectuser_missingtime as mt_miss
-    from ProjectUser
-    where projectuser_project_id = '$p_id'
-    order by mt_user, mt_task";
+    FROM ProjectUser
+    WHERE projectuser_project_id = '$p_id'
+    ORDER by mt_user, mt_task";
 
   $old_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_allocate_update(old)");
@@ -1014,7 +1017,7 @@ function run_query_allocate_update($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Advance Update query execution                                            //
+// Progress Update query execution
 // Parameters:
 //   - $project[] : hash info : keys used : missing
 ///////////////////////////////////////////////////////////////////////////////
@@ -1048,6 +1051,126 @@ function run_query_progress($project) {
     }
   }
   
+  return $ins_err;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Project Advance Update query execution
+// Parameters:
+//   - $project[] : hash info : keys used : projected
+///////////////////////////////////////////////////////////////////////////////
+function run_query_advance_update($project) {
+  global $auth, $cdg_sql;
+
+  $p_id = $project["id"];
+  $new = $project["projected"];
+  $uid = $auth->auth["uid"];  
+  $date_now = date("Y-m-d H:i:s");
+  $miss_tab = $project["missing"];
+
+  $query = "
+    SELECT
+      projectuser_user_id as mt_user,
+      projectuser_projecttask_id as mt_task,
+      projectuser_projectedtime as mt_proj,
+      projectuser_missingtime as mt_miss
+    FROM ProjectUser
+    WHERE projectuser_project_id = '$p_id'
+    ORDER by mt_user, mt_task";
+
+  $old_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "run_query_allocate_update(old)");
+  $old_q->query($query);
+
+  while ($old_q->next_record()) {
+    $old_user = $old_q->f("mt_user");
+    $old_task = $old_q->f("mt_task");
+    $old_proj = $old_q->f("mt_proj");
+    $old_miss = $old_q->f("mt_miss");
+    
+    $old[$old_user][$old_task] = $old_proj;
+    $old_miss_tab[$old_user][$old_task] = $old_miss;
+  }
+  
+  $obm_q = new DB_OBM;
+  
+  while ( list($m_id, $ttime) = each($new) ) {
+    while ( list($t_id, $proj) = each($ttime) ) {
+
+      $proj_new = ($new[$m_id][$t_id] > 0) ? $new[$m_id][$t_id] : 0;
+      $proj_old = (isset ($old[$m_id][$t_id])) ? $old[$m_id][$t_id] : 0;
+      $miss_new = ($miss_tab[$m_id][$t_id] > 0) ? $miss_tab[$m_id][$t_id] : 0;
+      $miss_old = ($old_miss_tab[$m_id][$t_id] > 0) ? $old_miss_tab[$m_id][$t_id] : 0;
+
+      // if an entry existed, but has been removed, we delete it
+      if (!($proj_new) && !($miss_new) && ($proj_old || $miss_old)) {
+	$query = "
+        DELETE FROM ProjectUser
+        WHERE projectuser_user_id = '$m_id'
+          AND projectuser_projecttask_id = '$t_id'";
+
+ 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(2)");
+	$obm_q->query($query);
+
+      // if an entry existed, and a new has been given, we update
+      } else if (($proj_new || $miss_new) && ($proj_old || $miss_old)) {
+	// if missing time not and never set or never updated (=old projected)
+	// we set missing time to new projected
+	if ( ((! miss_old) && (! miss_new))
+             || ($miss_old == $proj_old) ) {
+	  $set_miss_time = $proj_new;
+	} else {
+	  $set_miss_time = $miss_new;
+	}
+
+	$query = "
+         update ProjectUser
+         set projectuser_timeupdate = '$date_now',
+             projectuser_userupdate = '$uid',
+             projectuser_projectedtime = '$proj_new',
+             projectuser_missingtime = '$set_miss_time'
+         where projectuser_user_id = '$m_id'
+           and projectuser_projecttask_id = '$t_id'";
+
+	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(3)");
+	$obm_q->query($query);
+
+      // if a new entry has been given, we insert it
+      } else if (($proj_new || $miss_new) && (!($proj_old) && !($miss_old))) {
+	// if missing time not set, we set missing time to new projected
+	if (! miss_new) {
+	  $set_miss_time = $proj_new;
+	} else {
+	  $set_miss_time = $miss_new;
+	}
+
+	$query = "	
+        insert into ProjectUser 
+          (projectuser_user_id,
+           projectuser_project_id,
+           projectuser_projecttask_id,
+           projectuser_timecreate,
+           projectuser_usercreate,
+           projectuser_projectedtime,
+           projectuser_missingtime
+          )
+        values
+          ('$m_id',
+           '$p_id',
+           '$t_id',
+           '$date_now',
+           '$uid',
+           '$proj_new',
+           '$set_miss_time'
+          )";
+
+ 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(4)");
+	$obm_q->query($query);
+      }
+    }
+  }
+ 
   return $ins_err;
 }
 
@@ -1523,7 +1646,7 @@ function task_has_user($tid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Advance Form Data checking and formatting                                 //
+// Progress Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
 //   - $project[] : values checked
@@ -1531,7 +1654,7 @@ function task_has_user($tid) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_advance_form($project) {
+function check_progress_form($project) {
 
   $error = 0;
 

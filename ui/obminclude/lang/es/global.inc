@@ -199,7 +199,7 @@ $l_header_add_contact = "Nuevo contacto";
 // Project headers
 $l_header_man_task = "Tareas";
 $l_header_man_member = "Miembros";
-$l_header_man_advance = "Progreso";
+$l_header_progress = "Progreso";
 $l_header_man_affect = "Allocation";
 $l_header_add_member = "Nuevo miembro";
 

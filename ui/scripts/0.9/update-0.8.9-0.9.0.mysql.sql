@@ -146,5 +146,3 @@ UPDATE DisplayPref SET display_fieldname='company_name' WHERE display_entity='co
 -- Update Contact table
 -------------------------------------------------------------------------------
 ALTER TABLE Contact ADD COLUMN contact_company varchar(64) AFTER contact_company_id;
-
-

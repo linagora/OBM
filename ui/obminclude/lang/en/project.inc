@@ -39,6 +39,7 @@ $l_members = "members";
 $l_members_info = "Project members";
 $l_progressinfos = "Progress evaluation : time (used / missing / projected)";
 $l_memberstimeinfos = "Fill in the working length (in days) projected for each person assigned to a task";
+$l_fill_advance_form = "Fill in the working time : planned / remaining";
 $l_task_new = "New task";
 $l_task_update = "Update task";
 $l_task_list = "Defined tasks";

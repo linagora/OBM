@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre12";
+$obm_version = "0.9.0pre14";
 $l_obm_title = "O.B.M.";
 
 // Agenda constants
@@ -129,6 +129,45 @@ $cright_own = 2;
 $cright_write = 4;
 $cright_read_admin = 8;
 $cright_write_admin = 16;
+
+// reader : 01 (bit 0) : can see data
+// user   : 03 (bits 0+1) : can see data + insert or update his own data
+// editor : 05 (bits 0+2) : can see data + write data
+// admin  : 1D (bits 0+2+3+4) : can do everything
+$perm_reader = "01";
+$perm_user = "03";
+$perm_editor = "05";
+$perm_admin = "1D";
+
+//------------------------------//
+// Default Profiles definitions //
+//------------------------------//
+$profiles["user"] = array (
+  'section' => array (
+    'default' => 0,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1),
+  'module' => array (
+    'default' => $perm_user)
+);
+
+$profiles["editor"] = array (
+  'section' => array (
+    'default' => 0,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1),
+  'module' => array (
+    'default' => $perm_editor)
+);
+
+$profiles["admin"] = array (
+  'section' => array (
+    'default' => 1),
+  'module' => array (
+    'default' => $perm_admin)
+);
 
 //-------------------------//
 // Default Displayed Infos //

@@ -118,6 +118,8 @@ $l_err_end_repeat3 = "The max duration of a repetition is ten years when the rep
 $l_err_days_repeat = "You must check one or more repeatition day.";
 $l_err_days_repeat_not_weekly = "You can give repeatition days only on weekly repeatition.";
 $l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must at least be seven day after the end of the event.";
+$l_event_cant_delete = "You can only delete your own events !";
+
 $l_category_insert_ok = "The category has been inserted successfully.";
 $l_category_insert_error = "The insertion of the category has failed !";
 $l_category_delete_ok = "The category has been deleted successfully.";

@@ -19,19 +19,19 @@ $obmdb_password = "obm";
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://jaguar/";
+$cgp_host = "http://obm-panthere/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes
-$cgp_site_include = true;
+//$cgp_site_include = true;
 
 // Todo lines to display
 $cgp_todo_nb = 5;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 2;
-$cg_prod = 3;
+$cg_com = 1;
+$cg_prod = 2;
 
 // Allow * in search field
 $cgp_sql_star = true;
@@ -79,42 +79,30 @@ $default_path = "/Default";                  // Default directory
 $caf_company_name = true;
 $caf_town = true;
 
+//----------------------//
+// Profiles definitions //
+//----------------------//
+$profiles["editor"] = array (
+  'section' => array (
+    'default' => 0,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1,
+    'settings' => 1),
+  'module' => array (
+    'default' => $perm_editor)
+);
+
 //-----------------//
 // Displayed Infos //
 //-----------------//
 // sections -- Default is true
-$cgp_show["section"] = ""; // Needed if module order to change
-$cgp_show["section"]["com"]["url"] = "$path/agenda/agenda_index.php";
-$cgp_show["section"]["user"]["url"] = "$path/user/user_index.php";
-$cgp_show["section"]["prod"]["url"] = "$path/document/document_index.php";
-$cgp_show["section"]["settings"]["url"] = "$path/settings/settings_index.php";
-$cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
-$cgp_show["section"]["admin"]["right"] = "$cright_read";
+//$cgp_show["section"] = ""; // Needed if module order to change
+//$cgp_show["section"]["com"]["url"] = "$path/agenda/agenda_index.php";
 
 // modules -- false to hide, otherwise section
-$cgp_show["module"] = ""; // Needed if module order to change
-$cgp_show["module"]["company"] = false;
-$cgp_show["module"]["agenda"] = "com";
-$cgp_show["module"]["todo"] = false;
-$cgp_show["module"]["contact"] = "com";
-$cgp_show["module"]["deal"] = false;
-$cgp_show["module"]["list"] = "com";
-$cgp_show["module"]["publication"] = false;
-$cgp_show["module"]["statistic"] = false;
-$cgp_show["module"]["user"] = "user";
-$cgp_show["module"]["group"] = "user";
-$cgp_show["module"]["project"] = false;
-$cgp_show["module"]["contract"] = "prod";
-$cgp_show["module"]["incident"] = "prod";
-$cgp_show["module"]["document"] = "prod";
-$cgp_show["module"]["settings"] = "settings";
-$cgp_show["module"]["admin"] = "admin";
-$cgp_show["module"]["admin_code"] = "admin";
-$cgp_show["module"]["admin_pref"] = "admin";
-$cgp_show["module"]["admin_data"] = "admin";
-$cgp_show["module"]["admin_lang"] = "admin";
-$cgp_show["module"]["admin_ref"] = "admin";
-$cgp_show["module"]["import"] = "admin";
+//$cgp_show["module"] = ""; // Needed if module order to change
+//$cgp_show["module"]["company"] = "com";
 
 // Company module
 $cgp_hide["company"]["company_number"] = true;

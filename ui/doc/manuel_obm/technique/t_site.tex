@@ -2,7 +2,7 @@
 % ALIACOM Pierre Baudracco
 % $Id$
 
-
+\clearpage
 \section{Configuration spécifique d'un site}
 
 Depuis la version 0.8, OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
@@ -137,31 +137,15 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
   entre ces deux documentations, merci de vous référer à cette dernière.}
 
 
-\subsection{Le paramétrage des sections visibles et leur lien}
-\label{cgp_show}
+\subsection{La définition des sections}
+\label{cgp_show_section}
 
-Le tableau \$cgp\_show[``section''] définit les sections utilisées par OBM et pour chacune d'elle son lien (url) par défaut.
-Par défaut toutes les sections sont affichées et pointent vers le premier module affiché.
+Pour définir une section dans \obm, il faut la déclarer dans le fichier de configuration.
 
-\paragraph{La configuration des liens} des sections est disponible depuis OBM 0.8.1.\\
 
-Pour ne pas afficher une section il faut insérer dans le fichier de configuration la ligne :
+\subsubsection{Configuration générique par défaut}
 
-\begin{verbatim}  
-$cgp_show[``section''][``com''] = false;
-\end{verbatim}
-\vspace{0.3cm}
-
-A partir d'OBM 0.9.0, il suffit de ne pas définir la section.\\
-
-Pour modifier l'url par défaut d'une section il faut insérer dans le fichier de configuration la ligne (pour faire pointer la section Production vers le module Document) :
-
-\begin{verbatim}  
-$cgp_show[``section''][``prod''] = ``$path/document/document_index.php'';
-\end{verbatim}  
-\vspace{0.3cm}
-
-Liste des sections définies par défaut sont :\\
+Liste des sections définies par défaut :\\
 \begin{itemize}
 \item com
 \item prod
@@ -172,15 +156,141 @@ Liste des sections définies par défaut sont :\\
 \end{itemize}
 \vspace{0.3cm}
 
-A partir d'OBM 0.9.0, aucune section n'est définie en dur dans le code et l'administrateur définit les sections et leurs modules uniquement via le fichier de configuration.
+Par défaut toutes les sections pointent vers le premier module de la section.
 
 
-\subsection{Le paramétrage des modules visibles}
+\subsubsection{Personnalisation des sections}
+
+\obm permêt de définir :\\
+\begin{itemize}
+\item Ses propres sections
+\item L'ordre d'affichage des sections
+\item Les urls pointées par les sections
+\item Les droits d'accès à chaque section
+\item Les labels affichés des sections
+\end{itemize}
+\vspace{0.3cm}
+
+Le tableau \textbf{\$cgp\_show[``section'']} définit les sections utilisées par OBM.
+
+\paragraph{Sections propres et ordre d'affichage}
+
+Pour ne pas utiliser les sections génériques ou redéfinir l'ordre d'affichage des sections il est nécessaire de ``vider'' ce tableau avant d'y associer de nouvelles valeurs.
+ 
+\paragraph{Définition des urls et droits d'accès}
+
+Pour chaque section il est possible de déclarer 2 paramètres, l'url et le droit d'accès; exemple pour la section ``com'' (définition de \$cgp\_show[``section''][``com'']) :\\
+
+\begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Défaut} & \textbf{Description} \\
+\hline
+url & \$path/company/company\_index.php & url pointée par la section \\ 
+\hline
+right & \$cright\_read & Droits d'accès nécessaire pour l'affichage de la section \\ 
+\hline
+\end{tabular}
+
+\paragraph{Définition du label de la section}
+Le label de la section (affiché par l'onglet) est automatiquement la variable de langue \$l\_section\_com (pour la section com).
+Il doit donc être défini dans les fichiers de langues spécifiques, pour les sections non pré-définies par \obm.
+
+\paragraph{Exemple de définition :} Uniquement section admin
+\begin{verbatim}
+$cgp_show["section"] = ""; // Needed if module order to change
+$cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
+$cgp_show["section"]["admin"]["right"] = "$cright_read";
+\end{verbatim}
+
+
+\subsubsection{Evolutions d'\obm}
+
+\begin{itemize}
+\item La configuration des liens des sections est disponible depuis \obm 0.8.1 et a évolué à la version 0.9.0.
+\item A partir d'OBM 0.9.0, aucune section ou paramètre de section ne sont définis en dur dans le code et l'administrateur définit les sections et leurs modules uniquement via le fichier de configuration.
+\end{itemize}
+
+
+\subsection{La définition des modules affichés}
 \label{cgp_show_2}
 
-Le tableau \$cgp\_show[``module''] définit pour chaque module si celui-ci doit être affiché et dans quelle section.
-Par défaut tous les modules sont affichés.
-L'ordre d'affichage des modules dans une section est leur ordre de définition dans le fichier de configuration.
+\obm permêt de définir, via le fichier de configuration, quels modules sont disponibles et dans quelle section.
+
+
+\subsubsection{Configuration générique par défaut}
+
+\begin{tabular}{|p{2.5cm}|p{4cm}|}
+\hline
+\textbf{Section} & \textbf{Module} \\
+\hline
+\multirow{8}{4cm}{com} & company \\ 
+\cline{2-2}
+& contact \\
+\cline{2-2}
+& deal \\
+\cline{2-2}
+& list \\
+\cline{2-2}
+& agenda \\
+\cline{2-2}
+& todo \\
+\cline{2-2}
+& publication \\
+\cline{2-2}
+& statistic \\
+\hline
+\multirow{5}{2cm}{prod} & \timemanager \\ 
+\cline{2-2}
+& project \\
+\cline{2-2}
+& contract \\
+\cline{2-2}
+& incident \\
+\cline{2-2}
+& document \\
+\hline
+\multirow{3}{2cm}{compta} & account \\ 
+\cline{2-2}
+& invoice \\
+\cline{2-2}
+& payment \\
+\hline
+\multirow{3}{2cm}{user} & settings \\ 
+\cline{2-2}
+& user \\
+\cline{2-2}
+& group \\
+\hline
+\multirow{7}{2cm}{user} & admin \\ 
+\cline{2-2}
+& admin\_code \\
+\cline{2-2}
+& admin\_pref \\
+\cline{2-2}
+& admin\_data \\
+\cline{2-2}
+& admin\_lang \\
+\cline{2-2}
+& admin\_ref \\
+\cline{2-2}
+& import \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Personnalisation des modules}
+
+\obm permêt de définir :\\
+\begin{itemize}
+\item Les modules visibles ou utilisés
+\item L'association des modules aux sections
+\item L'ordre d'affichage des modules
+\end{itemize}
+\vspace{0.3cm}
+
+Le tableau \textbf{\$cgp\_show[``module'']} définit les modules utilisées par OBM.
+
+\subsubsection{Définition des modules visibles}
 
 Pour ne pas afficher un module il faut insérer dans le fichier de configuration la ligne :
 
@@ -195,29 +305,42 @@ ou bien re-définir l'ensemble des modules et ne définir que les modules souhaité
 $cgp_show[``module''] = "";
 $cgp_show[``module'']["contact"] = "com";
 \end{verbatim}
-\vspace{0.3cm}
 
-Liste des modules disponibles :\\
-\begin{itemize}
-\item company
-\item contact
-\item deal
-\item list
-\item agenda
-\item todo
-\item publication
-\item time
-\item project
-\item contract
-\item incident
-\item document
-\item account
-\item invoice
-\item payment
-\item settings
-\item user
-\item group
-\end{itemize}
+\paragraph{Association des modules aux sections}
+
+La définition \$cgp\_show[``company''] = ``com'' associe le module company à la section com.
+
+\paragraph{Ordre d'affichage des modules}
+
+L'ordre d'affichage des modules dans une section est leur ordre de définition dans le fichier de configuration.
+
+
+\subsubsection{Les dépendances entre modules}
+
+Certains modules dépendent d'autres modules et sont automatiquement désactivés par \obm si un des modules dont ils dépendent est désactivé.
+Par exemple le module \deal a besoin du module \company pour fonctionner et sera automatiquement désactivé si le module \company est désactivé.
+
+Liste des modules dépendants :\\
+
+\begin{tabular}{|p{3cm}|p{4cm}|}
+\hline
+\textbf{Module} & \textbf{Module dépendant} \\
+\hline
+\multirow{4}{2cm}{\company} & \deal \\ 
+\cline{2-2}
+& \project \\ 
+\cline{2-2}
+& \contract \\ 
+\cline{2-2}
+& \invoice \\ 
+\hline
+\project & \timemanager \\ 
+\hline
+\contract & \incident \\ 
+\hline
+\invoice & \payment \\ 
+\hline
+\end{tabular}
 
 
 \subsection{Le paramétrage des champs visibles}

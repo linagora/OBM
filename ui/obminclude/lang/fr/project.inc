@@ -40,6 +40,7 @@ $l_members = "participants";
 $l_members_info = "Participants au projet";
 $l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
+$l_fill_advance_form = "Renseignez le temps de travail (en jours) : prévu / estimé restant";
 $l_task_new = "Nouvelle tâche";
 $l_task_update = "Modifier une tâche";
 $l_task_list = "Tâches définies";

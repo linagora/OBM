@@ -492,72 +492,17 @@ class CAS_Auth extends Auth {
 ///////////////////////////////////////////////////////////////////////////////
 class OBM_Perm {
   var $classname      = "OBM_Perm";
-  var $mod_length     = 2;             // chars by module rights (1 byte = 2)
-  var $section_pos    = array();       // Section rights Position in profile 
-  var $mod_pos        = array();       // Module rights Position in profile 
 
   function OBM_Perm () {
     global $profiles;
 
-    // Section position in profile ------------------------------------------//
-    $this->section_pos["com"] = 0;
-    $this->section_pos["prod"] = 1;
-    $this->section_pos["compta"] = 2;
-    $this->section_pos["user"] = 3;
-    $this->section_pos["admin"] = 4;
-    $this->section_pos["ALIAMIN"] = 5;
-
-    $mod_length = $this->mod_length;
-
-    // Module position in profile -------------------------------------------//
-    $this->mod_pos["company"] = 6;
-    $this->mod_pos["contact"] = $this->mod_pos["company"] + $mod_length;
-    $this->mod_pos["deal"] = $this->mod_pos["contact"] + $mod_length;
-    $this->mod_pos["list"] = $this->mod_pos["deal"] + $mod_length;
-    $this->mod_pos["agenda"] = $this->mod_pos["list"] + $mod_length;
-    $this->mod_pos["todo"] = $this->mod_pos["agenda"] + $mod_length;
-    $this->mod_pos["publication"] = $this->mod_pos["todo"] + $mod_length;
-    $this->mod_pos["statistic"] = $this->mod_pos["publication"] + $mod_length;
-    $this->mod_pos["time"] = $this->mod_pos["statistic"] + $mod_length;
-    $this->mod_pos["project"] = $this->mod_pos["time"] + $mod_length;
-    $this->mod_pos["contract"] = $this->mod_pos["project"] + $mod_length;
-    $this->mod_pos["incident"] = $this->mod_pos["contract"] + $mod_length;
-    $this->mod_pos["document"] = $this->mod_pos["incident"] + $mod_length;
-    $this->mod_pos["account"] = $this->mod_pos["document"] + $mod_length;
-    $this->mod_pos["invoice"] = $this->mod_pos["account"] + $mod_length;
-    $this->mod_pos["payment"] = $this->mod_pos["invoice"] + $mod_length;
-    $this->mod_pos["settings"] = $this->mod_pos["payment"] + $mod_length;
-    $this->mod_pos["user"] = $this->mod_pos["settings"] + $mod_length;
-    $this->mod_pos["group"] = $this->mod_pos["user"] + $mod_length;
-    $this->mod_pos["admin"] = $this->mod_pos["group"] + $mod_length;
-    $this->mod_pos["admin_code"] = $this->mod_pos["admin"] + $mod_length;
-    $this->mod_pos["admin_pref"] = $this->mod_pos["admin_code"] + $mod_length;
-    $this->mod_pos["admin_data"] = $this->mod_pos["admin_pref"] + $mod_length;
-    $this->mod_pos["admin_lang"] = $this->mod_pos["admin_data"] + $mod_length;
-    $this->mod_pos["admin_ref"] = $this->mod_pos["admin_lang"] + $mod_length;
-    $this->mod_pos["import"] = $this->mod_pos["admin_ref"] + $mod_length;
-    $profile_length = $this->mod_pos["import"] + $mod_length;
-
-    // reader : 01 (bit 0) : can see data
-    // user   : 03 (bits 0+1) : can see data + insert or update his own data
-    // editor : 05 (bits 0+2) : can see data + write data
-    // admin  : 1D (bits 0+2+3+4) : can do everything
-    $perm_reader = "01";
-    $perm_user = "03";
-    $perm_editor = "05";
-    $perm_admin = "1D";
-
-    if (! isset($profiles["reader"])) {
-      $profiles["reader"] = str_pad("110100", $profile_length, $perm_reader);
-    }
-    if (! isset($profiles["user"])) {
-      $profiles["user"] = str_pad("110101", $profile_length, $perm_user);
-    }
-    if (! isset($profiles["editor"])) {
-      $profiles["editor"] = str_pad("110101", $profile_length, $perm_editor);
-    }
     if (! isset($profiles["admin"])) {
-      $profiles["admin"] = str_pad("111111", $profile_length, $perm_admin);
+      $profiles["admin"] = array (
+        'section' => array (
+          'default' => 1),
+        'module' => array (
+          'default' => "1D")
+      );
     }
   }
 
@@ -570,10 +515,13 @@ class OBM_Perm {
     global $profiles, $auth;
 
     $profile = $auth->auth["perm"];
-    $rights = $profiles["$profile"];
-    $right_start = $this->section_pos["$section"];
-    $section_right = hexdec(substr($rights, $right_start, 1));
 
+    if (isset($profiles[$profile]['section'][$section])) {
+      return $profiles[$profile]['section'][$section];
+    } else {
+      return $profiles[$profile]['section']['default'];
+    }
+ 
     return $section_right;
   }
 
@@ -586,10 +534,13 @@ class OBM_Perm {
     global $profiles, $auth;
 
     $profile = $auth->auth["perm"];
-    $rights = $profiles["$profile"];
-    $right_start = $this->mod_pos["$module"];
-    $module_right = hexdec(substr($rights, $right_start, $this->mod_length));
 
+    if (isset($profiles[$profile]['module'][$module])) {
+      return hexdec($profiles[$profile]['module'][$module]);
+    } else {
+      return hexdec($profiles[$profile]['module']['default']);
+    }
+ 
     return $module_right;
   }
 

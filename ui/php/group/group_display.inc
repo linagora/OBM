@@ -13,6 +13,7 @@
 // Direct fields
 $fieldnames["group_name"] = $l_name;
 $fieldnames["group_system"] = $l_system;
+$fieldnames["group_privacy"] = $l_private;
 $fieldnames["group_local"] = $l_local;
 $fieldnames["group_ext_id"] = $l_ext_id;
 $fieldnames["group_desc"] = $l_desc;
@@ -51,6 +52,16 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   }  
 
   else if ($fieldname == "group_system") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
+
+  else if ($fieldname == "group_privacy") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
       $res["name"] = "X";
@@ -486,7 +497,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
 
 
   // Affichage des groupes membres 
-  $nb_g = $g_q->num_rows();
+  $nb_g = $g_q->num_rows_total();
   if ($nb_g == 0) {
     $message = $l_no_group_group;
   } else {
@@ -527,9 +538,8 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     }
   }
 
-
   // registered Users display
-  $nb_u = $u_q->num_rows();
+  $nb_u = $u_q->num_rows_total();
   if ($nb_u == 0) {
     $message = $l_no_user;
   } else {

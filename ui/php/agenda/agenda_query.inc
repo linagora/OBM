@@ -14,6 +14,7 @@
 //   - $param_event
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($param_event) {
+
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type; 
   $timeupdate = sql_date_format($db_type, "calendarevent_timeupdate", "timeupdate");
@@ -138,24 +139,25 @@ function run_query_event_groups_array($param_event,$getdate) {
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the name and first name of users
 // Parameters: 
-//   - $contacts_array : contact id array, the event is assigned to 
+//   - $users : users id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_user_name($contacts_array) {
+function run_query_get_user_name($users) {
   global $cdg_sql;
-  
-  $obm_db = new DB_OBM;
-  $query = "SELECT userobm_lastname,userobm_firstname,userobm_id
+
+  $in = "'".implode ("','", $users)."'";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
             FROM UserObm
-	    WHERE userobm_id IN (".$contacts_array[0];
-  for ($i=1;$i<count($contacts_array);$i++) {
-    $query.= ",'".$contacts_array[$i]."'";
-  }
-  $query.= ")";        
+	    WHERE userobm_id IN ($in)";
+
   $query.= " ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q->query($query);
+
+  return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the concatenation of users and groups array in a users array 
@@ -477,6 +479,8 @@ function run_query_get_eventcategories() {
   $obm_db->query($query);
   return $obm_db;
 }
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Perform the modification of a event
 //////////////////////////////////////////////////////////////////////////////
@@ -673,7 +677,7 @@ function get_default_group_user_ids($p_group) {
   $uid = $auth->auth["uid"];
   $group = $p_group;
   if ($p_group != $c_all) {
-  $query = "SELECT u.*,
+    $query = "SELECT u.*,
       c.calendarright_read
     FROM UGroup g, UserObmGroup ug, UserObm as u
       LEFT OUTER JOIN CalendarRight as c
@@ -702,10 +706,10 @@ function get_default_group_user_ids($p_group) {
 
   $ret_array = array();
   while($obm_db->next_record()) {
-     $ret_array[] = $obm_db->f("userobm_id");
+    $ret_array[] = $obm_db->f("userobm_id");
   }
   if (count($ret_array) == 0) {
-     $ret_array = array($uid);
+    $ret_array = array($uid);
   }
 
   return $ret_array;
@@ -744,9 +748,11 @@ function run_query_userobm_readable() {
       WHERE (c.calendarright_read = 1 OR u.userobm_id='$uid')
       ORDER BY u.userobm_lastname";
   }
+
   $obm_db = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
+
   return $obm_db;
 }
 
@@ -760,17 +766,16 @@ function run_query_userobm_group() {
   $uid = $auth->auth["uid"];
   $where = sql_obm_entity_privacy("group");
   $query = "
-    SELECT *
+    SELECT group_id, group_privacy, group_name
     FROM UGroup
-    WHERE ";
-  $query .= $where;
-  $query .= " ORDER BY group_name";
+    WHERE $where
+    ORDER BY group_privacy DESC, group_name";
 
-
-  $obm_db = new DB_OBM;
+  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 
@@ -795,10 +800,12 @@ function run_query_userobm_writable() {
   $obm_db->query($query);
   $ret_array = array();
   while($obm_db->next_record()) {
-       $ret_array[] = $obm_db->f("userobm_id");
+    $ret_array[] = $obm_db->f("userobm_id");
   }
   return $ret_array;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of writable agenda users for the current user
 ///////////////////////////////////////////////////////////////////////////////
@@ -1053,12 +1060,10 @@ function valid_event($status_event) {
   
 }
  
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed users.
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
-//    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
+// Parameters:
+//   - $user_q : Userobm DBO
 /////////////////////////////////////////////////////////////////////////////
 function store_users($user_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2,$ico_calendar_user3,$ico_calendar_user4;
@@ -1066,14 +1071,41 @@ function store_users($user_q) {
 
   $i = 0;
   while($user_q->next_record()) {
-    $user_tab[$user_q->f("userobm_id")] = array("name"=>$user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname"),
-	                                        "class"=>"agendaEventBg$i",
-					        "image"=>${"ico_calendar_user".$i},
-					        "id"=>$user_q->f("userobm_id"));
+    $user_tab[$user_q->f("userobm_id")] = array(
+      "name"=>$user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname"),
+      "class"=>"agendaEventBg$i",
+      "image"=>${"ico_calendar_user".$i},
+      "id"=>$user_q->f("userobm_id"));
     $i++;
   }
   return $user_tab;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the event infos
+// Parameters:
+//   - $id : event id
+///////////////////////////////////////////////////////////////////////////////
+function get_event_info($id) {
+  global $cdg_sql;
+
+  if ($id == "") {
+    return false;
+  }
+
+  $query = "select * from CalendarEvent where calendarevent_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $e["usercreate"] = $obm_q->f("calendarevent_usercreate");
+  $e["owner"] = $obm_q->f("calendarevent_owner");
+
+  return $e;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Agenda Form Data checking and formatting                                 //
@@ -1662,7 +1694,6 @@ function monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,
 
 /////////////////////////////////////////////////////////////////////////////
 //  Perform the yealy repeatition of an event 
-//
 //////////////////////////////////////////////////////////////////////////////
 function yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {  
   global $day_duration;
@@ -1693,6 +1724,8 @@ function yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_e
     $temp_date = strtotime("+$repeatfrequence years",$temp_date);
   }
 }
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Class Event :
 // Describe an event.

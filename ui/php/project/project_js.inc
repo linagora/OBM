@@ -220,9 +220,9 @@ function check_allo_valid(form, nb_mem)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Select the advance update form                                            //
+// Select the progress update form
 ///////////////////////////////////////////////////////////////////////////////
-function check_advancevalid(form)
+function check_progressvalid(form)
 {
   error = 0;
 
@@ -246,6 +246,43 @@ function check_advancevalid(form)
     return false;
   } else if (error != 0) {
     alert (\"$l_fill_missing\");
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check that the advance form is valid
+///////////////////////////////////////////////////////////////////////////////
+function check_advance_valid(form)
+{
+  error = 0;
+
+  for (i = 0; i < document.forms[0].length; i++) {
+    i_name = document.forms[0].elements[i].name.substr(0,10);
+    i_value = document.forms[0].elements[i].value;
+    
+    if (i_name == \"tf_project\") { 
+      if ((i_value != \"\") && (!(check_number(i_value)))) {
+	error = 1;
+      }
+    } else if (i_name == \"tf_missing\") { 
+      if ((i_value != \"\") && (!(check_number(i_value)))) {
+	error = 2;
+      }
+    }
+  }
+
+  if (error == 1) {
+    alert (\"$l_fill_projnumber\");
+    return false;
+  } else if (error == 2) {
+    alert (\"$l_fill_missnumber\");
+    return false;
+  } else if (error != 0) {
+    alert (\"$l_fill_projected\");
     return false;
   } else {
     return true;

@@ -1272,7 +1272,7 @@ CREATE TABLE UGroup (
   group_local       integer DEFAULT 1,
   group_ext_id      integer,
   group_system      integer DEFAULT 0,
-  group_privacy     integer,
+  group_privacy     integer DEFAULT 0,
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : project_index.php                                            //
 //     - Desc : Project Index File                                           //
-// 2003-07-08 Bastien Continsouzas
+// 2003-07-08 Aliacom
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,6 +29,8 @@
 // - allocate_update -- $param_project -- 
 // - progress        -- $param_project -- show the project progress form
 // - progress_update -- form fields    -- update the project progress
+// - advance         -- $param_project -- show the project allocation/progress
+// - advance_update  -- form fields    -- update project allocation/progress
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
@@ -246,10 +248,41 @@ if ($action == "ext_get_id") {
     }
   }
 
+} elseif ($action == "advance")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($project["id"] > 0) {
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
+    $members_q = run_query_members($project["id"]);
+    if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
+      $display["msg"] = display_warn_msg($l_no_allocation);
+    } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
+      $display["msg"] = display_warn_msg($l_no_allocation);
+    } else {
+      $allo_q = run_query_allocation($project["id"]);
+      $display["detail"] = html_project_advance_form($tasks_q, $members_q, $allo_q, $project); 
+    }
+  }
+
 } elseif ($action == "allocate_update")  {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($project["id"], $project)) {
   $ins_err = run_query_allocate_update($project);
+  // Create an entry in the ProjectStat log
+  $retour = run_query_statlog($project["id"]);
+  if (!($retour))
+    $ins_err = 1;
+  if (!($ins_err)) {
+    $display["msg"] .= display_ok_msg($l_allocate_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_allocate_update_error);
+  }
+  $display["detail"] = dis_project_consult($project["id"]);
+
+} elseif ($action == "advance_update")  {
+///////////////////////////////////////////////////////////////////////////////
+//  if (check_member_form($project["id"], $project)) {
+  $ins_err = run_query_advance_update($project);
   // Create an entry in the ProjectStat log
   $retour = run_query_statlog($project["id"]);
   if (!($retour))
@@ -275,13 +308,13 @@ if ($action == "ext_get_id") {
     } else if (($allo_q == 0) or ($allo_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
     } else {
-      $display["detail"] = html_project_advance($members_q, $allo_q, $tasks_q, $project);
+      $display["detail"] = html_project_progress($members_q, $allo_q, $tasks_q, $project);
     }
   }
   
 } elseif ($action == "progress_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_advance_form($project)) {
+  if (check_progress_form($project)) {
     $ins_err = run_query_progress($project);
     // Create an entry in the ProjectStat log
     $retour = run_query_statlog($project["id"]);
@@ -490,8 +523,8 @@ function get_project_action() {
   global $project, $actions, $path, $l_project;
   global $l_header_find,$l_header_new,$l_header_update, $l_header_delete;
   global $l_header_display, $l_header_add_member, $l_add_member;
-  global $l_header_man_task, $l_header_man_member, $l_header_man_advance;
-  global $l_header_man_affect, $l_header_consult;
+  global $l_header_man_task, $l_header_man_member, $l_header_progress;
+  global $l_header_advance, $l_header_man_affect, $l_header_consult;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // External call : select one deal
@@ -529,7 +562,7 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_update', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update') 
+    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_update', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update', 'advance', 'advance_update') 
     );
 
 // Detail Update
@@ -642,7 +675,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=allocate&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'advance_update', 'advance', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
                                      );
 
 // Time allocation Update
@@ -652,12 +685,12 @@ function get_project_action() {
     'Condition'=> array ('None') 
                                         );
 
-// Progress detail update
+// Progress
   $actions["project"]["progress"] = array (
-    'Name'     => $l_header_man_advance,
+    'Name'     => $l_header_progress,
     'Url'      => "$path/project/project_index.php?action=progress&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
+    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate', 'allocate_update', 'advance', 'advance_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
                                      	 );
 
 // Update progress
@@ -666,6 +699,21 @@ function get_project_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
+
+// Advance
+  $actions["project"]["advance"] = array (
+    'Name'     => $l_header_advance,
+    'Url'      => "$path/project/project_index.php?action=advance&amp;param_project=".$project["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
+                                     );
+
+// Advance Update
+  $actions["project"]["advance_update"] = array (
+    'Url'      => "$path/project/project_index.php?action=advance_update&amp;param_project=".$project["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                        );
 
 // Display
    $actions["project"]["display"] = array (

@@ -297,11 +297,13 @@ function run_query_delete($p_id) {
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_group($p_id) {
-  global $cdg_sql;
+  global $cdg_sql, $uid;
 
-  $query = "select * from UGroup
-    left join UserObmGroup on group_id = userobmgroup_group_id
-    where userobmgroup_userobm_id='$p_id'";
+  $query = "SELECT *
+    FROM UGroup
+    LEFT join UserObmGroup on group_id = userobmgroup_group_id
+    WHERE userobmgroup_userobm_id='$p_id'
+      and (group_privacy=0 OR group_usercreate='$uid')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -319,7 +321,9 @@ function run_query_user_group($p_id) {
 function run_query_unsubscribe_all_groups($p_id) {
   global $cdg_sql;
 
-  $query = "delete from UserObmGroup where userobmgroup_userobm_id = '$p_id'";
+  $query = "DELETE
+  FROM UserObmGroup
+  WHERE userobmgroup_userobm_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -333,9 +337,11 @@ function run_query_unsubscribe_all_groups($p_id) {
 // Groups query execution                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group() {
-  global $cdg_sql;
+  global $cdg_sql, $uid;
 
-  $query = "select * from UGroup order by group_name";
+  $query = "SELECT *
+    FROM UGroup
+    ORDER by group_name";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

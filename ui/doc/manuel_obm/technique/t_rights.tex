@@ -28,59 +28,140 @@ Les fonctionnalitées proposées en standard (sans code spécifique dans un module)
 \end{itemize}
 
 
-\subsubsection{Droits, sections, modules et actions}
+\subsubsection{Principe des droits}
 
-\paragraph{Définition du droit d'accès à une section}
+Chaque action (consultation, création, modification,...) de tous les modules d'\obm nécessite une autorisation pour être exécutée.
+La définition des actions des modules précise donc un ``droit élémentaire'' (ex: droit de lecture) nécessaire pour son exécution.\\
 
-La définition du droit d'accès (visibilité) à une section est précisée dans la définition des sections dans \fichier{obminclude/global\_pref.inc}
-Un droit d'accès unitaire est requis (l'utilisateur doit avoir le droit de lecture \variable{\$cright\_read} sur la section USER pour qu'elle s'affiche dans l'exemple suivant).\\
+Les droits d'un utilisateur sur un module (ou permission sur un module) sont constitués de l'ensemble des droits élémentaires qu'il possède sur ce module (ex: lecture + écriture sur le module \company).
+Les droits élémentaires étant définis comme des champs de bits, la permission sur un module est une combinaison logique des droits élémentaires.\\
+
+Les permissions ne sont pas associées directement aux utilisateurs, mais à des profils utilisateurs. Chaque utilisateur d'\obm est associé à un profil.
+
+
+\subsubsection{Droits élémentaires}
+
+Droits élémentaires définis par \obm :\\
+
+\begin{tabular}{|p{3cm}|p{2cm}|p{2cm}|p{5cm}|}
+\hline
+\textbf{Droit} & \textbf{bit} & \textbf{Valeur} & \textbf{Description} \\
+\hline
+\$cright\_read & 0 & 1 & Lecture données simples \\ 
+\hline
+\$cright\_own & 1 & 2 & Ecriture données personnelles \\ 
+\hline
+\$cright\_write & 2 & 4 & Ecriture données simples \\ 
+\hline
+\$cright\_read\_admin & 3 & 8 & Lecture données admin \\ 
+\hline
+\$cright\_write\_admin & 4 & 16 & Ecriture données admin \\ 
+\hline
+\end{tabular}
+
+\subsubsection{Permissions : combinaisons de droits élémentaires}
+
+Toute combinaison de droits élémentaires est une permission.
+\obm par commodité définit les permissions des profils par défaut :\\
+
+\begin{tabular}{|p{3cm}|p{2.5cm}|p{2.2cm}|p{5cm}|}
+\hline
+\textbf{Permission} & \textbf{Droits (bits)} & \textbf{Valeur (hex)} & \textbf{Description} \\
+\hline
+\$perm\_reader & 0 & 01 & Voir données simples \\ 
+\hline
+\$perm\_user & 0+1 & 03 & Voir données simples + écriture données personnelles \\ 
+\hline
+\$perm\_editor & 0+2 & 05 & Lecture + écriture données simples \\ 
+\hline
+\$perm\_admin & 0+2+3+4 & 1D & Tout faire \\ 
+\hline
+\end{tabular}
+
+
+\subsubsection{Droits sur un module}
+
+Chaque action d'un module précise un droit élémentaire d'exécution.
+Exemple pour l'action search du module \user qui nécessite le droit \$cright\_read :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-if ($cgp_show["section"]["user"]) {
-  $sections["user"] = array('Name' => $l_section_user,
-                           'Url'  => $cgp_show["section"]["user"],
-                           'Right'=> $cright_read);
-}
+// Search
+  $actions["user"]["search"] = array (
+    'Url'      => "$path/user/user_index.php?action=search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                  );
 \end{verbatim}
 \end{minipage}
 }
 
+Si le droit \$cright\_read est inclus dans la permission de l'utilisateur (de son profil) sur ce module, il pourra exécuter l'action. 
+
+
+\subsubsection{Définition des profils}
+
+Un profil est un ensemble de permissions sur des sections et des modules.
+Une permission par défaut peut être attribuée à un profil pour les sections et les modules.
+Exemple de définition de profil :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+$profiles["editor"] = array (
+  'section' => array (
+    'default' => 0,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1),
+  'module' => array (
+    'default' => $perm_editor)
+);
+\end{verbatim}
+\end{minipage}
+}
+
+Un utilisateur du profil \textbf{editor} pourra accéder aux sections ``com'', ``prod'' et ``user'' (et uniquement celles-ci) et aura les permissions ``\$perm\_editor'' sur tous les modules.\\
+
+\paragraph{Personnalisation des profils}
+
+Les profils par défaut peuvent être modifiés ou supprimés et de nouveaux profils peuvent être définis dans le fichier de configuration.
+
+
+\subsubsection{Implémentation interne d'\obm}
+
+\paragraph{Définition du droit d'accès à une section}
+
+La définition du droit d'accès nécessaire pour accéder (et voir) une section est précisée dans la définition des sections dans le fichier de configuration (voir section \ref{cgp_show_section}).\\
+
+La configuration est interprétée dans le \fichier{obminclude/global\_pref.inc} et renseigne le hashage \variable{\$sections} utilisé par \obm.
+
 
 \paragraph{Définition du droit d'accès à un module}
 
-La définition du droit d'accès à un module est précisée dans la définition des modules dans \fichier{obminclude/global\_pref.inc}
+La définition du droit d'accès à un module est précisée dans la définition des modules dans \fichier{obminclude/global\_pref.inc}.
 Un droit d'accès unitaire est requis (l'utilisateur doit avoir le droit de lecture \variable{\$cright\_read} sur le module \settings pour y accéder dans l'exemple suivant).\\
 
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-  if ($cgp_show["module"]["settings"]) {
-    $modules["settings"] = array(
-                               'Name'=> $l_module_settings,
-                               'Ico' => "$ico_setting",
-		               'Url' => "$path/settings/settings_index.php",
+  if ($cgp_show["module"]["contact"]) {
+    $modules["contact"] = array(
+                               'Name'=> $l_module_contact,
+                               'Ico' => "$ico_contact",
+		               'Url' => "$path/contact/contact_index.php",
 			       'Right'=> $cright_read);
   }
 \end{verbatim}
 \end{minipage}
 }
 
-\subsubsection{Définition d'un profil}
 
+\subsubsection{Limitations actuelles du système de droits}
 
-\subsubsection{Spécifications de la notion de visibilité}
+\begin{itemize}
+\item Les droits sont donnés sur les actions sans distinction de particularité des données traitées. Il n'est pas possible par exemple de donner le droit de modification de groupes en fonction des caractéristiques du groupe à modifier (ex: pas les groupes système,...). Le droit donné est : modification de groupe OUI ou Non. Ces cas sont donc vérifiés au moment de l'exécution de l'action.
 
-Une api très simple (1 fonction définie dans global.inc) est disponible :\\
-
-\shadowbox{
-\begin{minipage}{13cm}
-\begin{verbatim}
-is_entity_visible($entity, $obm_q, $uid='''')
-\end{verbatim}
-\end{minipage}
-}
-\vspace{0.4cm}
-
-
+\item L'ajout de profil n'est pas automatiquement pris en compte dans le module \user (pour permettre l'affectation graphique du profil aux utilisateurs, l'apparition dans les sélections...). Cela nécessite du code dans le module.
+\end{itemize}

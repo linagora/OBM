@@ -239,7 +239,7 @@ td.agendaHour		{
 	font-size:		14px;
 	color:			#000000;
 	text-align:		center;
-	vertical-align:		middle;
+	vertical-align:		top;
 	background-color:	#ffffff;
         border-top: 		1px dashed #a1a4a8;
         border-right: 		2px solid #a1a4a8;
@@ -366,7 +366,7 @@ td.agendaOccupied 	{
 select.agendaQuery 	{ 
 	font-size:		11px; 
 	font-family: 		sans-serif;
-	width:                	116px; 
+	width:                	140px;
 	margin-bottom:          0;
 }
 

@@ -28,7 +28,6 @@ $l_function = "Fonction";
 
 // Actions
 $l_insert = "Enregistrer le groupe";
-$l_update = "Modifier le groupe";
 $l_delete = "Supprimer le groupe";
 $l_add = "Ajouter ces groupes";
 

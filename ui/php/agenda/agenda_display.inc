@@ -16,7 +16,7 @@
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q) {
   global $set_theme, $set_weekstart_default, $set_cal_interval, $ico_spacer;
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
-  global $l_free,$l_possible,$l_go,$l_occupied;
+  global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
   global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
   global $c_all, $l_all, $l_groups;
   global $action,$auth;
@@ -55,8 +55,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
   $whole_month = TRUE;
   $num_of_events = 0;
 
-// Week Selection
-
+  // Week Selection
   do {
     $weekdate	  = date ("Ymd", $start_week_time);
     $select_week1 = localizeDate("week_jump", $start_week_time);
@@ -72,8 +71,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
   } while (date("Y", $start_week_time) <= $this_year);
 
-// Month Selection
-
+  // Month Selection
   for ($i=0; $i<12; $i++) {
     $monthdate = date ("Ymd", $month_time);
     $month_month = date("m", $month_time);
@@ -88,8 +86,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $month_time = strtotime ("+1 month", $month_time);
   }
 
-// Year Selection
-
+  // Year Selection
   for ($i=-3; $i < (3); $i++) {
     $year_year = date ("Y", $year_time);
     $yeardate = date("Ymd", $year_time);
@@ -101,10 +98,9 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
       $sel_year .=  "$year_year</option>\n";
     }
     $year_time = strtotime ("+1 year", $year_time);
-}
+  }
 
-// User Selection
-
+  // User Selection
   if ($action == "perform_meeting") {
     $duration = $agenda["duration"];     
     $dis_duration = "<input type=\"hidden\" name=\"param_duration\" value=\"$duration\" />";
@@ -152,27 +148,30 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
 
   // Group selection
   $sel_group = "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_all")."\" ";
- if ($c_all == $this_group) {
-    $sel_group .= "selected=\"selected\">";
-  } else {
-    $sel_group .= ">";
+  if ($c_all == $this_group) {
+    $sel_group .= "selected=\"selected\"";
   }
-  $sel_group .= "$l_all</option>\n";
+  $sel_group .= ">$l_all</option>
+    <option disabled=\"disabled\">$l_private</option>\n";
+  $first_public = true;
   while ($group_q->next_record()) {
-    $c_id = $group_q->f("group_id");
-    $c_title = $group_q->f("group_name");
+    $g_id = $group_q->f("group_id");
+    $g_priv = $group_q->f("group_privacy");
+    $g_name = $group_q->f("group_name");
 
-    if ($c_id == $this_group) {
-      $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_id")."\" selected=\"selected\">";
-      $sel_group .= "$c_title</option>\n";
-    } else {
-      $sel_group .=  "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_id")."\">";
-      $sel_group .=  "$c_title</option>\n";
+    if ($first_public && $g_priv != "1") {
+      $sel_group .= "<option disabled=\"disabled\">$l_public</option>\n";
+      $first_public = false;
     }
+    if ($g_id == $this_group) {
+      $selected_s = "selected=\"selected";
+    } else {
+      $selected_s = "";
+    }
+    $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$g_id")."\" $selected_s\">&nbsp;&nbsp;$g_name</option>\n";
   }
 
-// Minicalendar Head
-
+  // Minicalendar Head
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);
     $day = $l_daysofweekfirst[$day_num];
@@ -180,7 +179,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
   
-// Minicalendar
+  // Minicalendar
   $i = 0;
   do {
     $day = date ("j", $start_day);
@@ -1077,13 +1076,20 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
 //   - $agenda:
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_delete($agenda) {
-  global $set_theme;
-  // -- Labels
-  global $ico_validate, $ico_cancel,$ico_confirm_mail;
-  global $l_confirm_delete,$l_confirm,$l_cancel,$l_confirm_mail
-;
-  
+  global $uid, $auth, $set_theme, $ico_validate,$ico_cancel,$ico_confirm_mail;
+  global $display, $l_confirm_delete,$l_confirm,$l_cancel,$l_confirm_mail;
+  global $l_event_cant_delete, $perms_admin;
+
+  $perms = $auth->auth["perm"];
   $event_id = $agenda["id"];
+  $e = get_event_info($id);
+  $usercreate = $e["usercreate"];
+
+  if (($uid != $usercreate) && ($perms != $perms_admin)) {
+    $display["msg"] = display_warn_msg($l_event_cant_delete);
+    return;
+  }
+
   $getdate = $agenda["date"];
   $block = "
   <div class=\"detail\">
@@ -1100,12 +1106,13 @@ function html_dis_delete($agenda) {
   ";
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Rights admin panel
 // Parameters:
 //   - $user_q :
 ///////////////////////////////////////////////////////////////////////////////
-
 function dis_right_admin($agenda) {
   global $display,$auth;
   if(isset($agenda["user_id"])) {
@@ -1118,6 +1125,8 @@ function dis_right_admin($agenda) {
   $display["features"] = html_userwritable_bar($writable_user,$user_id);
   return html_dis_right_admin($user_obm,$user_id);
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // User selection for agenda management admin panel
 // Parameters:

@@ -170,7 +170,7 @@ $l_header_add_contact = "Neuer Kontakt";
 // Project headers
 $l_header_man_task = "Aufgaben";
 $l_header_man_member = "Mitglieder";
-$l_header_man_advance = "Fortschritt";
+$l_header_progress = "Fortschritt";
 $l_header_man_affect = "?affect";
 $l_header_add_member = "neues Mitglied";
 

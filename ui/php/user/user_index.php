@@ -359,7 +359,8 @@ function get_user_action() {
     'Name'     => $l_header_upd_group,
     'Url'      => "$path/user/user_index.php?action=group_consult&amp;param_user=".$obm_user["id"],
     'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update') 
+//    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update') 
+    'Condition'=> array ('None') 
                                      );
 
 // Group Update

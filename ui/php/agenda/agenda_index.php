@@ -595,19 +595,18 @@ function get_agenda_action() {
   $actions["agenda"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/agenda/agenda_index.php?action=check_delete&amp;param_event=".$param_event."&amp;param_date=$param_date",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      		 );
-
 
 //Delete
   $actions["agenda"]["delete"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=".$param_event."&amp;param_date=$param_date",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      		 );
 
-						 
+					 
 //Insert
 
   $actions["agenda"]["insert"] = array (
