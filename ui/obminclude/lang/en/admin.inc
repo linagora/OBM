@@ -12,6 +12,7 @@ $l_check = "Checking";
 $l_version = "OBM version";
 $l_database_server = "Database Engine";
 $l_database = "Database";
+$l_host = "Host";
 $l_session_stats = "Sessions Statistics";
 $l_date = "Date";
 $l_lifetime = "User session lifetime (seconds)";
