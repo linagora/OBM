@@ -10,7 +10,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return events details
-// Parameters: 
+// Parameters:
 //   - $param_event
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($param_event,$getdate) {
@@ -23,8 +23,8 @@ function run_query_detail($param_event,$getdate) {
       calendarevent_id,
       calendarevent_usercreate,
       calendarevent_userupdate,
-      calendarevent_timecreate,
-      calendarevent_timeupdate,
+      UNIX_TIMESTAMP(calendarevent_timecreate) as timecreate,
+      UNIX_TIMESTAMP(calendarevent_timeupdate) as timeupdate,
       calendarevent_title, 
       calendarevent_description,
       calendarevent_category_id,
@@ -346,18 +346,7 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
     foreach($event_repeat_dates as $dates) {
       foreach($contacts_array as $user_id) {
 	if($user_id == $auth->auth["uid"]) {
-	  if(count($return_info) != 0) {
-	    $conflicts = run_query_get_conflicts_user($dates["date_begin"],$dates["date_end"],$user_id);
-	    if($conflicts->nf() != 0) {
-	      run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
-	    }
-	    else{
-	      run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
-	    }	    
-	  }
-	  else {
-	    run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
-	  }
+    	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
 	}
 	else{
 	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
@@ -790,7 +779,7 @@ function run_query_insert_event_data($agenda) {
                          calendarevent_usercreate, calendarevent_title, calendarevent_description,
 			 calendarevent_category_id,calendarevent_priority,calendarevent_privacy, calendarevent_length,
 			 calendarevent_repeatkind,calendarevent_repeatdays,calendarevent_endrepeat)
-	         VALUES ($max_id,null,'".date("YmdHis")."',null,".$auth->auth["uid"].",'$title',
+	         VALUES ($max_id,null,'".date("Y-m-d H:i:s")."',null,".$auth->auth["uid"].",'$title',
 		         '$description',$category_id,$priority,$privacy,'$length',
 			 '$repeat_kind','$repeat_days','$repeat_end')";
 
@@ -844,18 +833,7 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
     foreach($event_repeat_dates as $dates) {
       foreach($contacts_array as $user_id) {
 	if($user_id == $auth->auth["uid"]) {
-	  if(count($return_info) != 0) {
-	    $conflicts = run_query_get_conflicts_user($dates["date_begin"],$dates["date_end"],$user_id);
-	    if(count($conflicts) != 0) {
-	      run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
-	    }
-	    else{
-	      run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
-	    }	    
-	  }
-	  else {
-	    run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
-	  }
+      	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
 	}
 	else{
 	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
