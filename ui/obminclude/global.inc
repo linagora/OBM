@@ -345,7 +345,10 @@ require_once("$obminclude/global_display.inc");
 // Display: HTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_title, $set_theme, $obminclude;
+  global $l_title, $set_theme, $obminclude, $extra_css;
+
+  if (isset($extra_css))
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/$extra_css\" />";
 
   $headers_e = "
    <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
@@ -359,10 +362,12 @@ function display_head($p_module) {
      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
      <title>$l_title - $p_module</title>
      <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
+     $dis_extra_css
     </head>
     <body>";
 }
 
+//     <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: end of an HTML page

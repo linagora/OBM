@@ -13,6 +13,7 @@ $l_name = "Nom";
 $l_label = "Nom";
 $l_company_name = "Nom Société";
 $l_tasktype = "Catégorie";
+$l_status = "Init.";
 $l_soldtime = "Temps vendu";
 
 $l_sold = "Vendu";
@@ -88,6 +89,8 @@ $l_taskdelete_error = "Impossible de supprimer une tâche ; Quelqu'un y est affec
 $l_memberdelete_error = "Impossible d'enlever ce participant ; Il est affecté à une tâche du projet";
 $l_update_ok = "La modification du projet a été correctement effectuée";
 $l_update_error = "La modification du projet a échoué !";
+$l_proj_update_ok = "La mise à jour des affectation a été correctement effectuée";
+$l_proj_update_error = "La mise à jour des affectations a échoué !";
 $l_adv_update_ok = "La mise à jour des avancements a été correctement effectuée";
 $l_adv_update_error = "La mise à jour des avancements a échoué !";
 $l_close_ok = "Le projet est maintenant marqué comme terminé";

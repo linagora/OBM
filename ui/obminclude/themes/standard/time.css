@@ -1,0 +1,147 @@
+/*/////////////////////////////////////////////////////////////////////////////
+// OBM - File : time.css (standard)                                          //
+//     - Desc : CSS style file (standard theme)                              //
+// 2003-08-27 Bastien Continsouzas                                           //
+///////////////////////////////////////////////////////////////////////////////
+// $Id: 
+///////////////////////////////////////////////////////////////////////////////
+*/
+
+td.timePeriod			{
+ 	text-align: 		center; 
+ 	font-family: 		sans-serif;
+	font-size: 		12px;
+	font-weight: 		600;
+	color:			#4f7091;
+	}
+
+table.timeDetail		{
+ 	font-family: 		sans-serif;
+	font-size:		12px;
+	font-weight: 		600;
+	text-align:		left;
+	background-color:	#a5bace;
+	border-spacing:		1;
+	}
+
+td.timeForm			{
+ 	font-family: 		sans-serif;
+	font-size:		10px;
+	font-weight: 		300;
+	text-align:		left;
+	color:			#4f7091;
+	background-color:	#e7ebef;
+	padding:		3;
+	}
+
+td.timeWeekhead			{
+ 	font-family: 		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#a5bace;
+	}
+
+td.timeWeekunvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#fbf7db;
+	}
+
+td.timeWeekvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#c1cfdd;
+	}
+
+td.timeHead			{
+ 	font-family: 		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#a5bace;
+	}
+
+td.timeUnvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#fbf7db;
+	}
+
+td.timeValid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#c1cfdd;
+	}
+
+td.timeWorkday 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#4f7091;
+	text-align:		center;
+	background-color:	#a5bace;
+	font-weight: 		bold;
+}
+
+td.timeOffday 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#c6cfde;
+	text-align:		center;
+	background-color:	#97aec6;
+	font-weight: 		bold;
+}
+
+table.timeUser		{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+	border: 		1px #a1a5a9 solid; 
+	width:			100%;
+}
+
+td.timeUserhead		{
+ 	background-image: 	url(side_bg.gif); 
+ 	text-align: 		center; 
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		12px;
+	font-weight: 		800;
+	}
+
+td.timeUserback		{
+ 	text-align: 		center; 
+	background-color:	#ffffff;
+	}
+
+tr.timeUnvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#fbf7db;
+	}
+
+tr.timeValid0			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#e4eaef;
+	}
+
+tr.timeValid1			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#f4faff;
+	}

@@ -282,13 +282,10 @@ function fill_preferences() {
         display_fieldorder,
         display_display )
       values
-        ($id,'project_new','project_initlabel',1,2),
-        ($id,'project_new','project_company_name',2,2),
-        ($id,'project_new','project_tasktype',3,2),
         ($id,'project','project_label',1,2),
         ($id,'project','project_company_name',2,1),
         ($id,'project','project_tasktype',3,1),
-        ($id,'project','project_soldtime',4,1),
+        ($id,'project','project_status',4,1),
         ($id,'project','project_archive',5,1),
         ($id,'time','date_task',1,2),
         ($id,'time','timetask_deal_label',2,2),

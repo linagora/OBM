@@ -26,6 +26,7 @@
 $path = "..";
 $section = "PROD";
 $menu = "TIME";
+$extra_css = "time.css";
 
 // Deal we display in project list
 //  added proposal for 'avantvente';

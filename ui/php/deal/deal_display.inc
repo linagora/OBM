@@ -1679,7 +1679,7 @@ function dis_kind_links($id) {
    $dis_link
    </table>";
 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
+  $dis_back = "<form name=\"form_back\" method=\"get\"
         action=\"" .url_prepare("deal_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
@@ -1752,7 +1752,7 @@ function dis_status_links($id) {
    $dis_link
    </table>";
 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
+  $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("deal_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
@@ -1878,7 +1878,7 @@ function dis_cat_links($id) {
    $dis_link
    </table>";
 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
+  $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("deal_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />

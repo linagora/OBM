@@ -168,13 +168,10 @@ WHERE display_entity like "time%";
 -- add new preferences for the project displays
 INSERT INTO DisplayPref
 (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display)
-VALUES (0,'project_new','project_initlabel',1,2),
-       (0,'project_new','project_company_name',2,2),
-       (0,'project_new','project_tasktype',3,2),
-       (0,'project','project_label',1,2),
+VALUES (0,'project','project_label',1,2),
        (0,'project','project_company_name',2,1),
        (0,'project','project_tasktype',3,1),
-       (0,'project','project_soldtime',4,1),
+       (0,'project','project_status',4,1),
        (0,'project','project_archive',5,1),
        (0,'time','date_task',1,2),
        (0,'time','timetask_deal_label',2,2),

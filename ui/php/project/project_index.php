@@ -34,6 +34,8 @@
 $path = "..";
 $section = "PROD";
 $menu = "PROJECT";
+$extra_css = "project.css";
+
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
@@ -60,12 +62,12 @@ page_close();
 if($action == "") $action = "index";
 
 $project = get_param_project();
-get_project_action();
+// get_project_action();
 $perm->check();
 
-if (! $contact["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
-}
+// if (! $contact["popup"]) {
+//   $display["header"] = generate_menu($menu,$section);
+// }
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,45 +77,12 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($project);
-
-    if ($project["newlist"])
-      $display["result"] = dis_project_new_list($project);
-    else
-      $display["result"] = dis_project_search_list($project);
+  $display["result"] = dis_project_search_list($project);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   $tt_q = run_query_projecttype('intern');
-
   $display["detail"] = html_project_form($action, "", $tt_q, $project);
-
-} elseif ($action == "create")  {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_new_form($param_project, $project)) {
-    $param_project = run_query_insert($project);
-
-    if ($param_project) {
-      $project_q = run_query_detail($param_project);
-
-      $project["name"] = $project_q->f("project_label");
-      $project["tt"] = $project_q->f("project_tasktype_id");
-      $project["manager"] = $c_all;
-      $project["member"] = $c_all;
-
-      $display["msg"] .= display_ok_msg($l_insert_ok);
-      $display["search"] = dis_project_search_form($project);
-      $display["result"] = dis_project_search_list($project);
-    }
-    else {
-      $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
-    }
-
-  } else { 
-    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-
-    $tt_q = run_query_projecttype('intern');
-    $display["detail"] = html_project_form($action, "", $tt_q, $project);
-  }
 
 } elseif ($action == "init")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,6 +136,8 @@ if ($action == "index" || $action == "") {
       $display["detail"]  = html_project_memberadd_form($project);
       $display["detail"] .= html_project_member_form($members_q, $project );
 
+      $action = "member_fill";
+
     } else {
 
       $display["detail"] = html_project_membertime_form($tasks_q, $members_q, $membertime_q, $project); 
@@ -177,9 +148,6 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($param_project, $project)) {
 
-   //smlp renvoie le tableau des missings
-  //vire, modifie projectupdate
-//    $project["missing"] = run_query_memberlist_delete($project, 1);
    $ins_err = run_query_projectupdate($project);
 
    // Create an entry in the ProjectStat log
@@ -232,6 +200,7 @@ if ($action == "index" || $action == "") {
 	$members_q = run_query_members($param_project);
 	$membertime_q = run_query_membertime($param_project);
 	
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       } else {
 	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
@@ -243,9 +212,33 @@ if ($action == "index" || $action == "") {
       $project_q = run_query_detail($param_project);
       $display["detail"] = html_project_init_form($action, $project_q, $project);
     }
-  }
 
-  else if ($param_project > 0) {
+  } else if ($origin == "new") {
+
+    if (check_new_form($param_project, $project)) {
+      $param_project = run_query_insert($project);
+      
+      if ($param_project) {
+	$project["id"] = $param_project;
+	
+	$project_q = run_query_detail($param_project);
+	$tasks_q = run_query_tasks($param_project);
+
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
+      }
+      else {
+	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
+      }
+      
+    } else { 
+      $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+      
+      $tt_q = run_query_projecttype('intern');
+      $display["detail"] = html_project_form($action, "", $tt_q, $project);
+    }
+
+  } else if ($param_project > 0) {
     $project_q = run_query_detail($param_project);
     $tasks_q = run_query_tasks($param_project);
     $members_q = run_query_members($param_project);
@@ -348,11 +341,12 @@ if ($action == "index" || $action == "") {
       $display["detail"]  = html_project_memberadd_form($project);
       $display["detail"] .= html_project_member_form($members_q, $project );
 
-    } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
+      $action = "member_fill";
+//     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
 
-      $display["msg"] = display_warn_msg($l_no_members);
-      $display["detail"]  = html_project_memberadd_form($project);
-      $display["detail"] .= html_project_member_form($members_q, $project );
+//       $display["msg"] = display_warn_msg($l_no_members);
+//       $display["detail"]  = html_project_memberadd_form($project);
+//       $display["detail"] .= html_project_member_form($members_q, $project );
 
     } else if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
 
@@ -469,6 +463,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "member_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
+
     $pid = $project["ext_id"];
     $project["id"] = $pid;
     $project["label"] = run_query_projectname($pid);
@@ -544,6 +539,11 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
+get_project_action();
+if (! $contact["popup"]) {
+  $display["header"] = generate_menu($menu,$section);
+}
+
 $display["head"] = display_head($l_project);
 $display["end"] = display_end();
 
@@ -586,8 +586,8 @@ function get_param_project() {
   // External param
   if (isset ($ext_action)) $project["ext_action"] = $ext_action;
   if (isset ($ext_url)) $project["ext_url"] = $ext_url;
-  if (isset ($param_ext)) $project["ext_id"] = $param_ext;
-  if (isset ($param_ext)) $project["id"] = $param_ext;
+  if (isset ($ext_id)) $project["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $project["id"] = $ext_id;
   if (isset ($ext_target)) $project["ext_target"] = $ext_target;
   if (isset ($title)) $project["title"] = stripslashes($title);
 
@@ -603,9 +603,11 @@ function get_param_project() {
 
     while ( list( $key ) = each( $http_obm_vars ) ) {
 
-      if (strcmp(substr($key, 0, 7),"cb_user") == 0) {
+      // cb_u is likely to be called cb_user
+      if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
 	$nb_mem++;
-        $mem_num = substr($key, 7);
+        $mem_num = substr($key, 4);
+
         $project["mem$nb_mem"] = $mem_num;
       } 
 

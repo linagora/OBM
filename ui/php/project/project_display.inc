@@ -13,10 +13,10 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["project_label"] = $l_label;
-$fieldnames["project_initlabel"] = $l_label;
+//$fieldnames["project_initlabel"] = $l_label;
 $fieldnames["project_company_name"] = $l_company_name;
 $fieldnames["project_tasktype"] = $l_tasktype;
-$fieldnames["project_soldtime"] = $l_soldtime;
+$fieldnames["project_status"] = $l_status;
 $fieldnames["project_archive"] = $l_archive_first;
 
 
@@ -32,12 +32,22 @@ $fieldnames["project_archive"] = $l_archive_first;
 function dis_data_project(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
   
-  if ($fieldname == "project_initlabel") {
-    $res["url"] = "$path/project/project_index.php?action=init&amp;param_project=".$OD->data_set->f("project_id");
-  }
+//   if ($fieldname == "project_initlabel") {
+//     $res["url"] = "$path/project/project_index.php?action=init&amp;param_project=".$OD->data_set->f("project_id");
+//   }
   
-  else if ($fieldname == "project_label") {
-    $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$OD->data_set->f("project_id");
+  if ($fieldname == "project_label") {
+
+    if (($OD->data_set->f("project_status")) == 0)
+      $res["url"] = "$path/project/project_index.php?action=init&amp;param_project=".$OD->data_set->f("project_id");
+    else
+      $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$OD->data_set->f("project_id");
+  }
+
+  else if ($fieldname == "project_status") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
+    else $res["name"] = "&nbsp;";
   }
 
   else if ($fieldname == "project_archive") {
@@ -214,14 +224,16 @@ function html_project_form($action, $project_q, $tt_q, $project) {
   if ($action == "detailupdate") {
     $dis_action = "<input type=\"hidden\" name=\"action\" value=\"d_update\" />";
   } else {
-    $dis_action = "<input type=\"hidden\" name=\"action\" value=\"create\" />";
+    $dis_action = "
+      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+      <input type=\"hidden\" name=\"param_origin\" value=\"new\" />";
   }
 
   $l_button = ($action == "detailupdate" ? $l_update : $l_insert);
 
   $dis_button ="$dis_action
-      <input type=\"hidden\" name=\"param_project\" value=$pid />
-      <input type=\"hidden\" name=\"hd_status\" value=2 />
+      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"hd_status\" value=\"2\" />
       <input type=\"submit\" value=\"$l_button\" />";
   
   if ($action == "detailupdate") 
@@ -446,25 +458,25 @@ function html_project_memberadd_form($project) {
 //   - $company[] : company search criteria
 //     keys used  : status, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function dis_project_new_list($project) {
-  global $auth, $display;
-  global $l_new_projects, $l_no_display;
+// function dis_project_new_list($project) {
+//   global $auth, $display;
+//   global $l_new_projects, $l_no_display;
   
-  $pref_q = run_query_display_pref($auth->auth["uid"], "project_new");
+//   $pref_q = run_query_display_pref($auth->auth["uid"], "project_new");
 
-  $obm_q = run_query_newprojects($project);
+//   $obm_q = run_query_newprojects($project);
 
-  $nb_newprojects = $obm_q->num_rows();
+//   $nb_newprojects = $obm_q->num_rows();
 
-  if ($nb_newprojects != 0) {
-    $display["msg"] .= display_info_msg($l_new_projects) ;
-    $block = html_project_new_list($obm_q, $pref_q, $nb_newprojects, $project);
-  }
-  else
-    $display["msg"] .= display_info_msg($l_no_projects) ;
+//   if ($nb_newprojects != 0) {
+//     $display["msg"] .= display_info_msg($l_new_projects) ;
+//     $block = html_project_new_list($obm_q, $pref_q, $nb_newprojects, $project);
+//   }
+//   else
+//     $display["msg"] .= display_info_msg($l_no_projects) ;
 
-  return $block;
-}
+//   return $block;
+// }
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1047,7 +1059,7 @@ function html_project_member_form($members_q, $project) {
 
       $dis_member .= "
         <tr>
-         <td align=\"right\" width=\"5%\"><input type=\"checkbox\" name=\"cb_user$m_id\"/></td>
+         <td align=\"right\" width=\"5%\"><input type=\"checkbox\" name=\"cb_u$m_id\"/></td>
          <td class=\"detailText\" colspan=\"2\">$m_name</td>
         </tr>";
     }
@@ -1169,7 +1181,7 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 	} else {
 	  $dis_member .= "
             <td class=\"detailLabel\">
-             <input type=\"text\" name=\"tf_projected[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
+             <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
 	    </td>";
 	}
       }
@@ -1349,14 +1361,6 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_display_pref($display_newpref_q, $display_searchpref_q) {
   global $l_newproject_display, $l_searchproject_display;
-
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_newpref_q);
-  $dis_pref->display_entity = "project_new"; 
-  $dis_pref->pref_title = $l_newproject_display;
-
-  $block .= "<table class=\"detail\"><tr><td>";
-  $block .= $dis_pref->display();
-  $block .= "</td>";
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
   $dis_pref->display_entity = "project"; 
