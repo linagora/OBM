@@ -287,6 +287,9 @@ function html_company_consult($co_q, $kind_q) {
       <td class=\"detailLabel\">$l_contact_list</td>
       <td class=\"detailText\">$con_num</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailText\">$lmarket</td>
+    </tr><tr>
       <td class=\"detailHead\" colspan=\"2\">$l_coord</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_address 1</td>
@@ -610,6 +613,9 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td>$sel_kind </font></td>
+    </tr><tr>    
+      <td class=\"detailLabel\">$l_market</td> 
+      <td>$sel_market</td>
     </tr><tr>
       <td colspan=2 class=\"detailHead\">
         $font_label<b>$l_coord</b></font></td>
