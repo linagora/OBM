@@ -217,9 +217,6 @@ function check_meeting(form) {
   else if (check_date(form.tf_date_begin, \"$l_err_datebegin\") == false) {
     return false;
   }
-  else if (check_date(form.tf_date_end, \"$l_err_dateend\") == false) {
-    return false;
-  }
 
   return true;
 } 
