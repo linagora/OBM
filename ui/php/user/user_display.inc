@@ -33,11 +33,15 @@ $fieldnames["userobm_email"] = $l_email;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_user(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail;
-
+  global $path, $set_theme, $ico_mail,$ext_element;
   if (($fieldname == "userobm_login") && $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("userobm_id");
   }
+  if (($fieldname == "hidden_field") && $ext_element != "") {
+    $res["name"] = "<span id=\"data".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
+    $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname").
+    "</span>";
+  }  
   else if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
@@ -94,11 +98,13 @@ function html_user_search_form($user) {
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
+    $ext_element =  $user["ext_element"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     if ($ext_title == "") {
       $ext_title = $l_add_users;
@@ -198,7 +204,8 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
+    $ext_element =  $user["ext_element"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;cb_archive=$archive$url_ext");
@@ -209,7 +216,12 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
     $user_d->data_cb_name = "cb_u";
-    if ($ext_widget != "") {
+    if ($ext_element != "") {
+      $user_d->data_cb_name = "";
+      $display_popup_head = "
+      <form onsubmit=\"fill_ext_form2(this); return false;\">";
+    }
+    elseif ($ext_widget != "") {
       $display_popup_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } else {

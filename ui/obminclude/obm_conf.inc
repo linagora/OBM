@@ -43,7 +43,7 @@ $cg_com = 2;
 $cg_prod = 3;
 
 // Root of the document repository
-$document_path = "/var/www/obmdocuments";
+$document_path = "/var/www/documents";
 
 // Auto format fields
 $caf_company_name = true;

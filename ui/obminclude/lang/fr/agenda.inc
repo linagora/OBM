@@ -22,6 +22,7 @@ $l_timebegin = "Heure de début (HH:MM)";
 $l_timebegin2 = "Heure de début";
 $l_timeend = "Heure de fin (HH:MM)";
 $l_timeend2 = "Heure de fin";
+$l_hour = "Heure";
 $l_occupied_day = "Journée entière";
 $l_event_duration = "Durée de la réunion";
 $l_format = "(AAAA-MM-JJ)";
@@ -151,7 +152,7 @@ $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 
 $l_unknown = "Inconnu";
-$l_user_calendar = "Vue Multi-utilisateurs";
+$l_user_calendar = "Utilisateurs";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "La durée ne peux pas être nulle";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";

@@ -34,7 +34,59 @@ function fill_ext_form(int_form) {
      }
    }
  
-}";
+}
+";
+}
+if ($ext_element != "") {
+  $extra_js .= "
+function get_elem(doc, name ) {
+  return doc.getElementById(name);
+}  
+
+function fill_ext_form2(int_form) {
+  size = int_form.length;
+  for(i=0; i <size; i++) {
+    if(int_form.elements[i].type == 'checkbox'){
+      if(int_form.elements[i].checked == true) {
+        elemid = '$ext_element'+int_form.elements[i].name;
+        if(!get_elem(window.opener.document, elemid )) {
+ 	  elemid = 'data'+int_form.elements[i].name;
+	  span = get_elem(window.document,elemid);
+	  add_element('$ext_element' + '[]',int_form.elements[i].name, span.innerHTML);
+        }
+      }
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//  Add an element line in the list form                                     //
+///////////////////////////////////////////////////////////////////////////////
+function add_element(fieldName,fieldValue,fieldLabel) {
+  target = window.opener.document;
+  container = get_elem(target, '$ext_element' );
+  row = target.createElement('div');
+  row.id = '$ext_element'+fieldValue;
+  row.className = 'elementRow';
+  field = target.createElement('input');
+  field.type = 'hidden';
+  field.name = fieldName;
+  field.value = fieldValue;
+  link = target.createElement('a');
+  link.href = 'javascript: remove_element(\'$ext_element'+fieldValue+'\',\'$ext_element\');';
+  link.onclick = '';
+  image = target.createElement('img');
+  image.src = '/images/$set_theme/$ico_delete';
+  link.appendChild(image);
+  content = target.createTextNode(fieldLabel);
+  row.appendChild(link);
+  row.appendChild(content);
+  row.appendChild(field);
+  container.appendChild(row);
+} 
+  
+";
 }
 
 

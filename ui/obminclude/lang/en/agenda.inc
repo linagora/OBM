@@ -22,6 +22,7 @@ $l_low = "Low";
 $l_medium = "Medium";
 
 $l_timebegin = "Begin time";
+$l_hour = "Hour";
 $l_timeend = "End time";
 $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";

@@ -365,6 +365,7 @@ if (isset($ext_target) && $ext_target!="") {
 	 elemid = '$ext_target'+int_form.elements[i].name;
 	 if(!get_elem(window.opener.document, elemid )) {
 	   elemid = 'data'+int_form.elements[i].name;
+	   alert(elemid);
 	   span = get_elem(window.document,elemid);
 	   add_element('$ext_target' + '[]',int_form.elements[i].name, span.innerHTML);
 	 }

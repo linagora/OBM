@@ -1307,7 +1307,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   if ($show_cat1) {
     while ($cat1_q->next_record()) {
       $c1_id = $cat1_q->f("contactcategory1_id");
-      $sel_cat1 .= "\n<option value=\"$c1_id\"";
       if (in_array($c1_id, $cat1)) {
 	$sel_cat1 .= "<div class=\"elementRow\" id=\"data$c1_id\">
       <a href=\"javascript: remove_element('data$c1_id','sel_cat1');\">
@@ -1318,7 +1317,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       </div>";
       }
     }
-    $sel_cat1 .= "</select>";
     $url = "contact_index.php?action=ext_get_cat1_ids&amp;popup=1&amp;ext_target=sel_cat1";
 
     $block_cat1 = "
@@ -1341,7 +1339,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   if ($show_cat2) {
     while ($cat2_q->next_record()) {
       $c2_id = $cat2_q->f("contactcategory2_id");
-      $sel_cat2 .= "\n<option value=\"$c2_id\"";
       if (in_array($c2_id, $cat2)) {
 	$sel_cat2 .= "<div class=\"elementRow\" id=\"data$c2_id\">
       <a href=\"javascript: remove_element('data$c2_id','sel_cat2');\">
@@ -1352,7 +1349,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       </div>";
       }
     }
-    $sel_cat2 .= "</select>";
     $url = "contact_index.php?action=ext_get_cat2_ids&amp;popup=1&amp;ext_target=sel_cat2";
 
     $block_cat2 = "

@@ -77,7 +77,6 @@ class OBM_User_Sql extends CT_Sql {
     $now = date("Y-m-d H:i:s", time());
     $table = $this->database_table;
     $lastpage = "$module:$action";
-
     // update duration of visit
     $uquery = "UPDATE $table SET
         activeuserobm_userobm_id = '$u_id',
@@ -175,7 +174,6 @@ class OBM_Challenge_Auth extends Auth {
       $pass = $this->db->f("userobm_password");
     }
     $exspected_response = md5("$login:$pass:$challenge");
-
     // True when JS is disabled
     if ($response == "") {
       if ($password != $pass) {

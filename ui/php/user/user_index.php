@@ -225,7 +225,7 @@ function get_param_user() {
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_datebegin, $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
-  global $ext_widget;
+  global $ext_widget,$ext_element;
   global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
@@ -247,9 +247,9 @@ function get_param_user() {
   if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
   if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
   if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
+  if (isset ($ext_element)) $obm_user["ext_element"] = $ext_element;
   if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;
   if (isset ($ext_widget)) $obm_user["ext_widget"] = $ext_widget;
-
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {

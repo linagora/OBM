@@ -215,7 +215,7 @@ function run_query_insert(&$document) {
   $kind = $document["kind"];  
   $entity = $document["entity"];
   $entity_id = $document["entity_id"];
-
+  $path = format_path($path);
   $final_path = get_final_path($path);
   $dest_doc = $final_path.$name;
 
@@ -243,6 +243,9 @@ function run_query_insert(&$document) {
       $err_msg = $l_creation_error;
       return false;
     }
+  }
+  if(strrpos($path,'/') != strlen($path) -1) {
+    $path = $path.'/';
   }
 
   $query = "insert into Document (
@@ -303,13 +306,12 @@ function run_query_insert(&$document) {
   return $retour;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Get the final path from the path parameter entered
+// Add the final slash if necessary.
 // Parameters:
 //   - $p_path : path parameter
 ///////////////////////////////////////////////////////////////////////////////
-function get_final_path($p_path) {
+function format_path($p_path) {
   global $document_path;
 
   // Ensure that the path end with a /
@@ -318,7 +320,16 @@ function get_final_path($p_path) {
   } else {
     $path = $p_path;
   }
+  return $path; 
+}
 
+///////////////////////////////////////////////////////////////////////////////
+// Get the final path from the path parameter entered
+// Parameters:
+//   - $p_path : path parameter
+///////////////////////////////////////////////////////////////////////////////
+function get_final_path($p_path) {
+  global $document_path;
   // Ensure a / separate the document_path from the path
   if (strpos($path,'/') === 0) {
     $final_path = $document_path.$path;
@@ -342,7 +353,7 @@ function run_query_create_file($document) {
   $path = $document["path"];
   $name = $document["name"];
   $file = $document["file"];
-  
+  $path = format_path($path);
   $final_path = get_final_path($path);
 
   // Ensure that the final path is a directory
@@ -391,7 +402,7 @@ function run_query_update($did, &$document) {
   $url = $document["url"];
   $id = $document["id"];
   $file_update = $document["file_update"];
-
+  $path = format_path($path);
   $final_path = get_final_path($path);
   $dest_doc = $final_path.$name;
 
@@ -1186,7 +1197,7 @@ function run_query_insert_repository($document) {
 
   $path = $document["repository_path"];
   $name = $document["repository_name"];
-
+  $path = format_path($path);
   $final_path = get_final_path($path);
   $dest_dir = $final_path.$name;
 

@@ -344,9 +344,12 @@ class OBM_DISPLAY {
 	  } else {
 	    $cb_check = "";
 	  }
-
+	  if (function_exists($dis_data_entity)) {
+	    $hidden_field = $dis_data_entity($this, "hidden_field", $link_ok);
+	    $hidden_field = $hidden_field["name"];
+	  }	  
 	  $block .= "<td $style>
-                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
+                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check />$hidden_field </td>";
 	}
 	else
 	  $block .= "<td $style>&nbsp;</td>";

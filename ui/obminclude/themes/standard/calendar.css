@@ -16,26 +16,31 @@ a.agendaHead:active 	{ color: #ffff00; background-color: transparent;}
 a.agendaHead:visited 	{ color: #ffff00; background-color: transparent;}
 
 
-
+div.last {
+        margin-top : 		5px;
+}
+      
 div.agendaBar {
-	width:			180px;
-	margin-bottom:		20px;
-	margin-left:		2px;
+	width:			181px;
+	margin-top:		5px;
+	margin-left:		3px;
 }
 
 div.agendaHidden {
 	z-index: 		20;
-	visibility: 		hidden;
+	display:		none;
 	top: 			0px;
 	left: 			0px;
 	width:			auto;
 
 }
 table.agendaHidden {
-        background-color:	#000000;
-	border:			1px solid black;
+        background-color:	#ffffff;
 	width:			200px;
+	font-size:		12px;
 	border-spacing:		0;
+        font-family:            sans-serif;
+        color:                  #000000;   	
 }
 
 .agendaMain	{
@@ -62,6 +67,7 @@ table.agendaCalWeek		{
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
 	width:			554px;
+	border-collapse:	collapse;	
 	border-spacing:		0;
 }
 
@@ -71,6 +77,8 @@ table.agendaCalDay		{
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
 	width:			520px;
+	border-collapse:	collapse;	
+	border-spacing:		0;	
 }
 
 table.agendaCalMonth		{
@@ -113,6 +121,7 @@ table.agendaCal		{
 	width:			100%;
 	border-collapse:	collapse;
 	border-spacing:		0;
+	margin-top:		3px;
 }
 
 table.agendaMonth	{
@@ -120,13 +129,18 @@ table.agendaMonth	{
 	margin-right:		auto;
 	background-color: 	#a1a5a9;
 	border: 		0; 
+	border-collapse:	collapse;	
+	border-spacing:		0;
+	
 }
 
 
 table.agendaYear	{
         background-color:      #cccccc;
         margin-left:		auto;
-	margin-right:		auto;		
+	margin-right:		auto;	
+	border-collapse:	collapse;	
+	border-spacing:		0;	
 }
 
 table.agendaEventYear {
@@ -140,9 +154,8 @@ td.agendaMonthReg	{
         margin-left:		auto;
 	margin-right:		auto;
 	background-color: 	#ffffff;
- 	text-align: 		center; 
 	vertical-align: 	top;
-	border: 		0; 
+	border: 		1px #a1a5a9 solid; 	
 
 }
 
@@ -150,9 +163,8 @@ td.agendaMonthOff	{
         margin-left:		auto;
 	margin-right:		auto;
 	background-color: 	#f4f4f4;
- 	text-align: 		center; 
 	vertical-align: 	top;
-	border: 		0; 
+	border: 		1px #a1a5a9 solid; 	
 
 }
 
@@ -160,11 +172,28 @@ td.agendaMonthOn	{
         margin-left:		auto;
 	margin-right:		auto;
 	background-color: 	#f4e5a9;
- 	text-align: 		center; 
 	vertical-align: 	top;
-	border: 		0; 
-
+	border: 		1px #a1a5a9 solid; 	
 }
+
+td.agendaMonthOn a, td.agendaMonthReg a		
+{ text-decoration:	none; }
+td.agendaMonthOn a:link, td.agendaMonthReg a:link	
+{ font-family: sans-serif; font-size: 11px;color: #0454c4; background-color: transparent; }
+td.agendaMonthOn a:visited, td.agendaMonthReg a:visited
+{ font-family: sans-serif; font-size: 11px;color: #0454c4; background-color: transparent; }
+td.agendaMonthOn a:active, td.agendaMonthReg a:active
+{ font-family: sans-serif; font-size: 11px;color: #3366cc; background-color: transparent; }
+td.agendaMonthOn a:hover, td.agendaMonthReg a:hover
+{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: transparent; }
+
+td.agendaMonthOff a		{ text-decoration:	none; }
+td.agendaMonthOff a:link	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+td.agendaMonthOff a:visited	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+td.agendaMonthOff a:active	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+td.agendaMonthOff a:hover	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+
+
 
 
 td.agendaHead		{
@@ -172,7 +201,7 @@ td.agendaHead		{
 	font-family:		sans-serif;
 	font-size:		18px;
 	color: 			#000000; 
-	vertical-align:		bottom;
+	vertical-align:		top;
 	white-space:		nowrap;	
 	background-image: 	url(time_bg.gif); 
 }
@@ -247,38 +276,44 @@ td.agendaEventHead	{
     font-family: 		sans-serif;
 }
 
-td.agendaEventBg5 	{ 
+td.agendaEventBg5{ 
     background-color: 		#86c860; 
+    text-align:			center;
     vertical-align:		top;
     border : 			1px solid #336600;        
     }
 	
 td.agendaEventBg4 	{ 
     background-color: 		#d8f0b8; 
+    text-align:			center;
     vertical-align:		top;
     border : 			1px solid #669900;        
   }
 	
 td.agendaEventBg3 	{ 
     background-color:	 	#84a8d7;  
+    text-align:			center;
     vertical-align:		top;
     border : 			1px solid #333366;        
     }
 	
 td.agendaEventBg2 	{ 
     background-color: 		#cfe5f6;  
+    text-align:			center;
     vertical-align:		top;
     border : 			1px solid #336699;        
     }
 	
 td.agendaEventBg1 	{ 
     background-color: 		#f8d049;  
+    text-align:			center;
     vertical-align:		top;
     border : 			1px solid #cc3300;          
   }
 	
 td.agendaEventBg0 	{ 
     background-color: 		#fffba4;  
+    text-align:			center;
     vertical-align:		top;
     border : 			1px solid #cc6600;    
 }	

@@ -1363,6 +1363,7 @@ function dis_document_display_pref($display_pref_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_documents_tree($document,$display_file) {
   global $l_close;
+  
   $popup = $document["popup"];
   $obm_d = run_query_get_tree($display_file);
   if($popup) {

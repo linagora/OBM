@@ -30,7 +30,16 @@ function check_calendar(form) {
   
 }
   
-
+  
+///////////////////////////////////////////////////////////////////////////////
+//  Add an element line in the list form                                   //
+///////////////////////////////////////////////////////////////////////////////
+function remove_element(elemId,parentId) {
+  target = window.document;
+  content = target.getElementById(elemId);
+  container = target.getElementById(parentId)
+  container.removeChild(content); 
+} 
 
 function check_count_user(formulaire) {
   var selectObject = formulaire.elements[0];
@@ -113,22 +122,22 @@ function show ( evt, name ) {
   if ( NS4 ) {
     ele.right = parseInt ( x );
     ele.top = parseInt ( y );
-    ele.visibility = \"show\";
+    ele.display = \"block\";
   } else {  // IE4 & W3C
     ele.style.position = 'absolute'
     ele.style.left = x+'px';
     ele.style.top = y+'px';
-    ele.style.visibility = \"visible\";
+    ele.style.display = \"block\";
   }
 }
 
 function hide ( name ) {
   if (W3C) {
-    document.getElementById(name).style.visibility = \"hidden\";
+    document.getElementById(name).style.display = \"none\";
   } else if (NS4) {
-    document.layers[name].visibility = \"hide\";
+    document.layers[name].display = \"none\";
   } else {
-    document.all[name].style.visibility = \"hidden\";
+    document.all[name].style.display = \"none\";
   }
 }
 
