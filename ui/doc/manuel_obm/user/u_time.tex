@@ -45,14 +45,13 @@ Composantes d'une tâche :
 Le module \timemanager comporte 5 sous-menus :
 
 \begin{itemize}
-\item Semaine, qui permet de voir l'état de remplissage de la gestion des temps pour une semaine choisie, la liste des tâches déjà saisies et de saisir d'autres tâches.
-\item Mois, qui permet de visualiser l'état de remplissage de la gestion des temps pour un mois complet.
-\item Validation, qui permet de chercher des accords par activités,
+\item Semaine : qui permet de voir l'état de remplissage de la gestion des temps pour une semaine choisie, la liste des tâches déjà saisies et de saisir d'autres tâches.
+\item Mois : qui permet de visualiser l'état de remplissage de la gestion des temps pour un mois complet.
+\item Validation : qui permet de chercher des accords par activités,
 de chercher, consulter et modifier l'arborescence des activités de DIOR. 
-\item Statistiques, qui permet de consulter, modifier, supprimer et de chercher
+\item Statistiques : qui permet de consulter, modifier, supprimer et de chercher
 les segments d'après leur libellé et département.
-\item Affichage, qui permet la création d'un nouveau segment.
-
+\item Affichage : qui permet de personnaliser l'affichage de la liste de tâches.
 \end{itemize}
 
 \subsubsection{Le sous-menu : Semaine}
@@ -72,3 +71,27 @@ Ce menu affiche un écran qui permet de visualiser, pour un mois,  l'état de remp
 Ce menu permet de visualiser les informations concernant la répartition du temps de travail entre les différents projets et les différents types de tâches.
 
 \subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des tâches. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+
+\subsubsection{Saisir une tâche}
+
+A partir de l'écran de vue hebdomadaire, il est possible de saisir une tâche pour la semaine en cours.
+Le formulaire permet de remplir les informations suivantes :
+
+\begin{itemize}
+\item Date : il est possible de saisir un ou plusieurs jours de la semaine.
+\item Durée : elle est exprimée en fraction de journées.
+\item Catégorie : indique le type de tâche qui a été réalisé.
+\item Projet : indique le projet pour lequel cette tâche a été réalisée (sauf s'il s'agit d'une tâche non facturée).
+\item Sous-tâche du projet : indique plus précisément pour quelle partie du projet cette tâche a été réalisée.
+\item Commentaire : permet de décrire en quelques mots la tâche réalisée (non obligatoire).
+\end{itemize}
+
+Afin de faciliter la saisie, l'action sur les listes catégorie ou projet modifie le contenu de ces mêmes listes et de la liste de sous-tâches. Les différents cas de figures sont :
+
+\begin{itemize}
+\item Si une catégorie est sélectionnée, seul les projets correspondant à cette catégorie restent visibles dans la liste de projets. La liste des sous-tâches est également mise à jour.
+\item Si le projet sélectionné change, la catégorie adéquate est selectionnée dans la liste des catégories. La liste de sous-tâches est aussi mise à jour pour ne contenir que celles qui sont ratachées au projet choisi.
+\item Si la tâche vide est sélectionnée, la liste des projets est mise à jour pour contenir tous les projets auquel participe la personne qui saisit les informations.
+\end{itemize}
