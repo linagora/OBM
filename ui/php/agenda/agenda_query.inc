@@ -641,20 +641,18 @@ function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user
 
 }
   
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Insert a occurence of a event
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
-//    - $date_begin : 
-//    - $date_end : 
-//    - $user_id :
-//    - $event_id :
-//    - $state :
-/////////////////////////////////////////////////////////////////////////////
-
+// Parameters: 
+//   - $date_begin : 
+//   - $date_end : 
+//   - $user_id :
+//   - $event_id :
+//   - $state :
+////////////////////////////////////////////////////////////////////////////
 function run_query_insert_occurence($date_begin,$date_end,$user_id,$customer_type,$event_id,$state) {
   global $cdg_sql;
+
   $obm_db = new DB_OBM;
   $query = "INSERT INTO CalendarSegment (calendarsegment_eventid, calendarsegment_customerid, calendarsegment_date, calendarsegment_flag,
                                          calendarsegment_type, calendarsegment_state) 

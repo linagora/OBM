@@ -229,10 +229,10 @@ function fill_projecttask(sel_list, deal_id) {
   //select_list.options[0].selected = true;
 }
 
+
 //////////////////////////////////////
 // projecttask selection for update //
 //////////////////////////////////////
-
 function select_default(sel_list, def_value) {
   for (i=0; i<(sel_list.options.length); i++) {
     if (sel_list.options[i].value == def_value)

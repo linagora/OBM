@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.7.0, 0.7.1, 0.7.2
+<p />These docs are valid for OBM 0.7.0, 0.7.1, 0.7.2, 0.7.3
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -34,7 +34,7 @@ And uncompress it in /var/www (or where your document root will be located).
 <tr>
   <td><pre>
 cd /var/www
-tar -xzvf obm-0.7.2.tar.gz
+tar -xzvf obm-0.7.3.tar.gz
 </pre>
   </td>
 </tr>
@@ -71,12 +71,12 @@ include_path = ".:/php/includes:/var/www/obm"
 </table>
 <p>
 
-The short_open_tag must be On :
+Since 0.7.3, the short_open_tag can be set to Off but must be On on version before 0.7.3:
 
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-short_open_tag = On
+short_open_tag = On (can be switched to Off since OBM 0.7.3)
 </pre>
   </td>
 </tr>

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_index.php                                               //
 //     - Desc : Time management Index File                                   //
@@ -138,7 +138,7 @@ if (!(isset($time["user_id"])))
   $time["user_id"] = $uid;
 
 if (!(isset($time["date"])))
-  $time["date"]=date("Ymd");
+  $time["date"] = date("Ymd");
 
 if ( !isset($action)) $action = "index";
 
@@ -220,8 +220,8 @@ elseif ($action == "viewmonth") {
   $display["features"] .= dis_time_search_form($time, 
                        run_query_get_obmusers(),
                        $uid);
-
-} 
+}
+ 
 if ($action == "globalview") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";

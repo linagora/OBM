@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.6.6 - 2003-07-17<br>
+Version 0.7.3 - 2003-10-22<br>
 Pierre Baudracco
 </center>
 <p>
@@ -68,11 +68,9 @@ HTML output should always be separated from process logic and should only contai
   $sel_market = ...
 ---------------------------------
   echo "
-      < td>< font size=-2>$l_market< /font>< br>
-        $sel_market
-      < td>&nbsp;&nbsp;< /td>
-      < td align=center>< font size=-2>$l_internal< /font>< br>
-        < input type=\"checkbox\" name=\"cb_state\" value=\"1\" $cstate>< /td>
+    &lt;/tr>&lt;tr>
+      &lt;td class=\"detailLabel\">$l_market&lt;/td> 
+      &lt;td class=\"detailForm\">$sel_market&lt;/td>
 </pre>
 </td></tr>
 </table>
@@ -81,11 +79,24 @@ HTML output should always be separated from process logic and should only contai
 
 <h3>File Header</h3>
 
+The PHP tag should NOT be in short form (&lt;?) to allow OBM working with php.ini short_open_tag = Off.
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+&lt;script language="php">
+or
+&lt;?php
+</pre>
+</td></tr>
+</table>
+<p />
+
 Each OBM file should have an header as described below :
 <p>
 <table bgcolor="C0C0C0">
 <tr><td>
 <pre>
+&lt;script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //

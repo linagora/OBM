@@ -84,10 +84,12 @@ function display_page(&$display) {
 // Display: HTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_title, $set_theme, $obminclude, $extra_css;
+  global $l_title, $set_theme, $obminclude, $extra_css, $extra_js;
 
   if (isset($extra_css))
     $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/$extra_css\" />";
+  if (isset($extra_js))
+    $dis_extra_js = "<script type=\"text/javascript\" src=\"$extra_js\" />";
 
   $headers_e = "
    <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
@@ -102,6 +104,7 @@ function display_head($p_module) {
      <title>$l_title - $p_module</title>
      <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
      $dis_extra_css
+     $dis_extra_js
     </head>
     <body>";
 }

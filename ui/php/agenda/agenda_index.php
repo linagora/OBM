@@ -1,4 +1,4 @@
-<?
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : agenda_index.php                                             //
 //     - Desc : Agenda Index File                                            //
@@ -40,7 +40,7 @@ $www = "   <p class=\"messageInfo\">
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
-$menu="AGENDA";
+$menu = "AGENDA";
 $extra_css = "calendar.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

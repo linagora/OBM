@@ -970,10 +970,8 @@ function display_weekview($time, $result, $total, $title) {
 //     - $validate_days : array of validated days (not to be shown)
 //    
 ///////////////////////////////////////////////////////////////////////////////
-
 function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
                           $day_q, $fraction_t, $time, $validate_days) {
-
   global $auth, $time, $fraction_jour ,$task_id_modify;
   global $l_addtask_start, $l_addtask_end, $l_add, $l_none;
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
@@ -992,7 +990,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     print_r($validate_days);
     if (is_array($validate_days))
       echo "<br />sum validate_days " .array_sum($validate_days)."<br />";
-
   }
 
   if (sizeof($validate_days) == $c_days_in_a_week) {
@@ -1028,16 +1025,15 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   
   // Day check construction
   else {
-
     $day_checked = -1;
     for ($day=0;$day< sizeof($day_q);  $day++) {
       if ($day_q[$day][1] == date("Ymd"))
 	$day_checked = $day;
     }
 
-    for ($day=0;$day< sizeof($day_q);  $day++) {
+    for ($day=0; $day< sizeof($day_q); $day++) {
 
-      if(sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]]))
+      if (sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]]))
 	$disabled = 1;
       else
 	$disabled = 0;
@@ -1058,22 +1054,19 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     }
   }
 
-  // data array for the project dynamic list construction
-  // the generated array is used by fill_project()
+  // Javascript array construction for the Project dynamic Select list
+  // used by fill_project()
   if ($project_q->num_rows() != 0) {
     $previous_tt = 0;
 
-    while($project_q->next_record()) {
+    while ($project_q->next_record()) {
       $proj_tt  = $project_q->f("deal_tasktype_id");
       $proj_id = $project_q->f("deal_id");
-
       $company = $project_q->f("company_name");
-
       if ($company == "") $company = $l_intern;
 
       $proj_name = htmlspecialchars(addslashes($project_q->f("deal_label")));
       $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
-
       $proj_label = "\" $company -- ". $proj_name. "\"";
 
       if ($previous_tt != $proj_tt) {
@@ -1091,12 +1084,12 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     $proj_data .= "\n)\n";
   }
 
-  // data array for the projecttask dynamic list construction
-  // the generated array is used by fill_projecttask()
+  // Javascript array construction for the ProjectTask dynamic Select list
+  // used by fill_projecttask()
   if ($projecttask_q->num_rows() != 0) {
     $previous_dl = 0;
 
-    while($projecttask_q->next_record()) {
+    while ($projecttask_q->next_record()) {
       $projtask_dl  = $projecttask_q->f("projecttask_deal_id");
       $projtask_id = $projecttask_q->f("projecttask_id");
     
@@ -1134,10 +1127,10 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
   // TaskType select construction
   $type_prec = -1;
-  $sel_tt = "<select name=\"sel_tasktype\" ";
-  $sel_tt .= "  onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,";
-  $sel_tt .= "             this.form.sel_projecttask, -1) \">";
-  $sel_tt .= "<option value=\"0\">$l_none</option>";
+  $sel_tt = "
+    <select name=\"sel_tasktype\"
+      onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,this.form.sel_projecttask, -1) \">
+      <option value=\"0\">$l_none</option>";
 
   for ($i=0; $i<2; $i++) {
     $tt_q = $taskt_q[$i];
@@ -1161,9 +1154,8 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   // Project select construction
   $sel_proj = "
     <select name=\"sel_project\"
-            onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
-                       fill_project(this.form.sel_project, this.form.sel_tasktype.value,
-                                    this.form.sel_projecttask, this.form.sel_project.value);return true;\">
+      onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
+      fill_project(this.form.sel_project, this.form.sel_tasktype.value, this.form.sel_projecttask, this.form.sel_project.value);return true;\">
     <option value=\"0\">$l_none</option>
     </select>";
 
@@ -1251,7 +1243,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       </script>";
   } else {
     $dis_script .= "
-      <script type=\"javascript\">
+      <script type=\"text/javascript\">
         fill_projectall(document.f_add_task.sel_project);
       </script>";
   }

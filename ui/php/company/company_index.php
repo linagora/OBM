@@ -39,6 +39,7 @@
 $path = "..";
 $section = "COM";
 $menu = "COMPANY";
+$extra_js = "company_js.inc";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
@@ -76,13 +77,13 @@ if (! $company["popup"]) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  require("company_js.inc");
+  //  require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company["title"]);
 
 } elseif ($action == "ext_get_id_url") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
+//  require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company["title"], $company["url"]);
 
@@ -114,7 +115,7 @@ if ($action == "ext_get_id") {
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] = html_company_form($action,"",$type_q, $act_q, $usr_q, $company);
 
 } elseif ($action == "detailconsult")  {
@@ -138,7 +139,7 @@ if ($action == "ext_get_id") {
       $act_q = run_query_companyactivity();
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_userobm_active($users);
-      require("company_js.inc");
+      //      require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
       $display["detail"] = html_company_form($action, $comp_q, $type_q, $act_q, $usr_q, $company);
     } else {
@@ -214,7 +215,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
+//  require("company_js.inc");
   $display["detail"] = dis_check_links($param_company);
 
 } elseif ($action == "delete")  {
@@ -232,7 +233,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
+//  require("company_js.inc");
   $display["detail"] = dis_admin_index();
 
 } elseif ($action == "kind_insert")  {
@@ -243,7 +244,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_kind_insert_error);
   }
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_update")  {
@@ -254,13 +255,13 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_kind_update_error);
   }
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_kind_links($company);
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_delete")  {
@@ -271,7 +272,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_kind_delete_error);
   }
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_insert")  {
@@ -282,7 +283,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_act_insert_error);
   }
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_update")  {
@@ -293,13 +294,13 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_act_update_error);
   }
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_activity_links($company);
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_delete")  {
@@ -310,7 +311,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_act_delete_error);
   }
-  require("company_js.inc");
+  //  require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 }  elseif ($action == "display") {
