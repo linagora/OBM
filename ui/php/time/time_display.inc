@@ -34,7 +34,7 @@ $fieldnames["contact_company_name"] = $l_company;
 //   - $array : any array
 ///////////////////////////////////////////////////////////////////////////////
 function debug_array($a) {
-  global $HTTP_POST_VARS;
+  global $_POST;
 
   echo "<br>BEGIN----- debug_array ------<br>";
   foreach($a as $key => $val) {
@@ -48,8 +48,8 @@ function debug_array($a) {
     else
       echo "clé $key val --$val-- <br>";
   }
-  echo "HTTP_POST_VARS<br>";
-  foreach($HTTP_POST_VARS as $key => $val) {
+  echo "_POST<br>";
+  foreach($_POST as $key => $val) {
 	  if (is_array($val)) {
       echo "clé $key val ";
 	  print_r($val);
@@ -72,7 +72,7 @@ function debug_array($a) {
 //     default : all
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_links (&$time, $type="all") {
-	global $sess, $cdg_param; 
+	global $cdg_param; 
   global $l_week, $l_week_prev,$l_week_next, $l_month_prev,$l_month_next;
   global $hum_date, $l_month2;
   // WEEK
@@ -220,7 +220,7 @@ function dis_time_links (&$time, $type="all") {
 function dis_time_search_form ($time, $usr_q, $uid) {
   global $l_see, $l_week, $l_month, $project_managers;
   global $l_user;
-  global $sess, $uid;
+  global $uid;
 
   $hum_date_start = dis_human_date($time["date"]);
   $hum_date_end = dis_human_date($time["date_end"]);
@@ -305,7 +305,7 @@ function dis_selectusers_form ($time, $usr_q, $uid) {
   global $l_see, $l_week, $l_month, $project_managers, $stats_users;
   global $l_user, $l_all_users;
   global $l_tasktype, $l_task_all, $l_task_uservalid, $l_task_adminvalid;
-  global $sess, $uid;
+  global $uid;
 
   $hum_date_start = dis_human_date($time["date"]);
   $hum_date_end = dis_human_date($time["date_end"]);
@@ -401,7 +401,7 @@ function dis_selectusers_form ($time, $usr_q, $uid) {
 function dis_time_period ($time) {
   global $l_see, $l_week, $l_month, $project_managers;
   global $l_user;
-  global $sess, $uid;
+  global $uid;
 
   $hum_date_start = dis_human_date($time["date"]);
   $hum_date_end = dis_human_date($time["date_end"]);
@@ -684,7 +684,6 @@ function dis_time_export_stats($time) {
 //   an HTML table
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_menu($time) {
-  global $sess;
   global $col_tableh, $col_table;
 
   global $show_events, $total_menu, $total_tasks, $total_companies, $total_projects;
@@ -693,36 +692,31 @@ function dis_time_menu($time) {
   $dis_checked= $time["show_task_detail"] ? "checked" : "";
 
   echo "
-    <TABLE bgcolor=\"#$col_tableh\" cellspacing=\"2\" border=\"1\" width=75%>
-      <TR>
-        <TD align=\"center\">
-           $show_events
-        </TD>
-        <TD align=\"center\" colspan=3>
-           $total_menu
-        </TD>
-      </TR>
-      <TR>
-        <TD bgcolor=\"#$col_table\" align=\"center\">
-           <FORM METHOD=POST NAME=form_show_events 
-                 ACTION=\"".url_prepare("time_index.php")."\">
-              <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"show_details\">
-              <INPUT TYPE=\"checkbox\" NAME=\"show_task_detail\" $dis_checked>
-<!--              <INPUT TYPE=\"hidden\" NAME=\"user_id[]\" VALUE=\"".
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailHead\">$show_events</td>
+      <td class=\"detailHead\" colspan=\"3\">$total_menu</td>
+    </tr><tr>
+        <td class=\"detailLabel\">
+           <form method=\"post\" name=\"form_show_events\" 
+                 action=\"".url_prepare("time_index.php")."\">
+              <input type=\"hidden\" name=\"action\" value=\"show_details\">
+              <input type=\"checkbox\" name=\"show_task_detail\" $dis_checked>
+<!--              <input type=\"hidden\" name=\"user_id[]\" value=\"".
                  $time["user_id"]."\">
 -->
-              <INPUT TYPE=\"hidden\" NAME=\"param_begin\" VALUE=\"".
+              <input type=\"hidden\" name=\"param_begin\" value=\"".
                  $time["date"] ."\">
-              <INPUT TYPE=\"hidden\" NAME=\"param_end\" VALUE=\"".
+              <input type=\"hidden\" name=\"param_end\" value=\"".
                  $time["date_end"] ."\">
-              <INPUT TYPE=submit value=\"OK\" >
-           </FORM>
-        </TD>
-        <TD  bgcolor=\"#$col_table\" align=\"center\">$total_companies</TD>
-        <TD bgcolor=\"#$col_table\" align=\"center\">$total_projects</TD>
-        <TD bgcolor=\"#$col_table\" align=\"center\">$total_tasks</TD>
-      </TR>
-    </TABLE>
+              <input type=submit value=\"OK\" >
+           </form>
+        </td>
+        <td class=\"detailLabel\">$total_companies</TD>
+        <td class=\"detailLabel\">$total_projects</TD>
+        <td class=\"detailLabel\">$total_tasks</TD>
+    </tr>
+    </table>
   ";
 }
 
@@ -737,7 +731,7 @@ function dis_time_menu($time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list_result($obm_q,$pref_q,$nb_task,$time) {
   //-- Themes
-  global $sess, $set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
+  global $set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
 
@@ -767,14 +761,14 @@ function dis_time_list_result($obm_q,$pref_q,$nb_task,$time) {
   $dis_task_list->display();
 
   echo "
-    <BR>
-    <INPUT TYPE=hidden name=user_id[] value=\"".$time["user_id"][0]."\">
-    <INPUT TYPE=hidden name=param_begin value=\"".$time["date"]."\">
-    <INPUT TYPE=hidden name=param_end value=\"".$time["date_end"]."\">
-    <INPUT TYPE=hidden name=show_task_detail value=\"".
+    <br/>
+    <input type=\"hidden\" name=\"user_id[]\" value=\"".$time["user_id"][0]."\">
+    <input type=\"hidden\" name=\"param_begin\" value=\"".$time["date"]."\">
+    <input type=\"hidden\" name=\"param_end\" value=\"".$time["date_end"]."\">
+    <input type=\"hidden\" name=\"show_task_detail\" value=\"".
        $time["show_task_detail"]."\">
-    <input NAME=\"action\" TYPE=hidden VALUE=\"delete\">
-    <input NAME=\"submit\" TYPE=submit VALUE=\"".$l_delete."\" >
+    <input name=\"action\" type=\"hidden\" value=\"delete\">
+    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" >
     </form>
        ";
 }
@@ -793,7 +787,7 @@ function dis_time_list_result($obm_q,$pref_q,$nb_task,$time) {
 
 function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   //-- Themes
-  global $sess,$set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
+  global $set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
   global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
@@ -894,7 +888,7 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days) {
   //-- Themes
-  global $sess,$set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
+  global $set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
   global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
@@ -902,8 +896,6 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
   //session
   global $uid, $project_managers;
 
-  echo "<font color=\"#$col_textem\">";
-  echo "</font><br>";
 
   // We have to know if all the days have been validated by the admin
   // If so, no need to display the user valid one
@@ -917,7 +909,7 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
 
  dis_table_title("$l_total_day"); 
  echo "
-   <form method=post name=f_task_val action=\"".url_prepare("time_index.php")."\">";
+   <form method=\"post\" name=\"f_task_val\" action=\"".url_prepare("time_index.php")."\">";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
   $dis_task_list->data_set = $obm_dq;
@@ -933,20 +925,17 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
   $dis_task_list->data_page = false;
   $dis_task_list->data_url = $url;
 
-// display in another table to limit size
-  echo "<table border=0 width=50%><tr><td>";
   $dis_task_list->display();
-  echo "<td><tr></table>";
 
   echo "
-    <br>
-    <input type=hidden name=user_id[] value=\"".$time["user_id"][0]."\">
-    <input type=hidden name=param_begin value=\"".$time["date"]."\">
-    <input type=hidden name=param_end value=\"".$time["date_end"]."\">
-    <input type=hidden name=show_task_detail value=\"".
+    <br/>
+    <input type=\"hidden\" name=\"user_id[]\" value=\"".$time["user_id"][0]."\">
+    <input type=\"hidden\" name=\"param_begin\" value=\"".$time["date"]."\">
+    <input type=\"hidden\" name=\"param_end\" value=\"".$time["date_end"]."\">
+    <input type=\"hidden\" name=\"show_task_detail\" value=\"".
         $time["show_task_detail"]."\">
-    <input name=\"action\" type=hidden value=\"validate\">
-    <input name=\"submit\" type=submit value=\"$l_valid\" >
+    <input name=\"action\" type=\"hidden\" value=\"validate\">
+    <input name=\"submit\" type=\"submit\" value=\"$l_valid\" >
     </form>
        ";
 }
@@ -963,7 +952,7 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days) {
   //-- Themes
-  global $sess,$set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
+  global $set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
   global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
@@ -971,8 +960,6 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
   //session
   global $uid, $project_managers;
 
-  echo "<font color=\"#$col_textem\">";
-  echo "</font><br>";
 
   // We have to know if any of the days have been validated by the user
   // If not, no need to display the admin valid form
@@ -990,7 +977,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
     $admin_db = run_query_admin($time);
 
     echo "
-      <form method=post name=f_task_val_admin action=\"".url_prepare("time_index.php")."\">";
+      <form method=\"post\" name=\"f_task_val_admin\" action=\"".url_prepare("time_index.php")."\">";
 
    $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
    $dis_task_list->data_set = $admin_db;
@@ -1007,19 +994,17 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
    $dis_task_list->data_url = $url;
 
  // display in another table to limit size
-   echo "<table border=0 width=50%><tr><td>";
    $dis_task_list->display();
-   echo "<td><tr></table>";
 
    echo "
      <br>
-     <input type=hidden name=user_id[] value=\"".$time["user_id"][0]."\">
-     <input type=hidden name=param_begin value=\"".$time["date"]."\">
-     <input type=hidden name=param_end value=\"".$time["date_end"]."\">
-     <input type=hidden name=show_task_detail value=\"".
+     <input type=\"hidden\" name=\"user_id[]\" value=\"".$time["user_id"][0]."\">
+     <input type=\"hidden\" name=\"param_begin\" value=\"".$time["date"]."\">
+     <input type=\"hidden\" name=\"param_end\" value=\"".$time["date_end"]."\">
+     <input type=\"hidden\" name=\"show_task_detail\" value=\"".
         $time["show_task_detail"]."\">
-     <input name=\"action\" type=hidden value=\"validate_admin\">
-     <input name=\"submit\" type=submit value=\"".$l_valid."\" >
+     <input name=\"action\" type=\"hidden\" value=\"validate_admin\">
+     <input name=\"submit\" type=\"submit\" value=\"".$l_valid."\" >
      </form>
         ";    
    }
@@ -1037,7 +1022,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   //-- Themes
-  global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme,$col_tableh,$col_textem,$col_table;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $l_workingdays, $l_total_days_msg1, $l_total_days_msg2, $l_total_days_msg3, $l_total_days_msg4; 
@@ -1101,7 +1086,7 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_deal_export($obm_dq,$pref_dq,$time) {
   //-- Themes
-  global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme,$col_tableh,$col_textem,$col_table;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $l_workingdays, $l_total_days_msg1, $l_total_days_msg2, $l_total_days_msg3, $l_total_days_msg4; 
@@ -1150,7 +1135,7 @@ function dis_time_deal_export($obm_dq,$pref_dq,$time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_one_month($obm_dq,$pref_dq,$time, $shortview=false) {
   //-- Themes
-  global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme,$col_tableh,$col_textem,$col_table;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $c_day_fraction, $c_days_in_a_week;
@@ -1400,7 +1385,7 @@ function dis_table_title($message) {
 //    
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$time, $validate_days) {
-  global $sess, $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
+  global $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
   global $col_table, $col_tableh, $col_textem, $l_add, $task_list, $l_none;
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   //for list classement of task
