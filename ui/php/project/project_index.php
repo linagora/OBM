@@ -111,7 +111,7 @@ if ($action == "index" || $action == "") {
 
     html_project_infos($project_q, $project);
     html_project_memberadd_form($project);
-    html_project_memberlist();
+    html_project_memberlist(0, $project);
   }
   else {
     display_err_msg("$l_insert_error : $err_msg");
@@ -134,13 +134,42 @@ if ($action == "index" || $action == "") {
 
     html_project_infos($project_q, $project);
     html_project_memberadd_form($project);
-    html_project_memberlist();
+    html_project_memberlist(0, $project );
   } else {
     display_err_msg("$l_insert_error : $err_msg");
   }
 
-// } elseif ($action == "affect")  {
+ } elseif ($action == "validate")  {
 ///////////////////////////////////////////////////////////////////////////////
+  $ins_err = run_query_projectupdate($project);
+  
+  // Create an entry in the ProjectStat log
+  $retour = run_query_statlog($param_project);
+  
+  if (!($retour))
+    $ins_err = 1;
+  
+  if (!($ins_err)) {
+    display_ok_msg($l_adv_update_ok);
+  } else {
+    display_err_msg($l_adv_update_error);
+  }
+
+  // gets updated infos
+  $project_q = run_query_detail($param_project);
+  $members_q = run_query_memberstime($param_project);
+
+  // Displays new infos
+  if (($project_q->f("project_visibility")==0) ||
+      ($project_q->f("usercreate")==$uid) ) {
+    display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+    
+    html_project_consult($project_q, $members_q, $project);
+  } else {
+    // this project's page has "private" access
+    display_err_msg($l_error_visibility);
+  } 	
+
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -228,15 +257,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 //   if (check_data_form($param_company, $company)) {
 
-  // Update project estimated missing times
-  while ( list($m_id, $misstime) = each($project["missing"]) ) {
-    if ($misstime != "") {
-      $retour = run_query_advanceupdate($param_project, $m_id, $misstime);
-      
-      if (!($retour))
-	$ins_err = 1;
-    }
-  }
+  $ins_err = run_query_advanceupdate($project);
   
   // Create an entry in the ProjectStat log
   $retour = run_query_statlog($param_project);
@@ -288,7 +309,7 @@ if ($action == "index" || $action == "") {
     $members_q = run_query_memberstime($pid);
 
     html_project_infos($project_q, $project);
-    html_project_memberlist($members_q);
+    html_project_memberlist($members_q, $project);
 
 //     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
@@ -298,12 +319,12 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "member_del")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    $pid = $project["ext_id"];
-    $project["id"] = $pid;
+
+    $pid = $project["id"];
 
     if ($project["mem_nb"] > 0) {
       $nb = run_query_memberlist_delete($project);
-      display_ok_msg("$nb $l_contact_removed");
+      display_ok_msg("$nb $l_member_removed");
     } else {
       display_err_msg("no contact to delete");
     }
@@ -312,7 +333,7 @@ if ($action == "index" || $action == "") {
     $members_q = run_query_memberstime($pid);
 
     html_project_infos($project_q, $project);
-    html_project_memberlist($members_q);
+    html_project_memberlist($members_q, $project);
 
 //     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
@@ -352,7 +373,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_project() {
 
-  global $param_project, $tf_missing, $hd_state;
+  global $param_project, $tf_missing, $tf_projected, $hd_state;
   global $tf_name, $tf_company_name, $tf_soldtime;
   global $sel_tt, $sel_manager, $sel_member, $param_ext;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
@@ -363,6 +384,7 @@ function get_param_project() {
   if (isset ($param_project)) $project["id"] = $param_project;
   if (isset ($tf_soldtime)) $project["soldtime"] = $tf_soldtime;
   if (isset ($tf_missing)) $project["missing"] = $tf_missing;
+  if (isset ($tf_projected)) $project["projected"] = $tf_projected;
   if (isset ($hd_state)) $project["state"] = $hd_state;
 //   if (isset ($sel_state)) $project["state"] = $sel_state;
   if (isset ($cb_archive)) {
@@ -394,29 +416,16 @@ function get_param_project() {
 
   if (isset ($http_obm_vars)) {
     $nb_mem = 0;
-//     $nb_list = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
-
-//       echo "--dtc--$key--";
 
       if (strcmp(substr($key, 0, 7),"cb_user") == 0) {
 	$nb_mem++;
         $mem_num = substr($key, 7);
 
-// 	echo "--smlp--$mem_num--";
-
         $project["mem$nb_mem"] = $mem_num;
       } 
-// elseif (strcmp(substr($key, 0, 7),"cb_user") == 0) {
-// 	$nb_list++;
-//         $project_num = substr($key, 7);
-//         $project["list_$nb_list"] = $project_num;
-// 	// register the list in the list session array
-// 	$ses_list[$project_num] = $project_num;
-//       }
     }
     $project["mem_nb"] = $nb_mem;
-//     $project["list_nb"] = $nb_list;
   }
 
   if (debug_level_isset($cdg_param)) {
@@ -463,13 +472,6 @@ function get_project_action() {
     'Condition'=> array ('index', 'search', 'admin', 'display') 
                                      );
 
-// Init
-  $actions["PROJECT"]["init"] = array (
-    'Url'      => "$path/project/project_index.php?action=init",
-    'Right'    => $project_write,
-    'Condition'=> array ('None') 
-                                     );
-
 // Insert
   $actions["PROJECT"]["insert"] = array (
     'Url'      => "$path/project/project_index.php?action=insert",
@@ -478,8 +480,22 @@ function get_project_action() {
                                         );
 
 // Init
-  $actions["PROJECT"]["affect"] = array (
-    'Url'      => "$path/project/project_index.php?action=affect",
+  $actions["PROJECT"]["init"] = array (
+    'Url'      => "$path/project/project_index.php?action=init",
+    'Right'    => $project_write,
+    'Condition'=> array ('None') 
+                                     );
+
+// Create
+  $actions["PROJECT"]["create"] = array (
+    'Url'      => "$path/project/project_index.php?action=create",
+    'Right'    => $project_write,
+    'Condition'=> array ('None') 
+                                        );
+
+// Validate
+  $actions["PROJECT"]["validate"] = array (
+    'Url'      => "$path/project/project_index.php?action=validate",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                         );
@@ -487,7 +503,7 @@ function get_project_action() {
 // Detail Consult
   $actions["COMPANY"]["detailconsult"]  = array (
     'Url'      => "$path/company/company_index.php?action=detailconsult",
-    'Right'    => $company_read,
+    'Right'    => $project_read,
     'Condition'=> array ('None') 
                                      		 );
 
@@ -530,7 +546,7 @@ function get_project_action() {
 // Ext get Ids : Lists selection
   $actions["PROJECT"]["ext_get_ids"] = array (
     'Name'     => $l_header_add_member,
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$project["id"]."&amp;ext_target=$l_list",
     'Right'    => $user_write,
     'Popup'    => 1,
     'Target'   => $l_list,
@@ -546,7 +562,7 @@ function get_project_action() {
 
 // Display
   $actions["PROJECT"]["member_del"] = array (
-    'Url'      => "$path/project/project_index.php?action=member_del",
+    'Url'      => "$path/project/project_index.php?action=member_del&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                        );

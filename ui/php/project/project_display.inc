@@ -33,12 +33,12 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
   
   if ($fieldname == "project_initlabel") {
-    $res["name"] = "";
+//     $res["name"] = "";
     $res["url"] = "$path/project/project_index.php?action=init&amp;param_project=".$OD->data_set->f("project_id");
   }
   
   else if ($fieldname == "project_label") {
-    $res["name"] = "";
+//     $res["name"] = "";
     $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$OD->data_set->f("project_id");
   }
 
@@ -647,8 +647,10 @@ function html_project_consult($project_q, $members_q, $project) {
 //   -  $con_q     : DBO : list of contact from the company 
 //   -  $comp_id   : id of the company concerned by the deal
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_memberlist($members_q = 0) {
-  global $l_membersinfos;
+function html_project_memberlist($members_q, $project) {
+  global $l_membersinfos, $l_del_member_sel, $l_valid_member;
+
+  $id = $project["id"];
 
   if ($members_q != 0) {
 
@@ -663,23 +665,41 @@ function html_project_memberlist($members_q = 0) {
       $dis_members .= "    <input type=\"checkbox\" name=\"cb_user$m_id\" size=\"10\" maxlength=\"8\" value=\"\"/>";
       $dis_members .= "  </td>\n";;
       $dis_members .= "  <td class=\"detailLabel\">&nbsp;$m_name&nbsp;</td>\n";
-      $dis_members .= "  <td><input type=\"text\" name=\"tf_missing[$m_id]\" size=\"10\" maxlength=\"8\" value=\"$m_miss\"/></td>\n";;
+      $dis_members .= "  <td><input type=\"text\" name=\"tf_projected[$m_id]\" size=\"10\" maxlength=\"8\" value=\"$m_miss\"/></td>\n";;
       $dis_members .= "</tr>\n";
     }
     
   } else {
-    $dis_members = "y a personne";
+      $dis_members .= "<tr>\n";
+      $dis_members .= "  <td class=\"detailLabel\">y a personne</td>\n";
+      $dis_members .= "</tr>\n";
   }
 
+ 
   echo "
+    <form method=\"post\">
+    <table class=\"details\">
+      <tr>
+        <td colspan=\"6\" class=\"detailHead\">$l_membersinfos</td>
+      </tr>
+      <tr><td colspan=6>&nbsp;</td></tr>
+      $dis_members
+    </table>
      <table class=\"details\">
        <tr>
-        <td colspan=\"6\" class=\"detailHead\">$l_membersinfos</td>
+         <td>
+           <input type=\"submit\" value=\"$l_del_member_sel\"
+                  onclick=\"submit_memberdel(this.form)\" />
+         </td><td>
+           <input type=\"submit\" value=\"$l_valid_member\"
+                  onclick=\"submit_valid(this.form)\" />
+         </td>
+         <input type=\"hidden\" name=\"param_project\" value=\"$id\" />
        </tr>
-       <tr><td colspan=6>&nbsp;</td></tr>
-       $dis_members
      </table>
+     </form>
 ";
+
 
 }
 

@@ -319,10 +319,12 @@ function run_query_memberlist_delete($project) {
   $cpt_del = 0;
   while ($cpt < $project["mem_nb"]) {
     $cpt++;
-    $con_id = $project["mem$cpt"];
+    $mem_id = $project["mem$cpt"];
 
-    $query = "delete from ContactList
-      where ContactList_listid='$id' and ContactList_contactid='$con_id'";
+    $query = "delete
+      from ProjectUser
+      where projectuser_deal_id = $id
+        and projectuser_userobm_id = '$mem_id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -342,22 +344,73 @@ function run_query_memberlist_delete($project) {
 //   - $u_id      : user id
 //   - $missing   : new missing time
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_advanceupdate($p_id, $u_id, $missing) {
+function run_query_projectupdate($project) {
   global $auth, $cdg_sql;
 
-  $query = "update ProjectUser set
-      projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
-      projectuser_userupdate='". $auth->auth["uid"] ."',
-      projectuser_missingtime =  $missing
-    where projectuser_deal_id = $p_id
-      and projectuser_userobm_id = $u_id
-  ";
-
-  display_debug_msg($query, $cdg_sql);
+  $p_id = $project["id"];
   $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
 
-  return $retour;
+  // Update project estimated missing times
+  while ( list($m_id, $projtime) = each($project["projected"]) ) {
+    if ($projtime != "") {
+
+      $query = "update ProjectUser set
+          projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
+          projectuser_userupdate='". $auth->auth["uid"] ."',
+          projectuser_missingtime =  $projtime,
+          projectuser_projectedtime =  $projtime
+        where projectuser_deal_id = $p_id
+          and projectuser_userobm_id = $m_id
+      ";
+      
+      display_debug_msg($query, $cdg_sql);
+      $retour = $obm_q->query($query);
+      
+      if (!($retour))
+	$ins_err = 1;
+    }
+  }
+
+
+  return $ins_err;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Advance Update query execution                                            //
+// Parameters:
+//   - $p_id      : project id
+//   - $u_id      : user id
+//   - $missing   : new missing time
+///////////////////////////////////////////////////////////////////////////////
+function run_query_advanceupdate($project) {
+  global $auth, $cdg_sql;
+
+  $p_id = $project["id"];
+  $obm_q = new DB_OBM;
+
+  // Update project estimated missing times
+  while ( list($m_id, $misstime) = each($project["missing"]) ) {
+    if ($misstime != "") {
+      
+      $query = "update ProjectUser set
+          projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
+          projectuser_userupdate='". $auth->auth["uid"] ."',
+          projectuser_missingtime =  $misstime
+        where projectuser_deal_id = $p_id
+          and projectuser_userobm_id = $m_id
+      ";
+      
+      display_debug_msg($query, $cdg_sql);
+      $retour = $obm_q->query($query);
+      
+      if (!($retour))
+	$ins_err = 1;
+    }
+  }
+
+
+  return $ins_err;
 }
 
 
@@ -380,6 +433,7 @@ function run_query_statlog($p_id) {
   $obm_q->next_record();
 
   $time_used = $obm_q->f("time_used");
+  if ($time_used == "")  $time_used = 0;
 
   $query = "select sum(projectuser_missingtime) as time_left
             from ProjectUser
@@ -549,20 +603,41 @@ function run_query_memberstime($p_id) {
   global $cdg_sql;
 
   $query = "select
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname,
-      sum(task_length) as used_time,
-      projectuser_projectedtime as projected_time,
-      projectuser_missingtime as missing_time,
-      projectuser_manager
-    from Task, UserObm, ProjectUser
-    where task_deal_id=$p_id
-      and task_user_id=userobm_id
-      and projectuser_userobm_id=task_user_id
-      and projectuser_deal_id=task_deal_id
-    group by task_user_id
-    order by projectuser_manager desc, userobm_lastname, userobm_firstname";
+userobm_id,
+userobm_lastname,
+userobm_firstname,
+sum(task_length) as used_time,
+projectuser_projectedtime as projected_time,
+projectuser_missingtime as missing_time,
+projectuser_manager
+
+from UserObm, ProjectUser
+left join Task 
+on  task_deal_id = $p_id
+and task_user_id = userobm_id
+
+where projectuser_deal_id = $p_id
+and projectuser_userobm_id = userobm_id
+
+group by userobm_id, task_user_id
+order by projectuser_manager desc, userobm_lastname, userobm_firstname
+";
+
+//   $query = "select
+//       userobm_id,
+//       userobm_lastname,
+//       userobm_firstname,
+//       sum(task_length) as used_time,
+//       projectuser_projectedtime as projected_time,
+//       projectuser_missingtime as missing_time,
+//       projectuser_manager
+//     from Task, UserObm, ProjectUser
+//     where task_deal_id=$p_id
+//       and task_user_id=userobm_id
+//       and projectuser_userobm_id=task_user_id
+//       and projectuser_deal_id=task_deal_id
+//     group by projectuser_userobm_id
+//     order by projectuser_manager desc, userobm_lastname, userobm_firstname";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

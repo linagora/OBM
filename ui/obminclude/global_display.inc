@@ -317,13 +317,13 @@ class OBM_DISPLAY {
       // and for each entry (field) we set special parameters and display it
       while ($this->display_pref->next_record()) {
 	// Default values
+	$fieldname = $this->display_pref->f("display_fieldname");
 	$name = $this->data_set->f($fieldname);
 	$url = "";
 	$popup = false;
 	$popup_width = 600;
 	$popup_height = 400;
 	$align = "left";
-	$fieldname = $this->display_pref->f("display_fieldname");
 
         //--------------------------------------------------
         // Global field display disposition

@@ -273,6 +273,8 @@ CREATE TABLE Deal (
   deal_archive char(1) DEFAULT '0',
   deal_todo varchar(128),
   deal_visibility int(2) DEFAULT '0',
+  deal_soldtime int(8) DEFAULT NULL,
+  deal_state int(1) DEFAULT 0,
   PRIMARY KEY (deal_id)
 );
 
@@ -303,6 +305,42 @@ CREATE TABLE DealType (
   dealtype_label varchar(16),
   dealtype_inout varchar(1) DEFAULT '-',
   PRIMARY KEY (dealtype_id)
+);
+
+-------------------------------------------------------------------------------
+-- Project module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'ProjectStat'
+--
+CREATE TABLE ProjectStat (
+  projectstat_deal_id int(8) NOT NULL,
+  projectstat_date timestamp(14) NOT NULL,
+  projectstat_timeupdate timestamp(14) NOT NULL,
+  projectstat_timecreate timestamp(14) NOT NULL,
+  projectstat_userupdate int(8) default NULL,
+  projectstat_usercreate int(8) default NULL,
+  projectstat_useddays int(8) default NULL,
+  projectstat_remainingdays int(8) default NULL,
+  PRIMARY KEY (projectstat_deal_id, projectstat_date)
+);
+
+--
+-- Table structure for table 'ProjectUser'
+--
+CREATE TABLE ProjectUser (
+  projectuser_deal_id int(8) NOT NULL,
+  projectuser_userobm_id int(8) NOT NULL,
+  projectuser_timeupdate timestamp(14) NOT NULL,
+  projectuser_timecreate timestamp(14) NOT NULL,
+  projectuser_userupdate int(8) default NULL,
+  projectuser_usercreate int(8) default NULL,
+  projectuser_projectedtime int(8) default NULL,
+  projectuser_missingtime int(8) default NULL,
+  projectuser_validity timestamp(14) default NULL,
+  projectuser_soldprice int(8) default NULL,
+  projectuser_manager int(1) default NULL,
+  PRIMARY KEY (projectuser_deal_id, projectuser_userobm_id)
 );
 
 -------------------------------------------------------------------------------
