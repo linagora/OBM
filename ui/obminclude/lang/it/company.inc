@@ -15,7 +15,6 @@ $l_kind = "Tipo";
 $l_market = "Person in charge";
 $l_activity = "Attività";
 $l_company_kind = "Tipo Azienda";
-$l_country = "Nazione";
 $l_fax = "Fax";
 $l_web = "Web";
 $l_email = "E-Mail";

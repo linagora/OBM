@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Norwegian                                                //
 //     - File     : contact.inc                                              //
@@ -22,10 +22,7 @@ $l_mobilephone = "Mobile";
 $l_homephone = "Home"; 
 $l_fax = "Fax";
 $l_address = "Adresse";
-$l_postcode = "Postnummer";
-$l_country = "Land";
 $l_email = "E-post";
-$l_comment = "Kommentar";
 
 $l_contact_select_company = "Velg firma for kontakten.";
 

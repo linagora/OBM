@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_display.php                                             //
 //     - Desc : List Display File                                            //
-// 2000-01-20 Vincent MARGUERIT                                              //
+// 2000-01-20 Aliacom - Vincent MARGUERIT                                    //
 // 2001-08-23 jlb : add list_comment, add export for letter mailing
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -37,6 +37,7 @@ $fieldnames["address3"] = "$l_address 3";
 $fieldnames["zipcode"] = $l_postcode;
 $fieldnames["town"] = $l_town;
 $fieldnames["expresspostal"] = $l_expresspostal;
+$fieldnames["country_name"] = $l_country;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_mobilephone"] = $l_hphone;
 $fieldnames["contact_email"] = $l_email;
@@ -93,23 +94,29 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_address1") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address1") . " ";
       }
       if ($OD->data_set->f("contact_address2") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address2") . " ";
       }
       if ($OD->data_set->f("contact_address3") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address3");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_address1") != "") {
 	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address1") . " ";
       }
       if ($OD->data_set->f("company_address2") != "") {
 	$res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address2") . " ";
       }
       if ($OD->data_set->f("company_address3") != "") {
 	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address3");
       }
     }
   }
@@ -119,11 +126,13 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_address1") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address1");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_address1") != "") {
 	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address1");
       }
     }
   }
@@ -133,11 +142,13 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_address2") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address2");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_address2") != "") {
 	$res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address2");
       }
     }
   }
@@ -147,11 +158,13 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_address3") != "") {
 	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address3");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_address3") != "") {
 	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address3");
       }
     }
   }
@@ -161,11 +174,13 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_town") != "") {
 	$res["name"] .= $OD->data_set->f("contact_town")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_town");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_town") != "") {
 	$res["name"] .= $OD->data_set->f("company_town")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_town");
       }
     }
   }
@@ -175,11 +190,13 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_zipcode") != "") {
 	$res["name"] .= $OD->data_set->f("contact_zipcode")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_zipcode");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_zipcode") != "") {
 	$res["name"] .= $OD->data_set->f("company_zipcode")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_zipcode");
       }
     }
   }
@@ -189,11 +206,13 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ( $contact_has_address ) {
       if ($OD->data_set->f("contact_expresspostal") != "") {
 	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
       }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_expresspostal") != "") {
 	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_expresspostal");
       }
     }
   }

@@ -38,6 +38,7 @@ $l_address = "Indirizzo";
 $l_postcode = "CAP";
 $l_town = "Citta";
 $l_expresspostal = "CAP 2";
+$l_country = "Nazione";
 $l_priority = "Priorita";
 $l_datasource = "Data sorgente";
 $l_cat = "Categoria";

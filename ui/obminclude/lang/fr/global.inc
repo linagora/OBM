@@ -39,6 +39,7 @@ $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";
 $l_expresspostal = "Cedex";
+$l_country = "Pays";
 $l_priority = "Priorité";
 $l_datasource = "Source de données";
 $l_after = "Après";

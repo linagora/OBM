@@ -17,7 +17,6 @@ $l_activity = "Secteur d'activité";
 $l_nafcode = "Code NAF";
 $l_market = "Responsable du compte";
 $l_company_kind = "Type Société";
-$l_country = "Pays";
 $l_fax = "Fax";
 $l_web = "W";
 $l_email = "@M";

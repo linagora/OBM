@@ -14,7 +14,14 @@
 // Direct fields
 $fieldnames["company_name"] = $l_name;
 $fieldnames["company_archive"] = $l_archive_first;
-$fieldnames["company_address1"] = $l_address;
+$fieldnames["company_address"] = $l_address;
+$fieldnames["company_address1"] = "$l_address 1";
+$fieldnames["company_address2"] = "$l_address 2";
+$fieldnames["company_address3"] = "$l_address 3";
+$fieldnames["company_zipcode"] = $l_postcode;
+$fieldnames["company_town"] = $l_town;
+$fieldnames["company_expresspostal"] = $l_expresspostal;
+$fieldnames["country_name"] = $l_country;
 $fieldnames["company_phone"] = $l_phone;
 $fieldnames["company_fax"] = $l_fax;
 $fieldnames["company_email"] = $l_email;
@@ -106,7 +113,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
   }
   
-  else if ($fieldname == "company_address1") {
+  else if ($fieldname == "company_address") {
     if ($OD->data_set->f("company_address1") != "") {
       $res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
     }

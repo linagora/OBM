@@ -22,7 +22,6 @@ $l_minimphone = "(Celular)";
 $l_email = "E-Mail";
 $l_mailing_ok = "Correo habilitado";
 $l_fax = "Fax";
-$l_country = "Pais";
 $l_comment = "Comentarios";
 $l_coord = "Detalles";
 $l_contact_name = "Nombre contacto";

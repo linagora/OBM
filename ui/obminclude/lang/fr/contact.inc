@@ -24,7 +24,6 @@ $l_email = "@M";
 $l_email_other = "Autre Mail";
 $l_mailing_ok = "Activé pour mailing";
 $l_fax = "Fax";
-$l_country = "Pays";
 $l_coord = "Coordonnées";
 $l_contact_name = "Nom Contact";
 $l_from_company = "&nbsp;&nbsp;Société";

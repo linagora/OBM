@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_query.inc                                               //
 //     - Desc : list query File                                              //
-// 2000-06-07 Vincent MARGUERIT                                              //
+// 2000-06-07 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,8 @@ function run_query_update($list) {
   if (isset($list["criteria"])) {
     $list_critery = serialize($list["criteria"]);
   }
-  $query = "update List set list_timeupdate='". date("Y-m-d H:i:s")."',
+  $query = "update List set
+    list_timeupdate='". date("Y-m-d H:i:s")."',
     list_userupdate='".$auth->auth["uid"]."',
     list_visibility='$vis',
     list_name='$name',
@@ -323,7 +324,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_town,
          contact_expresspostal,
          contact_country_id,
-         country_name as contact_country,
+         country_name,
          contact_function_id,
          function_label as contact_function,
          contact_phone,
@@ -924,6 +925,13 @@ function make_query($list) {
         kind_lang,
         function_label,
         contact_title,
+        contact_address1,
+        contact_address2,
+        contact_address3,
+        contact_zipcode,
+        contact_town,
+        contact_expresspostal,
+        country_name,
         contact_phone,
         contact_homephone,
         contact_email,
@@ -944,6 +952,13 @@ function make_query($list) {
         kind_lang,
         function_label,
         contact_title,
+        contact_address1,
+        contact_address2,
+        contact_address3,
+        contact_zipcode,
+        contact_town,
+        contact_expresspostal,
+        country_name,
         contact_phone,
         contact_homephone,
         contact_email,
@@ -957,6 +972,7 @@ function make_query($list) {
         company_town";
 	
   $join = " Contact left join Company on contact_company_id=company_id
+                    left join Country on contact.contact_country_id=country_id
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
 	     
@@ -1067,7 +1083,7 @@ function make_final_query($query,$con_q) {
 	WHERE 
 	contact_id IN (";
 	
-  while($con_q->next_record()) {
+  while ($con_q->next_record()) {
     $final_query .= "$coma ".$con_q->f("contact_id");
     $coma = ",";
   }

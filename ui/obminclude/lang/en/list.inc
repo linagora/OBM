@@ -45,7 +45,6 @@ $l_function = "Function";
 $l_company = "Company";
 $l_hphone = "Home phone";
 $l_contact = "Contact";
-$l_country = "Country";
 $l_status = "Status";
 $l_letter = "L. Head";
 

@@ -46,7 +46,6 @@ $l_function = "Fonction";
 $l_company = "Société";
 $l_hphone = "Tél perso";
 $l_contact = "Contact";
-$l_country = "Pays";
 $l_status = "Genre";
 $l_letter = "En tête";
 

@@ -31,17 +31,6 @@ $l_modify = "Modifica";
 $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_kind = "Tipo";
-$l_function = "Funzione";
-$l_hphone = "Tel. personale";
-$l_minihphone = "(Perso)";
-$l_mphone = "Cellulare";
-$l_minimphone = "(Cell 2)";
-$l_email = "@M";
-$l_fax = "Fax";
-$l_address = "Indirizzo";
-$l_postcode = "CP";
-$l_town = "Città";
-$l_country = "Stato";
 
 $l_week_sel = "Settimana di ricerca";
 $l_from_company = "&nbsp;&nbsp;Azienda";

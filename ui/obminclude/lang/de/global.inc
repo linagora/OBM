@@ -38,6 +38,7 @@ $l_address = "Adresse";
 $l_postcode = "Postleitzahl";
 $l_town = "Ort";
 $l_expresspostal = "Eilzustellung";
+$l_country = "Land";
 $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_cat = "Kategorie";

@@ -24,8 +24,6 @@ $l_mobilephone = "Mobile";
 $l_homephone = "Home"; 
 $l_fax = "Telefax";
 $l_address = "Adresse";
-$l_postcode = "PLZ";
-$l_country = "Land";
 
 $l_contact_select_company = "Firmenauswahl für den Kontakt";
 

@@ -647,7 +647,7 @@ class OBM_DISPLAY {
 
   /////////////////////////////////////////////////////////////////////////////
   // Function that display the dataset headers (col names)
-  //   for result in a file (as .csv)
+  // for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header_file($sep) {
     global $fieldnames, $cdg_id, $set_debug;

@@ -17,14 +17,12 @@ $l_activity = "Activity";
 $l_nafcode = "Code";
 $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
-$l_country = "Country";
 $l_fax = "Fax";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Details";
 
 // Labels and texts
-$l_comment = "Comment";
 $l_contact_new = "New Contact";
 $l_deal_new = "New Deal";
 $l_project_new = "New Projet";
