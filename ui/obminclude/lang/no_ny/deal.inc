@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Norwegian                                                //
 //     - File     : deal.inc                                                 //
@@ -31,8 +31,6 @@ $l_manager= "Manager";
 $l_proposition = "Forslag";
 $l_amount = "Sum";
 $l_contacts = "Kontaktar";
-$l_add_comment = "Add a Kommentar";
-$l_upd_comment = "Update Kommentar";
 $l_company = "Firma";
 $l_show_archive = "Vis arkiv";
 $l_date = "Dato";

@@ -358,7 +358,12 @@ function run_query_contact_insert($contact) {
   $email = $contact["email"];
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
-  $com = $contact["com"];
+  $add_comment = $contact["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $contact["datecomment"];
+    $usercomment = $contact["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
   $vis = (isset($contact["vis"]) ? $contact["vis"] : '0');
 
@@ -421,7 +426,7 @@ function run_query_contact_insert($contact) {
     '$mailok',
     '$arch',
     '$vis',
-    '$com')";
+    '$comment')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -514,7 +519,13 @@ function run_query_contact_update($contact) {
   $email = $contact["email"];
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
-  $com = $contact["com"];
+  $comment = $contact["com"];
+  $add_comment = $contact["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $contact["datecomment"];
+    $usercomment = $contact["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
   $vis = (isset($contact["vis"]) ? $contact["vis"] : '0');
   $cat1 = $contact["category1"];
@@ -548,7 +559,7 @@ function run_query_contact_update($contact) {
     contact_mailing_ok='$mailok',
     contact_archive='$arch',
     contact_visibility='$vis',
-    contact_comment='$com'
+    contact_comment='$comment'
   where contact_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

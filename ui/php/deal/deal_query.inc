@@ -80,7 +80,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
                       or deal_usercreate='" . $auth->auth["uid"] . "')";
   }
   if ($label != "") {
-    $query .= " and deal_label $like '$label%'";
+    $query .= " and deal_label $like '%$label%'";
   }
   if (($kind != $c_all) && ($kind != "")) {
     $query .= " and dealtype_id='$kind'";
@@ -221,9 +221,7 @@ function run_query_insert($deal) {
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $cats = $deal["category"];
-
   $add_comment = $deal["add_comment"];
-  
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
     $usercomment = $deal["usercomment"];
@@ -311,6 +309,8 @@ function run_query_insert($deal) {
 
   return $d_id;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Deal Update query execution                                               //
 // Parameters:
@@ -341,13 +341,12 @@ function run_query_update($deal) {
   $todo = $deal["todo"];
   $comment = $deal["com"];
   $add_comment = $deal["add_comment"];
-  $cat_m = $deal["category"];
-
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
     $usercomment = $deal["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
+  $cat_m = $deal["category"];
   
   $query = "update Deal set
     deal_timeupdate='". date("Y-m-d H:i:s")."',

@@ -456,15 +456,14 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $comment = $contract_q->f("contract_comment");
     $archive = $contract_q->f("contract_archive");
 
-
-// comp info below could be directly fetched from contract_q query XXXXX
+    // comp info below could be directly fetched from contract_q query XXXXX
    
-   $comp_name = $comp_q->f("company_name");
+    $comp_name = $comp_q->f("company_name");
     $ad1 = $comp_q->f("company_address1");
     $zip = $comp_q->f("company_zipcode");
     $town = $comp_q->f("company_town");
    
-   $deal_id = $contract_q->f("deal_id");
+    $deal_id = $contract_q->f("deal_id");
     $deal_label = $contract_q->f("deal_label");
 
   } elseif ($action == "new") {
@@ -609,8 +608,9 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">
-        $comp_name <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
+        <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
         <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+        $comp_name
       </td>
       <td class=\"detailText\">$ad1
         <br />$zip $town

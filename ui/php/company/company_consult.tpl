@@ -72,7 +72,7 @@ $block_cat
   
   <table class="detail">
     <tr> 
-      <td class="detailText">$lcom
+      <td class="detailText">$com
       </td>
     </tr>
   </table>

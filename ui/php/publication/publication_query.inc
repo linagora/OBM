@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : publication_query.inc                                            //
-//     - Desc : publication query File                                           //
+// OBM - File : publication_query.inc                                        //
+//     - Desc : publication query File                                       //
 // 2004-01-28 Rande Mehdi                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -232,13 +232,13 @@ function run_query_auto_insert($publication){
   return $retour;
 }
 
- ///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
 // Auto Subscription Insertion query execution                                 
 // Parameters:
 //   - $auto_sub[] : List of contact_type to subscribe
-//   -p_id :  Id of the subscription
+//   - $p_id       :  Id of the subscription
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_auto_subscription($publication,$p_id){
   global $auth, $cdg_sql, $c_focsys;
   $auto_sub =   $publication["auto_sub"];
@@ -290,12 +290,11 @@ function run_query_auto_subscription($publication,$p_id){
 
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query); 
+}
 
-    
-  }
  
 ///////////////////////////////////////////////////////////////////////////////
-// Subscription Insertion query execution                                                 //
+// Subscription Insertion query execution
 // Parameters:
 //   - $publication[] : Entry's values
 //     keys used  : 
@@ -347,7 +346,7 @@ function run_query_insert_subscription($publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Subscription Update query execution                                                 //
+// Subscription Update query execution
 // Parameters:
 //   - $publication[] : Entry's values
 //     keys used  : 
@@ -446,25 +445,6 @@ function run_query_delete_subscription($p_id,$c_id) {
   return $retour;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Contact: Publication select query execution                                   //
-// Returns : DB object result with all publications
-///////////////////////////////////////////////////////////////////////////////
-function run_query_active_publication() {
-  global $cdg_sql;
-
-  $query = "select publication_id, publication_title, publication_town
-            from Publication
-            where publication_archive='0'
-            order by publication_title";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the contacts attached to the publication
@@ -479,46 +459,6 @@ function run_query_publication_contact_links($p_id) {
             from Contact Left Join Subscription ON subscription_contact_id = contact_id
             where subscription_publication_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the deals attached to the publication
-// Parameters:
-//   - $p_id : publication Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_deal_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select distinct deal_id, deal_label
-    from Deal
-    where deal_publication_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the contracts attached to the publication
-// Parameters:
-//   - $p_id : publication Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_contract_links($p_id) {
-  global $cdg_sql;
-
-  $query = "select distinct contract_id, contract_label 
-            from Contract, Contact
-            where contract_publication_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
@@ -556,7 +496,7 @@ function run_query_check_publication($p_id, $title, $lang) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Type publication query execution                                              //
+// Type publication query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : company_js.inc                                              //
 //     - Desc  : Company javascript functions File                           //

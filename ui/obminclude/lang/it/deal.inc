@@ -27,8 +27,6 @@ $l_hitrate = "Hit Rate";
 $l_state = "Stato";
 $l_date_alarm = "Data avviso";
 $l_todo = "Da fare";
-$l_add_comment = "Nuovo commento";
-$l_upd_comment = "Modifica commento";
 
 // Labels and texts
 $l_minus = "-";

@@ -27,7 +27,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $p_num = $contract["number"];
   $manager = $contract["manager"];
   $p_deal = $contract["deal_id"];
-  
+  $company_id = $contract["company_id"];
   $archive = $contract["archive"];
   
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
@@ -47,9 +47,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       company_name as contract_company_name,
       contracttype_label,
       contract_type_id,
-      
       contract_archive,
-      
       contract_techmanager_id,
       contract_marketmanager_id,
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
@@ -72,6 +70,9 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   if ($comp != "")
     $query .= " and (company_name $like '%$comp%')";
 
+  if ($company_id != "")
+    $query .= " and company_id = '$company_id'";
+
   if ($p_dateafter != "")
     $query .= " and (contract_dateexp >= '$p_dateafter')";
 
@@ -84,16 +85,13 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   if (($manager != $c_all) && ($manager != "")) {
     $query .= " and (contract_techmanager_id='$manager'
                     or contract_marketmanager_id='$manager') ";
-  } 
-  if ($p_deal != "")
+  }
+  if ($p_deal != "") {
     $query .= " and (contract_deal_id = '$p_deal')";
-
-  
-
-
- $query .= " and contract_archive = '$archive'";
-
-
+  }
+  if ($archive != "1") {
+    $query .= " and contract_archive = 0";
+  }
 
   $query .= " order by $order $p_order_dir";
 

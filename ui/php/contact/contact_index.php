@@ -398,7 +398,8 @@ function get_param_contact() {
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
+  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_vis, $ta_com;
+  global $tf_datecomment, $sel_usercomment, $ta_add_comment, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
   global $tf_func, $tf_label, $tf_lang, $tf_header,$view;
@@ -463,6 +464,9 @@ function get_param_contact() {
   if (isset ($cb_vis)) $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
+  if (isset ($tf_datecomment)) $contact["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $contact["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $contact["add_comment"] = trim($ta_add_comment);
 
   // Admin - Function fields
   // $sel_func -> "function" is already set

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : contact_js.inc                                              //
 //     - Desc  : Contact javascript functions File                           //
@@ -83,10 +83,11 @@ function check_func_checkdel(sel)
       return false;
    }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category check or deletion is possible                       //
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_cat1_checkdel(form)
 {
    if (form.sel_cat1.selectedIndex >= 0)
@@ -99,10 +100,11 @@ function check_cat1_checkdel(form)
       return false;
    }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category check or deletion is possible                       //
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_cat2_checkdel(form)
 {
    if (form.sel_cat2.selectedIndex >= 0)
@@ -115,6 +117,8 @@ function check_cat2_checkdel(form)
       return false;
    }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the function update is possible                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,52 +153,48 @@ function check_func_new(form)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_cat1_new(form)
 {
    if (form.tf_cat1.value != \"\")
       return true;
-   else
-   {
+   else {
       alert(\"$l_j_cat1_create\");
       return false;
    }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_cat2_new(form)
 {
    if (form.tf_cat2.value != \"\")
       return true;
-   else
-   {
+   else {
       alert(\"$l_j_cat2_create\");
       return false;
    }
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_checkdel(sel)
 {
-  if (sel.selectedIndex >= 0)
-  {
+  if (sel.selectedIndex >= 0) {
     return true;
-  }
-  else
-  {
+  } else {
     alert(\"$l_j_kind_delete\");
     return false;
   }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category update is possible
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_cat1_upd(form,formd)
 {
   cat1_pos = formd.sel_cat1.selectedIndex;
@@ -206,11 +206,11 @@ function check_cat1_upd(form,formd)
      return false;
    }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category update is possible
 ///////////////////////////////////////////////////////////////////////////////
-
-
 function check_cat2_upd(form,formd)
 {
   cat2_pos = formd.sel_cat2.selectedIndex;
@@ -254,6 +254,8 @@ function check_kind_new(form)
       return true;
    }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the Kind's mini label select.
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,13 +281,12 @@ function fill_select_label(source)
   }
   destination.selectedIndex=0;
   kind.selectedIndex=0;
-  
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the Kind's header select.
 ///////////////////////////////////////////////////////////////////////////////
-
 function fill_select_header(source) 
 {
   destination = source.form.sel_kind;
@@ -306,15 +307,17 @@ function fill_select_header(source)
   
 }
 ";
+
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
   function get_elem(doc, name ) {
     return doc.getElementById(name);
   }  
-   function fill_ext_form(repo_path) {
-     ext_field = window.opener.document.$ext_target;
-     ext_field.value = repo_path;
-     window.close();
+
+  function fill_ext_form(repo_path) {
+    ext_field = window.opener.document.$ext_target;
+    ext_field.value = repo_path;
+    window.close();
   } 
   
   function fill_ext_form2(int_form) {
@@ -325,7 +328,7 @@ if (isset($ext_target) && $ext_target!="") {
        if(int_form.elements[i].checked == true) {
 	 ext_size = ext_field.length;
 	 bool = false;
-	 for(j=0; j< ext_size  && bool == false; j++) {
+	 for(j=0; j<ext_size && bool == false; j++) {
 	   if(ext_field.options[j].value == int_form.elements[i].name) {
 	     ext_field.options[j].selected =true;
 	     bool = true;

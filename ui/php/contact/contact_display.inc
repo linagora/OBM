@@ -42,7 +42,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
   }
 
-  else if (($fieldname == "contact_company_name") && $link_ok){
+  else if (($fieldname == "contact_company_name") && $link_ok) {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contact_company_id");
   }
 
@@ -501,7 +501,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $email = $co_q->f("contact_email");
   $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
-  $com = nl2br($co_q->f("contact_comment"));
+  $com = beautify_comment(nl2br($co_q->f("contact_comment")));
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
 
@@ -892,9 +892,10 @@ function dis_contact_form($action, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add;
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone,$l_letter;
-  global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
-  global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
+  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_letter;
+  global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
+  global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok;
+  global $l_comment, $l_add_comment, $l_upd_comment;
   global $l_service, $l_email_other;
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
@@ -904,6 +905,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
 
   $cat1 = array();
   $cat2 = array();
+  $uid = $auth->auth["uid"];
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -935,7 +937,9 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
     $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
     $vis = $co_q->f("contact_visibility");
-    $com = $co_q->f("contact_comment");
+    $comment = $co_q->f("contact_comment");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
     $cat1 = run_query_get_contactcategory1($id);
     $cat2 = run_query_get_contactcategory2($id);
 
@@ -943,6 +947,8 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   } elseif ($action == "new") {
     $dsrc = $set_dsrc;
     $mark = $auth->auth["uid"];
+    $usercomment = $uid;
+    $datecomment = isodate_format();
     if ($cgp_mailing_default) {
       $mailok = " checked";
     }
@@ -994,7 +1000,10 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
   if (isset($contact["email2"])) { $email2 = stripslashes($contact["email2"]); }
   if (isset($contact["mailok"])) { $mailok = ($contact["mailok"] == 1 ? "checked" : ""); }
-  if (isset($contact["com"])) { $com = stripslashes($contact["com"]); }
+  if (isset($contact["comment"])) { $comment = stripslashes($contact["com"]); }
+  if (isset($contact["add_comment"])) { $add_comment = stripslashes($contact["add_comment"]); }
+  if (isset($contact["usercomment"])) { $usercomment = $contact["usercomment"]; }
+  if (isset($contact["datecomment"])) { $datecomment = $contact["datecomment"]; }
   if (isset($company["cat"])) { $compcat = $company["cat"]; }  
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($contact["category2"])) { $cat2 = $contact["category2"]; }  
@@ -1217,6 +1226,33 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
       </td>";
   }
 
+  // User comment select construction
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
+  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+    $sel_usercomment .= "<option value=\"$cname\"";
+    // First time default to uid of connected user (uid) then set to name
+    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+      $sel_usercomment .= " selected = \"selected\"";
+    }
+    $sel_usercomment .= ">$cname</option>\n";
+  }
+  $sel_usercomment .= "</select>";
+
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
+  }
+
 
   // If new contact or contact update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -1228,7 +1264,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   }
 
   // UPDATE 
-  if (($action=="detailupdate") || ($action=="update")) {
+  if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
@@ -1345,7 +1381,11 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
 
     <table class=\"detail\">
     <tr>
-    <td colspan=\"2\" class=\"detailForm\"><textarea name=\"ta_com\" rows=\"6\" cols=\"60\">$com</textarea></td>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      $dis_comment
     </tr>
     </table>
 

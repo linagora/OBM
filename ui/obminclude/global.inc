@@ -407,6 +407,85 @@ function get_hour($timestamp="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Parse and prepare the layout of a comment as a blog
+// Separe comment in section displayed with different colors
+// The secion separator is a line beginning with "nnnn-nn-nn:aa:"
+// Parameters :
+//   - $com     : comment text to handle
+//   - $p_order : Comment order (1 = reverse, else chronological)
+//              : if not set, take $set_commentorder pref
+///////////////////////////////////////////////////////////////////////////////
+function beautify_comment($com, $p_order="") {
+  global $cco_chro, $cco_rev, $set_commentorder;
+
+  $col0 = "FFFFFF";
+  $col1 = "BBBBBB";
+
+  if ($p_order != "") {
+    $order = $p_order;
+  } else {
+    $order = $set_commentorder;
+  }
+
+  // Chronological Order
+  if ($order == $cco_chro) {
+
+    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
+    $replace = "</td>
+    </tr>
+    <tr>
+      <td bgcolor=\"#$col1\">\\2</td>
+    </tr><tr>
+      <td bgcolor=\"#$col0\">";
+
+    $res = preg_replace($pattern, $replace, $com, 1);
+    while (preg_match($pattern, $res)) {
+      $nb++;
+      $res = preg_replace($pattern, $replace, $res, 1);
+    }
+    
+    $result = "
+    <table border=\"1\" width=\"100%\">
+    <tr>
+      <td>$res</td>
+    </tr>
+    </table>";
+
+  } else {
+  // reverse Chronological Order
+    // pattern modifiers :
+    // U : Ungreedy
+    // s : "." matches all chars even newlines
+    // D : $ matches only end of text, not end of line
+    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)(.*)($|((^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)))/UsD";
+    $replace = "\\4";
+    $tmp = $com;
+    
+    while (preg_match($pattern, $tmp, $matches)) {
+      $nb++;
+      $who = $matches[2];
+      $text = $matches[3];
+      $row = "
+    <tr>
+      <td bgcolor=\"#$col1\">$who</td>
+    </tr><tr>
+      <td bgcolor=\"#$col0\">$text</td>
+    </tr>";
+      $rows = $row . $rows;
+      $tmp = preg_replace($pattern, $replace, $tmp, 1);
+    }
+
+    $result = "
+    <table border=\"1\" width=\"100%\">
+    $rows
+    </table>";
+  }
+
+  return $result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display an entity dates and users creation / update infos
 // Parameters:
 //   - $obm_q : DBO object : used fields

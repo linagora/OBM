@@ -617,7 +617,6 @@ function get_param_deal() {
   if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
   if (isset ($sel_state)) $deal["state"] = $sel_state;
   if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
-  if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
   if (isset ($tf_code)) $deal["cat_code"] = $tf_code;
   if (isset ($sel_cat)) $deal["category"] = $sel_cat;
@@ -625,12 +624,14 @@ function get_param_deal() {
     $deal["archive"] = $cb_archive;
   }
   if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
-    $deal["vis"] = ($cb_vis == 1 ? 1 : 0);
+  $deal["vis"] = ($cb_vis == 1 ? 1 : 0);
+  if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $deal["add_comment"] = trim($ta_add_comment);
   if (isset ($hd_usercreate)) $deal["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $deal["timeupdate"] = $hd_timeupdate;
+
   // Parent Deal fields
   if (isset ($tf_plabel)) $deal["plabel"] = $tf_plabel;
   if (isset ($sel_pmarket)) $deal["pmarket"] = $sel_pmarket;
@@ -765,7 +766,7 @@ function get_deal_action() {
   // New
   $actions["DEAL"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 

@@ -261,7 +261,12 @@ function run_query_insert($company) {
   $fax = $company["fax"];
   $web = $company["web"];
   $email = $company["email"];
-  $com = $company["com"];
+  $add_comment = $company["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $company["datecomment"];
+    $usercomment = $company["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
   $compcat = $company["cat"];
   
   $query = "insert into Company (company_timeupdate,
@@ -315,7 +320,7 @@ function run_query_insert($company) {
     '$fax',
     '$web',
     '$email',
-    '$com')";
+    '$comment')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -403,7 +408,13 @@ function run_query_update($cid, $company) {
   $fax = $company["fax"];
   $web = $company["web"];
   $email = $company["email"];
-  $com = $company["com"];
+  $comment = $company["com"];
+  $add_comment = $company["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $company["datecomment"];
+    $usercomment = $company["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   $compcat = $company["cat"];
 
   $query = "update Company set
@@ -430,7 +441,7 @@ function run_query_update($cid, $company) {
     company_fax='$fax',
     company_web='$web',
     company_email='$email',
-    company_comment='$com'
+    company_comment='$comment'
   where company_id='$cid'";
 
   display_debug_msg($query, $cdg_sql);

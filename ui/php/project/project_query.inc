@@ -430,8 +430,8 @@ function run_query_update($pid, $project) {
   $soldtime = ($project["soldtime"] ? "'".$project["soldtime"]."'" : "null");
   $estimated = ($project["estimated"] ? "'".$project["estimated"]."'" : "null");
   $tt = $project["tt"];
-  $datebegin = ($project["datebegin"] ? $project["datebegin"] : "null");
-  $dateend = ($project["dateend"] ? $project["dateend"] : "null");
+  $datebegin = ($project["datebegin"] ? "'".$project["datebegin"]."'" : "null");
+  $dateend = ($project["dateend"] ? "'".$project["dateend"]."'" : "null");
   $archive = $project["archive"];
   if ($archive) {
     $arch = "1";
@@ -446,8 +446,8 @@ function run_query_update($pid, $project) {
       project_tasktype_id='$tt',
       project_soldtime=$soldtime,
       project_estimatedtime=$estimated,
-      project_datebegin='$datebegin',
-      project_dateend='$dateend',
+      project_datebegin=$datebegin,
+      project_dateend=$dateend,
       project_archive='$arch'
     where project_id='$pid'";
 

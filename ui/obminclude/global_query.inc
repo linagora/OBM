@@ -284,14 +284,19 @@ function run_query_tasktype($tt_cat="") {
 // Parameters:
 //   - $id     : Id of entity
 //   - $entity : entity (deal, company)
+//   - $arch   : flag to tell if archive projects should be counted (if true)
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_linked_project_nb ($id, $entity) {
+function run_query_linked_project_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
   $query = "select count(*) as nb from Project
     where project_${entity}_id = '$id'";
+
+  if (! $arch) {
+    $query .= " and project_archive='0'";
+  }
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);

@@ -26,9 +26,6 @@ $l_amount = "Cantidad";
 $l_hitrate = "Rata de Exito";
 $l_state = "Estado";
 $l_date_alarm = "Fecha de Alarma";
-$l_comment = "Comentario";
-$l_add_comment = "Adicionar un comentario";
-$l_upd_comment = "Actualizar comentario";
 $l_todo = "Tareas";
 
 // Labels and texts

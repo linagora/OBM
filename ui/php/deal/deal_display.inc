@@ -416,85 +416,6 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Parse and prepare the layout of a deal comment                            //
-// Separe comment in section displayed with different colors
-// The secion separator is a line beginning with "nnnn-nn-nn:aa:"
-// Parameters :
-//   - $com     : comment text to handle
-//   - $p_order : Comment order (1 = reverse, else chronological)
-//              : if not set, take $set_commentorder pref
-///////////////////////////////////////////////////////////////////////////////
-function beautify_deal_comment($com, $p_order="") {
-  global $cco_chro, $cco_rev, $set_commentorder;
-
-  $col0 = "FFFFFF";
-  $col1 = "BBBBBB";
-
-  if ($p_order != "") {
-    $order = $p_order;
-  } else {
-    $order = $set_commentorder;
-  }
-
-  // Chronological Order
-  if ($order == $cco_chro) {
-
-    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
-    $replace = "</td>
-    </tr>
-    <tr>
-      <td bgcolor=\"#$col1\">\\2</td>
-    </tr><tr>
-      <td bgcolor=\"#$col0\">";
-
-    $res = preg_replace($pattern, $replace, $com, 1);
-    while (preg_match($pattern, $res)) {
-      $nb++;
-      $res = preg_replace($pattern, $replace, $res, 1);
-    }
-    
-    $result = "
-    <table border=\"1\" width=\"100%\">
-    <tr>
-      <td>$res</td>
-    </tr>
-    </table>";
-
-  } else {
-  // reverse Chronological Order
-    // pattern modifiers :
-    // U : Ungreedy
-    // s : "." matches all chars even newlines
-    // D : $ matches only end of text, not end of line
-    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)(.*)($|((^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)))/UsD";
-    $replace = "\\4";
-    $tmp = $com;
-    
-    while (preg_match($pattern, $tmp, $matches)) {
-      $nb++;
-      $who = $matches[2];
-      $text = $matches[3];
-      $row = "
-    <tr>
-      <td bgcolor=\"#$col1\">$who</td>
-    </tr><tr>
-      <td bgcolor=\"#$col0\">$text</td>
-    </tr>";
-      $rows = $row . $rows;
-      $tmp = preg_replace($pattern, $replace, $tmp, 1);
-    }
-
-    $result = "
-    <table border=\"1\" width=\"100%\">
-    $rows
-    </table>";
-  }
-
-  return $result;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display: Deal links menu                                                  //
 // Parameters:
 //   - $deal_q : DBO : information about the deal
@@ -671,7 +592,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $timeu = date("H:i:s",$deal_q->f("timeupdate"));
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
-  $com = beautify_deal_comment(nl2br($deal_q->f("deal_comment")));
+  $com = beautify_comment(nl2br($deal_q->f("deal_comment")));
   $comp = $deal_q->f("company_name");
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
@@ -921,7 +842,7 @@ function html_category_list($deal) {
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
-  global $set_theme,$ico_company,$ico_contact,$l_company,$ico_add;
+  global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
   global $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
@@ -956,12 +877,12 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
     $archive = ($deal_q->f("deal_archive") == 1 ? " checked" : "");
     $todo = $deal_q->f("deal_todo");
     $comment = $deal_q->f("deal_comment");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
     $comp = $deal_q->f("company_name");
     $ad1 = $deal_q->f("company_address1");
     $zip = $deal_q->f("company_zipcode");
     $town = $deal_q->f("company_town");
-    $usercomment = $uid;
-    $datecomment = isodate_format();
     $cat_m = run_query_get_dealcategory($id);
   } elseif (($action == "new") || ($action == "insert")) {
     $comp = $comp_q->f("company_name");
@@ -1140,31 +1061,30 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   }
   $sel_state .= "</select>";
 
-  $js_state = "
-<script type=\"text/javascript\">
-<!--
-
-function auto_set_hitrate(select, targetField, pos) {
-";
-
   $sta_q->seek(0);
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $shitrate = $sta_q->f("dealstatus_hitrate");
     if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
-      $js_state .= "
+      $js_state_loop .= "
         if (select.options[pos].value == $sid) {
           targetField.value = $shitrate;
         }";
     }
   }
 
-  $js_state .= "  return true;
+  $js_state = "
+<script type=\"text/javascript\">
+<!--
+function auto_set_hitrate(select, targetField, pos) {
+$js_state_loop
+
+  return true;
 }
 -->
 </script>
 ";
-  
+
   // User comment select construction
   if ($usrc_q->nf()>0) {
     $usrc_q->seek(0);
@@ -1249,7 +1169,9 @@ function auto_set_hitrate(select, targetField, pos) {
     <tr>
       <td class=\"detailLabel\">
         <a href=\"" . url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
-        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a></td>
+        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        $comp
+      </td>
       <td class=\"detailText\">
         $ad1
         <br />$zip $town 

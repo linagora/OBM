@@ -48,7 +48,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
 
   if ($fieldname == "company_name") {
-    if($OD->data_specialfield == "ext_get_id") {
+    if ($OD->data_specialfield == "ext_get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".$OD->data_set->f("company_name")."');";
     }
     else {    
@@ -62,7 +62,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     else $res["name"] = "&nbsp;";
   }
 
-  else if ($fieldname == "company_email") {
+  else if (($fieldname == "company_email") && $link_ok) {
     $email = $OD->data_set->f("company_email");
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
@@ -70,7 +70,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == "company_web") {
+  else if (($fieldname == "company_web") && $link_ok) {
     $web = $OD->data_set->f("company_web");
     if (strcmp($web,"") != 0) {
       if ( (strcmp(substr($web,0,7), "http://") == 0)
@@ -90,13 +90,13 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "company_contact_number") {
     $res["name"] = $OD->data_set->f("company_contact_number");
-    if ($res["name"] > 0) {
+    if (($res["name"] > 0) && $link_ok) {
       $res["url"] = "$path/contact/contact_index.php?action=search&amp;param_company=".$OD->data_set->f("company_id")."&amp;tf_company=".urlencode("".$OD->data_set->f("company_name"));
     }
     $res["align"] = "center";
   }
 
-  else if ($fieldname == "company_new_contact") {
+  else if (($fieldname == "company_new_contact") && $link_ok){
     $res["align"] = "center";
     $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id");
     $res["name"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
@@ -107,7 +107,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $res["name"] .= $OD->data_set->f("company_deal_total");
     $res["txt_name"] .= $res["name"];
     $c_id = $OD->data_set->f("company_id");
-    if ($res["name"] != "0 / 0") {
+    if (($res["name"] != "0 / 0") && $link_ok) {
       $res["url"] = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";
     }
     $res["align"] = "center";
@@ -448,6 +448,8 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
   if ($popup) {
+    echo "AAAAAAAAAAAAAAAAAAAAAAAAAa";
+    $comp_d->display_link = false;
     $comp_d->data_specialfield = "ext_get_id";
     $display_popup_end = "
       <p>
@@ -509,7 +511,7 @@ function html_company_links($co_q) {
   if ($cgp_show["module"]["deal"]) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
-    $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id");
+    $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_deal = "
   <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
@@ -546,13 +548,15 @@ function html_company_links($co_q) {
   // Project
   if ($cgp_show["module"]["project"]) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
-    $nb_pro = run_query_linked_project_nb ($id,"company");
+    $nb_pro = run_query_linked_project_nb ($id, "company");
+    $nb_pro_total = run_query_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_project = "
   <div class=\"linkTitle\">:: $l_header_project</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" /></a>
-        <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>
+        $l_header_project ( <a href=\"$url_pro\">$nb_pro</a> /
+        <a href=\"$url_pro\">$nb_pro_total</a> )</li>
     <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
         <a href=\"$url_pro_new\">$l_project_new</a></li>
   </ul>";
@@ -625,7 +629,7 @@ function html_company_consult($co_q, $cat_q) {
   $email = $co_q->f("company_email");
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
-  $com = $co_q->f("company_comment");
+  $com = beautify_comment(nl2br($co_q->f("company_comment")));
 
   if ($mark > 0)
     $lmarket = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
@@ -749,7 +753,6 @@ function html_company_consult($co_q, $cat_q) {
     $link_web = "&nbsp;";
   }
 
-  $lcom = nl2br($com);
   $display["link"] = html_company_links($co_q);
   $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
@@ -786,8 +789,11 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
-  global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
+  global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
+  global $l_number, $l_market, $l_coord;
   global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
+
+  $uid = $auth->auth["uid"];
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -814,10 +820,14 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     $email = $co_q->f("company_email");
     $con_num = $co_q->f("company_contact_number");
     $deal_num = $co_q->f("company_deal_number");
-    $com = $co_q->f("company_comment");
+    $comment = $co_q->f("company_comment");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   } else  if ($action == "new") {
     $mark = $auth->auth["uid"];
     $dsrc = $set_dsrc;
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -842,7 +852,10 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (isset($company["fax"])) { $fax = stripslashes($company["fax"]); }
   if (isset($company["web"])) { $web = stripslashes($company["web"]); }
   if (isset($company["email"])) { $email = stripslashes($company["email"]); }
-  if (isset($company["com"])) { $com = stripslashes($company["com"]); }
+  if (isset($company["com"])) { $comment = stripslashes($company["com"]); }
+  if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
+  if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
+  if (isset($company["datecomment"])) { $datecomment = $company["datecomment"]; }
   if (isset($company["cat"])) { $compcat = $company["cat"]; }
 
   // Conditionnal fields
@@ -1027,6 +1040,34 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     $links = html_company_links($co_q);
   }
 
+  // User comment select construction
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
+  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+    $sel_usercomment .= "<option value=\"$cname\"";
+    // First time default to uid of connected user (uid) then set to name
+    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+      $sel_usercomment .= " selected = \"selected\"";
+    }
+    $sel_usercomment .= ">$cname</option>\n";
+  }
+  $sel_usercomment .= "</select>";
+
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
+  }
+
+  // Buttons
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <!-- Update button -->
@@ -1118,7 +1159,11 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea id=\"ta_com\" name=\"ta_com\" rows=\"8\" cols=\"80\">$com</textarea></td>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      $dis_comment
     </tr>
     </table>
 

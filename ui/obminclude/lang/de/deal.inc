@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Deutsch (German)                                         //
 //     - File     : deal.inc                                                 //
@@ -31,8 +31,6 @@ $l_proposition = "Vorschlag";
 $l_amount = "Bemerkung";
 $l_hitrate = "Hit Rate";
 $l_contacts = "Kontakte";
-$l_add_comment = "Add a comment";
-$l_upd_comment = "Update comment";
 $l_show_archive = "anzeigen Archiv";
 $l_date = "Datum";
 $l_date_init = "Startdatum";

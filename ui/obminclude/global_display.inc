@@ -671,7 +671,7 @@ class OBM_DISPLAY {
   // Function that display the dataset
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
-    function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
+  function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
     global $cdg_id, $set_debug;
 
     $this->dis_data_header_file($sep);

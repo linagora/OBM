@@ -91,13 +91,17 @@ if ($action == "ext_get_id") {
   $display["detail"] = html_select_company($comp_q, $company);
   
 } elseif ($action == "ext_get_cat_ids") {
+///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
   $display["detail"] =  html_category_tree($company);
+
 } elseif ($action == "ext_get_cat_code") {
+///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
   $display["detail"] =  html_category_code_tree($company);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -462,7 +466,8 @@ function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
   global $tf_email, $sel_act, $sel_naf, $sel_kind, $sel_cat, $sel_market;
-  global $ta_com, $tf_dateafter, $tf_datebefore, $cb_fuzzy;
+  global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
+  global $tf_dateafter, $tf_datebefore, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
   global $tf_naf_code, $tf_naf_label, $cb_naf_title;
   global $param_company, $cdg_param;
@@ -519,6 +524,9 @@ function get_param_company() {
   if (isset ($tf_web)) $company["web"] = $tf_web;
   if (isset ($tf_email)) $company["email"] = $tf_email;
   if (isset ($ta_com)) $company["com"] = $ta_com;
+  if (isset ($tf_datecomment)) $company["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $company["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $company["add_comment"] = trim($ta_add_comment);
 
   // Search fields
   if (isset ($tf_dateafter)) $company["dateafter"] = $tf_dateafter;

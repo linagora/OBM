@@ -97,7 +97,7 @@ if ($action == "ext_get_id") {
   }
   $usrc_q = run_query_all_users_from_group($cg_com);
   $usrp_q = run_query_all_users_from_group($cg_prod);
-  $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+  $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($contract["company_id"]),run_query_contact_contract($contract["company_id"]), $contract);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ if ($action == "ext_get_id") {
     $users = array($contract["market"], $contract["tech"]);
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($contract["company_id"]),run_query_contact_contract($contract["company_id"]), $contract);
  }
 
 } elseif ($action == "update")  {
@@ -157,7 +157,7 @@ if ($action == "ext_get_id") {
     $users = array($contract["market"], $contract["tech"]);
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($contract["company_id"]),run_query_contact_contract($contract["company_id"]), $contract);
   }
 
 } elseif ($action == "check_delete")  {
