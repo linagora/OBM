@@ -290,6 +290,96 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Conflicts
+// Parameters:
+//   - $agenda:
+//   - $conflict:
+//   - $event_id: 
+//   - $force: 
+///////////////////////////////////////////////////////////////////////////////
+function html_dis_conflict($agenda,$conflict) {
+  global $set_theme,$set_weekstart_default,$auth;
+  // -- Labels
+  global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
+  global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
+  $user_id = $agenda["user_id"];
+  while ($conflict->next_record()) {
+    $id = $conflict->f("calendarevent_id"); 
+    $title =  $conflict->f("calendarevent_title");
+    $user_id =  $conflict->f("calendaruser_id");
+    $user_name =  $conflict->f("userobm_lastname")." ".$conflict->f("userobm_firstname");
+    $date_begin =  $conflict->f("calendarevent_date");
+    $all_day =  $conflict->f("calendarevent_allday");
+    $date_end =  $conflict->f("calendarevent_date") + $conflict->f("calendarevent_duration")  ;
+    $day_array = "";
+    $day_array2 = "";
+    if($all_day) {
+      $dis_all_day = "<tr><td colspan=\"2\" class=\"detailLabel\">$l_all_day</td></tr>";
+      $date_b = isodate_format($date_begin);
+      $date_e =  isodate_format($date_end);
+    } else {
+      $date_b = datetime_format($date_begin);
+      $date_e =  datetime_format($date_end);
+    }       
+    $dis_conflict .= "
+      <tr>
+        <td class=\"detailForm\">$title</td>
+        <td class=\"detailForm\">$date_b</td>
+        <td class=\"detailForm\">$date_e</td>
+        <td class=\"detailForm\">$user_name</td>";
+
+     $dis_conflict .= "</tr>";
+  }
+  $block= "
+  $dis_form_begin
+  <div class=\"detailHead\">$l_conflicts</div>
+  <table class=\"detail\">
+   <tr>
+    <td class=\"detailText\">$l_title</td>
+    <td class=\"detailText\">$l_datebegin</td>
+    <td class=\"detailText\">$l_dateend</td>
+    <td class=\"detailText\">$l_user</td>    
+   </tr>
+   $dis_conflict
+  </table>
+  <div class=\"detailButton\">
+   <p class=\"detailButtons\">$dis_form_button</p>
+  </div>
+
+  $dis_form_end
+  ";
+  return $block;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display Conflicts
+// Parameters:
+//   - $agenda:
+//   - $conflict:
+//   - $event_id: 
+//   - $force: 
+///////////////////////////////////////////////////////////////////////////////
+function html_conflict_form($agenda) {
+  global $l_force_insert, $l_refuse_insert, $l_cancel_insert;
+  
+  $event_id = $agenda["id"]; 
+  $user_id = $agenda["user_id"];
+  $dis_form = "
+  <form name=\"f_conflict\" method=\"post\">
+   <input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
+   <input type=\"hidden\" name=\"action\" value=\"decision\" />
+   <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
+   <input type=\"hidden\" name=\"cb_force\" value=\"1\" />
+   <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />
+   <div class=\"detailButton\">
+    <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='A';\"/>
+    <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='R';\"/> 
+    <input type=\"submit\" value=\"$l_cancel_insert\" onclick=\"this.form.rd_decision_event.value='W';\"/>   
+   </div>
+  </form>";
+
+  return $dis_form; 
+}
+///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
 //   - $agenda         : agenda parameters
@@ -300,14 +390,14 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_list, $p_user_array) {
   global $display;
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
-  global $ico_add_user, $ico_add_group;
+  global $ico_add_user, $ico_add_group,$ico_delete;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$path;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort,$l_update;
   global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
-  global $l_agenda_select_group, $l_hour,$ico_delete;
+  global $l_agenda_select_group, $l_hour,$l_all_day;
 
   $time_unit = 60 / $set_cal_interval;  
 
@@ -324,6 +414,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $hourend = date("H",$dateend);
     $minend = date("i",$dateend);
     $dateend = date("Y-m-d",$dateend);
+    $all_day = $obm_q_event->f("calendarevent_allday"); 
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays");
@@ -341,7 +432,9 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   if (isset($agenda["title"])) { $title = $agenda["title"]; }
   if (isset($agenda["category"])) { $category_id = $agenda["category"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
+  if (isset($agenda["force"])) { $desc = $agenda["force"]; }
   if (isset($agenda["description"])) { $desc = $agenda["description"]; }
+  if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
   if (isset($agenda["date_begin"]) && !$datebegin) {
     $datebegin = substr($agenda["date_begin"],0,8);    
     preg_match ("/^(\d{4})(\d{2})(\d{2})/", $datebegin, $day_array);
@@ -406,8 +499,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       $tag_medium = "selected=\"selected\"";
       $tag_high = ""; 
     break;
-  }
-  
+  } 
   $dis_sel_prio .= "
     <select name=\"sel_priority\">
       <option value=\"1\" $tag_low>$l_low</option>
@@ -442,6 +534,12 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
 
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
+
+  if( $all_day == 1 ) {
+    $style = "display:none;";
+    $all_day_checked = "checked=\"checked\"";
+  }
+  
   // userobm select
     while ($usr_q->next_record()) {
       $u_id = $usr_q->f("userobm_id");
@@ -563,10 +661,10 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailLabel\">$l_sendamail</td>
      <td class=\"detailForm\"><input type=\"checkbox\" id=\"cb_mail\" value=\"1\" name=\"cb_mail\" /></td>
     </tr>       
-<!--    <tr>
+    <tr>
      <td class=\"detailLabel\">$l_force</td>
      <td class=\"detailForm\">$dis_force</td>
-     </tr>   -->
+     </tr>   
     <tr>
      <td class=\"detailLabel\">$l_private</td>
      <td class=\"detailForm\">$dis_privacy</td>
@@ -585,13 +683,19 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
    <div class=\"detailHead\">$l_carac</div>
    <table class=\"detail\">
     <tr>
+     <td class=\"detailLabel\">$l_all_day</td>
+     <td class=\"detailForm\">
+      <input onchange=\"show_hide_dates(this)\" type=\"checkbox\" name=\"ch_all_day\" value=\"1\" $all_day_checked />
+     </td>
+    </tr>   
+    <tr>
      <td class=\"detailLabel\">$l_datebegin $l_format </td>
      <td class=\"detailForm\">
-      <input onchange=\"changeDateEnd(this.form)\" \"type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
+      <input onchange=\"changeDateEnd(this.form)\" type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1') ;\">
        <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
-      $l_hour : $dis_hour_b : $dis_min_b
+      <span id=\"hour_begin\" style=\"$style\" >$l_hour : $dis_hour_b : $dis_min_b</span>
      </td>
     </tr>
     <tr>
@@ -601,7 +705,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_end,'agenda_index.php?action=calendar&popup=1');\">
        <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
-      $l_hour : $dis_hour_e : $dis_min_e
+      <span id=\"hour_end\" style=\"$style\" >$l_hour : $dis_hour_e : $dis_min_e</span>
      </td>       
     </tr>
     <tr>
@@ -747,17 +851,28 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   global $display;
   global $set_theme,$set_weekstart_default;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state,$l_groups;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait,$l_none;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
+  global $l_low,$l_medium,$l_datebegin;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
+  global $auth,$l_change_state,$l_groups,$l_all_day;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
+  global $set_weekstart_default,$l_wait,$l_none;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
+  global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   $title = $obm_q_event->f("calendarevent_title");
   $category = $obm_q_event->f("calendarcategory_label");
   $priority = $obm_q_event->f("calendarevent_priority"); 
   $description = $obm_q_event->f("calendarevent_description");
-  $datebegin = datetime_format($obm_q_event->f("calendarevent_date"));
-  $dateend =  datetime_format($obm_q_event->f("calendarevent_date") + $obm_q_event->f("calendarevent_duration"));
+  $all_day = $obm_q_event->f("calendarevent_allday");
+  if($all_day) {
+    $dis_all_day = "<tr><td colspan=\"2\" class=\"detailLabel\">$l_all_day</td></tr>";
+    $datebegin = isodate_format($obm_q_event->f("calendarevent_date"));
+    $dateend =  isodate_format($obm_q_event->f("calendarevent_date") + $obm_q_event->f("calendarevent_duration"));
+  } else {
+    $datebegin = datetime_format($obm_q_event->f("calendarevent_date"));
+    $dateend =  datetime_format($obm_q_event->f("calendarevent_date") + $obm_q_event->f("calendarevent_duration"));
+  }
   $privacy = $obm_q_event->f("calendarevent_privacy");
   $kind = ${"l_".$obm_q_event->f("calendarevent_repeatkind")};
   $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
@@ -805,9 +920,6 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
     }
     $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."(".$obm_q_cust->f("calendaruser_state").")<br />";
   }
-  /*while ($obm_q_grp->next_record()) {
-    $dis_grp_list .= $obm_q_grp->f("group_name")."<br />";
-  }*/
 
   $display["title"] = "<div class=\"title\">$l_module_agenda : $title</div>";
   // --- HTML Template --------------------------------------------------------
@@ -834,6 +946,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
    </table>
   <div class=\"detailHead\">$l_carac</div>
    <table class=\"detail\">   
+   $dis_all_day
     <tr>
      <td class=\"detailLabel\">$l_datebegin</td>
      <td class=\"detailText\">$datebegin</td>
@@ -870,78 +983,6 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
     $dis_decision_radio
    </table>
   </form>
-  ";
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Conflicts
-// Parameters:
-//   - $agenda:
-//   - $conflict:
-//   - $event_id: 
-//   - $force: 
-///////////////////////////////////////////////////////////////////////////////
-function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
-  global $set_theme,$set_weekstart_default,$auth;
-  // -- Labels
-  global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
-  global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
-
-  $user_id = $agenda["user_id"];
-  if ($force == 1) { 
-    $dis_form_begin = "
-    <form name=\"f_conflict\" method=\"post\">
-     <input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
-     <input type=\"hidden\" name=\"action\" value=\"decision\" />
-     <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
-     <input type=\"hidden\" name=\"cb_force\" value=\"1\" />
-     <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />";
-    $dis_form_button = "
-    <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='A';\"/>
-    <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='R';\"/> 
-    <input type=\"submit\" value=\"$l_cancel_insert\" onclick=\"this.form.rd_decision_event.value='W';\"/>
-    ";
-    $dis_form_end = " </form>";
-  }
-  foreach ($conflict as $data) {
-    $id = $data["event_id"];
-    $title = $data["event_title"];
-    $user_id = $data["user_id"];
-    $user_name = $data["user_name"];
-    $date_begin = $data["date_begin"];
-    $date_end = $data["date_end"];
-    $day_array = "";
-    $day_array2 = "";
-    $date_b = datetime_format($data["date_begin"]);
-    $date_e = datetime_format($data["date_end"]);
-    $dis_conflict .= "
-      <tr>
-        <td class=\"detailForm\">$title</td>
-        <td class=\"detailForm\">$date_b</td>
-        <td class=\"detailForm\">$date_e</td>
-        <td class=\"detailForm\">$user_name</td>";
-
-     $dis_conflict .= "</tr>";
-  }
-  $block= "
-  $dis_form_begin
-  <div class=\"detailHead\">$l_conflicts</div>
-  <table class=\"detail\">
-   <tr>
-    <td class=\"detailText\">$l_title</td>
-    <td class=\"detailText\">$l_datebegin</td>
-    <td class=\"detailText\">$l_dateend</td>
-    <td class=\"detailText\">$l_user</td>    
-   </tr>
-   $dis_conflict
-  </table>
-  <div class=\"detailButton\">
-   <p class=\"detailButtons\">$dis_form_button</p>
-  </div>
-
-  $dis_form_end
   ";
   return $block;
 }
@@ -2299,7 +2340,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	  }
 	  $days_cal .=  "</td>";
 	} else {
-	  $days_cal .= "<td colspan=\"$nb_user\" style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
+	  $days_cal .= "<td style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
 	}
       }
     } else {
@@ -2643,7 +2684,7 @@ function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
   $dis_calendar .=  "<a class=\"agendaLink\" 
   onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
-  href=\"$link\">$event_head_display</a><br />";
+  href=\"$link\">$event_head_display</a>";
   $hidden_div .= "
   <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
    <div class=\"lastTitle\">:: $title</div>

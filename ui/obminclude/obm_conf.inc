@@ -11,14 +11,14 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // OBM host (for mail links)
-$cgp_host = "http://obm/";
-define("C_IMAGE_PATH",$cgp_host."images");
+$cgp_host = "http://jaguar/obm/";
+define("C_IMAGE_PATH","/images");
 
 // Use specific site includes
 $cgp_site_include = true;
@@ -74,10 +74,10 @@ $cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
 $cgp_show["module"] = ""; // Needed if module order to change
 $cgp_show["module"]["company"] = "com";
 $cgp_show["module"]["agenda"] = "com";
-$cgp_show["module"]["todo"] = "com";
+$cgp_show["module"]["todo"] = false;
 $cgp_show["module"]["contact"] = "com";
 $cgp_show["module"]["deal"] = false;
-$cgp_show["module"]["list"] = false;
+$cgp_show["module"]["list"] = "com";
 $cgp_show["module"]["publication"] = false;
 $cgp_show["module"]["statistic"] = false;
 $cgp_show["module"]["user"] = "user";
@@ -116,7 +116,6 @@ $cgp_hide["contact"]["contact_function"] = true;
 $cgp_hide["deal"]["category1"] = true;
 
 // authentification : 'CAS' or 'standalone' : defaults to 'standalone'
-$auth_kind="CAS";
 
 // authentification 
 // 'CAS' or 'standalone'

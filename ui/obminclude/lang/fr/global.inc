@@ -148,6 +148,8 @@ $l_section_compta = "COMPTABILITE";
 $l_section_user   = "UTILISATEUR";
 $l_section_admin  = "ADMINISTRATION";
 $l_section_aliamin = "ALIAMIN";
+$l_section_settings = "PREFERENCES";
+
 
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";

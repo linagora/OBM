@@ -148,6 +148,7 @@ $l_section_compta = "ACCOUTANCY";
 $l_section_user   = "USERS";
 $l_section_admin  = "ADMINISTRATION";
 $l_section_aliamin = "ALIAMIN";
+$l_section_settings = "PREFERENCES";
 
 $l_module_company = "Companies";
 $l_module_contact = "Contacts";

@@ -111,6 +111,7 @@ $ico_event          = "ico_calendar_evt.gif";
 $ico_left_day       = "left_day.gif";
 $ico_right_day      = "right_day.gif";
 $ico_spacer         = "spacer.gif";
+$ico_calendar_day   = "ico_calendar_day.gif";
 $ico_calendar_user0 = "ico_calendar0.gif";
 $ico_calendar_user1 = "ico_calendar1.gif";
 $ico_calendar_user2 = "ico_calendar2.gif";

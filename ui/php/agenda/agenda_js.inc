@@ -30,7 +30,18 @@ function check_calendar(form) {
   
 }
   
-  
+function show_hide_dates(field) {
+  target = window.document;
+  begin = target.getElementById('hour_begin');   
+  end = target.getElementById('hour_end');
+  if(field.checked) {
+    end.style.display = 'none';
+    begin.style.display = 'none';
+  } else {
+    end.style.display = 'inline';
+    begin.style.display = 'inline';
+  }     
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Remove an element line in the list form
 ///////////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@ function run_query_waiting_events() {
   else {
     $query.="AND calendaruser_user_id = '".$auth->auth["uid"]."'";
   }
-  $query .= "ORDER BY userobm_id"; 
+  $query .= " GROUP BY userobm_id ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   $obm_db->next_record();

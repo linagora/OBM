@@ -37,6 +37,7 @@ function run_query_detail($param_event) {
       calendarevent_repeatkind,
       calendarevent_duration,
       calendarevent_repeatdays,
+      calendarevent_allday,
       $calendarevent_endrepeat,
       $calendarevent_date
       FROM  
@@ -198,21 +199,16 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// TODO : Implemet The conflict detection
-///////////////////////////////////////////////////////////////////////////////
 // Insert a user decision for an user
 // Parameters:
 //   - $agenda : Agenda params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert_decision($agenda) {
   global $auth;
-
-  $return_info = array();
   $user = $agenda["user_id"];
   $event_id = $agenda["id"];
-  $force = $agenda["force"];
   $state = $agenda["decision_event"];
-  run_query_update_occurence_state($event_id,$user,$state,$conflicts);
+  run_query_update_occurence_state($event_id,$user,$state);
 }
 
 
@@ -343,7 +339,7 @@ function run_query_insert_event_data($agenda) {
   $stamp_beg = mktime($begin_array[4],$begin_array[5],00,$begin_array[2],$begin_array[3],$begin_array[1] );
   preg_match ("/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/",$agenda["date_end"] , $end_array);        
   $stamp_end = mktime($end_array[4],$end_array[5], 00,$end_array[2],$end_array[3],$end_array[1] );
-  
+  $all_day = $agenda["allday"]; 
   $duration = $stamp_end - $stamp_beg;
   
   if($agenda["privacy"]!=1) $privacy = 0;else $privacy = 1; 
@@ -369,7 +365,8 @@ function run_query_insert_event_data($agenda) {
   $obm_db->next_record(); 
   $max_id = $obm_db->f("max_id")+1;
   $query = "INSERT INTO CalendarEvent (
-    calendarevent_id,calendarevent_timecreate,                         
+    calendarevent_id,
+    calendarevent_timecreate,                         
     calendarevent_usercreate,
     calendarevent_owner,
     calendarevent_title, 
@@ -382,6 +379,7 @@ function run_query_insert_event_data($agenda) {
     calendarevent_repeatkind,
     calendarevent_repeatfrequence,
     calendarevent_repeatdays,
+    calendarevent_allday,
     calendarevent_endrepeat)
 	         VALUES (
     $max_id,
@@ -398,6 +396,7 @@ function run_query_insert_event_data($agenda) {
     '$repeat_kind',
     '1',
     '$repeat_days',
+    '$all_day',
     '".date("Y-m-d H:i",$stamp_repeat)."')";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -415,10 +414,33 @@ function check_for_conflict($agenda,$sel_user_id) {
   $stamp_beg = mktime($begin_array[4],$begin_array[5],00,$begin_array[2],$begin_array[3],$begin_array[1] );
   preg_match ("/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/",$agenda["date_end"] , $end_array);        
   $stamp_end = mktime($end_array[4],$end_array[5], 00,$end_array[2],$end_array[3],$end_array[1] );
-  
-  run_query_no_repeat_events($stamp_beg,$stamp_end,$contacts_array);
-  run_query_no_repeat_events($stamp_beg,$stamp_end,$contacts_array);
+  $id = $agenda["id"];
+  $obm_conflict = run_query_conflict_events($stamp_beg,$stamp_end,$sel_user_id,$id);
+  if($obm_conflict->nf() == 0) {
+    return false;
+  }
+  return $obm_conflict;
+}
 
+/////////////////////////////////////////////////////////////////////////
+// Check for conflict : Only with the first occurence of each
+// event,
+/////////////////////////////////////////////////////////////////////////
+
+function check_for_decision_conflict($agenda) {
+  
+  $user[] = $agenda["user_id"];
+  $event_id = $agenda["id"];
+  $force = $agenda["force"];
+  $state = $agenda["decision_event"];
+  $event_data = run_query_detail($event_id);
+  $date_begin = $event_data->f("calendarevent_date");
+  $date_end = $event_data->f("calendarevent_date") + $event_data->f("calendarevent_duration");
+  $obm_conflict = run_query_conflict_events($date_begin,$date_end,$user,$event_id);
+  if($obm_conflict->nf() == 0) {
+    return false;
+  }
+  return $obm_conflict;
 }
 /////////////////////////////////////////////////////////////////////////
 // Get all event categories
@@ -505,6 +527,7 @@ function run_query_update_event_data($agenda) {
   $stamp_beg = mktime($begin_array[4],$begin_array[5],00,$begin_array[2],$begin_array[3],$begin_array[1] );
   preg_match ("/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/",$agenda["date_end"] , $end_array);        
   $stamp_end = mktime($end_array[4],$end_array[5], 00,$end_array[2],$end_array[3],$end_array[1] );
+  $all_day = $agenda["allday"];
   $event_id = $agenda["id"]; 
   $duration = $stamp_end - $stamp_beg;
   
@@ -540,6 +563,7 @@ function run_query_update_event_data($agenda) {
     calendarevent_duration = '$duration',
     calendarevent_repeatkind = '$repeat_kind',
     calendarevent_repeatdays = '$repeat_days',
+    calendarevent_allday = '$all_day', 
     calendarevent_endrepeat = '".date("Y-m-d H:i",$stamp_repeat)."'
   WHERE
     calendarevent_id = '$event_id'
@@ -1167,6 +1191,59 @@ function run_query_no_repeat_events($start,$end,$contacts_array) {
 //   - $contacts_array : contact id array, the event is assigned to 
 //   - $groups_array   : group id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
+function run_query_conflict_events($start,$end,$contacts_array,$event_id) {
+  global $cdg_sql, $auth;
+  
+  $obm_db = new DB_OBM;
+  $db_type = $obm_db->type;
+  $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
+  $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
+  $uid = $auth->auth["uid"];
+  $query = "SELECT calendarevent_id,
+		   calendarevent_title,
+		   calendarevent_privacy,
+		   calendarevent_description, 
+		   calendaruser_user_id,
+		   userobm_lastname,
+		   userobm_firstname,
+		   calendarcategory_label,
+		   $calendarevent_date_l,
+		   calendarevent_duration,
+		   calendarevent_allday
+	      FROM CalendarEvent
+	      LEFT JOIN CalendarCategory ON calendarcategory_id = calendarevent_category_id
+	      LEFT JOIN CalendarUser ON calendaruser_event_id = calendarevent_id
+	      LEFT JOIN UserObm ON calendaruser_user_id = userobm_id
+	      WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = calendaruser_event_id
+	      AND calendaruser_state = 'A'
+	      AND $calendarevent_date >= $start - calendarevent_duration
+	      AND $calendarevent_date <= $end 
+            ";	
+  if(is_array($contacts_array) && (count($contacts_array)>0) ) {
+    $query .= " AND calendaruser_user_id IN (";
+    foreach($contacts_array as $id) {
+      $query.= "$coma'$id'";
+      $coma = ",";
+    }
+    $query.=")";
+  }   	     
+  if($event_id != "") {
+    $query .= " AND calendarevent_id != '$event_id' ";
+  }
+  $query.=" ORDER BY calendarevent_date";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all not rejected events in a week of users or/and groups
+// Parameters:
+//   - $agenda : agenda params
+//   - $contacts_array : contact id array, the event is assigned to 
+//   - $groups_array   : group id array, the event is assigned to 
+///////////////////////////////////////////////////////////////////////////////
 function run_query_repeat_events($start,$end,$contacts_array) {
   global $cdg_sql, $set_start_time, $set_stop_time,$set_weekstart_default,$auth;
   
@@ -1259,7 +1336,7 @@ function events_model($start_time, $end_time,$calendar_user) {
     $repeatfrequence = $obm_repeat->f("calendarevent_repeatfrequence");
     $repeatdays = $obm_repeat->f("calendarevent_repeatdays");
     $user_id = $obm_repeat->f("calendaruser_user_id");    
-    $all_day = $obm_no_repeat->f("calendaruser_allday");       
+    $all_day = $obm_repeat->f("calendarevent_allday");       
     $event = &new Event($id,$duration,$title,$category,$privacy,$description);
     $temp_date = $date;
     $end_date = ($endrepeat < $end_time)?$endrepeat:$end_time;

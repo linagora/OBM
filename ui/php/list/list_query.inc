@@ -1241,7 +1241,7 @@ function make_query_from_criteria($list) {
 
 
   $select = "
-        contact_id,
+        contact_id as id,
         contact_lastname,
         contact_firstname,
         kind_minilabel,

@@ -34,7 +34,7 @@ $l_user_right = "Gérer les droits de";
 $l_use_endrepeat = "Fin de répétition (blanc si infinie)";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
-$l_all_day = "Journée";
+$l_all_day = "Toute la journée";
 $l_begin = "Début";
 $l_end = "Fin";
 $l_link_events = " événements liés à cette catégorie.";
@@ -43,6 +43,7 @@ $l_free = "Libre mais restreint";
 $l_possible = "Libre";
 $l_occupied = "Non disponible";
 $l_meeting_legend = "Légende";
+
 
 $l_accepted = "Accepté";
 $l_rejected = "Rejeté";
