@@ -72,8 +72,9 @@ function debug_array($a) {
 //     default : all
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_links (&$time, $type="all") {
-  global $sess, $l_week, $hum_date,$l_week_prev,$l_week_next, $l_month_prev,$l_month_next;
-  global $cdg_param;
+	global $sess, $cdg_param; 
+  global $l_week, $l_week_prev,$l_week_next, $l_month_prev,$l_month_next;
+  global $hum_date, $l_month2;
   // WEEK
   if ($type == "week") {
 
@@ -175,7 +176,7 @@ function dis_time_links (&$time, $type="all") {
       <CENTER> <FONT SIZE=-2>
          <TABLE BORDER=1>
             <TR>
-              <TD colspan=2 align=center><font size=+1> Mois de ". month_name($month) ." </TD>
+              <TD colspan=2 align=center><font size=+1> $l_month2 ". month_name($month) ." </TD>
             </TR>
             <TR><TD>
                <A HREF=\"" .
@@ -686,11 +687,7 @@ function dis_time_menu($time) {
   global $sess;
   global $col_tableh, $col_table;
 
-  $show_events="Voir le Détail";
-  $total_menu="Récapitulatifs";
-  $total_tasks="Total par taches";
-  $total_companies="Total par société";
-  $total_projects="Total par projet/affaire";
+  global $show_events, $total_menu, $total_tasks, $total_companies, $total_projects;
 
   // checked the show event checkbox or not
   $dis_checked= $time["show_task_detail"] ? "checked" : "";
@@ -970,7 +967,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
   //-- Labels
   global $l_found, $_task_del, $l_delete;
   global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
-  global $c_days_in_a_week, $c_task_notvalid;
+  global $c_days_in_a_week, $c_task_notvalid, $l_validate_msg1;
   //session
   global $uid, $project_managers;
 
@@ -980,7 +977,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
   // We have to know if any of the days have been validated by the user
   // If not, no need to display the admin valid form
   if (! is_array($validate_days)) {
-	echo "aucune tache validée par l'utilisateur, on affiche pas le tableau de validation admin";
+	echo "$l_validate_msg1";
     return ;
   }
      
@@ -1043,7 +1040,7 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
-
+  global $l_workingdays, $l_total_days_msg1, $l_total_days_msg2, $l_total_days_msg3, $l_total_days_msg4; 
 
   dis_table_title($l_total_deal);  
 
@@ -1076,11 +1073,11 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
 
   if ($time["interval"] == "month") {
     echo "<tr><td>";
-	echo "Total jours pour $nb_users users : $res sur ".
-		get_nb_working_days($time["date"]) * $nb_users. " à remplir";
+	echo "$l_total_days_msg1 $nb_users $l_total_days_msg2  : $res $l_total_days_msg3 ".
+		get_nb_working_days($time["date"]) * $nb_users. " $l_total_days_msg1";
 	echo "</td></tr>";
 	echo "<tr><td>";
-	echo "jours ouvrés : ".get_nb_working_days($time["date"]);
+	echo "$l_workingdays : ".get_nb_working_days($time["date"]);
 	echo "</td></tr>";
   }
   echo "       </table>";
@@ -1107,6 +1104,7 @@ function dis_time_deal_export($obm_dq,$pref_dq,$time) {
   global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
+  global $l_workingdays, $l_total_days_msg1, $l_total_days_msg2, $l_total_days_msg3, $l_total_days_msg4; 
 
 
 
@@ -1134,10 +1132,10 @@ function dis_time_deal_export($obm_dq,$pref_dq,$time) {
 
   if ($time["interval"] == "month") {
 
-	echo "\n\nTotal jours pour $nb_users users : $res sur ".
-		get_nb_working_days($time["date"]) * $nb_users. " à remplir\n\n";
+	echo "\n $l_total_days_msg1 $nb_users $l_total_days_msg2 : $res $l_total_days_msg3 ".
+		get_nb_working_days($time["date"]) * $nb_users. " $l_total_days_msg1\n";
 
-	echo "jours ouvrés : ".get_nb_working_days($time["date"]);
+	echo "$l_workingdays : ".get_nb_working_days($time["date"]);
   }
 
 }
@@ -1268,6 +1266,7 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
   global $col_orange, $col_grey, $col_blue;
   global $l_total;
   global $l_fill;
+  global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
   //  $col = "b2ebe8";
   //  $col_red="a00000";
@@ -1347,8 +1346,8 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
     $tab_total .= "</td></tr>\n";
 
     $tab_total .= "<tr><td>\n";
-	$tab_total .= "Total jours pour cet utilisateur : $fract sur ".
-		"$tot_workingdays (jours ouvrés) à remplir";
+	$tab_total .= "$l_total_user_msg1 : $fract $l_total_days_msg3 ".
+		" $tot_workingdays $l_workingdays2 $l_total_days_msg4";
 	$tab_total .= "</td></tr>\n";
 	$tab_total .= "</table>\n";
   }
