@@ -1182,7 +1182,6 @@ CREATE TABLE Import (
 --
 -- Table structure for table 'Publication'
 --
-
 CREATE TABLE Publication (
   publication_id             serial,
   publication_timeupdate     timestamp,
@@ -1196,6 +1195,7 @@ CREATE TABLE Publication (
   publication_desc           text,
   PRIMARY KEY (publication_id)
 );
+
 
 --
 -- Table structure for table 'PublicationType'
@@ -1218,7 +1218,7 @@ CREATE TABLE PublicationType (
 --
 -- Table structure for table 'Subscription'
 --
-CREATE TABLE Subscription (
+CREATE TABLE Subscription(
   subscription_id		serial,
   subscription_publication_id 	integer NOT NULL,
   subscription_contact_id       integer NOT NULL,

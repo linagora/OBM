@@ -140,6 +140,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_town,
       contact_expresspostal,
       contact_country_iso3166,
+      ctry1.country_name as country_name,
       contact_phone,
       contact_homephone,
       contact_mobilephone,
@@ -161,8 +162,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     from Contact
         left join Company on contact_company_id=company_id 
         left join Function on contact_function_id=function_id
-        left join Country on contact_country_iso3166=country_iso3166
-                  and country_lang='$lang'
+        left join Country as ctry1 ON
+                  contact_country_iso3166 = ctry1.country_iso3166
+                  and ctry1.country_lang='$lang'
         LEFT JOIN Country as ctry2 ON
                   Company.company_country_iso3166 = ctry2.country_iso3166
                   and ctry2.country_lang='$lang'
