@@ -31,6 +31,10 @@ $l_path = "Path";
 $l_private = "Private";
 $l_title = "Title";
 $l_updatetime = "Update time";
+$l_company_display = "Display options for documents list";
+$l_size = "Size";
+$l_bytes = "bytes";
+$l_name = "Name";
 
 // Message
 $l_cat1_checkdelete = "Check or delete Category 1"; 

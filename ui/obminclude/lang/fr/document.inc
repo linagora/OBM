@@ -31,6 +31,10 @@ $l_path = "Chemin";
 $l_private = "Privé";
 $l_title = "Titre";
 $l_updatetime = "Dernière modification";
+$l_document_display = "Options d'affichage des listes de documents";
+$l_size = "Taille";
+$l_bytes = "octets";
+$l_name = "Nom";
 
 // Message
 $l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1"; 

@@ -185,6 +185,10 @@ if ($section == "COM") {
                                      'Ico' => "$ico_incident",
   			      	     'Url' => "$path/incident/incident_index.php",
 			             'Right'=> $incident_read);
+  $menus["PROD"]["DOCUMENT"] = array('Name'=> $l_header_document,
+                                     'Ico' => "$ico_document",
+  			      	     'Url' => "$path/document/document_index.php",
+			             'Right'=> $incident_read);
 
 } elseif ($section == "ADMINS") {
 

@@ -192,6 +192,13 @@ $incident_read		= $prod_read;
 $incident_write 	= $prod_read + $prod_write;
 $incident_admin_read 	= $prod_admin_read;
 $incident_admin_write	= $prod_admin_read + $prod_admin_write;
+			////////////
+			//DOCUMENT//
+			////////////
+$document_read		= $prod_read;
+$document_write 	= $prod_read + $prod_write;
+$document_admin_read 	= $prod_admin_read;
+$document_admin_write	= $prod_admin_read + $prod_admin_write;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                         COMPTA RIGTHS                                     //

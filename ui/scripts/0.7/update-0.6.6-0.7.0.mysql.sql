@@ -101,6 +101,57 @@ CREATE TABLE ProjectUser (
 );
 
 -------------------------------------------------------------------------------
+-- Document
+-------------------------------------------------------------------------------
+CREATE TABLE Document (
+  document_timeupdate timestamp(14) NOT NULL,
+  document_timecreate timestamp(14) NOT NULL,
+  document_userupdate int(8) default NULL,
+  document_usercreate int(8) default NULL,
+  document_id int(8) NOT NULL auto_increment,
+  document_title varchar(255) default NULL,
+  document_name varchar(255) default NULL,
+  document_mimetype varchar(255) default NULL,
+  document_category1 varchar(255) default NULL,
+  document_category2 varchar(255) default NULL,
+  document_author varchar(255) default NULL,
+  document_private int(1) default NULL,
+  document_path text default NULL,
+  document_size int(15) default NULL,
+  PRIMARY KEY (document_id)
+);
+
+-------------------------------------------------------------------------------
+-- DocumentCategory1 
+-------------------------------------------------------------------------------
+CREATE TABLE DocumentCategory1 (
+  documentcategory1_id int(8) NOT NULL auto_increment,
+  documentcategory1_label varchar(255) default NULL,
+  PRIMARY KEY (documentcategory1_id)
+);
+
+-------------------------------------------------------------------------------
+-- DocumentCategory2 
+-------------------------------------------------------------------------------
+CREATE TABLE DocumentCategory2 (
+  documentcategory2_id int(8) NOT NULL auto_increment,
+  documentcategory2_label varchar(255) default NULL,
+  PRIMARY KEY (documentcategory2_id)
+);
+
+
+-------------------------------------------------------------------------------
+-- DocumentMimeType 
+-------------------------------------------------------------------------------
+CREATE TABLE DocumentMimeType (
+  documentmimetype_id int(8) NOT NULL auto_increment,
+  documentmimetype_label varchar(255) default NULL,
+  documentmimetype_extension varchar(10) default NULL,
+  documentmimetype_mime varchar(255) default NULL,
+  PRIMARY KEY (documentmimetype_id)
+);
+
+-------------------------------------------------------------------------------
 -- Tasktype
 -------------------------------------------------------------------------------
 -- change column value : 

@@ -308,6 +308,109 @@ CREATE TABLE DealType (
   PRIMARY KEY (dealtype_id)
 );
 
+-------------------------------------------------------------------------------
+-- Document module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Document'
+--
+
+
+CREATE TABLE Document (
+  document_timeupdate timestamp(14) NOT NULL,
+  document_timecreate timestamp(14) NOT NULL,
+  document_userupdate int(8) default NULL,
+  document_usercreate int(8) default NULL,
+  document_id int(8) NOT NULL auto_increment,
+  document_title varchar(255) default NULL,
+  document_name varchar(255) default NULL,
+  document_mimetype varchar(255) default NULL,
+  document_category1 varchar(255) default NULL,
+  document_category2 varchar(255) default NULL,
+  document_author varchar(255) default NULL,
+  document_private int(1) default NULL,
+  document_path text default NULL,
+  document_size int(15) default NULL,
+  PRIMARY KEY (document_id)
+);
+
+--
+-- Table structure for table 'DocumentCategory1'
+--
+CREATE TABLE DocumentCategory1 (
+  documentcategory1_timeupdate timestamp(14) NOT NULL,
+  documentcategory1_timecreate timestamp(14) NOT NULL,
+  documentcategory1_userupdate int(8) default NULL,
+  documentcategory1_usercreate int(8) default NULL,
+  documentcategory1_id int(8) NOT NULL auto_increment,
+  documentcategory1_label varchar(255) default NULL,
+  PRIMARY KEY (documentcategory1_id)
+);
+
+--
+-- Table structure for table 'DocumentCategory2'
+--
+CREATE TABLE DocumentCategory2 (
+  documentcategory2_timeupdate timestamp(14) NOT NULL,
+  documentcategory2_timecreate timestamp(14) NOT NULL,
+  documentcategory2_userupdate int(8) default NULL,
+  documentcategory2_usercreate int(8) default NULL,
+  documentcategory2_id int(8) NOT NULL auto_increment,
+  documentcategory2_label varchar(255) default NULL,
+  PRIMARY KEY (documentcategory2_id)
+);
+
+
+--
+-- Table structure for table 'DocumentMimeType'
+--
+CREATE TABLE DocumentMimeType (
+  documentmimetype_timeupdate timestamp(14) NOT NULL,
+  documentmimetype_timecreate timestamp(14) NOT NULL,
+  documentmimetype_userupdate int(8) default NULL,
+  documentmimetype_usercreate int(8) default NULL,
+  documentmimetype_id int(8) NOT NULL auto_increment,
+  documentmimetype_label varchar(255) default NULL,
+  documentmimetype_extension varchar(10) default NULL,
+  documentmimetype_mime varchar(255) default NULL,
+  PRIMARY KEY (documentmimetype_id)
+);
+
+-------------------------------------------------------------------------------
+-- Project module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'ProjectStat'
+--
+CREATE TABLE ProjectStat (
+  projectstat_deal_id int(8) NOT NULL,
+  projectstat_date timestamp(14) NOT NULL,
+  projectstat_timeupdate timestamp(14) NOT NULL,
+  projectstat_timecreate timestamp(14) NOT NULL,
+  projectstat_userupdate int(8) default NULL,
+  projectstat_usercreate int(8) default NULL,
+  projectstat_useddays int(8) default NULL,
+  projectstat_remainingdays int(8) default NULL,
+  PRIMARY KEY (projectstat_deal_id, projectstat_date)
+);
+
+--
+-- Table structure for table 'ProjectUser'
+--
+CREATE TABLE ProjectUser (
+  projectuser_deal_id int(8) NOT NULL,
+  projectuser_userobm_id int(8) NOT NULL,
+  projectuser_timeupdate timestamp(14) NOT NULL,
+  projectuser_timecreate timestamp(14) NOT NULL,
+  projectuser_userupdate int(8) default NULL,
+  projectuser_usercreate int(8) default NULL,
+  projectuser_projectedtime int(8) default NULL,
+  projectuser_missingtime int(8) default NULL,
+  projectuser_validity timestamp(14) default NULL,
+  projectuser_soldprice int(8) default NULL,
+  projectuser_manager int(1) default NULL,
+  PRIMARY KEY (projectuser_deal_id, projectuser_userobm_id)
+);
 
 -------------------------------------------------------------------------------
 -- List module tables
@@ -783,6 +886,96 @@ CREATE TABLE UserObmGroup (
 --
 -- Table structure for table 'GroupGroup'
 --
+CREATE TABLE Incident (
+  incident_id int(8) NOT NULL auto_increment,
+  incident_timeupdate timestamp(14) NOT NULL,
+  incident_timecreate timestamp(14) NOT NULL,
+  incident_userupdate int(8) default NULL,
+  incident_usercreate int(8) default NULL,
+  incident_contract_id int(8) NOT NULL,
+  incident_label varchar(100) default NULL,
+  incident_date date default NULL,
+  incident_priority_id int(8) default NULL,
+  incident_status_id int(8) default NULL,
+  incident_logger int(8) default NULL,
+  incident_owner int(8) default NULL,
+  incident_duration char(4) default '0',
+  incident_archive char(1) NOT NULL default '0',
+  incident_description text,
+  incident_resolution text,
+  PRIMARY KEY  (incident_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'IncidentPriority'
+--
+CREATE TABLE IncidentPriority (
+  incidentpriority_id int(8) NOT NULL auto_increment,
+  incidentpriority_timeupdate timestamp(14) NOT NULL,
+  incidentpriority_timecreate timestamp(14) NOT NULL,
+  incidentpriority_userupdate int(8) default NULL,
+  incidentpriority_usercreate int(8) default NULL,
+  incidentpriority_order int(2),
+  incidentpriority_color char(6),
+  incidentpriority_label varchar(32) default NULL,
+  PRIMARY KEY (incidentpriority_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'IncidentStatus'
+--
+CREATE TABLE IncidentStatus (
+  incidentstatus_id int(8) NOT NULL auto_increment,
+  incidentstatus_timeupdate timestamp(14) NOT NULL,
+  incidentstatus_timecreate timestamp(14) NOT NULL,
+  incidentstatus_userupdate int(8) default NULL,
+  incidentstatus_usercreate int(8) default NULL,
+  incidentstatus_order int(2),
+  incidentstatus_label varchar(32) default NULL,
+  PRIMARY KEY (incidentstatus_id)
+) TYPE=MyISAM;
+    
+
+-------------------------------------------------------------------------------
+-- Timemanagement tables
+-------------------------------------------------------------------------------
+--
+-- Task table
+--
+CREATE TABLE Task (
+  task_id int(8) NOT NULL auto_increment,
+  task_timeupdate timestamp(14) NOT NULL,
+  task_timecreate timestamp(14) NOT NULL,
+  task_userupdate int(8) default NULL,
+  task_usercreate int(8) default NULL,
+  task_user_id int(8) default NULL,
+  task_date timestamp(14) NOT NULL,
+  task_deal_id int(8) default NULL,
+  task_length int(2) default NULL,
+  task_tasktype_id int(8) default NULL,
+  task_label varchar(255) default NULL,
+  task_status int(1) default NULL,
+  PRIMARY KEY  (task_id)
+) TYPE=MyISAM;
+
+
+--
+-- TaskType table
+--
+CREATE TABLE TaskType (
+  tasktype_id int(8) NOT NULL auto_increment,
+  tasktype_timeupdate timestamp(14) NOT NULL,
+  tasktype_timecreate timestamp(14) NOT NULL,
+  tasktype_userupdate int(8) default NULL,
+  tasktype_usercreate int(8) default NULL,
+  tasktype_internal int(1) NOT NULL,
+  tasktype_label varchar(32) default NULL,
+  PRIMARY KEY  (tasktype_id)
+) TYPE=MyISAM;
+
+
 CREATE TABLE GroupGroup (
    groupgroup_parentid int(8) DEFAULT '0' NOT NULL,
    groupgroup_childid int(8) DEFAULT '0' NOT NULL

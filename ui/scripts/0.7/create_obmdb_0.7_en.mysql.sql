@@ -144,3 +144,36 @@ INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Holydays,...',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Outgoings',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Graphics/Communication',2);
+
+--
+-- Dumping data for table 'DocumentCategory1'
+--
+INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (1,'Others');
+INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (2,'Quotation');
+INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (3,'Propal');
+INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (4,'Documentation');
+INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (5,'Contract');
+INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (6,'CR');
+
+--
+-- Dumping data for table 'DocumentCategory2'
+--
+INSERT INTO DocumentCategory2 (documentcategory2_id,documentcategory2_label) VALUES (1,'Internal');
+INSERT INTO DocumentCategory2 (documentcategory2_id,documentcategory2_label) VALUES (2,'Tradesman');
+INSERT INTO DocumentCategory2 (documentcategory2_id,documentcategory2_label) VALUES (3,'Customers');
+
+
+
+--
+-- Dumping data for table 'DocumentMimeType'
+--
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (1,'Html File','html','text/html');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (2,'PNG Image','png','image/png');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (3,'Gif Image','gif','image/gif');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (4,'JPG Image','JPG','image/jpg');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (5,'PDF File','pdf','application/pdf');
