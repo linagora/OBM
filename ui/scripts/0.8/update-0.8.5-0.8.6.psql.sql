@@ -104,6 +104,7 @@ CREATE TABLE InvoiceStatus (
 -------------------------------------------------------------------------------
 ALTER TABLE subscription ADD COLUMN subscription_id int4;
 CREATE SEQUENCE subscription_subscription_id_seq;
+ALTER TABLE subscription_subscription_id_seq OWNER TO obm;
 UPDATE subscription set subscription_id = 0;
 ALTER TABLE subscription ALTER COLUMN subscription_id SET NOT NULL;
 ALTER TABLE subscription ALTER COLUMN subscription_id SET DEFAULT nextval('subscription_subscription_id_seq');
