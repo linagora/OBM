@@ -2070,7 +2070,7 @@ function display_popup_tree($tree,$indent) {
 	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\"> 
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
-	  <input type=\"checkbox\" id=\"pouic\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
+	  <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
 	 </tr>
 	</table>
@@ -2180,11 +2180,11 @@ function display_popup_code_tree($tree,$indent) {
 	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
-	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form($code);return false;\"><span id=\"data$id\">$code - $label</span></a>
+	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
 	  </td>
 	 </tr>
 	</table>
-	<div id='$code' style=\"display:none;\" >
+	<div id='div_$code' style=\"display:none;\" >
 	 $content
 	</div>";
     }

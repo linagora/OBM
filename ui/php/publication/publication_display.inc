@@ -30,7 +30,7 @@ $fieldnames["publicationtype_label"] = $l_type;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_publication(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
-
+  
   if ($fieldname == "publication_title") {
     if($OD->data_specialfield == "ext_get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".addslashes($OD->data_set->f("publication_title"))."');";
@@ -1587,8 +1587,15 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme,$ico_update;
   global $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
-  global  $path, $auth,$popup_height,$popup_width;
+  global  $path, $auth,$popup_height,$popup_width,$ico_crow;
+  global $cright_write_admin,$menu,$ico_delete,$perm;
 
+  $module_right = $perm->get_module_rights($menu);
+  if (($module_right & $cright_write_admin) == $cright_write_admin) {  
+    $is_admin = true;
+    $display_del .= "<td class=\"resultHead\"></td>";
+  }
+  
   $block = " 
   <div class=\"result\"><table class=\"resultTable\">
    <tr>
@@ -1601,6 +1608,7 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     <td class=\"resultHead\">$l_timecreate</td>    
     <td class=\"resultHead\">$l_timeupdate</td>
     <td class=\"resultHead\"></td>
+    $display_del
    </tr>
    ";
   while($sub_q->next_record()) {
@@ -1611,6 +1619,15 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     }
     $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
     $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
+    $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
+
+    if($is_admin) {
+      $display_del = "<td class=\"resultText\">
+      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+      <img src=\"/images/$set_theme/$ico_crow\" />
+      </a>
+      </td>  ";
+    }
     $block .= "
     <tr>
     <td class=\"resultText\">
@@ -1626,10 +1643,11 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     <td class=\"resultText\">".datetime_format($sub_q->f("timecreate"))."</td>
     <td class=\"resultText\">$date_update</td>    
     <td class=\"resultText\">
-    <a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+    <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
     <img src=\"/images/$set_theme/$ico_update\" />
     </a>
     </td>    
+    $display_del 
     </tr>
     ";
   }

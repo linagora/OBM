@@ -278,6 +278,20 @@ if ($action == "ext_get_id") {
   $act_q = run_query_publicationactivity();
   $usr_q = run_query_userobm_active();
   $display["search"] = html_publication_search_form($type_q, $act_q, $usr_q, $publication);
+  
+} elseif ($action == "delete_subscription")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_delete_subscription($param_publication,$param_contact);
+  $quit = "
+  <br />
+  <a href=\"javascript: void(0);\" onclick=\"window.opener.location.reload();window.close();\" >
+  $l_close
+  </a>";
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_delete_ok.$quit);
+  } else {
+    $display["msg"] .= display_err_msg($l_delete_error.$quit);
+  }
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -582,6 +596,13 @@ function get_publication_action() {
   $actions["PUBLICATION"]["delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=delete",
     'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     	 );
+
+// Delete
+  $actions["PUBLICATION"]["delete_subscription"] = array (
+    'Url'      => "$path/publication/publication_index.php?action=delete_subscription",
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	 );
 
