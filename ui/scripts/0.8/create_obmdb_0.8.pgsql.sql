@@ -1212,6 +1212,7 @@ CREATE TABLE PublicationType (
 -- Table structure for table 'Subscription'
 --
 CREATE TABLE Subscription (
+  subscription_id		serial,
   subscription_publication_id 	integer NOT NULL,
   subscription_contact_id       integer NOT NULL,
   subscription_timeupdate       timestamp,
@@ -1223,7 +1224,7 @@ CREATE TABLE Subscription (
   subscription_reception_id     integer NOT NULL,
   subscription_date_begin       timestamp,
   subscription_date_end         timestamp,
-  PRIMARY KEY (subscription_publication_id,subscription_contact_id)
+  PRIMARY KEY (subscription_id)
 );
 
 --

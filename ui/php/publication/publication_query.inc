@@ -314,7 +314,7 @@ function run_query_insert_subscription($publication) {
   $p_id = $publication["id"];
   $renew = $publication["renew"];
   $recept = $publication["recept"];
-  $query = "select count(subscription_contact_id) as num from
+/*  $query = "select count(subscription_contact_id) as num from
   Subscription where subscription_contact_id = '$c_id' and
   subscription_publication_id = '$p_id'";
   display_debug_msg($query, $cdg_sql);
@@ -323,7 +323,7 @@ function run_query_insert_subscription($publication) {
   $obm_q->next_record();
   if($obm_q->f("num") != 0) {
     return true;
-  }  
+  }*/  
   $query = "insert into Subscription (
     subscription_timeupdate,
     subscription_timecreate,
@@ -361,9 +361,8 @@ function run_query_insert_subscription($publication) {
 function run_query_update_subscription($publication) {
   global $auth, $cdg_sql;
 
-  $c_id = $publication["contact_id"];
+  $s_id = $publication["subscription_id"];
   $quantity = $publication["quantity"];
-  $p_id = $publication["id"];
   $renew = $publication["renew"];
   $recept = $publication["recept"];
   
@@ -374,8 +373,7 @@ function run_query_update_subscription($publication) {
         subscription_reception_id='$recept',
         subscription_quantity='$quantity'
     Where	
-        subscription_contact_id = '$c_id' and
-	subscription_publication_id = '$p_id'";
+        subscription_id = '$s_id'";
     
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -441,10 +439,10 @@ function run_query_delete($p_id) {
 //   - $p_id : publication id
 //   - $c_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_subscription($p_id,$c_id) {
+function run_query_delete_subscription($s_id) {
   global $cdg_sql;
 
-  $query = "delete from Subscription where subscription_publication_id='$p_id' and subscription_contact_id='$c_id'";
+  $query = "delete from Subscription where subscription_id='$s_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -888,7 +886,7 @@ function run_query_subscription_external_search($hash_table) {
 
     $query = "
         SELECT
-	      $timeupdate,$timecreate,subscription_contact_id,subscription_publication_id,
+	      $timeupdate,$timecreate,subscription_id,subscription_contact_id,subscription_publication_id,
 	      publication_title,publication_year, publication_lang,subscription_renewal,
 	      subscriptionreception_label, subscription_quantity 
         FROM Subscription 
@@ -907,7 +905,7 @@ function run_query_subscription_external_search($hash_table) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_subscription_detail($c_id,$p_id){
+function run_query_subscription_detail($s_id){
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
   $obm_q = new DB_OBM;
 
@@ -919,7 +917,7 @@ function run_query_subscription_detail($c_id,$p_id){
         FROM Subscription 
 	LEFT JOIN Publication ON publication_id = subscription_publication_id
         where
-        subscription_contact_id='$c_id' and subscription_publication_id='$p_id'
+        subscription_id='$s_id'
 	";
 
   display_debug_msg($query, $cdg_sql);

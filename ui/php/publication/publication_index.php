@@ -142,7 +142,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $recept_q = run_query_subscriptionreception();
   $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
-  $sub_q = run_query_subscription_detail($param_contact,$param_publication);
+  $sub_q = run_query_subscription_detail($param_subscription);
   require("publication_js.inc");
   $display["detail"] =html_subscription_form($action,$sub_q,  $recept_q, $publication);
 
@@ -283,7 +283,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "delete_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete_subscription($param_publication,$param_contact);
+  $retour = run_query_delete_subscription($param_subscription);
   $quit = "
   <br />
   <a href=\"javascript: void(0);\" onclick=\"window.opener.location.reload();window.close();\" >
@@ -413,7 +413,7 @@ display_page($display);
 // returns : $publication hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_publication() {
-  global $tf_title, $tf_year, $tf_lang;
+  global $tf_title, $tf_year, $tf_lang, $param_subscription;
   global $sel_type,$ta_desc, $param_publication,$tf_type,$param_contact;
   global $param_publication_orig,$sel_contactcategory1;
   global $cb_renewal,$sel_recept,$tf_recept,$tf_quantity;
@@ -432,10 +432,11 @@ function get_param_publication() {
   if (isset ($sel_contactcategory1)) $publication["auto_sub"] = $sel_contactcategory1;
   if (isset ($param_contact)) $publication["contact_id"] = $param_contact;
   if (isset ($param_publication)) $publication["id"] = $param_publication;
+  if (isset ($param_subscription)) $publication["subscription_id"] = $param_subscription;
   if (isset ($param_publication_orig)) $publication["id_orig"] = $param_publication_orig;
   if (isset ($tf_title)) $publication["title"] = $tf_title;
   if (isset ($sel_type)) $publication["type"] = $sel_type;
-  if (isset ($cb_renewal)) $publication["renew"] = $ch_renewal;
+  if (isset ($cb_renewal)) $publication["renew"] = $cb_renewal;
   else $publication["renew"] = 0;
   
   if (isset ($sel_recept)) $publication["recept"] = $sel_recept;

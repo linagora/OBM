@@ -98,3 +98,15 @@ CREATE TABLE InvoiceStatus (
   invoicestatus_label    varchar(24) DEFAULT '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)
 );
+
+-------------------------------------------------------------------------------
+-- Change the primary key for Subscription
+-------------------------------------------------------------------------------
+ALTER TABLE subscription ADD COLUMN subscription_id int4;
+CREATE SEQUENCE subscription_subscription_id_seq;
+UPDATE subscription set subscription_id = 0;
+ALTER TABLE subscription ALTER COLUMN subscription_id SET NOT NULL;
+ALTER TABLE subscription ALTER COLUMN subscription_id SET DEFAULT nextval('subscription_subscription_id_seq');
+UPDATE subscription set subscription_id = nextval('subscription_subscription_id_seq');
+ALTER TABLE subscription DROP CONSTRAINT subscription_pkey;
+ALTER TABLE subscription ADD CONSTRAINT subscription_pkey PRIMARY KEY(subscription_id);

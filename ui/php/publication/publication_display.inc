@@ -375,16 +375,6 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />
       ";
-    // reception mode select
-/*    $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
-    while ($recept_q->next_record()) {
-      $k_id = $recept_q->f("subscriptionreception_id");
-      $sel_recept .= "\n<option value=\"$k_id\"";
-      if ($k_id == $recept) { $sel_recept .= " selected=\"selected\""; }
-      $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
-    }
-    $sel_recept .= "</select>";
-*/
     $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\"> "; 
     while($cat1_q->next_record()) {
       $cat_id = $cat1_q->f("contactcategory1_id");
@@ -489,6 +479,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
    $pub_id = $sub_q->f("subscription_publication_id"); 
    $title = $sub_q->f("publication_title"); 
    $cont_id = $sub_q->f("subscription_contact_id"); 
+   $sub_id = $sub_q->f("subscription_id"); 
    $quantity = $sub_q->f("subscription_quantity");
    if ($sub_q->f("subscription_renewal") == 1) $renew = " checked=\"checked\"";
    $recept = $sub_q->f("subscription_reception_id"); 
@@ -498,6 +489,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
   if (isset($publication["id"])) { $pub_id = $publication["id"]; }
   if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
   if (isset($publication["quantity"])) { $quantity = $publication["quantity"]; }
+  if (isset($publication["subscription_id"])) { $sub_id = $publication["subscription_id"]; }
   if (isset($publication["contact_id"])) { $cont_id = $publication["contact_id"]; }
   if ($publication["renew"] == 1) { $renew = " checked=\"checked\""; }
   if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
@@ -519,6 +511,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_contact\" id=\"param_contact\" value=\"$cont_id\" />
+      <input type=\"hidden\" name=\"param_subscription\" id=\"param_subscription\" value=\"$sub_id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update_subscription\" />
       <input type=\"submit\" value=\"$l_update_sub\" /> 
       ";
@@ -1298,12 +1291,13 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
   while($sub_q->next_record()) {
     $c_id = $sub_q->f("subscription_contact_id");
     $p_id = $sub_q->f("subscription_publication_id");
+    $s_id = $sub_q->f("subscription_id");
     if($sub_q->f("timeupdate") != "") {
       $date_update = datetime_format($sub_q->f("timeupdate"));
     }
     $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
-    $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
-    $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
+    $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1");
+    $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
 
     if($is_admin) {
       $display_del = "<td class=\"resultText\">

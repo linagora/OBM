@@ -982,7 +982,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       $c_name = $co_q->f("company_name");
       $c_new_id = $c_id;
       $c_new_name = $c_name;
-      $mark = $contact["marketing_manager"];
     }
   }
 
