@@ -37,6 +37,11 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $dateafter = $deal["dateafter"];
   $datebefore = $deal["datebefore"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $datealarm = sql_date_format($type, "deal_datealarm", "deal_datealarm");
+
   $query = "select 
       deal_id as Id,
       deal_id,
@@ -61,7 +66,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager,
-      UNIX_TIMESTAMP(deal_datealarm) as deal_datealarm
+      $datealarm
     from Deal, DealType, TaskType, Company, DealStatus, UserObm
     where deal_type_id=dealtype_id
      and tasktype_id=deal_tasktype_id
@@ -115,12 +120,10 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   }
 
   // Order by clause
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "deal_datealarm";
+  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "Deal.deal_datealarm";
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql);
-
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 
@@ -136,66 +139,49 @@ function run_query_detail($id) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select Deal.*,
-        dealtype_label,
-        tasktype_label,
-        dealstatus_label,
-        company_name, company_address1, company_zipcode, company_town,
-        company_phone,
-        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        c1.contact_lastname as lnamec1, c1.contact_firstname as fnamec1,
-        c1.contact_phone as phonec1, c2.contact_phone as phonec2,
-        c2.contact_lastname as lnamec2, c2.contact_firstname as fnamec2,
-        UNIX_TIMESTAMP(deal_datebegin) as datebegin,
-        UNIX_TIMESTAMP(deal_dateproposal) as dateproposal,
-        UNIX_TIMESTAMP(deal_datealarm) as datealarm,
-        UNIX_TIMESTAMP(deal_timeupdate) as datemodif,
-        UNIX_TIMESTAMP(deal_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(deal_timecreate) as timecreate,
-        c.userobm_login as usercreate,
-        u.userobm_login as userupdate
-      from
-        Deal
-        left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id
-        left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id
-        left join Contact c1 on deal_contact1_id=c1.contact_id
-        left join Contact c2 on deal_contact2_id=c2.contact_id
-        left join UserObm c on deal_usercreate=c.userobm_id
-        left join UserObm u on deal_userupdate=u.userobm_id,
-        DealType,
-        TaskType,
-        DealStatus,
-        Company
-      where deal_id='$id'
-        and dealtype_id=deal_type_id
-        and tasktype_id=deal_tasktype_id
-        and dealstatus_id=deal_status_id
-        and company_id=deal_company_id";
+  $type = $obm_q->type;
 
-  } else if ($obm_q->type == $db_type_pgsql) {
-    // require at list Postgresql 7.1 (left join)
-    $query = "select Deal.*,
-        dealtype_label,
-        tasktype_label,
-        dealstatus_label,
-        company_name, company_address1, company_zipcode, company_town,
-        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        deal_timeupdate as datemodif,
-        deal_timeupdate as timeupdate,
-        deal_timecreate as timecreate
-      from
-        (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
-              left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
-         DealType TaskType, DealStatus, Company
-      where deal_id='$id'
-        and dealtype_id=deal_type_id
-        and tasktype_id=deal_tasktype_id
-        and dealstatus_id=deal_status_id
-        and company_id=deal_company_id";
-  }
+  $datebegin = sql_date_format($type, "deal_datebegin", "datebegin");
+  $dateproposal = sql_date_format($type, "deal_dateproposal", "dateproposal");
+  $datealarm = sql_date_format($type, "deal_datealarm", "datealarm");
+  $timeupdate = sql_date_format($type, "deal_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "deal_timecreate", "timecreate");
+
+  $query = "select Deal.*,
+      dealtype_label,
+      tasktype_label,
+      dealstatus_label,
+      company_name, company_address1, company_zipcode, company_town,
+      company_phone,
+      u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+      u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+      c1.contact_lastname as lnamec1, c1.contact_firstname as fnamec1,
+      c1.contact_phone as phonec1, c2.contact_phone as phonec2,
+      c2.contact_lastname as lnamec2, c2.contact_firstname as fnamec2,
+      $datebegin,
+      $dateproposal,
+      $datealarm,
+      $timeupdate,
+      $timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    from
+      Deal
+      left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id
+      left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id
+      left join Contact c1 on deal_contact1_id=c1.contact_id
+      left join Contact c2 on deal_contact2_id=c2.contact_id
+      left join UserObm c on deal_usercreate=c.userobm_id
+      left join UserObm u on deal_userupdate=u.userobm_id,
+      DealType,
+      TaskType,
+      DealStatus,
+      Company
+    where deal_id='$id'
+      and dealtype_id=deal_type_id
+      and tasktype_id=deal_tasktype_id
+      and dealstatus_id=deal_status_id
+      and company_id=deal_company_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -215,22 +201,22 @@ function run_query_insert($deal) {
   global $auth, $cdg_sql;
 
   $id = $deal["id"];
-  $pid = ($deal["parent"] ? $deal["parent"] : "null");
+  $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
   $vis = $deal["vis"];
-  $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
+  $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $kind = $deal["kind"]; 
   $cat = $deal["cat"];
   $comp = $deal["company"];
-  $market = ($deal["market"] ? $deal["market"] : "null");
-  $tech = ($deal["tech"] ? $deal["tech"] : "null");
-  $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
-  $amount = $deal["amount"];
-  $hitrate = $deal["hitrate"];
-  $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
-  $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
-  $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
+  $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
+  $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
+  $dateprop = ($deal["dateprop"] ? "'".$deal["dateprop"]."'" : "null");
+  $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
+  $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
+  $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
+  $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
+  $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $status = $deal["state"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
@@ -271,23 +257,23 @@ function run_query_insert($deal) {
     '" . $auth->auth["uid"] . "',
     '$num',
     '$label',
-    '$datebegin',
+    $datebegin,
     '$kind',
     '$cat',
     '$comp',
     '$con1',
     '$con2',
-    '$market',
-    '$tech',
-    '$dateprop',
-    '$amount',
-    '$hitrate',
+    $market,
+    $tech,
+    $dateprop,
+    $amount,
+    $hitrate,
     '$status',
-    '$datealarm',
+    $datealarm,
     '$comment',
     '$archive',
     '$vis',
-    '$pid',
+    $pid,
     '$todo')";
 
   display_debug_msg($query, $cdg_sql);
@@ -319,21 +305,21 @@ function run_query_update($deal) {
   global $auth, $cdg_sql;
 
   $id = $deal["id"];
-  $pid = ($deal["parent"] ? $deal["parent"] : "null");
+  $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
   $vis = $deal["vis"];
-  $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
+  $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $kind = $deal["kind"]; 
   $cat = $deal["cat"];
   $comp = $deal["company"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
-  $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
-  $amount = $deal["amount"];
-  $hitrate = $deal["hitrate"];
-  $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
-  $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
+  $dateprop = ($deal["dateprop"] ? "'".$deal["dateprop"]."'" : "null");
+  $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
+  $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
+  $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
+  $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
   $status = $deal["state"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
@@ -346,21 +332,22 @@ function run_query_update($deal) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   
-  $query = "update Deal set deal_timeupdate='". date("Y-m-d H:i:s")."',
+  $query = "update Deal set
+    deal_timeupdate='". date("Y-m-d H:i:s")."',
     deal_userupdate='".$auth->auth["uid"]."',
     deal_number='$num',
     deal_label='$label',
-    deal_datebegin='$datebegin',
+    deal_datebegin=$datebegin,
     deal_type_id='$kind',
     deal_tasktype_id='$cat',
     deal_company_id='$comp',
-    deal_contact1_id='$con1',
-    deal_contact2_id='$con2',
+    deal_contact1_id=$con1,
+    deal_contact2_id=$con2,
     deal_marketingmanager_id='$market',
     deal_technicalmanager_id='$tech',
-    deal_dateproposal='$dateprop',
-    deal_amount='$amount',
-    deal_hitrate='$hitrate',
+    deal_dateproposal=$dateprop,
+    deal_amount=$amount,
+    deal_hitrate=$hitrate,
     deal_status_id='$status',
     deal_datealarm='$datealarm',
     deal_comment='$comment',
@@ -401,18 +388,18 @@ function run_query_deal_id($deal) {
   $num = $deal["num"];
   $label = $deal["label"];
   $vis = $deal["vis"];
-  $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
+  $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
   $kind = $deal["kind"]; 
   $cat = $deal["cat"];
   $comp = $deal["company"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
-  $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
-  $amount = $deal["amount"];
-  $hitrate = $deal["hitrate"];
-  $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
-  $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
-  $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
+  $dateprop = ($deal["dateprop"] ? "='".$deal["dateprop"]."'" : "is null");
+  $amount = ($deal["amount"] ? "='".$deal["amount"]."'" : "is null");
+  $hitrate = ($deal["hitrate"] ? "='".$deal["hitrate"]."'" : "is null");
+  $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
+  $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
+  $datealarm = ($deal["datealarm"] ? "='".$deal["datealarm"]."'" : "is null");
   $status = $deal["state"];
   $todo = $deal["todo"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
@@ -421,7 +408,7 @@ function run_query_deal_id($deal) {
   $query = "select deal_id from Deal Where 
     deal_number='$num' and
     deal_label='$label' and
-    deal_datebegin='$datebegin' and
+    deal_datebegin $datebegin and
     deal_type_id='$kind' and
     deal_tasktype_id='$cat' and
     deal_company_id='$comp' and
@@ -429,11 +416,11 @@ function run_query_deal_id($deal) {
     deal_contact2_id='$con2' and
     deal_marketingmanager_id='$market' and
     deal_technicalmanager_id='$tech' and
-    deal_dateproposal='$dateprop' and
-    deal_amount='$amount' and
-    deal_hitrate='$hitrate' and
+    deal_dateproposal $dateprop and
+    deal_amount $amount and
+    deal_hitrate $hitrate and
     deal_status_id='$status' and
-    deal_datealarm='$datealarm' and
+    deal_datealarm $datealarm and
     deal_archive='$archive' and
     deal_visibility='$vis' and
     deal_todo='$todo'";
@@ -835,7 +822,7 @@ function run_query_status_insert($deal) {
     dealstatus_label,
     dealstatus_order,
     dealstatus_hitrate)
-  values ('null',
+  values (null,
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '$label',
@@ -930,7 +917,7 @@ function run_query_cat_insert($deal) {
     tasktype_usercreate,
     tasktype_internal,
     tasktype_label)
-  values ('null',
+  values (null,
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '$intern',
@@ -1053,7 +1040,7 @@ function check_deal_form($did, $deal) {
 
   // If the amount is filled, Check if the hitrate is between 0 and 100
   if ( ( ($deal["amount"]) && !($deal["amount"] == 0) )
-       || ($deal["hitrate"] != "") ) {
+       || (trim($deal["hitrate"]) != "") ) {
     if ( ($deal["hitrate"] == "") || (! is_numeric($deal["hitrate"]))
 	 || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
       $err_msg = $l_err_hitrate;
@@ -1467,7 +1454,7 @@ function get_parent_dateproposal($p_id)  {
 
   $query = "select deal_dateproposal from Deal
     where deal_parentdeal_id='$p_id' and deal_archive != '1'
-      and deal_dateproposal != '0000-00-00'
+      and deal_dateproposal is not null
     order by deal_dateproposal";
 
   display_debug_msg($query, $cdg_sql);
@@ -1576,7 +1563,7 @@ function get_parent_potential($p_id)  {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("res_balanced") . " / " .$obm_q->f("res") ;
+  return number_format($obm_q->f("res_balanced")) . " / " .$obm_q->f("res") ;
 }
 
 

@@ -162,6 +162,13 @@ ALTER table Kind change column kind_label kind_header varchar(64);
 
 
 -------------------------------------------------------------------------------
+-- Update structure for table 'Deal'
+-------------------------------------------------------------------------------
+-- Change column : deal_hitrate to int(3)
+ALTER table Deal change column deal_hitrate deal_hitrate int(3) default 0;
+
+
+-------------------------------------------------------------------------------
 -- Update structure for table 'ActiveUserObm'
 -------------------------------------------------------------------------------
 -- Change column : activeuserobm_timeupdate to timestamp
@@ -169,6 +176,7 @@ ALTER table ActiveUserObm change column activeuserobm_timeupdate activeuserobm_t
 
 -- Change column : activeuserobm_timecreate to timestamp
 ALTER table ActiveUserObm change column activeuserobm_timecreate activeuserobm_timecreate timestamp(14);
+
 
 -------------------------------------------------------------------------------
 -- Update structure for table 'UserObm_SessionLog'

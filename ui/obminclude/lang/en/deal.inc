@@ -169,6 +169,10 @@ $l_cat_can_delete = "The Category can be deleted";
 $l_cat_cant_delete = "The Category can't be deleted";
 $l_cat_link_deal = "The Category is involved in these deals";
 $l_cat_link_deal_no = "The Category is not involved in any deals";
+$l_cat_link_project = "The Category is involved in these projects";
+$l_cat_link_project_no = "The Category is not involved in any projects";
+$l_cat_link_timetask = "The Category is used in time management";
+$l_cat_link_timetask_no = "The Category is not used in time management";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";

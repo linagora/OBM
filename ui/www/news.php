@@ -19,6 +19,21 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2003-12-24</b> : version <b>0.7.5</b> released (enhancement)
+        <ol>
+          <li> PostreSQL support up to date
+          <li> Company enhancements (Phonetics and approximate searches, Categories, datasource...)
+          <li> Contact enhancements (Categories, marketing manager, kind, functions, datasource,...)
+          <li> New module : Admin Referential to handle global entities
+    <li> New tables : Country and DataSource (
+          <li> Fixes and enhancements in Project, Deal,...
+          <li> Updates on install script and doc
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-12-05</b> : version <b>0.7.4</b> released (minor fixes)
         <ol>
           <li> Project module fixes and improvement

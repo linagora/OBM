@@ -114,27 +114,27 @@ INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate
 --
 -- Dumping data for table 'TaskType'
 --
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (1,'Développement',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (2,'Sav / Maintenance',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (3,'Formation',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (4,'Etudes / Conseil',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (5,'Réseau / Intégration',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (6,'Infographie',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (7,'Hébergement',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (8,'Matériel',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (9,'Autres',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (11,'Avant vente',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (12,'Préparation formation',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (13,'Développements internes',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (14,'Projets internes',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (15,'Auto-Formations,Veille',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (16,'Garantie contractuelle projets',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17,'Divers(direction,autres)',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Congés , absences , maladie',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Déplacements',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Infographie/Communication',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (21,'Administratif',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (22,'Réunions',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Développement',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Sav / Maintenance',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Formation',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Etudes / Conseil',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Réseau / Intégration',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Infographie',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Hébergement',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Matériel',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Autres',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Avant vente',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Préparation formation',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Développements internes',1);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Projets internes',1);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Auto-Formations,Veille',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Garantie contractuelle projets',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Divers(direction,autres)',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Congés , absences , maladie',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Déplacements',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Infographie/Communication',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Administratif',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Réunions',2);
 
 
 --

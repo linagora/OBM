@@ -41,6 +41,7 @@ if ($action == "") $action = "index";
 $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
 $perm->check();
+$uid = $auth->auth["uid"];
 
 // updating the user bookmark : 
 if ( ($param_user == $last_user) && (strcmp($action,"delete")==0) ) {

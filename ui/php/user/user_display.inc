@@ -51,7 +51,7 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
   }
   else if ($fieldname == "userobm_timelastaccess") {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = date_format($date);
+    $res["name"] = datetime_format($date, 1);
   }
 
   return $res;
@@ -491,7 +491,7 @@ function html_user_consult($obm_q) {
   $fname = $obm_q->f("userobm_firstname");
   $phone = $obm_q->f("userobm_phone");
   $email = $obm_q->f("userobm_email");
-  $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"));
+  $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
 
   if ($perms == $perms_user) $l_perms = $l_perms_user;

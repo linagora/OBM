@@ -23,9 +23,14 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $perms = $user["perms"];
   $archive = $user["archive"];
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $lastaccess = sql_date_format($type, "userobm_timelastaccess", "userobm_timelastaccess");
+
   $select = "select UserObm.*,
       userobm_id as Id,
-      UNIX_TIMESTAMP(userobm_timelastaccess) as userobm_timelastaccess
+      $lastaccess
     from UserObm";
   $where = "";
 
@@ -59,10 +64,9 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_db=new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
 
-  return $obm_db;
+  return $obm_q;
 }
 
 
@@ -82,9 +86,15 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
   $perms = $user["perms"];
   $archive = $user["archive"];
   $uid = $auth->auth["uid"];
+
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $lastaccess = sql_date_format($type, "userobm_timelastaccess", "userobm_timelastaccess");
+
   $select = "select u.*,
       userobm_id as Id,
-      UNIX_TIMESTAMP(userobm_timelastaccess) as userobm_timelastaccess
+      $lastaccess
     from UserObm  as u
       LEFT OUTER JOIN CalendarRight as c 
         ON u.userobm_id = c.calendarright_ownerid
@@ -94,19 +104,19 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
 
   // If a login indication has been specified, get it
   if (trim($login) != "") {
-     $where .= " userobm_login like '$login%'";
+    $where .= " userobm_login like '$login%'";
   }
 
   // If a user perms indication has been specified, get it
   if (($perms != $c_all) && ($perms != "")) {
-     if (trim($where) != "") $where .= " and";
-     $where .= " userobm_perms='$perms'";
+    if (trim($where) != "") $where .= " and";
+    $where .= " userobm_perms='$perms'";
   }
 
   // If a name indication has been specified, get it
   if (trim($lname) != "") {
-     if (trim($where) != "") $where .= " and";
-     $where .= " userobm_lastname like '$lname%'";
+    if (trim($where) != "") $where .= " and";
+    $where .= " userobm_lastname like '$lname%'";
   }
 
   if ($archive != "1") {
@@ -121,10 +131,9 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_db=new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
 
-  return $obm_db;
+  return $obm_q;
 }
 
 
@@ -137,10 +146,18 @@ function run_query_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type, "UserObm.userobm_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "UserObm.userobm_timecreate", "timecreate");
+  $lastaccess = sql_date_format($type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
+
+  //      UNIX_TIMESTAMP(UserObm.userobm_timeupdate) as timeupdate,
+
   $query = "select UserObm.*,
-      UNIX_TIMESTAMP(UserObm.userobm_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(UserObm.userobm_timecreate) as timecreate,
-      UNIX_TIMESTAMP(UserObm.userobm_timelastaccess) as userobm_timelastaccess,
+      $timeupdate,
+      $timecreate,
+      $lastaccess,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     from UserObm

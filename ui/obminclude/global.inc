@@ -11,7 +11,7 @@
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
-$obm_version = "0.7.5pre3";
+$obm_version = "0.7.5pre4";
 $l_obm_title = "O.B.M.";
 
 // Bookmarks default
@@ -431,11 +431,12 @@ function debug_level_isset($debug) {
 ///////////////////////////////////////////////////////////////////////////////
 // Format a date according to user preference                                //
 // Parameters:
-//   - $timestamp : Unix timestamp
+//   - $timestamp  : Unix timestamp
+//   - $null_empty : tell if null should returns empty (true) or today ("")
 // Returns:
 //   date formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
-function date_format($timestamp="") {
+function date_format($timestamp="", $null_empty="") {
   global $set_date_default, $set_date;
 
   $format = $set_date;
@@ -447,7 +448,11 @@ function date_format($timestamp="") {
       $date = date($format, $timestamp);
     }
   } else {
-    $date = date($format);
+    if ($null_empty != "") {
+      $date = "";
+    } else {
+      $date = date($format);
+    }
   }
 
   return $date;
@@ -457,11 +462,12 @@ function date_format($timestamp="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Iso Format a date                                                         //
 // Parameters:
-//   - $timestamp : Unix timestamp
+//   - $timestamp  : Unix timestamp
+//   - $null_empty : tell if null should returns empty (true) or today ("")
 // Returns:
 //   datetime formated iso
 ///////////////////////////////////////////////////////////////////////////////
-function isodate_format($timestamp="") {
+function isodate_format($timestamp="", $null_empty="") {
   global $c_php_isodate_format;
 
   if ($timestamp != "") {
@@ -471,7 +477,11 @@ function isodate_format($timestamp="") {
       $date = date($c_php_isodate_format, $timestamp);
     }
   } else {
-    $date = date($c_php_isodate_format);
+    if ($null_empty != "") {
+      $date = "";
+    } else {
+      $date = date($c_php_isodate_format);
+    }
   }
 
   return $date;
@@ -482,7 +492,7 @@ function isodate_format($timestamp="") {
 // Format a date-time according to user preference                           //
 // Parameters:
 //   - $timestamp  : Unix timestamp
-//   - $empty_null : tell if null should returns empty (true) or today ("")
+//   - $null_empty : tell if null should returns empty (true) or today ("")
 // Returns:
 //   datetime formated as user settings
 ///////////////////////////////////////////////////////////////////////////////

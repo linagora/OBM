@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : company_js.inc                                              //
 //     - Desc  : Company javascript functions File                           //
@@ -51,6 +51,18 @@ function check_form(f_aff) {
     return false;
   }
 
+  if (trim(f_aff.tf_datebegin.value) == \"\") {
+    alert (\"$l_fill_datebegin\");
+    return false;
+  } else if (check_date(f_aff.tf_datebegin, \"$l_date_init\") == false) {
+    return false;
+  }
+  
+  if ((f_aff.tf_dateprop.value != \"\") &&
+          (check_date(f_aff.tf_dateprop, \"$l_proposition\") == false)) {
+    return false;
+  }
+
   if (trim(f_aff.tf_datealarm.value) == \"\") {
     alert (\"$l_fill_datealarm\");
     return false;
@@ -77,17 +89,7 @@ function check_form(f_aff) {
     return true;
   }
 
-  if (trim(f_aff.tf_datebegin.value) == \"\") {
-    alert (\"$l_fill_datebegin\");
-    return false;
-  } else if (check_date(f_aff.tf_datebegin, \"$l_date_init\") == false) {
-    return false;
-  }
-  
-  if ((f_aff.tf_dateprop.value != \"\") &&
-          (check_date(f_aff.tf_dateprop, \"$l_proposition\") == false)) {
-    return false;
-  }
+  return true;
 }
 
 
@@ -289,4 +291,3 @@ function check_category_new(form)
 // -->
 </script>
 ";
-

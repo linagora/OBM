@@ -84,10 +84,9 @@
       <tr bgcolor="#F1F9FA"> 
         <td>Postgres</td>
         <td>7.1.x, 7.2.x, 7.3.x</td>
-        <td>Is supported since 0.3.0 <br>
-          (Version prior to 7.1 (6.5.3, 7.0.x) were supported till OBM 0.5.1) 
+        <td>Was supported in 0.3.0
           <br>
-          (Postgres creation scripts are lacking for now in recent releases)</td>
+          Postgres support back since 0.7.5</td>
       </tr>
     </table>
     <p>&nbsp; </p>

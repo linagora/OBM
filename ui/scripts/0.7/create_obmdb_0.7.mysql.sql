@@ -380,7 +380,7 @@ CREATE TABLE Deal (
   deal_technicalmanager_id  int(8),
   deal_dateproposal         date,
   deal_amount               decimal(12,2),
-  deal_hitrate              char(3) DEFAULT '0',
+  deal_hitrate              int(3) DEFAULT 0,
   deal_status_id            int(2),
   deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
