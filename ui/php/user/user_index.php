@@ -80,14 +80,13 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   include("user_js.inc");
-  html_user_form(1,"",$obm_user);
+  $display["detail"] = html_user_form(1,"",$obm_user);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
-    display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
-    html_user_consult($obm_q);
+    $display["detail"] = html_user_consult($obm_q);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -97,8 +96,8 @@ if ($action == "index" || $action == "") {
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     include("user_js.inc");
-    display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
-    html_user_form(1, $obm_q, $obm_user);
+    $display["detailInfo"] = display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
+    $display["detail"] = html_user_form(1, $obm_q, $obm_user);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -124,7 +123,7 @@ if ($action == "index" || $action == "") {
     } else {
       $obm_q = check_user_context("", $obm_user);
       if ($obm_q->num_rows() > 0) {
-        dis_user_warn_insert("", $obm_q, $obm_user);
+        $display["detail"] = dis_user_warn_insert("", $obm_q, $obm_user);
       } else {
         $retour = run_query_insert($obm_user);
         if ($retour) {
@@ -142,7 +141,7 @@ if ($action == "index" || $action == "") {
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    html_user_form(0, "", $obm_user);
+    $display["detail"] = html_user_form(0, "", $obm_user);
   }
 
 } elseif ($action == "reset")  {
@@ -152,8 +151,7 @@ if ($action == "index" || $action == "") {
   $display["msg"] .= display_ok_msg($l_reset_ok);
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
-    display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
-    html_user_consult($obm_q);
+    $display["detail"] = html_user_consult($obm_q);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -175,7 +173,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("user_js.inc");
-  dis_check_links($obm_user["id"]);
+  $display["detail"] = dis_check_links($obm_user["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,7 +215,6 @@ function get_param_user() {
   if (isset ($param_user)) $obm_user["id"] = $param_user;
   if (isset ($popup)) $obm_user["popup"] = 1;
   if (isset ($tf_login)) $obm_user["login"] = $tf_login;
-  if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
   if (isset ($sel_perms)) $obm_user["perms"] = $sel_perms;
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
@@ -265,7 +262,7 @@ function get_user_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $user_write,
-    'Condition'=> array ('search','index','admin','detailconsult','display') 
+    'Condition'=> array ('search','index','admin','detailconsult','reset','display') 
                                   );
 
 // Search
@@ -288,7 +285,7 @@ function get_user_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
      'Right'    => $user_write,
-     'Condition'=> array ('detailconsult') 
+     'Condition'=> array ('detailconsult', 'reset') 
                                      	   );
 
 // Reset
@@ -318,7 +315,7 @@ function get_user_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
     'Right'    => $user_write,
-    'Condition'=> array ('detailconsult', 'detailupdate') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'reset') 
                                      	   );
 
 // Delete

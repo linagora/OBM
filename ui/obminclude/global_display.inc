@@ -301,7 +301,7 @@ class OBM_DISPLAY {
       }	  
       
       $cpt++;
-      $block .= "<tr ". $rowstyle .">";
+      $block .= "<tr $rowstyle>";
 
       // If debug level Id is set, display the entity id
       if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
@@ -313,7 +313,7 @@ class OBM_DISPLAY {
 	$style = "class=\"resultText\"";
 
       // If a left checkbox has to be displayed
-      if (($this->data_cb_side == "left") && ($this->data_cb_text != "")){
+      if (($this->data_cb_side == "left") && ($this->data_cb_text != "")) {
 	$col_show = $this->data_cb_show;
         // If cb are to be displayed or column telling visibility is true
         if (($col_show == "1") || ($this->data_set->f($col_show))) {
@@ -533,8 +533,9 @@ class OBM_DISPLAY {
     </div>
 ";
 
-    return $content;
     $this->data_set->seek($first_row);
+
+    return $content;
   }
 
 

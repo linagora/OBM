@@ -603,8 +603,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
     </div>
-    </form>
-   ";
+    </form>";
 
   return $block;
 }
@@ -741,7 +740,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     $id = $co_q->f("company_id");
     $samename = $co_q->f("company_name");
     $samezip = $co_q->f("company_zip");
-    $disp_same_comp .= "
+    $dis_same_comp .= "
           <tr><td colspan =\"2\" class=\"detailText\">
              <a class=\"detail\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
               $samename ($samezip)</a>
@@ -749,10 +748,12 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   }
 
   $block = "
-    <table class=\"detail\">
-    $disp_same_comp
-    <tr><td>
-    <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
+  <table class=\"detail\">
+    $dis_same_comp
+  </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    <form method=\"post\" name=\"form_insert\"
     action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
@@ -774,8 +775,9 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
-    </td><td>
-    <form id=\"form_back\" name=\"form_back\" method=\"post\"
+    </p>
+    <p class=\"detailButtons\">
+    <form name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
@@ -796,8 +798,8 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
-    </td></tr>
-    </table>";
+    </p>
+  </div>";
 
   return $block;
 }
