@@ -39,14 +39,14 @@ function run_query_month_event_list() {
 function run_query_waiting_events() {
   global $cdg_sql,$auth;
   $obm_db = new DB_OBM;
-  $query = "SELECT count(*) as num
+  $query = "SELECT count(calendarsegment_eventid) as num
             FROM  CalendarSegment
 	    WHERE calendarsegment_state = 'W'
-	      AND calendarsegment_customerid = '".$auth->auth["uid"]."'";
+	      AND calendarsegment_customerid = '".$auth->auth["uid"]."' GROUP BY calendarsegment_eventid";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
    
-  return $obm_db->f("num")/2;
+  return $obm_db->f("num")/1;
 }
 
 /////////////////////////////////////////////////////////////////////////////

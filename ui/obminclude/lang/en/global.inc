@@ -193,7 +193,7 @@ $l_document_new = "New document";
 $l_document_add = "Affect a document";
 
 //Portal labels
-$l_waiting_events = "Wainting events";
+$l_waiting_events = "Waiting events";
 $l_unfilled = "Days unfilled";
 $l_youre_agenda = "Your calendar";
 $l_youre_time = "Your time management";
