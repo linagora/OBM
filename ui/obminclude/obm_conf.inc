@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -19,7 +19,7 @@ $obmdb_password = "obm";
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://obm-panthere/";
+$cgp_host = "http://obm/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes

@@ -786,7 +786,7 @@ function html_waiting_events($obm_wait) {
 	  <td class=\"detailText\">$l_priority</td>
 	  <td class=\"detailText\">$l_from</td>
 	  <td class=\"detailText\">$dis_kind</td>
-	  <td class=\"detailText\">$dis_days</td>
+	  <td class=\"detailText\">$dis_day</td>
 	  <td class=\"detailText\">$dis_end</td>     
 	  <td class=\"detailText\">$l_datebegin</td>
 	  <td class=\"detailText\">$l_dateend</td>
@@ -825,7 +825,7 @@ function html_waiting_events($obm_wait) {
     $date_begin = datetime_format($obm_wait->f("calendarevent_date"));
     $date_end = datetime_format($obm_wait->f("calendarevent_date") + $obm_wait->f("calendarevent_duration"));
     $date_repeat = date_format($obm_wait->f("calendarevent_endrepeat"));
-    if ($kind != "none") {$is_repeat = true;}
+    if ($obm_wait->f("calendarevent_repeatkind") != "none") {$is_repeat = true;}
     $dis_events .= "
     <tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
@@ -849,7 +849,15 @@ function html_waiting_events($obm_wait) {
      </td>
     </tr>";
   }
-  
+  if($is_repeat) {
+    $dis_kind = $l_repeatkind;
+    $dis_day = $l_repeatdays2;
+    $dis_end = $l_use_endrepeat;
+  } else {
+    $dis_kind = "";
+    $dis_day = ""; 
+    $dis_end = "";
+  }
   // --- HTML Template --------------------------------------------------------
   $block .= "
   <p/>
@@ -861,7 +869,7 @@ function html_waiting_events($obm_wait) {
     <td class=\"detailText\">$l_priority</td>
     <td class=\"detailText\">$l_from</td>
     <td class=\"detailText\">$dis_kind</td>
-    <td class=\"detailText\">$dis_days</td>
+    <td class=\"detailText\">$dis_day</td>
     <td class=\"detailText\">$dis_end</td>     
     <td class=\"detailText\">$l_datebegin</td>
     <td class=\"detailText\">$l_dateend</td>
@@ -2474,15 +2482,18 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 		$week_cal .=  "</td>";
 	      }
 	    } else {
-	      if ($user_indice != $nb_user) {
+	      if ($user_indice == 1) {
+		$week_cal .= "<td width=\"$td_width\" style=\"border-left:1px solid #a1a4a8;\" class=\"agendaNoEvent\">&nbsp;</td>";
+	      }	      
+	      elseif ($user_indice != $nb_user) {
 		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
-	      } else {
+	      }	else {
 		$week_cal .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
 	      }	      
 	    }
 	  }
 	} else {
-          $week_cal .=  "<td class=\"agendaVide\" colspan=\"$nb_user\">&nbsp;</td>";
+          $week_cal .=  "<td class=\"agendaVide\"  style=\"border-left:1px solid #a1a4a8;\" colspan=\"$nb_user\">&nbsp;</td>";
         }
       }
       $week_cal .=  "</tr>";

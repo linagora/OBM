@@ -68,7 +68,7 @@ table.agendaCalWeek		{
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
 	width:			554px;
-	border-collapse:	collapse;	
+	border-collapse:	separate;	
 	border-spacing:		0;
 }
 
