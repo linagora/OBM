@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.6.0 - 2002-12-22<BR>
+Version 0.6.2 - 2003-02-26<br>
 Pierre Baudracco
 </center>
 <p>
@@ -371,24 +371,33 @@ The user debug level is stored in the session variable $set_debug.
 The debug level is a combination of different debug flags or switches.
 
 <h3>Debug flags defined</h3>
-For 0.5.2, OBM defines 3 independant debug switches.
+For 0.6.2, OBM defines 4 independant debug switches.
 
 <P>
 <TABLE border=1>
 <TR>
   <TH>Debug switch (value)</TH>
+  <TH>Since version</TH>
   <TH>Debug infos to display</TH>
   <TH>Developper Requirements</TH>
 </TR><TR>
   <TD><I>$cdg_id (1)</I></TD>
+  <TD>0.5.2</TD>
   <TD>Records ID</TD>
   <TD>In the main search query (run_query_search() usually) get the entity_id column as Id (example below)</TD>
 </TR><TR>
   <TD><I>$cdg_param (2)</I></TD>
-  <TD>Global and session variables</TD>
+  <TD>0.5.2</TD>
+  <TD>Parameters</TD>
   <TD>Call display_debug_msg on parameters in main get_param function</TD>
 </TR><TR>
-  <TD><I>$cdg_sql (4)</I></TD>
+  <TD><I>$cdg_sess (4)</I></TD>
+  <TD>0.6.2</TD>
+  <TD>Session content</TD>
+  <TD>If set display $_SESSION content in global_pref.inc</TD>
+</TR><TR>
+  <TD><I>$cdg_sql (8)</I></TD>
+  <TD>0.5.2</TD>
   <TD>SQL queries</TD>
   <TD>Call display_debug_msg() on each query (example below)</TD>
 </TR>
