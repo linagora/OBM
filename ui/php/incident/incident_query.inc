@@ -51,6 +51,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       incident_logger,
       incident_owner,
       incident_archive,
+      incident_duration,
       $date,
       $timeupdate,
       u1.userobm_lastname as incident_logger_lastname,
