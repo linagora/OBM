@@ -208,30 +208,33 @@ function get_param_pref() {
 // ADMIN PREF actions
 //////////////////////////////////////////////////////////////////////////////
 function get_admin_pref_action() {
-  global $actions;
+  global $actions, $path;
   global $l_header_index,$l_header_pref_update,$l_header_help;
   global $admin_pref_read, $admin_pref_write;
 
+  // index : lauch forms
   $actions["ADMIN_PREF"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=index&amp;mode=html",
      'Right'    => $admin_pref_read,
      'Condition'=> array ('all') 
                                     	 );
-
- $actions["ADMIN_PREF"]["help"] = array (
+  // help
+  $actions["ADMIN_PREF"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=help&amp;mode=html",
      'Right' 	=> $admin_pref_read,
      'Condition'=> array ('all') 
                                     	);
- $actions["ADMIN_PREF"]["user_pref_update"] = array (
+  // user_pref_update : update (set to default) all users prefs
+  $actions["ADMIN_PREF"]["user_pref_update"] = array (
      'Name'     => $l_header_pref_update,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update&amp;mode=html",
      'Right' 	=> $admin_pref_write,
      'Condition'=> array ('index') 
                                     	);
- $actions["ADMIN_PREF"]["global_pref_update"] = array (
+  // global_pref_update : global preferences update
+  $actions["ADMIN_PREF"]["global_pref_update"] = array (
      'Url'     => "$path/admin_pref/admin_pref_index.php?action=global_pref_update&amp;mode=html",
      'Right' 	=> $admin_pref_write,
      'Condition'=> array ('None') 

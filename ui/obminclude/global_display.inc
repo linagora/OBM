@@ -142,11 +142,11 @@ class OBM_DISPLAY {
           <tr>
             <td class=\"OBMDisplayText\">";
       if ($display == 1) {
-	echo "<a class=\"OBMDisplayText\" href=\"".$sess->url("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
+	echo "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
         <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_round\" /></a>";
       } else if ($display == 0) {
 	$nb_field_hidden++;
-	echo "<a class=\"OBMDisplayText\" href=\"".$sess->url("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
+	echo "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
           <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
       } else if($display == 2) {
 	echo "<img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
@@ -174,7 +174,7 @@ class OBM_DISPLAY {
       if ($i == $nb_field) {
 	echo "<td>&nbsp;</td>";
       } else {
-	echo "<td><a href=\"".$sess->url("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
+	echo "<td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
            <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
       }
 
@@ -183,7 +183,7 @@ class OBM_DISPLAY {
 	echo "<td >&nbsp;</td>";
       } else {
 	echo "<td>
-              <a href=\"".$sess->url("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
+              <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
             <img alt=\"$l_up\" src=\"/images/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       echo "
@@ -718,7 +718,7 @@ class OBM_DISPLAY {
 	}
 	else {
 	if ($url != "") {
-	  $content .= "&nbsp;<a class=\"OBMDisplayText\" href=\"".$sess->url("$url")."\">";
+	  $content .= "&nbsp;<a class=\"OBMDisplayText\" href=\"".url_prepare("$url")."\">";
 	  if ($name == "") { 
 	    $content .= $this->data_set->f($fieldname);
 	  } else {

@@ -500,17 +500,18 @@ function get_param_invoice() {
 
   return $invoice;
 }
+
+
 //////////////////////////////////////////////////////////////////////////////
 // Invoice actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_invoice_action() {
-  global $invoice,$actions;
+  global $invoice, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_dupplicate,$l_header_admin;
   global $invoice_read, $invoice_write, $invoice_admin_read, $invoice_admin_write;
-//Index 
 
+// Index 
   $actions["INVOICE"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/treso/invoice_index.php?action=index",
@@ -518,45 +519,36 @@ function get_invoice_action() {
     'Condition'=> array ('all') 
                                        );
 
-//Search
-
+// Search
   $actions["INVOICE"]["search"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=search",
     'Right'    => $invoice_read,
     'Condition'=> array ('None') 
-  
                                    );
 
-//New
-
+// New
   $actions["INVOICE"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/treso/invoice_index.php?action=new",
     'Right'    => $invoice_write,
     'Condition'=> array ('','search','index','detailconsult','display') 
-  
                                    );
 
 //Insert
-
   $actions["INVOICE"]["insert"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=insert",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
-  
                                    );
 
-//Detail Consult
-
+// Detail Consult
   $actions["INVOICE"]["detailconsult"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=detailconsult",
     'Right'    => $invoice_read,
     'Condition'=> array ('None') 
-  
                                    );
 
-//Duplicate
-
+// Duplicate
   $actions["INVOICE"]["duplicate"] = array (
     'Name'     => $l_header_dupplicate,
     'Url'      => "$path/treso/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["invoice"]."",
@@ -564,8 +556,7 @@ function get_invoice_action() {
     'Condition'=> array ('detailconsult') 
                                      	   );
 
-//Detail Update
-
+// Detail Update
   $actions["INVOICE"]["detailupdate"] = array (
     'Name'     => $l_header_modify,
     'Url'      => "$path/treso/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["invoice"]."",
@@ -573,65 +564,56 @@ function get_invoice_action() {
     'Condition'=> array ('detailconsult') 
                                      	       );
 
-//Update
-
+// Update
   $actions["INVOICE"]["update"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=update",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
-  
                                         );
 
-//Update Archive
-
+// Update Archive
   $actions["INVOICE"]["updatearchive"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=updatearchive",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
-//Add Deal
-
+// Add Deal
   $actions["INVOICE"]["add_deal"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=add_deal",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
-//Search Deal
-
+// Search Deal
   $actions["INVOICE"]["search_deal"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=search_deal",
     'Right'    => $invoice_read,
     'Condition'=> array ('None') 
                                         );
 
-//Add Deal Chosen
-
+// Add Deal Chosen
   $actions["INVOICE"]["add_deal_chosen"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=add_deal_chosen",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
-//Delete Deal 
-
+// Delete Deal 
   $actions["INVOICE"]["del_deal"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=del_deal",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
-//Delete
-
+// Delete
   $actions["INVOICE"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/treso/invoice_index.php?action=delete&amp;param_invoice=".$invoice["invoice"]."",
     'Right'    => $incident_write,
     'Condition'=> array ('detailconsult') 
                                      	);
-//Administration
-
+// Administration
   $actions["INVOICE"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/treso/invoice_index.php?action=admin",
@@ -639,8 +621,7 @@ function get_invoice_action() {
     'Condition'=> array ('all') 
                                        );
 
-//Display
-
+// Display
   $actions["INVOICE"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/invoice_index.php?action=display",
@@ -648,23 +629,19 @@ function get_invoice_action() {
     'Condition'=> array ('all') 
                                         );
 
-//Display Préférences
-
+// Display Preferences
   $actions["INVOICE"]["dispref_display"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=dispref_display",
     'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                         );
 
-//Display Préférences
-
+// Display Préférences
   $actions["INVOICE"]["dispref_level"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=dispref_level",
     'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                         );
-
-
 
 }
 

@@ -432,14 +432,12 @@ function get_param_time() {
 //////////////////////////////////////////////////////////////////////////////
 // Time actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_time_actions() {
-  global $time;
+  global $time, $path;
   global $l_header_stats, $l_header_month;
-global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
+  global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
-//Index
-
+// Index
   $actions["TIME"]["index"] = array (
 	'Name'     => "$l_header_month",
     'Url'      => "$path/time/time_index.php?action=index&amp;param_begin=".
@@ -448,76 +446,68 @@ global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
     'Condition'=> array('all') 
                                     );
 
-//Search
-
+// Search
   $actions["TIME"]["search"] = array (
     'Url'      => "$path/time/time_index.php?action=search",
     'Right'    => $time_read,
     'Condition'=> array ('None') 
                                     );
 
-
-//Validate
+// Validate
   $actions["TIME"]["validate"] = array (
     'Url'      => "$path/time/time_index.php?action=validate",
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 
-//Validate Admin
-
+// Validate Admin
   $actions["TIME"]["validate_admin"] = array (
     'Url'      => "$path/time/time_index.php?action=validate_admin",
     'Right'    => $time_admin_write,
     'Condition'=> array ('None') 
                                     );
 
-//Stats Update
-
+// Stats Update
   $actions["TIME"]["stats"] = array (
 	'Name'     => "$l_header_stats",
     'Url'      => "$path/time/time_index.php?action=stats",
     'Right'    => $time_write,
     'Condition'=> array ('index', 'admin') 
                                     );
-//Insert 
 
+// Insert 
   $actions["TIME"]["insert"] = array (
     'Url'      => "$path/time/time_index.php?action=insert",
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
-//Show Detail
-
+// Show Detail
   $actions["TIME"]["show_detail"] = array (
     'Url'      => "$path/time/time_index.php?action=show_detail",
     'Right'    => $time_read,
     'Condition'=> array ('None') 
                                     );
-//Delete 
 
+// Delete 
   $actions["TIME"]["delete"] = array (
     'Url'      => "$path/time/time_index.php?action=delete",
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 
-//Detail Update
-
+// Detail Update
   $actions["TIME"]["detailupdate"] = array (
     'Url'      => "$path/time/time_index.php?action=detailupdate",
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 
-//Update
-
+// Update
   $actions["TIME"]["update"] = array (
     'Url'      => "$path/time/time_index.php?action=update",
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
-
 
 }
 

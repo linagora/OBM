@@ -155,36 +155,36 @@ function parse_arg($argv) {
   if (! $action) $action = "show_amp";
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Admin Code Action 
 ///////////////////////////////////////////////////////////////////////////////
-
-
 function get_admin_code_action() {
-  global $actions;
+  global $actions, $path;
   global $l_header_index,$l_header_help, $l_header_amp;
   global $admin_code_read,$admin_code_write;
 
+  // index : launch form
   $actions["ADMIN_CODE"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_code/admin_code_index.php?action=index&amp;mode=html",
      'Right'    => $admin_code_read,
      'Condition'=> array ('all') 
                                     	 );
-
- $actions["ADMIN_CODE"]["help"]	= array (
+  // help
+  $actions["ADMIN_CODE"]["help"]	= array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_code/admin_code_index.php?action=help&amp;mode=html",
      'Right'    => $admin_code_read,
      'Condition'=> array ('all') 
                                         );
- $actions["ADMIN_CODE"]["show_amp"]	= array (
+  // show_amp : show & (&amp; use). & alone shouldn't be used in url
+  $actions["ADMIN_CODE"]["show_amp"]	= array (
      'Name'     => $l_header_amp,
      'Url'      => "$path/admin_code/admin_code_index.php?action=show_amp&amp;mode=html",
      'Right'    => $admin_code_write,
      'Condition'=> array ('index') 
                                         );
-
 
 }
 

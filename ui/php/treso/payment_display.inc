@@ -65,25 +65,24 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   }
 
   // various form actions :
-  $url_banking = "payment_index.php?action=check_banking";
-  $url_creating = "payment_index.php?action=insert";
-  $url_deleting = "payment_index.php?action=delete";
-  $url_updating = "payment_index.php?action=update";
+  $url_banking = url_prepare("payment_index.php?action=check_banking");
+  $url_creating = url_prepare("payment_index.php?action=insert");
+  $url_deleting = url_prepare("payment_index.php?action=delete");
+  $url_updating = url_prepare("payment_index.php?action=update");
 
-  echo "
-  <center>";
+  echo "<center>";
   // we do different check if we are creating/updating or banking the payment :
-    if (($p_action == "new") || ($p_action == "duplicate") ) {
+  if (($p_action == "new") || ($p_action == "duplicate") ) {
     // creating/duplicating
     echo "
-  <form name=\"form_create_payment\" method=\"post\" action=\"".$sess->url($url_creating)."\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
+  <form name=\"form_create_payment\" method=\"post\" action=\"$url_creating\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
     } elseif ($p_action == "detailupdate") {
     echo "
-  <form name=\"form_create_payment\" method=\"post\" action=\"".$sess->url($url_updating)."\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
+  <form name=\"form_create_payment\" method=\"post\" action=\"$url_updating\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
     } elseif ($p_action == "add_invoices") {
     // banking
     echo "
-  <FORM name=\"form_add_invoices\" method=\"post\" action=\"".$sess->url($url_banking)."\" onsubmit=\"if (check_payment_banking (this)) return true; else return false ;\">";
+  <FORM name=\"form_add_invoices\" method=\"post\" action=\"$url_banking\" onsubmit=\"if (check_payment_banking (this)) return true; else return false ;\">";
   } else {
     display_err_msg ("unhandled action value '".$p_action."' in html_payment_form ()");
   }
@@ -224,10 +223,10 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
     
     echo "
       </td><td>";
-    $new_action = "payment_index.php?action=new_with_invoices";
+    $new_action = url_prepare("payment_index.php?action=new_with_invoices");
     echo "
       <input type=\"button\" value=\"$l_add_invoices\" ".
-      "onClick=\"if (check_payment(this.form)) {this.form.action='".$sess->url($new_action)."'; this.form.submit();} else { return false; }\">";
+      "onClick=\"if (check_payment(this.form)) {this.form.action='$new_action'; this.form.submit();} else { return false; }\">";
 echo "
     </td></tr>
     </table>
@@ -240,7 +239,7 @@ echo "
        <input type=\"submit\" value=\"$l_update\">
            </form> 
       </td><td valign=\"top\"> 
-       <form method=\"post\" name=\"form_payment_delete\" onSubmit=\"return (valider_suppression());\" action=\"".$sess->url($url_deleting)."\">
+       <form method=\"post\" name=\"form_payment_delete\" onSubmit=\"return (valider_suppression());\" action=\"$url_deleting\">
         <input type=\"submit\" value=\"$l_delete\" $readonly>
         <input type=\"hidden\" name=\"hd_param_payment\" value=\"".$q_payment->f("payment_id")."\">
       </td></tr>
@@ -285,7 +284,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
 
   echo "
    <center>
-    <form method=\"post\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".$sess->url("payment_index.php?action=search")."\">";
+    <form method=\"post\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".url_prepare("payment_index.php?action=search")."\">";
   echo "
      <table border=$border cellspacing=$cellspacing>
       <tr><td>";
@@ -451,7 +450,6 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
   global $l_found;
   // session stuff
   global $perms_user,$l_perms_user;
-  global $auth, $sess;
 
   // get payment data :
   $label = $payment["label"];
@@ -467,7 +465,7 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
   echo "$nb_payments $l_found";
   echo "</FONT><BR></CENTER>";
 
-  $url = $sess->url("payment_index.php?action=search".
+  $url = url_prepare("payment_index.php?action=search".
 		    "&amp;tf_label=$label".
 		    "&amp;tf_number=$number".
 		    "&amp;tf_amount=$amount".
@@ -511,9 +509,9 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   }
 
   // various actions performed by the form :
-  $url_update = "payment_index.php?action=detailupdate&amp;param_payment=".$q_payment->f("payment_id");
-  $url_duplicate = "payment_index.php?action=duplicate&amp;param_payment=".$q_payment->f("payment_id");
-  $url_bank = "payment_index.php?action=search_invoice&amp;param_payment=".$q_payment->f("payment_id");
+  $url_update = url_prepare("payment_index.php?action=detailupdate&amp;param_payment=".$q_payment->f("payment_id"));
+  $url_duplicate = url_prepare("payment_index.php?action=duplicate&amp;param_payment=".$q_payment->f("payment_id"));
+  $url_bank = url_prepare("payment_index.php?action=search_invoice&amp;param_payment=".$q_payment->f("payment_id"));
   
   echo "
    <center>
@@ -601,19 +599,19 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
     // we do not need that button if the payment is checked :
     if ( ! $q_payment->f("payment_checked")) {
       echo "
-          <input type=button value=\"$l_update\" onClick=\"form_payment_update.action='".$sess->url($url_update)."';form_payment_update.submit();\">";
+          <input type=button value=\"$l_update\" onClick=\"form_payment_update.action='$url_update'; form_payment_update.submit();\">";
     }
     // this button is used to handle periodic payments.
     // when clicked, it allows the user to duplicate the current
     // payment, so he can keep some fields and only update those who need
     // to change :
     echo "
-          <input type=\"button\" value=\"$l_duplicate\" onClick=\"form_payment_update.action='".$sess->url($url_duplicate)."';form_payment_update.submit();\">";
+          <input type=\"button\" value=\"$l_duplicate\" onClick=\"form_payment_update.action='$url_duplicate'; form_payment_update.submit();\">";
     // we display the "bank" button only if payment has not been banked yet
     if ($q_payment->f("payment_paid") == "n"){
       // if the user clicks on bank, we jump to the invoice search page
       echo "
-          <input type=button value=\"$l_bank\" onClick=\"form_payment_update.action='".$sess->url($url_bank)."';form_payment_update.submit();\">"; 
+          <input type=button value=\"$l_bank\" onClick=\"form_payment_update.action='$url_bank';form_payment_update.submit();\">"; 
     } 
     // we hide payment_inout because we need to have it,
   // but not to show it :
@@ -640,7 +638,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
 
       display_ok_msg ($l_invoices_connected);
       
-      $url = $sess->url("payment_index.php?action=detailconsult".
+      $url = url_prepare("payment_index.php?action=detailconsult".
 			"&amp;param_payment=".$q_payment->f("payment_id"));
       
       $dis_invoice = new OBM_DISPLAY("DATA", $invoices_options);
@@ -653,7 +651,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
       //and the button to break invoices-payments associations :
 
       if ($action=="detailconsult" && $q_payment->f("payment_checked")=="n") {
-	$action_break = $sess->url("payment_index.php?action=break_asso&amp;param_payment=".$q_payment->f("payment_id"));
+	$action_break = url_prepare("payment_index.php?action=break_asso&amp;param_payment=".$q_payment->f("payment_id"));
 	echo "
 <center>
  <form name=\"break_asso\" method=\"post\" action=\"$action_break\">
@@ -693,15 +691,15 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
   global $auth, $sess, $cdg_param;
   
   if ($p_action == "search_invoice") {
-    $url = "payment_index.php?action=search_invoice&amp;param_payment=".$payment["payment"];
+    $url = url_prepare("payment_index.php?action=search_invoice&amp;param_payment=".$payment["payment"]);
   } elseif ($p_action == "new_with_invoices") {
-    $url = "payment_index.php?action=search_invoice_new&amp;param_payment=".$payment["payment"];
+    $url = url_prepare("payment_index.php?action=search_invoice_new&amp;param_payment=".$payment["payment"]);
   }
   
   // invoice search form  :
   echo"
 <center>
- <form name=\"invoice_search\" method=\"post\" action=\"".$sess->url($url)."\">
+ <form name=\"invoice_search\" method=\"post\" action=\"$url\">
   <table cellspacing=$cellspacing border=$border>";
   // the invoice label to look for :
   echo"
@@ -731,7 +729,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
    display_ok_msg ($l_no_invoices);
  } else {
 
-   $url = $sess->url("payment_index.php?action=search_invoice".
+   $url = url_prepare("payment_index.php?action=search_invoice".
 		     "&amp;param_payment=".$payment["payment"].
 		     "&amp;tf_invoice_label=$tf_invoice_label");
    
@@ -748,19 +746,17 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
    $dis_invoice->data_cb_name = "use_";
 
    if ($p_action == "search_invoice") {
-     $url = $sess->url("payment_index.php?action=add_invoices".
+     $url = url_prepare("payment_index.php?action=add_invoices".
 		       "&amp;param_payment=".$payment["payment"]);
    }
    elseif (($p_action == "new_with_invoices") 
 	   || ($p_action == "search_invoice_new")) {
-     $url = $sess->url("payment_index.php?action=insert_with_invoices".
+     $url = url_prepare("payment_index.php?action=insert_with_invoices".
 		       "&amp;param_payment=".$payment["payment"]);
    }
    if (true) {
      display_debug_msg("FIXME : permissions", $cdg_param); 
-     echo "
-   <form method=post action=\"".$sess->url($url)."\">
-";
+     echo "<form method=post action=\"$url\">";
    }
    $dis_invoice->display ();
 
@@ -886,18 +882,16 @@ function html_banking_problem ($p_error, $p_payment, $p_invoices) {
   global $sess;
 
   display_err_msg ($p_error);
-    // where the user goes if he clicks on "carry on"
-  $url_go = "payment_index.php?action=check_banking";
-    // and if he clicks on "do it again"
-    $url_again = "payment_index.php?action=search_invoice";
-
+  // where the user goes if he clicks on "carry on"
+  $url_go = url_prepare("payment_index.php?action=check_banking");
+  // and if he clicks on "do it again"
+  $url_again = url_prepare("payment_index.php?action=search_invoice");
+  
   if (($p_error == $l_not_enough) || ($p_error == $l_too_much)){
     // banking has to be done again :
-    echo "do it again";
-    echo "
+    echo "do it again
 <center>
- <form name=\"form_do_it_again\" method=post action=\"".$sess->url($url_again)."\">
-  ".$url."";
+ <form name=\"form_do_it_again\" method=post action=\"$url_again\">$url";
     // we need this to redisplay the search_invoice page
     echo "
   <input type=hidden name=\"hd_param_payment\" ".
@@ -916,7 +910,7 @@ function html_banking_problem ($p_error, $p_payment, $p_invoices) {
     // we need to "remember" all payment & invoices data...
     echo "
 <center>
- <form name=\"form_are_you_sure\" method=post action=\"".$url_go."\">";
+ <form name=\"form_are_you_sure\" method=post action=\"$url_go\">";
     // we know checks have been done :
     echo "
   <input type=hidden name=check_done value=1>";
@@ -994,14 +988,14 @@ function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices
     $msg = $l_break_asso_easy_confirm;
   }
   // where the form leads :
-  $url_break = $sess->url ("payment_index.php?action=do_break_asso&amp;".
+  $url_break = url_prepare("payment_index.php?action=do_break_asso&amp;".
 			   "param_payment=".$q_payment->f("payment_id").
 			   "&amp;situation=$situation");
 
   // invoices connected to that payment :
   display_ok_msg ($msg);
 
-  $url = $sess->url("payment_index.php?action=break_asso".
+  $url = url_prepare("payment_index.php?action=break_asso".
 		    "&amp;param_payment=".$q_payment->f("payment_id"));
 
   $dis_invoices = new OBM_DISPLAY ("DATA", $invoices_display);
@@ -1092,7 +1086,7 @@ function html_choose_csv_file () {
   global $l_choose_csv;
   global $sess;
 
-  $url = $sess->url("payment_index.php?action=reconcile_import");
+  $url = url_prepare("payment_index.php?action=reconcile_import");
 
   echo "
 <center>
@@ -1124,7 +1118,7 @@ function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
   echo $q_entrytemp->nf(). " opérations temporaires";
   echo "</FONT><BR></CENTER>";
 
-  $url_dm = $sess->url("payment_index.php?action=reconcile_import".
+  $url_dm = url_prepare("payment_index.php?action=reconcile_import".
 		       "&amp;import_file=no");
 
   $et_dis = new OBM_DISPLAY ("DATA", $q_et_prefs);
@@ -1136,8 +1130,8 @@ function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
   $et_dis->display ();
 
   // confirmation form :
-  $url_ok = $sess->url ("payment_index.php?action=select_reconcile");
-  $url_again = $sess->url("payment_index.php?action=reconcile");
+  $url_ok = url_prepare ("payment_index.php?action=select_reconcile");
+  $url_again = url_prepare ("payment_index.php?action=reconcile");
   echo "
 <br>
 <center>
@@ -1164,7 +1158,7 @@ function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
   global $l_reconcile, $l_nb_payments_to_reconcile;
   global $l_nb_entrytemp_to_reconcile;
   
-  $url = $sess->url ("payment_index.php?action=select_reconcile");
+  $url = url_prepare ("payment_index.php?action=select_reconcile");
 
   // preparing the payments display :
   $pay_dis = new OBM_DISPLAY("DATA", $q_pay_pref);
@@ -1228,8 +1222,8 @@ function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
  </table>
   <br/><br/>";
   // the buttons to validate this page...
-  $url_go_on = $sess->url("payment_index.php?action=select_reconcile");
-  $url_over = $sess->url("payment_index.php?action=do_reconcile");
+  $url_go_on = url_prepare("payment_index.php?action=select_reconcile");
+  $url_over = url_prepare("payment_index.php?action=do_reconcile");
 
   echo "
   <input type=\"button\" value=\"Valider les lignes cochées\" ".

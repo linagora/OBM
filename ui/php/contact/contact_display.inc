@@ -31,7 +31,7 @@ function html_contact_search_form ($contact) {
 
   // --- HTML Template --------------------------------------------------------
   echo "
-    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"".$sess->url("contact_index.php")."\">
+    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"".url_prepare("contact_index.php")."\">
     <table class=\"details\">
       <tr>
         <td class=\"textLabelForm\">$l_contact_name</td>
@@ -110,7 +110,7 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   $company_id = $contact["company_id"];
 
 
-  $url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_phone=".urlencode($phone)."&amp;tf_company=".urlencode($company)."&amp;param_company=$company_id$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_phone=".urlencode($phone)."&amp;tf_company=".urlencode($company)."&amp;param_company=$company_id$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA",$pref_q);
   if ($popup) {
@@ -211,7 +211,7 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
-      <a href=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
+      <a href=\"".url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
       </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>
@@ -377,7 +377,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   // CHECK DELETE
   /*$display_update .= "<TD valign=top>
         <form method=\"get\" name=\"f_del_con\"  
-        action=\"" . $sess->url("contact_index.php") . "\">
+        action=\"" . url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"check_delete\" />
     <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
     <input type=\"submit\" value=\"$l_checkdelete\" />\n";
@@ -392,7 +392,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   // --- HTML Template --------------------------------------------------------
 
   echo "
-    <form method=\"post\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".$sess->url("contact_index.php")."\">
+    <form method=\"post\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
 
     <table class=\"details\">
     <tr>
@@ -412,7 +412,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </tr><tr>
     <td class=\"detailLabel\">$l_company</td>
     <td>
-      <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+      <a href=\"". url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
       $c_name
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
@@ -515,7 +515,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     $company = $co_q->f("company_name");
     $disp_same_cont .= 
         "    <tr><td colspan =\"2\" class=\"detailText\">
-                <a class=\"details\" href=\"" .$sess->url("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
+                <a class=\"details\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
                 $samename ($company)</a>
              </td></tr>";
 
@@ -528,7 +528,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     $disp_same_cont
     <tr><td>
     <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
-    action=\"" .$sess->url("contact_index.php") . "\">
+    action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"param_company\" value=\"$cid\" />
@@ -553,7 +553,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     </form>
     </td><td>
     <form id=\"form_back\" name=\"form_back\" method=\"post\"
-    action=\"" .$sess->url("company_index.php") . "\">
+    action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"param_company\" value=\"$cid\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
@@ -603,7 +603,7 @@ function dis_check_links($p_id) {
       $dlabel = $obm_q->f("deal_label");
       $display_link_d .= "
       <tr><td class=\"detailText\">
-      <a class=\"details\" href=\"".$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
+      <a class=\"details\" href=\"".url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
       $dlabel</a>
       </td></tr>";
     }
@@ -621,7 +621,7 @@ function dis_check_links($p_id) {
       $lname = $obm_q->f("list_name");
       $display_link_l .= "
     	  <tr><td class=\"detailText\">
-          <a class=\"details\" href=\"".$sess->url("../list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
+          <a class=\"details\" href=\"".url_prepare("../list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
           $lname</a>
          </td></tr>";
     }
@@ -646,7 +646,7 @@ function dis_check_links($p_id) {
    $display_link_l
    <tr><td class=\"detailHead\">
    <form name=\"form_back\" method=\"post\"
-   action=\"".$sess->url("contact_index.php") ."\">
+   action=\"".url_prepare("contact_index.php") ."\">
    <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
    <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
    <input type=\"submit\" value=\"$l_back\" />
@@ -665,7 +665,7 @@ function dis_delete_form($p_id) {
 
   // --- HTML Template --------------------------------------------------------
   echo "\n<form name=\"form_delete\" " .
-      "method=\"post\" action=\"" . $sess->url("contact_index.php") . "\">
+      "method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"

@@ -305,13 +305,12 @@ function get_param_contact() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function get_contact_action() {
-  global $contact,$actions;
+  global $contact, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
   global $contact_read, $contact_write, $contact_admin_read, $contact_admin_write;
 
-//Index
-
+// Index
   $actions["CONTACT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=index",
@@ -319,16 +318,14 @@ function get_contact_action() {
     'Condition'=> array ('all') 
                                         );
 
-//Search
-
+// Search
   $actions["CONTACT"]["search"] = array (
     'Url'      => "$path/contact/contact_index.php?action=search",
     'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                     	);
 
-//New
-
+// New
   $actions["CONTACT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
@@ -336,16 +333,14 @@ function get_contact_action() {
     'Condition'=> array ('','search','index','detailconsult','admin','display') 
                                      );
 
-//Detail Consult
- 
+// Detail Consult
  $actions["CONTACT"]["detailconsult"]   = array (
     'Url'      => "$path/contact/contact_index.php?action=detailconsult",
     'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                     		 );
 
-//Detail Update
-
+// Detail Update
   $actions["CONTACT"]["detailupdate"] = array (
     'Name'     => $l_header_modify,
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
@@ -353,24 +348,21 @@ function get_contact_action() {
     'Condition'=> array ('detailconsult') 
                                      		 );
 
-//Insert
-
+// Insert
   $actions["CONTACT"]["insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=insert",
     'Right'    => $contact_write,
     'Condition'=> array ('None') 
                                      	);
 
-//Update
-
+// Update
   $actions["CONTACT"]["update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=update",
     'Right'    => $contact_write,
     'Condition'=> array ('None') 
                                      	);
 
-//Check Delete
-
+// Check Delete
   $actions["CONTACT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
@@ -378,16 +370,14 @@ function get_contact_action() {
     'Condition'=> array ('detailconsult') 
                                      	      );
 
-//Delete
-
+// Delete
   $actions["CONTACT"]["delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=delete",
     'Right'    => $contact_write,
     'Condition'=> array ('None') 
                                      	);
 
-//Admin
-
+// Admin
   $actions["CONTACT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/contact/contact_index.php?action=admin",
@@ -395,8 +385,7 @@ function get_contact_action() {
     'Condition'=> array ('all') 
                                       		 );
 
-//Dispay
-
+// Dispay
   $actions["CONTACT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contact/contact_index.php?action=display",
@@ -404,22 +393,19 @@ function get_contact_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-//Dispay Preferences
-
+// Dispay Preferences
   $actions["CONTACT"]["displref_level"]	= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_display",
     'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                       	        );
 
-//Dispay Level
-
+// Dispay Level
   $actions["CONTACT"]["displref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
     'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                       		 );
-
 
 }
 

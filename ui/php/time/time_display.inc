@@ -95,7 +95,7 @@ function dis_time_links (&$time, $type="all") {
             <TR><TD>
                <A HREF=\"" .
 
-               $sess->url("time_index.php?action=".$time["action"].
+               url_prepare("time_index.php?action=".$time["action"].
         "&amp;param_begin=".date("Ymd",$d_start_prev).
         "&amp;param_end=".date("Ymd",$d_end_prev).
 						  //        "&amp;user_id=".$time["user_id"].
@@ -105,7 +105,7 @@ function dis_time_links (&$time, $type="all") {
             </TD>  
             <TD>
                <A HREF=\"" .
-               $sess->url("time_index.php?action=".$time["action"].
+               url_prepare("time_index.php?action=".$time["action"].
         "&amp;param_begin=".date("Ymd",$d_start_next).
         "&amp;param_end=".date("Ymd",$d_end_next).
 						  //        "&amp;user_id=".$time["user_id"].
@@ -156,7 +156,7 @@ function dis_time_links (&$time, $type="all") {
          <TABLE BORDER=1>
             <TR><TD>
                <A HREF=\"" .
-               $sess->url("time_index.php?action=".$time["action"].
+               url_prepare("time_index.php?action=".$time["action"].
            "&amp;param_begin=$d_start_prev&amp;param_end=$d_end_prev".
 						  //		   "&amp;user_id=".$time["user_id"].
            "&amp;st_detail=".$time["show_task_detail"])."\">
@@ -165,7 +165,7 @@ function dis_time_links (&$time, $type="all") {
             </TD>  
             <TD>
                <A HREF=\"" .
-            $sess->url("time_index.php?action=".$time["action"].
+            url_prepare("time_index.php?action=".$time["action"].
                 "&amp;param_begin=".
                 $d_start_next.
                 "&amp;param_end=".
@@ -241,7 +241,7 @@ function dis_time_search_form ($time, $usr_q, $uid) {
     echo "<br>
       <center>
       <form method=post name=f_time action=\"" .
-      $sess->url("time_index.php") . "\">
+      url_prepare("time_index.php") . "\">
       <table border=1>
       <tr>
         <td><font size=-2>$period</font></td>
@@ -326,7 +326,7 @@ function dis_selectusers_form ($time, $usr_q, $uid) {
     echo "<br>
       <center>
       <form method=post name=f_time action=\"" .
-      $sess->url("time_index.php") . "\">
+      url_prepare("time_index.php") . "\">
       <table border=1>
       <tr>
         <td><font size=-2>$l_period</font></td>
@@ -679,7 +679,7 @@ function dis_time_menu($time) {
       <TR>
         <TD bgcolor=\"#$col_table\" align=\"center\">
            <FORM METHOD=POST NAME=form_show_events 
-                 ACTION=\"".$sess->self_url("time_index.php")."\">
+                 ACTION=\"".url_prepare("time_index.php")."\">
               <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"show_details\">
               <INPUT TYPE=\"checkbox\" NAME=\"show_task_detail\" $dis_checked>
 <!--              <INPUT TYPE=\"hidden\" NAME=\"user_id[]\" VALUE=\"".
@@ -718,14 +718,14 @@ function dis_time_list_result($obm_q,$pref_q,$nb_task,$time) {
   dis_table_title($l_found_task) ;
   echo "<font color=\"#$col_textem\">$nb_task $l_found</font><br>";
 
-  $url = $sess->url("time_index.php?action=index&amp;param_begin=".$time["date"].
+  $url = url_prepare("time_index.php?action=index&amp;param_begin=".$time["date"].
 					"&amp;param_end=".$time["date_end"].
 					//					"&amp;user_id=".$time["user_id"].
 					"&amp;tf_week=".urlencode($week).
 					"&amp;st_detail=".$time["show_task_detail"]);
  
   echo "
-    <form method=post NAME=f_task_del ACTION=\"".$sess->url("time_index.php")."\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >";
+    <form method=post name=f_task_del action=\"".url_prepare("time_index.php")."\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
   $dis_task_list->data_set = $obm_q;
@@ -777,12 +777,12 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   echo "<font color=\"#$col_textem\">";
   echo "</font><br>";
 
-  $url = $sess->url("time_index.php?action=search&amp;tf_week=".urlencode($week));
+  $url = url_prepare("time_index.php?action=search&amp;tf_week=".urlencode($week));
 
 
  dis_table_title("$l_total_day"); 
  echo "
-   <form method=post name=f_task_val action=\"".$sess->url("time_index.php")."\">";
+   <form method=post name=f_task_val action=\"".url_prepare("time_index.php")."\">";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
   $dis_task_list->data_set = $obm_dq;
@@ -821,7 +821,7 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
     $admin_db = run_query_admin($time);
 
     echo "
-      <form method=post name=f_task_val_admin action=\"".$sess->url("time_index.php")."\">";
+      <form method=post name=f_task_val_admin action=\"".url_prepare("time_index.php")."\">";
 
    $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
    $dis_task_list->data_set = $admin_db;
@@ -886,12 +886,12 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
     return ;
   }
      
-  $url = $sess->url("time_index.php?action=search&amp;tf_week=".urlencode($week));
+  $url = url_prepare("time_index.php?action=search&amp;tf_week=".urlencode($week));
 
 
  dis_table_title("$l_total_day"); 
  echo "
-   <form method=post name=f_task_val action=\"".$sess->url("time_index.php")."\">";
+   <form method=post name=f_task_val action=\"".url_prepare("time_index.php")."\">";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
   $dis_task_list->data_set = $obm_dq;
@@ -956,7 +956,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
   }
      
 
-  $url = $sess->url("time_index.php?action=search&amp;tf_week=".urlencode($week));
+  $url = url_prepare("time_index.php?action=search&amp;tf_week=".urlencode($week));
 
 //for project managers
   if( in_array($uid,$project_managers)) {
@@ -964,7 +964,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
     $admin_db = run_query_admin($time);
 
     echo "
-      <form method=post name=f_task_val_admin action=\"".$sess->url("time_index.php")."\">";
+      <form method=post name=f_task_val_admin action=\"".url_prepare("time_index.php")."\">";
 
    $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
    $dis_task_list->data_set = $admin_db;
@@ -1018,7 +1018,7 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time) {
 
   dis_table_title($l_total_deal);  
 
-  $url = $sess->url("time_index.php?action=search&amp;tf_week=".urlencode($week));
+  $url = url_prepare("time_index.php?action=search&amp;tf_week=".urlencode($week));
 
   // Calculate the task length grand total 
   echo "avant seek (1) <br>";
@@ -1076,7 +1076,7 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
 
   dis_table_title($l_total_deal);  
 
-  $url = $sess->url("time_index.php?action=search&amp;tf_week=".urlencode($week));
+  $url = url_prepare("time_index.php?action=search&amp;tf_week=".urlencode($week));
 
   // Calculate the task length grand total 
   if ($obm_dq->nf()) {
@@ -1115,11 +1115,11 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   echo "       </table>";
 
   // $popup = 2 -> file (no headers)
-  $url = "time_index.php?action=export_stats" .
+  $url = url_prepare("time_index.php?action=export_stats" .
             "&amp;param_begin=".$time["date"]. 
-            "&amp;param_end=".$time["date_end"]. 
-	        "&amp;popup=2";
-  echo "<a href=\"".$sess->url($url)."\">exporter</a>";
+            "&amp;param_end=".$time["date_end"].
+            "&amp;popup=2");
+  echo "<a href=\"$url\">exporter</a>";
   // We build a file
 }
 
@@ -1258,7 +1258,7 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
 		// return first and last day of the week
 		$day = $key < 10 ? "0".$key : $key; 
 		$week = get_week_point($year.$month.$day);
-		$url= $sess->url("time_index.php?action=search".
+		$url= url_prepare("time_index.php?action=search".
            "&amp;param_begin=".$week[0].
            "&amp;param_end=".$week[1].
 						  //        "&amp;user_id=".$time["user_id"].
@@ -1269,7 +1269,7 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
 	  else if ($key == 1) {
 		// return first and last day of the week
 		$week = get_week_point($year.$month."01");
-		$url= $sess->url("time_index.php?action=search".
+		$url= url_prepare("time_index.php?action=search".
            "&amp;param_begin=".$week[0].
            "&amp;param_end=".$week[1].
 						  //        "&amp;user_id=".$time["user_id"].
@@ -1452,7 +1452,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
     echo "
       <form method=get name=form_add_task
         onSubmit=\"if (check_form(this)) return true; else return false;\" 
-        action=\"".$sess->url("time_index.php")."\">
+        action=\"".url_prepare("time_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"$action\">
       <input type=\"hidden\" name=\"popup\" value=0>
   ";
@@ -1462,7 +1462,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
     echo "
       <form method=get  name=form_add_task 
         onSubmit=\"if (check_form(this)) return true; else return false;\"
-        action=\"".$sess->url("time_index.php")."\">
+        action=\"".url_prepare("time_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"update\">
       <input type=\"hidden\" name=\"popup\" value=0>
   ";

@@ -88,7 +88,7 @@ function dis_user_search_list($user) {
 //     keys used : login, lastname, pemrs
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_list($obm_q, $pref_q, $nb_user, $user) {
-  global $sess, $col_textem, $l_found;
+  global $col_textem, $l_found;
 
   $login = $user["login"];
   $lname = $user["lastname"];
@@ -97,7 +97,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user) {
 
   echo "<font color=\"#$col_textem\">$nb_user $l_found</font><br>";
 
-  $url = $sess->url("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive");
 
   $user_d = new OBM_DISPLAY("DATA", $pref_q);
   $user_d->data_set = $obm_q;

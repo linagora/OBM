@@ -55,7 +55,7 @@ function html_company_search_form ($kind_q, $usr_q, $company) {
   // --- HTML Template --------------------------------------------------------
 
   echo "    
-    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"" . $sess->url("company_index.php") . "\">
+    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"" . url_prepare("company_index.php") . "\">
     <table class=\"details\">
     <tr>
       <td class=\"textLabelForm\">$l_company_name</td>
@@ -135,7 +135,7 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $zip = urlencode(stripslashes($company["zip"]));
   
 
-  $url = $sess->url("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;tf_zip=$zip&amp;cb_state=$state");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;tf_zip=$zip&amp;cb_state=$state");
 
   $obm_q_comp->seek($first_row);
 
@@ -169,36 +169,36 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   $uname = urlencode($name);
 
   // -------| Menu Liste Contacts
-  $r = "<a href=\"".$sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
+  $r = "<a href=\"".url_prepare("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
         <img border=0 src=\"/images/$set_theme/$ico_contact_list\"></a>
         <font size=-1>
-         <a href=\"".$sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
+         <a href=\"".url_prepare("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
          $l_contact_list</a> ($con_num)</font>";
 
   // -------| Menu Nouveau Contact
   if ($auth->auth["perm"] != $perms_user) {
     $r .= "<br>
-           <a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
+           <a href=\"" . url_prepare("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
            <img border=0 src=\"/images/$set_theme/$ico_contact_new\"></a>
            <font size=-1>
-           <a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
+           <a href=\"" . url_prepare("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
            $l_contact_new</a></font>";
   }
 
   // -------| Menu Liste Affaires
   $r .= "<br>
-         <a href=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
+         <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
          <img border=0 src=\"/images/$set_theme/$ico_contact_list\"></a>
          <font size=-1>
-         <a href=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
+         <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
          $l_deal_list</a> ($deal_num)</font>";
 
   // -------| Menu Nouvelle Affaire
   if ($auth->auth["perm"] != $perms_user) {
     $r .= "<br>
-      <a href=\"".$sess->url("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
+      <a href=\"".url_prepare("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
         src=\"/images/$set_theme/$ico_contact_new\"></a>
-      <font size=-1><a href=\"".$sess->url("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
+      <font size=-1><a href=\"".url_prepare("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
   }
 
   return $r;
@@ -461,7 +461,7 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
     $dis_delete = "
       <form method=\"post\" name=\"f_sup_societe\"
       onsubmit=\"if (valider_suppression()) return true; else return false;\"
-      action=\"" . $sess->url("company_index.php") . "\"> 
+      action=\"" . url_prepare("company_index.php") . "\"> 
       <table class=\"details\">
         <tr>
           <td>
@@ -485,7 +485,7 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   echo "
     <form method=\"post\" name=\"f_mod_societe\"
       onsubmit=\"if (check_company(this)) return true; else return false;\"
-      action=\"".$sess->url("company_index.php")."\">
+      action=\"".url_prepare("company_index.php")."\">
     <table class=\"details\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">$l_company</td>
@@ -576,7 +576,7 @@ function dis_check_links($p_id) {
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
       $display_linkc .= "<tr><td class=\"detailText\">
-      <a class=\"details\" href=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">
+      <a class=\"details\" href=\"" . url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">
       $cname</a>
       </td></tr>";
     }
@@ -594,7 +594,7 @@ function dis_check_links($p_id) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
       $display_linkd .="<tr><td class=\"detailText\">
-      <a class=\"details\" href=\"" .$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
+      <a class=\"details\" href=\"" .url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
       $dlabel</a>
       </td></tr>";
     }
@@ -616,7 +616,7 @@ function dis_check_links($p_id) {
    $display_linkc
    $display_linkd 
    <tr><td class=\"detailHead\"><form name=\"form_back\" method=\"post\"
-   action=\"".$sess->url("company_index.php") ."\">
+   action=\"".url_prepare("company_index.php") ."\">
    <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
    <input type=\"submit\" value=\"$l_back\" />
@@ -661,7 +661,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     $samezip = $co_q->f("company_zip");
     $disp_same_comp .= "
           <tr><td colspan =\"2\" class=\"detailText\">
-             <a class=\"details\" href=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
+             <a class=\"details\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
               $samename ($samezip)</a>
           </td></tr>";
   }
@@ -671,7 +671,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     $disp_same_comp
     <tr><td>
     <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
-    action=\"" .$sess->url("company_index.php") . "\">
+    action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
@@ -693,7 +693,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     </form>
     </td><td>
     <form id=\"form_back\" name=\"form_back\" method=\"post\"
-    action=\"" .$sess->url("company_index.php") . "\">
+    action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
     <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
@@ -727,7 +727,7 @@ function dis_delete_form($p_id) {
   global $sess;
 
   echo "\n<form name=\"form_delete\" " .
-      "method=\"post\" action=\"" . $sess->url("company_index.php") . "\">
+      "method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"hd_company_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
@@ -769,7 +769,7 @@ function html_company_kind_form($kind_q) {
         <tr>
          <td colspan=\"3\">
         <form name=\"form_admin_kind_delete\"
-      method=\"post\" action=\"" . $sess->url("company_index.php") . "\">
+      method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
          <table>
           <tr>
           <td class=\"adminLabel\">$l_kind_exist</td>
@@ -789,7 +789,7 @@ function html_company_kind_form($kind_q) {
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
     <form name=\"form_admin_kind_update\"
-      method=\"get\" action=\"" . $sess->url("company_index.php") . "\">
+      method=\"get\" action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
             <input type=\"text\" name=\"tf_kind_upd\" />
@@ -806,7 +806,7 @@ function html_company_kind_form($kind_q) {
 
 <!-- New Kind Section -->
     <form name=\"form_admin_kind_new\"
-      method=\"get\" action=\"" . $sess->url("company_index.php") . "\">
+      method=\"get\" action=\"" . url_prepare("company_index.php") . "\">
       <table>
       <tr>
         <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind_new\" /></td>
@@ -839,7 +839,7 @@ function dis_kind_delete_form($label) {
   global $sess;
 
   $r = "<form name=\"form_kind_delete\"
-          method=post action=\"" . $sess->url("company_index.php") . "\">
+          method=post action=\"" . url_prepare("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"kind_delete\">
         <input type=\"hidden\" name=\"hd_kind_label\" value=\"$label\">
         <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\">
@@ -869,7 +869,7 @@ function dis_kind_links($label) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
       $dis_link .="<tr><td class=\"detailText\">
-                   <a href=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname
+                   <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname
                    </a></td></tr>\n";
     }
     $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_kind_cant_delete</td></tr>";
@@ -882,7 +882,7 @@ function dis_kind_links($label) {
         </td>
         <td>
         <form name=\"form_back\" method=\"get\"
-        action=\"" .$sess->url("company_index.php") . "\">
+        action=\"" .url_prepare("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>

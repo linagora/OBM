@@ -94,18 +94,17 @@ function html_account_form($obm_q_account, $action){
         <tr>
           <td><br><center>";
   if ($action=="detailupdate"){//modifier/supprimer
-    $url_delete = $sess->url ("account_index.php?action=delete&amp;param_account=". $obm_q_account->f("account_id"));
-    $url_update = $sess->url ("account_index.php?action=update&amp;param_account=".
-       $obm_q_account->f("account_id"));
+    $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=". $obm_q_account->f("account_id"));
+    $url_update = url_prepare("account_index.php?action=update&amp;param_account=". $obm_q_account->f("account_id"));
     echo "
             <table border=\"$border\" cellspacing=\"$cell_spacing\"><tr><td>
              <input type=\"button\" value=\"$l_update\" ".
       "onClick=\"if (check_cpte (this.form)) {".
-      "this.form.action='".$url_update."'; this.form.submit ();".
+      "this.form.action='$url_update'; this.form.submit ();".
       "}\">
             </td><td>";
     //    echo "
-    //            <form method=post name=form_account_delete onSubmit=\"if(valider_suppression()) return true; else return false;\" action=\"".$sess->url($url_delete)."\">";
+    //            <form method=post name=form_account_delete onSubmit=\"if(valider_suppression()) return true; else return false;\" action=\"$url_delete\">";
     // deletion is impossible if there are payments connected to
     // this account :
     if (($action == "detailupdate") && ($q_payments->nf() != 0)) {
@@ -117,17 +116,17 @@ function html_account_form($obm_q_account, $action){
       echo "
              <input type=\"button\" value=\"$l_delete\" ".
 	"onClick=\" if (valider_suppression ()) { ".
-	" this.form.action='".$url_delete."'; this.form.submit () ; ".
+	" this.form.action='$url_delete'; this.form.submit () ; ".
 	"}\">
              </td></tr>
             </table>"; 
     }
   } else{ // inserer : 
-    $url_insert = $sess->url ("account_index.php?action=insert");
+    $url_insert = url_prepare("account_index.php?action=insert");
     echo "
           <input type=\"button\" value=\"$l_insert\" ".
       " onClick=\"if (check_cpte (this.form)) {".
-      "this.form.action='".$url_insert."';this.form.submit();".
+      "this.form.action='$url_insert';this.form.submit();".
       "}\">";
   }  
   echo "
@@ -155,13 +154,13 @@ function html_account_search_form ($p_action, $account) {
   $bank = $account["bank"];
   $number = $account["number"];
 
-  $url = $sess->url ("account_index.php?action=search");
+  $url = url_prepare("account_index.php?action=search");
   echo "
 <center>
  <form method=\"post\" name=\"form_account\" ".
     " onSubmit=\"if (check_form(this) == false) return false ;".
     " else return true;\"".
-    " action=\"".$url."\">";
+    " action=\"$url\">";
   echo "
   <table border=0>
    <tr>";
@@ -219,7 +218,7 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
   echo "$nb_accounts $l_found";
   echo "</FONT><BR></CENTER>";
 
-  $url = $sess->url("account_index.php?action=search".
+  $url = url_prepare("account_index.php?action=search".
 		    "&amp;tf_label=$label".
 		    "&amp;tf_bank=$bank".
 		    "&amp;tf_number=$number");
@@ -227,7 +226,7 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
   $dis_account->data_set = $obm_q_accounts;
   $dis_account->data_url = $url;
 
-  $url = $sess->url("account_index.php?action=search&amp;tf_label=$label&amp;tf_bank=$bank&amp;tf_number=$number");
+  $url = url_prepare("account_index.php?action=search&amp;tf_label=$label&amp;tf_bank=$bank&amp;tf_number=$number");
 
   $dis_account->display ();
 } // html_account_search_list ()
@@ -343,16 +342,16 @@ function html_account_consult($obm_q_account, $p_action){
     // if ($auth->auth["perm"] != $perms_user) {
     echo "
        <form method=\"post\" action=\"\">";
-    $url_upd = $sess->url ("account_index.php?action=detailupdate".
+    $url_upd = url_prepare("account_index.php?action=detailupdate".
 			   "&amp;param_account=".
 			   $obm_q_account->f("account_id"));
-    $url_comp = $sess->url("account_index.php?action=compute_balance".
+    $url_comp = url_prepare("account_index.php?action=compute_balance".
 			   "&amp;param_account=".
 			   $obm_q_account->f("account_id"));
     
     echo " 
         <input type=\"button\" value=\"$l_update\" ".
-      "onClick=\"this.form.action='".$url_upd."' ; this.form.submit ();\">";
+      "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
 
     // compute the balance 
     // useless ?
@@ -361,7 +360,7 @@ function html_account_consult($obm_q_account, $p_action){
     echo "
       </td><td align=\"center\" valign=\"top\">
         <input type=\"button\" value=\"$l_compute_balance\" ".
-      "onClick=\"this.form.action='".$url_comp."' ; this.form.submit ();\">
+      "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
        </form>
       </td></tr>
      </table>";
@@ -392,7 +391,7 @@ function html_impossible_deletion ($p_account_id, $q_related_payments) {
   
   echo "
      <br><br>
-     <form name=form_cancel_delete method=post action=\"".$sess->url("account_index.php?action=index")."\">
+     <form name=form_cancel_delete method=post action=\"".url_prepare("account_index.php?action=index")."\">
       <input type=submit name=\"sub_cancel_del\" value=\"$l_cancel\">
      </form>
    <center>";
@@ -425,8 +424,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   $col_today   = ($data["today"] > 0) ? $col_balance_pos:$col_balance_neg;
 
   // where we go when user clicks on compute :
-  $url = "account_index.php?action=compute_balance&amp;param_account=".
-     $p_account["account"];
+  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["account"]);
 
   // we display all account data :
   $q_account = run_query_detail ($p_account["account"]);
@@ -435,12 +433,12 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
 
   // the form allowing a date input :
   echo "<br><br>";
-  $url=$sess->url("account_index.php?action=compute_balance&amp;param_account=".$p_account["account"]);
+  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["account"]);
   echo "
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
-  <form method=\"post\" action=\"".$sess->url($url)."\"".
-  " onSubmit=\"return check_balance_form (this);\">
+  <form method=\"post\" action=\"$url\"
+  onSubmit=\"return check_balance_form (this);\">
    <tr><td>";
   echo "
     <font size=-2 color=\"#$col_label\">$l_choose_balance_date</font><br>
@@ -550,7 +548,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   // expected operations detail display :
   if ($q_expected->nf() != 0) { 
     $q_expected->seek(0);
-    $url_expect = $sess->url ("account_index.php?action=compute_balance".
+    $url_expect = url_prepare ("account_index.php?action=compute_balance".
 			      "&amp;param_account=".$p_account["account"]);
 
     $dis_expect  = new OBM_DISPLAY ("DATA", $payments_options);
@@ -565,7 +563,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   // operations  detail display
   if ($q_payments->nf() != 0) { 
     $q_payments->seek(0);
-    $url_done = $sess->url ("account_index.php?action=compute_balance".
+    $url_done = url_prepare ("account_index.php?action=compute_balance".
 			      "&amp;param_account=".$p_account["account"]);
 
     $dis_done  = new OBM_DISPLAY ("DATA", $payments_options);

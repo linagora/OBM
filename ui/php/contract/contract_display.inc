@@ -61,7 +61,7 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
 echo "
     <form method=\"get\" name=\"form_contract\" 
     onsubmit=\"if (check_form(this) == false) return false;
-    else return true;\" action=\"".$sess->url("contract_index.php")."\">
+    else return true;\" action=\"".url_prepare("contract_index.php")."\">
      <table class=\"details\">   
       <tr>
        <td class=\"textLabelForm\">$l_label_start</td>
@@ -243,7 +243,7 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
 
   if ($action == "detailupdate") {
     $dis_sel_con1.="<a href=\"".
-    $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\">";
+    url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\">";
     $dis_sel_con1.="<img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
     }
 
@@ -263,7 +263,7 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
 
   if ($action == "detailupdate") {
     $dis_sel_con2.="<a href=\"".
-    $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\">";
+    url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\">";
     $dis_sel_con2.="<img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
   }
 
@@ -277,7 +277,7 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
       <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />
      ";
-  $dis_delete="<form method=\"get\" name=\"form_contract_delete\" onsubmit=\"if (valider_suppression()) return true; else return false;\" action=\"".$sess->url("contract_index.php")."\">
+  $dis_delete="<form method=\"get\" name=\"form_contract_delete\" onsubmit=\"if (valider_suppression()) return true; else return false;\" action=\"".url_prepare("contract_index.php")."\">
       <table class=\"details\">
         <tr>
           <td>
@@ -303,13 +303,13 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
 
   echo "  
   <form method=\"post\" name=\"form_contract_update\" onsubmit=\"if (verifier_aff(this)) return true; else return false;\" 
-        action=\"".$sess->url("contract_index.php")."\">
+        action=\"".url_prepare("contract_index.php")."\">
   <table class=\"details\">
    <tr>
     <td colspan=\"2\" class=\"detailHead\">$l_contract_company</td>
    </tr><tr>
     <td class=\"detailLabel\">
-     $comp_name <a href=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
+     $comp_name <a href=\"".url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
      <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
     </td>
     <td class=\"detailText\">
@@ -352,7 +352,7 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
       <input type=\"hidden\" name=\"deal_new_id\" value=\"$c_new_id\" />
     </td>
     <td>
-      <a href=\"".$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$c_id")."\">
+      <a href=\"".url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$c_id")."\">
       $c_name</a>
       <a href=\"\" onclick=\"window.open('../deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contract_select_deal)."&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
       <img src=\"/images/$set_theme/$ico_deal\" alt=\"[Choose Deal]\" /></a>
@@ -429,7 +429,7 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
   $dis_date_date = timestamp_to_date($contract_q->f("timeupdate"));
   $dis_date_time = timestamp_to_time($contract_q->f("timeupdate"));
 
-    $dis_update = "<form method=\"get\" name=\"form_contract_update\" action=\"".$sess->url("contract_index.php")."\">
+    $dis_update = "<form method=\"get\" name=\"form_contract_update\" action=\"".url_prepare("contract_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
       <input type=\"hidden\" name=\"param_contract\" value=\"".$contract_q->f("contract_id")."\">
       <input type=\"submit\" value=\"$l_update\">
@@ -443,20 +443,20 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
 //////////////////
 echo "
     <td valign=top> 
-      <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\">
+      <A HREF=\"".url_prepare("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\">
       <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
       <font SIZE=-1>
-      <A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
+      <A HREF=\"" . url_prepare("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
       $l_incident_list</A></font>
       <BR>
-      <A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
+      <A HREF=\"" . url_prepare("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
       <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_new\"></A>
-      <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
+      <FONT SIZE=-1><A HREF=\"" . url_prepare("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
       $l_incident_new</A></FONT>
       <BR>
-      <FONT SIZE=-1><A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
+      <FONT SIZE=-1><A HREF=\"" . url_prepare("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
       <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A></FONT>
-      <FONT SIZE=-1><A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
+      <FONT SIZE=-1><A HREF=\"" . url_prepare("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
       ".$deal_q->f("deal_label")."</A></FONT>
       </TD>";
 //////////////////////
@@ -470,7 +470,7 @@ echo "
  </tr><tr>
   <td class=\"detailLabel\">
    ".$comp_q->f("company_name")."
-   <a href=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">
+   <a href=\"".url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">
    <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
   </td>
   <td class=\"detailText\">
@@ -482,7 +482,7 @@ echo "
   <td class=\"detailText\">
      $dis_cont_cli1
      <a href=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$contract_q->f("contract_contact1_id"))."\">
+      url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$contract_q->f("contract_contact1_id"))."\">
       <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
    </td> 
  </tr><tr>
@@ -490,7 +490,7 @@ echo "
   <td class=\"detailText\">
     $dis_cont_cli2
     <a href=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$contract_q->f("contract_contact2_id"))."\">
+      url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$contract_q->f("contract_contact2_id"))."\">
     <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a></td>
  </tr><tr>
    <td class=\"detailHead\" colspan=\"2\">$l_contract</td>
@@ -582,7 +582,7 @@ function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contra
   $sel_tech = $contract["tech"];
   $p_num = $contract["number"]; 
 
-  $url = $sess->url("contract_index.php?action=search&amp;tf_label=$p_label&amp;tf_soc=$p_company&amp;sel_market=$sel_market&amp;sel_type=$p_type_id&amp;tf_num=$p_num&amp;sel_tech=$sel_tech&amp;tf_dateapres=$p_dateafter&amp;tf_dateavant=$p_datebefore");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$p_label&amp;tf_soc=$p_company&amp;sel_market=$sel_market&amp;sel_type=$p_type_id&amp;tf_num=$p_num&amp;sel_tech=$sel_tech&amp;tf_dateapres=$p_dateafter&amp;tf_dateavant=$p_datebefore");
 
    $contract_q->seek($first_row);
 
@@ -638,7 +638,7 @@ function html_contract_admin_form($type_q) {
         <table>
         <tr>
          <td colspan=\"3\">
-     <form name=\"form_admin_type_delete\" method=\"post\" action=\"".$sess->url("contract_index.php")."\">
+     <form name=\"form_admin_type_delete\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
        <table>
         <tr>
           <td class=\"adminLabel\">$l_type_exist</td>
@@ -657,7 +657,7 @@ function html_contract_admin_form($type_q) {
 <!--  type update section -->
      <tr>
       <td colspan=\"2\" class=\"adminLabel\">
-       <form name=\"form_admin_type_update\" method=\"post\" action=\"".$sess->url("contract_index.php")."\">
+       <form name=\"form_admin_type_update\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
        <table>
          <tr>
           <td>
@@ -679,7 +679,7 @@ function html_contract_admin_form($type_q) {
 <!-- new type section -->
    </td>
    <td>
-    <form name=\"form_admin_type_new\" method=\"post\" action=\"".$sess->url("contract_index.php")."\">
+    <form name=\"form_admin_type_new\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
      <table>
       <tr>
        <td class=\"adminLabel\">$l_type_new : <input type=\"text\" name=\"tf_type_new\" />

@@ -39,7 +39,7 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
   $company = $invoice["company"];
   $archive = ($invoice["archive"]) ? "checked" : "" ;
 
-  $url_form = $sess->url ("invoice_index.php?action=search");
+  $url_form = url_prepare("invoice_index.php?action=search");
 
   // "external" table
   // 1 row, 2cols :
@@ -49,10 +49,9 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
  <table border=\"$border\" cellspacing=\"$cellspacing\">";
   echo"
   <tr><td>
-  <form method=\"post\" name=\"form_invoice\"".
-    " onSubmit=\"if (check_form(this) == false) return false ; ".
-    "else return true;\" ".
-    "action=\"".$url_form."\">";
+  <form method=\"post\" name=\"form_invoice\"
+    onSubmit=\"if (check_form(this) == false) return false ;
+    else return true;\" action=\"$url_form\">";
   // form table (1 cell)
   echo "
    <table  border=\"$border\" cellspacing=\"$cellspacing\">
@@ -396,30 +395,30 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
     echo "<input type=\"hidden\" name=\"hd_rd_inout\" value=\"".$q_invoice->f("invoice_inout")."\">";
   }
   if ($action=="detailupdate") {
-    $url_update = $sess->url ("invoice_index.php?action=update&amp;".
+    $url_update = url_prepare("invoice_index.php?action=update&amp;".
 			      "param_invoice=".$q_invoice->f("invoice_id"));
     echo "
      <table cellspacing=\"$cellspacing\" border=\"$border\">
       <tr>
        <td>
-        <input type=\"button\" value=\"$l_update\" ".
-      "onClick=\"if (check_invoice (this.form)) { ".
-      " this.form.action='".$url_update."' ; ".
-      " this.form.submit () ".
-      "}\">
+        <input type=\"button\" value=\"$l_update\"
+        onClick=\"if (check_invoice (this.form)) {
+          this.form.action='$url_update';
+          this.form.submit ();
+          } \">
        </td>";
     // we can delete only if not paid
     $payments_connected = run_query_search_payment_invoice($invoice, -1, $new_order, $order_dir);
-    $url_delete = $sess->url ("invoice_index.php?action=delete".
-			      "&amp;param_invoice=".$q_invoice->f("invoice_id"));
+    $url_delete = url_prepare ("invoice_index.php?action=delete".
+			   "&amp;param_invoice=".$q_invoice->f("invoice_id"));
     if ($payments_connected->nf() == 0) {
       echo "
        <td>
-         <input type=\"button\" value=\"$l_delete\" ".
-	"onClick=\"if (valider_suppression (this.form)) { ".
-	" this.form.action='".$url_delete."' ; ".
-	" this.form.submit () ".
-	"}\">
+         <input type=\"button\" value=\"$l_delete\"
+	 onClick=\"if (valider_suppression (this.form)) {
+	   this.form.action='$url_delete';
+	   this.form.submit ();
+	   }\">
        </td>";
     }
     echo "
@@ -427,19 +426,19 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
      </table>"; 
   } elseif (($action == "duplicate") || ($action == "new")) {
     if ($action == "new") {
-      $url = $sess->url ("invoice_index.php?action=insert");
+      $url = url_prepare("invoice_index.php?action=insert");
     } elseif ($action == "duplicate") {
-      $url = $sess->url ("invoice_index.php?action=insert".
+      $url = url_prepare("invoice_index.php?action=insert".
 			 "&amp;param_invoice=".$q_invoice->f("invoice_id"));
     }
     // inserting or duplicating 
     echo "
      <input type=\"hidden\" name=\"hd_deal_linked\" value=\"".$p_deal_linked."\">
-     <input type=\"button\" value=\"$l_insert\" ".
-      "onClick=\"if (".$js_fct_invoice."(this.form)) { ".
-      " this.form.action='".$url."' ; ".
-      " this.form.submit () ".
-      "}\">";
+     <input type=\"button\" value=\"$l_insert\"
+       onClick=\"if ($js_fct_invoice(this.form)) {
+        this.form.action='$url';
+        this.form.submit ();
+        }\">";
   }
   echo "
     </center>
@@ -490,7 +489,7 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
   echo "$nb_invoices $l_found\n";
   echo "</font><br></center>\n";
 
-  $url = $sess->url("invoice_index.php?action=search".
+  $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
 		    "&amp;tf_number=$number".
 		    "&amp;tf_amount_HT=$amount_HT". 
@@ -506,7 +505,7 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
 
   // checkbox to allow archiving..
   if ($auth->auth["perm"] == $perms_admin) {
-    $url_archive = $sess->url ("invoice_index.php?action=updatearchive");
+    $url_archive = url_prepare("invoice_index.php?action=updatearchive");
     echo "<form method=\"post\" action=\"$url_archive\">";
     $dis_invoice->data_cb_text = $l_archive_invoices;
     $dis_invoice->data_idfield = "invoice_id";
@@ -592,10 +591,10 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   dis_invoice_detail ($action,$q_invoice, $q_status);
   
   // to add/remove deals
-  $action_add = $sess->url("invoice_index.php?action=add_deal".
+  $action_add = url_prepare("invoice_index.php?action=add_deal".
 			   "&amp;param_invoice=".
 			   $q_invoice->f("invoice_id"));
-  $action_del = $sess->url("invoice_index.php?action=del_deal".
+  $action_del = url_prepare("invoice_index.php?action=del_deal".
 			   "&amp;param_invoice=".
 			   $q_invoice->f("invoice_id"));
   // deals data 
@@ -615,9 +614,9 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
     display_ok_msg("<br>".($action == ("del_deal")? $l_deals_todel : $l_list_deal));
 
     if ($action == "del_deal") {
-      $url = $sess->url("invoice_index.php?action=del_deal&amp;param_invoice=".$q_invoice->f('invoice_id'));
+      $url = url_prepare("invoice_index.php?action=del_deal&amp;param_invoice=".$q_invoice->f('invoice_id'));
     }else{
-      $url = $sess->url("invoice_index.php?action=detailconsult&amp;param_invoice=".$q_invoice->f('invoice_id'));
+      $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=".$q_invoice->f('invoice_id'));
     }
     
     $dis_deal = new OBM_DISPLAY("DATA", $options_deals);
@@ -627,9 +626,9 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
     $dis_deal->data_order = false;
 
     if (($action == "del_deal") && ($perm->have_perm("admin"))) {
-      $url_submit=$sess->url("invoice_index.php?action=del_deal_chosen&amp;param_invoice=".$q_invoice->f('invoice_id'));
+      $url_submit = url_prepare("invoice_index.php?action=del_deal_chosen&amp;param_invoice=".$q_invoice->f('invoice_id'));
       display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
-      echo "<form method=\"post\" name=\"del_deal\" action=\"".$sess->url($url_submit)."\">\n";
+      echo "<form method=\"post\" name=\"del_deal\" action=\"$url_submit\">";
       $dis_deal->data_cb_text = $l_invoice_del_deal ;
       $dis_deal->data_idfield = "deal_id";
       $dis_deal->data_cb_side = "left";
@@ -669,7 +668,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   } else {
     display_ok_msg ("<br>".$l_list_payment);
 
-    $url = $sess->url("invoice_index.php?action=detailconsult".
+    $url = url_prepare("invoice_index.php?action=detailconsult".
 		      "&amp;param_invoice=".$q_invoice->f("invoice_id"));
 
     $dis_payment = new OBM_DISPLAY("DATA",$options_payments);
@@ -701,7 +700,7 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
     $is_checked = " checked ";
   }
 
-  $url = $sess->url ("invoice_index.php?action=search_deal".
+  $url = url_prepare("invoice_index.php?action=search_deal".
 		     "&amp;param_invoice=".$q_invoice->f("invoice_id"));
   // searching deals form 
   echo "<center><form method=\"post\" action=\"$url\">
@@ -723,7 +722,7 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
   if (is_object ($q_deal)) {
     if ($q_deal->nf()>0) {
 
-      $url = $sess->url("invoice_index.php?action=search_deal".
+      $url = url_prepare("invoice_index.php?action=search_deal".
 		      "&amp;param_invoice=".$q_invoice->f("invoice_id").
 		      "&amp;tf_deal_label=$p_deal_label".
 		      "&amp;tf_deal_company=$p_deal_company");
@@ -736,15 +735,15 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
 
     if (($action == "search_deal")&&($perm->have_perm("admin"))) {
       display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
-      $url = $sess->url("invoice_index.php?action=add_deal_chosen".
+      $url = url_prepare("invoice_index.php?action=add_deal_chosen".
 			"&amp;param_invoice=".$q_invoice->f("invoice_id").
 			"&amp;tf_deal_label=$p_deal_label".
 			"&amp;tf_deal_company=$p_deal_company");
     
-      $url_form = $sess->url("invoice_index.php?action=add_deal_chosen".
+      $url_form = url_prepare("invoice_index.php?action=add_deal_chosen".
 	 "&amp;param_invoice=".$q_invoice->f("invoice_id"));
-      echo "action = $action";
-      echo "<form method=\"post\" name=\"add_deal\" action=\"".$url_form."\">";
+      echo "action = $action
+        <form method=\"post\" name=\"add_deal\" action=\"$url_form\">";
     
       $dis_deal->data_cb_text = $l_add_deal;
       $dis_deal->data_idfield = "deal_id";
@@ -839,10 +838,10 @@ function dis_invoice_detail ($p_action, $q_invoice, $q_status){
   if ($p_action == "detailconsult" || $p_action == "add_deal"
       || $p_action == "del_deal") {
     // actions of the form :
-    $action_up = $sess->url ("invoice_index.php?action=detailupdate".
+    $action_up = url_prepare("invoice_index.php?action=detailupdate".
 			     "&amp;param_invoice=".
 			     $q_invoice->f("invoice_id"));
-    $action_dup = $sess->url("invoice_index.php?action=duplicate".
+    $action_dup = url_prepare("invoice_index.php?action=duplicate".
 			     "&amp;param_invoice=". 
 			     $q_invoice->f("invoice_id"));
 

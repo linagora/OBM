@@ -595,6 +595,20 @@ In OBM for performance and functionality, only <b>PCRE</b> regexps must be use.
 
 
 <!-- ---------------------------------------------------------------------- -->
+<h2>URL handling</h2>
+
+OBM used to call $sess->url() for eah url invocation in the code. Now each url construction must call <b>url_prepare()</b> which handle all operations an url should received.
+<p>
+Il will ease transition if we decide to migrate from the current session object ($sess) to another model.
+<p>
+<u>Operations handled by url_prepare()</u> :
+<ul>
+<li> Call <b>$sess->url()</b> to allow use without cookies
+<li> Replace '%' with '%25' to avoid URL interpreting %hh as special character (ex: searching %aa, lead to a special character when appearing in the url)
+</ul>
+
+
+<!-- ---------------------------------------------------------------------- -->
 <h2>Variables Names</h2>
 Variables names must be explicit without beeing exhaustive.
 <BR>

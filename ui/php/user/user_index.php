@@ -220,18 +220,15 @@ function get_param_user() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  User Action 
+// User Action 
 ///////////////////////////////////////////////////////////////////////////////
-
 function get_user_action() {
-  global $obm_user,$actions;
+  global $obm_user, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_reset;
   global $user_read, $user_write, $user_admin_read, $user_admin_write;
 
-
-//Index
-
+// Index
   $actions["USER"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/user/user_index.php?action=index",
@@ -239,8 +236,7 @@ function get_user_action() {
     'Condition'=> array ('all') 
                                     );
 
-//New
-
+// New
   $actions["USER"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
@@ -248,24 +244,21 @@ function get_user_action() {
     'Condition'=> array ('search','index','admin','detailconsult','display') 
                                   );
 
-//Search
-
+// Search
   $actions["USER"]["search"] = array (
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $user_read,
     'Condition'=> array ('None') 
                                   );
 
-//Detail Consult
-
+// Detail Consult
   $actions["USER"]["detailconsult"] = array (
      'Url'      => "$path/user/user_index.php?action=detailconsult",
     'Right'    => $user_read,
     'Condition'=> array ('None') 
                                   );
 
-//Reset
-
+// Reset
   $actions["USER"]["reset"] = array (
     'Name'     => $l_header_reset,
     'Url'      => "$path/user/user_index.php?action=reset&amp;param_user=".$obm_user["id"]."",
@@ -273,7 +266,7 @@ function get_user_action() {
     'Condition'=> array ('detailconsult') 
                                     );
 
-//Detail Uopate
+// Detail Uopate
   $actions["USER"]["detailupdate"] = array (
      'Name'     => $l_header_modify,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
@@ -281,24 +274,21 @@ function get_user_action() {
      'Condition'=> array ('detailconsult') 
                                      	   );
 
-//Insert
-
+// Insert
   $actions["USER"]["insert"] = array (
     'Url'      => "$path/user/user_index.php?action=insert",
     'Right'    => $user_write,
     'Condition'=> array ('None') 
                                      );
 
-//Update
-
+// Update
   $actions["USER"]["update"] = array (
     'Url'      => "$path/user/user_index.php?action=update",
     'Right'    => $user_write,
     'Condition'=> array ('None') 
                                      );
 
-//Check Delete
-
+// Check Delete
   $actions["USER"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
@@ -306,23 +296,20 @@ function get_user_action() {
     'Condition'=> array ('detailconsult') 
                                      	   );
 
-//Delete
-
+// Delete
   $actions["USER"]["delete"] = array (
     'Url'      => "$path/user/user_index.php?action=delete",
     'Right'    => $user_write,
     'Condition'=> array ('None') 
                                      );
 
-//Admin
-
+// Admin
   $actions["USER"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/user/user_index.php?action=admin",
     'Right'    => $user_admin_read,
     'Condition'=> array ('all') 
                                     );
-
 
 }
 

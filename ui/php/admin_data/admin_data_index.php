@@ -196,43 +196,43 @@ function parse_arg($argv) {
   if (! $module) $module = "company";
   if (! $action) $action = "data_show";
 }
+
+
 //////////////////////////////////////////////////////////////////////////////
 // ADMIN DATA actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_admin_data_action() {
-  global $actions;
+  global $actions, $path;
   global $l_header_index,$l_header_help;
   global $admin_data_read, $admin_data_write;
 
-
+  // index
   $actions["ADMIN_DATA"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_data/admin_data_index.php?action=index&amp;mode=html",
      'Right'    => $admin_data_read,
-     'Condition'=> array ('all') 
+     'Condition'=> array ('all')
                                     	  );
 
  $actions["ADMIN_DATA"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_data/admin_data_index.php?action=help&amp;mode=html",
      'Right' 	=> $admin_data_read,
-     'Condition'=> array ('all') 
+     'Condition'=> array ('all')
                                     	);
 
  $actions["ADMIN_DATA"]["data_show"] = array (
      'Url'      => "$path/admin_data/admin_data_index.php?action=data_show&amp;mode=html",
      'Right' 	=> $admin_data_read,
-     'Condition'=> array ('None') 
+     'Condition'=> array ('None')
                                     	);
 
  $actions["ADMIN_DATA"]["data_update"] = array (
      'Url'      => "$path/admin_data/admin_data_index.php?action=data_update&amp;mode=html",
      'Right' 	=> $admin_data_write,
-     'Condition'=> array ('None') 
+     'Condition'=> array ('None')
                                     	);
 
 }
 
 </SCRIPT>
-

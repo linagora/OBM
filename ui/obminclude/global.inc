@@ -52,10 +52,10 @@ $perms_editor = "editor" ;
 $perms_admin = "admin" ;
 
 
-//Perms and Profil
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////COMERCIAL RIGTHS////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+// Perms and Profil
+///////////////////////////////////////////////////////////////////////////////
+//                         COMMERCIAL RIGTHS                                 //
+///////////////////////////////////////////////////////////////////////////////
 $com_read 		= 1;
 $com_write 		= 2;
 $com_admin_read 	= 4;
@@ -95,9 +95,10 @@ $agenda_read 		= $com_read;
 $agenda_write 		= $com_read + $com_write ;
 $agenda_admin_read 	= $com_admin_read;
 $agenda_admin_write	= $com_admin_read + $com_admin_write;
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////PRODUCTION RIGTHS///////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//                         PRODUCTION RIGTHS                                 //
+///////////////////////////////////////////////////////////////////////////////
 $prod_read 		= 16;
 $prod_write 		= 32;
 $prod_admin_read	= 64;
@@ -116,9 +117,10 @@ $incident_read		= $prod_read;
 $incident_write 	= $prod_read + $prod_write;
 $incident_admin_read 	= $prod_admin_read;
 $incident_admin_write	= $prod_admin_read + $prod_admin_write;
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////COMPTA RIGTHS///////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//                         COMPTA RIGTHS                                     //
+///////////////////////////////////////////////////////////////////////////////
 $compta_read 		= 256;
 $compta_write 		= 512;
 $compta_admin_read 	= 1024;
@@ -144,9 +146,10 @@ $payment_read		= $compta_read;
 $payment_write	 	= $compta_read + $compta_write;
 $payment_admin_read 	= $compta_admin_read;
 $payment_admin_write	= $compta_admin_read + $compta_admin_write;
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////USERS RIGTHS//////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//                         USERS RIGTHS                                      //
+///////////////////////////////////////////////////////////////////////////////
 $users_read 		= 4096;
 $users_write 		= 8192;
 $users_admin_read	= 16384;
@@ -172,9 +175,10 @@ $settings_read		= $users_read;
 $settings_write	 	= $users_read + $users_write;
 $settings_admin_read 	= $users_admin_read;
 $settings_admin_write	= $users_admin_read + $users_admin_write;
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////ADMINS RIGTHS////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//                        ADMIN RIGTHS                                       //
+///////////////////////////////////////////////////////////////////////////////
 $admins_read		= 65536;
 $admins_write		= 131072;
 $admins_admin_read	= 262144;
@@ -208,10 +212,9 @@ $admin_pref_write 	= $admins_read + $admins_write;
 $admin_pref_admin_read 	= $admins_admin_read;
 $admin_pref_admin_write	= $admins_admin_read + $admins_admin_write;	
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////PROFILS/////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
+//                       PROFILES DEFINITIONS                                //
+///////////////////////////////////////////////////////////////////////////////
 $perm_user   =  $com_read + $prod_read + $users_read ;
 $perm_editor =  $com_read + $prod_read + $users_read + $com_write +
 	        $prod_write + $users_write;
@@ -289,14 +292,8 @@ require_once("$obminclude/global_query.inc");
 require_once("$obminclude/global_display.inc");
 
 
-//$config_var = run_query_get_config_var();
-
-//while($config_var->next_record())
-//  ${$config_var->f("ConfigObmVars_name")} = $config_var->f("ConfigObmVars_value");
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
+// Display HTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($l_module) { 
   global $l_title;
@@ -336,25 +333,6 @@ echo "
 ";
 
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Test if the debug flag is set
-// Parameters:
-//   - $debug : debug flag
-// Returns:
-//   - true || false : true is flag set
-///////////////////////////////////////////////////////////////////////////////
-function debug_level_isset($debug) {
-  global $set_debug;
-
-  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -397,56 +375,90 @@ function display_bookmarks($path="..") {
   global $last_account,$last_invoice, $last_payment, $last_incident;
   global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
   global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
-  global $sess;
 
   echo "
      <table class=\"bookmarks\">
        <tr>
          <td class=\"bookmarks\">
      <a class=\"bookmarks\" 
-     href=\"".$sess->url("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">
+     href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">
      ".substr($last_company_name,0,30)."
      </a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">
+     href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">
      ".substr($last_contact_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">
+     href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">
      ".substr($last_deal_name,0,30)."
      </a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
+     href=\"".url_prepare("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
      ".substr($last_account_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
+     href=\"".url_prepare("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
      ".substr($last_invoice_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
+     href=\"".url_prepare("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
      ".substr($last_payment_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">
+     href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">
      ".substr($last_contract_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".$sess->url("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
+     href=\"".url_prepare("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
      ".substr($last_incident_name,0,30)."</a>
          </td>
        </tr>
      </table>
      <hr />"; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Prepare an URL to be displayed in a link
+// Perfoms various operations as escape '%', call sess->url,...
+// Parameters:
+//   - $url : URL string
+// Returns:
+//   - $ret_url : prepared URL
+///////////////////////////////////////////////////////////////////////////////
+function url_prepare($url) {
+  global $sess;
+
+  $ret_url = str_replace('%', '%25', $sess->url($url));
+
+  return $ret_url;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Test if the debug flag is set
+// Parameters:
+//   - $debug : debug flag
+// Returns:
+//   - true || false : true is flag set
+///////////////////////////////////////////////////////////////////////////////
+function debug_level_isset($debug) {
+  global $set_debug;
+
+  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 

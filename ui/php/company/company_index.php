@@ -333,7 +333,7 @@ function get_param_company() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function get_company_action() {
-  global $company,$actions;
+  global $company, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
   global $company_read, $company_write, $company_admin_read, $company_admin_write;

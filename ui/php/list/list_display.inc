@@ -22,9 +22,9 @@ function html_list_search_form ($list) {
     $ext_action = $list["ext_action"];
     $ext_url = $list["ext_url"];
     $ext_id = $list["ext_id"];
-    $ext = "<INPUT NAME=ext_action TYPE=hidden VALUE=\"$ext_action\">
-      <INPUT NAME=ext_id TYPE=hidden VALUE=\"$ext_id\">
-      <INPUT NAME=ext_url TYPE=hidden VALUE=\"$ext_url\">";
+    $ext = "<input name=ext_action type=hidden value=\"$ext_action\">
+      <input name=ext_id type=hidden value=\"$ext_id\">
+      <input name=ext_url type=hidden value=\"$ext_url\">";
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -37,7 +37,7 @@ function html_list_search_form ($list) {
 
   echo "
     <center>
-    <form method=get name=f_list action=\"".$sess->url("list_index.php")."\">
+    <form method=get name=f_list action=\"".url_prepare("list_index.php")."\">
       <table border=0>
         <tr>
           <td>
@@ -121,7 +121,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
   echo  "$nb_list $l_found";
   echo "</FONT><BR>";
 
-  $url = $sess->url("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact$url_ext");
+  $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA",$pref_q);
   if ($popup) {
@@ -129,7 +129,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
     $dis_list->data_cb_text = "X";
     $dis_list->data_idfield = "list_id";
     $dis_list->data_cb_name = "cb_list";
-    echo "\n<FORM TARGET=root METHOD=get action=\"$ext_url\">";
+    echo "<form target=root method=get action=\"$ext_url\">";
   }
   $dis_list->data_set = $obm_q;
   $dis_list->data_header = "both";
@@ -178,7 +178,7 @@ function html_list_form($action, $list_q, $list) {
   }
 
   echo "
-  <form method=get name=f_new action=\"".$sess->url("list_index.php")."\"
+  <form method=get name=f_new action=\"".url_prepare("list_index.php")."\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">
   <table width=\"50%\" border=0 cellpadding=0 cellspacing=0>
   <tr>
@@ -204,7 +204,7 @@ function html_list_form($action, $list_q, $list) {
       <input type=submit value=\"$l_update\">
       </form>
       </td><td>
-      <form method=get name=f_back action=\"".$sess->url("list_index.php")."\">
+      <form method=get name=f_back action=\"".url_prepare("list_index.php")."\">
       <input type=hidden name=action value=detailconsult>
       <input type=hidden name=param_list value=\"$id\">
       <input type=submit value=\"$l_back\">
@@ -234,19 +234,22 @@ function html_list_links($id, $list_name, $l_action="") {
   global $l_add_contact, $l_delete, $l_mail, $l_update, $l_export;
   global $popup_width, $popup_contact_height;
 
+  $url_update = url_prepare("list_index.php?action=detailupdate&amp;param_list=$id");
+  $url_delete = url_prepare("list_index.php?action=check_delete&amp;hd_list_id=$id");
+
   echo "<table cellpadding=0 cellspacing=0 border=0>
     <tr>
-      <td><a href=\"".$sess->url("list_index.php?action=detailupdate&amp;param_list=$id")."\">$l_update</a></td>
+      <td><a href=\"$url_update\">$l_update</a></td>
     </tr>";
   if($perm->have_perm("editor")) {
-    echo "<tr><td><a href=\"".$sess->url("list_index.php?action=check_delete&amp;hd_list_id=$id") . "\">$l_delete</a></td></tr>";
+    echo "<tr><td><a href=\"$url_delete\">$l_delete</a></td></tr>";
   }
   if ($perm->have_perm("editor")) {
-    $ext_url = $sess->url("../list/list_index.php");
-    echo "<tr><td><a href=\"\" onclick=\"window.name='root';window.open('" .$sess->url("../contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=" . urlencode($l_add_contact) . "&amp;ext_action=contact_add&amp;ext_url=$ext_url&amp;ext_id=$id") . "','Company','height=$popup_height,width=$popup_width'); return false;\">$l_add_contact</a></td></tr>";
+    $ext_url = url_prepare("../list/list_index.php");
+    echo "<tr><td><a href=\"\" onclick=\"window.name='root';window.open('" .url_prepare("../contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=" . urlencode($l_add_contact) . "&amp;ext_action=contact_add&amp;ext_url=$ext_url&amp;ext_id=$id") . "','Company','height=$popup_height,width=$popup_width'); return false;\">$l_add_contact</a></td></tr>";
   }
   if ($perm->have_perm("editor")) {
-    echo "<tr><td><a href=\"".$sess->url("list_index.php?action=export_add&amp;cb_list$id=$id")."\">$l_export</a></td></tr>";
+    echo "<tr><td><a href=\"".url_prepare("list_index.php?action=export_add&amp;cb_list$id=$id")."\">$l_export</a></td></tr>";
   }
   echo "
             </td>
@@ -319,7 +322,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
   if ($nb_con != 0) {
 
-    $url= $sess->url("list_index.php?action=detailconsult&amp;param_list=$id");
+    $url= url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
     $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q);
     $dis_infos->data_set = $con_q;
@@ -386,7 +389,7 @@ function dis_list_display_pref($pref_list_q, $pref_contact_q) {
 //   - $l_id     : list id
 /////////////////////////////////////////////////////////////////////////////
 function dis_warn_delete($l_id) {
-  global $sess, $l_warn_delete, $l_delete, $l_back;
+  global $l_warn_delete, $l_delete, $l_back;
 
   $nb_con = get_list_nb_contact($l_id);
   echo "<P>$nb_con $l_warn_delete";
@@ -394,14 +397,14 @@ function dis_warn_delete($l_id) {
   echo "<P>
     <TABLE><TR><TD>
     <FORM METHOD=GET NAME=form_delete
-    ACTION=\"" .$sess->url("list_index.php") . "\">
+    ACTION=\"" .url_prepare("list_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=delete>
     <INPUT TYPE=hidden NAME=hd_list_id VALUE=\"$l_id\">
     <INPUT TYPE=submit NAME=submit VALUE=\"$l_delete\">
     </FORM>
     </TD><TD>
     <FORM NAME=form_back METHOD=GET
-    ACTION=\"" .$sess->url("list_index.php") . "\">
+    ACTION=\"" .url_prepare("list_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=detailconsult>
     <INPUT TYPE=hidden NAME=param_list VALUE=\"$l_id\">
     <INPUT TYPE=submit VALUE=\"$l_back\">
@@ -432,13 +435,13 @@ function dis_list_warn_insert($l_id, $l_q, $list) {
     $id = $l_q->f("list_id");
     $samename = $l_q->f("list_name");
     $samesubject = $l_q->f("list_subject");
-    echo "<BR><A HREF=\"" .$sess->url("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</A>";
+    echo "<BR><A HREF=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</A>";
   }
 
   echo "<P>
     <TABLE><TR><TD>
     <FORM METHOD=POST NAME=form_insert
-    ACTION=\"" .$sess->url("list_index.php") . "\">
+    ACTION=\"" .url_prepare("list_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=insert>
     <INPUT TYPE=hidden NAME=hd_confirm VALUE=\"$c_yes\">
     <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
@@ -447,7 +450,7 @@ function dis_list_warn_insert($l_id, $l_q, $list) {
     </FORM>
     </TD><TD>
     <FORM NAME=form_back METHOD=POST
-    ACTION=\"" .$sess->url("list_index.php") . "\">
+    ACTION=\"" .url_prepare("list_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=new>
     <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
     <INPUT TYPE=hidden NAME=tf_subject VALUE=\"$subject\">
@@ -511,7 +514,7 @@ function dis_export_form($list) {
   while ($c_export_format[$cpt]["name"]) {
     $name = $c_export_format[$cpt]["name"];
     $info = $c_export_format[$cpt]["info"];
-    $url = $c_export_format[$cpt]["url"] . $param_list;
+    $url = url_prepare($c_export_format[$cpt]["url"] . $param_list);
     $icon = $c_export_format[$cpt]["icon"];
     $url_help = "export_format_$cpt.html";
     $d_format .= "<tr>

@@ -174,7 +174,7 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
   //-- Labels
   global $l_found, $l_no_found;
   //-- Authentication
-  global $perms_user,$l_perms_user, $auth, $sess;
+  global $perms_user,$l_perms_user;
 
   $lincident = $incident["lincident"];
   $lcontract = $incident["lcontract"];
@@ -186,7 +186,7 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = $sess->url("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
 
   $obm_q_comp->seek($first_row);
 

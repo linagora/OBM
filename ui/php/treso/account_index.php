@@ -252,12 +252,12 @@ function get_param_account() {
 }
 
 function get_account_action() {
-  global $account,$actions;
+  global $account, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_compute_balance;
   global $account_read, $account_write, $account_admin_read, $account_admin_write;
-//Index
 
+// Index
   $actions["ACCOUNT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/treso/account_index.php?action=index",
@@ -265,16 +265,14 @@ function get_account_action() {
     'Condition'=> array ('all') 
                                        );
 
-//Search
-
+// Search
   $actions["ACCOUNT"]["search"] = array (
     'Url'      => "$path/treso/account_index.php?action=search",
     'Right'    => $account_read,
     'Condition'=> array ('None') 
                                        );
 
-//New
-
+// New
   $actions["ACCOUNT"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/treso/account_index.php?action=new",
@@ -282,24 +280,21 @@ function get_account_action() {
     'Condition'=> array ('','search','index','detailconsult','display') 
      		                     );
 
-//Insert
-
+// Insert
   $actions["ACCOUNT"]["insert"] = array (
     'Url'      => "$path/treso/account_index.php?action=insert",
     'Right'    => $account_write,
     'Condition'=> array ('None') 
                                        );
 
-//Detail Consult
-
+// Detail Consult
   $actions["ACCOUNT"]["detailconsult"] = array (
     'Url'      => "$path/treso/account_index.php?action=detailconsult",
     'Right'    => $account_read,
     'Condition'=> array ('None') 
                                        );
 
-//Compute Balance
-
+// Compute Balance
   $actions["ACCOUNT"]["compute_balance"] = array (
     'Name'     => $l_header_compute_balance,
     'Url'      => "$path/treso/account_index.php?action=compute_balance&amp;param_account=".$account["account"]."",
@@ -307,8 +302,7 @@ function get_account_action() {
     'Condition'=> array ('detailconsult') 
                                      		 );
 
-//Detail Update
-
+// Detail Update
   $actions["ACCOUNT"]["detailupdate"] = array (
     'Name'     => $l_header_modify,
     'Url'      => "$path/treso/account_index.php?action=detailupdate&amp;param_account=".$account["account"]."",
@@ -316,16 +310,14 @@ function get_account_action() {
     'Condition'=> array ('detailconsult') 
                                      	      );
 
-//Update
-
+// Update
   $actions["ACCOUNT"]["update"] = array (
     'Url'      => "$path/treso/account_index.php?action=update",
     'Right'    => $account_write,
     'Condition'=> array ('None') 
                                        );
 
-//Delete
-
+// Delete
   $actions["ACCOUNT"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/treso/account_index.php?action=delete&amp;param_account=".$account["account"]."",
@@ -333,8 +325,7 @@ function get_account_action() {
     'Condition'=> array ('detailconsult') 
                                      	);
 
-//Admin
-
+// Admin
   $actions["ACCOUNT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/treso/account_index.php?action=admin",
@@ -342,8 +333,7 @@ function get_account_action() {
     'Condition'=> array ('all') 
                                       );
 
-//Display
-
+// Display
   $actions["ACCOUNT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=display",
@@ -351,8 +341,7 @@ function get_account_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-//Display Preferences
-
+// Display Preferences
   $actions["ACCOUNT"]["dispref_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=dispref_display",
@@ -360,8 +349,7 @@ function get_account_action() {
     'Condition'=> array ('None') 
                                       	 );
 
-//Display Preferences
-
+// Display Preferences
   $actions["ACCOUNT"]["level_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=level_display",

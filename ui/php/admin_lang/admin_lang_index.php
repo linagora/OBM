@@ -185,45 +185,52 @@ function parse_arg($argv) {
   if (! $theme) $theme = "standard";
 }
 
+
 //////////////////////////////////////////////////////////////////////////////
 // ADMIN LANG actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_admin_lang_action() {
-  global $actions;
+  global $actions, $path;
   global $l_header_clear_sess,$l_header_index,$l_header_help;
   global $admin_lang_read, $admin_lang_write;
 
+  // index : launch forms
   $actions["ADMIN_LANG"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=index&amp;mode=htm",
      'Right'    => $admin_lang_read,
      'Condition'=> array ('all') 
                                     	 ); 
-
- $actions["ADMIN_LANG"]["help"] = array (
+  // help
+  $actions["ADMIN_LANG"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=help&amp;mode=html",
      'Right'    => $admin_lang_read,
-     'Condition'=> array ('all') 
+     'Condition'=> array ('all')
                                     	);
- $actions["ADMIN_LANG"]["show_src"] = array (
+  // show_src : show variables referenced in module sources
+  $actions["ADMIN_LANG"]["show_src"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=show_src&amp;mode=html",
      'Right'    => $admin_lang_write,
-     'Condition'=> array ('None') 
+     'Condition'=> array ('None')
                                     	);
- $actions["ADMIN_LANG"]["show_lang"] = array (
+  // show_lang : compare vars referenced in source and defined in lang files
+  $actions["ADMIN_LANG"]["show_lang"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=show_lang&amp;mode=html",
      'Right'    => $admin_lang_write,
      'Condition'=> array ('None') 
                                     	);
- $actions["ADMIN_LANG"]["comp_header_lang"] = array (
+  // comp_lang : compare vars from 2 langs
+  $actions["ADMIN_LANG"]["comp_lang"] = array (
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_lang&amp;mode=html",
+     'Right'    => $admin_lang_write,
+     'Condition'=> array ('None')
+                                    	);
+  // comp_header_lang : 
+  $actions["ADMIN_LANG"]["comp_header_lang"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_header_lang&amp;mode=html",
      'Right'    => $admin_lang_write,
-     'Condition'=> array ('None') 
+     'Condition'=> array ('None')
                                     	);
 
-
 }
-
-
