@@ -142,10 +142,10 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-< Files "\.inc$">
+&lt;Files ~ "\.inc$">
   Order allow,deny
   Deny from all
-< /Files>
+&lt;/Files>
 </pre>
   </td>
 </tr>
@@ -156,7 +156,7 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-< VirtualHost 192.168.1.5>
+&lt;VirtualHost 192.168.1.5>
     ServerAdmin root@localhost
     DocumentRoot /var/www/obm/php
     ServerName obm-panthere
@@ -165,7 +165,7 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
     SetEnv OBM_INCLUDE_VAR obminclude
     Alias /images /var/www/obm/obminclude/themes
     DirectoryIndex obm.php
-< /VirtualHost>
+&lt;/VirtualHost>
 </pre>
   </td>
 </tr>
@@ -267,7 +267,29 @@ var $Password = "web";
 </table>
 
 
-<h2>10: Run OBM (access the obm.php from your browser)</h2>
+<h2>5: Configure or check the PHP configuration</h2>
+
+In php.ini file set :
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+register_globals = On
+</pre>
+  </td>
+</tr>
+</table>
+
+and depending on obm file's owner :
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+safe_mode = Off
+</pre>
+  </td>
+</tr>
+</table>
+
+<h2>6: Run OBM (access the obm.php from your browser)</h2>
 # First restart your apache web server
 
 <table bgcolor="#CCCCCC" border="1">
