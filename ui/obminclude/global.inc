@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "test-0.8.9pre3";
+$obm_version = "0.8.9pre5";
 $l_obm_title = "O.B.M.";
 
 // Document constants 

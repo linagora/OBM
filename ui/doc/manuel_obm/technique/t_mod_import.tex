@@ -78,7 +78,7 @@ L'association des champs du fichier aux champs de la base de données utilise plu
 \hline
 \textbf{Structure} & \textbf{Description} & \textbf{Exemple} & \textbf{Fonction}\\
 \hline
-\$row[] & Tableau des valeurs d'une ligne du fichier & \$row[1]=Aliacom & \fonction{get\_file\_row\_fields} \\
+\$row[] & Tableau des valeurs d'une ligne du fichier & \$row[0]=Aliacom & \fonction{fgetcsv de PHP} \\
 \hline
 \$map[] & Mapping descriptif de l'import & \$map[l][field]=comp\_name \$map[1][label]=l\_company \$map[default][comp\_name]=ZZ \$map[field][comp\_name]=l & \fonction{get\_import\_field\_mapping}\\
 \hline
@@ -87,7 +87,8 @@ L'association des champs du fichier aux champs de la base de données utilise plu
 \end{tabular}
 
 \vspace{0.3cm}
-La structure \variable{\$row} est récupérée par une lecture de la ligne du fichier en tenant compte des paramètres CSV (séparateur, caractère encadrant).\\
+La structure \variable{\$row} est récupérée par une lecture de la ligne du fichier en tenant compte des paramètres CSV (séparateur, caractère encadrant).
+L'utilisation de la fonction \fonction{fgetcsv()} de PHP permet de gérer les caractères encadrant optionnels (champs encadrés optionnellement par ").\\
 
 La structure \variable{\$map} est construite à partir du mapping entré par l'utilisateur.
 Elle comporte 3 sous structures :\\

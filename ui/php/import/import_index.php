@@ -25,13 +25,8 @@
 // - dispref_level   --                -- update one field display position 
 // - export_add      --                --
 // External API ---------------------------------------------------------------
-// - ext_get_ids     --                -- select multiple lists (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms Management                                             //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "ADMIN";
 $menu = "IMPORT";
@@ -81,6 +76,7 @@ $uid = $auth->auth["uid"];
 $import = get_param_import();
 get_import_action();
 $perm->check_permissions($menu, $action);
+$field_size = get_import_field_size();
 
 require("import_js.inc");
 
@@ -401,6 +397,49 @@ function get_import_desc($import) {
   $desc .= '\$con["con_com"]["default"]="'.$import["con_com_d"] . '";';
   
   return $desc;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get fields max size (hard coded, must be similar to database field length)
+// returns : $field_size hash : $field_size["comp_name"] = 96
+///////////////////////////////////////////////////////////////////////////////
+function get_import_field_size() {
+
+  $fsize = "";
+  $fsize["comp_name"] = 96;
+  $fsize["comp_num"] = 32;
+  $fsize["comp_ad1"] = 64;
+  $fsize["comp_ad2"] = 64;
+  $fsize["comp_ad3"] = 64;
+  $fsize["comp_zip"] = 14;
+  $fsize["comp_town"] = 64;
+  $fsize["comp_cdx"] = 16;
+  $fsize["comp_ctry"] = 2;;
+  $fsize["comp_pho"] = 32;
+  $fsize["comp_fax"] = 32;
+  $fsize["comp_web"] = 64;
+  $fsize["comp_mail"] = 64;
+  $fsize["comp_com"] = 256;
+
+  $fsize["con_ln"] = 64;
+  $fsize["con_fn"] = 64;
+  $fsize["con_tit"] = 64;
+  $fsize["con_ad1"] = 64;
+  $fsize["con_ad2"] = 64;
+  $fsize["con_ad3"] = 64;
+  $fsize["con_zip"] = 14;
+  $fsize["con_town"] = 64;
+  $fsize["con_cdx"] = 16;
+  $fsize["con_ctry"] = 2;
+  $fsize["con_pho"] = 32;
+  $fsize["con_hpho"] = 32;
+  $fsize["con_mpho"] = 32;
+  $fsize["con_fax"] = 32;
+  $fsize["con_mail"] = 128;
+  $fsize["con_com"] = 256;
+
+  return $fsize;
 }
 
 

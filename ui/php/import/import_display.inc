@@ -182,7 +182,7 @@ function html_import_search_list($obm_q, $pref_q, $nb, $import, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Import Consultation                                          //
+// HTML Display Import Consultation
 // Parameters:
 //   - $import_q : Import database result 
 ///////////////////////////////////////////////////////////////////////////////
@@ -390,18 +390,22 @@ function html_import_file_sample($import_q, $import, $max_rows) {
     $display["msg"] .= display_err_msg("$file : $l_file_error");
     return;
   }
-  $r = file($file);
-  while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
-    $row = get_file_row_fields($line, $csv_sep, $enclosed);
+
+  $num_line = 0;
+  $fh = fopen($file, 'r');
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep, $enclosed)) && ($num_line < $max_rows) ) {
+    $num_line++;
 
     $mapping .= "<tr>";
     while (list($num, $value) = each($row)) {
+      $num++; // $map mapping start at 1 and $row at 0
       if ($map[$num]["label"] != "") {
 	$mapping .= "<td class=\"detailForm\">$value</td>";
       }
     }
     $mapping .= "</tr>";
   }
+  fclose($fh);
 
   $block = "
     <div class=\"detailHead\">$l_sample_file : $file_name</div>
@@ -442,7 +446,7 @@ function html_import_file_import($import_q, $import) {
   $csv_sep = $import_q->f("import_separator");
   $enclosed = trim($import_q->f("import_enclosed"));
   $run_mode = $import["run_mode"];
-  $row_start = ($import["row_start"] ? $import["row_start"] : 0);
+  $row_start = ($import["row_start"] ? $import["row_start"] : 1);
   $conflict_action = $import["conflict_action"];
   $company_id = $import["company_id"];
   $contact_id = $import["contact_id"];
@@ -472,12 +476,12 @@ function html_import_file_import($import_q, $import) {
     $display["msg"] .= display_err_msg("$file : $l_file_error");
     return;
   }
-  $r = file($file);
-  $cpt = 0;
-  // Go to the starting row
-  while ($cpt < $row_start) {
-    $cpt++;
-    next($r);
+
+  $cpt_line = 1;
+  $fh = fopen($file, 'r');
+  while ($cpt_line < $row_start) {
+    $cpt_line++;
+    $tmp = fgets($fh, 5000);
   }
 
   // Company & Contact Conflict Management ------------------------------------
@@ -486,12 +490,13 @@ function html_import_file_import($import_q, $import) {
     $log["num_line"] = $row_start;
     $nb_line++;
 
+    $cpt_line++;
+    $row = fgetcsv($fh, 4000, $csv_sep, $enclosed);
+    $fields = get_import_row_mapping($row, $map);
+
     // Test user decision
     // Insert the new company
     if ($conflict_action == "company_insert") {
-      list($num_line, $line) = each($r);
-      $row = get_file_row_fields($line, $csv_sep, $enclosed);
-      $fields = get_import_row_mapping($row, $map);
       $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
       $nb_comp_ins++;
 
@@ -504,10 +509,6 @@ function html_import_file_import($import_q, $import) {
       // Others company choices (update or keep) need then contact choice
     } else if (($conflict_action == "company_nothing")
               || ($conflict_action == "company_update")) {
-
-      list($num_line, $line) = each($r);
-      $row = get_file_row_fields($line, $csv_sep, $enclosed);
-      $fields = get_import_row_mapping($row, $map);
 
       if ($conflict_action == "company_update") {
 	run_query_import_company_update($import_q, $fields, $map["default"], $countries, $cats, $company_id);
@@ -550,32 +551,27 @@ function html_import_file_import($import_q, $import) {
 
       // Update the existing contact
     } else if ($conflict_action == "contact_update") {
-      list($num_line, $line) = each($r);
-      $row = get_file_row_fields($line, $csv_sep, $enclosed);
-      $fields = get_import_row_mapping($row, $map);
       run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $kinds, $contact_id);
       $nb_con_upd++;
 
     } else if ($conflict_action == "contact_insert") {
-      list($num_line, $line) = each($r);
-      $row = get_file_row_fields($line, $csv_sep, $enclosed);
-      $fields = get_import_row_mapping($row, $map);
       run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds);
       $nb_con_ins++;
 
     } else if ($conflict_action == "contact_nothing") {
-      next($r);
+      // Nothing to do
     }
   }
 
 
   // Loop through the file ----------------------------------------------------
-  while ((list($num_line, $line) = each($r)) && ($stop == false)) {
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep, $enclosed))
+	  && ($stop == false) ) {
     $log = "";
-    $log["num_line"] = $num_line;
+    $log["num_line"] = $cpt_line;
     $nb_line++;
+    $cpt_line++;
 
-    $row = get_file_row_fields($line, $csv_sep, $enclosed);
     $fields = get_import_row_mapping($row, $map);
 
     // Test if company is valid
@@ -642,6 +638,8 @@ function html_import_file_import($import_q, $import) {
 
     $log_block .= display_import_log_line($log, $fields, $comps);
   }
+
+  fclose($fh);
 
   $msg = "$nb_line $l_lines_processed";
   if (isset($log["num_line"])) {

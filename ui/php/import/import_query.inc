@@ -69,7 +69,7 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Import detail query execution                                             //
+// Import detail query execution
 // Parameters:
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ function run_query_insert($import) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Import Update query execution                                             //
+// Import Update query execution
 // Parameters:
 //   - $import[] : import hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ function run_query_update($import) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : import id
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,11 +261,14 @@ function run_query_check_import($import) {
   // We search for the same datasource
   $wdsrc = "import_datasource_id = '$dsrc'";
 
-  $query = "select distinct import_id, import_name, import_datasource_id,
+  $query = "SELECT DISTINCT
+       import_id,
+       import_name,
+       import_datasource_id,
        datasource_name
-     from Import
-          left join DataSource on import_datasource_id=datasource_id
-     where $where_id
+     FROM Import
+          LEFT JOIN DataSource ON import_datasource_id=datasource_id
+     WHERE $where_id
        ($wname and $wdsrc)";
 
   display_debug_msg($query, $cdg_sql);
@@ -424,11 +427,22 @@ function get_file_row_fields($row, $sep, $enclosed) {
 //   hash : $fields[comp_name] = $content
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_row_mapping($row, $map) {
+  global $field_size;
 
   while (list($field, $num) = each ($map["field"])) {
     if ($num != "") {
+      $num--; // $map mapping start at 1 and $row at 0
       $content = $row[$num];
-      $fields[$field] = trim($content);
+      // if a max size is defined for the field, we truncate the field
+      // exceptions for countryes values that can be iso codes or ctry names
+      // for ctry this is tested after passing ctry iso hash
+      if ( ($field_size[$field] > 0)
+	   && ($field != "comp_ctry")
+	   && ($field != "con_ctry") ) {
+	$fields[$field] = substr(trim($content), 0, $field_size[$field]);
+      } else {
+	$fields[$field] = trim($content);
+      }
     }
   }
 
@@ -525,7 +539,7 @@ function get_similar_company($fields, $map) {
 //   Id of the company inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$cats) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $field_size;
 
   $uid = $auth->auth["uid"];
 
@@ -559,7 +573,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     $ctry = $countries[$fields["comp_ctry"]];
     // else we get the entry as an iso code
   } else {
-    $ctry = trim($fields["comp_ctry"]);
+    $ctry = substr(trim($fields["comp_ctry"]), 0, $field_size["comp_ctry"]);
   }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
@@ -661,7 +675,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
 //   - $company_id  : Company id to update
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$cats, $company_id) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $field_size;
 
   $uid = $auth->auth["uid"];
 
@@ -692,7 +706,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     $ctry = $countries[$fields["comp_ctry"]];
     // else we get the entry as an iso code
   } else {
-    $ctry = trim($fields["comp_ctry"]);
+    $ctry = substr(trim($fields["comp_ctry"]), 0, $field_size["comp_ctry"]);
   }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
@@ -1064,7 +1078,7 @@ function get_import_kind_hash() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact: Kind select query execution                                      //
+// Contact: Kind select query execution
 // Returns : DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_kind() {

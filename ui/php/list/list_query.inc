@@ -82,7 +82,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// List detail query execution                                               //
+// List detail query execution
 // Parameters:
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ function addslashes_array(&$item, $key) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : list insertion                                          //
+// Query execution : list insertion
 // Parameters:
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
@@ -198,7 +198,7 @@ function run_query_insert($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the lsit id frol the list Infos
+// Get the list id from the list Infos
 // Parameters:
 //   - $list : list infos
 ///////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ function get_list_id($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// List Update query execution                                               //
+// List Update query execution
 // Parameters:
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ function run_query_list_update_sql($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : list id
 ///////////////////////////////////////////////////////////////////////////////
@@ -326,7 +326,7 @@ function run_query_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : ContactList conditionnal insertion                      //
+// Query execution : ContactList conditionnal insertion
 // Parameters:
 //   - $list[] : list hash info : keys used : id, con_nb, conX
 // Return: number of contact inserted
@@ -376,7 +376,7 @@ function run_query_contactlist_insert($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : ContactList deletion                                    //
+// Query execution : ContactList deletion
 // Parameters:
 //   - $list[] : list hash info : keys used : id, con_nb, conX
 ///////////////////////////////////////////////////////////////////////////////
@@ -405,7 +405,7 @@ function run_query_contactlist_delete($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the contacts of the given list                      //
+// Query Execution : Get the static contacts of the given list
 // Parameters:
 //   - $list   : List hash
 // -- Optionnals
@@ -532,7 +532,7 @@ function get_list_static_contact_nb($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update the dynamic rows number for the list                               //
+// Update the dynamic rows number for the list
 // Parameters:
 //   - $id : list_id
 ///////////////////////////////////////////////////////////////////////////////
@@ -628,7 +628,7 @@ function run_query_check_list($id, $name, $subject) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update the dynamic rows number for the list                               //
+// Update the dynamic rows number for the list
 // Parameters:
 //   - $id : list_id
 //   - $nb : new rows number
@@ -742,7 +742,7 @@ function check_data_form($id, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the infos of a List from its Id                                       //
+// Get the infos of a List from its Id
 // Parameters:
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
@@ -771,7 +771,7 @@ function get_list_info($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the rows number for the query given                                   //
+// Get the rows number for the query given
 // Parameters:
 //   - $query : query to run
 ///////////////////////////////////////////////////////////////////////////////
@@ -998,7 +998,7 @@ function run_query_subscriptionreception() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Generate the SQL Query from a List given by its id
+// Generate the SQL Query from a List given as a DBO
 // Parameters:
 //   - $list_q : DBO with list info
 ///////////////////////////////////////////////////////////////////////////////
@@ -1102,7 +1102,6 @@ function make_query_from_criteria($list) {
     "publication" => ", SUM(subscription_quantity) as subscription_quantity
     		      ,publication_lang
 		      ,publication_title"
-    			
   );
   $add_group = array (
     "publication" => ",publication_lang
