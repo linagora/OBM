@@ -6,6 +6,7 @@ echo "
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 echo "
+
 function check_calendar(form) {
 
   if (trim(form.tf_title.value) == \"\") {
@@ -22,7 +23,7 @@ function check_calendar(form) {
     return false;
   }
 
-    return true;
+    return true;html_dis_conflict
   
 } 
 function check_all_force(form) {
@@ -53,54 +54,111 @@ function check_all_cancel(form) {
 } 
 
 
+
+function check_count_user(formulaire) {
+  var selectObject = formulaire.elements[0];
+  var selectCount  = selectObject.length;
+  var nb_select = 0;
+  for (var i = 0; i < selectCount; i++)
+  {
+    if( selectObject.options[i].selected == true)
+      nb_select ++;
+  }
+  if( nb_select > 6) {
+    alert('$l_too_much_user');
+    return false;
+  }
+  return true;
+}
+  
+NS4 = (document.layers) ? 1 : 0;
+IE4 = (document.all) ? 1 : 0;
+W3C = (document.getElementById) ? 1 : 0;	
 function show ( evt, name ) {
+  if (IE4) {
+    evt = window.event;  
+  }
 
-  var currentX,		//mouse position on X axis
-      currentY,		//mouse position on X axis
-      x,		//layer target position on X axis
-      y,		//layer target position on Y axis
-      docWidth,		//width of current frame
-      docHeight,	//height of current frame
-      layerWidth,	//width of popup layer
-      layerHeight,	//height of popup layer
-      ele;		//points to the popup element
+  var currentX,		
+      currentY,	
+      x,
+      y,
+      docWidth,
+      docHeight,
+      layerWidth,
+      layerHeight,
+      ele;	
 
-  // First let's initialize our variables
-  ele = document.getElementById(name);
-  currentX = evt.clientX,
-  currentY = evt.clientY;
-  docWidth = document.width;
-  docHeight = document.height;
-  layerWidth = document.getElementById(name).style.width;
-  layerHeight = document.getElementById(name).style.height;
+  if ( W3C ) {
+    ele = document.getElementById(name);
+    currentX = evt.clientX,
+    currentY = evt.clientY;
+    docWidth = document.width;
+    docHeight = document.height;
+    layerWidth = ele.style.width;
+    layerHeight = ele.style.height;
 
+  } else if ( NS4 ) {
+    ele = document.layers[name];
+    currentX = evt.pageX,
+    currentY = evt.pageY;
+    docWidth = document.width;
+    docHeight = document.height;
+    layerWidth = ele.clip.width;
+    layerHeight = ele.clip.height;
 
-  // Then we calculate the popup element's new position
+  } else {
+    ele = document.all[name];
+    currentX = evt.clientX,
+    currentY = evt.clientY;
+    docHeight = document.body.offsetHeight;
+    docWidth = document.body.offsetWidth;
+    layerWidth = 200;
+    layerHeight = ele.offsetHeight;
+  }
+
   if ( ( currentX + layerWidth ) > docWidth ) {
     x = ( currentX - layerWidth );
   }
   else {
-    x = currentX;
+    x = currentX - 250;
   }
   if ( ( currentY + layerHeight ) >= docHeight ) {
-     y = ( currentY - layerHeight - 10 );
+     y = ( currentY - layerHeight - 20 );
   }
   else {
-    y = currentY + 10;
+    y = currentY + 20;
+  }
+  if ( IE4 ) {
+    x += document.body.scrollLeft;
+    y += document.body.scrollTop;
+  } else {
+    x += window.pageXOffset;
+    y += window.pageYOffset;
   }
 
-  x += window.pageXOffset;
-  y += window.pageYOffset;
-
-// alert(\"docWidth \" + docWidth + \", docHeight \" + docHeight + \"layerWidth \" + layerWidth + \", layerHeight \" + layerHeight + \"currentX \" + currentX + \", currentY \" + currentY + \"x \" + x + \", y \" + y);
+  if ( NS4 ) {
+    ele.left = parseInt ( x );
+    ele.top = parseInt ( y );
+    ele.visibility = \"show\";
+  } else {  // IE4 & W3C
     ele.style.left = x+'px';
     ele.style.top = y+'px';
     ele.style.visibility = \"visible\";
+  }
+
 }
 
 function hide ( name ) {
-  document.getElementById(name).style.visibility = \"hidden\";
+  if (W3C) {
+    document.getElementById(name).style.visibility = \"hidden\";
+  } else if (NS4) {
+    document.layers[name].visibility = \"hide\";
+  } else {
+    document.all[name].style.visibility = \"hidden\";
+  }
 }
+
 </script>
 
 ";

@@ -81,7 +81,7 @@ $l_cancel_all = "Tout annuler";
 $l_force_event = "Forcer";
 $l_cancel_event = "Annuler";
 $l_replace_event = "Remplacer";
-
+$l_too_much_user = "Vous ne pouvez selectionner au maximum que six utilisateurs";
 $l_insert_ok = "Insertion effectuée avec succès";
 $l_update_ok = "Mise a jour effectuée avec succès";
 $l_update_warning = "Attention des conflits ont été détectés";
@@ -104,6 +104,7 @@ $l_err_dateend = "Format du champ [ $l_dateend ] incorrect";
 $l_err_repeat = "Format du champ [ $l_use_endrepeat ] incorrect";
 $l_err_begin_end = "La date de fin doit etre supérieure à la date de début";
 $l_err_end_repeat = "La fin de répétition doit etre supérieure à la date de fin";
+$l_err_end_repeat2 = "La durée maximum d'une répétition est de 1 an";
 
 $l_monday="Lundi";
 $l_tuesday="Mardi";

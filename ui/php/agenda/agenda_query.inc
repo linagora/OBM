@@ -1101,7 +1101,7 @@ function store_users($user_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($agenda) {
   global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_err_datebegin, $l_err_dateend,$err_msg ;
-  global $l_err_begin_end ,$l_err_end_repeat, $l_err_repeat ;
+  global $l_err_begin_end ,$l_err_end_repeat, $l_err_repeat,$l_err_end_repeat2 ;
   
   $title = $agenda["title"];
   $datebegin = substr($agenda["date_begin"],0,8);
@@ -1162,7 +1162,11 @@ function check_data_form($agenda) {
     $err_msg =  $l_err_end_repeat;
     return false;
   }  
-    
+  if(trim($repeat_end) != "" && ($dateend+10000) < $repeat_end) {
+    $err_msg =  $l_err_end_repeat2;
+    return false;
+  }  
+  
   return true; 
 }
 

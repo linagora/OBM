@@ -35,7 +35,7 @@ $l_periodicity = "Frequency";
 $l_repeatkind = "Frequency type";
 $l_repeatdays = "Repetition days (weekly type)";
 $l_use_endrepeat = "End repetition date";
-
+$l_too_much_user = "No more than six users";
 $l_waiting_events = "Waiting events";
 $l_user_calendar = "Multi-user view";
 
@@ -128,6 +128,7 @@ $l_err_dateend = "[ $l_dateend ] format incorrect !";
 $l_err_repeat = "[ $l_use_endrepeat ] format incorrect !";
 $l_err_begin_end = "End date must be after begin date !";
 $l_err_end_repeat = "Repetion end must be after end date";
+$l_err_end_repeat2 = "The max duration of a repetition is one year";
 
 $l_short_december="Dec";
 

@@ -365,7 +365,6 @@ function get_param_agenda() {
   if (isset($tf_repeat_end)){
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_repeat_end , $day_array1);
     $agenda["repeat_end"] =  $day_array1[1].$day_array1[2].$day_array1[3];
-    echo $tf_repeat_end;
    }
   if (isset($cb_repeat_update)) $agenda["repeat_update"] = 1;
   if (isset($tf_date_begin)) {
