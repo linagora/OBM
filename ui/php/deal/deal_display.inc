@@ -312,14 +312,14 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact, $col_link;
+  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact, $col_link,$ico_contact_list;
   // - Labels
   global $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo;
   global $l_invoices_connected,$l_no_invoices_connected;
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
-  global $perms_user,$l_perms_user, $perms_admin;
+  global $perms_user,$l_perms_user, $perms_admin,$l_contract_list;
   global $auth, $sess, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
@@ -352,7 +352,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $nb_invoices = $q_invoices->num_rows ();
   echo "<CENTER>
     <TABLE border=0 width=100%><TR><TD valign=top width=130>";
-
+//////////////////
+//LIENS EXTERNES//
+//////////////////
   // Parent deal info (if exists) : link and bind
   if ($pid > 0) {
     $plabel = get_parent_label($pid);
@@ -362,7 +364,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     echo "<a href=\"".$sess->url("deal_index.php?action=affect&amp;param_deal=$id")
            . "\">$l_affect_deal</a><br><br>";
   }
-
+  echo "
+  <A HREF=\"".$sess->url("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
+  <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
+  <A HREF=\"".$sess->url("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
+  $l_contract_list</A><BR><BR>";
   // to create an invoice connected to this deal
   if ($auth->auth["perm"] == $perms_admin) {
     echo "<a href=\"".$sess->url("../treso/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br><br>";
@@ -376,6 +382,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
       $nb_arch_invoices." ".$l_archived_invoices_connected.
       "</font>";
   }else { /* echo "et merde..."; */ }
+//////////////////////
+//FIN LIENS EXTERNES//
+//////////////////////
 
   echo "</TD><TD>
     <TABLE border=0><TR><TD>
@@ -573,13 +582,13 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
+function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$contr_q,$deal) {
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
   global $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_private,$l_todo;
-  global $action, $sess, $auth,$c_all,$l_all;
+  global $action, $sess, $auth,$c_all,$l_all,$l_add_contrat;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -740,6 +749,10 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $sel_state .= ">$slabel</OPTION>\n";
   }
   $sel_state .= "</SELECT>";
+  
+  if($contr_q == 0) 
+    $ch_add_contr = "<INPUT type=checkbox name=ch_contrat>$l_add_contrat";
+
 
   echo "<CENTER>
     <FORM METHOD=POST NAME=form_deal_update 
@@ -879,9 +892,10 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       <TD><FONT COLOR=\"#$col_label\">$l_todo</FONT><BR>
       <INPUT type=text name=tf_todo size=60 maxlength=128 value=\"$todo\">
       </TD>
+      <TD><FONT COLOR=\"#$col_label\" ><br>$ch_add_contr</FONT></TD>
     </TR>
     <TR>
-      <TD><FONT COLOR=\"#$col_label\">$l_comment</FONT><BR>
+      <TD colspan = 2><FONT COLOR=\"#$col_label\">$l_comment</FONT><BR>
         <TEXTAREA NAME=ta_com ROWS=6 COLS=72>$comment</TEXTAREA>
       </TD>
       <TD align=center>";
@@ -1764,5 +1778,45 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   echo "<br>";      
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Deal Select Form                                               //
+// Parameters:
+//   - $deal_q : deal database result
+//   - $title  : Title to be displayed
+//   - $url    : URL to call with parameter deal
+///////////////////////////////////////////////////////////////////////////////
+function html_select_deal($deal_q, $title, $url="") {
+  global $l_select_deal;
+  global $sess;
+
+  if ($url != "") {
+    $jsfunc = "check_get_id_url(this, '$url')";
+  } else {
+    $jsfunc = "check_get_id(this)";
+  }
+
+  echo "<CENTER>
+    <FORM METHOD=GET NAME=form_contr
+          onSubmit=\"if ($jsfunc) return true; else return false;\"
+          ACTION=\"\">";
+
+  echo "$title
+    <P><font size=2 face=Courier>
+    <SELECT name=\"param_deal\" size=10>";
+
+  while($deal_q->next_record()) {
+    $id = $deal_q->f("deal_id");
+    $name = $deal_q->f("deal_label");
+    echo "\n<OPTION value=\"$id\">$name ";
+  }
+
+  echo "</SELECT></font>
+    <P>
+    <INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
+    <INPUT TYPE=submit value=\"$l_select_deal\">
+    </FORM>
+    </CENTER>";
+}
+ 
 
 </SCRIPT>

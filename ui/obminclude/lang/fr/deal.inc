@@ -74,7 +74,8 @@ $l_invoice_HT = "Montant HT";
 $l_invoice_TTC = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
-
+$l_add_contrat = "Ajouter un contrat lié à cette affaire";
+$l_contract_list = "Liste des contrats lié à cette affaire";
 //----------------------------------------------------------//
 // Fields that appear in result lists (used by OBM_DISPLAY) //
 //----------------------------------------------------------//
@@ -112,6 +113,7 @@ $l_deal = "Affaire";
 $l_parentdeal_deals = "Affaires appartenant a la SurAffaire";
 
 // Actions
+$l_select_deal = "Sélectionner l'Affaire";
 $l_insert = "Enregistrer l'Affaire";
 $l_update = "Modifier l'Affaire";
 $l_delete = "Supprimer l'Affaire";

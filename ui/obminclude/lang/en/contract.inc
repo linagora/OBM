@@ -29,6 +29,9 @@ $fieldnames["contract_number"] = $l_contract_num;
 $fieldnames["contract_dateexp"] = $l_contract_exp;
 $fieldnames["contracttype_label"] = $l_contract_contracttype;
 
+
+$l_contract_select_deal = "Select the Deal.";
+$l_deal_label = "Deal";
 $l_minus="-";
 $l_plus="+";
 $l_order="Ordrer";
@@ -90,7 +93,7 @@ $l_category_update = "Update Category";
 $l_category_insert = "Create Category";
 
 // Messages
-
+$l_add_contract_deal = "Please fill the fields the of the contract which is linked to the Deal";
 $l_error_permission = "You doesn't have the rights to access this page";
 $l_error_visibility = "You doesn't have the rights to access this informations";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the contract";

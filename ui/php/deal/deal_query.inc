@@ -326,8 +326,59 @@ function run_query_update($deal) {
 
   return $retour;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Deal ID : Get the id of the deal inserted.                                //
+// Parameters:
+//   - $deal[] : deal hash info : keys used : all
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_id($deal) {
+  global $cdg_sql;
 
+  $num = $deal["num"];
+  $label = $deal["label"];
+  $vis = (($deal["vis"] == 1) ? 1 : 0);
+  $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
+  $kind = $deal["kind"]; 
+  $cat = $deal["cat"];
+  $comp = $deal["company"];
+  $market = ($deal["market"] ? $deal["market"] : "null");
+  $tech = ($deal["tech"] ? $deal["tech"] : "null");
+  $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
+  $amount = $deal["amount"];
+  $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
+  $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
+  $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
+  $status = $deal["state"];
+  $archive = $deal["archive"];
+  $todo = $deal["todo"];
+  $comment = $deal["com"];
 
+  $query = "select deal_id from Deal Where 
+    deal_number='$num' and
+    deal_label='$label' and
+    deal_datebegin='$datebegin' and
+    deal_type_id='$kind' and
+    deal_tasktype_id='$cat' and
+    deal_company_id='$comp' and
+    deal_contact1_id='$con1' and
+    deal_contact2_id='$con2' and
+    deal_marketingmanager_id='$market' and
+    deal_technicalmanager_id='$tech' and
+    deal_dateproposal='$dateprop' and
+    deal_amount='$amount' and
+    deal_status_id='$status' and
+    deal_datealarm='$datealarm' and
+    deal_comment='$comment' and
+    deal_archive='$archive' and
+    deal_visibility='$vis' and
+    deal_todo='$todo'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return  $obm_q->f("deal_id");
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Delete query construction                                                 //
 // Parameters:
@@ -1391,5 +1442,38 @@ function run_query_nb_archived_invoices ($p_deal_id) {
 
   return $go->nf();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Selection of the Deal according to Company id           //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal($comp_id = "0") {
+  global $cdg_sql;
+  if ($comp_id == "0")
+   $query = "select * from Deal ";
+  else
+   $query = "select * from Deal Where deal_company_id = $comp_id";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Search for contact linked to this Deal                  //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_linked_contract($deal_id) {
+  global $cdg_sql;
+  if($deal_id) {
+    $query = "select count(*) as Num from Contract Where contract_deal_id = $deal_id";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("Num");
+  }
+  else
+    return 0;
+}
+
 
 </SCRIPT>

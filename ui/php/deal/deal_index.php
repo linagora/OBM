@@ -77,6 +77,28 @@ $deal = get_param_deal();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_deal);     // Head & Body
+
+if ($popup) {
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+  if ($action == "ext_get_id") {
+    require("deal_js.inc");
+    $deal_q = run_query_deal($comp_id);
+    html_select_deal($deal_q, stripslashes($title));
+  } elseif ($action == "ext_get_id_url") {
+    require("contract_js.inc");
+    $deak_q = run_query_deal($comp_id);
+    html_select_deal($deal_q, stripslashes($title), $url);
+  } else {
+    display_error_permission();
+  }
+
+  display_end();
+  exit();
+}
+
+
 generate_menu($menu);      // Menu
 display_bookmarks();
 
@@ -112,7 +134,7 @@ if (($action == "index") || ($action == "")) {
   if ($auth->auth["perm"] != $perms_user) {
     require("deal_js.inc");
     $usr_q = run_query_userobm();
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
   }
   else {
     display_error_permission();
@@ -146,7 +168,7 @@ if (($action == "index") || ($action == "")) {
     display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
     $param_company = $deal_q->f("deal_company_id");
     $usr_q = run_query_userobm();
-    html_deal_form($action, $deal_q, run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    html_deal_form($action, $deal_q, run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
   }
 
 } elseif ($action == "insert")  {
@@ -155,6 +177,14 @@ if (($action == "index") || ($action == "")) {
     $retour = run_query_insert($deal);
     if ($retour) {
       display_ok_msg($l_insert_ok);
+      if($deal["add_contract"]) {
+        $param_deal = run_query_deal_id($deal);
+	echo "
+        <SCRIPT LANGUAGE=\"javascript\">
+         window.location.href = '../contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_insert_ok)."'
+        </SCRIPT>
+        ";
+      }
     } else {
       display_err_msg("$l_insert_error : $err_msg");
     }
@@ -163,7 +193,7 @@ if (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     display_warn_msg($err_msg);
     $usr_q = run_query_userobm();
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal),run_query_linked_contract($param_deal), $deal);
   }
 
 } elseif ($action == "update")  {
@@ -172,6 +202,14 @@ if (($action == "index") || ($action == "")) {
     $retour = run_query_update($deal);
     if ($retour) {
       display_ok_msg($l_update_ok);
+      if($deal["add_contract"]) {
+        $param_deal = run_query_deal_id($deal);
+	echo "
+        <SCRIPT LANGUAGE=\"javascript\">
+         window.location.href = '../contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_update_ok)."'
+        </SCRIPT>
+        ";
+      }
     } else {
       display_err_msg($l_update_error);
     }
@@ -186,7 +224,7 @@ if (($action == "index") || ($action == "")) {
     display_err_msg($err_msg);
     $param_company = $deal["company"];
     $usr_q = run_query_userobm();
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff=="archives") {
@@ -508,7 +546,7 @@ function get_param_deal() {
   global $tf_plabel, $sel_pmanager, $cb_parchive;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $tf_company_name, $sel_manager, $tf_dateafter, $tf_datebefore;
-  global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
+  global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent, $ch_contrat;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat;
 
@@ -536,7 +574,7 @@ function get_param_deal() {
 
   if (isset ($hd_usercreate)) $deal["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $deal["timeupdate"] = $hd_timeupdate;
-
+  if (isset ($ch_contrat)) $deal["add_contract"] = $ch_contrat;
   // Parent Deal fields
   if (isset ($tf_plabel)) $deal["plabel"] = $tf_plabel;
   if (isset ($sel_pmarket)) $deal["pmarket"] = $sel_pmarket;

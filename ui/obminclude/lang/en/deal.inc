@@ -65,6 +65,8 @@ $l_category_new = "New Category";
 $l_category_label="Label";
 $l_category_minilabel="Mini Label";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
+$l_add_contrat = "Add a contract link whith this deal.";
+$l_contract_list = "Contracts belonging to this Deal";
 
 //----------------------------------------------------------//
 // Fields that appear in result lists (used by OBM_DISPLAY) //
@@ -93,6 +95,7 @@ $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
 $l_deal = "Deal";
 
 // Actions
+$l_select_deal = "Select Deal";
 $l_insert = "Insert the Deal";
 $l_update = "Update the  Deal";
 $l_delete = "Delete the Deal";

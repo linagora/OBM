@@ -27,6 +27,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $p_num = $contract["number"];
   $p_tech = $contract["tech"];
   $p_com = $contract["market"];
+  $p_deal = $contract["deal_id"];
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
   
@@ -68,7 +69,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 
   if (($p_com != $c_all) && ($p_com != ""))
     $query .= " and (contract_marketmanager_id = '$p_com')";
-  
+
+  if ($p_deal != "")
+    $query .= " and (contract_deal_id = '$p_deal')";
+
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql);
@@ -139,7 +143,7 @@ function run_query_insert($contract) {
   $sel_con2 =  $contract["contact2"];
   $sel_tech  = $contract["tech"];
   $sel_market = $contract["market"];
-
+  $deal_id = $contract["deal_id"];
   $connect_db=new DB_OBM;
 
   $query = "insert into Contract
@@ -148,6 +152,7 @@ function run_query_insert($contract) {
       contract_userupdate,
       contract_usercreate,
       contract_label,
+      contract_deal_id, 
       contract_company_id,
       contract_number,
       contract_datebegin,
@@ -165,6 +170,7 @@ function run_query_insert($contract) {
       '".$auth->auth["uid"]."',
       '".$auth->auth["uid"]."',
       '$p_label',
+      '$deal_id',
       '$comp_id',
       '$p_num',
       '$p_datebegin',
@@ -202,6 +208,7 @@ function run_query_update($contract) {
   $sel_market = $contract["market"];
   $p_comment = $contract["comment"];
   $p_clause = $contract["clause"];
+  $deal_id = $contract["deal_id"];
  
   $connect_db=new DB_OBM;
   
@@ -215,20 +222,21 @@ function run_query_update($contract) {
     $sel_tech = "null";
 
   $query = "update Contract set
-      contract_timeupdate='". date("Y-m-d H:i:s")."',
-      contract_userupdate='".$auth->auth["uid"]."',
-      contract_number='$p_num',
-      contract_label='$p_label',
-      contract_datebegin='$p_datebegin',
-      contract_dateexp='$p_dateexp',
-      contract_type_id='$p_type',
-      contract_company_id='$p_company_id',
-      contract_contact1_id='$sel_con1',
-      contract_contact2_id='$sel_con2',
-      contract_marketmanager_id='$sel_market',
-      contract_techmanager_id='$sel_tech',
-      contract_comment='$p_comment',
-      contract_clause='$p_clause'
+      contract_timeupdate = '". date("Y-m-d H:i:s")."',
+      contract_userupdate = '".$auth->auth["uid"]."',
+      contract_number = '$p_num',
+      contract_label = '$p_label',
+      contract_deal_id = '$deal_id',
+      contract_datebegin = '$p_datebegin',
+      contract_dateexp = '$p_dateexp',
+      contract_type_id = '$p_type',
+      contract_company_id = '$p_company_id',
+      contract_contact1_id = '$sel_con1',
+      contract_contact2_id = '$sel_con2',
+      contract_marketmanager_id = '$sel_market',
+      contract_techmanager_id = '$sel_tech',
+      contract_comment = '$p_comment',
+      contract_clause = '$p_clause'
     where contract_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -410,6 +418,22 @@ function check_data_form() {
   }
 
   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Select the deal linked to the contract                                    //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal($deal_id) {
+  global $sel_type; 
+  global $cdg_sql;
+  $obm_q= new DB_OBM;
+  if($deal_id != 0) { 
+    $query = "select * from Deal where deal_id = $deal_id";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+    $obm_q->next_record();
+  }
+  return $obm_q;
 }
 
 

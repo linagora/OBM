@@ -113,7 +113,8 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
     require("contract_js.inc");
-    html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+    display_ok_msg(stripslashes($ok_message)."<br>".$l_add_contract_deal);
+    html_contract_form($action,new DB_OBM,"",run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
   } else {
     display_error_permission();
   }
@@ -140,7 +141,7 @@ if ($action == "index") {
   if ($param_contract > 0) {
     $contract_q = run_query_detail($param_contract);
     display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
-    html_contract_consult($contract_q,run_query_contracttype(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")),$contract_q->f("contract_company_id"));
+    html_contract_consult($contract_q,run_query_contracttype(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")),$contract_q->f("contract_company_id"),run_query_deal($contract_q->f("contract_deal_id")));
   }
 
 } elseif ($action == "detailupdate")  {
@@ -150,11 +151,12 @@ if ($action == "index") {
     require("contract_js.inc");
     display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
 
-    html_contract_form($action,$contract_q,run_query_contracttype(),run_query_userobm(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")), $contract);
+    html_contract_form($action,$contract_q,run_query_deal($contract_q->f("contract_deal_id")),run_query_contracttype(),run_query_userobm(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")), $contract);
   }
 
 } elseif ($action == "insert")  {
 //OK///////////////////////////////////////////////////////////////////////////
+
  if (check_data_form("", $contract)) {
    run_query_insert($contract);
     display_ok_msg($l_insert_ok);
@@ -164,7 +166,6 @@ if ($action == "index") {
   require("contract_js.inc");
   $usr_q = run_query_userobm();
   html_contract_search_form($contract, $usr_q, run_query_contracttype());
- 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $contract)) {  
@@ -252,7 +253,7 @@ function get_param_contract() {
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
   global $param_contract,$tf_num,$sel_market, $sel_tech, $hd_soc;
   global $ta_clause,$ta_com,$sel_con1, $sel_con2,$tf_datebegin,$tf_dateexp;
-  global $hd_usercreate,$hd_timeupdate;
+  global $hd_usercreate,$hd_timeupdate, $param_deal, $deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $cdg_param, $action;
 
@@ -291,6 +292,8 @@ function get_param_contract() {
   if (isset ($hd_company_zip)) $contract["company_zip"] = $hd_company_zip;
   if (isset ($hd_company_town)) $contract["company_town"] = $hd_company_town;
 
+  if (isset ($param_deal)) $contract["deal_id"] = $param_deal;
+  if (isset ($deal_new_id)) $contract["deal_new_id"] = $deal_new_id;
   if (debug_level_isset($cdg_param)) {
     echo "<br>action=$action";
     if ( $contract ) {

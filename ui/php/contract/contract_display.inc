@@ -162,16 +162,20 @@ echo "</FORM>" .
 //   - contract[]  : default or transmitted values
 //     keys used   : all
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_q, $contract){
+function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$contact_q, $contract){
   // - Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
+  global $set_theme,$ico_mail,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
   global $l_update,$l_delete,$l_insert;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_project_manager,$l_origin,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_clause,$l_dateexp,$l_client_manager;
+  global $l_label,$l_date_init,$l_kind,$l_category,$l_project_manager,$l_origin,$l_marketing_manager;
+  global $l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update;
+  global $l_archive,$popup_height,$popup_width,$l_comment,$l_at,$l_number,$l_clause,$l_dateexp;
+  global $l_contract_select_deal,$l_client_manager,$l_deal_label;
   global $sess,$auth;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
+
     $id = $contract_q->f("contract_id");
     $label = $contract_q->f("contract_label");
     $comp_id = $contract_q->f("contract_company_id");
@@ -181,7 +185,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $type_id = $contract_q->f("contract_type_id");
     $con1_id = $contract_q->f("contract_contact1_id");
     $con2_id = $contract_q->f("contract_contact2_id");
-    $market = $contract_q->f("contract_marketmanager_id");
+    $market_i = $contract_q->f("contract_marketmanager_id");
     $tech = $contract_q->f("contract_techmanager_id");
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
@@ -195,9 +199,16 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $timeupdate = $contract_q->f("timeupdate");
     $dateu = timestamp_to_date($timeupdate);
     $timeu = timestamp_to_time($timeupdate);
-
+    if(is_object($deal_q)) {
+      $param_deal = $deal_q->f("deal_id");
+      $c_name = $deal_q->f("deal_label");
+      $c_id = $param_deal;
+    }
   } else {
     // Values are taken from parameters
+    $param_deal = $contract["deal_id"];
+    $c_name = $contract["label"];
+    $c_id = $contract["deal_id"];
     $id = $contract["id"];
     $label = $contract["label"];
     $comp_id = $contract["company_id"];
@@ -205,13 +216,12 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $datebegin = $contract["datebegin"];
     $dateexp = $contract["dateexp"];
     $type_id = $contract["type_id"];
-    $con1_id = $contract["contact1_id"];
-    $con2_id = $contract["contact2_id"];
-    $market = $contract["market"];
+    $con1_id = $contract["contact1"];
+    $con2_id = $contract["contact2"];
+    $market_i = $contract["market"];
     $tech = $contract["tech"];
     $clause = $contract["clause"];
     $comment = $contract["comment"];
-
     if ($action == "new") {
       $comp_name = $comp_q->f("company_name");
       $ad1 = $comp_q->f("company_address1");
@@ -242,7 +252,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
   $dis_sel_respc="<select name=\"sel_market\">";
   while($usr_q->next_record()) {
     $dis_sel_respc.="\n<option value=".$usr_q->f("userobm_id");
-    if ($usr_q->f("userobm_id") == $market) 
+    if ($usr_q->f("userobm_id") == $market_i) 
       $dis_sel_respc.=" selected ";
     $dis_sel_respc.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
@@ -371,18 +381,6 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
         </td>
       </tr>
       </table>
-
-      <table border=0>
-      <tr>
-        <td><font COLOR=\"#$col_label\">$l_marketing_manager</font>
-          <br>$dis_sel_respc
-        </td>
-        <td><font COLOR=\"#$col_label\">$l_technical_manager</font>
-          <br>$dis_sel_respt
-        </td>
-        <td> &nbsp; </td> 
-      </tr>
-      </table>
     </td>
 <!-- Company, Contact -->
     <td valign=top>
@@ -401,9 +399,34 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
       </tr>
       </table>
       <p>
+  
       $dis_last_update
     </td>
   </tr>
+  <tr>
+    <td colspan=\"2\">
+     <table border=0>
+      <tr>
+        <td><font COLOR=\"#$col_label\">$l_marketing_manager</font>
+          <br>$dis_sel_respc
+        </td>
+        <td><font COLOR=\"#$col_label\">$l_technical_manager</font>
+          <br>$dis_sel_respt
+        </td>
+        <td><font COLOR=\"#$col_label\">$l_deal_label</font>
+          
+         <A HREF=\"".
+         $sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$c_id") . "\">$c_name";
+         echo "</A><INPUT TYPE=hidden NAME=param_deal value=\"$param_deal\">
+         <INPUT TYPE=hidden NAME=deal_new_id value=\"$c_new_id\"><br>
+         <a href=\"\" onclick=\"window.open('../deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contract_select_deal)."&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+         <img src=\"/images/$set_theme/$ico_mail\"></a>
+         <INPUT TYPE=text NAME=deal_name value=\"$c_new_name\" size = 40 style=\"border:none\" READONLY onfocus=\"this.blur();\">
+        </td>
+      </tr>
+     </table>
+    </td>
+   </tr>
   </table>
 
   <table border=2>
@@ -442,7 +465,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
 //   - $contact_q  : list of contact from the company 
 //      $p_company_id  : id of the company concerned by the contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_company_id) {
+function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_company_id,$deal_q) {
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact,$ico_contact_list,$ico_contact_new;
   // - Labels
@@ -488,7 +511,11 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
 
   echo "<center>
   <table border=0>
-  <tr>
+  <tr>";
+//////////////////
+//Liens Externes//
+//////////////////
+echo "
     <td valign=top> 
       <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\"><img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
       <font SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_list</A></font>";
@@ -499,8 +526,17 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
         SRC=\"/images/$set_theme/$ico_contact_new\"></A>
       <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_new</A></FONT>";
   }
+  echo "<BR>
+      <A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
+      ".$deal_q->f("deal_label")."</A>
+      </TD>";
+//////////////////////
+//Fin Liens Externes//
+//////////////////////
 echo "
-</TD><TD>
+<TD>
+
+
 <TABLE border=0><TR><TD>";
 
 echo "

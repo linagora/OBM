@@ -23,7 +23,7 @@ $l_incident_new = "Ajouter un incident";
 $fieldnames["contract_label"] = $l_contract_label;
 $fieldnames["contract_company_name"] = $l_contract_company;
 $fieldnames["contract_number"] = $l_contract_num;
-$fieldnames["contract_dateexp"] = $l_contract_expiration;
+$fieldnames["contract_dateexp"] = $l_contract_exp ;
 $fieldnames["contracttype_label"] = $l_contract_contracttype;
 
 $l_minus="-";
@@ -31,6 +31,8 @@ $l_plus="+";
 $l_order="Ordre";
 $l_todo = "A faire";
 
+$l_contract_select_deal = "Séléction de l'Affaire liée à un contrat.";
+$l_deal_label = "Affaire";
 $l_label = "Label";
 $l_label_libelle = "Mot-clef du libellé";
 $l_label_start = "Numéro";
@@ -61,7 +63,7 @@ $l_type_exist = "Types existants";
 $l_type_new = "Nouveau Type";
 $l_category_label="Label";
 $l_category_minilabel="Mini Label";
-
+$l_add_contract_deal = "Veuillez à présent remplire les champs du contrat lié à l'affaire";
 // Titres
 $l_deal = "Contrat de Support";
 $l_deal_detail = "Detail Contrat";

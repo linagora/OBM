@@ -89,6 +89,37 @@ function check_form(f_aff) {
 ";
 
 
+echo "
+function check_get_id(form) {
+  valeur = form.param_deal.options[form.param_deal.selectedIndex].value;
+  text = form.param_deal.options[form.param_deal.selectedIndex].text;
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_deal\");
+    return false;
+  } else {
+    window.opener.document.form_contract_update.param_deal.value=valeur;
+    window.opener.document.form_contract_update.deal_name.value=text;
+    window.close();
+    return true;
+  }
+}
+
+
+function check_get_id_url(form, p_url) {
+  valeur = form.param_deal.options[form.param_deal.selectedIndex].value;
+  text = form.param_deal.options[form.param_deal.selectedIndex].text;
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_deal\");
+    return false;
+  } else {
+    new_url = p_url + valeur;
+    window.opener.location.href=new_url;
+    window.close();
+    return true;
+  }
+}
+";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the obligatory fields are set while creating a new ParentDeal    //
