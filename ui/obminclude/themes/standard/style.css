@@ -193,7 +193,8 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 }
 
 .detailLabel {
-	text-align: center;
+	font-size: 12px;
+  	text-align: center;
 	font-style: italic;
 	color: #7B9EAD;
 	width: 40%;
@@ -813,7 +814,7 @@ div.agendaBar {
 }
 
 div.agendaHidden {
-	position:		absolute;
+	position:		fixed;
 	z-index: 		20;
 	visibility: 		hidden;
 	top: 			0px;

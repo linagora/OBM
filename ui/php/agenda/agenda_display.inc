@@ -299,9 +299,6 @@ function dis_month_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	       	     
 	     $hidden_div .= "
 	      <div id=\"$daylink-$event_id\" class=\"agendaHidden\">
-	       <table border=\"0\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
-		<tr>
-                  <td bgcolor=\"transparent\">
 		  <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 		  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 		  <tr><td class=\"agendaEventHead\">
@@ -310,9 +307,6 @@ function dis_month_planning($agenda,$obm_q,$calendar_user,$usr_q) {
                   </tr>
 		  <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 		  </table>
-		</td>
-                </tr>
-	        </table>
 	      </div>";	
 	     if ($nb_user == 1) {
       	       $dis_month_cal .= $event_data[$event_id]["begin"]."-";
@@ -510,8 +504,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		     
 		    $hidden_div .= "
 		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-		      <table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-		       <tr><td bgcolor=\"transparent\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -519,8 +511,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		     	  </td></tr>
 			  <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 			 </table>
-		       </td></tr>
-		      </table>
 		     </div>";		     
 		    if($nb_user == 1) {	      
      		      $event_head_display .= "&#8226; $titleEvent";
@@ -554,8 +544,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
 		    $hidden_div .= "
 		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-		      <table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-		       <tr><td bgcolor=\"transparent\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -563,8 +551,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		     	  </td></tr>
 			  <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 			 </table>
-		       </td></tr>
-		      </table>
 		     </div>";
                     if ($nb_user == 1) {	      
      		      $event_head_display .= "&#8226; $titleEvent";
@@ -652,8 +638,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		       
 		      $hidden_div .= "
 		      <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-			<table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-			 <tr><td bgcolor=\"transparent\">
 			   <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			    <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			    <tr><td class=\"agendaEventHead\">
@@ -661,8 +645,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 			    </td></tr>
 			    <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 			   </table>
-			 </td></tr>
-			</table>
 		       </div>";		     
 		      if ($nb_user == 1) {	      
 			$event_head_display .= "&#8226; $titleEvent";
@@ -695,8 +677,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		       
 		      $hidden_div .= "
 		      <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-			<table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-			 <tr><td bgcolor=\"transparent\">
 			   <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			    <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			    <tr><td class=\"agendaEventHead\">
@@ -704,8 +684,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 			    </td></tr>
 			    <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 			   </table>
-			 </td></tr>
-			</table>
 		       </div>";		     
 		      if($nb_user == 1) {	      
 			$event_head_display .= "&#8226; $titleEvent";
@@ -745,7 +723,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
       $hour_day_list .=   "</tr>";
     }
   }
-// echo "<textarea cols=120 rows=120>$hidden_div</textarea>"; 
 $block = "
   <div class=\"agendaMain\">
    <table cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCalWeek\">
@@ -883,8 +860,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		   
 		  $hidden_div .= "
 		  <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-		    <table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-		     <tr><td bgcolor=\"transparent\">
 		       <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			<tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			<tr><td class=\"agendaEventHead\">
@@ -892,8 +867,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 			</td></tr>
 			<tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 		       </table>
-		     </td></tr>
-		    </table>
 		   </div>";	
 		  $event_head_display .= "&#8226;";
 		  if ($nb_user == 1) {
@@ -926,8 +899,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		   
 		  $hidden_div .= "
 		  <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-		    <table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-		     <tr><td bgcolor=\"transparent\">
 		       <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			<tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			<tr><td class=\"agendaEventHead\">
@@ -935,8 +906,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 			</td></tr>
 			<tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 		       </table>
-		     </td></tr>
-		    </table>
 		   </div>";	
 		  $event_head_display .= "&#8226;";
 		  if($nb_user == 1) {
@@ -1015,8 +984,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		     
 		    $hidden_div .= "
 		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-		      <table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-		       <tr><td bgcolor=\"transparent\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -1024,8 +991,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 			  </td></tr>
 			  <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 			 </table>
-		       </td></tr>
-		      </table>
 		     </div>";		     
 		    $event_head_display .= "&#8226;";
 		    if($nb_user == 1) {
@@ -1058,8 +1023,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		     
 		    $hidden_div .= "
 		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
-		      <table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\">
-		       <tr><td bgcolor=\"transparent\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -1067,8 +1030,6 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 			  </td></tr>
 			  <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 			 </table>
-		       </td></tr>
-		      </table>
 		     </div>";		     
 		    $event_head_display .= "&#8226;";
 		    if ($nb_user == 1) {
@@ -1369,7 +1330,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
       $dis_leg_user .="
       <tr>
        <td class=\"".$user_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-       <td class=\"detailText\">&nbsp;&nbsp;".$user_data["name"]."</td>
+       <td class=\"detailLabel\">&nbsp;&nbsp;".$user_data["name"]."</td>
       </tr>";
     }
   }

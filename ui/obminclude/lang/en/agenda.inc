@@ -31,7 +31,7 @@ $l_timeend = "End time";
 $l_occupied_day = "Whole day";
 
 $l_format = "(AAAA-MM-JJ)";
-$l_repeat = "REPETITION";
+$l_repeat = "Repeatition";
 $l_periodicity = "Frequency";
 $l_repeatkind = "Frequency type";
 $l_repeatdays = "Repetition days (weekly type)";

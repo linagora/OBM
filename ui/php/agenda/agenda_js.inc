@@ -118,18 +118,13 @@ function show ( evt, name ) {
     layerHeight = ele.offsetHeight;
   }
 
-  if ( ( currentX + layerWidth ) > docWidth ) {
+  if ( ( currentX) > docWidth ) {
     x = ( currentX - layerWidth );
   }
   else {
     x = currentX;
   }
-  if ( ( currentY + layerHeight ) >= docHeight ) {
-     y = ( currentY - layerHeight - 20 );
-  }
-  else {
-    y = currentY + 20;
-  }
+  y = currentY + 20;
   if ( IE4 ) {
     x += document.body.scrollLeft;
     y += document.body.scrollTop;
@@ -147,7 +142,6 @@ function show ( evt, name ) {
     ele.style.top = y+'px';
     ele.style.visibility = \"visible\";
   }
-
 }
 
 function hide ( name ) {
