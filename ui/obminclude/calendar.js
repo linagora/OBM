@@ -1,4 +1,4 @@
-<?
+<?php
 $extra_js .= "<script type=\"text/javascript\">
 <!--
 var calendarWindow = null;
@@ -53,4 +53,4 @@ function killCalendar()
 -->
 </script>
 ";
-?>
+php?>
