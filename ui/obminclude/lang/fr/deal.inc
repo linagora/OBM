@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 // Database fields
 $l_number = "Numéro";
 $l_label = "Label";
@@ -37,7 +36,6 @@ $l_amount_in = "Montant des entrées";
 $l_amount_out = "Montant des sorties";
 $l_potential = "Potentiel pondéré";
 $l_label_start = "Nom Affaire";
-$l_manager = "Responsable";
 $l_proposition = "Proposition";
 $l_show_archive = "Voir les archives";
 $l_date_alarm_after = "Date Alarme Après";
@@ -64,8 +62,8 @@ $l_cat_exist = "Catégories existantes";
 $l_cat_new = "Nouvelle catégorie";
 $l_invoice_number = "Numéro";
 $l_invoice_label = "Label";
-$l_invoice_HT = "Montant HT";
-$l_invoice_TTC = "Montant TTC";
+$l_invoice_ht = "Montant HT";
+$l_invoice_ttc = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
 $l_parentdeal_deals = "Affaires appartenant à la SurAffaire";

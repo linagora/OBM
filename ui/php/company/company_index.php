@@ -40,9 +40,6 @@
 // - ext_get_id         -- $title         -- select a company (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session, Auth, Perms  Management                                          //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
 $menu = "COMPANY";
@@ -421,7 +418,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
   $comp_q = run_query_detail($company["id"]);
-  $cat_q = run_query_get_companycat_name($param_company);
+  $cat_q = run_query_get_companycat_name($company["id"]);
   if ($comp_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($comp_q);
     $display["detail"] = html_company_consult($comp_q, $cat_q);

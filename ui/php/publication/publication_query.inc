@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($publication, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql;  
+  global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $archive = $publication["archive"];
   $title = $publication["title"];
@@ -30,10 +30,35 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
 
-  // If a title has been given we search its sound too
-  $req = "select
-      publication_id as Id,
+  $and = "";
+  if ($title != "") {
+    $where .= " publication_title $like '$title%'";
+    $and = "and";
+  }
+  if (($type != $c_all) && ($type != "")) { 
+    $where .= " $and publication_type_id='$type'";
+    $and = "and";
+  }
+  if ($year != "") {
+    $where .= " $and publication_year $like '$year%'";
+    $and = "and";
+  }
+  if ($lang != "") {
+    $where .= " $and publication_lang $like '%$lang%'";
+    $and = "and";
+  }
+  if ($where != "") {
+    $whereq = "where $where";
+  }
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : " publication_year DESC,publication_title";
+  $orderq = "order by $order $p_order_dir";
+
+  $query = "select
+      publication_id as id,
       publication_id,
       publication_title,
       publication_type_id,
@@ -41,40 +66,20 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
       publication_lang,
       publicationtype_label
     from Publication
-         LEFT JOIN PublicationType on publication_type_id=publicationtype_id";
+         LEFT JOIN PublicationType on publication_type_id=publicationtype_id
+    $whereq
+    $orderq
+    $limit";
 
-  $and = "";
-  if ($title != "") {
-    $where_title = " publication_title $like '$title%'";
-    $and = "and";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from Publication $whereq");
+    $obm_q->set_num_rows_total($count);
   }
-  if (($type != $c_all) && ($type != "")) { 
-    $where .= " $and publication_type_id='$type'";
-    $and = "and";
-  }
-
-  if ($year != "") {
-    $where .= " $and publication_year $like '$year%'";
-    $and = "and";
-  }
-  
-  if ($lang != "") {
-    $where .= " $and publication_lang $like '%$lang%'";
-    $and = "and";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "publication_search()");
+    $obm_q->query($query);
   }
 
-  if (($where != "") || ($where_title != "")) {
-    $whereq = " where $where_title $where";
-  }
-
-  // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : " publication_year DESC,publication_title";
-
-    
-  $query = "$req $whereq order by $order $p_order_dir";
-
-  display_debug_msg("publication_search(1) : $query", $cdg_sql);
-  $obm_q->query($query);
   return $obm_q;
 }
 
@@ -563,7 +568,7 @@ function run_query_type_insert($publication) {
   return $retour;
 }
 ///////////////////////////////////////////////////////////////////////////////
-// Reception mode insertion query construction and execution                           //
+// Reception mode insertion query construction and execution
 // Parameters:
 //   - $publication : publication hash info : keys used : recept_label
 ///////////////////////////////////////////////////////////////////////////////

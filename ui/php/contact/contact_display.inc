@@ -334,7 +334,7 @@ function dis_contact_search_list($contact) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contact");
   $obm_q = run_query_contact_search($contact, $new_order, $order_dir);
-  $nb_contact = $obm_q->num_rows();
+  $nb_contact = $obm_q->num_rows_total();
   if ($nb_contact == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -435,22 +435,17 @@ function dis_contact_consult($contact) {
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
-  if (is_entity_visible("contact", $con_q) ) {
-    $display["detailInfo"] = display_record_info($con_q);
-    if($view != "") {
-      $block .= html_contact_header($con_q);
-      include("$path/$view/".$view."_display.inc");
-      include("$path/$view/".$view."_query.inc");
-      $block .= dis_subscription_external_list($contact);
-    }
-    else {
-      $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
-      $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
-      $block .= html_contact_body($con_q,$cat1_q,$cat2_q);
-    }
+  $display["detailInfo"] = display_record_info($con_q);
+  if ($view != "") {
+    $block .= html_contact_header($con_q);
+    include("$path/$view/".$view."_display.inc");
+    include("$path/$view/".$view."_query.inc");
+    $block .= dis_subscription_external_list($contact);
   } else {
-    $display["msg"] .= display_err_msg($l_error_visibility);
-  }      
+    $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
+    $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
+    $block .= html_contact_body($con_q,$cat1_q,$cat2_q);
+  }
 
   return $block;
 }
@@ -508,7 +503,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
   $com = beautify_comment(nl2br($co_q->f("contact_comment")));
-  $vis = $co_q->f("contact_visibility");
+  $priv = $co_q->f("contact_privacy");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
 
   $display["link"] = html_contact_links($id);
@@ -555,7 +550,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   }
 
   if ($usercreate == $auth->auth["uid"]) {
-    if ($vis == 1) 
+    if ($priv == 1) 
       $l_priv = $l_private;
     else 
       $l_priv = $l_public;  
@@ -859,7 +854,7 @@ function html_contact_links($id) {
 //   - $co_q      : contact database result 
 //   - $contact[] : default values
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
-//                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
+//                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_form($action, $co_q, $contact) {
   global $display, $cg_com;
@@ -894,7 +889,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //   - $ctry_q    : country database result 
 //   - $contact[] : default values
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
-//                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
+//                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add;
@@ -942,7 +937,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
     $email2 = $co_q->f("contact_email2");
     $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
-    $vis = $co_q->f("contact_visibility");
+    $priv = $co_q->f("contact_privacy");
     $comment = $co_q->f("contact_comment");
     $usercomment = $uid;
     $datecomment = isodate_format();
@@ -1014,7 +1009,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   if (isset($company["cat"])) { $compcat = $company["cat"]; }  
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($contact["category2"])) { $cat2 = $contact["category2"]; }  
-  if (isset($contact["vis"])) { $vis = stripslashes($contact["vis"]); }
+  if (isset($contact["priv"])) { $priv = stripslashes($contact["priv"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
   // Conditionnal fields
@@ -1265,8 +1260,8 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action=="detailupdate") || ($action=="update")) &&
          ($usercreate == $auth->auth["uid"]) ) ) {
-    $display_private = "<input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
-    if ($vis == '1') $display_private .= " checked=\"checked\"";
+    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" ";
+    if ($priv == '1') $display_private .= " checked=\"checked\"";
     $display_private .= " />";
   }
 
@@ -1413,7 +1408,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
 //   - $co_q      : contact database result (at least 1 row)
 //   - $contact[] : values for insertion/update (if confirmation)
 //     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town,cdx
-//                : ctry, func, phone, hphone, mphone, fax, email, com, vis
+//                : ctry, func, phone, hphone, mphone, fax, email, com, priv
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
@@ -1442,7 +1437,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $email = stripslashes($contact["email"]);
   $email2 = stripslashes($contact["email2"]);
   $com = stripslashes($contact["com"]);
-  $vis = $contact["vis"];
+  $priv = $contact["priv"];
   $archive = ($contact["archive"] == 1 ? "1" : "0");
 
   $disp_same_cont = "
@@ -1489,7 +1484,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
-    <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
+    <input type=\"hidden\" name=\"cb_priv\" value=\"$priv\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
 
   $block = "

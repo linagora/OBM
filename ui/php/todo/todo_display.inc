@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : todo_display.inc                                             //
 //     - Desc : Todo Display File                                            //
-// 2003-09-15 Bastien Continsouzas                                           //
+// 2003-09-15 Aliacom - Bastien Continsouzas                                 //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,8 +77,6 @@ function dis_todo_list($todo, $todo_q) {
   $user = $todo["sel_user"];
   $priority = $todo["priority"];
   $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
-
-  $todo_q->seek($first_row);
 
   $block .= "
      <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").

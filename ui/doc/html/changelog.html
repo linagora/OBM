@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. ChangeLog</h1>
-version 0.8.4 - 2004-08-02
+version 0.8.5 - 2004-08-13
 <p>
 </center>
 
@@ -21,15 +21,38 @@ To do<br>
 <LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> how to detect doublons ?
 <LI> Pour les listes : supprimer les listes dans export ? trier requete exports ?
-<LI> Requete Document dans admin_data_index ?
 <LI> decouper : get_module_param() avant switch action, update_module_param() apres pour mise a jour url affectees
 <li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
-<li> harmonize all visibility tests (done) consult, access for : update, delete...
 </UL>
 
 
-2004-08-02 : version 0.8.4<br>
+2004-08-13 : version 0.8.5<br>
+
+<ul>
+<li> BUG#373 : Project : corrected sql error on inserting new task on Postgres
+<li> BUG#372 : Contact : corrected insert with categories selected on Postgres
+<li> BUG#366 : Project : project creation behave correctly when bad filled
+<li> BUG#365 : User : archiving an user unsubscribe him from all groups
+<li> BUG#361 : Time : project order now always the same (case sensitive sort)
+<li> BUG#356 : Admin Data : Document Data now works with Postgres too
+<li> BUG#354 : Invoice : Invoice type now correct on update form (+, -)
+<li> BUG#309 : Hour part of an incident can be updated on Postgres too
+<li> BUG#192 : SQL limit can be toggled on/off for Search queries performance
+<li> Export CSV : dates now correctly formated according to user preferences
+<li> List : Dynamic queries performance improvement (counting rows and limit)
+<li> Todo : session storage rewrite and enhanced, removed from UserObmPrefs
+<li> Debug Id flag now Postgres compliant (Id displayed using Postgres too)
+<li> Privacy : Global redesign. Now tested for all actions, not code intrusive
+<li> All : search queries optimization and harmonization (left join use,...)
+<li> Document : minor fixes and enhancements, Last visit entry, privacy
+<li> Document : now PostgreSQL compliant
+<li> Invoice : now PostgreSQL compliant
+<li> Agenda : replaced specfic group functions by call to global ones
+<li> Contract : corrected sort by managers
+</ul>
+
+2004-08-02 : version 0.8.4 (Guêpe Release !)<br>
 
 <ul>
 <li> BUG#364 : Contract search now works. Contract archive field defaults to 0

@@ -54,6 +54,7 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "contract_dateexp") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = date_format($date);
+    $res["txt_name"] = $res["name"];
   }
 
  else if ($fieldname == "contract_archive") {
@@ -76,8 +77,8 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   global $l_number,$l_label_libelle,$l_company,$l_kind,$l_after,$l_before;
-  global $l_find,$l_marketing_manager,$l_technical_manager; 
-  global $c_all, $l_all, $l_archive;
+  global $l_find, $l_manager, $l_archive;
+  global $c_all, $l_all;
 
   $p_label = $contract["label"];
   $comp = $contract["company_name"];
@@ -128,7 +129,7 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
     
     </div>
     <div class=\"searchLabel\">$l_company<br />
-      <input name=\"tf_company_name\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
+      <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
       <input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" />
@@ -142,16 +143,13 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
     <div class=\"searchLabel\">$l_kind<br />
       $dis_cont_typ
     </div>
-    <div class=\"searchLabel\">$l_technical_manager<br />
+    <div class=\"searchLabel\">$l_manager<br />
       $dis_resp_tec
     </div>
-    
 
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
     </div>
-
-
 
     <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -178,7 +176,7 @@ function dis_contract_search_list($contract) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contract");
   $obm_q = run_query_search($contract, $new_order, $order_dir);
-  $nb_contract = $obm_q->num_rows();
+  $nb_contract = $obm_q->num_rows_total();
   if ($nb_contract == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -210,7 +208,7 @@ function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
   $market = $contract["market"];
   $tech = $contract["tech"];
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_soc=$company&amp;sel_market=$market&amp;sel_type=$type&amp;tf_num=$num&amp;sel_tech=$tech&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_company=$company&amp;sel_market=$market&amp;sel_type=$type&amp;tf_num=$num&amp;sel_tech=$tech&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore");
 
   $contract_q->seek($first_row);
 
@@ -579,7 +577,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
 
   $dis_sub = "
     <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-    <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp_name\" />
+    <input type=\"hidden\" name=\"tf_company\" value=\"$comp_name\" />
     <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />

@@ -641,21 +641,21 @@ CREATE TABLE Todo (
 -- Table structure for table 'Document'
 --
 CREATE TABLE Document (
-  document_id          serial,
-  document_timeupdate  TIMESTAMP,
-  document_timecreate  TIMESTAMP,
-  document_userupdate  integer DEFAULT NULL,
-  document_usercreate  integer DEFAULT NULL,
-  document_title       varchar(255) DEFAULT NULL,
-  document_name        varchar(255) DEFAULT NULL,
-  document_kind        integer DEFAULT NULL,
-  document_mimetype    varchar(255) DEFAULT NULL,
-  document_category1   varchar(255) DEFAULT NULL,
-  document_category2   varchar(255) DEFAULT NULL,
-  document_author      varchar(255) DEFAULT NULL,
-  document_private     integer DEFAULT NULL,
-  document_path        text DEFAULT NULL,
-  document_size        integer DEFAULT NULL,
+  document_id            serial,
+  document_timeupdate    TIMESTAMP,
+  document_timecreate    TIMESTAMP,
+  document_userupdate  	 integer DEFAULT NULL,
+  document_usercreate  	 integer DEFAULT NULL,
+  document_title       	 varchar(255) DEFAULT NULL,
+  document_name        	 varchar(255) DEFAULT NULL,
+  document_kind        	 integer DEFAULT NULL,
+  document_mimetype    	 varchar(255) DEFAULT NULL,
+  document_category1_id  integer NOT NULL DEFAULT '0',
+  document_category2_id  integer NOT NULL DEFAULT '0',
+  document_author      	 varchar(255) DEFAULT NULL,
+  document_private     	 integer NOT NULL DEFAULT '0',
+  document_path        	 text DEFAULT NULL,
+  document_size        	 integer DEFAULT NULL,
   PRIMARY KEY (document_id)
 );
 
@@ -892,7 +892,7 @@ CREATE TABLE Incident (
   incident_usercreate   integer DEFAULT NULL,
   incident_contract_id  integer NOT NULL,
   incident_label        varchar(100) DEFAULT NULL,
-  incident_date         date DEFAULT NULL,
+  incident_date         TIMESTAMP,
   incident_priority_id  integer DEFAULT NULL,
   incident_status_id    integer DEFAULT NULL,
   incident_logger       integer DEFAULT NULL,
@@ -950,11 +950,11 @@ CREATE TABLE Invoice (
   invoice_usercreate        integer,
   invoice_number            varchar(10) DEFAULT '0',
   invoice_label             varchar(40) NOT NULL DEFAULT '',
-  invoice_amount_HT         DECIMAL(10,2),
-  invoice_amount_TTC        DECIMAL(10,2),
-  invoice_invoicestatus_id  integer DEFAULT '0' NOT NULL,
+  invoice_amount_ht         DECIMAL(10,2),
+  invoice_amount_ttc        DECIMAL(10,2),
+  invoice_status_id         integer DEFAULT '0' NOT NULL,
   invoice_comment           text,
-  invoice_date              date not NULL DEFAULT '0001-01-01' ,
+  invoice_date              date not NULL DEFAULT '0001-01-01',
   invoice_inout             char(1),
   invoice_archive           char(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (invoice_id)
@@ -1126,8 +1126,8 @@ CREATE TABLE UGroup (
 -- Table structure for table 'UserObmGroup'
 --
 CREATE TABLE UserObmGroup (
-  userobmgroup_groupid    integer DEFAULT '0' NOT NULL,
-  userobmgroup_userobmid  integer DEFAULT '0' NOT NULL
+  userobmgroup_group_id    integer DEFAULT '0' NOT NULL,
+  userobmgroup_userobm_id  integer DEFAULT '0' NOT NULL
 );
 
 
@@ -1135,8 +1135,8 @@ CREATE TABLE UserObmGroup (
 -- Table structure for table 'GroupGroup'
 --
 CREATE TABLE GroupGroup (
-  groupgroup_parentid  integer DEFAULT '0' NOT NULL,
-  groupgroup_childid   integer DEFAULT '0' NOT NULL
+  groupgroup_parent_id  integer DEFAULT '0' NOT NULL,
+  groupgroup_child_id   integer DEFAULT '0' NOT NULL
 );
 
 

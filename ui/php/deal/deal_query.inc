@@ -6,10 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-//-----------------------------------------------------------------
-// 2001-07-19 / Fink / single quotes for SQL
-// 2001-07-20 / Fink / handling of NULL values and quotes on ParentDeal
-//-----------------------------------------------------------------
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deal Search query execution 
@@ -22,7 +18,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
-  global $auth, $c_all, $cdg_sql;
+  global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $parent = $deal["parent"];
   $label = $deal["label"];
@@ -40,14 +36,12 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-
-  $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
+  $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
 
-  if ($all == 0) {
-    $where .= " and (deal_visibility=0
-                      or deal_usercreate='" . $auth->auth["uid"] . "')";
-  }
+  $where .= sql_obm_entity_privacy("deal");
+
   if ($label != "") {
     $where .= " and deal_label $like '%$label%'";
   }
@@ -93,12 +87,14 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $where .= " and deal_parentdeal_id='$parent'";
   }
 
+  $whereq = "where $where";
+
   // Order by clause
   $field = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Deal.deal_datealarm";
-  $order .= " order by $field $p_order_dir";
+  $orderq = " order by $field $p_order_dir";
 
   $query = "select 
-      deal_id as Id,
+      deal_id as id,
       deal_id,
       deal_label,
       deal_datebegin,
@@ -114,7 +110,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
       deal_datealarm,
       deal_archive,
       deal_todo,
-      deal_visibility,
+      deal_privacy,
       dealtype_label,
       company_name as deal_company_name,
       company_zipcode as deal_company_zipcode,
@@ -122,20 +118,27 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
       dealstatus_label,
       userobm_lastname as deal_marketingmanager,
       $datealarm
-    from Deal $join_cat,
-       DealType, TaskType, Company, DealStatus, UserObm
-    where deal_type_id=dealtype_id
-      and tasktype_id=deal_tasktype_id
-      and deal_company_id=company_id
-      and deal_status_id=dealstatus_id
-      and deal_marketingmanager_id=UserObm.userobm_id
-      $where
-      $order";
+    from Deal
+        left join Company on deal_company_id=company_id 
+        left join DealType on deal_type_id=dealtype_id 
+        left join TaskType on deal_tasktype_id=tasktype_id 
+        left join DealStatus on deal_status_id=dealstatus_id 
+        left join UserObm on deal_marketingmanager_id=userobm_id 
+        $join_cat
+    $whereq
+    $orderq
+    $limit";
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from Deal $whereq");
+    $obm_q->set_num_rows_total($count);
+  }
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "deal_search()");
+    $obm_q->query($query);
+  }
+
   return $obm_q;
-
 }
 
 
@@ -212,7 +215,7 @@ function run_query_insert($deal) {
   $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
-  $vis = $deal["vis"];
+  $priv = $deal["priv"];
   $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
@@ -257,7 +260,7 @@ function run_query_insert($deal) {
     deal_datealarm,
     deal_comment,
     deal_archive,
-    deal_visibility,
+    deal_privacy,
     deal_parentdeal_id,
     deal_todo)
   values (null,
@@ -281,7 +284,7 @@ function run_query_insert($deal) {
     $datealarm,
     '$comment',
     '$archive',
-    '$vis',
+    '$priv',
     $pid,
     '$todo')";
 
@@ -331,7 +334,7 @@ function run_query_update($deal) {
   $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
-  $vis = $deal["vis"];
+  $priv = $deal["priv"];
   $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
@@ -376,7 +379,7 @@ function run_query_update($deal) {
     deal_datealarm='$datealarm',
     deal_comment='$comment',
     deal_archive='$archive',
-    deal_visibility='$vis',
+    deal_privacy='$priv',
     deal_todo='$todo'
   where deal_id='$id'";
 
@@ -431,7 +434,7 @@ function run_query_deal_id($deal) {
 
   $num = $deal["num"];
   $label = $deal["label"];
-  $vis = $deal["vis"];
+  $priv = $deal["priv"];
   $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
@@ -466,7 +469,7 @@ function run_query_deal_id($deal) {
     deal_status_id='$status' and
     deal_datealarm $datealarm and
     deal_archive='$archive' and
-    deal_visibility='$vis' and
+    deal_privacy='$priv' and
     deal_todo='$todo'";
 
   display_debug_msg($query, $cdg_sql);
@@ -819,17 +822,17 @@ function run_query_company_info($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the contact
+// Return all the categories attached to the deal
 // Parameters:
-//   - $c_id : contact Id
+//   - $d_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dealcategory_info($c_id) {
+function run_query_get_dealcategory_info($d_id) {
     global $cdg_sql;
 
   $query = "select dealcategory_label, dealcategory_code
     from DealCategoryLink, DealCategory
     where dealcategorylink_category_id = dealcategory_id
-      and dealcategorylink_deal_id = '$c_id'
+      and dealcategorylink_deal_id = '$d_id'
     order by dealcategory_code";     
 
   display_debug_msg($query, $cdg_sql);
@@ -847,7 +850,12 @@ function run_query_get_dealcategory_info($c_id) {
 function run_query_contact_deal($p_id) {
   global $cdg_sql;
 
-  $query = "select contact_id,contact_lastname,contact_firstname,contact_phone from Contact where contact_company_id='$p_id'";
+  $query = "select contact_id,
+      contact_lastname,
+      contact_firstname,
+      contact_phone
+    from Contact
+    where contact_company_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1293,7 +1301,7 @@ function check_parent_has_deal($pid) {
 //   - $p_order_dir  : direction for order clause (asc, desc)
 //////////////////////////////////////////////////////////////////////////////
 function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
-  global $auth, $c_all, $cdg_sql;
+  global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $plabel = $deal["plabel"];
   $pmanager = $deal["pmanager"];
@@ -1302,40 +1310,54 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
+
+  if ($plabel != "") {
+    $where .= "parentdeal_label $like '$plabel%'";
+    $and = "and";
+  }
+  if ($parchive != 1) {
+    $where .= " $and parentdeal_archive=0";
+    $and = "and";
+  }
+  if (($pmanager != $c_all) && ($pmanager != "")) { 
+     $where .= " $and (parentdeal_technicalmanager_id='$pmanager'
+		    or parentdeal_marketingmanager_id='$pmanager') ";
+    $and = "and";
+  }
+
+  $whereq = "where $where";
+
+  // Order by clause
+  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "parentdeal_timecreate"; 
+  $orderq = " order by $order $p_order_dir";
 
   $query = "select
-      parentdeal_id as Id,
+      parentdeal_id as id,
       parentdeal_id,
       parentdeal_label,
       parentdeal_marketingmanager_id,
       parentdeal_technicalmanager_id,
       parentdeal_archive,
-      Marketing.userobm_lastname as parentdeal_marketing_lastname,
-      Technical.userobm_lastname as parentdeal_technical_lastname
-    from ParentDeal,
-      UserObm Marketing, 
-      UserObm Technical
-    where parentdeal_technicalmanager_id=Technical.userobm_id
-      and parentdeal_marketingmanager_id=Marketing.userobm_id";
+      um.userobm_lastname as parentdeal_marketing_lastname,
+      ut.userobm_lastname as parentdeal_technical_lastname
+    from ParentDeal
+      LEFT JOIN UserObm as um on parentdeal_marketingmanager_id=um.userobm_id
+      LEFT JOIN UserObm as ut on parentdeal_technicalmanager_id=ut.userobm_id
+    $whereq
+    $orderq
+    $limit
+";
    
-  if ($plabel != "") {
-    $query .= " and parentdeal_label $like '$plabel%'";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from ParentDeal $whereq");
+    $obm_q->set_num_rows_total($count);
   }
-  if ($parchive != 1) {
-    $query .= " and parentdeal_archive=0";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "parentdeal_search()");
+    $obm_q->query($query);
   }
-  if (($pmanager != $c_all) && ($pmanager != "")) { 
-     $query .= " and (parentdeal_technicalmanager_id='$pmanager'
-		    or parentdeal_marketingmanager_id='$pmanager') ";
-  } 
 
-  // Order by clause
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "parentdeal_timecreate"; 
-  $query .= " order by $order $p_order_dir";
-
-  display_debug_msg($query, $cdg_sql);
-
-  $obm_q->query($query);
   return $obm_q;
 }
 
@@ -1731,8 +1753,8 @@ function run_query_search_connected_invoices ($p_deal_id, $incl_arch = 0) {
   $query = "select invoice_id, invoice_inout ".
      ", invoice_label ".
      ", invoice_number ".
-     ", invoice_amount_HT ".
-     ", invoice_amount_TTC ".
+     ", invoice_amount_ht ".
+     ", invoice_amount_ttc ".
      ", invoicestatus_label as invoice_status ".
      ", invoice_date as date".
      ", deal_label as invoice_deal ".
@@ -1742,7 +1764,7 @@ function run_query_search_connected_invoices ($p_deal_id, $incl_arch = 0) {
      " from Deal, DealInvoice, Invoice, InvoiceStatus, Company ".
      " where deal_id = dealinvoice_deal_id ".
      " and dealinvoice_invoice_id = invoice_id ".
-     " and invoice_invoicestatus_id = invoicestatus_id ".
+     " and invoice_status_id = invoicestatus_id ".
      " and deal_company_id = company_id ".
      " and deal_id = '$p_deal_id'";
   if ($incl_arch == 0) {

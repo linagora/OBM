@@ -63,7 +63,8 @@ $l_sta_checkdelete = "Vérifier ou supprimer l'état";
 $l_sta_delete = "Supprimer l'état";
 $l_sta_insert = "Insérer l'état";
 
-//Message
+// Message
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
 $l_found = "incident(s) trouvé(s).";
 $l_no_found = "Aucun Incident ne correspond à ces critères !";
 $l_insert_ok = "L'insertion de l'incident a été correctement effectuée.";

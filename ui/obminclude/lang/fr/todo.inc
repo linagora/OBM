@@ -20,7 +20,7 @@ $l_delete = "Supprimer";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 
-$l_no_found = "Rien à faire";
+$l_no_found = "Pas de tâches à faire";
 $l_no_deadline = "Non spécifiée";
 $l_delete_ok = "La suppression du post-it a été correctement effectuée.";
 $l_delete_error = "La suppression du post-it a échoué !";

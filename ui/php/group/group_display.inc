@@ -51,7 +51,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "group_nb_user") {
     $nb_q = new DB_OBM;
     $id = $OD->data_set->f("group_id");
-    $query = "select count(*) from UserObmGroup where userobmgroup_groupid='$id'";
+    $query = "select count(*) from UserObmGroup where userobmgroup_group_id='$id'";
     $nb_q->query($query);
     $nb_q->next_record();
     $res["name"] = $nb_q->f(0);
@@ -157,7 +157,7 @@ function dis_group_search_group($group) {
     $obm_q = run_query_search($group);
   }
 
-  $nb_group = $obm_q->num_rows();
+  $nb_group = $obm_q->num_rows_total();
   if ($nb_group == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {

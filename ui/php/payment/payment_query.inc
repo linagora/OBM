@@ -79,13 +79,13 @@ function run_query_search($p_payment, $p_new_order="") {
   if ($date_before) {
     $query .= " and Payment.payment_date <='$date_before'";
   }
-  if (($inout != "") && ($inout != "_TOUT_")) {
+  if (($inout != "") && ($inout != "$c_all")) {
     $query .= " and Payment.payment_inout ='$inout'";
   }
-  if (($paid != "") && ($paid != "_TOUT_")) {
+  if (($paid != "") && ($paid != "$c_all")) {
     $query .= " and Payment.payment_paid = '$paid'";
   }
-  if (($kind != "") && ($kind!="$c_all")) {
+  if (($kind != "") && ($kind != "$c_all")) {
     $query .= " and Payment.payment_paymentkind_id ='$kind'";
   }
   if (($account != "") && ($account != "$c_all")) {
@@ -337,11 +337,11 @@ function run_query_search_connectable_invoices ($payment) {
   $query = "select invoice_id,
       invoice_label,
       invoice_number,
-      invoice_amount_TTC,
-      invoice_amount_HT,
+      invoice_amount_ttc,
+      invoice_amount_ht,
       invoice_date,
       invoice_inout,
-      invoice_invoicestatus_id,
+      invoice_status_id,
       invoicestatus_label as invoice_status,
       UNIX_TIMESTAMP(invoice_date) as date,
       sum(paymentinvoice_amount),
@@ -355,8 +355,8 @@ function run_query_search_connectable_invoices ($payment) {
               on (invoice_id = paymentinvoice_invoice_id) ".
      // invoicestatus == 1 => not completely paid
      // invoicestatus == 4 => trouble on that one...
-     " where invoice_invoicestatus_id in ('1','4') ".
-     " and invoicestatus_id = invoice_invoicestatus_id ".
+     " where invoice_status_id in ('1','4') ".
+     " and invoicestatus_id = invoice_status_id ".
      " and invoice_id = dealinvoice_invoice_id ".
      " and deal_id = dealinvoice_deal_id ".
      " and company_id = deal_company_id ".
@@ -393,11 +393,11 @@ function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
   $query = " select invoice_id,
       invoice_label,
       invoice_number,
-      invoice_amount_HT,
-      invoice_amount_TTC,
+      invoice_amount_ht,
+      invoice_amount_ttc,
       invoice_date,
       invoice_inout,
-      invoice_invoicestatus_id,
+      invoice_status_id,
       invoicestatus_label as invoice_status,
       UNIX_TIMESTAMP(invoice_date) as date,
       sum(paymentinvoice_amount),
@@ -409,7 +409,7 @@ function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
      " Invoice left outer join DealInvoice ".
      " on invoice_id = dealinvoice_invoice_id".
      " where invoice_id = paymentinvoice_invoice_id ".
-     " and invoice_invoicestatus_id = invoicestatus_id ".
+     " and invoice_status_id = invoicestatus_id ".
      " and deal_id = dealinvoice_deal_id ".
      " and company_id = deal_company_id ".
      " and paymentinvoice_payment_id = '".$p_payment_id."'";
@@ -435,12 +435,12 @@ function run_query_invoice_detail ($p_invoice_id) {
   $go = new DB_OBM;
 
   $query = "select invoice_id, invoice_number ".
-     ", invoice_label, invoice_amount_TTC ".
+     ", invoice_label, invoice_amount_ttc ".
      ", invoice_date, invoicestatus_label ".
-     ", invoice_amount_TTC - sum(paymentinvoice_amount) as invoice_not_paid_yet ".
+     ", invoice_amount_ttc - sum(paymentinvoice_amount) as invoice_not_paid_yet ".
      " from InvoiceStatus, Invoice left outer join PaymentInvoice ".
      " on (invoice_id = paymentinvoice_invoice_id) ".
-     " where invoice_invoicestatus_id = invoicestatus_id ".
+     " where invoice_status_id = invoicestatus_id ".
      " and invoice_id = $p_invoice_id".
      " group by paymentinvoice_invoice_id ";
 
@@ -538,7 +538,7 @@ function run_query_bank_invoice($p_invoice) {
   }
 
   $query = "update Invoice set ".
-     " invoice_invoicestatus_id = '".$new_status."',".
+     " invoice_status_id = '".$new_status."',".
      " invoice_userupdate = '".$auth->auth["uid"]."', ".
      " invoice_timeupdate = '".date("Y-m-d H:i:s")."' ".
      " where invoice_id = '".$p_invoice["invoice_id"]."'";
@@ -696,7 +696,7 @@ function payment_unpay_invoice ($p_invoice_id) {
   $go = new DB_OBM;
 
   $query = " update Invoice ".
-     "set invoice_invoicestatus_id = 1 ".
+     "set invoice_status_id = 1 ".
      " where invoice_id = $p_invoice_id";
   display_debug_msg ("<b>payment_unpay_invoice :</b>$query", $cdg_sql);
 
@@ -1093,11 +1093,11 @@ function  run_query_update_invoice_status () {
     $my_invoices = implode (",", $tab);
     
     $query = " update Invoice ".
-       " set invoice_invoicestatus_id = '3' ".// 3 == checked =)
+       " set invoice_status_id = '3' ".// 3 == checked =)
        " where invoice_id in (".$my_invoices.")";
     display_debug_msg ("<b>run_query_update_invoice_status(): </b>$query", $cdg_sql);
     $go->query($query);
   }
 }
 
-</SCRIPT>
+</script>

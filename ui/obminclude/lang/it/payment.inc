@@ -34,7 +34,7 @@ $l_unpaid = "Non Pagato";
 // invoice connected :
 $l_invoice_label = "Etichetta Fattura";
 $l_invoice_date = "Data Fattura";
-$l_invoice_TTC = "Importo Fattura";
+$l_invoice_ttc = "Importo Fattura";
 $l_invoice_number = "Numero Fattura";
 $l_invoice_not_paid_yet = "Importo non pagato PRIMA";
 $l_invoice_still_not_paid = "Import non pagato ORA";

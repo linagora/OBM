@@ -38,7 +38,6 @@ $l_amount_in = "Amout of inputs";
 $l_amount_out = "Amout of outputs";
 $l_potential = "Weighted Potential";
 $l_label_start = "Label start";
-$l_manager = "Manager";
 $l_proposition = "Proposal";
 $l_show_archive = "Show archives";
 $l_date_alarm_after = "Alarm Date after";

@@ -15,6 +15,7 @@
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
 
+$debug = 0;
 $path = "..";
 $section = "ADMIN";
 $menu = "ADMIN_DATA";
@@ -26,14 +27,16 @@ include("$obminclude/global.inc");
 require("admin_data_display.inc");
 require("admin_data_query.inc");
 
-$debug=0;
-$db = new DB_OBM;
-$query = "select globalpref_value from GlobalPref where
+// If in text mode we get the document path from DB as session var not here
+if ($mode != "html") {
+  $db = new DB_OBM;
+  $query = "select globalpref_value from GlobalPref where
           globalpref_option ='document_path'";
-$db->query($query);
-$db->next_record();
+  $db->query($query);
+  $db->next_record();
+  $document_path = $db->f("globalpref_value");	
+}
 
-$document_path = $db->f("globalpref_value");	
 $modules = array ('company', 'deal','document');
 //$modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');

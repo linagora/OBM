@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : payment.inc                                              //
@@ -38,8 +38,8 @@ $l_include_checked = "Incluya los pagos realizados";
 $l_add_invoices = "Asociar a factura";
 $l_invoice_label = "Referencia de la Factura";
 $l_invoice_date = "Fecha de la Factura";
-$l_invoice_TTC = "Cantidad de la Factura";
-$l_invoice_HT = "Cantidada HT";
+$l_invoice_ttc = "Cantidad de la Factura";
+$l_invoice_ht = "Cantidada HT";
 $l_invoice_number = "Factura Número"; 
 $l_invoice_status = "Estado";
 $l_invoice_not_paid_yet = "Cantidad no pagada ANTES";

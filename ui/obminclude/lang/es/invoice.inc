@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : invoice.inc                                              //
@@ -14,8 +14,8 @@ $l_label_start = "Inicio de Referencia";
 $l_number = "Número";
 $l_amount = "Cantidad";
 $l_geninvoice = "Características";
-$l_amount_HT = "Cantidad HT";
-$l_amount_TTC = "Cantidad TTC";
+$l_amount_ht = "Cantidad HT";
+$l_amount_ttc = "Cantidad TTC";
 $l_comment = "Comentario";
 $l_deal="Negocio";
 $l_company = "Compañía";
@@ -28,7 +28,7 @@ $l_pick_deal = "Escoja un negocio";
 $l_inout = "Tipo";
 $l_both = "Ambos"; 
 $l_client = "Cliente";
-$l_fournisseur = "Proveedor";
+$l_supplier = "Proveedor";
 $l_tax_rate="tasa de impuestos";
 $l_compute_tax="calcule total impuestos";
 $l_include_archive="archivos incluidos";

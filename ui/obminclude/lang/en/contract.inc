@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : contract.inc                                             //
@@ -44,7 +44,7 @@ $l_delete = "Delete the contract";
 $l_select_company = "Select the company";
 
 // Messages
-$l_no_display = "Fill the search fields and press < Find > to retrieve the contract";
+$l_no_display = "Fill the search fields and press < Find > to retrieve the contracts";
 $l_found = "contracts found.";
 $l_no_found = "No contract found matching the query !";
 $l_delete_ok = "The contract has been deleted successfully.";

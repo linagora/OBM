@@ -36,7 +36,6 @@ $l_amount_in = "Totale entrate";
 $l_amount_out = "Totale uscite";
 $l_potential = "Potenziale pesato";
 $l_label_start = "Nome inizio";
-$l_manager = "Resp. ";
 $l_proposition = "Proposta";
 $l_show_archive = "Mostra archivi";
 $l_date_alarm_after = "Data Avviso dopo";

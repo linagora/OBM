@@ -15,7 +15,7 @@
 //     keys used     : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($group) {
-  global $cdg_sql;
+  global $cdg_sql, $ctu_sql_limit;
   
   $name = $group["name"];
   $email = $group["email"];
@@ -26,37 +26,49 @@ function run_query_search($group) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-
+  $limit = sql_limit($db_type);
   $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
 
+  $where = "group_name $like '$name%'";
   if ($user != '') {
+    $join_user = "
+      LEFT JOIN UserObmGroup ON group_id=UserObmGroup_group_id
+      LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobm_id=C.userobm_id";
     $where .= " and C.userobm_lastname $like '$user%'";
   }
   if ($email != '') {
     $where .= " and group_email $like '%$email%'";
   }
-  
+  $whereq = "where $where";
 
-  $query = "select distinct UGroup.*, group_id as Id,
+  // ORDER construction
+  $order = (strcmp($new_order,"") != 0) ? $new_order : "group_name";
+  $orderq .= " order by $order $order_dir";
+
+  $query = "select distinct UGroup.*, group_id as id,
       $timecreate,
       $timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
-    from 
-      (UGroup LEFT JOIN UserObmGroup ON group_id=UserObmGroup_groupid)
-      LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobmid=C.userobm_id
+    from UGroup
+      $join_user
       LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
-    where group_name $like '$name%'
-      $where";
+    $whereq 
+    $orderq
+    $limit";
 
-  // ORDER construction
-  $order = (strcmp($new_order,"") != 0) ? $new_order : "group_name";
-  $query .= " order by $order $order_dir";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from UGroup $join_user $whereq");
+    $obm_q->set_num_rows_total($count);
+  }
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+
   return $obm_q;
 }
 
@@ -98,14 +110,14 @@ function run_query_search_possible_children($group) {
     $where .= " and group_id != '$g_id'";
   }
     
-  $query = "select distinct UGroup.*, group_id as Id,
+  $query = "select distinct UGroup.*, group_id as id,
       $timecreate,
       $timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     from 
-      (UGroup LEFT JOIN UserObmGroup ON group_id=UserObmGroup_groupid)
-      LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobmid=C.userobm_id
+      (UGroup LEFT JOIN UserObmGroup ON group_id=UserObmGroup_group_id)
+      LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobm_id=C.userobm_id
       LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
     where group_name $like '$name%'
@@ -235,15 +247,15 @@ function run_query_delete($p_id) {
   global $cdg_sql;
 
   // Delete all users registrations to this group
-  $query = "delete from UserObmGroup where userobmgroup_groupid='$p_id'";
+  $query = "delete from UserObmGroup where userobmgroup_group_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Delete all groups registration referencing this group
   $query = "delete from GroupGroup
-    where groupgroup_childid='$p_id'
-      or groupgroup_parentid='$p_id'";
+    where groupgroup_child_id='$p_id'
+      or groupgroup_parent_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -274,16 +286,16 @@ function run_query_usergroup_insert($group) {
     $u_id = $group["user$cpt"];
 
     $query = "select * from UserObmGroup
-      where userobmgroup_groupid='$id'
-        and userobmgroup_userobmid='$u_id'";
+      where userobmgroup_group_id='$id'
+        and userobmgroup_userobm_id='$u_id'";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
-      $query = "insert into UserObmGroup (userobmgroup_groupid,
-        userobmgroup_userobmid) values ($id, $u_id)";
+      $query = "insert into UserObmGroup (userobmgroup_group_id,
+        userobmgroup_userobm_id) values ($id, $u_id)";
 
       display_debug_msg($query, $cdg_sql);
       $obm_q = new DB_OBM;
@@ -313,7 +325,7 @@ function run_query_usergroup_delete($group) {
     $u_id = $group["user$cpt"];
 
     $query = "delete from UserObmGroup
-      where userobmgroup_groupid='$id' and userobmgroup_userobmid='$u_id'";
+      where userobmgroup_group_id='$id' and userobmgroup_userobm_id='$u_id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -346,8 +358,8 @@ function run_query_groupgroup_insert($group) {
     $g_id = $group["group_$cpt"];
 
     $query = "select * from GroupGroup
-      where groupgroup_parentid='$id'
-        and groupgroup_childid='$g_id'";
+      where groupgroup_parent_id='$id'
+        and groupgroup_child_id='$g_id'";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
@@ -357,8 +369,8 @@ function run_query_groupgroup_insert($group) {
          && (! in_array($g_id, $parents))
          && ($id != $g_id)
        ) {
-        $query = "insert into GroupGroup (groupgroup_parentid,
-        groupgroup_childid) values ($id, $g_id)";
+        $query = "insert into GroupGroup (groupgroup_parent_id,
+        groupgroup_child_id) values ($id, $g_id)";
 
       display_debug_msg($query, $cdg_sql);
       $obm_q = new DB_OBM;
@@ -388,7 +400,7 @@ function run_query_groupgroup_delete($group) {
     $g_id = $group["group_$cpt"];
 
     $query = "delete from GroupGroup
-      where groupgroup_parentid='$id' and groupgroup_childid='$g_id'";
+      where groupgroup_parent_id='$id' and groupgroup_child_id='$g_id'";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
@@ -421,8 +433,8 @@ function run_query_user_group($group) {
     $order = "order by userobm_lastname";
   }
 
-  $query = "select userobmgroup_userobmid as group_user_id,
-         userobmgroup_userobmid as Id,
+  $query = "select userobmgroup_userobm_id as group_user_id,
+         userobmgroup_userobm_id as id,
          userobm_timeupdate as group_user_timeupdate,
          userobm_timecreate as group_user_timecreate,
          userobm_userupdate as group_user_userupdate,
@@ -431,8 +443,8 @@ function run_query_user_group($group) {
          userobm_firstname as group_user_firstname,
          userobm_phone as group_user_phone,
          userobm_email as group_user_email
-      from UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobmid=userobm_id
-      where userobmgroup_groupid='$id'
+      from UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
+      where userobmgroup_group_id='$id'
          $order";
 
   $obm_q = new DB_OBM; 
@@ -462,8 +474,8 @@ function run_query_group_group($group) {
     $order = "order by group_name";
   }
 
-  $query = "select groupgroup_childid as child_id,
-         groupgroup_childid as Id,
+  $query = "select groupgroup_child_id as child_id,
+         groupgroup_child_id as id,
          group_timeupdate,
          group_timecreate,
          group_userupdate,
@@ -472,8 +484,8 @@ function run_query_group_group($group) {
          group_name,
          group_desc,
          group_email
-      from GroupGroup LEFT JOIN UGroup ON groupgroup_childid=group_id
-      where groupgroup_parentid='$id'
+      from GroupGroup LEFT JOIN UGroup ON groupgroup_child_id=group_id
+      where groupgroup_parent_id='$id'
          $order";
 
   $obm_q = new DB_OBM; 
@@ -492,7 +504,7 @@ function get_group_nb_user($id) {
   global $cdg_sql;
 
   $query = "select count(*) from UserObmGroup
-    where userobmgroup_groupid='$id'";
+    where userobmgroup_group_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -688,8 +700,8 @@ function check_data_form($group) {
 function get_group_parents($id) {
   global $cdg_sql;
 
-  $query = "select groupgroup_parentid
-    from GroupGroup where groupgroup_childid='$id'";
+  $query = "select groupgroup_parent_id
+    from GroupGroup where groupgroup_child_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -697,7 +709,7 @@ function get_group_parents($id) {
  
   $parents = array();
   while ($obm_q->next_record()) {
-    $g_id = $obm_q->f("groupgroup_parentid");
+    $g_id = $obm_q->f("groupgroup_parent_id");
     array_push($parents, $g_id);
     $child_parents = get_group_parents($g_id);
     $parents = array_merge($parents, $child_parents);

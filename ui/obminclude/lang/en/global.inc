@@ -51,6 +51,7 @@ $l_cat = "Category";
 $l_visibility = "Access";
 $l_private = "Private";
 $l_public = "Public";
+$l_manager = "Manager";
 
 // Global display
 $l_last_visit = "Bookmarks";

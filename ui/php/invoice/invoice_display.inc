@@ -7,10 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// to see tables during dev
-$border= ($set_debug>0)? 2 : 0;
-$cellspacing = ($set_debug>0)? 5 : 1;
-
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
@@ -19,8 +15,8 @@ $fieldnames["invoice_number"] = $l_number;
 $fieldnames["invoice_deal"] = $l_deal;
 $fieldnames["invoice_company"] = $l_company;
 $fieldnames["invoice_label"] = $l_label;
-$fieldnames["invoice_amount_HT"] = $l_amount_HT;
-$fieldnames["invoice_amount_TTC"] = $l_amount_TTC;
+$fieldnames["invoice_amount_ht"] = $l_amount_ht;
+$fieldnames["invoice_amount_ttc"] = $l_amount_ttc;
 $fieldnames["invoice_status"] = $l_status;
 $fieldnames["invoice_date"] = $l_date;
 $fieldnames["invoice_paid"] = $l_paid;
@@ -68,8 +64,8 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   }
 
   // amount column color 
-  elseif (($fieldname == "invoice_amount_HT") 
-	  || ($fieldname == "invoice_amount_TTC")
+  elseif (($fieldname == "invoice_amount_ht") 
+	  || ($fieldname == "invoice_amount_ttc")
 	  || ($fieldname == "invoice_paid")) {
     $amount = $OD->data_set->f($fieldname);
     if ($OD->data_set->f("invoice_inout") == '+') {
@@ -96,18 +92,15 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_form ($p_action,$q_status, $invoice) {
   global $c_all, $l_all_f;
-  global $l_label_start, $l_number, $l_amount_HT, $l_amount_TTC;
+  global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
-  global $l_find, $l_both, $l_client, $l_fournisseur;
-  global $cellspacing, $border;
-
-  $cellspacing = 10;
+  global $l_find, $l_both, $l_client, $l_supplier;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
-  $amount_HT = $invoice["HT"];
-  $amount_TTC = $invoice["TTC"];
+  $ht = $invoice["ht"];
+  $ttc = $invoice["ttc"];
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
@@ -143,71 +136,69 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
 
   $block = "
     <form method=\"post\" name=\"form_invoice\"
-        onSubmit=\"if (check_form(this) == false) return false ;
+        onSubmit=\"if (check_form(this) == false) return false;
         else return true;\" action=\"$url_form\">
       <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
 
     <div class=\"search\">
-      <div class=\"searchLabel\">$l_label_start<br />
-       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
-      </div>
 
-      <div class=\"searchLabel\">$l_number<br />
-       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"$number\" />
-      </div>
-
-      <div class=\"searchLabel\">$l_amount_HT<br />
-       <input type=\"text\" name=\"tf_amount_HT\" size=\"15\"
-              value=\"$amount_ht\" />
-      </div>
-
-      <div class=\"searchLabel\">$l_amount_TTC<br />
-       <input type=\"text\" name=\"tf_amount_TTC\" size=\"15\"
-              value=\"$amount_ttc\" />
-      </div>
-
-      <div class=\"searchLabel\">$l_status<br />
-       $sel_status
-      </div>
-
-      <div class=\"searchLabel\">$l_date_apres<br />
-       <input type=\"text\" name=\"tf_date_after\" size=\"12\"
-              value=\"$date_after\" />
-      </div>
-
-      <div class=\"searchLabel\">$l_date_avant<br />
-       <input type=\"text\" name=\"tf_date_before\" size=\"12\"
-              value=\"$date_before\" />
-      </div>
-
-      <div class=\"searchLabel\">$l_include_archive<br />
-       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive> 
-      </div>
-
-      <div class=\"searchLabel\">$l_inout<br />
-       $l_both &nbsp;
-       <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $rb_both />
-       $l_client &nbsp;
-       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
-       $l_fournisseur &nbsp;
-       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
-      </div>
-
-      <div class=\"searchLabel\">$l_deal<br />
-       <input type=\"text\" name=\"tf_deal\" value=\"$deal\" />
-      </div>
-
-      <div class=\"searchLabel\">$l_company<br />
-       <input type=\"text\" name=\"tf_company\" value=\"$company\" />
-      </div>
-
-      <div class=\"searchLabel\">&nbsp;<br>
-       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </div>
-
-      <div class=\"searchEnd\"></div>
+    <div class=\"searchLabel\">$l_label_start<br />
+      <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
     </div>
-   </form>
+
+    <div class=\"searchLabel\">$l_number<br />
+      <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"$number\" />
+    </div>
+
+    <div class=\"searchLabel\">$l_amount_ht<br />
+      <input type=\"text\" name=\"tf_amount_ht\" size=\"15\" value=\"$ht\" />
+    </div>
+
+    <div class=\"searchLabel\">$l_amount_ttc<br />
+      <input type=\"text\" name=\"tf_amount_ttc\" size=\"15\" value=\"$ttc\" />
+    </div>
+
+    <div class=\"searchLabel\">$l_status<br />
+      $sel_status
+    </div>
+
+    <div class=\"searchLabel\">$l_date_apres<br />
+      <input type=\"text\" name=\"tf_date_after\" size=\"12\" value=\"$date_after\" />
+    </div>
+
+    <div class=\"searchLabel\">$l_date_avant<br />
+      <input type=\"text\" name=\"tf_date_before\" size=\"12\" value=\"$date_before\" />
+    </div>
+
+    <div class=\"searchLabel\">$l_include_archive<br />
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive> 
+    </div>
+
+    <div class=\"searchLabel\">$l_inout<br />
+      $l_both &nbsp;
+      <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $rb_both />
+      $l_client &nbsp;
+      <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
+      $l_supplier &nbsp;
+      <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
+    </div>
+
+    <div class=\"searchLabel\">$l_deal<br />
+      <input type=\"text\" name=\"tf_deal\" value=\"$deal\" />
+    </div>
+
+    <div class=\"searchLabel\">$l_company<br />
+      <input type=\"text\" name=\"tf_company\" value=\"$company\" />
+    </div>
+
+    <div class=\"searchLabel\">&nbsp;<br>
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+    </div>
+
+    <div class=\"searchEnd\"></div>
+
+    </div>
+    </form>
    ";
 
   return $block;
@@ -216,24 +207,19 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Invoice Form              
-// params :
-//  $q_invoice : if updating, contains the invoice current info
-//  $action : action 
-//  $q_status : id et label des != status
+// Parameters:
+//   - $inv_q  : if updating, contains the invoice current info
+//   - $action : action 
+//   - $stat_q : Database result with status list
 ///////////////////////////////////////////////////////////////////////////////
-// formulaire de création de facture :
-function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_deal_linked="") {
-  // - Themes :
-  global $set_theme,$col_label,$col_ok,$ico_company,$ico_contact;
-  // -- Labels
-  global $l_label, $l_number, $l_comment, $l_deal,
-    $l_amount_HT, $l_amount_TTC, $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_fournisseur;
+function html_invoice_form($inv_q, $action, $stat_q, $p_nb_deals = 0, $p_deal_linked="") {
+  global $display, $set_theme, $ico_company,$ico_contact;
+  global $l_label, $l_number, $l_comment, $l_deal, $l_amount_ht, $l_amount_ttc;
+  global $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_supplier;
   global $l_insert,$l_update, $l_delete, $l_invoice;
   global $default_invoice_numbering;
   global $q_company;
   global $default_tax, $l_tax_rate, $l_compute_tax; 
-
-  global $cellspacing,$border;
 
   if ($action == "new" && $p_deal_linked != "") 
     $js_fct_invoice = "check_invoice_link";
@@ -246,24 +232,22 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
   if ($action == "new") {
     $invoice = "";
     $label = $date = $comment = $invoice_status = "";
-    $inout = $amount_HT = $amount_TTC = "";
+    $inout = $ht = $ttc = "";
     $number = date ($default_invoice_numbering);
-    // when creating from a deal, we must use the same "inout" as
-    // the deal...
+    // when creating from a deal, default to use same "inout" as the dealtype
     if ($p_deal_linked != "") {
       $inout = run_query_deal_get_inout ($p_deal_linked);
-      //      $readonly = "readonly"; doesn't work @#$!
     }
   } else {
-    $label = $q_invoice->f("invoice_label");
-    $number = $q_invoice->f("invoice_number");
-    $comment = $q_invoice->f("invoice_comment");
-    $invoice_status = $q_invoice->f("invoice_invoicestatus_id");
-    $date = $q_invoice->f("invoice_date");
-    $inout = $q_invoice->f("invoice_inout");
-    $amount_HT = $q_invoice->f("invoice_amount_HT");
-    $amount_TTC = $q_invoice->f("invoice_amount_TTC");
-    $invoice = $q_invoice->f("invoice_id");
+    $label = $inv_q->f("invoice_label");
+    $number = $inv_q->f("invoice_number");
+    $comment = $inv_q->f("invoice_comment");
+    $invoice_status = $inv_q->f("invoice_status_id");
+    $date = $inv_q->f("invoice_date");
+    $inout = $inv_q->f("invoice_inout");
+    $ht = $inv_q->f("invoice_amount_ht");
+    $ttc = $inv_q->f("invoice_amount_ttc");
+    $invoice = $inv_q->f("invoice_id");
   }
 
   // if we duplicate we have to modify some fields :
@@ -274,9 +258,9 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
   }
 
   $sel_status = "<select name=\"sel_status\">"; 
-  while ($q_status->next_record()) {
-    $s_id = $q_status->f("invoicestatus_id");
-    $s_label = $q_status->f("invoicestatus_label");
+  while ($stat_q->next_record()) {
+    $s_id = $stat_q->f("invoicestatus_id");
+    $s_label = $stat_q->f("invoicestatus_label");
     $sel_status .= "<option value=\"$s_id\""; 
     if ($s_id == $status) {
       $sel_status .= " selected ";
@@ -285,35 +269,27 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
   }
   $sel_status .= "</select>";
 
-  // Type select
-  if ($action == "new" && $p_deal_linked != "") {
-    $dis_inout = "
-      <td>
-       <input type=\"hidden\" name=\"hd_inout\" value=\"$inout\">
-      </td>";
-  } else {
-    $pcheck = ($inout == "+") ? "checked" : "";
-    $mcheck = ($inout == "-") ? "" : "checked";
+  $inout_c = ($inout == "+") ? "checked" : "";
+  $inout_s = ($inout == "-") ? "checked" : "";
 
-    $dis_inout = "
+  $dis_inout = "
       <td class=\"detailLabel\">$l_inout</td>
       <td class=\"detailForm\">
-       $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck />
-       $l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />
+       $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c />
+       $l_supplier &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s />
       </td>";
-  }
 
   // Buttons
   $dis_button = "<input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">";
 
-  if (($action == "update") || ($action == "detailupdate")){
+  if (($action == "update") || ($action == "detailupdate")) {
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\"/>
     <input type=\"hidden\" name=\"param_invoice\" value=\"$invoice\" />
     <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\">"; 
     $dis_button .= "
       <input type=\"submit\" value=\"$l_update\"
         onClick=\"if (check_invoice (this.form)) return true; else return false;\" />";
-  }elseif ($action == "new" || $action =="insert"){
+  } elseif ($action == "new" || $action == "insert"){
     $dis_button .= "
       <input type=\"submit\" value=\"$l_insert\" 
         onClick=\"if(check_invoice(this.form)) return true ; else return false;\" />";
@@ -321,222 +297,65 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
       <input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .= "
       <input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">
-      <input type=\"hidden\" name=\"hd_param_deal\" value=\"".$p_deal_linked."\">";
+      <input type=\"hidden\" name=\"hd_param_deal\" value=\"$p_deal_linked\">";
   }
 
-  if ($action != "new") 
-    $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
+  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
 
   $block = "
-    <form method=\"post\" action=\"invoice_index.php\">
+  <form method=\"post\" action=\"invoice_index.php\">
 
-    <table class=\"detail\">
-     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\">
-       <input name=tf_label type=text size=40 value=\"$label\">
-      </td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\">
-       <input name=tf_number type=text size=11 value=\"$number\">
-      </td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailForm\">
-       <input name=tf_date type=text size=12 value=\"$date\">
-      </td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_status</td>
-      <td class=\"detailForm\">$sel_status</td>
-     </tr>
-     <tr>
-      $dis_inout
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_amount_HT</td>
-      <td class=\"detailForm\">
-       <input name=\"tf_amount_HT\" type=text size=15 value=\"$amount_HT\">
-      </td>
-     </tr>
-     <tr>
-         <td class=\"detailLabel\">$l_tax_rate</td>
-          <td class=\"detailForm\"><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" /></td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_amount_TTC</td>
-      <td class=\"detailForm\">
-       <input name=\"tf_amount_TTC\" type=text size=15 value=\"$amount_TTC\">
-      </td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_compute_tax</td>
-      <td class=\"detailForm\">
-       <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\"
-              onClick=\"compute_tax(this.form);\">
-      </td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailForm\">
-       <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
-      </td>
-     </tr>
-    </table>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\">$l_label</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\">
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_number</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\">
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_date</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_date\" type=\"text\" size=\"12\" value=\"$date\">
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_status</td>
+    <td class=\"detailForm\">$sel_status</td>
+  </tr><tr>
+    $dis_inout
+  </tr><tr>
+    <td class=\"detailLabel\">$l_amount_ht</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_amount_ht\" type=\"text\" size=\"15\" value=\"$ht\">
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_tax_rate</td>
+    <td class=\"detailForm\"><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" /></td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_compute_tax</td>
+    <td class=\"detailForm\">
+      <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\" onClick=\"compute_tax(this.form);\"></td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_amount_ttc</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_amount_ttc\" type=\"text\" size=\"15\" value=\"$ttc\">
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_comment</td>
+    <td class=\"detailForm\">
+      <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
+    </td>
+  </tr>
+  </table>
 
-    <div class=\"detailButton\">
-     <p class=\"detailButtons\">$dis_button</p>
-    </div>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+  </div>
 
-    </form>";
-
-  // bcontins : ancienne version de nico
-  // "
-  // -----------------------------------------------------
-  // <center>
-  //  <form method=\"post\" action=\"\">
-  //   <table border=\"$border\" cellspacing=\"$cellspacing\">
-  //   <tr>
-  //    <td>
-  //     <table border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
-  //      <tr>
-  //       <td width=\"20%\"><font color=\"#$col_label\">$l_number</font><br>
-       
-  //       </td>
-  //       <td width=\"60%\"><font color=\"#$col_label\">$l_label</font><br>
-       
-  //       </td>
-  //       <td width=\"20%\"><font color=\"#$col_label\"></font><br>
-       
-  //       </td>
-  //      </tr>
-  //     </table>
-  //    </td>
-  //   </tr><tr>
-  //    <td>
-  //     <table border=$border cellspacing=$cellspacing width=\"100%\">
-  //      <tr>
-  //       <td><font color=\"#$col_label\"></font><br>
-       
-  //       </td>"; 
-
-  //   // inout : customer or provider
-  //   // not to be display if creating an invoice from a deal
-  //   if ($action == "new" && $p_deal_linked != "") {
-  //     // but we need to keep the inout...
-  //     $block .= "
-  //       <td>
-  //        <input type=\"hidden\" name=\"hd_inout\" value=\"$inout\">
-  //       </td>";
-  //   } else {
-  //     $block .= "
-  //       <td>\n
-  //        <font color=\"#$col_label\">".."</font><br>
-  //     $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\"";
-  //     if ($inout == "+") {
-  //       $block .= " checked";
-  //     }
-  //     $block .= ">\n
-  //     $l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\"";
-  //     if ($inout == '-') {
-  //       $block .= " checked";
-  //     }
-  //     $block .= ">\n
-  //       </td>";
-  //   }
-  //   $block .= "
-  //      </tr>
-  // <!--  amounts and auto-compute stuff -->
-  //      <tr><td colspan=\"2\">
-  //       <table border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
-  // <!--  amount_HT ==> HT : without charges -->
-  //        <tr>
-  //         <td><font color=\"#$col_label\">$l_amount_HT</font><br>
-  //                  </td>
-  //         <td><font color=\"#$col_label\">$l_tax_rate</font></br>
-  //          <input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" >
-  //         </td>
-  // <!--  amount_TTC ==> TTC : charges included -->
-  //         <td><font color=\"#$col_label\"></font><br> 
-  //         </td>
-  //         <td>
-  //          <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\" ".
-  //     "onClick=\"compute_tax(this.form);\">
-  //         </td>
-  //        </tr>
-  //       </table>
-  //      </td></tr>
-  //     </table>
-  //    </td>
-  //   </tr>
-  //   <tr>
-  //    <td>
-  //      <font color=\"#$col_label\">$l_comment</font><br>
-  //      <textarea name=ta_comment rows=6 cols=72>$comment</textarea>
-  //    </td>
-  //   </tr>
-  //   <tr>
-  //    <td>
-  //     <br><center>
-  //      <input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">";
-  //   if (($action=="update") || ($action =="detailupdate")) {
-  //     $block .= "<input type=\"hidden\" name=\"hd_rd_inout\" value=\"".$q_invoice->f("invoice_inout")."\">";
-  //   }
-  //   if ($action=="detailupdate") {
-  //     $url_update = url_prepare("invoice_index.php?action=update&amp;".
-  // 			      "param_invoice=".$q_invoice->f("invoice_id"));
-  //     $block .= "
-  //      <table cellspacing=\"$cellspacing\" border=\"$border\">
-  //       <tr>
-  //        <td>
-  //         <input type=\"button\" value=\"$l_update\"
-  //         onClick=\"if (check_invoice (this.form)) {
-  //           this.form.action='$url_update';
-  //           this.form.submit ();
-  //           } \">
-  //        </td>";
-  //     // we can delete only if not paid
-  //     $payments_connected = run_query_search_payment_invoice($invoice, -1, $new_order, $order_dir);
-  //     $url_delete = url_prepare ("invoice_index.php?action=delete".
-  // 			   "&amp;param_invoice=".$q_invoice->f("invoice_id"));
-  //     if ($payments_connected->nf() == 0) {
-  //       $block .= "
-  //        <td>
-  //          <input type=\"button\" value=\"$l_delete\"
-  // 	 onClick=\"if (valider_suppression (this.form)) {
-  // 	   this.form.action='$url_delete';
-  // 	   this.form.submit ();
-  // 	   }\">
-  //        </td>";
-  //     }
-  //     $block .= "
-  //       </tr>
-  //      </table>"; 
-  //   } elseif (($action == "duplicate") || ($action == "new")) {
-  //     if ($action == "new") {
-  //       $url = url_prepare("invoice_index.php?action=insert");
-  //     } elseif ($action == "duplicate") {
-  //       $url = url_prepare("invoice_index.php?action=insert".
-  // 			 "&amp;param_invoice=".$q_invoice->f("invoice_id"));
-  //     }
-  //     // inserting or duplicating
-  //     $block .= "
-  //      <input type=\"hidden\" name=\"hd_deal_linked\" value=\"".$p_deal_linked."\">
-  //      <input type=\"button\" value=\"$l_insert\"
-  //        onClick=\"if ($js_fct_invoice(this.form)) {
-  //         this.form.action='$url';
-  //         this.form.submit ();
-  //         }\">";
-  //   }
-  //   $block .= "
-  //     </center>
-  //    </td>
-  //   </tr>
-  //  </table>
-  //  </form>
-  // </center>
-  // ";
+  </form>";
 
   return $block;
 }
@@ -556,14 +375,14 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice,
   //-- Themes
   global $col_frs, $col_client;
   //-- Labels
-  global $l_found, $l_archive_invoices, $l_archive_update;
-  global $l_label, $l_number, $l_amount_HT, $l_amount_TTC, $l_date, $l_status, $l_deal;
+  global $l_found, $l_archive_invoices, $l_archive_update, $l_deal;
+  global $l_label, $l_number, $l_amount_ht, $l_amount_ttc, $l_date, $l_status;
   global $display, $auth, $perms_user,$l_perms_user, $perms_admin;
 
   $label = urlencode($invoice["label"]);
   $number = urlencode($invoice["number"]);
-  $amount_HT = urlencode($invoice["HT"]);
-  $amount_TTC = urlencode($invoice["TTC"]);
+  $ht = urlencode($invoice["ht"]);
+  $ttc = urlencode($invoice["ttc"]);
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
@@ -575,8 +394,8 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice,
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
 		    "&amp;tf_number=$number".
-		    "&amp;tf_amount_HT=$amount_HT". 
-		    "&amp;tf_amount_TTC=$amount_TTC".
+		    "&amp;tf_amount_ht=$ht". 
+		    "&amp;tf_amount_ttc=$ttc".
 		    "&amp;sel_status=$status".
 		    "&amp;tf_deal=$deal".
 		    "&amp;rd_inout=$inout".
@@ -662,16 +481,15 @@ function dis_invoice_display_pref ($pref_inv_q, $pref_deal_q) {
 // screen to access if you want to add/remove deals linked to an invoice
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_deals, $q_payment, $options_payments) {
-  global $display, $set_theme,$col_label,$col_ok;
+  global $display, $set_theme;
   // - Labels
   global $l_update,$l_delete,$l_insert, $l_invoice_infos,$l_deals_todel;
   global $l_invoice_del_deal, $l_del_deal_chosen, $l_list_deal,$l_no_deal;
   global $l_list_payment, $l_no_payment, $l_payments_todel, $l_invoice_del_payment, $l_del_payment_chosen;
   global $l_add_deal, $l_del_deal;
-  global $l_label,$l_comment,$l_number, $l_date, $l_amount_HT, $l_amount_TTC, $l_deal, $l_status;
+  global $l_label,$l_comment,$l_number, $l_date, $l_deal, $l_status;
   global $perms_user,$l_perms_user;
   global $perm, $param_invoice, $menu, $cright_write_admin;
-  global $border, $cellspacing;
 
   $i_id = $q_invoice->f('invoice_id');
 
@@ -746,7 +564,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
 	// bcontins
 	// we display the button to add some deals or remove some...
 	// 	$block .= "
-	// <table cellspacing=\"$cellspacing\" border=\"$border\">
+	// <table>
 	//  <tr><td valign=\"top\">
 	//   <form method=\"post\" action=\"\">
 	//    <input type=\"button\" value=\"$l_add_deal\"
@@ -790,13 +608,83 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
 
 
 /////////////////////////////////////////////////////////////////////////////
+// displays an invoice details :
+/////////////////////////////////////////////////////////////////////////////
+function dis_invoice_detail ($p_action, $q_invoice, $q_status){
+  global $param_invoice, $display;
+  global $l_update, $l_comment,$l_amount_ht, $l_amount_ttc, $l_status;
+  global $l_date, $l_label, $l_number, $l_inout, $l_supplier;
+  global $l_client, $l_duplicate, $l_invoice, $l_geninvoice;
+
+  $label = $q_invoice->f("invoice_label");
+  $num = $q_invoice->f("invoice_number");
+  $date = date_format($q_invoice->f("date"));
+  $status_id = $q_invoice->f("invoice_status_id");
+
+  while ($q_status->next_record()) {
+    if ($q_status->f("invoicestatus_id") == $status_id){
+      $status .= $q_status->f("invoicestatus_label");
+      break; // as soon as we catch the one we leave
+    }
+  }
+
+  $inout = ($q_invoice->f("invoice_inout")=='-') ? $l_supplier : $l_client;
+  $ht = $q_invoice->f("invoice_amount_ht");
+  $ttc = $q_invoice->f("invoice_amount_ttc");
+  $comment = nl2br($q_invoice->f("invoice_comment"));
+
+  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
+
+  $block .= "
+    <div class=\"detailHead\">$l_geninvoice</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailText\">$label</td>
+     </tr>
+     <tr>
+      $dis_company
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$num</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailText\">$date</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_status</td>
+      <td class=\"detailText\">$status</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_inout</td>
+      <td class=\"detailText\">$inout</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_amount_ht</td>
+      <td class=\"detailText\">$ht</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_amount_ttc</td>
+      <td class=\"detailText\">$ttc</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_comment</td>
+      <td class=\"detailText\">$comment</td>
+     </tr>
+    </table>";
+
+  return $block;
+} 
+
+
+/////////////////////////////////////////////////////////////////////////////
 // form to add deals to an invoice
 /////////////////////////////////////////////////////////////////////////////
 function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=0,$p_deal_label="", $p_deal_company="", $p_deal_archive = 0) {
   global $l_search_deal, $l_invoice_deal_label, $l_invoice_infos, $l_find;
   global $l_invoice_deal_archive ;
   global $l_add_deal, $l_add_deal_chosen, $l_no_deal_found, $l_no_deal_display;
-  global $cellspacing, $border;
   global $display, $action, $perm, $menu, $cright_write_admin, $col_label;
   //$param_invoice;
   global $l_invoice_deal_company;
@@ -812,7 +700,7 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
 		     "&amp;param_invoice=".$q_invoice->f("invoice_id"));
   // searching deals form 
   $block .= "<center><form method=\"post\" action=\"$url\">
-        <table border=\"$border\" cellspacing=\"$cellspacing\">
+        <table>
          <tr><td>
           <font color=\"$col_label\"> $l_invoice_deal_label</font></br>
           <input type=\"text\" name=tf_deal_label value=\"$p_deal_label\">
@@ -881,77 +769,6 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// displays an invoice details :
-/////////////////////////////////////////////////////////////////////////////
-function dis_invoice_detail ($p_action, $q_invoice, $q_status){
-  global $param_invoice, $display;
-  global $l_update, $l_comment,$l_amount_HT, $l_amount_TTC, $l_status;
-  global $l_date, $l_label, $col_label,$l_number, $l_inout, $l_fournisseur;
-  global $l_client, $l_duplicate, $l_invoice, $l_geninvoice;
-
-  $label = $q_invoice->f("invoice_label");
-  $num = $q_invoice->f("invoice_number");
-  $date = date_format($q_invoice->f("date"));
-  $status_id = $q_invoice->f("invoice_invoicestatus_id");
-
-  while ($q_status->next_record()) {
-    if ($q_status->f("invoicestatus_id") == $status_id){
-      $status .= $q_status->f("invoicestatus_label");
-      break; // as soon as we catch the one we leave
-    }
-  }
-
-  $inout = ($q_invoice->f("invoice_inout")=='-') ? $l_fournisseur : $l_client;;
-  $amount_ht = $q_invoice->f("invoice_amount_HT");
-  $amount_ttc = $q_invoice->f("invoice_amount_TTC");
-  $comment = nl2br($q_invoice->f("invoice_comment"));
-
-  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
-
-  $block .= "
-    <div class=\"detailHead\">$l_geninvoice</div>
-
-    <table class=\"detail\">
-     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
-     </tr>
-     <tr>
-      $dis_company
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$num</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_status</td>
-      <td class=\"detailText\">$status</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailText\">$inout</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_amount_HT</td>
-      <td class=\"detailText\">$amount_ht</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_amount_TTC</td>
-      <td class=\"detailText\">$amount_ttc</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailText\">$comment</td>
-     </tr>
-    </table>";
-
-  return $block;
-} 
-
-
 //////////////////////////////////////////////////////////////////////////
 // error screen : adding payments to an invoice not connected to a deal
 //////////////////////////////////////////////////////////////////////////
@@ -971,4 +788,4 @@ function html_error_last_deal_remove ($q_invoice) {
   $display["msg"] .= display_err_msg  ($l_last_deal_remove_error);
 }
 
-</SCRIPT>
+</script>

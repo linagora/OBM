@@ -21,25 +21,42 @@ function run_query_search($time) {
   $date = $time["date"];
 
   if ($time["interval"] == "week") {
-      $array_date = get_week_point($date);
+    $array_date = get_week_point($date);
   }
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
+  $datetask = sql_date_format($db_type, "timetask_date", "date_task");
+  $timeupdate = sql_date_format($db_type, "timetask_timeupdate", "date_timeupdate");
+  $timecreate = sql_date_format($db_type, "timetask_timecreate", "date_timecreate");
+  $ctt[0]["type"] = "field";
+  $ctt[0]["value"] = "timetask_length";
+  $ctt[1]["type"] = "string";
+  $ctt[1]["value"] = "/";
+  $ctt[2]["type"] = "string";
+  $ctt[2]["value"] = "$c_day_fraction";
+  $concat = sql_string_concat($db_type, $ctt);
+  $if_status = sql_if($db_type, "(timetask_status != 2)", 1, 0);
 
   $query = "
     select timetask_id,
-      UNIX_TIMESTAMP(timetask_date) as date_task,
-      UNIX_TIMESTAMP(timetask_timeupdate) as date_timeupdate,
-      UNIX_TIMESTAMP(timetask_timecreate) as date_timecreate,
-      concat(timetask_length,concat('/', $c_day_fraction)) as timetask_length,
+      $datetask,
+      $timeupdate,
+      $timecreate,
+      $concat as timetask_length,
       tasktype_label,
       project_name as timetask_project_name,
       timetask_label,
       projecttask_label,
       company_name as timetask_company_name,
       timetask_status,
-      (if (timetask_status != 2, 1, 0)) as test_status,
+      $if_status as test_status,
       SUBSTRING(timetask_date,8,1) as date_parity
-    from ((TimeTask left join ProjectTask on timetask_projecttask_id = projecttask_id)
-      left join Project on projecttask_project_id = project_id)
+    from TimeTask
+      left join ProjectTask on timetask_projecttask_id = projecttask_id
+      left join Project on projecttask_project_id = project_id
       left join Company on project_company_id = company_id, TaskType 
     where timetask_tasktype_id = tasktype_id
       and timetask_date >='". $array_date[0] ."' 
@@ -201,7 +218,7 @@ function run_query_valid_search($time) {
   }
 
   // Group
-  $query .= " group by timetask_date ";
+  $query .= " group by timetask_date, timetask_status ";
   
   display_debug_msg($query, $cdg_sql, "run_query_valid_search");
   $obm_db = new DB_OBM;
@@ -732,11 +749,13 @@ function run_query_project($time) {
   $query = "
     select distinct
       project_id,
+      project_company_id,
       project_name,
       company_name,
       project_tasktype_id
-    from Project, ProjectTask, ProjectUser
-      left join Company on company_id = project_company_id
+    from Project
+      left join Company on company_id = project_company_id,
+      ProjectTask, ProjectUser
     where project_archive='0'
       and projectuser_projecttask_id = projecttask_id
       and projecttask_project_id = project_id

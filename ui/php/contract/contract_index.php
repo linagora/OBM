@@ -252,7 +252,7 @@ display_page($display);
 // returns : $contract hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contract() {
-  global $tf_label,$tf_company_name,$sel_type, $tf_type;
+  global $tf_label,$tf_company,$sel_type, $tf_type;
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
   global $param_contract,$tf_num,$sel_market, $sel_tech;
   global $ta_clause,$ta_com,$sel_con1, $sel_con2,$tf_datebegin,$tf_dateexp;
@@ -288,7 +288,7 @@ function get_param_contract() {
   if (isset ($tf_dateafter)) $contract["dateafter"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $contract["datebefore"] = $tf_datebefore;
   if (isset ($sel_manager)) $contract["manager"] = $sel_manager;
-  if (isset ($tf_company_name)) $contract["company_name"] = $tf_company_name;
+  if (isset ($tf_company)) $contract["company_name"] = $tf_company;
 
   // Company infos (with company_name)
   if (isset ($hd_company_ad1)) $contract["company_ad1"] = $hd_company_ad1;

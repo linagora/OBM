@@ -16,7 +16,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($project, $p_new_order="", $p_order_dir) {
-  global $auth, $c_all, $cdg_sql;
+  global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = $project["name"];
   $tt = $project["tt"];
@@ -31,80 +31,89 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
+  $datebegin = sql_date_format($db_type, "project_datebegin", "project_datebegin");
+  $dateend = sql_date_format($db_type, "project_dateend", "project_dateend");
+
+  $where = "1=1";
+
+  if ($name != "") {
+    $where .= " and project_name $like '$name%'";
+  }
+
+  if ($company) {
+    $where .= " and project_company_id = '$company'";
+  }
+
+  if ($company_name != "") {
+    $where .= " and company_name $like '$company_name%'";
+  }
+
+  if ($deal) {
+    $where .= " and project_deal_id = '$deal'";
+  }
+
+  if ($tt != 0) {
+    $where .= " and project_tasktype_id = '$tt'";
+  }
+
+  if ($date != "") {
+    $where .= " and project_datebegin < '$date'
+                  and (project_dateend < '$date' or project_dateend is null)";
+  }
+
+  if (!($archive)) {
+    $where .= " and project_archive = '0'";
+  }
+
+  if (($member != "") && ($member != $c_all)) {
+    $join_member = "left join ProjectUser as Member on project_id=Member.projectuser_project_id";
+    $where .= "and Member.projectuser_id = '$member'";
+  }
+
+  if (($manager != "") && ($manager != $c_all)) {
+    $join_manager = "left join ProjectUser as Manager on project_id=Manager.projectuser_project_id";
+    $where .= " and Manager.projectuser_user_id = '$manager'
+                and Manager.projectuser_manager = 1";
+  }
+
+  $whereq = "where $where";
+
+  // Order by clause
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "project_name";
+  $orderq = " order by $order $p_order_dir";
 
   $query = "select distinct
+      project_id as id,
       project_id,
       project_name,
       project_soldtime,
       project_estimatedtime,
       company_name as project_company,
       tasktype_label as project_tasktype,
-      project_datebegin,
-      project_dateend,
+      $datebegin,
+      $dateend,
       project_archive
     from Project
          left join Company on project_company_id=company_id
-         left join Deal on project_deal_id=deal_id,
-      TaskType
+         left join Deal on project_deal_id=deal_id
+         left join TaskType on project_tasktype_id=tasktype_id
+         $join_member
+         $join_manager
+    $whereq
+    $orderq
+    $limit
  ";
 
-  if (($member != "") && ($member != $c_all)) {
-    $query .= ", ProjectUser Member";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from Project $whereq");
+    $obm_q->set_num_rows_total($count);
   }
-  
-  if (($manager != "") && ($manager != $c_all)) {
-    $query .= ", ProjectUser Manager";
-  }
-
-  $query .= " where tasktype_id=project_tasktype_id";
-
-  if ($company) {
-    $query .= " and project_company_id = '$company'";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "run_query_search");
+    $obm_q->query($query);
   }
 
-  if ($deal) {
-    $query .= " and project_deal_id = '$deal'";
-  }
-
-  if (!($archive)) {
-    $query .= " and project_archive = '0'";
-  }
-
-  if ($name != "") {
-    $query .= " and project_name $like '$name%'";
-  }
-
-  if ($company_name != "") {
-    $query .= " and company_name $like '$company_name%'";
-  }
-
-  if ($tt != 0) {
-    $query .= " and project_tasktype_id = '$tt'";
-  }
-
-  if (($manager != "") && ($manager != $c_all)) {
-    $query .= " and project_id = Manager.projectuser_project_id
-                and Manager.projectuser_user_id = '$manager'
-                and Manager.projectuser_manager = 1";
-  }
-
-  if (($member != "") && ($member != $c_all)) {
-    $query .= " and project_id = Member.projectuser_project_id
-                and Member.projectuser_user_id = '$member'";
-  }
-
-  if ($date != "") {
-    $query .= " and project_datebegin < '$date'
-                  and (project_dateend < '$date' or project_dateend is null)";
-  }
-
-  // Order by clause
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "project_name";
-  $query .= " order by $order $p_order_dir";
-
-  display_debug_msg($query, $cdg_sql, "run_query_search");
-  $obm_q->query($query);
-  
   return $obm_q;
 }
 
@@ -1431,6 +1440,10 @@ function check_task_form($pid, $project) {
 ///////////////////////////////////////////////////////////////////////////////
 function is_task_parent($tid) {
   global $cdg_sql;
+
+  if ($tid == "") {
+    return false;
+  }
 
   $query = "select projecttask_id
     from ProjectTask

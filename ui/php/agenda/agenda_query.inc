@@ -401,7 +401,7 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   $groups = $agenda["group"];
   if(is_array($groups)) {
     foreach($groups as $group_id) {
-      $user_group_array = array_merge($user_group_array,run_query_get_groupsusers($group_id));
+      $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));
     }
     $contacts_array = array_merge($contacts_array,$user_group_array);
     $contacts_array = array_unique($contacts_array);
@@ -953,7 +953,7 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
   }
   if(is_array($groups)) {
     foreach($groups as $group_id) {
-      $user_group_array = array_merge($user_group_array,run_query_get_groupsusers($group_id));
+      $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));
     }
     $contacts_array = array_merge($contacts_array,$user_group_array);
     $contacts_array = array_unique($contacts_array);
@@ -1195,85 +1195,6 @@ function run_query_group_writable() {
   $obm_db->query($query);
   return $obm_db;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Get a group user list                                                   //
-// Parameters:
-//   - $id : group id
-// Returns:
-//   - array of users groups ids
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_groupsusers($id) {
-
-   $groups[] = $id;
-   $groups = array_merge($groups,get_group_children($id));
-   $groups = array_unique($groups);
-   return run_query_get_group_users($groups);
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get a group child list                                                   //
-// Parameters:
-//   - $id : group id
-// Returns:
-//   - array of parent groups ids
-///////////////////////////////////////////////////////////////////////////////
-function get_group_children($id) {
-  global $cdg_sql;
-
-  $query = "select groupgroup_childid
-    from GroupGroup where groupgroup_parentid='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
- 
-  $children = array();
-  while ($obm_q->next_record()) {
-    $g_id = $obm_q->f("groupgroup_childid");
-    array_push($children, $g_id);
-    $child_parents = get_group_children($g_id);
-    $children = array_merge($children, $child_parents);
-
-  }
-
-  return array_unique($children);
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get a group first level user list                                         //
-// Parameters:
-//   - $id : array ofgroup id
-// Returns:
-//   - array of users groups ids
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_group_users($groups) {
-  global $cdg_sql;
-
-  $query = "select userobmgroup_userobmid
-    from UserObmGroup where userobmgroup_groupid IN(";
-  $coma = "";
-  foreach($groups as $group_id) {
-	$query .= $coma.$group_id;
-	$coma = ",";
-  }
-  $query .= ")";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
- 
-  $users = array();
-  while($obm_q->next_record()) {
-    $users[] = $obm_q->f("userobmgroup_userobmid");
-  }
-  return array_unique($users);
-}
-
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -51,6 +51,7 @@ $l_cat = "Catégorie";
 $l_visibility = "Accès";
 $l_private = "Privé";
 $l_public = "Public";
+$l_manager = "Responsable";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
 

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : payment.inc                                              //
@@ -38,8 +38,8 @@ $l_include_checked = "Inclure les Paiements pointés";
 $l_add_invoices = "Associer à des Factures";
 $l_invoice_label = "Label";
 $l_invoice_date = "Date";
-$l_invoice_TTC = "Montant TTC";
-$l_invoice_HT = "Montant HT";
+$l_invoice_ttc = "Montant TTC";
+$l_invoice_ht = "Montant HT";
 $l_invoice_number = "Numéro"; 
 $l_invoice_status = "Etat";
 $l_invoice_not_paid_yet = "Montant impayé AVANT";

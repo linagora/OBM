@@ -161,7 +161,7 @@ function dis_document_search_list($document) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "document");
   $obm_q = run_query_search($document, $new_order, $order_dir);
-  $nb_document = $obm_q->num_rows();
+  $nb_document = $obm_q->num_rows_total();
   if ($nb_document == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -251,21 +251,21 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
-  global $display;
-  global $set_theme,$l_document,$l_new_file,$l_link,$path,$l_noupdate_file,$l_update_file;
-  global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme,$l_url,$l_links;
-  global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width,$document_path; 
-  global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto,$default_path;
-
+  global $display, $path, $document_path, $default_path, $set_theme;
+  global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
+  global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
+  global $l_author, $l_category1, $l_category2, $l_path, $l_kind; 
+  global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
+  global $popup_width, $popup_height;
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
     $id = $doc_q->f("document_id");
     $title = $doc_q->f("document_title");
-    $cat1 = $doc_q->f("document_category1");
-    $cat2 = $doc_q->f("document_category2");
+    $cat1 = $doc_q->f("document_category1_id");
+    $cat2 = $doc_q->f("document_category2_id");
     $author = $doc_q->f("document_author");
-    $privacy = ($doc_q->f("document_private") == 1 ? " checked" : "");
+    $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
     if (islink($doc_q->f("document_name"))) {
       $kind = "link";
@@ -310,7 +310,6 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $url_parse = parse_url($url);
     $proto = $url_parse["scheme"];
     $url = $url_parse["host"].$url_parse["path"];
-
   }
 
   if ($fi_path =="") $fi_path = $default_path;
@@ -361,35 +360,38 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <input type=\"submit\" value=\"$l_insert\" />
       ";
   }
-   if($kind == "new_file" || $kind == "" || $kind =="file") { 
-     $checked = "checked=\"checked\"";
-     $dis_img2 = " style=\"display: none;\" ";
-     $dis_url = " style=\"display: none;\" ";
-   }
-   else 
-     $checked = "";
-  
+
+  if ($kind == "new_file" || $kind == "" || $kind =="file") { 
+    $checked = "checked=\"checked\"";
+    $dis_img2 = " style=\"display: none;\" ";
+    $dis_url = " style=\"display: none;\" ";
+  } else { 
+    $checked = "";
+  }
+
   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"new_file\" $checked/> $l_new_file<br /> ";
 
-  if($kind == "link" && $proto == "http") {
+  if ($kind == "link" && $proto == "http") {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
      $tp = "http://";
-   }else 
-     $checked = "";
+  } else { 
+    $checked = "";
+  }
 
    $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link &nbsp;&nbsp;";
 
-  if($kind == "link" && $proto == "https") {
+  if ($kind == "link" && $proto == "https") {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
      $tp = "https://";
-   }else 
-     $checked = "";
-   
-     $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_links<br />";
+  } else { 
+    $checked = "";
+  }
+
+  $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_links<br />";
  
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
@@ -467,8 +469,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Repository Form                                                      //
+// Display Repository Form
 // Parameters:
 //   - $document[] : default values
 //     keys used  : uri, name
@@ -522,28 +525,31 @@ function html_repository_form($action, $document) {
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_consult($doc_q) {
-  global $display,$link_to;
-  global $set_theme,$l_document,$l_size,$l_bytes;
-  global $l_title, $l_category1, $l_mimetype,$l_private;
-  global $l_find, $l_author, $l_category2,$l_path,$l_name; 
-  global $l_file,$l_insert,$l_update,$l_checkdelete;
-  global $c_yes, $c_no,$l_consult;
+  global $display, $set_theme, $link_to;
+  global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
+  global $l_author, $l_category1, $l_category2, $l_path, $l_name; 
+  global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
+  global $c_yes, $c_no;
+
   // if update mode and first display values are taken from database
   $id = $doc_q->f("document_id");
   $title = $doc_q->f("document_title");
   $cat1 = $doc_q->f("documentcategory1_label");
   $cat2 = $doc_q->f("documentcategory2_label");
   $author = $doc_q->f("document_author");
-  $privacy = ($doc_q->f("document_private") == 1 ? $c_yes : $c_no );
+  $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
   $mimetype = $doc_q->f("documentmimetype_label");
   $path = $doc_q->f("document_path");
   $size = $doc_q->f("document_size");
   $name = $doc_q->f("document_name");
 
+  $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
+  $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
+
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
+
   // --- HTML Template --------------------------------------------------------
-    $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
-    $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
+
   $block = "
     <div class=\"detailHead\">$l_document</div>
 
@@ -624,7 +630,6 @@ function dis_check_links($p_id) {
         <td class=\"detailHead\">$l_have_no_link</td>
       </tr>";
   }
-
  
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("document_index.php") ."\">
@@ -655,6 +660,7 @@ function dis_check_links($p_id) {
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Display and check the repository links (and delete form if ok)
@@ -714,6 +720,7 @@ function dis_check_repository_links($p_id) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Displays the delete form (button)                                         //
 // Parameters:
@@ -725,7 +732,7 @@ function dis_delete_form($p_id) {
   $ret = "<form name=\"form_delete\" method=\"post\"
       action=\"" . url_prepare("document_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"hd_document_id\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
@@ -733,16 +740,15 @@ function dis_delete_form($p_id) {
   return $ret;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display the document administration index                                  //
+// Display the document administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
   $mime_q = run_query_documentmime();
-
-
 
   $block = html_document_cat1_form($cat1_q);
   $block .= "<hr />";
@@ -753,8 +759,9 @@ function dis_admin_index() {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Document Category1 section                                             //
+// Display: Document Category1 section
 // Parameters:
 //   - $cat1_q : Category1 list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -850,7 +857,7 @@ function html_document_cat1_form($cat1_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Document Category1 section                                             //
+// Display: Document Category2 section
 // Parameters:
 //   - $cat2_q : Category2 list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -944,8 +951,9 @@ function html_document_cat2_form($cat2_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Document Category2 section                                             //
+// Display: Document Mime section
 // Parameters:
 //   - $mime_q : Category2 list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1070,8 +1078,9 @@ function html_document_mime_form($mime_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the cat1 links                                               //
+// Display: the cat1 links
 // Parameters:
 //   - $document : document hash info : keys used : cat1
 ///////////////////////////////////////////////////////////////////////////////

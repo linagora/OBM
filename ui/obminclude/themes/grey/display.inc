@@ -389,61 +389,40 @@ function display_last_visited($path="..") {
 }
 
 
-// bcontins todo experiment (cette fontion)
 ///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the last visited display block
+// Display : Returns the Todo display block
 // Parameters:
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todo_toplist($path="..") {
-  global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
-  global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
-  global $todo_5_id, $todo_5_title, $l_header_todo;
+  global $todos, $l_header_todo;
 
-  $block = "
+  $nb = count($todos);
+
+  for ($i = 1; $i <= $nb; $i++) {
+    $t_id = $todos[$i]["id"];
+    $t_title = $todos[$i]["title"];
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=$t_id");
+    $todo_title = substr($t_title, 0, 30);
+    $block_todo .= "
+      <li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($nb >= 1) {
+    $block = "
     <div class=\"last\"> 
-     <div class=\"lastTitle\">:: $l_header_todo</div>
-     <ul class=\"lastList\">";
-
-  if ($todo_1_id) {
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_1_id);
-    $todo_title = substr($todo_1_title,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
-  }
-
-  if ($todo_2_id) {
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_2_id);
-    $todo_title = substr($todo_2_title,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
-  }
-
-  if ($todo_3_id) {
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_3_id);
-    $todo_title = substr($todo_3_title,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
-  }
-
-  if ($todo_4_id) {
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_4_id);
-    $todo_title = substr($todo_4_title,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
-  }
-
-  if ($todo_5_id) {
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_5_id);
-    $todo_title = substr($todo_5_title,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
-  }
-
-  $block .= "
+    <div class=\"lastTitle\">:: $l_header_todo</div>
+      <ul class=\"lastList\">
+      $block_todo
      </ul>
     </div>";
-
-  if (!($todo_1_id))
+  } else {
     $block = "";
+  }
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: end of an HTML page

@@ -50,13 +50,17 @@ require("$obminclude/global_pref.inc");
 include("list_display.inc");
 include("list_query.inc");
 
-update_last_visit("list", $param_list, $action);
-
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $list = get_param_list();
 get_list_action();
 $perm->check_permissions($menu, $action);
+if (! check_privacy($menu, "List", $action, $list["id"], $uid)) {
+  $display["msg"] = display_err_msg($l_error_visibility);
+  $action = "index";
+} else {
+  update_last_visit("list", $param_list, $action);
+}
 
 // ses_list is the session array of lists id to export
 if (sizeof($ses_list) >= 1) {
@@ -109,12 +113,7 @@ if ($action == "new_criterion") {
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_detail($list["id"]);
-  if (is_entity_visible("list", $list_q, $uid)) {
-    $display["detail"] = dis_list_form($action, $list_q, $list);
-  } else {
-    // this deal's page has "private" access
-    $display["msg"] .= display_err_msg($l_error_visibility);
-  } 	
+  $display["detail"] = dis_list_form($action, $list_q, $list);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -262,7 +261,7 @@ exit(0);
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
-  global $action, $cb_vis, $ext_action, $ext_url, $ext_id, $ext_target, $title;
+  global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
   global $new_order, $order_dir, $popup, $row_index;
   global $ch_mailing_ok;
 
@@ -295,11 +294,8 @@ function get_param_list() {
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
   if (isset ($row_index)) $list["row_index"] = $row_index;
-  if (isset( $cb_vis))
-  $list["vis"] = $cb_vis == 1?  1:0; 
-  if (isset($ch_mailing_ok))
-  $list["mailing_ok"] = $ch_mailing_ok == 1?  1:0; 
-
+  if (isset( $cb_priv)) $list["priv"] = $cb_priv == 1 ? 1 : 0;
+  if (isset($ch_mailing_ok)) $list["mailing_ok"] = $ch_mailing_ok == 1 ? 1 : 0; 
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
@@ -434,15 +430,17 @@ function get_list_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
     'Right'    => $cright_read,
+    'Privacy'  => true,
     'Condition'=> array ('detailupdate') 
                                       );
 
 // Detail Update
   $actions["LIST"]["detailupdate"] = array (
-     'Name'     => $l_header_update,
-     'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
-     'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult','contact_add','contact_del', 'update') 
+    'Name'     => $l_header_update,
+    'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('detailconsult','contact_add','contact_del', 'update')
                                            );
 
 // Insert
@@ -456,6 +454,7 @@ function get_list_action() {
   $actions["LIST"]["update"] = array (
     'Url'      => "$path/list/list_index.php?action=update",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                       );
 
@@ -464,6 +463,7 @@ function get_list_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/list/list_index.php?action=check_delete&amp;hd_list_id=".$list["id"]."",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
                                            );
 
@@ -471,6 +471,7 @@ function get_list_action() {
   $actions["LIST"]["delete"] = array (
     'Url'      => "$path/list/list_index.php?action=delete",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                       );
 
@@ -488,12 +489,14 @@ function get_list_action() {
   $actions["LIST"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                           );
 // Contact Del
   $actions["LIST"]["contact_del"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_del",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                           );
 

@@ -124,9 +124,7 @@ function debug_array($a) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_links ($time, $type="all") {
   global $cdg_param, $auth, $set_theme; 
-  global $l_week;
-  global $hum_date, $l_month2, $l_from, $l_to;
-  // WEEK
+  global $hum_date, $l_week, $l_month2, $l_from, $l_to;
 
   $action = $time["action"];
 
@@ -170,7 +168,7 @@ function dis_time_links ($time, $type="all") {
           <a href=\"" .
       url_prepare("time_index.php?action=".$time["action"].
 		  "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
-           <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
+          <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
           </a>
          </td>
          <td class=\"timePeriod\">
@@ -427,10 +425,8 @@ function dis_time_index($time) {
       $block = dis_time_one_month($obm_month_task_q, $time);
     }
 
-  }
-  else {
+  } else {
     $obm_week_task_q = run_query_task_one_week($time, '');
-
     $block = dis_time_one_week($obm_week_task_q, $time);
   }
 
@@ -1058,14 +1054,14 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     $previous_tt = 0;
 
     while ($project_q->next_record()) {
-      $proj_tt  = $project_q->f("project_tasktype_id");
+      $proj_tt = $project_q->f("project_tasktype_id");
       $proj_id = $project_q->f("project_id");
       $company = $project_q->f("company_name");
       if ($company == "") $company = $l_intern;
 
       $proj_name = addslashes($project_q->f("project_name"));
       $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
-      $proj_label = "\" $company -- ". $proj_name. "\"";
+      $proj_label = "\" $company -- $proj_name\"";
 
       if ($previous_tt != $proj_tt) {
 	if ($previous_tt != 0) {
@@ -1076,7 +1072,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       } else {
 	$proj_data .= ",\n";
       }
-      $proj_data .= "new Array(". $proj_label .", ". $proj_id .")";  
+      $proj_data .= "new Array($proj_label, $proj_id)";  
     }
     $proj_data .= "\n)\n";
   }

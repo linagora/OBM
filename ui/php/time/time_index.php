@@ -198,68 +198,50 @@ if ($action == "index" || $action == "") {
                        run_query_get_obmusers(),
                        $uid);
 
-} 
-
-elseif ($action == "viewmonth") {
+} elseif ($action == "viewmonth") {
 //////////////////////////////////////////////////////////////////////////////
-
   $time["interval"] = "month";
-
   // display links to previous and next week
   $display["result"] = dis_time_links($time,"month");
-
   // display the month panel
   $display["result"] .= dis_time_index($time);
-
   // display user Search Form
   $display["features"] .= dis_time_search_form($time, 
                        run_query_get_obmusers(),
                        $uid);
-}
  
-if ($action == "globalview") {
+} if ($action == "globalview") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
-
   // display links to previous and next week
   $display["result"] = dis_time_links($time,"month");
-
   // display validation panel
   $display["result"] .= dis_time_index($time);
-} 
 
-elseif ($action == "insert") {
+} elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time["action"]="index";
   $time["interval"] = "week";
-
   $display["result"] = dis_time_links($time,"week");
-
   run_query_insert($time);
   run_query_validate($time["user_id"]);
-
   $display["result"] .= dis_time_index($time);
   $display["result"] .= dis_time_list($time);
   $display["features"] .= dis_time_search_form($time,
 					     run_query_get_obmusers(),
 					     $uid);
-}
 
-elseif ($action == "validate") {
+} elseif ($action == "validate") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
-
   run_query_adminvalidate($time);
-
   // display links to previous and next week
   $display["result"] = dis_time_links($time,"month");
-
   // display validation panel
   $display["result"] .= dis_time_index($time);
-}
 
-elseif ($action == "unvalidate") {
+} elseif ($action == "unvalidate") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
 
@@ -351,9 +333,7 @@ elseif ($action == "detailupdate") {
   else {
     run_query_update($time);
     run_query_validate($time["user_id"]);
-  
     $user_id = $time["user_id"];
-    
     $display["result"] .= "
       <script language=\"javascript\">
        window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
@@ -365,23 +345,18 @@ elseif ($action == "detailupdate") {
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
-
   $display["detail"] = dis_time_display_pref($pref_search_q);
 
 } else if ($action == "dispref_display") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
-
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
-
   $display["detail"] = dis_time_display_pref($pref_search_q);
 
 } else if ($action == "dispref_level") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
-
   $display["detail"] = dis_time_display_pref($pref_search_q);
 }  
 

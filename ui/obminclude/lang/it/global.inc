@@ -47,6 +47,7 @@ $l_cat = "Categoria";
 $l_visibility = "Accesso";
 $l_private = "Privato";
 $l_public = "Pubblico";
+$l_manager = "Resp.";
 
 // OBM_DISPLAY
 $l_entries = "Resultati";

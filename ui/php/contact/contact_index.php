@@ -32,9 +32,6 @@
 // - ext_get_ids     --                -- select multiple contacts (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session, Auth, Perms Management                                           //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
 $menu = "CONTACT";
@@ -47,19 +44,19 @@ require("contact_display.inc");
 require("contact_query.inc");
 
 $uid = $auth->auth["uid"];
-update_last_visit("contact", $param_contact, $action);
-
-page_close();
 
 if ($action == "") $action = "index";
 $contact = get_param_contact();
 get_contact_action();
 $perm->check_permissions($menu, $action);
-
-
-if (! $contact["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
+if (! check_privacy($menu, "Contact", $action, $contact["id"], $uid)) {
+  $display["msg"] = display_err_msg($l_error_visibility);
+  $action = "index";
+} else {
+  update_last_visit("contact", $contact["id"], $action);
 }
+page_close();
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -80,6 +77,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] =  html_category2_list($contact);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,8 +98,8 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (isset($param_company)) {
-    $comp_q = run_query_contact_company($param_company);
+  if (isset($contact["company_id"])) {
+    $comp_q = run_query_contact_company($contact["company_id"]);
   }
   require("contact_js.inc");
   $display["detail"] = dis_contact_form($action, $comp_q, $contact);
@@ -385,6 +383,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_contact);
 $display["end"] = display_end();
+if (! $contact["popup"]) {
+  $display["header"] = generate_menu($menu,$section);
+}
 
 display_page($display);
 
@@ -398,7 +399,7 @@ function get_param_contact() {
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_vis, $ta_com;
+  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_priv, $ta_com;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
@@ -461,7 +462,7 @@ function get_param_contact() {
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
   if (isset ($tf_email2)) $contact["email2"] = trim($tf_email2);
   if (isset ($cb_archive)) $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($cb_vis)) $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
+  if (isset ($cb_priv)) $contact["priv"] = ($cb_priv == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
   if (isset ($tf_datecomment)) $contact["datecomment"] = $tf_datecomment;
@@ -551,6 +552,7 @@ function get_contact_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_read,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult','detailupdate') 
                                     		 );
 
@@ -559,6 +561,7 @@ function get_contact_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update') 
                                      		 );
 
@@ -573,6 +576,7 @@ function get_contact_action() {
   $actions["CONTACT"]["update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=update",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
 					
@@ -580,15 +584,16 @@ function get_contact_action() {
   $actions["CONTACT"]["document_add"] = array (
     'Url'      => "$path/contact/contact_index.php?action=document_add",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
-
 
 // Check Delete
   $actions["CONTACT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
@@ -596,6 +601,7 @@ function get_contact_action() {
   $actions["CONTACT"]["delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=delete",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
 

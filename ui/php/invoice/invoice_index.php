@@ -37,7 +37,7 @@ if ($action == "index" || $action == "") {
   $display["search"] = html_invoice_search_form ($action,run_query_invoicestatus(), $invoice); 
   if ($set_display == "yes") { 
     $obm_q = run_query_search($invoice, $new_order, $order_dir); 
-    $nb_invoices = $obm_q->num_rows(); 
+    $nb_invoices = $obm_q->num_rows_total();
     if ($nb_invoices == 0) { 
       $display["msg"] .= display_warn_msg($l_no_found);
     } else { 
@@ -53,7 +53,7 @@ if ($action == "index" || $action == "") {
   require("invoice_js.inc");
   $display["search"] = html_invoice_search_form($action, run_query_invoicestatus(), $invoice);
   $obm_q = run_query_search($invoice, $new_order, $order_dir);
-  $nb_invoices = $obm_q->num_rows();
+  $nb_invoices = $obm_q->num_rows_total();
   if ($nb_invoices == 0) { 
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -422,7 +422,7 @@ display_page($display);
 // returns : $invoice hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_invoice() {
-  global $tf_label, $tf_number, $tf_amount_HT, $tf_amount_TTC;
+  global $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
   global $ta_comment, $sel_status, $param_invoice, $tf_date;
   global $tf_date_after, $tf_date_before, $rd_inout, $hd_inout;
   global $tf_deal, $tf_company, $cb_archive, $param_deal;
@@ -430,8 +430,8 @@ function get_param_invoice() {
 
   if (isset ($tf_label)) $invoice["label"] = $tf_label;
   if (isset ($tf_number)) $invoice["number"] = $tf_number;
-  if (isset ($tf_amount_HT)) $invoice["HT"] = $tf_amount_HT;
-  if (isset ($tf_amount_TTC)) $invoice["TTC"] = $tf_amount_TTC;
+  if (isset ($tf_amount_ht)) $invoice["ht"] = $tf_amount_ht;
+  if (isset ($tf_amount_ttc)) $invoice["ttc"] = $tf_amount_ttc;
   if (isset ($sel_status)) $invoice["status"] = $sel_status;
   if (isset ($tf_date)) $invoice["date"] = $tf_date;
   if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after;
@@ -466,7 +466,7 @@ function get_param_invoice() {
 function get_invoice_action() {
   global $invoice, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_dupplicate,$l_header_admin;
+  global $l_header_consult, $l_header_display,$l_header_dupplicate,$l_header_admin;
   global $l_header_add_deal, $invoice_admin_write;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -502,9 +502,10 @@ function get_invoice_action() {
 
 // Detail Consult
   $actions["INVOICE"]["detailconsult"] = array (
-    'Url'      => "$path/invoice/invoice_index.php?action=detailconsult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$invoice["invoice"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
                                    );
 
 // Duplicate

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : payment.inc                                              //
@@ -35,7 +35,7 @@ $l_unpaid = "Not Paid";
 // invoice connected :
 $l_invoice_label = "Invoice Label";
 $l_invoice_date = "Invoice Date";
-$l_invoice_TTC = "Invoice Amount";
+$l_invoice_ttc = "Invoice Amount";
 $l_invoice_number = "Invoice Number"; 
 $l_invoice_not_paid_yet = "Amount not paid BEFORE";
 $l_invoice_still_not_paid = "Amount not paid NOW";

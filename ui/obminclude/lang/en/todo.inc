@@ -11,6 +11,7 @@ $l_todo = "Todo";
 $l_user = "User";
 $l_author = "Author";
 $l_date = " Date";
+$l_deadline = "Deadline";
 $l_todotitle = "Title";
 $l_content = "Content";
 
@@ -19,7 +20,7 @@ $l_delete = "Delete";
 $l_add = "Add";
 $l_update = "Update";
 
-$l_no_found = "Nothing to do";
+$l_no_found = "No to do tasks registered";
 $l_no_deadline = "Not specified";
 $l_delete_ok = "The reminder has been deleted successfully.";
 $l_delete_error = "The deletion of the reminder has failed !";

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.4";
+$obm_version = "0.8.5pre3";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -49,13 +49,14 @@ $c_task_adminvalid = 2;
 //Id of the Publication reception type which is dedicated to the auto
 //subscription.
 $c_focsys = 3;
+
 //---------------------------------------------------------------------------//
 // OBM Default configurable Constants : Default values
 // To change site values => change these in obm_conf.inc 
 //---------------------------------------------------------------------------//
 
 // Query limits (for user queries)
-$cql_max_row = 50000;  // Maximum rows to be returned
+$cql_max_row = 50000;    // Maximum rows to be returned
 $cql_max_cost = 100000;  // Maximum query cost (Postgres)
 
 // Popup Display size
@@ -71,6 +72,11 @@ $cg_prod = 3;
 // Use Database sessions
 $cgp_sess_db = false;
 
+// Tuning constants
+$ctu_sql_limit = false;
+
+// Todo lines to display
+$cgp_todo_nb = 5;
 
 //-------------------------//
 // Default Displayed Infos //
@@ -177,6 +183,19 @@ $c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
 
+//---------------------------------------------------------------------------//
+// Default access rights bits meanings
+// 0 - read  : data
+// 1 - own   : owner data
+// 2 - write : data
+// 3 - read  : admin 
+// 4 - write : admin 
+$cright_read = 1;
+$cright_own = 2;
+$cright_write = 4;
+$cright_read_admin = 8;
+$cright_write_admin = 16;
+
 // JavaScript and PHP Fields masks (regexp)
 $js_regexp_phone="/^[0-9+ \(\)-\.]+$/"; // digits + SPACE ( ) - in phone number
 $php_regexp_phone="^[0-9+ \(\)-\.]+$";  // digits + SPACE ( ) - in phone number
@@ -198,20 +217,6 @@ $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_lifetime = "^[0-9]{1,6}$";
 
 
-//---------------------------------------------------------------------------//
-// Default access rights bits meanings
-// 0 - read  : data
-// 1 - own   : owner data
-// 2 - write : data
-// 3 - read  : admin 
-// 4 - write : admin 
-$cright_read = 1;
-$cright_own = 2;
-$cright_write = 4;
-$cright_read_admin = 8;
-$cright_write_admin = 16;
-
-
 // Path to the OBM php root (if not set)
 if ($path == "") {
   if ($menu == "")
@@ -219,6 +224,7 @@ if ($path == "") {
   else 
     $path = "..";
 }
+
 
 //those functions must be defined before the global_query and global display
 //includes.
@@ -231,10 +237,8 @@ if ($path == "") {
 function display_debug_msg($msg, $debug=0, $function_name="") {
   global $set_debug;
 
-  if (! empty($function_name))
-	$function_name .= " : ";
   if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    echo "$function_name : $msg<hr>";
+    echo "<b>$function_name</b> : $msg<hr>";
   }
 }  
 
@@ -522,30 +526,56 @@ function display_record_info($obm_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if an entity is visible by the user
+// Check Privacy access
+// if action has privacy enable, check if entity is visible by the user
 // Parameters:
-//   - $entity : Entity (to get database fieldname)
-//   - $q      : DBO object with entity to check
-//   - $uid    : user id to check visibility
+//   - $menu   : menu to check (get $actions from)
+//   - $table  : table (entity) to check (can be parentdeal for DEAL menu)
+//   - $action : action to check
+//   - $id     : entity id
+//   - $p_uid  : user id to check access
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
-function is_entity_visible($entity, $q, $uid="") {
-  global $auth;
+function check_privacy($menu, $table, $action, $id, $p_uid="") {
+  global $actions, $auth, $cdg_sql;
 
-  if ($uid == "") {
+  // If action does not require privacy, grant access
+  if (! $actions[$menu][$action]["Privacy"]) {
+    return true;
+  }
+ 
+  // Set uid if not given
+  if ($p_uid == "") {
     $uid = $auth->auth["uid"];
+  } else {
+    $uid = $p_uid;
   }
 
-  $field_vis = "${entity}_visibility";
-  $field_uc = "${entity}_usercreate";
+  $entity = strtolower($table);
 
-  if ( ($q->f("$field_vis") == 0)
-    || ($q->f("$field_uc") == $uid) ){
+  $field_pri = "${entity}_privacy";
+  $field_uc = "${entity}_usercreate";
+  $field_id = "${entity}_id";
+
+  $query = "select $field_pri, $field_uc from $table where $field_id = '$id'";
+  display_debug_msg($query, $cdg_sql, "${entity}_search()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  // If entity not found, grant access !
+  if ($obm_q->num_rows() == 0) {
+    return true;
+  }
+
+  $obm_q->next_record();
+
+  // If entity is public or uid is the owner, grant access
+  if ( ($obm_q->f("$field_pri") == 0)
+    || ($obm_q->f("$field_uc") == $uid) ) {
     return true;
   } else {
     return false;
   }
-
 }
 
 

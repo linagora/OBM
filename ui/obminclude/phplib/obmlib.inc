@@ -36,6 +36,7 @@ class DB_OBM extends DB_Sql {
   var $type     = "";
   var $User     = "";
   var $Password = "";
+  var $Rows_nolimit = "";
 
   function DB_OBM ($query = "") {
     global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
@@ -48,12 +49,25 @@ class DB_OBM extends DB_Sql {
 
     $this->query($query);
   }
+
+  // Aliacom : Set the total rows number (case query is constraint by limit)
+  function set_num_rows_total ($total) {
+    $this->Rows_nolimit = $total;
+  }
+
+  // Aliacom : Get the total rows number (case query is constraint by limit)
+  function num_rows_total () {
+    if ($this->Rows_nolimit != "")
+      return $this->Rows_nolimit;
+    else
+      return $this->num_rows();
+  }
 }
 
 
 class OBM_CT_Sql extends CT_Sql {
   var $database_class = "DB_OBM";          // Which database to connect...
-  var $database_table = "ActiveSessions";  // and find our session data in this table.
+  var $database_table = "ActiveSessions";  // our session data in this table.
 }
 
 
@@ -71,39 +85,38 @@ class OBM_User_Sql extends CT_Sql {
     $module_name = substr($module_name,0,strlen($module_name)-10);
     $now = date("Y-m-d H:i:s", time());
     $uquery = sprintf("update %s
-               set activeuserobm_userobm_id='%d',
-                 activeuserobm_timeupdate='%s', 
-                 activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1,
-                 activeuserobm_lastpage= '%s'
-	       where activeuserobm_sid='%s'
-               and activeuserobm_session_name='%s'",
-      $this->database_table,
-      $str,
-      $now,
-      ucfirst($module_name).":".ucfirst($action),
-      $id,
-      $name);
+      set activeuserobm_userobm_id='%d',
+        activeuserobm_timeupdate='%s',
+        activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1,
+        activeuserobm_lastpage= '%s'
+      where activeuserobm_sid='%s' and activeuserobm_session_name='%s'",
+        $this->database_table,
+        $str,
+        $now,
+        ucfirst($module_name).":".ucfirst($action),
+        $id,
+        $name);
     $squery = sprintf("select count(*)
-        from %s
-        where activeuserobm_userobm_id='%s'
-          and activeuserobm_timeupdate='%s' 
-          and activeuserobm_sid='%s'
-          and activeuserobm_session_name='%s'",
+      from %s
+      where activeuserobm_userobm_id='%s'
+        and activeuserobm_timeupdate='%s'
+        and activeuserobm_sid='%s'
+        and activeuserobm_session_name='%s'",
       $this->database_table,
       $str,
       $now,
       $id,
       $name);
-    $iquery = sprintf("insert into %s
-          (activeuserobm_sid,
-           activeuserobm_session_name,
-           activeuserobm_userobm_id,
-           activeuserobm_timeupdate,
-           activeuserobm_timecreate,
-           activeuserobm_nb_connexions,
-           activeuserobm_lastpage,
-           activeuserobm_ip) 
-        values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
+    $iquery = sprintf("insert into %s (
+        activeuserobm_sid,
+        activeuserobm_session_name,
+        activeuserobm_userobm_id,
+        activeuserobm_timeupdate,
+        activeuserobm_timecreate,
+        activeuserobm_nb_connexions,
+        activeuserobm_lastpage,
+        activeuserobm_ip
+      ) values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
       $this->database_table,
       $id,
       $name,
@@ -168,16 +181,16 @@ class OBM_Challenge_Auth extends Auth {
   function auth_validatelogin() {
     global $login, $password, $challenge, $response;
 
-    if(isset($login)) {
-      $this->auth["uname"]= $login; // This provides access for loginform.ihtml
+    if (isset($login)) {
+      $this->auth["uname"] = $login; // provides access for loginform.ihtml
     }
 
     $this->db->query(sprintf("select userobm_id,
-      userobm_perms,
-      userobm_password
-    from %s
-    where userobm_login = '%s'
-      and userobm_archive = '0'",
+        userobm_perms,
+        userobm_password
+      from %s
+      where userobm_login = '%s'
+        and userobm_archive = '0'",
                           $this->database_table,
                           addslashes($login)));
 

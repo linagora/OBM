@@ -7,8 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-//NOTA:    $connect_db->free() DOES NOT WORK WITH PGSQL
-
 ///////////////////////////////////////////////////////////////////////////////
 // List Search query execution 
 // Parameters :
@@ -18,7 +16,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($list, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql, $uid;
+  global $c_all, $cdg_sql, $ctu_sql_limit;
   
   $name = $list["name"];
   $email = $list["email"];
@@ -27,11 +25,16 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-
+  $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
   $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
-  $like = sql_casei_like($db_type);
 
+  $where .= sql_obm_entity_privacy("list");
+
+  if ($name != '') {
+    $where .= " and list_name $like '$name%'";
+  }
   if ($contact != '') {
     $where .= " and contact_lastname $like '$contact%'";
   }
@@ -42,7 +45,13 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     $where .= " and (list_usercreate='$market' or list_userupdate='$market')";
   }
 
-  $query = "select distinct List.*, list_id as Id,
+  $whereq = "where $where";
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
+  $orderq .= " order by $order $p_order_dir";
+
+  $query = "select distinct List.*, list_id as id,
     $timecreate,
     $timeupdate,
     A.userobm_login as usercreate,
@@ -52,17 +61,19 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     LEFT JOIN Contact ON ContactList.contactlist_contact_id=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
-  where (list_visibility=0 or list_usercreate='$uid')
-    and list_name $like '$name%'
-    $where";
+  $whereq
+  $orderq
+  $limit";
 
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from List $whereq");
+    $obm_q->set_num_rows_total($count);
+  }
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "list_search()");
+    $obm_q->query($query);
+  }
 
-  // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
-  $query .= " order by $order $p_order_dir";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
   return $obm_q;
 }
 
@@ -106,7 +117,7 @@ function run_query_detail($id) {
 function run_query_insert($list) {
   global $auth, $cdg_sql;
 
-  $vis = ($list["vis"]==1)?1:0;
+  $priv = ($list["priv"]==1) ? 1 : 0;
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
@@ -119,7 +130,7 @@ function run_query_insert($list) {
     list_timecreate,
     list_userupdate,
     list_usercreate,
-    list_visibility,
+    list_privacy,
     list_name,
     list_subject,
     list_email,
@@ -130,7 +141,7 @@ function run_query_insert($list) {
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
-    '$vis',
+    '$priv',
     '$name',
     '$subject',
     '$email',
@@ -154,7 +165,7 @@ function run_query_update($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
-  $vis = ($list["vis"]==1)?1:0;
+  $priv = ($list["priv"]==1) ? 1 : 0;
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
@@ -166,7 +177,7 @@ function run_query_update($list) {
   $query = "update List set
     list_timeupdate='". date("Y-m-d H:i:s")."',
     list_userupdate='".$auth->auth["uid"]."',
-    list_visibility='$vis',
+    list_privacy='$priv',
     list_name='$name',
     list_subject='$subject',
     list_email='$email',
@@ -329,7 +340,7 @@ function run_query_contacts_list($list, $entity="") {
   }
 
   $query = "select contactlist_contact_id as contact_id,
-         contactlist_contact_id as Id,
+         contactlist_contact_id as id,
          contact_timeupdate,
          contact_timecreate,
          contact_userupdate,
@@ -357,7 +368,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_fax,
          contact_email,
          contact_comment,
-         contact_visibility,
+         contact_privacy,
          company_name,
          company_address1,
          company_address2,
@@ -623,14 +634,19 @@ function get_list_info($id) {
 function get_query_num_rows($query="") {
   global $cdg_sql;
 
-  if (trim($query) != "") {
-    display_debug_msg($query, $cdg_sql);
+  // Construct count query to optimize performance (instead of counting rows)
+  // Get the From ... Where clauses
+  if (preg_match('/(FROM (.*)) (GROUP BY|$)/s', $query, $matches)) {
+     $query_c = "select count (contact_id) " . $matches[1];
+
+    display_debug_msg($query_c, $cdg_sql);
     $obm_q = new DB_OBM;
-    $r = $obm_q->query($query, 1);
+    $r = $obm_q->query($query_c, 1);
     if (is_string($r)) {
       $ret = -1;
     } else {
-      $ret = $obm_q->num_rows();
+      $obm_q->next_record();
+      $ret = $obm_q->f(0);
     }
   } else {
     $ret = 0;
@@ -1169,7 +1185,7 @@ function run_query_contacts_for_letter($list_ids) {
         contact_fax as list_contact_fax,
         contact_email as list_contact_email,
         contact_comment as list_contact_comment,
-        contact_visibility as list_contact_visibility,
+        contact_privacy as list_contact_privacy,
         company_name as contact_company_name,
         company_address1 as contact_company_address1,
         company_address2 as contact_company_address2,
@@ -1179,11 +1195,11 @@ function run_query_contacts_for_letter($list_ids) {
         c2.country_name as contact_company_country,
         kind_minilabel as list_contact_kind
       from Contact
-             left join Company on contact_company_id=company_id
-             left join Kind on contact_kind_id=kind_id
-             left join Function on contact_function_id=function_id
-             left join Country as c1 on contact_country_id=c1.country_id
-             left join Country as c2 on company_country_id=c2.country_id,
+           left join Company on contact_company_id=company_id
+           left join Kind on contact_kind_id=kind_id
+           left join Function on contact_function_id=function_id
+           left join Country as c1 on contact_country_id=c1.country_id
+           left join Country as c2 on company_country_id=c2.country_id,
            ContactList
       where contactlist_list_id in (";
     $query .= $list_ids;

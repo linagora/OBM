@@ -147,11 +147,11 @@ function dis_publication_search_list($publication) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "publication");
   $obm_q = run_query_search($publication, $new_order, $order_dir);
-  $nb_publication = $obm_q->num_rows();
-  if ($nb_publication == 0) {
+  $nb_pub = $obm_q->num_rows_total();
+  if ($nb_pub == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_publication_search_list($obm_q,$pref_q,$nb_publication,$publication,$popup);
+    $block = html_publication_search_list($obm_q,$pref_q,$nb_pub,$publication,$popup);
   }
 
   return $block;
@@ -161,13 +161,13 @@ function dis_publication_search_list($publication) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Returns the XHTML result display
 // Parameters : 
-//   - $comp_q     : list of companies
+//   - $pub_q      : publication list
 //   - $pref_q     : the fields which have to be displayed
-//   - $nb_publication : nb companies returned by the search query
+//   - $nb_pub     : nb publications returned by the search query
 //   - $publication[]  : publication search criteria
 //     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publication,$popup) {
+function html_publication_search_list($pub_q, $pref_q, $nb_pub,$publication,$popup) {
   global $display, $l_found,$l_close;
 
   if ($popup) {
@@ -186,8 +186,6 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
  
   $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;sel_type=$type&amp;tf_year=$year&amp;tf_lang=$lang$url_ext");
 
-  $comp_q->seek($first_row);
-
   $pub_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
   if ($popup) {
     $pub_d->display_link = false;
@@ -198,10 +196,10 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
       </p>";
   }
   
-  $pub_d->data_set = $comp_q;
+  $pub_d->data_set = $pub_q;
   $pub_d->data_url = $url;
   $pub_d->data_header = "both";
-  $display["msg"] = display_info_msg("$nb_publication $l_found");
+  $display["msg"] = display_info_msg("$nb_pub $l_found");
   $block = $pub_d->display("dis_data_publication");
   $block .= $display_popup_end;  
 
@@ -212,13 +210,13 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Returns the XHTML result display
 // Parameters : 
-//   - $comp_q     : list of companies
+//   - $pub_q      : publication list
 //   - $pref_q     : the fields which have to be displayed
-//   - $nb_publication : nb companies returned by the search query
+//   - $nb_pub     : nb publications returned by the search query
 //   - $publication[]  : publication search criteria
 //     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_search_list($comp_q, $pref_q, $nb_publication,$publication,$popup) {
+function html_subscription_search_list($pub_q, $pref_q, $nb_pub,$publication,$popup) {
   global $display, $l_found,$l_close;
 
   // we urlencode to avoid breakage for space char
@@ -233,22 +231,22 @@ function html_subscription_search_list($comp_q, $pref_q, $nb_publication,$public
   
   $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
 
-  $comp_q->seek($first_row);
+  $pub_q->seek($first_row);
 
-  $comp_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
+  $pub_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
   if ($popup) {
-    $comp_d->display_ext = "ext_get_id";
+    $pub_d->display_ext = "ext_get_id";
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
   }
   
-  $comp_d->data_set = $comp_q;
-  $comp_d->data_url = $url;
-  $comp_d->data_header = "both";
-  $display["msg"] = display_info_msg("$nb_publication $l_found");
-  $block = $comp_d->display("dis_data_publication");
+  $pub_d->data_set = $pub_q;
+  $pub_d->data_url = $url;
+  $pub_d->data_header = "both";
+  $display["msg"] = display_info_msg("$nb_pub $l_found");
+  $block = $pub_d->display("dis_data_publication");
   $block .= $display_popup_end;  
 
   return $block;

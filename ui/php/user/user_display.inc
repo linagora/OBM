@@ -18,7 +18,7 @@ $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_phone"] = $l_phone;
-$fieldnames["userobm_timelastaccess"] = $l_lastaccess;
+$fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
 
@@ -49,9 +49,10 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
     if ($OD->data_set->f($fieldname)) $res["name"] = "X";
     else $res["name"] = "&nbsp;";
   }
-  else if ($fieldname == "userobm_timelastaccess") {
+  else if ($fieldname == "timelastaccess") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = datetime_format($date, 1);
+    $res["txt_name"] = $res["name"];
   }
 
   return $res;
@@ -152,7 +153,7 @@ function dis_user_search_list($user) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "user");
   $obm_q = run_query_search($user, $new_order, $order_dir);
-  $nb_user = $obm_q->num_rows();
+  $nb_user = $obm_q->num_rows_total();
   if ($nb_user == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -474,7 +475,7 @@ function html_user_group_consult($usr_q) {
   $gu_q = run_query_user_group($id);
   $groups = array();
   while ($gu_q->next_record()) {
-    $g_id = $gu_q->f("userobmgroup_groupid");
+    $g_id = $gu_q->f("userobmgroup_group_id");
     array_push($groups, $g_id);
   }
 

@@ -23,8 +23,8 @@ $fieldnames["payment_number"] = $l_number;
 $fieldnames["payment_account_lbl"] = $l_payment_account;
 $fieldnames["invoice_label"] = $l_invoice_label;
 $fieldnames["invoice_date"] = $l_invoice_date;
-$fieldnames["invoice_amount_TTC"] = $l_invoice_TTC;
-$fieldnames["invoice_amount_HT"] = $l_invoice_HT;
+$fieldnames["invoice_amount_ttc"] = $l_invoice_ttc;
+$fieldnames["invoice_amount_ht"] = $l_invoice_ht;
 $fieldnames["invoice_number"] = $l_invoice_number;
 $fieldnames["invoice_paid"] = $l_invoice_paid;
 $fieldnames["invoice_company"] = $l_invoice_company;
@@ -431,23 +431,23 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   $ichecked = ($payment["checked"]) ? "checked" : "" ;
 
   // Inout
-  $bcheck = (($inout == "_TOUT_")||($inout=="")) ? "checked" : "";
+  $bcheck = (($inout == "$c_all")||($inout=="")) ? "checked" : "";
   $pcheck = ($inout == "+") ? "checked" : "";
   $mcheck = ($inout == "-") ? "checked" : "";
 
   $rd_inout = "
-    <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\" $bcheck />$l_both &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $bcheck />$l_both &nbsp;
     <input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck />$l_client &nbsp;
     <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />$l_fournisseur &nbsp;
     ";
 
   // Paid
-  $bcheck = (($paid == "_TOUT_")||($paid=="")) ? "checked" : "";
+  $bcheck = (($paid == "$c_all")||($paid=="")) ? "checked" : "";
   $ycheck = ($paid == "y") ? "checked" : "";
   $ncheck = ($paid == "n") ? "checked" : "";
 
   $rd_status = "
-    <input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\" $bcheck />$l_both &nbsp;
+    <input type=\"radio\" name=\"rd_paid\" value=\"$c_all\" $bcheck />$l_both &nbsp;
     <input type=\"radio\" name=\"rd_paid\" value=\"y\" $ycheck />$l_paid &nbsp;
     <input type=\"radio\" name=\"rd_paid\" value=\"n\" $ncheck />$l_unpaid &nbsp;
     ";
@@ -578,8 +578,8 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   //          </td>
   //         <td>
   //           <font size=-2>$l_inout</font><br>
-  //           <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
-  //   if (($inout == "_TOUT_")||($inout=="")){
+  //           <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\"";
+  //   if (($inout == "$c_all")||($inout=="")){
   //     $block .= "checked";
   //   }
   //   $block .= ">$l_both &nbsp;
@@ -599,8 +599,8 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   //         <tr><td>
   //           <font size=-2>$l_status</font>
   //           <br>
-  //           <input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\"";
-  //   if (($paid == "_TOUT_")||($paid=="")){
+  //           <input type=\"radio\" name=\"rd_paid\" value=\"$c_all\"";
+  //   if (($paid == "$c_all")||($paid=="")){
   //     $block .= "checked"; 
   //   }
   //   $block .= ">$l_both &nbsp;
@@ -974,7 +974,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
   // Labels
   global $l_found, $l_select_invoice, $l_affect_invoices;
   global $l_label, $l_number, $l_amount, $l_kind, $l_date, $l_expected_date;
-  global $l_invoice_label, $l_invoice_date, $l_invoice_TTC,$l_invoice_status;
+  global $l_invoice_label, $l_invoice_date, $l_invoice_status;
   global $l_invoice_company;
   global $cdg_param;
   
@@ -1063,7 +1063,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
 //   on the previous screen
 //////////////////////////////////////////////////////////////////////////
 function html_payment_affect_invoices ($payment, $tab_invoices_selected){
-  global $l_invoice_label, $l_invoice_date, $l_invoice_TTC;
+  global $l_invoice_label, $l_invoice_date, $l_invoice_ttc;
   global $l_invoice_number, $l_invoice_not_paid_yet;
   global $l_invoice_still_not_paid,$l_invoice_share;
   global $l_already_used_share;
@@ -1093,7 +1093,7 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
   // let's put the headers :
   $block .=  "
    <tr><th>$l_invoice_number</th><th>$l_invoice_date</th>".
-    "<th>$l_invoice_label</th><th>$l_invoice_TTC</th>".
+    "<th>$l_invoice_label</th><th>$l_invoice_ttc</th>".
     "<th>$l_invoice_not_paid_yet</th><th>$l_invoice_still_not_paid</th>".
     "<th>$l_invoice_share</th></tr>";
   // we need this $i later on...
@@ -1110,7 +1110,7 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
       "<td>".$q_invoice->f("invoice_number")."</td>\n".
       "<td>".$q_invoice->f("invoice_date")."</td>\n".
       "<td>".$q_invoice->f("invoice_label")."</td>\n".
-      "<td>".$q_invoice->f("invoice_amount_TTC")."</td>\n".
+      "<td>".$q_invoice->f("invoice_amount_ttc")."</td>\n".
       "<td><input type=text readonly size=\"$size\" name=\"tf_not_paid_yet_$i\"".
       " value=\"".$q_invoice->f("invoice_not_paid_yet")."\"></td>\n".
       "<td><input type=text readonly size=\"$size\" name=\"tf_still_not_paid_$i\"".

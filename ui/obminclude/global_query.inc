@@ -151,6 +151,95 @@ function sql_if($db_type, $expr, $iftrue, $iffalse) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the sql string corresponding to the limit clause
+// If number and count not given, user preferences values are used
+// Parameters:
+//   - $db_type  : DB type
+//   - $number   : number of rows to return (set_rows by default)
+//   - $p_offset : #rows to skip (start at offset + 1) (default from page)
+// Returns:
+//   - limit clause
+///////////////////////////////////////////////////////////////////////////////
+function sql_limit($db_type, $number="", $p_offset="") {
+  global $db_type_mysql, $db_type_pgsql, $ctu_sql_limit;
+  global $set_rows, $set_rows_default, $page;
+
+  // If limit should not be used, return empty clause
+  if (! $ctu_sql_limit) { return ""; }
+
+  if ($number != "") {
+    $num = $number;
+  } else if ($set_rows != "") {
+    $num = $set_rows;
+  } else {
+    $num = $set_rows_default;
+  }
+
+  if ($p_offset != "") {
+    $off = $p_offset;
+  } else if ($page > 0) {
+    $off = ($page - 1) * $num;
+  } else {
+    $off = "0";
+  }
+
+  if (($db_type == $db_type_mysql) || ($db_type == $db_type_pgsql)) {
+    $ret = "limit $num offset $off";
+  } else {
+    $ret = "limit $num offset $off";
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check Privacy access
+// Parameters:
+//   - $entity : entity to check
+//   - $p_uid  : user id to check access
+// Returns true if entity is visible, else false
+///////////////////////////////////////////////////////////////////////////////
+function sql_obm_entity_privacy($entity, $p_uid="") {
+  global $auth, $cdg_sql;
+
+  // Set uid if not given
+  if ($p_uid == "") {
+    $uid = $auth->auth["uid"];
+  } else {
+    $uid = $p_uid;
+  }
+
+  $field_pri = "${entity}_privacy";
+  $field_uc = "${entity}_usercreate";
+
+  $where = "($field_pri = '0' or $field_uc = '$uid')";
+
+  return $where;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the count(*) of the query (the 1fst field)
+// Parameters:
+//   - $db_type  : DB type
+// Returns:
+//   - limit clause
+///////////////////////////////////////////////////////////////////////////////
+function get_query_count($query) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  display_debug_msg("get_query_count() : $query", $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $count = $obm_q->f(0);
+
+  return $count;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login
 // Parameters:
 //   - $login  : login
@@ -440,7 +529,7 @@ function run_query_userobm($id="") {
     order by userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg("run_query_userobm() : $query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_userobm()");
 
   return $obm_q;
 }
@@ -541,9 +630,9 @@ function get_all_users_from_group($g_id) {
   $users = array();
 
   // Groups members of this group
-  $query = "select groupgroup_childid as child_id
+  $query = "select groupgroup_child_id as child_id
       from GroupGroup
-      where groupgroup_parentid='$g_id'";
+      where groupgroup_parent_id='$g_id'";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);
@@ -556,9 +645,9 @@ function get_all_users_from_group($g_id) {
   }
 
   // Users members of this group
-  $query = "select userobmgroup_userobmid as user_id
+  $query = "select userobmgroup_userobm_id as user_id
     from UserObmGroup
-    where userobmgroup_groupid='$g_id'
+    where userobmgroup_group_id='$g_id'
   ";
 
   $obm_q = new DB_OBM; 
@@ -684,9 +773,10 @@ function run_query_display_pref($u_id, $entity, $all=0)  {
   }
   $query.=" order by display_fieldorder"; 
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_display_pref()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;	
 }      
 
@@ -849,9 +939,6 @@ function session_load_global_prefs() {
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
   global $sess, $auth, $last_v;
-  global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
-  global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
-  global $todo_5_id, $todo_5_title;
 
   $obm_q = run_query_get_user_prefs($auth->auth["uid"]);
   while ($obm_q->next_record()) {
@@ -859,28 +946,65 @@ function session_load_user_prefs() {
     $value = $obm_q->f("userobmpref_value");
     global $$option;
     $$option = $value;
-    $sess->register("$option");
+
     // Last visit management (if last_visit entry, get the associated text)
     if (substr($option, 0, 5) == "last_") {
       $entity = substr($option, 5);
       $function_get_last_text = "get_last_${entity}_text";
       $last_v[$entity]["id"] = $$option;
       $last_v[$entity]["text"] = $function_get_last_text($$option);
+
+      // Other preferences
+    } else {
+      $sess->register("$option");
     }
   }
 
   $sess->register("last_v");
+}
 
-  $todo_1_title = run_query_global_todo_title($todo_1_id);
-  $sess->register("todo_1_title");
-  $todo_2_title = run_query_global_todo_title($todo_2_id);
-  $sess->register("todo_2_title");
-  $todo_3_title = run_query_global_todo_title($todo_3_id);
-  $sess->register("todo_3_title");
-  $todo_4_title = run_query_global_todo_title($todo_4_id);
-  $sess->register("todo_4_title");
-  $todo_5_title = run_query_global_todo_title($todo_5_id);
-  $sess->register("todo_5_title");
+
+///////////////////////////////////////////////////////////////////////////////
+// Get and register the user's todo into session
+// This must be called in an open session (between page_open and page_close )
+///////////////////////////////////////////////////////////////////////////////
+function session_load_user_todos() {
+  global $cdg_sql, $cgp_todo_nb, $set_todo, $todos, $sess, $auth;
+
+  $uid = $auth->auth["uid"];
+
+  $limit = sql_limit($db_type, $cgp_todo_nb, 0);
+
+  // create the todo list
+  $query = "select
+      todo_id,
+      todo_title
+    from Todo
+    where todo_user = '$uid'
+    order by $set_todo desc
+    $limit";
+
+  display_debug_msg($query, $cdg_sql);
+  $todolist_q = new DB_OBM;
+  $todolist_q->query($query);
+
+  $nb_todo = $todolist_q->num_rows();
+  $max = min ($cgp_todo_nb, $nb_todo);
+
+  $todos = "";
+
+  for ($rank = 1; $rank <= $max; $rank++) {
+    $todolist_q->next_record();
+
+    $option = "todo_$rank";
+    $t_id = $todolist_q->f("todo_id");
+    $t_title = $todolist_q->f("todo_title");
+
+    $todos[$rank]["id"] = $t_id; 
+    $todos[$rank]["title"] = $t_title; 
+  }
+
+  $sess->register("todos");
 }
 
 
@@ -1171,6 +1295,27 @@ function get_last_incident_text($id) {
     $obm_q->next_record();
     return $obm_q->f("incident_label");
   }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the Document name from the document Id
+// Parameters:
+//   - $id : document id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_document_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "select document_name from Document where document_id='$id'";
+    $obm_q = new DB_OBM;
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("document_name");
+  }
+
   return;
 }
 

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //
-// 2003-09-15 Bastien Continsouzas                                           //
+// 2003-09-15 Aliacom - Bastien Continsouzas                                 //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,6 @@ require("todo_display.inc");
 if (!(($action == "detailupdate") && ($popup)))
   require("todo_js.inc");
 
-page_close();
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 
@@ -43,9 +42,9 @@ $perm->check_permissions($menu, $action);
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $user_q = run_query_userobm();
-  $todo_q = run_query_todolist($todo, $new_order, $order_dir);
   $display["result"] = dis_todo_form($todo, $user_q);
-  if ($todo_q->nf() != 0)
+  $todo_q = run_query_todolist($todo, $new_order, $order_dir);
+  if ($todo_q->num_rows_total() != 0)
     $display["result"] .= dis_todo_list($todo, $todo_q);
   else
     $display["msg"] .= display_info_msg($l_no_found);
@@ -101,10 +100,9 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-    $user_q = run_query_userobm();
-    $todo_q = run_query_detail($todo);
-
-    $display["result"] = dis_todo_form($todo, $user_q, $todo_q);
+  $user_q = run_query_userobm();
+  $todo_q = run_query_detail($todo);
+  $display["result"] = dis_todo_form($todo, $user_q, $todo_q);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,8 +126,7 @@ if ($action == "index" || $action == "") {
     $user_q = run_query_userobm();
     $todo_q = run_query_todolist($todo, "", "");
     $display["result"] = dis_todo_form($todo, $user_q);
-
-    if ($todo_q->nf() != 0)
+    if ($todo_q->num_rows_total() != 0)
       $display["result"] .= dis_todo_list($todo, $todo_q);
     else
       $display["msg"] .= display_info_msg($l_no_found);
@@ -138,45 +135,34 @@ if ($action == "index" || $action == "") {
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "todo", 1);
-
   $display["detail"] = dis_todo_display_pref($pref_search_q);
 
 } else if ($action == "dispref_display") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
-
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "todo", 1);
-
   $display["detail"] = dis_todo_display_pref($pref_search_q);
 
 } else if ($action == "dispref_level") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "todo", 1);
-
   $display["detail"] = dis_todo_display_pref($pref_search_q);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Todo top list (same as the bookmarks : id and titles are registered)
 ///////////////////////////////////////////////////////////////////////////////
-// if a todo was modified for an other user, we update his prefs
-if ((in_array($action, array("add", "detailupdate")))
-    && ($sel_user != $uid))
-  run_query_set_user_todo($sel_user);;
-
-//we update the current user prefs
+// If the todo list was updated, we reload the todo in session
 if (in_array($action, array("add", "detailupdate", "delete", "delete_unique")))
-  run_query_set_user_todo($uid);
+  session_load_user_todos();
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-
 if (($action != "update") or (!($popup)))
   $display["header"] = generate_menu($menu, $section);
-     
 $display["head"] = display_head($l_todo);
 $display["end"] = display_end();
      

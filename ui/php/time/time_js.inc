@@ -14,7 +14,6 @@ $extra_js .= "
 
 require("$obminclude/javascript/check_js.inc");
 
-
 $extra_js .= "
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
@@ -27,7 +26,7 @@ function select_all(form) {
   data = form.elements[0];
 
   longueur=data.length;
-  for(i=0;i<longueur;i++){
+  for (i=0;i<longueur;i++) {
     data.options[i].selected = 1;
   }
   return false;
@@ -161,12 +160,17 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
 
     // there are projects with the selected tasktype
     if (tt_location != -1) {
-      // add new items
-      // Way to correct bug#361 ?? but causes 1 undefined in project list ??
-      // project[tt_location].sort();
+      // We construct a new array (without the tt id) to sort it case sensitive
+      proj_array = new Array();
       for (i = 1; i < project[tt_location].length; i++) {
-        sel_list.options[i-1] = new Option(project[tt_location][i][0]);
-        sel_list.options[i-1].value = project[tt_location][i][1]; 
+        proj_array[i-1] = project[tt_location][i];
+      }
+      proj_array.sort();
+
+      // Fill the project select widget
+      for (i = 0; i < proj_array.length; i++) {
+        sel_list.options[i] = new Option(proj_array[i][0]);
+        sel_list.options[i].value = proj_array[i][1]; 
       }
     }
     // there are no projects with the selected tasktype

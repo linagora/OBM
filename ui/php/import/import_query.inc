@@ -37,7 +37,7 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
     $where .= " and import_marketingmanager_id='$market'";
   }
 
-  $query = "select distinct import_id as Id,
+  $query = "select distinct import_id as id,
     import_id,
     import_name,
     import_separator,

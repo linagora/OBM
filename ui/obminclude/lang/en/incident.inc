@@ -64,12 +64,12 @@ $l_sta_delete = "Delete Status";
 $l_sta_insert = "Insert Status";
 
 // Message
+$l_no_display = "Fill the search fields and press < Find > to retrieve the incidents";
 $l_found = "incidents found";
 $l_no_found = "No incident found matching the query !";
 $l_insert_ok = "The incident has been inserted successfully.";
 $l_update_ok = "The incident has been updated successfully.";
 $l_delete_ok = "The incident has been deleted successfully.";
-$l_no_display = "Fill the search fields and press &lt; Find &gt; to retrieve the Incidents";
 
 $l_pri_insert_ok = "The priority has been inserted successfully.";
 $l_pri_insert_error = "The insertion of the priority has failed !";

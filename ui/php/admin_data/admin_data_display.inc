@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : admin_data_display.inc                                      //
 //     - Desc  : Data admin display File                                     //

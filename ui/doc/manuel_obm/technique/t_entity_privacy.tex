@@ -6,37 +6,20 @@
 %%\clearpage
 \subsection{Gestion des entités privées et visibilité}
 
-La gestion des entités privées est standardisée afin de permettre une évolution possible des règles de visibilité des entités.
+OBM permet de créer des entités privées, soit non visibles par tout le monde.\\
 
+La gestion des entités privées est standardisée afin de permettre une évolution possible des règles de visibilité des entités.
+Elle a été repensée et rendue non intrusive depuis \obm 0.8.5.
 
 \subsubsection{Spécifications de la notion de visibilité}
 
-Une api très simple (1 fonction définie dans global.inc) est disponible :\\
+Actuellement une entité est visible par un utilisateur si l'entité est publique (visibility == 0) ou que l'utilisateur en est le créateur.\\
 
-\shadowbox{
-\begin{minipage}{13cm}
-\begin{verbatim}
-is_entity_visible($entity, $obm_q, $uid='''')
-\end{verbatim}
-\end{minipage}
-}
-\begin{itemize}
- \item \textbf{\$entity} : entité à vérifier.\\
-Exemple : ``company'', ``contact''... Attention ce n'est pas toujours le module (ex: parendeal dans module deal)
- \item \textbf{\$obm\_q} : Objet base de données contenant l'entité\\
-Exemple : souvent l'objet associé à la requete : run\_query\_detail()
- \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié.
-Si non donné, l'utilisateur courant est utilisé.
-\end{itemize}
-
-\vspace{0.4cm}
-
-Actuellement une entité est visible par un utilisateur si l'entité est publique (visibility == 0) ou que l'utilisateur en est le créateur.
-
-Implémentation du test de visibilité :
+\paragraph{Implémentation du test de visibilité}
 \begin{verbatim}
   $field_vis = "${entity}_visibility";
   $field_uc = "${entity}_usercreate";
+  ...
 
   if ( ($q->f("$field_vis") == 0)
     || ($q->f("$field_uc") == $uid) ) {
@@ -47,12 +30,110 @@ Implémentation du test de visibilité :
 \end{verbatim}
 
 
+\subsubsection{API définie}
+
+Une api très simple (1 fonction définie dans global.inc) est disponible :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function check_privacy($menu, $table, $action, $id, $p_uid="") {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$menu} : menu (module) à vérifier.\\
+Exemple : ``CONTACT'', mais \$menu peut être utilisé. Indispensable pour récupérer l'information dans le tableau global \$actions
+ \item \textbf{\$table} : table ou entité à vérifier.\\
+Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDeal dans module deal). L'entité (pour nom des colonnes) est tiré de cette chaîne (lowercase)
+ \item \textbf{\$action} : Action à vérifier
+ \item \textbf{\$id} : Id de l'entité à vérifier
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
+\end{itemize}
+
+
+\subsubsection{Implémentation dans un module}
+
+\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_visibility} défini comme un entier.
+Les valeurs définies sont :\\
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Valeur} & \textbf{Description} \\
+\hline
+0 & entité publique \\
+\hline
+1 & entité privée \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Tout accès à une entité doit être validé (passer le test de visibilité).
+Ceci est vrai pour les actions de consultations (detailconsult, detailupdate) mais aussi pour toutes les actions sur une entité (update, delete, document\_add...).\\
+
+Pour cette raison et pour éviter la répétition de ce test dans un module, le test est effectué une fois en début de module.\\
+
+Test pour le module \contact :
+\begin{verbatim}
+if (! check_privacy($menu, "Contact", $action, $contact["id"], $uid)) {
+  $display["msg"] = display_err_msg($l_error_visibility);
+  $action = "index";
+} else {
+  update_last_visit("contact", $contact["id"], $action);
+}
+\end{verbatim}
+
+Afin d'être optimal, le test ne requiert un accès à la base de données que lorsque nécessaire.
+Les actions définies du module doivent indiquer si elles sont sujettes à la protection privée (attribut \textbf{Privacy}).\\
+
+Définition d'une action sujette à la protection donnée privée.
+\begin{verbatim}
+// Update
+  $actions["CONTACT"]["update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=update",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None') 
+                                     	);
+\end{verbatim}
+
+\paragraph{La fonction de recherche} de l'entité doit aussi tenir compte et intégrer le test de visibilité afin de ne pas afficher les entités non visibles dans les résultats de recherche.
+Une fonction est définie retournant la clause de visibilité pour l'entité demandée.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function sql_obm_entity_privacy($entity, $p_uid="") {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$table} : entité à vérifier.\\
+Exemple : ``contact'', ``deal''
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
+\end{itemize}
+\vspace{0.3cm}
+
+Exemple d'utilisation :
+\begin{verbatim}
+function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
+  global $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $company_id = $contact["company_id"];
+  ...
+
+  // only the one which are allowed (ie. publics )
+  $where .= sql_obm_entity_privacy("contact");
+  ...
+\end{verbatim}
+
+
 \subsubsection{Gestion de la notion de visibilité et conséquences}
 
 Une entité créée en tant que privée n'est visible que par son créateur.
 Il faut donc veiller à traiter les entités privés d'un utilisateur lorsque celui-ci doit être supprimé.
 
-Ces entités peuvent être supprimées ou rendues publiques (la fonction run\_query\_delete\_profile() effectue se travail).
+Ces entités peuvent être supprimées ou rendues publiques (la fonction run\_query\_delete\_profile() effectue ce travail).
 
 
 \subsubsection{Modules gérant la notion de visibilité}
@@ -66,5 +147,7 @@ contact & 0.4.0 \\
 deal & 0.4.0 \\
 \hline
 list & 0.8.2 \\
+\hline
+document & 0.7.0 \\
 \hline
 \end{tabular}

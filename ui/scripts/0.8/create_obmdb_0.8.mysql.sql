@@ -303,7 +303,7 @@ CREATE TABLE Contact (
   contact_email2               varchar(128),
   contact_mailing_ok           char(1) DEFAULT '0',
   contact_archive              char(1) DEFAULT '0',
-  contact_visibility           int(2) DEFAULT '0',
+  contact_privacy              int(2) NOT NULL DEFAULT '0',
   contact_comment              text,
   PRIMARY KEY (contact_id)
 );
@@ -437,7 +437,7 @@ CREATE TABLE Deal (
   deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
-  deal_visibility           int(2) DEFAULT '0',
+  deal_privacy              int(2) NOT NULL DEFAULT '0',
   deal_comment              text,
   PRIMARY KEY (deal_id)
 );
@@ -510,7 +510,7 @@ CREATE TABLE List (
   list_timecreate  timestamp(14),
   list_userupdate  int(8),
   list_usercreate  int(8),
-  list_visibility  int(2) DEFAULT '0',
+  list_privacy     int(2) NOT NULL DEFAULT '0',
   list_name        varchar(32) NOT NULL,
   list_subject     varchar(70),
   list_email       varchar(128),
@@ -562,7 +562,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_description  text,
   calendarevent_category_id  int(8) default NULL,
   calendarevent_priority     int(2) default NULL,
-  calendarevent_privacy      int(2) default NULL,
+  calendarevent_privacy      int(2) NOT NULL default '0',
   calendarevent_length       int(4) NOT NULL default '',
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
@@ -638,21 +638,21 @@ CREATE TABLE Todo (
 -- Table structure for table 'Document'
 --
 CREATE TABLE Document (
-  document_id          int(8) NOT NULL auto_increment,
-  document_timeupdate  timestamp(14),
-  document_timecreate  timestamp(14),
-  document_userupdate  int(8) default NULL,
-  document_usercreate  int(8) default NULL,
-  document_title       varchar(255) default NULL,
-  document_name        varchar(255) default NULL,
-  document_kind        int(2) default NULL,
-  document_mimetype    varchar(255) default NULL,
-  document_category1   varchar(255) default NULL,
-  document_category2   varchar(255) default NULL,
-  document_author      varchar(255) default NULL,
-  document_private     int(1) default NULL,
-  document_path        text default NULL,
-  document_size        int(15) default NULL,
+  document_id          	 int(8) NOT NULL auto_increment,
+  document_timeupdate  	 timestamp(14),
+  document_timecreate  	 timestamp(14),
+  document_userupdate  	 int(8) default NULL,
+  document_usercreate  	 int(8) default NULL,
+  document_title       	 varchar(255) default NULL,
+  document_name        	 varchar(255) default NULL,
+  document_kind        	 int(2) default NULL,
+  document_mimetype    	 varchar(255) default NULL,
+  document_category1_id  int(8) not null default '0',
+  document_category2_id  int(8) not null default '0',
+  document_author      	 varchar(255) default NULL,
+  document_privacy     	 int(2) not null default '0',
+  document_path        	 text default NULL,
+  document_size        	 int(15) default NULL,
   PRIMARY KEY (document_id)
 );
 
@@ -947,11 +947,11 @@ CREATE TABLE Invoice (
   invoice_usercreate        int(8),
   invoice_number            varchar(10) DEFAULT '0',
   invoice_label             varchar(40) NOT NULL DEFAULT '',
-  invoice_amount_HT         double(10,2),
-  invoice_amount_TTC        double(10,2),
-  invoice_invoicestatus_id  int(4) DEFAULT '0' NOT NULL,
+  invoice_amount_ht         double(10,2),
+  invoice_amount_ttc        double(10,2),
+  invoice_status_id         int(4) DEFAULT '0' NOT NULL,
   invoice_comment           text,
-  invoice_date              date not NULL DEFAULT '0000-00-00' ,
+  invoice_date              date not NULL DEFAULT '0000-00-00',
   invoice_inout             char(1),
   invoice_archive           char(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (invoice_id)
@@ -1120,8 +1120,8 @@ CREATE TABLE UGroup (
 -- Table structure for table 'UserObmGroup'
 --
 CREATE TABLE UserObmGroup (
-  userobmgroup_groupid    int(8) DEFAULT '0' NOT NULL,
-  userobmgroup_userobmid  int(8) DEFAULT '0' NOT NULL
+  userobmgroup_group_id    int(8) DEFAULT '0' NOT NULL,
+  userobmgroup_userobm_id  int(8) DEFAULT '0' NOT NULL
 );
 
 
@@ -1129,8 +1129,8 @@ CREATE TABLE UserObmGroup (
 -- Table structure for table 'GroupGroup'
 --
 CREATE TABLE GroupGroup (
-  groupgroup_parentid  int(8) DEFAULT '0' NOT NULL,
-  groupgroup_childid   int(8) DEFAULT '0' NOT NULL
+  groupgroup_parent_id  int(8) DEFAULT '0' NOT NULL,
+  groupgroup_child_id   int(8) DEFAULT '0' NOT NULL
 );
 
 

@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($company, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql;  
+  global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
@@ -44,6 +44,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
 
   $and = "";
   if ($name != "") {
@@ -126,7 +127,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
 
   $req = "select
-      company_id as Id,
+      company_id as id,
       company_id,
       company_name,
       company_archive,
@@ -160,27 +161,37 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
          LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
          LEFT JOIN Country on company_country_id=country_id";
 
-  $query = "$req $whereq order by $order $p_order_dir $order_next";
-
   if (! $fuzzy) {
-    display_debug_msg("company_search(1) : $query", $cdg_sql);
-    $obm_q->query($query);
+    if ($ctu_sql_limit) {
+      $count = get_query_count("select count(*) from Company $whereq");
+      $obm_q->set_num_rows_total($count);
+    }
+    if (($count > 0) || (! $ctu_sql_limit)) {
+      $query = "$req $whereq order by $order $p_order_dir $order_next $limit";
+      display_debug_msg($query, $cdg_sql, "company_search(1)");
+      $obm_q->query($query);
+      if (! $ctu_sql_limit) {
+	$count = $obm_q->num_rows();
+      }
+    }
   }
 
-  // If fuzzy or unsuccessful search
-  if ( ($fuzzy)
-       || ( ($obm_q->num_rows() == 0) && ($name != "") ) ) {
-	 if ($name != "") {
-	   $where_name = " ($where_name or company_aka $like '%$auto_aka%'
+  // if fuzzy or unsuccessful search (meaningful only if name has been entered)
+  if ( ( ($fuzzy) || ($count == 0) ) && ($name != "") ) {
+    $where_name = " ($where_name or company_aka $like '%$auto_aka%'
                  or company_sound = '$sound')";
-	 }
     $whereq = " where $where_name $where";
-    $query = "$req $whereq order by $order $p_order_dir";
-    display_debug_msg("company_search(2) : $query", $cdg_sql);
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
+    if ($ctu_sql_limit) {
+      $count = get_query_count("select count(*) from Company $whereq");
+      $obm_q->set_num_rows_total($count);
+    }
+    if (($count > 0)  || (! $ctu_sql_limit)) {
+      $query = "$req $whereq order by $order $p_order_dir $order_next $limit";
+      display_debug_msg($query, $cdg_sql, "company_search(2)");
+      $obm_q->query($query);
+    }
   }
-
+  
   return $obm_q;
 }
 
@@ -236,6 +247,7 @@ function run_query_insert($company) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
+  $now = date("Y-m-d H:i:s");
 
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
@@ -300,7 +312,7 @@ function run_query_insert($company) {
     company_email,
     company_comment)
   values (null,
-    '" . date("Y-m-d H:i:s") . "',
+    '$now',
     null,
     '$uid',
     '$dsrc',

@@ -44,6 +44,18 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
     else $res["name"] = "&nbsp;";
   }
 
+  else if ($fieldname == "project_datebegin") {
+    $date = $OD->data_set->f($fieldname);
+    $res["name"] = date_format($date);
+    $res["txt_name"] = $res["name"];
+  }
+
+  else if ($fieldname == "project_dateend") {
+    $date = $OD->data_set->f($fieldname);
+    $res["name"] = date_format($date);
+    $res["txt_name"] = $res["name"];
+  }
+
   return $res;
 }
 
@@ -55,7 +67,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_consult($pid) {
   global $display, $uid;
-  global $l_query_error, $l_error_visibility;
+  global $l_query_error;
 
   $project_q = run_query_detail($pid);
   $tasks_q = run_query_tasks($pid);
@@ -66,16 +78,8 @@ function dis_project_consult($pid) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $project_q->query . " !");
   }
 
-  if (($project_q->f("project_visibility") == 0) ||
-      ($project_q->f("usercreate") == $uid) ) {
-    $display["detailInfo"] = display_record_info($project_q);
-    $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $times);
-  } else {
-    // this project's page has "private" access
-    $display["msg"] .= display_err_msg($l_error_visibility);
-    $action = "";
-  }
-
+  $display["detailInfo"] = display_record_info($project_q);
+  $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $times);
 }
 
 
@@ -172,7 +176,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 
     <div class=\"search\">
       <div class=\"searchLabel\">$l_name<br />
-        <input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" />
+        <input type=\"text\" name=\"tf_name\" size=\"20\" value=\"$name\" />
       </div>
       <div class=\"searchLabel\">$l_company<br />
         <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
@@ -220,8 +224,7 @@ function dis_project_search_list($project) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
   $obm_q = run_query_search($project, $new_order, $order_dir);
-
-  $nb_project = $obm_q->num_rows();
+  $nb_project = $obm_q->num_rows_total();
 
   if ($nb_project == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -689,14 +692,14 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 
     <div class=\"projectCenter\">
     <table $tab_style>
-     <tr>
+    <tr>
       $dis_memhead
-     </tr>
-     $dis_member
+    </tr>
+      $dis_member
     </table>
     </div>
     ";
-  //remettre le cellpadding
+
   return $block;
 }
 
@@ -739,24 +742,30 @@ function html_project_form($action, $project_q, $project) {
     $company_name = $project["company_name"];
     $deal_label = $project["deal_label"];
     $task = $project["tasklabel"];
+    $member = $project["member"];
     $datebegin = $project["datebegin"];
     $dateend = $project["dateend"];
     $arc_val = $project["archive"] ? "checked" : "";
 
     if ($action == "new") {
       $name = $deal_label;
-      // We pre-fill datebegin and datealarm with current date
+      // We pre-fill datebegin and dateend with current date
       $datebegin = date($c_php_isodate_format); 
+      $dateend = $datebegin;
+    }
 
+    if (($action == "new") || ($action == "insert")) {
       // member select
       $mb_q = run_query_get_obmusers();
       $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
         <option value=\"0\">$l_none</option>\n";
-      while($mb_q->next_record()) {
+      while ($mb_q->next_record()) {
 	$mb_id = $mb_q->f("userobm_id");
 	$mb_name = $mb_q->f("userobm_lastname")." ".$mb_q->f("userobm_firstname");
 	$sel_member .= "
-        <option value=\"$mb_id\">$mb_name</option>";
+        <option value=\"$mb_id\"";
+	if ($mb_id == $member) { $sel_member .= " selected=\"selected\""; }
+	$sel_member .= ">$mb_name</option>";
       }
       $sel_member .= "</select>";
 

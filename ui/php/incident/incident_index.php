@@ -20,9 +20,6 @@
 // - dispref_level   --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms Management                                             //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "PROD";
 $menu = "INCIDENT";
@@ -46,17 +43,17 @@ get_incident_action();
 $perm->check_permissions($menu, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Programe principal                                                        //
+// Main Program
 ///////////////////////////////////////////////////////////////////////////////
 
 if ($action == "index" || $action == "") {
-//////////////////////h////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
   $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
   if ($set_display == "yes") {
     $display["result"] = dis_incident_search_list($incident);
   } else {
-    display_info_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 
 } elseif ($action == "search")  {
@@ -151,9 +148,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_priority_insert($incident);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_pri_insert_ok);
+    $display["msg"] .= display_ok_msg($l_pri_insert_ok);
   } else {
-    $display["msg"] = display_err_msg($l_pri_insert_error);
+    $display["msg"] .= display_err_msg($l_pri_insert_error);
   }
   require("incident_js.inc");
   $display["detail"] = dis_admin_index();
@@ -162,9 +159,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_priority_update($incident);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_pri_update_ok);
+    $display["msg"] .= display_ok_msg($l_pri_update_ok);
   } else {
-    $display["msg"] = display_err_msg($l_pri_update_error);
+    $display["msg"] .= display_err_msg($l_pri_update_error);
   }
   require("incident_js.inc");
   $display["detail"] = dis_admin_index();
@@ -177,9 +174,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_priority_delete($incident["priority"]);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_pri_delete_ok);
+    $display["msg"] .= display_ok_msg($l_pri_delete_ok);
   } else {
-    $display["msg"] = display_err_msg($l_pri_delete_error);
+    $display["msg"] .= display_err_msg($l_pri_delete_error);
   }
   require("incident_js.inc");
   $display["detail"] = dis_admin_index();
@@ -188,9 +185,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_insert($incident);
   if ($retour) {
-    display_ok_msg($l_sta_insert_ok);
+    $display["msg"] .= display_ok_msg($l_sta_insert_ok);
   } else {
-    display_err_msg($l_sta_insert_error);
+    $display["msg"] .= display_err_msg($l_sta_insert_error);
   }
   require("incident_js.inc");
   $display["detail"] = dis_admin_index();
@@ -199,9 +196,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_update($incident);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_sta_update_ok);
+    $display["msg"] .= display_ok_msg($l_sta_update_ok);
   } else {
-    $display["msg"] = display_err_msg($l_sta_update_error);
+    $display["msg"] .= display_err_msg($l_sta_update_error);
   }
   require("incident_js.inc");
   $display["detail"] = dis_admin_index();
@@ -214,9 +211,9 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_delete($incident["status"]);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_sta_delete_ok);
+    $display["msg"] .= display_ok_msg($l_sta_delete_ok);
   } else {
-    $display["msg"] = display_err_msg($l_sta_delete_error);
+    $display["msg"] .= display_err_msg($l_sta_delete_error);
   }
   require("incident_js.inc");
   $display["detail"] = dis_admin_index();
@@ -243,8 +240,8 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_incident);     // Head & Body
-$display["header"] = generate_menu($menu,$section); // Menu
+$display["head"] = display_head($l_incident);
+$display["header"] = generate_menu($menu,$section);
 $display["end"] = display_end();
 display_page($display);
 

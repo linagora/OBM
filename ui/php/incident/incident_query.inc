@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($incident, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql;  
+  global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $status = $incident["status"];
   $lincident = $incident["lincident"];
@@ -33,11 +33,49 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
   $date = sql_date_format($db_type, "incident_date", "date");
   $timeupdate = sql_date_format($db_type, "incident_timeupdate", "timeupdate");
 
+  $where = "1=1";
+  if ($lincident != "") {
+     $where .= " and Incident.incident_label $like '$lincident%'";
+  }
+  if (($priority != $c_all) && ($priority != "")) { 
+     $where .= " and Incident.incident_priority_id = '$priority'";
+  }
+  if ($param_contract != "") {
+     $where .= " and Contract.contract_id = '$param_contract'";
+  }
+  if ($owner != $c_all && ($owner != "")) {
+     $where .=" and (Incident.incident_owner = '$owner') ";
+  }
+  if ($dateafter !="") {
+     $where .=" and (Incident.incident_date >= '$dateafter') ";
+  }
+  if ($datebefore !="") {
+     $where .=" and (Incident.incident_date <= '$datebefore') ";
+  }
+  if ($company != "") {
+     $where .= " and Company.company_name $like '$company%'";
+  }
+  if ($lcontract != "") {
+     $where .= " and Contract.contract_label $like '$lcontract%'";
+  }
+  if (($status != $c_all) && ($status != "")) { 
+     $where .= " and Incident.incident_status_id = '$status'";
+  }
+  if ($archive == "0") {
+     $where .= " and Incident.incident_archive != '1'";
+  }
+  $whereq = "where $where";
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_order";
+  $orderq .= " order by $order $p_order_dir, incidentpriority_order";
+
   $req = "select
-      Incident.incident_id as Id,
+      Incident.incident_id as id,
       incident_id,
       incident_timeupdate,
       incident_contract_id,
@@ -57,53 +95,32 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
-    from Incident, IncidentPriority, IncidentStatus, Contract,
-      UserObm u1, UserObm u2, Company
-    where u1.userobm_id = Incident.incident_logger
-      AND u2.userobm_id = Incident.incident_owner
-      AND Incident.incident_contract_id = Contract.contract_id
-      AND Contract.contract_company_id = Company.company_id
-      AND Incident.incident_priority_id = IncidentPriority.incidentpriority_id
-      AND Incident.incident_status_id = IncidentStatus.incidentstatus_id";
+    from Incident
+         left join Contract on incident_contract_id=contract_id
+         left join Company on contract_company_id=company_id
+         left join UserObm as u1 on incident_logger=u1.userobm_id
+         left join UserObm as u2 on incident_owner=u2.userobm_id
+         left join IncidentPriority on incident_priority_id=incidentpriority_id
+         left join IncidentStatus on incident_status_id=incidentstatus_id
+    $whereq
+    $orderq
+    $limit
+";
 
-  if ($lincident != "") {
-     $req .= " and Incident.incident_label $like '$lincident%'";
+  if ($ctu_sql_limit) {
+    $cq = "select count(*)
+      from Incident
+         left join Contract on incident_contract_id=contract_id
+         left join Company on contract_company_id=company_id
+      $whereq";
+    $count = get_query_count($cq);
+    $obm_q->set_num_rows_total($count);
   }
-  if (($priority != $c_all) && ($priority != "")) { 
-     $req .= " and Incident.incident_priority_id = '$priority'";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($req, $cdg_sql);
+    $obm_q->query($req);
   }
-  if($param_contract != "") {
-     $req .= " and Contract.contract_id = '$param_contract'";
-  }
-  if ($owner != $c_all && ($owner != "")) {
-     $req .=" and (Incident.incident_owner = '$owner') ";
-  }
-  if ($dateafter !="") {
-     $req .=" and (Incident.incident_date >= '$dateafter') ";
-  }
-  if ($datebefore !="") {
-     $req .=" and (Incident.incident_date <= '$datebefore') ";
-  }
-  if ($company != "") {
-     $req .= " and Company.company_name $like '$company%'";
-  }
-  if ($lcontract != "") {
-     $req .= " and Contract.contract_label $like '$lcontract%'";
-  }
-  if (($status != $c_all) && ($status != "")) { 
-     $req .= " and Incident.incident_status_id = '$status'";
-  }
-  if ($archive == "0") {
-     $req .= " and Incident.incident_archive != '1'";
-  }
-  // ORDER construction
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_order";
-  $req .= " order by $order $p_order_dir, incidentpriority_order";
-
-  $obm_q->query($req);
-  display_debug_msg($req, $cdg_sql);
-  
   return $obm_q;
 }
 
@@ -125,20 +142,20 @@ function run_query_detail($id) {
   $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        p.incidentpriority_label,
-        s.incidentstatus_label,
+        incidentpriority_label,
+        incidentstatus_label,
         $date,
         $timeupdate,
         $timecreate,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
       from Incident
-           left join UserObm u1 on incident_logger=u1.userobm_id
-           left join UserObm u2 on incident_owner=u2.userobm_id
-           left join IncidentPriority p on incident_priority_id=p.incidentpriority_id
-           left join IncidentStatus s on incident_status_id=s.incidentstatus_id
-           left join UserObm as c on incident_usercreate=c.userobm_id
-           left join UserObm as u on incident_userupdate=u.userobm_id
+        left join UserObm u1 on incident_logger=u1.userobm_id
+        left join UserObm u2 on incident_owner=u2.userobm_id
+        left join IncidentPriority on incident_priority_id=incidentpriority_id
+        left join IncidentStatus on incident_status_id=incidentstatus_id
+        left join UserObm as c on incident_usercreate=c.userobm_id
+        left join UserObm as u on incident_userupdate=u.userobm_id
       where incident_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

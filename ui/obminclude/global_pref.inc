@@ -17,6 +17,7 @@ if (($set_lang == "")  && ($mode != "txt")) {
   // We Load and make session variables from Global and User preferences
   session_load_global_prefs();
   session_load_user_prefs();
+  session_load_user_todos();
 
   // We update the last login date for the user
   run_query_userobm_update_lastaccess($auth->auth["uid"]);

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : contract.inc                                             //
@@ -44,7 +44,7 @@ $l_select_company = "Sélectionner la société avec laquelle le contrat doit être 
 $l_select_contract = "Selectionner le contrat";
 
 // Messages
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des contrats de support correspondants.";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des contrats correspondants.";
 $l_found = "contrat(s) trouvé(s).";
 $l_no_found = "Aucun Contrat ne correspond à ces critères !";
 $l_delete_ok = "La suppression du Contrat a été correctement effectuée.";

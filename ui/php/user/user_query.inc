@@ -16,24 +16,25 @@
 //   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($user, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql;
+  global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $login = $user["login"];
-  $lname = $user["lastname"];
   $perms = $user["perms"];
+  $lname = $user["lastname"];
   $email = $user["email"];
   $archive = $user["archive"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-
-  $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "userobm_timelastaccess");
+  $limit = sql_limit($db_type);
+  $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
 
   $select = "select UserObm.*,
-      userobm_id as Id,
+      userobm_id as id,
       $lastaccess
     from UserObm";
+
   $where = "";
 
   // If a login indication has been specified, get it
@@ -64,83 +65,28 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
     $where .= " userobm_archive = '0'";
   }
 
-  if (trim($where) != "") $where = " where" . $where;
-  $query = $select . $where;
+  if (trim($where) != "") {
+    $whereq = " where $where";
+  }
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
-  $query .= " order by $order $p_order_dir";
+  $orderq .= " order by $order $p_order_dir";
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+  $query = "$select
+    $whereq
+    $orderq
+    $limit";
 
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// User query search query execution                                         //
-// Parameters:
-//   - $user[] : user search criteria
-//     keys used  : name, perms
-//   - $p_new_order : infos for order clause
-//   - $p_order_dir : direction for order clause (asc, desc)
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_search($user, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql,$auth;
-
-  $login = $user["login"];
-  $lname = $user["lastname"];
-  $perms = $user["perms"];
-  $archive = $user["archive"];
-  $uid = $auth->auth["uid"];
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-
-  $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "userobm_timelastaccess");
-
-  $select = "select u.*,
-      userobm_id as Id,
-      $lastaccess
-    from UserObm  as u
-      LEFT OUTER JOIN CalendarRight as c 
-        ON u.userobm_id = c.calendarright_ownerid
-          AND c.calendarright_customerid = '$uid'
-    WHERE (c.calendarright_write = 1 OR u.userobm_id='$uid') AND";
-  $where = "";
-
-  // If a login indication has been specified, get it
-  if (trim($login) != "") {
-    $where .= " userobm_login $like '$login%'";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from UserObm $whereq");
+    $obm_q->set_num_rows_total($count);
   }
 
-  // If a user perms indication has been specified, get it
-  if (($perms != $c_all) && ($perms != "")) {
-    if (trim($where) != "") $where .= " and";
-    $where .= " userobm_perms='$perms'";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
   }
-
-  // If a name indication has been specified, get it
-  if (trim($lname) != "") {
-    if (trim($where) != "") $where .= " and";
-    $where .= " userobm_lastname $like '$lname%'";
-  }
-
-  if ($archive != "1") {
-    if (trim($where) != "") $where .= " and";
-    $where .= " userobm_archive = '0'";
-  }
-
-  $query = $select . $where;
-
-  // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
-  $query .= " order by $order $p_order_dir";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
 
   return $obm_q;
 }
@@ -277,6 +223,11 @@ function run_query_update($p_id, $user) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  // If the user is archived, we unsubscribe it from all Groups
+  if ($archive == "1") {
+    $retour = run_query_unsubscribe_all_groups($p_id);    
+  }
+
   return $retour;
 }
 
@@ -308,14 +259,32 @@ function run_query_user_group($p_id) {
   global $cdg_sql;
 
   $query = "select * from UGroup
-    left join UserObmGroup on group_id = userobmgroup_groupid
-    where userobmgroup_userobmid='$p_id'";
+    left join UserObmGroup on group_id = userobmgroup_group_id
+    where userobmgroup_userobm_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Unsubscribe the user from all groups                                      //
+// Parameters:
+//   - $p_id : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_unsubscribe_all_groups($p_id) {
+  global $cdg_sql;
+
+  $query = "delete from UserObmGroup where userobmgroup_userobm_id = '$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
 }
 
 
@@ -345,7 +314,7 @@ function run_query_update_user_group($user) {
   global $cdg_sql;
 
   $uid = $user["id"];
-  $query = "delete from UserObmGroup where userobmgroup_userobmid = '$uid'";
+  $query = "delete from UserObmGroup where userobmgroup_userobm_id = '$uid'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -357,8 +326,8 @@ function run_query_update_user_group($user) {
     $cpt++;
     $g_id = $user["group_$cpt"];
 
-    $query = "insert into UserObmGroup (userobmgroup_groupid,
-        userobmgroup_userobmid) values ($g_id, $uid)";
+    $query = "insert into UserObmGroup (userobmgroup_group_id,
+        userobmgroup_userobm_id) values ($g_id, $uid)";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
@@ -509,25 +478,25 @@ function run_query_delete_profile($param_user)  {
 
   // Move all the user contact from private to public
   $query = "Update Contact set
-      contact_visibility='0'
+      contact_privacy='0'
     where contact_usercreate='$param_user'
-      and contact_visibility != '0'"; 
+      and contact_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   // Move all the user deal from private to public
   $query = "Update Deal set
-      deal_visibility='0'
+      deal_privacy='0'
     where deal_usercreate='$param_user'
-      and deal_visibility != '0'"; 
+      and deal_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   // Move all the user list from private to public
   $query = "Update List set
-      list_visibility='0'
+      list_privacy='0'
     where list_usercreate='$param_user'
-      and list_visibility != '0'"; 
+      and list_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 

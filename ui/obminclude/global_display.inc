@@ -321,7 +321,7 @@ class OBM_DISPLAY {
 
       // If debug level Id is set, display the entity id
       if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
-	$dg_id = $this->data_set->f("Id");
+	$dg_id = $this->data_set->f("id");
 	$block .= "<td class=\"resultText\">$dg_id</td>";
       }
 
@@ -477,7 +477,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $page, $new_order, $order_dir, $entity;
+    global $path, $page, $new_order, $order_dir, $entity, $ctu_sql_limit;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end, $ico_previous, $ico_next;
@@ -499,7 +499,7 @@ class OBM_DISPLAY {
     }
 
     if ($set_rows < 1) $set_rows = $set_rows_default;
-    $nb_rows = $this->data_set->num_rows();
+    $nb_rows = $this->data_set->num_rows_total();
     // If we delete all contacts of the last page, we must go to $page-1 (list)
     if ($lpage > 1) {
       if ($nb_rows < (($lpage-1)*$set_rows)+1) {
@@ -574,7 +574,10 @@ class OBM_DISPLAY {
     </div>
 ";
 
-    $this->data_set->seek($first_row);
+    // If limit is not used, we seek to the first row to display
+    if (! $ctu_sql_limit) {
+      $this->data_set->seek($first_row);
+    }
 
     return $content;
   }
@@ -672,11 +675,14 @@ class OBM_DISPLAY {
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
-    global $cdg_id, $set_debug;
+    global $cdg_id, $set_debug, $ctu_sql_limit;
 
     $this->dis_data_header_file($sep);
 
-    $this->data_set->seek($first_row);
+    // If limit is not used, we seek to the first row to display
+    if (! $ctu_sql_limit) {
+      $this->data_set->seek($first_row);
+    }
 
     // Iteration on each data row of dataset
     $cpt = 0;
@@ -687,16 +693,36 @@ class OBM_DISPLAY {
       $this->display_pref->seek(0);
       while ($this->display_pref->next_record()) {
 	$fieldname = $this->display_pref->f("display_fieldname");
-        //--------------------------------------------------
-        // We call module specific field display disposition
-        //--------------------------------------------------
-	if (function_exists($dis_data_entity)) {
-	  $res = $dis_data_entity($this, $fieldname, $link_ok);
-	}	  
-	if ($res["txt_name"] != "") {
-	  echo $res["txt_name"] . $sep;
-	} else {
-	  echo $this->data_set->f($fieldname) . $sep;
+
+	if (! $cgp_hide[$module][$fieldname]) {
+	  $txt_name = $this->data_set->f($fieldname);
+
+	  //--------------------------------------------------
+	  // Global field display disposition
+	  //--------------------------------------------------
+	  // Format dates
+	  if (substr($fieldname,0,5) == "date_") {
+	    $txt_name = date_format($this->data_set->f($fieldname));
+	  }
+	  elseif ($fieldname == "timeupdate") {
+	    $txt_name = datetime_format($this->data_set->f($fieldname));
+	  }
+	  else if ($fieldname == "timecreate") {
+	    $txt_name = datetime_format($this->data_set->f($fieldname));
+	  }
+	  
+	  //--------------------------------------------------
+	  // We call module specific field display disposition
+	  //--------------------------------------------------
+	  if (function_exists($dis_data_entity)) {
+	    $res = $dis_data_entity($this, $fieldname, $link_ok);
+	  }	  
+
+	  if ($res["txt_name"] != "") {
+	    echo $res["txt_name"] . $sep;
+	  } else {
+	    echo $txt_name . $sep;
+	  }
 	}
       }
 

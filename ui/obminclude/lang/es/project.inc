@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : project.inc                                              //
@@ -30,7 +30,6 @@ $l_progeval = "Evaluacion de Avance/Retraso";
 
 // Labels et textes
 $l_parent = "Tarea Padre";
-$l_manager = "Gerente de proyecto";
 $l_member = "Miembro";
 $l_soldtime = "Tiempo vendido";
 $l_projtime = "Tiempo proyectado";

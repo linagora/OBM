@@ -17,7 +17,7 @@
 //   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($contract, $p_new_order, $p_order_dir) {
-  global $cdg_sql, $c_all;
+  global $cdg_sql, $c_all, $ctu_sql_limit;
 
   $p_label = $contract["label"];
   $p_type = $contract["type"];
@@ -30,17 +30,61 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $company_id = $contract["company_id"];
   $archive = $contract["archive"];
   
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
-  
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-
+  $limit = sql_limit($db_type);
   $dateexp = sql_date_format($db_type, "contract_dateexp", "contract_dateexp");
+
+  $where = "1=1";
+  if (($p_type != $c_all) && ($p_type != ""))
+    $where .= " and contract_type_id = '$p_type'";
+
+  if ($p_num != "")
+    $where .= " and (contract_number $like '%$p_num%')";
+  
+  if ($comp != "")
+    $where .= " and (company_name $like '$comp%')";
+
+  if ($company_id != "")
+    $where .= " and company_id = '$company_id'";
+
+  if ($p_dateafter != "")
+    $where .= " and (contract_dateexp >= '$p_dateafter')";
+
+  if ($p_datebefore != "")
+    $where .= " and (contract_dateexp <= '$p_datebefore')";
+
+  if ($p_label != "")
+    $where .= " and (contract_label $like '%$p_label%')";
+  
+  if (($manager != $c_all) && ($manager != "")) {
+    $where .= " and (contract_techmanager_id='$manager'
+                    or contract_marketmanager_id='$manager') ";
+  }
+  if ($p_deal != "") {
+    $where .= " and (contract_deal_id = '$p_deal')";
+  }
+  if ($archive != "1") {
+    $where .= " and contract_archive != '1'";
+  }
+
+  $whereq = "where $where";
+
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
+  // Order exceptions
+  if (strcmp($p_new_order,"contract_marketmanager")==0) {
+    $order = "lmarket";
+  }
+  if (strcmp($p_new_order,"contract_techmanager")==0) {
+    $order = "ltech";
+  }
+  
+  $orderq .= " order by $order $p_order_dir";
 
   $query = "select contract_label,
       contract_id,
-      contract_id as Id,
+      contract_id as id,
       contract_deal_id,
       contract_number,
       contract_company_id,
@@ -55,50 +99,29 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       contract_archive,
       $dateexp
     from Contract
+         left join Company on contract_company_id=company_id
          left join UserObm u1 on contract_techmanager_id=u1.userobm_id
          left join UserObm u2 on contract_marketmanager_id=u2.userobm_id
-         left join ContractType on contract_type_id=contracttype_id,
-      Company
-    where contract_company_id=company_id";
+         left join ContractType on contract_type_id=contracttype_id
+    $whereq
+    $orderq
+    $limit
+";
 
-  if (($p_type != $c_all) && ($p_type != ""))
-    $query .= " and contract_type_id = '$p_type'";
-
-  if ($p_num != "")
-    $query .= " and (contract_number $like '%$p_num%')";
-  
-  if ($comp != "")
-    $query .= " and (company_name $like '%$comp%')";
-
-  if ($company_id != "")
-    $query .= " and company_id = '$company_id'";
-
-  if ($p_dateafter != "")
-    $query .= " and (contract_dateexp >= '$p_dateafter')";
-
-  if ($p_datebefore != "")
-    $query .= " and (contract_dateexp <= '$p_datebefore')";
-
-  if ($p_label != "")
-    $query .= " and (contract_label $like '%$p_label%')";
-  
-  if (($manager != $c_all) && ($manager != "")) {
-    $query .= " and (contract_techmanager_id='$manager'
-                    or contract_marketmanager_id='$manager') ";
+  if ($ctu_sql_limit) {
+    $cq = "select count(*)
+      from Contract
+           left join Company on contract_company_id=company_id
+      $whereq";
+    $count = get_query_count($cq);
+    $obm_q->set_num_rows_total($count);
   }
-  if ($p_deal != "") {
-    $query .= " and (contract_deal_id = '$p_deal')";
-  }
-  if ($archive != "1") {
-    $query .= " and contract_archive != '1'";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
   }
 
-  $query .= " order by $order $p_order_dir";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
   return($obm_q);
-
 }
 
 

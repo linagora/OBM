@@ -113,6 +113,7 @@ function html_account_search_form ($p_action, $account) {
   <div class='searchEnd'></div>
   </div>
   </form>";
+
   return $block;
 }  
 
@@ -129,7 +130,7 @@ function dis_account_search_list($account) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "account");
   $obm_q = run_query_search($account, $new_order, $order_dir);
-  $nb_account = $obm_q->num_rows();
+  $nb_account = $obm_q->num_rows_total();
   if ($nb_account == 0) {
     $display["msg"] = display_info_msg($l_no_found);
   } else {
@@ -283,6 +284,7 @@ function html_account_form($obm_q_account, $action) {
     $id = $obm_q_account->f("account_id");
     $label = $obm_q_account->f("account_label");
     $number = $obm_q_account->f("account_number");
+    $balance = $obm_q_account->f("account_balance");
     $today = $obm_q_account->f("account_today");
     $bank = $obm_q_account->f("account_bank");
     $comment = nl2br($obm_q_account->f("account_comment"));
@@ -488,7 +490,6 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
 
   // we display all account data :
   $q_account = run_query_detail ($p_account["account"]);
-  $q_account->next_record ();
   html_account_consult ($q_account, "compute_balance");
 
   // the form allowing a date input :
@@ -634,4 +635,4 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
 
 }
 
-</SCRIPT>
+</script>

@@ -19,7 +19,7 @@
 // it's hard to compute the account at the same time...
 //////////////////////////////////////////////////////////////////////////////
 function run_query_search ($account, $p_new_order, $p_order_dir) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $ctu_sql_limit;
 
   $label = $account["label"];
   $bank = $account["bank"];
@@ -28,27 +28,41 @@ function run_query_search ($account, $p_new_order, $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
+
+  $where = "1=1";
+  if ($label != "") {
+    $where .= " and account_label $like '$label%'";
+  }
+  if ($bank != "") {
+    $where .= " and account_bank $like '%$bank%'";
+  }
+  if ($number != "") {
+    $where .= " and account_number $like '%$number%'";
+  }
+  $whereq = "where $where";
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "account_bank";
+  $orderq = " order by $order $p_order_dir";
   
-  $query = "select *, account_id as Id from Account ";
-  $query .= " where 1 > 0 ";
+  $query = "select *,
+      account_id as id
+    from Account
+    $whereq
+    $orderq
+    $limit
+";
 
-  if ($label != "") {
-    $query .= " and account_label $like '$label%' ";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from Account $whereq");
+    $obm_q->set_num_rows_total($count);
   }
 
-  if ($bank != "") {
-    $query .= $flag." and account_bank $like '%$bank%' ";
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql,"run_query_search()");
+    $obm_q->query($query);
   }
-  if ($number != "") 
-    $query .= " and account_number $like '%$number%' ";
 
-  $query .= " order by $order $p_order_dir";
-  
-  display_debug_msg("<b>run_query_search() : </b>$query", $cdg_sql);
-  $obm_q->query($query);
-  
   return ($obm_q);
 }
 
@@ -56,62 +70,98 @@ function run_query_search ($account, $p_new_order, $p_order_dir) {
 ///////////////////////////////////////////////////////////////////////////////
 // Account: Select query construction
 // the balance returned by this query is the true balance at date == today... 
+// Parameters:
+//   - $id : account id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_account_id) {
-  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
+function run_query_detail($id) {
+  global $cdg_sql;
 
-  $connect_db = new DB_OBM;
-  if ($connect_db->type == $db_type_mysql) {
-    $query = "select *,
-        UNIX_TIMESTAMP(account_timeupdate) as datemodif,
-        UNIX_TIMESTAMP(account_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(account_timecreate) as timecreate,
-        c.userobm_login as usercreate,
-        u.userobm_login as userupdate
-      from Account
-           LEFT JOIN UserObm as c on account_usercreate=c.userobm_id
-           LEFT JOIN UserObm as u on account_userupdate=u.userobm_id
-      where account_id ='$p_account_id'";
-  } else if ($connect_db->type == $db_type_pgsql) {
-    $query = "select *,account_timeupdate as datemodif,account_timeupdate as timeupdate,account_timecreate as timecreate from Account where account_id=".$p_account_id;
-  }
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datemodif = sql_date_format($db_type, "account_timeupdate", "datemodif");
+  $timeupdate = sql_date_format($db_type, "account_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "account_timecreate", "timecreate");
 
-  display_debug_msg ("<b>run_query_detail() : </b>$query", $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
+  $query = "select *,
+      $datemodif,
+      $timeupdate,
+      $timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    from Account
+         LEFT JOIN UserObm as c on account_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u on account_userupdate=u.userobm_id
+    where account_id ='$id'";
+
+  display_debug_msg ($query, $cdg_sql, "run_query_detail()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
-// insertion query :
+// Account insert query execution
+// Parameters:
+//   - $account[] : Entry's values
 //////////////////////////////////////////////////////////////////////////////
 function run_query_insert ($account) {
   global $auth, $cdg_sql;
 
+  $now = date("Y-m-d H:i:s");
+  $uid = $auth->auth["uid"];
+
   $label = $account["label"];
   $bank = $account["bank"];
   $number = $account["number"];
-  $balance = $acount["balance"];
+  $balance = $account["balance"];
   $comment = $account["comment"];
   
-  $query = "insert into Account (account_timeupdate, account_timecreate, account_userupdate, account_usercreate, account_bank, account_label, account_number, account_balance, account_today,  account_comment) values (null,'".date("Y-m-d H:i:s")."',null,'".$auth->auth["uid"]."','$bank','$label','$number','$balance','$balance','$comment')";
+  $query = "insert into Account (
+    account_timeupdate,
+    account_timecreate,
+    account_userupdate,
+    account_usercreate,
+    account_bank,
+    account_label,
+    account_number,
+    account_balance,
+    account_today,
+    account_comment
+  ) values (
+    null,
+    '$now',
+    null,
+    '$uid',
+    '$bank',
+    '$label',
+    '$number',
+    '$balance',
+    '$balance',
+    '$comment')";
 
-  display_debug_msg( "<b>run_query_insert () :</b>$query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_insert()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update query construction                                                 
+// Account update query execution
+// Parameters:
+//   - $account[] : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($account) {
   global $auth, $cdg_sql;
 
+  $now = date("Y-m-d H:i:s");
+  $uid = $auth->auth["uid"];
+
   $label = $account["label"];
   $bank = $account["bank"];
   $number = $account["number"];
-  $balance = $acount["balance"];
+  $balance = $account["balance"];
   $comment = $account["comment"];
   $account_id = $account["account"];
 
@@ -121,13 +171,15 @@ function run_query_update($account) {
      account_number='$number',
      account_balance='$balance',
      account_comment='$comment',
-     account_userupdate='".$auth->auth["uid"]."',
-     account_timeupdate='".date("Y-m-d H:i:s")."'
+     account_userupdate='$uid',
+     account_timeupdate='$now'
    where account_id='$account_id'";  
 
-  display_debug_msg ("<b>run_query_update() : </b>$query", $cdg_sql);
+  display_debug_msg ($query, $cdg_sql, "run_query_update()");
   $obm_q = new DB_OBM;
-  $obm_q->query($query);  
+  $retour = $obm_q->query($query);  
+
+  return $retour;
 }
 
 
@@ -139,7 +191,7 @@ function run_query_update($account) {
 function run_query_search_payments ($p_account_id, $p_date_before = "") {
   global $cdg_sql;
 
-  $query = "select *, payment_id as Id,
+  $query = "select *, payment_id as id,
       payment_expected_date as payment_expect_date,
       payment_amount
     from Payment
@@ -150,10 +202,11 @@ function run_query_search_payments ($p_account_id, $p_date_before = "") {
   }
   $query .= " and payment_paid = '1'"; // payed payments only
 
-  display_debug_msg("<b>run_query_search_payments() : </b>$query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_search_payments()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  return $obm_q; 
+
+  return $obm_q;
 }
 
 
@@ -165,7 +218,7 @@ function run_query_search_payments ($p_account_id, $p_date_before = "") {
 function run_query_search_expected_payments($p_account_id, $p_date_before="") {
   global $cdg_sql;
 
-  $query = "select *, payment_id as Id,
+  $query = "select *, payment_id as id,
       payment_expected_date as payment_expect_date
       from Payment where payment_account_id='$p_account_id'";
   if ($p_date_before != "") {
@@ -173,10 +226,11 @@ function run_query_search_expected_payments($p_account_id, $p_date_before="") {
   }
   $query .= " and payment_paid = '0' "; // expected payments only
   
-  display_debug_msg ("<b>run_query_search_expected_payments() : </b>$query", $cdg_sql);
+  display_debug_msg ($query, $cdg_sql, "run_query_search_expected_payments()");
   $obm_q = new DB_OBM; 
   $obm_q->query($query);
-  return $obm_q; 
+
+  return $obm_q;
 }
 
 
@@ -260,22 +314,22 @@ function account_compute_balance ($p_account_id, $p_date="") {
   return $result;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // returns the balance of $p_account_id account at its creation
 ///////////////////////////////////////////////////////////////////////////////
 function account_creation_balance ($p_account_id) {
   global $cdg_sql;
 
-
   $query = "select account_balance
             from Account
             where account_id ='$p_account_id'";
-  display_debug_msg ("<b>account_creation_balance() : </b>$query", $cdg_sql);
+  display_debug_msg ($query, $cdg_sql, "account_creation_balance()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
+
   return $obm_q->f("account_balance");
 }
 
-</SCRIPT>
-
+</script>

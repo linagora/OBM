@@ -77,9 +77,10 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $nb_q->query($query);
     $nb_q->next_record();
     $res["name"] = $nb_q->f(0) . " / " .$OD->data_set->f("list_query_nb");
+    $res["txt_name"] = $res["name"];
     $res["align"] = "center";
   }
-  
+
   // For contacts urls (link):
   else if ($fieldname == "contact_lastname") {
     $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
@@ -322,7 +323,7 @@ function dis_list_search_list($list, $popup=false) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "list");
   $obm_q = run_query_search($list, $new_order, $order_dir);
-  $nb_list = $obm_q->num_rows();
+  $nb_list = $obm_q->num_rows_total();
   if ($nb_list == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -398,18 +399,14 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 //   - $list[] : list parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_consult($list) {
-  global $display, $uid, $l_error_visibility;
+  global $display, $uid;
 
   $id = $list["id"];
 
   $list_q = run_query_detail($id);
-  if (is_entity_visible("list", $list_q, $uid)) {
-    $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list, $entity);
-    $block = html_list_consult($list_q, $pref_con_q, $con_q);
-  } else {
-    $display["msg"] .= display_warn_msg($l_error_visibility);
-  }
+  $pref_con_q = run_query_display_pref($uid, "list_contact");
+  $con_q = run_query_contacts_list($list, $entity);
+  $block = html_list_consult($list_q, $pref_con_q, $con_q);
 
   return $block;
 }
@@ -425,7 +422,7 @@ function dis_list_consult($list) {
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query;
   global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
-  global $display, $perm, $menu, $action, $cright_write;
+  global $display, $perm, $menu, $cright_write, $ctu_sql_limit, $cdg_sql;
   global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_invalid_query;
   global $l_del_contact_sel, $nb_contact_added,$l_mailing, $nb_contact_deleted;
@@ -528,7 +525,6 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     }
   }
 
-
   // Dynamic Contacts
   if ($query_nb != 0) {
     $message = "$nb_conq $l_dyn_con_found";
@@ -537,7 +533,16 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
     $conq_q = new DB_OBM;
-    $conq_q->query($query);
+    $db_type = $obm_q->type;
+    $limit = sql_limit($db_type);
+
+    if ($ctu_sql_limit) {
+      $conq_q->set_num_rows_total($query_nb);
+    }
+
+    $query_limit = "$query $limit";
+    display_debug_msg($query_limit, $cdg_sql, "dynamic list()");
+    $conq_q->query("$query_limit");
     $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
     $dis_infos->data_set = $conq_q;
     $dis_infos->data_url = $url;

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_data_query.inc                                         //
 //     - Desc : Data admin Query File                                        //
@@ -104,14 +104,20 @@ function update_one_deal($id, $hitrate) {
 function get_document_list() {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $ctt[0]["type"] = "field";
+  $ctt[0]["value"] = "document_path";
+  $ctt[1]["type"] = "field";
+  $ctt[1]["value"] = "document_name";
+  $concat = sql_string_concat($db_type, $ctt);
+
   $query = "select document_id,
       document_path,
       document_name,
       document_kind
-      from Document order by
-      BINARY CONCAT(document_path,
-	     document_name
-  )";
+      from Document order by $concat";
 
   display_debug_msg($query, $cdg_sql);
 
@@ -122,26 +128,27 @@ function get_document_list() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution - document list                                           //
+// Get file list from Filesystem
 ///////////////////////////////////////////////////////////////////////////////
 function get_file_list($repository) {
   global $document_path;
+
   $root_handler = opendir($repository);
   $relative_path = substr($repository,strlen($document_path));
   while($file = readdir($root_handler)) {
     $path = "$repository$file";
-    if($file != ".." && $file != ".") {
+    if ($file != ".." && $file != ".") {
       $ret[$path] =$file;
     }
   }
   closedir($root_handler);
-  if($ret) {
+  if ($ret) {
     ksort($ret);
     foreach($ret as $path=>$file) {
       $tree[$relative_path.$file] = array($relative_path,$file);;
-      if(is_dir($path)) {
-	  $result =  get_file_list("$path/");
-	if($result) {
+      if (is_dir($path)) {
+	$result =  get_file_list("$path/");
+	if ($result) {
 	  $tree = array_merge($tree,$result);
 	}
       }

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : invoice.inc                                              //
@@ -14,8 +14,8 @@ $l_label_start = "Label start";
 $l_number = "Number";
 $l_amount = "Amount";
 $l_geninvoice = "Caractéristics";
-$l_amount_HT = "HT amount";
-$l_amount_TTC = "TTC Amount";
+$l_amount_ht = "HT amount";
+$l_amount_ttc = "TTC Amount";
 $l_comment = "Comment";
 $l_deal="Deal";
 $l_company = "Company";
@@ -41,7 +41,7 @@ $l_invoice_payment_amount = "Payment Amount";
 $l_inout = "Kind";
 $l_both = "Both"; 
 $l_client = "Customer";
-$l_fournisseur = "Supplier";
+$l_supplier = "Supplier";
 $l_no_deals_related_error = "You cannot add payments to this invoice because it has no deals connected";
 $l_last_deal_remove_error = "You cannot remove more deal : there remains only one related to this invoice, and there are still payments...<br>Remove payments first.";
 $l_archive_ok="successfully archived invoices";

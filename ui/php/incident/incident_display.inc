@@ -51,6 +51,7 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "incident_date") {
     $res["name"] = date_format($OD->data_set->f("date"));
+    $res["txt_name"] = $res["name"];
   }
 
   else if ($fieldname == "incident_priority") {

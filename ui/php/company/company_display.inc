@@ -54,7 +54,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".$OD->data_set->f("company_name")."');";
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
-    } else {    
+    } else {
       $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
     }
   }
@@ -406,7 +406,7 @@ function dis_company_search_list($company) {
   $popup = $company["popup"];
   $pref_q = run_query_display_pref($auth->auth["uid"], "company");
   $obm_q = run_query_search($company, $new_order, $order_dir);
-  $nb_company = $obm_q->num_rows();
+  $nb_company = $obm_q->num_rows_total();
   if ($nb_company == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
@@ -453,8 +453,6 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $dsrc = $company["datasource"];
 
   $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc$url_ext");
-
-  $comp_q->seek($first_row);
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
   if ($popup) {

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_js.inc                                               //
 //     - Desc : invoice javascript functions File                            //
@@ -9,7 +9,7 @@
 
 
 $extra_js .= "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script Language=\"JavaScript\">
 <!--
 ";
 
@@ -19,8 +19,8 @@ require("$obminclude/lang/$set_lang/check_date_js.inc");
 $extra_js .= "
 // user input check in  html_invoice_search_form :
 function check_form(f_inv){
-  j_ht=f_inv.tf_amount_HT.value;
-  j_ttc=f_inv.tf_amount_TTC.value;
+  j_ht=f_inv.tf_amount_ht.value;
+  j_ttc=f_inv.tf_amount_ttc.value;
   j_date_apres=f_inv.tf_date_after.value;
   j_date_avant=f_inv.tf_date_before.value;
 
@@ -54,8 +54,8 @@ function check_form(f_inv){
 
 // input check when creating an invoice
 function check_invoice(f_inv) {
-  var j_ht=f_inv.tf_amount_HT.value;
-  var j_ttc=f_inv.tf_amount_TTC.value;
+  var j_ht=f_inv.tf_amount_ht.value;
+  var j_ttc=f_inv.tf_amount_ttc.value;
   j_number=f_inv.tf_number.value;
   j_status=f_inv.sel_status.value;
   j_date=f_inv.tf_date.value;
@@ -111,8 +111,8 @@ function check_invoice(f_inv) {
 
 
 function check_invoice_link(f_inv) {
-  var j_ht=f_inv.tf_amount_HT.value;
-  var j_ttc=f_inv.tf_amount_TTC.value;
+  var j_ht=f_inv.tf_amount_ht.value;
+  var j_ttc=f_inv.tf_amount_ttc.value;
   j_number=f_inv.tf_number.value;
   j_status=f_inv.sel_status.value;
   j_date=f_inv.tf_date.value;
@@ -160,7 +160,7 @@ function valider_suppression() {
 // back to HT or rate...
 function compute_tax (form) {
  var rate = parseFloat(form.tf_tax_rate.value);
- var ht   = parseFloat(form.tf_amount_HT.value);
+ var ht   = parseFloat(form.tf_amount_ht.value);
 
  if (isNaN (rate)) {
   alert (\"$l_rate_nan\");
@@ -170,16 +170,14 @@ function compute_tax (form) {
  }
  if (isNaN (ht)) {
   alert (\"$l_ht_nan\");
-  form.tf_amount_HT.focus();
-  form.tf_amount_HT.select();
+  form.tf_amount_ht.focus();
+  form.tf_amount_ht.select();
   return;
  }
 
- form.tf_amount_TTC.value = (Math.round (ht * rate*100))/100;
+ form.tf_amount_ttc.value = (Math.round (ht * rate*100))/100;
 }
 
 // --> 
-</SCRIPT>
+</script>
 ";
-
-//</SCRIPT>

@@ -74,7 +74,6 @@ if ($action == "index" || $action == "") {
   require("account_js.inc");
   if ($account["account"] > 0) {
     $ac_q = run_query_detail($account["account"]);
-    $ac_q->next_record();
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
@@ -82,7 +81,6 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($account["account"] > 0) {
     $ac_q = run_query_detail($account["account"]);
-    $ac_q->next_record();    
     require("account_js.inc");
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_form($ac_q, $action);
@@ -95,7 +93,6 @@ if ($action == "index" || $action == "") {
 
   if ($account["account"] > 0) {
     $ac_q = run_query_detail($account["account"]);
-    $ac_q->next_record();
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
@@ -123,7 +120,6 @@ if ($action == "index" || $action == "") {
     display_ok_msg ("FIXME PERMISSIONS");
     require ("account_js.inc");
     $q_account = run_query_detail ($account["account"]);
-    $q_account->next_record();
     // used to compute today balance :
     $q_payments = run_query_search_payments($account["account"], date ("Y-m-d"));
     // used to compute balance on $tf_balance_date :
@@ -140,7 +136,6 @@ if ($action == "index" || $action == "") {
     require ("account_js.inc");
     $display["msg"] = display_ok_msg ("FIXME PERMISSIONS");
     //$q_account = run_query_detail ($account["account"]);
-    //$q_account->next_record();
     //    $payments_options = run_query_display_options ($auth->auth["uid"],"payment");
     $payments_prefs = run_query_display_pref ($auth->auth["uid"], "payment");
 
@@ -151,7 +146,6 @@ if ($action == "index" || $action == "") {
   } 
   /*  
 $q_account = run_query_detail ($account["account"]);
-  $q_account->next_record(); 
   $today = account_compute_balance ($q_account); 
   $other = account_compute_balance ($q_account, $tf_balance_date);  
   echo "<br>calcul du solde pour aujourd'hui : <br>"; 
@@ -277,7 +271,7 @@ function get_account_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/account/account_index.php?action=detailconsult&amp;param_account=".$account["account"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('compute_balance') 
+    'Condition'=> array ('compute_balance', 'detailupdate') 
                                        );
 
 // Compute Balance
@@ -293,7 +287,7 @@ function get_account_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/account/account_index.php?action=detailupdate&amp;param_account=".$account["account"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update')
                                      	      );
 
 // Update
@@ -308,7 +302,7 @@ function get_account_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/account/account_index.php?action=delete&amp;param_account=".$account["account"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	);
 
 // Admin
