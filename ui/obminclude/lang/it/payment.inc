@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian                                                 //
-//     - File     : invoice.inc                                             //
-// 01/08/2002 Augusto Fagiolin                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italiano                                                 //
+//     - File     : payment.inc                                              //
+// 2002-08-01 Augusto Fagioli                                                //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 
@@ -12,14 +14,11 @@ $l_label_start = "Etichetta inizio";
 $l_last_payment = "Ultimo pagamento";
 $l_number = "Numero";
 $l_amount = "Importo";
-$l_comment = "Note";
 $l_date = "Data";
 $l_expected_date = "Scadenza";
 $l_date_apres = "Data Prima";
 $l_date_avant = "Data Dopo";
 $l_account = "Account";
-$l_all = "Tutti;
-$l_all_f = "Tutti";
 $l_type = "Tipo";
 $l_inout = "Tipo";
 $l_both = "Entrambi";
@@ -49,7 +48,6 @@ $l_payment = "Pagamenti";
 $l_payment_infos = "Informazioni sui pagamenti";
 
 // Actions
-$l_find = "Trova";
 $l_insert= "Inserisci pagamento";
 $l_update = "Aggiorna pagamento";
 $l_delete = "Elimina pagamento";
@@ -76,11 +74,6 @@ $l_update_ok = "Pagamento modificato.";
 $l_update_error = "Modifica pagamento fallita!";
 $l_query_error = "Problemi durante la query.....";
 
-// Specifics fields
-// MySQL Date and time format for display in the detail screen
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_no_number = "\\nNumero pagamento non valido!";
 $lj_check_amount = "\\nImporto non valido!";
@@ -92,24 +85,9 @@ $lj_check_account = "Scegli prima un account !";
 $l_no_amount = "Inserisci prima importo del pagamento";
 $l_fill_date = "Riempi questo campo";
 $l_invalid_amount = "Ultimo importo inserto non valido";
+
 // For the display parameters modification screen
 $l_payment_options = "Opzioni di visualizzazione per elenco dei pagamenti";
-$l_options_dis = "Opzioni di Visualizzazione" ;
-$l_query_display = "Visualizzati" ;
-$l_order_dis = "Ordine di visualizzazione" ;
-$l_action = "Azione" ;
-$l_ch_to_dis_no = "Not to display it fields" ;
-$l_ch_to_dis_no_help = "Il campo appropriato è visualizzato<br>Click per nasconderlo" ;
-$l_ch_to_dis_yes = "To display it fields" ;
-$l_ch_to_dis_yes_help = "Il campo appropriato è nascosto<br>Click per visualizzarlo" ;
-$l_dis_obligatory = "Il campo non si può nascondere" ;
-$l_dis_obligatory_help = "This button means you don't have choice. The field appropriate field is be displayed" ;
-$l_down_option = "Scendi di un livello" ;
-$l_down_option_help  = "Click per spostare sotto il campo" ;
-$l_up_option = "To assemble this option of a notch" ;
-$l_up_option_help = "Click per spostare sopra il campo" ;
-$l_back_tolist = "Torna alla visualizzazione dellalista " ;
-$l_help_options = "Aiuto contestuale" ;
 
 // banking check messages :
 $l_not_enough = "Non hai usato tutto l'importo del pagamento  !<BR>";

@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian						    //
-//     - File     : company.inc                                             //
-// 1999-01-25 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italiano                                                 //
+//     - File     : company.inc                                              //
+// 2002-08-01 Augusto Fagioli                                                //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 $l_number = "Numero";
@@ -25,16 +25,12 @@ $l_web = "Web";
 $l_email = "E-Mail";
 
 // Labels and texts
-$l_back = "Dietro";
 $l_last_company = "Ultima Azienda";
 $l_last_contact = "Ultyimo Contatto";
 $l_last_deal = "Ultimo Impegno";
-$l_all = "Tutto";
-$l_find = "Trova";
 $l_mailing_first = "M";
 $l_listdoc_first = "D";
 $l_newdoc_first = "ND";
-$l_comment = "Commento";
 $l_contact_list = "Lista Contatti";
 $l_contact_new = "Nuovo Contatto";
 $l_deal_list = "Lista Impegni";
@@ -42,7 +38,6 @@ $l_deal_new = "New Deal";
 $l_kind_manage = "Azienda Tipo Management";
 $l_kind_exist = "Tipi esistente";
 $l_kind_new = "Nuovo Tipo";
-$l_invalid_data = "Data Non valida";
 $l_internal = "Interno";
 
 //------------------------------------//
@@ -124,10 +119,6 @@ $l_j_kind_delete = "Scegli un tipo da controllare o eliminare !";
 $l_j_kind_update = "Scegli un tipo e inserisci il nuovo nome per la modifica !";
 $l_j_kind_create = "Inserisci nuovo tipo per crearlo  !";
 $l_j_select_company = "Scegli  Azienda !";
-
-// Specifics fields
-// MySQL Date and time format for display in the Impegno detail screen
-$l_date_format = "%d-%m-%Y %H:%i:%s";
 
 // For the display parameters modification screen
 $l_company_display = "Mostra opzioni lista  Aziende ";

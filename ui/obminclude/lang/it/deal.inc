@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italiano                                                //
-//     - File     : deal.inc                                                //
-// 02-08-2002 Augusto Fagioli                           //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italiano                                                 //
+//     - File     : deal.inc                                                 //
+// 02-08-2002 Augusto Fagioli                                                //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
 //for list
@@ -27,13 +27,10 @@ $l_date_proposal = "Data Proposta";
 $l_amount = "Totale";
 $l_state = "Stato";
 $l_date_alarm = "Data avviso";
-$l_comment = "Commento";
-$l_archive = "Archivio";
 $l_todo = "Da fare";
 $l_visibility = "Accesso";
 
 // Labels and texts
-$l_back = "Indietro";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Ordine";
@@ -47,8 +44,6 @@ $l_manager = "Resp. ";
 $l_proposition = "Proposta";
 $l_show_archive = "Mostra archivi";
 $l_archive_first = "A";
-$l_all_f = "Tutti";
-$l_all = "Tutti";
 $l_date_alarm_after = "Data Avviso dopo";
 $l_date_alarm_before = "Data avviso prima";
 $l_after = "Dopo";
@@ -99,7 +94,6 @@ $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
 $l_deal = "Impegni";
 
 // Actions
-$l_find = "Trova";
 $l_insert = "Inserisci Impegno";
 $l_update = "Modifica  Impegno";
 $l_delete = "Elimina Impegno";
@@ -199,15 +193,10 @@ $l_j_kind_create = "Inserisci il nome per un nuovo tipo per crearlo!";
 $l_j_status_create = "Inserisci il nome per un nuovo Stato per crearlo!";
 $l_j_category_create = "Inserisci il nome per una  nuova categoria per crearla!";
 
-// Specifics fields
-// MySQL Date and time format for display in deal detail screen
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-
 // For display parameters modification screen
 $l_deal_display = "Visualizza opzioni per la lista di Impegni";
 $l_parentdeal_display = "Visualizza opzioni per la lista di Sub-Impegni";
 $l_invoice_display = "Visualizza opzioni per la lista di fatture";
-
 
 
 //about invoice...
@@ -217,5 +206,3 @@ $l_invoices_connected = "Fatture collegate";
 $l_archived_invoices_connected ="Fatture in archivio collegate";
 $l_no_invoices_connected = "Non sono presenti fatture collegate";
 $l_see_archived_invoices = "Vedi Elenco fatture in archivio";
-$l_sel_none = "deseleziona";
-

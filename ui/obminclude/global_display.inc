@@ -321,7 +321,7 @@ class OBM_DISPLAY {
       }
 
       //Incident Rows special Color
-      if ($this->data_set->f("incident_etat") == "CLOSED")  {
+      if ($this->data_set->f("incident_state") == "CLOSED")  {
        $special_col_table=$col_inc_closed;
       }elseif ($this->data_set->f("incident_priority") == "REDHOT")  {
 	$special_col_table=$col_inc_redhot;
@@ -475,19 +475,18 @@ class OBM_DISPLAY {
         } 
 	else if ($fieldname == "deal_datealarm") {
 	  $date = $this->data_set->f($fieldname);
+	  $datealarm = $this->data_set->f("datealarm");
 	  $year = substr($date,0,4);
 	  $month = substr($date,5,2);
 	  $day = substr($date,8,2);
 	  $timestamp = mktime (23,59,59,$month,$day,$year);
 	  $time = time();
 	  if ($time > $timestamp) {
-            $name="<FONT COLOR=\"#$col_error\">".
-	      $this->data_set->f($fieldname) . "</FONT>";
+            $name="<font color=\"#$col_error\">$datealarm</font>";
 	  } else if (($time + 86400) > $timestamp) {
-	    $name="<FONT COLOR=\"#$col_ok\">".
-	      $this->data_set->f($fieldname) . "</FONT>";
+	    $name="<font color=\"#$col_ok\">$datealarm</font>";
 	  } else {
-	    $name="";
+	    $name="$datealarm";
 	  }
 	}
 
@@ -619,6 +618,9 @@ class OBM_DISPLAY {
 	  }
 	  $name = "<FONT COLOR=\"#$couleur\">$amount</FONT>";
 	}
+        else if ($fieldname == "invoice_date") {
+	  $name = $this->data_set->f("date");
+	}
 
         //------------------------
 	// For the payments :
@@ -644,6 +646,14 @@ class OBM_DISPLAY {
 	  }
 	  $name = "<FONT COLOR=\"#$couleur\">$amount</FONT>";
 	}
+        else if ($fieldname == "payment_date") {
+	  $name = $this->data_set->f("date");
+	}
+        else if ($fieldname == "payment_expect_date") {
+	  $name = $this->data_set->f("expect_date");
+	}
+
+
 
 	//For Image scan (crow or round):
 	if($fieldname == "service_status") {
@@ -659,6 +669,9 @@ class OBM_DISPLAY {
 	}
        	else if ($fieldname == "contract_company_name") {
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contract_company_id");
+       	}
+        else if ($fieldname == "contract_dateexp") {
+	  $name = $this->data_set->f("dateexp");
 	}
 	//------------------------------
 	// For the incidentss 
@@ -687,7 +700,9 @@ class OBM_DISPLAY {
           }
 	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_logger");
 	}
-
+        else if ($fieldname == "incident_date") {
+	  $name = $this->data_set->f("date");
+	}
 	
         //------------------------------
         // For the time management

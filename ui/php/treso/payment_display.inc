@@ -16,7 +16,7 @@ $cellspacing=($set_debug>0)?5:1;
 // $q_payment if update, data about that payment
 // $q_paymentkind data about all existing payment kinds
 ///////////////////////////////////////////////////////////////////////////////
-function html_payment_form ($p_action, $q_payment, $q_paymentkind, $q_account) {
+function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   // debug :
   global $border, $cellspacing;
   // themes :
@@ -41,8 +41,8 @@ function html_payment_form ($p_action, $q_payment, $q_paymentkind, $q_account) {
     $label = $q_payment->f("payment_label");
     $amount = $q_payment->f("payment_amount");
     $comment = $q_payment->f("payment_comment");
-    $date = $q_payment->f("payment_date");
-    $expected_date = $q_payment->f("payment_expected_date");
+    $date = $q_payment->f("date");
+    $expected_date = $q_payment->f("expect_date");
     $type = $q_payment->f("payment_paymentkind_id");
     $inout = $q_payment->f("payment_inout");
     $account = $q_payment->f("payment_account_id");
@@ -540,10 +540,10 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
      <tr><td>
       <table width=\"100%\" border=$border cellspacing=$cellspacing>
        <tr><td>
-        <font color=\"#$col_label\">$l_expected_date</font><br>".$q_payment->f("payment_expected_date")."
+        <font color=\"#$col_label\">$l_expected_date</font><br>".$q_payment->f("expect_date")."
        </td><td>
         <font color=\"#$col_label\">$l_date</font><br>".
-    ( ($q_payment->f("payment_date") == "") ? "&nbsp;" :$q_payment->f("payment_date") )  ."
+    ( ($q_payment->f("date") == "") ? "&nbsp;" :$q_payment->f("date") )  ."
        </td></tr>
       </table>
      </td></tr>";

@@ -18,7 +18,6 @@ $l_header_user = "Utilisateurs";
 $l_header_computer = "Ordinateurs" ;
 $l_header_admin = "Administration";
 $l_header_admin_lang = "Langue";
-$l_header_admin_lang_help = "Aide Langue";
 $l_header_admin_data = "Données";
 $l_header_admin_pref = "Préférences";
 $l_header_admin_code = "Code";

@@ -17,7 +17,6 @@ $l_header_list = "Lists";
 $l_header_user = "Users";
 $l_header_admin = "Administration";
 $l_header_admin_lang = "Lang";
-$l_header_admin_lang_help = "Lang Help";
 $l_header_admin_data = "Data";
 $l_header_admin_pref = "Prefs";
 $l_header_admin_code = "Code";

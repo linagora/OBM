@@ -49,7 +49,7 @@ function dis_lang_index($mode, $actions, $modules, $langs, $themes) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_lang_index($actions, $modules, $langs, $themes) {
   global $sess;
-  global $l_execute;
+  global $l_execute, $l_help;
   global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
 
   // modules SELECT
@@ -82,7 +82,10 @@ function html_lang_index($actions, $modules, $langs, $themes) {
   }
   $sel_theme .= "</SELECT>";
 
-  echo "<FORM method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
+  echo "
+    <a href=\"" . $sess->url("admin_lang_index.php?action=help&amp;mode=html"). "\">$l_help</a>
+    <p>
+    <form method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
     <table border=1>
     <tr>
       <td>action : show_src<br>
@@ -93,11 +96,11 @@ function html_lang_index($actions, $modules, $langs, $themes) {
           <input type=submit value=\"$l_execute\"></td>
     </tr>
     </table>
-    </FORM>
+    </form>
 
-    <HR>
+    <hr>
 
-    <FORM method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
+    <form method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
     <table border=1>
     <tr>
       <td>action : show_lang<br>
@@ -109,11 +112,11 @@ function html_lang_index($actions, $modules, $langs, $themes) {
           <input type=submit value=\"$l_execute\"></td>
     </tr>
     </table>
-    </FORM>
+    </form>
 
-    <HR>
+    <hr>
 
-    <FORM method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
+    <form method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
     <table border=1>
     <tr>
       <td>action : comp_lang<br>
@@ -126,11 +129,11 @@ function html_lang_index($actions, $modules, $langs, $themes) {
           <input type=submit value=\"$l_execute\"></td>
     </tr>
     </table>
-    </FORM>
+    </form>
 
-    <HR>
+    <hr>
 
-    <FORM method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
+    <form method=get action=\"" . $sess->url("admin_lang_index.php"). "\">
     <table border=1>
     <tr>
       <td>action : comp_header_lang<br>
@@ -143,7 +146,7 @@ function html_lang_index($actions, $modules, $langs, $themes) {
           <input type=submit value=\"$l_execute\"></td>
     </tr>
     </table>
-    </FORM>";
+    </form>";
 
 }
 
@@ -256,16 +259,23 @@ function dis_lang_vars($mode, $module, $lang) {
     echo "File $lang/$module.inc is missing ! Create it";
     return false;
   }
+
+  $glang_v = get_global_lang_vars($lang);
+  if (! $glang_v) {
+    echo "File $lang/global.inc is missing ! Create it";
+    return false;
+  }
+
   $ref_v = get_src_vars($module);
   $used_v = get_src_used_vars($module);
   $unused_v = array_diff ($ref_v, $used_v);
 
   switch ($mode) {
   case "txt":
-    txt_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v);
+    txt_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v);
     break;
   case "html":
-    html_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v);
+    html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -279,18 +289,22 @@ function dis_lang_vars($mode, $module, $lang) {
 //   - $module   : module name
 //   - $lang     : language to display
 //   - $lang_v   : lang vars defined
+//   - $glang_v  : lang vars defined in the lang global.inc
 //   - $ref_v    : lang vars referenced in source files
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function txt_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v) {
+function txt_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v) {
 
   $text = "";
   $nb_ref = count($ref_v);
   $nb_used = count($used_v);
   $nb_unused = count($unused_v);
   $nb_lang = count($lang_v);
+  $nb_glang = count($glang_v);
   $nb_used_def = 0;
+  $nb_used_def_glo = 0;
+  $nb_used_def_twi = 0;
   $nb_used_undef = 0;
   $nb_unused_def = 0;
   $nb_unused_undef = 0;
@@ -307,7 +321,7 @@ function txt_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v) {
 *** $module / $lang
 ------------------------------------------------------------------------------
 From Source    : $nb_ref var referenced : $nb_used used - $nb_unused unused 
-From lang file : $nb_lang var defined
+From lang file : $nb_lang ($module.inc), $nb_glang ($lang/global.inc) vars defined
 ------------------------------------------------------------------------------
 *** $module / $lang : vars used and defined : $nb_used_def vars
 ------------------------------------------------------------------------------
@@ -317,8 +331,40 @@ $text
   $text = "";
   reset($used_v);
   while (list ($nb, $lval) = each ($used_v)) {
+    $value = $glang_v[$lval];
+    if ($value) {
+      $text .= "$lval = $value\n";
+      $nb_used_def_glo++;
+    }
+  }
+  echo "------------------------------------------------------------------------------
+*** $module / $lang : vars used and defined in global : $nb_used_def_glo vars
+------------------------------------------------------------------------------
+$text
+";
+
+  $text = "";
+  reset($used_v);
+  while (list ($nb, $lval) = each ($used_v)) {
     $value = $lang_v[$lval];
-    if (! $value) {
+    $gvalue = $glang_v[$lval];
+    if (($value) && ($gvalue)) {
+      $text .= "$lval = $value - (global : $gvalue)\n";
+      $nb_used_def_twi++;
+    }
+  }
+  echo "------------------------------------------------------------------------------
+*** $module / $lang : vars used and defined twice ($module + global) : $nb_used_def_twi vars
+------------------------------------------------------------------------------
+$text
+";
+
+  $text = "";
+  reset($used_v);
+  while (list ($nb, $lval) = each ($used_v)) {
+    $value = $lang_v[$lval];
+    $value2 = $glang_v[$lval];
+    if ((! $value) && (! $value2)) {
       $text .= "$lval = $value\n";
       $nb_used_undef++;
     }
@@ -384,23 +430,28 @@ $text
 //   - $module   : module name
 //   - $lang     : language to display
 //   - $lang_v   : lang vars defined
+//   - $glang_v  : lang vars defined in the lang global.inc
 //   - $ref_v    : lang vars referenced in source files
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function html_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v) {
+function html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v) {
   global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
 
   $nb_ref = count($ref_v);
   $nb_used = count($used_v);
   $nb_unused = count($unused_v);
   $nb_lang = count($lang_v);
+  $nb_glang = count($glang_v);
   $nb_used_def = 0;
+  $nb_used_def_glo = 0;
+  $nb_used_def_twi = 0;
   $nb_used_undef = 0;
   $nb_unused_def = 0;
   $nb_unused_undef = 0;
   $nb_def_unref = 0;
 
+  // Used and defined
   while (list ($nb, $lval) = each ($used_v)) {
     $value = $lang_v[$lval];
     if ($value) {
@@ -409,10 +460,33 @@ function html_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v) {
     }
   }
 
+  // Used and defined in global
+  reset($used_v);
+  while (list ($nb, $lval) = each ($used_v)) {
+    $value = $glang_v[$lval];
+    if ($value) {
+      $text_used_def_glo .= "<tr><td bgcolor=\"#$col_a_table\"><font color=\"#$col_a_text\">$lval</font></td><td bgcolor=\"#$col_a_table\"><font color=\"#$col_a_text\">$value</font></td></tr>\n";
+      $nb_used_def_glo++;
+    }
+  }
+
+  // Used and Defined twic ($module.inc and $lang/global.inc)
   reset($used_v);
   while (list ($nb, $lval) = each ($used_v)) {
     $value = $lang_v[$lval];
-    if (! $value) {
+    $gvalue = $glang_v[$lval];
+    if (($value)  && ($gvalue)) {
+      $text_used_def_twi .= "<tr><td bgcolor=\"#$col_a_table\"><font color=\"#$col_a_text\">$lval</font></td><td bgcolor=\"#$col_a_table\"><font color=\"#$col_a_text\">$value (global: $gvalue)</font></td></tr>\n";
+      $nb_used_def_twi++;
+    }
+  }
+
+  // Used but undefined
+  reset($used_v);
+  while (list ($nb, $lval) = each ($used_v)) {
+    $value = $lang_v[$lval];
+    $value2 = $glang_v[$lval];
+    if ((! $value) && (! $value2)) {
       $text_used_undef .= "<tr><td bgcolor=\"#$col_a_table\"><font color=\"#$col_a_text\">$lval</font></td><td bgcolor=\"#$col_a_table\"><font color=\"#$col_a_text\">$value</font></td></tr>\n";
       $nb_used_undef++;
     }
@@ -449,7 +523,8 @@ function html_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v) {
       <td colspan=2 bgcolor=\"#$col_a_tableh\">
       <font color=\"#$col_textem\">$module / $lang<br>
       From Source : $nb_ref var referenced : $nb_used used - $nb_unused unused 
-      <br>From lang file : $nb_lang var defined
+      <br>From lang file : $nb_lang ($module.inc),
+          $nb_glang ($lang/global.inc) vars defined
       </font>
       </td>
     </tr><tr>
@@ -460,6 +535,18 @@ function html_lang_vars($module, $lang, $lang_v, $ref_v, $used_v, $unused_v) {
       </td>
     </tr>
       $text_used_def
+    </tr><tr>
+      <td colspan=2 bgcolor=\"#$col_a_tableh\">
+        <font color=\"#$col_textem\">Vars Used and defined in lang global : $nb_used_def_glo</font>
+      </td>
+    </tr>
+      $text_used_def_glo
+    </tr><tr>
+      <td colspan=2 bgcolor=\"#$col_a_tableh\">
+        <font color=\"#$col_textem\">Vars Used and defined twice ($module.inc + $lang/global.inc) : $nb_used_def_twi</font>
+      </td>
+    </tr>
+      $text_used_def_twi
     <tr>
       <td colspan=2 bgcolor=\"#$col_a_tableh\">
         <font color=\"#$col_textem\">Vars used but not defined : $nb_used_undef</font>
@@ -511,16 +598,27 @@ function dis_comp_lang_vars($mode, $module, $lang, $lang2) {
     return false;
   }
 
+  $glang_v = get_global_lang_vars($lang);
+  if (! $glang_v) {
+    echo "File $lang/global.inc is missing ! Create it";
+    return false;
+  }
+  $glang2_v = get_global_lang_vars($lang2);
+  if (! $glang2_v) {
+    echo "File $lang2/global.inc is missing ! Create it";
+    return false;
+  }
+
   $ref_v = get_src_vars($module);
   $used_v = get_src_used_vars($module);
   $unused_v = array_diff ($ref_v, $used_v);
 
   switch ($mode) {
   case "txt":
-    txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, $used_v, $unused_v);
+    txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v);
     break;
   case "html":
-    html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, $used_v, $unused_v);
+    html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -536,11 +634,13 @@ function dis_comp_lang_vars($mode, $module, $lang, $lang2) {
 //   - $lang2    : language dest to display
 //   - $lang_v   : lang vars defined
 //   - $lang2_v  : lang vars defined
+//   - $glang_v  : lang vars defined in the lang global.inc
+//   - $glang2_v  : lang vars defined in the lang global.inc
 //   - $ref_v    : lang vars referenced in source files
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, $used_v, $unused_v) {
+function txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v) {
   echo "txt mode Not implemented: Run this action in HTML mode.\n";
 }
 
@@ -553,11 +653,13 @@ function txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, $
 //   - $lang2    : language dest to display
 //   - $lang_v   : lang vars defined
 //   - $lang2_v  : lang vars defined
+//   - $glang_v  : lang vars defined in the lang global.inc
+//   - $glang2_v  : lang vars defined in the lang global.inc
 //   - $ref_v    : lang vars referenced in source files
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, $used_v, $unused_v) {
+function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v) {
   global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
 
   $nb_ref = count($ref_v);
@@ -565,6 +667,8 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, 
   $nb_unused = count($unused_v);
   $nb_lang = count($lang_v);
   $nb_lang2 = count($lang2_v);
+  $nb_glang = count($glang_v);
+  $nb_glang2 = count($glang2_v);
   $nb_used_def = $nb_used_def_2 = 0;
   $nb_used_undef = $nb_used_undef_2 = 0;
   $nb_unused_def = $nb_unused_def_2 = 0;
@@ -573,6 +677,7 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, 
 
   $fonttext = "<font color=\"#$col_a_text\">";
 
+  // Used and defined in module.inc
   while (list ($nb, $lval) = each ($used_v)) {
     $value = $lang_v[$lval];
     $value2 = $lang2_v[$lval];
@@ -587,11 +692,30 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, 
     }
   }
 
+  // Used and defined in global
+  reset($used_v);
+  while (list ($nb, $lval) = each ($used_v)) {
+    $value = $glang_v[$lval];
+    $value2 = $glang2_v[$lval];
+    if ($value || $value2) {
+      $text_used_def_glo .= "<tr>
+        <td bgcolor=\"#$col_a_table\">$fonttext$lval</font></td>
+        <td bgcolor=\"#$col_a_table\">$fonttext$value</font></td>
+        <td bgcolor=\"#$col_a_table\">$fonttext$value2</font></td>
+        </tr>\n";
+      if ($value) $nb_used_def_glo++;
+      if ($value2) $nb_used_def_glo_2++;
+    }
+  }
+
+  // Used but not defined
   reset($used_v);
   while (list ($nb, $lval) = each ($used_v)) {
     $value = $lang_v[$lval];
     $value2 = $lang2_v[$lval];
-    if ((! $value) || (! $value2)) {
+    $gvalue = $glang_v[$lval];
+    $gvalue2 = $glang2_v[$lval];
+    if ( ((! $value) && (! $gvalue)) || ((! $value2) && (! $gvalue2)) ) {
       $text_used_undef .= "<tr>
         <td bgcolor=\"#$col_a_table\">$fonttext$lval</font></td>
         <td bgcolor=\"#$col_a_table\">$fonttext$value</font></td>
@@ -602,11 +726,14 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, 
     }
   }
 
+  // Unused (only in global) but defined
   reset($unused_v);
   while (list ($nb, $lval) = each ($unused_v)) {
     $value = $lang_v[$lval];
     $value2 = $lang2_v[$lval];
-    if ($value || $value2) {
+    $gvalue = $glang_v[$lval];
+    $gvalue2 = $glang2_v[$lval];
+    if ($value || $value2 || $gvalue || $gvalue2) {
       $text_unused_def .= "<tr>
         <td bgcolor=\"#$col_a_table\">$fonttext$lval</font></td>
         <td bgcolor=\"#$col_a_table\">$fonttext$value</font></td>
@@ -692,6 +819,15 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $ref_v, 
         <font color=\"#$col_textem\">$nb_used_def_2</font></td>
     </tr>
       $text_used_def
+    </tr><tr>
+      <td bgcolor=\"#$col_a_tableh\">
+        <font color=\"#$col_textem\">Vars Used and defined in global</font></td>
+      <td bgcolor=\"#$col_a_tableh\" align=center>
+        <font color=\"#$col_textem\">$nb_used_def_glo</font></td>
+      <td bgcolor=\"#$col_a_tableh\" align=center>
+        <font color=\"#$col_textem\">$nb_used_def_glo_2</font></td>
+    </tr>
+      $text_used_def_glo
     <tr>
       <td bgcolor=\"#$col_a_tableh\">
         <font color=\"#$col_textem\">Vars used but not defined</font></td>

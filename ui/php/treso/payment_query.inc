@@ -11,7 +11,7 @@
 // search for the specified payment in the database
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($p_payment, $p_new_order="") {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $l_date_format;
 
   $label = $p_payment["label"];
   $number = $p_payment["number"];
@@ -35,13 +35,15 @@ function run_query_search($p_payment, $p_new_order="") {
   // same problem with payment_account_id...
   // a payment not yet banked can have no kind, no account...
   // we do with an left outer join
-  $query = "select Payment.payment_id".
-  ", Payment.payment_label ". 
-  ", Payment.payment_amount".
-  ", Payment.payment_number". 
-  ", Payment.payment_inout". 
-  ", Payment.payment_date ".
-  ", Payment.payment_expected_date as payment_expect_date".
+  $query = "select Payment.payment_id,
+    Payment.payment_label,
+    Payment.payment_amount,
+    Payment.payment_number, 
+    Payment.payment_inout, 
+    Payment.payment_date,
+    DATE_FORMAT(Payment.payment_date,'$l_date_format') as date,
+    DATE_FORMAT(Payment.payment_expected_date,'$l_date_format') as expect_date,
+    Payment.payment_expected_date as payment_expect_date".
   // expect_date, without 'ed' because display_fieldname is varchar(20)...
   ", Payment.payment_paymentkind_id".
   ", paymentkind_shortlabel, paymentkind_longlabel ".
@@ -192,20 +194,23 @@ function run_query_account () {
 // récupération de tous les champs du payment
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_payment_id) {
-  global $l_date_format, $db_type_mysql, $db_type_pgsql, $cdg_sql;
+  global $l_datetime_format, $l_date_format, $db_type_mysql, $db_type_pgsql;
+  global $cdg_sql;
 
   $go = new DB_OBM;
 
-  if ($go->db_type == $db_type_mysql){
-    $query = "select * ".
-       ", DATE_FORMAT(payment_timeupdate,'$l_date_format') as datemodif ".
-       ", DATE_FORMAT(payment_timeupdate, '$l_date_format') as timeupdate".
-       ", DATE_FORMAT(payment_timecreate,'$l_date_format') as timecreate ".
-       ", sum(paymentinvoice_amount) as pay_inv_paid ".
-       " from Payment left outer join PaymentInvoice ". 
-       " on (payment_id=paymentinvoice_payment_id)".
-       " where payment_id =".$p_payment_id;
-  } elseif ($go->db_type == $db_type_pgsql) { 
+  if ($go->type == $db_type_mysql){
+    $query = "select *,
+      DATE_FORMAT(Payment.payment_date,'$l_date_format') as date,
+      DATE_FORMAT(Payment.payment_expected_date,'$l_date_format') as expect_date,
+      DATE_FORMAT(payment_timeupdate,'$l_datetime_format') as datemodif,
+      DATE_FORMAT(payment_timeupdate, '$l_datetime_format') as timeupdate,
+      DATE_FORMAT(payment_timecreate,'$l_datetime_format') as timecreate,
+      sum(paymentinvoice_amount) as pay_inv_paid
+    from Payment left outer join PaymentInvoice
+         on (payment_id=paymentinvoice_payment_id)
+    where payment_id = '$p_payment_id'";
+  } elseif ($go->type == $db_type_pgsql) { 
     $query = "select * ".
        ", payment_timeupdate as datemodif ".
        ", payment_timeupdate as timeupdate ".
@@ -321,25 +326,25 @@ function run_query_search_connectable_invoices ($payment) {
     }
   }
 
-  $query = "select invoice_id".
-     ", invoice_label ".
-     ", invoice_number ".
-     ", invoice_amount_TTC ".
-     ", invoice_amount_HT ".
-     ", invoice_date ".
-     ", invoice_inout ".
-     ", invoice_invoicestatus_id ".
-     ", invoicestatus_label as invoice_status ".
-     ", sum(paymentinvoice_amount) ".
-     ", company_name as invoice_company ".
-     ", company_id ".
-     ", deal_id ".
-     ", deal_label as invoice_deal ".
-     " from ";
-  $query .= "InvoiceStatus, DealInvoice, Deal, Company, ".
-     "Invoice ".
-     " left outer join PaymentInvoice ".
-     " on (invoice_id = paymentinvoice_invoice_id) ".
+  $query = "select invoice_id,
+      invoice_label,
+      invoice_number,
+      invoice_amount_TTC,
+      invoice_amount_HT,
+      invoice_date,
+      invoice_inout,
+      invoice_invoicestatus_id,
+      invoicestatus_label as invoice_status,
+      DATE_FORMAT(invoice_date,'$l_date_format') as date,
+      sum(paymentinvoice_amount),
+      company_name as invoice_company,
+      company_id,
+      deal_id,
+      deal_label as invoice_deal
+    from 
+      InvoiceStatus, DealInvoice, Deal, Company,
+      Invoice left outer join PaymentInvoice
+              on (invoice_id = paymentinvoice_invoice_id) ".
      // invoicestatus == 1 => not completely paid
      // invoicestatus == 4 => trouble on that one...
      " where invoice_invoicestatus_id in ('1','4') ".
@@ -373,25 +378,26 @@ function run_query_search_connectable_invoices ($payment) {
 // if not_paid = 1, we return only not paid invoices
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
-  global $cdg_sql;
+  global $cdg_sql, $l_date_format;
 
   $go = new DB_OBM;
   
-  $query = " select invoice_id".
-     ", invoice_label ".
-     ", invoice_number ".
-     ", invoice_amount_HT ".
-     ", invoice_amount_TTC ".
-     ", invoice_date ".
-     ", invoice_inout ".
-     ", invoice_invoicestatus_id ".
-     ", invoicestatus_label as invoice_status ".
-     ", sum(paymentinvoice_amount) ".
-     ", company_id ".
-     ", company_name as invoice_company ".
-     ", deal_id ".
-     ", deal_label as invoice_deal ".
-     " from PaymentInvoice, Company, Deal, InvoiceStatus, ".
+  $query = " select invoice_id,
+      invoice_label,
+      invoice_number,
+      invoice_amount_HT,
+      invoice_amount_TTC,
+      invoice_date,
+      invoice_inout,
+      invoice_invoicestatus_id,
+      invoicestatus_label as invoice_status,
+      DATE_FORMAT(invoice_date,'$l_date_format') as date,
+      sum(paymentinvoice_amount),
+      company_id,
+      company_name as invoice_company,
+      deal_id,
+      deal_label as invoice_deal
+   from PaymentInvoice, Company, Deal, InvoiceStatus, ".
      " Invoice left outer join DealInvoice ".
      " on invoice_id = dealinvoice_invoice_id".
      " where invoice_id = paymentinvoice_invoice_id ".

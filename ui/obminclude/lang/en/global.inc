@@ -20,8 +20,12 @@ $l_all_f = "All";
 $l_none = "---";
 $l_archive = "Archive";
 $l_invalid_data = "Invalid Data";
-$l_date_format = "%Y-%d-%m %H:%i:%s"; // Mysql date format
-$l_time_format = "%Y-%d-%m %H:%i:%s";
+
+// Mysql Date format
+$l_datetime_format = "%m-%d-%Y %H:%i:%s"; // Complete Date + Time
+$l_date_format = "%m-%d-%Y"; // Date only 
+$l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
+$l_time_format = "%H:%i:%s"; // Time only
 
 // OBM_DISPLAY
 $l_field = "Field";

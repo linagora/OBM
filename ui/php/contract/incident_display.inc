@@ -192,7 +192,7 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display new incident : Contract Form                                       //
+// Display new incident : Contract Form                                      //
 // Parameters:
 //   - $contr_q : contract database result
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ function html_new_incident_contract($contr_q) {
 
   echo $l_incident_select_contract;
   echo "<P>
-  ". $dis_param_contract ."
+    $dis_param_contract
     <P>
     <INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
     <INPUT TYPE=submit value=\"$l_select_contract\">
@@ -228,13 +228,13 @@ function html_new_incident_contract($contr_q) {
 // Display Incident Form                                                     //
 // Parameters:
 //   - $action    : action called
+//   - $inc_q     : incident database result 
+//   - $contr_q   : contract database result 
 //   - $usr_q     : userobm database result 
-//   - $comp_q    : company database result 
 //   - $incident[]: default values
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
-//                : phone, hpone, mphone, fax, email ,com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $contr_q, $usr_q, $incident) {
+function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   global $col_table, $col_label, $col_textem;
   global $l_incident_label,$l_contract_label,$l_incident_prority,$l_incident_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -245,17 +245,17 @@ function html_incident_form($action, $contr_q, $usr_q, $incident) {
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
-    $param_contract = $incident->f("incident_contract_id");
-    $lincident = $incident->f("incident_label");
-    $owner =  $incident->f("incident_owner");
-    $logger =  $incident->f("incident_logger");
-    $desc =  $incident->f("incident_description");
-    $solu =  $incident->f("incident_resolution");
-    $priority =  $incident->f("incident_priority");
-    $status =  $incident->f("incident_etat");
-    $date =  $incident->f("incident_date");
-    $archive = ($incident->f("incident_archive") == "1" ? "checked" : "");
-    $param_incident = $incident->f("incident_id");
+    $param_contract = $inc_q->f("incident_contract_id");
+    $lincident = $inc_q->f("incident_label");
+    $owner =  $inc_q->f("incident_owner");
+    $logger =  $inc_q->f("incident_logger");
+    $desc =  $inc_q->f("incident_description");
+    $solu =  $inc_q->f("incident_resolution");
+    $priority =  $inc_q->f("incident_priority");
+    $status =  $inc_q->f("incident_state");
+    $date =  $inc_q->f("date");
+    $archive = ($inc_q->f("incident_archive") == "1" ? "checked" : "");
+    $param_incident = $inc_q->f("incident_id");
     $c_name = $contr_q->f("contract_label");
     $c_id = $param_contract;
   } else {
@@ -447,17 +447,13 @@ echo "
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Incident Consult                                                  //
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// ------------
-//      $obm_q_contract : information about the contract
-//      $obm_q_type : list deal's types
-//      $usr_q : list of contacts from internal companies 
+// Parameters:
+//   - $inc_q : DBO : incident result
+//   - $con_q : DBO : contract result
 //      $obm_q_company : list of companies
-//      $obm_q_contact : list of contact from the company 
-//      $p_company_id  : id of the company concerned by the contract
+//      $contact_q : list of contact from the company 
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_consult($inc_q,$con_q,$obm_q_type,$usr_q,$obm_q_company,$obm_q_contacts,$p_company_id) {
+function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // - Labels
@@ -470,18 +466,19 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type,$usr_q,$obm_q_company,$
 
   $label = $inc_q->f("incident_label");
   $pri = $inc_q->f("incident_priority");
-  $state = $inc_q->f("incident_etat");
-  $date = $inc_q->f("incident_date");
+  $state = $inc_q->f("incident_state");
+  $date = $inc_q->f("date");
   $inc_id = $inc_q->f("incident_id");
   $inc_desc = nl2br($inc_q->f("incident_description"));
   $inc_reso = nl2br($inc_q->f("incident_resolution"));
   $con_id = $con_q->f("contract_id");
+  $comp_id = $con_q->f("contract_company_id");
   $con_label = $con_q->f("contract_label");
   $con_num = $con_q->f("contract_numero");
   $con_debut = $con_q->f("contract_datebegin");
   $con_exp = $con_q->f("contract_dateexp");
-  $con_tech = $con_q->f("contract_techmanager_id");
-  $con_com = $con_q->f("contract_marketmanager_id");
+  $tech = $con_q->f("contract_techmanager_id");
+  $market = $con_q->f("contract_marketmanager_id");
   $con_cli = $con_q->f("contract_contact1_id");
   $con_cli2 = $con_q->f("contract_contact2_id");
   $obm_q_company->next_record();
@@ -492,41 +489,27 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type,$usr_q,$obm_q_company,$
 
   $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
   $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
+  $dis_market = $con_q->f("lname1") . " " . $con_q->f("fname1");
+  $dis_tech = $con_q->f("lname2") . " " . $con_q->f("fname2");
+  $dis_con1 = $con_q->f("lname_c1") . " " . $con_q->f("fname_c1");
+  $dis_con2 = $con_q->f("lname_c2") . " " . $con_q->f("fname_c2");
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="</TD></TR><TR><TD>$l_archive_consult";
   }
 
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0); 
-  }
-
-  while($usr_q->next_record()) {
-    if ($usr_q->f("userobm_id") == $con_tech) 
-      $dis_lab_tec = "<td> ".$usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</td>";
-  }
-
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0); 
-  }
-
-  while($usr_q->next_record()) {
-    if ($usr_q->f("userobm_id") == $con_com) 
-      $dis_lab_com = "<td> ".$usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</td>";
-  }
-
-  while($obm_q_contacts->next_record()) {
-    if ($obm_q_contacts->f("contact_id") == $con_cli) 
-      $dis_lab_cli1 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+  while($contact_q->next_record()) {
+    if ($contact_q->f("contact_id") == $con_cli) 
+      $dis_lab_cli1 = "<TD>".$contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone")."</TD>";
     }
 
- if ($obm_q_contacts->nf()>0) {
-   $obm_q_contacts->seek(0);
+ if ($contact_q->nf()>0) {
+   $contact_q->seek(0);
  }
  
- while($obm_q_contacts->next_record()) {
-   if ($obm_q_contacts->f("contact_id") == $con_cli2) 
-     $dis_lab_cli2 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+ while($contact_q->next_record()) {
+   if ($contact_q->f("contact_id") == $con_cli2) 
+     $dis_lab_cli2 = "<TD>".$contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone")."</TD>";
     }
 
   if ($auth->auth["perm"] != $perms_user) {
@@ -586,12 +569,9 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type,$usr_q,$obm_q_company,$
               </tr><tr>
                 <td valign=center colspan=2>$l_manager</td>
               </tr><tr>
-                <td>$dis_lab_tec <A HREF=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_tech") . "\">
-                  <img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
-                </td>
+                <td>$dis_market</td>
               </tr><tr>
-                <td>$dis_lab_com <A HREF=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_com") . "\"><img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
-                </td>
+                <td>$dis_tech</td>
               </tr>
               </table>
             </td>
@@ -600,24 +580,21 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type,$usr_q,$obm_q_company,$
               <table bgcolor=\"#$col_label\">
               <tr>
                 <td bgcolor=\"#$col_table\" colspan=2>
-                  <font color=\"#$col_textem\">$comp_name</FONT>
+                  <a href=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\"><img align=middle border=1 src=\"/images/$set_theme/$ico_company\"></a>
+                  <font color=\"#$col_textem\">$comp_name</font>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <A HREF=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">
-                  <img ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></a>
                   <br>$comp_ad1
                   <br>$comp_zip $comp_town
                 </td>
               </tr><tr>
                 <td valign=center colspan=2>$l_client_manager</td>
               </tr><tr>
-                <td>$dis_lab_cli1 <A HREF=\"".
-                  $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli")."\">
-                  <IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
+                <td><a href=\"".
+                  $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli")."\"><img align=middle src=\"/images/$set_theme/$ico_contact\"></a> $dis_con1
                 </td>
               </tr><tr>
-                <td>$dis_lab_cli2 <A HREF=\"".
-                  $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
-                  <img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
+                <td><a href=\"".
+                  $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\"><img align=middle src=\"/images/$set_theme/$ico_contact\"></a> $dis_con2
                 </td>
               </tr>
               </table>

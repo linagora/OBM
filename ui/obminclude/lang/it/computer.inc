@@ -1,9 +1,10 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian                                                 //
-//     - File     : computer.inc                                            //
-// 05-08-2002 Augusto FAgioli                                               //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italian                                                  //
+//     - File     : computer.inc                                             //
+// 05-08-2002 Augusto FAgioli                                                //
+///////////////////////////////////////////////////////////////////////////////
+
 $l_compu_name = "Nome  macchina" ;
 $l_compu_domain_name = "Nome del dominio" ;
 $l_compu_ip = "Indirizzo ip della macchina" ;
@@ -65,7 +66,6 @@ $l_compu_name_short = "Nome" ;
 $l_compu_domain_short = "dominio" ;
 $l_compu_user_short = "Utente" ;
 $l_compu_ip_short = "Indirizzo ip" ;
-$l_find = "Cerca" ;
 $l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir les ordinateurs correspondants.";
 $l_no_compu = "Nessun ordinateur corrisponde ai criteri." ;
 $l_compu_found = "Ordinateurs trovato" ;
@@ -98,12 +98,3 @@ $l_del_port = "Enlever le porte" ;
 $l_update_port = "Scan delle porte" ;
 $l_modify_compu = "Modifica richiedente" ;
 $l_del_compu = "Eliminare il richiedente" ;
-
-//Computer options
-
-// Champs specifiques
-// Format de Data et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Data and time format for display in the deal detail screen
-$l_time_format = "%d-%m-%Y %H:%i";
-$l_date_format = "%d-%m-%Y %H:%i";

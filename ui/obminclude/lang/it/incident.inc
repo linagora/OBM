@@ -1,11 +1,11 @@
 <SCRIPT LANGUAGE="PHP">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : incident.inc                                            //
-// 2001-08-20  Mehdi RANDE                                                  //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : incident.inc                                             //
+// 2001-08-20 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 //   $Id   //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 //Fields Label
 $l_incident_label = "Label";
@@ -28,7 +28,6 @@ $l_manager = "Managers";
 $l_client_manager = "Client Managers";
 $l_incident_lastupdate = "Date of last update";
 $l_archive_new = "To File";
-$l_archive = "Include Files";
 $l_archive_consult = "Filed";
 $l_incident_company = "Company";
 
@@ -44,7 +43,6 @@ $l_call = "Call";
 $l_waitcall = "Wait Call";
 $l_paused = "Paused";
 $l_closed = "Closed";
-$l_all = "All";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -62,7 +60,6 @@ $fieldnames["incident_company_name"] = $l_incident_company;
 
 // Action
 
-$l_find = "Find";
 $l_select_contract = "Selct the Contract";
 $l_insert = "Record the Incident";
 $l_update = "Modify the Incident";
@@ -78,7 +75,6 @@ $l_no_display = "Fill the search fields and press < Find > to retrieve the Incid
 $l_incident_select_contract = "Select the contract of the Incident";
 
 // For the display preferences modification screen 
-
 $l_incident_display = "Display options for Incidents";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
@@ -89,7 +85,3 @@ $l_invalid_date = "Invalid date format (DD/MM/YYYY or YYYY-MM-DD).";
 $l_j_select_contract = "You have to select a contract !";
 $l_delete_confirm="Really delete the Incident ?";
 $l_date_after_js ="Date After";
-
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-

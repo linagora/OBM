@@ -790,20 +790,20 @@ CREATE TABLE ContractType (
 --
 CREATE TABLE Incident (
   incident_id int(8) NOT NULL auto_increment,
-  incident_contract_id int(8) default NULL,
   incident_timeupdate timestamp(14) NOT NULL,
   incident_timecreate timestamp(14) NOT NULL,
   incident_userupdate int(8) default NULL,
   incident_usercreate int(8) default NULL,
+  incident_contract_id int(8) NOT NULL,
   incident_label varchar(100) default NULL,
   incident_date date default NULL,
-  incident_description text,
   incident_priority enum('REDHOT','HOT','NORMAL','LOW') default NULL,
-  incident_etat enum('OPEN','CALL','WAITCALL','PAUSED','CLOSED') default NULL,
+  incident_state enum('OPEN','CALL','WAITCALL','PAUSED','CLOSED') default NULL,
   incident_logger int(8) default NULL,
   incident_owner int(8) default NULL,
-  incident_resolution text,
   incident_archive char(1) NOT NULL default '0',
+  incident_description text,
+  incident_resolution text,
   PRIMARY KEY  (incident_id)
 ) TYPE=MyISAM;
 

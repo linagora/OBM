@@ -107,21 +107,21 @@ function run_query_kind() {
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $l_datetime_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q= new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select Contact.*,
-                DATE_FORMAT(contact_timeupdate,'$l_date_format') as timeupdate,
-                DATE_FORMAT(contact_timecreate,'$l_date_format') as timecreate,
-                company_id, company_name, company_phone,
-                kind_minilabel
-              from
-                Contact left join Kind on kind_id=contact_kind_id,
-                Company
-              where
-                contact_id='$p_id'
-                and company_id=contact_company_id";
+        DATE_FORMAT(contact_timeupdate,'$l_datetime_format') as timeupdate,
+        DATE_FORMAT(contact_timecreate,'$l_datetime_format') as timecreate,
+        company_id, company_name, company_phone,
+        kind_minilabel
+      from
+        Contact left join Kind on kind_id=contact_kind_id,
+        Company
+      where
+        contact_id='$p_id'
+        and company_id=contact_company_id";
 
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select Contact.*,
@@ -200,7 +200,7 @@ function run_query_insert($contact) {
     contact_email,
     contact_comment,
     contact_visibility)
-  values(null,
+  values (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
     '" . $auth->auth["uid"] . "',

@@ -7,8 +7,10 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-// Update the cookie expires time : now + lifetime (not in txt mode)
-if ($mode != "txt") $sess->setcookie();
+// Update the cookie expires time : now + lifetime or session wide
+// but not in txt mode or if headers have already been sent
+if ( (! headers_sent()) && ($mode != "txt"))
+  $sess->setcookie();
 
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;

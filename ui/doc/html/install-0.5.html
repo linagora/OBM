@@ -4,7 +4,7 @@
 
 <A HREF="index.html">back</A>
 
-<p>These docs are valid for OBM 0.5.2.
+<p>These docs are valid for OBM 0.5.3.
 <br>
 OBM 0.5 works with PHP4. <b>PHP3 is no longuer supported !</b>
 
@@ -236,7 +236,7 @@ Set environment variable for PostgreSQL use for postgres user in .bash_profile (
 <P>
 cp -r ./php/* /home/web/obm
 
-<H2>8: [0.5.2] Move the obm directory in your web tree</H2>
+<H2>8: [0.5.2+] Move the obm directory in your web tree</H2>
 # you must have write permissions on the web directory
 <P>
 mv obm/ /home/web
@@ -390,6 +390,35 @@ In this virtual host section :
     DirectoryIndex obm.php
 < /VirtualHost>
 </pre>
+
+
+<A NAME="upgrade-0.5.3">
+<H1>UPGRADE OBM DATABASE 0.5.2 to 0.5.3</H1></a>
+<p>
+# Database has evolved from 0.5.2 to 0.5.3
+<br>mysql -u web -pweb obm < scripts/0.5/update-0.5.2-0.5.3.mysql.sql
+<p>
+# Insert new default display values
+<br>mysql -u web -pweb obm < scripts/0.5/obmdb_default_values_0.5.sql
+
+<p>
+# Reload default display values for each user
+<br>
+# In OBM, from the admin module (must be connected with an admin user), select the <b>Prefs</b> menu and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+
+<p>
+# Update stored values that are not calculated
+<br>
+# In OBM, from the admin module (must be connected with an admin user), select the <b>Data</b> menu and execute the action <b>data_update</b> for the company module (which update these values)
+
+<p>
+# Database model update (what were internal contacts are now Obm users) need
+some data reference update.
+<br># Hence the scipt update-0.5.2-0.5.3.php (in scripts/0.5)
+<br>
+php update-0.5.2-0.5.3.php
+<br>or (on Debian)
+php4 update-0.5.2-0.5.3.php
 
 <br><br>
 <A HREF="index.html">back</A>

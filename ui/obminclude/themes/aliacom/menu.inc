@@ -86,6 +86,7 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
   </tr>
   <tr>
     <td bgcolor=\"#0d2932\" align=\"left\">&nbsp;<b>";
+
   if ($menu == "COMPANY") {
     echo "<font color=\"#b2ebe8\"> [$l_header_company]</font>"; 
   } else {
@@ -93,30 +94,35 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
         <a class=header_white href=\"".
     $sess->url($path."company/company_index.php?action=index")."\">$l_header_company</a>" ;
   }
+
   if ($menu == "CONTACT") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_contact]</font>" ;
   } else {
     echo "
    &middot; <a class=header_white href=\"".$sess->url($path."contact/contact_index.php?action=index")."\">$l_header_contact</a>" ;
   }
+
   if ($menu == "DEAL") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_deal]</font>" ;
   } else {
     echo "
     &middot; <a class=header_white href=\"".$sess->url($path."deal/deal_index.php?action=index")."\">$l_header_deal</a>" ;
   }
+
   if ($menu == "LIST") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_list]</font>" ;
   } else {
     echo "
     &middot; <a class=header_white href=\"".$sess->url($path."list/list_index.php?action=index")."\">$l_header_list</a>" ;
   }
+
   if ($menu == "AGENDA") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_agenda]</font>" ;
   } else {
     echo "
     &middot; <a class=header_white href=\"".$sess->url($path."agenda/agenda_index.php?action=index")."\">$l_header_agenda</a>" ;
   }
+
   if ($auth->auth["perm"] == $perms_admin) {
     if ($menu == "USER") {
       echo " &middot; <font color=\"#b2ebe8\">[$l_header_user]</font>" ;
@@ -126,44 +132,48 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     }
   }
   echo "<BR>testing :";
+
   if ($menu == "COMPUTER") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_computer]</font>";
   } else {
     echo "
     <a class=header_white href=\"".$sess->url($path."computer/computer_index.php?action=index")."\">$l_header_computer</a>";
   }
+
   if ($menu == "CONTRACT") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_contract]</font>";
   } else {
     echo "
      &middot; <a class=header_white href=\"".$sess->url($path."contract/contract_index.php?action=index")."\">$l_header_contract</a>";
   }
+
   if ($menu == "INCIDENT") {
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_incident]</font>";
   } else {
     echo "
      &middot; <a class=header_white href=\"".$sess->url($path."contract/incident_index.php?action=index")."\">$l_header_incident</a>";
   }
-  // TRESO STUFF :
-  if ($menu =="ACCOUNT") {
-    echo " &middot; <font color=\"#b2ebe8\">[$l_header_account]</font>" ;
-  } else {
-    echo "
-    &middot; <a class=header_white href=\"".$sess->url($path."treso/account_index.php?action=index")."\">".$l_header_account."</a>" ;
-  }
-  if ($menu =="INVOICE") {
-    echo " &middot; <font color=\"#b2ebe8\">[$l_header_invoice]</font>" ;
-  } else {
-    echo "
-    &middot; <a class=header_white href=\"".$sess->url($path."treso/invoice_index.php?action=index")."\">".$l_header_invoice."</a>" ;
-  }
-  if ($menu =="PAYMENT") {
-    echo " &middot; <font color=\"#b2ebe8\">[$l_header_payment]</font>" ;
-  } else {
-    echo "
-    &middot; <a class=header_white href=\"".$sess->url($path."treso/payment_index.php?action=index")."\">".$l_header_payment."</a>" ;
-  } 
 
+  // TRESO STUFF :
+  if ($auth->auth["perm"] == $perms_admin) {
+    if ($menu =="ACCOUNT") {
+      echo " &middot; <font color=\"#b2ebe8\">[$l_header_account]</font>" ;
+    } else {
+      echo " &middot; <a class=header_white href=\"".$sess->url($path."treso/account_index.php?action=index")."\">$l_header_account</a>";
+    }
+
+    if ($menu =="INVOICE") {
+      echo " &middot; <font color=\"#b2ebe8\">[$l_header_invoice]</font>" ;
+    } else {
+      echo " &middot; <a class=header_white href=\"".$sess->url($path."treso/invoice_index.php?action=index")."\">".$l_header_invoice."</a>" ;
+    }
+
+    if ($menu =="PAYMENT") {
+      echo " &middot; <font color=\"#b2ebe8\">[$l_header_payment]</font>" ;
+    } else {
+      echo " &middot; <a class=header_white href=\"".$sess->url($path."treso/payment_index.php?action=index")."\">".$l_header_payment."</a>" ;
+    } 
+  }
 
   // Menu TimeManager
   if ($menu == "TIME") {
@@ -202,37 +212,36 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     echo "<a href=\"".$sess->url("admin_code_index.php?mode=html&amp;action=index")."\">$l_header_admin_code</a> | ";
     echo "<a href=\"".$sess->url("admin_pref_index.php?mode=html&amp;action=index")."\">$l_header_admin_pref</a> | ";
     echo "<a href=\"".$sess->url("admin_data_index.php?mode=html&amp;action=index")."\">$l_header_admin_data</a> | ";
-    echo "<a href=\"".$sess->url("admin_lang_index.php?mode=html&amp;action=index")."\">$l_header_admin_lang</a> | ";
-    echo "<a href=\"".$sess->url("admin_lang_index.php?mode=html&amp;action=help")."\">$l_header_admin_lang_help</a>";
+    echo "<a href=\"".$sess->url("admin_lang_index.php?mode=html&amp;action=index")."\">$l_header_admin_lang</a>";
   }
 
   /////////////////////////////////////////////////////////////////////////////
   // COMPANY Submenu                                                         //
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "COMPANY") {
-    echo "<a class=header_green href=\"".$sess->url("company_index.php?action=index")."\">$l_header_find</a>" ;
+    echo "<a class=header_green href=\"".$sess->url("company_index.php?action=index")."\">$l_header_find</a>";
     if ($auth->auth["perm"] != $perms_user) {
       echo " | <a class=header_green href=\"".$sess->url("company_index.php?action=new")."\">$l_header_new_f</a> | 
-            <a class=header_green href=\"".$sess->url("company_index.php?action=admin")."\">$l_header_admin</a>" ;
-    } else {echo "&nbsp;" ;}
-    echo " | <a class=header_green href=\"".$sess->url("company_index.php?action=display")."\">$l_header_display</a>" ;
+            <a class=header_green href=\"".$sess->url("company_index.php?action=admin")."\">$l_header_admin</a>";
+    }
+    echo " | <a class=header_green href=\"".$sess->url("company_index.php?action=display")."\">$l_header_display</a>";
   }
   /////////////////////////////////////////////////////////////////////////////
   // CONTACT Submenu                                                         //
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "CONTACT") {
-    echo "<a class=header_green href=\"".$sess->url("contact_index.php?action=index")."\">$l_header_find</a>" ;
+    echo "<a class=header_green href=\"".$sess->url("contact_index.php?action=index")."\">$l_header_find</a>";
     if ($auth->auth["perm"] != $perms_user) {
       echo " | <a class=header_green href=\"".$sess->url("contact_index.php?action=new")."\">$l_header_new</a> | 
             <a class=header_green href=\"".$sess->url("contact_index.php?action=admin")."\">$l_header_admin</a> "; 
-    }else {echo "&nbsp;" ;}
-    echo " | <a class=header_green href=\"".$sess->url("contact_index.php?action=display")."\">$l_header_display</a>" ;
+    }
+    echo " | <a class=header_green href=\"".$sess->url("contact_index.php?action=display")."\">$l_header_display</a>";
   }
   /////////////////////////////////////////////////////////////////////////////
   // DEAL Submenu                                                            //
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "DEAL") {
-    echo "<a class=header_green href=\"".$sess->url("deal_index.php?action=index")."\"> $l_header_find</a> | " ;
+    echo "<a class=header_green href=\"".$sess->url("deal_index.php?action=index")."\"> $l_header_find</a> | ";
     if ($auth->auth["perm"] != $perms_user) {
       $ret_url = urlencode($path."deal/deal_index.php?action=new&amp;param_company=");
       $title = urlencode($l_deal_select_company);
@@ -241,17 +250,17 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
             <a class=header_green href=\"".$sess->url("deal_index.php?action=parent_new")."\">$l_header_new_parent</a> | 
             <a class=header_green href=\"".$sess->url("deal_index.php?action=admin")."\">$l_header_admin</a> | ";
     }
-    echo "<a class=header_green href=\"".$sess->url("deal_index.php?action=display")."\">$l_header_display</a>" ;
+    echo "<a class=header_green href=\"".$sess->url("deal_index.php?action=display")."\">$l_header_display</a>";
   }
   /////////////////////////////////////////////////////////////////////////////
   // LIST Submenu                                                            //
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "LIST") {
-    echo "<a class=header_green href=\"".$sess->url("list_index.php?action=index")."\">$l_header_find</a>" ;
+    echo "<a class=header_green href=\"".$sess->url("list_index.php?action=index")."\">$l_header_find</a> | ";
     if ($auth->auth["perm"] != $perms_user) {
-      echo " | <a class=header_green href=\"".$sess->url("list_index.php?action=new")."\">$l_header_new_f</a> | 
+      echo "<a class=header_green href=\"".$sess->url("list_index.php?action=new")."\">$l_header_new_f</a> | 
             <a class=header_green href=\"".$sess->url("list_index.php?action=admin")."\">$l_header_admin</a> | "; 
-    } else {echo "&nbsp;";}
+    }
     if ($auth->auth["perm"] != $perms_user) {
       $ext_url = urlencode($path."list/list_index.php");
       $title = urlencode($l_deal_select_company);
@@ -283,15 +292,17 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
   // Contract Submenu                                                        //
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "CONTRACT") {
-    echo "<a class=header_green href=\"".$sess->url("contract_index.php?action=index")."\"> $l_header_find</a> |" ;
+    echo "<a class=header_green href=\"".$sess->url("contract_index.php?action=index")."\"> $l_header_find</a> | ";
       $ret_url = urlencode($path."contract/contract_index.php?action=new&amp;param_company=");
       $title = urlencode($l_select_company);
       $url = $sess->url("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
-      echo "<a class=header_green href=\"\" onclick=\"window.open('$url','Company','height=$popup_height,width=$popup_width'      ); return false;\">$l_header_new</a> | ";
+      echo "<a class=header_green href=\"\" onclick=\"window.open('$url','Company','height=$popup_height,width=$popup_width'); return false;\">$l_header_new</a> | ";
+    if ($auth->auth["perm"] != $perms_user) {
       echo "<a class=header_green href=\"".
           $sess->url("contract_index.php?action=admin")."\" " .
-           "target=_top>" . $l_header_admin . "</a> |"; 
-      echo " <a class=header_green href=\"".$sess->url("contract_index.php?action=display")."\">$l_header_display</a>";
+           "target=_top>$l_header_admin</a> | ";
+    }
+    echo " <a class=header_green href=\"".$sess->url("contract_index.php?action=display")."\">$l_header_display</a>";
 
   }
   /////////////////////////////////////////////////////////////////////////////
@@ -299,9 +310,8 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "INCIDENT") {
     echo "<a class=header_green href=\"".$sess->url("incident_index.php?action=index")."\"> $l_header_find</a> |" ;
-      echo " <a href=\"".
-          $sess->url("incident_index.php?action=new")."\" " .
-           "target=_top>" . $l_header_new . "</a> | ";
+      echo " <a href=\"". $sess->url("incident_index.php?action=new")."\" " .
+           "target=_top>$l_header_new</a> | ";
       echo " <a class=header_green href=\"".$sess->url("incident_index.php?action=display")."\">$l_header_display</a>";
 
   }

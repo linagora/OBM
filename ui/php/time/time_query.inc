@@ -16,7 +16,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_format, $l_jour_format, $fraction_jour, $cdg_sql;
+  global $auth, $l_datetime_format, $l_date_text_format, $fraction_jour, $cdg_sql;
 
   $date = $time["date"];
   //  echo "date $date<br>";
@@ -27,7 +27,25 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 
   // 0 = task_status renamed as test_status : if =0, check box visible
   //    if <> 0 (i.e. validated), checkbox not visible
-  $query="select Task.*,task_id, Task.task_id as Id, DATE_FORMAT(task_date,'$l_jour_format') as task_date, DATE_FORMAT(task_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(task_timecreate,'$l_date_format') as timecreate, concat(task_length,concat('/',$fraction_jour)) as task_length, TaskType.*, deal_label as task_deal_label, company_name as task_company_name, 0=task_status as test_status from Task, TaskType, Deal, Company where task_tasktype_id = tasktype_id and task_user_id=".$time["contact_id"]." and task_deal_id = deal_id and deal_company_id = company_id ";
+  $query = "select Task.*,
+      task_id,
+      Task.task_id as Id,
+      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
+      DATE_FORMAT(task_timeupdate,'$l_datetime_format') as timeupdate,
+      DATE_FORMAT(task_timecreate,'$l_datetime_format') as timecreate,
+      concat(task_length,concat('/',$fraction_jour)) as task_length,
+      TaskType.*,
+      deal_label as task_deal_label,
+      company_name as task_company_name,
+      0=task_status as test_status
+    from Task,
+      TaskType,
+      Deal,
+      Company
+    where task_tasktype_id = tasktype_id
+      and task_user_id='".$time["contact_id"]."'
+      and task_deal_id = deal_id
+      and deal_company_id = company_id ";
 
  
   // If a time interval has been specified, get it 
@@ -69,7 +87,7 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_by_day($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_format, $l_jour_format, $fraction_jour, $cdg_sql;
+  global $auth, $l_date_text_format, $fraction_jour, $cdg_sql;
 
   $week = $time["week"];
   $contact_id = $time["contact_id"];
@@ -77,7 +95,16 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
   $week_end = $time["date_end"];
 
   // task_valid 0 if checkbox not to be shown
-  $query="select concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,DATE_FORMAT(task_date,'$l_jour_format') as task_date,(1=sum(task_length)/$fraction_jour and task_status<>2) as task_valid,task_status from Task where task_user_id='$contact_id' and task_date>='$week_start' and task_date<='$week_end' group by task_date";
+  $query = "select
+      concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,
+      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
+      (1=sum(task_length)/$fraction_jour and task_status<>2) as task_valid,
+      task_status
+    from Task
+    where task_user_id='$contact_id'
+      and task_date>='$week_start'
+      and task_date<='$week_end'
+    group by task_date";
 
   // order
   $query .= " order by Task.task_date";
@@ -97,14 +124,29 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_by_deal($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_format, $l_jour_format, $fraction_jour, $cdg_sql;
+  global $auth, $l_date_text_format, $fraction_jour, $cdg_sql;
 
   $week = $time["week"];
   $contact_id = $time["contact_id"];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
 
-  $query="select concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,DATE_FORMAT(task_date,'$l_jour_format') as task_date, deal_label as task_deal_label, company_name as task_company_name from Task, Deal, TaskType, Company where tasktype_id=task_tasktype_id and task_deal_id = deal_id and task_user_id='$contact_id'  and task_date>='$week_start' and task_date<='$week_end' and deal_company_id = company_id group by task_deal_id ";
+  $query = "select
+      concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,
+      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
+      deal_label as task_deal_label,
+      company_name as task_company_name
+    from Task,
+      Deal,
+      TaskType,
+      Company
+    where tasktype_id=task_tasktype_id
+      and task_deal_id = deal_id
+      and task_user_id='$contact_id'
+      and task_date>='$week_start'
+      and task_date<='$week_end'
+      and deal_company_id = company_id
+    group by task_deal_id ";
 
   // order
   $query .= " order by Task.task_date";
@@ -124,14 +166,22 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir) {
 //     keys used       contac_id, date, date_end
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin($time) {
+  global $l_date_text_format,$fraction_jour, $cdg_sql;
 
-   global $l_jour_format,$fraction_jour, $cdg_sql;
-
-   $contact_id = $time["contact_id"];
-   $week_start = $time["date"];
-   $week_end = $time["date_end"];
+  $contact_id = $time["contact_id"];
+  $week_start = $time["date"];
+  $week_end = $time["date_end"];
  
-   $query = "select concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,DATE_FORMAT(task_date,'$l_jour_format') as task_date,task_status=2 as task_status from Task where task_user_id='$contact_id' and task_date>='$week_start' and task_date<='$week_end' and task_status!=0 group by task_date";
+  $query = "select
+      concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,
+      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
+      task_status=2 as task_status
+    from Task
+    where task_user_id='$contact_id'
+      and task_date>='$week_start'
+      and task_date<='$week_end'
+      and task_status!=0
+    group by task_date";
 
    //order
    $query .= " order by Task.task_date";
@@ -317,7 +367,7 @@ function run_query_delete($parms) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_validate($parms,$time,$who) {
 
-  global $l_jour_format;
+  global $l_date_text_format;
   global $uid;
   global $cdg_sql;
 
@@ -344,7 +394,7 @@ function run_query_validate($parms,$time,$who) {
       $d_task = substr($d_task, 1);  
       if($val == "on"){ 
         $d_task = str_replace("_"," ",$d_task); 
-        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_jour_format') = '$d_task' and task_user_id='". $time["contact_id"]."'";
+        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_date_text_format') = '$d_task' and task_user_id='". $time["contact_id"]."'";
         $delete_query = new DB_OBM;
         display_debug_msg($query, $cdg_sql);
         $delete_query->query($query);
@@ -479,7 +529,6 @@ function get_week_point($sel_date) {
   global $auth, $debug;
   global $cdg_sql;
 
-  // $l_date_format, $l_jour_format, $fraction_jour;
 
     // week planning
 	if (is_null($sel_date))

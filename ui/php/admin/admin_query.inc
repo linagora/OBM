@@ -56,7 +56,7 @@ function get_usersession_number() {
 //   - DBO : list of active user session
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_active_user($delay) {
-  global $cdg_sql, $l_date_format;
+  global $cdg_sql, $l_datetime_format;
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
   if ($delay > 0)
@@ -65,12 +65,12 @@ function run_query_active_user($delay) {
     $date_limit = 0;
 
   $query = "select UserObm.userobm_login,
-               UserObm.userobm_timelastaccess,
-               ActiveUserObm.*,
-               DATE_FORMAT(activeuserobm_timeupdate, '$l_date_format') as timeupdate
-            from UserObm, ActiveUserObm
-            where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
-              and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
+       UserObm.userobm_timelastaccess,
+       ActiveUserObm.*,
+       DATE_FORMAT(activeuserobm_timeupdate, '$l_datetime_format') as timeupdate
+    from UserObm, ActiveUserObm
+    where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
+      and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
   display_debug_msg($query,$cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

@@ -9,7 +9,7 @@
 <CENTER>
 <H1>OBM Development Guidelines</H1>
 <I>Coding standards now mandatory to harmonize the OBM code</I><BR>
-Version 0.5.3 - 2002-08-12<BR>
+Version 0.5.3 - 2002-08-16<BR>
 Pierre Baudracco
 </CENTER>
 <P>
@@ -451,6 +451,87 @@ function display_debug_msg($msg, $debug=0) {
 </table>
 <P>
 
+
+<!-- ---------------------------------------------------------------------- -->
+<H2>Date handling</H2>
+
+OBM allow different date representation depending on the user current language.
+<br>
+Each user in OBM can set individually its language preference.
+
+<h3>Database storage</h3>
+Date should be store with data type date fields in database (more clean up is needed here !).
+Date for simple date or timestamp for MySQL.
+
+
+<h3>Developper Requirements</h3>
+
+Date are store as date and are formatted when retrieved from the database.
+This can lead to different queries for different database.
+<p>
+Date Format variables define the date representation.
+You can modify date display representation in OBM simply by updating these variables formats.
+<p>
+At the moment, only variables for the MySQL version are set.
+
+<h4>Date format variables defined in OBM</h4>
+These are defined in the lang/$lang/global.inc include file so each module has access to them.
+Each language global.inc can hence define its version:
+<p>
+
+<table border=1>
+<tr>
+  <th>Format / Language</th>
+  <th>example</th>
+</tr><tr>
+  <td>ISO</td>
+  <td>AAAA-MM-JJ hh:mm:ss</td>
+</tr><tr>
+  <td>English</td>
+  <td>MM-DD-AAAA hh:mm:ss</td>
+</tr>
+</table>
+<p>
+
+<table border=1>
+<tr>
+  <th>Variable</th>
+  <th>Format</th>
+  <th>Example</th>
+  <th>MySQL FR value</th>
+</tr><tr>
+  <td>$l_date_format</td>
+  <td>simple date (without time info)</td>
+  <td>2002-12-31</td>
+  <td>%Y-%m-%d</td>
+</tr><tr>
+  <td>$l_time_format</td>
+  <td>simple time (without date info)</td>
+  <td>16:51:30</td>
+  <td>%H:%i:%s</td>
+</tr><tr>
+  <td>$l_datetime_format</td>
+  <td>complete date info</td>
+  <td>2002-12-31 16:51:30</td>
+  <td>%Y-%m-%d %H:%i:%s</td>
+</tr>
+</table>
+
+<h4>MySQL Query Example</h4>
+
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+  $query = "select Deal.*, deal_id as Id,
+     dealtype_label,
+     ...
+     DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
+...
+</pre>
+</td></tr>
+</table>
+
+<p>
 
 
 <H2>Variables Names</H2>

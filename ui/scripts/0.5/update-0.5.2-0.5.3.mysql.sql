@@ -82,3 +82,27 @@ ALTER table Contract add column tmp text after contract_clause;
 UPDATE Contract set tmp=contract_comment;
 ALTER table Contract drop column contract_comment;
 ALTER table Contract change tmp contract_comment text;
+
+
+-------------------------------------------------------------------------------
+-- Incident Update
+-------------------------------------------------------------------------------
+-- update column name "etat" to "state
+ALTER table Incident change column incident_etat incident_state enum('OPEN','CALL','WAITCALL','PAUSED','CLOSED');
+
+-- move text columns at the row end
+ALTER table Incident add column tmp text after incident_archive;
+UPDATE Incident set tmp=incident_description;
+ALTER table Incident drop column incident_description;
+ALTER table Incident change tmp incident_description text;
+
+ALTER table Incident add column tmp text after incident_description;
+UPDATE Incident set tmp=incident_resolution;
+ALTER table Incident drop column incident_resolution;
+ALTER table Incident change tmp incident_resolution text;
+
+-- move column contract_id after usercreate
+ALTER table Incident add column tmp int(8) after incident_usercreate;
+UPDATE Incident set tmp=incident_contract_id;
+ALTER table Incident drop column incident_contract_id;
+ALTER table Incident change tmp incident_contract_id int(8) NOT NULL;

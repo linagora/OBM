@@ -327,7 +327,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $usercreate = $deal_q->f("deal_usercreate");
   $label = $deal_q->f("deal_label");
   $num = $deal_q->f("deal_number");
-  $datebegin = $deal_q->f("deal_datebegin");
+  $datebegin = $deal_q->f("datebegin");
   $kind = $deal_q->f("dealtype_label");
   $cat = $deal_q->f("tasktype_label");
   $lvis = ($deal_q->f("deal_visibility") == 0 ? $l_public : $l_private);
@@ -337,7 +337,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $amount = $deal_q->f("deal_amount");
   $con1 = $deal_q->f("deal_contact1_id");
   $con2 = $deal_q->f("deal_contact2_id");
-  $datealarm = $deal_q->f("deal_datealarm");
+  $datealarm = $deal_q->f("datealarm");
   $status = $deal_q->f("dealstatus_label");
   $dateu = timestamp_to_date($deal_q->f("datemodif"));
   $timeu = timestamp_to_time($deal_q->f("datemodif"));
@@ -577,7 +577,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
-  global $l_update,$l_delete,$l_insert, $l_sel_none;
+  global $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_private,$l_todo;
   global $action, $sess, $auth,$c_all,$l_all;
   
@@ -588,7 +588,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $usercreate = $deal_q->f("deal_usercreate");
     $label = $deal_q->f("deal_label");
     $num = $deal_q->f("deal_number");
-    $datebegin = $deal_q->f("deal_datebegin");
+    $datebegin = $deal_q->f("datebegin");
     $kind = $deal_q->f("deal_type_id");
     $cat = $deal_q->f("deal_tasktype_id");
     $vis = ($deal_q->f("deal_visibility") == 0 ? "0" : "1");
@@ -598,7 +598,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $amount = $deal_q->f("deal_amount");
     $con1 = $deal_q->f("deal_contact1_id");
     $con2 = $deal_q->f("deal_contact2_id");
-    $datealarm = $deal_q->f("deal_datealarm");
+    $datealarm = $deal_q->f("datealarm");
     $status = $deal_q->f("deal_status_id");
     $dateu = timestamp_to_date($deal_q->f("datemodif")); // ???? timeupdate
     $timeu = timestamp_to_time($deal_q->f("datemodif"));
@@ -650,7 +650,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
 
   // Kind select construction
   $sel_kind = "<select name=sel_kind>
-    <option value=\"0\">$l_sel_none</option>";
+    <option value=\"0\">$l_none</option>";
   while ($kind_q->next_record()) {
     $kid = $kind_q->f("dealtype_id");
     $klabel = $kind_q->f("dealtype_label");
@@ -662,7 +662,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
 
   // Category select construction
   $sel_cat = "<select name=sel_cat>
-    <option value=\"0\">$l_sel_none</option>";
+    <option value=\"0\">$l_none</option>";
   while($cat_q->next_record()) {
     $cid = $cat_q->f("tasktype_id");
     $tt_label = $cat_q->f("tasktype_label");
@@ -674,7 +674,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
  
   // Marketing manager select construction
   $sel_market = "<select name=sel_market>
-    <option value=\"0\">$l_sel_none</option>";
+    <option value=\"0\">$l_none</option>";
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname") . " " .
@@ -690,7 +690,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $usr_q->seek(0);
   }
   $sel_tech = "<select name=sel_tech>
-    <option value=\"0\">$l_sel_none</option>";
+    <option value=\"0\">$l_none</option>";
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname") . " " .
@@ -1505,7 +1505,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the parent deal (null for new deal)
-//   - $usr_q : DBO : list of contacts from internal companies 
+//   - $usr_q     : DBO : OBM user list
 //   - deal[]     : default or transmitted values
 //     keys used  : parent_id, plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
@@ -1632,7 +1632,7 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
 //   - $kind_q        : list of deal types available
 //   - $cat_q         : list of deal categpries available
 //   - $state_q       : list of deal status available 
-//   - $usr_q     : DBO : list of contacts from internal companies 
+//   - $usr_q         : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
   global $col_textem,$col_label,$col_ok; 

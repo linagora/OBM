@@ -1,16 +1,16 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
-//     - File     : azienda.inc                                             //
-// 02/08/2002  Augusto Fagioli                                              //
-//////////////////////////////////////////////////////////////////////////////
+//     - File     : contract.inc                                             //
+// 02/08/2002  Augusto Fagioli                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 
 // Labels et textes
-$l_contract_num="Contract numero";
+$l_contract_num="Numero";
 $l_contract_label="Contract etichetta";
 $l_contract_company="Company";
 $l_contract_contracttype="Tipo di contract";
@@ -24,7 +24,7 @@ $l_incident_new = "Aggiungi a nuovo Incident";
 
 $fieldnames["contract_label"] = $l_contract_label;
 $fieldnames["contract_company_name"] = $l_contract_company;
-$fieldnames["contract_numero"] = $l_contract_num;
+$fieldnames["contract_number"] = $l_contract_num;
 $fieldnames["contract_expiration"] = $l_contract_expiration;
 $fieldnames["contracttype_label"] = $l_contract_contracttype;
 
@@ -39,7 +39,6 @@ $l_label = "Label";
 $l_label_libelle = "Key-word di the etichetta";
 $l_label_start = "numero";
 $l_kind = "Tipo";
-$l_kind_deal = "Tipo di deal";
 $l_category = "Categoria";
 $l_state = "Stato";
 $l_marketing_manager = "Marketing Resp.";
@@ -48,17 +47,14 @@ $l_client_manager = "Client Resp.";
 $l_manager= "Responsabile";
 $l_contacts = "Contatti";
 $l_clause = "Clauses";
-$l_comment = "Commento";
 $l_company = "None dell'Azienda";
-$l_all_f = "tutti";
-$l_all = "tutti";
 $l_date = "Data";
 $l_date_init = "Data inizio";
 $l_date_expir = "Data scadenza ";
 $l_date_alarm = "Data Avviso";
 $l_last_update = "Ultimo aggiornamento";
 $l_at = "&agrave;";
-$l_number_deal = "Numero";
+$l_number = "Numero";
 $l_private = "Privato";
 $l_public = "Pubblico";
 $l_visibility ="Accesso";
@@ -79,7 +75,6 @@ $l_deal_update = "Contratto aggiornamento";
 $l_deal_delete = "Contratto eliminazione";
 
 // Actions
-$l_find = "Trova";
 $l_insert = "Inserisci Contratto";
 $l_update = "Aggiorna Contratto";
 $l_delete = "Elimina Contratto";
@@ -95,7 +90,6 @@ $l_category_delete = "Cancella Categoria";
 $l_category_update = "Aggiorna Categoria";
 $l_category_insert = "Crea Categoria";
 
-$l_cancel = "Cancella";
 
 // Messages
 
@@ -129,7 +123,7 @@ $l_fill_date = "You have to fill the Date before submitting..";
 $l_invalid_date = "Invalid date format (DD/MM/YYYY or YYYY-MM-DD).";
 $l_delete_confirm = "Confermi eliminazione the Contratto ?";
 
-$mj_type_delete_confirm = "Confermi eliminazione the Tipo di deal ?";
+$mj_type_delete_confirm = "Confermi eliminazione the Tipo ?";
 $mj_type_delete = "You have to select a Tipo to eliminazione it !";
 $mj_status_delete_confirm = "Confermi eliminazione the state ?";
 $mj_status_delete = "You have to select a state to eliminazione it !";
@@ -144,31 +138,7 @@ $mj_category_create = "You have to enter a nuovo category name to create it !";
 $l_length_label = "  Etichetta troppo lunga";
 $l_length_number = " Nummero Contratto troppo lungo ";
 
-// champs specifiques
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-
-
-
 // For the display preferences modification screen
 $l_contract_display = "Opzioni visualizzazione per Supporto contratti";
 $l_updater = "Ultima modifica di " ;
 $l_date_last_update = "Data ultima modifica" ;
-$l_options_dis = "Opzioni di visualizzazione" ;
-$l_query_display = "Visualizzati" ;
-$l_order_dis = "Oridina per " ;
-$l_action = "Azione" ;
-$l_ch_to_dis_no = "Non  afficher questo campos" ;
-$l_ch_to_dis_no_help = "Cela signifie que le champs est affiché<br>Cliquer sur cet icône si vous ne souhaitez afficher pas ce champs" ;
-$l_ch_to_dis_yes = "Afficher ce champs" ;
-$l_ch_to_dis_yes_help = "Cela signifie que le champs n'est pas affiché<br>Cliquer sur cet icône si vous souhaitez afficher ce champs" ;
-$l_dis_obligatory = "L'affichage de ce champs est obligatoire" ;
-$l_dis_obligatory_help = "Cet icône signifie que vous êtes obligé d'afficher ce champs" ;
-$l_down_option = "Descendre cette option d'un cran" ;
-$l_down_option_help  = "Cliquez sur cet icône pour descendre le champs d'un cran" ;
-$l_up_option = "Monter cette option d'un cran" ;
-$l_up_option_help = "Clik sull'icona per pour monter le champs d'un cran" ;
-$l_subject = "Oggetto" ;
-$l_help_options = "Aiuto contestuale";
-
-

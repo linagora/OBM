@@ -21,6 +21,12 @@ $l_archive = "Arkiv";
 $l_none = "---";
 $l_invalid_data = "Ugyldig data";
 
+// Mysql Date format
+$l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time
+$l_date_format = "%Y-%m-%d"; // Date only 
+$l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
+$l_time_format = "%H:%i:%s"; // Time only
+
 // OBM_DISPLAY
 $l_field = "Field";
 $l_displayed = "Displayed";

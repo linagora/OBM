@@ -166,7 +166,7 @@ if (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     display_warn_msg($err_msg);
     $usr_q = run_query_userobm();
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
   }
 
 } elseif ($action == "update")  {
@@ -189,7 +189,7 @@ if (($action == "index") || ($action == "")) {
     display_err_msg($err_msg);
     $param_company = $deal["company"];
     $usr_q = run_query_userobm();
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff=="archives") {
@@ -392,7 +392,7 @@ if (($action == "index") || ($action == "")) {
   $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
 
-  html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_internal_contact());
+  html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_userobm());
 
 } elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -452,7 +452,7 @@ if (($action == "index") || ($action == "")) {
     $obm_q_options = run_query_display_pref ($uid,"deal");
     $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
     $num_rows = $deal_q->num_rows();
-    html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_internal_contact());
+    html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_userobm());
   } else {
     display_err_msg($err_msg);
     require("deal_js.inc");
@@ -484,7 +484,6 @@ if (($action == "index") || ($action == "")) {
       $q_invoices->next_record();
       $invoices_options = run_query_display_pref ($uid,"invoice");
       html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
-      //      html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid);
     }
   } else {
     display_err_msg($l_query_error);

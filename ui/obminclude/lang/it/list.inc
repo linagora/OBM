@@ -1,6 +1,6 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian                                                  //
+// OBM - Language : Italiano                                                 //
 //     - File     : list.inc                                                 //
 // 01-08-2002 Augusto Fagioli                                                //
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,8 +69,6 @@ $l_insert = "Inserisci lista";
 $l_update = "Modifica lista";
 $l_delete = "Elimina lista";
 $l_change_auth = "Cambia auth";
-$l_find = "Trova";
-$l_back = "indietro";
 $l_confirm = "Conferma azione";
 $l_add = "Aggiungi queste liste";
 $l_mail = "Invia email alla lista" ;
@@ -160,8 +158,3 @@ $l_nb_message_send = "Number of mail(s) sent : " ;
 //Error:
 $l_error_which = "Error::: The which variable is NOT CORRECTLY set... Please Check your administrator" ;
 $l_error_authentification = "Errore ::: Autentificazione interrotta ... Prego contattare, l'amministratore di sistema" ;
-
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%d-%m %H:%i";

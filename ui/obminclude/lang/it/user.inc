@@ -7,13 +7,9 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_back = "Indietro";
-$l_none = "---";
 $l_user_name = "Utente";
 $l_user_perms = "Autorizzazione";
 $l_password = "Password";
-$l_all = "Tutti";
-$l_find = "Trova";
 $l_lastaccess = "Ultimo Accesso";
 $l_email = "@M";
 $l_associated_contact = "Contatti associati";
@@ -23,8 +19,6 @@ $l_perms_admin = "Amministratore";
 $l_check_usercreate = " voci dell'utente.";
 $l_check_userupdate = " voci aggiornate dall'utente.";
 $l_no_user = "No campi utente nella tabella";
-
-$l_invalid_data = "Dati non validi";
 
 $l_last_deal="Ultimo deal";
 $l_last_company = "Ultima azienda";
@@ -74,8 +68,3 @@ $l_fill_username = "Scrivi prima il nome utente.";
 $l_fill_password = "Scrivi prima la password.";
 $l_delete_confirm = "Confermi eliminazione utente?";
 $l_j_check_email = "Email non valida";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%d-%m-%Y %H:%i:%s";
-

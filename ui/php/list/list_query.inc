@@ -18,7 +18,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($list, $p_new_order, $p_order_dir) {
-  global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $l_datetime_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
   
   $name = $list["name"];
   $email = $list["email"];
@@ -35,8 +35,8 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     }
 
     $query = "select distinct List.*, list_id as Id,
-      DATE_FORMAT(List.list_timecreate,'$l_date_format') as timecreate,
-      DATE_FORMAT(List.list_timeupdate,'$l_date_format') as timeupdate,
+      DATE_FORMAT(List.list_timecreate,'$l_datetime_format') as timecreate,
+      DATE_FORMAT(List.list_timeupdate,'$l_datetime_format') as timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     from 
@@ -81,13 +81,13 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $l_date_format, $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $l_datetime_format, $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
-      DATE_FORMAT(List.list_timecreate,'$l_date_format') as timecreate,
-      DATE_FORMAT(List.list_timeupdate,'$l_date_format') as timeupdate
+      DATE_FORMAT(List.list_timecreate,'$l_datetime_format') as timecreate,
+      DATE_FORMAT(List.list_timeupdate,'$l_datetime_format') as timeupdate
     from List where list_id = '$id'";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select List.* from List where list_id = '$id'";

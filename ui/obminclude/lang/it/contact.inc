@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                  //
+// OBM - Language : Italiano                                                 //
 //     - File     : contact.inc                                              //
-// 1999-01-24 Pierre Baudracco                                               //
+// 1999-01-24 Augusto Fagili                                                 //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id //
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,6 @@ $l_postcode = "ZIP";
 $l_expresspostal = "CAP";
 $l_town = "Città";
 $l_country = "Nazione";
-$l_comment = "Commento";
 $l_visibility ="Accesso";
 
 // Labels and texts
@@ -34,12 +33,10 @@ $l_last_company = "Ultima azienda";
 $l_last_deal="Ultimo  deal";
 $l_contact_name = "Nome Contatto";
 $l_from_company = "Azienda";
-$l_find = "Trova";
 $l_telother = "Altro Tel";
 $l_private = "Privato";
 $l_public = "Pubblico";
 $l_contact_select_company = "Scegli l'azienda per il contatto.";
-$l_invalid_data = "Valore errato";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -63,7 +60,6 @@ $l_insert = "Inserisci Contatto ";
 $l_update = "Modifica Contatto";
 $l_checkdelete = "Controlla o elimina il Contatto";
 $l_delete = "Elimina il ";
-$l_back = "Indietro";
 $l_confirm= "Conferma azione";
 $l_add = "Aggiungi i contatti";
 
@@ -99,10 +95,6 @@ $l_j_check_hphone = "Numero telefono privato non valido.";
 $l_j_check_mphone = "Numero cellulare non valido.";
 $l_j_check_fax = "Numero fax non valido.";
 $l_j_check_email = "Indirizzo email non valido.";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%m-%d %H:%i:%s";
 
 // For the display parameters modification screen
 $l_contact_display = "Opzioni visualizzazine della lista contatti";

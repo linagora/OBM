@@ -22,7 +22,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
-  global $auth, $c_all, $cdg_sql;
+  global $auth, $c_all, $cdg_sql, $l_date_format;
 
   $parent = $deal["parent"];
   $label = $deal["label"];
@@ -36,16 +36,17 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $dateafter = $deal["dateafter"];
   $datebefore = $deal["datebefore"];
 
-  $query="select Deal.*, deal_id as Id,
-             dealtype_label,
-             company_name as deal_company_name,
-             tasktype_label,
-             dealstatus_label
-          from Deal, DealType, TaskType, Company, DealStatus
-          where deal_type_id=dealtype_id
-             and tasktype_id=deal_tasktype_id
-             and deal_company_id=company_id
-             and deal_status_id=dealstatus_id";
+  $query = "select Deal.*, deal_id as Id,
+     dealtype_label,
+     company_name as deal_company_name,
+     tasktype_label,
+     dealstatus_label,
+     DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
+  from Deal, DealType, TaskType, Company, DealStatus
+  where deal_type_id=dealtype_id
+     and tasktype_id=deal_tasktype_id
+     and deal_company_id=company_id
+     and deal_status_id=dealstatus_id";
 
   if ($all == 0) {
     $query .= " and (deal_visibility=0
@@ -108,7 +109,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $l_date_format, $cdg_sql;
+  global $l_datetime_format, $l_date_format, $cdg_sql;
   global $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
@@ -120,9 +121,11 @@ function run_query_detail($id) {
         company_name, company_address1, company_zipcode, company_town,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(deal_timeupdate,'$l_date_format') as datemodif,
-        DATE_FORMAT(deal_timeupdate,'$l_date_format') as timeupdate,
-        DATE_FORMAT(deal_timecreate,'$l_date_format') as timecreate
+        DATE_FORMAT(deal_datebegin,'$l_date_format') as datebegin,
+        DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm,
+        DATE_FORMAT(deal_timeupdate,'$l_datetime_format') as datemodif,
+        DATE_FORMAT(deal_timeupdate,'$l_datetime_format') as timeupdate,
+        DATE_FORMAT(deal_timecreate,'$l_datetime_format') as timecreate
       from
         (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
               left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
@@ -428,21 +431,6 @@ function run_query_contact_deal($p_id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : contact list from internal companies                    //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_internal_contact() {
-  global $cdg_sql;
-
-  $query = "select contact_id,contact_lastname,contact_firstname from Contact,Company where contact_company_id=company_id and company_state=1 order by contact_lastname"; 	
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
   return $obm_q;
 }
 
@@ -925,13 +913,13 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   $parchive = $deal["parchive"];
 
   $query = "select ParentDeal.*, parentdeal_id as Id,
-      Marketing.contact_lastname as parentdeal_marketing_lastname,
-      Technical.contact_lastname as parentdeal_technical_lastname
+      Marketing.userobm_lastname as parentdeal_marketing_lastname,
+      Technical.userobm_lastname as parentdeal_technical_lastname
     from ParentDeal,
-      Contact Marketing, 
-      Contact Technical
-    where parentdeal_technicalmanager_id=Technical.contact_id
-      and parentdeal_marketingmanager_id=Marketing.contact_id";
+      UserObm Marketing, 
+      UserObm Technical
+    where parentdeal_technicalmanager_id=Technical.userobm_id
+      and parentdeal_marketingmanager_id=Marketing.userobm_id";
    
   if ($plabel != "") {
     $query .= " and parentdeal_label like '$plabel%'";
@@ -1002,7 +990,7 @@ function run_query_insert_parentdeal($deal) {
 //   - $pid : parentdeal id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail_parentdeal($pid) {
-  global $l_date_format, $cdg_sql; 
+  global $l_datetime_format, $cdg_sql; 
   global $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
@@ -1011,9 +999,9 @@ function run_query_detail_parentdeal($pid) {
     $query = "select ParentDeal.*,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(parentdeal_timeupdate,'$l_date_format') as datemodif,
-        DATE_FORMAT(parentdeal_timeupdate,'$l_date_format') as timeupdate,
-        DATE_FORMAT(parentdeal_timecreate,'$l_date_format') as timecreate
+        DATE_FORMAT(parentdeal_timeupdate,'$l_datetime_format') as datemodif,
+        DATE_FORMAT(parentdeal_timeupdate,'$l_datetime_format') as timeupdate,
+        DATE_FORMAT(parentdeal_timecreate,'$l_datetime_format') as timecreate
       from (ParentDeal
           left join UserObm u1 on parentdeal_marketingmanager_id=u1.userobm_id)
           left join UserObm u2 on parentdeal_technicalmanager_id=u2.userobm_id

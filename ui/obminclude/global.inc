@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version="0.5.3pre4";
+$obm_version="0.5.3pre6";
 //$set_debug=0;
 $l_title="O.B.M.";
 $status="";
@@ -45,7 +45,6 @@ $cdg_sql = 4;    // sql query display
 $c_all = "_ALL_";		// Used in Form select
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
-$l_sel_none = "---";
 
 // Display size
 $popup_width = 620;

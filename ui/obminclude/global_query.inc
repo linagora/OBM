@@ -218,20 +218,22 @@ function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
 
 
 
-///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : Update an user preference
-// Can not display debug info because called before include global.inc
-// in the setting module
-///////////////////////////////////////////////////////////////////////////
-function run_query_set_options_user($p_user_id, $option, $new_value) {
+// Parameters:
+//   - $user_id  : user Id
+//   - $option   : preference name
+//   - $value    : new preference value
+///////////////////////////////////////////////////////////////////////////////
+function run_query_set_options_user($user_id, $option, $value) {
+  global $cdg_sql;
 
   $query = "update UserObmPref
-            set userobmpref_value='$new_value'
-            where userobmpref_user_id ='$p_user_id'
+            set userobmpref_value='$value'
+            where userobmpref_user_id ='$user_id'
               and userobmpref_option = '$option'";   
 
-  // Problem because called before include global.inc in setting module
-   display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM ;
   $obm_q->query($query);
 }

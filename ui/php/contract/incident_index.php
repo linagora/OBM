@@ -1,15 +1,14 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : incident_index.php                                          //
-//     - Desc  : Incident Index File                                        //
-// 2002-03-14  : Mehdi Rande                                                //
-//////////////////////////////////////////////////////////////////////////////
+//     - Desc  : Incident Index File                                         //
+// 2002-03-14  : Mehdi Rande                                                 //
+///////////////////////////////////////////////////////////////////////////////
 //  $Id$
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Actions :
 // - index (default) -- search fields  -- show the Incident search form
 // - search          -- search fields  -- show the result set of search
-// - contract_new     --                -- show the contract selection form
 // - new             -- $param_contract -- show the new Incidentform
 // - detailconsult   -- $param_incident-- show the Incident detail
 // - detailupdate    -- $param_incident-- show the Incident detail form
@@ -20,7 +19,6 @@
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +51,6 @@ if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
 page_close();
 
 
-
 $incident=get_param_incident();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +70,7 @@ if ($action == "index") {
   require("incident_js.inc");
   html_incident_search_form(run_query_userobm(),$incident);
   if ($set_display == "yes") {
-    dis_incident_search_list(run_query_internal_contact(),$incident);
+    dis_incident_search_list($incident);
   } else {
     display_ok_msg($l_no_display);
   }
@@ -84,24 +81,13 @@ if ($action == "index") {
   html_incident_search_form(run_query_userobm(),$incident);
   dis_incident_search_list($incident);
 
-} elseif ($action == "contract_new")  {
-///////////////////////h///////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-    $contr_q = run_query_contract();
-    require("incident_js.inc");
-    html_new_incident_contract($contr_q);
-  } else {
-    display_error_permission();
-  }
-
 } elseif ($action == "new")  {
-//////////////////////h////////////////////////////////////////////////////////
-  $contr_q = NULL;
+///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_form($action, NULL,$contr_q, run_query_userobm(), $incident);
+  html_incident_form($action, "", "", run_query_userobm(), $incident);
 
 } elseif ($action == "detailconsult")  {
-//////////////////////h////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if ($param_incident > 0) {
     $inc_q = run_query_detail($param_incident);
     if ($inc_q->num_rows() == 1) {
@@ -110,23 +96,23 @@ if ($action == "index") {
       display_err_msg($l_query_error . " - " . $inc_q->query . " !");
     }
     display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
-    html_incident_consult($inc_q, $con_q,run_query_contracttype($con_q->f("contract_type_id")),
-   	 run_query_userobm(),run_query_company_contract($con_q->f("contract_company_id")),
-   	 run_query_contact_contract($con_q->f("contract_company_id")),$con_q->f("contract_company_id"));
+    $comp_id = $con_q->f("contract_company_id");
+    html_incident_consult($inc_q, $con_q, run_query_company_contract($comp_id), run_query_contact_contract($comp_id));
   }
 
 } elseif ($action == "detailupdate")  {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if ($param_incident > 0) {
     $inc_q = run_query_detail($param_incident);
     if ($inc_q->num_rows() == 1) {
       $contr_q = run_query_incident_contract($param_contract);
+      require("incident_js.inc");
+      display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
+      html_incident_form($action, $inc_q, $contr_q, run_query_userobm(), $incident);
     } else {
       display_err_msg($l_query_error . " - " . $con_q->query . " !");
+      html_incident_search_form(run_query_userobm(),$incident);
     }
-    require("incident_js.inc");
-    display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
-    html_incident_form($action, $inc_q, $contr_q, run_query_userobm(), $incident);
   }
 
 } elseif ($action == "insert")  {
@@ -139,12 +125,11 @@ if ($action == "index") {
   } else {
     require("incident_js.inc");
     display_warn_msg($err_msg);
-    $contr_q = new DB_OBM;
-    html_incident_form($action, "", $contr_q, run_query_userobm(), $incident);
+    html_incident_form($action, "", run_query_userobm(), $incident);
   }
 
 } elseif ($action == "update")  {
-  ///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
  if (check_incident_form($incident)) {
     run_query_update($incident);         
     display_ok_msg($l_update_ok);

@@ -17,7 +17,7 @@ $l_incident_owner = "Responsable Technique";
 $l_incident_description = "Description";
 $l_incident_solution = "Solution apportée";
 $l_contract_num = "Numéro de Contrat";
-$l_contract_label = "Label du Contrat";
+$l_contract_label = "Contrat";
 $l_contract_date_init = "Date Debut";
 $l_contract_date_expir = "Date Expiration";
 $l_to = "Au"; 
@@ -48,7 +48,7 @@ $l_incident_lastupdate = "Date de dernière modification";
 // Fields that appear in result lists //
 //------------------------------------//
 // Direct fields
-$fieldnames["incident_etat"] = $l_incident_status;
+$fieldnames["incident_state"] = $l_incident_status;
 $fieldnames["incident_label"] = $l_incident_label;
 $fieldnames["incident_priority"] = $l_incident_priority;
 $fieldnames["incident_date"] = $l_incident_date;

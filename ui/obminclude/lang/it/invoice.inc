@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                  //
-//     - File     : invoice.inc                                             //
-// 2001-08-02 Nicolas Roman                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italiano                                                 //
+//     - File     : invoice.inc                                              //
+// 2001-08-02 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 
@@ -14,15 +16,12 @@ $l_number = "Number";
 $l_amount = "Amount";
 $l_amount_HT = "HT amount";
 $l_amount_TTC = "TTC Amount";
-$l_comment = "Comment";
 $l_deal="Deal";
 $l_status="Status";
 $l_date="Date";
 $l_date_apres = "After";
 $l_date_avant = "Before";
 $l_paid = "Paid TTC Amount";
-$l_all= "All"; 
-$l_all_f = "All";
 $l_pick_deal = "Choose a deal";
 $l_no_deal = "no deals related to this invoice";
 $l_list_deal = "deals related to this invoice";
@@ -53,7 +52,6 @@ $l_affect = "Affect";
 // Actions 
 $l_select_nb_deals = "How many deals will be linked to the new invoice ?";
 $l_select_deals = "choose number of deals";
-$l_find = "Find";
 $l_insert= "Insert Invoice";
 $l_update = "Update Invoice";
 $l_delete = "Delete Invoice";
@@ -100,14 +98,6 @@ $l_update_ok = "The invoice has been updated successfully.";
 $l_update_error = "The update of the invoice has failed !";
 $l_query_error = "Trouble executing the query...";
 
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-$l_short_date_format = "%Y-%d-%m";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nThe invoice number is not valid!";
 $lj_check_money_ht = "\\nThe amount without charges is not valid!";
@@ -124,23 +114,6 @@ $lj_select_deals = "You have to select a number of deals";
 
 // For the display parameters modification screen
 $l_invoice_options = "Display options for invoices list"; 
-$l_options_dis = "options of display" ;
-//$l_subject = "Subject" ;
-$l_query_display = "Displayed" ;
-$l_order_dis = "Order of display" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Not to display it fields" ;
-$l_ch_to_dis_no_help = "That indicates the appropriate field is displayed<br>Click on this button if you don't want to display the field" ;
-$l_ch_to_dis_yes = "To display it fields" ;
-$l_ch_to_dis_yes_help = "That indicates the appropriate field is not displayed<br>Click on this button if you want to display the field" ;
-$l_dis_obligatory = "Display of this fields is mandatory" ;
-$l_dis_obligatory_help = "This button means you don't have choice. The field appropriate field is be displayed" ;
-$l_down_option = "To descend this option from a notch" ;
-$l_down_option_help  = "Click on this button to move down the field" ;
-$l_up_option = "To assemble this option of a notch" ;
-$l_up_option_help = "Click on this button to move up the field" ;
-$l_back_tolist = "Back to list display" ;
-$l_help_options = "Contextual help" ;
 
 // default invoice numbering policy :
 $default_invoice_numbering = "Y"; // we use only year

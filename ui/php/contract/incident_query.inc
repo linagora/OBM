@@ -8,16 +8,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Incident search query execution                                          //
+///////////////////////////////////////////////////////////////////////////////
+// Incident search query execution                                           //
 // Parametes:
 //   - $incident[]   : incident search criteria
 //     keys used       status, label incident, priority, label contract
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function run_query_search($incident, $p_new_order, $p_order_dir) {
-  global $c_all,$l_date_format, $cdg_sql;  
+  global $c_all ,$l_datetime_format, $l_date_format, $cdg_sql;  
 
   $status = $incident["status"];
   $lincident = $incident["lincident"];
@@ -31,7 +31,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 
   $req = "select Incident.*,
       Incident.incident_id as Id,
-      DATE_FORMAT(Incident.incident_timeupdate,'$l_date_format') as timeupdate,
+      DATE_FORMAT(incident_date,'$l_date_format') as date,
+      DATE_FORMAT(incident_timeupdate,'$l_datetime_format') as timeupdate,
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
@@ -49,7 +50,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
      $req .= " and Incident.incident_priority ='$priority'";
   }
   if($param_contract != "") {
-     $req .= " and Contract.contract_id = $param_contract";
+     $req .= " and Contract.contract_id = '$param_contract'";
   }
   if ($owner != $c_all && ($owner != "")) {
      $req .=" and (Incident.incident_owner = '$owner') ";
@@ -64,14 +65,14 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
      $req .= " and Contract.contract_label like '$lcontract%'";
   }
   if (($status != $c_all) && ($status != "")) { 
-     $req .= " and Incident.incident_etat ='$status'";
+     $req .= " and Incident.incident_state = '$status'";
   }
   if ($archive == "0") {
      $req .= " and Incident.incident_archive != '1'";
   }
   // ORDER construction
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Incident.incident_etat";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Incident.incident_state";
   $req .= " order by $order $p_order_dir, Incident.incident_priority";
 
   $obm_db=new DB_OBM;
@@ -88,7 +89,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 //   - $id : incident id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $l_date_format; 
+  global $l_datetime_format, $l_date_format; 
   global $db_type_mysql,$db_type_pgsql;  
   global $cdg_sql;
 
@@ -97,9 +98,9 @@ function run_query_detail($id) {
     $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(incident_timeupdate,'$l_date_format') as datemodif,
-        DATE_FORMAT(incident_timeupdate,'$l_date_format') as timeupdate,
-        DATE_FORMAT(incident_timecreate,'$l_date_format') as timecreate
+        DATE_FORMAT(incident_date,'$l_date_format') as date,
+        DATE_FORMAT(incident_timeupdate,'$l_datetime_format') as timeupdate,
+        DATE_FORMAT(incident_timecreate,'$l_datetime_format') as timecreate
       from (Incident
               left join UserObm u1 on incident_logger=u1.userobm_id)
               left join UserObm u2 on incident_owner=u2.userobm_id
@@ -107,7 +108,6 @@ function run_query_detail($id) {
   }
   else if ($connect_db->type == $db_type_pgsql) {
     $query = "select *,
-        incident_timeupdate as datemodif,
         incident_timeupdate as timeupdate,
         incident_timecreate as timecreate
       from Incident
@@ -121,59 +121,67 @@ function run_query_detail($id) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Query execution: Contract info query                                      //
+// Parameters:
+//   - $cid : contract Id
+// Returns:
+//   -  DB object result : contract info
 //////////////////////////////////////////////////////////////////////////////
-// Incident: Contract select query execution                                 //
-// Returns : DB object result with all contract
-//////////////////////////////////////////////////////////////////////////////
-function run_query_contract() {
+function run_query_incident_contract($cid) {
   global $cdg_sql;
-  $query = "select contract_id,contract_label from Contract order by contract_label";
+
+  $query = "select contract_id,
+      contract_label,
+      contract_company_id,
+      contract_number,
+      contract_datebegin,
+      contract_dateexp,
+      contract_type_id,
+      u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+      u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+      c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
+      c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2
+    from (((Contract
+              left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
+              left join UserObm u2 on contract_techmanager_id=u2.userobm_id)
+              left join Contact c1 on contract_contact1_id=c1.contact_id)
+              left join Contact c2 on contract_contact2_id=c2.contact_id
+    where contract_id='$cid'
+    order by contract_label";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
+  $obm_q->next_record();
 
   return $obm_q;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Query   : company contacts deal  :  Table Contact (company OBM)           //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_internal_contact() {
- global $cdg_sql;
-
-  $connect_db=new DB_OBM;
-  $query = "select contact_id,contact_lastname,contact_firstname from Contact,Company where contact_company_id=company_id and company_state=1 order by contact_lastname"; 	
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
-}
-
-
 //////////////////////////////////////////////////////////////////////////////
-// ContractContract: Select query construction                               //
+// Query   : company contract       :  Table Company                         //
 //////////////////////////////////////////////////////////////////////////////
-function run_query_incident_contract($p_contract_id) {
+function run_query_company_contract($p_company_id) {
   global $cdg_sql;
-
-  $connect_db = new DB_OBM;
-  $query = "select * from Contract where contract_id='$p_contract_id'";
+  
+  $connect_db=new DB_OBM;
+  $query = "select company_name, company_address1,company_zipcode,company_town from Company where company_id=".$p_company_id;
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);
-  $connect_db->next_record();
-
   return $connect_db;
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Insertion query construction                                             //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Incident Insertion query execution                                        //
+// Parameters:
+//   - $incident[] : Entry's values
+//     keys used   : lincident, logger, owner, description, solution, priority
+//                 : status, date, archive, contract_id
+///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($incident) {
-
-  global $auth;
- global $cdg_sql;
+  global $auth, $cdg_sql;
 
   $lincident = $incident["lincident"];
   $owner =  $incident["owner"];
@@ -183,30 +191,55 @@ function run_query_insert($incident) {
   $priority =  $incident["priority"];
   $status =  $incident["status"];
   $date =  $incident["date"];
-  $archive = $incident["archive"];
+  $archive = ($incident["archive"] ? "1" : "0");
   $contract_id = $incident["contract_id"];
 
   $connect_db=new DB_OBM;
 
-  $query = "insert into Incident (incident_timeupdate,incident_timecreate,incident_userupdate,incident_usercreate,
-				  incident_label,incident_contract_id,incident_date,incident_description,
-				  incident_resolution,incident_priority,incident_etat,incident_logger,incident_owner,incident_archive) 
-			values 
-				 ('". date("Y-m-d H:i:s") ."','". date("Y-m-d H:i:s") ."',".$auth->auth["uid"].",".$auth->auth["uid"].",
-				  '" .$lincident. "'," .$contract_id. ",'" .$date. "','".$desc."','".$solu."','".$priority."',
-				  '" .$status. "'," .$logger. "," .$owner. ",'".$archive."')";
+  $query = "insert into Incident (incident_timeupdate,
+    incident_timecreate,
+    incident_userupdate,
+    incident_usercreate,
+    incident_label,
+    incident_contract_id,
+    incident_date,
+    incident_priority,
+    incident_state,
+    incident_logger,
+    incident_owner,
+    incident_archive,
+    incident_description,
+    incident_resolution)
+  values ('". date("Y-m-d H:i:s") ."',
+    '". date("Y-m-d H:i:s") ."',
+    '".$auth->auth["uid"]."',
+    '".$auth->auth["uid"]."',
+    '$lincident',
+    '$contract_id',
+    '$date',
+    '$priority',
+    '$status',
+    '$logger',
+    '$owner',
+    '$archive',
+    '$desc',
+    '$solu')";
 
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Update query construction                                                //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Incident update query execution                                           //
+// Parameters:
+//   - $incident[] : Entry's values
+//     keys used   : lincident, logger, owner, description, solution, priority
+//                 : status, date, archive, contract_id
+///////////////////////////////////////////////////////////////////////////////
 function run_query_update($incident) {
+  global $auth, $cdg_sql;
 
-  global $cdg_sql;
   $param_incident = $incident["id"];
   $param_contract = $incident["contract_id"];
   $lincident = $incident["lincident"];
@@ -217,33 +250,42 @@ function run_query_update($incident) {
   $priority =  $incident["priority"];
   $status =  $incident["status"];
   $date =  $incident["date"];
-  $archive = $incident["archive"];
+  $archive = ($incident["archive"] ? "1" : "0");
  
-  global $auth;
   $connect_db=new DB_OBM;
-  
 
- $query = "update Incident set incident_timeupdate='". date("Y-m-d H:i:s")."',incident_userupdate=".$auth->auth["uid"].",
-           incident_logger=".$logger.",incident_owner=" .$owner. ", incident_label='" .$lincident. "', incident_date='" .$date. "', 
-           incident_priority='" .$priority. "', incident_etat='". $status. "',incident_resolution = '$solu',
-	   incident_description = '$desc', incident_archive='". $archive. "', incident_contract_id = $param_contract
-           where incident_id=$param_incident";
+  $query = "update Incident set
+    incident_timeupdate='". date("Y-m-d H:i:s")."',
+    incident_userupdate='".$auth->auth["uid"]."',
+    incident_logger='$logger',
+    incident_owner='$owner',
+    incident_label='$lincident',
+    incident_date='$date', 
+    incident_priority='$priority',
+    incident_state='$status',
+    incident_resolution = '$solu',
+    incident_description = '$desc',
+    incident_archive='$archive',
+    incident_contract_id = '$param_contract'
+   where incident_id='$param_incident'";
 
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);  
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Delete query construction                                                //
-//////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_incident_id) {
-   global $cdg_sql;
+///////////////////////////////////////////////////////////////////////////////
+// Delete query construction/                                                //
+// Parameters:
+//   - $i_id : incident id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete($i_id) {
+  global $cdg_sql;
 
-  $connect_db=new DB_OBM;
-  $query = "delete from Incident where incident_id=".$p_incident_id;
+  $i_q = new DB_OBM;
+  $query = "delete from Incident where incident_id='$i_id'";
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
+  $i_q->query($query);
 }
 
 
@@ -263,35 +305,6 @@ function run_query_contracttype($type_id) {
 
 
 //////////////////////////////////////////////////////////////////////////////
-// Requete :  TYPES de deal du contract : Table DealType                     //
-// Query   :  kind of Deal of the Contract        : Table DealType          //
-//////////////////////////////////////////////////////////////////////////////
-function run_query_contract_dealtype($deal_id) {
-  global $cdg_sql;
-
-  $connect_db=new DB_OBM;
-  $query = "select dealtype_label,dealtype_id from DealType where dealtype_id=".$deal_id."";
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Query   : company contract       :  Table Company                         //
-//////////////////////////////////////////////////////////////////////////////
-function run_query_company_contract($p_company_id) {
-  global $cdg_sql;
-  
-  $connect_db=new DB_OBM;
-  $query = "select company_name, company_address1,company_zipcode,company_town from Company where company_id=".$p_company_id;
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
 // Query   : company contacts contract  :  Table Contact                     //
 //////////////////////////////////////////////////////////////////////////////
 function run_query_contact_contract($p_company_id) {
@@ -304,11 +317,11 @@ function run_query_contact_contract($p_company_id) {
   return $connect_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Deal Form Data checking and formatting
+// Incident Form Data checking and formatting
 // Parameters:
-//   - $did : deal id : (empty on insertion)
-//   - $deal[] : values to check
+//   - $incident[] : values to check
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_incident_form($incident) {

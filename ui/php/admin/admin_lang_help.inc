@@ -36,6 +36,7 @@ txt: php admin_lang_index.php -a show_src -m deal
 ===============================================================================
 show_lang        | module | Compares variables referenced in the module source
                  | lang   | with variables defined in the lang for the module
+                 |        | Detect variables defined both in module + global
 -------------------------------------------------------------------------------
                  | notions used for vars :
                  | - referenced : the variable is present in source files
@@ -43,8 +44,9 @@ show_lang        | module | Compares variables referenced in the module source
                  | - unused     : referenced but only in declaration (global)
                  | - defined    : present in language file definition
 -------------------------------------------------------------------------------
-                 | variables are classified in 5 groups | Suggestion
+                 | variables are classified in 6 groups | Suggestion
  used and defined : used in source, defined in lang  -> Great
+ defined twice    : used, but defined twice (global) -> To suppress from lang
  used but not def : used in src, not defined in lang -> to add in lang file
  unused and def   : global in src, defined in lang   -> miss, mispelled in src
  unused, not def  : global in src, not def in lang   -> remove from global dec

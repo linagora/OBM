@@ -69,13 +69,13 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $l_datetime_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
-    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_date_format') as timecreate from UserObm where userobm_id='$p_id'";
+    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_datetime_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_datetime_format') as timecreate from UserObm where userobm_id='$p_id'";
   } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_date_format') as timecreate from UserObm where userobm_id='$p_id'";
+    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_datetime_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_datetime_format') as timecreate from UserObm where userobm_id='$p_id'";
   } 
 
   $obm_q->query($query);

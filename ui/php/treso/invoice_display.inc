@@ -12,6 +12,193 @@ $border= ($set_debug>0)? 2 : 0;
 $cellspacing = ($set_debug>0)? 5 : 1;
 
 ///////////////////////////////////////////////////////////////////////////////
+// invoice search Form
+// Parameters :
+//  $p_action : current action in the application
+//  $q_status : infos concernant les != status
+///////////////////////////////////////////////////////////////////////////////
+function html_invoice_search_form ($p_action,$q_status, $invoice) {
+  global $l_label_start, $l_number, $l_amount_HT, $l_amount_TTC;
+  global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
+  global $l_deal, $l_company, $l_include_archive;
+  global $l_find, $l_all_f, $l_both, $l_client, $l_fournisseur;
+  global $sess;
+  global $cellspacing,$border;
+
+  $cellspacing = 10;
+
+  $label = $invoice["label"];
+  $number = $invoice["number"];
+  $amount_HT = $invoice["HT"];
+  $amount_TTC = $invoice["TTC"];
+  $status = $invoice["status"];
+  $date_after = $invoice["date_after"];
+  $date_before = $invoice["date_before"];
+  $inout = $invoice["inout"];
+  $deal = $invoice["deal"];
+  $company = $invoice["company"];
+  $archive = ($invoice["archive"]) ? "checked" : "" ;
+
+  $url_form = $sess->url ("invoice_index.php?action=search");
+
+  // "external" table
+  // 1 row, 2cols :
+  // 1 for the form itself, 1 for the submit button
+  echo "
+<center>
+ <table border=\"$border\" cellspacing=\"$cellspacing\">";
+  echo"
+  <tr><td>
+  <form method=\"post\" name=\"form_invoice\"".
+    " onSubmit=\"if (check_form(this) == false) return false ; ".
+    "else return true;\" ".
+    "action=\"".$url_form."\">";
+  // form table (1 cell)
+  echo "
+   <table  border=\"$border\" cellspacing=\"$cellspacing\">
+    <tr><td>";  
+  // first form line table :
+  // label, number, amounts HT & TTC
+  echo "
+     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
+      <tr>";  
+  //--------------------------------------------------------------------------
+  // label
+  echo "<td width=\"40%\">
+       <font size=\"-2\">".$l_label_start."</font><br>
+       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"".$label.
+    "\">
+      </td>";
+  //--------------------------------------------------------------------------
+  // number
+  echo "<td width=\"20%\">
+       <font size=\"-2\">".$l_number."</font><br>
+       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"".$number.
+    "\">
+      </td>";
+  //--------------------------------------------------------------------------
+  // amount_HT
+  echo "<td width=\"20%\">
+       <font size=\"-2\">".$l_amount_HT."</font><br>
+       <input type=\"text\" name=\"tf_amount_HT\" size=\"15\" value=\"".$amount_ht.
+    "\">
+      </td>";
+  //--------------------------------------------------------------------------
+  // amount_TTC
+  echo "<td width=\"20%\">
+       <font size=\"-2\">".$l_amount_TTC."</font><br>
+       <input type=\"text\" name=\"tf_amount_TTC\" size=\"15\" value=\"".$amount_ttc.
+    "\">
+      </td>";
+  // end of first form line table
+  echo "</tr>
+     </table>
+      </td></tr>";
+  // beginning of second form line table
+  // status, date after, date before, archive 
+  echo "
+    <tr><td>
+     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
+      <tr>";
+  // status
+  echo "<td>
+       <font size=-2>".$l_status."</font><br>
+       <select name=\"sel_status\">
+        <option value=\"_TOUT_\">".$l_all_f;
+
+  while ($q_status->next_record()) {
+    echo "
+        <option value=".$q_status->f("invoicestatus_id");
+    if ($q_status->f("invoicestatus_id")==$status) echo " selected";
+    echo ">".$q_status->f("invoicestatus_label");
+  }
+  echo "
+       </select>
+      </td>";
+  //--------------------------------------------------------------------------
+  // date after :
+  echo "<td>
+       <font size=\"-2\">".$l_date_apres."</font><br>
+       <input type=\"text\" name=\"tf_date_after\" size=12 ".
+    "value=\"".$date_after.
+    "\">
+      </td>";
+  // date before :
+  echo "<td>
+       <font size=\"-2\">".$l_date_avant."</font><br>
+       <input type=\"text\" name=\"tf_date_before\" size=12 ".
+    "value=\"".$date_before.
+    "\">
+      </td>";
+  // archive
+  echo "<td>
+       <font size=\"-2\">".$l_include_archive."</font><br>
+       <input type=\"checkbox\" name=\"cb_archive\" value=\"y\" $archive> 
+      </td></tr>";
+  // end of second form line table
+  echo "
+     </table>
+    </td></tr>
+    <tr><td>";
+  // beginning of third form line table
+  // kind, deal, company
+  echo "
+     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">";
+  // radios : customer/provider/both invoice  ?
+  echo "
+      <tr><td>
+       <font size=-2>".$l_inout."</font><br>
+       $l_both &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
+  if (($inout == "_tout_")||($inout=="")) {
+    echo "checked";
+  }
+  echo ">
+       $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\"";
+  if ($inout == "+") {
+    echo " checked ";
+  }
+  echo ">
+       $l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\"";
+  if ($inout == "-") {
+    echo " checked ";
+  }
+  echo ">";
+  // deal connected
+  echo "
+      </td><td>
+       <font size=\"-2\">$l_deal</font><br>
+       <input type=\"text\" name=\"tf_deal\" value=\"".$deal."\">
+      </td>";
+  // company of the deal of the invoice...
+  echo "<td>
+        <font size=\"-2\">$l_company</font><br>
+        <input type=\"text\" name=\"tf_company\" value=\"".
+    $company."\">
+      </td></tr>";
+  // end of third line form table
+  echo "
+     </table>";
+  // end of form table
+  echo "
+    </td></tr>
+   </table>
+  </td>";
+//  //--------------------------------------------------------------------------
+  // bouton valider
+  echo "<td align=\"center\"> 
+   <input name=\"submit\" type=\"submit\" value=\"$l_find\">
+  </td>";
+  // end of "external" table
+  echo "</tr>
+  </form><hr>
+  </td></tr>
+ </table>
+</center>
+";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Invoice Form              
 // params :
 //  $q_invoice : if updating, contains the invoice current info
@@ -266,191 +453,7 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
 ";
 } // html_invoice_form
 
-///////////////////////////////////////////////////////////////////////////////
-// invoice search Form
-// Parameters :
-//  $p_action : current action in the application
-//  $q_status : infos concernant les != status
-///////////////////////////////////////////////////////////////////////////////
-function html_invoice_search_form ($p_action,$q_status, $invoice) {
-  global $l_label_start, $l_number, $l_amount_HT, $l_amount_TTC;
-  global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
-  global $l_deal, $l_company, $l_include_archive;
-  global $l_find, $l_all_f, $l_both, $l_client, $l_fournisseur;
-  global $sess;
-  global $cellspacing,$border;
 
-  $cellspacing = 10;
-
-  $label = $invoice["label"];
-  $number = $invoice["number"];
-  $amount_HT = $invoice["HT"];
-  $amount_TTC = $invoice["TTC"];
-  $status = $invoice["status"];
-  $date_after = $invoice["date_after"];
-  $date_before = $invoice["date_before"];
-  $inout = $invoice["inout"];
-  $deal = $invoice["deal"];
-  $company = $invoice["company"];
-  $archive = ($invoice["archive"]) ? "checked" : "" ;
-
-  $url_form = $sess->url ("invoice_index.php?action=search");
-
-  // "external" table
-  // 1 row, 2cols :
-  // 1 for the form itself, 1 for the submit button
-  echo "
-<center>
- <table border=\"$border\" cellspacing=\"$cellspacing\">";
-  echo"
-  <tr><td>
-  <form method=\"post\" name=\"form_invoice\"".
-    " onSubmit=\"if (check_form(this) == false) return false ; ".
-    "else return true;\" ".
-    "action=\"".$url_form."\">";
-  // form table (1 cell)
-  echo "
-   <table  border=\"$border\" cellspacing=\"$cellspacing\">
-    <tr><td>";  
-  // first form line table :
-  // label, number, amounts HT & TTC
-  echo "
-     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
-      <tr>";  
-  //--------------------------------------------------------------------------
-  // label
-  echo "<td width=\"40%\">
-       <font size=\"-2\">".$l_label_start."</font><br>
-       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"".$label.
-    "\">
-      </td>";
-  //--------------------------------------------------------------------------
-  // number
-  echo "<td width=\"20%\">
-       <font size=\"-2\">".$l_number."</font><br>
-       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"".$number.
-    "\">
-      </td>";
-  //--------------------------------------------------------------------------
-  // amount_HT
-  echo "<td width=\"20%\">
-       <font size=\"-2\">".$l_amount_HT."</font><br>
-       <input type=\"text\" name=\"tf_amount_HT\" size=\"15\" value=\"".$amount_ht.
-    "\">
-      </td>";
-  //--------------------------------------------------------------------------
-  // amount_TTC
-  echo "<td width=\"20%\">
-       <font size=\"-2\">".$l_amount_TTC."</font><br>
-       <input type=\"text\" name=\"tf_amount_TTC\" size=\"15\" value=\"".$amount_ttc.
-    "\">
-      </td>";
-  // end of first form line table
-  echo "</tr>
-     </table>
-      </td></tr>";
-  // beginning of second form line table
-  // status, date after, date before, archive 
-  echo "
-    <tr><td>
-     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
-      <tr>";
-  // status
-  echo "<td>
-       <font size=-2>".$l_status."</font><br>
-       <select name=\"sel_status\">
-        <option value=\"_TOUT_\">".$l_all_f;
-
-  while ($q_status->next_record()) {
-    echo "
-        <option value=".$q_status->f("invoicestatus_id");
-    if ($q_status->f("invoicestatus_id")==$status) echo " selected";
-    echo ">".$q_status->f("invoicestatus_label");
-  }
-  echo "
-       </select>
-      </td>";
-  //--------------------------------------------------------------------------
-  // date after :
-  echo "<td>
-       <font size=\"-2\">".$l_date_apres."</font><br>
-       <input type=\"text\" name=\"tf_date_after\" size=12 ".
-    "value=\"".$date_after.
-    "\">
-      </td>";
-  // date before :
-  echo "<td>
-       <font size=\"-2\">".$l_date_avant."</font><br>
-       <input type=\"text\" name=\"tf_date_before\" size=12 ".
-    "value=\"".$date_before.
-    "\">
-      </td>";
-  // archive
-  echo "<td>
-       <font size=\"-2\">".$l_include_archive."</font><br>
-       <input type=\"checkbox\" name=\"cb_archive\" value=\"y\" $archive> 
-      </td></tr>";
-  // end of second form line table
-  echo "
-     </table>
-    </td></tr>
-    <tr><td>";
-  // beginning of third form line table
-  // kind, deal, company
-  echo "
-     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">";
-  // radios : customer/provider/both invoice  ?
-  echo "
-      <tr><td>
-       <font size=-2>".$l_inout."</font><br>
-       $l_both &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
-  if (($inout == "_tout_")||($inout=="")) {
-    echo "checked";
-  }
-  echo ">
-       $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\"";
-  if ($inout == "+") {
-    echo " checked ";
-  }
-  echo ">
-       $l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\"";
-  if ($inout == "-") {
-    echo " checked ";
-  }
-  echo ">";
-  // deal connected
-  echo "
-      </td><td>
-       <font size=\"-2\">$l_deal</font><br>
-       <input type=\"text\" name=\"tf_deal\" value=\"".$deal."\">
-      </td>";
-  // company of the deal of the invoice...
-  echo "<td>
-        <font size=\"-2\">$l_company</font><br>
-        <input type=\"text\" name=\"tf_company\" value=\"".
-    $company."\">
-      </td></tr>";
-  // end of third line form table
-  echo "
-     </table>";
-  // end of form table
-  echo "
-    </td></tr>
-   </table>
-  </td>";
-//  //--------------------------------------------------------------------------
-  // bouton valider
-  echo "<td align=\"center\"> 
-   <input name=\"submit\" type=\"submit\" value=\"$l_find\">
-  </td>";
-  // end of "external" table
-  echo "</tr>
-  </form><hr>
-  </td></tr>
- </table>
-</center>
-";
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Search result (if it has to be done                               //
@@ -795,7 +798,7 @@ function dis_invoice_detail ($p_action, $q_invoice, $q_status){
   // date :
   echo "
    <td><font color=\"#$col_label\">$l_date</font><br>".
-    $q_invoice->f("invoice_date")."</td>";
+    $q_invoice->f("date")."</td>";
   echo "</tr>
    </table></td></tr>"; 
 

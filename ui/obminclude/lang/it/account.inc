@@ -1,9 +1,9 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian                                                 //
-//     - File     : account.inc                                             //
-// 01/08/2002 Augusto Fagioli                                               //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italian                                                  //
+//     - File     : account.inc                                              //
+// 01/08/2002 Augusto Fagioli                                                //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_label = "Etichetta";
@@ -13,7 +13,6 @@ $l_bank = "Banca";
 $l_number = "Numero";
 $l_balance = "Saldo";
 $l_initial_balance = "Creazione Saldo";
-$l_comment = "Commento";
 $l_choose_balance_date = "Data Saldo";
 $l_date = "Data";
 $l_expected_date = "Data Prevista";
@@ -33,12 +32,10 @@ $l_used_expected_payments = "Pagameni previsti usati nel calcolo del saldo";
 $l_account = "Account";
 
 // Actions
-$l_find = "Trova";
 $l_insert= "Inserisci Account";
 $l_update = "Aggiorna Account";
 $l_delete = "Cancella Account";
 $l_delete_confirm = "Confermi l'eliminazione dell'account ?";
-$l_cancel = "Cancella";
 $l_compute_balance = "Elabora Saldo";
 
 // Messages
@@ -54,14 +51,6 @@ $l_update_error = "Aggiornamento account fallito !";
 $l_query_error = "Problemi nell'esecuzione della ricerca...";
 $l_impossible_deletion = " alcuni pagamenti sono associati a questo account. Impossibile cancellare";
 
-// must be used with the number of payments leading...
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%d-%m-%Y %H:%i:%s";
-$l_date_format = "%d-%m-%Y %H:%i:%s";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nNumero account non valido ! ";
 $lj_fill_number = " Inserisci prima il numero ! ";
@@ -74,20 +63,3 @@ $l_fill_date = "\\n Inserisci prima la data .";
 // For the display parameters modification screen
 $l_account_options = "Visualizza le opzioni per la lista di account ";
 $l_payment_options = "Visualizza le opzioni per la lista di pagamenti ";
-$l_options_dis = "Opzioni di visualizzazione " ;
-//$l_subject = "Oggetto" ;
-$l_query_display = "Visualizzato" ;
-$l_order_dis = "Ordine di visualizzazione" ;
-$l_action = "Azione" ;
-$l_ch_to_dis_no = "non visualizzarlo come campo" ;
-$l_ch_to_dis_no_help = "Indica che il relativo campo è visualizzato<br>Click qui se non vuoi visualizzare il campo" ;
-$l_ch_to_dis_yes = "To display it fields" ;
-$l_ch_to_dis_yes_help = "Indica che il relativo campo non è visualizzato<br>Click qui se vuoi visualizzare il campo" ;
-$l_dis_obligatory = "Campo obbligatorio" ;
-$l_dis_obligatory_help = "Il pulsante significa che non hai scelta. Il campo appropriato deve essere visualizzato" ;
-$l_down_option = "scendi in bassoda un notch" ;
-$l_down_option_help  = "Click qui per andare sotto il campo " ;
-$l_up_option = "Per unire questa opzione di  un  notch" ;
-$l_up_option_help = "Click qui per muovere sopra il campo " ;
-$l_back_tolist = "Torna alla lista display" ;
-$l_help_options = "Aiuto contestuale " ;

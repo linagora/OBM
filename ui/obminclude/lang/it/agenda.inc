@@ -1,11 +1,11 @@
 <?php
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian                                                 //
-//     - File     : agenda.inc                                              //
-// 13/08/2002 by Augusto Fagioli                                            //
-//////////////////////////////////////////////////////////////////////////////
-// Last Update 13/08/2002                                                   //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italiano                                                 //
+//     - File     : agenda.inc                                               //
+// 2002-08-13 Augusto Fagioli                                                //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 
 $l_users = "Contatti";
@@ -17,7 +17,6 @@ $l_public  = "Pubblico";
 $l_category = "Categoria";
 $l_description = "Descrizione";
 $l_state = "Stato";
-$l_none = "Nessuno";
 
 $l_high = "Alta";
 $l_low = "Bassa";
@@ -54,17 +53,14 @@ $l_yearly = "annuale";
 $l_from = "da";
 $l_to = "al";
 
-
 // actions
 $l_insert = "Registra l'appuntamento ";
 $l_update = "Modifier le appuntamento";
 $l_delete = "Supprimer le appuntamento";
 $l_delete_all = "elimina tutti";
-$l_validate = "Valida";
 $l_accept = "Accetta";
 $l_reject = "Respingi";
 $l_select = "Scegli";
-$l_cancel = "Annulla";
 
 // Messages
 $l_error_permission = "Non hai i permessi di accesso alla pagina.";

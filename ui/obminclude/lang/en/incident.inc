@@ -16,8 +16,8 @@ $l_incident_owner = "Owner";
 $l_incident_logger = "Technical manager";
 $l_incident_description = "Description";
 $l_incident_solution = "Solution founded";
-$l_contract_num = "Number of Contract";
-$l_contract_label = "Label of Contract";
+$l_contract_num = "Number";
+$l_contract_label = "Contract";
 $l_contract_date_init = "Begin Date";
 $l_contract_date_expir = "Expiration Date";
 $l_date_before ="Date Before";
@@ -49,7 +49,7 @@ $l_closed = "Closed";
 // Fields that appear in result lists //
 //------------------------------------//
 // Direct fields
-$fieldnames["incident_etat"] = $l_incident_status;
+$fieldnames["incident_state"] = $l_incident_status;
 $fieldnames["incident_label"] = $l_incident_label;
 $fieldnames["incident_priority"] = $l_incident_priority;
 $fieldnames["incident_date"] = $l_incident_date;

@@ -17,13 +17,13 @@
 //   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($contract, $p_new_order, $p_order_dir) {
-  global $cdg_sql, $c_all;
+  global $cdg_sql, $c_all, $l_date_format;
 
   $p_label = $contract["label"];
   $p_type = $contract["type"];
   $p_dateafter = $contract["dateafter"];
   $p_datebefore = $contract["datebefore"];
-  $p_companyname = $contract["companyname"];
+  $comp = $contract["company_name"];
   $p_num = $contract["number"];
   $p_tech = $contract["tech"];
   $p_com = $contract["market"];
@@ -39,7 +39,8 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       contract_company_id,
       company_name as contract_company_name,
       contracttype_label,
-      contract_dateexp
+      contract_dateexp,
+      DATE_FORMAT(contract_dateexp,'$l_date_format') as dateexp
     from Contract, Company, ContractType
     where contract_company_id=company_id
       and contracttype_id=contract_type_id";
@@ -50,8 +51,8 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   if ($p_num != "")
     $query .= " and (contract_number like '%$p_num%')";
   
-  if ($p_companyname != "")
-    $query .= " and (company_name like '%$p_companyname%')";
+  if ($comp != "")
+    $query .= " and (company_name like '%$comp%')";
 
   if ($p_dateafter != "")
     $query .= " and (contract_dateexp >= '$p_dateafter')";
@@ -82,7 +83,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_contract_id) {
   global $cdg_sql;
-  global $l_date_format; 
+  global $l_datetime_format, $l_date_format; 
   global $db_type_mysql,$db_type_pgsql;  
 
   $connect_db = new DB_OBM;
@@ -90,9 +91,10 @@ function run_query_detail($p_contract_id) {
     $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(contract_timeupdate,'$l_date_format') as datemodif,
-        DATE_FORMAT(contract_timeupdate,'$l_date_format') as timeupdate,
-        DATE_FORMAT(contract_timecreate,'$l_date_format') as timecreate
+        DATE_FORMAT(contract_datebegin,'$l_date_format') as datebegin,
+        DATE_FORMAT(contract_dateexp,'$l_date_format') as dateexp,
+        DATE_FORMAT(contract_timeupdate,'$l_datetime_format') as timeupdate,
+        DATE_FORMAT(contract_timecreate,'$l_datetime_format') as timecreate
       from (Contract
             left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
             left join UserObm u2 on contract_techmanager_id=u2.userobm_id
@@ -102,7 +104,8 @@ function run_query_detail($p_contract_id) {
     $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        contract_timeupdate as datemodif,
+        contract_datebegin as datebegin,
+        contract_dateexp as dateexp,
         contract_timeupdate as timeupdate,
         contract_timecreate as timecreate
       from (Contract
@@ -125,7 +128,7 @@ function run_query_insert($contract) {
   global $auth;
 
   $p_label = $contract["label"];
-  $hd_soc = $contract["company_id"];
+  $comp_id = $contract["company_id"];
   $p_num = $contract["number"];
   $ta_clause = $contract["clause"];
   $p_datebegin = $contract["datebegin"];
@@ -162,7 +165,7 @@ function run_query_insert($contract) {
       '".$auth->auth["uid"]."',
       '".$auth->auth["uid"]."',
       '$p_label',
-      '$hd_soc',
+      '$comp_id',
       '$p_num',
       '$p_datebegin',
       '$p_dateexp',
@@ -288,6 +291,8 @@ function run_query_company_info($id) {
   display_debug_msg($query, $cdg_sql);
   $connect_db=new DB_OBM;
   $connect_db->query($query);
+  $connect_db->next_record();
+
   return $connect_db;
 }
 

@@ -37,14 +37,14 @@ function get_langs_array() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the theme list                                                       //
+// Get the theme list                                                        //
 // Return : $themes : array of themes
 ///////////////////////////////////////////////////////////////////////////////
 function get_themes_array() {
   global $obminclude;
 
   // Themes dirs to exclude
-  $exclude = array('.', '..', 'CVS');
+  $exclude = array('.', '..', 'CVS', 'images');
   $themes = array();
 
   $theme_dir = dir("../../$obminclude/themes");
@@ -60,9 +60,11 @@ function get_themes_array() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fonction qui retourne la liste des variables langues citees dans le module//
-// Parametres:
-//   - $module : module a traiter
+// Get the list of lang vars that appears in the module sources
+// Parameters:
+//   - $module : module to proces
+// Returns:
+//   - $resultat : array of var present in the module sources
 ///////////////////////////////////////////////////////////////////////////////
 function get_src_vars($module) {
   global $debug;
@@ -106,7 +108,6 @@ function get_src_vars($module) {
       $line = preg_replace("/$pattern/", "\$R_", $line, 1);
 
       array_push($tableau, $lvar);      
-
     }
   }
 
@@ -115,12 +116,13 @@ function get_src_vars($module) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Fonction qui retourne la liste des variables langues utilisees dans le    //
-// module (reellement utilisee, non juste definie)                           //
-// Parametres:
-//   - $module : module a traiter
+// Get the list of lang vars that appears and are really used in the module
+// sources (not just defined in a global line)
+// Parameters:
+//   - $module : module to process
+// Returns:
+//   - $resultat : array of var present and used in the module sources
 ///////////////////////////////////////////////////////////////////////////////
 function get_src_used_vars($module) {
   global $debug;
@@ -254,10 +256,12 @@ function get_src_header_vars($theme) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fonction qui retourne la liste des variables langues citees dans le module//
-// Parametres:
-//   - $module : module a traiter
-// Return : $tableau[var]=value
+// Get the list of vars defined in the module lang file
+// Parameters:
+//   - $module : module to process
+//   - $lang   : lang to process
+// Returns: 
+//   - $tableau : array of lang module vars : $tableau[var]=value
 ///////////////////////////////////////////////////////////////////////////////
 function get_lang_vars($module, $lang) {
   global $debug, $obminclude;
@@ -282,7 +286,53 @@ function get_lang_vars($module, $lang) {
   while (list($line_num, $line) = each($contents)) {
 
     // for each lang var, we note it as recorded "R_" and put it in the array
-    while (preg_match('/^.*(\$l_)([a-z_]*)\s*=\s*"(.*)"\s*;\s*$/Us',$line, $matches)) {
+    while (preg_match('/^.*(\$l_)([a-z_]*)\s*=\s*"(.*)"\s*;\s*(\/\/.*$)*$/Us',$line, $matches)) {
+      $lvar = "\$l_" . $matches[2];
+      $lvalue = $matches[3];
+      $pattern = preg_quote($matches[1]);
+      $line = preg_replace("/$pattern/", "\$R_", $line, 1);
+
+      $tableau[$lvar] = $lvalue;
+
+    }
+  }
+
+  return $tableau;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of lang vars defined in the global lang file (included in
+// each module)
+// Parameters:
+//   - $lang   : lang to process
+// Returns: 
+//   - $tableau : array of global lang vars : $tableau[var]=value
+///////////////////////////////////////////////////////////////////////////////
+function get_global_lang_vars($lang) {
+  global $debug, $obminclude;
+
+  $path = "..";
+
+  $tableau = array();
+  $file = "$path/../$obminclude/lang/$lang/global.inc";
+
+  if (file_exists($file)) {
+    $contents = file($file);
+  } else {
+    return false;
+  }
+
+  if ($debug > 0) {
+    echo "Global Lang vars : Files read : ";
+    echo "file=$file\n";
+  }
+
+  // For each line of the file
+  while (list($line_num, $line) = each($contents)) {
+
+    // for each lang var, we note it as recorded "R_" and put it in the array
+    while (preg_match('/^.*(\$l_)([a-z_]*)\s*=\s*"(.*)"\s*;\s*(\/\/.*$)*/Us',$line, $matches)) {
       $lvar = "\$l_" . $matches[2];
       $lvalue = $matches[3];
       $pattern = preg_quote($matches[1]);
