@@ -68,158 +68,129 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
 
   $url_form = url_prepare("invoice_index.php?action=search");
 
-  // "external" table
-  // 1 row, 2cols :
-  // 1 for the form itself, 1 for the submit button
-  echo "
-<center>
- <table border=\"$border\" cellspacing=\"$cellspacing\">";
-  echo"
-  <tr><td>
-  <form method=\"post\" name=\"form_invoice\"
-    onSubmit=\"if (check_form(this) == false) return false ;
-    else return true;\" action=\"$url_form\">";
-  // form table (1 cell)
-  echo "
-   <table  border=\"$border\" cellspacing=\"$cellspacing\">
-    <tr><td>";  
-  // first form line table :
-  // label, number, amounts HT & TTC
-  echo "
-     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
-      <tr>";  
-  //--------------------------------------------------------------------------
-  // label
-  echo "<td width=\"40%\">
-       <font size=\"-2\">".$l_label_start."</font><br>
-       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"".$label.
-    "\">
-      </td>";
-  //--------------------------------------------------------------------------
-  // number
-  echo "<td width=\"20%\">
-       <font size=\"-2\">".$l_number."</font><br>
-       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"".$number.
-    "\">
-      </td>";
-  //--------------------------------------------------------------------------
-  // amount_HT
-  echo "<td width=\"20%\">
-       <font size=\"-2\">".$l_amount_HT."</font><br>
-       <input type=\"text\" name=\"tf_amount_HT\" size=\"15\" value=\"".$amount_ht.
-    "\">
-      </td>";
-  //--------------------------------------------------------------------------
-  // amount_TTC
-  echo "<td width=\"20%\">
-       <font size=\"-2\">".$l_amount_TTC."</font><br>
-       <input type=\"text\" name=\"tf_amount_TTC\" size=\"15\" value=\"".$amount_ttc.
-    "\">
-      </td>";
-  // end of first form line table
-  echo "</tr>
-     </table>
-      </td></tr>";
-  // beginning of second form line table
-  // status, date after, date before, archive 
-  echo "
-    <tr><td>
-     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">
-      <tr>";
-  // status
-  echo "<td>
-       <font size=-2>".$l_status."</font><br>
-       <select name=\"sel_status\">
-        <option value=\"_TOUT_\">".$l_all_f;
-
+  $sel_status = "<select name=\"sel_status\">
+     <option value=\"_TOUT_\">$l_all_f</option>";
   while ($q_status->next_record()) {
-    echo "
-        <option value=".$q_status->f("invoicestatus_id");
-    if ($q_status->f("invoicestatus_id")==$status) echo " selected";
-    echo ">".$q_status->f("invoicestatus_label");
+    $id = $q_status->f("invoicestatus_id");
+    $label = $q_status->f("invoicestatus_label");
+    $sel_status .= "<option value=\"$id\"";
+    if ($status == $id) $sel_status .= " selected = \"selected\"";
+    $sel_status .= ">$label</option>";
   }
-  echo "
-       </select>
-      </td>";
-  //--------------------------------------------------------------------------
-  // date after :
-  echo "<td>
-       <font size=\"-2\">".$l_date_apres."</font><br>
-       <input type=\"text\" name=\"tf_date_after\" size=12 ".
-    "value=\"".$date_after.
-    "\">
-      </td>";
-  // date before :
-  echo "<td>
-       <font size=\"-2\">".$l_date_avant."</font><br>
-       <input type=\"text\" name=\"tf_date_before\" size=12 ".
-    "value=\"".$date_before.
-    "\">
-      </td>";
-  // archive
-  echo "<td>
-       <font size=\"-2\">".$l_include_archive."</font><br>
-       <input type=\"checkbox\" name=\"cb_archive\" value=\"y\" $archive> 
-      </td></tr>";
-  // end of second form line table
-  echo "
-     </table>
-    </td></tr>
-    <tr><td>";
-  // beginning of third form line table
-  // kind, deal, company
-  echo "
-     <table  border=\"$border\" cellspacing=\"$cellspacing\" width=\"100%\">";
-  // radios : customer/provider/both invoice  ?
-  echo "
-      <tr><td>
-       <font size=-2>".$l_inout."</font><br>
-       $l_both &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
-  if (($inout == "_tout_")||($inout=="")) {
-    echo "checked";
+  $sel_status .= "</select>";
+
+  if (($inout == "_tout_") || ($inout=="")) {
+    $rb_both = "checked";
   }
-  echo ">
-       $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\"";
   if ($inout == "+") {
-    echo " checked ";
+    $rb_client = " checked ";
   }
-  echo ">
-       $l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\"";
   if ($inout == "-") {
-    echo " checked ";
+    $rb_four = " checked ";
   }
-  echo ">";
-  // deal connected
+
+
   echo "
-      </td><td>
-       <font size=\"-2\">$l_deal</font><br>
-       <input type=\"text\" name=\"tf_deal\" value=\"".$deal."\">
-      </td>";
-  // company of the deal of the invoice...
-  echo "<td>
-        <font size=\"-2\">$l_company</font><br>
-        <input type=\"text\" name=\"tf_company\" value=\"".
-    $company."\">
-      </td></tr>";
-  // end of third line form table
-  echo "
-     </table>";
-  // end of form table
-  echo "
-    </td></tr>
-   </table>
-  </td>";
-//  //--------------------------------------------------------------------------
-  // bouton valider
-  echo "<td align=\"center\"> 
-   <input name=\"submit\" type=\"submit\" value=\"$l_find\">
-  </td>";
-  // end of "external" table
-  echo "</tr>
-  </form><hr>
-  </td></tr>
- </table>
-</center>
+      <form method=\"post\" name=\"form_invoice\"
+        onSubmit=\"if (check_form(this) == false) return false ;
+        else return true;\" action=\"$url_form\">
+
+  <table class=\"details\">
+  <tr>
+    <td>
+
+      <table>
+      <tr>
+        <td>
+        <table>
+        <tr>
+          <td class=\"textLabelForm\">$l_label_start
+            <br />
+            <input type=\"text\" name=\"tf_label\" size=\"20\"
+              value=\"$label\" />
+          </td>
+          <td class=\"textLabelForm\">$l_number
+            <br />
+            <input type=\"text\" name=\"tf_number\" size=\"12\"
+              value=\"$number\" />
+          </td>
+          <td class=\"textLabelForm\">$l_amount_HT
+            <br />
+            <input type=\"text\" name=\"tf_amount_HT\" size=\"15\"
+              value=\"$amount_ht\" />
+          </td>
+          <td class=\"textLabelForm\">$l_amount_TTC
+            <br />
+            <input type=\"text\" name=\"tf_amount_TTC\" size=\"15\"
+              value=\"$amount_ttc\" />
+          </td>
+        </tr>
+        </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+        <table>
+        <tr>
+          <td class=\"textLabelForm\">$l_status
+            <br />
+            $sel_status
+          </td>
+          <td class=\"textLabelForm\">$l_date_apres
+            <br />
+            <input type=\"text\" name=\"tf_date_after\" size=\"12\"
+              value=\"$date_after\" />
+          </td>
+          <td class=\"textLabelForm\">$l_date_avant
+            <br />
+            <input type=\"text\" name=\"tf_date_before\" size=\"12\"
+              value=\"$date_before\" />
+          </td>
+          <td class=\"textLabelForm\">$l_include_archive
+            <br />
+            <input type=\"checkbox\" name=\"cb_archive\" value=\"y\" $archive> 
+          </td>
+        </tr>
+        </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+        <table>
+        <tr>
+          <td class=\"textLabelForm\">$l_inout
+            <br />$l_both &nbsp;
+            <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\" $rb_both />
+            $l_client &nbsp;
+            <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
+            $l_fournisseur &nbsp;
+            <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
+          </td>
+          <td class=\"textLabelForm\">$l_deal
+            <br />
+            <input type=\"text\" name=\"tf_deal\" value=\"$deal\" />
+          </td>
+          <td class=\"textLabelForm\">$l_company
+            <br />
+            <input type=\"text\" name=\"tf_company\" value=\"$company\" />
+          </td>
+        </tr>
+        </table>
+        </td>
+      </tr>
+      </table>
+    </td>
+
+    <td class=\"textLabelForm\"> 
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+    </td>
+  </tr>
+  </table>
+
+  </form>
+  <hr />
 ";
 }
 
