@@ -109,7 +109,6 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 
   echo "
 
-
     <form method=\"get\" name=\"form_deal\"
     onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
     action=\"" . $sess->url("deal_index.php") . "\">
@@ -341,6 +340,43 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Parse and prepare the layout of a deal comment                            //
+// Separe comment in section displayed with different colors
+// The secion separator is a line beginning with "nnnn-nn-nn:aa:"
+// Parameters :
+//   - $com : comment text to handle
+///////////////////////////////////////////////////////////////////////////////
+function beautify_deal_comment($com) {
+
+  $col0 = "FFFFFF";
+  $col1 = "BBBBBB";
+
+  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:[A-Z]{2}:)/";
+  $replace = "</td>
+    </tr>
+    <tr>
+      <td bgcolor=\"#$col1\">\\2</td>
+    </tr><tr>
+      <td bgcolor=\"#$col0\">";
+
+  $res = preg_replace($pattern, $replace, $com, 1);
+  while (preg_match($pattern, $res)) {
+    $nb++;
+    $res = preg_replace($pattern, $replace, $res, 1);
+  }
+
+  $result .= "
+    <table border=1>
+    <tr>
+      <td>$res</td>
+    </tr>
+    </table>";
+
+  return $result;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HTML Display Contact Consult                                              //
 // Parameters :
 //   -  $deal_q    : DBO : information about the deal
@@ -352,7 +388,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $set_theme,$ico_company,$ico_contact, $ico_contact_list;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
+  global $l_company, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
   global $l_invoices_connected,$l_no_invoices_connected;
@@ -382,7 +418,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $timeu = timestamp_to_time($deal_q->f("datemodif"));
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
-  $com = nl2br($deal_q->f("deal_comment"));
+  $com = beautify_deal_comment(nl2br($deal_q->f("deal_comment")));
   $comp = $deal_q->f("company_name");
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
@@ -393,23 +429,27 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
                  <td class=\"detailText\">$lvis</td>";
   }
 
-    // contact 1
-    while($con_q->next_record()) {
-      if ($con_q->f("contact_id") == $con1)
-        $dis_con1 .=  $con_q->f("contact_lastname") . " " .
-                      $con_q->f("contact_firstname") . " - " . $con_q->f("contact_phone");
+  // contact 1
+  while($con_q->next_record()) {
+    if ($con_q->f("contact_id") == $con1) {
+      $dis_con1 .=  $con_q->f("contact_lastname") . " " .
+	$con_q->f("contact_firstname");
+      $dis_con1_tel = $con_q->f("contact_phone");
     }
+  }
 
-    // contact 2
-    if ($con_q->nf()>0) {  
-      $con_q->seek(0);
-    }
+  // contact 2
+  if ($con_q->nf()>0) {  
+    $con_q->seek(0);
+  }
 
-    while($con_q->next_record()) {
-      if ($con_q->f("contact_id") == $con2) 
-        $dis_con2 .= $con_q->f("contact_lastname")."
-                     ". $con_q->f("contact_firstname") .  " - " . $con_q->f("contact_phone");
+  while($con_q->next_record()) {
+    if ($con_q->f("contact_id") == $con2) {
+      $dis_con2 .=  $con_q->f("contact_lastname") . " " .
+	$con_q->f("contact_firstname");
+      $dis_con2_tel = $con_q->f("contact_phone");
     }
+  }
 
 
   $nb_invoices = $q_invoices->num_rows ();
@@ -450,85 +490,94 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 //////////////////////
 */
   echo "
+    <table>
+    <tr>
+      <td valign=\"top\">
       <table class=\"details\">
-        <tr>
-          <td colspan=\"2\" class=\"detailHead\">$l_company</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$comp&nbsp;&nbsp;          
-          <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-          <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
-          </td>
-          <td class=\"detailText\">$ad1<br/>$zip $town</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_contact 1&nbsp;&nbsp;
-          <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
-          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a></td>
-          <td class=\"detailText\">$dis_con1&nbsp;&nbsp;
-          </td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_contact 2&nbsp;&nbsp;
-          <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
-          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a></td>
-          <td class=\"detailText\">$dis_con2
-          </td>
-        </tr><tr>
-          <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_label</td>
-          <td class=\"detailText\">$label</td>
-          $visibility
-        </tr><tr>
-          <td class=\"detailLabel\">$l_number</td>
-          <td class=\"detailText\">$num</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_date_init</td>
-          <td class=\"detailText\">$datebegin</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_kind</td>
-          <td class=\"detailText\">$kind</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_category</td>
-          <td class=\"detailText\">$cat</td>
-        </tr><tr>
-        </tr><tr>
-          <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_marketing_manager</td>
-          <td class=\"detailText\">$market</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_technical_manager</td>
-          <td class=\"detailText\">$tech</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_proposition date</td>
-          <td class=\"detailText\">$datepro</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_amount</td>
-	  <td class=\"detailText\">$amount</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_date_alarm</td>
-	  <td class=\"detailText\">$datealarm</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_state</td>
-	  <td class=\"detailText\">$status</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_last_update</td>
-	  <td class=\"detailText\">$dateu</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_at</td>
-	  <td class=\"detailText\">$timeu</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_archive</td>
-	  <td class=\"detailText\">$archive</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_todo</td>
-	  <td class=\"detailText\">$todo</td>
-        </tr><tr>
-          <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
-        </tr><tr>
-	  <td colspan=\"2\" class=\"detailText\">$com</td>
-        </tr>
-        </table>
-      ";
+      <tr>
+        <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_label</td>
+        <td class=\"detailText\">$label</td>
+        $visibility
+      </tr><tr>
+        <td class=\"detailLabel\">$l_number</td>
+        <td class=\"detailText\">$num</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_date_init</td>
+        <td class=\"detailText\">$datebegin</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_kind</td>
+        <td class=\"detailText\">$kind</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_category</td>
+        <td class=\"detailText\">$cat</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_marketing_manager</td>
+        <td class=\"detailText\">$market</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_technical_manager</td>
+        <td class=\"detailText\">$tech</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_proposition date</td>
+        <td class=\"detailText\">$datepro</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_amount</td>
+        <td class=\"detailText\">$amount</td>
+      </tr>
+      </table>
+      </td>
+
+      <td>
+      <table class=\"details\">
+      <tr>
+        <td colspan=\"2\" class=\"detailHead\">$l_company</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$comp
+        <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        </td>
+        <td class=\"detailText\">$ad1<br/>$zip $town</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$dis_con1
+        <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
+        <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
+        </td>
+        <td class=\"detailText\">$dis_con1_tel
+        </td>
+      </tr><tr>
+        <td class=\"detailLabel\">$dis_con2
+        <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
+        <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
+        </td>
+        <td class=\"detailText\">$dis_con2_tel
+        </td>
+      </tr><tr>
+        <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_date_alarm</td>
+        <td class=\"detailText\">$datealarm</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_state</td>
+        <td class=\"detailText\">$status</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_last_update</td>
+        <td class=\"detailText\">$dateu $l_at $timeu</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_archive</td>
+        <td class=\"detailText\">$archive</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_todo</td>
+        <td class=\"detailText\">$todo</td>
+      </tr>
+      </table>
+      </td>
+    </tr><tr>
+      <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
+    </tr><tr>
+      <td colspan=\"2\" class=\"detailText\">$com</td>
+    </tr>
+    </table>";
 
   // we display invoices list
   if ($nb_invoices == 0) {
@@ -854,8 +903,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td class=\"detailLabel\">$l_category</td>
         <td>$sel_cat</td>
       </tr><tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
-      </tr><tr>
         <td class=\"detailLabel\">$l_marketing_manager</td>
         <td>$sel_market</td>
       </tr><tr>
@@ -867,6 +914,8 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       </tr><tr>
         <td class=\"detailLabel\">$l_proposition $l_amount</td>
         <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
+      </tr><tr>
+        <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_date_alarm</td>
         <td><input name=\"tf_datealarm\" type=\"text\" size=\"10\" value=\"$datealarm\" /></td>

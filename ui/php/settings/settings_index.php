@@ -144,10 +144,9 @@ $theme_dir->close();
 // HTML Display
 ///////////////////////////////////////////////////////////////////////////////
 echo "
-  <center>
-
 <!-- User preferences current config -------------------------------------- -->
 
+  <center>
   <form action=\"".$sess->url("settings_index.php")."\" method=get>
   <table border=1>
   <tr>
