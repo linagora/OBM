@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : agenda_index.php                                             //
 //     - Desc : Agenda Index File                                            //
-// created 2002-11-26 by Mehdi Rande                                     //
+// 2002-11-26 - Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,11 +21,10 @@
 // - update
 // - update_decision
 // - 
-
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$www ="   <p class=\"messageInfo\">
+$www = "   <p class=\"messageInfo\">
     	<a href=\"http://validator.w3.org/check/referer\"><img
         src=\"http://www.w3.org/Icons/valid-xhtml10\"
         alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
@@ -88,12 +87,13 @@ if ($action == "index") {
     dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
   }
 }
+
 elseif($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
   $conflict = run_query_insert_decision($agenda);
   if(count($conflict) == 0) {
     display_ok_msg($l_update_ok);  
-    $p_user_array =  array($auth->auth["uid"]);
+    $p_user_array = array($auth->auth["uid"]);
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
     $user_q = run_query_get_user_name($p_user_array);
     $user_obm = run_query_userobm();
@@ -105,13 +105,14 @@ elseif($action == "decision") {
     html_dis_conflict($agenda,$conflict,$agenda["id"],1);
   }
 }
+
 elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
   if(count($sel_user_id) != 0){
-    $p_user_array =  $sel_user_id;
+    $p_user_array = $sel_user_id;
   }
   else {
-    $p_user_array =  array($auth->auth["uid"]);
+    $p_user_array = array($auth->auth["uid"]);
   }
   $obm_q = run_query_day_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
@@ -134,10 +135,10 @@ elseif ($action == "view_week") {
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
  if(count($sel_user_id) != 0){
-    $p_user_array =  $sel_user_id;
+    $p_user_array = $sel_user_id;
   }
   else {
-    $p_user_array =  array($auth->auth["uid"]);
+    $p_user_array = array($auth->auth["uid"]);
   }
   $obm_q = run_query_month_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
@@ -147,10 +148,10 @@ elseif ($action == "view_month") {
 elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
   if(count($sel_user_id) != 0){
-    $p_user_array =  $sel_user_id;
+    $p_user_array = $sel_user_id;
   }
   else {
-    $p_user_array =  array($auth->auth["uid"]);
+    $p_user_array = array($auth->auth["uid"]);
   }
   $obm_q = run_query_year_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
@@ -163,20 +164,21 @@ elseif ($action == "new") {
   $user_obm = run_query_userobm();
   $cat_event = run_query_get_eventcategories();
   if(count($sel_user_id) != 0){
-    $p_user_array =  $sel_user_id;
+    $p_user_array = $sel_user_id;
   }
   else {
-    $p_user_array =  array($auth->auth["uid"]);
+    $p_user_array = array($auth->auth["uid"]);
   }
   $user_obm = run_query_userobm();  
   dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
 }
+
 elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if(check_data_form($agenda)){    
+  if (check_data_form($agenda)){    
     $conflict = run_query_add_event($agenda,$sel_user_id,$event_id);
-    if(count($conflict) == 0) {
-      $p_user_array =  array($auth->auth["uid"]);
+    if (count($conflict) == 0) {
+      $p_user_array = array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -191,7 +193,7 @@ elseif ($action == "insert") {
     else{
       display_err_msg($l_insert_error);
       html_dis_conflict($agenda,$conflict,'',0);
-      $p_user_array =  array($auth->auth["uid"]);
+      $p_user_array = array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -206,8 +208,9 @@ elseif ($action == "insert") {
     dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
   }
 }
+
 elseif ($action == "insert_conflict") {
-///////////////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////////////
   run_query_manage_conflict($agenda);  
   $p_user_array =  array($auth->auth["uid"]);
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -215,9 +218,8 @@ elseif ($action == "insert_conflict") {
   $user_obm = run_query_userobm();
   display_ok_msg($l_insert_ok);
   dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
-  
-
 }
+
 elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
@@ -293,11 +295,12 @@ elseif ($action == "update_decision") {
     html_dis_conflict($agenda,$conflict,$agenda["id"],1);
   }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-
 function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
   global $set_start_time, $set_stop_time,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
@@ -529,5 +532,3 @@ function get_agenda_action() {
 display_end();
 
 ?>
-
-

@@ -8,15 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the year
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    $agenda: agenda parameters
-//    $obm_q_events : list of event's records 
-//    $contacts_array : array of selected contacts 
-//    $groups_array : array of selected groups 
+// Parameters:
+//   - $agenda: agenda parameters
+//   - $obm_q_events : list of event's records 
+//   - $contacts_array : array of selected contacts 
+//   - $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
@@ -202,17 +200,15 @@ echo "
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-// Display the planning for the month
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    $agenda: agenda parameters
-//    $obm_q_events : list of event's records 
-//    $contacts_array : array of selected contacts 
-//    $groups_array : array of selected groups 
-///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the planning for the month
+// Parameters:
+//   - $agenda: agenda parameters
+//   - $obm_q_events : list of event's records 
+//   - $contacts_array : array of selected contacts 
+//   - $groups_array : array of selected groups 
+///////////////////////////////////////////////////////////////////////////////
 function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default,$l_daysofweek;
@@ -590,7 +586,6 @@ echo "
 //    $contacts_array : array of selected contacts 
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-
 function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_start_time, $set_stop_time,$set_time_unit;
@@ -754,18 +749,19 @@ echo "
 ";
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the navigation bar
 // Parameters:
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
-  global $set_theme,$ico_spacer,$l_go_to,$l_user_calendar;
+  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar;
   global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate;
+  global $action;
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
-
 
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
@@ -830,7 +826,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
       $sel_month .= "$select_month</option>\n";
     }
     $month_time = strtotime ("+1 month", $month_time);
-}
+  }
 
 // Year Selection
 
@@ -848,6 +844,12 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 }
 
 // User Selection
+  if ( ($action != "view_day") && ($action != "view_week") &&
+       ($action != "view_month") && ($action != "view_year") )
+    $new_action = "view_week";
+  else
+    $new_action = $action;
+
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\">";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
@@ -868,8 +870,10 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     
     $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
   } 
-  $dis_sel_user .= "</select><br />";
-  $dis_sel_user .= "<input type=\"submit\" value=\"$l_validate\" />";
+  $dis_sel_user .= "</select>
+    <br />
+    <input type=\"hidden\" name=\"action\" value=\"view_week\" />
+    <input type=\"submit\" value=\"$l_validate\" />";
 
 
 // Minicalendar Head
@@ -1083,7 +1087,7 @@ echo "
 //    $contacts_array : array of selected contacts 
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
+function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
@@ -1301,7 +1305,6 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
   $dis_min_e .= "</select>";  
   
       
-    
   // --- HTML Template --------------------------------------------------------
   echo "
   <form method=\"get\" name=\"f_mod_calendar\"
@@ -1450,7 +1453,7 @@ function html_waiting_events($obm_wait) {
   }
 
 
-    // --- HTML Template --------------------------------------------------------
+  // --- HTML Template --------------------------------------------------------
   echo "
    <table class=\"details\">
     <tr>
@@ -1468,7 +1471,7 @@ function html_waiting_events($obm_wait) {
     $dis_waiting_events
    </table>
   ";
-  }
+}
  
  
 ///////////////////////////////////////////////////////////////////////////////
