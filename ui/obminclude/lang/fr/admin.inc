@@ -13,7 +13,6 @@ $l_version = "version d'OBM";
 $l_database_server = "Serveur SQL";
 $l_database = "Base de données";
 $l_session_stats = "Statistiques des Sessions";
-$l_session = " Entrées dans ActiveSessions";
 $l_user_session = " Entrées dans ActiveUserObm";
 $l_active_user = "Utilisateurs actuellement actifs";
 $l_last_acces = "Date de login";

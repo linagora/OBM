@@ -34,10 +34,9 @@ function dis_index($mode) {
     echo "try -h to help\n";
     break;
   case "html":
-    $nb_ses = get_session_number();
     $nb_user_ses = get_usersession_number();
     $obm_u = run_query_active_user($time_active_session);
-    html_admin_status($nb_ses, $nb_user_ses, $obm_u);
+    html_admin_status( $nb_user_ses, $obm_u);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -52,7 +51,7 @@ function dis_index($mode) {
 //   - $nb_user_ses : user session number
 //   - $obm_u       : DBO : List of Active User Session
 ///////////////////////////////////////////////////////////////////////////////
-function html_admin_status($nb_ses, $nb_user_ses, $obm_u) {
+function html_admin_status( $nb_user_ses, $obm_u) {
   global $col_textem, $col_a_table, $col_a_tableh, $col_a_text, $l_help;
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
   global $l_session_stats, $l_session, $l_user_session, $l_active_user, $l_last_acces,$l_nb_connec,$sess;
@@ -116,11 +115,6 @@ function html_admin_status($nb_ses, $nb_user_ses, $obm_u) {
     <TR ALIGN=center> 
       <TD COLSPAN=5 bgcolor=\"#$col_a_tableh\">
       <font color=\"#$col_textem\">&nbsp;$l_session_stats&nbsp;</font></TD>
-    </TR><TR ALIGN=center> 
-      <TD COLSPAN=3 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_session</font></TD>
-      <TD COLSPAN=2 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$nb_ses</font></TD>
     </TR><TR ALIGN=center> 
       <TD COLSPAN=3 bgcolor=\"#$col_a_table\">
       <font color=\"#$col_a_text\">$l_user_session</font></TD>

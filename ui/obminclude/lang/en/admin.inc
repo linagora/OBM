@@ -13,7 +13,6 @@ $l_version = "OBM version";
 $l_database_server = "Database Engine";
 $l_database = "Database";
 $l_session_stats = "Sessions Statistics";
-$l_session = " Entries in ActiveSessions";
 $l_user_session = " Entries in ActiveUserObm";
 $l_active_user = "Active users";
 $l_last_acces = "Last login date";

@@ -30,25 +30,6 @@ function run_query_count_passive_sess($delay) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the number of Web session (rows in ActiveSessions)                    //
-// Returns:
-//   - number of Web session
-///////////////////////////////////////////////////////////////////////////////
-function get_session_number() {
-  global $cdg_sql;
-
-  $query = "select count(*) from ActiveSessions";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  return $obm_q->f("count(*)");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Get the number of User session (rows in ActiveUserObm)                    //
 // Returns:
 //   - number of user session

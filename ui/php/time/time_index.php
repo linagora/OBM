@@ -164,8 +164,8 @@ elseif ($action == "modify") {
     run_query_modify($time,$sel_date);
     echo "
     <Script language=\"javascript\">
-     window.opener.location.href='/time/time_index.php?action=index&amp;param_begin=".
-     $param_begin."&amp;param_end=".$param_end."&amp;user_id=".$user_id."';
+     window.opener.location.href='/time/time_index.php?action=index&param_begin=".
+     $param_begin."&param_end=".$param_end."&user_id=".$user_id."';
      window.close();
     </script>
     ";
