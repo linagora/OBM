@@ -12,6 +12,7 @@ $l_number = "Numéro";
 $l_name = "Nom";
 $l_company_name = "Nom Société";
 $l_kind = "Type";
+$l_activity = "Secteur d'activité";
 $l_market = "Responsable du compte";
 $l_company_kind = "Type Société";
 $l_address = "Adresse";
@@ -37,6 +38,9 @@ $l_kind_manage = "Gestion des Types de Société";
 $l_kind_exist = "Types existants";
 $l_kind_new = "Nouveau Type";
 $l_internal = "Interne";
+$l_act_manage = "Gestion des secteurs d'activité";
+$l_act_exist = "Secteurs d'activités existants";
+$l_act_new = "Nouveau secteur d'activité";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -51,6 +55,7 @@ $fieldnames["company_email"] = $l_email;
 $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
 $fieldnames["companytype_label"] = $l_kind;
+$fieldnames["companyactivity_label"] = $l_activity;
 $fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact_list\" alt=\"C\" />";
 $fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
 $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal_list\" alt=\"D\" />";
@@ -69,6 +74,10 @@ $l_kind_update = "Modifier le Type";
 $l_kind_checkdelete = "Vérifier ou Supprimer le Type";
 $l_kind_delete = "Supprimer le Type";
 $l_kind_insert = "Créer le Type";
+$l_act_update = "Modifier le secteur d'activité";
+$l_act_checkdelete = "Vérifier ou Supprimer le secteur d'activité";
+$l_act_delete = "Supprimer le secteur d'activité";
+$l_act_insert = "Créer le secteur d'activité";
 $l_confirm = "Confirmer l'action";
 $l_select_company = "Sélectionner la société";
 
@@ -104,6 +113,16 @@ $l_kind_link_company = "Ces sociétés sont du type";
 $l_kind_link_company_no = "Pas de sociétés du type";
 $l_kind_cant_delete = "Le type ne peut être supprimé !";
 $l_kind_can_delete = "Le type peut être supprimé.";
+$l_act_delete_ok = "La suppression du secteur d'activité a été correctement effectuée.";
+$l_act_delete_error = "La suppression du secteur d'activité a échoué !";
+$l_act_insert_ok = "L'insertion du secteur d'activité a été correctement effectuée.";
+$l_act_insert_error = "L'insertion du secteur d'activité a échoué !";
+$l_act_update_ok = "La modification du secteur d'activité a été correctement effectuée";
+$l_act_update_error = "La modification du secteur d'activité a échoué !";
+$l_act_link_company = "Ces sociétés sont du secteur d'activité";
+$l_act_link_company_no = "Pas de sociétés du secteur d'activité";
+$l_act_cant_delete = "Le secteur d'activité ne peut être supprimé !";
+$l_act_can_delete = "Le secteur d'activité peut être supprimé.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_delete_confirm = "Really delete the company ?";
@@ -117,6 +136,9 @@ $l_j_check_web = "L'adresse web n'est pas valide.";
 $l_j_kind_delete = "Sélectionnez un type pour le vérifier ou supprimer !";
 $l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
 $l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
+$l_j_act_delete = "Sélectionnez un secteur d'activité pour le vérifier ou supprimer !";
+$l_j_act_update = "Vous devez sélectionner un secteur d'activité et entrer une modification avant de valider !";
+$l_j_act_create = "Vous devez saisir un nom de secteur d'activité pour le créer !";
 $l_j_select_company = "Vous devez sélectionner une société !";
 
 // For the display preferences modification screen 

@@ -128,13 +128,14 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_upd(form,formd)
 {
-   form.sel_kind.value=formd.sel_kind.options[formd.sel_kind.selectedIndex].value;
-   if ((formd.sel_kind.selectedIndex >= 0) && (form.tf_kind_upd.value != \"\"))
-      return true;
-   else {
-      alert(\"$l_j_kind_update\");
-      return false;
-   }
+  kind_pos = formd.sel_kind.selectedIndex;
+  if ((kind_pos >= 0) && (form.tf_kind_upd.value != \"\")) {
+    form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_kind_update\");
+    return false;
+  }
 }
 ";
 
@@ -152,6 +153,58 @@ function check_kind_new(form)
       return false;
    }
 }
+";
+
+echo "
+///////////////////////////////////////////////////////////////////////////////
+// Check if the activity check or deletion is possible                       //
+///////////////////////////////////////////////////////////////////////////////
+function check_act_checkdel(form)
+{
+   if (form.sel_act.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_act_delete\");
+      return false;
+   }
+}
+";
+
+echo "
+///////////////////////////////////////////////////////////////////////////////
+// Check if the activity update is possible                                  //
+///////////////////////////////////////////////////////////////////////////////
+function check_act_upd(form,formd)
+{
+  act_pos = formd.sel_act.selectedIndex;
+  if ((act_pos >= 0) && (form.tf_act_upd.value != \"\")) {
+    form.sel_act.value=formd.sel_act.options[act_pos].value;
+    return true;
+   } else {
+     alert(\"$l_j_act_update\");
+     return false;
+   }
+}
+";
+
+echo "
+///////////////////////////////////////////////////////////////////////////////
+// Check if the activity creation is possible                                //
+///////////////////////////////////////////////////////////////////////////////
+function check_act_new(form)
+{
+   if (form.tf_act_new.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_act_create\");
+      return false;
+   }
+}
+
 
 // -->
 </script>

@@ -12,6 +12,7 @@ $l_number = "Numero";
 $l_name = "Nome";
 $l_company_name = "Nome Azienda";
 $l_kind = "Tipo";
+$l_activity = "Activita";
 $l_company_kind = "Tipo Azienda";
 $l_address = "Indirizzo";
 $l_postcode = "CAP";
@@ -38,6 +39,9 @@ $l_deal_new = "New Deal";
 $l_kind_manage = "Azienda Tipo Management";
 $l_kind_exist = "Tipi esistente";
 $l_kind_new = "Nuovo Tipo";
+$l_act_manage = "Azienda Activita Management";
+$l_act_exist = "Activita esistente";
+$l_act_new = "Nuova Activita";
 $l_internal = "Interno";
 
 //------------------------------------//
@@ -53,6 +57,7 @@ $fieldnames["company_email"] = $l_email;
 $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
 $fieldnames["companytype_label"] = $l_kind;
+$fieldnames["companyactivity_label"] = $l_activity;
 $fieldnames["company_contact_number"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_list\" ALT=C>";
 $fieldnames["company_new_contact"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_new\" ALT=NC>";
 $fieldnames["company_deal_number"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_deal_list\" ALT=D>";
@@ -71,6 +76,10 @@ $l_kind_update = "Aggiorna Tipo";
 $l_kind_checkdelete = "Controlla o Elimina Tipo";
 $l_kind_delete = "Elimina Tipo";
 $l_kind_insert = "Inserisci Tipo";
+$l_act_update = "Aggiorna Activita";
+$l_act_checkdelete = "Controlla o Elimina Activita";
+$l_act_delete = "Elimina Activita";
+$l_act_insert = "Inserisci Activita";
 $l_confirm = "Conferma azione";
 $l_select_company = "Seleziona Azienda";
 
@@ -106,6 +115,16 @@ $l_kind_link_company = " Aziende legate a  ";
 $l_kind_link_company_no = "Azienda non legata";
 $l_kind_cant_delete = "Tipo non eliminabile.";
 $l_kind_can_delete = "Tipo eliminabile.";
+$l_act_insert_ok = "Activita inserita.";
+$l_act_insert_error = "Inserimento activita fallito !";
+$l_act_delete_ok = "Activita eliminata.";
+$l_act_delete_error = "Eliminazione activita fallita !";
+$l_act_update_ok = "Activita modificata.";
+$l_act_update_error = "Modifica activita fallito !";
+$l_act_link_company = " Aziende legate a  ";
+$l_act_link_company_no = "Azienda non legata";
+$l_act_cant_delete = "Activita non eliminabile.";
+$l_act_can_delete = "Activita eliminabile.";
 
 // Java Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_delete_confirm = "Conferma eliminazione  Azienda ?";
@@ -118,6 +137,9 @@ $l_j_check_web = " Indirizzo  Web non  valido.";
 $l_j_kind_delete = "Scegli un tipo da controllare o eliminare !";
 $l_j_kind_update = "Scegli un tipo e inserisci il nuovo nome per la modifica !";
 $l_j_kind_create = "Inserisci nuovo tipo per crearlo  !";
+$l_j_act_delete = "Scegli una activita da controllare o eliminare !";
+$l_j_act_update = "Scegli una activita e inserisci il nuovo nome per la modifica !";
+$l_j_act_create = "Inserisci nuova activita per crearla !";
 $l_j_select_company = "Scegli  Azienda !";
 
 // For the display parameters modification screen

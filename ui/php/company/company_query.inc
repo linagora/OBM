@@ -23,30 +23,50 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $name = $company["name"];
   $phone = $company["phone"];
   $kind = $company["kind"];
+  $act = $company["activity"];
   $market = $company["marketing_manager"];
   $zip = $company["zip"];
 
-  $req = "select Company.*, company_id as Id, companytype_label
-          from Company, CompanyType 
-          where company_type_id=companytype_id";
+  $req = "select Company.*,
+      company_id as Id,
+      companytype_label,
+      companyactivity_label
+    from (Company
+         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id)
+         LEFT JOIN CompanyType on company_type_id=companytype_id";
 
+  $and = "";
   if ($name != "") {
-     $req .= " and company_name like '$name%'";
+    $where .= " company_name like '$name%'";
+    $and = "and";
   }
   if (($kind != $c_all) && ($kind != "")) { 
-     $req .= " and company_type_id='$kind'";
+    $where .= " $and company_type_id='$kind'";
+    $and = "and";
+  }
+  if (($act != $c_all) && ($act != "")) { 
+    $where .= " $and company_activity_id='$act'";
+    $and = "and";
   }
   if (($market != $c_all) && ($market != "")) { 
-     $req .= " and company_marketingmanager_id='$market'";
+    $where .= " $and company_marketingmanager_id='$market'";
+    $and = "and";
   }
   if ($phone != "") {
-     $req .= " and company_phone like '$phone%'";
+    $where .= " $and company_phone like '$phone%'";
+    $and = "and";
   }
   if ($zip != "") {
-     $req .= " and company_zipcode like '$zip%'";
+    $where .= " $and company_zipcode like '$zip%'";
+    $and = "and";
   }
   if ($state == 1) {
-     $req .= " and company_state=1";
+    $where .= " $and company_state=1";
+    $and = "and";
+  }
+
+  if ($where != "") {
+    $where = " where $where";
   }
 
   // ORDER construction
@@ -57,7 +77,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $order = "company_name";
   }
 
-  $req .= " order by $order $p_order_dir";
+  $req .= "$where order by $order $p_order_dir";
 
   display_debug_msg($req, $cdg_sql);
   $obm_db = new DB_OBM;
@@ -80,7 +100,9 @@ function run_query_detail($p_id) {
     $query = "select *,
         DATE_FORMAT(company_timeupdate,'$l_datetime_format') as timeupdate,
         DATE_FORMAT(company_timecreate,'$l_datetime_format') as timecreate
-      from Company where company_id='$p_id'";
+      from (Company LEFT JOIN CompanyType on company_type_id=companytype_id)
+           LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+      where company_id='$p_id'";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select *,company_timeupdate as timeupdate, company_timecreate as timecreate from Company where company_id=".$p_id;
   }
@@ -107,6 +129,7 @@ function run_query_insert($company) {
   $state = ($company["state"] == 1 ? 1 : 0);
   $name = $company["name"];
   $kind = $company["kind"];
+  $act = $company["activity"];
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -128,6 +151,7 @@ function run_query_insert($company) {
     company_state,
     company_name,
     company_type_id,
+    company_activity_id,
     company_marketingmanager_id,
     company_address1,
     company_address2,
@@ -148,6 +172,7 @@ function run_query_insert($company) {
     '$state',
     '$name',
     '$kind',
+    '$act',
     '$market',
     '$ad1',
     '$ad2',
@@ -184,6 +209,7 @@ function run_query_update($cid, $company) {
   $state = ($company["state"] == 1 ? 1 : 0);
   $name = $company["name"];
   $kind = $company["kind"];
+  $act = $company["activity"];
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -204,6 +230,7 @@ function run_query_update($cid, $company) {
     company_state='$state',
     company_name='$name',
     company_type_id='$kind',
+    company_activity_id='$act',
     company_marketingmanager_id='$market',
     company_address1='$ad1',
     company_address2='$ad2',
@@ -332,7 +359,7 @@ function run_query_check_company($p_id, $name, $zip) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// type company query execution                                              //
+// Kind company query execution                                              //
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -440,6 +467,115 @@ function run_query_kind_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Activity company query execution                                          //
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_companyactivity() {
+  global $cdg_sql;
+
+  $query = "select * from CompanyActivity order by companyactivity_label"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Activity insertion query construction and execution                       //
+// Parameters:
+//   - $label : Activity label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_activity_insert($label) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+
+  $query = "insert into CompanyActivity (
+      companyactivity_timecreate,
+      companyactivity_usercreate,
+      companyactivity_label)
+    values (
+      '$timecreate',
+      '$usercreate',
+      '$label')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Activity update query execution                                           //
+// Parameters:
+//   - $label     : label to set
+//   - $label_old : Activity label to update
+///////////////////////////////////////////////////////////////////////////////
+function run_query_activity_update($label, $label_old) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+
+  $query = "update CompanyActivity set
+      companyactivity_label='$label',
+      companyactivity_timeupdate='$timeupdate',
+      companyactivity_userupdate='$userupdate'
+    where
+      companyactivity_label='$label_old'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Activity deletion query execution                                         //
+// Parameters:
+//   - $label : Activity label to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_activity_delete($label) {
+  global $cdg_sql;
+
+  $query = "delete from CompanyActivity where companyactivity_label='$label'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Activity - Company links query execution                                  //
+// Parameters:
+//   - $p_id : activity id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_activity_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select company_name, company_id, company_activity_id
+    from Company where company_activity_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the Id of a Kind from its label                                       //
 // Parameters:
 //   - $label : label
@@ -455,6 +591,27 @@ function get_kind_id($label) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("companytype_id");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the Id of an Activity from its label                                  //
+// Parameters:
+//   - $label : label
+///////////////////////////////////////////////////////////////////////////////
+function get_activity_id($label) {
+  global $cdg_sql;
+
+  $query = "select companyactivity_id
+    from CompanyActivity where companyactivity_label='$label'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("companyactivity_id");
   return $retour;
 }
 

@@ -222,14 +222,11 @@ $admin_pref_admin_write	= $admins_admin_read + $admins_admin_write;
 $perm_user   =  $com_read + $prod_read + $users_read ;
 $perm_editor =  $com_read + $prod_read + $users_read + $com_write +
 	        $prod_write + $users_write;
-$perm_admin  =  $com_read + $prod_read + $compta_read + $users_read +
-  	        $com_write + $prod_write + $compta_write + $users_write +
-  	        $com_admin_read + $prod_admin_read + $compta_admin_read +
-  	        $users_admin_read + $com_admin_write + $prod_admin_write +
-  	        $compta_admin_write + $users_admin_write + $admins_read	+
-  	        $admins_write + $admins_admin_read + $admins_admin_write +
-            $time_admin_read + $time_admin_write;
-
+$perm_admin = $com_read + $com_write + $com_admin_read + $com_admin_write +
+      $prod_read + $prod_write + $prod_admin_read + $prod_admin_write +
+      $compta_read + $compta_write + $compta_admin_read + $compta_admin_write +
+      $users_read + $users_write + $users_admin_read + $users_admin_write +
+      $admins_read + $admins_write + $admins_admin_read + $admins_admin_write;
 
 // Debug Constants
 $cdg_id = 1;     // id display

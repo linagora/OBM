@@ -93,8 +93,9 @@ display_bookmarks();
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
+  $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
-  html_company_search_form($type_q, $usr_q, $company);
+  html_company_search_form($type_q, $act_q, $usr_q, $company);
   if ($set_display == "yes") {
     dis_company_search_list($company);
   } else {
@@ -103,23 +104,26 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
+  $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
-  html_company_search_form($type_q, $usr_q, $company);
+  html_company_search_form($type_q, $act_q, $usr_q, $company);
   dis_company_search_list($company);
+
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
+  $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
   require("company_js.inc");
-  html_company_form($action,"",$type_q, $usr_q, $company);
+  html_company_form($action,"",$type_q, $act_q, $usr_q, $company);
+
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_company > 0) {
     $obm_q_soc = run_query_detail($param_company);
     if ($obm_q_soc->num_rows() == 1) {
-      $obm_q_type = run_query_companytype();
       display_record_info($obm_q_soc->f("company_usercreate"),$obm_q_soc->f("company_userupdate"),$obm_q_soc->f("timecreate"),$obm_q_soc->f("timeupdate")); 
-      html_company_consult($obm_q_soc, $obm_q_type);
+      html_company_consult($obm_q_soc);
     } else {
       display_err_msg($l_query_error . " - " . $obm_q_soc->query . " !");
     }
@@ -131,10 +135,11 @@ if ($action == "index" || $action == "") {
     $comp_q = run_query_detail($param_company);
     if ($comp_q->num_rows() == 1) {
       $type_q = run_query_companytype();
+      $act_q = run_query_companyactivity();
       $usr_q = run_query_userobm();
       require("company_js.inc");
       display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
-      html_company_form($action, $comp_q, $type_q, $usr_q, $company);
+      html_company_form($action, $comp_q, $type_q, $act_q, $usr_q, $company);
     } else {
       display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -152,8 +157,9 @@ if ($action == "index" || $action == "") {
         display_err_msg($l_insert_error);
       }
       $type_q = run_query_companytype();
+      $act_q = run_query_companyactivity();
       $usr_q = run_query_userobm();
-      html_company_search_form($type_q, $usr_q, $company);
+      html_company_search_form($type_q, $act_q, $usr_q, $company);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
       $obm_q = check_company_context("", $company);
@@ -167,8 +173,9 @@ if ($action == "index" || $action == "") {
           display_err_msg($l_insert_error);
         }
         $type_q = run_query_companytype();
+	$act_q = run_query_companyactivity();
         $usr_q = run_query_userobm();
-        html_company_search_form($type_q, $usr_q, $company);
+        html_company_search_form($type_q, $act_q, $usr_q, $company);
       }
     }
 
@@ -176,10 +183,10 @@ if ($action == "index" || $action == "") {
   } else {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_companytype();
+    $act_q = run_query_companyactivity();
     $usr_q = run_query_userobm();
-    html_company_form($action, "", $type_q, $usr_q, $company);
+    html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
   }
-
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,15 +197,15 @@ if ($action == "index" || $action == "") {
     } else {
       display_err_msg($l_update_error);
     }
-    $obm_q_type = run_query_companytype();
     $obm_q_soc = run_query_detail($param_company);
     display_record_info($obm_q_soc->f("company_usercreate"),$obm_q_soc->f("company_userupdate"),$obm_q_soc->f("timecreate"),$obm_q_soc->f("timeupdate")); 
-    html_company_consult($obm_q_soc, $obm_q_type);
+    html_company_consult($obm_q_soc);
   } else {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_companytype();
+    $act_q = run_query_companyactivity();
     $usr_q = run_query_userobm();
-    html_company_form($action, "", $type_q, $usr_q, $company);
+    html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -214,15 +221,16 @@ if ($action == "index" || $action == "") {
   } else {
     display_err_msg($l_delete_error);
   }
-
   $type_q = run_query_companytype();
+  $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
-  html_company_search_form($type_q, $usr_q, $company);
+  html_company_search_form($type_q, $act_q, $usr_q, $company);
+
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-   $obm_q_type = run_query_companytype();
-   require("company_js.inc");
-   html_company_kind_form($obm_q_type);
+  require("company_js.inc");
+  dis_admin_index();
+
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_insert($tf_kind_new);
@@ -231,11 +239,8 @@ if ($action == "index" || $action == "") {
   } else {
     display_err_msg($l_kind_insert_error);
   }
-
-  // Affichage admin
-  $obm_q_type = run_query_companytype();
   require("company_js.inc");
-  html_company_kind_form($obm_q_type);
+  dis_admin_index();
 
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -245,19 +250,14 @@ if ($action == "index" || $action == "") {
   } else {
     display_err_msg($l_kind_update_error);
   }
-  // Affichage admin
-  $obm_q_type = run_query_companytype();
   require("company_js.inc");
-  html_company_kind_form($obm_q_type);
+  dis_admin_index();
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_kind_links($sel_kind);
-
-  // Affichage admin
-  $obm_q_type = run_query_companytype();
   require("company_js.inc");
-  html_company_kind_form($obm_q_type);
+  dis_admin_index();
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -267,11 +267,48 @@ if ($action == "index" || $action == "") {
   } else {
     display_err_msg($l_kind_delete_error);
   }
-
-  // Affichage admin
-  $obm_q_type = run_query_companytype();
   require("company_js.inc");
-  html_company_kind_form($obm_q_type);
+  dis_admin_index();
+
+} elseif ($action == "activity_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_activity_insert($tf_act_new);
+  if ($retour) {
+    display_ok_msg($l_act_insert_ok);
+  } else {
+    display_err_msg($l_act_insert_error);
+  }
+  require("company_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "activity_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_activity_update($tf_act_upd, $sel_act);
+  if ($retour) {
+    display_ok_msg($l_act_update_ok);
+  } else {
+    display_err_msg($l_act_update_error);
+  }
+  require("company_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "activity_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  dis_activity_links($sel_act);
+  require("company_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "activity_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_activity_delete($hd_act_label);
+  if ($retour) {
+    display_ok_msg($l_act_delete_ok);
+  } else {
+    display_err_msg($l_act_delete_error);
+  }
+  require("company_js.inc");
+  dis_admin_index();
+
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
@@ -296,7 +333,7 @@ if ($action == "index" || $action == "") {
 function get_param_company() {
   global $tf_num, $cb_state, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
-  global $sel_market, $ta_com, $param_company;
+  global $sel_act, $sel_market, $ta_com, $param_company;
   global $cdg_param;
 
   if (isset ($param_company)) $company["id"] = $param_company;
@@ -304,6 +341,7 @@ function get_param_company() {
   if (isset ($cb_state)) $company["state"] = $cb_state;
   if (isset ($tf_name)) $company["name"] = $tf_name;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
+  if (isset ($sel_act)) $company["activity"] = $sel_act;
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
   if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
   if (isset ($tf_ad2)) $company["ad2"] = $tf_ad2;
@@ -328,17 +366,17 @@ function get_param_company() {
   return $company;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Company Action 
 ///////////////////////////////////////////////////////////////////////////////
-
 function get_company_action() {
   global $company, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
   global $company_read, $company_write, $company_admin_read, $company_admin_write;
-//Index
 
+// Index
   $actions["COMPANY"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/company/company_index.php?action=index",
@@ -346,75 +384,66 @@ function get_company_action() {
     'Condition'=> array ('all') 
                                     	 );
 
-//Search
-
+// Search
   $actions["COMPANY"]["search"] = array (
     'Url'      => "$path/company/company_index.php?action=search",
     'Right'    => $company_read,
     'Condition'=> array ('None') 
                                     	 );
 
-//New
-
+// New
   $actions["COMPANY"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=new",
     'Right'    => $company_write,
-    'Condition'=> array ('search','index','detailconsult','admin','display') 
+    'Condition'=> array ('search','index','detailconsult','update','admin','display') 
                                      );
 
-//Detail Consult
-
+// Detail Consult
   $actions["COMPANY"]["detailconsult"]  = array (
     'Url'      => "$path/company/company_index.php?action=detailconsult",
     'Right'    => $company_write,
     'Condition'=> array ('None') 
                                      		 );
 
-//Detail Update
-
+// Detail Update
   $actions["COMPANY"]["detailupdate"] = array (
     'Name'     => $l_header_modify,
     'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
     'Right'    => $company_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 
-//Insert
-
+// Insert
   $actions["COMPANY"]["insert"] = array (
     'Url'      => "$path/company/company_index.php?action=insert",
     'Right'    => $company_write,
     'Condition'=> array ('None') 
                                      	 );
 
-//Update
-
+// Update
   $actions["COMPANY"]["update"] = array (
     'Url'      => "$path/company/company_index.php?action=update",
     'Right'    => $company_write,
     'Condition'=> array ('None') 
                                      	 );
 
-//Check Delete
-
+// Check Delete
   $actions["COMPANY"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
     'Right'    => $company_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 
-//Delete
-
+// Delete
   $actions["COMPANY"]["delete"] = array (
     'Url'      => "$path/company/company_index.php?action=delete",
     'Right'    => $company_write,
     'Condition'=> array ('None') 
                                      	 );
 
-//Admin
-
+// Admin
   $actions["COMPANY"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/company/company_index.php?action=admin",
@@ -422,40 +451,35 @@ function get_company_action() {
     'Condition'=> array ('all') 
                                        );
 
-//Kind Insert
-
+// Kind Insert
   $actions["COMPANY"]["kind_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_insert",
     'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	     );
 
-//Kind Update
-
+// Kind Update
   $actions["COMPANY"]["kind_update"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_insert",
     'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	      );
 
-//Kind Check Link
-
+// Kind Check Link
   $actions["COMPANY"]["kind_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_checklink",
     'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      		);
 
-//Kind Delete
-
+// Kind Delete
   $actions["COMPANY"]["kind_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_delete",
     'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	       );
 
-//Display
-
+// Display
   $actions["COMPANY"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/company/company_index.php?action=display",
@@ -463,15 +487,14 @@ function get_company_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-//Display Préférences
-
+// Display Préférences
   $actions["COMPANY"]["dispref_display"] = array (
     'Url'      => "$path/company/company_index.php?action=dispref_display",
     'Right'    => $company_read,
     'Condition'=> array ('None') 
                                      		 );
 
-//Display Level
+// Display Level
   $actions["COMPANY"]["dispref_level"]  = array (
     'Url'      => "$path/company/company_index.php?action=dispref_level",
     'Right'    => $company_read,

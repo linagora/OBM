@@ -411,7 +411,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $datepro = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
   $amount = $deal_q->f("deal_amount");
   $con1 = $deal_q->f("deal_contact1_id");
+  $dis_con1 = $deal_q->f("lnamec1") . " " . $deal_q->f("fnamec1");
+  $phone_con1 = $deal_q->f("phonec1");
   $con2 = $deal_q->f("deal_contact2_id");
+  $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
+  $phone_con2 = $deal_q->f("phonec2");
   $datealarm = $deal_q->f("datealarm");
   $status = $deal_q->f("dealstatus_label");
   $dateu = timestamp_to_date($deal_q->f("datemodif"));
@@ -423,34 +427,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
   $town = $deal_q->f("company_town");
- 
+
   if ($usercreate == $auth->auth["uid"]) {   
    $visibility = "<tr><td class=\"detailLabel\">$l_visibility</td>
                  <td class=\"detailText\">$lvis</td>";
   }
-
-  // contact 1
-  while($con_q->next_record()) {
-    if ($con_q->f("contact_id") == $con1) {
-      $dis_con1 .=  $con_q->f("contact_lastname") . " " .
-	$con_q->f("contact_firstname");
-      $dis_con1_tel = $con_q->f("contact_phone");
-    }
-  }
-
-  // contact 2
-  if ($con_q->nf()>0) {  
-    $con_q->seek(0);
-  }
-
-  while($con_q->next_record()) {
-    if ($con_q->f("contact_id") == $con2) {
-      $dis_con2 .=  $con_q->f("contact_lastname") . " " .
-	$con_q->f("contact_firstname");
-      $dis_con2_tel = $con_q->f("contact_phone");
-    }
-  }
-
 
   $nb_invoices = $q_invoices->num_rows ();
 
@@ -484,7 +465,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     echo "<br><br><font color=\"#$col_link\">".
       $nb_arch_invoices." ".$l_archived_invoices_connected.
       "</font>";
-  }else { echo "et merde...";  //}
+  } else { echo "probleme...";  //}
 //////////////////////
 //FIN LIENS EXTERNES//
 //////////////////////
@@ -543,14 +524,14 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
         <a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
-        <td class=\"detailText\">$dis_con1_tel
+        <td class=\"detailText\">$phone_con1
         </td>
       </tr><tr>
         <td class=\"detailLabel\">$dis_con2
         <a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
-        <td class=\"detailText\">$dis_con2_tel
+        <td class=\"detailText\">$phone_con2
         </td>
       </tr><tr>
         <td colspan=\"2\" class=\"detailHead\">$l_infos</td>

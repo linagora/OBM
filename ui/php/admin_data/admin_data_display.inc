@@ -149,10 +149,13 @@ function dis_data_company($action, $mode) {
       <tr>
         <th>Company ($nb_comp)</th>
         <th colspan=2># Contact</th>
-        <th colspan=2># Deal</th>
+        <th colspan=2># Deal Active</th>
+        <th colspan=2># Deal Total</th>
         $update
       </tr><tr>
         <th>Id</th>
+        <th>field</th>
+        <th>calculated</th>
         <th>field</th>
         <th>calculated</th>
         <th>field</th>
@@ -167,25 +170,30 @@ function dis_data_company($action, $mode) {
     $id = $c_q->f("company_id");
     $con_num = $c_q->f("company_contact_number");
     $deal_num = $c_q->f("company_deal_number");
+    $deal_total = $c_q->f("company_deal_total");
 
     $new_con_num = get_company_contact_number($id);
     $new_deal_num = get_company_active_deal_number($id);
+    $new_deal_total = get_company_total_deal_number($id);
 
-    if (($con_num != $new_con_num) || ($deal_num != $new_deal_num)) {
+    if ( ($con_num != $new_con_num) || ($deal_num != $new_deal_num)
+         || ($deal_total != $new_deal_total) ) {
       $cpt_cu++;
       if ($mode == "txt") {
-	echo "\nCompany (id=$id) : Contact ($con_num, $new_con_num) : Deal ($deal_num, $new_deal_num)";
+	echo "\nCompany (id=$id) : Contact ($con_num, $new_con_num) : Deal ($deal_num, $new_deal_num) : Deal total ($deal_total, $new_deal_total)";
       } else {
 	echo "<tr>
           <td>$id</td>
           <td>$con_num</td>
           <td>$new_con_num</td>
           <td>$deal_num</td>
-          <td>$new_deal_num</td>";
+          <td>$new_deal_num</td>
+          <td>$deal_total</td>
+          <td>$new_deal_total</td>";
       }
 
       if ($action == "data_update") {
-	$retour = update_one_company($id, $new_con_num, $new_deal_num);
+	$retour = update_one_company($id, $new_con_num, $new_deal_num, $new_deal_total);
 	if ($retour) {
 	  if ($mode == "txt") {
 	    echo "OK";
@@ -211,7 +219,7 @@ function dis_data_company($action, $mode) {
       if ($mode =="txt") {
 	echo ".";
       } else {
-	echo "<tr><th colspan=6 align=center>$cpt_c</th></tr>";
+	echo "<tr><th colspan=8 align=center>$cpt_c</th></tr>";
 	flush();
       }
     }

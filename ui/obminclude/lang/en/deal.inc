@@ -78,6 +78,8 @@ $fieldnames["deal_label"] = $l_label;
 $fieldnames["deal_datealarm"] = $l_date_alarm;
 $fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
+$fieldnames["deal_marketingmanager"] = $l_marketing_manager;
+$fieldnames["deal_amount"] = $l_amount;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields

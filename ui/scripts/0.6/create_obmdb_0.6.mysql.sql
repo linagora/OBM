@@ -143,11 +143,15 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_label',1,2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_company_name',2,2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','dealtype_label',3,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_tasktype_label',4,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','dealstatus_label',5,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_todo',6,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_datealarm',7,2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_company_zipcode',3,2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','dealtype_label',4,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','tasktype_label',5,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','dealstatus_label',6,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_marketingmanager',7,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_amount',8,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_archive',9,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_todo',10,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_datealarm',11,2);
 
 -- module 'parentdeal'
 
@@ -262,7 +266,7 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 -------------------------------------------------------------------------------
 -- Company module tables
 -------------------------------------------------------------------------------
----- 
+-- 
 -- Table structure for table 'CompanyType'
 --
 CREATE TABLE CompanyType (
@@ -273,6 +277,20 @@ CREATE TABLE CompanyType (
   companytype_usercreate int(8),
   companytype_label char(12),
   PRIMARY KEY (companytype_id)
+);
+
+
+-- 
+-- Table structure for table 'CompanyActivity'
+--
+CREATE TABLE CompanyActivity (
+  companyactivity_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  companyactivity_timeupdate timestamp(14),
+  companyactivity_timecreate timestamp(14),
+  companyactivity_userupdate int(8),
+  companyactivity_usercreate int(8),
+  companyactivity_label varchar(64),
+  PRIMARY KEY (companyactivity_id)
 );
 
 
@@ -289,6 +307,7 @@ CREATE TABLE Company (
   company_state int(2) DEFAULT '0',
   company_name varchar(50) DEFAULT '' NOT NULL,
   company_type_id int(8),
+  company_activity_id int(8),
   company_marketingmanager_id int(8),
   company_address1 varchar(64),
   company_address2 varchar(64),
@@ -302,6 +321,7 @@ CREATE TABLE Company (
   company_email varchar(64),
   company_contact_number int(5) DEFAULT '0' NOT NULL,
   company_deal_number int(5) DEFAULT '0' NOT NULL,
+  company_deal_total int(5) DEFAULT '0' NOT NULL,
   company_comment text,
   PRIMARY KEY (company_id)
 );

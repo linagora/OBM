@@ -206,6 +206,7 @@ function display_menus($section) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_tabs($section) {
   global $menus, $auth, $perm;
+  global $perm_admin;
 
   echo "
         <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
@@ -224,7 +225,7 @@ function display_tabs($section) {
       }
     }
   }
-     echo "
+  echo "
           <!-- Remplissage apres tabs -->
 	  <td class=\"sectionsfilling\">
             <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sectionsfilling\">

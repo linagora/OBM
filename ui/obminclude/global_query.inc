@@ -590,13 +590,35 @@ function get_company_active_deal_number($id) {
   $retour = $obm_q->f("count(deal_id)");
   return $retour;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the company total deal number
+// Parameters:
+//   - $id : deal id
+///////////////////////////////////////////////////////////////////////////////
+function get_company_total_deal_number($id) {
+  global $cdg_sql;
+
+  $query = "select count(deal_id) from Deal
+            where deal_company_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("count(deal_id)");
+  return $retour;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the configuration variable in the database this variable could be set
 // in the administration module.
 // Parameters:
 //   - none   
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_config_var() {
   global $cdg_sql;
 

@@ -11,16 +11,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels and texts
+$l_number = "Nummer";
+$l_name = "Name";
 $l_company_name = "Firma";
+$l_kind = "Firmenart";
+$l_activity = "Activity";
+$l_market = "Marketing manager";
 $l_company_kind = "Firmenart";
 $l_postcode = "Postleitzahl";
-$l_mailing_first = "M";
-$l_name = "Name";
 $l_contact_first = "K";
 $l_newcontact_first = "NK";
 $l_listdoc_first = "D";
 $l_newdoc_first = "ND";
-$l_kind = "Firmenart";
 $l_address = "Adresse";
 $l_postcode_first = "PLZ";
 $l_expresspostal = "Eilzustellung";
@@ -36,7 +38,27 @@ $l_kind_manage = "Verwaltung Firmenart";
 $l_kind_exist = "Vorhandene Firmenarten";
 $l_kind_new = "Neue Firmenart";
 $l_internal = "Intern";
-$l_number_soc = "Nummer";
+$l_act_manage = "Company Activity Management";
+$l_act_exist = "Existing Activities";
+$l_act_new = "New Activity";
+
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["company_name"] = $l_name;
+$fieldnames["company_address1"] = $l_address;
+$fieldnames["company_address2"] = $l_address;
+$fieldnames["company_phone"] = $l_phone;
+$fieldnames["company_fax"] = $l_fax;
+$fieldnames["company_email"] = $l_email;
+$fieldnames["company_web"] = $l_web;
+// Calculated or indirect fields
+$fieldnames["companytype_label"] = $l_kind;
+$fieldnames["companyactivity_label"] = $l_activity;
+$fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact_list\" alt=\"C\" />";
+$fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
+$fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal_list\" alt=\"D\" />";
 
 // Titres
 $l_company_detail = "Firmen-Daten";
@@ -50,11 +72,13 @@ $l_company_admin = "Firma verwalten";
 $l_insert = "anlegen Firma";
 $l_update = "‰ndern Firma";
 $l_delete = "lˆschen Firma";
-$l_mailing_update = "‰ndern Mailing";
-$l_mailing_reset = "zur¸cksetzen Mailing";
 $l_kind_update = "‰ndern Firmenart";
 $l_kind_delete = "lˆschen Firmenart";
 $l_kind_insert = "anlegen Firmenart";
+$l_act_update = "Update Activity";
+$l_act_checkdelete = "Check or Delete Activity";
+$l_act_delete = "Delete Activity";
+$l_act_insert = "Insert Activity";
 
 // Messages
 $l_company_del_verif_error = " es sind noch Vertr‰ge zugeordnet: Firma kann nicht gelˆscht werden";
@@ -66,18 +90,23 @@ $l_insert_ok = "Firma angelegt.";
 $l_insert_error = "Fehler bei Neuanlage der Firma!";
 $l_update_ok = "Firmendaten ge‰ndert.";
 $l_update_error = "Fehler bei ƒnderung der Firmendaten!";
-$l_mailing_ok = "Mailing ge‰ndert.";
-$l_mailing_nb = "Firmen f¸r Mailing vorgemerkt.";
-$l_mailing_error = "Fehler beim Eintrag Mailing f¸r Firma ";
-$l_mailing_reset_error = "Fehler beim Reset des Mailing!";
-$l_mailing_reset_ok = "Reset des Mailing erfolgt.";
 $l_kind_insert_ok = "Firmenart angelegt.";
 $l_kind_insert_error = "Fehler bei Neuanlage Firmenart!";
 $l_kind_delete_ok = "Firmenart gelˆscht.";
 $l_kind_delete_error = "Fehler beim Lˆschen der Firmenart!";
 $l_kind_update_ok = "Firmenart ge‰ndert.";
 $l_kind_update_error = "Fehler bei ƒnderung Firmenart!";
-$l_kind_del_verif_error = " mehrere(?) Firmenart vorhanden!";
+$l_kind_cant_delete = " mehrere(?) Firmenart vorhanden!";
+$l_act_delete_ok = "Activity has been deleted successfully.";
+$l_act_delete_error = "Activity deletion has failed !";
+$l_act_insert_ok = "Activity has been inserted successfully.";
+$l_act_insert_error = "Activity insertion has failed !";
+$l_act_update_ok = "Activity has been updated successfully.";
+$l_act_update_error = "Activity update has failed !";
+$l_act_link_company = "These companies are referenced as";
+$l_act_link_company_no = "No company from activity";
+$l_act_cant_delete = "Activity can't be deleted !";
+$l_act_can_delete = "Activity can be deleted.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "\\n Firmenname muﬂ eingetragen sein.";

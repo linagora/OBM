@@ -43,12 +43,14 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
      company_zipcode as deal_company_zipcode,
      tasktype_label,
      dealstatus_label,
+     userobm_lastname as deal_marketingmanager,
      DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
-  from Deal, DealType, TaskType, Company, DealStatus
+  from Deal, DealType, TaskType, Company, DealStatus, UserObm
   where deal_type_id=dealtype_id
      and tasktype_id=deal_tasktype_id
      and deal_company_id=company_id
-     and deal_status_id=dealstatus_id";
+     and deal_status_id=dealstatus_id
+     and deal_marketingmanager_id=UserObm.userobm_id";
 
   if ($all == 0) {
     $query .= " and (deal_visibility=0
@@ -126,14 +128,19 @@ function run_query_detail($id) {
         company_name, company_address1, company_zipcode, company_town,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+        c1.contact_lastname as lnamec1, c1.contact_firstname as fnamec1,
+        c1.contact_phone as phonec1, c2.contact_phone as phonec2,
+        c2.contact_lastname as lnamec2, c2.contact_firstname as fnamec2,
         DATE_FORMAT(deal_datebegin,'$l_date_format') as datebegin,
         DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm,
         DATE_FORMAT(deal_timeupdate,'$l_datetime_format') as datemodif,
         DATE_FORMAT(deal_timeupdate,'$l_datetime_format') as timeupdate,
         DATE_FORMAT(deal_timecreate,'$l_datetime_format') as timecreate
       from
-        (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
-              left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
+        (((Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
+           left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id)
+           left join Contact c1 on deal_contact1_id=c1.contact_id)
+           left join Contact c2 on deal_contact2_id=c2.contact_id,
          DealType, TaskType, DealStatus, Company
       where deal_id='$id'
         and dealtype_id=deal_type_id
@@ -255,7 +262,12 @@ function run_query_insert($deal) {
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($retour) && ($archive == '0')) {
-    run_query_company_deal_inc($comp);
+    run_query_company_active_deal_inc($comp);
+  }
+
+  // we increment the company total deal number
+  if ($retour) {
+    run_query_company_total_deal_inc($comp);
   }
 
   return $retour;
@@ -322,9 +334,9 @@ function run_query_update($deal) {
   // If deal archive state has changed, update the company deal number
   if (($retour) && ($archive != $archive_old)) {
     if ($archive == '1') {
-      run_query_company_deal_dec($comp);
+      run_query_company_active_deal_dec($comp);
     } else {
-      run_query_company_deal_inc($comp);
+      run_query_company_active_deal_inc($comp);
     }
   }
 
@@ -384,6 +396,8 @@ function run_query_deal_id($deal) {
   $obm_q->next_record();
   return  $obm_q->f("deal_id");
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Delete query construction                                                 //
 // Parameters:
@@ -393,11 +407,15 @@ function run_query_delete($id) {
   global $cdg_sql;
 
   $archive = get_deal_archive($id);
+  $comp_id = get_deal_company_id($id);
+
   // If deal archive state is off (0), update the company deal number
   if ($archive == '0') {
-    $comp_id = get_deal_company_id($id);
-    run_query_company_deal_dec($comp_id);
+    run_query_company_active_deal_dec($comp_id);
   }
+
+  // update the company total deal number
+  run_query_company_total_deal_dec($comp_id);
 
   $query = "delete from Deal where deal_id='$id'";
 
@@ -492,11 +510,11 @@ function run_query_contact_deal($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company deal number increment                           //
+// Query Execution - Company active deal number increment                    //
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_deal_inc($comp_id) {
+function run_query_company_active_deal_inc($comp_id) {
   global $cdg_sql;
 
   $query = "update Company
@@ -511,15 +529,53 @@ function run_query_company_deal_inc($comp_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company deal number decrement                           //
+// Query Execution - Company active deal number decrement                    //
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_deal_dec($comp_id) {
+function run_query_company_active_deal_dec($comp_id) {
   global $cdg_sql;
 
   $query = "update Company
               set company_deal_number=company_deal_number-1
+              where company_id='$comp_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Company total deal number increment
+// Parameters:
+//   - $comp_id : company id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_company_total_deal_inc($comp_id) {
+  global $cdg_sql;
+
+  $query = "update Company
+              set company_deal_total=company_deal_total+1
+              where company_id='$comp_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Company total deal number decrement                     //
+// Parameters:
+//   - $comp_id : company id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_company_total_deal_dec($comp_id) {
+  global $cdg_sql;
+
+  $query = "update Company
+              set company_deal_total=company_deal_total-1
               where company_id='$comp_id'";
 
   display_debug_msg($query, $cdg_sql);

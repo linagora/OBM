@@ -219,12 +219,13 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_upd(form,formd)
 {
-   form.sel_kind.value=formd.sel_kind.options[formd.sel_kind.selectedIndex].value;
-   if ((formd.sel_kind.selectedIndex >= 0) && (form.tf_kind.value != \"\"))
-      return true;
-   else {
-      alert(\"$l_j_kind_update\");
-      return false;
+  kind_pos = formd.sel_kind.selectedIndex;
+  if ((kind_pos >= 0) && (form.tf_kind.value != \"\")) {
+    form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
+    return true;
+   } else {
+     alert(\"$l_j_kind_update\");
+     return false;
    }
 }
 ";
@@ -236,13 +237,14 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 function check_status_upd(form,formd)
 {
-   form.sel_state.value=formd.sel_state.options[formd.sel_state.selectedIndex].value;
-   if ((formd.sel_state.selectedIndex >= 0) && (form.tf_status.value != \"\"))
-      return true;
-   else {
-      alert(\"$l_j_status_update\");
-      return false;
-   }
+  status_pos = formd.sel_state.selectedIndex;
+  if ((status_pos >= 0) && (form.tf_status.value != \"\")) {
+    form.sel_state.value=formd.sel_state.options[status_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_status_update\");
+    return false;
+  }
 }
 ";
 
@@ -253,13 +255,13 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 function check_category_upd(form,formd)
 {
-
-   form.sel_cat.value=formd.sel_cat.options[formd.sel_cat.selectedIndex].value;
-   if ((formd.sel_cat.selectedIndex >= 0) && (form.tf_cat.value != \"\"))
-      return true;
-   else {
-      alert(\"$l_j_category_update\");
-      return false;
+  cat_pos = formd.sel_cat.selectedIndex;
+  if ((cat_pos >= 0) && (form.tf_cat.value != \"\")) {
+    form.sel_cat.value=formd.sel_cat.options[cat_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_category_update\");
+    return false;
    }
 }
 ";

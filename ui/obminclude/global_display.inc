@@ -100,7 +100,7 @@ class OBM_DISPLAY {
     global $l_displayed, $l_order, $l_field, $l_move, $l_mandatory;
     global $l_display_no, $l_display_yes, $l_down, $l_up;
     // Images
-    global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_round, $ico_forbidden;
+    global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
     global $sess, $fieldnames;
     
     $nb_field = $this->display_pref->nf() - 1;
@@ -140,20 +140,20 @@ class OBM_DISPLAY {
       $display = $this->display_pref->f("display_display");
       echo "
           <tr>
-            <td class=\"OBMDisplayText\">";
+            <td class=\"OBMDisplayTextCentered\">";
       if ($display == 1) {
 	echo "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
-        <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_round\" /></a>";
+        <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_ball\" /></a>";
       } else if ($display == 0) {
 	$nb_field_hidden++;
-	echo "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
+	echo "<a class=\"OBMDisplayTextCentered\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
           <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
       } else if($display == 2) {
 	echo "<img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
       }
       echo "
             </td>
-            <td class=\"OBMDisplayText\">
+            <td class=\"OBMDisplayTextCentered\">
               ";
       if($display == 0) {
 	echo "&nbsp;";
@@ -163,7 +163,7 @@ class OBM_DISPLAY {
       }
       echo "
              </td>
-            <td class=\"OBMDisplayText\">
+            <td class=\"OBMDisplayTextCentered\">
                    ".$fieldnames[$fieldname]."
             </td>
             <td class=\"OBMDisplayText\">
@@ -210,7 +210,7 @@ class OBM_DISPLAY {
     global $col_tableh,$col_textem,$col_table;
     global $l_help, $l_help_display_yes, $l_help_display_no, $l_help_mandatory, $l_help_down, $l_help_up;
     // Images
-    global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_round, $ico_forbidden;
+    global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
 
     echo "<hr />
       <table class=\"OBMDisplayPref\">
@@ -220,7 +220,7 @@ class OBM_DISPLAY {
       </tr>
       <tr>
         <td class=\"OBMDisplayLabel\">
-          <img src=\"/images/$set_theme/$ico_round\" alt=\"\" />
+          <img src=\"/images/$set_theme/$ico_ball\" alt=\"\" />
         </td>
         <td class=\"OBMDisplayText\">
           $l_help_display_yes
@@ -269,7 +269,7 @@ class OBM_DISPLAY {
     global $col_textem, $col_table, $col_tableh,$col_error,$col_text_hot;
     global $col_frs, $col_client,$col_balance_pos, $col_balance_neg,$col_text_redhot;
     global $l_minimphone, $l_minihphone,$col_inc_redhot,$col_inc_hot,$col_inc_closed;
-    global $set_theme,$ico_mail,$ico_contact_list,$ico_contact_new,$ico_web,$ico_round, $ico_crow, $set_rows;
+    global $set_theme,$ico_mail,$ico_contact_list,$ico_contact_new,$ico_web,$ico_ball, $ico_crow, $set_rows;
     global $auth, $sess, $cdg_id, $set_debug;
     global $time;
 
@@ -331,9 +331,11 @@ class OBM_DISPLAY {
       while ($this->display_pref->next_record()) {
 	$name = "";
 	$url = "";
-	$target = "";
+	$popup = false;
+	$popup_width = 600;
+	$popup_height = 400;
 	$ico = "";
-	$align="left";
+	$align = "left";
 	$fieldname = $this->display_pref->f("display_fieldname");
 
         //=====================================================================
@@ -386,13 +388,15 @@ class OBM_DISPLAY {
           $align = "center";
         }
         else if ($fieldname == "company_new_contact") {
+          $align = "center";
 	  $url = "../contact/contact_index.php?action=new&amp;param_company=".$this->data_set->f("company_id");
           $name = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
         }
         else if ($fieldname == "company_deal_number") {
-	  $name = $this->data_set->f("company_deal_number");
+	  $name = $this->data_set->f("company_deal_number") . " / ";
+	  $name .= $this->data_set->f("company_deal_total");
 	  $c_id = $this->data_set->f("company_id");
-	  if ($name > 0) {
+	  if ($name != "0 / 0") {
 	    $url = "../deal/deal_index.php?action=search&amp;param_company=$c_id";
 	  }
           $align = "center";
@@ -649,10 +653,9 @@ class OBM_DISPLAY {
 	}
 
 
-
 	//For Image scan (crow or round):
 	if($fieldname == "service_status") {
-	  $name = ($this->data_set->f($fieldname) == 1) ? "<img border=0 src=\"/images/$set_theme/$ico_round\">" : "<img border=0 src=\"/images/$set_theme/$ico_crow\">";
+	  $name = ($this->data_set->f($fieldname) == 1) ? "<img border=0 src=\"/images/$set_theme/$ico_ball\">" : "<img border=0 src=\"/images/$set_theme/$ico_crow\">";
 	  $align = "center";
 	}
 
@@ -687,10 +690,13 @@ class OBM_DISPLAY {
         //------------------------------
         // For the time management
         //------------------------------
-        else if ($fieldname == "task_id" && $this->data_set->f("task_status")==0) { //make the popup timemanagement modification variable
-	   $popup_display = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
-	   $name = "<img border=0 src=\"/images/$set_theme/modify.png\">";
-           $url="./time_index.php?action=index&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
+        else if (($fieldname == "task_id")
+                  && ($this->data_set->f("task_status")==0) ) {
+	  $popup = true;
+	  $popup_width = 970;
+	  $popup_height = 270;
+	  $url = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
+	  $name = "<img border=0 src=\"/images/$set_theme/modify.png\">";
 	}
 	else if ($fieldname == "task_id")
            $name = " ";
@@ -705,39 +711,34 @@ class OBM_DISPLAY {
 	//   $td = "<td align=\"$align\" bgcolor=\"#$col_table\">";
 	// }
 
-	if ($align == "centrer") {
+	// Set the alignment
+	if ($align == "center") {
 	  $td = "<td class=\"OBMDisplayTextCentered\">";
 	} else {
 	  $td = "<td class=\"OBMDisplayText\">";
 	}
         $content = "";
 	
-	if($popup_display!="") { //make the popup link for timemanagement modification
-	  $content ="&nbsp;<a class=\"OBMDisplayText\" href=\"\" OnClick=\"window.name='root';window.open('$popup_display','',config='height=270,width=970,scrollbar=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
-	  if ($name == "") {
-	     $content .= $this->data_set->f($fieldname);
-	  } else {
-	     $content .= $name;
-	 }
-	 $content .= "</a>";
+	// Pre cell display (open popup, link)
+	if ($popup) {
+	  $content = "<a class=\"OBMDisplayText\" href=\"\" OnClick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbar=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	} else if ($url != "") {
+	  $content = "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url")."\">";
 	}
-	else {
-	if ($url != "") {
-	  $content .= "&nbsp;<a class=\"OBMDisplayText\" href=\"".url_prepare("$url")."\">";
-	  if ($name == "") { 
-	    $content .= $this->data_set->f($fieldname);
-	  } else {
-	    $content .= $name;
-	  }
-	  $content .= "</a>";
+	
+	// Cell display
+	if ($name == "") {
+	  $content .= $this->data_set->f($fieldname);
 	} else {
-	  if ($name != "") {
-	    $content .= $name."&nbsp;";
-	  } else {
-	    $content .= $this->data_set->f($fieldname) . "&nbsp;";
-	  }
+	  $content .= $name;
 	}
-      }
+	
+	// Post cell display (close link, popup)
+	if ($popup || ($url != "")) {
+	  $content .= "</a>";
+	}
+	
+	// Cell writing
 	echo "$td $content </td>\n";
       }
       
@@ -754,13 +755,12 @@ class OBM_DISPLAY {
       $this->display_pref->seek(0);
       echo "</tr>";
       $special_col_table="";
-      $popup_display="";
     }
 
     //--------------------------------------------------------
     // Data Set end : if header set to both, display an header
     //--------------------------------------------------------
-    if($this->data_header == "both") {
+    if ($this->data_header == "both") {
       $this->dis_data_header($this->data_url);
     }
     echo "</table>";

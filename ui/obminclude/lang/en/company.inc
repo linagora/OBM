@@ -12,6 +12,7 @@ $l_number = "Number";
 $l_name = "Name";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
+$l_activity = "Activity";
 $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
 $l_address = "Address";
@@ -27,7 +28,6 @@ $l_email = "E-Mail";
 $l_coord = "Details";
 
 // Labels and texts
-$l_mailing_first = "M";
 $l_listdoc_first = "D";
 $l_newdoc_first = "ND";
 $l_comment = "Comment";
@@ -39,6 +39,9 @@ $l_kind_manage = "Company Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";
 $l_internal = "Internal";
+$l_act_manage = "Company Activity Management";
+$l_act_exist = "Existing Activities";
+$l_act_new = "New Activity";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -53,6 +56,7 @@ $fieldnames["company_email"] = $l_email;
 $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
 $fieldnames["companytype_label"] = $l_kind;
+$fieldnames["companyactivity_label"] = $l_activity;
 $fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact_list\" alt=\"C\" />";
 $fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
 $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal_list\" alt=\"D\" />";
@@ -65,12 +69,14 @@ $l_insert = "Insert the Company";
 $l_update = "Update the Company";
 $l_checkdelete = "Check or Delete the Company";
 $l_delete = "Delete the Company";
-$l_mailing_update = "Update Mailing";
-$l_mailing_reset = "Reset Mailing";
 $l_kind_update = "Update Kind";
 $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
 $l_kind_insert = "Insert Kind";
+$l_act_update = "Update Activity";
+$l_act_checkdelete = "Check or Delete Activity";
+$l_act_delete = "Delete Activity";
+$l_act_insert = "Insert Activity";
 $l_confirm = "Confirm the action";
 $l_select_company = "Select the Company";
 
@@ -87,9 +93,6 @@ $l_check_samecompany = "These companies seem similar to this new entry !";
 $l_update_ok = "The company has been updated successfully.";
 $l_update_error = "The update of the company has failed !";
 $l_query_error = "Critical trouble during the execution of the query.";
-$l_mailing_ok = "The mailing has been updated successfully.";
-$l_mailing_nb = "companies registered in the mailing.";
-$l_mailing_reset_ok = "The reset of the mailing has been completed successfully.";
 $l_link_deal = "The company is involved in these deals";
 $l_link_deal_no = "The company isn't involved in any deal";
 $l_link_contact = "These contacts are from this company";
@@ -106,6 +109,16 @@ $l_kind_link_company = "These companies are referenced as";
 $l_kind_link_company_no = "No company referenced as";
 $l_kind_cant_delete = "The Kind can't be deleted !";
 $l_kind_can_delete = "The Kind can be deleted.";
+$l_act_delete_ok = "Activity has been deleted successfully.";
+$l_act_delete_error = "Activity deletion has failed !";
+$l_act_insert_ok = "Activity has been inserted successfully.";
+$l_act_insert_error = "Activity insertion has failed !";
+$l_act_update_ok = "Activity has been updated successfully.";
+$l_act_update_error = "Activity update has failed !";
+$l_act_link_company = "These companies are referenced as";
+$l_act_link_company_no = "No company from activity";
+$l_act_cant_delete = "Activity can't be deleted !";
+$l_act_can_delete = "Activity can be deleted.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_delete_confirm = "Really delete the company ?";
@@ -118,6 +131,9 @@ $l_j_check_web = "The web adress is not valid.";
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";
 $l_j_kind_create = "You have to enter a new kind name to create it !";
+$l_j_act_delete = "You have to select an activity to check or delete it !";
+$l_j_act_update = "You have to select an activity and enter a new name to update it !";
+$l_j_act_create = "You have to enter a new activity name to create it !";
 $l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen
