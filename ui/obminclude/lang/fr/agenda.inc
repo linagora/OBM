@@ -91,6 +91,33 @@ $l_thursday="Jeudi";
 $l_friday="Vendredi";
 $l_saturday="Samedi";
 $l_sunday="Dimanche";
+$l_go_to = "Aller à";
+$l_tomorrow_event ="Evenements de demain";
+$l_daysofweek = array (	'Dimanche',
+			'Lundi',
+			'Mardi',
+			'Mercredi',
+			'Jeudi',
+			'Vendredi',
+			'Samedi');
+$l_daysofweekshort = array (	'Dim',
+				'Lun',
+				'Mar',
+				'Mer',
+				'Jeu',
+				'Ven',
+				'Sam');
+
+$l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
+
+$l_monthsofyear = array (	'Janvier','Février',
+				'Mars','Avril','Mai',
+				'Juin','Juillet','Août',
+				'Septembre','Octobre','Novembre',
+				'Décembre');
+$l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
+			      'juil','aoû','sep','oct','nov','déc');
+
 
 $l_short_monday="Lun";
 $l_short_tuesday="Mar";

@@ -49,7 +49,7 @@ $l_help_up = "Monter le champ d'un cran";
 //used by many modules
 // days and months
 $l_january="Janvier";
-$l_february="F&eacute;vrier";
+$l_february="Février";
 $l_march="Mars";
 $l_april="Avril";
 $l_may="Mai";
@@ -145,9 +145,10 @@ $l_header_index     = "Accueil";
 $l_header_help = "Aide";
 $l_header_pref_update = "Réinitialiser les préférences utilisateur";
 
-	$l_header_day = "Jour";
+$l_header_day = "Jour";
 $l_header_week = "Semaine";
 $l_header_month = "Mois";
+$l_header_year = "Année";
 $l_header_new_event = "Nouveau rdv";
 
 //TIME

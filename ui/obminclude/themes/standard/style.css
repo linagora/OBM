@@ -547,26 +547,6 @@ table.agenda		{
 	color:			#ffff00;
 }
 
-
-td.agendaText		{
-	font-family:		sans-serif;
-	font-size:		14px;
-	font-weight:		bold;
-	color:			#000000;
-	text-align:		center;
-	background-color:	#ffffff;
-}
-
-td.agendaVide		{
-	font-family:		sans-serif;
-	font-size:		14px;
-	font-weight:		bold;
-	color:			#000000;
-	text-align:		center;
-	background-color:	#bbbbbb;
-}
-
-
 table.agendaMain	{
         margin-left:		auto;
 	margin-right:		auto;
@@ -575,6 +555,56 @@ table.agendaMain	{
 	background-color:	transparent;
 	color:			#000000;
 }
+
+table.agendaCal		{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+	border: 		1px #a1a5a9 solid; 
+}
+
+table.agendaMonth	{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#a1a5a9;
+	border: 		0; 
+}
+
+
+table.agendaYear	{
+        background-color:      #cccccc;
+}
+
+td.agendaMonthReg	{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+ 	text-align: 		center; 
+	vertical-align: 	top;
+	border: 		0; 
+
+}
+
+td.agendaMonthOff	{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#f4f4f4;
+ 	text-align: 		center; 
+	vertical-align: 	top;
+	border: 		0; 
+
+}
+
+td.agendaMonthOn	{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#fdf8b9;
+ 	text-align: 		center; 
+	vertical-align: 	top;
+	border: 		0; 
+
+}
+
 
 td.agendaHead		{
 	text-align:		center;
@@ -587,69 +617,101 @@ td.agendaHead		{
 }
 
 
-.eventborder	{ background-color: #336699; border: 1px #006699 solid; }
+td.agendaVide		{
+	font-family:		sans-serif;
+	font-size:		14px;
+	font-weight:		bold;
+	color:			#000000;
+	text-align:		center;
+	background-color:	#ffffff;
+        border-top: 		1px dashed #a1a4a8;
+        border-right: 		1px solid #a1a4a8;
+}
+
+
+td.agendaHour		{
+	font-family:		sans-serif;
+	font-size:		14px;
+	color:			#000000;
+	text-align:		center;
+	vertical-align:		middle;
+	background-color:	#ffffff;
+        border-top: 		1px dashed #a1a4a8;
+        border-right: 		2px solid #a1a4a8;
+	background-image:	url(time_bg.gif);
+	width:			60px;
+}
+
+
+td.agendaCell		{
+        margin-left:		auto;
+	margin-right:		auto;
+	width:			auto;
+	background-color: 	#eeeeee;
+  	vertical-align:		top;
+	text-align:		center;
+}
+
+
+td.agendaCell2		{
+        margin-left:		auto;
+	margin-right:		auto;
+	width:			auto;
+	background-color: 	transparent;
+  	vertical-align:		top;
+	text-align:		right;
+}
+
+td.agendaHead2		{
+ 	background-image: 	url(side_bg.gif); 
+ 	text-align: 		center; 
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		11px;
+	font-weight: 		900;
+	}
+	
+td.agendaEventHead	{ 
+        background-color:       #336699;
+	border:                 1px #a1a4a8 solid; 
+	}
+
+.agendaEventBg2  	{ 
+        background-color:       #6699CC;
+        border-right:            1px solid #FFFFFF; }
+
+select.agendaQuery 	{ 
+	font-size:		11px; 
+	font-family: 		sans-serif;
+	width:                  156px; 
+	margin-bottom:          0;
+}
+
+
+
+a.agendaLink		{ text-decoration:	none; }
+a.agendaLink:link	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: transparent; }
+a.agendaLink:visited	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: transparent; }
+a.agendaLink:active	{ font-family: sans-serif; font-size: 11px;color: #3366cc; background-color: transparent; }
+a.agendaLink:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: transparent; }
+
+a.agendaLink2		{ text-decoration:	none; }
+a.agendaLink2:link	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+a.agendaLink2:visited	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+a.agendaLink2:active	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+a.agendaLink2:hover	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+
+a.agendaLink3		{ text-decoration:	none; }
+a.agendaLink3:link	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: #ffcc00; }
+a.agendaLink3:visited	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: #ffcc00; }
+a.agendaLink3:active	{ font-family: sans-serif; font-size: 11px;color: #3366cc background-color:  #ffcc00; }
+a.agendaLink3:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: #ffcc00; }
+
+.agendaEventHead	{ background-color: #336699; border: 1px #006699 solid; }
 .eventbg 	{ background-color: #6699CC; }
 .eventbg2  	{ background-color: #6699CC; border-right: 1px solid #FFFFFF; }
 .eventbg2week 	{ background-color: #6699CC; border-right: 1px solid #A1A5A9; }
-.calborder 	{ background-color: #FFFFFF; border: 1px #A1A5A9 solid; }
-.dateback	{ background-color: #EEEEEE; }
-.dayborder 	{ border-top: 1px solid #A1A5A9; }
-.dayborder2 	{ border-top: 1px dashed #CCCCCC; }
-.weekborder 	{ border-top: 1px dashed #A1A5A9; border-right: 1px solid #A1A5A9; }
-.weekborder2 	{ border-right: 1px solid #A1A5A9; }
-.timeborder 	{ border-right: 2px solid #A1A5A9; border-top: 1px dashed #A1A5A9; background-image: url(time_bg.gif); }
-.timeborder2 	{ border-right: 2px solid #A1A5A9; border-top: 1px solid #A1A5A9; background-image: url(time_bg.gif); }
-.navback 	{ background-image: url(time_bg.gif); }
-.sideback 	{ background-image: url(side_bg.gif); }
-.monthback	{ background-color: #A1A5A9; }
-.monthreg	{ background-color: #FFFFFF; }
-.monthoff	{ background-color: #F2F2F2; }
-.monthon	{ background-color: #F2F9FF; }
 .montheventtop	{ background-image: url(side_bg.gif); border-top: 1px solid #A1A5A9; }
 .montheventline	{ border-right: 1px dotted #A1A5A9; }
-.yearmonth		{ background: #CCCCCC; }
-
-/* Link colors and attributes */
-/* This is the main link style */
-a.psf		{ text-decoration:	none; }
-a.psf:link	{ color: #0066FF; background-color: transparent; }
-a.psf:visited	{ color: #0066FF; background-color: transparent; }
-a.psf:active	{ color: #3366CC; background-color: transparent; }
-a.psf:hover	{ color: #000099; background-color: transparent; }
-
-/* This is the link style for the mini-cals */	
-a.ps2		{ text-decoration:	underline; }
-a.ps2:link	{ color: #0066FF; background-color: transparent; }
-a.ps2:visited	{ color: #0066FF; background-color: transparent; }
-a.ps2:active	{ color: #3366CC; background-color: transparent; }
-a.ps2:hover	{ color: #000099; background-color: transparent; }
-
-/* This is the link style for year months */	
-a.ps3		{ text-decoration:	none; }
-a.ps3:link	{ color: #000000; background-color: transparent; }
-a.ps3:visited	{ color: #000000; background-color: transparent; }
-a.ps3:active	{ color: #000000; background-color: transparent; }
-a.ps3:hover	{ color: #000000; background-color: transparent; text-decoration:underline;}
-	
-/* CSS definitions for fonts */
-.G10BOLD 		{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 900; }
-.G10G 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #A1A5A9; }
-
-.V9 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 9px; color: #000000; }
-.V10W 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #FFFFFF; }
-.V10WB 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #FFFFFF; font-weight: 900; }
-.V9G 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 9px; color: #666666; }
-.V10 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #000000; }
-.V9BOLD 		{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 9px; font-weight: 900; }
-.G10 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #0066FF; }
-.G10B 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #000000; }
-.V12 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px;  color: #000000; }
-.H20 			{ font-family: Helvetica, sans-serif; font-size: 18px; color: #000000; }
-.eventfont 		{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #FFFFFF; }
-
-
-/* Length of the form drop downs */
-
-.query_style 	{ font-size: 11px; font-family: verdana, geneva, arial, sans-serif; width: 156px; margin-bottom: 0; }
-.search_style 	{ font-size: 12px; font-family: verdana, geneva, arial, sans-serif; width: 134px; margin-bottom: 0; }
+.eventfont 	{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #FFFFFF; }
 

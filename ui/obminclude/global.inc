@@ -26,8 +26,12 @@ $last_account_default = 0;
 $last_payment_default = 0;
 $last_contract_default = 0;
 $last_incident_default = 0;
-$set_weekstart_default = "monday";
-
+//Agenda constants
+$set_weekstart_default = "monday"; //First day of the week, in english
+$set_start_time = '5'; // first hour of the day
+$set_stop_time = '23'; // last hour of the day
+$set_time_unit = 2 ;// define the time unit for the agenda display.
+		   // For exemple 2 = 1/2 hour(30min), 4 = 1/4 hour(15 mins)...  
 //Timemanager module CONSTANTS
 // In how many parts we can chop a day
 $c_day_fraction = 8;
