@@ -15,33 +15,10 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 </head>
 
 <body>
-<a href="http://www.aliacom.fr" target="_blank"><img src="images/shim.gif" alt="www.aliacom.fr" width="210" height="70" border="0"></a>
+<?php include("menu.html"); ?>
 
-<ul class="menuList">
-  <div class="menuTitle">:: Discover OBM</div>
-
-    <li><a href="index.php">Home</a></li>
-    <li><a href="about.php">About OBM</a></li>
-    <li><a href="news.php">News</a></li>
-    <li><a href="usage.php">OBM usage</a></li>
-    <li><a href="screenshots.php">Screenshots</a></li>
-    <li><a href="http://obmdemo.aliacom.fr/">Online demonstration (Démo OBM - mailing disabled)</a></li>
-
-    <li><a href="download.php">Download section</a></li>
-</ul>
-
-<ul class="menuList">
-  <div class="menuTitle">:: Developement</div>
-    <li><a href="doc.php">Documentation</a></li>
-    <li><a href="mail.php">Mailing list</a></li>
-    <li><a href="bugz.php">Bugzilla : bugs and requested features</a></li>
-
-    <li><a href="../doc/html/changelog.html">Change Log</a></li>
-    <li><a href="../doc/html/hist-roadmap.html">History, Status and RoadMap</a></li>
-</ul>
-
-  <div class="center"> 
-    <h1>Screenshots</h1>
+<div class="center"> 
+  <h1>Screenshots</h1>
   </div>
 <!-- Contenu de la page ------------------------------------------------------------------------------------------------------------------->
 
@@ -200,14 +177,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 </div>
 </div>
 
-
-
-<div class="contact">
-
-  More info : <br />
-  <a href="mailto:obm-NOSPAM@NOSPAM-list.aliacom.fr">obm-NOSPAM@NOSPAM-list.aliacom.fr</a> 
-  (remove -NOSPAM-)
-</div>
+<?php include("footer.html"); ?>
 
 </body>
 </html>

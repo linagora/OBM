@@ -22,6 +22,7 @@ if [ $? != 0 ]; then
     if [ $? != 0 ]; then
       echo "Can't find php interpreter"
       exit
+    fi
   fi
 fi
 echo $PHP : PHP interpreter found

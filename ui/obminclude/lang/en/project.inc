@@ -85,6 +85,8 @@ $l_task_delete_error = "The tasks deletion has failed ! Someone is assigned to t
 $l_no_task_del = "No task to remove";
 $l_ptask_same_task = "The parent task can't be the same as the task !";
 $l_ptask_and_parent = "A parent task can't have a parent !";
+$l_ptask_has_parent = "The task given as parent has a parent now !";
+$l_ptask_has_user = "The task given as parent is assigned to user !";
 
 $l_member_delete_error = "The deletion of the member has failed ! He should be assigned to some tasks or has spent some time on the project.";
 $l_allocate_update_ok = "The project allocation update has been updated successfully.";

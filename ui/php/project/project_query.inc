@@ -620,51 +620,26 @@ function run_query_task_insert($project) {
 function run_query_task_update($project) {
   global $auth, $cdg_sql;
 
-  $pid = $project["id"];
   $task = $project["task"];
   $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];
 
-
-  echo "task=$task, ptask=$ptask, label=$tasklabel";
-  // If a parent task has been given, check that there are no links from
-  // User to the parent task (a parent task can't be assigned to users)
-  if ( (isset($ptask)) && ($ptask != "0") ) {
-    $query = "
-      select projectuser_user_id
-      from ProjectUser
-      where projectuser_projecttask_id = '$ptask'
-      ";
-
-    display_debug_msg($query, $cdg_sql, "run_query_task_update(1)");
-    $search_q->query($query);
-  }
-
-  if (($ptask == 0) or ($search_q->nf() == 0))  {
-    $query = "
+  $query = "
       update ProjectTask set
-        projecttask_timeupdate,
-        projecttask_userupdate,
-        projecttask_label,
-        projecttask_parenttask_id,
-        projecttask_rank)
-      values (
-        '". date("Y-m-d H:i:s") ."',
-        '". $auth->auth["uid"] ."',
-        '$tasklabel',
-        '$ptask',
-        '1')
+        projecttask_timeupdate='". date("Y-m-d H:i:s") ."',
+        projecttask_userupdate='". $auth->auth["uid"] ."',
+        projecttask_label='$tasklabel',
+        projecttask_parenttask_id='$ptask',
+        projecttask_rank='1'
+      where
+        projecttask_id='$task';
         ";
 
-    display_debug_msg($query, $cdg_sql, "run_query_task_update(2)");
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_task_update(2)");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
   
-    return $obm_q;
-  } else {
-    echo "parent has users !";
-    return 0;
-  }
+  return $obm_q;
 }
 
 
@@ -1391,16 +1366,29 @@ function check_project_form($pid, $project) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_task_form($pid, $project) {
   global $err_msg, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
-  global $l_ptask_and_parent;
+  global $l_ptask_has_parent, $l_ptask_and_parent;
 
   $pid = $project["id"];
   $task = $project["task"];
   $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];
 
+  // MANDATORY: task label
+  if (trim($tasklabel) == "") {
+    $err_msg = $l_fill_tasklabel;
+    return false;
+  }
+
   // If parent task same has task
-  if ($ptask == $task) {
+  if ( (isset($ptask)) && ($ptask == $task)) {
     $err_msg = $l_ptask_same_task;
+    return false;
+  }
+
+  // If parent task is given, it should not have parents
+  // Can happen if update from another window simultaneously
+  if (task_has_parent($ptask)) {
+    $err_msg = $l_ptask_has_parent;
     return false;
   }
 
@@ -1411,31 +1399,21 @@ function check_task_form($pid, $project) {
     $task_is_parent = false;
   }
 
-  if ( $task_is_parent && ($ptask > 0)) {
+  if ( ($task > 0) && $task_is_parent && ($ptask > 0)) {
     $err_msg = $l_ptask_and_parent;
     return false;
   }
 
-  echo "task=$task, ptask=$ptask, label=$tasklabel";
   // If a parent task has been given, check that there are no links from
   // User to the parent task (a parent task can't be assigned to users)
-  if ( (isset($ptask)) && ($ptask != "0") ) {
-    $query = "
-      select projectuser_user_id
-      from ProjectUser
-      where projectuser_projecttask_id = '$ptask'
-      ";
-    display_debug_msg($query, $cdg_sql, "check_task_form(1)");
-    $search_q->query($query);
+  if (task_has_user($ptask)) {
+    $pt_has_user = true;
   } else {
-    $err_msg = $l_ptask_has_user;
-    return false;
+    $pt_has_user = false;
   }
 
-
-  // MANDATORY: task label
-  if (trim($tasklabel) == "") {
-    $err_msg = $l_fill_tasklabel;
+  if ( ($ptask > 0) && $pt_has_user) {
+    $err_msg = $l_ptask_has_user;
     return false;
   }
 
@@ -1458,7 +1436,62 @@ function is_task_parent($tid) {
     where projecttask_parenttask_id = '$tid'
     ";
 
-  display_debug_msg($query, $cdg_sql, "check_task_is_parent");
+  display_debug_msg($query, $cdg_sql, "is_task_parent");
+  $t_q = new DB_OBM;
+  $t_q->query($query);
+  
+  if ($t_q->num_rows() > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if a task has a parent task
+// Parameters:
+//   - $tid : task id
+// Returns:
+//   - (true | false) : true if task has a parent, else false 
+///////////////////////////////////////////////////////////////////////////////
+function task_has_parent($tid) {
+  global $cdg_sql;
+
+  $query = "select projecttask_parenttask_id
+    from ProjectTask
+    where projecttask_id = '$tid'
+    ";
+
+  display_debug_msg($query, $cdg_sql, "task_has_parent");
+  $t_q = new DB_OBM;
+  $t_q->query($query);
+  $t_q->next_record();
+  
+  if ($t_q->f("projecttask_parenttask_id") > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if a task as some user allocation
+// Parameters:
+//   - $tid : task id
+// Returns:
+//   - (true | false) : true if task is assigned to user, else false 
+///////////////////////////////////////////////////////////////////////////////
+function task_has_user($tid) {
+  global $cdg_sql;
+
+  $query = "select projectuser_id
+    from ProjectUser
+    where projectuser_projecttask_id = '$tid'
+    ";
+
+  display_debug_msg($query, $cdg_sql, "task_has_user");
   $t_q = new DB_OBM;
   $t_q->query($query);
 

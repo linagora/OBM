@@ -17,7 +17,7 @@
     <li><a href="#cant_log">I can't log in to OBM, I always return to the login page</a>
     <li><a href="#no_text">I can log in but no text are displayed (in tabs, menus...)</a>
     <li><a href="#doc_size">I can't insert document of size over 2 or 4 Mb</a>
-    <li><a href="#user_pref">OBM seems to work but each search lead to a mysql error</a>
+    <li><a href="#user_pref">OBM seems to work but each search results in a mysql error</a>
   </ul>
   </p>
 
@@ -60,7 +60,7 @@ LimitRequestBody 16000000
 </pre>
 
 <a name="user_pref">
-<h2>OBM seems to work but each search lead to a mysql error</h2>
+<h2>OBM seems to work but each search results in a mysql error</h2>
 
 Each search lead to this result :
 <pre>

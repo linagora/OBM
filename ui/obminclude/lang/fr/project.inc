@@ -85,6 +85,8 @@ $l_task_delete_error = "Impossible de supprimer une tâche ; Quelqu'un y est affe
 $l_no_task_del = "Aucune tâche à effacer";
 $l_ptask_same_task = "La tâche parente ne peut être la tâche elle-même !";
 $l_ptask_and_parent = "La tâche est parente et ne peut donc avoir une tâche parente !";
+$l_ptask_has_parent = "La tâche parente a elle-même un parent maintenant !";
+$l_ptask_has_user = "La tâche parente est assignée à des utilisateurs !";
 
 $l_member_delete_error = "Impossible d'enlever ce participant ; Il est affecté à une tâche du projet ou a déjà passé du temps sur le projet.";
 $l_allocate_update_ok = "La mise à jour des affectations a été correctement effectuée";

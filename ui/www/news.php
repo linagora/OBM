@@ -19,6 +19,26 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-06-14</b> :  New FAQ section on obm community site</div>
+        <br />
+      </li>
+
+      <li>
+        <div align="left"><b>2004-06-14</b> : version <b>0.8.2</b> released (fixes and minors enhancments)
+        <ol>
+          <li> New field NAF code on Company, can be hidden
+          <li> A project task can now be updated
+          <li> Lists can now be private
+          <li> Fixes on List (graphical construction), Deal, Document, Contact
+          <li> Enhancements in Company, Project, CSV export, List, Calendar
+          <li> Optimizations (hidden data no more fetched from DB)
+          <li> Install more mandrake friendly
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-04-22</b> : version <b>0.8.1</b> released (fixes)
         <ol>
           <li> Corrected some action rights on deal, document and user modules

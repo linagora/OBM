@@ -165,7 +165,10 @@ if ($action == "index" || $action == "") {
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   } else { 
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    dis_project_consult($param_project);
+    $project["name"] = run_query_projectname($param_project);
+    $tasks_q = run_query_tasks($param_project);
+    $display["detail"]  = html_project_task_form($tasks_q, $project);
+    $display["detail"] .= html_project_tasklist($tasks_q, $project);
   }
 
 } elseif ($action == "task_update")  {
@@ -541,7 +544,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'task', 'task_add', 'task_update', 'task_del', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
     );
 
 // Add a task

@@ -51,7 +51,7 @@
       </tr>
       <tr> 
         <td bgcolor="#E2F1F3">Linux</td>
-        <td bgcolor="#E2F1F3">2.0.31 - 2.4.25 </td>
+        <td bgcolor="#E2F1F3">2.0.31 - 2.4.26, 2.6.x </td>
         <td bgcolor="#E2F1F3">OBM shouldn't be related to kernel and OS
           version directly (should run on every UNIX)</td>
       </tr>
@@ -82,7 +82,7 @@
       </tr>
       <tr bgcolor="#F1F9FA"> 
         <td>Postgres</td>
-        <td>7.1.x, 7.2.x, 7.3.x</td>
+        <td>7.1.x, 7.2.x, 7.3.x, 7.4.x</td>
         <td>Was supported in 0.3.0
           <br>
           Postgres support back since 0.8.0</td>
