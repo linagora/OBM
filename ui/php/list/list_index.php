@@ -271,13 +271,13 @@ function get_param_list() {
 
   global $tf_company_name,$tf_company_zipcode,$tf_company_town;
   global $tf_company_timeafter,$tf_company_timebefore;
-  global $sel_company_country_id,$sel_company_marketingmanager_id;
+  global $sel_company_country_iso3166, $sel_company_marketingmanager_id;
   global $sel_company_datasource_id,$sel_companycategory_code;
 
   global $tf_contact_firstname,$tf_contact_lastname;
   global $tf_contact_zipcode,$tf_contact_town,$sel_kind_lang;
   global $tf_contact_timeafter,$tf_contact_timebefore;
-  global $sel_contact_country_id,$sel_contact_marketingmanager_id;
+  global $sel_contact_country_iso3166, $sel_contact_marketingmanager_id;
   global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id,$sel_contact_function_id;
   
@@ -307,6 +307,7 @@ function get_param_list() {
   if (isset ($new_order)) $list["new_order"] = $new_order;
   if (isset ($order_dir)) $list["order_dir"] = $order_dir;
   if (isset ($popup)) $list["popup"] = $popup;
+
   // External param
   if (isset ($ext_action)) $list["ext_action"] = $ext_action;
   if (isset ($ext_url)) $list["ext_url"] = $ext_url;
@@ -322,7 +323,7 @@ function get_param_list() {
   //Criteria params :
   //Company
   if (isset ($tf_company_name)) $list["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
-  if (isset ($sel_company_country_id)) $list["criteria"]["modules"]["company"]["company_country_id"] = $sel_company_country_id;
+  if (isset ($sel_company_country_iso3166)) $list["criteria"]["modules"]["company"]["company_country_iso3166"] = $sel_company_country_iso3166;
   if (isset ($tf_company_timeafter)) $list["criteria"]["modules"]["company"]["company_timeafter"] = $tf_company_timeafter; 
   if (isset ($tf_company_zipcode)) $list["criteria"]["modules"]["company"]["company_zipcode"] = $tf_company_zipcode;
   if (isset ($sel_company_marketingmanager_id)) $list["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $sel_company_marketingmanager_id;
@@ -333,7 +334,7 @@ function get_param_list() {
   
   //Contact
   if (isset ($tf_contact_firstname)) $list["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
-  if (isset ($sel_contact_country_id)) $list["criteria"]["modules"]["contact"]["contact_country_id"] = $sel_contact_country_id;
+  if (isset ($sel_contact_country_iso3166)) $list["criteria"]["modules"]["contact"]["contact_country_iso3166"] = $sel_contact_country_iso3166;
   if (isset ($tf_contact_timeafter)) $list["criteria"]["modules"]["contact"]["contact_timeafter"] = $tf_contact_timeafter;
   if (isset ($tf_contact_lastname)) $list["criteria"]["modules"]["contact"]["contact_lastname"] = $tf_contact_lastname;
   if (isset ($sel_contact_marketingmanager_id)) $list["criteria"]["modules"]["contact"]["contact_marketingmanager_id"] = $sel_contact_marketingmanager_id;
@@ -345,7 +346,7 @@ function get_param_list() {
   if (isset ($sel_contactcategory2link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
   if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
   if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
-  
+
   //Publication
   if (isset ($sel_subscription_publication_id)) $list["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;
   if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
@@ -356,7 +357,9 @@ function get_param_list() {
 
   if (isset ($sel_log_not)) $list["criteria"]["logical"]["NOT"] = $sel_log_not;
   if (isset ($sel_log_and)) $list["criteria"]["logical"]["AND"] = $sel_log_and;
-  if (isset ($se_criteria)){$list["criteria"] = unserialize( urldecode($se_criteria)); }
+  if (isset ($se_criteria)) {
+    $list["criteria"] = unserialize(urldecode($se_criteria));
+  }
   if (isset ($http_obm_vars)) {
     $nb_con = 0;
     $nb_list = 0;

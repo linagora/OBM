@@ -78,6 +78,9 @@ $l_mail_rcpt_obli = "If diffrenet from sender e-mail" ;
 $l_subject_obli = "The subject of mail is required" ;
 $l_nb_message_send = "Number of mail(s) sent : " ;
 
+$l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
+$l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
+
 //Error:
 $l_error_which = "Error::: The which variable is NOT CORRECTLY set... Please Check your administrator" ;
 $l_error_authentification = "Error::: Wrong Authentification... Please Check your administrator " ;

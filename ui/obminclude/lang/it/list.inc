@@ -76,6 +76,9 @@ $l_no_static_contact = "Non sono presenti contatti statici registrati";
 $l_dyn_con_found = "Contatti dinamici registrati";
 $l_no_dyn_contact = "Non sono presenti contatti dinamici registrati";
 
+$l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
+$l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
+
 //------------------------------------//
 // Export Format informations         //
 //------------------------------------//

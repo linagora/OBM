@@ -34,6 +34,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $zip = $company["zip"];
   $dateafter = $company["dateafter"];
   $datebefore = $company["datebefore"];
+  $lang = get_lang();
 
   // If a name has been given we search its sound too
   if ($name != "") {
@@ -85,7 +86,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $and = "and";
   }
   if (($ctry != $c_all) && ($ctry != "")) { 
-    $where .= " $and company_country_id='$ctry'";
+    $where .= " $and company_country_iso3166='$ctry'";
     $and = "and";
   }
   if ($zip != "") {
@@ -141,7 +142,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_zipcode,
       company_town,
       company_expresspostal,
-      company_country_id,
+      company_country_iso3166,
       company_phone,
       company_fax,
       company_web,
@@ -159,7 +160,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
          $join_cat
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
-         LEFT JOIN Country on company_country_id=country_id";
+         LEFT JOIN Country on company_country_iso3166=country_iso3166
+                   and country_lang='$lang'";
 
   if (! $fuzzy) {
     if ($ctu_sql_limit) {
@@ -209,6 +211,7 @@ function run_query_detail($p_id) {
 
   $timeupdate = sql_date_format($db_type, "company_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "company_timecreate", "timecreate");
+  $lang = get_lang();
 
   $query = "select *,
       $timeupdate,
@@ -222,7 +225,8 @@ function run_query_detail($p_id) {
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
          LEFT JOIN UserObm as m on company_marketingmanager_id=m.userobm_id
-         LEFT JOIN Country on company_country_id=country_id
+         LEFT JOIN Country on company_country_iso3166=country_iso3166
+                   and country_lang='$lang'
          LEFT JOIN DataSource on company_datasource_id=datasource_id
          LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
@@ -305,7 +309,7 @@ function run_query_insert($company) {
     company_zipcode,
     company_town,
     company_expresspostal,
-    company_country_id,
+    company_country_iso3166,
     company_phone,
     company_fax,
     company_web,
@@ -452,7 +456,7 @@ function run_query_update($cid, $company) {
     company_zipcode='$zip',
     company_town='$town',
     company_expresspostal='$cdx',
-    company_country_id='$ctry',
+    company_country_iso3166='$ctry',
     company_phone='$phone',
     company_fax='$fax',
     company_web='$web',

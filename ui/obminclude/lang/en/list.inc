@@ -101,7 +101,9 @@ $l_fill_subject = "The subject must be filled !";
 $l_invalid_query = "The query is invalid !";
 $l_banned_word = "Banned word";
 $l_hungry_query = "The query need too much resource !";
-$l_warning_lose_query = "Warning, You might lose all query criteria already entered. Continue?";
+$l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
+$l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
+
 //------------------------------------//
 // Export Format informations         //
 //------------------------------------//

@@ -178,7 +178,7 @@ function get_list_id($list) {
     where list_name='$name'
       and list_subject='$subject'
       and list_email='$email'
-      and list_query='$query'";
+      and list_query='$list_query'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -379,6 +379,7 @@ function run_query_contacts_list($list, $entity="") {
   $id = $list["id"];
   $new_order = $list["new_order"];
   $order_dir = $list["order_dir"];
+  $lang = get_lang();
 
   if ( ($entity == "list_contact") && (trim($new_order) != "") ) {
     $order = "order by $new_order $order_dir";
@@ -406,7 +407,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_zipcode,
          contact_town,
          contact_expresspostal,
-         contact_country_id,
+         contact_country_iso3166,
          country_name,
          contact_function_id,
          function_label as contact_function,
@@ -427,11 +428,12 @@ function run_query_contacts_list($list, $entity="") {
          company_town,
          company_expresspostal
       from ContactList
-           LEFT JOIN Contact ON contactlist_contact_id=contact_id
-           LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-           LEFT JOIN Country ON Contact.contact_country_id = country_id
-           LEFT JOIN Function ON Contact.contact_function_id = function_id
-           LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
+         LEFT JOIN Contact ON contactlist_contact_id=contact_id
+         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+         LEFT JOIN Country ON Contact.contact_country_iso3166 = country_iso3166
+                              and country_lang='$lang'
+         LEFT JOIN Function ON Contact.contact_function_id = function_id
+         LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       where contactlist_list_id='$id'
          $order";
 
@@ -712,7 +714,7 @@ function get_list_query_num_rows($query="") {
   // IF 'Group by' present, take between From and group by (ungreedy)
   // else get between From and the end
   if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) {
-    $query_c = "select count(contact_id) " . $matches[1];
+    $query_c = "select count(distinct contact_id) " . $matches[1];
     display_debug_msg($query_c, $cdg_sql);
     $obm_q = new DB_OBM;
     $r = $obm_q->query($query_c, 1);
@@ -887,7 +889,7 @@ function run_query_publication() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Reception mode subscription query execution                                 //
+// Reception mode subscription query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -904,7 +906,7 @@ function run_query_subscriptionreception() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Generate the SQL Query from a List
+// Generate the SQL Query from a List given by its id
 // Parameters:
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
@@ -935,6 +937,7 @@ function make_query_from_criteria($list) {
   $boulean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
   $mailing_ok = $list["mailing_ok"];
+  $lang = get_lang();
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -951,7 +954,7 @@ function make_query_from_criteria($list) {
   
   $operateurs = array(
     "company_name" => $common_like,
-    "company_country_id" => $common_equal,
+    "company_country_iso3166" => $common_equal,
     "company_timeafter"  => $comp_time_sup,
     "company_timebefore" => $comp_time_inf,
     "company_zipcode"  => $common_like,
@@ -960,7 +963,7 @@ function make_query_from_criteria($list) {
     "company_datasource_id" => $common_equal,
     "companycategory_code" => $category_equal,
     "contact_firstname"  => $common_like,
-    "contact_country_id" => $common_equal,
+    "contact_country_iso3166" => $common_equal,
     "contact_timeafter"  => $cont_time_sup,
     "contact_timebefore"  => $cont_time_inf,
     "contact_lastname"  => $common_like,
@@ -997,6 +1000,7 @@ function make_query_from_criteria($list) {
     "publication" => ",publication_lang
     		      ,publication_title"
   );  
+
   $select = "
         contact_id,
         contact_lastname,
@@ -1025,6 +1029,7 @@ function make_query_from_criteria($list) {
         company_zipcode,
         company_expresspostal,
         company_town";
+
   $group = "
         contact_id,
         contact_lastname,
@@ -1034,6 +1039,7 @@ function make_query_from_criteria($list) {
         kind_lang,
         function_label,
         contact_title,
+        contact_service,
         contact_address1,
         contact_address2,
         contact_address3,
@@ -1054,7 +1060,7 @@ function make_query_from_criteria($list) {
         company_town";
 	
   $join = " Contact left join Company on contact_company_id=company_id
-                    left join Country on Contact.contact_country_id=country_id
+                    left join Country on Contact.contact_country_iso3166=country_iso3166 and country_lang='$lang'
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
 	     
@@ -1097,7 +1103,7 @@ function make_query_from_criteria($list) {
       if ($line == 0) {
 	$logical_criterion[$line] = "";
       }
-      $where .= $logical_criterion[$line]." ".$boulean_criterion[$line]." ($value)";
+      $where .= " " . $logical_criterion[$line]." ".$boulean_criterion[$line]." ($value)";
     }    
   }
 
@@ -1160,69 +1166,6 @@ function run_query_list_static_contact_id($id) {
 
   return $obm_q;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Make a query with the dynamic and static contact.
-// Parameters:
-//   - $query  : Dynamic query
-//   - $con_q  : Statics users
-///////////////////////////////////////////////////////////////////////////////
-function make_final_query($query,$con_q) {
-  global $auth, $cdg_sql;
-
-  $nb_con = $con_q->num_rows();
-  if ($nb_con == 0) {
-    return $query;  
-  } 
-
-  return $query;
-  // Dead Code? no... but it need MySQL 4.x 
-  // and Obm must keep the compatibility with
-  // the Debian Stable Mysql Version...
-  // So w&s
-  $final_query = "($query)";
-  $final_query .= " UNION 
-        (SELECT      
-        contact_id,
-        contact_lastname,
-        contact_firstname,
-        contact_service,
-        contact_address1,
-        contact_address2,
-        contact_address3,
-        contact_zipcode,
-        contact_expresspostal,
-        contact_town,
-        contact_phone,
-        contact_homephone,
-        contact_mobilephone,
-        contact_email,
-        company_id,
-        company_name,
-        company_address1,
-        company_address2,
-        company_address3,
-        company_zipcode,
-        company_expresspostal,
-        contact_town,
-        company_town 
-	FROM 
-	Contact
-             left join Company on contact_company_id=company_id 
-	WHERE 
-	contact_id IN (";
-	
-  while ($con_q->next_record()) {
-    $final_query .= "$coma ".$con_q->f("contact_id");
-    $coma = ",";
-  }
-  $final_query .= " ) ) GROUP BY contact_lastname";
-  return $final_query; 
-}
-
-
-
 
 
 

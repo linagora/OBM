@@ -18,6 +18,20 @@ BEGIN;
 
 -- use obm;
 
+
+-------------------------------------------------------------------------------
+-- Global Information table
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'ObmInfo'
+--
+CREATE TABLE ObmInfo (
+  obminfo_name   varchar(32) NOT NULL default '',
+  obminfo_value  varchar(255) default '',
+  PRIMARY KEY (obminfo_name)
+);
+
+
 -------------------------------------------------------------------------------
 -- User, Preferences tables
 -------------------------------------------------------------------------------
@@ -146,16 +160,15 @@ CREATE TABLE DataSource (
 -- Table structure for the table  'Country'
 --
 CREATE TABLE Country (
-  country_id          serial,
   country_timeupdate  timestamp,
   country_timecreate  timestamp,
   country_userupdate  integer,
   country_usercreate  integer,
   country_iso3166     char(2),
-  country_name        varchar(64) UNIQUE,
+  country_name        varchar(64),
   country_lang        char(2),
   country_phone       varchar(4),
-  PRIMARY KEY (country_id)
+  PRIMARY KEY (country_iso3166, country_lang)
 );
 
 
@@ -231,7 +244,7 @@ CREATE TABLE Company (
   company_zipcode              varchar(14),
   company_town                 varchar(64),
   company_expresspostal        varchar(8),
-  company_country_id           integer,
+  company_country_iso3166      char(2) DEFAULT '',
   company_phone                varchar(32),
   company_fax                  varchar(32),
   company_web                  varchar(64),
@@ -294,7 +307,7 @@ CREATE TABLE Contact (
   contact_zipcode              varchar(14),
   contact_town                 varchar(24),
   contact_expresspostal        varchar(8),
-  contact_country_id           integer,
+  contact_country_iso3166      char(2) DEFAULT '',
   contact_function_id          integer,
   contact_title                varchar(64),
   contact_phone                varchar(32),
@@ -305,7 +318,7 @@ CREATE TABLE Contact (
   contact_email2               varchar(128),
   contact_mailing_ok           char(1) DEFAULT '0',
   contact_archive              char(1) DEFAULT '0',
-  contact_visibility           integer DEFAULT '0',
+  contact_privacy              integer DEFAULT '0',
   contact_comment              text,
   PRIMARY KEY (contact_id)
 );
@@ -439,7 +452,7 @@ CREATE TABLE Deal (
   deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
-  deal_visibility           integer DEFAULT '0',
+  deal_privacy              integer DEFAULT '0',
   deal_comment              text,
   PRIMARY KEY (deal_id)
 );
@@ -512,7 +525,7 @@ CREATE TABLE List (
   list_timecreate  TIMESTAMP,
   list_userupdate  integer,
   list_usercreate  integer,
-  list_visibility  integer DEFAULT '0',
+  list_privacy     integer DEFAULT '0',
   list_name        varchar(32) NOT NULL,
   list_subject     varchar(70),
   list_email       varchar(128),

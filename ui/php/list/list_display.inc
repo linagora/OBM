@@ -596,18 +596,11 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 function dis_list_form($action, $list_q, $list) {
   global $l_insert, $l_update, $l_back;
 
-//  if(is_object($list_q)){
-//    $crit_q = $list_q->f("list_structure");
-//  }
   $url = url_prepare("list_index.php");
   $block = "<form method=\"post\" name=\"f_new\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">";
 
   $block .= html_list_form($action, $list_q, $list);
-//  if($action == "insert" || $action == "new" || $list["criteria"] != "" || 
-//     $crit_q !="" || ($crit_q =="" && $list_q->f("list_query") == "")) {
-     $block .= html_list_graphical_form($action, $list_q, $list);
-//  }
 
   if (($action == "detailupdate") || ($action == "update")) {
      $dis_but .= "
@@ -649,7 +642,8 @@ function html_list_form($action, $list_q, $list) {
     $name = $list_q->f("list_name");
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
-    $crit_q = $list_q->f("list_structure");
+    $structure = $list_q->f("list_structure");
+    $criteria = unserialize($structure);
     $query = $list_q->f("list_query");
     $vis = ($list_q->f("list_visibility") == 0 ? "0" : "1");
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
@@ -663,6 +657,7 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["mailing_ok"])) { $mailing_ok = stripslashes($list["mailing_ok"]); }
+  if (isset($list["criteria"])) { $criteria = $list["criteria"]; }
 	
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
@@ -674,16 +669,21 @@ function html_list_form($action, $list_q, $list) {
     $dis_vis .= " /></td>
   </tr><tr>";
   }
+
   if ($mailing_ok == 1) $dis_mailing .= "checked = \"checked\""; 
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
-  if ($crit_q == "" && $query != "") {
+
+  // If criteria are set, we display the criteria form, else the query
+  if ($criteria == "" && $query != "") {
     $query_checked = " checked=\"checked\" ";
-    $dis_query = "";
+    $style_query = "";
   } else {
     $criterion_checked = " checked=\"checked\" ";
-    $dis_query = "style=\"display:none;\"";
+    $style_query = "style=\"display:none;\"";
   }
+  $dis_query = html_list_graphical_form($action, $list_q, $list);
+
   $block = "
   <div class=\"detailHead\">$l_list</div>
   <table class=\"detail\">
@@ -716,16 +716,19 @@ function html_list_form($action, $list_q, $list) {
        <input type=\"radio\" $query_checked name=\"js_query\" value=\"1\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
        <input type=\"radio\" $criterion_checked name=\"js_query\" value=\"-1\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
       </td>
-     </tr>
-     <tr>
-     <td class=\"detailLabel\">
-      <textarea id=\"ta_query\" $dis_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">
+      <textarea id=\"ta_query\" $style_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
+      $dis_query
       </td>
     </tr>
   </table>";
+
   if (($action == "detailupdate") || ($action == "update")) {
     $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
   }
+
   return $block;
 }
 
@@ -771,9 +774,10 @@ function html_list_graphical_form($action, $list_q, $list) {
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"]; 
   }
-    $field_kind = array(
+
+  $field_kind = array(
       "company_name" => "tf",
-      "company_country_id" => "sel",
+      "company_country_iso3166" => "sel",
       "company_timeafter"  =>  "tf",
       "company_zipcode"  =>  "tf",
       "company_marketingmanager_id" => "sel",
@@ -782,7 +786,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "company_datasource_id" => "sel",
       "companycategory_code" => "sel",
       "contact_firstname"  =>  "tf",
-      "contact_country_id" => "sel",
+      "contact_country_iso3166" => "sel",
       "contact_timeafter"  =>  "tf",
       "contact_lastname"  =>  "tf",
       "contact_marketingmanager_id" => "sel",
@@ -801,7 +805,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "subscription_renewal"  => "tf"      
   );
   $fields_label["company_name"] = $l_company; 
-  $fields_label["company_country_id"] = "$l_company: $l_country"; 
+  $fields_label["company_country_iso3166"] = "$l_company: $l_country"; 
   $fields_label["company_zipcode"] = "$l_company: $l_postcode"; 
   $fields_label["company_town"] = "$l_company: $l_town"; 
   $fields_label["company_timeafter"] = "$l_company: $l_timeafter"; 
@@ -811,7 +815,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
   $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
   $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
-  $fields_label["contact_country_id"]= "$l_contact: $l_country";  
+  $fields_label["contact_country_iso3166"]= "$l_contact: $l_country";  
   $fields_label["contact_zipcode"] = "$l_contact: $l_postcode";  
   $fields_label["contact_town"] = "$l_contact: $l_town"; 
   $fields_label["contact_timeafter"] = "$l_contact: $l_timeafter"; 
@@ -829,7 +833,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["subscription_renewal"] = "$l_publication: $l_renew";
 
   if (is_array($criteria)) {
-    $cty_q = run_query_country();
+    $cty_q = run_query_country_for_lang();
     $dsr_q = run_query_datasource();
     $cat1_q = run_query_contactcategory1();
     $usr_q = run_query_userobm_active();  
@@ -841,11 +845,11 @@ function html_list_graphical_form($action, $list_q, $list) {
     $pub_q = run_query_publication();
 
     $field_data = array(
-      "company_country_id" => array($cty_q,"country_id","country_name"),
+      "company_country_iso3166" => array($cty_q,"country_iso3166","country_name"),
       "company_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "company_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
       "companycategory_code" => array($cat_q,"companycategory_code","companycategory_label"),
-      "contact_country_id" => array($cty_q,"country_id","country_name"),
+      "contact_country_iso3166" => array($cty_q,"country_iso3166","country_name"),
       "contact_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "contact_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
       "contactcategory1link_category_id" => array($cat1_q,"contactcategory1_id","contactcategory1_label"),
@@ -861,12 +865,11 @@ function html_list_graphical_form($action, $list_q, $list) {
         if ($value != "") {
 	  if ($field_kind[$field] == "tf") {
 	    $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
-	  }
-	  else {
+	  } else {
 	    $input = "<select name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">";
 	    $data = $field_data[$field];
 	    $data_q = $data[0];
-	    while($data_q->next_record()) {
+	    while ($data_q->next_record()) {
 	      if ("$value " == $data_q->f($data[1])." ") {
 	        $input .= "<option selected=\"selected\" value=\"$value\" $selected>".$data_q->f($data[2])."</option>";
 	      }
@@ -914,7 +917,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     }
   }
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-  if($criteria =="" && $query != "") { 
+  if ($criteria =="" && $query != "") { 
     $display = "style=\"display:none\"";
   }
   $block = "
@@ -947,7 +950,7 @@ function dis_add_criterion_form($list) {
   }
 //  $ds_q =;
 //  $cat_q =;
-  $cty_q = run_query_country();
+  $cty_q = run_query_country_for_lang();
   $usr_q = run_query_userobm_active();
   $dsr_q = run_query_datasource();
   $cat1_q = run_query_contactcategory1();
@@ -992,7 +995,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while ($cty_q->next_record()) {
-    $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
+    $sel_cty .= "\n<option value=\"".$cty_q->f("country_iso3166")."\">".$cty_q->f("country_name")."</option>";
   }
   if ($cty_q->nf()!=0) { 
     $cty_q->seek(0);
@@ -1028,7 +1031,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_company_country_id\">$sel_cty</select></td>
+    <td class=\"detailForm\"><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
      <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timeafter\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
@@ -1070,6 +1073,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Contact Criterion Form //
 // Parameters:
@@ -1083,7 +1087,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while($cty_q->next_record()) {
-    $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
+    $sel_cty .= "\n<option value=\"".$cty_q->f("country_iso3166")."\">".$cty_q->f("country_name")."</option>";
   }  
   if($cty_q->nf()!=0)   
     $cty_q->seek(0);
@@ -1135,7 +1139,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_contact_country_id\">$sel_cty</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
      <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timeafter\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">

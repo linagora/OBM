@@ -17,6 +17,20 @@ create database obm;
 use obm;
 
 -------------------------------------------------------------------------------
+-- Global Information table
+-------------------------------------------------------------------------------
+
+--
+-- Table structure for table 'ObmInfo'
+--
+CREATE TABLE ObmInfo (
+  obminfo_name   varchar(32) NOT NULL default '',
+  obminfo_value  varchar(255) default '',
+  PRIMARY KEY (obminfo_name)
+);
+
+
+-------------------------------------------------------------------------------
 -- User, Preferences tables
 -------------------------------------------------------------------------------
 
@@ -145,7 +159,6 @@ CREATE TABLE DataSource (
 -- Table structure for the table  'Country'
 --
 CREATE TABLE Country (
-  country_id          int(8) DEFAULT '0' NOT NULL auto_increment,
   country_timeupdate  timestamp(14),
   country_timecreate  timestamp(14),
   country_userupdate  int(8),
@@ -154,7 +167,7 @@ CREATE TABLE Country (
   country_name        varchar(64) UNIQUE,
   country_lang        char(2),
   country_phone       varchar(4),
-  PRIMARY KEY (country_id)
+  PRIMARY KEY (country_iso3166, country_lang)
 );
 
 
@@ -230,7 +243,7 @@ CREATE TABLE Company (
   company_zipcode              varchar(14),
   company_town                 varchar(64),
   company_expresspostal        varchar(8),
-  company_country_id           int(8),
+  company_country_iso3166      char(2) DEFAULT '',
   company_phone                varchar(32),
   company_fax                  varchar(32),
   company_web                  varchar(64),
@@ -293,7 +306,7 @@ CREATE TABLE Contact (
   contact_zipcode              varchar(14),
   contact_town                 varchar(24),
   contact_expresspostal        varchar(8),
-  contact_country_id           int(8),
+  contact_country_iso3166      char(2) DEFAULT '',
   contact_function_id          int(8),
   contact_title                varchar(64),
   contact_phone                varchar(32),

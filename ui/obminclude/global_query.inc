@@ -347,6 +347,26 @@ function run_query_datasource() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the country list filled for the current lang
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_country_for_lang() {
+  global $cdg_sql;
+
+  $lang = get_lang();
+  $query = "select * from Country
+    where country_lang='$lang'
+    order by country_name, country_iso3166"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Country query execution
 // Return:
 //   Database Object
@@ -354,7 +374,8 @@ function run_query_datasource() {
 function run_query_country() {
   global $cdg_sql;
 
-  $query = "select * from Country order by country_name, country_iso3166"; 
+  $query = "select * from Country
+     order by country_name, country_iso3166"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);

@@ -85,12 +85,26 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Invoice search form
+// Parameters:
+//   - $invoice[] : hash with invoice values
+///////////////////////////////////////////////////////////////////////////////
+function dis_invoice_search_form($invoice="") {
+
+  $sta_q = run_query_invoicestatus();
+  $block .= html_invoice_search_form($sta_q, $invoice);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // invoice search Form
 // Parameters :
-//  $p_action : current action in the application
-//  $q_status : infos concernant les != status
+//  $sta_q   : DBO : status info
+//  $invoice : invoice hash parameters
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_search_form ($p_action,$q_status, $invoice) {
+function html_invoice_search_form($sta_q, $invoice) {
   global $c_all, $l_all_f;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
@@ -114,16 +128,16 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
 
   $sel_status = "<select name=\"sel_status\">
      <option value=\"$c_all\">$l_all_f</option>";
-  while ($q_status->next_record()) {
-    $s_id = $q_status->f("invoicestatus_id");
-    $s_label = $q_status->f("invoicestatus_label");
+  while ($sta_q->next_record()) {
+    $s_id = $sta_q->f("invoicestatus_id");
+    $s_label = $sta_q->f("invoicestatus_label");
     $sel_status .= "<option value=\"$s_id\"";
     if ($status == $s_id) $sel_status .= " selected = \"selected\"";
     $sel_status .= ">$s_label</option>";
   }
   $sel_status .= "</select>";
 
-  if (($inout == "_tout_") || ($inout=="")) {
+  if (($inout == "$c_all") || ($inout == "")) {
     $rb_both = "checked";
   }
   if ($inout == "+") {
@@ -132,7 +146,6 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
   if ($inout == "-") {
     $rb_four = " checked ";
   }
-
 
   $block = "
     <form method=\"post\" name=\"form_invoice\"
@@ -206,13 +219,121 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Invoice search result
+// Parameters:
+//   - $invoice[] : invoice search criteria
+///////////////////////////////////////////////////////////////////////////////
+function dis_invoice_search_list($invoice) {
+  global $display, $l_no_found;
+  global $auth, $new_order, $order_dir;
+
+  $pref_q = run_query_display_pref($auth->auth["uid"], "invoice");
+  $inv_q = run_query_search($invoice, $new_order, $order_dir);
+  $nb_inv = $inv_q->num_rows_total();
+  if ($nb_inv == 0) {
+    $display["msg"] = display_warn_msg($l_no_found);
+  } else {
+    $block = html_invoice_search_list($inv_q,$pref_q,$nb_inv,$invoice);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Invoice search result
+// Paratemers:
+// $inv_q  : list of invoices
+// $pref_q : fields to display
+// $nb_invoices : number of invoices
+///////////////////////////////////////////////////////////////////////////////
+function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
+  global $col_frs, $col_client;
+  global $l_found, $l_archive_invoices, $l_archive_update, $l_deal;
+  global $l_label, $l_number, $l_amount_ht, $l_amount_ttc, $l_date, $l_status;
+  global $display, $perm, $menu, $cright_write_admin;
+
+  $label = urlencode($invoice["label"]);
+  $number = urlencode($invoice["number"]);
+  $ht = urlencode($invoice["ht"]);
+  $ttc = urlencode($invoice["ttc"]);
+  $status = $invoice["status"];
+  $date_after = $invoice["date_after"];
+  $date_before = $invoice["date_before"];
+  $inout = $invoice["inout"];
+  $deal = urlencode($invoice["deal"]);
+  $company = urlencode($invoice["company"]);
+  $archive = $invoice["archive"];
+
+  $url = url_prepare("invoice_index.php?action=search".
+		    "&amp;tf_label=$label".
+		    "&amp;tf_number=$number".
+		    "&amp;tf_amount_ht=$ht". 
+		    "&amp;tf_amount_ttc=$ttc".
+		    "&amp;sel_status=$status".
+		    "&amp;tf_deal=$deal".
+		    "&amp;rd_inout=$inout".
+		    "&amp;cb_archive=$archive"); 
+
+  $dis_invoice = new OBM_DISPLAY ("DATA", $pref_q, "invoice");
+  $dis_invoice->data_set = $inv_q;
+  $dis_invoice->data_header = "top";
+  $dis_invoice->data_url = $url;
+
+  // checkbox to allow archiving..
+  if ($perm->check_right($menu, $cright_write_admin)) {
+    $url_archive = url_prepare("invoice_index.php?action=updatearchive");
+    $block .= "<form method=\"post\" action=\"$url_archive\">";
+    $dis_invoice->data_cb_text = $l_archive_invoices;
+    $dis_invoice->data_idfield = "invoice_id";
+    $dis_invoice->data_cb_side = "left";
+    $dis_invoice->data_cb_name = "archive_";
+  }
+
+  $display["msg"] .= display_info_msg("$nb_invoice $l_found");
+  $block .= $dis_invoice->display("dis_data_invoice");
+  if ($perm->check_right($menu, $cright_write_admin)) {
+    $block .= "<input type=\"submit\" value=\"$l_archive_update\">
+      </form>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Invoice search result
+// Parameters:
+//   - $action    : action called
+//   - $invoice[] : invoice hash parameters
+///////////////////////////////////////////////////////////////////////////////
+function dis_invoice_form($action, $invoice) {
+  global $display, $l_no_found;
+  global $auth, $new_order, $order_dir;
+
+  $id = $invoice["id"];
+  if ($id > 0) {
+    $inv_q = run_query_detail($id);
+    $display["detailInfo"] = display_record_info($inv_q);
+  } else {
+    $inv_q = "";
+  }
+  $stat_q = run_query_invoicestatus();
+  $block = html_invoice_form($action, $invoice, $inv_q, $stat_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Invoice Form              
 // Parameters:
-//   - $inv_q  : if updating, contains the invoice current info
-//   - $action : action 
-//   - $stat_q : Database result with status list
+//   - $action    : action called
+//   - $invoice[] : invoice hash parameters
+//   - $inv_q     : if updating, contains the invoice current info
+//   - $stat_q    : Database result with status list
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_form($inv_q, $action, $stat_q, $p_nb_deals = 0, $p_deal_linked="") {
+function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   global $display, $set_theme, $ico_company,$ico_contact;
   global $l_label, $l_number, $l_comment, $l_deal, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_supplier;
@@ -280,8 +401,6 @@ function html_invoice_form($inv_q, $action, $stat_q, $p_nb_deals = 0, $p_deal_li
       </td>";
 
   // Buttons
-  $dis_button = "<input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">";
-
   if (($action == "update") || ($action == "detailupdate")) {
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\"/>
     <input type=\"hidden\" name=\"param_invoice\" value=\"$invoice\" />
@@ -296,7 +415,6 @@ function html_invoice_form($inv_q, $action, $stat_q, $p_nb_deals = 0, $p_deal_li
     $dis_button .="
       <input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .= "
-      <input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">
       <input type=\"hidden\" name=\"hd_param_deal\" value=\"$p_deal_linked\">";
   }
 
@@ -360,71 +478,6 @@ function html_invoice_form($inv_q, $action, $stat_q, $p_nb_deals = 0, $p_deal_li
   return $block;
 }
 
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Search result (if it has to be done                               //
-// if ($set_display != "no") or if it comes from the submit bouton           //
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// $q_invoice : list of invoices
-// $q_display_options : fields to display in the list of invoices
-// $nb_invoices : number of invoices
-//
-function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice, $invoice) {
-  //-- Themes
-  global $col_frs, $col_client;
-  //-- Labels
-  global $l_found, $l_archive_invoices, $l_archive_update, $l_deal;
-  global $l_label, $l_number, $l_amount_ht, $l_amount_ttc, $l_date, $l_status;
-  global $display, $auth, $perms_user,$l_perms_user, $perms_admin;
-
-  $label = urlencode($invoice["label"]);
-  $number = urlencode($invoice["number"]);
-  $ht = urlencode($invoice["ht"]);
-  $ttc = urlencode($invoice["ttc"]);
-  $status = $invoice["status"];
-  $date_after = $invoice["date_after"];
-  $date_before = $invoice["date_before"];
-  $inout = $invoice["inout"];
-  $deal = urlencode($invoice["deal"]);
-  $company = urlencode($invoice["company"]);
-  $archive = $invoice["archive"];
-
-  $url = url_prepare("invoice_index.php?action=search".
-		    "&amp;tf_label=$label".
-		    "&amp;tf_number=$number".
-		    "&amp;tf_amount_ht=$ht". 
-		    "&amp;tf_amount_ttc=$ttc".
-		    "&amp;sel_status=$status".
-		    "&amp;tf_deal=$deal".
-		    "&amp;rd_inout=$inout".
-		    "&amp;cb_archive=$archive"); 
-
-  $dis_invoice = new OBM_DISPLAY ("DATA", $q_display_options, "invoice");
-  $dis_invoice->data_set = $q_invoices;
-  $dis_invoice->data_header = "top";
-  $dis_invoice->data_url = $url;
-
-  // checkbox to allow archiving..
-  if ($auth->auth["perm"] == $perms_admin) {
-    $url_archive = url_prepare("invoice_index.php?action=updatearchive");
-    $block .= "<form method=\"post\" action=\"$url_archive\">";
-    $dis_invoice->data_cb_text = $l_archive_invoices;
-    $dis_invoice->data_idfield = "invoice_id";
-    $dis_invoice->data_cb_side = "left";
-    $dis_invoice->data_cb_name = "archive_";
-  }
-
-  $display["msg"] .= display_info_msg("$nb_invoice $l_found");
-  $block .= $dis_invoice->display("dis_data_invoice");
-  if ($auth->auth["perm"] == $perms_admin) {
-    $block .= "<input type=\"submit\" value=\"$l_archive_update\">
-      </form>";
-  }
-
-  return $block;
-}
 
 
 //////////////////////////////////////////////////////////////////////////

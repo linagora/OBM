@@ -128,7 +128,7 @@ function dis_contact_search_form($contact="") {
 
   $usr_q = run_query_userobm_active();
   $func_q = run_query_function();
-  $ctry_q = run_query_country();
+  $ctry_q = run_query_country_for_lang();
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();
   $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q, $cat1_q, $cat2_q);
@@ -208,9 +208,9 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
   $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
-    $ctry_id = $ctry_q->f("country_id");
-    $sel_ctry .= "\n<option value=\"$ctry_id\"";
-    if ($ctry_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $ctry_iso3166 = $ctry_q->f("country_iso3166");
+    $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
+    if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
     $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
   }
   $sel_ctry .= "</select>";
@@ -877,8 +877,8 @@ function dis_contact_form($action, $co_q, $contact) {
     $users = array($contact["marketing_manager"]);
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
-  $ctry_q = run_query_country();
-  $block = html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
+  $ctry_q = run_query_country_for_lang();
+  $block = html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
@@ -888,9 +888,9 @@ function dis_contact_form($action, $co_q, $contact) {
 // HTML Display Contact Form
 // Parameters:
 //   - $action    : action called
+//   - $co_q      : contact database result (company detail on new)
 //   - $cat1_q    : Contact category1 database result 
 //   - $cat2_q    : Contact category2 database result 
-//   - $co_q      : contact database result 
 //   - $dsrc_q    : datasource database result 
 //   - $func_q    : function database result 
 //   - $kind_q    : kind database result 
@@ -900,7 +900,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
@@ -935,7 +935,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
     $zip = $co_q->f("contact_zipcode");
     $town = $co_q->f("contact_town");
     $cdx = $co_q->f("contact_expresspostal");
-    $ctry = $co_q->f("contact_country_id");
+    $ctry = $co_q->f("contact_country_iso3166");
     $func = $co_q->f("contact_function_id");
     $title = $co_q->f("contact_title");
     $phone = $co_q->f("contact_phone");
@@ -973,7 +973,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
       $zip = $co_q->f("company_zipcode");
       $town = $co_q->f("company_town");
       $cdx = $co_q->f("company_expresspostal");
-      $ctry = $co_q->f("company_country_id");
+      $ctry = $co_q->f("company_country_iso3166");
       $c_id = $co_q->f("company_id");
       $c_name = $co_q->f("company_name");
       $c_new_id = $c_id;
@@ -1210,9 +1210,9 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
     <option value=\"0\">$l_none</option>";
   while ($ctry_q->next_record()) {
-    $ctry_id = $ctry_q->f("country_id");
-    $sel_ctry .= "\n<option value=\"$ctry_id\"";
-    if ($ctry_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $ctry_iso3166 = $ctry_q->f("country_iso3166");
+    $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
+    if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
     $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
   }
   $sel_ctry .= "</select>";

@@ -281,6 +281,7 @@ function run_query_invoicestatus() {
   display_debug_msg($query, $cdg_sql, "run_query_invoicestatus()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;
 }
 

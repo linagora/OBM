@@ -32,6 +32,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
   $archive = $contact["archive"];
+  $lang = get_lang();
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -77,7 +78,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   }
   // If a country has been set
   if (($ctry != $c_all) && ($ctry != "")) { 
-    $where .= " and contact_country_id='$ctry'";
+    $where .= " and contact_country_iso3166='$ctry'";
   }
   // If a person in charge has been set
   if (($market != $c_all) && ($market != "")) { 
@@ -148,7 +149,8 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     from Contact
         left join Company on contact_company_id=company_id 
         left join Function on contact_function_id=function_id
-        left join Country on contact_country_id=country_id
+        left join Country on contact_country_iso3166=country_iso3166
+                  and country_lang='$lang'
         $join_cat1
         $join_cat2
     $whereq
@@ -182,6 +184,7 @@ function run_query_contact_detail($p_id) {
 
   $timeupdate = sql_date_format($db_type, "contact_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
+  $lang = get_lang();
 
   $query = "select Contact.*,
         $timeupdate,
@@ -203,7 +206,8 @@ function run_query_contact_detail($p_id) {
         left join Kind on kind_id=contact_kind_id
         left join UserObm as m on contact_marketingmanager_id=m.userobm_id
         left join Function on contact_function_id=function_id
-        left join Country on contact_country_id=country_id
+        left join Country on contact_country_iso3166=country_iso3166
+                  and country_lang='$lang'
         left join DataSource on contact_datasource_id=datasource_id
         left join UserObm as c on contact_usercreate=c.userobm_id
         left join UserObm as u on contact_userupdate=u.userobm_id
@@ -237,11 +241,11 @@ function run_query_contact_company($c_id) {
       company_zipcode,
       company_town,
       company_expresspostal,
-      company_country_id,
+      company_country_iso3166,
       country_name
     from Company
-    left join Country on
-    company_country_id = country_id
+    left join Country on company_country_iso3166 = country_iso3166
+                         and country_lang='$lang'
     where company_id='$c_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -407,7 +411,7 @@ function run_query_contact_insert($contact) {
     contact_zipcode,
     contact_town,
     contact_expresspostal,
-    contact_country_id,
+    contact_country_iso3166,
     contact_function_id,
     contact_title,
     contact_phone,
@@ -570,7 +574,7 @@ function run_query_contact_update($contact) {
     contact_zipcode='$zip',
     contact_town='$town',
     contact_expresspostal='$cdx',
-    contact_country_id='$ctry',
+    contact_country_iso3166='$ctry',
     contact_function_id='$func',
     contact_title='$title',
     contact_phone='$phone',

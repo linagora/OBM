@@ -47,7 +47,6 @@ my_url = '&action=new_criterion&popup=1&row_index=';
 ///////////////////////////////////////////////////////////////////////////////
 //  Add a criteria line in the list form                                   //
 ///////////////////////////////////////////////////////////////////////////////
-
 function add_criterion(form,index) {
   target = window.opener.document;
   if (W3C) {
@@ -59,8 +58,7 @@ function add_criterion(form,index) {
   }
   if(index == -1) {
     index = criteria.rows.length;
-  }
-  else{
+  } else {
     del_row(criteria.rows.item(index+1));
   }
   labels = criteria.insertRow(index); 
@@ -85,10 +83,10 @@ function add_criterion(form,index) {
   i=publication_criterion(form,labels,values,i);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //  delete a criteria line in the list form                                  //
 ///////////////////////////////////////////////////////////////////////////////
-
 function del_row(row) {
   i = row.rowIndex;
   table = row.parentNode;
@@ -96,19 +94,19 @@ function del_row(row) {
   table.deleteRow(i-1);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//  Open the update criteria line form                                  //
-///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+//  Open the update criteria line form
+///////////////////////////////////////////////////////////////////////////////
 function open_window(row) {
   i = row.rowIndex-1;
   window.open(window.location+my_url+i,'','height=650,width=$popup_width,scrollbars=yes,status=yes');
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the values to update into the update form                             //
 ///////////////////////////////////////////////////////////////////////////////
-
 function get_values(form) {
   target = window.opener.document;
   if (W3C) {
@@ -128,122 +126,113 @@ function get_values(form) {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Perform the Company Criteria's insertion                              //
-///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Perform the Company Criteria's insertion
+///////////////////////////////////////////////////////////////////////////////
 function company_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
-  if(form.tf_company_name.value != '') {  
+  if (form.tf_company_name.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_name[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_name.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +='<input type=\"hidden\" name=\"tf_company_name[]\" value=\"\" />';
   }
 
-  if(form.sel_company_country_id.value != '') {  
+  if (form.sel_company_country_iso3166.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_country'; 
     cell = values.insertCell(i);
-    field = form.sel_company_country_id;
-    cell.innerHTML = '<select name=\"sel_company_country_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    field = form.sel_company_country_iso3166;
+    cell.innerHTML = '<select name=\"sel_company_country_iso3166[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_country_id[]\" value=\"\" />';
+  } else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_country_iso3166[]\" value=\"\" />';
   }
 
-  if(form.tf_company_zipcode.value != '') {    
+  if (form.tf_company_zipcode.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_postcode'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_zipcode[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_zipcode.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_zipcode[]\" value=\"\" />';
   }
 
-  if(form.tf_company_town.value != '') {    
+  if (form.tf_company_town.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_town'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_town[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_town.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_town[]\" value=\"\" />';
   }
 
-  if(form.tf_company_timeafter.value != '') {    
+  if (form.tf_company_timeafter.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_timeafter'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timeafter.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timeafter[]\" value=\"\" />';
   }
 
-  if(form.tf_company_timebefore.value != '') {    
+  if (form.tf_company_timebefore.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_timebefore'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timebefore.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timebefore[]\" value=\"\" />';
   }
   
-  if(form.sel_company_marketingmanager_id.value != '') {  
+  if (form.sel_company_marketingmanager_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_market'; 
     cell = values.insertCell(i);
     field = form.sel_company_marketingmanager_id;
     cell.innerHTML = '<select name=\"sel_company_marketingmanager_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_marketingmanager_id[]\" value=\"\" />';
   }
    
-  if(form.sel_companycategory_code.value != '') {  
+  if (form.sel_companycategory_code.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_category'; 
     cell = values.insertCell(i);
     field = form.sel_companycategory_code;
     cell.innerHTML = '<select name=\"sel_companycategory_code[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_companycategory_code[]\" value=\"\" />';
   }   
   
-  if(form.sel_company_datasource_id.value != '') {  
+  if (form.sel_company_datasource_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_datasource'; 
     cell = values.insertCell(i);
     field = form.sel_company_datasource_id;
     cell.innerHTML = '<select name=\"sel_company_datasource_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_datasource_id[]\" value=\"\" />';
   }   
   return i;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Perform the Contact Criteria's insertion                              //
-///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Perform the Contact Criteria's insertion
+///////////////////////////////////////////////////////////////////////////////
 function contact_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
@@ -269,16 +258,16 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_contact_firstname[]\" value=\"\" />';
   }
 
-  if(form.sel_contact_country_id.value != '') {    
+  if (form.sel_contact_country_iso3166.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_country';  
     cell = values.insertCell(i);
-    field = form.sel_contact_country_id;
-    cell.innerHTML = '<select name=\"sel_contact_country_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    field = form.sel_contact_country_iso3166;
+    cell.innerHTML = '<select name=\"sel_contact_country_iso3166[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;    
   }  
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_country_id[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_country_iso3166[]\" value=\"\" />';
   }
 
   if(form.tf_contact_zipcode.value != '') {    
@@ -459,29 +448,38 @@ function publication_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_subscription_renewal[]\" value=\"\" />';
   }  
 
-
-  if(form.sel_subscription_reception_id.value != '') {  
+  if (form.sel_subscription_reception_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_recept'; 
     cell = values.insertCell(i);
     field = form.sel_subscription_reception_id;
     cell.innerHTML = '<select name=\"sel_subscription_reception_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_subscription_reception_id[]\" value=\"\" />';
   }  
   
   return i;
-  }
-///////////////////////////////////////////////////////////////////////////////
-// Show the manual query field                              //
-///////////////////////////////////////////////////////////////////////////////
+}
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Show the manual query field
+///////////////////////////////////////////////////////////////////////////////
 function show_query_field(value1,value2,field) {
   ta_display = document.getElementById('ta_query').style.display;
   di_display = document.getElementById('di_query').style.display;
-  if(ta_display != di_display && !confirm('$l_warning_lose_query')) {
+
+  exp_to_nor = '$l_warning_exp_to_nor';
+  nor_to_exp = '$l_warning_nor_to_exp';
+
+  if (value2 == 'none') {
+    txt = nor_to_exp;
+  } else {
+    txt = exp_to_nor;
+  }
+
+  if (ta_display != di_display && !confirm(txt)) {
     return false;
   }
   if (W3C) {

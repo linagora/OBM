@@ -114,7 +114,7 @@ if ($action == "ext_get_id") {
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_all_users_from_group($cg_com);
   $cat_q = get_ordered_companycat();
-  $ctry_q = run_query_country();
+  $ctry_q = run_query_country_for_lang();
   require("company_js.inc");
   $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q,"", $ctry_q, $company);
 
@@ -144,7 +144,7 @@ if ($action == "ext_get_id") {
       $usr_q = run_query_all_users_from_group($cg_com, $users);
       $cat_q = get_ordered_companycat();
       $compcat = get_company_cat($company["id"]);
-      $ctry_q = run_query_country();
+      $ctry_q = run_query_country_for_lang();
       require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q);
       $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q,$compcat,$ctry_q, $company);
@@ -192,7 +192,7 @@ if ($action == "ext_get_id") {
     $cat_q = get_ordered_companycat();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_all_users_from_group($cg_com, $users);
-    $ctry_q = run_query_country();
+    $ctry_q = run_query_country_for_lang();
     $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $naf_q, $usr_q,$cat_q,"",$ctry_q, $company);
   }
 
@@ -219,7 +219,7 @@ if ($action == "ext_get_id") {
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_all_users_from_group($cg_com, $users);
     $cat_q = get_ordered_companycat();
-    $ctry_q = run_query_country();
+    $ctry_q = run_query_country_for_lang();
     $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q, "", $ctry_q, $company);
   }
 

@@ -73,6 +73,9 @@ $l_fill_subject = "El asunto debe ser llenado !";
 $l_invalid_query = "La búsqueda es inválida !";
 $l_banned_word = "Palabra prohibida";
 
+$l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
+$l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
+
 //------------------------------------//
 // Export Format informations         //
 //------------------------------------//

@@ -18,70 +18,51 @@ include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
 
-update_last_visit("invoice", $param_invoice, $action);
-
-page_close();
-
 if ($action == "") $action = "index";
 $invoice = get_param_invoice();
 get_invoice_action();
 $perm->check_permissions($menu, $action);
 
+update_last_visit("invoice", $invoice["id"], $action);
+
+page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
-// Programme principal                                                       //
+// Main program
 ///////////////////////////////////////////////////////////////////////////////
+
 if ($action == "index" || $action == "") {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc");
-  $display["search"] = html_invoice_search_form ($action,run_query_invoicestatus(), $invoice); 
+  $display["search"] = dis_invoice_search_form($invoice); 
   if ($set_display == "yes") { 
-    $obm_q = run_query_search($invoice, $new_order, $order_dir); 
-    $nb_invoices = $obm_q->num_rows_total();
-    if ($nb_invoices == 0) { 
-      $display["msg"] .= display_warn_msg($l_no_found);
-    } else { 
-      $pref_q = run_query_display_pref($auth->auth["uid"],"invoice");
-      $display["result"] = html_invoice_search_list($obm_q, $pref_q, $nb_invoices, $invoice); 
-    } 
+    $display["result"] = dis_invoice_search_list($invoice);
   } else { 
     $display["msg"] .= display_ok_msg($l_no_display); 
   } 
 
 } elseif ($action == "search")  { 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc");
-  $display["search"] = html_invoice_search_form($action, run_query_invoicestatus(), $invoice);
-  $obm_q = run_query_search($invoice, $new_order, $order_dir);
-  $nb_invoices = $obm_q->num_rows_total();
-  if ($nb_invoices == 0) { 
-    $display["msg"] .= display_warn_msg($l_no_found);
-  } else {
-    $pref_q = run_query_display_pref($auth->auth["uid"],"invoice");
-    $display["result"] = html_invoice_search_list($obm_q, $pref_q, $nb_invoices, $invoice);
-  }
+  $display["search"] = dis_invoice_search_form($invoice); 
+  $display["result"] = dis_invoice_search_list($invoice);
   
 } elseif ($action == "new") {
-//////////////////////////////////////////////////////////////////////////////
-// FIXME permissions 
-  if ($auth->auth["perm"] != $perms_user) {
-    require("invoice_js.inc"); 
-    $display["detail"] = html_invoice_form("", $action, run_query_invoicestatus(),0, $param_deal);
-  } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
+///////////////////////////////////////////////////////////////////////////////
+  require("invoice_js.inc"); 
+  $display["detail"] = dis_invoice_form($action, $invoice);
 
 } elseif ($action == "insert")  {
 ///////////////////////h//////////////////////////////////////////////////////
   run_query_insert($invoice);
   $display["msg"] .= display_ok_msg($l_insert_ok);
   require("invoice_js.inc");
-  $display["search"] = html_invoice_search_form($action, run_query_invoicestatus(), $invoice);
+  $display["search"] = dis_invoice_search_form($invoice); 
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////h//////////////////////////////////////////////////////
   require("invoice_js.inc");
-  if ($param_invoice > 0) {    
+  if ($invoice["id"] > 0) {    
     $inv_q = run_query_detail($param_invoice);
     $obm_q_deals = run_query_search_deal_invoice($param_invoice);
     $obm_q_payment = run_query_search_payment_invoice ($param_invoice);
@@ -94,20 +75,15 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailupdate")  { 
 ///////////////////////h//////////////////////////////////////////////////////
-  if ($param_invoice > 0) {
-    $inv_q = run_query_detail($param_invoice);
     require("invoice_js.inc");
-    $display["detailInfo"] = display_record_info($inv_q);
-    $q_deals = run_query_search_deal_invoice ($inv_q->f("invoice_id"));
-    $display["detail"] = html_invoice_form($inv_q,$action, run_query_invoicestatus(), $q_deals->nf());
-    }
+    $display["detail"] = dis_invoice_form($action, $invoice);
 
 } elseif ($action == "update")  {
 ///////////////////////h//////////////////////////////////////////////////////
   run_query_update($invoice); 
   $display["msg"] .= display_ok_msg($l_update_ok); 
   require("invoice_js.inc"); 
-  $display["search"] = html_invoice_search_form($action, run_query_invoicestatus(), $invoice);
+  $display["search"] = dis_invoice_search_form($invoice); 
 
 } elseif ($action == "updatearchive")  {
 ///////////////////////h//////////////////////////////////////////////////////
@@ -124,7 +100,7 @@ if ($action == "index" || $action == "") {
   echo $nb_invoices . " " . $l_archive_number . "<BR>\n";
   
   require ("invoice_js.inc");
-  $display["search"] = html_invoice_search_form ($action, run_query_invoicestatus(), $invoice);
+  $display["search"] = dis_invoice_search_form($invoice); 
 
 } elseif ($action=="add_deal"){
 ///////////////////////////////////////////////////////////////////////////////
@@ -362,22 +338,14 @@ elseif ($action == "delete")  { // delete means delete an invoice
     $display["msg"] .= display_err_msg ($l_delete_error."<br>".$l_payments_exist);
   }
   require ("invoice_js.inc");
-  $display["search"] = html_invoice_search_form($action,run_query_invoicestatus(),$invoice);
-///////////////////////h//////////////////////////////////////////////////////
+  $display["search"] = dis_invoice_search_form($invoice); 
 
 } elseif ($action == "duplicate") {
 ///////////////////////h//////////////////////////////////////////////////////
-  $inv_q = run_query_detail ($invoice["invoice"]);
-  require("invoice_js.inc"); 
-
   // we give the user the traditionnal form to modify this invoice :
-  $display["detail"] = html_invoice_form ($inv_q, $action, run_query_invoicestatus());
+  require("invoice_js.inc"); 
+  $display["detail"] = dis_invoice_form($action, $invoice);
   
-/////////////////////////////////////////////////////////////////////////
-//
-// display stuff below...
-//
-/////////////////////////////////////////////////////////////////////////
 } elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $invoice_options=run_query_display_pref ($auth->auth["uid"], "invoice",1);
@@ -428,6 +396,7 @@ function get_param_invoice() {
   global $tf_deal, $tf_company, $cb_archive, $param_deal;
   global $set_debug, $cdg_param, $action;
 
+  if (isset ($param_invoice)) $invoice["id"] = $param_invoice;
   if (isset ($tf_label)) $invoice["label"] = $tf_label;
   if (isset ($tf_number)) $invoice["number"] = $tf_number;
   if (isset ($tf_amount_ht)) $invoice["ht"] = $tf_amount_ht;
@@ -438,7 +407,6 @@ function get_param_invoice() {
   if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before;
   if (isset ($rd_inout)) $invoice["inout"] = $rd_inout;
   if (isset ($hd_inout)) $invoice["inout"] = $hd_inout;
-  if (isset ($param_invoice)) $invoice["invoice"] = $param_invoice;
   if (isset ($tf_balance)) $invoice["balance"] = $tf_balance;
   if (isset ($tf_bank)) $invoice["bank"] = $tf_bank;
   if (isset ($ta_comment)) $invoice["comment"] = $ta_comment;

@@ -161,7 +161,7 @@ function dis_company_search_form($company="") {
   $act_q = run_query_companyactivity();
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
-  $ctry_q = run_query_country();
+  $ctry_q = run_query_country_for_lang();
   $dsrc_q = run_query_datasource();
   $block .= html_company_search_form($type_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
@@ -282,9 +282,9 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
-    $ctry_id = $ctry_q->f("country_id");
-    $sel_ctry .= "\n<option value=\"$ctry_id\"";
-    if ($ctry_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $ctry_iso3166 = $ctry_q->f("country_iso3166");
+    $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
+    if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
     $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
   }
   $sel_ctry .= "</select>";
@@ -497,7 +497,7 @@ function html_company_links($co_q) {
   $id = $co_q->f("company_id");
   $name = $co_q->f("company_name");
   $market = $co_q->f("company_marketingmanager_id");
-  $ctry = $co_q->f("company_country_id");
+  $ctry = $co_q->f("company_country_iso3166");
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
   $deal_total = $co_q->f("company_deal_total");
@@ -805,6 +805,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
 
   $uid = $auth->auth["uid"];
+  $lang = get_lang();
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -824,7 +825,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     $zip = $co_q->f("company_zipcode");
     $town = $co_q->f("company_town");
     $cdx = $co_q->f("company_expresspostal");
-    $ctry = $co_q->f("company_country_id");
+    $ctry = $co_q->f("company_country_iso3166");
     $phone = $co_q->f("company_phone");
     $fax = $co_q->f("company_fax");
     $web = $co_q->f("company_web");
@@ -1017,15 +1018,16 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
   $js_ctry = "<script type=\"text/javascript\">
       var country_phone = new Array ();
+      country_phone[0] = '';
       ";
   while ($ctry_q->next_record()) {
-    $c_id = $ctry_q->f("country_id");
+    $c_iso3166 = $ctry_q->f("country_iso3166");
     $c_name = $ctry_q->f("country_name");
     $c_phone = $ctry_q->f("country_phone");
-    $sel_ctry .= "\n<option value=\"$c_id\"";
-    if ($c_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $sel_ctry .= "\n<option value=\"$c_iso3166\"";
+    if ($c_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
     $sel_ctry .= ">$c_name</option>";
-    $js_ctry .= "country_phone[$c_id] = '$c_phone';\n";
+    $js_ctry .= "country_phone['$c_iso3166'] = '$c_phone';\n";
   }
   $sel_ctry .= "</select>";
   $js_ctry .= "

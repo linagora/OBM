@@ -100,7 +100,8 @@ $l_fill_subject = "Le sujet doit être saisi !";
 $l_invalid_query = "La requête saisie est incorrecte !";
 $l_banned_word = "Mot interdit";
 $l_hungry_query = "La requête est trop consommatrice de ressource !";
-$l_warning_lose_query = "Attention, Vous risquez de perdre tout les critères déjà entrés. Continuer?";
+$l_warning_exp_to_nor = "Attention, Vous allez perdre votre requête actuelle. Continuer ?";
+$l_warning_nor_to_exp = "Attention, La requête générée sera gardée mais vous ne pourrez pas revenir en mode normal sans perdre les critères. Continuer ?";
 
 //------------------------------------//
 // Export Format informations         //

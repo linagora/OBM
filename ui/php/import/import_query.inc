@@ -552,9 +552,12 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $zip = $fields["comp_zip"];
   $town = addslashes($fields["comp_town"]);
   $cdx = addslashes($fields["comp_cdx"]);
-  $ctry = $countries[$fields["comp_ctry"]];
-  if ($ctry == "") {
-    $ctry = "0";
+  // If a country name has been found we get the corresponding iso code
+  if (isset($countries[$fields["comp_ctry"]])) {
+    $ctry = $countries[$fields["comp_ctry"]];
+    // else we get the entry as an iso code
+  } else {
+    $ctry = trim($fields["comp_ctry"]);
   }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
@@ -579,7 +582,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     company_zipcode,
     company_town,
     company_expresspostal,
-    company_country_id,
+    company_country_iso3166,
     company_phone,
     company_fax,
     company_web,
@@ -682,9 +685,12 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $zip = $fields["comp_zip"];
   $town = addslashes($fields["comp_town"]);
   $cdx = addslashes($fields["comp_cdx"]);
-  $ctry = $countries[$fields["comp_ctry"]];
-  if ($ctry == "") {
-    $ctry = "0";
+  // If a country name has been found we get the corresponding iso code
+  if (isset($countries[$fields["comp_ctry"]])) {
+    $ctry = $countries[$fields["comp_ctry"]];
+    // else we get the entry as an iso code
+  } else {
+    $ctry = trim($fields["comp_ctry"]);
   }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
@@ -705,7 +711,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     company_zipcode='$zip',
     company_town='$town',
     company_expresspostal='$cdx',
-    company_country_id='$ctry',
+    company_country_iso3166='$ctry',
     company_phone='$phone',
     company_fax='$fax',
     company_web='$web',
@@ -810,9 +816,12 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $zip = $fields["con_zip"];
   $town = addslashes($fields["con_town"]);
   $cdx = addslashes($fields["con_cdx"]);
-  $ctry = $countries[$fields["con_ctry"]];
-  if ($ctry == "") {
-    $ctry = "0";
+  // If a country name has been found we get the corresponding iso code
+  if (isset($countries[$fields["con_ctry"]])) {
+    $ctry = $countries[$fields["con_ctry"]];
+    // else we get the entry as an iso code
+  } else {
+    $ctry = trim($fields["con_ctry"]);
   }
   $title = addslashes($fields["con_tit"]);
   $phone = $fields["con_pho"];
@@ -823,7 +832,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $mailok = "0";
   $com = addslashes($fields["con_com"]);
   $arch = '0';
-  $vis = '0';
+  $priv = '0';
 
   $query = "insert into Contact (contact_timeupdate,
     contact_timecreate,
@@ -840,7 +849,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_zipcode,
     contact_town,
     contact_expresspostal,
-    contact_country_id,
+    contact_country_iso3166,
     contact_title,
     contact_phone,
     contact_homephone,
@@ -849,7 +858,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_email,
     contact_mailing_ok,
     contact_archive,
-    contact_visibility,
+    contact_privacy,
     contact_comment)
   values (null,
     '" . date("Y-m-d H:i:s") . "',
@@ -875,7 +884,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$email',
     '$mailok',
     '$arch',
-    '$vis',
+    '$priv',
     '$com')";
 
   display_debug_msg($query, $cdg_sql);
@@ -924,9 +933,12 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $zip = $fields["con_zip"];
   $town = addslashes($fields["con_town"]);
   $cdx = addslashes($fields["con_cdx"]);
-  $ctry = $countries[$fields["con_ctry"]];
-  if ($ctry == "") {
-    $ctry = "0";
+  // If a country name has been found we get the corresponding iso code
+  if (isset($countries[$fields["con_ctry"]])) {
+    $ctry = $countries[$fields["con_ctry"]];
+    // else we get the entry as an iso code
+  } else {
+    $ctry = trim($fields["con_ctry"]);
   }
   $title = addslashes($fields["con_tit"]);
   $phone = $fields["con_pho"];
@@ -937,7 +949,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $mailok = "0";
   $com = addslashes($fields["con_com"]);
   $arch = '0';
-  $vis = '0';
+  $priv = '0';
 
   $query = "update Contact set
     contact_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -952,7 +964,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_zipcode='$zip',
     contact_town='$town',
     contact_expresspostal='$cdx',
-    contact_country_id='$ctry',
+    contact_country_iso3166='$ctry',
     contact_title='$title',
     contact_phone='$phone',
     contact_homephone='$hphone',
@@ -961,7 +973,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_email='$email',
     contact_mailing_ok='$mailok',
     contact_archive='$arch',
-    contact_visibility='$vis',
+    contact_privacy='$priv',
     contact_comment='$com'
   where contact_id='$contact_id'";
 
@@ -974,7 +986,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the country hash : countries["iso"] = id
+// Return the country hash : countries["name"] = iso
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_country_hash() {
   global $cdg_sql;
@@ -982,10 +994,9 @@ function get_import_country_hash() {
   $ctry_q = run_query_country();
 
   while ($ctry_q->next_record()) {
-    $id = $ctry_q->f("country_id");
     $name = $ctry_q->f("country_name");
     $iso = $ctry_q->f("country_iso3166");
-    $countries[$iso] = $id;
+    $countries[$name] = $iso;
   }
 
   return $countries;

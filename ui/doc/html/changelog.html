@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. ChangeLog</h1>
-version 0.8.5 - 2004-08-16
+version 0.8.6 - 2004-08-23
 <p>
 </center>
 
@@ -28,7 +28,19 @@ To do<br>
 </UL>
 
 
-2004-08-13 : version 0.8.5<br>
+2004-08-30 : version 0.8.6<br>
+
+<ul>
+<li> BUG#378 : Install : Postgres db creation had 3 wrong column names
+<li> BUG#377 : Stats : No more warning when there are no Company categories
+<li> BUG#376 : List : Corrected erroneous display on very special case
+<li> BUG#374 : List : Fixed some case where queries could have wrong # contacts
+<li> New ObmInfo table to store global information (eg: obm db version)
+<li> Country : key is now iso3166 code + lang, updated company, contact, list
+<li> List : improve dual expert and normal mode query (display, transition)
+</ul>
+
+2004-08-16 : version 0.8.5<br>
 
 <ul>
 <li> BUG#373 : Project : corrected sql error on inserting new task on Postgres

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.5";
+$obm_version = "0.8.6pre1";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -407,6 +407,21 @@ function get_hour($timestamp="") {
     $date = date("H");
 
   return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the current lang used by the user
+// Returns:
+//   $lang
+///////////////////////////////////////////////////////////////////////////////
+function get_lang() {
+  global $set_lang;
+
+  if ($set_lang != "")
+    return strtoupper($set_lang);
+  else
+    return "EN";
 }
 
 

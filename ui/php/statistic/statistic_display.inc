@@ -1,8 +1,8 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : statistic_display.php                                          //
-//     - Desc : Statistic Display File                                         //
-// 2004-04-19 Rande Mehdi                                               //
+// OBM - File : statistic_display.php                                        //
+//     - Desc : Statistic Display File                                       //
+// 2004-04-19 Rande Mehdi                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -10,9 +10,9 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Statistics differents actions                                //
-// Parameters:                                                               //
-// Returns:                                                                  //
+// Display Statistics differents actions
+// Parameters:
+// Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_menu_stats() {
   global $path, $set_theme;
@@ -27,8 +27,6 @@ function dis_menu_stats() {
   <ul class=\"lastList\">";
 
 
-
-  
   if (is_array($actions[$menu])) {
     $module_right = $perm->get_module_rights($menu); 
     foreach ($actions[$menu] as $key => $value) {
@@ -50,12 +48,13 @@ function dis_menu_stats() {
   return $ret;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Statistics About the responsibles                                 //
-// Parameters:                                                               //
+// Display Statistics About the responsibles
+// Parameters:
 //  - $cont_q : DB Object for contact stats
 //  - $comp_q : DB Object for companies stats
-// Returns:                                                                  //
+// Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resp_stats($cont_q,$comp_q) {
   global $path, $set_theme;
@@ -78,10 +77,12 @@ function dis_resp_stats($cont_q,$comp_q) {
     }
   } 
   $block .= "<table class=\"detail\" >";
-  foreach($stat as $id => $value) {
-    $cont = round(($value["contact"]/$max)*90);
-    $comp = round(($value["company"]/$max)*90);
-    $block .= "<tr>
+
+  if (is_array($stat)) {
+    foreach($stat as $id => $value) {
+      $cont = round(($value["contact"]/$max)*90);
+      $comp = round(($value["company"]/$max)*90);
+      $block .= "<tr>
     <td class=\"detailLabel\" rowspan =\"2\">".$value["name"]."</td>
     <td class=\"detailForm\">
      <table style=\"width:100%;\">
@@ -96,6 +97,7 @@ function dis_resp_stats($cont_q,$comp_q) {
     </table>   
     </td>
    </tr>";    
+    }
   }
    
   $block .= "
@@ -114,38 +116,37 @@ function dis_resp_stats($cont_q,$comp_q) {
     </table>   
     </td>
    </tr>
-   
-  
   </table>"; 
+
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Statistics About the responsibles                                //
-// Parameters:                                                               //
-// Returns:                                                                  //
+// Display Statistics About the responsibles
+// Parameters:
+// Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_stats($comp_q,$tot) {
   global $path, $set_theme;
   global $set_theme, $action,$l_header_company,$l_header_contact,$l_key;
   global $actions,$menu, $perm,$l_null,$l_totals, $l_header_country,$l_compcat;
-  while($comp_q->next_record()) {
-    if($comp_q->f("companycategory_id") == NULL) {
+
+  while ($comp_q->next_record()) {
+    if ($comp_q->f("companycategory_id") == NULL) {
       $cat_id = 0;
       $cat_c = $l_null;
-    }
-    else {
+    } else {
       $code = $comp_q->f("companycategory_code");
       $cat_id = $comp_q->f("companycategory_id");
       $cat_c = $code; 
       $cat_d = $comp_q->f("companycategory_label");
       $cat_s_c = substr($code,0,strpos($code,'.'));
     }
-    if($comp_q->f("country_id") == NULL || $comp_q->f("country_id") == 0) {
+    if ($comp_q->f("country_id") == NULL || $comp_q->f("country_id") == 0) {
       $cty_id = 0;
       $cty_c = $l_null;
-    }
-    else {
+    } else {
       $cty_id = $comp_q->f("country_id") ;
       $cty_c = $comp_q->f("country_iso3166") ;
       $cty_d = $comp_q->f("country_name") ;
@@ -153,12 +154,13 @@ function dis_cat_stats($comp_q,$tot) {
     $nb = $comp_q->f("nb");
     $stat[$cty_id][$cat_id] += $nb;
     $cty_count[$cty_id] += $nb;
-    if(!$cat_count[$cat_id] && $cat_id !=0) {
+    if (!$cat_count[$cat_id] && $cat_id !=0) {
       $cat_s_n[$cat_s_c] += 1;
     }
     $cat_count[$cat_id] += $nb;
-    if($cat_id !=0)
+    if ($cat_id != 0) {
       $cat_s_count[$cat_s_c] += $nb;
+    }
     $cty[$cty_id] = $cty_c;
     $cat[$cat_id] = $cat_c;
     $cty_desc[$cty_id] = $cty_d;
@@ -170,12 +172,13 @@ function dis_cat_stats($comp_q,$tot) {
   <table class=\"classic\">
   <tr>
   <th></th>";
+
   foreach($cat as $cat_id =>$cat_name) {
-    if($cat_id != 0) {
+    if ($cat_id != 0) {
       $onOver = "    onMouseOver=\"show(event,'cat_$cat_id'); return true;\"
     onMouseOut=\"hide('cat_$cat_id'); return true;\"";
       $infos .= "<span class=\"hiddenLegend\" id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
-    }else {
+    } else {
       $onOver = "";
     }
     $cat_label .= "<th $onOver>
@@ -186,9 +189,10 @@ function dis_cat_stats($comp_q,$tot) {
     $cat_tots .= "<td class=\"totals\">".$cat_count[$cat_id]."</td>";
     $infos .= "<span class=\"hiddenLegend\"  id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
   }
+
   $pair = 0;
   $block .= "$cat_label<th>$l_totals</th><th>%</th></tr>";
-  foreach($stat as $cty_id => $data) {
+  foreach ($stat as $cty_id => $data) {
     if($cty_id != 0) {
       $onOver = "    onMouseOver=\"show(event,'cty_$cty_id'); return true;\"
     onMouseOut=\"hide('cty_$cty_id'); return true;\"";
@@ -196,11 +200,10 @@ function dis_cat_stats($comp_q,$tot) {
     } else {
       $onOver = "";
     }
-    if($pair == 0) {
+    if ($pair == 0) {
       $pair = 1;
       $block .= "<tr class=\"pair\">";
-    }
-    else {
+    } else {
       $pair = 0;
       $block .= "<tr class=\"impair\">";
     }
@@ -215,10 +218,12 @@ function dis_cat_stats($comp_q,$tot) {
     $block .= "<td class=\"totals\">$percent</td>";
     $block .= "</tr>";
   }
-  foreach($cat_s_count as $code => $value) {
-   $super_cat .= "<td colspan=\"".$cat_s_n[$code]."\">$value</td>";
-    $percent = round(($value)*100/$tot,1);
-    $super_cat_p .= "<td class=\"totals\" colspan=\"".$cat_s_n[$code]."\">$percent</td>";
+  if (is_array($cat_s_count)) {
+    foreach($cat_s_count as $code => $value) {
+      $super_cat .= "<td colspan=\"".$cat_s_n[$code]."\">$value</td>";
+      $percent = round(($value)*100/$tot,1);
+      $super_cat_p .= "<td class=\"totals\" colspan=\"".$cat_s_n[$code]."\">$percent</td>";
+    }
   }
   $block .= "
   <tr><th>$l_totals</th>$cat_tots<td>$tot</td><td></td></tr>
