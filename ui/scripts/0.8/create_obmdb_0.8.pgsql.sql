@@ -528,8 +528,8 @@ CREATE TABLE List (
 -- Table structure for table 'ContactList'
 --
 CREATE TABLE ContactList (
-  ContactList_listid     integer DEFAULT '0' NOT NULL,
-  ContactList_contactid  integer DEFAULT '0' NOT NULL
+  contactlist_list_id     integer DEFAULT '0' NOT NULL,
+  contactlist_contact_id  integer DEFAULT '0' NOT NULL
 );
 
 

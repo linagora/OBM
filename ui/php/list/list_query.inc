@@ -48,8 +48,8 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     A.userobm_login as usercreate,
     B.userobm_login as userupdate
   from 
-    (List LEFT JOIN ContactList ON list_id=ContactList_listid)
-    LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
+    (List LEFT JOIN ContactList ON list_id=contactlist_list_id)
+    LEFT JOIN Contact ON ContactList.contactlist_contact_id=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
   where (list_visibility=0 or list_usercreate='$uid')
@@ -184,6 +184,30 @@ function run_query_update($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Update the SQL for a List
+// Parameters:
+//   - $id : list id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_list_update_sql($id) {
+  global $auth, $cdg_sql;
+
+  $list_query = make_query_from_db($id);
+
+  $query = "update List set
+    list_timeupdate='". date("Y-m-d H:i:s")."',
+    list_userupdate='".$auth->auth["uid"]."',
+    list_query='$list_query'
+  where list_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution                                                  //
 // Parameters:
 //   - $p_id : list id
@@ -192,7 +216,7 @@ function run_query_delete($p_id) {
   global $cdg_sql;
 
   // Delete all contacts registration to this list
-  $query = "delete from ContactList where ContactList_listid='$p_id'";
+  $query = "delete from ContactList where contactlist_list_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -233,16 +257,16 @@ function run_query_contactlist_insert($list) {
     $con_id = $list["con$cpt"];
 
     $query = "select * from ContactList
-      where ContactList_listid='$id'
-        and ContactList_contactid='$con_id'";
+      where contactlist_list_id='$id'
+        and contactlist_contact_id='$con_id'";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
-      $query = "insert into ContactList (ContactList_listid,
-        ContactList_contactid) values ($id, $con_id)";
+      $query = "insert into ContactList (contactlist_list_id,
+        contactlist_contact_id) values ($id, $con_id)";
 
       display_debug_msg($query, $cdg_sql);
       $obm_q = new DB_OBM;
@@ -271,7 +295,7 @@ function run_query_contactlist_delete($list) {
     $con_id = $list["con$cpt"];
 
     $query = "delete from ContactList
-      where ContactList_listid='$id' and ContactList_contactid='$con_id'";
+      where contactlist_list_id='$id' and contactlist_contact_id='$con_id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -304,8 +328,8 @@ function run_query_contacts_list($list, $entity="") {
     $order = "order by contact_lastname";
   }
 
-  $query = "select ContactList_contactid as contact_id,
-         ContactList_contactid as Id,
+  $query = "select contactlist_contact_id as contact_id,
+         contactlist_contact_id as Id,
          contact_timeupdate,
          contact_timecreate,
          contact_userupdate,
@@ -342,12 +366,12 @@ function run_query_contacts_list($list, $entity="") {
          company_town,
          company_expresspostal
       from ContactList
-           LEFT JOIN Contact ON ContactList_contactid=contact_id
+           LEFT JOIN Contact ON contactlist_contact_id=contact_id
            LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
            LEFT JOIN Country ON Contact.contact_country_id = country_id
            LEFT JOIN Function ON Contact.contact_function_id = function_id
            LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
-      where ContactList_listid='$id'
+      where contactlist_list_id='$id'
          $order";
 
   $obm_q = new DB_OBM; 
@@ -365,7 +389,7 @@ function run_query_contacts_list($list, $entity="") {
 function get_list_nb_contact($id) {
   global $cdg_sql;
 
-  $query = "select count(*) from ContactList where ContactList_listid='$id'";
+  $query = "select count(*) from ContactList where contactlist_list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -534,7 +558,7 @@ function check_data_form($id, $list) {
   if (trim($query) != "") {
     // Check if banned words are included
     $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop', 'userobm_password');
-    while ( list($key, $value) = each($excluded_words)) {
+    while ( list($key, $value) = each($excluded_words) ) {
       if (preg_match("/\b$value\b/i", $query)) {
 	$err_msg = "$l_invalid_query $l_banned_word : $value";
 	return false;
@@ -563,22 +587,31 @@ function check_data_form($id, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the Name of a List from its Id                                        //
+// Get the infos of a List from its Id                                       //
 // Parameters:
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
-function get_list_name($id) {
+function get_list_info($id) {
   global $cdg_sql;
 
-  $query = "select list_name from List where list_id='$id'";
+  $query = "select list_id,
+      list_name,
+      list_structure,
+      list_mailing_ok
+    from List
+    where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("list_name");
-  return $retour;
+  $res["id"] = $obm_q->f("list_id");
+  $res["name"] = $obm_q->f("list_name");
+  $res["structure"] = $obm_q->f("list_structure");
+  $res["mailing_ok"] = $obm_q->f("list_mailing_ok");
+
+  return $res;
 }
 
 
@@ -672,68 +705,6 @@ function sql_query_resource_high($query) {
 }
 
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Distincts contacts from several lists for export        //
-// Parameters:
-//   - $list_ids : comma separated list of list id
-// Returns:
-//   - database result set
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contacts_for_letter($list_ids) {
-  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
-
-  $connect_db = new DB_OBM;
-  if($list_ids != "") {
-    $query = "select DISTINCT contact_id as list_contact_id,
-        contact_timeupdate as list_contact_timeupdate,
-        contact_timecreate as list_contact_timecreate,
-        contact_userupdate as list_contact_userupdate,
-        contact_usercreate as list_contact_usercreate,
-        contact_company_id as list_contact_company_id,
-        contact_lastname as list_contact_lastname,
-        contact_firstname as list_contact_firstname,
-        contact_address1 as list_contact_address1,
-        contact_address2 as list_contact_address2,
-        contact_zipcode as list_contact_zipcode,
-        contact_town as list_contact_town,
-        contact_expresspostal as list_contact_expresspostal,
-        c1.country_name as list_contact_country,
-        function_label as list_contact_function,
-        contact_phone as list_contact_phone,
-        contact_homephone as list_contact_homephone,
-        contact_mobilephone as list_contact_mobilephone,
-        contact_fax as list_contact_fax,
-        contact_email as list_contact_email,
-        contact_comment as list_contact_comment,
-        contact_visibility as list_contact_visibility,
-        company_name as contact_company_name,
-        company_address1 as contact_company_address1,
-        company_address2 as contact_company_address2,
-        company_zipcode as contact_company_zipcode,
-        company_town as contact_company_town,
-        company_expresspostal as contact_company_expresspostal,
-        c2.country_name as contact_company_country,
-        kind_minilabel as list_contact_kind
-      from Contact
-             left join Company on contact_company_id=company_id
-             left join Kind on contact_kind_id=kind_id
-             left join Function on contact_function_id=function_id
-             left join Country as c1 on contact_country_id=c1.country_id
-             left join Country as c2 on company_country_id=c2.country_id,
-           ContactList
-      where contactlist_listid in (";
-    $query .= $list_ids;
-    $query .= ") and contactlist_contactid = contact_id and company_id = contact_company_id and contact_kind_id = kind_id";
-    $query .= " order by ";
-    $query .= (strcmp($options_order,"") != 0) ? $options_order : "contact_lastname";
-    display_debug_msg($query, $cdg_sql);
-    $connect_db->query($query);
-  }
-  return $connect_db;
-}
 ///////////////////////////////////////////////////////////////////////////////
 // Contact Category 1 query execution
 // Return:
@@ -766,6 +737,8 @@ function run_query_contactcategory2() {
 
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Contact: Function select query execution
 // Returns:
@@ -784,6 +757,7 @@ function run_query_function() {
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Contact: Kind lang select query 
@@ -821,6 +795,7 @@ function run_query_publication() {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Reception mode subscription query execution                                 //
 // Return:
@@ -838,21 +813,37 @@ function run_query_subscriptionreception() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Generate the SQL Query from a List
+// Parameters:
+//   - $id : list id
+///////////////////////////////////////////////////////////////////////////////
+function make_query_from_db($id) {
+  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+
+  $list_info = get_list_info($id);
+  $structure = $list_info["structure"];
+  $list_info["criteria"] = unserialize($structure);
+
+  $query = make_query($list_info);
+
+  return $query;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make an SQL Query with the list of criteria
 // Parameters:
-//   - $list[]       : list search criteria
-//     keys used     : $criteria.
+//   - $list[]   : list search criteria
+//     keys used : $criteria.
 ///////////////////////////////////////////////////////////////////////////////
 function make_query($list) {
   global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
 
+  $id = $list["id"];
   $criteria = $list["criteria"]["modules"];
-  $query_kind = $list["query_kind"];
-  $bollean_criterion = $list["criteria"]["logical"]["NOT"];
+  $boulean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
-  
   $mailing_ok = $list["mailing_ok"];
   
   $obm_q = new DB_OBM;
@@ -972,7 +963,7 @@ function make_query($list) {
         company_town";
 	
   $join = " Contact left join Company on contact_company_id=company_id
-                    left join Country on contact.contact_country_id=country_id
+                    left join Country on Contact.contact_country_id=country_id
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
 	     
@@ -1015,29 +1006,76 @@ function make_query($list) {
       if ($line == 0) {
 	$logical_criterion[$line] = "";
       }
-      $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
+      $where .= $logical_criterion[$line]." ".$boulean_criterion[$line]." ($value)";
     }    
   }
 
 
-
-  
-  if($mailing_ok == 1) {
+  // Handle the Mailing enable flag
+  if ($mailing_ok == 1) {
     $where = " ($where) AND contact_mailing_ok = 1 ";
-  }	
-  if ($where != "") {
-    $where = " WHERE $where";
   }
-  $query = "SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname";
-  return trim(addslashes($query));
+
+  // If any (not in insert mode), add statics contacts to the query
+  if ($id > 0) {
+    $con_q = run_query_list_static_contact_id($id);
+    if ($con_q->num_rows() > 0) {
+      $first = true;
+      $where_static = "(";
+      while ($con_q->next_record()) {
+	$c_id = $con_q->f("contactlist_contact_id");
+	if ($first) {
+	  $where_static .= "contact_id='$c_id'";
+	} else {
+	  $where_static .= "or contact_id='$c_id'";
+	}
+	$first = false;
+      }
+      $where_static .= ")";
+    }
+  }
+
+  if ($where != "") {
+    if ($where_static != "") {
+      $where = "WHERE ($where) or $where_static";
+    } else {
+      $where = "WHERE $where";
+    }
+  }
+
+  $query = trim(addslashes("SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname"));
+
+  return $query;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Staticaly registered contacts ids to the list 
+// Parameters:
+//   - $id : List id
+// Returns:
+//   DB object result with statically registered contact
+///////////////////////////////////////////////////////////////////////////////
+function run_query_list_static_contact_id($id) {
+  global $cdg_sql;
+
+  $query = "select contactlist_contact_id
+    from ContactList
+    where contactlist_list_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make a query with the dynamic and static contact.
 // Parameters:
-//   - $query       : Dynamic query
-//   - $cont_q      : Statics users
+//   - $query  : Dynamic query
+//   - $cont_q : Statics users
 ///////////////////////////////////////////////////////////////////////////////
 function make_final_query($query,$con_q) {
   global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
@@ -1091,6 +1129,72 @@ function make_final_query($query,$con_q) {
   return $final_query; 
 }
 
+
+
+
+
+
+
+// Utilise que par adresses.php
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Distincts contacts from several lists for export        //
+// Parameters:
+//   - $list_ids : comma separated list of list id
+// Returns:
+//   - database result set
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contacts_for_letter($list_ids) {
+  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+
+  $connect_db = new DB_OBM;
+  if($list_ids != "") {
+    $query = "select DISTINCT contact_id as list_contact_id,
+        contact_timeupdate as list_contact_timeupdate,
+        contact_timecreate as list_contact_timecreate,
+        contact_userupdate as list_contact_userupdate,
+        contact_usercreate as list_contact_usercreate,
+        contact_company_id as list_contact_company_id,
+        contact_lastname as list_contact_lastname,
+        contact_firstname as list_contact_firstname,
+        contact_address1 as list_contact_address1,
+        contact_address2 as list_contact_address2,
+        contact_zipcode as list_contact_zipcode,
+        contact_town as list_contact_town,
+        contact_expresspostal as list_contact_expresspostal,
+        c1.country_name as list_contact_country,
+        function_label as list_contact_function,
+        contact_phone as list_contact_phone,
+        contact_homephone as list_contact_homephone,
+        contact_mobilephone as list_contact_mobilephone,
+        contact_fax as list_contact_fax,
+        contact_email as list_contact_email,
+        contact_comment as list_contact_comment,
+        contact_visibility as list_contact_visibility,
+        company_name as contact_company_name,
+        company_address1 as contact_company_address1,
+        company_address2 as contact_company_address2,
+        company_zipcode as contact_company_zipcode,
+        company_town as contact_company_town,
+        company_expresspostal as contact_company_expresspostal,
+        c2.country_name as contact_company_country,
+        kind_minilabel as list_contact_kind
+      from Contact
+             left join Company on contact_company_id=company_id
+             left join Kind on contact_kind_id=kind_id
+             left join Function on contact_function_id=function_id
+             left join Country as c1 on contact_country_id=c1.country_id
+             left join Country as c2 on company_country_id=c2.country_id,
+           ContactList
+      where contactlist_list_id in (";
+    $query .= $list_ids;
+    $query .= ") and contactlist_contact_id = contact_id and company_id = contact_company_id and contact_kind_id = kind_id";
+    $query .= " order by ";
+    $query .= (strcmp($options_order,"") != 0) ? $options_order : "contact_lastname";
+    display_debug_msg($query, $cdg_sql);
+    $connect_db->query($query);
+  }
+  return $connect_db;
+}
 
 </script>
 

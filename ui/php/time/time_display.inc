@@ -1073,8 +1073,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 	}
 	$proj_data .= "\nnew Array (\n". $proj_tt .",\n";
 	$previous_tt = $proj_tt;
-      }
-      else {
+      } else {
 	$proj_data .= ",\n";
       }
       $proj_data .= "new Array(". $proj_label .", ". $proj_id .")";  

@@ -76,14 +76,15 @@ require("list_js.inc");
 if (! $popup) {
   $display["header"] = generate_menu($menu, $section); // Menu
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "new_criterion") {
   require("$obminclude/calendar.js");  
   $display["detail"] = dis_add_criterion_form($list);
-}
-elseif (($action == "index") || ($action == "")) {
+
+} elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_list_search_form($list);
   if ($set_display == "yes") {
@@ -91,32 +92,21 @@ elseif (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-}
 
-else if ($action == "search") {
+} else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_list_search_form($list);
   $display["result"] = dis_list_search_list($list, $popup);
-}
 
-else if ($action == "new") {
+} else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_list_form($action, "", $list);
-}
 
-else if ($action == "detailconsult") {
+} else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_detail($list["id"]);
-  if (is_entity_visible("list", $list_q, $uid)) {
-    $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list, $entity);
-    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
-  } else {
-    $display["msg"] .= display_warn_msg($l_error_visibility);
-  }
-}
+  $display["detail"] = dis_list_consult($list);
 
-else if ($action == "detailupdate") {
+} else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_detail($list["id"]);
   if (is_entity_visible("list", $list_q, $uid)) {
@@ -125,11 +115,10 @@ else if ($action == "detailupdate") {
     // this deal's page has "private" access
     $display["msg"] .= display_err_msg($l_error_visibility);
   } 	
-}
 
-else if ($action == "insert") {
+} else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if($list["criteria"] != "") {
+  if ($list["criteria"] != "") {
     $list["query"] = make_query($list);
   }
   if (check_data_form("", $list)) {
@@ -165,10 +154,9 @@ else if ($action == "insert") {
     $display["detail"] = dis_list_form($action, "", $list);
   }
 
-
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if($list["criteria"]!="") {
+  if ($list["criteria"] != "") {
     $list["query"] = make_query($list);
   }
   if (check_data_form($list["id"], $list)) {
@@ -178,10 +166,7 @@ else if ($action == "insert") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $list_q = run_query_detail($list["id"]);
-    $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list);
-    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+    $display["detail"] = dis_list_consult($list);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
     $list_q = run_query_detail($list["id"]);
@@ -206,60 +191,52 @@ else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["con_nb"] > 0) {
     $nb = run_query_contactlist_insert($list);
+    run_query_list_update_sql($list["id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_added");
   } else {
     $display["msg"] .= display_err_msg("no contact to add");
   }
-  $list_q = run_query_detail($list["id"]);
-  $pref_con_q = run_query_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($list);
-  $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+  $display["detail"] = dis_list_consult($list);
 
 } elseif ($action == "contact_del")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["con_nb"] > 0) {
     $nb = run_query_contactlist_delete($list);
+    run_query_list_update_sql($list["id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
   } else {
     $display["msg"] .= display_err_msg("no contact to delete");
   }
-  $list_q = run_query_detail($list["id"]);
-  $pref_con_q = run_query_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($list);
-  $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+  $display["detail"] = dis_list_consult($list);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
   $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
-}
 
-else if($action == "dispref_display") {
+} else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
   $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
-}
 
-else if($action == "dispref_level") {
+} else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
   $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
-}
 
-else if($action == "export_add") {
+} else if($action == "export_add") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_export_form($list);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_ids") {
+} else if ($action == "ext_get_ids") {
   $display["search"] = dis_list_search_form($list);
   if ($set_display == "yes") {
     $display["detail"] = dis_list_search_list($list, $popup);

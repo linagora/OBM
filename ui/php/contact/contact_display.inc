@@ -379,8 +379,10 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   $company_id = $contact["company_id"];
   $func = $contact["function"];
   $mark = $contact["marketing_manager"];
+  $cat1 = $contact["category1"];
+  $cat2 = $contact["category2"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark&amp;sel_cat1=$cat1&amp;sel_cat2=$cat2$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
   if ($popup) {
@@ -473,6 +475,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $c_id = $co_q->f("contact_company_id");
   $c_name = $co_q->f("company_name");
   $c_phone = $co_q->f("company_phone");
+  $c_fax = $co_q->f("company_fax");
   $id = $co_q->f("contact_id");
   $kind = "[" . $co_q->f("kind_lang") . "] " . $co_q->f("kind_minilabel");
   $kind_header = $co_q->f("kind_header");
@@ -498,6 +501,9 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $hphone = $co_q->f("contact_homephone");
   $mphone = $co_q->f("contact_mobilephone");
   $fax = $co_q->f("contact_fax");
+  if ( (trim($fax) != "") && ($fax == $c_fax)) {
+    $fax = "( $fax )";
+  }
   $email = $co_q->f("contact_email");
   $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
@@ -956,6 +962,7 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
     if (is_object($co_q)) {
       // fill the phone with company one
       $phone = $co_q->f("company_phone");
+      $fax = $co_q->f("company_fax");
       $ad1 = $co_q->f("company_address1");
       $ad2 = $co_q->f("company_address2");
       $ad3 = $co_q->f("company_address3");

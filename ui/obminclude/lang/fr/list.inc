@@ -89,9 +89,9 @@ $l_del_contact_sel = "Enlever ces contacts";
 $l_contact_added = "Contact(s) ajouté(s)";
 $l_contact_removed = "Contact(s) enlevé(s)";
 $l_static_con_found = "contacts statiques enregistrés";
-$l_dyn_con_found = "contacts dynamiques enregistrés";
+$l_dyn_con_found = "Contacts trouvés";
 $l_no_static_contact = "Il n'y a pas de contact statique dans cette liste";
-$l_no_dyn_contact = "Il n'y a pas de contact dynamique dans cette liste";
+$l_no_dyn_contact = "Pas de contacts trouvés";
 
 $l_fill_name = "Le nom de la liste doit être saisi !";
 $l_fill_subject = "Le sujet doit être saisi !";

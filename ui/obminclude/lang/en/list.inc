@@ -86,8 +86,8 @@ $l_found = "lists found.";
 $l_no_found = "No lists found matching the query";
 $l_static_con_found = "static registered contacts";
 $l_no_static_contact = "No static contact registered";
-$l_dyn_con_found = "dynamic registered contacts";
-$l_no_dyn_contact = "No dynamic contact registered";
+$l_dyn_con_found = "Contacts found";
+$l_no_dyn_contact = "No contacts found";
 
 $l_add_contact = "Add contacts to the list" ;
 $l_del_contact_sel = "Remove these contacts";

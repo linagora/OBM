@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_js.inc                                                  //
 //     - Desc : Time javascript functions File                               //
@@ -32,6 +32,7 @@ function select_all(form) {
   }
   return false;
 }
+
 
 ////////////////////////
 // Task Form checking //
@@ -161,6 +162,8 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
     // there are projects with the selected tasktype
     if (tt_location != -1) {
       // add new items
+      // Way to correct bug#361 ?? but causes 1 undefined in project list ??
+      // project[tt_location].sort();
       for (i = 1; i < project[tt_location].length; i++) {
         sel_list.options[i-1] = new Option(project[tt_location][i][0]);
         sel_list.options[i-1].value = project[tt_location][i][1]; 
@@ -185,10 +188,10 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
   }
 }
 
+
 /////////////////////////////////////////
 // projecttask dynamic list generation //
 /////////////////////////////////////////
-
 function fill_projecttask(sel_list, deal_id) {
   var i, j;
   // location of selected deal in projecttask array

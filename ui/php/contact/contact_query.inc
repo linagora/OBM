@@ -172,6 +172,7 @@ function run_query_contact_company($c_id) {
   $query = "select company_id,
       company_name,
       company_phone,
+      company_fax,
       company_address1,
       company_address2,
       company_address3,
@@ -294,7 +295,7 @@ function run_query_contact_detail($p_id) {
   $query = "select Contact.*,
         $timeupdate,
         $timecreate,
-        company_id, company_name, company_phone,
+        company_id, company_name, company_phone, company_fax,
         kind_lang,
         kind_minilabel,
         kind_header,
@@ -771,11 +772,11 @@ function run_query_contact_list_links($p_id) {
 
   $query = "select distinct list_id,
       list_name,
-      ContactList_contactid,
-      ContactList_listid
+      contactlist_contact_id,
+      contactlist_list_id
     from List, ContactList
-    where list_id=ContactList_listid
-      and ContactList_contactid='$p_id'";
+    where list_id=contactlist_list_id
+      and contactlist_contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

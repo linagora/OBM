@@ -352,11 +352,11 @@ function run_query_update($task) {
   $query = "
   update TimeTask set
     timetask_date='$date',
-    timetask_tasktype_id=$ttype,
+    timetask_tasktype_id='$ttype',
     timetask_length='$time',
     timetask_label='$label',
-    timetask_projecttask_id=$projecttask
-  where timetask_id=$id";
+    timetask_projecttask_id='$projecttask'
+  where timetask_id='$id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_update");
   $obm_db = new DB_OBM;

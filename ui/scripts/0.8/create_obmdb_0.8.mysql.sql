@@ -458,6 +458,7 @@ CREATE TABLE DealStatus (
   PRIMARY KEY (dealstatus_id)
 );
 
+
 --
 -- Table structure for table 'DealType'
 --
@@ -471,7 +472,6 @@ CREATE TABLE DealType (
   dealtype_inout       varchar(1) DEFAULT '-',
   PRIMARY KEY (dealtype_id)
 );
-
 
 
 -
@@ -493,10 +493,9 @@ CREATE TABLE DealCategory (
 --
 CREATE TABLE DealCategoryLink (
   dealcategorylink_category_id  int(8) NOT NULL default '0',
-  dealcategorylink_deal_id   int(8) NOT NULL default '0',
+  dealcategorylink_deal_id      int(8) NOT NULL default '0',
   PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
 );
-
 
 
 -------------------------------------------------------------------------------
@@ -528,8 +527,8 @@ CREATE TABLE List (
 -- Table structure for table 'ContactList'
 --
 CREATE TABLE ContactList (
-  ContactList_listid     int(8) DEFAULT '0' NOT NULL,
-  ContactList_contactid  int(8) DEFAULT '0' NOT NULL
+  contactlist_list_id     int(8) DEFAULT '0' NOT NULL,
+  contactlist_contact_id  int(8) DEFAULT '0' NOT NULL
 );
 
 
@@ -861,8 +860,7 @@ CREATE TABLE Contract (
   contract_clause            text,
   contract_comment           text,
   contract_archive           int(1) default 0,
-
-  PRIMARY KEY  (contract_id)
+  PRIMARY KEY (contract_id)
 ) TYPE=MyISAM;
 
 

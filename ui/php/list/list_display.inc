@@ -73,7 +73,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "list_nb_contact") {
     $nb_q = new DB_OBM;
     $id = $OD->data_set->f("list_id");
-    $query = "select count(*) from ContactList where ContactList_listid='$id'";
+    $query = "select count(*) from ContactList where contactlist_list_id='$id'";
     $nb_q->query($query);
     $nb_q->next_record();
     $res["name"] = $nb_q->f(0) . " / " .$OD->data_set->f("list_query_nb");
@@ -339,7 +339,7 @@ function dis_list_search_list($list, $popup=false) {
 //   - $obm_q    : list of the lists to display 
 //   - $pref_q   : fields that have to be displayed
 //   - $nb_list  : nb lists returned by the search query 
-//   - $list[ ]  : list search criteria
+//   - $list[]   : list search criteria
 //     keys used : name, contact, ext_id, ext_url, ext_action
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
@@ -386,6 +386,29 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
     </form>
     <p align=\"right\">
     <a href=\"\" onclick='window.close();'>$l_close</a></p>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display List Consultation
+// Parameters:
+//   - $list[] : list parameters
+///////////////////////////////////////////////////////////////////////////////
+function dis_list_consult($list) {
+  global $display, $uid, $l_error_visibility;
+
+  $id = $list["id"];
+
+  $list_q = run_query_detail($id);
+  if (is_entity_visible("list", $list_q, $uid)) {
+    $pref_con_q = run_query_display_pref($uid, "list_contact");
+    $con_q = run_query_contacts_list($list, $entity);
+    $block = html_list_consult($list_q, $pref_con_q, $con_q);
+  } else {
+    $display["msg"] .= display_warn_msg($l_error_visibility);
   }
 
   return $block;
@@ -599,7 +622,7 @@ function html_list_form($action, $list_q, $list) {
     $query = $list_q->f("list_query");
     $vis = ($list_q->f("list_visibility") == 0 ? "0" : "1");
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
-      }
+  }
   
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
@@ -623,11 +646,10 @@ function html_list_form($action, $list_q, $list) {
   if ($mailing_ok == 1) $dis_mailing .= "checked = \"checked\""; 
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
-  if ($crit_q =="" && $query != "") {
+  if ($crit_q == "" && $query != "") {
     $query_checked = " checked=\"checked\" ";
     $dis_query = "";
-  }
-  else {
+  } else {
     $criterion_checked = " checked=\"checked\" ";
     $dis_query = "style=\"display:none;\"";
   }
@@ -711,7 +733,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["criteria"])) { 
     $criteria = $list["criteria"];
-    if(!is_array($criteria)) {
+    if (!is_array($criteria)) {
       $criteria = unserialize($criteria);
     }
     $bollean_criterion = $criteria["logical"]["NOT"];
@@ -1027,6 +1049,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
   global $l_none,$l_yes,$l_no;
   global $set_theme,$ico_mini_cal;  
+
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while($cty_q->next_record()) {
     $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
@@ -1133,10 +1156,11 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td></td>
   </tr>
 
-  </table>
-  ";
+  </table>";
+
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Contact Criterion Form //
@@ -1354,7 +1378,8 @@ function dis_export_form($list) {
       $param_list .= ",$val";
     }
     $first = false;
-    $name = get_list_name($val);
+    $list_info = get_list_info($val);
+    $name = $list_info["name"];
     $d_list .= "
     <tr>
       <td class=\"detailText\">
