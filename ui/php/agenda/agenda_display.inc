@@ -433,7 +433,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     $hour_day_list .= 	"<tr>";
     $hour_day_list .= 	"<td height=\"15\" rowspan=\"$set_time_unit\" class=\"agendaHour\">$i:00</td>";
-    $hour_day_list .= 	"<td width=\"1\"></td>";
+    $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
     for($j=0; $j<7;$j++) {
       $current_time = date("YmdHi", strtotime("+$j days $i hours",$start_week_day));  
       if(is_array($current_events[$current_time])) {
@@ -509,7 +509,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     }
     $hour_day_list .=   "</tr>\n";
     for($k=1;$k<$set_time_unit;$k++) {
-      $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
+      $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
       for($j=0; $j<7;$j++) {
       	$current_time = date("YmdHi", strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day));  
 	if(is_array($current_events[$current_time])) {

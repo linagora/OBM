@@ -1213,7 +1213,7 @@ function check_data_form($agenda) {
     $err_msg =  $l_err_end_repeat3;
     return false;
   }  
-  if($kind != "" && $dateend > $datebegin) {
+  if($kind != "none" && $dateend > $datebegin) {
     $err_msg =  $l_err_repeat;
     return false;
   }  
@@ -1259,7 +1259,7 @@ function get_event_repetition_dates($agenda) {
   
 
   if($repeat_end!="") {
-    $time_end_repeat = strtotime($repeat_end);
+    $time_end_repeat = strtotime("+1 day",strtotime($repeat_end));
   }
   else {
     $time_end_repeat = strtotime("+1 year +1 day", strtotime($this_year_b.$this_month_b.$this_day_b));

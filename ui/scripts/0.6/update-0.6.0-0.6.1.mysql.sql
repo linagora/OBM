@@ -16,3 +16,4 @@ ALTER table Contact add column tmp text;
 UPDATE Contact set tmp=contact_comment;
 ALTER table Contact drop column contact_comment;
 ALTER table Contact change tmp contact_comment text;
+ALTER TABLE `CalendarEvent` CHANGE `calendarevent_endrepeat` `calendarevent_endrepeat` VARCHAR( 12 ) DEFAULT NULL; 
