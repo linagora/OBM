@@ -41,7 +41,32 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("OBM Version $obm_version");
 $display["header"] = generate_menu("","");
+$display["title"] = "<div class=\"title\">Accueil : </div>";
 $display["detail"] = "
+<div class=\"detail\">
+ <div class=\"portal\">
+  <div class=\"portalModule\"> 
+   <div class=\"portalModuleLeft\">
+    <img src=\"/images/standard/$ico_agenda_portal\" />
+   </div>
+   <div class=\"portalTitle\">$l_header_agenda</div>
+    <div class=\"portalContent\"></div>
+    <div class=\"portalLink\"> </div>
+  </div>
+  <div class=\"portalModule\"> 
+   <div class=\"portalModuleLeft\">
+    <img src=\"/images/standard/$ico_agenda_portal\" />
+   </div>
+   <div class=\"portalTitle\">$l_header_agenda</div>
+    <div class=\"portalContent\"></div>
+    <div class=\"portalLink\"> </div>
+  </div>
+<p style=\"clear:both;\"/>  
+ </div>
+
+</div>
+
+
 <center>
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
 </center>";
