@@ -31,7 +31,7 @@ $module = "admin_ref";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc"); 
-page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
 require("admin_ref_display.inc");

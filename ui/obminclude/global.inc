@@ -100,6 +100,13 @@ $c_task_notvalid = 0;    // task not valiated
 $c_task_uservalid = 1;   // validated by user (auto when day is full)
 $c_task_adminvalid = 2;  // validated by admin
 
+// authentification 
+// can be 'CAS' => SSO within AliaSuite
+// or 'standalone' => OBM alone 
+// defaults to 'standalone'
+$auth_kind="standalone"; 
+// CAS specific parameters are in obm_conf.inc.
+
 //-------------------------//
 // Default Displayed Infos //
 //-------------------------//
@@ -162,6 +169,24 @@ if ($cgp_hide["company"]["company_expresspostal"]) {
 if ($cgp_hide["contact"]["contact_function"]) {
   $cgp_hide["list_contact"]["function_label"] = true;
   $cgp_hide["list_contact_2"]["function_label"] = true;
+}
+
+//---------------------------------------------------------------------------//
+// OBM authentication Management : 
+// Just change $cas_version according to your phpCAS lib
+//---------------------------------------------------------------------------//
+if ($auth_kind == "CAS") {
+  $auth_class_name = "CAS_Auth";
+  include_once("$obminclude/CAS/CAS.php");
+  // adjust value according to phpCAS lib you use
+  $cas_version = CAS_VERSION_2_0; 
+  phpCAS::setDebug();
+} elseif($auth_kind == "standalone") {
+  $auth_class_name = "OBM_Challenge_Auth";
+} else {
+  echo "unknown Authentication kind !<br/>";
+  echo "please edit \$auth_kind in obm_conf.inc";
+  exit;
 }
 
 

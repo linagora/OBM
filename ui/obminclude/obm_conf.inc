@@ -103,5 +103,16 @@ $cgp_hide["contact"]["contact_function"] = true;
 
 $cgp_hide["deal"]["category1"] = true;
 
+// authentification 
+// 'CAS' or 'standalone'
+// defaults to 'standalone'
+//$auth_kind="CAS"; 
+// CAS specific parameters.
+// useless in standalone mode
+// Authentication used :
+$cas_server ="sso.aliacom.local";
+$cas_server_port = 8443;
+$cas_server_uri = "";
+
 
 </script>

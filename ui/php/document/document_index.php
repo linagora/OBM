@@ -18,7 +18,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 $extra_css = "document.css";
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("document_query.inc");
 require("document_display.inc");

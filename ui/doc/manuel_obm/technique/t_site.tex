@@ -82,8 +82,24 @@ Liste des paramètres définis :\\
 \hline
 \$cgp\_hide & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
 \hline
+\$auth\_kind\footnotemark[1] & 'standalone' & "standalone" pour gérer les
+authentifications dans la base OBM, "CAS" pour passer par un serveur
+CAS \\ 
+\hline
+\$cas\_server & aucune & nom ou IP du serveur CAS. Utilisé seulement
+si le mode d'authentification est "CAS". \\ 
+\hline
+\$cas\_server\_port & aucune & port du service CAS sur le serveur. Utilisé seulement
+si le mode d'authentification est "CAS". \\ 
+\hline
+\$cas\_server\_uri & aucune  &  URI du service CAS sur le
+serveur. Utilisé seulement si le mode d'authentification est "CAS".\\  
+\hline
 \end{longtable}
 
+\footnotetext[1]{L'installation de l'authentification CAS est
+  détaillée dans la documentation Aliamin. En attendant l'unification
+  entre ces deux documentations, merci de vous référer à cette dernière.}
 
 
 \subsection{Le paramétrage des sections visibles et leur lien}

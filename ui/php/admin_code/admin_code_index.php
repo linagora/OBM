@@ -38,7 +38,7 @@ switch ($mode) {
    if (! $retour) { end; }
    break;
  case "html":
-   page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+   page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    //   $debug = $set_debug;
    if($action == "") $action = "index";

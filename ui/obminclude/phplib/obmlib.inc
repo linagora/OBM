@@ -21,6 +21,7 @@ if ($obmdb_dbtype == $db_type_pgsql) {
 } else {
   require_once("$obminclude/phplib/db_mysql.inc");
 }
+
 require("$obminclude/phplib/ct_sql.inc");
 require("$obminclude/of/of_session.inc");
 require("$obminclude/phplib/auth.inc");
@@ -192,6 +193,252 @@ class OBM_Challenge_Auth extends Auth {
       return $uid;
     }
   }
+}
+
+class CAS_Auth extends Auth {
+
+  var $classname      = "CAS_Auth";
+  var $lifetime       =  0;
+  var $magic          = "CASSimsalabim";  ## Challenge seed
+  var $database_class = "DB_OBM";
+  var $database_table = "UserObm";
+
+  function auth_loginform() {
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
+    phpCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+    phpCAS::authenticateIfNeeded();
+  }
+
+  function is_authenticated() {
+    global $ticket;
+    if (
+      $this->auth["uid"] 
+        && 
+      (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
+    ) {
+      # If more than $this->refresh minutes are passed since last check,
+      # perform auth data refreshing. Refresh is only done when current
+      # session is valid (registered, not expired).
+      if (
+        ($this->refresh > 0) 
+         && 
+        ($this->auth["refresh"])
+         && 
+        ($this->auth["refresh"] < time())
+      ) {
+        if ( $this->auth_refreshlogin() ) {
+          $this->auth["refresh"] = time() + (60 * $this->refresh);
+        } else {
+          return false;
+        }
+      }
+      return $this->auth["uid"] ;
+    } elseif (isset($ticket)) {
+      return "form" ;
+    } else {
+      return false;
+    }
+  }
+
+  function auth_validatelogin () {
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
+    phpCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+    //valider le login CAS
+    if (!phpCAS::isAuthenticated()) {
+      echo "non authentifié";
+      return false;
+    }
+
+    $login = phpCAS::getUser();
+
+    $this->db->query(sprintf("select userobm_id,
+        userobm_perms
+      from %s
+      where userobm_login = '%s'",
+			     $this->database_table,
+			     addslashes($login)));
+
+    while ($this->db->next_record()) {
+      $uid  = $this->db->f("userobm_id");
+      $perm = $this->db->f("userobm_perms");
+    }
+
+    $this->auth["perm"] = $perm;
+    $this->auth["uname"] = $login;
+    return $uid;
+  }
+   
+   function logout($nobody = "") {
+    global $sess;
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
+    
+    $sess->unregister("auth");
+    unset($this->auth["uname"]);
+    $this->unauth($nobody == "" ? $this->nobody : $nobody);
+
+    phpCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+    phpCAS::logout();
+  }
+  
+##
+## Initialization
+##
+  function start() {
+    $cl = $this->cancel_login;
+    global $sess, $$cl;
+
+    ## This is for performance, I guess but I'm not sure if it could
+    ## be safely removed -- negro
+    if (! $this->in) {
+      $sess->register("auth");
+      $this->in = true;
+    }
+    
+    ## back compatibility: if d_c is set, create db object
+    if(isset($this->database_class)) {
+      $class = $this->database_class;
+      $this->db = new $class;
+    }
+
+    # Check current auth state. Should be one of
+    #  1) Not logged in (no valid auth info or auth expired)
+    #  2) Logged in (valid auth info)
+    #  3) Login in progress (if $$cl, revert to state 1)
+    // seule modif par rapport à Auth::start()
+    if ($uid = $this->is_authenticated()) {
+      
+      switch ($uid) {
+        case "form":
+          # Login in progress
+          if ($$cl) {
+            # If $$cl is set, delete all auth info 
+            # and set state to "Not logged in", so eventually
+            # default or automatic authentication may take place
+            $this->unauth();
+            $state = 1;
+          } else {
+            # Set state to "Login in progress"
+            $state = 3;
+          }
+          break;
+        default:
+          # User is authenticated and auth not expired
+          $state = 2;
+          break;
+      }
+    } else {
+      # User is not (yet) authenticated
+      $this->unauth();
+      $state = 1;
+    }
+
+    switch ($state) {
+      case 1:
+        # No valid auth info or auth is expired
+        
+        # Check for user supplied automatic login procedure 
+        if ( $uid = $this->auth_preauth() ) {
+          $this->auth["uid"] = $uid;
+          $this->auth["exp"] = time() + (60 * $this->lifetime);
+          $this->auth["refresh"] = time() + (60 * $this->refresh);
+          return true;
+        }
+        
+        # Check for "log" vs. "reg" mode
+        switch ($this->mode) {
+          case "yes":
+          case "log":
+            if ($this->nobody) {
+              # Authenticate as nobody
+              $this->auth["uid"] = "nobody";
+              # $this->auth["uname"] = "nobody";
+              $this->auth["exp"] = 0x7fffffff;
+              $this->auth["refresh"] = 0x7fffffff;
+              return true;
+            } else {
+              # Show the login form
+              $this->auth_loginform();
+              $this->auth["uid"] = "form";
+              $this->auth["exp"] = 0x7fffffff;
+              $this->auth["refresh"] = 0x7fffffff;
+              $sess->freeze();
+              exit;
+            }
+            break;
+          case "reg":
+            # Show the registration form
+            $this->auth_registerform();
+            $this->auth["uid"] = "form";
+            $this->auth["exp"] = 0x7fffffff;
+            $this->auth["refresh"] = 0x7fffffff;
+            $sess->freeze();
+            exit;
+            break;
+          default:
+            # This should never happen. Complain.
+            echo "Error in auth handling: no valid mode specified.\n";
+            $sess->freeze();
+            exit;
+        }
+        break;
+      case 2:
+        # Valid auth info
+        # Refresh expire info
+        ## DEFAUTH handling: do not update exp for nobody.
+        if ($uid != "nobody")
+          $this->auth["exp"] = time() + (60 * $this->lifetime);
+        break;
+      case 3:
+        # Login in progress, check results and act accordingly
+        switch ($this->mode) {
+          case "yes":
+          case "log":
+            if ( $uid = $this->auth_validatelogin() ) {
+              $this->auth["uid"] = $uid;
+              $this->auth["exp"] = time() + (60 * $this->lifetime);
+              $this->auth["refresh"] = time() + (60 * $this->refresh);
+              return true;
+            } else {
+              $this->auth_loginform();
+              $this->auth["uid"] = "form";
+              $this->auth["exp"] = 0x7fffffff;
+              $this->auth["refresh"] = 0x7fffffff;
+              $sess->freeze();
+              exit;
+            }
+            break;
+          case "reg":
+            if ($uid = $this->auth_doregister()) {
+              $this->auth["uid"] = $uid;
+              $this->auth["exp"] = time() + (60 * $this->lifetime);
+              $this->auth["refresh"] = time() + (60 * $this->refresh);
+              return true;
+            } else {
+              $this->auth_registerform();
+              $this->auth["uid"] = "form";
+              $this->auth["exp"] = 0x7fffffff;
+              $this->auth["refresh"] = 0x7fffffff;
+              $sess->freeze();
+              exit;
+            }
+            break;
+          default:
+            # This should never happen. Complain.
+            echo "Error in auth handling: no valid mode specified.\n";
+            $sess->freeze();
+            exit;
+            break;
+        }
+        break;
+      default:
+        # This should never happen. Complain.
+        echo "Error in auth handling: invalid state reached.\n";
+        $sess->freeze();
+        exit;
+        break;
+    }
+  }
+
 }
 
 

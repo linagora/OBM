@@ -42,7 +42,7 @@ switch ($mode) {
  case "html":
    $pref = get_param_pref();
    $debug = $set_debug;
-   page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+   page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
    get_admin_pref_action();
