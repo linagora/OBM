@@ -464,7 +464,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
   $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
-  if ($auth->auth["perm"] == $perms_admin) {
+  if ($auth->auth["perm"] == $perms_user) {
     echo "<a href=\"".url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br /><br />";
     // this is displayed close to links so we use that color too
     echo "$nb_invoices $l_invoices_connected.";

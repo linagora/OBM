@@ -455,7 +455,7 @@ function get_agenda_action() {
     'Condition'=> array ('index','detailconsult',
                   'view_month','view_week','view_day','view_year',
                   'insert','insert_conflict',
-		  'update_decision','decision') 
+		  'update_decision','decision','update') 
                                     );
 
 //Insert
