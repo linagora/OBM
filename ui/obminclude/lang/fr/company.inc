@@ -12,6 +12,7 @@ $l_number = "Numéro";
 $l_aka = "Aussi connue comme";
 $l_company_name = "Nom Société";
 $l_kind = "Type";
+$l_category = "Categories";
 $l_activity = "Secteur d'activité";
 $l_market = "Responsable du compte";
 $l_company_kind = "Type Société";
@@ -44,6 +45,7 @@ $l_act_new = "Nouveau secteur d'activité";
 $l_company = "Société";
 
 // Actions
+$l_add = "Ajouter";
 $l_insert = "Enregistrer la Société";
 $l_update = "Modifier la Société";
 $l_checkdelete = "Vérifier ou Supprimer la Société";

@@ -353,14 +353,14 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
 // Parameters:
 //   - $co_q   : company database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult($co_q) {
+function html_company_consult($co_q,$cat_q) {
   // - Themes
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   // - Labels
   global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_archive;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
-  global $l_insert,$l_update,$l_delete, $l_company, $l_coord;
+  global $l_insert,$l_update,$l_delete, $l_company, $l_coord,$l_category;
   global $display, $c_yes, $c_no;
 
   $id = $co_q->f("company_id");
@@ -402,7 +402,7 @@ function html_company_consult($co_q) {
   } else {
     $dis_aka = "";
   }
-
+  
   // Email link
   if ($email != "") {
     $link_email = "<a href=\"mailto:$email\">
@@ -410,6 +410,25 @@ function html_company_consult($co_q) {
       alt=\"$email\" /></a>";
   } else {
     $link_email = "&nbsp;";
+  }
+
+  $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
+  $i = 0;
+  while($cat_q->next_record()) {
+    if($i==0) {
+      $cat_disp .= "<tr>";
+    }
+    $length = 8 - strlen($cat_q->f("companycategory_code"));
+    $label = $cat_q->f("companycategory_code");
+    for($i=0;$i<$length;$i++) {
+      $label .= "-";
+    }
+    $label .= "-".$cat_q->f("companycategory_label");    
+    $i++;
+    $cat_disp .= "<td class=\"detailText\"> $label </td>";
+    if($i==3) {
+      $cat_disp .= "</tr>";
+    }    
   }
 
   // Web link
@@ -451,9 +470,9 @@ function html_company_consult($co_q) {
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $cat_q, $compcat,$ctry_q, $company) {
   global $display, $auth, $set_dsrc, $l_none;
-  global $set_theme,$ico_web,$ico_mail;
+  global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
@@ -511,7 +530,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ct
   if (isset($company["web"])) { $web = stripslashes($company["web"]); }
   if (isset($company["email"])) { $email = stripslashes($company["email"]); }
   if (isset($company["com"])) { $com = stripslashes($company["com"]); }
-
+  if (isset($company["cat"])) { $compcat = $company["cat"]; }
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
     <option value=\"0\">$l_none</option>";
@@ -532,7 +551,26 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ct
     $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
   }
   $sel_kind .= "</select>";
-
+  // cat select
+  $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;\">";
+  $i =0;
+  while($cat_q->next_record()) {
+    $c_id = $cat_q->f("companycategory_id");
+    $sel_cat .= "\n<option value=\"$c_id\"";
+    if ($compcat[$i] == $c_id) { 
+      $sel_cat .= " selected=\"selected\""; 
+      $i++;
+    }
+    $length = 8 - strlen($cat_q->f("companycategory_code"));
+    $label = $cat_q->f("companycategory_code");
+    for($i=0;$i<$length;$i++) {
+      $label .= "-";
+    }
+    $label .= "-".$cat_q->f("companycategory_label");
+    $sel_cat .= ">$label</option>\n";
+  }
+  $sel_kind .= "</select>";
+ 
   // activity select
   $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
     <option value=\"0\">$l_none</option>";
@@ -601,6 +639,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ct
       <input type=\"submit\" value=\"$l_insert\" />
       ";
   }
+  $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
   $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
@@ -620,7 +659,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ct
     </tr><tr>
       <td class=\"detailLabel\">$l_aka</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
-    </tr><tr>
+    </tr><tr
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
     </tr><tr>
@@ -633,6 +672,12 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ct
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_category
+      <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">+</a>
+      </td>
+      <td class=\"detailForm\">$sel_cat</td>
+    </tr><tr>      
       <td class=\"detailLabel\">$l_activity</td>
       <td class=\"detailForm\">$sel_act</td>
     </tr><tr>    
@@ -1062,16 +1107,23 @@ function html_company_cat_form($cat_q) {
   $sel_cat = "<select name=\"sel_cat\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
     pos = mytext.indexOf('-');
-    ext = mytext.substr(0, pos-1);
-    mytext = mytext.substr(pos+2); 
+    pos2 = mytext.indexOf(' ');
+    ext = mytext.substr(0, pos);
+    mytext = mytext.substr(pos2+1); 
     forms.form_cat_update.tf_cat.value=mytext;
     forms.form_cat_update.tf_cat_code.value=ext;\"
-    size=\"4\" >";
+    size=\"4\" style=\"font-family:monospace;\">";
   while ($cat_q->next_record()) {
     $id = $cat_q->f("companycategory_id");
     $code = $cat_q->f("companycategory_code");
     $label = $cat_q->f("companycategory_label");
-    $sel_cat .= "\n<option value=\"$id\">$code - $label</option>";
+    $length = 8 - strlen($cat_q->f("companycategory_code"));
+    $label2 = $cat_q->f("companycategory_code");
+    for($i=0;$i<$length;$i++) {
+      $label2 .= "-";
+    }
+    $label2 .= " ".$cat_q->f("companycategory_label");    
+    $sel_cat .= "\n<option value=\"$id\">$label2</option>";
   }
   $sel_cat .= "</select>";
 
@@ -1556,5 +1608,114 @@ function html_select_company($comp_q, $company) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: category Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_category_tree($category) {
+  global $l_close,$l_add;
+  $popup = $category["popup"];
+  $obm_d = run_query_get_tree();
+  if($popup) {
+    $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link_end ="</a>";
+  }
+  $name = '/';
+  $kind = "0";
+  $realpath = $path.$name;
+  
+  $block.= "
+  <div class=\"categoryTree\">
+   <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
+   ";
+   
+   while($obm_d->next_record()) {
+     $id = $obm_d->f("companycategory_id");
+     $code = $obm_d->f("companycategory_code");
+     $doc_info = array(
+     "id" =>$id,
+     "label" =>$obm_d->f("companycategory_label"),
+     "code" => $code);
+     $hash_code = explode(".",$code);
+     $deep = count($hash_code);
+     switch ($deep) {
+       	case 1:
+	  $tree[$hash_code[0]] = $doc_info;
+	  break;
+	case 2:
+	  $tree[$hash_code[0]][$hash_code[1]] = $doc_info;
+	  break;
+	case 3:
+	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $doc_info;
+	  break;
+	}
+      }
+  foreach($tree as $level => $info) { 
+    $block .= @display_popup_tree($info,0);
+  }
+  $block.= "
+  <br />
+  <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
+  <input name=\"popup\" type=\"hidden\" value=\"1\" />
+  <input type=\"submit\" value=\"$l_add\" />  
+  </form>
+  </div>
+  ";
+
+
+  
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+
+function display_popup_tree($tree,$indent) {
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $popup;
+  $indent_file = $indent + 15;
+  $code = $tree["code"];
+  $label = $tree["label"];
+  $id = $tree["id"];
+
+  foreach($tree as $level => $info) {
+    if($level != "code" && $level != "label" && $level != "id") {
+       $content.= display_popup_tree($info,$indent_file);
+      $bool = true;
+    }
+  }
+  
+  if($bool == true) {
+    $block= 
+    "<table class=\"category\">
+       <tr>
+	<td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
+	  <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	 </a>
+	 <input type=\"checkbox\" name=\"$id\" />$code - $label
+	</td>
+       </tr>
+      </table>
+      <div id='$code' style=\"display:none;\" >
+       $content
+      </div>";
+  }
+  else {
+    $block= 
+    "<table class=\"category\">
+       <tr>
+	<td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	  <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	   <input type=\"checkbox\" name=\"$id\" />$code - $label
+	</td>
+       </tr>
+      </table>";
+  }
+  return $block;
+}
 
 </SCRIPT>

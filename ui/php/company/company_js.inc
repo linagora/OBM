@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 $extra_js .= "
 <script type=\"text/javascript\">
 <!--
@@ -257,7 +256,108 @@ function check_act_new(form)
    }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Category Functions                                //
+///////////////////////////////////////////////////////////////////////////////
+NS4 = (document.layers) ? 1 : 0;
+IE4 = (document.all) ? 1 : 0;
+W3C = (document.getElementById) ? 1 : 0;	
 
-// -->
+function show_hide_repo(name)
+{
+  if (W3C) {
+    if(document.getElementById(name).style.display != \"none\") {
+      hide(name);
+     }
+     else{
+        show(name);
+     }
+  } else if (NS4) {
+    if(document.layers[name].display != \"none\") {
+      hide(name);
+    }
+    else{
+      show(name);
+     }
+
+  } else {
+    if(document.all[name].style.display != \"none\") {
+       hide(name);
+    }
+    else{
+      show(name);
+    }
+  
+  }
+
+}
+
+function hide ( name ) {
+  if (W3C) {
+    document.getElementById(name).style.display = \"none\";
+    document.getElementById(name).style.height = \"0px\";
+    document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_close\";    
+  } else if (NS4) {
+    document.layers[name].display = \"hide\";
+    document.layers[name].height = \"0px\";
+    document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";    
+  } else {
+    document.all[name].style.display = \"none\";
+    document.all[name].style.height = \"0px\";
+    document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";
+  }
+}
+
+function show ( name ) {
+  if (W3C) {
+    document.getElementById(name).style.display = \"\";
+    document.getElementById(name).style.height = \"auto\"; 
+    document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_open\";
+  } else if (NS4) {
+    document.layers[name].display = \"\";
+    document.layers[name].height = \"auto\";
+    document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
+  } else {
+    document.all[name].style.display = \"\";
+    document.all[name].style.height = \"auto\";
+    document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
+  }
+}
+
+
+";
+
+if (isset($ext_target)) {
+  $extra_js .= "
+   function fill_ext_form(repo_path) {
+     ext_field = window.opener.document.$ext_target;
+     ext_field.value = repo_path;
+     window.close();
+  } 
+  
+  function fill_ext_form2(int_form) {
+   size = int_form.length;
+   ext_field = window.opener.document.$ext_target;
+   for(i=0; i <size ; i++) {
+     if(int_form.elements[i].type == 'checkbox'){
+       if(int_form.elements[i].checked == true) {
+	 ext_size = ext_field.length;
+	 for(j=0; j< ext_size; j++) {
+	   if(ext_field.options[j].value == int_form.elements[i].name) {
+	     window.opener.document.$ext_target.options[j].selected =true;
+	   }
+	 }
+       }
+     }
+   }
+ }
+   ";
+}
+
+$extra_js .= "
+
+-->
 </script>
 ";
+// -->
+</script>

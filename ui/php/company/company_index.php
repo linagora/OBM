@@ -85,7 +85,11 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company);
-
+  
+} elseif ($action == "ext_get_cat_ids") {
+  $extra_css = "category.css";
+  require("company_js.inc");
+  $display["detail"] =  html_category_tree($document);
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,17 +119,19 @@ if ($action == "ext_get_id") {
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();
+  $cat_q = run_query_companycat();
   $ctry_q = run_query_country();
   require("company_js.inc");
-  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
+  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $usr_q, $cat_q,"", $ctry_q, $company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_company > 0) {
     $comp_q = run_query_detail($param_company);
+    $cat_q = run_query_get_companycat_name($param_company);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_consult($comp_q);
+      $display["detail"] = html_company_consult($comp_q,$cat_q);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -141,10 +147,12 @@ if ($action == "ext_get_id") {
       $act_q = run_query_companyactivity();
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_userobm_active($users);
+      $cat_q = run_query_companycat();
+      $compcat = run_query_get_companycat($param_company);
       $ctry_q = run_query_country();
       require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
+      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $cat_q,$compcat,$ctry_q, $company);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -191,10 +199,11 @@ if ($action == "ext_get_id") {
     $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
+    $cat_q = run_query_companycat();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
     $ctry_q = run_query_country();
-    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
+    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q,$cat_q,"",$ctry_q, $company);
   }
 
 } elseif ($action == "update")  {
@@ -216,8 +225,9 @@ if ($action == "ext_get_id") {
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
+    $cat_q = run_query_companycat();
     $ctry_q = run_query_country();
-    $display["detail"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
+    $display["detail"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q,$cat_q,"", $ctry_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -413,7 +423,7 @@ function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
   global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com, $param_company;
-  global $sel_dsrc, $tf_kind, $tf_act,$tf_cat_code,$tf_cat;
+  global $sel_dsrc, $tf_kind, $tf_act,$tf_cat_code,$tf_cat,$sel_cat;
   global $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -476,7 +486,6 @@ function get_param_company() {
   // $sel_kind -> "kind" is already set
   if (isset ($tf_cat_code)) $company["cat_code"] = $tf_cat_code;
   if (isset ($tf_cat)) $company["cat_label"] = $tf_cat;
-  
   // Admin - Activity fields
   // $sel_act -> "act" is already set
   if (isset ($tf_act)) $company["act_label"] = $tf_act;
@@ -606,6 +615,37 @@ function get_company_action() {
     'Condition'=> array ('None') 
                                      	       );
 
+					       
+					       // Category Insert
+  $actions["COMPANY"]["cat_insert"] = array (
+    'Url'      => "$path/company/company_index.php?action=cat_insert",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Category Update
+  $actions["COMPANY"]["cat_update"] = array (
+    'Url'      => "$path/company/company_index.php?action=cat_update",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Category Check Link
+  $actions["COMPANY"]["cat_checklink"] = array (
+    'Url'      => "$path/company/company_index.php?action=cat_checklink",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Category Delete
+  $actions["COMPANY"]["cat_delete"] = array (
+    'Url'      => "$path/company/company_index.php?action=cat_delete",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+
+					       
 // Activity Insert
   $actions["COMPANY"]["activity_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_insert",

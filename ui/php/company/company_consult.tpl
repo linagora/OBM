@@ -28,6 +28,12 @@
     </tr>
   </table>
 
+  <div class="detailHead">$l_category</div>
+  
+  <table class="detail">
+    $cat_disp
+  </table>
+
 <div class="detailHead">$l_coord</div>
   
   <table class="detail">

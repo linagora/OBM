@@ -191,7 +191,8 @@ function run_query_insert($company) {
   $web = $company["web"];
   $email = $company["email"];
   $com = $company["com"];
-
+  $compcat = $company["cat"];
+  
   $query = "insert into Company (company_timeupdate,
     company_timecreate,
     company_userupdate,
@@ -247,6 +248,29 @@ function run_query_insert($company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+
+  $query = "select company_id as Id
+  from Company where 
+  company_name = '$name' and company_type_id='$kind' and company_activity_id='$act' and company_marketingmanager_id='$market'
+  and company_phone = '$phone' and company_zipcode = '$zip'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $id = $obm_q->f("Id");
+
+  if($retour && is_array($compcat)) {
+    foreach($compcat as $categoryid) {
+      $query = "insert into CompanyCategoryLink (
+	companycategorylink_companyid,
+	companycategorylink_categoryid)
+	values
+	('$id','$categoryid')";
+      display_debug_msg($query, $cdg_sql);
+      $obm_q->query($query);
+    }
+  }
+  
   return $retour;
 }
 
@@ -288,7 +312,7 @@ function run_query_update($cid, $company) {
   $web = $company["web"];
   $email = $company["email"];
   $com = $company["com"];
-
+  $compcat = $company["cat"];
 
   $query = "update Company set
     company_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -320,6 +344,23 @@ function run_query_update($cid, $company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  $query = "delete from CompanyCategoryLink where companycategorylink_companyid='$cid'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  var_dump($compcat);
+  if($retour && is_array($compcat)) {
+    foreach($compcat as $categoryid) {
+      $query = "insert into CompanyCategoryLink (
+	companycategorylink_companyid,
+	companycategorylink_categoryid)
+	values
+	('$cid','$categoryid')";
+      display_debug_msg($query, $cdg_sql);
+      $obm_q->query($query);
+    }
+  }
+
+
   return $retour;
 }
 
@@ -338,6 +379,8 @@ function run_query_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   run_query_delete_document($p_id,"Company");
+  $query = "delete from CompanyCategoryLink where companycategorylink_companyid='$p_id'";
+  $obm_q->query($query);
 
   return $retour;
 }
@@ -567,6 +610,43 @@ function run_query_companycat() {
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
 
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query to build the file tree
+// Parameters:
+//   - $display_file : bolean
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_companycat($id) { 
+  global $cdg_sql;
+
+  $query = "select * from CompanyCategoryLink,CompanyCategory where companycategorylink_companyid = '$id' 
+  and companycategorylink_categoryid = companycategory_id order by companycategory_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $i=0;
+  while($obm_q->next_record()) {
+    $links[$i++] = $obm_q->f("companycategorylink_categoryid");
+  }
+  return $links;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query to build the file tree
+// Parameters:
+//   - $display_file : bolean
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_companycat_name($id) { 
+  global $cdg_sql;
+
+  $query = "select * from CompanyCategoryLink,CompanyCategory where companycategorylink_companyid = '$id' 
+  and companycategorylink_categoryid = companycategory_id order by companycategory_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
   return $obm_q;
 }
 
@@ -935,5 +1015,22 @@ function check_data_form($cid, $company) {
   return true; 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Query to build the file tree
+// Parameters:
+//   - $display_file : bolean
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_tree() {
+  global $cdg_sql,$auth;
+
+  $query = "select *  from CompanyCategory $where 
+  order by companycategory_code
+";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;  
+
+}
 
 </SCRIPT>
