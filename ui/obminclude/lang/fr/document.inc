@@ -97,6 +97,7 @@ $l_new_file = "Fichier à envoyer";
 $l_link = "Lien HTML";
 $l_existing_file = "Fichier déjà envoyé";
 $l_kind = "Type de document";
+$l_invalid_link_file = "Impossible de creer un alias sur un lien";
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";
 $l_delete = "Supprimer le document";

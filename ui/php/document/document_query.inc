@@ -457,7 +457,7 @@ function run_query_create_link($document) {
 function check_data_form($cid, $document) {
   global $l_fill_title, $l_fill_author, $l_fill_path, $l_invalid_repository_path;
   global $l_invalid_file,$l_invalid_existing_file;
-  global $err_msg,$document_path;
+  global $err_msg,$document_path,$l_invalid_link_file;
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -498,6 +498,13 @@ function check_data_form($cid, $document) {
     }
   }
 
+  if($kind == "file" ) {
+    $filename = substr($path,strrpos($path,'/')+1);
+    if(islink($filename)) {
+      $err_msg = $l_invalid_link_file;
+      return false;
+    }
+  }
   // MANDATORY: Document Title 
   if (trim($title) == "") {
     $err_msg = $l_fill_title;
@@ -1051,7 +1058,7 @@ function check_repository_data_form($document) {
     $err_msg = $l_fill_repository_name;
     return false;
   }
-
+  $final_path = $document_path.$path;
   $realpath = realpath($final_path);
   if(substr($realpath,0,strlen($document_path)) != $document_path) {
     $err_msg = $l_invalid_repository_path;
@@ -1060,7 +1067,7 @@ function check_repository_data_form($document) {
 
 
   // MANDATORY: Document Title 
-  if (!opendir($document_path.$path)) {
+  if (!@opendir($final_path)) {
     $err_msg = $l_invalid_repository_path;
     return false;
   }
@@ -1073,10 +1080,27 @@ function check_repository_data_form($document) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function islink($filename) {
-  if(substr_count($filename,"http://") != 0) {
+  global $link_to;
+
+  if(substr($filename,0,strlen($link_to)) == $link_to) {
     return true;
   }
-  else {
-    return false;
+  if(substr_count($filename,'/')>0) {
+    return true;
   }
+  return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Tell if the file is a link or not.
+// return true if it is false else
+///////////////////////////////////////////////////////////////////////////////
+
+function getlink($name,$path) {
+  global $document_path;
+  $final_path = $document_path.'/'.$path.'/'.stripslashes($name);
+  $handle = fopen ($final_path, "r");
+  $link = fread($handle,filesize ($final_path));
+  fclose($handle);
+  return $link;
 }

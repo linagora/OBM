@@ -97,6 +97,7 @@ $l_query_error = "Critical trouble during the execution of the query.";
 $l_update_ok = "The document has been updated successfully.";
 $l_update_error = "The update of the document has failed !";
 $l_header_tree = "Tree";
+$invalid_link_file = "Cannot create a alias over a link";
 
 // Actions
 $l_checkdelete = "Check or Delete the Document";

@@ -246,6 +246,7 @@ function show_hide_field()
   }
   else if(radios[2].checked == true) {
     basic_hide('browse_img_file');
+    basic_show('browse_img');
     basic_hide('browse_field');
     basic_show('url_field');
   }

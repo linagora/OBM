@@ -215,10 +215,10 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
-    if(islink($doc_q->f("docment_name"))) {
+    if(islink($doc_q->f("document_name"))) {
       $kind = "link";
       $fi_path = $doc_q->f("document_path");
-      $url = $doc_q->f("docment_name");
+      $url = $doc_q->f("document_name");
       if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
 	$fi_path = $doc_q->f("document_path").'/';
       }
@@ -400,7 +400,7 @@ function html_repository_form($action, $document) {
   global $l_path, $l_name,$path,$ico_browse;
   global $l_repository,$l_add_repos;
   $name = $document["repository_name"];
-  $path = $document["repository_path"];
+  $re_path = $document["repository_path"];
   $dis_button = "
   <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_repository\" />
   <input type=\"submit\" value=\"$l_add_repos\" />
@@ -421,7 +421,7 @@ function html_repository_form($action, $document) {
     </tr><tr>
       <td class=\"detailLabel\">$l_path</td>
       <td class=\"detailForm\">
-     <input type=\"text\" id=\"tf_repository_path\" name=\"tf_repository_path\" value=\"$path\" size=\"50\"/>
+     <input type=\"text\" id=\"tf_repository_path\" name=\"tf_repository_path\" value=\"$re_path\" size=\"50\"/>
        <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a>
       </td>
     </tr>
@@ -443,7 +443,7 @@ function html_repository_form($action, $document) {
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_consult($doc_q) {
-  global $display;
+  global $display,$link_to;
   global $set_theme,$l_document,$l_size,$l_bytes;
   global $l_title, $l_category1, $l_mimetype,$l_private;
   global $l_find, $l_author, $l_category2,$l_path,$l_name; 
@@ -464,7 +464,12 @@ function html_document_consult($doc_q) {
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
 
   // --- HTML Template --------------------------------------------------------
-
+  if(islink($name)) {
+    $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$link_to$title&amp;popup=1";
+  }
+  else {
+    $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
+  }
   $block = "
     <div class=\"detailHead\">$l_document</div>
 
@@ -508,7 +513,7 @@ function html_document_consult($doc_q) {
      </tr>    
     </table>
     <div class=\"detailHead\">
-    <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1\">
+    <a target=\"_blank\" href=\"$url\">
      $l_consult
     </a>
     </div>
@@ -1201,10 +1206,8 @@ function dis_file($document) {
   global $obm_version,$set_weekstart_default;
   $path = $document["path"];
   $name = $document["name"];
-  if(substr($name,0,strlen($link_to)) == $link_to) {
-    $final_path = $document_path.'/'.$path.'/'.str_replace(" ","\ ",$name); 
-    $handle = fopen ($final_path, "r");
-    $link = fread($handle,filesize ($final_path));
+  if(islink($name)) {
+    $link = getlink($name,$path);
     header("location: $link");
     exit;
   }
