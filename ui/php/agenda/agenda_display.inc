@@ -295,7 +295,7 @@ function dis_month_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	     }   
 	     $dis_month_cal .= "
 	      <a class=\"agendaLink4\" href=\"$linkEvent\" 
-	       onMouseOver=\"show(event,'$daylink-$event_id'); return true;\" onMouseOut=\"hide('$daylink-$event_id'); return true;\">";
+	       onMouseOver=\"show(event,'$daylink-$event_id-$id'); return true;\" onMouseOut=\"hide('$daylink-$event_id-$id'); return true;\">";
 	       	     
 	     $hidden_div .= "
 	      <div id=\"$daylink-$event_id-$id\" class=\"agendaHidden\">
@@ -980,7 +980,7 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		    $event_head_display .= "
 		     <a class=\"agendaLink4\" href=\"$linkEvent\"
 		      onMouseOver=\"show(event,'$tempDate-$idOfEvent--$id'); return true;\"
-		      onMouseOut=\"hide('$tempDate-$idOfEvent--$id'); return true;\">";
+		      onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		     
 		    $hidden_div .= "
 		    <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
