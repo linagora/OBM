@@ -543,22 +543,37 @@ CREATE TABLE ContactList (
 -------------------------------------------------------------------------------
 -- Calendar module tables
 -------------------------------------------------------------------------------
+
 --
--- Table structure for the table  'CalendarSegment'
+-- Table structure for the table  'CalendarUser'
 --
-CREATE TABLE CalendarSegment (
-  calendarsegment_eventid     int(8) NOT NULL default '0',
-  calendarsegment_customerid  int(8) NOT NULL default '0',
-  calendarsegment_date        timestamp(14) NOT NULL,
-  calendarsegment_flag        varchar(5) NOT NULL default '',
-  calendarsegment_type        varchar(5) NOT NULL default '',
-  calendarsegment_state       char(1) NOT NULL default '',
-  PRIMARY KEY (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
+CREATE TABLE CalendarUser (
+  calendaruser_timeupdate   timestamp(14),
+  calendaruser_timecreate   timestamp(14),
+  calendaruser_userupdate   int(8) default NULL,
+  calendaruser_usercreate   int(8) default NULL,
+  calendaruser_user_id  int(8) NOT NULL default '0',
+  calendaruser_event_id     int(8) NOT NULL default '0',
+  calendaruser_state       char(1) NOT NULL default '',
+  calendaruser_required    int(1) NOT NULL default '0',
+  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
+);
+  
+--
+-- Table structure for the table  'CalendarException'
+--
+CREATE TABLE CalendarException (
+  calendarexception_timeupdate   timestamp(14),
+  calendarexception_timecreate   timestamp(14),
+  calendarexception_userupdate   int(8) default NULL,
+  calendarexception_usercreate   int(8) default NULL,
+  calendarexception_event_id int(8)    NOT NULL auto_increment,
+  calendarexception_date         timestamp(14) NOT NULL,
+  PRIMARY KEY (calendarexception_event_id,calendarexception_date)
 );
 
-
 --
--- Table structure for the table  'CalendarEvent'
+-- Table structure for table 'CalendarEvent'
 --
 CREATE TABLE CalendarEvent (
   calendarevent_id int(8)    NOT NULL auto_increment,
@@ -566,19 +581,22 @@ CREATE TABLE CalendarEvent (
   calendarevent_timecreate   timestamp(14),
   calendarevent_userupdate   int(8) default NULL,
   calendarevent_usercreate   int(8) default NULL,
+  calendarevent_owner        int(8) default NULL,
   calendarevent_title        varchar(255) default NULL,
   calendarevent_description  text,
   calendarevent_category_id  int(8) default NULL,
   calendarevent_priority     int(2) default NULL,
   calendarevent_privacy      int(2) NOT NULL default '0',
-  calendarevent_length       int(4) NOT NULL default '',
+  calendarevent_date       timestamp(14) NOT NULL,
+  calendarevent_duration     int(8) NOT NULL default '',
+  calendarevent_allday	     int(1) NOT NULL default '0',
   calendarevent_repeatkind   varchar(20) default NULL,
+  calendarevent_repeatfrequence  int(3) default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
   calendarevent_endrepeat    timestamp(14) NOT NULL,
   PRIMARY KEY (calendarevent_id)
 );
 
-    
 --
 -- Table structure for table 'CalendarCategory'
 --
@@ -592,7 +610,6 @@ CREATE TABLE CalendarCategory (
   PRIMARY KEY (calendarcategory_id)
 );
 
-
 --
 -- Table structure for table 'CalendarRight'
 --
@@ -604,19 +621,6 @@ CREATE TABLE CalendarRight (
   PRIMARY KEY (calendarright_ownerid,calendarright_customerid)
 );
 
-
---
--- structure fot table 'RepeatKind'
---
-CREATE TABLE RepeatKind (
-  repeatkind_id          int(8) NOT NULL auto_increment,
-  repeatkind_timeupdate  timestamp(14),
-  repeatkind_timecreate  timestamp(14),
-  repeatkind_userupdate  int(8),
-  repeatkind_usercreate  int(8),
-  repeatkind_label       varchar(128),
-  PRIMARY KEY(repeatkind_id)	
-);
 
 
 -------------------------------------------------------------------------------
