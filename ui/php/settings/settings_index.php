@@ -161,7 +161,7 @@ $dis_theme = "<table class=\"admin\">";
 while($entry=$theme_dir->read()) {
 $dotcase = strcmp($entry, "."); 
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
-       && is_dir($theme_dir->path."/".$entry)) {
+       && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
     $dis_theme .= "<tr>
       <td class=\"adminLabel\">
         <a href=\"".url_prepare("settings_index.php?param_theme=$entry") .
