@@ -223,7 +223,7 @@ function get_param_user() {
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
 
   // External param
-  if (isset ($popup)) $obm_user["popup"] = 1;
+  if (isset ($popup)) $obm_user["popup"] = $popup;
   if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
   if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
   if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
