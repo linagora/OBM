@@ -148,7 +148,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
   $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
 
-  $show_func = (! $cgp_hide["contact"]["function"]);
+  $show_func = (! $cgp_hide["contact"]["contact_function"]);
 
   // Function select
   if ($show_func) {

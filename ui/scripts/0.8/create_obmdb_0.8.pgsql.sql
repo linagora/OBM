@@ -189,6 +189,21 @@ CREATE TABLE CompanyActivity (
 );
 
 
+-- 
+-- Table structure for table 'CompanyNafCode'
+--
+CREATE TABLE CompanyNafCode (
+  companynafcode_id          serial,
+  companynafcode_timeupdate  timestamp,
+  companynafcode_timecreate  timestamp,
+  companynafcode_userupdate  integer,
+  companynafcode_usercreate  integer,
+  companynafcode_code        varchar(4),
+  companynafcode_label       varchar(128),
+  PRIMARY KEY (companynafcode_id)
+);
+
+
 --
 -- Table structure for table 'Company'
 --
@@ -206,6 +221,7 @@ CREATE TABLE Company (
   company_sound                varchar(48),
   company_type_id              integer,
   company_activity_id          integer, 
+  company_nafcode_id           integer, 
   company_marketingmanager_id  integer,
   company_address1             varchar(64),
   company_address2             varchar(64),

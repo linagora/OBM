@@ -95,7 +95,7 @@ Par défaut tous les champs sont affichés et il faut donc préciser explicitement 
 Pour ne pas afficher un champ il faut insérer dans le fichier de configuration la ligne :
 
 \begin{verbatim}  
-$cgp_hide[``company][``number] = true;
+$cgp_hide[``company''][``number''] = true;
 \end{verbatim}  
 
 Lorsqu'un champ est caché, il n'est plus disponible dans les critères de recherche, dans les listes de résultats ni dans les fiches de détail.
@@ -110,6 +110,7 @@ Liste des champs paramétrables (masquables) du module \company :
 $cgp_hide["company"]["number"] = true;                 // numéro
 $cgp_hide["company"]["companytype_label"] = true;      // type
 $cgp_hide["company"]["companyactivity_label"] = true;  // secteur d'activité
+$cgp_hide["company"]["companynafcode_code"] = true;    // code NAF
 $cgp_hide["company"]["category"] = true;               // catégorie
 $cgp_hide["company"]["address3"] = true;               // ligne adresse 3
 \end{verbatim}  

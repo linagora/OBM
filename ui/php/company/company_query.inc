@@ -27,6 +27,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $ctry = $company["country"];
   $kind = $company["kind"];
   $act = $company["activity"];
+  $naf = $company["nafcode"];
   $market = $company["marketing_manager"];
   $dsrc = $company["datasource"];
   $zip = $company["zip"];
@@ -50,6 +51,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_archive,
       company_type_id,
       company_activity_id,
+      company_nafcode_id,
       company_marketingmanager_id,
       company_address1,
       company_address2,
@@ -67,9 +69,12 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_deal_total,
       companytype_label,
       companyactivity_label,
+      companynafcode_code,
+      companynafcode_label,
       country_name
     from Company
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+         LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
          LEFT JOIN CompanyType on company_type_id=companytype_id
          LEFT JOIN Country on company_country_id=country_id";
 
@@ -84,6 +89,10 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
   if (($act != $c_all) && ($act != "")) { 
     $where .= " $and company_activity_id='$act'";
+    $and = "and";
+  }
+  if (($naf != $c_all) && ($naf != "")) { 
+    $where .= " $and company_nafcode_id='$naf'";
     $and = "and";
   }
   if (($market != $c_all) && ($market != "")) { 
@@ -189,6 +198,7 @@ function run_query_detail($p_id) {
     from Company
          LEFT JOIN CompanyType on company_type_id=companytype_id
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+         LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
          LEFT JOIN UserObm as m on company_marketingmanager_id=m.userobm_id
          LEFT JOIN Country on company_country_id=country_id
          LEFT JOIN DataSource on company_datasource_id=datasource_id
@@ -229,6 +239,7 @@ function run_query_insert($company) {
   $dsrc = $company["datasource"];
   $kind = ($company["kind"] != "" ? $company["kind"] : "0");
   $act = ($company["activity"] != "" ? $company["activity"] : "0");
+  $naf = ($company["nafcode"] != "" ? $company["nafcode"] : "0");
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -256,6 +267,7 @@ function run_query_insert($company) {
     company_sound,
     company_type_id,
     company_activity_id,
+    company_nafcode_id,
     company_marketingmanager_id,
     company_address1,
     company_address2,
@@ -281,6 +293,7 @@ function run_query_insert($company) {
     '$sound',
     '$kind',
     '$act',
+    '$naf',
     '$market',
     '$ad1',
     '$ad2',
@@ -365,6 +378,8 @@ function run_query_update($cid, $company) {
   if ($kind != "") $upd_kind = "company_type_id='$kind',";
   $act = $company["activity"];
   if ($act != "") $upd_act = "company_activity_id='$act',";
+  $naf = $company["nafcode"];
+  if ($naf != "") $upd_naf = "company_nafcode_id='$naf',";
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -391,6 +406,7 @@ function run_query_update($cid, $company) {
     company_sound='$sound',
     $upd_kind
     $upd_act
+    $upd_naf
     company_marketingmanager_id='$market',
     company_address1='$ad1',
     company_address2='$ad2',
@@ -592,12 +608,17 @@ function run_query_check_company($p_id, $name, $zip) {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_companytype() {
-  global $cdg_sql;
+  global $cdg_sql, $cgp_hide;
 
-  $query = "select * from CompanyType order by companytype_label"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
+  if ($show_kind) {
+    $query = "select * from CompanyType order by companytype_label"; 
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }
@@ -702,12 +723,18 @@ function run_query_kind_links($p_id) {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_companycat() {
-  global $cdg_sql;
+  global $cdg_sql, $cgp_hide;
 
-  $query = "select * from CompanyCategory"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  $show_cat = (! $cgp_hide["company"]["category"]);
+  if ($show_cat) {
+    $query = "select * from CompanyCategory"; 
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+  } else {
+    $obm_q = "";
+  }
+
   return $obm_q;
 }
 
@@ -718,19 +745,25 @@ function run_query_companycat() {
 //   - $id : Company ID
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_companycat($id) { 
-  global $cdg_sql;
+  global $cdg_sql, $cgp_hide;
 
-  $query = "select CompanyCategory.*
+  $show_cat = (! $cgp_hide["company"]["category"]);
+  if ($show_cat) {
+    $query = "select CompanyCategory.*
     from CompanyCategoryLink, CompanyCategory
     where companycategorylink_company_id = '$id' 
       and companycategorylink_category_id = companycategory_id
     order by  companycategory_code"; 
 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-  $i=0;
-  $links = get_ordered_category($obm_q);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+    $i=0;
+    $links = get_ordered_category($obm_q);
+  } else {
+    $links = "";
+  }
+
   return $links;
 }
 
@@ -741,18 +774,24 @@ function run_query_get_companycat($id) {
 //   - $id : Company ID
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_companycat_name($id) { 
-  global $cdg_sql;
+  global $cdg_sql, $cgp_hide;
 
-  $query = "select *
+  $show_cat = (! $cgp_hide["company"]["category"]);
+  if ($show_cat) {
+    $query = "select *
     from CompanyCategoryLink,
       CompanyCategory
     where companycategorylink_company_id = '$id' 
       and companycategorylink_category_id = companycategory_id
     order by  companycategory_code"; 
 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+  } else {
+    $obm_q = "";
+  }
+
   return $obm_q;
 }
 
@@ -867,12 +906,17 @@ function run_query_cat_links($p_id) {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_companyactivity() {
-  global $cdg_sql;
+  global $cdg_sql, $cgp_hide;
 
-  $query = "select * from CompanyActivity order by companyactivity_label"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  if ($show_act) {
+    $query = "select * from CompanyActivity order by companyactivity_label"; 
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }
@@ -973,6 +1017,127 @@ function run_query_activity_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Naf Code company query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_companynafcode() {
+  global $cdg_sql, $cgp_hide;
+
+  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  if ($show_naf) {
+    $query = "select * from CompanyNafCode order by companynafcode_code"; 
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+  } else {
+    $obm_q = "";
+  }
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Naf Code insertion query construction and execution
+// Parameters:
+//   - $company : company hash info : keys used : naf_code, naf_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_nafcode_insert($company) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $code = $company["naf_code"];
+  $label = $company["naf_label"];
+
+  $query = "insert into CompanyNafCode (
+      companynafcode_timecreate,
+      companynafcode_usercreate,
+      companynafcode_code,
+      companynafcode_label)
+    values (
+      '$timecreate',
+      '$usercreate',
+      '$code',
+      '$label')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Naf Code update query execution
+// Parameters:
+//   - $company : company hash info : keys used : naf_code, naf_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_nafcode_update($company) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $company["nafcode"];
+  $code = $company["naf_code"];
+  $label = $company["naf_label"];
+
+  $query = "update CompanyNafCode set
+      companynafcode_code='$code',
+      companynafcode_label='$label',
+      companynafcode_timeupdate='$timeupdate',
+      companynafcode_userupdate='$userupdate'
+    where
+      companynafcode_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Naf Code deletion query execution
+// Parameters:
+//   - $id : Naf code id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_nafcode_delete($id) {
+  global $cdg_sql;
+
+  $query = "delete from CompanyNafCode where companynafcode_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Naf Code - Company links query execution
+// Parameters:
+//   - $p_id : naf code id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_nafcode_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select company_name, company_id, company_nafcode_id
+    from Company where company_nafcode_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the label of a Kind from its id                                       //
 // Parameters:
 //   - $id : id
@@ -1015,6 +1180,7 @@ function get_cat_label($id) {
   return $retour;
 }      
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Activity from its id                                  //
 // Parameters:
@@ -1033,6 +1199,29 @@ function get_activity_label($id) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("companyactivity_label");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of an Naf Code from its id (code + label)
+// Parameters:
+//   - $id : id
+///////////////////////////////////////////////////////////////////////////////
+function get_nafcode_label($id) {
+  global $cdg_sql;
+
+  $query = "select companynafcode_code,
+      companynafcode_label
+    from CompanyNafCode
+    where companynafcode_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("companynafcode_code") . " - " . $obm_q->f("companynafcode_label");
   return $retour;
 }
 
@@ -1151,8 +1340,8 @@ function run_query_get_tree() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_ordered_category($cat_q) {
 
-  $wc =0; 
-  while($cat_q->next_record()) {
+  $wc = 0; 
+  while ($cat_q->next_record()) {
     $id = $cat_q->f("companycategory_id");
     $code = $cat_q->f("companycategory_code");
     $label = $cat_q->f("companycategory_label");

@@ -542,6 +542,9 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $zip = $fields["comp_zip"];
   $town = addslashes($fields["comp_town"]);
   $ctry = $countries[$fields["comp_ctry"]];
+  if ($ctry == "") {
+    $ctry = "0";
+  }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
   $web = $fields["comp_web"];
@@ -666,6 +669,9 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $zip = $fields["comp_zip"];
   $town = addslashes($fields["comp_town"]);
   $ctry = $countries[$fields["comp_ctry"]];
+  if ($ctry == "") {
+    $ctry = "0";
+  }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
   $web = $fields["comp_web"];
@@ -789,6 +795,9 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $zip = $fields["con_zip"];
   $town = addslashes($fields["con_town"]);
   $ctry = $countries[$fields["con_ctry"]];
+  if ($ctry == "") {
+    $ctry = "0";
+  }
   $title = addslashes($fields["con_tit"]);
   $phone = $fields["con_pho"];
   $hphone = $fields["con_hpho"];
@@ -897,6 +906,9 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $zip = $fields["con_zip"];
   $town = addslashes($fields["con_town"]);
   $ctry = $countries[$fields["con_ctry"]];
+  if ($ctry == "") {
+    $ctry = "0";
+  }
   $title = addslashes($fields["con_tit"]);
   $phone = $fields["con_pho"];
   $hphone = $fields["con_hpho"];

@@ -127,7 +127,7 @@ function html_country_form($ctry_q) {
         <tr>
           <td class=\"adminLabel\">$l_phone : </td>
           <td>
-            <input type=\"text\" name=\"tf_phone\" size=\"3\" maxlength=\"3\" />
+            <input type=\"text\" name=\"tf_phone\" size=\"5\" maxlength=\"5\" />
           </td>
         </tr>
         </table>
@@ -175,7 +175,7 @@ function html_country_form($ctry_q) {
         </tr>
         <tr>
           <td class=\"adminLabel\">$l_phone : </td>
-          <td><input type=\"text\" name=\"tf_phone\" size=\"2\" maxlength=\"2\" /></td>
+          <td><input type=\"text\" name=\"tf_phone\" size=\"5\" maxlength=\"5\" /></td>
         </tr>
         <tr>
           <td class=\"adminLabel\">

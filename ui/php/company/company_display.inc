@@ -22,6 +22,7 @@ $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
 $fieldnames["companytype_label"] = $l_kind;
 $fieldnames["companyactivity_label"] = $l_activity;
+$fieldnames["companynafcode_code"] = $l_nafcode;
 $fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact\" alt=\"C\" />";
 $fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
 $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" alt=\"D\" />";
@@ -147,10 +148,11 @@ function dis_company_search_form($company="") {
 
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
+  $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_country();
   $dsrc_q = run_query_datasource();
-  $block .= html_company_search_form($type_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $company);
+  $block .= html_company_search_form($type_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
 }
@@ -161,16 +163,17 @@ function dis_company_search_form($company="") {
 // Parameters:
 //   - $kind_q    : database object with kind list
 //   - $act_q     : database object with activity list
+//   - $naf_q     : database object with nafcode list
 //   - $usr_q     : database object with userobm list
 //   - $ctry_q    : database object with country list
 //   - $dsrc_q    : database object with datasource list
 //   - $company[] : default form values
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $company) {
+function html_company_search_form($kind_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
-  global $l_all, $l_find, $l_fuzzy, $l_datasource;
+  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_nafcode;
   global $c_all, $cgp_hide;
 
   $popup = $company["popup"];
@@ -180,6 +183,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $co
   $town = stripslashes($company["town"]);
   $kind = $company["kind"];
   $act = $company["activity"];
+  $naf = $company["nafcode"];
   $ctry = $company["country"];
   $mark = $company["marketing_manager"];
   $dsrc = $company["datasource"];
@@ -190,6 +194,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $co
 
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
 
   // Kind select
   if ($show_kind) {
@@ -224,6 +229,25 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $co
     $block_act = "
     <div class=\"searchLabel\">$l_activity<br />
       $sel_act
+    </div>";
+  }
+
+  // Naf Code select
+  if ($show_naf) {
+    $sel_naf = "<select id=\"sel_naf\" name=\"sel_naf\">
+    <option value=\"$c_all\">$l_all</option>";
+    while ($naf_q->next_record()) {
+      $n_id = $naf_q->f("companynafcode_id");
+      $n_code = $naf_q->f("companynafcode_code");
+      $sel_naf .= "\n<option value=\"$n_id\"";
+      if ($a_id == $naf) { $sel_naf .= " selected=\"selected\""; }
+      $sel_naf .= ">$n_code</option>\n";
+    }
+    $sel_naf .= "</select>";
+
+    $block_naf = "
+    <div class=\"searchLabel\">$l_nafcode<br />
+      $sel_naf
     </div>";
   }
 
@@ -291,6 +315,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $co
     </div>
     $block_kind
     $block_act
+    $block_naf
     <div class=\"searchLabel\">$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
@@ -388,12 +413,12 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $ctry = $company["country"];
   $kind = $company["kind"];
   $act = $company["activity"];
+  $naf = $company["nafcode"];
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
   $dsrc = $company["datasource"];
 
-  
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc");
 
   $comp_q->seek($first_row);
 
@@ -548,9 +573,9 @@ function html_company_consult($co_q, $cat_q) {
   // - Themes
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   // - Labels
-  global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_archive;
+  global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
-  global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
+  global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
   global $l_insert,$l_update, $l_company, $l_coord,$l_category;
   global $display, $c_yes, $c_no, $cgp_hide;
 
@@ -561,6 +586,7 @@ function html_company_consult($co_q, $cat_q) {
   $aka = $co_q->f("company_aka");
   $kind = $co_q->f("companytype_label");
   $act = $co_q->f("companyactivity_label");
+  $naf = $co_q->f("companynafcode_code")." - ".$co_q->f("companynafcode_label");
   $mark = $co_q->f("company_marketingmanager_id");
   $ad1 = $co_q->f("company_address1");
   $ad2 = $co_q->f("company_address2");
@@ -598,6 +624,7 @@ function html_company_consult($co_q, $cat_q) {
   $show_number = (! $cgp_hide["company"]["number"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["address3"]);
 
@@ -628,7 +655,14 @@ function html_company_consult($co_q, $cat_q) {
     </tr>";
   }
 
-
+  // Naf code field
+  if ($show_naf) {
+    $block_naf = "
+    <tr> 
+      <td class=\"detailLabel\">$l_nafcode</td>
+      <td class=\"detailText\">$naf</td>
+    </tr>";
+  }
   
   // Address3 field
   if ($show_ad3) {
@@ -647,8 +681,9 @@ function html_company_consult($co_q, $cat_q) {
   } else {
     $link_email = "&nbsp;";
   }
+
   $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  if($cat_q->nf() >0) {
+  if ( ($show_cat) && ($cat_q->nf() > 0) ) {
     $cat_a = get_ordered_category($cat_q);
     $i = 0;
     foreach($cat_a as $cat_info) {
@@ -712,19 +747,21 @@ function html_company_consult($co_q, $cat_q) {
 //   - $co_q      : company database result 
 //   - $dsrc_q    : datasource database result 
 //   - $kind_q    : kind database result 
+//   - $act_q     : activity database result 
+//   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
 //   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $cat_q, $compcat, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cat_q, $compcat, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
-  global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
+  global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
-  global $l_insert, $l_update, $l_internal, $l_company;
+  global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -736,6 +773,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $dsrc = $co_q->f("company_datasource_id");
     $kind = $co_q->f("company_type_id");
     $act = $co_q->f("company_activity_id");
+    $naf = $co_q->f("company_nafcode_id");
     $mark = $co_q->f("company_marketingmanager_id");
     $ad1 = $co_q->f("company_address1");
     $ad2 = $co_q->f("company_address2");
@@ -765,6 +803,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   if (isset($company["datasource"])) { $dsrc = $company["datasource"]; }
   if (isset($company["kind"])) { $kind = $company["kind"]; }
   if (isset($company["activity"])) { $act = $company["activity"]; }
+  if (isset($company["nafcode"])) { $naf = $company["nafcode"]; }
   if (isset($company["marketing_manager"])) { $mark = $company["marketing_manager"]; }
   if (isset($company["ad1"])) { $ad1 = stripslashes($company["ad1"]); }
   if (isset($company["ad2"])) { $ad2 = stripslashes($company["ad2"]); }
@@ -784,6 +823,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   $show_number = (! $cgp_hide["company"]["number"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["address3"]);
 
@@ -828,9 +868,9 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       <td class=\"detailForm\">$sel_kind</td>";
   }
 
-  $cat_a = get_ordered_category($cat_q); 
   // Cat select field
   if ($show_cat) {
+    $cat_a = get_ordered_category($cat_q);
     $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
     $j =0;
     if (is_array($cat_a)) {
@@ -887,6 +927,26 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     </tr><tr>      
       <td class=\"detailLabel\">$l_activity</td>
       <td class=\"detailForm\">$sel_act</td>";
+  }
+
+  // Naf code select field
+  if ($show_naf) {
+    $sel_naf = "<select name=\"sel_naf\" id=\"sel_naf\">
+    <option value=\"0\">$l_none</option>";
+    while ($naf_q->next_record()) {
+      $n_id = $naf_q->f("companynafcode_id");
+      $n_code = $naf_q->f("companynafcode_code");
+      $n_label = $naf_q->f("companynafcode_label");
+      $sel_naf .= "\n<option value=\"$n_id\"";
+      if ($n_id == $naf) { $sel_naf .= " selected=\"selected\""; }
+      $sel_naf .= ">$n_code - $n_label</option>\n";
+    }
+    $sel_naf .= "</select>";
+
+    $block_naf = "
+    </tr><tr>      
+      <td class=\"detailLabel\">$l_nafcode</td>
+      <td class=\"detailForm\">$sel_naf</td>";
   }
 
   // Marketing manager select
@@ -995,6 +1055,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $block_kind
     $block_cat
     $block_act
+    $block_naf
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
       <td class=\"detailForm\">$sel_market</td>
@@ -1216,6 +1277,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $kind = $company["kind"];
   $dsrc = $company["datasource"];
   $act = $company["activity"];
+  $naf = $company["nafcode"];
   $mark = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -1261,6 +1323,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
+    <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
     <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
@@ -1288,6 +1351,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
+    <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
     <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
@@ -1350,6 +1414,11 @@ function dis_admin_index() {
   if (! $cgp_hide["company"]["companyactivity_label"]) {
     $act_q = run_query_companyactivity();
     $block .= html_company_activity_form($act_q);
+  }
+
+  if (! $cgp_hide["company"]["companynafcode_code"]) {
+    $naf_q = run_query_companynafcode();
+    $block .= html_company_nafcode_form($naf_q);
   }
 
   return $block;
@@ -1452,7 +1521,90 @@ function html_company_kind_form($kind_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Company Category section                                             //
+// Displays the kind links                                                   //
+// Parameters:
+//   - $company : company hash info : keys used : kind
+///////////////////////////////////////////////////////////////////////////////
+function dis_kind_links($company) {
+  global $display, $l_back, $l_kind_link_company, $l_kind_link_company_no;
+  global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
+
+  $delete_ok = true;
+  $id = $company["kind"];
+  $label = get_kind_label($id);
+  $obm_q = run_query_kind_links($id);
+
+  $nb_kind = $obm_q->num_rows();
+  if ($nb_kind > 0) {
+    $delete_ok = false;
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_kind_link_company ($nb_kind)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $cid = $obm_q->f("company_id");
+      $cname = $obm_q->f("company_name");
+      $dis_link .="
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_kind) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_kind_link_company_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_kind_can_delete);
+    $dis_del = "<form name=\"form_kind_delete\".
+          method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
+        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_kind_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Company Category section
 // Parameters:
 //   - $cat_q : Category list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1469,7 +1621,7 @@ function html_company_cat_form($cat_q) {
     forms.form_cat_update.tf_cat.value=mytext;
     forms.form_cat_update.tf_cat_code.value=ext;\"
     size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
-  if($cat_q->nf()>0) {
+  if ($cat_q->nf()>0) {
     $cat_a = get_ordered_category($cat_q);
     foreach($cat_a as $cat_info) {
       $id = $cat_info["id"];
@@ -1569,90 +1721,6 @@ function html_company_cat_form($cat_q) {
     </tr>
     </table>
 ";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the kind links                                                   //
-// Parameters:
-//   - $company : company hash info : keys used : kind
-///////////////////////////////////////////////////////////////////////////////
-function dis_kind_links($company) {
-  global $display, $l_back, $l_kind_link_company, $l_kind_link_company_no;
-  global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
-
-  $delete_ok = true;
-  $id = $company["kind"];
-  $label = get_kind_label($id);
-  $obm_q = run_query_kind_links($id);
-
-  $nb_kind = $obm_q->num_rows();
-  if ($nb_kind > 0) {
-    $delete_ok = false;
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_kind_link_company ($nb_kind)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("company_id");
-      $cname = $obm_q->f("company_name");
-      $dis_link .="
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_kind) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-  } else {
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_kind_link_company_no</td>
-    </tr>";
-  }
-
-  $block .= "<table class=\"detail\">
-    $dis_link
-    </table>";
-
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("company_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_kind_can_delete);
-    $dis_del = "<form name=\"form_kind_delete\".
-          method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
-        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
-        </form>";
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_kind_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
 
   return $block;
 }
@@ -1915,6 +1983,202 @@ function dis_activity_links($company) {
       </div>";
   }
 
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Company Naf Code section
+// Parameters:
+//   - $naf_q : Naf Code list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_company_nafcode_form($naf_q) {
+  global $l_naf_manage,$l_naf_exist,$l_naf_code,$l_naf_label,$l_naf_no;
+  global $l_naf_checkdelete,$l_naf_update,$l_naf_new,$l_naf_insert;
+
+  if ($naf_q->num_rows() > 0) {
+    $sel_naf = "<select name=\"sel_naf\" onChange=\"
+    mytext = this.options[this.selectedIndex].text;
+    pos = mytext.indexOf('-');
+    code = mytext.substr(0, pos-1);
+    mytext = mytext.substr(pos+2); 
+    forms.form_naf_update.tf_naf_label.value=mytext;
+    forms.form_naf_update.tf_naf_code.value=code;\"
+    size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
+    while ($naf_q->next_record()) {
+      $id = $naf_q->f("companynafcode_id");
+      $code = $naf_q->f("companynafcode_code");
+      $label = $naf_q->f("companynafcode_label");
+      $sel_naf .= "\n<option value=\"$id\">$code - $label</option>";
+    }
+    $sel_naf .= "</select>";
+  } else {
+    $sel_naf = $l_naf_no;
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_naf_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Naf Code Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_naf_delete\" method=\"post\"
+              action=\"" . url_prepare("company_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_naf_exist</td>
+              <td class=\"adminLabel\">$sel_naf</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"nafcode_checklink\" />
+              <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_checkdelete\" onclick=\"if (check_naf_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Naf Code Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_naf_update\" method=\"get\"
+              action=\"" . url_prepare("company_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_naf\" value=\"\" />
+	    <input type=\"hidden\" name=\"action\" value=\"nafcode_update\" />
+	    <input type=\"text\" size=\"4\" maxlength=\"4\" name=\"tf_naf_code\" />
+            <input type=\"text\" name=\"tf_naf_label\" />
+            <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_update\"
+              onclick=\"if (check_naf_upd(this.form,document.form_naf_delete)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Naf Code Section -->
+
+        <form name=\"form_naf_new\" method=\"get\"
+          action=\"" . url_prepare("company_index.php") . "\">
+        <table>
+	<tr>
+	 <td class=\"adminLabel\">$l_naf_code :
+	  <input type=\"text\" name=\"tf_naf_code\" size=\"4\" maxlength=\"4\" />
+	 </td>
+        </tr>
+        <tr>
+         <td class=\"adminLabel\">$l_naf_label
+	   <input type=\"text\" name=\"tf_naf_label\" />
+	 </td>
+	</tr>
+	<tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"nafcode_insert\" />
+            <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_insert\"
+              onclick=\"if (check_naf_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: the Naf Code links
+// Parameters:
+//   - $company : company hash info : keys used : nafcode
+///////////////////////////////////////////////////////////////////////////////
+function dis_nafcode_links($company) {
+  global $display, $l_back, $l_naf_link_company, $l_naf_link_company_no;
+  global $l_naf_delete, $l_naf_can_delete, $l_naf_cant_delete;
+
+  $delete_ok = true;
+  $id = $company["nafcode"];
+  $label = get_nafcode_label($id);
+  $obm_q = run_query_nafcode_links($id);
+
+  $nb_naf = $obm_q->num_rows();
+  if ($nb_naf > 0) {
+    $delete_ok = false;
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_naf_link_company ($nb_naf)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $cid = $obm_q->f("company_id");
+      $cname = $obm_q->f("company_name");
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_naf) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_naf_link_company_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_naf_can_delete);
+    $dis_del = "<form name=\"form_naf_delete\".
+          method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"nafcode_delete\" />
+        <input type=\"hidden\" name=\"sel_naf\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_naf_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
 
   return $block;
 }
@@ -2062,6 +2326,7 @@ function html_category_tree($category) {
 function display_popup_tree($tree,$indent) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $popup;
+
   $code = $tree["code"];
   $label = $tree["label"];
   $id = $tree["id"]; 
@@ -2115,15 +2380,18 @@ function display_popup_tree($tree,$indent) {
     
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_category_code_tree($category) {
   global $l_close,$l_add,$l_cat_no;
+
   $popup = $category["popup"];
   $obm_d = run_query_get_tree();
-  if($popup) {
+  if ($popup) {
     $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
@@ -2166,16 +2434,17 @@ function html_category_code_tree($category) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Document Tree
+// Display: Category Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function display_popup_code_tree($tree,$indent) {
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
-  global $popup;
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory;
+  global $popup, $set_theme;
+
   $code = $tree["code"];
   $label = $tree["label"];
   $id = $tree["id"]; 
-  if($code != "") {
+  if ($code != "") {
     $is_valid = true;
     $indent_file = $indent + 15;
   }
@@ -2190,8 +2459,8 @@ function display_popup_code_tree($tree,$indent) {
     }
   }
  
-  if($is_valid) {
-    if($bool == true) {
+  if ($is_valid) {
+    if ($bool == true) {
       $block= 
       "<table class=\"category\">
 	 <tr>
@@ -2206,8 +2475,7 @@ function display_popup_code_tree($tree,$indent) {
 	<div id='div_$code' style=\"display:none;\" >
 	 $content
 	</div>";
-    }
-    else {
+    } else {
       $block= 
       "<table class=\"category\">
 	 <tr>
@@ -2226,4 +2494,4 @@ function display_popup_code_tree($tree,$indent) {
   return $block;
 }
 
-</SCRIPT>
+</script>

@@ -188,6 +188,21 @@ CREATE TABLE CompanyActivity (
 );
 
 
+-- 
+-- Table structure for table 'CompanyNafCode'
+--
+CREATE TABLE CompanyNafCode (
+  companynafcode_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  companynafcode_timeupdate  timestamp(14),
+  companynafcode_timecreate  timestamp(14),
+  companynafcode_userupdate  int(8),
+  companynafcode_usercreate  int(8),
+  companynafcode_code        varchar(4),
+  companynafcode_label       varchar(128),
+  PRIMARY KEY (companynafcode_id)
+);
+
+
 --
 -- Table structure for table 'Company'
 --
@@ -205,6 +220,7 @@ CREATE TABLE Company (
   company_sound                varchar(48),
   company_type_id              int(8),
   company_activity_id          int(8),
+  company_nafcode_id           int(8),
   company_marketingmanager_id  int(8),
   company_address1             varchar(64),
   company_address2             varchar(64),

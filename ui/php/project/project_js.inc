@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : project_js.inc                                              //
 //     - Desc  : Project javascript functions File                           //
-// 2003-07-08 Bastien Continsouzas                                           //
+// 2003-07-08 Aliacom - Bastien Continsouzas                                 //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,6 +81,22 @@ function check_project(form) {
 // Select the task add form                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 function check_taskadd(form)
+{
+  // MANDATORY : Check that the ProjectTask label is not empty
+  if (trim(form.tf_tasklabel.value) == \"\") {
+    alert (\"$l_fill_tasklabel\");
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check the task update form                                                //
+///////////////////////////////////////////////////////////////////////////////
+function check_taskupd(form)
 {
   // MANDATORY : Check that the ProjectTask label is not empty
   if (trim(form.tf_tasklabel.value) == \"\") {
@@ -215,6 +231,23 @@ function submit_memberadd(form, p_id)
     window.name='Liste';
     window.open('../user/user_index.php?action=ext_get_ids&popup=1&title=$l_add_member&ext_action=member_add&ext_url=../project/project_index.php&ext_id='+ p_id +'&ext_target=Liste','','height=400,width=620,scrollbars=yes');
     return false;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// parent task auto select on task selection (task update form)
+///////////////////////////////////////////////////////////////////////////////
+function fill_parenttask(sel_pt, sel_t, tf_tname) {
+  var task_id, ptask_id;
+
+  task_id = sel_t.value;
+  ptask_id = parent_task[task_id];
+  pos = parent_pos[ptask_id];
+  sel_pt.options[pos].selected=true;
+  stext = sel_t.options[sel_t.selectedIndex].text;
+  // Delete special space chars at the beginning (&nbsp; ?)
+  new_text = stext.replace(/(\s+)(\S)/, '$2');
+  tf_tname.value = trim(new_text);
 }
 
 // -->

@@ -14,6 +14,7 @@ $l_company_name = "Nom Société";
 $l_kind = "Type";
 $l_category = "Catégories";
 $l_activity = "Secteur d'activité";
+$l_nafcode = "Code NAF";
 $l_market = "Responsable du compte";
 $l_company_kind = "Type Société";
 $l_expresspostal = "Cedex";
@@ -41,6 +42,11 @@ $l_internal = "Interne";
 $l_act_manage = "Gestion des secteurs d'activité";
 $l_act_exist = "Secteurs d'activité existants";
 $l_act_new = "Nouveau secteur d'activité";
+$l_naf_manage = "Gestion des Codes NAF";
+$l_naf_exist = "Codes NAF existants";
+$l_naf_new = "Nouveau Code NAF";
+$l_naf_label = "Label";
+$l_naf_code = "Code ";
 
 // Titres
 $l_company = "Société";
@@ -63,12 +69,15 @@ $l_act_update = "Modifier le secteur d'activité";
 $l_act_checkdelete = "Vérifier ou Supprimer le secteur d'activité";
 $l_act_delete = "Supprimer le secteur d'activité";
 $l_act_insert = "Créer le secteur d'activité";
+$l_naf_update = "Modifier le Code NAF";
+$l_naf_checkdelete = "Vérifier ou Supprimer le Code NAF";
+$l_naf_delete = "Supprimer le Code NAF";
+$l_naf_insert = "Créer le Code NAF";
 $l_select_company = "Sélectionner la société";
 
 // Messages
 $l_err_act_empty = "Le secteur d'activité doit être renseigné !";
 
-$l_cat_no = "Pas de catégories définies";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des sociétés correspondantes.";
 $l_found = "sociétés trouvées.";
 $l_no_found = "Aucune société ne correspond à ces critères !";
@@ -99,6 +108,7 @@ $l_kind_link_company = "Ces sociétés sont du type";
 $l_kind_link_company_no = "Pas de sociétés du type";
 $l_kind_cant_delete = "Le type ne peut être supprimé !";
 $l_kind_can_delete = "Le type peut être supprimé.";
+$l_cat_no = "Pas de catégories définies";
 $l_cat_delete_ok = "La suppression de la catégorie a été correctement effectuée.";
 $l_cat_delete_error = "La suppression de la catégorie a échoué !";
 $l_cat_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
@@ -119,6 +129,17 @@ $l_act_link_company = "Ces sociétés sont du secteur d'activité";
 $l_act_link_company_no = "Pas de sociétés du secteur d'activité";
 $l_act_cant_delete = "Le secteur d'activité ne peut être supprimé !";
 $l_act_can_delete = "Le secteur d'activité peut être supprimé.";
+$l_naf_no = "Pas de codes NAF définis";
+$l_naf_delete_ok = "La suppression du code NAF a été correctement effectuée.";
+$l_naf_delete_error = "La suppression du code NAF a échoué !";
+$l_naf_insert_ok = "L'insertion du code NAF a été correctement effectuée.";
+$l_naf_insert_error = "L'insertion du code NAF a échoué !";
+$l_naf_update_ok = "La modification du code NAF a été correctement effectuée";
+$l_naf_update_error = "La modification du code NAF a échoué !";
+$l_naf_link_company = "Ces sociétés sont de code NAF";
+$l_naf_link_company_no = "Pas de sociétés de code NAF";
+$l_naf_cant_delete = "Le code NAF ne peut être supprimé !";
+$l_naf_can_delete = "Le code NAF peut être supprimé";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez renseigner le Nom avant de valider.";
@@ -135,10 +156,12 @@ $l_j_cat_delete = "Sélectionnez une catégorie pour la vérifier ou supprimer !";
 $l_j_cat_update = "Vous devez sélectionner une catégorie et entrer une modification avant de valider !";
 $l_j_cat_create = "Vous devez saisir un nom de catégorie et un code pour la créer !";
 $l_j_cat_deep = "Les catégories ne peuvent pas avoir plus de trois niveaux de profondeur";
-
 $l_j_act_delete = "Sélectionnez un secteur d'activité pour le vérifier ou supprimer !";
 $l_j_act_update = "Vous devez sélectionner un secteur d'activité et entrer une modification avant de valider !";
 $l_j_act_create = "Vous devez saisir un nom de secteur d'activité pour le créer !";
+$l_j_naf_delete = "Sélectionnez un code NAF pour le vérifier ou supprimer !";
+$l_j_naf_update = "Vous devez sélectionner un code NAF et entrer une modification avant de valider !";
+$l_j_naf_create = "Vous devez saisir un code NAF pour le créer !";
 $l_j_select_company = "Vous devez sélectionner une société !";
 
 // For the display preferences modification screen 

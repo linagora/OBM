@@ -53,11 +53,12 @@ $cgp_show["module"]["statistic"] = true;
 //$cgp_hide["company"]["number"] = true;
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
-//$cgp_hide["company"]["category"] = true;
+$cgp_hide["company"]["companynafcode_code"] = true;
+$cgp_hide["company"]["category"] = true;
 //$cgp_hide["company"]["address3"] = true;
 
 // Contact module
-//$cgp_hide["contact"]["contact_function"] = true;
+$cgp_hide["contact"]["contact_function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["category1"] = true;
 //$cgp_hide["contact"]["category2"] = true;

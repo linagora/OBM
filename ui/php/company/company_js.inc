@@ -138,6 +138,21 @@ function check_kind_upd(form,formd)
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if the Kind creation is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_kind_new(form)
+{
+   if (form.tf_kind.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_kind_create\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
 function check_cat_checkdel(form)
@@ -154,9 +169,8 @@ function check_cat_checkdel(form)
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind creation is possible                                    //
+// Check if the Category creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_cat_new(form)
 {
@@ -176,8 +190,6 @@ function check_cat_new(form)
 }
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the cat update is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,21 +203,6 @@ function check_cat_upd(form,formd)
     alert(\"$l_j_cat_update\");
     return false;
   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the cat creation is possible                                    //
-///////////////////////////////////////////////////////////////////////////////
-function check_kind_new(form)
-{
-   if (form.tf_kind.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_kind_create\");
-      return false;
-   }
 }
 
 
@@ -255,6 +252,55 @@ function check_act_new(form)
       return false;
    }
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the Naf code check or deletion is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_naf_checkdel(form)
+{
+   if (form.sel_naf.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_naf_delete\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the nafcode update is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_naf_upd(form,formd)
+{
+  naf_pos = formd.sel_naf.selectedIndex;
+  if ((naf_pos >= 0) && (form.tf_naf_code.value != \"\")) {
+    form.sel_naf.value=formd.sel_naf.options[naf_pos].value;
+    return true;
+   } else {
+     alert(\"$l_j_naf_update\");
+     return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the naf code creation is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_naf_new(form)
+{
+   if (form.tf_naf_code.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_naf_create\");
+      return false;
+   }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Category Functions                                //

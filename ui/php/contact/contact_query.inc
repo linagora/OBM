@@ -193,15 +193,20 @@ function run_query_kind() {
 //   DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_function() {
-  global $cdg_sql;
+  global $cdg_sql, $cgp_hide;
 
-  $query = "select function_id, function_label
+  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  if ($show_func) {
+    $query = "select function_id, function_label
     from Function
     order by function_label";
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q= new DB_OBM;
-  $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+    $obm_q= new DB_OBM;
+    $obm_q->query($query);
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }
@@ -564,12 +569,12 @@ function run_query_contact_update($contact) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the contact
 // Parameters:
 //   - $c_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_contactcategory1($c_id) {
     global $cdg_sql;
 
@@ -595,14 +600,14 @@ function run_query_get_contactcategory1($c_id) {
 // Parameters:
 //   - $c_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_contactcategory1_label($c_id) {
     global $cdg_sql;
 
   $query = "select contactcategory1_label,contactcategory1_code
-  from ContactCategory1Link,ContactCategory1 where 
-  contactcategory1link_category_id = contactcategory1_id and  contactcategory1link_contact_id = '$c_id'
-  order by contactcategory1_id";     
+    from ContactCategory1Link, ContactCategory1
+    where contactcategory1link_category_id = contactcategory1_id
+      and contactcategory1link_contact_id = '$c_id'
+    order by contactcategory1_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -615,14 +620,14 @@ function run_query_get_contactcategory1_label($c_id) {
 // Parameters:
 //   - $c_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_contactcategory2_label($c_id) {
-    global $cdg_sql;
+  global $cdg_sql;
 
   $query = "select contactcategory2_label,contactcategory2_code
-  from ContactCategory2Link,ContactCategory2 where 
-  contactcategory2link_category_id = contactcategory2_id and  contactcategory2link_contact_id = '$c_id'
-  order by contactcategory2_id";     
+    from ContactCategory2Link, ContactCategory2
+    where contactcategory2link_category_id = contactcategory2_id
+      and contactcategory2link_contact_id = '$c_id'
+    order by contactcategory2_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -630,19 +635,20 @@ function run_query_get_contactcategory2_label($c_id) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the contact
 // Parameters:
 //   - $c_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_contactcategory2($c_id) {
-    global $cdg_sql;
+  global $cdg_sql;
 
   $query = "select contactcategory2_id
-  from ContactCategory2Link,ContactCategory2 where 
-  contactcategory2link_category_id = contactcategory2_id and  contactcategory2link_contact_id = '$c_id'
-  order by contactcategory2_id";     
+    from ContactCategory2Link, ContactCategory2
+    where contactcategory2link_category_id = contactcategory2_id
+      and contactcategory2link_contact_id = '$c_id'
+    order by contactcategory2_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -653,6 +659,8 @@ function run_query_get_contactcategory2($c_id) {
   }
   return $categories;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the deals attached to the contact
 // Parameters:
@@ -1234,7 +1242,6 @@ function run_query_cat1_insert($contact) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Category2 insertion query construction and execution
 // Parameters:
@@ -1325,6 +1332,7 @@ function run_query_cat1_update($contact) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Category from its id                                  //
 // Parameters:
@@ -1356,7 +1364,9 @@ function run_query_cat1_links($p_id) {
   global $cdg_sql;
 
   $query = "select contact_title, contact_id, '$p_id' as contact_category1
-  from Contact,ContactCategory1Link where contact_id = contactcategory1link_contact_id and contactcategory1link_category_id = '$p_id'";
+    from Contact,ContactCategory1Link
+    where contact_id = contactcategory1link_contact_id
+      and contactcategory1link_category_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1395,8 +1405,11 @@ function get_cat2_label($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat2_links($p_id) {
   global $cdg_sql;
+
   $query = "select contact_title, contact_id, '$p_id' as contact_category2
-    from Contact,ContactCategory2Link where contact_id = contactcategory2link_contact_id and contactcategory2link_category_id = '$p_id'";
+    from Contact, ContactCategory2Link
+    where contact_id = contactcategory2link_contact_id
+      and contactcategory2link_category_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1413,7 +1426,8 @@ function run_query_cat2_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat1_delete($id) {
   global $cdg_sql;
-  if($id != '') {
+
+  if ($id != '') {
     $query = "delete from ContactCategory1 where contactcategory1_id='$id'";
 
     display_debug_msg($query, $cdg_sql);
@@ -1434,7 +1448,8 @@ function run_query_cat1_delete($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat2_delete($id) {
   global $cdg_sql;
-  if($id != '') {
+
+  if ($id != '') {
 
     $query = "delete from ContactCategory2 where contactcategory2_id='$id'";
 
@@ -1448,6 +1463,7 @@ function run_query_cat2_delete($id) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Count the number of subscription
 // Parameters:
@@ -1455,8 +1471,8 @@ function run_query_cat2_delete($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_subscription_nb($id) {
   global $cdg_sql;
-  if($id != '') {
 
+  if ($id != '') {
     $query = "select count(*) as nb from Subscription where subscription_contact_id = '$id'";
 
     display_debug_msg($query, $cdg_sql);

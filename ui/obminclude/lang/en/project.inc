@@ -46,6 +46,7 @@ $l_members_info = "Project members";
 $l_progressinfos = "Progress evaluation : time (used / missing / projected)";
 $l_memberstimeinfos = "Fill in the working length (in days) projected for each person assigned to a task";
 $l_task_new = "New task";
+$l_task_update = "Update task";
 $l_task_list = "Defined tasks";
 $l_progress_info = "Fill in the working length (in days) missing for each person to complete a task";
 
@@ -55,6 +56,7 @@ $l_update = "Update the project";
 $l_delete = "Delete the project";
 $l_progress_update = "Update the project progress";
 $l_task_add = "Add the task";
+$l_task_upd = "Update task";
 $l_task_del = "Delete selected tasks";
 
 // Messages
@@ -72,6 +74,8 @@ $l_delete_ok = "The project has been deleted successfully";
 $l_delete_error = "The deletion of the project has failed !";
 $l_task_insert_ok = "Task inserted successfully";
 $l_task_insert_error = "The task insertion has failed ! The parent task is already assigned to users";
+$l_task_update_ok = "Task updated successfully";
+$l_task_update_error = "The task update has failed !";
 $l_task_delete_ok = "The task has been deleted successfully.";
 $l_task_delete_error = "The tasks deletion has failed ! Someone is assigned to the task (or its children)";
 $l_member_delete_error = "The deletion of the member has failed ! He should be assigned to some tasks or has spent some time on the project.";

@@ -46,6 +46,7 @@ $l_members_info = "Participants au projet";
 $l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
 $l_task_new = "Nouvelle tâche";
+$l_task_update = "Modifier une tâche";
 $l_task_list = "Tâches définies";
 $l_progress_info = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
 
@@ -54,6 +55,7 @@ $l_insert = "Créer le projet";
 $l_update = "Modifier le Projet";
 $l_delete = "Supprimer le projet";
 $l_task_add = "Ajouter la tâche";
+$l_task_upd = "Modifier la tâche";
 $l_task_del = "Supprimer les tâches sélectionnées";
 $l_progress_update = "Mettre à jour les avancements";
 
@@ -72,6 +74,8 @@ $l_delete_ok = "La suppression du projet a été correctement effectuée";
 $l_delete_error = "La suppression du projet a échoué !";
 $l_task_insert_ok = "La création de la tâche a été correctement effectuée.";
 $l_task_insert_error = "Impossible de créer cette tâche; La tâche parente est déjà assignée à des utilisateurs";
+$l_task_update_ok = "La modification de la tâche a été correctement effectuée.";
+$l_task_update_error = "Impossible de modifier cette tâche";
 $l_task_delete_ok = "La suppression des tâches a été correctement effectuée.";
 $l_task_delete_error = "Impossible de supprimer une tâche ; Quelqu'un y est affecté (ou à ses filles), ou la tâche est référencée en gestion du temps";
 $l_member_delete_error = "Impossible d'enlever ce participant ; Il est affecté à une tâche du projet ou a déjà passé du temps sur le projet.";

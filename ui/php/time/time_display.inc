@@ -1044,9 +1044,9 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       else if ($day_checked == -1) {
 	$ch_day .= " checked=\"checked\"";
 	$day_checked = $day;
-      } else if ($day == $day_checked)
+      } else if ($day == $day_checked) {
 	$ch_day .= " checked=\"checked\"";
-      
+      }
       $ch_day .= " />$dlabel\n";
     }
   }

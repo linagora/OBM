@@ -553,7 +553,7 @@ function run_query_projectname($pid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : UserList conditionnal insertion                         //
+// Query execution : Task conditionnal insertion                         //
 // Parameters:
 //   - $project[] : Entry's values
 //     keys used  : id, ptask, tasklabel
@@ -612,6 +612,62 @@ function run_query_task_insert($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution : Task Update
+// Parameters:
+//   - $project[] : Entry's values
+//     keys used  : id, ptask, tasklabel
+///////////////////////////////////////////////////////////////////////////////
+function run_query_task_update($project) {
+  global $auth, $cdg_sql;
+
+  $pid = $project["id"];
+  $task = $project["task"];
+  $ptask = $project["ptask"];
+  $tasklabel = $project["tasklabel"];
+
+  echo "task=$task, ptask=$ptask, label=$tasklabel";
+  // If a parent task has been given, check that there are no links from
+  // User to the parent task (a parent task can't be assigned to users)
+  if ( (isset($ptask)) && ($ptask != "0") ) {
+    $query = "
+      select projectuser_user_id
+      from ProjectUser
+      where projectuser_projecttask_id = '$ptask'
+      ";
+
+    display_debug_msg($query, $cdg_sql, "run_query_task_update(1)");
+    $search_q->query($query);
+  }
+
+  if (($ptask == 0) or ($search_q->nf() == 0))  {
+    $query = "
+      update ProjectTask set
+        projecttask_timeupdate,
+        projecttask_userupdate,
+        projecttask_label,
+        projecttask_parenttask_id,
+        projecttask_rank)
+      values (
+        '". date("Y-m-d H:i:s") ."',
+        '". $auth->auth["uid"] ."',
+        '$tasklabel',
+        '$ptask',
+        '1')
+        ";
+
+    display_debug_msg($query, $cdg_sql, "run_query_task_update(2)");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+  
+    return $obm_q;
+  } else {
+    echo "parent has users !";
+    return 0;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : Tasklist deletion                                       //
 // Parameters:
 //   - $project[] : hash info : keys used : id, task_nb, tskX
@@ -628,7 +684,7 @@ function run_query_task_delete($project) {
     $cpt++;
     $tsk_id = $project["tsk$cpt"];
 
-    // Check that neither the task to be deleted or its childre tasks are
+    // Check that neither the task to be deleted or its children tasks are
     // assigned to users
     $query = "
       select projectuser_user_id
@@ -1206,7 +1262,7 @@ function run_query_managers($p_id = 0) {
     $query .= "and projectuser_project_id = '$p_id' ";
 
   $query .= "group by manager_id, manager_firstname, manager_lastname
-             order by manager_firstname";
+             order by manager_lastname";
 
   display_debug_msg($query, $cdg_sql, "run_query_managers");
   $obm_q = new DB_OBM;
@@ -1333,11 +1389,31 @@ function check_project_form($pid, $project) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_task_form($pid, $project) {
-  global $err_msg, $l_fill_tasklabel;
+  global $err_msg, $l_fill_tasklabel, $l_ptask_has_user;
 
+  $pid = $project["id"];
+  $task = $project["task"];
+  $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];
 
-  // MANDATORY: Soldtime
+  echo "task=$task, ptask=$ptask, label=$tasklabel";
+  // If a parent task has been given, check that there are no links from
+  // User to the parent task (a parent task can't be assigned to users)
+  if ( (isset($ptask)) && ($ptask != "0") ) {
+    $query = "
+      select projectuser_user_id
+      from ProjectUser
+      where projectuser_projecttask_id = '$ptask'
+      ";
+    display_debug_msg($query, $cdg_sql, "check_task_form(1)");
+    $search_q->query($query);
+  } else {
+    $err_msg = $l_ptask_has_user;
+    return false;
+  }
+
+
+  // MANDATORY: task label
   if (trim($tasklabel) == "") {
     $err_msg = $l_fill_tasklabel;
     return false;

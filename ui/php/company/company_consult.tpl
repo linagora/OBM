@@ -13,6 +13,7 @@
     </tr>
     $block_kind
     $block_act
+    $block_naf
     <tr>
       <td class="detailLabel">$l_market</td>
       <td class="detailText">$lmarket</td>

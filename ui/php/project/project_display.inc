@@ -730,7 +730,7 @@ function html_project_form($action, $project_q, $project) {
     $dateend = isodate_format($project_q->f("dateend"), 1);
   } else {
     $pid = $project["id"];
-    $name = $project["name"];
+    $name = stripslashes($project["name"]);
     $tt = $project["tt"];
     $company = $project["company"];
     $deal = $project["deal"];
@@ -983,32 +983,31 @@ function dis_delete_form($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Task Add Form                                                     //
 // Parameters:
-//   - $ptask_q   : database object with project parent tasks list
+//   - $ptask_q   : database object with project tasks list
 //   - $project[] : default form values
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_task_form($ptask_q, $project) {
   global $display;
   global $l_none, $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
+  global $l_task_update, $l_task_upd, $l_task;
   
   $pid = $project["id"];
   $pname = $project["name"];
   $label = stripslashes($project["tasklabel"]);
+  $task = $project["task"];
   $ptask = $project["ptask"];
 
   if (($ptask_q != 0) && ($ptask_q->num_rows() != 0)) {
-    // ptask select
+    $cpt_root = 0;
+    // parent task select
     $sel_ptask = "
-    <tr>
-      <td class=\"detailLabel\">$l_parent</td>
-      <td class=\"detailForm\">
         <select id=\"sel_ptask\" name=\"sel_ptask\">
           <option value=\"0\">$l_none</option>\n";
-    $nrows = $ptask_q->num_rows();
-
     while ($ptask_q->next_record()) {
       $parent = $ptask_q->f("parent_id");
       if ($parent == 0) {
+	$cpt_root++;
 	$ptask_id = $ptask_q->f("projecttask_id");
 	$ptask_label = $ptask_q->f("projecttask_label");
 	if ($ptask_id == $ptask) {
@@ -1017,18 +1016,52 @@ function html_project_task_form($ptask_q, $project) {
 	  $selected = "";
 	}
 	$sel_ptask .= "<option value=\"$ptask_id\" $selected>$ptask_label</option>\n";
+	$js_task .= "parent_pos[$ptask_id] = $cpt_root;\n";
       }
     }
+    $sel_ptask .= "</select>";
 
-    $sel_ptask .= "</select></td></tr>\n";
+    // task select
+    $sel_task = "
+      <select id=\"sel_task\" name=\"sel_task\"
+      onchange=\"fill_parenttask(this.form.sel_ptask, this.form.sel_task, this.form.tf_tasklabel)\" >";
+    $ptask_q->seek(0);
+    while ($ptask_q->next_record()) {
+      $parent = $ptask_q->f("parent_id");
+      if ($parent == 0) {
+	$prefix = "";
+      } else {
+	$prefix = "&nbsp;&nbsp;&nbsp;&nbsp;";
+      }	
+      $task_id = $ptask_q->f("projecttask_id");
+      $task_label = $ptask_q->f("projecttask_label");
+      if ($task_id == $task) {
+	$selected = "selected";
+      } else {
+	$selected = "";
+      }
+      $sel_task .= "<option value=\"$task_id\" $selected>$prefix$task_label</option>\n";
+      $js_task .= "parent_task[$task_id] = $parent;\n";
+    }
+
+    $sel_task .= "</select>";
     $ptask_q->seek(0);
   }
+
+  $js_script = "
+    <script type=\"text/javascript\">
+      parent_pos = new Array();
+      parent_task = new Array();
+      parent_pos[0] = 0;
+      $js_task
+    </script>\n";
 
   $display["title"] = "<div class=\"title\">$l_project : $pname</div>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
+   $js_script
    <form method=\"post\" name=\"form_taskadd\"
      onsubmit=\"if (check_taskadd(this)) return true; else return false;\"
      action=\"". url_prepare("project_index.php") ."\">
@@ -1038,9 +1071,14 @@ function html_project_task_form($ptask_q, $project) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"$label\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
     </tr>
-    $sel_ptask
+    <tr>
+      <td class=\"detailLabel\">$l_parent</td>
+      <td class=\"detailForm\">
+      $sel_ptask
+      </td>
+    </tr>
     </table>
 
     <div class=\"detailButton\">
@@ -1048,6 +1086,42 @@ function html_project_task_form($ptask_q, $project) {
      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_add\" />
      <input type=\"submit\" value=\"$l_task_add\" />
+    </p>
+    </div>
+  </form>    
+
+  <form method=\"post\" name=\"form_taskupd\"
+     onsubmit=\"if (check_taskupd(this)) return true; else return false;\"
+     action=\"". url_prepare("project_index.php") ."\">
+
+    <p class=\"detailButtons\">&nbsp;</p>
+
+    <div class=\"detailHead\">$l_task_update</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_task</td>
+      <td class=\"detailForm\">
+      $sel_task
+      </td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_parent</td>
+      <td class=\"detailForm\">
+      $sel_ptask
+      </td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
+    </tr>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+     <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+     <input type=\"hidden\" name=\"action\" value=\"task_update\" />
+     <input type=\"submit\" value=\"$l_task_upd\" />
     </p>
     </div>
 
@@ -1111,7 +1185,8 @@ function html_project_tasklist($tasks_q, $project) {
   }
   
   $block = "
-    <p>&nbsp;</p>
+    <p class=\"detailButtons\">&nbsp;</p>
+
     <div class=\"detailHead\">$l_task_list</div>
 
     <form name=\"form_tasklist\" method=\"post\">

@@ -21,10 +21,14 @@
 // - kind_update        -- form fields    -- update the kind
 // - kind_checklink     --                -- check if kind is used
 // - kind_delete        -- $sel_kind      -- delete the kind
-// - activity_insert    -- form fields    -- insert the kind
-// - activity_update    -- form fields    -- update the kind
-// - activity_checklink --                -- check if kind is used
-// - activity_delete    -- $sel_kind      -- delete the kind
+// - activity_insert    -- form fields    -- insert the activity
+// - activity_update    -- form fields    -- update the activity
+// - activity_checklink --                -- check if activity is used
+// - activity_delete    -- $sel_kind      -- delete the activity
+// - nafcode_insert     -- form fields    -- insert the nafcode
+// - nafcode_update     -- form fields    -- update the nafcode
+// - nafcode_checklink  --                -- check if nafcode is used
+// - nafcode_delete     -- $sel_kind      -- delete the nafcode
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -113,11 +117,12 @@ if ($action == "ext_get_id") {
   $dsrc_q = run_query_datasource();
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
+  $naf_q = run_query_companynafcode();
   $usr_q = run_query_all_users_from_group($cg_com);
   $cat_q = run_query_companycat();
   $ctry_q = run_query_country();
   require("company_js.inc");
-  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $usr_q, $cat_q,"", $ctry_q, $company);
+  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q,"", $ctry_q, $company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,6 +145,7 @@ if ($action == "ext_get_id") {
       $dsrc_q = run_query_datasource();
       $type_q = run_query_companytype();
       $act_q = run_query_companyactivity();
+      $naf_q = run_query_companynafcode();
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_all_users_from_group($cg_com, $users);
       $cat_q = run_query_companycat();
@@ -147,7 +153,7 @@ if ($action == "ext_get_id") {
       $ctry_q = run_query_country();
       require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $cat_q,$compcat,$ctry_q, $company);
+      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q,$compcat,$ctry_q, $company);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -188,11 +194,12 @@ if ($action == "ext_get_id") {
     $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
+    $naf_q = run_query_companynafcode();
     $cat_q = run_query_companycat();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_all_users_from_group($cg_com, $users);
     $ctry_q = run_query_country();
-    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q,$cat_q,"",$ctry_q, $company);
+    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $naf_q, $usr_q,$cat_q,"",$ctry_q, $company);
   }
 
 } elseif ($action == "update")  {
@@ -214,11 +221,12 @@ if ($action == "ext_get_id") {
     $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
+    $naf_q = run_query_companynafcode();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_all_users_from_group($cg_com, $users);
     $cat_q = run_query_companycat();
     $ctry_q = run_query_country();
-    $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $cat_q, "", $ctry_q, $company);
+    $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q, "", $ctry_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -280,6 +288,84 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
+} elseif ($action == "activity_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_activity_insert($company);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_act_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_act_insert_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "activity_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_activity_update($company);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_act_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_act_update_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "activity_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_activity_links($company);
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "activity_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_activity_delete($company["activity"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_act_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_act_delete_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "nafcode_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_nafcode_insert($company);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_naf_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_naf_insert_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "nafcode_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_nafcode_update($company);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_naf_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_naf_update_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "nafcode_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_nafcode_links($company);
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "nafcode_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_nafcode_delete($company["nafcode"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_naf_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_naf_delete_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
 } elseif ($action == "cat_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_insert($company);
@@ -319,45 +405,6 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-
-} elseif ($action == "activity_insert")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_insert($company);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_act_insert_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_act_insert_error);
-  }
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
-
-} elseif ($action == "activity_update")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_update($company);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_act_update_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_act_update_error);
-  }
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
-
-} elseif ($action == "activity_checklink")  {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_activity_links($company);
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
-
-} elseif ($action == "activity_delete")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_delete($company["activity"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_act_delete_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_act_delete_error);
-  }
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -417,9 +464,10 @@ display_page($display);
 function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
-  global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com;
-  global $tf_dateafter, $tf_datebefore, $cb_fuzzy;
+  global $tf_email, $sel_act, $sel_naf, $sel_kind, $sel_cat, $sel_market;
+  global $ta_com, $tf_dateafter, $tf_datebefore, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
+  global $tf_naf_code, $tf_naf_label;
   global $param_company, $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -460,6 +508,7 @@ function get_param_company() {
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
   if (isset ($sel_cat)) $company["cat"] = $sel_cat;
   if (isset ($sel_act)) $company["activity"] = $sel_act;
+  if (isset ($sel_naf)) $company["nafcode"] = $sel_naf;
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
   if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
   if (isset ($tf_ad2)) $company["ad2"] = $tf_ad2;
@@ -483,13 +532,18 @@ function get_param_company() {
   // $sel_kind -> "kind" is already set
   if (isset ($tf_kind)) $company["kind_label"] = $tf_kind;
 
-  // Admin - Kind fields
-  // $sel_kind -> "kind" is already set
-  if (isset ($tf_cat_code)) $company["cat_code"] = $tf_cat_code;
-  if (isset ($tf_cat)) $company["cat_label"] = $tf_cat;
   // Admin - Activity fields
   // $sel_act -> "act" is already set
   if (isset ($tf_act)) $company["act_label"] = $tf_act;
+
+  // Admin - Nafcode fields
+  // $sel_naf -> "naf" is already set
+  if (isset ($tf_naf_code)) $company["naf_code"] = $tf_naf_code;
+  if (isset ($tf_naf_label)) $company["naf_label"] = $tf_naf_label;
+
+  // Admin - Cat fields
+  if (isset ($tf_cat_code)) $company["cat_code"] = $tf_cat_code;
+  if (isset ($tf_cat)) $company["cat_label"] = $tf_cat;
 
   if (debug_level_isset($cdg_param)) {
     if ( $company ) {
@@ -668,6 +722,34 @@ function get_company_action() {
 // Activity Delete
   $actions["COMPANY"]["activity_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Naf Code Insert
+  $actions["COMPANY"]["nafcode_insert"] = array (
+    'Url'      => "$path/company/company_index.php?action=nafcode_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Naf Code Update
+  $actions["COMPANY"]["nafcode_update"] = array (
+    'Url'      => "$path/company/company_index.php?action=nafcode_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Naf Code Check Link
+  $actions["COMPANY"]["nafcode_checklink"] = array (
+    'Url'      => "$path/company/company_index.php?action=nafcode_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Naf Code Delete
+  $actions["COMPANY"]["nafcode_delete"] = array (
+    'Url'      => "$path/company/company_index.php?action=nafcode_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );

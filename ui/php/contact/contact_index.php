@@ -47,7 +47,6 @@ require("contact_display.inc");
 require("contact_query.inc");
 
 $uid = $auth->auth["uid"];
-
 update_last_visit("contact", $param_contact, $action);
 
 page_close();
@@ -118,6 +117,7 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
   }
+
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contact_data_form("", $contact)) {

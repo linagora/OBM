@@ -34,7 +34,7 @@ function select_all(form) {
 }
 
 ////////////////////////
-// Deal Form checking //
+// Task Form checking //
 ////////////////////////
 function check_addtaskform(f_aff) {
 
@@ -85,14 +85,13 @@ function check_sel_tasktype(form) {
 /////////////////////////////////////
 // tasklist auto-selection         //
 /////////////////////////////////////
-
-function fill_tasktype(sel_tt, deal_id) {
+function fill_tasktype(sel_tt, project_id) {
   var i, j, k;
   var tt;
 
   for (i = 0; i < project.length; i++) {
     for (j = 1; j < project[i].length; j++) {
-      if (project[i][j][1] == deal_id) {
+      if (project[i][j][1] == project_id) {
         tt = project[i][0];
       }
     }
@@ -108,7 +107,6 @@ function fill_tasktype(sel_tt, deal_id) {
 /////////////////////////////////////
 // project dynamic list generation //
 /////////////////////////////////////
-
 function fill_projectall(sel_list) {
   var i, j, k;
   k = 0;
@@ -239,4 +237,3 @@ function select_default(sel_list, def_value) {
 // -->
 </script>
 ";
-

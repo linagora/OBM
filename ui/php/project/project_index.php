@@ -18,6 +18,7 @@
 // - delete          -- $param_project -- delete the project
 // - task            -- $param_project -- show project tasks main screen
 // - task_add        -- form fields    -- 
+// - task_update     -- form fields    -- 
 // - task_del        -- form fields    -- 
 // - member          -- $param_project -- show project members main screen
 // - sel_member      -- ext: user
@@ -157,7 +158,7 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_ok_msg($l_task_insert_ok);
     } else {
       $display["msg"] .= display_err_msg("$l_task_insert_error");
-    }      
+    }
     $project["name"] = run_query_projectname($param_project);
     $tasks_q = run_query_tasks($param_project);
     $display["detail"] = html_project_task_form($tasks_q, $project);
@@ -165,6 +166,27 @@ if ($action == "index" || $action == "") {
   } else { 
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     dis_project_consult($param_project);
+  }
+
+} elseif ($action == "task_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_task_form($param_project, $project)) {
+    $retour = run_query_task_update($project);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_task_update_ok);
+    } else {
+      $display["msg"] .= display_err_msg("$l_task_update_error");
+    }
+    $project["name"] = run_query_projectname($param_project);
+    $tasks_q = run_query_tasks($param_project);
+    $display["detail"] = html_project_task_form($tasks_q, $project);
+    $display["detail"] .= html_project_tasklist($tasks_q, $project);
+  } else { 
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $project["name"] = run_query_projectname($param_project);
+    $tasks_q = run_query_tasks($param_project);
+    $display["detail"]  = html_project_task_form($tasks_q, $project);
+    $display["detail"] .= html_project_tasklist($tasks_q, $project);
   }
 
 } elseif ($action == "task_del")  {
@@ -350,7 +372,7 @@ function get_param_project() {
   global $param_project, $param_user, $param_status, $param_company, $param_deal;
   global $tf_missing, $tf_projected, $tf_datebegin, $tf_dateend;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_estimated, $tf_tasklabel, $cb_archive;
-  global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext;
+  global $sel_tt, $sel_manager, $sel_member, $sel_task, $sel_ptask, $param_ext;
   global $deal_label;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
@@ -365,6 +387,7 @@ function get_param_project() {
   // Project fields
   if (isset ($tf_soldtime)) $project["soldtime"] = $tf_soldtime;
   if (isset ($tf_estimated)) $project["estimated"] = $tf_estimated;
+  if (isset ($sel_task)) $project["task"] = $sel_task;
   if (isset ($sel_ptask)) $project["ptask"] = $sel_ptask;
   if (isset ($tf_tasklabel)) $project["tasklabel"] = $tf_tasklabel;
   if (isset ($tf_missing)) $project["missing"] = $tf_missing;
@@ -465,7 +488,7 @@ function get_project_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/project/project_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('index', 'search', 'insert', 'detailconsult', 'admin', 'display') 
+    'Condition'=> array ('index', 'search', 'insert', 'detailconsult', 'update', 'delete', 'admin', 'display') 
     );
 
 // Detail Consult
@@ -473,7 +496,7 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update') 
+    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_update', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update') 
     );
 
 // Detail Update
@@ -528,6 +551,13 @@ function get_project_action() {
     'Condition'=> array ('None')
                                        );
 
+// Update a task
+  $actions["PROJECT"]["task_update"] = array (
+    'Url'      => "$path/project/project_index.php?action=task_update",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                       );
+
 // Remove a task
   $actions["PROJECT"]["task_del"] = array (
     'Url'      => "$path/project/project_index.php?action=task_del",
@@ -540,7 +570,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_del', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_update', 'task_del', 'allocate', 'progress') 
                                      );
 
 // Select members : Lists selection
@@ -579,7 +609,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=allocate&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_del') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
                                      );
 
 // Time allocation Update
@@ -594,7 +624,7 @@ function get_project_action() {
     'Name'     => $l_header_man_advance,
     'Url'      => "$path/project/project_index.php?action=progress&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_del') 
+    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
                                      	 );
 
 // Update progress

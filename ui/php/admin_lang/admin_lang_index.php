@@ -83,7 +83,7 @@ switch ($mode) {
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $actions, $modules, $langs, $themes;
+  global $argv, $actions, $modules, $langs, $themes;
 
   while (list($nb, $val) = each ($actions)) {
     if ($nb == 0) $lactions .= "$val";
