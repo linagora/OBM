@@ -82,7 +82,24 @@ function html_code_index($actions, $words) {
       <td class=\"adminText\"><tt>$word_list</tt></td>
     </tr>
     </table>
-    </form>";
+    </form>
+
+    <form method=\"get\" action=\"" . url_prepare("admin_code_index.php"). "\">
+    <table class=\"admin\">
+    <tr>
+      <td class=\"adminHead\">action : func_dep</td>
+      <td class=\"adminLabel\" rowspan=\"2\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"func_unused\" />
+        <input type=\"submit\" value=\"$l_execute\" /></td>
+    </tr><tr>
+      <td class=\"adminText\">
+        Show deprecated functions, defined but not used in code</td>
+    </tr>
+    </table>
+    </form>
+
+";
 }
 
 
@@ -90,9 +107,8 @@ function html_code_index($actions, $words) {
 // Display files containing '&' but not in exluded words from $words         //
 // Parameters:
 //   - $mode  : "txt" or "html"
-//   - $words : word list to exclude
 ///////////////////////////////////////////////////////////////////////////////
-function dis_amp($mode, $words) {
+function dis_amp($mode) {
   global $obm_root, $cpt_line;
 
   if ($mode == "txt") {
@@ -102,7 +118,7 @@ function dis_amp($mode, $words) {
   } else {
     echo "<table class=\"admin\">";
   }
-  dis_amp_directory($mode, $words, $obm_root);
+  dis_amp_directory($mode, $obm_root);
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
@@ -123,10 +139,9 @@ $cpt_line lines parsed
 // Parse and proceed one directory (recursive)
 // Parameters:
 //   - $mode  : "txt" or "html"
-//   - $words : word list to exclude
 //   - $dir   : directory to process
 ///////////////////////////////////////////////////////////////////////////////
-function dis_amp_directory($mode, $words, $dir) {
+function dis_amp_directory($mode, $dir) {
   global $exclude;
 
   $obm_dir = dir($dir);
@@ -136,7 +151,7 @@ function dis_amp_directory($mode, $words, $dir) {
 
     if (! in_array ($entry, $exclude)) {
       if (is_dir($long_entry)) {
-	dis_amp_directory($mode, $words, $long_entry);
+	dis_amp_directory($mode, $long_entry);
       } else {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
@@ -167,7 +182,6 @@ function dis_amp_file($mode, $file) {
   if (file_exists($file)) {
     $contents = file($file);
   }
-
 
   // For each line of the file
   while (list($line_num, $line) = each($contents)) {
@@ -210,3 +224,77 @@ function dis_amp_file($mode, $file) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display defined functions that are not used in code                       //
+// Parameters:
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_unused_functions($mode) {
+  global $obm_root, $cpt_line, $def_func, $used_func;
+
+  $def_func = get_def_func_directory($obm_root);
+  echo "<hr />";
+
+  $used_func = get_used_func_directory($obm_root);
+  
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<table class=\"admin\">";
+  }
+  dis_unused_func_directory($obm_root, $def_func, $used_func);
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+$cpt_line lines parsed
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "</table>
+      <p />
+      <b>$cpt_line</b> lines parsed";
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Unused functions
+// Parameters:
+//   - $mode : "txt" or "html"
+//   - $def  : defined functions array
+//   - $used : used functions array
+///////////////////////////////////////////////////////////////////////////////
+function dis_unused_func_directory($mode, $def, $used) {
+  global $exclude;
+
+  echo "<tr>
+    <td class=\"adminHead\">Function</td>
+      <td class=\"adminHead\"> # Line</td>
+      <td class=\"adminHead\">Defined in file</td>
+      <td class=\"adminHead\"> # used</td>
+</tr>";
+
+  foreach ($def as $func => $fa) {
+    $def_file = $fa["file"];
+    $def_ln = $fa["line_num"];
+
+    if (array_key_exists($func, $used)) {
+      $used_cpt = $used["$func"]["cpt"];
+      $class = "class=\"admintext\"";
+    } else {
+      $used_cpt = "No";
+      $class = "class=\"adminLabel\"";
+    }
+
+    echo "<tr>
+      <td $class>$func</td>
+      <td $class>$def_ln</td>
+      <td $class>$def_file</td>
+      <td $class>$used_cpt</td>
+</tr>";
+  }
+}

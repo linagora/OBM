@@ -14,13 +14,14 @@ $menu = "ADMIN_CODE";
 // $obminclude not used in txt mode
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-$debug=1;
+$debug = 0;
 $obm_root = "../..";
 $cpt_line = 0;
 
+require("admin_code_query.inc");
 require("admin_code_display.inc");
 
-$acts = array ('help', 'index', 'show_amp');
+$acts = array ('help', 'index', 'show_amp', 'func_unused');
 $words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
 $exclude = array('.', '..', 'CVS', 'doc', 'scripts');
 
@@ -66,6 +67,9 @@ switch ($action) {
     break;
   case "show_amp":
     dis_amp($mode, $words);
+    break;
+  case "func_unused":
+    dis_unused_functions($mode);
     break;
   default:
     echo "No action specified !";
@@ -182,6 +186,13 @@ function get_admin_code_action() {
   $actions["ADMIN_CODE"]["show_amp"]	= array (
      'Name'     => $l_header_amp,
      'Url'      => "$path/admin_code/admin_code_index.php?action=show_amp&amp;mode=html",
+     'Right'    => $admin_code_write,
+     'Condition'=> array ('index') 
+                                        );
+  // func_unused : show unused functions
+  $actions["ADMIN_CODE"]["func_unused"]	= array (
+     'Name'     => $l_header_amp,
+     'Url'      => "$path/admin_code/admin_code_index.php?action=func_unused&amp;mode=html",
      'Right'    => $admin_code_write,
      'Condition'=> array ('index') 
                                         );
