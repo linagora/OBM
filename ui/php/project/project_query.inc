@@ -262,6 +262,32 @@ function run_query_close($pid) {
 // Query execution : UserList conditionnal insertion                         //
 // Parameters:
 //   - $project[] : Entry's values
+//     keys used  : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_projectname($pid) {
+
+  $query = "
+    select deal_label as project_label
+    from Deal
+    where deal_id = $pid";
+
+  display_debug_msg($query, $cdg_sql, "run_query_projectname");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->nf() != 0) {
+    $obm_q->next_record();
+    $p_name = $obm_q->f("project_label");
+  }
+
+  return $p_name;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : UserList conditionnal insertion                         //
+// Parameters:
+//   - $project[] : Entry's values
 //     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tasklist_insert($project) {
@@ -329,14 +355,12 @@ function run_query_tasklist_delete($project) {
   while ($cpt < $project["tsk_nb"]) {
     $cpt++;
     $tsk_id = $project["tsk$cpt"];
-    
-    // verify if deletion is possible
+
     $query = "
-      select timetask_id
-      from TimeTask, ProjectTask
-      where timetask_projecttask_id = projecttask_id
-        and (projecttask_id = $tsk_id
-          or projecttask_parenttask_id = $tsk_id)
+      select projectuser_user_id
+      from ProjectUser
+      where projectuser_projecttask_id = 1638
+        and projectuser_projectedtime != 0
       ";
     
     display_debug_msg($query, $cdg_sql, "run_query_tasklist_delete(1)");
@@ -538,7 +562,6 @@ function run_query_projectupdate($project) {
              projectuser_projecttask_id,
              projectuser_timecreate,
              projectuser_usercreate,
-             projectuser_missingtime,
              projectuser_projectedtime
             )
           values
@@ -546,7 +569,6 @@ function run_query_projectupdate($project) {
              $t_id,
              '".date("Y-m-d H:i:s")."',
              ". $auth->auth["uid"] .",
-             $proj,
              $proj
             )";
 	
@@ -802,26 +824,27 @@ function run_query_membertime($p_id) {
 
   $frac = $c_day_fraction;
 
+//       userobm_lastname,
+//       userobm_firstname,
+//       projectuser_user_id,
+//      projectuser_manager
+
   $query = "
     select
       userobm_id,
-      userobm_lastname,
-      userobm_firstname,
-      projectuser_user_id,
       projectuser_projecttask_id,
       sum((timetask_length)/$frac) as used_time,
       projectuser_projectedtime as projected_time,
-      projectuser_missingtime as missing_time,
-      projectuser_manager
+      projectuser_missingtime as missing_time
     from UserObm, ProjectUser, ProjectTask
-    left join TimeTask 
+    left join TimeTask
       on  timetask_projecttask_id = projecttask_id
       and timetask_user_id = userobm_id
     where projecttask_deal_id = $p_id
       and projecttask_id = projectuser_projecttask_id
       and projectuser_user_id = userobm_id
+      and projectuser_projectedtime != 0
     group by userobm_id, projecttask_id
-    order by projectuser_manager desc,userobm_lastname, userobm_firstname
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_membertime");

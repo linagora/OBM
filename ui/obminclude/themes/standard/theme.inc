@@ -52,6 +52,8 @@ $ico_account        = "ico_account.gif";
 $ico_invoice        = "ico_invoice.gif";
 $ico_payment        = "ico_payment.gif";
 
+$ico_time           = "ico_time.gif";
+$ico_project        = "ico_project.png";
 $ico_user           = "ico_user.gif";
 $ico_group          = "ico_group.gif";
 $ico_setting        = "ico_setting.gif";
