@@ -50,9 +50,10 @@ function dis_data_import(&$OD, $fieldname, $link_ok) {
 //   - $import[] : hash with import values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_import_search_form($import="") {
+  global $cg_adm;
 
   $dsrc_q = run_query_datasource();
-  $usr_q = run_query_userobm_active();
+  $usr_q = run_query_all_users_from_group($cg_adm);
   $block = html_import_search_form($import, $dsrc_q, $usr_q);
 
   return $block;

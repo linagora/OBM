@@ -12,9 +12,9 @@ autres utilisateurs. \\
 
 Les principales entités du module \agenda sont décrites ci-dessous :
 
-\subsection{Description d'un évenement}
+\subsection{Description d'un événement}
 
-Composantes d'une société :\\
+Composantes d'un événement :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
@@ -23,9 +23,9 @@ Composantes d'une société :\\
 Titre & Titre de votre évenement.\\ 
 \hline
 Privé & Visibilité de l'événement qui peut être publique ou privée. Un 
-évenementprivé n'est visible que par ses participants.\\
+évenement privé n'est visible que par ses participants.\\
 \hline
-Catégorie & Catégories de l'événement.Les catégories de tâches sont gérées dans
+Catégorie & Catégories de l'événement. Les catégories sont gérées dans
 la section administration du module \agenda.\\
 \hline
 Utilisateurs & Liste des participants de l'événement. La valeur entre
@@ -61,32 +61,35 @@ Description & Description de l'événement.\\
 \subsubsection{Type de répétition}
 
 Un événement peut être répétitif, c'est à dire qu'il va se répéter suivant un
-fréquence définit lors de sa création. 
- Les differentes valeurs sont :
-\begin{description}
-\item[---] Pour indiquer l'absence de répétition.
-\item[quotidienne] Pour indiquer une répétion qui aurait lieu toute les 
-jours.
-\item[hebdomadaire] Pour indiquer une répétion qui aurait lieu toute les 
-semaines. Le champs Jours de répétition détermine les jours de la semaine
-auxquels aura lieu l'évenement. Par exemple les Lundi et Mardi de chaque 
-semaine.
-\item[mensuelle(date)] Pour une répétition qui aurait lieu tout les mois a une 
-date donnée (le 4 de chaque mois par exemple).
-\item[mensuelle(jour)] Pour une répétition qui aurait lieu tout les mois à un 
-jour
-donné (exemple tout les seconds lundi du mois).
-\item[annuelle] Pour une répétition qui aura lieu tout les ans à la même date.
-\end{description}
+fréquence définie lors de sa création. 
+Les differentes répétitions possibles sont :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{---} & Pas de répétition\\
+\hline
+\textbf{quotidienne} & Evénement a lieu tous les jours.\\
+\hline
+\textbf{hebdomadaire} & Evénement a lieu toutes les semaines. Il est possible de préciser les jours de la semaine pour lesquels l'événement doit être indiqué 'ex: le mardi et le jeudi).\\
+\hline
+\textbf{mensuelle (date)} & Evénement a lieu tous les mois à une date donnée (le 4 de chaque mois par exemple).\\
+\hline
+\textbf{mensuelle (jour)} & Evénement a lieu tous les mois à un jour donné (exemple tout les seconds lundi du mois).\\
+\hline
+\textbf{annuelle} & Evénement a lieu tous les ans à la même date.\\
+\hline
+\end{tabular}
+
 
 \subsubsection{Les liens d'un événement}
 
-Actuellement le module \agenda est uniquement lié aux utilisateurs.
-Cependant ce module est prévut pour pouvoir se lier à d'autres modules.
+Actuellement un événement est associé à des utilisateurs.
+Une des évolutions prévues du module agenda est de pouvoir lier aux événements différentes entités comme des documents, des contacts...
+
 
 \subsection{Les sous-menus du module \agenda}
 
-Le module \agenda comporte 12 sous-menus (accessibles selon les droits d'accès)
+Le module \agenda comporte 12 sous-menus (certains contextuels ou accessibles selon les droits d'accès)
 :\\
 
 \begin{tabular}{|p{2.5cm}|p{9.5cm}|}
@@ -95,12 +98,11 @@ Le module \agenda comporte 12 sous-menus (accessibles selon les droits d'accès)
 \hline
 Nouveau rdv & Créer un nouvel événement \\
 \hline
-Consulter & Consulter les informations d'un évenement.\\
+Consulter & Consulter les informations d'un événement (et changer sa participation à l'événement si on y est invité).\\
 \hline
-Modifier & Modifier les informations d'un évenement.\\
+Modifier & Modifier les informations d'un événement.\\
 \hline
-Supprimer & Permet de supprimer un événement (uniquement pour les 
-administrateurs).\\
+Supprimer & Supprimer un événement (uniquement pour les administrateurs).\\
 \hline
 Année & Affichage de la vue annuelle de l'agenda.\\
 \hline
@@ -110,23 +112,24 @@ Semaine & Affichage de la vue hebdomadaire de l'agenda.\\
 \hline
 Jour & Affichage de la vue quotidienne de l'agenda.\\
 \hline
-Nouvelle réunion & Plannifier une nouvelle réunion.\\
+Nouvelle réunion & Plannifier une nouvelle réunion. Visualisation des créneaux disponibles pour un ensemble d'utilisateurs.\\
 \hline
 Gestion des droits & Gérer les permissions de son agenda.\\
 \hline
-Administrer & Administration des informations annexes (catégories).\\
+Administrer & Administration des informations annexes (catégories d'événements).\\
 \hline
 Exporter & Exporter l'agenda au format iCalendar.\\
-\hline       	
+\hline
 \end{tabular}
 
 
 \subsubsection{Le sous-menu : Nouveau rdv}
 
-Ce menu permet de créer un évenement.
+Ce menu permet de créer un événement dans l'agenda.
+Il permet de renseigner les différentes informations de l'événement.\\
 
-Pour insérer l'événement saisie, il faut cliquer sur le bouton ``Enregistrer la
-société''.\\
+Pour insérer l'événement saisi, il faut cliquer sur le bouton ``Enregistrer le
+rdv''.\\
 
 A noter :
 \begin{description}

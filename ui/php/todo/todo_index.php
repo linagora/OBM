@@ -40,8 +40,7 @@ $perm->check_permissions($module, $action);
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $user_q = run_query_userobm();
-  $display["result"] = dis_todo_form($todo, $user_q);
+  $display["result"] = dis_todo_form($todo);
   $todo_q = run_query_todolist($todo, $new_order, $order_dir);
   if ($todo_q->num_rows_total() != 0)
     $display["result"] .= dis_todo_list($todo, $todo_q);
@@ -57,10 +56,9 @@ if ($action == "index" || $action == "") {
 } else if ($action == "add") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_add($todo);
-  $user_q = run_query_userobm();
   $todo_q = run_query_todolist($todo, "", "");
 
-  $display["result"] = dis_todo_form($todo, $user_q);
+  $display["result"] = dis_todo_form($todo);
 
   if ($todo_q->nf() != 0)
     $display["result"] .= dis_todo_list($todo, $todo_q);
@@ -70,10 +68,9 @@ if ($action == "index" || $action == "") {
 } else if ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($HTTP_POST_VARS);
-  $user_q = run_query_userobm();
   $todo_q = run_query_todolist($todo, "", "");
 
-  $display["result"] = dis_todo_form($todo, $user_q);
+  $display["result"] = dis_todo_form($todo);
 
   if ($todo_q->nf() != 0)
     $display["result"] .= dis_todo_list($todo, $todo_q);
@@ -83,9 +80,8 @@ if ($action == "index" || $action == "") {
 } else if ($action == "delete_unique") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete_unique($param_todo);
-  $user_q = run_query_userobm();
   $todo_q = run_query_todolist($todo, "", "");
-  $display["result"] = dis_todo_form($todo, $user_q);
+  $display["result"] = dis_todo_form($todo);
 
   if ($retour)
     $display["msg"] = display_ok_msg($l_delete_ok);
@@ -99,9 +95,8 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $user_q = run_query_userobm();
   $todo_q = run_query_detail($todo);
-  $display["result"] = dis_todo_form($todo, $user_q, $todo_q);
+  $display["result"] = dis_todo_form($todo, $todo_q);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,9 +117,8 @@ if ($action == "index" || $action == "") {
 
   } else {
     $action = "index";
-    $user_q = run_query_userobm();
     $todo_q = run_query_todolist($todo, "", "");
-    $display["result"] = dis_todo_form($todo, $user_q);
+    $display["result"] = dis_todo_form($todo);
     if ($todo_q->num_rows_total() != 0)
       $display["result"] .= dis_todo_list($todo, $todo_q);
     else
@@ -174,7 +168,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_todo() {
   global $uid, $param_todo, $action, $popup;
-  global $tf_title, $sel_user, $sel_priority, $tf_deadline, $ta_content;
+  global $tf_title, $sel_user_id, $sel_priority, $tf_deadline, $ta_content;
 
   if (isset ($uid)) $todo["uid"] = $uid;
   if (isset ($action)) $todo["action"] = $action;
@@ -184,7 +178,7 @@ function get_param_todo() {
   // Todo form
   if (isset ($tf_title)) $todo["title"] = $tf_title;
   if (isset ($tf_deadline)) $todo["deadline"] = $tf_deadline;
-  if (isset ($sel_user)) $todo["sel_user"] = $sel_user;
+  if (isset ($sel_user_id)) $todo["sel_user"] = $sel_user_id;
   if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
   if (isset ($ta_content)) $todo["content"] = $ta_content;
 

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre7";
+$obm_version = "0.9.0pre8";
 $l_obm_title = "O.B.M.";
 
 // Agenda constants
@@ -116,26 +116,26 @@ $cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
 $cgp_show["section"]["aliamin"] = "http://aliamin/";
 
 // modules
-$cgp_show["module"]["company"] = "COM";
-$cgp_show["module"]["contact"] = "COM";
-$cgp_show["module"]["deal"] = "COM";
-$cgp_show["module"]["list"] = "COM";
-$cgp_show["module"]["agenda"] = "COM";
-$cgp_show["module"]["todo"] = "COM";
-$cgp_show["module"]["publication"] = "COM";
-$cgp_show["module"]["statistic"] = "COM";
-$cgp_show["module"]["time"] = "PROD";
-$cgp_show["module"]["project"] = "PROD";
-$cgp_show["module"]["contract"] = "PROD";
-$cgp_show["module"]["incident"] = "PROD";
-$cgp_show["module"]["document"] = "PROD";
-$cgp_show["module"]["account"] = "COMPTA";
-$cgp_show["module"]["invoice"] = "COMPTA";
-$cgp_show["module"]["payment"] = "COMPTA";
-$cgp_show["module"]["settings"] = "USER";
-$cgp_show["module"]["user"] = "USER";
-$cgp_show["module"]["group"] = "USER";
-$cgp_show["module"]["admin"] = "ADMIN";
+$cgp_show["module"]["company"] = "com";
+$cgp_show["module"]["contact"] = "com";
+$cgp_show["module"]["deal"] = "com";
+$cgp_show["module"]["list"] = "com";
+$cgp_show["module"]["agenda"] = "com";
+$cgp_show["module"]["todo"] = "com";
+$cgp_show["module"]["publication"] = "com";
+$cgp_show["module"]["statistic"] = "com";
+$cgp_show["module"]["time"] = "prod";
+$cgp_show["module"]["project"] = "prod";
+$cgp_show["module"]["contract"] = "prod";
+$cgp_show["module"]["incident"] = "prod";
+$cgp_show["module"]["document"] = "prod";
+$cgp_show["module"]["account"] = "compta";
+$cgp_show["module"]["invoice"] = "compta";
+$cgp_show["module"]["payment"] = "compta";
+$cgp_show["module"]["settings"] = "user";
+$cgp_show["module"]["user"] = "user";
+$cgp_show["module"]["group"] = "user";
+$cgp_show["module"]["admin"] = "admin";
 
 
 require_once("$obminclude/obm_conf.inc");

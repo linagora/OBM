@@ -106,7 +106,7 @@ function run_query_detail($todo) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo add query execution                                                  //
+// Todo add query execution
 // Parametes:
 //   - $todo[]       : company search criteria
 //     keys used       uid, title, sel_user, priority, deadline, content
@@ -117,45 +117,51 @@ function run_query_add($todo) {
   $now = date("Y-m-d H:i:s");
   $uid = $todo["uid"];
   $title = $todo["title"];
-  $user = $todo["sel_user"];
+  $users = $todo["sel_user"];
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];
   $content = $todo["content"];
 
-  $query = "insert into Todo (
-    todo_timeupdate,
-    todo_timecreate,
-    todo_userupdate,
-    todo_usercreate,
-    todo_user,
-    todo_date,
-    todo_deadline,
-    todo_priority,
-    todo_title,
-    todo_content)
-  values (
-    null,
-    '$now',
-    null,
-    '$uid',
-    '$user',
-    '$now',
-    '$deadline',
-    '$priority',
-    '$title',
-    '$content'
-  )";
-
-  display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
+
+  if (is_array($users)) {
+    foreach ($users as $user) {
+
+      $query = "insert into Todo (
+        todo_timeupdate,
+        todo_timecreate,
+        todo_userupdate,
+        todo_usercreate,
+        todo_user,
+        todo_date,
+        todo_deadline,
+        todo_priority,
+        todo_title,
+        todo_content)
+      values (
+        null,
+        '$now',
+        null,
+        '$uid',
+        '$user',
+        '$now',
+        '$deadline',
+        '$priority',
+        '$title',
+        '$content'
+      )";
+
+      display_debug_msg($query, $cdg_sql);
+      $retour = $obm_q->query($query);
+    }
+  }
 
   return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo update query execution                                               //
+// Todo update query execution
 // Parametes:
 //   - $todo[]       : company search criteria
 //     keys used       id, uid, title, sel_user, priority, deadline, content
@@ -168,7 +174,8 @@ function run_query_update($todo) {
   $t_id = $todo["id"];
   $uid = $todo["uid"];
   $title = $todo["title"];
-  $user = $todo["sel_user"];
+  $users = $todo["sel_user"];
+  $user = $users[0];
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];
   $content = $todo["content"];
@@ -193,7 +200,7 @@ function run_query_update($todo) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete todo pass in $params                                               //
+// Delete todo pass in $params
 // Parameters:
 //   - $parms : correponding to page parameters
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,9 +225,9 @@ function run_query_delete($parms) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete one todo                                                           //
+// Delete one todo
 // Parameters:
-//     -$t_id = todo id
+//   - $t_id = todo id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete_unique($t_id) {
   global $cdg_sql;

@@ -348,14 +348,25 @@ function html_group_form($action, $group_q, $group) {
 //   - $uid     : user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_consult($group, $uid) {
+  global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $g_id = $group["id"];
 
   $group_q = run_query_detail($g_id);
+
   $pref_u_q = run_query_display_pref($uid, "group_user");
   $u_q = run_query_user_group($group);
+  if ($ctu_sql_limit) {
+    $count = get_query_count("SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id=$g_id");
+    $u_q->set_num_rows_total($count);
+  }
+
   $pref_g_q = run_query_display_pref($uid, "group_group");
   $g_q = run_query_group_group($group);
+  if ($ctu_sql_limit) {
+    $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
+    $g_q->set_num_rows_total($count);
+  }
   $block = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
 
   return $block;

@@ -214,30 +214,8 @@ function run_query_insert_decision($agenda) {
   $state = $agenda["decision_event"];
   run_query_update_occurence_state($event_id,$user,$state,$conflicts);
 }
-///////////////////////////////////////////////////////////////////////////////
-// Get users from the array passes
-// Parameters:
-//   - users : array of users id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_in($users) {
-  global $cdg_sql;
-  $where = "(0";
-  foreach($users as $user) {
-    $where .= ", $user";
-  }
-  $where .= ")";
-  $query = "select *
-    from UserObm
-    where userobm_archive = 0
-    AND userobm_id IN $where 
-    order by userobm_lastname"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_userobm()");
 
-  return $obm_q;
 
-}
 ///////////////////////////////////////////////////////////////////////////////
 // XXXXX???? Bad definition : Update a user decision for an user
 // Parameters: 
@@ -249,7 +227,7 @@ function run_query_update_occurence_state($event_id,$user_id,$state){
   $query = "UPDATE CalendarUser 
             SET calendaruser_state = '$state'
             WHERE calendaruser_user_id = $user_id
-            AND calendaruser_event_id = '$event_id'";
+              AND calendaruser_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql);  
   $obm_db->query($query);
   return $obm_db;    

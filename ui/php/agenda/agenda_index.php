@@ -160,7 +160,7 @@ if ($action == "index") {
   $display["result"] = dis_month_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 } elseif ($action == "view_year") {
-////////////////////////////////////DONE///////////////////////////////////////////
+////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
   if (count($sel_user_id) != 0) {
@@ -174,7 +174,7 @@ if ($action == "index") {
   $display["result"] = dis_year_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 } elseif ($action == "new") {
-/////////////////////////TODO : CONFLICTS//////////////////////////////////////  
+/////////////////////////TODO : CONFLICTS//////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
@@ -188,7 +188,7 @@ if ($action == "index") {
   $user_obm = run_query_userobm_in($p_user_array);
   $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $p_user_array);
 } elseif ($action == "insert") {
-/////////////////////////TODO : CONFLICTS//////////////////////////////////////  
+/////////////////////////TODO : CONFLICTS//////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($agenda)){ 
     if (!$agenda["force_insert"] && $conflicts = check_for_conflict($agenda,$sel_user_id)) {
@@ -505,7 +505,7 @@ function get_param_agenda() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_agenda_action() {
   global $actions, $path;
-  global $l_header_update,$l_header_right,$l_header_meeting;
+  global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
   global $l_header_month,$l_header_new_event,$param_event,$param_date,$l_header_admin, $l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -542,17 +542,15 @@ function get_agenda_action() {
 		);
 		
 //Detail Update
-
   $actions["agenda"]["detailconsult"] = array (
-    'Name'     => $l_header_update,
+    'Name'     => $l_header_consult,
     'Url'      => "$path/agenda/agenda_index.php?action=detailconsult&amp;param_event=".$param_event."&amp;param_date=$param_date",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
   );
 
 		
 //Detail Update
-
   $actions["agenda"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."&amp;param_date=$param_date",

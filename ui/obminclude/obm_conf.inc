@@ -72,7 +72,7 @@ $cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
 
 // modules -- false to hide, otherwise section
 $cgp_show["module"] = ""; // Needed if module order to change
-$cgp_show["module"]["company"] = false;
+$cgp_show["module"]["company"] = "com";
 $cgp_show["module"]["agenda"] = "com";
 $cgp_show["module"]["todo"] = "com";
 $cgp_show["module"]["contact"] = "com";
@@ -83,16 +83,17 @@ $cgp_show["module"]["statistic"] = false;
 $cgp_show["module"]["user"] = "user";
 $cgp_show["module"]["group"] = "user";
 $cgp_show["module"]["project"] = false;
-$cgp_show["module"]["contract"] = false;
+$cgp_show["module"]["contract"] = "prod";
+$cgp_show["module"]["incident"] = "prod";
 $cgp_show["module"]["document"] = "prod";
-$cgp_show["module"]["settings"] = "SETTINGS";
-$cgp_show["module"]["admin"] = "ADMIN";
-$cgp_show["module"]["admin_code"] = "ADMIN";
-$cgp_show["module"]["admin_pref"] = "ADMIN";
-$cgp_show["module"]["admin_data"] = "ADMIN";
-$cgp_show["module"]["admin_lang"] = "ADMIN";
-$cgp_show["module"]["admin_ref"] = "ADMIN";
-$cgp_show["module"]["import"] = "ADMIN";
+$cgp_show["module"]["settings"] = "user";
+$cgp_show["module"]["admin"] = "admin";
+$cgp_show["module"]["admin_code"] = "admin";
+$cgp_show["module"]["admin_pref"] = "admin";
+$cgp_show["module"]["admin_data"] = "admin";
+$cgp_show["module"]["admin_lang"] = "admin";
+$cgp_show["module"]["admin_ref"] = "admin";
+$cgp_show["module"]["import"] = "admin";
 
 // Company module
 $cgp_hide["company"]["company_number"] = true;

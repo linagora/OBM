@@ -422,6 +422,10 @@ function run_query_groupgroup_delete($group) {
 function run_query_user_group($group) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM; 
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type);
+
   $id = $group["id"];
   $entity = $group["entity"];
   $new_order = $group["new_order"];
@@ -433,7 +437,7 @@ function run_query_user_group($group) {
     $order = "order by userobm_lastname";
   }
 
-  $query = "select userobmgroup_userobm_id as group_user_id,
+  $query = "SELECT userobmgroup_userobm_id as group_user_id,
          userobmgroup_userobm_id as id,
          userobm_timeupdate as group_user_timeupdate,
          userobm_timecreate as group_user_timecreate,
@@ -443,11 +447,11 @@ function run_query_user_group($group) {
          userobm_firstname as group_user_firstname,
          userobm_phone as group_user_phone,
          userobm_email as group_user_email
-      from UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
-      where userobmgroup_group_id='$id'
-         $order";
+      FROM UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
+      WHERE userobmgroup_group_id='$id'
+         $order
+         $limit";
 
-  $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
@@ -463,6 +467,10 @@ function run_query_user_group($group) {
 function run_query_group_group($group) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM; 
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type);
+
   $id = $group["id"];
   $entity = $group["entity"];
   $new_order = $group["new_order"];
@@ -474,7 +482,7 @@ function run_query_group_group($group) {
     $order = "order by group_name";
   }
 
-  $query = "select groupgroup_child_id as child_id,
+  $query = "SELECT groupgroup_child_id as child_id,
          groupgroup_child_id as id,
          group_timeupdate,
          group_timecreate,
@@ -484,9 +492,10 @@ function run_query_group_group($group) {
          group_name,
          group_desc,
          group_email
-      from GroupGroup LEFT JOIN UGroup ON groupgroup_child_id=group_id
-      where groupgroup_parent_id='$id'
-         $order";
+      FROM GroupGroup LEFT JOIN UGroup ON groupgroup_child_id=group_id
+      WHERE groupgroup_parent_id='$id'
+         $order
+         $limit";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);

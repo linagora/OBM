@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_js.inc                                                  //
 //     - Desc : Time javascript functions File                               //
@@ -35,6 +35,18 @@ function check_addtodoform(form) {
   } else
     return true;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Remove an element line in the list form
+///////////////////////////////////////////////////////////////////////////////
+function remove_element(elemId,parentId) {
+  target = window.document;
+  content = target.getElementById(elemId);
+  container = target.getElementById(parentId)
+  container.removeChild(content); 
+} 
+
 
 // Copy paste from mehdi's calendar.js
 

@@ -17,8 +17,9 @@ $fieldnames["todo_priority"] = $l_priority;
 $fieldnames["todo_title"] = $l_todotitle;
 $fieldnames["todo_id"] = $l_update;
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company specific dataset fields                                   //
+// Display Company specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -63,7 +64,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Todo Full list                                                    //
+// Display Todo Full list
 // Parameters:
 //   - $todo_q    : todo list
 //   - $todo[]    : default values
@@ -74,8 +75,10 @@ function dis_todo_list($todo, $todo_q) {
 
   $uid = $todo["uid"];
   $title = $todo["title"];
-  $user = $todo["sel_user"];
+  $users = $todo["sel_user"];
+  $user = $users[0];
   $priority = $todo["priority"];
+
   $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
 
   $block .= "
@@ -111,7 +114,7 @@ function dis_todo_list($todo, $todo_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Todo Detail (all informations)                                    //
+// Display Todo Detail (all informations)
 // Parameters:
 //   - $todo_q    : todo list
 //   - $todo[]    : default values
@@ -167,15 +170,15 @@ function dis_todo_detail($todo, $todo_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Todo Form                                                         //
+// Display Todo Form
 // Parameters:
-//   - $user_q    : userobm database result 
-//   - $todo_q    : default values
-//   - $todo[]    : default values
-//     keys used  : id, uid
+//   - $todo[] : default values
+//   - $todo_q : default values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_todo_form($todo, $user_q, $todo_q = 0) {
-  global $set_theme, $set_date, $ico_mini_cal;
+function dis_todo_form($todo, $todo_q = 0) {
+  global $uid;
+  global $set_theme, $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
+  global $popup_width, $popup_height;
   global $l_add, $l_update, $l_close,$display,$l_todo;
   global $l_deadline, $l_priority, $l_todotitle, $l_user, $l_content;
 
@@ -196,16 +199,45 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
     $priority = intval(($max_priority+1)/2);
     $deadline = date("Y-m-d");
   }
-  // User select
-  $sel_user = "<select id=\"sel_user\" name=\"sel_user\">";
 
-  while($user_q->next_record()) {
-    $user_id = $user_q->f("userobm_id");
-    $sel_user .= "\n<option value=\"$user_id\"";
-    if ($user_id == $uid) { $sel_user .= " selected=\"selected\""; }
-    $sel_user .= ">". $user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname") . "</option>\n";
+  if (is_array($todo["sel_user"])) {
+    $p_user_array = $todo["sel_user"];
+  } else {
+    $p_user_array = array($uid);
   }
-  $sel_user .= "</select>";
+  $usr_q = run_query_userobm_in($p_user_array);
+
+  // UserObm section
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $u_lname = $usr_q->f("userobm_lastname");
+    $u_fname = $usr_q->f("userobm_firstname");
+    if (in_array($u_id, $p_user_array)) {
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
+      <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+      </a>
+      $u_lname $u_fname
+      <input value=\"$u_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      </div>";
+    }
+  }
+  
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+   
+  $block_user = "
+  </tr><tr>
+    <td class=\"detailLabel\">
+      $l_users
+      <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+      </a>
+    </td>    
+    <td class=\"detailForm\" id=\"sel_user_id\">
+      $dis_sel_user
+    </td>";
 
   $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
   // Priority select
@@ -235,46 +267,44 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
     $dis_button .=  "<input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
 
   $block = "
-    <form method=\"post\" name=\"f_add_todo\"
-      onsubmit=\"if (check_addtodoform(this)) return true; else return false;\"
-      action=\"".url_prepare("todo_index.php")."\">
+  <form method=\"post\" name=\"f_add_todo\"
+    onsubmit=\"if (check_addtodoform(this)) return true; else return false;\"
+    action=\"".url_prepare("todo_index.php")."\">
 
-    <table class=\"detail\">
-     <tr>
-      <td class=\"detailLabel\">$l_todotitle</td>
-      <td class=\"detailForm\">
-       <input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" />
-      </td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_user</td>
-      <td class=\"detailForm\">$sel_user</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_priority</td>
-      <td class=\"detailForm\">$sel_priority</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_deadline</td>
-      <td class=\"detailForm\">
-       <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" value=\"$deadline\" />
-       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_add_todo.tf_deadline,'../agenda/agenda_index.php?action=calendar&popup=1') ;\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-       </a>
-      </td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_content</td>
-      <td class=\"detailForm\">
-       <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
-      </td>
-     </tr>
-    </table>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\">$l_todotitle</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" />
+    </td>
+  $block_user
+  </tr><tr>
+    <td class=\"detailLabel\">$l_priority</td>
+    <td class=\"detailForm\">$sel_priority</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_deadline</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" value=\"$deadline\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_add_todo.tf_deadline,'../agenda/agenda_index.php?action=calendar&popup=1') ;\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
+      </a>
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_content</td>
+    <td class=\"detailForm\">
+      <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
+    </td>
+  </tr>
+  </table>
 
-    <div class=\"detailButton\">
-     <p class=\"detailButtons\">
-      $dis_button
-     </p>
-    </div>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    $dis_button
+    </p>
+  </div>
 
-    </form>
-    <p /> <br />";
+  </form>
+  <p /> <br />";
 
   return $block;
 }

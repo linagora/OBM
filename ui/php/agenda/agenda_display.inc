@@ -331,7 +331,6 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       $repeat_end = date("Y-m-d",$obm_q_event->f("calendarevent_endrepeat"));
     }
     $id = $obm_q_event->f("calendarevent_id");
-
   }
 
   // If parameters have been given, they supercede the default action value
@@ -428,7 +427,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   }
   $sel_cat .= "</select>";
 
- // Repetition days
+  // Repetition days
   $start_week_day = strtotime($set_weekstart_default);
 
   for ($i=0; $i<7; $i++) {
@@ -442,24 +441,26 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
 
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
+
   // userobm select
-    while ($usr_q->next_record()) {
-      $u_id = $usr_q->f("userobm_id");
-      $u_lname = $usr_q->f("userobm_lastname");
-      $u_fname = $usr_q->f("userobm_firstname");
-      if (in_array($u_id, $p_user_array)) {
-	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $u_lname = $usr_q->f("userobm_lastname");
+    $u_fname = $usr_q->f("userobm_firstname");
+    if (in_array($u_id, $p_user_array)) {
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
       <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $u_lname $u_fname
       <input value=\"$u_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
-      }
     }
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  }
+  
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
-    $block_user = "
+  $block_user = "
     <td class=\"detailLabel\">
     $l_users
     <a href=\"javascript: return false;\" 
@@ -473,9 +474,9 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      </td>
      ";
 
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
+  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
-    $block_group = "
+  $block_group = "
     <td class=\"detailLabel\">
     $l_groups
     <a href=\"javascript: return false;\" 
@@ -487,6 +488,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\" id=\"sel_group_id\">
      </td>
      ";
+
   if ($force == 1){
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
   } else {
@@ -498,7 +500,6 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   } else {
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" name=\"cb_privacy\" />";
   }
-
   
   $dis_hour_b = "<select name=\"sel_time_begin\">";
   for ($i=$set_start_time;$i<$set_stop_time;$i++) {

@@ -569,6 +569,32 @@ function run_query_insert_documents($ids, $entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get users infos from the uid array given
+// Parameters:
+//   - users : array of users id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_in($users) {
+  global $cdg_sql;
+
+  $where = "(0";
+  foreach($users as $user) {
+    $where .= ", $user";
+  }
+  $where .= ")";
+  $query = "SELECT *
+    FROM UserObm
+    WHERE userobm_archive = 0
+      AND userobm_id IN $where 
+    ORDER by userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_userobm()");
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login
 // Parameters:
 //   - $login  : login

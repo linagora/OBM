@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 
 $extra_js .= "
 <script type=\"text/javascript\">
@@ -26,13 +26,13 @@ function check_calendar(form) {
     return false;
   }
 
-    return true;
+  return true;
   
 }
   
   
 ///////////////////////////////////////////////////////////////////////////////
-//  Add an element line in the list form                                   //
+// Remove an element line in the list form
 ///////////////////////////////////////////////////////////////////////////////
 function remove_element(elemId,parentId) {
   target = window.document;
@@ -147,7 +147,7 @@ function changeDateEnd ( form ) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the category check or deletion is possible                           //
+// Check if the category check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_category_checkdel(form)
 {
@@ -163,7 +163,7 @@ function check_category_checkdel(form)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the category update is possible                                    //
+// Check if the category update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_category_upd(form,formd)
 {
@@ -176,8 +176,10 @@ function check_category_upd(form,formd)
     return false;
   }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the category creation is possible                                    //
+// Check if the category creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_category_new(form)
 {
@@ -188,11 +190,12 @@ function check_category_new(form)
       alert(\"$l_j_category_create\");
       return false;
    }
- }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the meeting perform is possible                                //
+// Check if the meeting perform is possible
 ///////////////////////////////////////////////////////////////////////////////
- 
 function check_meeting(form) {
   
   if (trim(form.sel_min_duration.options[form.sel_min_duration.selectedIndex].value) == \"00\" 
@@ -207,8 +210,7 @@ function check_meeting(form) {
     return false;
   }
 
-    return true;
-  
+  return true;
 } 
 
 -->

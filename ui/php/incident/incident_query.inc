@@ -277,7 +277,7 @@ function run_query_insert($incident) {
 //   incident Id if found else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_id($incident) {
-  global $cdg_sql, $c_id;
+  global $cdg_sql;
 
   $contract_id = $incident["contract_id"];
   $lincident = $incident["lincident"];
@@ -289,7 +289,6 @@ function run_query_incident_id($incident) {
   $hour = $incident["hour"];
   $date = $incident["date"];
   $call_date = "$date $hour:0:0";
-  $duration = $incident["duration"];
   $archive = ($incident["archive"] ? $incident["archive"] : "0");
 
   $query = "SELECT incident_id
@@ -301,9 +300,9 @@ function run_query_incident_id($incident) {
       and incident_date='$call_date'
       and incident_priority_id $pri
       and incident_status_id $status
-      and incident_duration='$duration'
       and incident_archive='$archive'";
 
+  echo $query;
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
