@@ -44,6 +44,7 @@ switch ($mode) {
    require("$obminclude/phplib/obmlib.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global.inc");
+   include("$obminclude/global_pref.inc");
    //   $debug = $set_debug;
    display_head("Admin_Code");
    generate_menu($menu);

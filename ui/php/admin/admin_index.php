@@ -12,14 +12,15 @@
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
 
 $actions = array ('help', 'index', 'data_show', 'data_update','clear_sess');
 
 $menu="ADMIN";
-require("admin_display.inc");
+
 require("$obminclude/phplib/obmlib.inc");
+require("admin_display.inc");
 require("admin_query.inc");
-require("$obminclude/global_query.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -30,12 +31,14 @@ switch ($mode) {
  case "txt":
    $retour = parse_arg($argv);
    include("$obminclude/global.inc");
+   include("$obminclude/global_pref.inc");
    if (! $retour) { end; }
    break;
  case "html":
    $menu = "ADMIN";
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global.inc");
+   include("$obminclude/global_pref.inc");
    //   $debug = $set_debug;
 //   if($action!="clear_sess") {
      display_head("Admin_Code");

@@ -34,8 +34,7 @@ page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" 
 $perm->check("user");
 
 require("$obminclude/global.inc");
-include("$obminclude/global_display.inc");
-include("$obminclude/global_query.inc");
+require("$obminclude/global_pref.inc");
 include("list_display.inc");
 include("list_query.inc");
 require("list_js.inc");

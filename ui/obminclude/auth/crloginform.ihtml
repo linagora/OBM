@@ -71,7 +71,7 @@ include("$obminclude/auth/md5.js"); ?>
 
 Please identify yourself with a username and a password:<br>
 
-<form name="login" action="obm.php" method=post>
+<form name="login" action="/obm.php" method=post>
 <table border=0 bgcolor="#000000" align="center" cellspacing=0 cellpadding=4>
  <tr valign=top align=left>
   <td>Username:</td>

@@ -289,7 +289,7 @@ function run_query_set_options_user($p_user_id, $option, $new_value) {
               and userobmpref_option = '$option'";   
 
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM ;
   $obm_q->query($query);
 }
@@ -305,7 +305,7 @@ function run_query_get_all_options_user($p_user_id) {
 
   $query = "select * from UserObmPref where userobmpref_user_id='$p_user_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_q_pref = new DB_OBM;
   $obm_q_pref->query($query);
 
@@ -432,7 +432,7 @@ function run_query_global_company_name($p_company_id) {
   $query = "select company_name from Company where company_id='$p_company_id'";
   $obm_db = new DB_OBM;
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   $obm_db->next_record();
   return $obm_db->f("company_name");
@@ -444,7 +444,7 @@ function run_query_global_contact_name($p_contact_id) {
   
   $query = "select contact_lastname from Contact where contact_id='$p_contact_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -457,7 +457,7 @@ function run_query_global_deal_label($p_deal_id) {
 
   $query = "select deal_label from Deal where deal_id='$p_deal_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -469,7 +469,7 @@ function run_query_global_account_label($p_account_id) {
 
   $query = "select account_label from Account where account_id='$p_account_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -481,7 +481,7 @@ function run_query_global_invoice_label($p_invoice_id) {
   
   $query = "select invoice_label from Invoice where invoice_id='$p_invoice_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -493,7 +493,7 @@ function run_query_global_payment_label($p_payment_id) {
   
   $query="select payment_label from Payment where payment_id='$p_payment_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -505,7 +505,7 @@ function run_query_global_contract_label($p_contract_id) {
   
   $query="select contract_label from Contract where contract_id='$p_contract_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -517,7 +517,7 @@ function run_query_global_incident_label($p_incident_id) {
   
   $query="select incident_label from Incident where incident_id='$p_incident_id'";
   // Problem because called before include global.inc in setting module
-  //  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();

@@ -18,13 +18,12 @@ $perm->check("user");
 
 
 // script continues here only if the user is authenticate
-include("$obminclude/global_query.inc");
-
+include("$obminclude/global.inc");
 // make session variables from all the current user's preferences
 session_load_preferences();
-
+include("$obminclude/global_pref.inc");
 $menu="";
-include("$obminclude/global.inc");
+
 
 if ($action == "logout") {
   run_query_logout();

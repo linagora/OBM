@@ -18,14 +18,13 @@ $perm->check("user");
 require("agenda_query.inc");
 require("agenda_display.inc");
 
-require("$obminclude/global_query.inc");
 
 $menu="AGENDA";
 include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 
 page_close();
 
-include("$obminclude/global_display.inc");
 include("agenda_functions.inc");
 
 

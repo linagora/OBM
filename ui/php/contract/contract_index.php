@@ -36,10 +36,10 @@ $perm->check("user");
 
 require("contract_query.inc");
 require("contract_display.inc");
-require("$obminclude/global_query.inc");
 
 $menu="CONTRACT";
 include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 
 
 // Updating the "last contract" bookmark 
@@ -54,7 +54,6 @@ if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-include("$obminclude/global_display.inc");
 
 $contract=get_param_contract();
 display_head($l_contract);     // Head & Body

@@ -21,7 +21,7 @@ $perm->check("user");
 page_close(); //?usefull?
 $menu="LIST";
 require("$obminclude/global.inc");
-include("$obminclude/global_query.inc") ;
+include("$obminclude/global_pref.inc") ;
 include("list_query.inc") ;
 include($lang_file);
 

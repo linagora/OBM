@@ -22,8 +22,7 @@ $sess->start() ;//To call the method for headers (no-cache)  and so much... :)
 
 $menu="COMPUTER";
 require("$obminclude/global.inc");
-include("$obminclude/global_display.inc") ;
-include("$obminclude/global_query.inc") ;
+include("$obminclude/global_pref.inc") ;
 include("computer_display.inc");
 include("computer_query.inc");
 require("computer_js.inc") ;

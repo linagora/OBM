@@ -54,15 +54,16 @@ $menu="DEAL";
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
+
 require("$obminclude/phplib/obmlib.inc");
+
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
 include("$obminclude/global.inc");
-require("$obminclude/global_query.inc");
+include("$obminclude/global_pref.inc");
 require("deal_query.inc");
 require("deal_display.inc");
-include("$obminclude/global_display.inc");
 
 $uid = $auth->auth["uid"];
 

@@ -17,7 +17,7 @@ require("$obminclude/phplib/obmlib.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
-require("$obminclude/global_query.inc");
+include("$obminclude/global.inc");
 
 if ($param_lang != "") {
   $set_lang=$param_lang;
@@ -52,8 +52,9 @@ if ($param_rows != "") {
 page_close();
 
 $menu="SETTINGS";
+require("$obminclude/global_pref.inc");
 require("settings_display.inc");
-include("$obminclude/global.inc");
+
 
 if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";

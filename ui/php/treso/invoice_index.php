@@ -14,9 +14,9 @@ $perm->check("admin");
 $menu="INVOICE";
 
 include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
-require("$obminclude/global_query.inc"); 
 
 // bookmark 
 if ( ($param_invoice == $last_invoice) && (strcmp($action,"delete")==0) ) {
@@ -33,7 +33,6 @@ page_close();
 // in the calling page, a couple var_name => var_value...
 $invoice = get_param_invoice();
 
-include("$obminclude/global_display.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //

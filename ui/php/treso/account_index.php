@@ -12,9 +12,9 @@ $perm->check("admin");
 
 $menu="ACCOUNT";
 include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 require("account_display.inc");
 require("account_query.inc");
-require("$obminclude/global_query.inc");
 
 // bookmark 
 if ( ($param_account == $last_account) && (strcmp($action,"delete")==0) ) {
@@ -32,7 +32,6 @@ page_close();
 // in the calling page, a couple var_name, var_value...
 $account = get_param_account();
 
-include("$obminclude/global_display.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //

@@ -31,6 +31,7 @@ switch ($mode) {
    require("$obminclude/phplib/obmlib.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global.inc");
+   include("$obminclude/global_pref.inc");
    display_head("Admin_Lang");
    generate_menu($menu);
    break;

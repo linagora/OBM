@@ -12,9 +12,9 @@ $perm->check("admin");
 
 $menu="PAYMENT";
 require("$obminclude/global.inc");
+require("$obminclude/global_pref.inc");
 require("payment_display.inc");
 require("payment_query.inc");
-require("$obminclude/global_query.inc"); 
 
 // bookmarks 
 if ( ($param_payment == $last_payment) && (strcmp($action,"delete")==0) ) {
@@ -31,7 +31,6 @@ page_close();
 // in the calling page, a couple var_name => var_value...
 $payment = get_param_payment();
 
-include("$obminclude/global_display.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //

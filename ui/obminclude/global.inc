@@ -31,7 +31,6 @@ $order_contactslist_default="contact_lastname";
 $set_weekstart_default="monday";
 //Time of inactivity during which a user is regarded as active (second), you 
 //can modify it or modify the php session time in the session4.inc file.
-global $sess;
 $time_active_session = $sess->lifetime;
 //Timemanager module
 // In how many parts we can chop a day
@@ -74,6 +73,35 @@ $js_regexp_list_name = "/^[0-9A-Za-z_-]+$/";  //Name of a list
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 
+//thoose functions must be defined before the global_query and global display
+//includes.
+///////////////////////////////////////////////////////////////////////////////
+// Display a debug message
+// Parameters:
+//   - $msg         : message to display
+//   - $debug (opt) : debug flag required
+///////////////////////////////////////////////////////////////////////////////
+function display_debug_msg($msg, $debug=0) {
+  global $set_debug;
+
+  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
+    echo $msg;
+    echo "<HR>\n";
+  }
+}  
+
+//Includes
+require_once("$obminclude/global_query.inc");
+require_once("$obminclude/global_display.inc");
+
+
+//$config_var = run_query_get_config_var();
+
+//while($config_var->next_record())
+//  ${$config_var->f("ConfigObmVars_name")} = $config_var->f("ConfigObmVars_value");
+
+
+/*
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;
 if ($set_display == "") $set_display = $set_display_default;
@@ -88,27 +116,6 @@ if ($last_invoice=="") $last_invoice=$last_invoice_default;
 if ($last_payment=="") $last_payment=$last_payment_default;
 if ($last_contract=="") $last_contract=$last_contract_default;
 if ($last_incident=="") $last_incident=$last_incident_default;
-
-  
-/*
-if ($set_debug > 0) {
-  echo "set_debug=$set_debug ";
-  echo "set_lang=$set_lang ";
-  echo "set_theme=$set_theme ";
-  echo "set_display=$set_display ";
-  echo "set_rows=$set_rows ";
-  echo "last_company=$last_company ";
-  echo "last deal=$last_deal ";
-  echo "last_contact=$last_contact<br>";
-}
-	*/ 
-
-//include("$obminclude/global_query.inc");
-
-//$config_var = run_query_get_config_var();
-
-//while($config_var->next_record())
-//  ${$config_var->f("ConfigObmVars_name")} = $config_var->f("ConfigObmVars_value");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
@@ -285,7 +292,7 @@ else if ($menu == "INCIDENT") {
 $menu_include_file = "$obminclude/themes/$set_theme/menu.inc";
 include("$menu_include_file");
 
-
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -334,21 +341,6 @@ function debug_level_isset($debug) {
   }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Display a debug message
-// Parameters:
-//   - $msg         : message to display
-//   - $debug (opt) : debug flag required
-///////////////////////////////////////////////////////////////////////////////
-function display_debug_msg($msg, $debug=0) {
-  global $set_debug;
-
-  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    echo $msg;
-    echo "<HR>\n";
-  }
-}
 
 
 /////////////////////////////////////////////////////////////////////////////

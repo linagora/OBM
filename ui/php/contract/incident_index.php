@@ -33,12 +33,11 @@ $perm->check("user");
 
 require("incident_query.inc");
 require("incident_display.inc");
-require("$obminclude/global_query.inc");
 
 $uid = $auth->auth["uid"];
 $menu="INCIDENT";
 include("$obminclude/global.inc");
-
+include("$obminclude/global_pref.inc");
 
 // Updating the "last incident" bookmark 
 if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
@@ -53,7 +52,6 @@ if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
 page_close();
 
 
-include("$obminclude/global_display.inc");
 
 $incident=get_param_incident();
 

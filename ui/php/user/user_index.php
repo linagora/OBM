@@ -31,8 +31,7 @@ $perm->check("admin");
 
 $menu="USER";
 include("$obminclude/global.inc");
-include("$obminclude/global_query.inc");
-include("$obminclude/global_display.inc");
+include("$obminclude/global_pref.inc");
 require("user_display.inc");
 require("user_query.inc");
 

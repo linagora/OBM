@@ -32,17 +32,19 @@
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
+
 require("$obminclude/phplib/obmlib.inc");
+
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
-
+$menu = "CONTACT";
+include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 require("contact_display.inc");
 require("contact_query.inc");
-require("$obminclude/global_query.inc");
 
-$menu = "CONTACT";
+
 $uid = $auth->auth["uid"];
-include("$obminclude/global.inc");
 
 // updating the contact bookmark : 
 if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
@@ -56,7 +58,6 @@ if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-include("$obminclude/global_display.inc");
 
 $contact = get_param_contact();
 

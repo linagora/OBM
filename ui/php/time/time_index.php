@@ -27,7 +27,7 @@ require("$obminclude/phplib/obmlib.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
-require("$obminclude/global_query.inc");
+require("$obminclude/global.inc");
 require("../agenda/agenda_functions.inc");
 
 require("time_display.inc");
@@ -38,8 +38,7 @@ $uid = $auth->auth["uid"]; //current user uid
 
 page_close();
 
-include("$obminclude/global_display.inc");
-include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 require("time_js.inc");
 
 //echo "afficher ici les paramètres HTTP_POST_VARS <br><br><hr>";

@@ -16,7 +16,6 @@
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("admin_pref_display.inc");
-require("$obminclude/global_query.inc");
 
 $debug=0;
 
@@ -30,6 +29,7 @@ if ($mode == "") $mode = "txt";
 switch ($mode) {
  case "txt":
    include("$obminclude/global.inc"); 
+   include("$obminclude/global_pref.inc"); 
    require("$obminclude/phplib/obmlib.inc");
    $retour = parse_arg($argv);
    if (! $retour) { end; }
@@ -40,6 +40,7 @@ switch ($mode) {
    require("$obminclude/phplib/obmlib.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global.inc");
+   include("$obminclude/global_pref.inc"); 
    display_head("Admin_Pref");
    generate_menu($menu);
    break;

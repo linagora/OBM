@@ -40,10 +40,10 @@ $perm->check("user");
 
 require("company_query.inc");
 require("company_display.inc");
-require("$obminclude/global_query.inc");
 
 $menu="COMPANY";
 include("$obminclude/global.inc");
+include("$obminclude/global_pref.inc");
 
 // updating the company bookmark : 
 if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
@@ -57,7 +57,6 @@ if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-include("$obminclude/global_display.inc");
 
 $company = get_param_company();
 
