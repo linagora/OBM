@@ -54,6 +54,7 @@ function check_addtaskform(f_aff) {
 echo "
 function check_sel_date(form) {
   error = 1;
+  cb = 0;
 
   for (i = 0; i < form.length; i++) {
     i_name = form.elements[i].name.substr(0,6);

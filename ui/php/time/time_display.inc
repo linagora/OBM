@@ -995,7 +995,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   
   $task_list  = array($l_task_fac, $l_task_int, $l_task_div);
   
-  //get different attribute for task to be modify
+  // get different attribute for task to be modify
   if ($action == "detailupdate") {
     $task_id = $time["task_id"];
     $task_q = run_query_get_task($task_id);
@@ -1233,9 +1233,9 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
         fill_project(document.f_add_task.sel_project,
           document.f_add_task.sel_tasktype.value,
           document.f_add_task.sel_projecttask);
-        fill_projecttask(document.f_add_task.sel_projecttask, $is_proj);
+        fill_projecttask(document.f_add_task.sel_projecttask, \"$is_proj\");
         select_default(document.f_add_task.sel_project, $is_proj);
-        select_default(document.f_add_task.sel_projecttask, $is_projtask);
+        select_default(document.f_add_task.sel_projecttask, \"$is_projtask\");
       </script>";
     } else {
     $dis_script .= "
