@@ -531,7 +531,7 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
    $cont_id = $sub_q->f("subscription_contact_id"); 
    $quantity = $sub_q->f("subscription_quantity"); 
    $renew = $sub_q->f("subscription_renewal_id"); 
-   $reception = $sub_q->f("subscription_reception_id"); 
+   $recept = $sub_q->f("subscription_reception_id"); 
    $lang = $sub_q->f("publication_lang"); 
   }
   // If parameters have been given, they supercede the default action value
@@ -563,22 +563,31 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
   }
   $sel_recept .= "</select>";
   
-  if (($action == "detailupdate_supscritpion") || ($action == "update_supscritpion")) {
+  $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang"; 
+  if (($action == "detailupdate_subscription") || ($action == "update_subscription")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_contact\" id=\"param_publication\" value=\"$id\" />
-      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
+      <input type=\"hidden\" name=\"param_contact\" id=\"param_contact\" value=\"$cont_id\" />
+      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update_subscription\" />
       <input type=\"submit\" value=\"$l_update_sub\" /> 
       ";
+     $block_publi = "$title<input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />";
+     	
   } elseif (($action == "new_subscription") || ($action == "insert_subscription")) {
     $dis_button = "
       <input type=\"hidden\" id=\"param_contact\" name=\"param_contact\" value=\"$cont_id\" />
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_subscription\" />
       <input type=\"submit\" value=\"$l_insert_sub\" />
       ";
+    $block_publi = "      
+    <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+     <img src=\"/images/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+    </a>
+    <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />
+    <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
+    ";     
   }
   $dis_button .= "<input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
-  $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang"; 
 
   $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
 
@@ -599,11 +608,7 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
       $l_publication 
       </td>
       <td class=\"detailForm\">
-       <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-       <img src=\"/images/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
-       </a>
-        <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />
-        <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
+	$block_publi
       </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_quantity</td>
@@ -1446,13 +1451,13 @@ function dis_publication_display_pref($display_pref_q) {
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_subscription_external_list($hash_table) {
-  global $display,$l_subscription, $l_no_found;
+  global $display,$l_subscription, $l_no_found_subscription;
   global $auth, $new_order, $order_dir;
   
   $obm_q = run_query_subscription_external_search($hash_table);
   $nb_subscription = $obm_q->num_rows();
   if ($nb_subscription == 0) {
-    $display["msg"] = display_warn_msg($l_no_found);
+    $display["msg"] = display_warn_msg($l_no_found_subscription);
   } else {
     $block .= "<div class=\"detailHead\">$l_subscription</div>";
     $block .= html_subscription_list_result($obm_q,$nb_subscription);
@@ -1474,7 +1479,7 @@ function dis_subscription_external_list($hash_table) {
 function html_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme,$ico_update;
   global $l_timecreate, $l_timeupdate,$l_publication_title;
-  global $l_year, $l_renewal,$l_recep,$l_quantity;
+  global $l_year, $l_renewal,$l_recept,$l_quantity;
   global  $path, $auth,$popup_height,$popup_width;
 
   $block = " 
@@ -1493,17 +1498,24 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
   while($sub_q->next_record()) {
     $c_id = $sub_q->f("subscription_contact_id");
     $p_id = $sub_q->f("subscription_publication_id");
-    
-   $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
+    if($sub_q->f("timeupdate") != "") {
+      $date_update = datetime_format($sub_q->f("timeupdate"));
+    }
+    $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
+    $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
     $block .= "
     <tr>
-    <td class=\"resultText\">".$sub_q->f("publication_title")."</td>
+    <td class=\"resultText\">
+    <a href=\"$url_publication_consult\">
+     ".$sub_q->f("publication_title")."
+    </a>
+    </td>
     <td class=\"resultText\">".$sub_q->f("publication_year")."</td>
     <td class=\"resultText\">".$sub_q->f("subscriptionrenewal_label")."</td>
     <td class=\"resultText\">".$sub_q->f("subscriptionreception_label")."</td>
     <td class=\"resultText\">".$sub_q->f("subscription_quantity")."</td>
     <td class=\"resultText\">".datetime_format($sub_q->f("timecreate"))."</td>
-    <td class=\"resultText\">".datetime_format($sub_q->f("timeupdate"))."</td>    
+    <td class=\"resultText\">$date_update</td>    
     <td class=\"resultText\">
     <a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
     <img src=\"/images/$set_theme/$ico_update\" />

@@ -197,6 +197,37 @@ function run_query_insert_subscription($publication) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Subscription Update query execution                                                 //
+// Parameters:
+//   - $publication[] : Entry's values
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_update_subscription($publication) {
+  global $auth, $cdg_sql;
+
+  $c_id = $publication["contact_id"];
+  $quantity = $publication["quantity"];
+  $p_id = $publication["id"];
+  $renew = $publication["renew"];
+  $recept = $publication["recept"];
+  
+  $query = "Update Subscription 
+    set subscription_timeupdate = '". date("Y-m-d H:i:s") ."',
+        subscription_userupdate='". $auth->auth["uid"] ."',
+        subscription_renewal_id='$renew',
+        subscription_reception_id='$recept',
+        subscription_quantity='$quantity'
+    Where	
+        subscription_contact_id = '$c_id' and
+	subscription_publication_id = '$p_id'";
+    
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Update query execution                                                    //
@@ -820,17 +851,21 @@ function check_data_form($cid, $publication) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_publication_form($cid, $publication) {
-  global $l_j_check_quantity ;
+function check_data_subscription_form($cid, $publication) {
+  global $l_j_check_quantity,$l_j_select_publication ;
   global $err_msg;
 
   $quantity = $publication["quantity"];
+  $p_id = $publication["id"];
 
-  if (($quantity == "") || !($quantity >= 0) ) {
-    $err_msg = $l_j_check_quantity. " : $quantity";
+  if (($p_id == "") || !($p_id >= 0) ) {
+    $err_msg = $l_j_select_publication;
     return false;
   }
-
+  if (($quantity == "")) {
+    $err_msg = $l_j_check_quantity;
+    return false;
+  }
   return true; 
 }
 

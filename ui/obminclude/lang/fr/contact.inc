@@ -178,6 +178,8 @@ $l_timeupdate = "Date de Mise à jour";
 $l_publication_title = "Titre";
 $l_year = "Année";
 $l_renewal = "Mode de renouvellement";
-$l_recep = "Mode de réception";
 $l_quantity = "Quantité";
-
+$l_recept = "Mode de réception";
+$l_quantity = "Quantité";
+$l_quantity = "Quantité";
+$l_no_found_subscription = "Aucun abonnement lié à ce contact !";

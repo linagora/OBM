@@ -176,7 +176,7 @@ if ($action == "ext_get_id") {
   }
 } elseif ($action == "insert_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_publication_form("", $publication)) {
+  if (check_data_subscription_form("", $publication)) {
     $retour = run_query_insert_subscription($publication);
     $quit = "
     <br />
@@ -188,16 +188,15 @@ if ($action == "ext_get_id") {
     } else {
       $display["msg"] .= display_err_msg($l_insert_error.$quit);
     }
-    $type_q = run_query_publicationtype();
-    $display["search"] = html_publication_search_form($type_q,$publication);
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $renew_q = run_query_subscriptionrenewal();
     $recept_q = run_query_subscriptionreception();
     $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
+    require("publication_js.inc");
+    $display["detail"] =html_subscription_form($action,$cont_q, $renew_q, $recept_q, $publication);        
   }
-
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($param_publication, $publication)) {
@@ -217,7 +216,30 @@ if ($action == "ext_get_id") {
     $display["detail"] = html_publication_form($action, $pub_q, $type_q, $publication);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "update_subscription")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_data_subscription_form("", $publication)) {
+    $retour = run_query_update_subscription($publication);
+    $quit = "
+    <br />
+    <a href=\"javascript: void(0);\" onclick=\"window.opener.location.reload();window.close();\" >
+    $l_close
+    </a>";
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_update_ok.$quit);
+    } else {
+      $display["msg"] .= display_err_msg($l_update_error.$quit);
+    }
+  // Form data are not valid
+  } else {
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $renew_q = run_query_subscriptionrenewal();
+    $recept_q = run_query_subscriptionreception();
+    $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
+    require("publication_js.inc");
+    $display["detail"] =html_subscription_form($action,$cont_q, $renew_q, $recept_q, $publication);        
+  }
+}elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("publication_js.inc");
   $display["detail"] = dis_check_publication_links($param_publication);
@@ -627,6 +649,13 @@ function get_publication_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      	       );
+// Update Subscription
+  $actions["PUBLICATION"]["update_subscription"] = array (
+    'Url'      => "$path/publication/publication_index.php?action=update_subscription",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     	       );
+					       
 // Display
   $actions["PUBLICATION"]["display"] = array (
     'Name'     => $l_header_display,

@@ -126,24 +126,6 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
   }
-} elseif ($action == "externaldetail")  {
-///////////////////////////////////////////////////////////////////////////////
-  if ($param_contact > 0 && $module !="") {
-    include("$path/$module/".$module."_display.inc");
-    $con_q = run_query_contact_detail($param_contact);
-    if ($con_q->num_rows() != 1) {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
-    }
-    if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
-      $display["detailInfo"] = display_record_info($con_q);
-      $display["detail"] = html_contact_header($con_q);
-      $display["detail"] .= dis_subscription_external_list();
-    } else {
-      // this contact's page has "private" access
-      $display["msg"] .= display_err_msg($l_error_visibility);
-    }      
-  }
-  
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contact_data_form("", $contact)) {
@@ -191,11 +173,9 @@ if ($action == "index" || $action == "") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $con_q = run_query_contact_detail($param_contact);
-    $display["detailInfo"] = display_record_info($con_q);
-    $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
-    $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
-    $display["detail"] = html_contact_consult($con_q,$cat1_q,$cat2_q);
+    if ($param_contact > 0) {
+      $display["detail"] = dis_contact_consult($contact);
+    }    
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
     require("contact_js.inc");
@@ -399,19 +379,9 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $con_q = run_query_contact_detail($contact["id"]);
-  if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
-  }
-  if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
-    $display["detailInfo"] = display_record_info($con_q);
-    $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
-    $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
-    $display["detail"] = html_contact_consult($con_q,$cat1_q,$cat2_q);
-  } else {
-    // this contact's page has "private" access
-    $display["msg"] .= display_err_msg($l_error_visibility);
-  }
+  if ($param_contact > 0) {
+      $display["detail"] = dis_contact_consult($contact);
+  }    
 }
 
 

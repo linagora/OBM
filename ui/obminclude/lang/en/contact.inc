@@ -178,5 +178,7 @@ $l_timeupdate = "Last update";
 $l_publication_title = "Title";
 $l_year = "Year";
 $l_renewal = "Renewal mode";
-$l_recep = "Reception mode";
+$l_recept = "Reception mode";
 $l_quantity = "Quantity";
+$l_no_found_subscription = "No subscription found matching this contact !";
+
