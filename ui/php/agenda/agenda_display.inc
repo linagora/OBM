@@ -656,7 +656,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category
   $dis_hour_b .= "</select>";  
  
   $dis_hour_e = "<select name=\"sel_time_end\">";
-  for ($i=$cagenda_first_hour; $i<$cagenda_last_hour; $i++) {
+  for ($i=$cagenda_first_hour; $i<=$cagenda_last_hour; $i++) {
     $current_hour = substr("0$i",-2,2); 
     if ($current_hour == $hourend) {
       $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
