@@ -35,8 +35,7 @@ class OBM_DISPLAY {
   var $data_cb_show = 1;      // To set visible
                               //   1 -> visible
                               //   "string" if ->f["string"] == 0 -> visible
-                              // haven't been perform here 
-  var $separator = ";";       // for file generation : .csv by default
+  var $delimiter = '"';        // CVS field delimiter (enclosed by)
 
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
@@ -739,11 +738,16 @@ class OBM_DISPLAY {
 	  } else {
 	    $name = $txt_name;
 	  }
-	  $delimiter = "";
+	  $delimiter = $this->delimiter;
 	  // If double quote in field, we double these and set field delimiter
-	  if (strstr($name, '"')) {
+	  if ( (($delimiter == '"') || ($delimiter == ''))
+               && (strstr($name, '"'))) {
 	    $name = str_replace('"', '""', $name);
 	    $delimiter = '"';
+	  } else if (($sep != '') && (strstr($name, $sep))) {
+	    if ($delimiter == "") {
+	      $delimiter = '"';
+	    }
 	  }
 	  echo "${delimiter}${name}${delimiter}$sep";
 

@@ -38,7 +38,7 @@ $fieldnames["company_deal_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ic
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company specific dataset fields                                   //
+// Display Company specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -162,7 +162,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search form                                               //
+// Display Company search form
 // Parameters:
 //   - $company[] : hash with company values
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ function dis_company_search_form($company="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form
+// XHTML Display Company search Form
 // Parameters:
 //   - $kind_q    : database object with kind list
 //   - $cats      : array of company categories
@@ -419,7 +419,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Company search result                                         //
+// Display the Company search result
 // Parameters:
 //   - $company[] : company search criteria
 //     keys used  : name, kind, zip
@@ -653,7 +653,30 @@ function html_company_links($co_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Company Consultation
+// Display Company Detail
+// Parameters:
+//   - $cid : company id
+///////////////////////////////////////////////////////////////////////////////
+function dis_company_consult($cid) {
+  global $display, $l_query_error;
+
+  if ($cid > 0) {
+    $comp_q = run_query_detail($cid);
+    $cat_q = run_query_get_companycat_name($cid);
+    if ($comp_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($comp_q);
+      $block = html_company_consult($comp_q, $cat_q);
+    } else {
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
+    }
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Company Consultation
 // Parameters:
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
@@ -848,6 +871,56 @@ function html_company_consult($co_q, $cat_q) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company Form
+// Parameters:
+//   - $action    : action called
+//   - $company[] : default values
+///////////////////////////////////////////////////////////////////////////////
+function dis_company_form($action, $company) {
+  global $display, $cg_com, $cgp_hide, $uid, $l_query_error;
+
+  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_cat = (! $cgp_hide["company"]["category"]);
+
+  if ($company["id"] > 0) {
+    $comp_q = run_query_detail($company["id"]);
+    if ($comp_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($comp_q);
+      $compcat = get_company_cat($company["id"]);
+    } else {
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
+    }
+  }
+  $dsrc_q = run_query_datasource();
+  $type_q = run_query_companytype();
+  if ($show_act) {
+    $act_q = run_query_companyactivity();
+  }
+  if ($show_naf) {
+    $naf_q = run_query_companynafcode();
+  }
+  if ($show_cat) {
+    $cat_q = get_ordered_companycat();
+  }
+
+  $users = array();
+  if ($company["marketing_manager"] > 0) {
+    $users[] = $company["marketing_manager"];
+  }
+  if ($company["id"] > 0) {
+    $users[] = array($comp_q->f("company_marketingmanager_id"));
+  }
+  $usr_q = run_query_all_users_from_group($cg_com, $users);
+  $ctry_q = run_query_country_for_lang();
+
+  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q, $compcat, $ctry_q, $company);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Company Form
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : company database result 

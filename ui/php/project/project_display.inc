@@ -153,7 +153,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $sel_member .= "</select>";
 
   $checked = ($archive) ? "checked" : "";
-  $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" $checked />";
+  $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $checked />";
 
   $url = url_prepare("project_index.php");
 

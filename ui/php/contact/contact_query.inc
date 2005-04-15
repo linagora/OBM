@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact search query execution                                            //
+// Contact search query execution
 // Parametes:
 //   - $contact[]    : contact search criteria
 //     keys used       company_id, name, phone, company
@@ -584,7 +584,7 @@ function run_query_contact_insert($contact) {
     }
   }
   
-  return $retour;
+  return $id;
 }
 
 

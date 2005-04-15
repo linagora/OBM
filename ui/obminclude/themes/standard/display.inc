@@ -88,7 +88,7 @@ function display_page(&$display) {
 // Display: XHTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_obm_title, $set_theme, $extra_css, $extra_js;
+  global $l_obm_title, $set_theme, $extra_css, $extra_js, $extra_file_js;
 
   if (isset($extra_css))
     $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
@@ -97,12 +97,17 @@ function display_head($p_module) {
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
 <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
 
+  //  if ($extra_file_js) {
+  //    $file_js = "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$extra_file_js\" />";
+  //  }
+
   return "$headers_e
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" />
   $dis_extra_css
+  $file_js
   $extra_js
 </head>
 

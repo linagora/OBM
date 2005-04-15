@@ -299,7 +299,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contact search form                                               //
+// Display Contact search form
 // Parameters:
 //   - $contact[] : hash with contact values
 ///////////////////////////////////////////////////////////////////////////////
@@ -532,7 +532,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact search result                                            //
+// Display: Contact search result
 // Parameters:
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company
@@ -631,7 +631,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact search result                                            //
+// Display: Contact search result
 // Parameters:
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company

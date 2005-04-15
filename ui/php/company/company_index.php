@@ -66,7 +66,7 @@ $perm->check_permissions($module, $action);
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  require("company_js.inc");  
+  require("company_js.inc");
   $display["search"] = dis_company_search_form($company);
   if ($set_display == "yes") {
     $display["result"] = dis_company_search_list($company);
@@ -90,7 +90,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
-} elseif ($action == "index" || $action == "") {
+} elseif ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_company_search_form($company);
   if ($set_display == "yes") {
@@ -107,50 +107,17 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $dsrc_q = run_query_datasource();
-  $type_q = run_query_companytype();
-  $act_q = run_query_companyactivity();
-  $naf_q = run_query_companynafcode();
-  $usr_q = run_query_all_users_from_group($cg_com);
-  $cat_q = get_ordered_companycat();
-  $ctry_q = run_query_country_for_lang();
   require("company_js.inc");
-  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q,"", $ctry_q, $company);
+  $display["detail"] = dis_company_form($action, $company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($company["id"] > 0) {
-    $comp_q = run_query_detail($company["id"]);
-    $cat_q = run_query_get_companycat_name($company["id"]);
-    if ($comp_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_consult($comp_q, $cat_q);
-    } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
-    }
-  }
+  $display["detail"] = dis_company_consult($company["id"]);
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($company["id"] > 0) {
-    $comp_q = run_query_detail($company["id"]);
-    if ($comp_q->num_rows() == 1) {
-      $dsrc_q = run_query_datasource();
-      $type_q = run_query_companytype();
-      $act_q = run_query_companyactivity();
-      $naf_q = run_query_companynafcode();
-      $users = array($comp_q->f("company_marketingmanager_id"));
-      $usr_q = run_query_all_users_from_group($cg_com, $users);
-      $cat_q = get_ordered_companycat();
-      $compcat = get_company_cat($company["id"]);
-      $ctry_q = run_query_country_for_lang();
-      require("company_js.inc");
-      $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q,$compcat,$ctry_q, $company);
-    } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
-    }
-  }
+  require("company_js.inc");
+  $display["detail"] = dis_company_form($action, $company);
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,41 +125,35 @@ if ($action == "ext_get_id") {
 
     // If the context (same companies) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_insert($company);
-      if ($retour) {
+      $cid = run_query_insert($company);
+      if ($cid > 0) {
+        $company["id"] = $cid;
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $display["search"] = dis_company_search_form($company);
+      $display["detail"] = dis_company_consult($cid);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
       $obm_q = check_company_context("", $company);
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_company_warn_insert("", $obm_q, $company);
       } else {
-        $retour = run_query_insert($company);
-        if ($retour) {
+        $cid = run_query_insert($company);
+        if ($cid > 0) {
+          $company["id"] = $cid;
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
-        $display["search"] = dis_company_search_form($company);
+        $display["detail"] = dis_company_consult($cid);
       }
     }
 
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $dsrc_q = run_query_datasource();
-    $type_q = run_query_companytype();
-    $act_q = run_query_companyactivity();
-    $naf_q = run_query_companynafcode();
-    $cat_q = get_ordered_companycat();
-    $users = array($company["marketing_manager"]);
-    $usr_q = run_query_all_users_from_group($cg_com, $users);
-    $ctry_q = run_query_country_for_lang();
-    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $naf_q, $usr_q,$cat_q,"",$ctry_q, $company);
+    $display["detail"] = dis_company_form($action, $company);
   }
 
 } elseif ($action == "update")  {
@@ -204,22 +165,10 @@ if ($action == "ext_get_id") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $comp_q = run_query_detail($company["id"]);
-    $cat_q = run_query_get_companycat_name($company["id"]);
-    $display["detailInfo"] .= display_record_info($comp_q);
-    $display["detail"] = html_company_consult($comp_q, $cat_q);
+    $display["detail"] = dis_company_consult($company["id"]);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $comp_q = run_query_detail($company["id"]);
-    $dsrc_q = run_query_datasource();
-    $type_q = run_query_companytype();
-    $act_q = run_query_companyactivity();
-    $naf_q = run_query_companynafcode();
-    $users = array($company["marketing_manager"]);
-    $usr_q = run_query_all_users_from_group($cg_com, $users);
-    $cat_q = get_ordered_companycat();
-    $ctry_q = run_query_country_for_lang();
-    $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q, "", $ctry_q, $company);
+    $display["detail"] = dis_company_form($action, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -416,15 +365,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $comp_q = run_query_detail($company["id"]);
-  $cat_q = run_query_get_companycat_name($company["id"]);
-  if ($comp_q->num_rows() == 1) {
-    $display["detailInfo"] = display_record_info($comp_q);
-    $display["detail"] = html_company_consult($comp_q, $cat_q);
-  } else {
-    var_dump($company);    
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->num_rows() . " !");
-  }
+  $display["detail"] = dis_company_consult($company["id"]);
 }
 
 
@@ -573,7 +514,7 @@ function get_company_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'insert', 'update') 
                                      	      );
 
 // Insert
@@ -595,7 +536,7 @@ function get_company_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update') 
                                      	      );
 
 // Delete

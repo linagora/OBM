@@ -46,7 +46,7 @@ $fieldnames["invoice_company"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal specific dataset fields                                      //
+// Display Deal specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -136,7 +136,7 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal index page                                                   //
+// Display Deal index page
 // Parameters:
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,7 +156,7 @@ function dis_deal_index($deal="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal Search page                                                  //
+// Display Deal Search page
 // Parameters:
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Parent Deal search form                                           //
+// Display Parent Deal search form
 // Parameters : 
 //   - $deal[]      : default form values
 //     keys used    plabel, parchive, pmanager
@@ -420,7 +420,7 @@ function html_parentdeal_search_form($deal, $pmanager_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Deal search result                                            //
+// Display the Deal search result
 // Parameters:
 //   - $deal[]    : deal search criteria
 //     keys used  : company_id, name, company
@@ -445,7 +445,7 @@ function dis_deal_search_list($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Deal Search result                                       //
+// HTML Display the Deal Search result
 // Parameters:
 //   - $deal_q   : list of deals
 //   - $pref_q   : fields to display in the list of deals 
@@ -510,7 +510,7 @@ function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Deal links menu                                                  //
+// Display: Deal links menu
 // Parameters:
 //   - $deal_q : DBO : information about the deal
 // Returns:
@@ -554,10 +554,12 @@ function html_deal_links($deal_q) {
   // Project
   if ($cgp_show["module"]["project"]) {
     $nb_pro = run_query_linked_project_nb ($id, "deal");
+    $nb_pro_arch = run_query_linked_project_nb ($id, "deal", 1);
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
+    $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $dis_ico_project = "
         <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
-            <a href=\"$url_pro\">$l_module_project ($nb_pro)</a></li>";
+            $l_module_project (<a href=\"$url_pro\">$nb_pro</a> / <a href=\"$url_pro_arch\">$nb_pro_arch</a>)</li>";
 
     // New project allowed only if hitrate = 100
     if ($hitrate == "100") {

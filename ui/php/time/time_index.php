@@ -56,6 +56,7 @@ $perm->check_permissions($module, $action);
 page_close();
 
 require("time_js.inc");
+//$extra_file_js = "time_js.inc";
 
 
 ///////////////////////////////////////////////////////////////////////////////

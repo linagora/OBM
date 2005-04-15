@@ -133,13 +133,14 @@ if ($action == "ext_get_ids") {
 
     // If the context (same contacts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_contact_insert($contact);
-      if ($retour) {
+      $id = run_query_contact_insert($contact);
+      if ($id > 0) {
+        $contact["id"] = $id;
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $display["search"] = dis_contact_search_form($contact);
+      $display["detail"] = dis_contact_consult($contact);
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
@@ -148,13 +149,15 @@ if ($action == "ext_get_ids") {
 	$display["title"] = display_title("$l_contact : $l_insert");
         $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
       } else {
-        $retour = run_query_contact_insert($contact);
-        if ($retour) {
+        $id = run_query_contact_insert($contact);
+        if ($id > 0) {
+          $contact["id"] = $id;
           $display["msg"] .= display_ok_msg($l_insert_ok);
+          $display["detail"] = dis_contact_consult($contact);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
+          $display["detail"] = dis_contact_form($action, "", $contact);
         }
-        $display["search"] = dis_contact_search_form($contact);
       }
     }
 
@@ -388,6 +391,7 @@ if ($action == "ext_get_ids") {
 $display["head"] = display_head($l_contact);
 $display["end"] = display_end();
 if (! $contact["popup"]) {
+  update_contact_action_url();
   $display["header"] = generate_menu($module,$section);
 }
 
@@ -525,7 +529,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','index','search','new','detailconsult','update','admin','display') 
+    'Condition'=> array ('','index','search','new','detailconsult','update','delete','admin','display') 
                                      );
 
 // Detail Consult
@@ -552,7 +556,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'insert', 'update')
                                      		 );
 
 // Insert
@@ -583,7 +587,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update') 
                                      	      );
 
 // Delete
@@ -735,6 +739,24 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       		 );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact Actions URL updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_contact_action_url() {
+  global $contact, $actions, $path;
+
+  // Detail Consult
+  $actions["contact"]["detailconsult"]["Url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"];
+
+  // Detail Update
+  $actions["contact"]["detailupdate"]['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"];
+
+  // Check Delete
+  $actions["contact"]["check_delete"]['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"];
 
 }
 

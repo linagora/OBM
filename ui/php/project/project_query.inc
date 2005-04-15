@@ -63,7 +63,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
                   and (project_dateend < '$date' or project_dateend is null)";
   }
 
-  if (!($archive)) {
+  if (! $archive) {
     $where .= " and project_archive = '0'";
   }
 

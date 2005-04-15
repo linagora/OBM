@@ -539,7 +539,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
 //   - $validate_days : array of validated days (not to be shown)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_addtask($time, $validate_days) {
-  global $auth, $l_add, $l_update, $l_none, $l_close;
+  global $auth, $extra_js, $l_add, $l_update, $l_none, $l_close;
   global $l_fill_addtask, $l_comment, $l_date, $l_cat, $l_project, $l_duration;
   global $l_task_fac, $l_task_div, $l_task_int, $l_intern;
   global $c_day_fraction, $c_working_days, $c_week_first_day;
@@ -679,7 +679,7 @@ function dis_form_addtask($time, $validate_days) {
     $projtask_data .= "\n)\n";
   }
 
-  $script = "
+  $extra_js .= "
 <script type=\"text/javascript\">
   project = new Array (
     $proj_data
@@ -737,10 +737,6 @@ function dis_form_addtask($time, $validate_days) {
     $sel_time .= ">$dlabel</option>\n";
   }
   $sel_time .= "</select>";
-
-
-  $block = "$script
-<p></p>";
 
   // Update timetask ----------------------------------------------------------
   if ($action == "detailupdate") {

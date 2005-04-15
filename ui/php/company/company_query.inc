@@ -9,7 +9,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company search query execution                                            //
+// Company search query execution
 // Parametes:
 //   - $company[]    : company search criteria
 //     keys used       archive, name, phone, kind, zip
@@ -251,7 +251,7 @@ function run_query_detail($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Insertion query execution                                                 //
+// Insertion query execution
 // Parameters:
 //   - $company[] : Entry's values
 //     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
@@ -358,19 +358,21 @@ function run_query_insert($company) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-  if($kind != 0) {
+
+  if ($kind != 0) {
     $kind_sql = "and company_type_id='$kind'";
   }
-  if($market != 0) {
+  if ($market != 0) {
     $marquet_sql = "and company_marketingmanager_id='$market'";
   }
-  if($act != 0) {
+  if ($act != 0) {
     $act_sql = "and company_activity_id='$act'";
   }
 
   $query = "select company_id as id
     from Company
     where company_name = '$name'
+      and company_timecreate='$now'
       $kind_sql
       $marquet_sql
       $act_sql
@@ -395,12 +397,12 @@ function run_query_insert($company) {
     }
   }
   
-  return $retour;
+  return $id;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update query execution                                                    //
+// Update query execution
 // Parameters:
 //   - $cid       : company id
 //   - $company[] : Entry's values
