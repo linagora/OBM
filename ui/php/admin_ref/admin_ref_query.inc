@@ -174,7 +174,7 @@ function get_country_name($iso, $lang) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source insertion query construction and execution                    //
+// Data Source insertion query construction and execution
 // Parameters:
 //   - $dsrc : data source hash info : keys used : name
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,11 +185,11 @@ function run_query_datasource_insert($dsrc) {
   $usercreate = $auth->auth["uid"];
   $name = $dsrc["name"];
 
-  $query = "insert into DataSource (
+  $query = "INSERT INTO DataSource (
       datasource_timecreate,
       datasource_usercreate,
       datasource_name)
-    values (
+    VALUES (
       '$timecreate',
       '$usercreate',
       '$name')";
@@ -203,7 +203,7 @@ function run_query_datasource_insert($dsrc) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source update query execution                                        //
+// Data Source update query execution
 // Parameters:
 //   - $dsrc : data source hash info : keys used : act, name
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,11 +215,11 @@ function run_query_datasource_update($dsrc) {
   $id = $dsrc["datasource"];
   $name = $dsrc["name"];
 
-  $query = "update DataSource set
+  $query = "UPDATE DataSource SET
       datasource_name='$name',
       datasource_timeupdate='$timeupdate',
       datasource_userupdate='$userupdate'
-    where
+    WHERE
       datasource_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -231,7 +231,7 @@ function run_query_datasource_update($dsrc) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source deletion query execution                                      //
+// Data Source deletion query execution
 // Parameters:
 //   - $dsrc : data source hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ function run_query_datasource_delete($dsrc) {
 
   $id = $dsrc["datasource"];
 
-  $query = "delete from DataSource where datasource_id='$id'";
+  $query = "DELETE FROM DataSource WHERE datasource_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -251,7 +251,7 @@ function run_query_datasource_delete($dsrc) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source - Company links query execution                               //
+// Data Source - Company links query execution
 // Parameters:
 //   - $dsrc : data source hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
@@ -260,11 +260,11 @@ function run_query_datasource_company_links($dsrc) {
 
   $id = $dsrc["datasource"];
 
-  $query = "select company_id,
+  $query = "SELECT company_id,
       company_name,
       company_datasource_id
-    from Company
-    where company_datasource_id='$id'";
+    FROM Company
+    WHERE company_datasource_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -275,7 +275,7 @@ function run_query_datasource_company_links($dsrc) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source - Contact links query execution                               //
+// Data Source - Contact links query execution
 // Parameters:
 //   - $dsrc : data source hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,11 +284,12 @@ function run_query_datasource_contact_links($dsrc) {
 
   $id = $dsrc["datasource"];
 
-  $query = "select contact_id,
+  $query = "SELECT contact_id,
       contact_lastname,
       contact_firstname,
       contact_datasource_id
-    from Contact where contact_datasource_id='$id'";
+    FROM Contact
+    WHERE contact_datasource_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

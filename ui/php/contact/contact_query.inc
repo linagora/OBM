@@ -162,12 +162,15 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 
   $orderq = " order by $order $p_order_dir $order_next";
 
-  $query = "select
+  $query = "SELECT
       contact_id as id,
       contact_id,
       contact_usercreate,
       contact_company_id,
       contact_kind_id,
+      kind_minilabel,
+      kind_header,
+      kind_lang,
       contact_marketingmanager_id,
       contact_lastname,
       contact_firstname,
@@ -193,6 +196,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       function_label as contact_function
     FROM Contact
         $join_comp
+        left join Kind on contact_kind_id = kind_id
         left join Function on contact_function_id=function_id
         left join Country as ctry1 ON
                   contact_country_iso3166 = ctry1.country_iso3166

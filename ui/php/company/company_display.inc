@@ -471,6 +471,8 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $ctry = $company["country"];
   $kind = $company["kind"];
   $cat = $company["cat"];
+  $cat_code = $company["cat_code"];
+  $cat_tree = $company["cat_tree"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $zip = urlencode(stripslashes($company["zip"]));
@@ -479,7 +481,7 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;tf_cat_code=$cat_code&amp;cb_cat_tree=$cat_tree&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
   if ($popup) {

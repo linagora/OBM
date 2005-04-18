@@ -44,7 +44,6 @@ $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_function = "Fonction";
 $l_service = "Service";
-$l_hphone = "Tél perso";
 $l_status = "Genre";
 $l_letter = "En tête";
 

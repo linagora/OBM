@@ -419,12 +419,13 @@ function html_datasource_form($dsrc_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Data Source links                                                //
+// Display: Data Source links
 // Parameters:
 //   - $ref : datasource hash info : keys used : id, name
 ///////////////////////////////////////////////////////////////////////////////
 function dis_datasource_links($ref) {
-  global $display, $l_back, $l_dsrc_link_company, $l_dsrc_link_company_no;
+  global $path, $display, $l_back;
+  global $l_dsrc_link_company, $l_dsrc_link_company_no;
   global $l_dsrc_link_contact, $l_dsrc_link_contact_no;
   global $l_dsrc_delete, $l_dsrc_can_delete, $l_dsrc_cant_delete;
 
@@ -433,12 +434,13 @@ function dis_datasource_links($ref) {
   $name = get_datasource_name($id);
 
   // Company Links
-  $obm_q = run_query_datasource_company_links($id);
-  if ($obm_q->num_rows() > 0) {
+  $obm_q = run_query_datasource_company_links($ref);
+  $nb = $obm_q->num_rows();
+  if ($nb > 0) {
     $delete_ok = false;
     $dis_link_comp = "
     <tr>
-      <td class=\"detailHead\">$name : $l_dsrc_link_company</td>
+      <td class=\"detailHead\">$name : $l_dsrc_link_company ($nb)</td>
     </tr>";
 
     while ($obm_q->next_record()) {
@@ -447,7 +449,7 @@ function dis_datasource_links($ref) {
       $dis_link_comp .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -460,12 +462,13 @@ function dis_datasource_links($ref) {
   }
 
   // Contacts Links
-  $obm_q = run_query_datasource_contact_links($id);
-  if ($obm_q->num_rows() > 0) {
+  $obm_q = run_query_datasource_contact_links($ref);
+  $nb = $obm_q->num_rows();
+  if ($nb > 0) {
     $delete_ok = false;
     $dis_link_cont = "
     <tr>
-      <td class=\"detailHead\">$name : $l_dsrc_link_contact</td>
+      <td class=\"detailHead\">$name : $l_dsrc_link_contact ($nb)</td>
     </tr>";
 
     while ($obm_q->next_record()) {
@@ -474,7 +477,7 @@ function dis_datasource_links($ref) {
       $dis_link_cont .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
