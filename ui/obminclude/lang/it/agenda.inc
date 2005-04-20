@@ -59,7 +59,19 @@ $l_accept = "Accetta";
 $l_reject = "Respingi";
 $l_select = "Scegli";
 
+$l_update_ok = "modifica eseguita";
+$l_update_warning = "attenzione: sono stati rilevati conflitti";
+$l_insert_ok = "registrazione effettauta";
+$l_insert_warning = $l_update_warning;
+$l_insert_error	= "sono stati rilevati conflitti. creazione non effettuata";
+
 // Messages
+$l_category_insert_ok = "la categoria e stata registrata";
+$l_category_insert_error ="attenzione! la categoria NON e stata registrata";
+$l_category_update_ok = "la categoria e stata modificata";
+$l_category_update_error = "attenzione! la categoria NON e stata modificata";
+$l_category_delete_ok = "la categoria e stata eliminata";
+$l_category_delete_error = "attenzione! la categoria NON e stata eliminata";
 $l_select_contacts = "Scegliere un mese od un gruppo.";
 $l_select_repeat_day = "Scegli il giorno della ripetizione.";
 $l_event_insert_ok = "Registrazione appuntamento effettuata;";
@@ -77,6 +89,43 @@ $l_event_insert_cancel_ok = "Inserimento appuntamento eseguito";
 $l_conflict_events = "Conflitto di appuntamenti";
 
 $l_unknown="Sconosciuto";
+
+$l_header_meeting		= "Nuova riunione";
+$l_header_right			= "gestione dei diritti";
+$l_header_admin			= "amministratore";
+$l_header_export		= "esporta";
+$l_meeting_legend		= "legenda";
+$l_possible			= "disponibile";
+$l_free				= "disponibile ma limitato";
+$l_occupied			= "non disponibile";
+$l_user_calendar		= "vista multi utente";
+$l_go_to			= "vai a";
+$l_go				= "vai";
+$l_repeat_update		= "modifica i legami a questo appuntamento";
+$l_agenda_select_group		= "scegli il gruppo";
+$l_sendamail			= "&#232; richiesta notifica email";
+$l_force			= "forzatura";
+$l_carac			= "catatteristiche";
+$l_format			= "formato data(AAAA-MM-GG)";
+$l_wait				= "attesa";
+$l_refuse			= "rifiuta";
+$l_change_state			= "partecipazione evento";
+$l_force_insert			= "forza inserimento";
+$l_refuse_insert		= "rifiuta inserimento";
+$l_cancel_insert		= "attendere";
+$l_conflicts			= "sono stati trovati conflitti";
+$l_user				= "utente";
+$l_confirm_delete		= "questa operazione elimina i legami dell&#039;evento.confermi?";
+$l_confirm_mail			= "conferma+forza norifica";
+$l_confirm			="conferma";
+$l_cancel			="elimina";
+$l_user_right			= "gestisci i diritti per";
+$l_read_permission		= "leggi gestione accessi";
+$l_denie_list			= "persone non autorizzate";
+$l_authorize_list		= "persone autorizzate";
+$l_deny				= "nega";
+$l_authorize			= "autorizza";
+$l_write_permission		= "scrivi gestione accessi";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Scegli un titolo per l'appuntamento.";

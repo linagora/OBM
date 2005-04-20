@@ -26,7 +26,7 @@ $fieldnames["incident_company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident specific dataset fields                                  //
+// Display Incident specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -65,9 +65,8 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident search form                                              //
+// Display Incident search form
 // Parameters:
 //   - $incident[] 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,9 +82,8 @@ function dis_incident_search_form($incident) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident search Form                                              //
+// Display Incident search Form
 // Parameters:
 //   - $usr_q      : DB result object (userobm list)
 //   - $pri_q      : DB result object (incident priority list)
@@ -193,9 +191,8 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident, $cat1_q) 
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Incident search result                                        //
+// Display the Incident search result
 // Parameters:
 //   - $incident[] : incident search criteria
 //     keys used  : status, label incident, priority, label contract
@@ -212,15 +209,14 @@ function dis_incident_search_list($incident) {
     $display["msg"] = display_info_msg($l_no_found);
   } else {
       $block = html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
-    }
+  }
   
   return $block;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Search result                                                //
+// HTML Display Search result
 // Parameters : 
 //   - $in_q        : list of incidents
 //   - $pref_q      : the fields which have to be displayed
@@ -428,15 +424,11 @@ function dis_incident_form($action,$incident) {
     }
   }
 
-  if ($action == "insert") {
+  if ( ($action == "insert") || ($action == "update") ) {
     $users = array($incident["owner"], $incident["logger"]);
     $inc_q = "";
   }
 
-  if ($action == "update") {
-    $users = array($incident["owner"], $incident["logger"]);
-    $inc_q = "";
-  }
   $usr_q = run_query_userobm_active($users);
   $usrp_q = run_query_all_users_from_group($cg_prod,$users);
   $prio_q = run_query_priority();
@@ -450,7 +442,7 @@ function dis_incident_form($action,$incident) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident Form
+// XHTML Display Incident Form
 // Parameters:
 //   - $action    : action called
 //   - $incident[]: default values
@@ -636,7 +628,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"form_mod_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
+    <form method=\"get\" name=\"form_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
       <div class=\"detailHead\">$l_incident</div>
         <table class=\"detail\">
           <tr>
@@ -657,9 +649,9 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
               <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_label</a>
               <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
               <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-              <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
+              <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=form_incident.contract_new_id&amp;ext_widget_text=form_incident.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
               <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
-              <input type=\"text\" name=\"contract_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+              <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
             </td>
           </tr><tr>
             <td class=\"detailLabel\">$l_priority</td>

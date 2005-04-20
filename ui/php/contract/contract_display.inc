@@ -36,26 +36,38 @@ $fieldnames["contract_archive"] = $l_archive_first;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contract(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
+  global $path, $set_theme, $contract;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   global $cck_customer, $cck_supplier, $l_cck_customer, $l_cck_supplier;
 
+  $ext_url = $contract["ext_url"];
+
   if ($fieldname == "contract_label") {
-    $res["url"] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$OD->data_set->f("contract_id");
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("contract_id").",'".addslashes($OD->data_set->f("contract_label"))."');";
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("contract_id").");";
+    } else {
+      $res["url"] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$OD->data_set->f("contract_id");
+    }
   }
 
-  else if ($fieldname == "contract_company_name") {
+  else if (($fieldname == "contract_company_name") && $link_ok) {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contract_company_id");
   }
 
   else if ($fieldname == "contract_marketmanager") {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_techmanager_id");
+    if ($link_ok) {
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_techmanager_id");
+    }
     $res["name"] = $OD->data_set->f("lmarket") . " " . $OD->data_set->f("fmarket");
   }
 
   else if ($fieldname == "contract_techmanager") {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_marketmanager_id");
+    if ($link_ok) {
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_marketmanager_id");
+    }
     $res["name"] = $OD->data_set->f("ltech") . " " . $OD->data_set->f("ftech");
   }
 
@@ -132,12 +144,13 @@ function dis_contract_search_form($contract) {
 //   - $usr_q      : DB result object (userobm list)
 //   - $type_q : DB result object (contract kind list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_form($contract, $usr_q, $type_q,$pri_q,$sta_q) {
+function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   global $l_number,$l_label_libelle,$l_company,$l_type,$l_after,$l_before;
   global $l_find,$l_manager,$l_priority, $l_archive, $l_status;
   global $cck_customer, $cck_supplier, $l_contract_kind,$l_cck_customer,$l_cck_supplier;
   global $c_all, $l_all;
  
+  $popup = $contract["popup"];
   $status = $contract["status"];
   $priority = $contract["priority"];
   $label = $contract["label"];
@@ -162,7 +175,7 @@ function html_contract_search_form($contract, $usr_q, $type_q,$pri_q,$sta_q) {
     }
     $dis_cont_typ .= "</select>";
 
-  if ($usr_q->nf()>0){
+  if ($usr_q->nf()>0) {
     $usr_q->seek(0);
   }
   
@@ -214,6 +227,25 @@ function html_contract_search_form($contract, $usr_q, $type_q,$pri_q,$sta_q) {
   }
   $dis_resp_tec .="</select>";
 
+  if ($popup) {
+    $ext_action = $contract["ext_action"];
+    $ext_url = $contract["ext_url"];
+    $ext_id = $contract["ext_id"];
+    $ext_title = ($contract["ext_title"] ? $contract["ext_title"] : $l_select_contract);
+    $ext_target = $contract["ext_target"];
+    $ext_widget = $contract["ext_widget"];
+    $ext_widget_text = $contract["ext_widget_text"];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
+            <input name=\"popup\" type=\"hidden\" value=\"$popup\" />";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -260,6 +292,7 @@ function html_contract_search_form($contract, $usr_q, $type_q,$pri_q,$sta_q) {
     <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      $ext
     </div>
     <div class=\"searchEnd\"></div>
 </div>
@@ -267,7 +300,6 @@ function html_contract_search_form($contract, $usr_q, $type_q,$pri_q,$sta_q) {
 
   return $block;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -280,13 +312,14 @@ function dis_contract_search_list($contract) {
   global $l_no_found;
   global $display, $auth, $new_order, $order_dir;
   
+  $popup = $contract["popup"];
   $pref_q = run_query_display_pref($auth->auth["uid"], "contract");
   $obm_q = run_query_search($contract, $new_order, $order_dir);
   $nb_contract = $obm_q->num_rows_total();
   if ($nb_contract == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_contract_search_list($obm_q,$pref_q,$nb_contract,$contract);
+    $block = html_contract_search_list($obm_q,$pref_q,$nb_contract,$contract, $popup);
   }
 
   return $block;
@@ -294,16 +327,27 @@ function dis_contract_search_list($contract) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Contract Search result                                   //
+// XHTML Display the Contract Search result
 // Parameters :
 //   - $contract_q : contracts list
 //   - $pref_q     : fields to display in the contracts list
 //   - $nb_con     : nb contract found
 //   - $contract[] : contract search criteria
 //     keys used   : label, type, dateafter, datebefore, company_name, market
+//   - $popup      : popup flag tell if external parameters to handle
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
-  global $display, $l_found;
+function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract, $popup) {
+  global $display, $l_found, $l_close;
+
+  if ($popup) {
+    $ext_action = $contract["ext_action"];
+    $ext_url = $contract["ext_url"];
+    $ext_id = $contract["ext_id"];
+    $ext_target = $contract["ext_target"];
+    $ext_widget = $contract["ext_widget"];
+    $ext_widget_text = $contract["ext_widget_text"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
+  }
 
   $num = urlencode($contract["number"]); 
   $label = urlencode($contract["label"]);
@@ -318,18 +362,31 @@ function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
   $kind = $contract["kind"];
   $format = $contract["format"];
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_tech=$tech&amp;sel_market=$market&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_tech=$tech&amp;sel_market=$market&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
   
   $contract_q->seek($first_row);
-  $dis_contracts_list = new OBM_DISPLAY("DATA", $pref_q, "contract");
-  $dis_contracts_list->data_set = $contract_q;
-  $dis_contracts_list->data_url = $url;
-  $dis_contracts_list->data_header = "both";
+  $contract_d = new OBM_DISPLAY("DATA", $pref_q, "contract");
+  if ($popup) {
+    $contract_d->display_link = false;
+    if ($ext_url != "") {
+      $contract_d->display_ext = "get_id_url";
+    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $contract_d->display_ext = "get_id";
+    }
+    $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+
+  $contract_d->data_set = $contract_q;
+  $contract_d->data_url = $url;
+  $contract_d->data_header = "both";
 
   // --- html template --------------------------------------------------------
 
   $display["msg"] .= display_info_msg($nb_con." ".$l_found);
-  $block = $dis_contracts_list->display("dis_data_contract");
+  $block = $contract_d->display("dis_data_contract");
 
   return $block;
 }
@@ -727,7 +784,7 @@ function dis_contract_form($action,$contract,$param_company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract Form                                                     //
+// XHTML Display Contract Form
 // Parameters :
 //   - $action     : action called
 //   - $contract_q : DBO : information about the contract (null for new)

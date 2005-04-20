@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($import, $p_new_order, $p_order_dir) {
-  global $cdg_sql, $c_all;
+  global $cdg_sql, $c_all, $ctu_sql_limit;
   
   $name = sql_search_text_parse($import["name"]);
   $dsrc = $import["datasource"];
@@ -26,9 +26,12 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
 
   $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
+
+  $where = "import_name $like '$name%'";
 
   if (($dsrc != $c_all) && ($dsrc != "")) { 
     $where .= " and import_datasource_id='$dsrc'";
@@ -37,7 +40,13 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
     $where .= " and import_marketingmanager_id='$market'";
   }
 
-  $query = "select distinct import_id as id,
+  $whereq = "WHERE $where";
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "import_name";
+  $orderq = " order by $order $p_order_dir";
+
+  $query = "SELECT DISTINCT import_id as id,
     import_id,
     import_name,
     import_separator,
@@ -49,17 +58,24 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
     datasource_name as import_datasource,
     C.userobm_lastname as market_lastname,
     C.userobm_firstname as market_firstname
-  from 
+  FROM
     Import LEFT JOIN DataSource ON import_datasource_id=datasource_id
     LEFT JOIN UserObm as A ON Import.import_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON Import.import_userupdate=B.userobm_id
     LEFT JOIN UserObm as C ON Import.import_marketingmanager_id=C.userobm_id
-  where import_name $like '$name%'
-    $where";
+  $whereq
+  $orderq
+  $limit";
 
-  // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "import_name";
-  $query .= " order by $order $p_order_dir";
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) FROM Import $whereq");
+    $obm_q->set_num_rows_total($count);
+  }
+
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "import_search()");
+    $obm_q->query($query);
+  }
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

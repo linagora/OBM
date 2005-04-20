@@ -22,6 +22,9 @@
       <a href="../doc/html/install-0.3.html">0.3.x</a> -
       <a href="../doc/html/install-0.2.html">0.2.x</a> 
     <li>Upgrade guide :
+      <a href="../doc/html/install-0.8.html#upgrade-0.8.11">0.8.10 to 0.8.11</a> -
+      <a href="../doc/html/install-0.8.html#upgrade-0.8.10">0.8.9 to 0.8.10</a> -
+      <a href="../doc/html/install-0.8.html#upgrade-0.8.9">0.8.8 to 0.8.9</a> -
       <a href="../doc/html/install-0.8.html#upgrade-0.8.8">0.8.7 to 0.8.8</a> -
       <a href="../doc/html/install-0.8.html#upgrade-0.8.7">0.8.6 to 0.8.7</a> -
       <a href="../doc/html/install-0.8.html#upgrade-0.8.6">0.8.5 to 0.8.6</a> -

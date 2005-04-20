@@ -167,6 +167,7 @@ function run_query_insert($list) {
     }
     $list_critery = addslashes(serialize($ss_criteria));
   }
+  echo $query;
   $query = "insert into List (list_timeupdate,
     list_timecreate,
     list_userupdate,
@@ -1217,7 +1218,11 @@ function make_query_from_criteria($list) {
   $comp_time_inf = "(company_timecreate <= '%v' OR company_timeupdate <= '%v')";
   $cont_time_sup = "(contact_timecreate >= '%v' OR contact_timeupdate >= '%v')";
   $cont_time_inf = "(contact_timecreate <= '%v' OR contact_timeupdate <= '%v')";
-  
+  // Contact Country specific case (if not set, test with company one)
+  $contact_country = "%f = '%v' OR (%f = '' AND company_country_iso3166 = '%v')";   
+  $sub_time_aft = "(subscription_timecreate >= '%v' OR subscription_timeupdate >= '%v')";
+  $sub_time_bef = "(subscription_timecreate <= '%v' OR subscription_timeupdate <= '%v')";
+
   $operateurs = array(
     "company_name" => $common_like,
     "company_country_iso3166" => $common_equal,
@@ -1229,7 +1234,7 @@ function make_query_from_criteria($list) {
     "company_datasource_id" => $common_equal,
     "companycategory_code" => $category_equal,
     "contact_firstname"  => $common_like,
-    "contact_country_iso3166" => $common_equal,
+    "contact_country_iso3166" => $contact_country,
     "contact_timeafter"  => $cont_time_sup,
     "contact_timebefore"  => $cont_time_inf,
     "contact_lastname"  => $common_like,
@@ -1245,6 +1250,8 @@ function make_query_from_criteria($list) {
     "publication_year"  => $common_like,
     "subscription_renewal"  => $common_equal,
     "subscription_reception_id"  => $common_equal,
+    "subscription_timeafter"  => $sub_time_aft,
+    "subscription_timebefore" => $sub_time_bef,
     "kind_lang"  => $common_equal
   );
     
@@ -1279,6 +1286,7 @@ function make_query_from_criteria($list) {
         ctry1.country_name as contact_country,
         contact_phone,
         contact_homephone,
+        contact_mobilephone,
         contact_fax,
         contact_email,
         contact_archive,
@@ -1301,12 +1309,14 @@ function make_query_from_criteria($list) {
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
 
+
   //--------------------------------------------------------------------------
   // If publication info must be displayed we prepare a Subquery
   // SELECT $over_select FROM (SELECT $select ...) AS FOO GROUP BY $over_group
   if ($info_pub == 1) {
     // We add Subscription and publication infos in Select and Join
     $select .= ", subscription_id
+                , subscription_timecreate
                 , subscription_quantity
                 , publication_lang
                 , publication_title";
@@ -1335,6 +1345,7 @@ function make_query_from_criteria($list) {
         $conv_select
         $info_over_group";
   }
+
 
   if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {

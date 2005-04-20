@@ -41,7 +41,8 @@ $fieldnames["expresspostal"] = $l_expresspostal;
 $fieldnames["country_name"] = $l_country;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_fax"] = $l_fax;
-$fieldnames["contact_mobilephone"] = $l_hphone;
+$fieldnames["contact_homephone"] = $l_hphone;
+$fieldnames["contact_mobilephone"] = $l_mphone;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["subscription_quantity"] = $l_quantity;
 $fieldnames["publication_title"] = $l_publication." ".$l_title;
@@ -409,7 +410,7 @@ function dis_list_search_list($list, $popup=false) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the List search result                                       //
+// HTML Display the List search result
 // Parameters : 
 //   - $obm_q    : list of the lists to display 
 //   - $pref_q   : fields that have to be displayed
@@ -567,7 +568,6 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $query_nb = "0";
     $comp_query_nb = "0";
   }
-
 
   $comp_static_nb = get_list_static_company_nb($id);
 
@@ -861,7 +861,7 @@ function html_list_form($action, $list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Graphical List Form                                               //
+// Display Graphical List Form
 // Parameters :
 //   - $action    : action called
 //   - $list_q    : DBO : information about the list (null for new list)
@@ -869,12 +869,12 @@ function html_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_graphical_form($action, $list_q, $list) {
-  global $l_add_criterion;
+  global $l_add_criterion, $l_and, $l_or, $l_not, $l_empty;
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
   global $l_contact_cat2,$l_function,$l_cat;
-  global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;
+  global $l_publication,$l_title,$l_lang,$l_year, $l_after, $l_before;
   global $l_update,$l_delete,$l_recept,$l_renew;
   global $clist_mode_expert, $clist_mode_normal;
   
@@ -887,7 +887,6 @@ function html_list_graphical_form($action, $list_q, $list) {
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"];
   }
-
 
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
@@ -905,31 +904,33 @@ function html_list_graphical_form($action, $list_q, $list) {
   $field_kind = array(
       "company_name" => "tf",
       "company_country_iso3166" => "sel",
-      "company_timeafter"  =>  "tf",
-      "company_zipcode"  =>  "tf",
+      "company_timeafter" => "tf",
+      "company_zipcode" => "tf",
       "company_marketingmanager_id" => "sel",
-      "company_timebefore" =>  "tf",
-      "company_town"  =>  "tf",
+      "company_timebefore" => "tf",
+      "company_town" => "tf",
       "company_datasource_id" => "sel",
       "companycategory_code" => "sel",
-      "contact_firstname"  =>  "tf",
+      "contact_firstname" => "tf",
       "contact_country_iso3166" => "sel",
-      "contact_timeafter"  =>  "tf",
-      "contact_lastname"  =>  "tf",
+      "contact_timeafter" => "tf",
+      "contact_lastname" => "tf",
       "contact_marketingmanager_id" => "sel",
-      "contact_timebefore"  => "tf",
+      "contact_timebefore" => "tf",
       "contact_datasource_id" => "sel",
-      "contact_town"  => "tf",
-      "contact_zipcode"  => "tf",
+      "contact_town" => "tf",
+      "contact_zipcode" => "tf",
       "contactcategory1link_category_id" => "sel",
       "contactcategory2link_category_id" => "sel",
       "contact_function_id" => "sel",
       "kind_lang" => "sel",
-      "subscription_publication_id"  => "sel",
-      "publication_lang"  => "tf",
-      "publication_year"  => "tf",
-      "subscription_reception_id"  => "sel",
-      "subscription_renewal"  => "tf"      
+      "subscription_publication_id" => "sel",
+      "publication_lang" => "tf",
+      "publication_year" => "tf",
+      "subscription_reception_id" => "sel",
+      "subscription_renewal" => "tf",
+      "subscription_timeafter" => "tf",
+      "subscription_timebefore" => "tf"
   );
   $fields_label["company_name"] = $l_company; 
   $fields_label["company_country_iso3166"] = "$l_company: $l_country"; 
@@ -958,6 +959,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["publication_year"] = "$l_publication: $l_year"; 
   $fields_label["subscription_reception_id"] = "$l_publication: $l_recept"; 
   $fields_label["subscription_renewal"] = "$l_publication: $l_renew";
+  $fields_label["subscription_timeafter"] = "$l_publication: $l_after";
+  $fields_label["subscription_timebefore"] = "$l_publication: $l_before";
 
   if (is_array($criteria)) {
     $cty_q = run_query_country_for_lang();
@@ -1061,7 +1064,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Form to make a Criterion //
+// Display the Form to add a Criterion
 // Parameters:
 //   - $pref_list_q    : DBO : List Field list to display
 //   - $pref_contact_q : DBO : Contact Field list to display
@@ -1111,8 +1114,9 @@ function dis_add_criterion_form($list) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Company Criterion Form //
+// Display the Company Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
@@ -1160,7 +1164,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timeafter\" value=\"\" />
+     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_company_timeafter\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
     </td>    
@@ -1171,10 +1175,10 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailLabel\">$l_timebefore</td>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_zipcode\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timebefore\" value=\"\" />
+     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_company_timebefore\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
      </a>
@@ -1268,7 +1272,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timeafter\" value=\"\" />
+     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_contact_timeafter\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
     </td>    
@@ -1281,7 +1285,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timebefore\" value=\"\" />
+     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_contact_timebefore\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
      </a>
@@ -1295,7 +1299,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   <tr>    
     <td class=\"detailForm\"><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>        
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>    
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_zipcode\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_contact_zipcode\" value=\"\" /></td>
   </tr>  
   <tr>  
     <td class=\"detailLabel\">$l_contact_cat1</td>
@@ -1325,14 +1329,17 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contact Criterion Form //
+// Display the Contact Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_criterion($rec_q,$pub_q){
-  global $l_publication,$l_title,$l_lang,$l_year;
-  global $l_renew,$l_recept,$l_all,$l_none,$l_yes,$l_no;
-  if($rec_q->nf()!=0) 
+  global $path, $l_all, $l_none, $l_yes, $l_no, $set_theme, $ico_mini_cal;
+  global $l_publication, $l_title, $l_lang, $l_year;
+  global $l_renew,$l_recept, $l_after, $l_before;
+
+  if ($rec_q->nf()!=0) {
     $rec_q->seek(0);
+  }
   $sel_rec .= "\n<option value=\"\">$l_all</option>";
   while($rec_q->next_record()) {
     $sel_rec .= "\n<option value=\"".$rec_q->f("subscriptionreception_id")."\">".$rec_q->f("subscriptionreception_label")."</option>";
@@ -1351,31 +1358,48 @@ function html_publication_criterion($rec_q,$pub_q){
     <td class=\"detailLabel\">$l_title</td>
     <td class=\"detailLabel\">$l_lang</td>
     <td class=\"detailLabel\">$l_year</td>
+    <td class=\"detailLabel\">$l_after</td>  
   </tr>
   <tr>
     <td class=\"detailForm\"><select name=\"sel_subscription_publication_id\">$sel_pub</select></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_lang\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_year\" value=\"\" /></td>  
+    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_publication_lang\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_publication_year\" value=\"\" /></td>  
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+      <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_subscription_timeafter\" value=\"\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_subscription_timeafter,'$path/agenda/agenda_index.php?action=calendar&popup=1');\">
+      <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+      </a>
+    </td>     
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_renew</td>
     <td class=\"detailLabel\">$l_recept</td>
+    <td class=\"detailLabel\">&nbsp;</td>  
+    <td class=\"detailLabel\">$l_before</td>  
   </tr>
   <tr>
     <td class=\"detailForm\">
-    <select name=\"tf_subscription_renewal\">
-     <option value=\"\">$l_none</option>
-     <option value=\"1\">$l_yes</option>
-     <option value=\"0\">$l_no</option>
-    </select>
-   </td>    
+      <select name=\"tf_subscription_renewal\">
+       <option value=\"\">$l_none</option>
+       <option value=\"1\">$l_yes</option>
+       <option value=\"0\">$l_no</option>
+      </select>
+    </td>    
     <td class=\"detailForm\"><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
+    <td class=\"detailForm\">&nbsp;</td>
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+      <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_subscription_timebefore\" value=\"\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_subscription_timebefore,'$path/agenda/agenda_index.php?action=calendar&popup=1');\">
+      <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+      </a>
+    </td>     
   </tr>
   
   </table>
-  ";
+";
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the List Display preference screen                                //

@@ -56,8 +56,9 @@ IE4 = (document.all) ? 1 : 0;
 W3C = (document.getElementById) ? 1 : 0;	
 my_url = '&action=new_criterion&popup=1&row_index=';
 
+
 ///////////////////////////////////////////////////////////////////////////////
-//  Add a criteria line in the list form                                   //
+// Add a criteria line in the list form
 ///////////////////////////////////////////////////////////////////////////////
 function add_criterion(form,index) {
   target = window.opener.document;
@@ -68,7 +69,7 @@ function add_criterion(form,index) {
   } else {
     criteria = target.all['list_criterion'];
   }
-  if(index == -1) {
+  if (index == -1) {
     index = criteria.rows.length;
   } else {
     del_row(criteria.rows.item(index+1));
@@ -88,8 +89,16 @@ function add_criterion(form,index) {
   cell.style.paddingRight = '5px';
   cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
-  cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
-  cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option></select>';
+  cell.innerHTML = '
+    <select name=\"sel_log_and[]\">
+      <option value=\"OR\" selected=\"true\">$l_or</option>
+      <option value=\"AND\">$l_and</option>
+    </select>';
+  cell.innerHTML += '
+    <select name=\"sel_log_not[]\">
+      <option value=\"\" selected=\"true\">$l_empty</option>
+      <option value=\"NOT\">$l_not</option>
+    </select>';
   i=company_criterion(form,labels,values,4);
   i=contact_criterion(form,labels,values,i);
   i=publication_criterion(form,labels,values,i);
@@ -130,7 +139,7 @@ function get_values(form) {
   }
   row = criteria.rows.item(".($row_index+1).");
   cells = row.cells;
-  for(i=4;i<cells.length;i++) {
+  for (i=4;i<cells.length;i++) {
     name = cells.item(i).lastChild.name;
     field = eval('form.'+name.substr(0,name.length-2));
     field.value = cells.item(i).lastChild.value;
@@ -145,6 +154,7 @@ function get_values(form) {
 function company_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
+
   if (form.tf_company_name.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company'; 
@@ -248,25 +258,24 @@ function company_criterion(form,labels,values,i) {
 function contact_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
-  if(form.tf_contact_lastname.value != '') {    
+
+  if (form.tf_contact_lastname.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_lastname';    
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_lastname[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_lastname.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_contact_lastname[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_firstname.value != '') {
+  if (form.tf_contact_firstname.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_firstname';      
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_firstname[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_firstname.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_contact_firstname[]\" value=\"\" />';
   }
 
@@ -277,126 +286,113 @@ function contact_criterion(form,labels,values,i) {
     field = form.sel_contact_country_iso3166;
     cell.innerHTML = '<select name=\"sel_contact_country_iso3166[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;    
-  }  
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_country_iso3166[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_zipcode.value != '') {    
+  if (form.tf_contact_zipcode.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_postcode';  
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_zipcode[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_zipcode.value+'\" />';
     i++;
-  } 
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_zipcode[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_town.value != '') {    
+  if (form.tf_contact_town.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_town';  
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_town[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_town.value+'\" />';
     i++;
-  }  
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_town[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_timeafter.value != '') {    
+  if (form.tf_contact_timeafter.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_timeafter'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timeafter.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timeafter[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_timebefore.value != '') {    
+  if (form.tf_contact_timebefore.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_timebefore'; 
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timebefore.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timebefore[]\" value=\"\" />';
   }
 
-  if(form.sel_contact_marketingmanager_id.value != '') {    
+  if (form.sel_contact_marketingmanager_id.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_market';  
     cell = values.insertCell(i);
     field = form.sel_contact_marketingmanager_id;
     cell.innerHTML = '<select name=\"sel_contact_marketingmanager_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;    
-  }  
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_marketingmanager_id[]\" value=\"\" />';
   }
 
-  if(form.sel_contact_datasource_id.value != '') {  
+  if (form.sel_contact_datasource_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_datasource'; 
     cell = values.insertCell(i);
     field = form.sel_contact_datasource_id;
     cell.innerHTML = '<select name=\"sel_contact_datasource_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_datasource_id[]\" value=\"\" />';
   }   
   
-  if(form.sel_contactcategory1link_category_id.value != '') {  
+  if (form.sel_contactcategory1link_category_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_contact_cat1'; 
     cell = values.insertCell(i);
     field = form.sel_contactcategory1link_category_id;
     cell.innerHTML = '<select name=\"sel_contactcategory1link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory1link_category_id[]\" value=\"\" />';
   }  
 
-  
-  if(form.sel_contactcategory2link_category_id.value != '') {  
+  if (form.sel_contactcategory2link_category_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_contact_cat2'; 
     cell = values.insertCell(i);
     field = form.sel_contactcategory2link_category_id;
     cell.innerHTML = '<select name=\"sel_contactcategory2link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory2link_category_id[]\" value=\"\" />';
   }  
   
-
-  if(form.sel_contact_function_id.value != '') {  
+  if (form.sel_contact_function_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_function'; 
     cell = values.insertCell(i);
     field = form.sel_contact_function_id;
     cell.innerHTML = '<select name=\"sel_contact_function_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_function_id[]\" value=\"\" />';
   }   
 
-  if(form.sel_kind_lang.value != '') {  
+  if (form.sel_kind_lang.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_lang'; 
     cell = values.insertCell(i);
     field = form.sel_kind_lang;
     cell.innerHTML = '<select name=\"sel_kind_lang[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_kind_lang[]\" value=\"\" />';
   }    
 
@@ -412,7 +408,7 @@ function publication_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
 
-  if(form.sel_subscription_publication_id.value != '') {  
+  if (form.sel_subscription_publication_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_title'; 
     cell = values.insertCell(i);
@@ -424,39 +420,34 @@ function publication_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_subscription_publication_id[]\" value=\"\" />';
   }  
 
-
-  if(form.tf_publication_lang.value != '') {
+  if (form.tf_publication_lang.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_lang';      
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_publication_lang[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_publication_lang.value+'\" />';
     i++;
-  }
-  else {
+  } else {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_publication_lang[]\" value=\"\" />';
   }
 
-  if(form.tf_publication_year.value != '') {    
+  if (form.tf_publication_year.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_year';  
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_publication_year[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_publication_year.value+'\" />';
     i++;    
-  }  
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_publication_year[]\" value=\"\" />';
   }
-  
 
-  if(form.tf_subscription_renewal.value != '') {
+  if (form.tf_subscription_renewal.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_renew';      
     cell = values.insertCell(i);
     field = form.tf_subscription_renewal;
     cell.innerHTML = '<select name=\"tf_subscription_renewal[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
-  }
-  else {
+  } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_subscription_renewal[]\" value=\"\" />';
   }  
 
@@ -469,6 +460,26 @@ function publication_criterion(form,labels,values,i) {
     i++;  
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_subscription_reception_id[]\" value=\"\" />';
+  }
+
+  if (form.tf_subscription_timeafter.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_publication: $l_after'; 
+    cell = values.insertCell(i);
+    cell.innerHTML = '<input type=\"text\" name=\"tf_subscription_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_subscription_timeafter.value+'\" />';
+    i++;
+  } else {
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_subscription_timeafter[]\" value=\"\" />';
+  }
+
+  if (form.tf_subscription_timebefore.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_publication: $l_before'; 
+    cell = values.insertCell(i);
+    cell.innerHTML = '<input type=\"text\" name=\"tf_subscription_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_subscription_timebefore.value+'\" />';
+    i++;
+  } else {
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_subscription_timebefore[]\" value=\"\" />';
   }
   
   return i;

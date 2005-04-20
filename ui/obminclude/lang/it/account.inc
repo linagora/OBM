@@ -25,6 +25,9 @@ $l_nb_expected_used = " operazioni previste per il calcolo.";
 $l_expected = "previsto";
 $l_used_payments = "Pagamenti Considerati nel conteggio del saldo ";
 $l_used_expected_payments = "Pagameni previsti usati nel calcolo del saldo";
+$l_expected_payments = "pagamenti in attesa";
+$l_payments = "pagamenti";
+$l_totals = "totali";
 
 // Actions
 $l_insert= "Inserisci Account";
@@ -47,9 +50,9 @@ $l_query_error = "Problemi nell'esecuzione della ricerca...";
 $l_impossible_deletion = " alcuni pagamenti sono associati a questo account. Impossibile cancellare";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$lj_check_number = "\\nNumero account non valido ! ";
-$lj_fill_number = " Inserisci prima il numero ! ";
-$lj_fill_bank = "Inserisci prima la Banca !";
+$l_check_number = "Numero account non valido ! ";
+$l_fill_number = " Inserisci prima il numero ! ";
+$l_fill_bank = "Inserisci prima la Banca !";
 $lj_confirm_no_bank="Questo accoutn non è associato a banche. Click OK per confermare.";
 
 // For the display parameters modification screen

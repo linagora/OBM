@@ -14,8 +14,9 @@
   <h1>Download</h1>
   <p>
   <ul>
-    <li>last : <a href="/obm-archives/obm-0.8.9.tar.gz"> 0.8.9 sources : obm-0.8.9.tar.gz</a>
-    <br /><br />
+    <li>last : <a href="/obm-archives/obm-0.8.11.tar.gz"> 0.8.11 sources : obm-0.8.11.tar.gz</a>
+    <li><a href="/obm-archives/obm-0.8.10.tar.gz"> 0.8.10 sources : obm-0.8.10.tar.gz</a>
+    <li><a href="/obm-archives/obm-0.8.9.tar.gz"> 0.8.9 sources : obm-0.8.9.tar.gz</a>
     <li><a href="/obm-archives/obm-0.8.8.tar.gz"> 0.8.8 sources : obm-0.8.8.tar.gz</a>
     <li><a href="/obm-archives/obm-0.8.7.tar.gz"> 0.8.7 sources : obm-0.8.7.tar.gz</a>
     <li><a href="/obm-archives/obm-0.8.6.tar.gz"> 0.8.6 sources : obm-0.8.6.tar.gz</a>

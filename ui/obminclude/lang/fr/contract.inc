@@ -72,7 +72,7 @@ $l_insert = "Enregistrer le Contrat";
 $l_update = "Modifier le Contrat";
 $l_delete = "Supprimer le Contrat";
 $l_select_company = "Sélectionner la société avec laquelle le contrat doit être renseigné.";
-$l_select_contract = "Selectionner le contrat";
+$l_select_contract = "Sélectionner le contrat";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des contrats correspondants.";

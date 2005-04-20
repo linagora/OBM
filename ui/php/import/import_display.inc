@@ -141,7 +141,7 @@ function dis_import_search_list($import, $popup=false) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "import");
   $obm_q = run_query_search($import, $new_order, $order_dir);
-  $nb = $obm_q->num_rows();
+  $nb = $obm_q->num_rows_total();
   if ($nb == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
@@ -171,7 +171,7 @@ function html_import_search_list($obm_q, $pref_q, $nb, $import, $popup) {
   $display["msg"] .= display_info_msg("$nb $l_found");
 
   $url = url_prepare("import_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact");
-  
+
   $od = new OBM_DISPLAY("DATA", $pref_q, "import");
   $od->data_set = $obm_q;
   $od->data_header = "both";
@@ -207,7 +207,6 @@ function html_import_consult($import_q) {
   $datasource = $import_q->f("datasource_name");
   $market = $import_q->f("market_lastname") . " " . $import_q->f("market_firstname");
   $csv_sep = $import_q->f("import_separator");
-  if($ccsvd_tab == $csv_sep) $local_csv_sep = "\t";
   $enclosed = $import_q->f("import_enclosed");
   $desc = $import_q->f("import_desc");
   eval ($desc);
@@ -366,14 +365,16 @@ function html_import_consult_file($import_q) {
 //   - $max_rows : max rows displayed from test file
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_file_sample($import_q, $import, $max_rows) {
-  global $l_sample_file, $l_file_error, $ccsvd_tab;
+  global $ccsvd_tab, $l_sample_file, $l_file_error;
   global $display;
 
   $file = $import["file"];
   $file_name = $import["file_name"];
   $file_size = $import["file_size"];
   $csv_sep = $import_q->f("import_separator");
-  if($ccsvd_tab == $csv_sep) $local_csv_sep = "\t";
+  if ($csv_sep == $ccsvd_tab) {
+    $csv_sep = "\t";
+  }
   $enclosed = trim($import_q->f("import_enclosed"));
 
   $map = get_import_field_mapping($import_q);
@@ -396,7 +397,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
  
   $num_line = 0;
   $fh = fopen($file, 'r');
-  while ( ($row = fgetcsv($fh, 4000, $local_csv_sep, $enclosed)) && ($num_line < $max_rows) ) {
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep, $enclosed)) && ($num_line < $max_rows) ) {
     $num_line++;
 
     $mapping .= "<tr>";
@@ -431,7 +432,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 //   - $import[] : import hash values
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_file_import($import_q, $import) {
-  global $l_test_file, $l_import_file;
+  global $ccsvd_tab, $l_test_file, $l_import_file;
   global $l_company, $l_contact, $l_info, $l_result;
   global $l_similar_company, $l_similar_contact, $l_contact_defaultname;
   global $l_company_defaultname, $ccsvd_tab;
@@ -447,7 +448,9 @@ function html_import_file_import($import_q, $import) {
   $file_name = $import["file_name"];
   $file_size = $import["file_size"];
   $csv_sep = $import_q->f("import_separator");
-  if($ccsvd_tab == $csv_sep) $local_csv_sep = "\t";
+  if ($csv_sep == $ccsvd_tab) {
+    $csv_sep = "\t";
+  }
   $enclosed = trim($import_q->f("import_enclosed"));
   $run_mode = $import["run_mode"];
   $row_start = ($import["row_start"] ? $import["row_start"] : 1);
@@ -495,7 +498,7 @@ function html_import_file_import($import_q, $import) {
     $nb_line++;
 
     $cpt_line++;
-    $row = fgetcsv($fh, 4000, $local_csv_sep, $enclosed);
+    $row = fgetcsv($fh, 4000, $csv_sep, $enclosed);
     $fields = get_import_row_mapping($row, $map);
 
     // Test user decision
@@ -569,7 +572,7 @@ function html_import_file_import($import_q, $import) {
 
 
   // Loop through the file ----------------------------------------------------
-  while ( ($row = fgetcsv($fh, 4000, $local_csv_sep, $enclosed))
+  while ( ($row = fgetcsv($fh, 4000, $csv_sep, $enclosed))
 	  && ($stop == false) ) {
     $log = "";
     $log["num_line"] = $cpt_line;
@@ -686,7 +689,7 @@ function html_import_file_import($import_q, $import) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Import Form                                                       //
+// Display Import Form
 // Parameters :
 //   - $log      : log line info array
 //   - $log_head : log line header

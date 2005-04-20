@@ -283,7 +283,7 @@ function run_query_companycategory() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company contact number increment                        //
+// Query Execution - Company contact number increment
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
@@ -302,7 +302,7 @@ function run_query_company_contact_inc($comp_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source query execution                                               //
+// Data Source query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,8 +404,9 @@ function run_query_tasktype($tt_cat="") {
 function run_query_linked_project_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
-  $query = "select count(project_id) as nb from Project
-    where project_${entity}_id = '$id'";
+  $query = "SELECT count(project_id) as nb
+    FROM Project
+    WHERE project_${entity}_id = '$id'";
 
   if (! $arch) {
     $query .= " and project_archive='0'";
@@ -425,14 +426,20 @@ function run_query_linked_project_nb ($id, $entity, $arch="") {
 // Parameters:
 //   - $id     : Id of entity
 //   - $entity : entity (deal, company)
+//   - $arch   : flag to tell if archived contract should be counted (if true)
 // Return:
 //   - $nb     : number of contract
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_linked_contract_nb ($id, $entity) {
+function run_query_linked_contract_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
-  $query = "select count(contract_id) as nb from Contract
-    where contract_${entity}_id = '$id'";
+  $query = "SELECT count(contract_id) as nb
+    FROM Contract
+    WHERE contract_${entity}_id = '$id'";
+
+  if (! $arch) {
+    $query .= " and contract_archive='0'";
+  }
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);

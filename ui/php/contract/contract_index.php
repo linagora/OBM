@@ -70,15 +70,18 @@ if (! $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   require("contract_js.inc");
-  $con_q = run_query_contract();
-  $display["detail"] = html_select_contract($con_q, $contract["ext_title"]);
+  $display["search"] = dis_contract_search_form($contract);
+  if ($set_display == "yes") {
+    $display["result"] = dis_contract_search_list($contract);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-
   require("contract_js.inc");
   $display["search"] = dis_contract_search_form($contract);
   if ($set_display == "yes") {
@@ -89,6 +92,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
+  require("contract_js.inc");
   $display["search"] = dis_contract_search_form($contract);
   $display["result"] = dis_contract_search_list($contract);
   
@@ -331,10 +335,16 @@ function get_param_contract() {
   global $tf_datebegin,$tf_dateexp,$tf_daterenew,$tf_datecancel,$tf_datesignature;
   global $hd_usercreate,$cb_archive,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town,$l_header_export;
-  global $ext_title;
+  global $popup, $ext_title, $ext_target, $ext_widget, $ext_widget_text;
   global $cdg_param, $action,$sel_priority,$sel_status,$param_contract;
   global $tf_pri,$tf_order, $tf_status, $tf_color, $tf_ticket_nb;
   global $tf_duration, $rd_format, $cb_vis;
+
+  if (isset ($popup)) $contract["popup"] = $popup;
+  if (isset ($ext_title)) $contract["ext_title"] = stripslashes(urldecode($ext_title));
+  if (isset ($ext_target)) $contract["ext_target"] = $ext_target;
+  if (isset ($ext_widget)) $contract["ext_widget"] = $ext_widget;
+  if (isset ($ext_widget_text)) $contract["ext_widget_text"] = $ext_widget_text;
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
   if (isset ($param_company)) $contract["company_id"] = $param_company;
@@ -363,7 +373,7 @@ function get_param_contract() {
   if (isset ($ta_com)) $contract["comment"] = $ta_com;  
   if (isset ($hd_usercreate)) $contract["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $contract["timeupdate"] = $hd_timeupdate;
-  if (isset ($cb_autorenew)) $contract["autorenewal"] = $autorenewal;
+  if (isset ($cb_autorenew)) $contract["autorenewal"] = $cb_autorenew;
 
   // Admin - Priority fields
   // $sel_priority -> "priority" is already set
@@ -392,7 +402,6 @@ function get_param_contract() {
   if (isset ($deal_new_id)) $contract["deal_new_id"] = $deal_new_id;
   if (isset ($deal_label)) $contract["deal_label"] = $deal_label;
   if (isset ($tf_type)) $contract["type_label"] = $tf_type;
-  if (isset ($ext_title)) $contract["ext_title"] = stripslashes(urldecode($ext_title));
 
   display_debug_param($contract);
 

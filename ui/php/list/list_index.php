@@ -295,6 +295,7 @@ function get_param_list() {
   
   global $sel_subscription_publication_id,$tf_publication_lang,$tf_publication_year;
   global $sel_subscription_reception_id,$tf_subscription_renewal;
+  global $tf_subscription_timeafter, $tf_subscription_timebefore;
   
   global $sel_log_and,$sel_log_not;
   global $se_criteria;
@@ -334,8 +335,8 @@ function get_param_list() {
     $http_obm_vars = $HTTP_GET_VARS;
   }
   
-  //Criteria params :
-  //Company
+  // Criteria params :
+  // Company
   if (isset ($tf_company_name)) $list["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
   if (isset ($sel_company_country_iso3166)) $list["criteria"]["modules"]["company"]["company_country_iso3166"] = $sel_company_country_iso3166;
   if (isset ($tf_company_timeafter)) $list["criteria"]["modules"]["company"]["company_timeafter"] = $tf_company_timeafter; 
@@ -346,7 +347,7 @@ function get_param_list() {
   if (isset ($sel_company_datasource_id)) $list["criteria"]["modules"]["company"]["company_datasource_id"] = $sel_company_datasource_id;
   if (isset ($sel_companycategory_code)) $list["criteria"]["modules"]["company"]["companycategory_code"] = $sel_companycategory_code;
   
-  //Contact
+  // Contact
   if (isset ($tf_contact_firstname)) $list["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
   if (isset ($sel_contact_country_iso3166)) $list["criteria"]["modules"]["contact"]["contact_country_iso3166"] = $sel_contact_country_iso3166;
   if (isset ($tf_contact_timeafter)) $list["criteria"]["modules"]["contact"]["contact_timeafter"] = $tf_contact_timeafter;
@@ -361,12 +362,14 @@ function get_param_list() {
   if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
   if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
 
-  //Publication
+  // Publication
   if (isset ($sel_subscription_publication_id)) $list["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;
   if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
   if (isset ($tf_publication_year)) $list["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
   if (isset ($sel_subscription_reception_id)) $list["criteria"]["modules"]["publication"]["subscription_reception_id"] = $sel_subscription_reception_id;
   if (isset ($tf_subscription_renewal)) $list["criteria"]["modules"]["publication"]["subscription_renewal"] = $tf_subscription_renewal;
+  if (isset ($tf_subscription_timeafter)) $list["criteria"]["modules"]["publication"]["subscription_timeafter"] = $tf_subscription_timeafter;
+  if (isset ($tf_subscription_timebefore)) $list["criteria"]["modules"]["publication"]["subscription_timebefore"] = $tf_subscription_timebefore;
   
 
   if (isset ($sel_log_not)) $list["criteria"]["logical"]["NOT"] = $sel_log_not;

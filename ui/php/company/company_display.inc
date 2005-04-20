@@ -355,6 +355,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -407,7 +408,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
       <input name=\"tf_cat_code\" type=\"hidden\" value=\"$cat_code\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext
     </div>
     <div class=\"searchEnd\"></div>
@@ -608,14 +609,17 @@ function html_company_links($co_q) {
   // Contract
   if ($cgp_show["module"]["contract"]) {
     $nb_ctra = run_query_linked_contract_nb($id, "company");
+    $nb_ctra_total = run_query_linked_contract_nb($id, "company", 1);
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id");
+    $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
 
      $block_contract = "
   <div class=\"linkTitle\">:: $l_module_contract</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_ctra\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
-        <a href=\"$url_ctra\">$l_module_contract ($nb_ctra)</a></li>
+        $l_module_contract ( <a href=\"$url_ctra\">$nb_ctra</a> /
+        <a href=\"$url_ctra_total\">$nb_ctra_total</a> )</li>
     <li><a href=\"$url_ctra_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
         <a href=\"$url_ctra_new\">$l_new</a></li>
   </ul>";

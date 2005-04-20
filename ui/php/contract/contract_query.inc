@@ -820,17 +820,23 @@ function run_query_contact_contract($p_company_id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query   :  contract  :  Table Contract                        //
+// Query execution : Contract list
+// Parameters:
+//   - $archive : if set get also archived contracts
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contract() {
+function run_query_contract($archive=false) {
   global $cdg_sql;
 
-  $query = "select *, 
-                 company_name
-            from Contract Left Join Company on contract_company_id=company_id
-            order by company_name";
+  if (! $archive) {
+    $whereq = "WHERE contract_archive = 0";
+  }
+
+  $query = "SELECT *,
+      company_name
+    FROM Contract Left Join Company on contract_company_id=company_id
+    $whereq
+    ORDER BY company_name";
 
   display_debug_msg($query, $cdg_sql);
   $con_q = new DB_OBM;
@@ -840,9 +846,8 @@ function run_query_contract() {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Type insert                                             //
+// Query execution : Type insert
 // Parameters:
 //   - $contract[] : contract hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
