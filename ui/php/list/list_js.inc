@@ -89,16 +89,8 @@ function add_criterion(form,index) {
   cell.style.paddingRight = '5px';
   cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
-  cell.innerHTML = '
-    <select name=\"sel_log_and[]\">
-      <option value=\"OR\" selected=\"true\">$l_or</option>
-      <option value=\"AND\">$l_and</option>
-    </select>';
-  cell.innerHTML += '
-    <select name=\"sel_log_not[]\">
-      <option value=\"\" selected=\"true\">$l_empty</option>
-      <option value=\"NOT\">$l_not</option>
-    </select>';
+  cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
+  cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option></select>';
   i=company_criterion(form,labels,values,4);
   i=contact_criterion(form,labels,values,i);
   i=publication_criterion(form,labels,values,i);
