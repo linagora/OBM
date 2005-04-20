@@ -1017,45 +1017,6 @@ function run_query_allocate_update($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Progress Update query execution
-// Parameters:
-//   - $project[] : hash info : keys used : missing
-///////////////////////////////////////////////////////////////////////////////
-function run_query_progress($project) {
-  global $auth, $cdg_sql;
-
-  $date_now = date("Y-m-d H:i:s");
-  $obm_q = new DB_OBM;
-  
-  // Update project estimated missing times
-  while ( list($t_id, $misstab) = each($project["missing"]) ) {
-    while ( list($m_id, $misstime) = each($misstab) ) {
-      if ($misstime != "") {
-	
-	$query = "
-          UPDATE ProjectUser SET
-            projectuser_timeupdate = '$date_now',
-            projectuser_userupdate = '". $auth->auth["uid"] ."',
-            projectuser_validity = '$date_now',
-            projectuser_missingtime = '$misstime'
-          WHERE projectuser_projecttask_id = '$t_id'
-            AND projectuser_user_id = '$m_id'
-          ";
-	
-	display_debug_msg($query, $cdg_sql, "run_query_progress");
-	$retour = $obm_q->query($query);
-	
-	if (!($retour))
-	  $ins_err = 1;
-      }
-    }
-  }
-  
-  return $ins_err;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Project Advance Update query execution
 // Parameters:
 //   - $project[] : hash info : keys used : projected
@@ -1439,7 +1400,7 @@ function manager_rights($uid, $project, $project_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// New Project Form Data checking and formatting                             //
+// New Project Form Data checking and formatting
 // Parameters:
 //   - $pid       : project id (empty on insertion)
 //   - $project[] : values checked
@@ -1493,7 +1454,7 @@ function check_project_form($pid, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project Task Form Data checking and formatting                            //
+// Project Task Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
 //   - $project[] : values checked

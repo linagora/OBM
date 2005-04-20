@@ -214,7 +214,6 @@ $l_header_add_contact = "Add contact";
 // Project headers
 $l_header_man_task = "Tasks";
 $l_header_man_member = "Members";
-$l_header_progress = "Progress";
 $l_header_advance = "Advance";
 $l_header_man_affect = "Allocation";
 $l_header_add_member = "Add member";

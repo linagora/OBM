@@ -27,8 +27,6 @@
 // - member_update   -- form fields    -- 
 // - allocate        -- $param_project -- 
 // - allocate_update -- $param_project -- 
-// - progress        -- $param_project -- show the project progress form
-// - progress_update -- form fields    -- update the project progress
 // - advance         -- $param_project -- show the project allocation/progress
 // - advance_update  -- form fields    -- update project allocation/progress
 // - dashboard       -- $param_project -- dashboard / stats of the project
@@ -295,40 +293,6 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] = dis_project_consult($project["id"]);
 
-} elseif ($action == "progress")  {
-///////////////////////////////////////////////////////////////////////////////
-  if ($project["id"] > 0) {
-    $project["name"] = run_query_projectname($project["id"]);
-    $tasks_q = run_query_tasks($project["id"]);
-    $members_q = run_query_members($project["id"]);
-    $allo_q = run_query_allocation($project["id"]);
-    if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
-      $display["msg"] = display_warn_msg($l_no_allocation);
-    } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
-      $display["msg"] = display_warn_msg($l_no_allocation);
-    } else if (($allo_q == 0) or ($allo_q->num_rows() == 0)) {
-      $display["msg"] = display_warn_msg($l_no_allocation);
-    } else {
-      $display["detail"] = html_project_progress($members_q, $allo_q, $tasks_q, $project);
-    }
-  }
-  
-} elseif ($action == "progress_update")  {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_progress_form($project)) {
-    $ins_err = run_query_progress($project);
-    // Create an entry in the ProjectStat log
-    $retour = run_query_statlog($project["id"]);
-    if (!($retour))
-      $ins_err = 1;
-    if (!($ins_err)) {
-      $display["msg"] .= display_ok_msg($l_progress_update_ok);
-    } else {
-      $display["msg"] .= display_err_msg($l_progress_update_error);
-    }
-    $display["detail"] = dis_project_consult($project["id"]);
-  }
-
 } elseif ($action == "dashboard")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["id"] > 0) {
@@ -530,7 +494,7 @@ function get_project_action() {
   global $project, $actions, $path, $l_project;
   global $l_header_find,$l_header_new,$l_header_update, $l_header_delete;
   global $l_header_display, $l_header_add_member, $l_add_member;
-  global $l_header_man_task, $l_header_man_member, $l_header_progress;
+  global $l_header_man_task, $l_header_man_member;
   global $l_header_advance, $l_header_man_affect, $l_header_consult;
   global $l_header_dashboard;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -692,21 +656,6 @@ function get_project_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                         );
-
-// Progress
-  $actions["project"]["progress"] = array (
-    'Name'     => $l_header_progress,
-    'Url'      => "$path/project/project_index.php?action=progress&amp;param_project=".$project["id"]."",
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate', 'allocate_update', 'advance', 'advance_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
-                                     	 );
-
-// Update progress
-  $actions["project"]["progress_update"] = array (
-    'Url'      => "$path/project/project_index.php?action=update",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                     	 );
 
 // Advance
   $actions["project"]["advance"] = array (
