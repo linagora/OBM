@@ -362,7 +362,11 @@ function display_last_visited($path="..") {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todo_toplist($path="..") {
-  global $todos, $l_module_todo;
+  global $cgp_show, $todos, $l_module_todo;
+
+  if (! $cgp_show["module"]["todo"]) {
+    return "";
+  }
 
   $nb = count($todos);
 

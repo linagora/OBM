@@ -144,7 +144,6 @@ $l_kind_link_contact_no = "Pas de contacts du genre";
 $l_kind_cant_delete = "Le contact ne peut être supprimé !";
 $l_kind_can_delete = "Le contact peut être supprimé.";
 
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";
 $l_fill_company = "Vous devez sélectionner une société avant de valider.";

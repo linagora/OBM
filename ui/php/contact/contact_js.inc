@@ -285,7 +285,7 @@ function fill_select_label(source)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Add an element line in the list form                                   //
+//  Add an element line in the list form
 ///////////////////////////////////////////////////////////////////////////////
 function add_element(fieldName,fieldValue,fieldLabel) {
   target = window.opener.document;
@@ -311,7 +311,7 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 } 
   
 ///////////////////////////////////////////////////////////////////////////////
-//  Add an element line in the list form                                   //
+// Remove an element line from the list form
 ///////////////////////////////////////////////////////////////////////////////
 function remove_element(elemId,parentId) {
   target = window.document;
@@ -365,7 +365,6 @@ if (isset($ext_target) && $ext_target!="") {
 	 elemid = '$ext_target'+int_form.elements[i].name;
 	 if(!get_elem(window.opener.document, elemid )) {
 	   elemid = 'data'+int_form.elements[i].name;
-	   alert(elemid);
 	   span = get_elem(window.document,elemid);
 	   add_element('$ext_target' + '[]',int_form.elements[i].name, span.innerHTML);
 	 }

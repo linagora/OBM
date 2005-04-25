@@ -867,6 +867,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   // If parameters have been given, they supercede the default action value
   if (isset($contract["deal_id"])) { $deal_id = $contract["deal_id"]; }
   if (isset($contract["deal_label"])) { $deal_label = stripslashes($contract["deal_label"]); }
+  if (isset($contract["deal_new_id"])) { $d_new_id = $contract["deal_new_id"]; }
   if (isset($contract["id"])) { $id = $contract["id"]; }
   if (isset($contract["label"])) { $label = stripslashes($contract["label"]); }
   if (isset($contract["company_id"])) { $comp_id = $contract["company_id"]; }
@@ -938,7 +939,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     <option value=\"0\">$l_none</option>";
   while($type_q->next_record()) {
     $dis_type.="\n<option value=\"".$type_q->f("contracttype_id")."\"";
-    if ($type_id==$type_q->f("contracttype_id"))
+    if ($type_id == $type_q->f("contracttype_id"))
        $dis_type.=" selected=\"selected\""; 
     $dis_type.=">".$type_q->f("contracttype_label")."</option>";
   }
@@ -1118,7 +1119,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_deal
         <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-        <input type=\"hidden\" name=\"deal_new_id\" value=\"$c_new_id\" />
+        <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
       </td>
       <td class=\"detailForm\">
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>

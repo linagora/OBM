@@ -579,13 +579,14 @@ function html_deal_links($deal_q) {
   // Contract
   if ($cgp_show["module"]["contract"]) {
     $contract_nb = run_query_linked_contract_nb($id, "deal");
+    $contract_nb_arch = run_query_linked_contract_nb($id, "deal", 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
     $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
     $block_contract = "
   <div class=\"linkTitle\">:: $l_module_contract</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
-        <a href=\"$url_contract\">$l_module_contract ($contract_nb)</a></li>
+        $l_module_contract (<a href=\"$url_contract\">$contract_nb</a> / <a href=\"$url_contract_arch\">$contract_nb_arch</a>)</li>
     <li><a href=\"$url_contract_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_new</a></li>
   </ul>";
@@ -602,8 +603,8 @@ function html_deal_links($deal_q) {
   <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
-        <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
+        $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
+        <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>
     <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>";

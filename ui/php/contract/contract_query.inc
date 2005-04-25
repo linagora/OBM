@@ -216,12 +216,20 @@ function run_query_detail($id) {
 // Insertion query construction                                              //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($contract) {
-  global $display, $cdg_sql, $auth;
+  global $display, $cdg_sql, $auth, $cgp_show;
 
   $vis = ($contract["privacy"]==1)?1:0;
   $uid = $auth->auth["uid"];
   $label = $contract["label"];
   $comp_id = $contract["company_id"];
+  $deal_id = $contract["deal_new_id"];
+  if ($deal_id < 1) {
+    $deal_id = $contract["deal_id"];
+  }
+  // In case deal module not used, to avoid postgres error
+  if ($deal_id == "") {
+    $deal_id = "0";
+  }
   $num = $contract["number"];
   $clause = $contract["clause"];
   $datesignature = ($contract["datesignature"] ? "'".$contract["datesignature"]."'" : "null");
@@ -242,7 +250,6 @@ function run_query_insert($contract) {
   $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
   $tech = ($contract["tech"] ? $contract["tech"] : "0");
   $market = ($contract["market"] ? $contract["market"] : "0");
-  $deal_id = ($contract["deal_new_id"] ? $contract["deal_new_id"] : "0");
   $archive = ($contract["archive"] ? $contract["archive"] : "0");
 
   $query = "insert into Contract
@@ -354,7 +361,14 @@ function run_query_update($contract) {
   $market = ($contract["market"] ? $contract["market"] : "0");
   $comment = $contract["comment"];
   $clause = $contract["clause"];
-  $deal_id = ($contract["deal_new_id"] ? $contract["deal_new_id"] : $contract["deal_id"]);
+  $deal_id = $contract["deal_new_id"];
+  if ($deal_id < 1) {
+    $deal_id = $contract["deal_id"];
+  }
+  // In case deal module not used, to avoid postgres error
+  if ($deal_id == "") {
+    $deal_id = "0";
+  }
   $archive = ($contract["archive"] ? $contract["archive"] : "0");
   
   $query = "update Contract set

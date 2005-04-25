@@ -51,7 +51,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   $and = "";
   if ($name != "") {
-    $where_name = " company_name $like '$name%'";
+    $where_name = " (company_name $like '$name%' or company_aka like '$name%')";
     $and = "and";
   }
   if (($kind != $c_all) && ($kind != "")) { 

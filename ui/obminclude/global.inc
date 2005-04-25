@@ -217,6 +217,7 @@ $cgp_show["module"]["admin_pref"] = "admin";
 $cgp_show["module"]["admin_data"] = "admin";
 $cgp_show["module"]["admin_lang"] = "admin";
 $cgp_show["module"]["admin_code"] = "admin";
+$cgp_show["module"]["admin_ref"] = "admin";
 $cgp_show["module"]["import"] = "admin";
 
 
