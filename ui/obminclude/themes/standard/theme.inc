@@ -47,6 +47,7 @@ $ico_agenda         = "ico_agenda.gif";          // Agenda Icon
 $ico_todo           = "ico_todo.png";            // Todo Icon
 $ico_publication    = "ico_publication.gif";     // Publication Icon
 $ico_publication_new= "ico_publication_new.gif";     // Publication Icon
+$ico_clipboard      = "clipoard.jpg";
 
 $ico_time           = "ico_time.gif";
 $ico_project        = "ico_project.png";

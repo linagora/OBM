@@ -692,7 +692,7 @@ function html_company_consult($co_q, $cat_q) {
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
   global $l_insert,$l_update, $l_company, $l_coord,$l_category;
-  global $display, $l_yes, $l_no, $cgp_hide;
+  global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");

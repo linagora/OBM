@@ -81,6 +81,7 @@ $ico_export_all     = "ico_export_all.gif";
 $ico_begin          = "ico_begin.gif";
 $ico_end            = "ico_end.gif";
 $ico_previous       = "ico_previous.gif";
+$ico_clipboard      = "clipoard.jpg";
 $ico_next           = "ico_next.gif";
 
 $ico_created        = "ico_created.gif";

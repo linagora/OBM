@@ -675,7 +675,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
   global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
   global $l_email_other, $l_service,$ico_clipboard;
-  global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
+  global $l_update,$l_delete,$l_insert, $l_coord, $l_contact,$ico_clipboard;
   global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
   global $display, $path, $action, $auth, $cgp_show, $cgp_hide;
 
