@@ -746,6 +746,27 @@ function html_company_consult($co_q, $cat_q) {
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
+  if ($ad1 != "") {
+    $copy .= "$ad1\\n";
+  }
+  if ($ad2 != "") {
+    $copy .= "$ad2\\n";
+  }
+  if ($ad3 != "") {
+    $copy .= "$ad3\\n";
+  }
+  if ($zip != "" ) {
+    $copy .=  "$zip ";
+  } else {
+    $copy .= " ";
+  }
+  if ($town != "" ) {
+    $copy .= $town;
+  }
+  if ($ctry_name != "" ) {
+    $copy .= " $ctry_name";
+  }
+  $copy = "'".addslashes($copy)."'"; 
   // Number field
   if ($show_number) {
     $block_num = "

@@ -112,6 +112,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
+  require("company_js.inc");
   $display["detail"] = dis_company_consult($company["id"]);
 
 } elseif ($action == "detailupdate")  {
@@ -132,6 +133,7 @@ if ($action == "ext_get_id") {
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
+      require("company_js.inc");
       $display["detail"] = dis_company_consult($cid);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
@@ -146,6 +148,7 @@ if ($action == "ext_get_id") {
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
+        require("company_js.inc");
         $display["detail"] = dis_company_consult($cid);
       }
     }
@@ -165,6 +168,7 @@ if ($action == "ext_get_id") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
+    require("company_js.inc");
     $display["detail"] = dis_company_consult($company["id"]);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
@@ -365,6 +369,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
+  require("company_js.inc");
   $display["detail"] = dis_company_consult($company["id"]);
 }
 

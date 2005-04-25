@@ -111,6 +111,7 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($contact["id"] > 0) {
+    require("contact_js.inc");
     $display["detail"] = dis_contact_consult($contact);
   }
   
@@ -140,6 +141,7 @@ if ($action == "ext_get_ids") {
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
+      require("contact_js.inc");
       $display["detail"] = dis_contact_consult($contact);
 
     // If it is the first try, we warn the user if some contacts seem similar
@@ -153,6 +155,7 @@ if ($action == "ext_get_ids") {
         if ($id > 0) {
           $contact["id"] = $id;
           $display["msg"] .= display_ok_msg($l_insert_ok);
+          require("contact_js.inc");
           $display["detail"] = dis_contact_consult($contact);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
@@ -178,6 +181,7 @@ if ($action == "ext_get_ids") {
       $display["msg"] .= display_err_msg($l_update_error);
     }
     if ($contact["id"] > 0) {
+      require("contact_js.inc");
       $display["detail"] = dis_contact_consult($contact);
     }    
   } else {
@@ -380,6 +384,7 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
   if ($contact["id"] > 0) {
+      require("contact_js.inc");
       $display["detail"] = dis_contact_consult($contact);
   }    
 }

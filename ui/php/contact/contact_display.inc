@@ -674,7 +674,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   global $l_phone, $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
   global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
-  global $l_email_other, $l_service;
+  global $l_email_other, $l_service,$ico_clipboard;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
   global $display, $path, $action, $auth, $cgp_show, $cgp_hide;
@@ -752,6 +752,28 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
+
+  
+  if ($ad1 != "") {
+    $copy .= "$ad1\\n";
+  }
+  if ($ad2 != "") {
+    $copy .= "$ad2\\n";
+  }
+  if ($ad3 != "") {
+    $copy .= "$ad3\\n";
+  }
+  if ($zip != "" ) {
+    $copy .=  "$zip ";
+  } else {
+    $copy .= " ";
+  }
+  if ($town != "" ) {
+    $copy .= $town;
+  }
+  if ($ctry_name != "" ) {
+    $copy .= " $ctry_name";
+  }
 
   // Function field
   if ($show_func) {
@@ -938,7 +960,10 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">$mphone</td>
     $block_service
     </tr><tr>
-      <td class=\"detailLabel\">$l_address 1</td>
+      <td class=\"detailLabel\">
+      $l_address 1
+      <a href=\"javascript: return false;\" onclick=\"copy_clip('".addslashes($copy)."');return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
+      </td>
       <td class=\"detailText\">$ad1</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>

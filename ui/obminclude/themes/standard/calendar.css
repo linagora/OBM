@@ -234,6 +234,18 @@ td.agendaNoEvent	{
         border-bottom: 		1px dashed #a1a4a8;
 }
 
+td.agendaNoEventHover	{
+	font-family:		sans-serif;
+	font-size:		14px;
+	font-weight:		bold;
+	color:			#000000;
+	text-align:		center;
+	background-color:       #fdffbf; 
+        border: 		1px solid #a1a4a8;	
+	border-top: 		1px dashed #a1a4a8;
+        border-bottom: 		1px dashed #a1a4a8;	
+}
+
 td.agendaHour		{
 	font-family:		sans-serif;
 	font-size:		14px;

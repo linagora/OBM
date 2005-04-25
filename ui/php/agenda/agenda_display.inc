@@ -1162,7 +1162,7 @@ function html_userwritable_bar($writable_user,$user_id) {
         <td class=\"agendaHead2\">$l_user_right</td>
        </tr>
        <tr>
-        <td class=\"agendaVide\" align=\"left\">
+        <td class=\"agendaNoEvent\" align=\"left\">
  	 <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
 	  $dis_sel_user
 	 </form>
@@ -2465,7 +2465,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $cagenda_first_hour, $cagenda_last_hour;
-  global $l_private,$l_all_day, $ico_agenda;
+  global $l_private,$l_all_day, $ico_agenda,$path;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -2499,7 +2499,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
      <td class=\"agendaCell\" colspan=\"$nb_user\" style=\"width:72px\">
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$this_date")."\">$this_date_l</a>
       <br />
-      <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" > 
+      <a href=\"agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end\" > 
        <img align=\"middle\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
       </a>	
      </td>";
@@ -2543,6 +2543,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
       $delta2 = $k * $time_unit;
       for($i = 0; $i <7; $i ++) {
 	$current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
+        // $goto = "$path/agenda/agenda_index.php?action=new&amp;param_date_begin=".date("YmdHis",$current_time)."&amp;param_date_end=".date("YmdHis",$current_time + $time_unit_sec);
 	if(isset($events[date("Ymd",$current_time)])) {
 	  $day = $events[date("Ymd",$current_time)];
 	  $user_indice = 0;
@@ -2556,25 +2557,22 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	      if(is_array($events_data)) {
 		$duration = $events_data["duration"];
 		$list_events = $events_data["events"];
-		$week_cal .=  "<td class=\"".$properties["class"]."\" style=\"width:$td_width;text-align:left;\" rowspan='".ceil($duration/($time_unit_sec))."'>";
+		$week_cal .=  "<td class=\"".$properties["class"]."\" style=\"width:$td_width;text-align:left;\" rowspan=\"".ceil($duration/($time_unit_sec))."\">";
 		foreach($list_events as $event) {
 		  week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties);	
 		}
 		$week_cal .=  "</td>";
 	      }
 	    } else {
-	      if ($user_indice == 1) {
-		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\" style=\"border-width:1px 0 1px 1px !important;\">&nbsp;</td>";
-	      }	      
-	      elseif ($user_indice == $nb_user) {
-		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\" style=\"border-width:1px 1px 1px 0 !important;\">&nbsp;</td>";
-	      }	else {
-		$week_cal .= "<td width=\"$td_width\" class=\"agendaVide\" style=\"border-width:1px 0 !important;\">&nbsp;</td>";
-	      }	      
+		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\" onclick=\"window.location='$goto'\"
+             onmouseover=\"this.className='agendaNoEventHover';this.style.cursor = 'pointer'\"
+             onmouseout=\"this.className ='agendaNoEvent'\">&nbsp;</td>";
 	    }
 	  }
 	} else {
-          $week_cal .=  "<td class=\"agendaVide\" colspan=\"$nb_user\">&nbsp;</td>";
+          $week_cal .=  "<td class=\"agendaNoEvent\"  onclick=\"window.location='$goto'\"
+             onmouseover=\"this.className='agendaNoEventHover';this.style.cursor = 'pointer'\"
+             onmouseout=\"this.className ='agendaNoEvent'\" colspan=\"$nb_user\">&nbsp;</td>";
         }
       }
       $week_cal .=  "</tr>";
@@ -2741,11 +2739,11 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
 	      $hour_day_list .=  "</td>";
 	    }
 	  } else {
-	    $hour_day_list .= "<td style=\"width:$td_width;\" class=\"agendaVide\">&nbsp;</td>";
+	    $hour_day_list .= "<td style=\"width:$td_width;\" class=\"agendaNoEvent\">&nbsp;</td>";
 	  }
         }
       } else {
-	$hour_day_list .= "<td class=\"agendaVide\">&nbsp;</td>";
+	$hour_day_list .= "<td class=\"agendaNoEvent\">&nbsp;</td>";
       }      
       $hour_day_list .= "</tr>";
     }

@@ -251,6 +251,12 @@ $l_document_new = "Nouveau document";
 $l_document_add = "Lier des documents";
 
 ////////////////////////////////////////////////////////
+// Javascript error ////////////////////////////////////
+////////////////////////////////////////////////////////
+$l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \\nles droits sont insuffisants pour exécuter l\'action. \\n Si vous utilisez mozilla/firefox veuillez soit : \\n- Ajouter dans le fichier prefs.js de votre répertoire mozilla la ligne :user_pref(\"signed.applets.codebase_principal_support\", true);\\n - Tapez dans la barre d\'adresse de votre navigateur about:config puis passer la clé signed.applets.codebase_principal_support a true.";
+
+
+////////////////////////////////////////////////////////
 ////// Theme 'Yours' lang files ////////////////////////
 ////////////////////////////////////////////////////////
 
