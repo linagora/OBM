@@ -59,6 +59,7 @@ $l_after = "Après";
 $l_before = "Avant";
 $l_fuzzy = "Avancée";
 $l_cat = "Catégorie";
+$l_visibility = "Accés";
 $l_private = "Privé";
 $l_public = "Public";
 $l_local = "Local";

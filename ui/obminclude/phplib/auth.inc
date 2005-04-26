@@ -15,7 +15,7 @@ class Auth {
   var $classname = "Auth";
   var $persistent_slots = array("auth");
   
-  var $lifetime = 1;             ## Max allowed idle time before
+  var $lifetime = 0;             ## Max allowed idle time before
                                   ## reauthentication is necessary.
                                   ## If set to 0, auth never expires.
   

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// User query search query execution                                         //
+// User query search query execution
 // Parameters:
 //   - $user[] : user search criteria
 //     keys used  : name, perms
@@ -22,6 +22,8 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $perms = $user["perms"];
   $lname = sql_search_text_parse($user["lastname"]);
   $email = sql_search_text_parse($user["email"]);
+  $desc = sql_search_text_parse($user["description"]);
+  $group = sql_search_text_parse($user["group"]);
   $archive = $user["archive"];
 
   $obm_q = new DB_OBM;
@@ -30,12 +32,6 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
-
-  $select = "select UserObm.*,
-      userobm_id as id,
-      $datebegin,
-      $lastaccess
-    from UserObm";
 
   $where = "";
 
@@ -62,6 +58,20 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
      $where .= " userobm_email like '%$email%'";
   }
 
+  // If a description indication has been specified, get it
+  if (trim($desc) != "") {
+     if (trim($where) != "") $where .= " and";
+     $where .= " userobm_description like '%$desc%'";
+  }
+
+  // If a group indication has been specified, get it
+  if (trim($group) != "") {
+     if (trim($where) != "") $where .= " and";
+     $where .= " group_name like '%$group%'";
+     $join_grp = "LEFT JOIN UserObmGroup ON userobm_id=userobmgroup_userobm_id
+                  LEFT JOIN UGroup ON userobmgroup_group_id=group_id";
+  }
+
   if ($archive != "1") {
     if (trim($where) != "") $where .= " and";
     $where .= " userobm_archive = '0'";
@@ -70,6 +80,14 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   if (trim($where) != "") {
     $whereq = " where $where";
   }
+
+  $select = "SELECT distinct UserObm.*,
+      userobm_id as id,
+      $datebegin,
+      $lastaccess
+    FROM UserObm $join_grp
+    ";
+
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
@@ -81,7 +99,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from UserObm $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $whereq");
     $obm_q->set_num_rows_total($count);
   }
 

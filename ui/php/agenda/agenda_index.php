@@ -43,7 +43,11 @@ require("agenda_display.inc");
 //Session parameters
 if (isset($param_group)) {
   $agenda_group_view = $param_group;
-  $sel_user_id = get_default_group_user_ids($param_group);
+  if ($param_group != "$c_all") {
+    $sel_user_id = get_default_group_user_ids($param_group);
+  } else {
+    $sel_user_id = array($uid);
+  }
 }
 $sess->register("agenda_group_view");
 if (count($sel_user_id) != 0 ) {

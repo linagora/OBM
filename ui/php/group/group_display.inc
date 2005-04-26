@@ -32,7 +32,7 @@ $fieldnames["group_user_email"] = $l_email;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group specific dataset fields                                     //
+// Display Group specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -436,7 +436,7 @@ function dis_group_consult($group, $uid) {
 function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   global $auth;
   global $l_yes, $l_no, $ico_mail;
-  global $l_group, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_group_group;
+  global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
   global $l_visibility, $l_private, $l_public;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;

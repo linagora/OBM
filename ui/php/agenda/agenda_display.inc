@@ -18,7 +18,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
   global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
-  global $c_all, $l_all, $l_groups;
+  global $c_all, $l_select_group, $l_everybody, $l_group_members;
   global $action,$auth;
  
   $getdate = $agenda["date"];
@@ -114,7 +114,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $check_sel_user = "onsubmit=\"if (check_count_user(this)) return true; else return false;\"";
   }
   if (count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
-    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
+    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;param_group=$c_all&amp;sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
   }
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\" style=\"font-size:10px\">";
   
@@ -124,7 +124,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $u_fname = $usr_q->f("userobm_firstname");
     $dis_sel_user .= "\n<option value=\"$u_id\"";
        
-    if (count($p_user_array)>0) {
+    if (count($p_user_array) > 0) {
       $tag_user = "";
       while ( (list($key, $user_id) = each($p_user_array) )
               && ($tag_user == "") ) {
@@ -144,12 +144,13 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     <input type=\"submit\" value=\"$l_validate\" />";
 
   // Group selection
-  $sel_group = "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_all")."\" ";
-  if ($c_all == $this_group) {
-    $sel_group .= "selected=\"selected\"";
+  if ($this_group == $c_all) {
+    $sel_group = "<option selected=\"selected\">$l_select_group</option>";
+  } else {
+    $dis_back_all_users = "<br /><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;param_group=$c_all&amp;sel_user_id[]=".$auth->auth["uid"]."\" >$l_everybody</a>";
   }
-  $sel_group .= ">$l_all</option>
-  <optgroup label=\"$l_private\">";
+
+  $sel_group .= "<optgroup label=\"$l_private\">";
   $first_public = true;
   while ($group_q->next_record()) {
     $g_id = $group_q->f("group_id");
@@ -170,6 +171,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
   }
   $sel_group .= "</optgroup>
   </select>";
+
   // Minicalendar Head
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);
@@ -247,7 +249,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
        <tr align=\"center\">
         <td>
-        $l_groups
+        $l_group_members
          <form action=\"\" onsubmit=\"return false;\">
           <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
             $sel_group
@@ -255,6 +257,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
           <!--
             <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);\" />
           -->
+	  $dis_back_all_users
          </form>
 	 <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
 	  $dis_sel_user
@@ -262,7 +265,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
 	  $dis_back_monoview
 	 </form>
         </td>
-       </tr>              
+       </tr>
       </table>
      </div>
 

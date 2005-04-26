@@ -221,7 +221,7 @@ display_page($display);
 // returns : $obm_user hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
-  global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
+  global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email, $tf_group;
   global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive;
   global $tf_desc, $tf_phone, $tf_phone2, $tf_fax, $tf_fax2;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
@@ -234,6 +234,7 @@ function get_param_user() {
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
   if (isset ($sel_perms)) $obm_user["perms"] = $sel_perms;
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
+  if (isset ($tf_group)) $obm_user["group"] = $tf_group;
   if (isset ($tf_datebegin)) $obm_user["datebegin"] = $tf_datebegin;
   if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_firstname)) $obm_user["firstname"] = $tf_firstname;

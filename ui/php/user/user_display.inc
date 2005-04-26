@@ -100,7 +100,7 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
-  global $l_email, $perms_user, $perms_admin, $perms_editor;
+  global $l_email, $l_desc, $l_group, $perms_user, $perms_admin, $perms_editor;
   global $l_add_users;
   global $display, $c_all, $l_perms_user, $l_perms_admin, $l_perms_editor;
 
@@ -108,6 +108,8 @@ function html_user_search_form($user) {
   $perms = $user["perms"];
   $lname = stripslashes($user["lastname"]);
   $email = $user["email"];
+  $desc = $user["description"];
+  $group = $user["group"];
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
 
@@ -138,11 +140,11 @@ function html_user_search_form($user) {
 
   <div class=\"search\">
     <div class=\"searchLabel\">$l_login<br />
-      <input type=\"text\" name=\"tf_login\" size=\"20\" maxlength=\"32\"
+      <input type=\"text\" name=\"tf_login\" size=\"16\" maxlength=\"32\"
       value=\"$login\" />
     </div>
     <div class=\"searchLabel\">$l_lastname<br />
-      <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"32\"
+      <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
     </div>
     <div class=\"searchLabel\">$l_user_perms<br />
@@ -154,8 +156,16 @@ function html_user_search_form($user) {
       </select>
     </div>
     <div class=\"searchLabel\">$l_email<br />
-      <input type=\"text\" name=\"tf_email\" size=\"20\" maxlength=\"32\"
+      <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
+    </div>
+    <div class=\"searchLabel\">$l_desc<br />
+      <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
+      value=\"$desc\" />
+    </div>
+    <div class=\"searchLabel\">$l_group<br />
+      <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
+      value=\"$group\" />
     </div>
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive>
@@ -216,6 +226,8 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   $lname = urlencode($user["lastname"]);
   $perms = $user["perms"];
   $email = $user["email"];
+  $desc = urlencode($user["description"]);
+  $group = urlencode($user["group"]);
   $archive = $user["archive"];
 
   if ($popup) {
@@ -228,7 +240,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;tf_desc=$desc&amp;tf_group=$group&amp;cb_archive=$archive$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
   if ($popup) {
