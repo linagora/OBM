@@ -1669,7 +1669,8 @@ function get_email_used($id="", $gid="", $lid="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Send a Mail to an user
+// Send a Mail to an user set
+// If recipient list is empty, no mail is sent
 // Parameters:
 //  - $subject    : mail subject
 //  - $message    : mail content
@@ -1682,6 +1683,10 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
 
   $message = stripslashes($message);
   if (! $cgp_mail_enabled) {
+    return 0;
+  }
+
+  if (count ($recipients) < 1) {
     return 0;
   }
 
