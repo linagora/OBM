@@ -414,7 +414,7 @@ function dis_incident_form($action,$incident) {
   $id = $incident ["id"];
   if ($action == "new") {
     $inc_q = "";
-    $users="";
+    $users = "";
   }
   if ($action == "detailupdate") {
     if ($id > 0) {
@@ -508,11 +508,12 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
   $dis_sel_owner="<select name=\"sel_owner\">";
   while ($usrp_q->next_record()) {
     $dis_sel_owner.="\n<option value=\"".$usrp_q->f("userobm_id")."\"";
-    if ($usrp_q->f("userobm_id") == $owner) 
+    if ($usrp_q->f("userobm_id") == $owner) {
       $dis_sel_owner.=" selected=\"selected\"";
+    }
     $dis_sel_owner.=">". $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_owner.="</select>";
+  $dis_sel_owner .= "</select>";
 
   // Logger select
   if (! isset($logger)) { $logger = $uid; }
@@ -612,14 +613,14 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
   }
 
   // update 
-  if (($action=="detailupdate") || ($action=="update")) {
+  if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
   // insert
-  } elseif (($action=="new") || ($action=="insert")) {
+  } elseif (($action == "new") || ($action == "insert")) {
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }

@@ -77,7 +77,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_order";
   $orderq .= " order by $order $p_order_dir, incidentpriority_order";
 
-  $req = "select
+  $req = "SELECT
       Incident.incident_id as id,
       incident_id,
       incident_timeupdate,
@@ -98,7 +98,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
-    from Incident
+    FROM Incident
          left join Contract on incident_contract_id=contract_id
          left join Company on contract_company_id=company_id
          left join UserObm as u1 on incident_logger=u1.userobm_id
@@ -111,7 +111,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 ";
 
   if ($ctu_sql_limit) {
-    $cq = "select count(*) from Incident $join_contr $join_comp $whereq";
+    $cq = "SELECT count(*) FROM Incident $join_contr $join_comp $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }
@@ -198,6 +198,11 @@ function run_query_insert($incident) {
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
 
+  $contract_id = $incident["cont_new_id"];
+  if ($contract_id < 1) {
+    $contract_id = $incident["contract_id"];
+  }
+
   $lincident = $incident["lincident"];
   $owner = ($incident["owner"] ? "'".$incident["owner"]."'" : "null");
   $logger = ($incident["logger"] ? "'".$incident["logger"]."'" : "null");
@@ -210,7 +215,6 @@ function run_query_insert($incident) {
   $hour = $incident["hour"];
   $add_duration = $incident["add_duration"];
   $archive = ($incident["archive"] ? $incident["archive"] : "0");
-  $contract_id = $incident["contract_id"];
   $call_date = "$date $hour:0:0";
   $add_comment = $incident["add_comment"];
   if ($add_comment != "") {
@@ -283,7 +287,10 @@ $comment";
 function run_query_incident_id($incident) {
   global $cdg_sql;
 
-  $contract_id = $incident["contract_id"];
+  $contract_id = $incident["cont_new_id"];
+  if ($contract_id < 1) {
+    $contract_id = $incident["contract_id"];
+  }
   $lincident = $incident["lincident"];
   $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : " is null");
   $logger = ($incident["logger"] ? "='".$incident["logger"]."'" : " is null");
@@ -331,8 +338,11 @@ function run_query_incident_id($incident) {
 function run_query_update($incident) {
   global $auth, $cdg_sql;
 
+  $contract_id = $incident["cont_new_id"];
+  if ($contract_id < 1) {
+    $contract_id = $incident["contract_id"];
+  }
   $param_incident = $incident["id"];
-  $param_contract = $incident["contract_id"];
   $lincident = $incident["lincident"];
   $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : "is null");
   $logger = ($incident["logger"] ? "='".$incident["logger"]."'" : "is null");
@@ -368,7 +378,7 @@ function run_query_update($incident) {
     incident_duration = '$duration',
     incident_comment='$comment',
     incident_archive='$archive',
-    incident_contract_id = '$param_contract'
+    incident_contract_id = '$contract_id'
    where incident_id='$param_incident'";
 
   $inc_q = new DB_OBM;

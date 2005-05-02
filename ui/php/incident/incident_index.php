@@ -95,7 +95,7 @@ if ($action == "index" || $action == "") {
       $display["msg"] = display_ok_msg($l_insert_ok);
       $display["detail"] = dis_incident_consult($incident);
     } else {
-      $display["msg"] = display_ok_msg($l_insert_error);
+      $display["msg"] = display_err_msg($l_insert_error);
       require("incident_js.inc");
       $display["detail"] = dis_incident_form($action,$incident);
     }
@@ -281,7 +281,7 @@ display_page($display);
 function get_param_incident() {
   global $tf_lcontract, $tf_lincident, $tf_company, $sel_status, $sel_cat1, $sel_priority;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
-  global $tf_date, $ta_solu, $param_contract, $param_incident, $param_contract;
+  global $tf_date, $ta_solu, $param_contract, $param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
   global $tf_duration, $tf_pri, $tf_order, $tf_status,$tf_cat1, $tf_color;
   global $set_debug, $cdg_param,$res_duration;
