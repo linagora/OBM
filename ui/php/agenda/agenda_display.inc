@@ -2502,14 +2502,14 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
     $delta = $j - $cagenda_first_hour;
     for ($k=0; $k<$set_cal_interval; $k++) {
       if ($k==0) {
-        $week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"agendaHour\" >".($j).":00</td>";
+        $week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"agendaHour\"  style=\"height:".($set_cal_interval*18)."px;\" >".($j).":00</td>";
       } else {
         $week_cal .= "\n<tr>";
       }
       $delta2 = $k * $time_unit;
       for($i = 0; $i <7; $i ++) {
         $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
-        // $goto = "$path/agenda/agenda_index.php?action=new&amp;tf_date_begin=".isodate_format($current_time,"",1)."&amp;tf_date_end=".date("YmdHis",$current_time + $time_unit_sec);
+        $goto = "$path/agenda/agenda_index.php?action=new&amp;tf_date_begin=".isodate_format($current_time,"",1)."&amp;tf_date_end=".isodate_format($current_time + $time_unit_sec,"",1);
         $iso_date = isodate_format($current_time);
         if (isset($events[$iso_date])) {
           $day = $events[$iso_date];
@@ -2639,7 +2639,7 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
   $ts_date = strtotime($iso_date);
 
   $tomorrows_date = isodate_format(strtotime("+1 day", $ts_date));
-  $yesterdays_date = isodate_format(strtotime("-1 day", $ts_date_time));
+  $yesterdays_date = isodate_format(strtotime("-1 day", $ts_date));
 
   $time_unit = 60 / $set_cal_interval; 
   $time_unit_sec = 3600 / $set_cal_interval;; 
@@ -2679,7 +2679,7 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
   for ($i = $cagenda_first_hour; $i < $cagenda_last_hour; $i++) {
     for ($k=0; $k<$set_cal_interval; $k++) {
       if ($k==0) {
-	$hour_day_list .= "\n<tr><td class=\"agendaHour\" rowspan=\"$set_cal_interval\" >$i:00</td>"; 
+	$hour_day_list .= "\n<tr><td class=\"agendaHour\"  style=\"height:".($set_cal_interval*18)."px;\"  rowspan=\"$set_cal_interval\" >$i:00</td>"; 
       } else {
 	$hour_day_list .= "\n<tr>"; 
       }
