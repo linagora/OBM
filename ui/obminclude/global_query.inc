@@ -1669,7 +1669,7 @@ function get_email_used($id="", $gid="", $lid="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Send a Mail to an user                                                    //
+// Send a Mail to an user
 // Parameters:
 //  - $subject    : mail subject
 //  - $message    : mail content
@@ -1717,7 +1717,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get recipients mail addresses                                             //
+// Get recipients mail addresses
 // Parameters:
 //  - $recipients : Id Recipients array
 //  - $force      : Mail should be forced (all user even with no set_mail)
@@ -1731,13 +1731,22 @@ function run_query_get_recipients($recipients, $force) {
       AND userobmpref_value = 'yes'";
     $join = ", UserObmPref";
   }  
-  $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (";
+
   $coma = "";
   foreach($recipients as $recipient) {
-    $query.= $coma.$recipient;
+    $user_list .= $coma.$recipient;
     $coma = ",";
   }
-  $query.=") AND userobm_email != '' $mail_filter";
+  if ($user_list != "") {
+    $user_in = "userobm_id IN ($user_list) AND";
+  }
+
+  $query = "SELECT userobm_email
+    FROM UserObm $join
+    WHERE $user_in
+      userobm_email != ''
+      $mail_filter";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

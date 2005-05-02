@@ -330,8 +330,9 @@ display_page($display);
 function get_param_contract() {
   global $tf_label,$tf_company,$sel_type, $tf_type,$rd_kind,$cb_autorenew;
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
-  global $param_contract,$tf_num,$sel_market, $sel_tech;
-  global $ta_clause,$ta_com,$sel_con1, $sel_con2;
+  global $param_contract,$tf_num,$sel_market, $sel_tech, $sel_con1, $sel_con2;
+  global $ta_clause;
+  global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_datebegin,$tf_dateexp,$tf_daterenew,$tf_datecancel,$tf_datesignature;
   global $hd_usercreate,$cb_archive,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town,$l_header_export;
@@ -369,8 +370,11 @@ function get_param_contract() {
   if (isset ($sel_con2)) $contract["contact2"] = $sel_con2;
   if (isset ($sel_type)) $contract["type"] = $sel_type;
   if (isset ($cb_arc)) $contract["arc"] = $cb_arc;
-  if (isset ($ta_clause)) $contract["clause"] = $ta_clause;  
-  if (isset ($ta_com)) $contract["comment"] = $ta_com;  
+  if (isset ($ta_clause)) $contract["clause"] = $ta_clause;
+  if (isset ($ta_com)) $contract["comment"] = $ta_com;
+  if (isset ($tf_datecomment)) $contract["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $contract["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $contract["add_comment"] = trim($ta_add_comment);
   if (isset ($hd_usercreate)) $contract["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $contract["timeupdate"] = $hd_timeupdate;
   if (isset ($cb_autorenew)) $contract["autorenewal"] = $cb_autorenew;

@@ -82,7 +82,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
     $where .= " and contract_archive != '1'";
   }
 
-  $whereq = "where $where";
+  $whereq = "WHERE $where";
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
   // Order exceptions
@@ -92,9 +92,9 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   if (strcmp($p_new_order,"contract_techmanager")==0) {
     $order = "ltech";
   }
-  $orderq .= " order by $order $p_order_dir";
+  $orderq .= " ORDER BY $order $p_order_dir";
 
-  $query = "select contract_label,
+  $query = "SELECT contract_label,
       contract_id,
       contract_id as id,
       contract_deal_id,
@@ -120,7 +120,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       contract_archive,
       $datebegin,
       $dateexp
-    from Contract
+    FROM Contract
          left join Company on contract_company_id=company_id
          left join UserObm u1 on contract_techmanager_id=u1.userobm_id
          left join UserObm u2 on contract_marketmanager_id=u2.userobm_id
@@ -133,7 +133,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 ";
 
   if ($ctu_sql_limit) {
-    $cq = "select count(*) from Contract $join_comp $whereq";
+    $cq = "SELECT count(*) FROM Contract $join_comp $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }
@@ -147,10 +147,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contract deatil query execution                                           //
+// Contract detail query execution                                           //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql;  
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -162,7 +162,7 @@ function run_query_detail($id) {
   $timeupdate = sql_date_format($db_type, "contract_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "contract_timecreate", "timecreate");
 
-  $query = "select Contract.*,
+  $query = "SELECT Contract.*,
       deal_id,
       deal_label,
       contracttype_label,
@@ -190,7 +190,7 @@ function run_query_detail($id) {
       $timecreate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-    from Contract
+    FROM Contract
          left join UserObm u1 on contract_marketmanager_id=u1.userobm_id
          left join UserObm u2 on contract_techmanager_id=u2.userobm_id
          left join Contact c1 on contract_contact1_id=c1.contact_id
@@ -202,7 +202,7 @@ function run_query_detail($id) {
          left join Deal on contract_deal_id=deal_id
          left join UserObm as c on contract_usercreate=c.userobm_id
          left join UserObm as u on contract_userupdate=u.userobm_id
-    where contract_id = '$id'";
+    WHERE contract_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -245,14 +245,19 @@ function run_query_insert($contract) {
   $duration = $contract["duration"];
   $autorenewal =$contract["autorenewal"];
   $sel_type = $contract["type"];
-  $com = $contract["comment"];
   $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
   $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
   $tech = ($contract["tech"] ? $contract["tech"] : "0");
   $market = ($contract["market"] ? $contract["market"] : "0");
+  $add_comment = $contract["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $contract["datecomment"];
+    $usercomment = $contract["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
   $archive = ($contract["archive"] ? $contract["archive"] : "0");
 
-  $query = "insert into Contract
+  $query = "INSERT INTO Contract
      (contract_timeupdate,
       contract_timecreate,
       contract_userupdate,
@@ -282,7 +287,7 @@ function run_query_insert($contract) {
       contract_clause,
       contract_archive,
       contract_comment)
-    values (
+    VALUES (
       null,
       '". date("Y-m-d H:i:s") ."', 
       '$uid',
@@ -311,7 +316,7 @@ function run_query_insert($contract) {
       '$market',
       '$clause',
       '$archive',    
-      '$com')";
+      '$comment')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -360,6 +365,12 @@ function run_query_update($contract) {
   $tech = ($contract["tech"] ? $contract["tech"] : "0");
   $market = ($contract["market"] ? $contract["market"] : "0");
   $comment = $contract["comment"];
+  $add_comment = $contract["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $contract["datecomment"];
+    $usercomment = $contract["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   $clause = $contract["clause"];
   $deal_id = $contract["deal_new_id"];
   if ($deal_id < 1) {

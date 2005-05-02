@@ -215,7 +215,7 @@ function get_todo_action() {
 // Add a todo
   $actions["todo"]["add"] = array (
     'Url'      => "$path/todo/todo_index.php?action=add",
-    'Right'    => $cright_read,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     	 );
 

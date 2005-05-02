@@ -5,7 +5,7 @@
 // 1999-03-19 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 $module = "";
 $path = ".";
 $extra_css = "portal.css";
@@ -16,7 +16,6 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 include_once("obm_query.inc"); 
-
 
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 
@@ -31,7 +30,6 @@ if ($action == "logout") {
   $action = "";
   display_page($display);
   exit;
-
 } else {
   include("$obminclude/global_pref.inc");
 }
@@ -112,45 +110,42 @@ function dis_calendar_portal() {
   $num = run_query_waiting_events() ;
 
   $unix_time = time();  
- 
-  $first_of_month = date("Ym01",$unix_time);
-  $next_month = date( "Ym01", strtotime("+1 month",  $unix_time));
-  $start_month_day = dateOfWeek($first_of_month, $cagenda_weekstart);  
-  $start_time = strtotime($start_month_day);
-  $end_time = strtotime($next_month);
+  $this_month = get_month($unix_time);
+  $this_year = get_year($unix_time);
+  $start_time = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
+  $end_time = strtotime("+1 month",  $start_time);
+  $current_time = $start_time;
+
   $calendar_user = array ($auth->auth["uid"] => "dummy"); 
   $events_list = events_model($start_time,$end_time,$calendar_user);
-  $minical_month = date("m");
-  $minical_year = date("Y");
-  $start_day = strtotime(dateOfWeek($first_of_month, $cagenda_weekstart));
   $whole_month = TRUE;
   $num_of_events = 0;
   $i = 0;
   do {
-    $day = date ("j", $start_day);
-    $daylink = date ("Ymd", $start_day);
-    $check_month = date ("m", $start_day);
-    if ($check_month != $minical_month) 
-      $day= "<a class=\"agendaLink2\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
-    else {
-      if(isset($events_list[$daylink]) && $dayObj = $events_list[$daylink]) { 
+    $day = date ("j", $current_time);
+    $iso_day = isodate_format($current_time);
+    $check_month = get_month($current_time);
+    if ($check_month != $this_month) {
+      $day = "<a class=\"agendaLink2\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$iso_day)."\">$day</a>";
+    } else {
+      if (isset($events_list[$iso_day]) && $dayObj = $events_list[$iso_day]) {
 	$events_data = $dayObj->get_events($id);
-	  $day= "<a class=\"agendaLink3\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
-	} else {
-	  $day= "<a class=\"agendaLink\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
-	}
+        $day = "<a class=\"agendaLink3\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$iso_day)."\">$day</a>";
+      } else {
+        $day = "<a class=\"agendaLink\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$iso_day)."\">$day</a>";
+      }
     }
-    if ($i == 0) $dis_minical .=  "<tr>\n";
-    $dis_minical .= "<td class=\"agendaCell\">\n";
-    $dis_minical .=  "$day\n";
-    $dis_minical .=  "</td>\n";
-    $start_day = strtotime("+1 day", $start_day); 
+    if ($i == 0) {
+      $dis_minical .= "<tr>\n";
+    }
+    $dis_minical .= "<td class=\"agendaCell\">$day</td>\n";
+    $current_time = strtotime("+1 day", $current_time); 
     $i++;
     if ($i == 7) { 
-      $dis_minical .=  "</tr>\n";
+      $dis_minical .= "</tr>\n";
       $i = 0;
-      $checkagain = date ("m", $start_day);
-      if ($checkagain != $minical_month) $whole_month = FALSE;	
+      $checkagain = get_month($current_time);
+      if ($checkagain != $this_month) $whole_month = FALSE;	
     }
   } while ($whole_month == TRUE);
 
@@ -158,10 +153,10 @@ function dis_calendar_portal() {
  // Minicalendar Head
 
   for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $start_day);
+    $day_num = date("w", $current_time);
     $day = $l_daysofweekfirst[$day_num];
     $dis_minical_head .= "<td class=\"agendaHead\">$day</td>\n";
-    $start_day = strtotime("+1 day", $start_day); 
+    $current_time = strtotime("+1 day", $current_time); 
   } 
   $block = "
     <div class=\"portalModule\"> 

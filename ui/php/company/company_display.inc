@@ -1004,7 +1004,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     $comment = $co_q->f("company_comment");
     $usercomment = $uid;
     $datecomment = isodate_format();
-  } else  if ($action == "new") {
+  } else if ($action == "new") {
     $mark = $auth->auth["uid"];
     $dsrc = $set_dsrc;
     $usercomment = $uid;
@@ -1034,7 +1034,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (isset($company["fax"])) { $fax = stripslashes($company["fax"]); }
   if (isset($company["web"])) { $web = stripslashes($company["web"]); }
   if (isset($company["email"])) { $email = stripslashes($company["email"]); }
-  if (isset($company["com"])) { $comment = stripslashes($company["com"]); }
+  if (isset($company["comment"])) { $comment = stripslashes($company["comment"]); }
   if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
   if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
   if (isset($company["datecomment"])) { $datecomment = $company["datecomment"]; }
@@ -1518,7 +1518,7 @@ function dis_check_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a company insertion or update                   //
+// Display the context about a company insertion or update
 // When similar companies exists we show these and ask confirmation
 // Parameters:
 //   - $cid       : company id
@@ -1551,7 +1551,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $fax = $company["fax"];
   $web = $company["web"];
   $email = $company["email"];
-  $com = $company["com"];
+  $com = $company["comment"];
   $compcat = $company["cat"]; 
   $display["msg"] .= display_warn_msg($l_check_samecompany);
 

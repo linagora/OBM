@@ -16,13 +16,13 @@ function check_calendar(form) {
     alert (\"$l_fill_title\");
     return false;
   }
-  else if (check_date(form.tf_date_begin, \"$l_err_datebegin\") == false) {
+  else if (check_date(form.tf_date_begin, \"$l_datebegin\") == false) {
     return false;
   }
-  else if (check_date(form.tf_date_end, \"$l_err_dateend\") == false) {
+  else if (check_date(form.tf_date_end, \"$l_dateend\") == false) {
     return false;
   }
-  else if ((trim(form.tf_repeat_end.value) != \"\") && (trim(form.sel_repeat_kind.value) != \"none\") && (check_date(form.tf_repeat_end, \"$l_err_repeat\") == false) ) {
+  else if ((trim(form.tf_repeat_end.value) != \"\") && (trim(form.sel_repeat_kind.value) != \"none\") && (check_date(form.tf_repeat_end, \"$l_date_repeatend\") == false) ) {
     return false;
   }
 
@@ -42,6 +42,8 @@ function show_hide_dates(field) {
     begin.style.display = 'inline';
   }     
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Remove an element line in the list form
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,7 +216,7 @@ function check_meeting(form) {
     alert (\"$l_interval_null\");
     return false;
   }
-  else if (check_date(form.tf_date_begin, \"$l_err_datebegin\") == false) {
+  else if (check_date(form.tf_date_begin, \"$l_datebegin\") == false) {
     return false;
   }
 

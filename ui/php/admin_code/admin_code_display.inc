@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_code_display.inc                                       //
 //     - Desc : code admin display File                                      //
@@ -59,7 +59,7 @@ function html_code_index($actions, $words) {
   global $modules, $l_execute;
 
   // modules SELECT
-  $sel_module = "<select name=\"module\">";
+  $sel_module = "<select name=\"param_module\">";
   while (list ($key, $val) = each ($modules)) {
     $sel_module .= "<option value=\"$val\">$val</option>";
   }

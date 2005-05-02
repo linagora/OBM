@@ -157,24 +157,23 @@ if ($action == "index") {
     $sel_user_id = slice_user($sel_user_id);
     require("agenda_js.inc");
     if (count($sel_user_id) != 0) {
-      $p_user_array =  $sel_user_id;
-    }
-    else {
-      $p_user_array =  array($uid);
+      $p_user_array = $sel_user_id;
+    } else {
+      $p_user_array = array($uid);
     }
     $user_q = store_users(run_query_get_user_name($p_user_array));
     $user_obm = run_query_userobm_readable();  
     $group_q = run_query_userobm_group();
     $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
     $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
+
 } elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
   require("agenda_js.inc");
   if (count($sel_user_id) != 0) {
     $p_user_array = $sel_user_id;
-  }
-  else {
+  } else {
     $p_user_array = array($uid);
   }
   $user_q = store_users(run_query_get_user_name($p_user_array));
@@ -282,7 +281,7 @@ if ($param_event > 0) {
       $cat_event = run_query_get_eventcategories();
       $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);      
     } else {
-      run_query_modify_event($agenda,$sel_user_id,$event_id);
+      run_query_event_update($agenda,$sel_user_id,$event_id);
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg($l_update_ok);
       $sel_user_id = array($uid);
@@ -420,8 +419,9 @@ if (count($sel_user_id) != 0 ) {
 $display["head"] = display_head($l_agenda);
 $display["header"] = generate_menu($module,$section);      
 $display["end"] = display_end();
-
 display_page($display);
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
@@ -432,7 +432,7 @@ function get_param_agenda() {
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
-  global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
+  global $rd_decision_event,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
   global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id,$sel_user_meeting_id, $sel_group_meeting_id;
   global $ch_all_day;
@@ -442,10 +442,11 @@ function get_param_agenda() {
   if (isset($hd_category_label)) $agenda["category_label"] = $hd_category_label;
   if (isset($tf_category_upd)) $agenda["category_label"] = $tf_category_upd;
   if (isset($sel_category)) $agenda["category_id"] = $sel_category;
-  if (isset ($param_date))
+  if (isset ($param_date)) {
     $agenda["date"] = $param_date; 
-  else 
-    $agenda["date"] = date("Ymd",time());
+  } else { 
+    $agenda["date"] = isodate_format();
+  }
   if (isset($param_event)) $agenda["id"] = $param_event;
   if (isset($ch_all_day)) $agenda["allday"] = $ch_all_day;
   else  $agenda["allday"] = "0";
@@ -453,8 +454,8 @@ function get_param_agenda() {
   if (isset($sel_category_id)) $agenda["category"] = $sel_category_id;
   if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
   if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;
-  if (isset($cb_force))  $agenda["force"] = $cb_force;
-  if (isset($cb_privacy))  $agenda["privacy"] = $cb_privacy;
+  if (isset($cb_force)) $agenda["force"] = $cb_force;
+  if (isset($cb_privacy)) $agenda["privacy"] = $cb_privacy;
   if (is_array($rd_conflict_event)) $agenda["conflict_event"] = $rd_conflict_event;
   if (is_array($hd_conflict_end)) $agenda["conflict_end"] = $hd_conflict_end;
   if (isset($hd_old_begin)) $agenda["old_begin"] = $hd_old_begin;
@@ -469,65 +470,57 @@ function get_param_agenda() {
 
   if (isset($sel_time_duration)) {
     $agenda["duration"] = $sel_time_duration;
-    if(isset($sel_min_duration)) {
-      $agenda["duration"] +=  $sel_min_duration/60;
+    if (isset($sel_min_duration)) {
+      $agenda["duration"] += $sel_min_duration/60;
     }
   }
-  if(isset($param_user)) $agenda["user_id"] = $param_user;
-  if(isset($param_duration)) $agenda["duration"] = $param_duration;
-  if (isset($tf_repeat_end)){
-    ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_repeat_end , $day_array1);
-    $agenda["repeat_end"] =  $day_array1[1].$day_array1[2].$day_array1[3];
-   }
+  if (isset($param_user)) $agenda["user_id"] = $param_user;
+  if (isset($param_duration)) $agenda["duration"] = $param_duration;
+  if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;
   if (isset($cb_repeat_update)) $agenda["repeat_update"] = 1;
-  if (isset($tf_date_begin)) {
-    ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_begin , $day_array2);
-    $agenda["date_begin"] .=  $day_array2[1].$day_array2[2].$day_array2[3];
-    $agenda["date"] = $agenda["date_begin"];
-    if (isset($sel_time_begin) && isset($sel_min_begin)) {
-      $agenda["date_begin"] = $agenda["date_begin"].$sel_time_begin.$sel_min_begin;
-    }
-    else {
-      $agenda["date_begin"] = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($agenda["date_begin"])));
-    }
+
+  if (isset($sel_time_begin)) {
+    $start_hour = $sel_time_begin;
+  } else {
+    $start_hour = $cagenda_first_hour;
   }
-  else {
-    $agenda["date_begin"] = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime(date("Ymd"))));
+  if (isset($sel_min_begin)) {
+    $start_min = $sel_min_begin;
+  } else {
+    $start_min = "00";
   }
-  if (isset($tf_date_end)) {
-    ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_end , $day_array);
-    $agenda["date_end"] =  $day_array[1].$day_array[2].$day_array[3];
-    if (isset($sel_time_end) && isset($sel_min_end)) {
-      $agenda["date_end"] =  $agenda["date_end"].$sel_time_end.$sel_min_end;
-    }
-    else {
-      $agenda["date_end"] = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($agenda["date_end"])));
-    }
+  if (isset($sel_time_end)) {
+    $end_hour = $sel_time_end;
+  } else {
+    $end_hour = $cagenda_last_hour;
   }
-  else {
-    $agenda["date_end"] = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime(date("Ymd"))));
+  if (isset($sel_min_end)) {
+    $end_min = $sel_min_end;
+  } else {
+    $end_min = "00";
   }
-  if (isset($param_date_begin)) { 
-    $agenda["date_begin"] = $param_date_begin;
+  if (isset($tf_date_begin)) $agenda["datebegin"] = $tf_date_begin;
+  if (strlen($agenda["datebegin"]) == 10) {
+    $agenda["datebegin"] .= " $start_hour:$start_min:00";
   }
-  if (isset($param_date_end))   
-    $agenda["date_end"] = $param_date_end;
+  if (isset($tf_date_end)) $agenda["dateend"] = $tf_date_end;
+  if (strlen($agenda["dateend"]) == 10) {
+    $agenda["dateend"] .= " $end_hour:$end_min:00";
+  }
+  $agenda["event_duration"] = (($end_hour-$start_hour)*60 + $end_min-$start_min)*60;
+
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {
     if (isset(${"cb_repeatday_".$i}))  {
       $agenda["repeat_days"] .= '1';
-    }
-    else {
+    } else {
       $agenda["repeat_days"] .= '0';
     }
-      
   }  
-  if (isset($hd_date_begin)) $agenda["date_begin"] = $hd_date_begin;
-  if (isset($hd_date_end)) $agenda["date_end"] = $hd_date_end;
+
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
   if (is_array($sel_group_id)) $agenda["group"] = $sel_group_id;
   if (isset($param_group)) $agenda["agenda_group"] = $param_group;
-
 
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {

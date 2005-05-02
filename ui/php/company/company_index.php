@@ -438,7 +438,7 @@ function get_param_company() {
   if (isset ($tf_fax)) $company["fax"] = $tf_fax;
   if (isset ($tf_web)) $company["web"] = $tf_web;
   if (isset ($tf_email)) $company["email"] = $tf_email;
-  if (isset ($ta_com)) $company["com"] = $ta_com;
+  if (isset ($ta_com)) $company["comment"] = $ta_com;
   if (isset ($tf_datecomment)) $company["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $company["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $company["add_comment"] = trim($ta_add_comment);

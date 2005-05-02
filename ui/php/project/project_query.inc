@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project search query execution                                            //
+// Project search query execution
 // Parametes:
 //   - $project[]    : project search criteria
 //     keys used       name, company_name, tt, manager, member
@@ -121,7 +121,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Detail query execution (retrieve the main infos about the project)        //
+// Detail query execution (retrieve the main infos about the project)
 // Parameters :
 //   - $p_id  : project id
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ function run_query_detail($p_id) {
   $timeupdate = sql_date_format($db_type, "project_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "project_timecreate", "timecreate");
 
-  $query = "select
+  $query = "SELECT
       project_id,
       project_name,
       project_tasktype_id,
@@ -148,19 +148,20 @@ function run_query_detail($p_id) {
       project_soldtime,
       project_estimatedtime,
       project_archive,
+      project_comment,
       $timeupdate,
       $timecreate,
       $datebegin,
       $dateend,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-    from Project
+    FROM Project
          left join Company on project_company_id=company_id
          left join Deal on project_deal_id=deal_id
          left join TaskType on project_tasktype_id=tasktype_id
          LEFT JOIN UserObm as c on project_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on project_userupdate=u.userobm_id
-    where project_id='$p_id'
+    WHERE project_id='$p_id'
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_detail");
@@ -279,15 +280,20 @@ function run_query_insert($project) {
   $tt = $project["tt"];
   $comp = ($project["company"] ? "'".$project["company"]."'" : "null");
   $deal = ($project["deal"] ? "'".$project["deal"]."'" : "null");
-  $com = $project["comment"];
   $task = $project["tasklabel"];
   $member = $project["member"];
   $datebegin = ($project["datebegin"] ? "'".$project["datebegin"]."'" : "null");
   $dateend = ($project["dateend"] ? "'".$project["dateend"]."'" : "null");
+  $add_comment = $project["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $project["datecomment"];
+    $usercomment = $project["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
   
 
-  $query = "insert into Project
-   (project_timeupdate,
+  $query = "INSERT INTO Project (
+    project_timeupdate,
     project_timecreate,
     project_userupdate,
     project_usercreate,
@@ -314,7 +320,7 @@ function run_query_insert($project) {
     $datebegin,
     $dateend,
     '0',
-    '$com')";
+    '$comment')";
 
   display_debug_msg($query, $cdg_sql, "run_query_insert");
   $obm_q = new DB_OBM;
@@ -452,8 +458,15 @@ function run_query_update($pid, $project) {
   } else {
     $arch = "0";
   }
+  $comment = $project["comment"];
+  $add_comment = $project["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $project["datecomment"];
+    $usercomment = $project["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
 
-  $query = "update Project set
+  $query = "UPDATE Project SET
       project_timeupdate='". date("Y-m-d H:i:s") ."',
       project_userupdate='$uid',
       project_name='$name',
@@ -462,7 +475,8 @@ function run_query_update($pid, $project) {
       project_estimatedtime=$estimated,
       project_datebegin=$datebegin,
       project_dateend=$dateend,
-      project_archive='$arch'
+      project_archive='$arch',
+      project_comment='$comment'
     where project_id='$pid'";
 
   display_debug_msg($query, $cdg_sql, "run_query_update");

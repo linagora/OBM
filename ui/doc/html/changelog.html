@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. ChangeLog</h1>
-version 0.9.0 - 2005-05-02
+version 0.9.0 - 2005-05-03
 <p>
 </center>
 
@@ -25,17 +25,18 @@ To do
 <LI> decouper : get_module_param() avant switch action, update_module_param() apres pour mise a jour url affectees
 <li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
-<li> move all ereg to pcre (preg) Regexps (done but agenda)
+<li> move all ereg to pcre (preg) Regexps (done but 1 in payment !)
 </UL>
 
 - admin code : verifier si des actions non utilisees
 
 
-2005-05-02 : version 0.9.0<br>
+2005-05-03 : version 0.9.0<br>
 
 <ul>
 <li> BUG#466 : Todo : When todo disabled, todo portlet not shown anymore
 <li> BUG#465 : Deal : Links to Open and archived contracts from a deal
+<li> BUG#464 : Contract : Contract comment now timestamped
 <li> BUG#462 : Contract : Deal correctly set in new contract from Deal
 <li> BUG#460 : Contact : Removed a javascript debug alert
 <li> BUG#459 : Contract : Autorenewal now correctly handled
@@ -64,6 +65,8 @@ To do
 <li> BUG#425 : List : Corrected SQL error on MySQL with ambigous country column
 <li> BUG#395 : Incident : better navigation when creating incidents
 <li> BUG#387 : Export CSV : fixes when exporting datas with ; or "
+<li> BUG#379 : Project : Comment field added, timestamped
+<li> BUG#338 : Calendar : Event creator no more in email alert recipient list
 <li> BUG#251 : All parameters now referenced in the doc
 <li> New module : Import module to import company and contact from CSV
 <li> Allow use of contact without company module (company becoming a field)
@@ -92,6 +95,8 @@ To do
 <li> List: new criteria on publication subscriptions (after and before)
 <li> Company, Contact: Copy address to clipboard.
 <li> User: added search by description and group
+<li> Incident: email alert subject display the company, and comment in msg
+<li> Calendar: all date handling (and links too) in ISO or timestamp format
 </ul>
 
 2005-01-04 : version 0.8.9 (Clément 1 Release !)<br>

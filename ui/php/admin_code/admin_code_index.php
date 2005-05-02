@@ -40,7 +40,7 @@ switch ($mode) {
    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    //   $debug = $set_debug;
-   if($action == "") $action = "index";
+   if ($action == "") $action = "index";
    get_admin_code_action();
    $perm->check_permissions($module, $action);
    $display["head"] = display_head("Admin_Code");
@@ -61,7 +61,7 @@ switch ($action) {
     dis_amp($mode, $words);
     break;
   case "func_unused":
-    dis_unused_functions($mode, $module);
+    dis_unused_functions($mode, $param_module);
     break;
   case "function_uses":
     dis_function_uses($mode, $function);
@@ -115,7 +115,7 @@ Ex: php4 admin_code_index.php -a show_amp
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
   global $debug, $acts, $target_modules;
-  global $action, $module;
+  global $action, $param_module;
 
   // We skip the program name [0]
   next($argv);
@@ -129,8 +129,8 @@ function parse_arg($argv) {
     case '-m':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $target_modules)) {
-        $module = $val2;
-        if ($debug > 0) { echo "-m -> \$module=$val2\n"; }
+        $param_module = $val2;
+        if ($debug > 0) { echo "-m -> \$param_module=$val2\n"; }
       }
       else {
         dis_command_use("Invalid module ($val2)");
@@ -162,7 +162,7 @@ function parse_arg($argv) {
     }
   }
 
-  if (! $module) $module = "contact";
+  if (! $param_module) $param_module = "contact";
   if (! $action) $action = "show_amp";
   if (! $function) $function = "run_query_detail";
 }

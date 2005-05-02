@@ -300,7 +300,7 @@ function run_query_insert($company) {
   }
   $compcat = $company["cat"];
   
-  $query = "insert into Company (company_timeupdate,
+  $query = "INSERT INTO Company (company_timeupdate,
     company_timecreate,
     company_userupdate,
     company_usercreate,
@@ -327,7 +327,7 @@ function run_query_insert($company) {
     company_web,
     company_email,
     company_comment)
-  values (null,
+  VALUES (null,
     '$now',
     null,
     '$uid',
@@ -444,7 +444,7 @@ function run_query_update($cid, $company) {
   $fax = $company["fax"];
   $web = $company["web"];
   $email = $company["email"];
-  $comment = $company["com"];
+  $comment = $company["comment"];
   $add_comment = $company["add_comment"];
   if ($add_comment != "") {
     $datecomment = $company["datecomment"];

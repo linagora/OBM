@@ -18,21 +18,21 @@ function run_query_waiting_events() {
   $db_type = $obm_db->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");    
-  $query = "SELECT count(userobm_id) as num   
-            FROM CalendarEvent LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
-	    LEFT JOIN CalendarUser ON calendarevent_id  = calendaruser_event_id
-	    LEFT JOIN UserObm ON calendaruser_user_id = userobm_id
-	    WHERE calendaruser_state = 'W'";
+  $query = "SELECT
+      count(userobm_id) as num
+    FROM CalendarEvent LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
+      LEFT JOIN CalendarUser ON calendarevent_id  = calendaruser_event_id
+      LEFT JOIN UserObm ON calendaruser_user_id = userobm_id
+    WHERE calendaruser_state = 'W'";
 
-  if(is_array($writable_user)) {
+  if (is_array($writable_user)) {
     $query .= " AND calendaruser_user_id IN (";
     $num = count($writable_user);
     foreach($writable_user as $user) {
       $query.= "'$user',";
     }
     $query.="'".$auth->auth["uid"]."')";
-  }
-  else {
+  } else {
     $query.="AND calendaruser_user_id = '".$auth->auth["uid"]."'";
   }
   $query .= " GROUP BY userobm_id ORDER BY userobm_id"; 
@@ -70,27 +70,23 @@ function run_query_userobm_writable() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// dateOfWeek() takes a date in Ymd and a day of week in 3 letters or more
-// and returns the date of that day. (ie: "sun" or "sunday" would be 
-// acceptable values of $day but not "su")
-//------------------------------------------------------------------------
-// Argument:
-// ---------
-//     - $Ymd 
-//     - $day
+// Get the date of a day, from its day of week and a week date
+// Parameters:
+//   - $timestamp : timestamp date for the week 
+//   - $day       : day of week ("sun", "mon",...) at least 3 letters
+// Returns:
+//   - $ts : timestamp of the day
 ///////////////////////////////////////////////////////////////////////////////
-function dateOfWeek($Ymd, $day) {
+function get_date_day_of_week($timestamp, $day) {
   global $cagenda_weekstart;
 
   if (!isset($cagenda_weekstart)) $cagenda_weekstart = 'Sunday';
-  $timestamp = strtotime($Ymd);
   $num = date('w', strtotime($cagenda_weekstart));
   $start_day_time = strtotime((date('w',$timestamp)==$num ? "$cagenda_weekstart" : "last $cagenda_weekstart"), $timestamp);
-  $ret_unixtime = strtotime($day,$start_day_time);
-  $ret_unixtime = strtotime('+12 hours', $ret_unixtime);
-  $ret = date('Ymd',$ret_unixtime);
+  $ret_ts = strtotime($day,$start_day_time);
+  $ret_ts = strtotime('+12 hours', $ret_ts);
 
-  return $ret;
+  return $ret_ts;
 }
 
 
@@ -307,21 +303,24 @@ function daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_ev
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
   }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-//  Perform the weekly repeatition of an event 
-//
+// Perform the weekly repeatition of an event (clone as in agenda_query.inc)
+// Parameters:
+//   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
 function weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
   global $day_duration,$cagenda_weekstart;
 
-  $temp_date = strtotime(dateOfWeek(date("Ymd",$date), $cagenda_weekstart));
-  $temp_date = strtotime("+".date("H",$date)." hours +".date("i",$date)." minutes",$temp_date);
-  if($temp_date < $start_time) {
+  $temp_date = get_date_day_of_week($date, $cagenda_weekstart);
+  $temp_date = strtotime("+".get_hour($date)." hours +".date("i",$date)." minutes",$temp_date);
+  if ($temp_date < $start_time) {
     $temp_date = ceil(($start_time - $temp_date) / $day_duration);
-    $hour_diff = date("H",$date) - date("H",$start_time);
+    $hour_diff = get_hour($date) - get_hour($start_time);
     $min_diff = date("i",$date) - date("i",$start_time);
     $temp_date = ($temp_date % ($repeatfrequence * 7));
-    if($temp_date == "") $temp_date = 0;
+    if ($temp_date == "") $temp_date = 0;
     $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
   $num = (date('w', $temp_date) - date('w', strtotime($cagenda_weekstart)) +7)%7;
@@ -661,7 +660,6 @@ function run_query_days_unfilled() {
   }
   return $workingdays - $filled_days;
 }
-
 
 
 </script>

@@ -412,7 +412,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
   global $l_name, $l_tasktype, $l_company, $l_total, $l_datebegin, $l_dateend;
   global $l_deal, $l_project, $l_progress, $l_progressinfos;
-  global $l_used, $l_missing, $l_sold, $l_estimated;
+  global $l_used, $l_missing, $l_sold, $l_estimated, $l_comment;
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
   global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
   global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
@@ -434,6 +434,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $estimated = $project_q->f("project_estimatedtime");
   $datebegin = date_format($project_q->f("datebegin"), 1);
   $dateend = date_format($project_q->f("dateend"), 1);
+  $comment = beautify_comment(nl2br($project_q->f("project_comment")));
 
   // Labels are different for sales and R&D projects
   if ($company > 0) {
@@ -826,7 +827,14 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $dis_member
     </table>
     </div>
-    ";
+
+    <div class=\"detailHead\">$l_comment</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailText\">$comment</td>
+    </tr>
+    </table>
+";
 
   return $block;
 }
@@ -844,7 +852,10 @@ function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
   global $l_datebegin, $l_dateend, $l_none;
-  global $ctt_sales, $ctt_research, $c_php_isodate_format;
+  global $l_comment,$l_add_comment,$l_upd_comment;
+  global $uid, $cg_prod, $ctt_sales, $ctt_research, $c_php_isodate_format;
+
+  $usr_q = run_query_all_users_from_group($cg_prod, array($uid));
 
   if ($action == "detailupdate") {
     $pid = $project_q->f("project_id");
@@ -859,55 +870,66 @@ function html_project_form($action, $project_q, $project) {
     $deal_label = $project_q->f("deal_label");
     $datebegin = isodate_format($project_q->f("datebegin"), 1);
     $dateend = isodate_format($project_q->f("dateend"), 1);
+    $comment = $project_q->f("project_comment");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   } else {
-    $pid = $project["id"];
-    $name = stripslashes($project["name"]);
-    $tt = $project["tt"];
-    $company = $project["company"];
-    $deal = $project["deal"];
-    $soldtime = $project["soldtime"];
-    $estimated = $project["estimated"];
-    $company_name = stripslashes($project["company_name"]);
-    $deal_label = stripslashes($project["deal_label"]);
-    $task = $project["tasklabel"];
-    $member = $project["member"];
-    $datebegin = $project["datebegin"];
-    $dateend = $project["dateend"];
-    $arc_val = $project["archive"] ? "checked" : "";
-
     if ($action == "new") {
-      $name = $deal_label;
+      $name = $project["deal_label"];
       // We pre-fill datebegin and dateend with current date
       $datebegin = date($c_php_isodate_format); 
       $dateend = $datebegin;
+      $usercomment = $uid;
+      $datecomment = isodate_format();
     }
+  }
 
-    if (($action == "new") || ($action == "insert")) {
-      // member select
-      $mb_q = run_query_get_obmusers();
-      $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
-        <option value=\"0\">$l_none</option>\n";
-      while ($mb_q->next_record()) {
+  // If parameters have been given, they supercede the default action value
+  if (isset($project["id"])) { $pid = $project["id"]; }
+  if (isset($project["name"])) { $name = stripslashes($project["name"]); }
+  if (isset($project["tt"])) { $tt = $project["tt"]; }
+  if (isset($project["company"])) { $company = $project["company"]; }
+  if (isset($project["deal"])) { $deal = $project["deal"]; }
+  if (isset($project["soldtime"])) { $soldtime = $project["soldtime"]; }
+  if (isset($project["estimated"])) { $estimated = $project["estimated"]; }
+  if (isset($project["company_name"])) { $company_name = $project["company_name"]; }
+  if (isset($project["deal_label"])) { $deal_label = $project["deal_label"]; }
+  if (isset($project["tasklabel"])) { $task = $project["tasklabel"]; }
+  if (isset($project["member"])) { $member = $project["member"]; }
+  if (isset($project["datebegin"])) { $datebegin = $project["datebegin"]; }
+  if (isset($project["dateend"])) { $dateend = $project["dateend"]; }
+  if (isset($project["archive"])) { $arc_val = ($project["archive"] == 1 ? "checked" : ""); }
+  if (isset($project["comment"])) { $comment = stripslashes($project["comment"]); }
+  if (isset($project["add_comment"])) { $add_comment = stripslashes($project["add_comment"]); }
+  if (isset($project["usercomment"])) { $usercomment = $project["usercomment"]; }
+  if (isset($project["datecomment"])) { $datecomment = $project["datecomment"]; }
+
+
+  if (($action == "new") || ($action == "insert")) {
+    // member select
+    $mb_q = run_query_get_obmusers();
+    $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
+      <option value=\"0\">$l_none</option>\n";
+    while ($mb_q->next_record()) {
 	$mb_id = $mb_q->f("userobm_id");
 	$mb_name = $mb_q->f("userobm_lastname")." ".$mb_q->f("userobm_firstname");
 	$sel_member .= "
-        <option value=\"$mb_id\"";
+      <option value=\"$mb_id\"";
 	if ($mb_id == $member) { $sel_member .= " selected=\"selected\""; }
 	$sel_member .= ">$mb_name</option>";
-      }
-      $sel_member .= "</select>";
-
-      $dis_member = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_member</td>
-      <td class=\"detailForm\">$sel_member</td>";
-
-      // task
-      $dis_task = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_task</td>
-      <td class=\"detailForm\"><input name=\"tf_tasklabel\" size=\"40\" maxlength=\"128\" value=\"$task\" /></td>";
     }
+    $sel_member .= "</select>";
+
+    $dis_member = "
+  </tr><tr>
+    <td class=\"detailLabel\">$l_member</td>
+    <td class=\"detailForm\">$sel_member</td>";
+
+    // task
+    $dis_task = "
+  </tr><tr>
+    <td class=\"detailLabel\">$l_task</td>
+    <td class=\"detailForm\"><input name=\"tf_tasklabel\" size=\"40\" maxlength=\"128\" value=\"$task\" /></td>";
   }
 
   // We select the task list depending on task category (or if company filled)
@@ -963,8 +985,35 @@ function html_project_form($action, $project_q, $project) {
     $dis_archive = "";
   }
 
+  // User comment select construction
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
+  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+    $sel_usercomment .= "<option value=\"$cname\"";
+    // First time default to uid of connected user (uid) then set to name
+    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+      $sel_usercomment .= " selected = \"selected\"";
+    }
+    $sel_usercomment .= ">$cname</option>\n";
+  }
+  $sel_usercomment .= "</select>";
+
   // target action
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "update")) {
+    $display["title"] = "<div class=\"title\">$l_project : $name</div>";
+
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
+
     $dis_action = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />";
     $text_button = $l_update;
@@ -979,9 +1028,6 @@ function html_project_form($action, $project_q, $project) {
       <input type=\"hidden\" name=\"param_company\" value=\"$company\" />
       <input type=\"hidden\" name=\"param_deal\" value=\"$deal\" />
       <input type=\"submit\" value=\"$text_button\" />";
-  
-  if ($action == "detailupdate") 
-    $display["title"] = "<div class=\"title\">$l_project : $name</div>";
   
   // --- HTML Template --------------------------------------------------------
   
@@ -1001,23 +1047,35 @@ function html_project_form($action, $project_q, $project) {
     </tr><tr>
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailForm\">$sel_tt</td>
-   $dis_sold
+    $dis_sold
     </tr><tr>
       <td class=\"detailLabel\">$l_projtime</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_estimated\" size=\"10\" maxlength=\"8\" value=\"$estimated\" /></td>
-   $dis_task
-   $dis_member
-   </tr><tr>
-     <td class=\"detailLabel\">$l_datebegin</td>
-     <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
-   </tr><tr>
-     <td class=\"detailLabel\">$l_dateend</td>
-     <td class=\"detailForm\"><input name=\"tf_dateend\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateend\" /></td>
-   </tr><tr>
+    $dis_task
+    $dis_member
+    </tr><tr>
+      <td class=\"detailLabel\">$l_datebegin</td>
+      <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_dateend</td>
+      <td class=\"detailForm\"><input name=\"tf_dateend\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateend\" /></td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" $arc_val /></td>
-   </tr>
-   </table>
+    </tr>
+    </table>
+
+    <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      $dis_comment
+    </tr>
+    </table>
 
    <div class=\"detailButton\">
    <p class=\"detailButtons\">$dis_button</p>

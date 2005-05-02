@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : project_index.php                                            //
 //     - Desc : Project Index File                                           //
-// 2003-07-08 Aliacom
+// 2003-07-08 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,6 +404,7 @@ function get_param_project() {
   global $tf_missing, $tf_projected, $tf_datebegin, $tf_dateend;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_estimated, $tf_tasklabel, $cb_archive;
   global $sel_tt, $sel_manager, $sel_member, $sel_task, $sel_ptask,$deal_label;
+  global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
@@ -424,6 +425,10 @@ function get_param_project() {
   if (isset ($tf_projected)) $project["projected"] = $tf_projected;
   if (isset ($tf_datebegin)) $project["datebegin"] = $tf_datebegin;
   if (isset ($tf_dateend)) $project["dateend"] = $tf_dateend;
+  if (isset ($ta_com)) $project["comment"] = $ta_com;
+  if (isset ($tf_datecomment)) $project["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $project["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $project["add_comment"] = trim($ta_add_comment);
 
   // Helper fields (for performance)
   if (isset ($deal_label)) $project["deal_label"] = $deal_label;

@@ -27,7 +27,7 @@ $l_repeat = "Ripatizione";
 $l_periodicity = "Frequenza";
 $l_repeatkind = "Tipo di ripetizione";
 $l_repeatdays = "Giorni di ripetizione";
-$l_use_endrepeat = "Data fine ripetizione";
+$l_date_repeatend = "Data fine ripetizione";
 $l_interval = "Intervallo ";
 
 $l_waiting_events = "Appuntamento in attesa ";

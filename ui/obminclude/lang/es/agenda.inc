@@ -31,7 +31,7 @@ $l_repeatkind = "Tipo de Repetición";
 $l_repeatdays = "Dias de Repetición (Tipo semanal)";
 $l_repeatdays2 = "Dias de Repetición";
 
-$l_use_endrepeat = "Fecha Final de repetición";
+$l_date_repeatend = "Fecha Final de repetición";
 $l_carac = "Propiedades";
 $l_force = "Forzar la inserción del evento";
 
@@ -111,9 +111,6 @@ $l_conflict_events = "Las horas escogidas están ocupadas por";
 $l_fill_title = "Tiene que llenar el campo [ $l_title ] ";
 $l_fill_dateend = "Tiene que llenar el campo [ $l_dateend ]";
 $l_fill_datebegin = "Tiene que llenar el campo [ $l_datebegin ]";
-$l_err_datebegin = "[ $l_datebegin ] formato inválido !";
-$l_err_dateend = "[ $l_dateend ] formato inválido !";
-$l_err_repeat = "[ $l_use_endrepeat ] formato inválido !";
 $l_err_begin_end = "Fecha final debe ser posterior a la de inicio !";
 $l_err_end_repeat = "El final de la repetición debe ser posterior a la fecha de final.";
 $l_err_end_repeat2 = "The duración máxima de una repetición es un año";

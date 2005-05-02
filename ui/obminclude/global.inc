@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre19";
+$obm_version = "0.9.0pre20";
 $l_obm_title = "O.B.M.";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -310,6 +310,7 @@ $cdg_sql = 8;    // sql query display
 
 // Date constants
 $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
+$c_php_isodatetime_format = "Y-m-d H:i:s";  // AAAA-MM-JJ H:m:s iso format
 $cda_iso = "Y-m-d"; // Iso format
 $cda_en = "m/d/Y";  // us format
 $cda_fr = "d/m/Y";  // fr format
@@ -377,6 +378,7 @@ $php_regexp_email_name="/^[a-z0-9_&\'-]+(\.[a-z0-9_-]+)*$/"; // Email name
 $js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-_\.\/A-Za-z0-9])*$/";  // Web
 $php_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[a-z]{2,3}([\-_\.\/A-Za-z0-9]*)$/i"; // Web
 $php_regexp_isodate = "/^[0-9]{4}-[01][0-9]-[0123][0-9]$/";
+$php_regexp_isodatetime = "/^[0-9]{4}-[01][0-9]-[0123][0-9] [012][0-9]:[0-5][0-9]:[0-5][0-9]$/";
 $js_regexp_list_name = "/^[0-9A-Za-z_- ]+$/";  // List name
 $js_regexp_import_name = "/^[0-9A-Za-z_- ]+$/";  // Import name
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
@@ -495,7 +497,7 @@ function debug_level_isset($debug) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Format a date according to user preference                                //
+// Format a date according to user preference
 // Parameters:
 //   - $timestamp  : Unix timestamp
 //   - $null_empty : tell if null should returns empty (true) or today ("")
@@ -526,27 +528,33 @@ function date_format($timestamp="", $null_empty="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Iso Format a date                                                         //
+// Iso Format a date
 // Parameters:
 //   - $timestamp  : Unix timestamp
 //   - $null_empty : tell if null should returns empty (true) or today ("")
+//   - $time_flag  : tell if time info should be returned (true)
 // Returns:
 //   datetime formated iso
 ///////////////////////////////////////////////////////////////////////////////
-function isodate_format($timestamp="", $null_empty="") {
-  global $c_php_isodate_format;
+function isodate_format($timestamp="", $null_empty="", $time_flag=false) {
+  global $c_php_isodate_format, $c_php_isodatetime_format;
 
+  if ($time_flag) {
+    $format = $c_php_isodatetime_format;
+  } else {
+    $format = $c_php_isodate_format;
+  }
   if ($timestamp != "") {
     if ($timestamp == "0") {
       $date = "";
     } else {
-      $date = date($c_php_isodate_format, $timestamp);
+      $date = date($format, $timestamp);
     }
   } else {
     if ($null_empty != "") {
       $date = "";
     } else {
-      $date = date($c_php_isodate_format);
+      $date = date($format);
     }
   }
 
@@ -555,7 +563,7 @@ function isodate_format($timestamp="", $null_empty="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Format a date-time according to user preference                           //
+// Format a date-time according to user preference
 // Parameters:
 //   - $timestamp  : Unix timestamp
 //   - $null_empty : tell if null should returns empty (true) or today ("")
@@ -586,7 +594,77 @@ function datetime_format($timestamp="", $null_empty="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return hour portion of a datetime                                         //
+// Get the timestamp of a date from its ISO format
+// Parameters:
+//   - $iso : date (Iso format)
+// Returns:
+//   timestamp of the date
+///////////////////////////////////////////////////////////////////////////////
+function isodate_to_timestamp($iso) {
+
+  preg_match("/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/",$iso, $d);
+  $ts = mktime($d[4],$d[5],$d[6],$d[2],$d[3],$d[1]);
+
+  return $ts;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return year portion of a datetime
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   year (1900-9999)
+///////////////////////////////////////////////////////////////////////////////
+function get_year($timestamp="") {
+
+  if ($timestamp != "")
+    $date = date("Y", $timestamp);
+  else
+    $date = date("Y");
+
+  return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return month portion of a datetime
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   month (1-12)
+///////////////////////////////////////////////////////////////////////////////
+function get_month($timestamp="") {
+
+  if ($timestamp != "")
+    $date = date("m", $timestamp);
+  else
+    $date = date("m");
+
+  return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return day portion of a datetime
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   day (1-31)
+///////////////////////////////////////////////////////////////////////////////
+function get_day($timestamp="") {
+
+  if ($timestamp != "")
+    $date = date("m", $timestamp);
+  else
+    $date = date("m");
+
+  return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return hour portion of a datetime
 // Parameters:
 //   - $timestamp : Unix timestamp
 // Returns:
@@ -598,6 +676,24 @@ function get_hour($timestamp="") {
     $date = date("H", $timestamp);
   else
     $date = date("H");
+
+  return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return min portion of a datetime
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   min (0-59)
+///////////////////////////////////////////////////////////////////////////////
+function get_min($timestamp="") {
+
+  if ($timestamp != "")
+    $date = date("i", $timestamp);
+  else
+    $date = date("i");
 
   return $date;
 }

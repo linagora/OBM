@@ -30,7 +30,7 @@ $l_repeatkind = "Repetition kind";
 $l_repeatdays = "Repetition day (weekly kind)";
 $l_repeatdays2 = "Repetition day";
 
-$l_use_endrepeat = "Date end repetition";
+$l_date_repeatend = "Date end repetition";
 $l_carac = "Propreties";
 $l_force = "Force insertion";
 

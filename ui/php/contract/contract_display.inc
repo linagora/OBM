@@ -528,7 +528,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   $number = $contract_q->f("contract_number");
   $market = $contract_q->f("lname1") . " " . $contract_q->f("fname1");
   $tech = $contract_q->f("lname2") . " " . $contract_q->f("fname2");
-  $com = nl2br($contract_q->f("contract_comment"));
+  $com = beautify_comment(nl2br($contract_q->f("contract_comment")));
   $clause = nl2br($contract_q->f("contract_clause"));
   $datebegin = date_format($contract_q->f("datebegin"), 1);
   $dateexp = date_format($contract_q->f("dateexp"), 1);
@@ -718,19 +718,20 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   </tr>
   </table>
 
-  <div class=\"detailHead\">$l_comment</div>
-  <table class=\"detail\">
-  <tr>
-    <td class=\"detailText\" colspan=\"2\">$com</td>
-  </tr>
-  </table>
-
   <div class=\"detailHead\">$l_clause</div>
   <table class=\"detail\">
   <tr>
-    <td class=\"detailText\" colspan=\"2\">$clause</td>
+    <td class=\"detailText\">$clause</td>
   </tr> 
-  </table>";
+  </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailText\">$com</td>
+  </tr>
+  </table>
+";
 
    return $block;
 }
@@ -744,32 +745,25 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_form($action,$contract,$param_company) {
   global $display, $cg_com, $cg_prod;
- 
-  if ($action == "new" || $action == "insert" || $action == "update") {
-    $contract_q = new DB_OBM; $users="";
-  }
+
   if ($action == "detailupdate") {
     $contract_q = run_query_detail($contract["id"]);
+    $comp_id = $contract_q->f("contract_company_id"); 
     $users = array($contract_q->f("contract_marketmanager_id"), $contract_q->f("contract_techmanager_id"));
-  } elseif ($action == "insert" || $action == "update" ) {
-      $users = array($contract["market"], $contract["tech"]);
+    $display["detailInfo"] = display_record_info($contract_q);
   } else {
-      $users = "";
-  }
-
-  $comp_id = $contract_q->f("contract_company_id"); 
-  if ($action == "new" || $action == "insert"){ 
-    $company_q = run_query_company_info($param_company);
-    $comp_id = $param_company;  
-  }
-    else {
+    $contract_q = new DB_OBM;
+    if ($action == "new") {
+      $comp_id = $contract["company_id"];
       $company_q = run_query_company_info($comp_id);
     }
-  
-  if ($action == "detailupdate") {
-    $display["detailInfo"] = display_record_info($contract_q);
+    if ($action == "insert" || $action == "update" ) {
+      $users = array($contract["market"], $contract["tech"]);
+    } else {
+      $users = "";
+    }
   }
- 
+
   $contact_q = run_query_contact_contract($comp_id);
   $prio_q = run_query_priority();
   $status_q = run_query_status();
@@ -789,8 +783,8 @@ function dis_contract_form($action,$contract,$param_company) {
 //   - $action     : action called
 //   - $contract_q : DBO : information about the contract (null for new)
 //   - $type_q     : DBO : contract type list
-//   - $u_com_q    : DBO : list of userobm from group Commercial
-//   - $u_prod_q   : DBO : list of userobm from group Production
+//   - $u_com_q    : DBO : list of userobm from Commercial group
+//   - $u_prod_q   : DBO : list of userobm from Production group
 //   - $comp_q     : DBO : company infos (name, ad1, zip, town when new)
 //   - $contact_q  : DBO : list of contact from the company 
 //   - contract[]  : default or transmitted values
@@ -798,13 +792,13 @@ function dis_contract_form($action,$contract,$param_company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
-  global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
+  global $uid, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_begin,$l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel;
   global $l_technical_manager;
-  global $popup_height,$popup_width,$l_comment,$l_number,$l_clause;
-  global $l_priority,$l_status;
+  global $popup_height,$popup_width,$l_number,$l_clause,$l_priority, $l_status;
+  global $l_comment,$l_add_comment,$l_upd_comment;
   global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
   global $l_contract_kind,$l_format,$l_autorenewal;
   global $l_ticket_nb,$l_private,$uid,$l_duration; 
@@ -839,14 +833,14 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $tech = $contract_q->f("contract_techmanager_id");
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
     $archive = $contract_q->f("contract_archive");
    
-    // comp info below could be directly fetched from contract_q query XXXXX
-   
-    $comp_name = $comp_q->f("company_name");
-    $ad1 = $comp_q->f("company_address1");
-    $zip = $comp_q->f("company_zipcode");
-    $town = $comp_q->f("company_town");   
+    $comp_name = $contract_q->f("company_name");
+    $ad1 = $contract_q->f("company_address1");
+    $zip = $contract_q->f("company_zipcode");
+    $town = $contract_q->f("company_town");   
     $deal_id = $contract_q->f("deal_id");
     $deal_label = $contract_q->f("deal_label");
 
@@ -862,6 +856,9 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     // We pre-fill date with current date     
     $datebegin = date($c_php_isodate_format);
     $dateexp = date($c_php_isodate_format, time() + 31536000);
+
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -892,6 +889,9 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["tech"])) { $tech = $contract["tech"]; }
   if (isset($contract["clause"])) { $clause = stripslashes($contract["clause"]); }
   if (isset($contract["comment"])) { $comment = stripslashes($contract["comment"]); }
+  if (isset($contract["add_comment"])) { $add_comment = stripslashes($contract["add_comment"]); }
+  if (isset($contract["usercomment"])) { $usercomment = $contract["usercomment"]; }
+  if (isset($contract["datecomment"])) { $datecomment = $contract["datecomment"]; }
   if (isset($contract["company_name"])) { $comp_name = stripslashes($contract["company_name"]); }
   if (isset($contract["company_ad1"])) { $ad1 = stripslashes($contract["company_ad1"]); }
   if (isset($contract["company_zip"])) { $zip = $contract["company_zip"]; }
@@ -935,6 +935,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $sel_sta .= "</select>";
 
+  // Type select
   $dis_type="<select name=\"sel_type\">
     <option value=\"0\">$l_none</option>";
   while($type_q->next_record()) {
@@ -945,6 +946,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $dis_type.="</select>";
  
+  // Marketing manager select
   $sel_market = "<select name=\"sel_market\">
     <option value=\"0\">$l_none</option>";
   while ($u_com_q->next_record()) {
@@ -955,6 +957,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $sel_market.="</select>";
  
+  // Technical manager select
   $sel_tech = "<select name=\"sel_tech\">
     <option value=\"0\">$l_none</option>";
   while ($u_prod_q->next_record()) {
@@ -970,7 +973,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $autorenewal_display = "<input type=\"checkbox\" name=\"cb_autorenew\" value=\"1\" $autorenew_c />";
 
-  // gestion du type du contrat : client ou fournisseur
+  // Contract kind : customer or supplier
   if ($kind == "$cck_customer") {
     $kind_customer_c = "checked";
   } else {
@@ -1068,6 +1071,23 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $dis_sel_con2.="</select>";
 
+  // User comment select construction
+  if ($u_com_q->nf()>0) {
+    $u_com_q->seek(0);
+  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  while ($u_com_q->next_record()) {
+    $cid = $u_com_q->f("userobm_id");
+    $cname = $u_com_q->f("userobm_lastname")." ".$u_com_q->f("userobm_firstname");
+    $sel_usercomment .= "<option value=\"$cname\"";
+    // First time default to uid of connected user (uid) then set to name
+    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+      $sel_usercomment .= " selected = \"selected\"";
+    }
+    $sel_usercomment .= ">$cname</option>\n";
+  }
+  $sel_usercomment .= "</select>";
+
   if ($action == "detailupdate") {
     $dis_con2 = "
       <a href=\"".url_prepare("$path/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
@@ -1086,6 +1106,13 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
   } else {
     $dis_sub .= "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -1185,18 +1212,24 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
 $dis_format_detail
     </table>
 
-  <div class=\"detailHead\">$l_comment</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailForm\"><textarea name=\"ta_com\" rows=\"6\" cols=\"72\">$comment</textarea></td>
-    </tr>
-    </table>
   <div class=\"detailHead\">$l_clause</div>
     <table class=\"detail\">
     <tr>
       <td class=\"detailForm\"><textarea name=\"ta_clause\" rows=\"6\" cols=\"72\">$clause</textarea></td>
     </tr>
     </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      $dis_comment
+    </tr>
+    </table>
+
   <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_sub</p>
   </div>

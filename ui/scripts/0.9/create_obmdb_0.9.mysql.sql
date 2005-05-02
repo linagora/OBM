@@ -552,7 +552,7 @@ CREATE TABLE ContactList (
 -- Calendar module tables
 -------------------------------------------------------------------------------
 --
--- Table structure for the table  'CalendarSegment'
+-- Table structure for the table  'CalendarEvent'
 --
 CREATE TABLE CalendarEvent (
   calendarevent_id int(8)        NOT NULL auto_increment,

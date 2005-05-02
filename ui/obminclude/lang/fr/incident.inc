@@ -61,7 +61,7 @@ $l_cat1_delete = "Supprimer la catégorie";
 $l_cat1_insert = "Insérer la catégorie";
 
 // Mail
-$l_mail_incident_new_subject = "OBM : Nouvel incident";
+$l_mail_incident_new_subject = "OBM : N. Incident";
 
 // Message
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";

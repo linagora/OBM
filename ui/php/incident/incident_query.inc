@@ -259,9 +259,13 @@ function run_query_insert($incident) {
   $i_id = run_query_incident_id($incident);
 
   if ($cmail_incident != "") {
+    $company_name = get_company_name_from_contract($contract_id);
     $label_mail = stripslashes($lincident);
-    $subject = "$l_mail_incident_new_subject : $label_mail";
-    $message = "$cgp_host/incident/incident_index.php?action=detailconsult&param_incident=$i_id";
+    $subject = "$l_mail_incident_new_subject : $company_name : $label_mail";
+    $message = "$cgp_host/incident/incident_index.php?action=detailconsult&param_incident=$i_id
+
+State: $status
+$comment";
     send_mail($subject, $message, array($logger, $owner), array("$cmail_incident"), 1);
   }
 
@@ -302,7 +306,6 @@ function run_query_incident_id($incident) {
       and incident_status_id $status
       and incident_archive='$archive'";
 
-  echo $query;
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -743,16 +746,40 @@ function run_query_cat1_links($c_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get a priority label                                                      //
+// Get the company name from the incident contract
+// Parameters:
+//   - $c_id : contract id
+///////////////////////////////////////////////////////////////////////////////
+function get_company_name_from_contract($c_id) {
+  global $cdg_sql;
+
+  $query = "SELECT contract_id,
+      company_name
+    FROM Contract LEFT JOIN Company on contract_company_id=company_id
+    WHERE contract_id='$c_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("company_name");
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get a priority label
 // Parameters:
 //   - $id : priority id
 ///////////////////////////////////////////////////////////////////////////////
 function get_priority_label($id) {
   global $cdg_sql;
 
-  $query = "select incidentpriority_label
-    from IncidentPriority
-    where incidentpriority_id='$id'";
+  $query = "SELECT incidentpriority_label
+    FROM IncidentPriority
+    WHERE incidentpriority_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -766,16 +793,16 @@ function get_priority_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get a status label                                                        //
+// Get a status label
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
 function get_status_label($id) {
   global $cdg_sql;
 
-  $query = "select incidentstatus_label
-    from IncidentStatus
-    where incidentstatus_id='$id'";
+  $query = "SELECT incidentstatus_label
+    FROM IncidentStatus
+    WHERE incidentstatus_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
