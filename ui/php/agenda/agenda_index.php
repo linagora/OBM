@@ -507,7 +507,8 @@ function get_param_agenda() {
   if (strlen($agenda["dateend"]) == 10) {
     $agenda["dateend"] .= " $end_hour:$end_min:00";
   }
-  $agenda["event_duration"] = (($end_hour-$start_hour)*60 + $end_min-$start_min)*60;
+  
+  $agenda["event_duration"] =  strtotime($agenda["dateend"]) - strtotime($agenda["datebegin"]);
 
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {

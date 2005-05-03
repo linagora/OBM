@@ -1680,6 +1680,7 @@ function get_email_used($id="", $gid="", $lid="") {
 ///////////////////////////////////////////////////////////////////////////////
 function send_mail($subject, $message, $recipients, $r_addr, $force) {
   global $cgp_mail_enabled;
+  global $aliasuite_enabled;  
 
   $message = stripslashes($message);
   if (! $cgp_mail_enabled) {
@@ -1693,9 +1694,21 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
   $send_q = run_query_get_sender();
   $reci_q = run_query_get_recipients($recipients, $force);
 
+  // If AliaSuite, get local main mail domain.
+  if( $aliasuite_enabled ) {
+      $domain_q = run_query_get_domain();
+      $local_domain = $domain_q->f("mail_value");
+  }
+
   // Construct recipient list
   while ($reci_q->next_record()) {
     $reci = $reci_q->f("userobm_email");
+    
+    // If AliaSuite, construct recipient address.
+    if( $aliasuite_enabled ) {
+        $reci = strtok($reci, "\r\n")."@".$local_domain;
+    }
+    
     if ($reci_list == "") {
       $reci_list = $reci;
     } else {
@@ -1714,7 +1727,14 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
     }
   }
 
-  $headers .= "From: ".$send_q->f("userobm_email");
+  $headers .= "From: ";
+  // If AliaSuite, construct sender address.
+  if( $aliasuite_enabled ) {
+    $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@".$local_domain;
+  }else {
+    $headers .= $send_q->f("userobm_email");
+  }
+  
   if ($reci_list != "") {
     mail ($reci_list, $subject, $message, $headers);      
   }
@@ -1736,7 +1756,6 @@ function run_query_get_recipients($recipients, $force) {
       AND userobmpref_value = 'yes'";
     $join = ", UserObmPref";
   }  
-
   $coma = "";
   foreach($recipients as $recipient) {
     $user_list .= $coma.$recipient;
@@ -1769,6 +1788,24 @@ function run_query_get_sender() {
   $query = "SELECT userobm_email
     FROM UserObm
     WHERE userobm_id = '$uid'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get sender mail address                                                 //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_domain() {
+  global $cdg_sql;
+
+  $query = "SELECT mail_value
+    FROM Mail
+    WHERE mail_name = 'main_domain'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

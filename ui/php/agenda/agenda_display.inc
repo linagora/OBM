@@ -554,7 +554,7 @@ function dis_event_form($action, $agenda,$event_q, $usr_q, $grp_q, $category_lis
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
 
-  if ( $all_day == 1 ) {
+  if ( $all_day == "1" ) {
     $style = "display:none;";
     $all_day_checked = "checked=\"checked\"";
   }
@@ -2239,11 +2239,11 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
   $ts_date = strtotime($iso_date);  
   $this_month = get_month($ts_date);
   $this_year = get_year($ts_date);
- 
   $start_time = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
+  echo date("Ymd",$start_time);
   $end_time = strtotime("+1 month +6 days", $start_time);
-  $next_month = isodate_format($end_time);
-  $prev_month = isodate_format(strtotime("-1 month", $start_time));
+  $next_month = isodate_format(strtotime("+1 month",$ts_date));
+  $prev_month = isodate_format(strtotime("-1 month",$ts_date));
 
   $display_date = localizeDate("month", $ts_date);  
   $start_week_day = strtotime($cagenda_weekstart);
