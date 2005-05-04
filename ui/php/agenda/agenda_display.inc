@@ -2532,15 +2532,20 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 		$week_cal .= "</td>";
 	      }
 	    } else {
-              $week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\" onclick=\"window.location='$goto'\"
-                onmouseover=\"this.className='agendaNoEventHover';this.style.cursor = 'pointer'\"
-                onmouseout=\"this.className ='agendaNoEvent'\">&nbsp;</td>";
+	      if( $user_indice == 1) {
+		$class = " border";
+	      } else {
+		$class = "";
+	      }
+              $week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent$class\" onclick=\"window.location='$goto'\"
+                onmouseover=\"this.className='agendaNoEventHover$class';this.style.cursor = 'pointer'\"
+                onmouseout=\"this.className ='agendaNoEvent$class'\">&nbsp;</td>";
 	    }
 	  }
 	} else {
-          $week_cal .= "<td class=\"agendaNoEvent\"  onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='agendaNoEventHover';this.style.cursor = 'pointer'\"
-             onmouseout=\"this.className ='agendaNoEvent'\" colspan=\"$nb_user\">&nbsp;</td>";
+          $week_cal .= "<td class=\"agendaNoEvent border\"  onclick=\"window.location='$goto'\"
+             onmouseover=\"this.className='agendaNoEventHover border';this.style.cursor = 'pointer'\"
+             onmouseout=\"this.className ='agendaNoEvent border'\" colspan=\"$nb_user\">&nbsp;</td>";
         }
       }
       $week_cal .= "</tr>";

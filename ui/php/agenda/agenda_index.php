@@ -230,6 +230,7 @@ if ($action == "index") {
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
       $group_q = run_query_userobm_group();
+      $agenda["date"] = $agenda["datebegin"];
       $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
       $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);  
     }
@@ -289,6 +290,7 @@ if ($param_event > 0) {
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
       $group_q = run_query_userobm_group();
+      $agenda["date"] = $agenda["datebegin"];
       $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
       $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
     }
