@@ -622,7 +622,7 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display warning before a group deletion                                   //
+// Display warning before a group deletion
 // We ask confirmation or cancel
 // Parameters:
 //   - $id : group id
