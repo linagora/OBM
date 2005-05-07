@@ -30,7 +30,7 @@ echo $PHP : PHP interpreter found
 
 # Database creation
 echo "Database creation"
-mysql -u $U -p$P $DB < create_obmdb_0.9.mysql.sql
+mysql -u $U -p$P < create_obmdb_0.9.mysql.sql
 
 # Dictionnary data insertion
 echo "Dictionnary data insertion"

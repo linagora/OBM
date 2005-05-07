@@ -26,7 +26,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
 
   $this_month = get_month($ts_date);
   $this_year = get_year($ts_date);
-  $this_group = $agenda["agenda_group"];
+  $this_group = ($agenda["agenda_group"] ? $agenda["agenda_group"] : $c_all);
 
   $check_week = $ts_date;
   $start_week_time = get_date_day_of_week(strtotime("$this_year-01-01"), $cagenda_weekstart);
@@ -2240,7 +2240,6 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
   $this_month = get_month($ts_date);
   $this_year = get_year($ts_date);
   $start_time = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
-  echo date("Ymd",$start_time);
   $end_time = strtotime("+1 month +6 days", $start_time);
   $next_month = isodate_format(strtotime("+1 month",$ts_date));
   $prev_month = isodate_format(strtotime("-1 month",$ts_date));

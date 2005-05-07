@@ -1,17 +1,17 @@
 <html>
 <head>
-<title>Basic steps to build and install OBM 0.8.x</title>
+<title>Basic steps to build and install OBM 0.9.x</title>
 </head>
 <!-- $Id$ -->
 <body bgcolor="#FFFFFF">
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4, 0.8.5, 0.8.6, 0.8.7, 0.8.8, 0.8.9.
+<p />These docs are valid for OBM 0.9.0.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
-<h1>Basic steps to build and install OBM 0.8.x</h1>
+<h1>Basic steps to build and install OBM 0.9.x</h1>
 
 <h2> Assumptions</h2>
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.9.tar.gz
-tar -C /var/www -xzvf obm-0.8.9.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.9.0.tar.gz
+tar -C /var/www -xzvf obm-0.9.0.tar.gz
 cd /var/www
-ln -s obm-0.8.9 obm
+ln -s obm-0.9.0 obm
 </pre>
   </td>
 </tr>
@@ -59,7 +59,7 @@ chown -R apache:apache *  (on Redhat)
 <h2>2: PHP (module and command line configuration)</h2>
 
 PHP apache module config file : on Debian : /etc/php/apache/php.ini, on RedHat /etc/php.ini.
-<br />Command line PHP must be configured too (Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).) (on Debian : /etc/php4/cgi/php.ini, ot /etc/php4/cli/php.ini on recent versions it seems)
+<br />Command line PHP must be configured too (Some tools (install script, admin tools) works or are also available with php in command line mode (php-cli).) (on Debian : /etc/php4/cgi/php.ini, ot /etc/php4/cli/php.ini on recent versions)
 <p />
 The include_path directive must be set :
 
@@ -73,7 +73,7 @@ include_path = ".:/php/includes:/var/www/obm"
 </table>
 <p>
 
-Since 0.7.3, the short_open_tag can be set to Off but must be On on version before 0.7.3:
+short_open_tag can be set to Off :
 
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -85,7 +85,7 @@ short_open_tag = On (can be switched to Off since OBM 0.7.3)
 </table>
 <p>
 
-Globals must be registered automatically
+Globals must be registered automatically :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
@@ -96,7 +96,7 @@ register_globals = On
 </table>
 <p>
 
-Magic quotes must be On
+Magic quotes must be On :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
@@ -135,7 +135,6 @@ extension=pgsql.so
 
 OBM sources are in the php directory.
 Included files are in the obminclude directory.
-Since 0.5.2 obminclude is by default outside the document root for <b>security</b> reasons.
 <p />
 For the OBM web application, all the apache and php configuration is done through the apache <b>httpd.conf</b> file.
 
@@ -276,7 +275,10 @@ NameVirtualHost 127.0.0.1
 
 <h3>4.1: OBM configuration</h3>
 
-# in obminclude edit the file <i>obm_conf.inc</i> and select the database to use, declare the database, the database user and password.
+# in obminclude copy the file <i>obm_conf.inc.sample</i> to your conf file <i>obm_conf.inc</i> and edit it.
+<br/>
+Sselect the database engine to use, declare the database, the database user and password.
+Fill in your apache host name too.
 You can update some global preferences in this file too (eg: cgp_mail_enabled)
 
 <table bgcolor="#CCCCCC" border="1">
@@ -289,6 +291,10 @@ $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
+// OBM host
+$cgp_host = "http://obm/";
+ ...
+
 // is Mail enabled ? (agenda)
 $gp_mail_enabled = false;
 </pre>
@@ -299,12 +305,12 @@ $gp_mail_enabled = false;
 
 
 <h3>4.2: Database Configuration and Creation</h3>
-The scripts are in the scripts/0.8 directory.
+The scripts are in the scripts/0.9 directory.
 
 <h4>4.2.1: Default Data language</h4>
 
 Some references values are inserted by default. These values can be in french (by default) or in english.
-To toggle these to english for installation edit the file scripts/0.8/install_obmdb_0.8.mysql.sh (pr pgsql) and change the DATA_LANG value to en :
+To toggle these to english for installation edit the file scripts/0.9/install_obmdb_0.9.mysql.sh (pr pgsql) and change the DATA_LANG value to en :
 
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -337,15 +343,15 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* 
 </table>
 <p />
 
-The script <i>install_obmdb_0.8.mysql.sh</i> handle all the database creation steps.
+The script <i>install_obmdb_0.9.mysql.sh</i> handle all the database creation steps.
 <br>
 Set the correct User / password (or DB) in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-cd obm/scripts/0.8
-emacs /install_obmdb_0.8.mysql.sh
-./install_obmdb_0.8.mysql.sh
+cd obm/scripts/0.9
+emacs /install_obmdb_0.9.mysql.sh
+./install_obmdb_0.9.mysql.sh
 </pre>
   </td>
 </tr>
@@ -353,8 +359,6 @@ emacs /install_obmdb_0.8.mysql.sh
 
 
 <h4>4.2.3: PostgreSQL</h4>
-
-Postgres support is back since 0.7.5.
 
 Create the obm user and create the obm database :
 <table bgcolor="#CCCCCC" border="1">
@@ -368,20 +372,7 @@ create database obm with owner = obm;
 </table>
 <p />
 
-<h5>4.2.3.1: For OBM 0.8.0 to 0.8.2</h5>
-If your Postgres server is not configured with latin1 character set:
- edit the file scripts/0.8/obmdb_test_values_0.8.sql and scripts/0.8/obmdb_ref_0.8_fr.sql (or scripts/0.8/obmdb_ref_0.8_en.sql for english) and uncomment the lines
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-\encoding latin1
-</pre>
-  </td>
-</tr>
-</table>
-<p />
-
-<h5>4.2.3.2: Since OBM 0.8.3</h5>
+<h5>4.2.3.1: Encoding</h5>
 If your Postgres server is not configured with latin1 character set:
  edit the file scripts/0.8/postgres-pre.sql and uncomment the line (now uncommented by default)
 <table bgcolor="#CCCCCC" border="1">
@@ -392,18 +383,20 @@ If your Postgres server is not configured with latin1 character set:
   </td>
 </tr>
 </table>
+
+OBM should soon be converted to UTF8 by default.
 <p />
 
-<h5>4.2.3.3: All OBM versions</h5>
-The script <i>install_obmdb_0.8.pgsql.sh</i> handle all the database creation steps.
+<h5>4.2.3.2: Install</h5>
+The script <i>install_obmdb_0.9.pgsql.sh</i> handle all the database creation steps.
 <br>
 Edit User / password (or DB) infos in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-cd obm/scripts/0.8
-emacs install_obmdb_0.8_pgsql.sh
-./install_obmdb_0.8_pgsql.sh
+cd obm/scripts/0.9
+emacs install_obmdb_0.9_pgsql.sh
+./install_obmdb_0.9_pgsql.sh
 </pre>
   </td>
 </tr>
@@ -429,261 +422,9 @@ emacs install_obmdb_0.8_pgsql.sh
 
 
 <p/>
-<a name="upgrade-0.8.0"><h1>UPGRADE OBM DATABASE 0.7.5 to 0.8.0 (MySQL)</h1></a>
-<p />
-# MySQL Database has evolved from 0.7.5 to 0.8.0
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.7.5-0.8.0.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# As a consequence of the new db model, some data need an update too.
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-cd scripts/0.8
-php4 update-0.7.5-0.8.0.php  (on Debian)
-php update-0.7.5-0.8.0.php  (on Redhat)
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.1"><h1>UPGRADE OBM DATABASE 0.8.0 to 0.8.1 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.0 to 0.8.1
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.0-0.8.1.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.0 to 0.8.1
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.0-0.8.1.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.2"><h1>UPGRADE OBM DATABASE 0.8.1 to 0.8.2 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.1 to 0.8.2
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.1-0.8.2.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.1 to 0.8.2
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.1-0.8.2.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-
-<p />
-<a name="upgrade-0.8.3"><h1>UPGRADE OBM DATABASE 0.8.2 to 0.8.3 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.2 to 0.8.3
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.2-0.8.3.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.2 to 0.8.3
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.2-0.8.3.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.4"><h1>UPGRADE OBM DATABASE 0.8.3 to 0.8.4 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.3 to 0.8.4
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.3-0.8.4.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.3 to 0.8.4
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.3-0.8.4.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.5"><h1>UPGRADE OBM DATABASE 0.8.4 to 0.8.5 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.4 to 0.8.5
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.4-0.8.5.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.4 to 0.8.5
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.4-0.8.5.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-<p />
-# Update store values for List module (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.6"><h1>UPGRADE OBM DATABASE 0.8.5 to 0.8.6 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.5 to 0.8.6 (beware, update script <b>requires MySQL 4.x</b> and does not work with MySQL 3.23 ! Check your mysql version before upgrading)
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.5-0.8.6.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.5 to 0.8.6
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.5-0.8.6.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-<p />
-# Update store values for List module (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.7"><h1>UPGRADE OBM FROM 0.8.6 to 0.8.7</h1></a>
-<p />
-OBM Database hasn't evolved from 0.8.6 to 0.8.7, so no update scripts are needed.
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
-
-<p />
-# Update store values for List module (see <a href="#upgrade-common">common upgrade actions</a>).
-
-
-<p />
-<a name="upgrade-0.8.8"><h1>UPGRADE OBM DATABASE 0.8.7 to 0.8.8 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.7 to 0.8.8
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.7-0.8.8.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.7 to 0.8.8
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.7-0.8.8.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-
-<p />
-<a name="upgrade-0.8.9"><h1>UPGRADE OBM DATABASE 0.8.8 to 0.8.9 (MySQL and Postgres)</h1></a>
-<p />
-# MySQL Database has evolved from 0.8.8 to 0.8.9
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/update-0.8.8-0.8.9.mysql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-# Postgres Database has evolved from 0.8.8 to 0.8.9
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/update-0.8.8-0.8.9.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+<a name="upgrade"><h1>UPGRADE versions</h1></a>
+Depending on versions, some upgrade scripts may be provided (to get automatic upgrades for each versions see "Support and Service" link).
+Here are some common actions when upgrading.
 
 
 
@@ -695,7 +436,7 @@ psql -U obm obm < scripts/0.8/update-0.8.8-0.8.9.pgsql.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/obmdb_default_values_0.8.sql
+mysql -u obm -pobm obm < scripts/0.9/obmdb_default_values_0.9.sql
 </pre>
   </td>
 </tr>
@@ -705,7 +446,7 @@ mysql -u obm -pobm obm < scripts/0.8/obmdb_default_values_0.8.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-psql -U obm obm < scripts/0.8/obmdb_default_values_0.8.sql
+psql -U obm obm < scripts/0.9/obmdb_default_values_0.9.sql
 </pre>
   </td>
 </tr>
@@ -725,7 +466,7 @@ A naf code dump is available (french naf codes). If you want to insert these ref
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
+mysql -u obm -pobm obm < scripts/0.9/data-fr/obmdb_nafcode_0.9.sql
 </pre>
   </td>
 </tr>
@@ -735,7 +476,7 @@ mysql -u obm -pobm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-psql -U obm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
+psql -U obm obm < scripts/0.9/data-fr/obmdb_nafcode_0.9.sql
 </pre>
   </td>
 </tr>

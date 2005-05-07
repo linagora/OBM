@@ -206,9 +206,9 @@ function dis_incident_search_list($incident) {
   $obm_q = run_query_search($incident, $new_order, $order_dir);
   $nb_incident = $obm_q->num_rows_total();
   if ($nb_incident == 0) {
-    $display["msg"] = display_info_msg($l_no_found);
+    $display["msg"] = display_warn_msg($l_no_found);
   } else {
-      $block = html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
+    $block = html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
   }
   
   return $block;
