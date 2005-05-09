@@ -109,13 +109,14 @@ function dis_calendar_portal() {
 
   $num = run_query_waiting_events() ;
 
-  $unix_time = time();  
-  $this_month = get_month($unix_time);
-  $this_year = get_year($unix_time);
-  $start_time = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
-  $end_time = strtotime("+1 month",  $start_time);
-  $current_time = $start_time;
 
+  $ts_date = time();  
+  $this_month = get_month($ts_date);
+  $this_year = get_year($ts_date);
+  $start_time = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
+  $end_time = strtotime("+1 month +6 days", $start_time);
+
+   $current_time = $start_time; 
   $calendar_user = array ($auth->auth["uid"] => "dummy"); 
   $events_list = events_model($start_time,$end_time,$calendar_user);
   $whole_month = TRUE;
