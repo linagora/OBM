@@ -517,7 +517,7 @@ class Event {
 class Day {
 
   var $day;
-  var $events;
+  var $events = array();
   var $day_events;
 
   function Day($day) {
