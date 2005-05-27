@@ -10,11 +10,10 @@ Le module \invoice \obm.
 
 \subsection{Organisation de la base de données}
 
-Le module \invoice utilise 3 tables :
+Le module \invoice utilise 2 tables :
 \begin{itemize}
  \item Invoice
  \item InvoiceStatus
- \item InvoiceTerm
 \end{itemize}
 
 \subsection{Invoice}
@@ -34,7 +33,7 @@ Table principale des informations d'une facture.\\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_company\_id & int 8 & Société client ou forunisseur & \\
+\_company\_id & int 8 & Société client ou fournisseur & \\
 \hline
 \_deal\_id & int 8 & Affaire concernée & \\
 \hline
@@ -44,9 +43,9 @@ Table principale des informations d'une facture.\\
 \hline
 \_label & varchar 128 & Label & \\
 \hline
-\_amount\_ht & double 10,2 & montant Hors taxe &\\
+\_amount\_ht & double 10,2 & Montant Hors taxe &\\
 \hline
-\_amount\_ttc & double 10,2 & montant TTC &\\
+\_amount\_ttc & double 10,2 & Montant TTC &\\
 \hline
 \_status\_id & int 4 & Etat & \\
 \hline
@@ -72,7 +71,7 @@ Table des informations des états des factures.\\
 \hline
 \_payment & int 1 & Indicateur facture doit avoir des paiements & (1 = Oui) \\
 \hline
-\_archive & char 1 & Indicateur facture de cet Etat est archivable & (1 = 0ui)\\
+\_archive & char 1 & Indicateur facture de cet Etat est archivable & (1 = Oui)\\
 \hline
 \_label & varchar 24 & Label de l'état & \\
 \hline
@@ -109,45 +108,13 @@ Payée & X & X & \\
 
 
 \subsection{ProjectTerm}
-Table des consitions de règlement ou délais de paiements.
-
-\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
-\hline
-\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
-\hline
-\_id & int 8 & Identifiant & Clé primaire \\
-\hline
-\_project\_id & int 8 & Projet & \\
-\hline
-\_user\_id & int 8 & Utilisateur & \\
-\hline
-\_projecttask\_id & int 8 & Tâche & \\
-\hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
-\hline
-\_timecreate & timestamp 14 & Date de création & \\
-\hline
-\_userupdate & int 8 & Id du modificateur & \\
-\hline
-\_usercreate & int 8 & Id du createur & \\
-\hline
-\_projectedtime & int 8 & Durée prévue & \\
-\hline
-\_missingtime & int 8 & Durée restante estimée & Par Chef P \\
-\hline
-\_validity & timestamp 14 & Date d'estimation d'avancement & \\
-\hline
-\_soldprice & int 8 & Prix de vente de l'utilisateur & \\
-\hline
-\_manager & int 1 & Statut de l'utilisateur dans le projet (si tâche est nulle) & 1 = CP \\
-\hline
-\end{tabular}
+Table des conditions de règlement ou délais de paiements.
 
 
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \invoice, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
@@ -172,7 +139,7 @@ Voici la liste des actions du module \project, avec le droit d'accès requis ains
  \hline
   check\_delete & write & Vérification avant suppression d'une facture. \\
  \hline
-  delete & write & Suppression d'une facture projet. \\
+  delete & write & Suppression d'une facture. \\
  \hline
   display & read & Ecran de modification des préférences d'affichage. \\
  \hline

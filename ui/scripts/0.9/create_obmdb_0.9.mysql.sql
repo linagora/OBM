@@ -1150,7 +1150,7 @@ CREATE TABLE  Payment (
   payment_date            date,
   payment_expected_date   date,		
   payment_amount          double(10,2) DEFAULT '0.0' NOT NULL,
-  payment_label           varchar(40) NOT NULL DEFAULT '',
+  payment_label           varchar(128) NOT NULL DEFAULT '',
   payment_paymentkind_id  int(8),
   payment_account_id      int(8),
   payment_inout           char(1) NOT NULL,

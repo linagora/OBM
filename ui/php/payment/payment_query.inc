@@ -30,6 +30,8 @@ function run_query_search($p_payment, $p_new_order="") {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
+  $dateafter = sql_date_format($db_type, "payment_datealarm", "deal_datealarm");
+
   $order = (strcmp($p_new_order,"")!=0) ? $p_new_order : "payment_label";
   // attention : 
   // if any payment already in the database hase payment_paymentkind_id == -1 
@@ -240,46 +242,46 @@ function run_query_account () {
 // mise à jour de payments 
 // if $banking == 1, we are banking and we set payment_paid to 1.
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update ($p_payment, $banking=0) {
+function run_query_update ($payment, $banking=0) {
   global $auth, $cdg_sql;
 
-  $label = $p_payment["label"];
-  $amount = $p_payment["amount"];
-  $date = $p_payment["date"];
-  $expected_date = $p_payment["expected_date"];
-  $inout = $p_payment["inout"];
-  $comment = $p_payment["comment"];
-  $payment = $p_payment["payment"];
+  $label = $payment["label"];
+  $amount = $payment["amount"];
+  $date = $payment["date"];
+  $expected_date = $payment["expected_date"];
+  $inout = $payment["inout"];
+  $comment = $payment["comment"];
+  $id = $payment["id"];
   // number == "" => no number so null...
-  $number = ($p_payment["number"] == "") ? "null" : "'".$p_payment["number"]."'" ;
+  $number = ($payment["number"] == "") ? "null" : "'".$payment["number"]."'" ;
   // $payment["account"] == -1 means no account selected on insertion page
-  $account = ($p_payment["account"] == "-1") ? "null" : "'".$p_payment["account"]."'" ;
+  $account = ($payment["account"] == "-1") ? "null" : "'".$payment["account"]."'" ;
   // $payment["kind"] == -1 means no kind selected on insertion page
-  $kind = ($p_payment["kind"] == "-1") ? "null" : "'".$p_payment["kind"]."'" ;
-  $date = ($p_payment["date"] == "") ? "null" : "'".$p_payment["date"]."'";
+  $kind = ($payment["kind"] == "-1") ? "null" : "'".$payment["kind"]."'" ;
+  $date = ($payment["date"] == "") ? "null" : "'".$payment["date"]."'";
   
-  $go = new DB_OBM;
+  $pay_q = new DB_OBM;
   
-  $query = "update Payment set ".
-     "payment_timeupdate='".date("Y-m-d H:i:s")."',".
-     "payment_userupdate='".$auth->auth["uid"]."', ".
-     "payment_label ='$label', ".
-     "payment_amount ='".$amount."', ".
-     "payment_number =".$number.", ".
-     "payment_expected_date='".$expected_date."', ".
-     "payment_date =".$date.", ".
-     "payment_paymentkind_id =".$kind.", ".
-     "payment_comment='".$comment."', ".
-     "payment_account_id=".$account." ";
+  $query = "UPDATE Payment SET
+      payment_timeupdate = '".date("Y-m-d H:i:s")."',
+      payment_userupdate = '".$auth->auth["uid"]."',
+      payment_label = '$label',
+      payment_amount = '$amount',
+      payment_number = '$number',
+      payment_expected_date = '$expected_date',
+      payment_date =  '$date',
+      payment_paymentkind_id = '$kind',
+      payment_comment = '$comment',
+      payment_account_id = '$account'";
   if ($banking == 1) {
     $query.= ", payment_paid = '1' ";
   }
   
-  $query .= "where payment_id = '".$payment."'";
+  $query .= " WHERE payment_id = '$id'";
   
   display_debug_msg ("<b>run_query_update() : </b>$query", $cdg_sql);
   
-  $go->query($query);
+  $pay_q->query($query);
 }
 
 
@@ -287,19 +289,22 @@ function run_query_update ($p_payment, $banking=0) {
 // suppression du payment p_payment_id (et toutes les lignes le concernant
 // dans la table PaymentInvoice
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete ($p_payment_id){
+function run_query_delete ($p_id){
   global $cdg_sql;
 
-  $go = new DB_OBM;
+  $pay_q = new DB_OBM;
   // suppression des associations payment-Invoice
-  $query = "delete from PaymentInvoice where paymentinvoice_payment_id = '".$p_payment_id."'";
-  $go->query($query);
-  $query = "delete from Payment where payment_id = '".$p_payment_id."'";
-  $go->query($query);
+  $query = "DELETE FROM PaymentInvoice
+    WHERE paymentinvoice_payment_id = '$p_id'";
+  $pay_q->query($query);
+
+  $query = "DELETE FROM Payment
+    WHERE payment_id = '$p_id'";
+  $pay_q->query($query);
 
   display_debug_msg ("<b>run_query_delete() : </b>$query", $cdg_sql);
 
-  return $go;
+  return $pay_q;
 }
 
 
@@ -321,7 +326,7 @@ function run_query_search_connectable_invoices ($payment) {
   // to that payment if they are paid :
   $query = "select paymentinvoice_invoice_id ".
      "from PaymentInvoice ".
-     "where paymentinvoice_payment_id ='".$payment["payment"]."'".
+     "where paymentinvoice_payment_id ='".$payment["id"]."'".
      " and paymentinvoice_amount = '0.0'";
   display_debug_msg ("<b>run_query_search_connectable_invoices() : </b>$query", $cdg_sql);
   $obm_q->query($query);
@@ -564,18 +569,18 @@ function run_query_bank_paymentinvoice ($p_payment, $p_invoice) {
 
   $go = new DB_OBM;
 
-  if (payment_invoice_are_connected($p_payment["payment"], 
+  if (payment_invoice_are_connected($p_payment["id"], 
   $p_invoice["invoice_id"])) {
     $query = "update PaymentInvoice ".
        " set paymentinvoice_amount = '".$p_invoice["shares"]."'".
        ", paymentinvoice_userupdate ='".$auth->auth["uid"]."'".
        ", paymentinvoice_timeupdate = '".date("Y-m-d H:i:s")."'".
-       " where paymentinvoice_payment_id = '".$p_payment["payment"]."'".
+       " where paymentinvoice_payment_id = '".$p_payment["id"]."'".
        " and paymentinvoice_invoice_id = '".$p_invoice["invoice_id"]."'";
   } else {
     $query = "insert into PaymentInvoice values (".
        " '".$p_invoice["invoice_id"]."'".
-       ",'".$p_payment["payment"]."'".
+       ",'".$p_payment["id"]."'".
        ",'".$p_invoice["shares"]."'".
        ",''". // timeupdate
        ",'".date("Y-m-d H:i:s")."' ".// timecreate
@@ -632,7 +637,7 @@ $query = "insert into PaymentInvoice ".
    " paymentinvoice_userupdate)".
    "values (".
    "'".$p_invoice_id."'," .
-   "'".$payment["payment"]."',".
+   "'".$payment["id"]."',".
    "'0.0',".
    "'',".
    "'".date("Y-m-d H:i:s")."',".

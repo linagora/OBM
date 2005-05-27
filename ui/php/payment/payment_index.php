@@ -21,16 +21,14 @@ require("payment_display.inc");
 require("payment_query.inc");
 require("payment_js.inc");
 
-update_last_visit("payment", $param_payment, $action);
-
-page_close();
-
-// $payment is a hash table containing, for each form field set 
-// in the calling page, a couple var_name => var_value...
-if($action == "")  $action = "index";
+if ($action == "")  $action = "index";
 $payment = get_param_payment();
 get_payment_action();
 $perm->check_permissions($module, $action);
+
+update_last_visit("payment", $param_payment, $action);
+page_close();
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
@@ -60,9 +58,9 @@ if ($action == "new") {
     // we re-load all values :
     $pay_q = run_query_search ($payment);
     $pay_q->next_record();
-    $payment["payment"] = $pay_q->f("payment_id");
+    $payment["id"] = $pay_q->f("payment_id");
 
-    $pay_q = run_query_detail ($payment["payment"]);
+    $pay_q = run_query_detail ($payment["id"]);
     $inv_q = run_query_search_connectable_invoices ($payment);
     $pref_inv_q = run_query_display_pref($auth->auth["uid"], "invoice");
 
@@ -124,9 +122,9 @@ if ($action == "new") {
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($payment["payment"] > 0) {
-    $pay_q = run_query_detail($payment["payment"]);
-    $inv_q = run_query_search_connected_invoices($payment["payment"]);
+  if ($payment["id"] > 0) {
+    $pay_q = run_query_detail($payment["id"]);
+    $inv_q = run_query_search_connected_invoices($payment["id"]);
     $pref_inv_q = run_query_display_pref($auth->auth["uid"], "invoice");
     $display["detailInfo"] = display_record_info($pay_q);
     $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $pref_inv_q);
@@ -136,8 +134,8 @@ if ($action == "new") {
   // detailupdate means changing the label or that kind of things...
   // nothing to do with invoice or account stuff
 ///////////////////////////////////////////////////////////////////////////////
-  if ($payment["payment"] > 0) {
-    $pay_q = run_query_detail($payment["payment"]);
+  if ($payment["id"] > 0) {
+    $pay_q = run_query_detail($payment["id"]);
     $display["detailInfo"] = display_record_info($pay_q);
     $display["detail"] = html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
   }
@@ -151,9 +149,9 @@ if ($action == "new") {
   // and must be validated, including connecting it to one or more invoice
   // and checking its amount, date, bank account concerned, etc.
 ///////////////////////////////////////////////////////////////////////////////
-   if ($payment["payment"] > 0) {
+   if ($payment["id"] > 0) {
      display_ok_msg (" action == bank");
-     $pay_q = run_query_detail ($payment["payment"]);
+     $pay_q = run_query_detail ($payment["id"]);
      $display["detailInfo"] = display_record_info ($pay_q);
      html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
   } 
@@ -175,10 +173,10 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   // recherche des invoices selon label si la recherche a déjà été lancée,
   $inv_q = run_query_search_connectable_invoices($payment);
   // get invoices already connected to that payment :
-  $q_invoices_connected = run_query_search_connected_invoices($payment["payment"]);
+  $q_invoices_connected = run_query_search_connected_invoices($payment["id"]);
   //  $q_invoices_connected->next_record ();
   // first, we display payment info :
-  $pay_q = run_query_detail($payment["payment"]);
+  $pay_q = run_query_detail($payment["id"]);
   $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $q_invoices_connected, $pref_inv_q);
   
   // then the invoices search form
@@ -199,7 +197,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
 
   // then we need to get from base invoices already connected to 
   // that payment, but not paid yet...
-  $invoices_connected = run_query_search_connected_invoices ($payment["payment"], 1);
+  $invoices_connected = run_query_search_connected_invoices ($payment["id"], 1);
   while ($invoices_connected->next_record()) {
     $invoices_selected[] = $invoices_connected->f("invoice_id");
   }
@@ -233,7 +231,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
 
 } elseif ($action == "duplicate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pay_q = run_query_detail($payment["payment"]);
+  $pay_q = run_query_detail($payment["id"]);
   // we give the user the traditionnal form to modify his payment :
   $display["detail"] = html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
 
@@ -254,7 +252,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $success = run_query_delete ($payment["payment"]);
+  $success = run_query_delete ($payment["id"]);
   if ($success) {
     $display["msg"] = display_ok_msg ($l_delete_ok);
   } else {
@@ -269,9 +267,9 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
     $display["msg"] = display_err_msg($l_error_permission);
   } else {
     // first, we get payment details :
-    $pay_q = run_query_detail($payment["payment"]);
+    $pay_q = run_query_detail($payment["id"]);
     // then invoices connected to that payment
-    $inv_q = run_query_search_connected_invoices ($payment["payment"]);
+    $inv_q = run_query_search_connected_invoices ($payment["id"]);
     //$q_connected_invoices->next_record ();
     // display stuff :
     $pref_inv_q = run_query_display_pref ($auth->auth["uid"], "invoice");
@@ -296,15 +294,15 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
     // same work to do :
     $display["msg"] = display_debug_msg("situation = $situation", $cdg_param);
     // we get the list of connected invoices (only one if situation is soft)
-    $invoices = run_query_search_connected_invoices ($payment["payment"]);
+    $invoices = run_query_search_connected_invoices ($payment["id"]);
     while ($invoices->next_record ()) {
       // unpay the invoice
       payment_unpay_invoice ($invoices->f("invoice_id"));
       // unlink payment and invoice
-      payment_invoice_unlink ($payment["payment"], $invoices->f("invoice_id"));
+      payment_invoice_unlink ($payment["id"], $invoices->f("invoice_id"));
     }
     // unpay the payment
-    payment_unpay ($payment["payment"]);
+    payment_unpay ($payment["id"]);
 
   } else {//$situation == "easy"
     $display["msg"] = display_debug_msg("situation = $situation", $cdg_param);
@@ -313,7 +311,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
     while (list($key) = each ($HTTP_POST_VARS)) {
       if (strcmp(substr($key,0,6), "break_") == 0) {
 	$display["msg"] .= display_debug_msg ("cle $key<br>", $cdg_param);
-	payment_invoice_unlink ($payment["payment"], substr($key,6));
+	payment_invoice_unlink ($payment["id"], substr($key,6));
       }
     }
   }
@@ -535,38 +533,40 @@ function get_param_payment() {
   global $hd_nb_invoices, $tf_instant_value, $tf_invoice_company;
   global $rd_paid, $cb_checked;
 
-  if (isset ($tf_amount)) $p_payment["amount"] = $tf_amount;
-  if (isset ($hd_amount)) $p_payment["amount"] = $hd_amount;
-  if (isset ($tf_label)) $p_payment["label"] = $tf_label;
-  if (isset ($tf_number)) $p_payment["number"] = $tf_number;
-  if (isset ($hd_number)) $p_payment["number"] = $hd_number;
-  if (isset ($tf_date_after)) $p_payment["date_after"] = $tf_date_after;
-  if (isset ($tf_date_before)) $p_payment["date_before"] = $tf_date_before;
-  if (isset ($rd_inout)) $p_payment["inout"] = $rd_inout;
-  if (isset ($hd_inout)) $p_payment["inout"] = $hd_inout;
-  if (isset ($sel_kind)) $p_payment["kind"] = $sel_kind;
-  if (isset ($hd_kind)) $p_payment["kind"] = $hd_kind;
-  if (isset ($sel_account)) $p_payment["account"] = $sel_account;
-  if (isset ($hd_account)) $p_payment["account"] = $hd_account;
-  if (isset ($tf_expected_date)) $p_payment["expected_date"]=$tf_expected_date;
-  if (isset ($tf_date)) $p_payment["date"] = $tf_date;
-  if (isset ($param_payment)) $p_payment["payment"] = $param_payment;
-  if (isset ($hd_param_payment)) $p_payment["payment"] = $hd_param_payment;
-  if (isset ($ta_comment)) $p_payment["comment"] = $ta_comment;
-  if (isset ($tf_invoice_label)) $p_payment["invoice_label"] = $tf_invoice_label;
-  if (isset ($tf_invoice_company)) $p_payment["invoice_company"] = $tf_invoice_company;
-  if (isset ($tf_instant_value)) $p_payment["used_amount"] = $tf_instant_value;
-  if (isset ($hd_used_amount)) $p_payment["used_amount"] = $hd_used_amount;
-  if (isset ($hd_nb_invoices)) $p_payment["nb_invoices"] = $hd_nb_invoices;
-  if (isset ($rd_paid)) $p_payment["paid"] = $rd_paid;
-  if (isset ($tf_deal)) $p_payment["deal"] = $tf_deal;
-  if (isset ($tf_company)) $p_payment["company"] = $tf_company;
-  if (isset ($cb_checked)) $p_payment["checked"] = $cb_checked;
+  if (isset ($tf_amount)) $payment["amount"] = $tf_amount;
+  if (isset ($hd_amount)) $payment["amount"] = $hd_amount;
+  if (isset ($tf_label)) $payment["label"] = $tf_label;
+  if (isset ($tf_number)) $payment["number"] = $tf_number;
+  if (isset ($hd_number)) $payment["number"] = $hd_number;
+  if (isset ($tf_date_after)) $payment["date_after"] = $tf_date_after;
+  if (isset ($tf_date_before)) $payment["date_before"] = $tf_date_before;
+  if (isset ($rd_inout)) $payment["inout"] = $rd_inout;
+  if (isset ($hd_inout)) $payment["inout"] = $hd_inout;
+  if (isset ($sel_kind)) $payment["kind"] = $sel_kind;
+  if (isset ($hd_kind)) $payment["kind"] = $hd_kind;
+  if (isset ($sel_account)) $payment["account"] = $sel_account;
+  if (isset ($hd_account)) $payment["account"] = $hd_account;
+  if (isset ($tf_expected_date)) $payment["expected_date"]=$tf_expected_date;
+  if (isset ($tf_date)) $payment["date"] = $tf_date;
+  if (isset ($param_payment)) $payment["id"] = $param_payment;
+  if (isset ($hd_param_payment)) $payment["id"] = $hd_param_payment;
+  if (isset ($ta_comment)) $payment["comment"] = $ta_comment;
+  if (isset ($tf_invoice_label)) $payment["invoice_label"] = $tf_invoice_label;
+  if (isset ($tf_invoice_company)) $payment["invoice_company"] = $tf_invoice_company;
+  if (isset ($tf_instant_value)) $payment["used_amount"] = $tf_instant_value;
+  if (isset ($hd_used_amount)) $payment["used_amount"] = $hd_used_amount;
+  if (isset ($hd_nb_invoices)) $payment["nb_invoices"] = $hd_nb_invoices;
+  if (isset ($rd_paid)) $payment["paid"] = $rd_paid;
+  if (isset ($tf_deal)) $payment["deal"] = $tf_deal;
+  if (isset ($tf_company)) $payment["company"] = $tf_company;
+  if (isset ($cb_checked)) $payment["checked"] = $cb_checked;
 
-  display_debug_param($p_payment);
+  display_debug_param($payment);
 
-  return $p_payment;
+  return $payment;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Invoice data in a hash table.
 // All data come from the banking form
@@ -613,6 +613,7 @@ function get_invoices_data ($nb) {
   
   return $p_all_invoices;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Invoice actions

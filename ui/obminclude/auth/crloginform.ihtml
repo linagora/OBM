@@ -146,7 +146,7 @@ function doChallengeResponse() {
   - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   </font><br>
   <font size="2" face="sans-serif, Verdana, Arial"><a href="http://www.aliacom.fr" target="_blank">Aliacom</a></font> 
-  <font size="2" face="sans-serif, Verdana, Arial">- 2004</font></div>
+  <font size="2" face="sans-serif, Verdana, Arial">: 1998 - 2005</font></div>
 
 <!-- Set up the form with the challenge value and an empty reply value -->
 <input type="hidden" name="challenge" value="<?php print $challenge ?>">

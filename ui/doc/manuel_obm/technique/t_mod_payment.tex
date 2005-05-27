@@ -1,0 +1,139 @@
+% Documentation technique d'OBM : module Paiment
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{Paiment}
+
+Le module \payment d'\obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \payment utilise 3 tables :
+\begin{itemize}
+ \item Payment
+ \item PaymentKind
+ \item PaymentInvoice
+\end{itemize}
+
+\subsection{Payment}
+Table principale des informations d'un paiement.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_company\_id & int 8 & Société client ou fournisseur & \\
+\hline
+\_number & varchar 10 & Numéro du paiement & \\
+\hline
+\_date & date & Date du paiment & \\
+\hline
+\_expected\_date & date & Date prévue du paiment & \\
+\hline
+\_amount & double 10,2 & Montant &\\
+\hline
+\_label & varchar 128 & Label & \\
+\hline
+\_paymentkind\_id & int 8 & Moyen de paiement & \\
+\hline
+\_account\_id & int 8 & Compte crédité ou débité & \\
+\hline
+\_inout & char 1 & Type entrée ou sortie & (+ entrée, - sortie) \\
+\hline
+\_checked & char 1 & Indicateur de vérification & (1 = 0ui)\\
+\hline
+\_comment & text (64k) & Commentaire &\\
+\hline
+\end{tabular}
+
+
+\subsection{PaymentKind}
+Table des moyens de paiement.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_shortlabel & char 3 & Label court & \\
+\hline
+\_longlabel & varchar 40 & Label & \\
+\hline
+\end{tabular}
+
+
+\subsection{PaymentInvoice}
+Table de liaison entre les paiements et les factures.\\
+Une facture peut avoir plusieurs paiement et un paiement peut couvrir plusieurs factures.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_invoice\_id & int 8 & Identifiant de la facture & \\
+\hline
+\_payment\_id & int 8 & Identifiant du paiment & \\
+\hline
+\_amount & double 10,2 & Montant concerné du paiment pour la facture &\\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\end{tabular}
+
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \payment, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche des paiments. \\ 
+ \hline
+  search & read & Résultat de recherche de paiments. \\
+ \hline
+  new & write & Formulaire de création d'un paiment. \\
+ \hline
+  detailconsult & read & Fiche détail d'un paiment. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'un paiment. \\
+ \hline
+  duplicate & write & Formulaire de création à partir d'une facture existante. \\
+ \hline
+  insert & write & Insertion d'un paiment. \\
+ \hline
+  update & write & Mise à jour d'un paiment. \\
+ \hline
+  check\_delete & write & Vérification avant suppression d'un paiment. \\
+ \hline
+  delete & write & Suppression d'un paiment. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ \hline
+\end{tabular}

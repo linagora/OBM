@@ -261,7 +261,7 @@ $l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \
 ////// Theme 'Yours' lang files ////////////////////////
 ////////////////////////////////////////////////////////
 
-$l_waiting_events = "Evémenement(s) en attente";
+$l_waiting_events = "Evénement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
 $l_your_agenda = "Votre agenda";
 $l_your_time = "Votre gestion du temps";

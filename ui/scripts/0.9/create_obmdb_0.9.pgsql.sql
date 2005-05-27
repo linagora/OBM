@@ -1154,7 +1154,7 @@ CREATE TABLE  Payment (
   payment_date            date,
   payment_expected_date   date,		
   payment_amount          decimal(10,2) DEFAULT '0.0' NOT NULL,
-  payment_label           varchar(40) NOT NULL DEFAULT '',
+  payment_label           varchar(128) NOT NULL DEFAULT '',
   payment_paymentkind_id  integer,
   payment_account_id      integer,
   payment_inout           char(1) NOT NULL,
@@ -1176,9 +1176,6 @@ CREATE TABLE PaymentKind (
 );
 
 
---
--- New table 'PaymentInvoice'
---
 --
 -- New table 'PaymentInvoice'
 --

@@ -1011,7 +1011,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
  } else {
 
    $url = url_prepare("payment_index.php?action=search_invoice".
-		     "&amp;param_payment=".$payment["payment"].
+		     "&amp;param_payment=".$payment["id"].
 		     "&amp;tf_invoice_label=$tf_invoice_label");
    
    $dis_invoice = new OBM_DISPLAY("DATA", $dis_options_invoice, "payment");
@@ -1028,12 +1028,12 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
 
    if ($p_action == "search_invoice") {
      $url = url_prepare("payment_index.php?action=add_invoices".
-		       "&amp;param_payment=".$payment["payment"]);
+		       "&amp;param_payment=".$payment["id"]);
    }
    elseif (($p_action == "new_with_invoices") 
 	   || ($p_action == "search_invoice_new")) {
      $url = url_prepare("payment_index.php?action=insert_with_invoices".
-		       "&amp;param_payment=".$payment["payment"]);
+		       "&amp;param_payment=".$payment["id"]);
    }
    if (true) {
      $display["msg"] .= display_debug_msg("FIXME : permissions", $cdg_param); 
@@ -1078,7 +1078,7 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
 
   // first form : the user can update the payment
   // (type in number, amount kind, account...)
-  $q_payment = run_query_detail ($payment["payment"]);
+  $q_payment = run_query_detail ($payment["id"]);
   html_payment_form ("add_invoices", $q_payment,
 		     run_query_paymentkind(), run_query_account());
   // ATTENTION : peut-être un problème de formulaire dans html_payment_form()
@@ -1170,7 +1170,7 @@ function html_banking_problem ($p_error, $p_payment, $p_invoices) {
 <center>
  <form name=\"form_do_it_again\" method=post action=\"$url_again\">$url
   <input type=hidden name=\"hd_param_payment\" ".
-      " value=\"".$p_payment["payment"]."\">
+      " value=\"".$p_payment["id"]."\">
   <input type=hidden name=\"hd_inout\" ".
       " value=\"".$p_payment["inout"]."\">
   <input type=submit value=\"$l_bank_again\">
@@ -1183,7 +1183,7 @@ function html_banking_problem ($p_error, $p_payment, $p_invoices) {
 <center>
  <form name=\"form_are_you_sure\" method=post action=\"$url_go\">
   <input type=hidden name=check_done value=1>
-  <input type=hidden name=hd_param_payment value=\"".$p_payment["payment"]."\">
+  <input type=hidden name=hd_param_payment value=\"".$p_payment["id"]."\">
   <input type=hidden name=hd_amount value=\"".$p_payment["amount"]."\">
   <input type=hidden name=hd_used_amount value=\"".$p_payment["used_amount"]."\">
   <input type=hidden name=hd_account value=\"".$p_payment["account"]."\">
@@ -1522,4 +1522,4 @@ function html_reconcile_error_page ($error_msg) {
   return $block;
 } // html_reconcile_error_page ()
 
-</SCRIPT>
+</script>
