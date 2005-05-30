@@ -1,3 +1,11 @@
+/*/////////////////////////////////////////////////////////////////////////////
+// OBM - File : portal.css                                                   //
+//     - Desc : CSS style file (aliasuite theme)                             //
+// 2003-07-30 Aliacom                                                        //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+/////////////////////////////////////////////////////////////////////////////*/
+
 .portal {
 	margin: auto;
 	width: 600px;
@@ -97,9 +105,9 @@ a.agendaLink3:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; b
 
 
 
-/* //////////////////Time////////////////// */
-/* ////// Time table style definition ///// */
-/* ////////////////////////////////////////// */
+/*---------------------------------------------------------------------------*/
+/* Time table style definition */
+/*---------------------------------------------------------------------------*/
 
 .timeWarn {
   	color:		 	#ff0000;
@@ -107,4 +115,20 @@ a.agendaLink3:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; b
 	font-weight: 		800;	
   	margin: 		auto;
 	text-align:		center;
+}
+
+/*---------------------------------------------------------------------------*/
+/* Deal style definition */
+/*---------------------------------------------------------------------------*/
+
+td.number		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	font-weight:		bold;
+	text-align:		right;
+}
+
+td		{
+	font-family:		sans-serif;
+	font-size:		10px;
 }

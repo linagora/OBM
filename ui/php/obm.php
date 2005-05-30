@@ -33,6 +33,7 @@ if ($action == "logout") {
   exit;
 } else {
   include("$obminclude/global_pref.inc");
+  $uid = $auth->auth["uid"];
 }
 
 page_close();
@@ -52,6 +53,10 @@ if ($cgp_show["module"]["agenda"]) {
 
 if ($cgp_show["module"]["time"]) { 
   $block .= dis_time_portal();
+}
+
+if ($cgp_show["module"]["deal"]) { 
+  $block .= dis_deal_portal();
 }
 
 $display["detail"] = "
@@ -116,7 +121,7 @@ function dis_calendar_portal() {
   $start_time = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
   $end_time = strtotime("+1 month +6 days", $start_time);
 
-   $current_time = $start_time; 
+  $current_time = $start_time; 
   $calendar_user = array ($auth->auth["uid"] => "dummy"); 
   $events_list = events_model($start_time,$end_time,$calendar_user);
   $whole_month = TRUE;
@@ -176,7 +181,8 @@ function dis_calendar_portal() {
    </div>
    <div class=\"portalLink\"><a href=\"".url_prepare("agenda/agenda_index.php")."\">$l_your_agenda</a></div>
   </div>
-  ";
+";
+
   return $block;
 }
 
@@ -211,22 +217,51 @@ function dis_time_portal() {
 // Display The Deal specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_portal() {
-  global $ico_deal_portal, $set_theme;
-  global $l_module_time,$l_your_time, $l_unfilled;
+  global $uid, $ico_deal_portal, $set_theme;
+  global $l_deal_total, $l_module_deal, $l_my_deal, $l_deal_balanced;
 
-  $num = run_query_days_unfilled();
+  $potential = run_query_deal_potential($uid);
+  $amount = number_format($potential["amount"]);
+  $balanced = number_format($potential["amount_balanced"]);
+  $nb_potential = $potential["number"];
+
+  $deals = run_query_deal_status($uid);
+  if (count($deals) > 0) {
+    foreach ($deals as $status => $nb) {
+      $dis_status .= "
+    <tr>
+      <td>$status</td>
+      <td class=\"number\">$nb</td>
+    </tr>";
+    }
+  }
+
   $block = "
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_portal\" />
    </div>
-   <div class=\"portalTitle\">$l_module_time</div>
+   <div class=\"portalTitle\">$l_module_deal</div>
    <div class=\"portalContent\">
-    <div class=\"timeWarn\">
-    $num $l_unfilled
+    <div>
+    <table>
+    <tr>
+      <td>$l_my_deal</td>
+      <td class=\"number\">$nb_potential</td>
+    </tr><tr>
+      <td>$l_deal_total</td>
+      <td class=\"number\">&nbsp; $amount</td>
+    </tr><tr>
+      <td>$l_deal_balanced</td>
+      <td class=\"number\">$balanced</td>
+    </tr>
+    <tr><td>&nbsp;</td><td></td></tr>
+    $dis_status
+    </table>
+
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_your_time</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("deal/deal_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_deal</a></div>
   </div>
   ";
   return $block;

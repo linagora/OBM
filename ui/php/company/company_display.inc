@@ -930,7 +930,7 @@ function dis_company_form($action, $company) {
     $cat_q = get_ordered_companycat();
   }
 
-  $users = array();
+  $users = array($uid);
   if ($company["marketing_manager"] > 0) {
     $users[] = $company["marketing_manager"];
   }

@@ -699,51 +699,68 @@ function run_query_days_unfilled() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deal : To complete
+// Get the amount, balanced amount and number of deals of one user
+// Parameters:
+//   - $user_id : User id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deals() {
-  global $cdg_sql, $cdg_param, $auth;
-  global $c_day_fraction, $c_working_days;
+function run_query_deal_potential($user_id) {
+  global $cdg_sql, $cdg_param;
 
-  $uid = $auth->auth["uid"];
-
-  $begindate = get_user_entrydate($uid);
-  $unix_ts = $begindate["unix_timestamp"];
-  $iso = $begindate["iso"];
-  $jan_first = mktime (0, 0, 0, 1, 1, date("Y"));
-  if ($unix_ts > $jan_first) {
-    $date = $iso;
-  } else {
-    $date = date("Y0101");
-  }
-
-  // First and last days of month
-  $query = "
-    select
-      sum(timetask_length) as total_length
-    from TimeTask
-    where timetask_date <= '".date("Ymd")."'
-    and timetask_date >= '$date'
-      and timetask_user_id = '$uid'
-    ";
+  $query = "SELECT
+      count(*) as nb,
+      sum(deal_amount) as amount,
+      sum(deal_amount/deal_hitrate) as amount_balanced
+    FROM Deal
+      LEFT Join DealType on deal_type_id = dealtype_id
+    WHERE dealtype_inout = '+'
+      AND deal_hitrate > 0
+      AND deal_hitrate < 100
+      AND deal_archive = '0'
+      AND deal_marketingmanager_id = '$user_id'
+";
   
-  display_debug_msg($query, $cdg_sql, "run_query_days_unfilled");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  $filled_days = $obm_db->f("total_length");
-  $filled_days = $filled_days/$c_day_fraction;
-  $workingdays = 0;
-  $current_day = strtotime($date);
-  $today = time();
-  while($current_day <= $today) {
-    $day = date("w",$current_day);
-    if ($c_working_days[$day] == 1) {
-      $workingdays ++;
-    }
-    $current_day = strtotime("+1 day",$current_day);
+  display_debug_msg($query, $cdg_sql, "run_query_deal_potential");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $res["amount"] = $obm_q->f("amount");
+  $res["amount_balanced"] = $obm_q->f("amount_balanced");
+  $res["number"] = $obm_q->f("nb");
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the number of active deal by status for one user
+// Parameters:
+//   - $user_id : User id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_status($user_id) {
+  global $cdg_sql, $cdg_param;
+
+  $query = "SELECT
+      count(*) as nb,
+      dealstatus_label
+    FROM Deal
+      LEFT Join DealStatus on deal_status_id = dealstatus_id
+    WHERE deal_hitrate > 0
+      AND deal_hitrate < 100
+      AND deal_archive = '0'
+      AND deal_marketingmanager_id = '$user_id'
+    GROUP BY deal_status_id
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_deal_status");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  while ($obm_q->next_record()) {
+    $res[$obm_q->f("dealstatus_label")] = $obm_q->f("nb");
   }
-  return $workingdays - $filled_days;
+
+  return $res;
 }
 
 

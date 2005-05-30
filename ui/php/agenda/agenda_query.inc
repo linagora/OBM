@@ -1778,25 +1778,26 @@ class Day {
   }
   
   function get_events_before($end, $uid,$start="") {
-    foreach($this->events as $event) {
+    if (count($this->events) > 0) {
+      foreach($this->events as $event) {
       
-      $ev_start = $event["date"];
-      $ev_end = $event["event"]->duration + $ev_start;
+	$ev_start = $event["date"];
+	$ev_end = $event["event"]->duration + $ev_start;
           
-      if ($ev_start > $end) {
-	break;
-      }
-      
-      if (!in_array($uid,$event["users"])) {
-	continue;
-      }
-      if ($ev_start < $end) {
-	$return[] = $event;
-	if ($ev_end > $end) {
-	  $end = $ev_end;
+	if ($ev_start > $end) {
+	  break;
+	}
+	
+	if (!in_array($uid,$event["users"])) {
+	  continue;
+	}
+	if ($ev_start < $end) {
+	  $return[] = $event;
+	  if ($ev_end > $end) {
+	    $end = $ev_end;
+	  }
 	}
       }
-      
     }
     if ($return != null) {
       $return = array("duration"=>$end - $start,"events"=>$return);
@@ -1805,34 +1806,35 @@ class Day {
   }
     
   function get_events_between($start, $end, $uid) {
-    foreach($this->events as $event) {
+    if (count($this->events) > 0) {
+      foreach($this->events as $event) {
       
-      $ev_start = $event["date"];
-      $ev_end = $event["event"]->duration + $ev_start;
+	$ev_start = $event["date"];
+	$ev_end = $event["event"]->duration + $ev_start;
+	
+	if ($ev_end < $start) {
+	  continue;
+	}
+	
+	if ($ev_start > $end) {
+	  break;
+	}
+	
+	if (!in_array($uid,$event["users"])) {
+	  continue;
+	}
       
-      if ($ev_end < $start) {
-	continue;
-      }
+	if ($ev_end > $start && $ev_start < $start) {
+	  return -1;
+	}
       
-      if ($ev_start > $end) {
-	break;
-      }
-      
-      if (!in_array($uid,$event["users"])) {
-	continue;
-      }
-      
-      if ($ev_end > $start && $ev_start < $start) {
-	return -1;
-      }
-      
-      if ($ev_start < $end && $ev_end > $start) {
-	$return[] = $event;
-	if ($ev_end > $end) {
-	  $end = $ev_end;
+	if ($ev_start < $end && $ev_end > $start) {
+	  $return[] = $event;
+	  if ($ev_end > $end) {
+	    $end = $ev_end;
+	  }
 	}
       }
-      
     }
     if ($return != null) {
       $return = array("duration"=>$end - $start,"events"=>$return);

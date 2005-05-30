@@ -50,6 +50,7 @@ include("$obminclude/global_pref.inc");
 require("company_query.inc");
 require("company_display.inc");
 
+$uid = $auth->auth["uid"];
 update_last_visit("company", $param_company, $action);
 
 page_close();

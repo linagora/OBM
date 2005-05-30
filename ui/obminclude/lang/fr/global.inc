@@ -257,12 +257,15 @@ $l_document_add = "Lier des documents";
 $l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \\nles droits sont insuffisants pour exécuter l\'action. \\n Si vous utilisez mozilla/firefox veuillez soit : \\n- Ajouter dans le fichier prefs.js de votre répertoire mozilla la ligne :user_pref(\"signed.applets.codebase_principal_support\", true);\\n - Tapez dans la barre d\'adresse de votre navigateur about:config puis passer la clé signed.applets.codebase_principal_support a true.";
 
 
-////////////////////////////////////////////////////////
-////// Theme 'Yours' lang files ////////////////////////
-////////////////////////////////////////////////////////
-
+//---------------------------------------------------------------------------//
+// Homa page portlets
+//---------------------------------------------------------------------------//
 $l_waiting_events = "Evénement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
 $l_your_agenda = "Votre agenda";
 $l_your_time = "Votre gestion du temps";
 
+$l_my_deal_curent = "Mes affaires en cours";
+$l_my_deal = "Mes affaires";
+$l_deal_total = "Montant Total";
+$l_deal_balanced = "Total pondéré";

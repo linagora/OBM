@@ -59,7 +59,7 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_group_search_form($group);
   if ($set_display == "yes") {
-    $display["msg"] .= dis_group_search_group("");
+    $display["result"] .= dis_group_search_group("");
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
