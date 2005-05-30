@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+
 $module = "";
 $path = ".";
 $extra_css = "portal.css";
@@ -109,7 +110,6 @@ function dis_calendar_portal() {
 
   $num = run_query_waiting_events() ;
 
-
   $ts_date = time();  
   $this_month = get_month($ts_date);
   $this_year = get_year($ts_date);
@@ -180,8 +180,9 @@ function dis_calendar_portal() {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display The Time Managemebt specific portal layer.                       //
+// Display The Time Management specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_portal() {
   global $ico_time_portal,$set_theme;
@@ -192,6 +193,32 @@ function dis_time_portal() {
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_time_portal\" />
+   </div>
+   <div class=\"portalTitle\">$l_module_time</div>
+   <div class=\"portalContent\">
+    <div class=\"timeWarn\">
+    $num $l_unfilled
+    </div>
+   </div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_your_time</a></div>
+  </div>
+  ";
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The Deal specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_portal() {
+  global $ico_deal_portal, $set_theme;
+  global $l_module_time,$l_your_time, $l_unfilled;
+
+  $num = run_query_days_unfilled();
+  $block = "
+  <div class=\"portalModule\"> 
+   <div class=\"portalModuleLeft\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_portal\" />
    </div>
    <div class=\"portalTitle\">$l_module_time</div>
    <div class=\"portalContent\">

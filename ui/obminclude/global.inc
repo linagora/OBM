@@ -347,7 +347,7 @@ $ctt_research = '1'; // Internal R&D tasks
 $ctt_others = '2';   // Tasks not related to production
 
 // task_status flag
-$c_task_notvalid = 0;    // task not valiated
+$c_task_notvalid = 0;    // task not validated
 $c_task_uservalid = 1;   // validated by user (auto when day is full)
 $c_task_adminvalid = 2;  // validated by admin
 

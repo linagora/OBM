@@ -1,0 +1,266 @@
+% Documentation technique d'OBM : module Deal
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{Affaire (module \deal)}
+
+Le module \deal d'\obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \deal utilise 6 tables :
+\begin{itemize}
+ \item Deal
+ \item DealStatus
+ \item DealType
+ \item DealCategory
+ \item DealCategoryLink
+ \item taskType
+\end{itemize}
+
+\subsection{Deal}
+Table principale des informations d'une affaire.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_number & varchar 32 & Numéro ou identifiant de l'affaire & \\
+\hline
+\_label & varchar 128 & Label de l'affaire & \\
+\hline
+\_datebegin & date & Date de début de l'affaire & \\
+\hline
+\_parentdeal\_id & int 8 & Suraffaire d'appartenance de l'affaire & \\
+\hline
+\_type\_id & int 8 & Type de l'affaire & (Achat, Vente,...) \\
+\hline
+\_tasktype\_id & int 8 & Domaine d'activité de l'affaire & (Intégration,...) \\
+\hline
+\_company\_id & int 8 & Société en relation & \\
+\hline
+\_contact1\_id & int 8 & Contact 1 de l'affaire & \\
+\hline
+\_contact2\_id & int 8 & Contact 2 de l'affaire & \\
+\hline
+\_marketingmanager\_id & int 8 & Responsable commercial de l'affaire & \\
+\hline
+\_technicalmanager\_id & int 8 & Responsable technique de l'affaire & \\
+\hline
+\_dateproposal & date & Date de la dernière proposition commerciale & \\
+\hline
+\_amount & Decimal(12,2) & Montant estimé ou proposé de l'affaire & \\
+\hline
+\_hitrate & int 3 & Pourcentage de réussite estimé & \\
+\hline
+\_status\_id & int 2 & Etat de l'affaire & \\
+\hline
+\_datealarm & date & Date d'alarme pour la prochaine action & \\
+\hline
+\_archive & char 1 & Indicateur d'archivage & (1 = 0ui)\\
+\hline
+\_todo & varchar 128 & Action à faire & \\
+\hline
+\_privacy & int 2 & Indicateur de visibilité de l'affaire & \\
+\hline
+\_comment & text (64k) & Commentaire &\\
+\hline
+\end{tabular}
+
+
+\subsection{DealStatus}
+Table de référence des états d'une affaire.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_project\_id & int 8 & Projet de la tâche & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 24 & Label de l'état & \\
+\hline
+\_order & int 2 & Ordre d'affichage de l'état & \\
+\hline
+\_hitrate & char 3 & Pourcentage de réussite associé à l'état & \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+\paragraph{dealstatus\_hitrate} : Pourcentage de réussite associé à l'état. La sélection de cet état positionne automatiquement par défaut le pourcentage de réussite de l'affaire à ce pourcentage.
+La valeur positionnée dans l'affaire peut cependant être modifiée.
+
+
+\subsection{DealType}
+Table de référence des types d'affaire.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 16 & Label du type & \\
+\hline
+\_inout & char 1 & Indicateur d'entrée ou sortie du type de l'affaire & (+ = entrée) \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+\paragraph{dealtype\_inout} : Indicateur d'entrée ou sortie du type d'affaire. Une affaire dont le type a cet indicateur à '+' sera comptée positivement dans les calculs ou estimations de chiffre d'affaire.
+
+Une affaire dont le type a l'indicateur à '-' aura son montant compté négativement dans les calculs.
+Cependant le module \deal étant surtout destiné aux forces de vente, ceci ne devrait pas être fréquent.
+
+
+\subsection{DealCategory}
+Table des catégories d'affaire. Une affaire peut être reliée à plusieurs catégories.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_code & int 8 & Code de la catégorie & \\
+\hline
+\_label & varchar 100 & Label de la catégorie & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{DealCategoryLink}
+Table de liaison entre les affaires et catégories d'affaire.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_category\_id & int 8 & Référence à la catégorie & \\
+\hline
+\_deal\_id & int 8 & Référence à l'affaire & \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche d'affaires. \\ 
+ \hline
+  search & read & Résultat de recherche d'affaires. \\
+ \hline
+  new & write & Formulaire de création d'une affaire. \\
+ \hline
+  detailconsult & read & Fiche détail d'une affaire. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'une affaire. \\
+ \hline
+  insert & write & Insertion d'une affaire. \\
+ \hline
+  update & write & Mise à jour d'une affaire. \\
+ \hline
+  quick\_update & write & Mise à jour rapide d'une affaire. \\
+ \hline
+  check\_delete & write & Vérification avant suppression d'une affaire. \\
+ \hline
+  delete & write & Suppression d'une affaire. \\
+ \hline
+  affect & write & Formulaire d'affectation à une suraffaire. \\
+ \hline
+  affect\_update & write & Affectation à une suraffaire. \\
+ \hline
+  admin & read\_admin & Ecran d'administration des affaires. \\
+ \hline
+  kind\_insert & write\_admin & Ajout d'un type d'affaire. \\
+ \hline
+  kind\_update & write\_admin & Modification d'un type d'affaire. \\
+ \hline
+  kind\_checklink & write\_admin & Vérification avant suppression d'un type d'affaire. \\
+ \hline
+  kind\_delete & write\_admin & Suppression d'un type d'affaire. \\
+ \hline
+  status\_insert & write\_admin & Ajout d'un état d'affaire. \\
+ \hline
+  status\_update & write\_admin & Modification d'un état d'affaire. \\
+ \hline
+  status\_checklink & write\_admin & Vérification avant suppression d'un état d'affaire. \\
+ \hline
+  status\_delete & write\_admin & Suppression d'un état d'affaire. \\
+ \hline
+  cat\_insert & write\_admin & Ajout d'une catégorie d'affaire. \\
+ \hline
+  cat\_update & write\_admin & Modification d'une catégorie d'affaire. \\
+ \hline
+  cat\_checklink & write\_admin & Vérification avant suppression d'une catégorie d'affaire. \\
+ \hline
+  cat\_delete & write\_admin & Suppression d'une catégorie d'affaire. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ \hline
+  document\_add & write & Ajout de liens vers des documents. \\
+ \hline
+  parent\_search & read & Résultat de recherche de suraffaires. \\
+ \hline
+  parent\_new & write & Formulaire de création d'une suraffaire. \\
+ \hline
+  parent\_detailconsult & read & Fiche détail d'une suraffaire. \\
+ \hline
+  parent\_detailupdate & write & Formulaire de modification d'une suraffaire. \\
+ \hline
+  parent\_insert & write & Insertion d'une suraffaire. \\
+ \hline
+  parent\_update & write & Mise à jour d'une suraffaire. \\
+ \hline
+  parent\_delete & write & Suppression d'une suraffaire. \\
+ \hline
+\end{tabular}

@@ -20,6 +20,7 @@ $fieldnames["invoice_label"] = $l_label;
 $fieldnames["invoice_amount_ht"] = $l_amount_ht;
 $fieldnames["invoice_amount_ttc"] = $l_amount_ttc;
 $fieldnames["invoice_status"] = $l_status;
+$fieldnames["invoice_inout"] = $l_inout;
 $fieldnames["invoice_date"] = $l_date;
 $fieldnames["invoice_expiration_date"] = $l_expiration_date;
 $fieldnames["invoice_payment_date"] = $l_payment_date;
@@ -41,7 +42,7 @@ $fieldnames["payment_amount"] = $l_amount;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_invoice(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $col_frs, $col_client;
+  global $path, $set_theme, $col_frs, $col_client, $l_supplier, $l_client;
 
   if ($fieldname == "invoice_deal") {
     $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$OD->data_set->f("deal_id");
@@ -57,6 +58,14 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 
   elseif ($fieldname == "invoice_company") {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+  }
+
+  elseif ($fieldname == "invoice_inout") {
+    if ($OD->data_set->f($fieldname) == '+') {
+      $res["name"] = $l_client;
+    } else {
+      $res["name"] = $l_supplier;
+    }
   }
   
   elseif ($fieldname == "invoice_pay_label") {

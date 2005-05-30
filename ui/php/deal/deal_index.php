@@ -20,6 +20,7 @@
 // - delete          -- $param_deal    -- delete the deal
 // - affect          -- $param_deal    -- show the new parent deal form
 // - affect_update   -- $param_deal    -- affect the deal to the parentdeal
+// - document_add    -- form fields    -- Add a doucment
 // - admin           --                -- admin index (kind)
 // - kind_insert     -- form fields    -- insert the kind
 // - kind_update     -- form fields    -- update the kind
@@ -29,6 +30,10 @@
 // - status_update   -- form fields    -- update the status
 // - status_checklink-- $sel_state     -- check if status is used
 // - status_delete   -- $sel_state     -- delete the status
+// - cat_insert      -- form fields    -- insert the category
+// - cat_update      -- form fields    -- update the category
+// - cat_checklin k  -- $sel_cat       -- check if category is used
+// - cat_delete      -- $sel_cat       -- delete the category
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
