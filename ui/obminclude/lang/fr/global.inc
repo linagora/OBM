@@ -258,14 +258,14 @@ $l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \
 
 
 //---------------------------------------------------------------------------//
-// Homa page portlets
+// Home page portlets
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Evénement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
 $l_your_agenda = "Votre agenda";
 $l_your_time = "Votre gestion du temps";
 
-$l_my_deal_curent = "Mes affaires en cours";
+$l_my_deal_current = "Mes affaires en cours";
 $l_my_deal = "Mes affaires";
 $l_deal_total = "Montant Total";
 $l_deal_balanced = "Total pondéré";

@@ -1581,13 +1581,14 @@ $js_state_loop
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays and check the deal links (and delete form if ok)                 //
+// Displays and check the deal links (and delete form if ok)
 // Parameters:
 //   - $p_id : deal id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_check_links($p_id) {
   global $display, $path, $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
+  global $l_link_invoice, $l_link_invoice_no;
 
   $delete_ok = true;
 
@@ -1637,9 +1638,33 @@ function dis_check_links($p_id) {
     </tr>";
   }
 
+  // Links from Invoice
+  $obm_q = run_query_deal_invoice_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_linki ="<tr><td class=\"detailHead\">$l_link_invoice</td></tr>";
+    while ($obm_q->next_record()) {
+      $iid = $obm_q->f("invoice_id");
+      $ilabel = $obm_q->f("invoice_label");
+      $display_linki .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$iid") . "\">$ilabel</a>
+      </td>
+    </tr>";
+    }
+  } else {
+    $display_linki = "
+    <tr>
+      <td class=\"detailHead\">$l_link_invoice_no</td>
+    </tr>";
+  }
+
   $block .= "<table class=\"detail\">
    $display_linkc
    $display_linkp
+   $display_linki
    </table>";
 
   $dis_back = "<form name=\"form_back\" method=\"post\"

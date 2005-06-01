@@ -73,6 +73,8 @@ $l_link_contract = "L'affare è collegato a questi contratti";
 $l_link_contract_no = "L'affare non è collegato a nessun contratto";
 $l_link_project = "L'affare è collegato a questi progetti";
 $l_link_project_no = "L'affare è non collegato a nessun progetti";
+$l_link_invoice = "L'affare è collegato a queste fatture";
+$l_link_invoice_no = "L'affare è non collegato a nessun fatture";
 $l_cant_delete = "L'affare non può essere eliminato";
 $l_can_delete = "L'affare può essere eliminato";
 

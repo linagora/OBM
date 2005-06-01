@@ -249,8 +249,15 @@ $l_header_globalview = "Validation";
 $l_document_new = "New document";
 $l_document_add = "Link some documents";
 
-//Portal labels
+//---------------------------------------------------------------------------//
+// Home page portlets
+//---------------------------------------------------------------------------//
 $l_waiting_events = "Waiting event(s)";
 $l_unfilled = "Day(s) unfilled";
 $l_your_agenda = "Your calendar";
 $l_your_time = "Your time management";
+
+$l_my_deal_current = "My current deals";
+$l_my_deal = "My deals";
+$l_deal_total = "Total amount";
+$l_deal_balanced = "Balanced amount";

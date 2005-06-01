@@ -218,7 +218,7 @@ function dis_time_portal() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_portal() {
   global $uid, $ico_deal_portal, $set_theme;
-  global $l_deal_total, $l_module_deal, $l_my_deal, $l_deal_balanced;
+  global $l_deal_total, $l_module_deal, $l_my_deal, $l_my_deal_current, $l_deal_balanced;
 
   $potential = run_query_deal_potential($uid);
   $amount = number_format($potential["amount"]);
@@ -246,7 +246,7 @@ function dis_deal_portal() {
     <div>
     <table>
     <tr>
-      <td>$l_my_deal</td>
+      <td>$l_my_deal_current</td>
       <td class=\"number\">$nb_potential</td>
     </tr><tr>
       <td>$l_deal_total</td>

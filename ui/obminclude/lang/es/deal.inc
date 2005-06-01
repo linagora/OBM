@@ -91,6 +91,8 @@ $l_link_contract = "El negocio esta involucrado en estos contratos";
 $l_link_contract_no = "El negocio NO esta involucrado en ningún contrato";
 $l_link_project = "El negocio esta involucrado con estos proyectos";
 $l_link_project_no = "El negocio NO esta involucrado en ningún proyecto";
+$l_link_invoice = "El negocio esta involucrado con estas facturas";
+$l_link_invoice_no = "El negocio NO esta involucrado en ningún facturas";
 $l_cant_delete = "El negocio NO puede ser borrado !";
 $l_can_delete = "El negocio puede ser borrado.";
 

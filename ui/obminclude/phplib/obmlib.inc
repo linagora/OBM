@@ -138,7 +138,7 @@ class OBM_Session extends Session {
 
 class OBM_Challenge_Auth extends Auth {
   var $classname      = "OBM_Challenge_Auth";
-  var $lifetime       =  1200;
+  var $lifetime       =  86400;
   var $magic          = "Simsalabim";  // Challenge seed
   var $database_class = "DB_OBM";
   var $database_table = "UserObm";

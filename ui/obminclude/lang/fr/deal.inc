@@ -93,6 +93,8 @@ $l_link_contract = "L'affaire est référencée par ces contrats";
 $l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
 $l_link_project = "L'affaire est référencée par ces projets";
 $l_link_project_no = "L'affaire n'est pas référencée dans les projets";
+$l_link_invoice = "L'affaire est référencée par ces factures";
+$l_link_invoice_no = "L'affaire n'est pas référencée dans les factures";
 $l_cant_delete = "L'affaire ne peut être supprimée !";
 $l_can_delete = "L'affaire peut être supprimée.";
 
