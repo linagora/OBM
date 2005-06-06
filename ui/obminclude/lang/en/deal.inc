@@ -54,6 +54,7 @@ $l_cat_manage = "Category management";
 $l_cat_exist = "Existing Category";
 $l_cat_new = "New category";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
+$l_forecast = "Forecast";
 
 // Actions
 $l_select_deal = "Select a Deal";
@@ -145,6 +146,8 @@ $l_cat_link_deal_no = "No deals referenced as";
 $l_cat_cant_delete = "The category can't be deleted !";
 $l_cat_can_delete = "The category can be deleted.";     
 $l_cat_no = "No categories !";
+
+$l_help_deal_forecast = "Forecast take into account deals with these criteria : deal not in an archived state, with an amount estimated and with a hitrate > 0 and < 100.";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";

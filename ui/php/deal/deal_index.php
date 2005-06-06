@@ -20,6 +20,7 @@
 // - delete          -- $param_deal    -- delete the deal
 // - affect          -- $param_deal    -- show the new parent deal form
 // - affect_update   -- $param_deal    -- affect the deal to the parentdeal
+// - stats           -- form fields    -- Display the stats screen
 // - document_add    -- form fields    -- Add a doucment
 // - admin           --                -- admin index (kind)
 // - kind_insert     -- form fields    -- insert the kind
@@ -217,6 +218,11 @@ if ($action == "ext_get_id") {
   }
   $display["search"] = dis_deal_index();
   
+} elseif ($action == "stats")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_deal_potential($deal);
+  $display["detail"] .= dis_deal_stats($deal);
+
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($deal["doc_nb"] > 0) {
@@ -586,7 +592,7 @@ function get_deal_action() {
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $l_header_new_child, $l_header_new_parent, $l_header_quickupdate;
-  global $l_deal_select_company;
+  global $l_header_stats, $l_deal_select_company;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   // Index
@@ -734,6 +740,14 @@ function get_deal_action() {
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
+                                     );
+
+  // Stats
+  $actions["deal"]["stats"] = array (
+    'Name'     => $l_header_stats,
+    'Url'      => "$path/deal/deal_index.php?action=stats",
+    'Right'    => $cright_write,
+    'Condition'=> array ('all') 
                                      );
 
   // Document add

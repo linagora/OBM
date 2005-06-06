@@ -61,6 +61,7 @@ $l_invoice_ttc = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
 $l_parentdeal_deals = "Affaires appartenant à la SurAffaire";
+$l_forecast = "Prévisionnel";
 
 // Actions
 $l_select_deal = "Sélectionner l'Affaire";
@@ -150,6 +151,8 @@ $l_cat_link_deal_no = "La catégorie n'est référencée par aucune affaire";
 $l_cat_can_delete = " La catégorie peut être supprimée"; 
 $l_cat_cant_delete = " La catégorie ne peut pas etre supprimée";
 $l_cat_no = "Pas de catégories enregistrées !";
+
+$l_help_deal_forecast = "Le prévisionnel regroupe les affaires répondant aux critères : affaire non archivée, avec une estimation de montant et un % de réussite > 0 et < 100.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";

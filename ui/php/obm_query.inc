@@ -699,40 +699,70 @@ function run_query_days_unfilled() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the amount, balanced amount and number of deals of one user
+// Get the amount, balanced amount and number of deals for a set of users
 // Parameters:
-//   - $user_id : User id
+//   - $users_id : array of User id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_potential($user_id) {
+function run_query_deal_potential($users_id="") {
   global $cdg_sql, $cdg_param;
 
+  if ((is_array($users_id)) && (count($users_id) > 0)) {
+    $where_uid = "AND (";
+    $or = "";
+    foreach ($users_id as $u_id) {
+      $where_uid .= " $or deal_marketingmanager_id='$u_id'";
+      $or = "OR";
+    }
+    $where_uid .= ")";
+  }
+
   $query = "SELECT
+      deal_marketingmanager_id AS uid,
       count(*) as nb,
       sum(deal_amount) as amount,
-      sum(deal_amount/deal_hitrate) as amount_balanced
+      sum(deal_amount/deal_hitrate) as amount_balanced,
+      userobm_lastname,
+      userobm_firstname
     FROM Deal
-      LEFT Join DealType on deal_type_id = dealtype_id
+      LEFT join DealType on deal_type_id = dealtype_id
+      LEFT join UserObm on deal_marketingmanager_id=userobm_id
     WHERE dealtype_inout = '+'
       AND deal_hitrate > 0
       AND deal_hitrate < 100
       AND deal_archive = '0'
-      AND deal_marketingmanager_id = '$user_id'
+      $where_uid
+    GROUP BY deal_marketingmanager_id
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_deal_potential");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $res["amount"] = $obm_q->f("amount");
-  $res["amount_balanced"] = $obm_q->f("amount_balanced");
-  $res["number"] = $obm_q->f("nb");
+
+  $am = 0;
+  $ab = 0;
+  $nb = 0;
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f("uid");
+    $res["$u_id"]["amount"] = $obm_q->f("amount");
+    $res["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
+    $res["$u_id"]["number"] = $obm_q->f("nb");
+    $res["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+    $am += $res["$u_id"]["amount"];
+    $ab += $res["$u_id"]["amount_balanced"];
+    $nb += $res["$u_id"]["number"];
+  }
+
+  $res["0"]["amount"] = $am;
+  $res["0"]["amount_balanced"] = $ab;
+  $res["0"]["number"] = $nb;
 
   return $res;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// XXXX Exists in deal_query.inc too
 // Get the number of active deal by status for one user
 // Parameters:
 //   - $user_id : User id

@@ -220,10 +220,10 @@ function dis_deal_portal() {
   global $uid, $ico_deal_portal, $set_theme;
   global $l_deal_total, $l_module_deal, $l_my_deal, $l_my_deal_current, $l_deal_balanced;
 
-  $potential = run_query_deal_potential($uid);
-  $amount = number_format($potential["amount"]);
-  $balanced = number_format($potential["amount_balanced"]);
-  $nb_potential = $potential["number"];
+  $potential = run_query_deal_potential(array($uid));
+  $amount = number_format($potential["$uid"]["amount"]);
+  $balanced = number_format($potential["$uid"]["amount_balanced"]);
+  $nb_potential = $potential["$uid"]["number"];
 
   $deals = run_query_deal_status($uid);
   if (count($deals) > 0) {

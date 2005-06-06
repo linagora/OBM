@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.1";
+$obm_version = "0.9.2pre1";
 $l_obm_title = "O.B.M.";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -72,7 +72,7 @@ $cgp_sess_db = false;
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 // CAS specific parameters are in obm_conf.inc.
-$auth_kind="standalone"; 
+$auth_kind = "standalone"; 
 
 // Shall the login page encrypt authentication password
 $auth_encryption = 1;

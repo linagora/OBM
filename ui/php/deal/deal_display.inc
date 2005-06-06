@@ -1756,6 +1756,105 @@ function html_deal_affect($parent_q, $p_deal_id) {
          
 	  
 ///////////////////////////////////////////////////////////////////////////////
+// Display The Deal potential block
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_potential() {
+  global $display, $set_theme;
+  global $l_deal, $l_forecast, $l_deal_total, $l_module_deal, $l_deal_balanced;
+  global $l_marketing_manager, $l_total, $l_help_deal_forecast;
+
+  $display["title"] = "<div class=\"title\">$l_deal : $l_forecast</div>";
+
+  $cpt = 1;
+  $potentials = run_query_deal_potential();
+  foreach($potentials as $u_id => $pu) {
+    if ($u_id != "0") {
+      $cpt++;
+      $data = "data" . ($cpt % 2);
+      $amount = number_format($pu["amount"]);
+      $balanced = number_format($pu["amount_balanced"]);
+      $nb_potential = $pu["number"];
+      $user = $pu["name"];
+      $dis_pot .= "
+      <tr class=\"$data\">
+        <td>$user</td>
+        <td style=\"text-align: center;\">$nb_potential</td>
+        <td style=\"text-align: right;\">$amount</td>
+        <td style=\"text-align: right;\">$balanced</td>
+      </tr>";
+    }
+  }
+
+  $amount_t = number_format($potentials["0"]["amount"]);
+  $balanced_t = number_format($potentials["0"]["amount_balanced"]);
+  $nb_potential_t = $potentials["0"]["number"];
+
+  $dis_potential = "
+    <table class=\"resultTable\">
+    <tr>
+      <td class=\"resultHead\">$l_marketing_manager</td>
+      <td class=\"resultHead\"># $l_module_deal</td>
+      <td class=\"resultHead\">$l_deal_total</td>
+      <td class=\"resultHead\">$l_deal_balanced</td>
+    </tr>
+    $dis_pot
+    <tr class=\"data2\">
+      <td>$l_total</td>
+      <td style=\"text-align: center;\">$nb_potential_t</td>
+      <td style=\"text-align: right;\">$amount_t</td>
+      <td style=\"text-align: right;\">$balanced_t</td>
+    </tr>
+    </table>";
+
+  //  $deals = run_query_deal_status($uid);
+  if (count($deals) > 0) {
+    foreach ($deals as $status => $nb) {
+      $dis_status .= "
+    <tr>
+      <td>$status</td>
+      <td class=\"number\">$nb</td>
+    </tr>";
+    }
+  }
+
+  $msg = display_info_msg($l_help_deal_forecast);
+
+  $block = "$msg
+    $dis_potential
+  ";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The Deal stats detail
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_stats($deal) {
+  global $display, $set_theme, $uid;
+  global $l_module_deal;
+
+  $block .= "
+  <div class=\"detailHead\">$l_module_deal</div>";
+
+  $deal_q = run_query_deal_stats($deal);
+  $pref_q = run_query_display_pref($uid, "deal", 0);
+
+  $url=url_prepare("deal_index.php?action=stats&amp;param_list=$id");
+    
+  $dis_deal = new OBM_DISPLAY("DATA", $pref_q, "deal");
+  $dis_deal->data_set = $deal_q;
+  $dis_deal->data_url = $url;
+  $dis_deal->display_entity = "deal";
+  $dis_deal->data_order = true;
+  $dis_deal->data_header = "both";
+  $block .= $dis_deal->display("dis_data_deal");
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Deal Administration Forms
 // Parametres:
 //   - $kind_q   : DBO : Deal kind list
