@@ -19,7 +19,6 @@ $l_technical_manager = "Resp Technique";
 $l_date_proposal = "Date de proposition";
 $l_amount = "Montant";
 $l_hitrate = "% Réussite";
-$l_state = "Etat";
 $l_date_alarm = "Date Alarme";
 $l_date_comment = "Date Commentaire";
 $l_todo = "A faire";

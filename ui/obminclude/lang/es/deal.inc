@@ -16,7 +16,6 @@ $l_technical_manager = "Gerente Técnico";
 $l_date_proposal = "Fecha de Propuesta";
 $l_amount = "Cantidad";
 $l_hitrate = "Rata de Exito";
-$l_state = "Estado";
 $l_date_alarm = "Fecha de Alarma";
 $l_date_comment = "Fecha de Comentario";
 

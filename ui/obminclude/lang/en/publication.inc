@@ -63,6 +63,7 @@ $l_fill_title = "You have to fill the Title before submitting.";
 $l_delete_confirm = "Delete the publication ?";
 $l_j_check_year = "The Year is not valid.";
 $l_j_fill_lang = "The Language is not valid.";
+$l_j_check_lang = "The Lang is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
 $l_j_type_delete = "You have to select a type to check or delete it !";
 $l_j_type_update = "You have to select a type and enter a new name to update it !";

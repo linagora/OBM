@@ -32,8 +32,7 @@ $l_soldtime = "Sold time";
 $l_projtime = "Projected time";
 $l_total = "Total";
 $l_resume = "Résumé";
-$l_tasks = "tasks";
-$l_members = "members";
+$l_tasks = "Tasks";
 
 // Titres
 $l_members_info = "Project members";

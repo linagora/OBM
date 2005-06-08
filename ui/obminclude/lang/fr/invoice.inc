@@ -14,7 +14,6 @@ $l_number = "Numéro";
 $l_amount = "Montant";
 $l_amount_ht = "Montant HT";
 $l_amount_ttc = "Montant TTC";
-$l_status = "Etat";
 $l_expiration_date = "Date d'échéance";
 $l_payment_date = "Date de paiment";
 $l_date_apres = "Ayant la date après";

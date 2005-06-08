@@ -8,8 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.2pre1";
-$l_obm_title = "O.B.M.";
+$obm_version = "0.9.2pre2";
+$l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
 $c_focsys = 3;
@@ -379,6 +379,7 @@ $js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A
 $php_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[a-z]{2,3}([\-_\.\/A-Za-z0-9]*)$/i"; // Web
 $php_regexp_isodate = "/^[0-9]{4}-[01][0-9]-[0123][0-9]$/";
 $php_regexp_isodatetime = "/^[0-9]{4}-[01][0-9]-[0123][0-9] [012][0-9]:[0-5][0-9]:[0-5][0-9]$/";
+$php_regexp_pub_lang = "/^[A-Za-z-]+$/";  // Publication lang
 $js_regexp_list_name = "/^[0-9A-Za-z_- ]+$/";  // List name
 $js_regexp_import_name = "/^[0-9A-Za-z_- ]+$/";  // Import name
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers

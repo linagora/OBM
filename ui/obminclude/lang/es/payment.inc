@@ -21,7 +21,6 @@ $l_pick_paymentkind = "escoja un tipo de pago";
 $l_kind = "Tipo";
 $l_pick_account = "escoja una cuenta";
 $l_payment_account = "Cuenta ";
-$l_status = "Estado";
 $l_paid = "Cancelado";
 $l_unpaid = "No Cancelado";
 $l_choose_csv = "Escoja el Archivo";

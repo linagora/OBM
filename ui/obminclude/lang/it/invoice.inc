@@ -12,7 +12,6 @@ $l_label_start = "Inizio Etichetta";
 $l_amount = "Totale";
 $l_amount_ht = "Totale HT ";
 $l_amount_ttc = "TTC Totale";
-$l_status = "Stato";
 $l_expiration_date = "Data expiration";
 $l_payment_date = "Data pagamento";
 $l_date_apres = "Dopo";

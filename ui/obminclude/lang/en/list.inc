@@ -43,7 +43,6 @@ $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_function = "Function";
 $l_service = "Service";
-$l_status = "Status";
 $l_letter = "L. Head";
 
 //Publication

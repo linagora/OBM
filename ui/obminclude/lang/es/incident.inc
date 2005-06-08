@@ -9,7 +9,6 @@
 
 // Fields Referencia
 $l_priority = "Prioridad";
-$l_status = "Estado";
 $l_logger = "Gerente Técnico";
 $l_owner = "Responsable";
 $l_duration = "Tiempo tomado para solución";

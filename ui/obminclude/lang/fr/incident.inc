@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_status = "Etat";
 $l_cat1 = "Catégorie";
 $l_date = "Date";
 $l_logger = "Récepteur";

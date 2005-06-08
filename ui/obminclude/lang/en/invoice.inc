@@ -12,7 +12,6 @@ $l_label_start = "Label start";
 $l_amount = "Amount";
 $l_amount_ht = "HT amount";
 $l_amount_ttc = "TTC Amount";
-$l_status = "Status";
 $l_expiration_date = "Expiration date";
 $l_payment_date = "Payment date";
 $l_date_apres = "After";

@@ -115,6 +115,7 @@ $l_fill_title = "Vous devez renseigner le Titre avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de la Publication ?";
 $l_j_check_year = "L'année n'est pas correcte.";
 $l_j_fill_lang = "Vous devez renseigner la Langue avant de valider;";
+$l_j_check_lang = "La langue indiquée n'est pas correcte.";
 $l_j_type_delete = "Sélectionnez un type pour le vérifier ou supprimer !";
 $l_j_type_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
 $l_j_type_create = "Vous devez saisir un nom de type pour le créer !";

@@ -767,7 +767,7 @@ function get_recept_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Publication environment checking (same publications exists ?)                    //
+// Publication environment checking (same publications exists ?)
 // Parameters: :/ Tous les champs ici
 //   - $cid       : publication id
 //   - $publication[] : publication's values
@@ -786,7 +786,7 @@ function check_publication_context($cid, $publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Publication Form Data checking and formatting                                 //
+// Publication Form Data checking and formatting
 // Parameters:
 //   - $cid   : publication id
 //   - $publication[] : values checked
@@ -795,8 +795,8 @@ function check_publication_context($cid, $publication) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($cid, $publication) {
-  global $l_fill_title, $l_j_check_year,$l_j_fill_lang ;
-  global $err_msg;
+  global $l_fill_title, $l_j_check_year,$l_j_fill_lang, $php_regexp_pub_lang;
+  global $err_msg, $l_j_check_lang;
 
   $title = $publication["title"];
   $year = $publication["year"];
@@ -817,6 +817,9 @@ function check_data_form($cid, $publication) {
   if ($lang == "") {
     $err_msg = $l_j_fill_lang;
     return false;
+  } else if (preg_match($php_regexp_pub_lang, $lang) == 0) {
+    $err_msg = $l_j_check_lang . " : $lang";
+    return false;
   }
 
   return true; 
@@ -824,7 +827,7 @@ function check_data_form($cid, $publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Publication Form Data checking and formatting                                 //
+// Publication Form Data checking and formatting
 // Parameters:
 //   - $cid   : publication id
 //   - $publication[] : values checked

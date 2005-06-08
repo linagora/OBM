@@ -1399,7 +1399,7 @@ function events_model($start_time, $end_time, $calendar_user) {
     $user_id = $obm_no_repeat->f("calendaruser_user_id");
     $all_day = $obm_no_repeat->f("calendarevent_allday");    
     $event = &new Event($id,$duration,$title,$category,$privacy,$description);
-    store_event($date, &$event, &$day_events,$user_id,$all_day,$end_time);
+    store_event($date, $event, $day_events, $user_id, $all_day, $end_time);
   }
   
   $obm_repeat = run_query_repeat_events($start_time,$end_time,$calendar_user);
@@ -1494,7 +1494,7 @@ function daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_ev
       $day = &new Day($temp_date);
       $day_events[$iso_date] = &$day;
     }
-    store_event($temp_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    store_event($temp_date, $event, $day_events, $user_id, $all_day,$end_date);
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
   }
 }
@@ -1533,7 +1533,7 @@ function weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequ
 	    $day = &new Day($current_date);
 	    $day_events[$iso_date] = &$day;
 	  }
-	  store_event($current_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+	  store_event($current_date, $event, $day_events,$user_id,$all_day,$end_date);
 	}
       }
     } 
@@ -1584,7 +1584,7 @@ function monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&
 	$day = &new Day($current_date);
 	$day_events[$iso_date] = &$day;
       }
-      store_event($current_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+      store_event($current_date, $event, $day_events,$user_id,$all_day,$end_date);
     }
     $ts_cur = strtotime("+$repeatfrequence months", $ts_cur);
   }	
@@ -1624,7 +1624,7 @@ function monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,
       $day = &new Day($ts_date);
       $day_events[$iso_date] = &$day;
     }
-    store_event($ts_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    store_event($ts_date, $event, $day_events,$user_id,$all_day,$end_date);
     $ts_date = strtotime("+$repeatfrequence months",$ts_date);
   }  
 }
@@ -1662,7 +1662,7 @@ function yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_e
       $day = &new Day($ts_date);
       $day_events[$iso_date] = &$day;
     }
-    store_event($ts_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    store_event($ts_date, $event, $day_events,$user_id,$all_day,$end_date);
     $ts_date = strtotime("+$repeatfrequence years",$ts_date);
   }
 }

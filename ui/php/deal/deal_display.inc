@@ -22,14 +22,14 @@ $fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
-$fieldnames["dealstatus_label"] = $l_state;
+$fieldnames["dealstatus_label"] = $l_status;
 $fieldnames["dealtype_label"] = $l_kind;
 $fieldnames["tasktype_label"] = $l_tt;
 $fieldnames["deal_company_name"] = $l_company;
 $fieldnames["deal_company_zipcode"] = $l_postcode;
 $fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
 $fieldnames["parentdeal_technical_lastname"] = $l_technical_manager;
-$fieldnames["parentdeal_status"] = $l_state;
+$fieldnames["parentdeal_status"] = $l_status;
 $fieldnames["parentdeal_dateproposal"] = $l_date_proposal;
 $fieldnames["parentdeal_datealarm"] = $l_date_alarm;
 $fieldnames["parentdeal_amountprovider"] = $l_amount_out;
@@ -178,7 +178,7 @@ function dis_deal_search_form($deal="") {
 // XHTML Display Deal search form
 // Parameters : 
 //   - $deal[]     : default form values
-//     keys used   : parent, label, company_name, archive, kind, cat, state,
+//     keys used   : parent, label, company_name, archive, kind, cat, status,
 //                   manager, dateafter, datebefore
 //   - $kind_q     : DB result object (deal kind list)
 //   - $tt_q       : DB result object (deal task type list)
@@ -187,7 +187,7 @@ function dis_deal_search_form($deal="") {
 //   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_q) {
-  global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_state;
+  global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
   global $l_all, $l_all_f, $l_find, $c_all, $l_category;
   global $display, $cgp_hide, $l_select_deal;
@@ -203,7 +203,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
   $cat = $deal["category"];
-  $state = $deal["state"];
+  $status = $deal["status"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
@@ -252,17 +252,17 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
     $sel_cat .= "</select>";
   }
 
-  // State select construction
-  $sel_state = "<select name=\"sel_state\">
+  // Status select construction
+  $sel_status = "<select name=\"sel_status\">
      <option value=\"$c_all\">$l_all</option>";
   while ($stat_q->next_record()) {
     $id = $stat_q->f("dealstatus_id");
     $slabel = $stat_q->f("dealstatus_label");
-    $sel_state .= "<option value=\"$id\"";
-    if ($state == $id) $sel_state .= "selected =\" selected\"";
-    $sel_state .= ">$slabel</option>";
+    $sel_status .= "<option value=\"$id\"";
+    if ($status == $id) $sel_status .= "selected =\" selected\"";
+    $sel_status .= ">$slabel</option>";
   }
-  $sel_state .= "</select>";
+  $sel_status .= "</select>";
 
   // Manager select construction
   if ($manager_q->num_rows() > 0) {
@@ -334,8 +334,8 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
     <div class=\"searchLabel\">$l_category<br />
       $sel_cat
     </div>
-    <div class=\"searchLabel\">$l_state<br />
-      $sel_state
+    <div class=\"searchLabel\">$l_status<br />
+      $sel_status
     </div>
     <div class=\"searchLabel\">$l_manager<br />
       $sel_manager
@@ -451,7 +451,7 @@ function dis_deal_search_list($deal) {
 //   - $pref_q   : fields to display in the list of deals 
 //   - $nb_deal  : nb deals found
 //   - $deal[]   : deal search criteria
-//     keys used : parent, label, company_name, archive, kind, tt, state,
+//     keys used : parent, label, company_name, archive, kind, tt, status,
 //                 manager, dateafter, datebefore
 //////////////////////////////////////////////////////////////////////////////
 function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
@@ -466,7 +466,7 @@ function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
   $cat = $deal["category"];
-  $state = $deal["state"];
+  $status = $deal["status"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
@@ -482,7 +482,7 @@ function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
 
   $deal_d = new OBM_DISPLAY("DATA", $pref_q, "deal");
   if ($popup) {
@@ -679,7 +679,7 @@ function html_deal_consult($deal_q) {
   global $set_theme, $ico_company, $ico_contact, $display;
   global $l_infos, $l_company, $l_contact, $l_label,$l_date_init,$l_kind;
   global $l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
-  global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
+  global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_status,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal,$l_category;
   global $l_invoice, $l_no_invoice, $incl_arch, $param_deal;
   global $display, $path, $auth, $cgp_hide, $c_yes, $c_no;
@@ -838,7 +838,7 @@ function html_deal_consult($deal_q) {
         <td class=\"detailLabel\">$l_date_alarm</td>
         <td class=\"detailText\">$datealarm</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_state</td>
+        <td class=\"detailLabel\">$l_status</td>
         <td class=\"detailText\">$status</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_last_update</td>
@@ -983,9 +983,10 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   global $c_php_isodate_format, $l_update,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
   global $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
-  global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state;
-  global $l_last_update,$l_archive,$l_comment,$l_add_comment,$l_upd_comment;
-  global $l_at,$l_todo, $l_category;
+  global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_status;
+  global $l_last_update, $l_archive, $l_at, $l_todo, $l_category;
+  global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
+  global $l_no, $l_members, $l_group;
   global $path, $action, $auth, $cgp_hide, $c_all,$l_all,$popup;
 
   $ext_target = $deal["ext_target"];
@@ -1057,7 +1058,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   if (isset($deal["contact1"])) { $con1 = $deal["contact1"]; }
   if (isset($deal["contact2"])) { $con2 = $deal["contact2"]; }
   if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
-  if (isset($deal["state"])) { $status = $deal["state"]; }
+  if (isset($deal["status"])) { $status = $deal["status"]; }
   if (isset($deal["timeupdate"])) { $timeupdate = $deal["timeupdate"]; }
   if (isset($deal["archive"])) { $archive = ($deal["archive"] == 1 ? "checked" : ""); }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
@@ -1065,6 +1066,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
   if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
   if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
+  if (isset($deal["mail_comment"])) { $mail_comment = $deal["mail_comment"]; }
   if (isset($deal["company_name"])) { $comp = stripslashes($deal["company_name"]); }
   if (isset($deal["company_ad1"])) { $ad1 = stripslashes($deal["company_ad1"]); }
   if (isset($deal["company_zip"])) { $zip = stripslashes($deal["company_zip"]); }
@@ -1188,34 +1190,34 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
       </td>";
   }
 
-  // state select construction
-  $sel_state = "<select name=\"sel_state\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
+  // status select construction
+  $sel_status = "<select name=\"sel_status\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $slabel = $sta_q->f("dealstatus_label");
-    $sel_state .= "<option value=\"$sid\"";
-    if ($status == $sid) $sel_state .= " selected = \"selected\""; 
-    $sel_state .= ">$slabel</option>\n";
+    $sel_status .= "<option value=\"$sid\"";
+    if ($status == $sid) $sel_status .= " selected = \"selected\""; 
+    $sel_status .= ">$slabel</option>\n";
   }
-  $sel_state .= "</select>";
+  $sel_status .= "</select>";
 
   $sta_q->seek(0);
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $shitrate = $sta_q->f("dealstatus_hitrate");
     if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
-      $js_state_loop .= "
+      $js_status_loop .= "
         if (select.options[pos].value == $sid) {
           targetField.value = $shitrate;
         }";
     }
   }
 
-  $js_state = "
+  $js_status = "
 <script type=\"text/javascript\">
 <!--
 function auto_set_hitrate(select, targetField, pos) {
-$js_state_loop
+$js_status_loop
 
   return true;
 }
@@ -1239,6 +1241,15 @@ $js_state_loop
     $sel_usercomment .= ">$cname</option>\n";
   }
   $sel_usercomment .= "</select>";
+
+  // Mail comment radio
+  if (($mail_comment == "") || ($mail_comment == "$l_no")) {
+    $rd_mail_no_c = "checked";
+  } else if ($mail_comment == "$l_members") {
+    $rd_mail_members_c = "checked";
+  } else if ($mail_comment == "$l_group") {
+    $rd_mail_group_c = "checked";
+  }
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
@@ -1296,7 +1307,7 @@ $js_state_loop
   }
 
   $block = "
-    $js_state
+    $js_status
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
@@ -1371,8 +1382,8 @@ $js_state_loop
       <td class=\"detailLabel\">$l_date_alarm</td>
       <td class=\"detailForm\"><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_state</td>
-      <td class=\"detailForm\">$sel_state</td>
+      <td class=\"detailLabel\">$l_status</td>
+      <td class=\"detailForm\">$sel_status</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_todo</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
@@ -1388,6 +1399,13 @@ $js_state_loop
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
       <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_mail_comment</td>
+      <td class=\"detailForm\">
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
+      </td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
       $dis_comment
@@ -1438,8 +1456,9 @@ function dis_deal_quick_form($deal) {
 function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $c_php_isodate_format, $l_update, $l_none;
   global $l_deal, $l_infos, $l_label;
-  global $l_date_alarm, $l_state, $l_hitrate, $l_todo;
-  global $l_last_update,$l_comment,$l_add_comment,$l_upd_comment;
+  global $l_last_update,$l_date_alarm, $l_status, $l_hitrate, $l_todo;
+  global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
+  global $l_no, $l_members, $l_group;
   global $path, $display, $action, $auth, $cgp_hide;
 
   $uid = $auth->auth["uid"];
@@ -1463,43 +1482,43 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   // If parameters have been given, they supercede the default action value
   if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
-  if (isset($deal["state"])) { $status = $deal["state"]; }
+  if (isset($deal["status"])) { $status = $deal["status"]; }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
   if (isset($deal["com"])) { $comment = stripslashes($deal["com"]); }
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
   if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
   if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
+  if (isset($deal["mail_comment"])) { $mail_comment = $deal["mail_comment"]; }
  
-
-  // state select construction
-  $sel_state = "<select name=\"sel_state\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
+  // status select construction
+  $sel_status = "<select name=\"sel_status\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $slabel = $sta_q->f("dealstatus_label");
-    $sel_state .= "<option value=\"$sid\"";
-    if ($status == $sid) $sel_state .= " selected = \"selected\""; 
-    $sel_state .= ">$slabel</option>\n";
+    $sel_status .= "<option value=\"$sid\"";
+    if ($status == $sid) $sel_status .= " selected = \"selected\""; 
+    $sel_status .= ">$slabel</option>\n";
   }
-  $sel_state .= "</select>";
+  $sel_status .= "</select>";
 
   $sta_q->seek(0);
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $shitrate = $sta_q->f("dealstatus_hitrate");
     if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
-      $js_state_loop .= "
+      $js_status_loop .= "
         if (select.options[pos].value == $sid) {
           targetField.value = $shitrate;
         }";
     }
   }
 
-  $js_state = "
+  $js_status = "
 <script type=\"text/javascript\">
 <!--
 function auto_set_hitrate(select, targetField, pos) {
-$js_state_loop
+$js_status_loop
 
   return true;
 }
@@ -1524,10 +1543,19 @@ $js_state_loop
   }
   $sel_usercomment .= "</select>";
 
+  // Mail comment radio
+  if (($mail_comment == "") || ($mail_comment == "$l_no")) {
+    $rd_mail_no_c = "checked";
+  } else if ($mail_comment == "$l_members") {
+    $rd_mail_members_c = "checked";
+  } else if ($mail_comment == "$l_group") {
+    $rd_mail_group_c = "checked";
+  }
+
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
  
   $block = "
-    $js_state
+    $js_status
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_quick_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
@@ -1539,8 +1567,8 @@ $js_state_loop
       <td class=\"detailLabel\">$l_date_alarm</td>
       <td class=\"detailForm\"><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_state</td>
-      <td class=\"detailForm\">$sel_state</td>
+      <td class=\"detailLabel\">$l_status</td>
+      <td class=\"detailForm\">$sel_status</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_todo</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
@@ -1556,6 +1584,13 @@ $js_state_loop
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
       <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_mail_comment</td>
+      <td class=\"detailForm\">
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
+      </td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"8\" cols=\"78\">$add_comment</textarea></td>
     </tr><tr>
@@ -1889,7 +1924,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   $sel_kind .= "</select>";
 
   // status select construction
-  $sel_sta = "<select name=\"sel_state\" onChange=\"
+  $sel_sta = "<select name=\"sel_status\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
     pos = mytext.indexOf('(');
     hit = mytext.substr(pos+1);
@@ -2038,7 +2073,7 @@ function html_deal_admin_form($kind_q, $status_q) {
         <td colspan=\"2\">
       <form name=\"form_status_update\"
         method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-          <input type=\"hidden\" name=\"sel_state\" value=\"\" />
+          <input type=\"hidden\" name=\"sel_status\" value=\"\" />
           <input type=\"hidden\" name=\"action\" value=\"status_update\" />
           <table>
           <tr>
@@ -2470,7 +2505,7 @@ function dis_status_links($id) {
     $dis_del = "<form name=\"form_kind_delete\".
         method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
-      <input type=\"hidden\" name=\"sel_state\" value=\"$id\" />
+      <input type=\"hidden\" name=\"sel_status\" value=\"$id\" />
       <input type=\"submit\" name=\"sub_status\" value=\"$l_status_delete\" />
       </form>";
 
@@ -2614,10 +2649,10 @@ function dis_parentdeal_consult($deal) {
   $kind_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
   $cat_q = run_query_dealcategory();
-  $state_q = run_query_dealstatus();
+  $status_q = run_query_dealstatus();
   $usr_q = run_query_userobm();
 
-  $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $pref_q, $num_rows, $kind_q, $tt_q, $cat_q, $state_q, $usr_q);
+  $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $pref_q, $num_rows, $kind_q, $tt_q, $cat_q, $status_q, $usr_q);
 
   return $block;
 }
@@ -2635,13 +2670,13 @@ function dis_parentdeal_consult($deal) {
 //     //---> used by the deal search form :
 //   - $kind_q   : list of deal types available
 //   - $tt_q     : list of deal tasktype available
-//   - $state_q  : list of deal status available 
+//   - $status_q : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$tt_q,$cat_q,$state_q,$usr_q) {
+function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$tt_q,$cat_q,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
-  global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_state;
+  global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_status;
   global $l_infos;
   global $popup_width, $popup_height, $l_deal_select_company;
 
@@ -2689,7 +2724,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
 
 	<table class=\"detail\">
 	<tr>
-	  <td class=\"detailLabel\">$l_state :</td>
+	  <td class=\"detailLabel\">$l_status :</td>
 	  <td class=\"detailText\">$p_status</td>
 	</tr><tr>
 	  <td class=\"detailLabel\">$l_date_alarm</td>
@@ -2727,7 +2762,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $block .= display_info_msg($l_parentdeal_deals);
 
   //----- deal search form 
-  $block .= html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $state_q, $usr_q);
+  $block .= html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $status_q, $usr_q);
 
   //-----> deal list
   // if no record found, display it and stop
@@ -2740,12 +2775,12 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
-  $state = $deal["state"];
+  $status = $deal["status"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
 
   // Display the list of deals attached to the parentdeal
   $dis_list_deal = new OBM_DISPLAY("DATA", $pref_q, "deal");

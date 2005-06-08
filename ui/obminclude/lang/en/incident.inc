@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_status = "Status";
 $l_cat1 = "Category";
 $l_owner = "Owner";
 $l_logger = "Technical manager";

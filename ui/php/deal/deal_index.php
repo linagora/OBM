@@ -29,8 +29,8 @@
 // - kind_delete     -- $sel_kind      -- delete the kind
 // - status_insert   -- form fields    -- insert the status
 // - status_update   -- form fields    -- update the status
-// - status_checklink-- $sel_state     -- check if status is used
-// - status_delete   -- $sel_state     -- delete the status
+// - status_checklink-- $sel_status    -- check if status is used
+// - status_delete   -- $sel_status    -- delete the status
 // - cat_insert      -- form fields    -- insert the category
 // - cat_update      -- form fields    -- update the category
 // - cat_checklin k  -- $sel_cat       -- check if category is used
@@ -361,12 +361,12 @@ $display["detail"] .= dis_cat_links($deal);
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_status_links($deal["state"]);
+  $display["detail"] = dis_status_links($deal["status"]);
   require("deal_js.inc");
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_status_delete($deal["state"]);
+  $retour = run_query_status_delete($deal["status"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_status_delete_ok);
   } else {
@@ -484,8 +484,8 @@ display_page($display);
 function get_param_deal() {
   global $tf_num, $tf_label, $tf_datebegin, $param_parent, $sel_kind, $sel_tt;
   global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
-  global $tf_dateprop, $tf_amount, $sel_state, $tf_datealarm, $ta_com;
-  global $tf_datecomment, $sel_usercomment, $ta_add_comment;
+  global $tf_dateprop, $tf_amount, $sel_status, $tf_datealarm, $ta_com;
+  global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
   global $tf_plabel, $sel_pmanager, $cb_parchive,$cb_archive,$tf_todo,$cb_priv;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
@@ -524,7 +524,7 @@ function get_param_deal() {
   if (isset ($tf_dateprop)) $deal["dateprop"] = $tf_dateprop;
   if (isset ($tf_amount)) $deal["amount"] = $tf_amount;
   if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
-  if (isset ($sel_state)) $deal["state"] = $sel_state;
+  if (isset ($sel_status)) $deal["status"] = $sel_status;
   if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
   if (isset ($tf_code)) $deal["cat_code"] = $tf_code;
@@ -538,6 +538,7 @@ function get_param_deal() {
   if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $deal["add_comment"] = trim($ta_add_comment);
+  if (isset ($rd_mail_comment)) $deal["mail_comment"] = trim($rd_mail_comment);
   if (isset ($hd_usercreate)) $deal["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $deal["timeupdate"] = $hd_timeupdate;
 
@@ -572,7 +573,7 @@ function get_param_deal() {
   if (isset ($rd_kind_inout)) $deal["kind_inout"] = $rd_kind_inout;
 
   // Admin - Status fields
-  // $sel_state -> "state" is already set
+  // $sel_status -> "status" is already set
   if (isset ($tf_status)) $deal["status_label"] = $tf_status;
   $deal["status_order"] = (isset($tf_order) ? $tf_order : "0");
 

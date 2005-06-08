@@ -12,7 +12,6 @@ $l_users = "Contatti";
 $l_groups = "Gruppi";
 $l_title = "Titolo";
 $l_private_description = "L'Evento è privato. non è possibile visualizzare i dettagli";
-$l_state = "Stato";
 $l_back_mono = "Torna alla tua impostazione";
 
 $l_high = "Alta";

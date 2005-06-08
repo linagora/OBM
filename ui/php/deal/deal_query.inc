@@ -11,7 +11,7 @@
 // Deal Search query execution 
 // Parameters :
 //   - $deal[]   : deal search criteria
-//     keys used      : parent, label, company_name, archive, kind, cat, state,
+//     keys used      : parent, label, company_name, archive, kind, cat, status
 //                      manager, dateafter, datebefore
 //   - $all : if it is set to 1 then return also the private deals ...
 //   - $p_new_order  : if it's set, it replaces the default "order by" value
@@ -29,7 +29,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
   $cat = $deal["category"];
-  $state = $deal["state"];
+  $status = $deal["status"];
   $manager = $deal["manager"];
   $dateafter = $deal["dateafter"];
   $datebefore = $deal["datebefore"];
@@ -66,8 +66,8 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $where .= " and company_zipcode $like '$zip%'";
     $join_comp = "left join Company on deal_company_id=company_id";
   }
-  if (($state != $c_all) && ($state != "")) {
-    $where .= " and deal_status_id='$state'";
+  if (($status != $c_all) && ($status != "")) {
+    $where .= " and deal_status_id='$status'";
   }
   if ($dateafter != "") {
     $where .= " and deal_datealarm > '$dateafter'";
@@ -224,7 +224,7 @@ function run_query_insert($deal) {
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
-  $status = $deal["state"];
+  $status = $deal["status"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $cats = $deal["category"];
@@ -324,7 +324,7 @@ function run_query_insert($deal) {
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($deal) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $l_no;
 
   $id = $deal["id"];
   $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
@@ -343,7 +343,7 @@ function run_query_update($deal) {
   $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
   $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
-  $status = $deal["state"];
+  $status = $deal["status"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $comment = $deal["com"];
@@ -353,6 +353,7 @@ function run_query_update($deal) {
     $usercomment = $deal["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
+  $mail_comment = $deal["mail_comment"];
   $cat_m = $deal["category"];
   
   $query = "UPDATE Deal SET
@@ -404,8 +405,7 @@ function run_query_update($deal) {
     }
   }
 
-
-  // If deal archive state has changed, update the company deal number
+  // If deal archive status has changed, update the company deal number
   if (($retour) && ($archive != $archive_old)) {
     if ($archive == '1') {
       run_query_company_active_deal_dec($comp);
@@ -414,7 +414,57 @@ function run_query_update($deal) {
     }
   }
 
+  // If mail comment activated, send the updates by mail
+  if (($mail_comment != "") && ($mail_comment != "$l_no")) {
+    deal_send_mail($deal);
+  }
+
   return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Deal Send Mail
+// Parameters:
+//   - $deal[] : deal hash info
+///////////////////////////////////////////////////////////////////////////////
+function deal_send_mail($deal) {
+  global $auth, $uid, $cdg_sql, $cg_com;
+  global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
+  global $l_hitrate, $l_status, $l_date_alarm;
+
+  $id = $deal["id"];
+  $d = get_deal_infos($id);
+  $mail_comment = $deal["mail_comment"];
+  $market = $d["market"];
+  $tech = $d["tech"];
+  $company = $d["company"];
+  $label = $d["label"];
+  $hitrate = $deal["hitrate"];
+  $datealarm = $deal["datealarm"];
+  $add_comment = $deal["add_comment"];
+  $datecomment = $deal["datecomment"];
+  $usercomment = $deal["usercomment"];
+
+  $subject = "$l_obm_title : $l_deal : $company - $label";
+  $message = "$l_company: $company
+$l_deal: $label
+$l_hitrate: $hitrate
+$l_status: $status
+$l_date_alarm: $datealarm
+$datecomment:$usercomment:$add_comment";
+  if ($mail_comment == "$l_members") {
+    $users_array = array($market, $tech);
+  } else if ($mail_comment == "$l_group") {
+    $users_array = get_all_users_from_group($cg_com);
+  }
+  if (! is_array($users_array)) {
+    $users_array = array();
+  }
+  $recipient_array = array_diff($users_array, array($uid));
+  send_mail($subject, $message, $recipient_array,"");
+
+  return true;
 }
 
 
@@ -424,12 +474,12 @@ function run_query_update($deal) {
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_quick_update($deal) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $l_no;
 
   $id = $deal["id"];
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
-  $status = $deal["state"];
+  $status = $deal["status"];
   $todo = $deal["todo"];
   $comment = $deal["com"];
   $add_comment = $deal["add_comment"];
@@ -438,6 +488,7 @@ function run_query_quick_update($deal) {
     $usercomment = $deal["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
+  $mail_comment = $deal["mail_comment"];
   $cat_m = $deal["category"];
   
   $query = "UPDATE Deal SET
@@ -453,6 +504,11 @@ function run_query_quick_update($deal) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+  // If mail comment activated, send the updates by mail
+  if (($mail_comment != "") && ($mail_comment != "$l_no")) {
+    deal_send_mail($deal);
+  }
 
   return $retour;
 }
@@ -483,7 +539,7 @@ function run_query_deal_id($deal) {
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
   $datealarm = ($deal["datealarm"] ? "='".$deal["datealarm"]."'" : "is null");
-  $status = $deal["state"];
+  $status = $deal["status"];
   $todo = $deal["todo"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   // comment not searched because processed before stored in db
@@ -534,7 +590,7 @@ function run_query_delete($id) {
   $archive = get_deal_archive($id);
   $comp_id = get_deal_company_id($id);
 
-  // If deal archive state is off (0), update the company deal number
+  // If deal archive status is off (0), update the company deal number
   if ($archive == '0') {
     run_query_company_active_deal_dec($comp_id);
   }
@@ -880,15 +936,15 @@ function run_query_company_total_deal_dec($comp_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the deal archive state                                                //
+// Get the deal archive status
 // Parameters:
 //   - $deal_id : deal id
-// Returns: archived state : 1 = archived, 0 = not archived
+// Returns: archived status : 1 = archived, 0 = not archived
 ///////////////////////////////////////////////////////////////////////////////
 function get_deal_archive($deal_id) {
   global $cdg_sql;
 
-  $query = "select deal_archive from Deal where deal_id='$deal_id'";
+  $query = "SELECT deal_archive FROM Deal WHERE deal_id='$deal_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -901,7 +957,42 @@ function get_deal_archive($deal_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the deal company id                                                   //
+// Get the deal infos
+// Parameters:
+//   - $deal_id : deal id
+// Returns: array of deal infos
+///////////////////////////////////////////////////////////////////////////////
+function get_deal_infos($deal_id) {
+  global $cdg_sql;
+
+  $query = "SELECT *,
+      company_name,
+      dealstatus_label,
+      dealtype_label
+    FROM Deal
+      LEFT JOIN Company on deal_company_id = company_id
+      LEFT JOIN DealStatus on deal_status_id = dealstatus_id
+      LEFT JOIN DealType on deal_type_id = dealtype_id
+    WHERE deal_id='$deal_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  $res["label"] = $obm_q->f("deal_label");
+  $res["company"] = $obm_q->f("company_name");
+  $res["status"] = $obm_q->f("dealstatus_label");
+  $res["type"] = $obm_q->f("dealtype_label");
+  $res["market"] = $obm_q->f("deal_marketingmanager_id");
+  $res["tech"] = $obm_q->f("deal_technicalmanager_id");
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the deal company id
 // Parameters:
 //   - $deal_id : deal id
 // Returns: company id
@@ -1279,7 +1370,7 @@ function run_query_status_insert($deal) {
 function run_query_status_update($deal) {
   global $auth, $cdg_sql;
 
-  $status = $deal["state"];
+  $status = $deal["status"];
   $label = $deal["status_label"];
   $order = $deal["status_order"];
   $hitrate = $deal["hitrate"];

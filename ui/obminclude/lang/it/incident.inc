@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_status = "Stato";
 $l_owner = "Possessore";
 $l_logger = "Resp. Tecnico";
 $l_duration = "Durata";

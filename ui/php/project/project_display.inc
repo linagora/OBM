@@ -2009,7 +2009,6 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
     $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
     $dis_member .= "</tr>\n";
 
-
     // ratios
     $ratio_alloestimated = intval(($allotted/$estimated)*100);
     $ratio_usedestimated = intval(($usedtime/$estimated)*100);

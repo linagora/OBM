@@ -13,7 +13,6 @@ $l_label_start = "Inicio de Referencia";
 $l_amount = "Cantidad";
 $l_amount_ht = "Cantidad HT";
 $l_amount_ttc = "Cantidad TTC";
-$l_status="Estado";
 $l_expiration_date = "Expiration date";
 $l_payment_date = "Payment date";
 $l_date_apres = "Despues";

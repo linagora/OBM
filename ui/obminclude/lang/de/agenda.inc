@@ -10,7 +10,6 @@
 $l_users = "Users";
 $l_groups = "Groups";
 $l_title = "Title";
-$l_state = "State";
 $l_none = "None";
 
 $l_high = "High";

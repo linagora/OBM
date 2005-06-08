@@ -1678,7 +1678,7 @@ function get_email_used($id="", $gid="", $lid="") {
 //  - $r_addr     : adresses array to add to recipients
 //  - $force      : Mail should be forced (all user even with no set_mail)
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject, $message, $recipients, $r_addr, $force) {
+function send_mail($subject, $message, $recipients, $r_addr, $force="") {
   global $cgp_mail_enabled;
   global $aliasuite_enabled;  
 
@@ -1695,24 +1695,26 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
   $reci_q = run_query_get_recipients($recipients, $force);
 
   // If AliaSuite, get local main mail domain.
-  if( $aliasuite_enabled ) {
-      $domain_q = run_query_get_domain();
-      $local_domain = $domain_q->f("mail_value");
+  if ($aliasuite_enabled) {
+    $domain_q = run_query_get_domain();
+    $local_domain = $domain_q->f("mail_value");
   }
 
   // Construct recipient list
-  while ($reci_q->next_record()) {
-    $reci = $reci_q->f("userobm_email");
+  if (is_object($reci_q)) {
+    while ($reci_q->next_record()) {
+      $reci = $reci_q->f("userobm_email");
     
-    // If AliaSuite, construct recipient address.
-    if( $aliasuite_enabled ) {
-        $reci = strtok($reci, "\r\n")."@".$local_domain;
-    }
+      // If AliaSuite, construct recipient address.
+      if ($aliasuite_enabled) {
+	$reci = strtok($reci, "\r\n")."@".$local_domain;
+      }
     
-    if ($reci_list == "") {
-      $reci_list = $reci;
-    } else {
-      $reci_list .= " , $reci";
+      if ($reci_list == "") {
+	$reci_list = $reci;
+      } else {
+	$reci_list .= " , $reci";
+      }
     }
   }
 
@@ -1731,11 +1733,12 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
   // If AliaSuite, construct sender address.
   if( $aliasuite_enabled ) {
     $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@".$local_domain;
-  }else {
+  } else {
     $headers .= $send_q->f("userobm_email");
   }
   
   if ($reci_list != "") {
+    // echo "<p>mail: $reci_list<br>$subject<br>$message<br>$headers";
     mail ($reci_list, $subject, $message, $headers);      
   }
 }
@@ -1743,9 +1746,11 @@ function send_mail($subject, $message, $recipients, $r_addr, $force) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get recipients mail addresses
+// If no recipient given, no list returned
 // Parameters:
 //  - $recipients : Id Recipients array
 //  - $force      : Mail should be forced (all user even with no set_mail)
+// Returns: DB with email recipients, or false if no valid recipients
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_recipients($recipients, $force) {
   global $cdg_sql;
@@ -1758,11 +1763,15 @@ function run_query_get_recipients($recipients, $force) {
   }  
   $coma = "";
   foreach($recipients as $recipient) {
-    $user_list .= $coma.$recipient;
-    $coma = ",";
+    if ($recipient) {
+      $user_list .= $coma.$recipient;
+      $coma = ",";
+    }
   }
   if ($user_list != "") {
     $user_in = "userobm_id IN ($user_list) AND";
+  } else {
+    return false;
   }
 
   $query = "SELECT userobm_email
@@ -1774,12 +1783,13 @@ function run_query_get_recipients($recipients, $force) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get sender mail address                                                 //
+// Get sender mail address
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_sender() {
   global $auth, $cdg_sql;
@@ -1798,7 +1808,7 @@ function run_query_get_sender() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get sender mail address                                                 //
+// Get domain name (aliasuite mode)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_domain() {
   global $cdg_sql;

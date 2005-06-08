@@ -26,7 +26,6 @@ $l_renew = "Renouvellement";
 $l_date_cancel = "Résiliation";
 $l_autorenewal ="Tacite Reconduction";
 $l_priority = "Priorite";
-$l_status = "Etat";
 $l_type = "Type";
 $l_pri_manage = "Gestion des priorités du contrat";
 $l_pri_exist = "Priorités existantes";

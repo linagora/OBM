@@ -219,7 +219,7 @@ function check_kind_checkdel(form) {
 // Check if the Deal Status deletion is possible                            //
 ///////////////////////////////////////////////////////////////////////////////
 function check_status_checkdel(form) {  
-   if (form.sel_state.selectedIndex >= 0)
+   if (form.sel_status.selectedIndex >= 0)
    { 
      return true;
    }
@@ -250,9 +250,9 @@ function check_kind_upd(form,formd) {
 // Check if the status update is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_status_upd(form,formd) {
-  status_pos = formd.sel_state.selectedIndex;
+  status_pos = formd.sel_status.selectedIndex;
   if ((status_pos >= 0) && (form.tf_status.value != \"\")) {
-    form.sel_state.value=formd.sel_state.options[status_pos].value;
+    form.sel_status.value=formd.sel_status.options[status_pos].value;
     return true;
   } else {
     alert(\"$l_j_status_update\");

@@ -21,7 +21,6 @@ $l_potential = "Weighted Potential";
 $l_label = "Label";
 $l_label_start = "Label start with";
 $l_kind = "Branche";
-$l_state = "Status";
 $l_project_manager = "Projektleiter";
 $l_origin = "Origin";
 $l_marketing_manager = "Vertriebsleiter";

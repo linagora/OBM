@@ -21,7 +21,6 @@ $l_pick_paymentkind = "Scegli un tipo di pagamento";
 $l_kind = "Tipo";
 $l_pick_account = "Scegli un account";
 $l_payment_account = "Account ";
-$l_status = "Status";
 $l_paid = "Pagato";
 $l_unpaid = "Non Pagato";
 // invoice connected :

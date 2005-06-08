@@ -26,7 +26,6 @@ $l_renew = "Renewal";
 $l_date_cancel = "Cancellation";
 $l_autorenewal =" Renewal Auto";
 $l_priority = "Priority";
-$l_status = "Status";
 $l_pri_manage = "Contract Priority Management";
 $l_pri_exist = "Existing Priorities";
 $l_pri_new = "New Priority";
