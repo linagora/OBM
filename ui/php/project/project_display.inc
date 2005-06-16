@@ -1815,6 +1815,8 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
   // retrieve project related infos
   $pid = $project_q->f("project_id");
   $name = $project_q->f("project_name");
+  $soldtime = $project_q->f("project_soldtime");
+  $estimated = $project_q->f("project_estimatedtime");
 
   if (($members_q != 0) && ($members_q->num_rows() != 0)){
     while ($members_q->next_record()) {

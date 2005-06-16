@@ -265,10 +265,21 @@ $l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Evénement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
-$l_your_agenda = "Votre agenda";
-$l_your_time = "Votre gestion du temps";
+$l_my_agenda = "Mon agenda";
+$l_my_time = "Ma gestion du temps";
 
 $l_my_deal_current = "Mes affaires en cours";
 $l_my_deal = "Mes affaires";
 $l_deal_total = "Montant Total";
 $l_deal_balanced = "Total pondéré";
+
+$l_my_incident = "Mes incidents";
+$l_my_incident_current = "Mes incidents en cours";
+
+$l_my_contract = "Mes contrats";
+$l_my_contract_current = "Mes contrats en cours";
+$l_cr_date[$cr_date_tosign] = "A signer";
+$l_cr_date[$cr_date_tobegin] = "A débuter";
+$l_cr_date[$cr_date_current] = "En cours";
+$l_cr_date[$cr_date_torenew] = "A renouveler";
+$l_cr_date[$cr_date_ended] = "Expiré";

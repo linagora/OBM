@@ -257,10 +257,21 @@ $l_document_add = "Link some documents";
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Waiting event(s)";
 $l_unfilled = "Day(s) unfilled";
-$l_your_agenda = "Your calendar";
-$l_your_time = "Your time management";
+$l_my_agenda = "My calendar";
+$l_my_time = "My time management";
 
 $l_my_deal_current = "My current deals";
 $l_my_deal = "My deals";
 $l_deal_total = "Total amount";
 $l_deal_balanced = "Balanced amount";
+
+$l_my_incident = "My incidents";
+$l_my_incident_current = "My current incidents";
+
+$l_my_contract = "My contracts";
+$l_my_contract_current = "My current contracts";
+$l_cr_date[$cr_date_tosign] = "To sign";
+$l_cr_date[$cr_date_tobegin] = "To begin";
+$l_cr_date[$cr_date_current] = "Running";
+$l_cr_date[$cr_date_torenew] = "To renew";
+$l_cr_date[$cr_date_ended] = "Expired";

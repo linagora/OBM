@@ -59,13 +59,18 @@ if ($cgp_show["module"]["deal"]) {
   $block .= dis_deal_portal();
 }
 
-$display["detail"] = "
-<div class=\"detail\">
- <div class=\"portal\">
- $block
- <p style=\"clear:both;\"/>  
- </div>
+if ($cgp_show["module"]["incident"]) { 
+  $block .= dis_incident_portal();
+}
 
+if ($cgp_show["module"]["contract"]) { 
+  $block .= dis_contract_portal();
+}
+
+$display["detail"] = "
+<div class=\"portal\">
+$block
+<p style=\"clear:both;\"/>  
 </div>";
 
 $display["end"] = display_end();
@@ -110,7 +115,7 @@ function dis_logout_detail() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_portal() {
   global $ico_agenda_portal,$set_theme;
-  global $l_module_agenda,$l_daysofweekfirst,$l_your_agenda,$l_waiting_events;
+  global $l_module_agenda,$l_daysofweekfirst,$l_my_agenda,$l_waiting_events;
   global $auth, $cagenda_weekstart;
 
   $num = run_query_waiting_events() ;
@@ -179,7 +184,7 @@ function dis_calendar_portal() {
     </table>  
     $num $l_waiting_events
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("agenda/agenda_index.php")."\">$l_your_agenda</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("agenda/agenda_index.php")."\">$l_my_agenda</a></div>
   </div>
 ";
 
@@ -191,8 +196,8 @@ function dis_calendar_portal() {
 // Display The Time Management specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_portal() {
-  global $ico_time_portal,$set_theme;
-  global $l_module_time,$l_your_time, $l_unfilled;
+  global $ico_time_portal, $set_theme;
+  global $l_module_time, $l_my_time, $l_unfilled;
 
   $num = run_query_days_unfilled();
   $block = "
@@ -206,7 +211,7 @@ function dis_time_portal() {
     $num $l_unfilled
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_your_time</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_my_time</a></div>
   </div>
   ";
   return $block;
@@ -262,6 +267,99 @@ function dis_deal_portal() {
     </div>
    </div>
    <div class=\"portalLink\"><a href=\"".url_prepare("deal/deal_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_deal</a></div>
+  </div>
+  ";
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The Incident specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_incident_portal() {
+  global $uid, $ico_incident_portal, $set_theme;
+  global $l_total, $l_module_incident, $l_my_incident, $l_my_incident_current;
+
+  $incs = run_query_incident_status($uid);
+  if (count($incs) > 0) {
+    foreach ($incs as $status => $nb) {
+      if ($status != "0") {
+        $dis_status .= "
+      <tr>
+        <td>$status</td>
+        <td class=\"number\">$nb</td>
+      </tr>";
+      }
+    }
+  }
+
+  $block = "
+  <div class=\"portalModule\"> 
+   <div class=\"portalModuleLeft\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident_portal\" />
+   </div>
+   <div class=\"portalTitle\">$l_module_incident</div>
+   <div class=\"portalContent\">
+    <div>
+    <table>
+    <tr>
+      <td>$l_my_incident_current &nbsp;</td>
+      <td class=\"number\">$incs[0]</td>
+    </tr>
+    <tr><td>&nbsp;</td><td></td></tr>
+    $dis_status
+    </table>
+
+    </div>
+   </div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("incident/incident_index.php?action=search&amp;sel_owner=$uid")."\">$l_my_incident</a></div>
+  </div>
+  ";
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The Contract specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_contract_portal() {
+  global $uid, $ico_contrac_portal, $set_theme;
+  global $l_total, $l_module_contract, $l_my_contract, $l_my_contract_current;
+  global $l_cr_date;
+  global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew, $cr_date_ended;
+
+  $conts = run_query_contract_range($uid);
+  if (count($conts) > 0) {
+    foreach ($conts as $range => $nb) {
+      $dis_range .= "
+    <tr>
+      <td>$l_cr_date[$range]</td>
+      <td class=\"number\">$nb</td>
+    </tr>";
+    }
+  }
+
+  $total = array_sum($conts);
+  $block = "
+  <div class=\"portalModule\"> 
+   <div class=\"portalModuleLeft\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract_portal\" />
+   </div>
+   <div class=\"portalTitle\">$l_module_contract</div>
+   <div class=\"portalContent\">
+    <div>
+    <table>
+    <tr>
+      <td>$l_my_contract_current &nbsp;</td>
+      <td class=\"number\">$total</td>
+    </tr>
+    <tr><td>&nbsp;</td><td></td></tr>
+    $dis_range
+    </table>
+
+    </div>
+   </div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("contract/contract_index.php?action=search&amp;sel_market=$uid")."\">$l_my_contract</a></div>
   </div>
   ";
   return $block;

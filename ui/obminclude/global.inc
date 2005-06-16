@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.2pre2";
+$obm_version = "0.9.2pre3";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -77,8 +77,11 @@ $auth_kind = "standalone";
 // Shall the login page encrypt authentication password
 $auth_encryption = 1;
 
-// encyption used to store password : "plain", "md5" or "crypt"
+// Encyption used to store password : "plain", "md5" or "crypt"
 $password_encryption = "md5";
+
+// Handle connectors data
+$c_use_connectors = true;
 
 // Modules specific parameters ----------------------------------------------//
 
@@ -359,6 +362,13 @@ $cck_supplier = 1;
 $ccf_period = 0;
 $ccf_duration = 1;
 $ccf_ticket = 2;
+
+// Contract date ranges
+$cr_date_tosign = 0;
+$cr_date_tobegin = 1;
+$cr_date_current = 2;
+$cr_date_torenew = 3;
+$cr_date_ended = 4;
 
 // Perms XXXXX Deprecated : to be removed
 $perms_user = "user";

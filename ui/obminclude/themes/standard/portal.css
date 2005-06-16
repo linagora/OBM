@@ -8,22 +8,22 @@
 
 .portal {
 	margin: auto;
-	width: 600px;
+	width: auto;
 }
 
 
 .portalModule {
-	margin: 10px;
+	margin: 2px;
 	background-color: #ffffff;
 	border: 1px solid #9ccbd6;
 	height: 200px;
-	width: 270px;
-	float : right;
+	width: 250px;
+	float : left;
 }
 
 .portalModuleLeft {
   	height: 200px;
-	width: 65px;	
+	width: 60px;	
 	background-image: url(bg_portal_module.gif);
 	background-position: left top;
 	float : left;
@@ -47,7 +47,7 @@
 }
 
 .portalTitle {
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: bold;
 	text-transform: uppercase;
 	color: #009EC6;

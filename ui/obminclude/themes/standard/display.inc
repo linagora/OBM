@@ -136,7 +136,7 @@ function generate_menu($module) {
   $section = $cgp_show["module"][$module];
   $display["section"] = display_sections($section);
   $display["menu"] = display_menus($section, $module);
-  $display["action"] = display_menu_bar($section, $module);
+  $display["action"] = display_actions($section, $module);
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
 
@@ -254,7 +254,7 @@ function display_menus($section, $module) {
 //   - $section : selected section
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_menu_bar($section, $module) {
+function display_actions($section, $module) {
   global $set_theme, $modules, $action, $popup_height;
   global $actions, $popup_width, $perm;
 
@@ -264,13 +264,6 @@ function display_menu_bar($section, $module) {
     $dico = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico\" alt=\"\" />&nbsp;";
   else
     $dico = "";
-
-  $ret = "
-<table cellpadding=\"0\" cellspacing=\"0\" class=\"menuBar\">
-  <tr>
-    <td><img class=\"menuBarIconG\" src=\"".C_IMAGE_PATH."/$set_theme/barre_g.gif\" alt=\"\" /></td>
-    <td class=\"menuBarLabel\">$dico$name</td>
-    <td class=\"menuBarText\">";
 
   if (is_array($actions[$module])) {
     $module_right = $perm->get_module_rights($module); 
@@ -287,25 +280,35 @@ function display_menu_bar($section, $module) {
 	    if ($value["Target"]) {
 	      $wtarget = "window.name='" . $value['Target'] . "';";
 	    }
-	    $ret .= "
+	    $content .= "
               <a href=\"\" class=\"menuBar\" 
               onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
 	  } else {
-	    $ret .= "
+	    $content .= "
                <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
 	  }
 	}
       }
     }
   }
-   
-  $ret .= "
+
+  if ($content != "") {
+    $ret = "
+<table cellpadding=\"0\" cellspacing=\"0\" class=\"menuBar\">
+  <tr>
+    <td><img class=\"menuBarIconG\" src=\"".C_IMAGE_PATH."/$set_theme/barre_g.gif\" alt=\"\" /></td>
+    <td class=\"menuBarLabel\">$dico$name</td>
+    <td class=\"menuBarText\">
+    $content
     </td>
     <td><img class=\"menuBarIconD\" src=\"".C_IMAGE_PATH."/$set_theme/barre_d.gif\" alt=\"\" /></td>
   </tr>
-  </table>
+</table>
 ";
+  } else {
+    $ret = "";
+  }
 
   return $ret;
 }

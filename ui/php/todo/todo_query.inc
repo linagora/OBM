@@ -9,7 +9,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo search query execution                                               //
+// Todo search query execution
 // Parametes:
 //   - $todo[]       : company search criteria
 //     keys used       uid
@@ -120,6 +120,7 @@ function run_query_add($todo) {
   $users = $todo["sel_user"];
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];
+  $percent = "0";
   $content = $todo["content"];
 
   $obm_q = new DB_OBM;
@@ -179,8 +180,9 @@ function run_query_update($todo) {
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];
   $content = $todo["content"];
+  $percent = "0";
 
-  $query = "update Todo set
+  $query = "UPDATE Todo SET
     todo_timeupdate = '$now',
     todo_userupdate = '$uid',
     todo_user = '$user',
@@ -188,8 +190,8 @@ function run_query_update($todo) {
     todo_priority = '$priority',
     todo_title = '$title',
     todo_content = '$content'
-  where todo_id = '$t_id'
-  ";
+  WHERE todo_id = '$t_id'
+";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

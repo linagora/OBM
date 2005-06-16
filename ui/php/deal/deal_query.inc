@@ -431,7 +431,7 @@ function run_query_update($deal) {
 function deal_send_mail($deal) {
   global $auth, $uid, $cdg_sql, $cg_com;
   global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
-  global $l_hitrate, $l_status, $l_date_alarm;
+  global $l_hitrate, $l_todo, $l_status, $l_date_alarm;
 
   $id = $deal["id"];
   $d = get_deal_infos($id);
@@ -440,8 +440,10 @@ function deal_send_mail($deal) {
   $tech = $d["tech"];
   $company = $d["company"];
   $label = $d["label"];
+  $status = $d["status"];
   $hitrate = $deal["hitrate"];
   $datealarm = $deal["datealarm"];
+  $todo = $deal["todo"];
   $add_comment = $deal["add_comment"];
   $datecomment = $deal["datecomment"];
   $usercomment = $deal["usercomment"];
@@ -452,6 +454,7 @@ $l_deal: $label
 $l_hitrate: $hitrate
 $l_status: $status
 $l_date_alarm: $datealarm
+$l_todo: $todo
 $datecomment:$usercomment:$add_comment";
   if ($mail_comment == "$l_members") {
     $users_array = array($market, $tech);

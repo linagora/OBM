@@ -138,7 +138,7 @@ function generate_menu($module, $section) {
 
   $display["section"] = display_sections($section);
   $display["menu"] = display_menus($section);
-  $display["action"] = display_menu_bar($section, $module);
+  $display["action"] = display_actions($section, $module);
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
 
@@ -287,7 +287,7 @@ function display_menus($section) {
 //   - $section : selected section
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_menu_bar($section, $module) {
+function display_actions($section, $module) {
   global $set_theme, $menus, $action, $popup_height, $perm;
   global $actions, $popup_width;
 

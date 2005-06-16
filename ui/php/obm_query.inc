@@ -766,6 +766,8 @@ function run_query_deal_potential($users_id="") {
 // Get the number of active deal by status for one user
 // Parameters:
 //   - $user_id : User id
+// Returns:
+//     array : array[status_label] = nb
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_status($user_id) {
   global $cdg_sql, $cdg_param;
@@ -775,7 +777,9 @@ function run_query_deal_status($user_id) {
       dealstatus_label
     FROM Deal
       LEFT Join DealStatus on deal_status_id = dealstatus_id
-    WHERE deal_hitrate > 0
+      LEFT join DealType on deal_type_id = dealtype_id
+    WHERE dealtype_inout = '+'
+      AND deal_hitrate > 0
       AND deal_hitrate < 100
       AND deal_archive = '0'
       AND deal_marketingmanager_id = '$user_id'
@@ -788,6 +792,102 @@ function run_query_deal_status($user_id) {
   
   while ($obm_q->next_record()) {
     $res[$obm_q->f("dealstatus_label")] = $obm_q->f("nb");
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the number of active incident by status for one user
+// Parameters:
+//   - $user_id : User id
+// Returns:
+//     array : array[status_label] = nb, array[0] = total
+///////////////////////////////////////////////////////////////////////////////
+function run_query_incident_status($user_id) {
+  global $cdg_sql, $cdg_param;
+
+  $query = "SELECT
+      count(*) as nb,
+      incidentstatus_label
+    FROM Incident
+      LEFT Join IncidentStatus on incident_status_id = incidentstatus_id
+    WHERE incident_archive = '0'
+      AND incident_owner = '$user_id'
+    GROUP BY incident_status_id
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_incident_status");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  $tot = 0;
+  while ($obm_q->next_record()) {
+    $nb = $obm_q->f("nb");
+    $res[$obm_q->f("incidentstatus_label")] = $nb;
+    $tot += $nb;
+  }
+  $res["0"] = $tot;
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the number of contracts by range of dates (expired,...)
+// Parameters:
+//   - $user_id : User id
+// Returns:
+//     array : array[range] = nb
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contract_range($user_id) {
+  global $cdg_sql, $cdg_param;
+  global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew, $cr_date_ended;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $ds = sql_date_format($db_type, "contract_datesignature", "datesignature");
+  $db = sql_date_format($db_type, "contract_datebegin", "datebegin");
+  $de = sql_date_format($db_type, "contract_dateexp", "dateexp");
+  $dr = sql_date_format($db_type, "contract_daterenew", "daterenew");
+
+  $query = "SELECT
+      $ds,
+      $db,
+      $de,
+      $dr
+    FROM Contract
+    WHERE contract_archive = '0'
+      AND contract_marketmanager_id = '$user_id'
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_contract_range");
+  $obm_q->query($query);
+  
+  $res[$cr_date_tosign] = 0;
+  $res[$cr_date_tobegin] = 0;
+  $res[$cr_date_current] = 0;
+  $res[$cr_date_torenew] = 0;
+  $res[$cr_date_ended] = 0;
+  $now = time();
+  while ($obm_q->next_record()) {
+    $ds = $obm_q->f("datesignature");
+    $db = $obm_q->f("datebegin");
+    $de = $obm_q->f("dateexp");
+    $dr = $obm_q->f("daterenew");
+
+    if (($ds != "") && ($now < $ds)) {
+      $res[$cr_date_tosign]++;
+    } else if (($db != "") && ($now < $db)) {
+      $res[$cr_date_tobegin]++;
+    } else if (($dr != "") && ($now < $dr)) {
+      $res[$cr_date_current]++;
+    } else if (($de != "") && ($now < $de)) {
+      $res[$cr_date_torenew]++;
+    } else if (($de != "") && ($now > $de)) {
+      $res[$cr_date_ended]++;
+    }
   }
 
   return $res;
