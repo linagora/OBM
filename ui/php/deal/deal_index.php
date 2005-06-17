@@ -665,14 +665,6 @@ function get_deal_action() {
     'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update', 'quick_update')
                                     	    );
 
-  // Parent Detail Consult
-  $actions["deal"]["parent_detailconsult"] = array (
-    'Name'     => $l_header_consult,
-    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"],
-    'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate')
-                                    	    );
-
   // Detail Update
   $actions["deal"]["detailupdate"] = array (
     'Name'     => $l_header_update,
