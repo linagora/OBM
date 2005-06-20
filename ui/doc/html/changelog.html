@@ -11,8 +11,8 @@
 <a href="javascript:back();">back</A>
     
 <center>
-<h1>O.B.M. 0.9 ChangeLog</h1>
-version 0.9.2 - 2005-06-16
+<h1>O.B.M. 1.0 ChangeLog</h1>
+version 1.0.0 - 2005-06-30
 <p>
 </center>
 
@@ -34,6 +34,7 @@ To do
 2005-06-30 : version 0.9.2<br>
 
 <ul>
+<li> BUG#480 : Project : update menu now displayed after advance update
 <li> BUG#477 : Calendar : Fixed a warning with EasyPHP (pass-by-reference)
 <li> BUG#476 : Contact : Search result now correctly show company name
 <li> BUG#322 : Home page: Incident portlet added
@@ -43,112 +44,6 @@ To do
 <li> Home page: Contract portlet added
 </ul>
 
-2005-06-01 : version 0.9.1<br>
-
-<ul>
-<li> BUG#473 : Calendar: Home page portlet now correctly shows events
-<li> BUG#475 : Company: Comment select now list the connected user
-<li> Calendar : Fixed some warning with some PHP versions
-<li> Group : Fixed a display bug when automatic listing display was on
-<li> Home page: Deal portlet added
-<li> Deal : Deal deletion now check references in invoices too
-</ul>
-
-2005-05-08 : version 0.9.0<br>
-
-<ul>
-<li> BUG#472 : Calendar: Multi-days events OK
-<li> BUG#471 : Calendar: Month navigation OK 
-<li> BUG#470 : Incident : Contract and Company assignment OK
-<li> BUG#469 : Incident : fixed a wrong debug sql display
-<li> BUG#466 : Todo : When todo disabled, todo portlet not shown anymore
-<li> BUG#465 : Deal : Links to Open and archived contracts from a deal
-<li> BUG#464 : Contract : Contract comment now timestamped
-<li> BUG#462 : Contract : Deal correctly set in new contract from Deal
-<li> BUG#460 : Contact : Removed a javascript debug alert
-<li> BUG#459 : Contract : Autorenewal now correctly handled
-<li> BUG#458 : Company : Contract links now show active and total contracts
-<li> BUG#457 : Incident : Contract select replaced by Contract search
-<li> BUG#456 : Time : Archived projects do not appear in selects
-<li> BUG#455 : Company : all category criteria now preserved on search
-<li> BUG#454 : Admin ref: Datasource references correctly checked on deletion
-<li> BUG#451 : Calendar: dupplicate of #338
-<li> BUG#450 : Calendar: Fixed updating all day events (checkbox preserved)
-<li> BUG#449 : List : List (normal mode) now handle Debug Id info
-<li> BUG#448 : List : Corrected some problems with publication infos selected
-<li> BUG#447 : Admin_data : sound_aka_update quote bug fixed
-<li> BUG#445 : Invalid bug
-<li> BUG#443 : Calendar : User (editor) can now delete his own events
-<li> BUG#441 : List : Rows count could be wrong in some circumstances
-<li> BUG#439 : List : SQL error when removing last criteria on a list
-<li> BUG#438 : Company : light search enhancement (with name alias)
-<li> BUG#436 : Tabs and modules contents and order now in configuration file
-<li> BUG#434 : Time : Month view navigation now stay in month view
-<li> BUG#433 : MySQL: Character set and collation paramaters for MySQL 4.1+
-<li> BUG#432 : Deal : Invalid bug
-<li> BUG#431 : Deal : Search by deal status corrected
-<li> BUG#428 : Deal : Archived projects now displayes from Deal
-<li> BUG#427 : Time : Allow to update tasks even if week fully filled
-<li> BUG#426 : List : performance problem when consulting some lists fixed
-<li> BUG#425 : List : Corrected SQL error on MySQL with ambigous country column
-<li> BUG#397 : Document : Document path is now correctly parsed
-<li> BUG#395 : Incident : better navigation when creating incidents
-<li> BUG#387 : Export CSV : fixes when exporting datas with ; or "
-<li> BUG#379 : Project : Comment field added, timestamped
-<li> BUG#338 : Calendar : Event creator no more in email alert recipient list
-<li> BUG#251 : All parameters now referenced in the doc
-<li> New module : Import module to import company and contact from CSV
-<li> Allow use of contact without company module (company becoming a field)
-<li> AliaSuite integration (CAS SSO support, new theme)
-<li> New Calendar storage model for conformance, performance and connectors...
-<li> Global enhancement of Contract and Incident modules
-<li> Calendar popup now use global OBM lang and translation (monthes, days)
-<li> Contact: new parameter to allow private contacts by default
-<li> Contact: allow search by title
-<li> User: new fields (phone and fax 1 and 2, description)
-<li> User and Group: new fields (local and external id) to ease, handle imports
-<li> Password storage now configurable : plain, md5 or crypt
-<li> New parameter : login page password encryption (true or false)
-<li> Group : Private group handling
-<li> Calendar : meeting management now can use groups
-<li> Calendar : Direct view of group calendar
-<li> Project : Allocation and Progress form now merged in the Advance Form
-<li> OBM : Session handling simplified and enhanced
-<li> OBM : New profile handling and definition. Enhanced with better genericity
-<li> List: Display company phone or fax if contact ones not avalaible
-<li> Import: Fixed search with ctu_sql_limit on
-<li> Import: Fixed problem with tab as field separator
-<li> Contact: added kind infos on result lists
-<li> List: added contact mobile phone on result lists
-<li> List: criteria on contact country check for company country if empty
-<li> List: new criteria on publication subscriptions (after and before)
-<li> Company, Contact: Copy address to clipboard.
-<li> User: added search by description and group
-<li> Incident: email alert subject display the company, and comment in msg
-<li> Calendar: all date handling (and links too) in ISO or timestamp format
-</ul>
-
-2005-01-04 : version 0.8.9 (Clément 1 Release !)<br>
-
-<ul>
-<li> BUG#424 : Contact : fixed the deletion of last category association
-<li> BUG#423 : Invoice : Added expiration date field
-<li> BUG#419 : Deal : Quick update form now alerts if date alarm is in the past
-<li> BUG#417 : List : Dupplicate of #412
-<li> BUG#414 : Project : member search fixed
-<li> BUG#413 : Deal : fixed an error when deal categories where disabled
-<li> BUG#412 : List : flag to include archived contacts or not
-<li> BUG#410 : Invalid install script bug
-<li> BUG#409 : Company search corrected with sql_limit On
-<li> BUG#408 : Incident HTML entities now correctly displayed
-<li> BUG#393 : Admin Pref : Allow propagating only one (can be new) preference
-<li> BUG#392 : Invoice : Archiving now done from Invoice update form
-<li> BUG#368 : Invoice : Invoice comment now splitted and tagged
-<li> BUG#265 : Time : going to next week always ok (PHP problem with DST date)
-<li> List : flag to select publication info or not
-<li> Contact : enhancement in contact and company address handling
-<li> Parameters : handling and debug enhancements
-</ul>
 
 <p/>
 
