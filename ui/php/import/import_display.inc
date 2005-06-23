@@ -191,9 +191,9 @@ function html_import_consult($import_q) {
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_expresspostal, $l_lang, $l_country;
-  global $l_phone, $l_fax, $l_web, $l_email, $l_mailing_ok, $l_comment;
-  global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
+  global $l_expresspostal, $l_lang, $l_country, $l_comment;
+  global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_web,$l_email,$l_mailing_ok;
+  global $l_contact, $l_lastname, $l_firstname, $l_function, $l_title;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $display;
 
@@ -466,6 +466,7 @@ function html_import_file_import($import_q, $import) {
     $countries = get_import_country_hash();
     $cats = get_import_companycategory_hash();
     $kinds = get_import_kind_hash();
+    $functions = get_import_function_hash();
   }
     
   $map = get_import_field_mapping($import_q);
@@ -509,7 +510,7 @@ function html_import_file_import($import_q, $import) {
 
       // If contact, insert
       if (row_has_contact($fields)) {
-	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds);
+	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
 	$nb_con_ins++;
       }
 
@@ -548,7 +549,7 @@ function html_import_file_import($import_q, $import) {
 	  if ($fields["con_ln"] == "") {
 	    $log["res"] .= $l_contact_defaultname;
 	  }
-	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds);
+	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions);
 	  $nb_con_ins++;
 	}
 
@@ -558,11 +559,11 @@ function html_import_file_import($import_q, $import) {
 
       // Update the existing contact
     } else if ($conflict_action == "contact_update") {
-      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $kinds, $contact_id);
+      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $kinds, $functions, $contact_id);
       $nb_con_upd++;
 
     } else if ($conflict_action == "contact_insert") {
-      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds);
+      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions);
       $nb_con_ins++;
 
     } else if ($conflict_action == "contact_nothing") {
@@ -624,12 +625,12 @@ function html_import_file_import($import_q, $import) {
 	  if (row_has_contact($fields)) {
 	    // We insert If lastname filled, or if lastname empty but default
 	    if ($fields["con_ln"] != "") {
-	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds);
+	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
 	      $nb_con_ins++;
 	    } else if ($fields["con_ln"] == "") {
 	      if ($map["default"]["con_ln"] != "") {
 		$log["res"] .= $l_contact_defaultname;
-		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds);
+		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
 		$nb_con_ins++;
 	      }
 	    }
@@ -713,7 +714,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   $name = $fields["comp_name"];
   $info = $fields["comp_zip"] . " " . $fields["comp_town"] . " " . $fields["comp_cdx"];
   $con = $fields["con_ln"] . " " . $fields["con_fn"];
-  $con_info = $fields["con_tit"] . " " . $fields["con_pho"];
+  $con_info = $fields["con_func"] . " " . $fields["con_tit"] . " " . $fields["con_pho"];
   $res = $log["res"];
   $line_log .= "<tr>
       <td class=\"detailForm\">$num_line</td>
@@ -827,7 +828,7 @@ function display_import_log_line($log, $fields, $comps) {
     $name = $fields["comp_name"];
     $info = $fields["comp_zip"] . " " . $fields["comp_town"] . " " . $fields["comp_cdx"];
     $con = $fields["con_ln"] . " " . $fields["con_fn"];
-    $con_info = $fields["con_tit"] . " " . $fields["con_pho"];
+    $con_info = $fields["con_func"] . " " . $fields["con_tit"] . " " . $fields["con_pho"];
     $res = $log["res"];
     $line_log .= "<tr>
       <td class=\"detailForm\">$num_line</td>
@@ -854,7 +855,7 @@ function display_import_log_line($log, $fields, $comps) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Import Form                                                       //
+// Display Import Form
 // Parameters :
 //   - $action   : action called
 //   - $import[] : default or transmitted values
@@ -871,7 +872,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
   global $l_expresspostal, $l_lang, $l_country, $l_mailing_ok_msg;
   global $l_phone, $l_fax, $l_web, $l_email, $l_mailing_ok, $l_comment;
-  global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
+  global $l_contact, $l_lastname, $l_firstname, $l_function, $l_title, $l_hphone, $l_mphone;
 
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -1094,6 +1095,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td class=\"detailLabel\">$l_lang</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_con_lang_d\" value=\"$con_lang_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_con_func\" value=\"$con_func\" /></td>
+    <td class=\"detailLabel\">$l_function</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_con_func_d\" value=\"$con_func_d\" /></td>
   </tr>
   <tr>
     <td class=\"detailForm\">

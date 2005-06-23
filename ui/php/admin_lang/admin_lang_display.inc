@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_lang_display.inc                                       //
 //     - Desc : lang admin display File                                      //
@@ -60,7 +60,7 @@ function html_lang_index($actions, $modules, $langs, $themes) {
   global $l_execute, $l_help;
 
   // modules SELECT
-  $sel_module = "<select name=\"module\">";
+  $sel_module = "<select name=\"target_module\">";
   while (list ($key, $val) = each ($modules)) {
     $sel_module .= "<option value=\"$val\">$val</option>";
   }

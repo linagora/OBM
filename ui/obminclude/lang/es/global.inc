@@ -25,7 +25,7 @@ $l_none = "---";
 $l_comment = "Comentario";
 $l_add_comment = "Adicionar un comentario";
 $l_upd_comment = "Actualizar comentario";
-$l_mail_comment "Mail";
+$l_mail_comment = "Mail";
 $l_members = "Miembros";
 $l_default = "Default";
 $l_lang = "Idioma";

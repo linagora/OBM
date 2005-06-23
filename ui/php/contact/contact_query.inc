@@ -356,31 +356,6 @@ function run_query_kind() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact: Function select query execution
-// Returns:
-//   DB object result with all kinds
-///////////////////////////////////////////////////////////////////////////////
-function run_query_function() {
-  global $cdg_sql, $cgp_hide;
-
-  $show_func = (! $cgp_hide["contact"]["contact_function"]);
-  if ($show_func) {
-    $query = "SELECT function_id, function_label
-    FROM Function
-    ORDER by function_label";
-
-    display_debug_msg($query, $cdg_sql);
-    $obm_q= new DB_OBM;
-    $obm_q->query($query);
-  } else {
-    $obm_q = "";
-  }
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Category 1 query execution
 // Return:
 //   Database Object
@@ -546,7 +521,7 @@ function run_query_contact_insert($contact) {
   $retour = $obm_q->query($query);
 
   if (($cgp_show["module"]["company"]) && ($retour)) {
-    run_query_company_contact_inc($comp_id);
+    run_query_company_contact_number_update($comp_id);
   }
 
   $query = "select contact_id
@@ -728,8 +703,8 @@ function run_query_contact_update($contact) {
   if ($cgp_show["module"]["company"]) {
     // If company has changed, update the companies contact number
     if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
-      run_query_company_contact_inc($comp_new_id);
-      run_query_company_contact_dec($comp_old_id);
+      run_query_company_contact_number_update($comp_new_id);
+      run_query_company_contact_number_update($comp_old_id);
     }
   }
 
@@ -930,7 +905,7 @@ function run_query_contact_publication_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact Deletion query execution                                          //
+// Contact Deletion query execution
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
@@ -939,7 +914,7 @@ function run_query_contact_delete($p_id) {
 
   $comp_id = get_contact_company_id($p_id);
   run_query_delete_document_links($p_id, "contact");    
-  run_query_company_contact_dec($comp_id);
+  run_query_company_contact_number_update($comp_id);
   run_query_delete_contact_subscription($p_id);    
 
   $query = "delete from Contact where contact_id='$p_id'";
@@ -966,25 +941,6 @@ function run_query_delete_contact_subscription($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company contact number decrement                        //
-// Parameters:
-//   - $comp_id : company id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_contact_dec($comp_id) {
-  global $cdg_sql;
-
-  $query = "update Company
-            set company_contact_number=company_contact_number-1
-            where company_id='$comp_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
   return $retour;
 }
 

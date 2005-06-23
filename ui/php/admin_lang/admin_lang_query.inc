@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_lang_query.inc                                         //
 //     - Desc : lang admin Query File                                        //
@@ -8,13 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $actions = array ('help', 'index', 'show_src', 'show_lang', 'comp_lang', 'comp_header_lang');
-$modules = get_modules_array();
+$target_modules = get_modules_array();
 $langs = get_langs_array();
 $themes = get_themes_array();
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the lang list                                                         //
+// Get the lang list
 // Return : $langs : array of langs
 ///////////////////////////////////////////////////////////////////////////////
 function get_langs_array() {
@@ -37,7 +37,7 @@ function get_langs_array() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the theme list                                                        //
+// Get the theme list
 // Return : $themes : array of themes
 ///////////////////////////////////////////////////////////////////////////////
 function get_themes_array() {
@@ -253,12 +253,12 @@ function get_src_used_vars_file($myfile) {
 // Returns the list of all vars used in OBM modules                          //
 ///////////////////////////////////////////////////////////////////////////////
 function get_all_src_used_vars() {
-  global $debug, $obminclude, $path, $modules;
+  global $debug, $obminclude, $path, $target_modules;
 
   $all_vars = array();
   $vars = array();
 
-  while (list($key, $mod) = each($modules)) {
+  while (list($key, $mod) = each($target_modules)) {
     if ($debug > 0) {
       echo "All Source used vars : module : $mod";
     }
@@ -297,7 +297,6 @@ function get_lang_vars($module, $lang) {
 
   $tableau = array();
   $file = "$path/../$obminclude/lang/$lang/${module}.inc";
-
   if (file_exists($file)) {
     $contents = file($file);
   } else {

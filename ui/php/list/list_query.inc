@@ -1070,26 +1070,6 @@ function run_query_contactcategory2() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact: Function select query execution
-// Returns:
-//   DB object result with all kinds
-///////////////////////////////////////////////////////////////////////////////
-function run_query_function() {
-  global $cdg_sql;
-
-  $query = "SELECT function_id, function_label
-    FROM Function
-    ORDER BY function_label";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q= new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Contact: Kind lang select query 
 // Returns:
 //   DB object result with all kinds

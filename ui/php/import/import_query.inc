@@ -355,8 +355,8 @@ function check_data_form($id, $import) {
 function get_import_field_mapping($import_q) {
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
   global $l_expresspostal, $l_country, $l_phone, $l_fax, $l_web, $l_email;
-  global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
-  global $l_comment, $l_lang;
+  global $l_contact, $l_lastname, $l_firstname, $l_function, $l_title;
+  global $l_hphone, $l_mphone, $l_comment, $l_lang;
 
   $desc = $import_q->f("import_desc");
   eval ($desc);
@@ -450,7 +450,7 @@ function get_import_row_mapping($row, $map) {
       $num--; // $map mapping start at 1 and $row at 0
       $content = $row[$num];
       // if a max size is defined for the field, we truncate the field
-      // exceptions for countryes values that can be iso codes or ctry names
+      // exceptions for countries values that can be iso codes or ctry names
       // for ctry this is tested after passing ctry iso hash
       if ( ($field_size[$field] > 0)
 	   && ($field != "comp_ctry")
@@ -496,6 +496,7 @@ function row_has_contact($fields) {
   // we consider the row has a contact if lastname, firstname or job title
   if ( ( (isset($fields["con_ln"])) && ($fields["con_ln"] != "") )
      || ( (isset($fields["con_fn"])) && ($fields["con_fn"] != "") )
+     || ( (isset($fields["con_func"])) && ($fields["con_func"] != "") )
      || ( (isset($fields["con_tit"])) && ($fields["con_tit"] != "") ) ) {
     return true;
   } else {
@@ -825,8 +826,9 @@ function get_similar_contact($fields, $cid) {
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
 //   - $kinds[]     : Kinds hash (from lang)
+//   - $functions[] : Functions hash
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds) {
+function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds, &$functions) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -850,6 +852,13 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     $kind_id = $kinds[$fields["con_lang"]];
   } else {
     $kind_id = "0";
+  }
+  // If a function name has been found we get the corresponding id
+  if (isset($functions[$fields["con_func"]])) {
+    $function_id = $functions[$fields["con_func"]];
+    // else we get the entry as an id
+  } else {
+    $function_id = $fields["con_func"];
   }
   $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
@@ -892,6 +901,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_town,
     contact_expresspostal,
     contact_country_iso3166,
+    contact_function_id,
     contact_title,
     contact_phone,
     contact_homephone,
@@ -919,6 +929,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$town',
     '$cdx',
     '$ctry',
+    '$function_id',
     '$title',
     '$phone',
     '$hphone',
@@ -936,7 +947,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 
   
   if ($retour) {
-    run_query_company_contact_inc($comp_id);
+    run_query_company_contact_number_update($comp_id);
   }
 
   return $retour;
@@ -951,9 +962,10 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
 //   - $kinds[]     : Kind hash
-//   - $contact_id  : Company id to update
+//   - $functions[] : Functions hash
+//   - $contact_id  : Contact id to update
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, $contact_id) {
+function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, &$functions, $contact_id) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -976,6 +988,13 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   if (isset($kinds[$fields["con_lang"]])) {
     $kind_id = $kinds[$fields["con_lang"]];
     $q_kind = "contact_kind_id='$kind_id',";
+  }
+  // If a function name has been found we get the corresponding id
+  if (isset($functions[$fields["con_func"]])) {
+    $function_id = $functions[$fields["con_func"]];
+    // else we get the entry as an id
+  } else {
+    $function_id = $fields["con_func"];
   }
   $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
@@ -1016,6 +1035,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_town='$town',
     contact_expresspostal='$cdx',
     contact_country_iso3166='$ctry',
+    contact_function_id='$function_id',
     contact_title='$title',
     contact_phone='$phone',
     contact_homephone='$hphone',
@@ -1091,6 +1111,24 @@ function get_import_kind_hash() {
   }
 
   return $kinds;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the contact function hash : functions["label"] = id
+///////////////////////////////////////////////////////////////////////////////
+function get_import_function_hash() {
+  global $cdg_sql;
+
+  $func_q = run_query_function();
+
+  while ($func_q->next_record()) {
+    $id = $func_q->f("function_id");
+    $label = $func_q->f("function_label");
+    $functions[$label] = $id;
+  }
+
+  return $functions;
 }
 
 

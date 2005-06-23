@@ -283,19 +283,29 @@ function run_query_companycategory() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company contact number increment
+// Query Execution - Company contact update
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_contact_inc($comp_id) {
+function run_query_company_contact_number_update($comp_id) {
   global $cdg_sql;
 
-  $query = "update Company
-              set company_contact_number=company_contact_number+1
-              where company_id='$comp_id'";
+  $query = "SELECT count(*) as nb
+      FROM Contact
+      WHERE contact_company_id='$comp_id'
+        AND contact_archive != '1'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f("nb");
+
+  $query = "UPDATE Company
+    SET company_contact_number='$nb'
+    WHERE company_id='$comp_id'";
+
+  display_debug_msg($query, $cdg_sql);
   $retour = $obm_q->query($query);
   return $retour;
 }
@@ -351,6 +361,31 @@ function run_query_country() {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact: Function select query execution
+// Returns:
+//   DB object result with all kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function() {
+  global $cdg_sql, $cgp_hide;
+
+  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  if ($show_func) {
+    $query = "SELECT function_id, function_label
+    FROM Function
+    ORDER by function_label";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }

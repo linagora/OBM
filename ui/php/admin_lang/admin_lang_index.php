@@ -49,13 +49,13 @@ switch ($action) {
     dis_lang_index($mode, $actions, $target_modules, $langs, $themes);
     break;
   case "show_src":
-    dis_src_vars($mode, $module);
+    dis_src_vars($mode, $target_module);
     break;
   case "show_lang":
-    dis_lang_vars($mode, $module, $lang);
+    dis_lang_vars($mode, $target_module, $lang);
     break;
   case "comp_lang":
-    dis_comp_lang_vars($mode, $module, $lang, $lang2);
+    dis_comp_lang_vars($mode, $target_module, $lang, $lang2);
     break;
   case "comp_global_lang":
     dis_comp_global_lang_vars($mode, $lang, $lang2);
@@ -120,7 +120,7 @@ Ex: php4 admin_lang.php -a show_lang -m deal -l fr
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
   global $debug, $actions, $target_modules, $langs, $themes;
-  global $action, $module, $lang, $theme;
+  global $action, $target_module, $lang, $theme;
 
   // We skip the program name [0]
   next($argv);
@@ -134,8 +134,8 @@ function parse_arg($argv) {
     case '-m':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $target_modules)) {
-        $module = $val2;
-        if ($debug > 0) { echo "-m -> \$module=$val2\n"; }
+        $target_module = $val2;
+        if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }
       else {
         dis_command_use("Invalid module ($val2)");
@@ -178,7 +178,7 @@ function parse_arg($argv) {
     }
   }
 
-  if (! $module) $module = "contact";
+  if (! $target_module) $target_module = "contact";
   if (! $lang) $lang = "fr";
   if (! $action) $action = "show_src";
   if (! $theme) $theme = "standard";
