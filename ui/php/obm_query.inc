@@ -859,7 +859,8 @@ function run_query_contract_range($user_id) {
       $dr
     FROM Contract
     WHERE contract_archive = '0'
-      AND contract_marketmanager_id = '$user_id'
+      AND (contract_marketmanager_id = '$user_id'
+        OR contract_techmanager_id = '$user_id')
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_contract_range");

@@ -992,20 +992,19 @@ function get_type_label($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Get the infos of a List from its Id                                       //
+// Get Contract infos from its Id
 // Parameters:
-//   - $id : list id
+//   - $id : contract id
 ///////////////////////////////////////////////////////////////////////////////
 function get_contract_info($id) {
   global $cdg_sql;
 
-  $query = "select 
-                 contract_id,
-                 contract_name,
-            from Contract
-            where contract_id='$id'";
+  $query = "SELECT
+      contract_id,
+      contract_name,
+    FROM Contract
+    WHERE contract_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1014,7 +1013,6 @@ function get_contract_info($id) {
   
   $res["id"] = $obm_q->f("contract_id");
   $res["name"] = $obm_q->f("contract_name");
- 
 
   return $res;
 }

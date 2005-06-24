@@ -193,7 +193,7 @@ function run_query_detail($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($incident) {
   global $auth, $cdg_sql, $cgp_host;
-  global $cmail_incident, $l_mail_incident_new_subject;
+  global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
 
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
@@ -263,12 +263,16 @@ function run_query_insert($incident) {
   $i_id = run_query_incident_id($incident);
 
   if ($cmail_incident != "") {
-    $company_name = get_company_name_from_contract($contract_id);
+    $inc = get_incident_info($i_id);
+    $company_name = $inc["company"];
+    $status = $inc["status"];
+    $contract = $inc["contract"];
     $label_mail = stripslashes($lincident);
     $subject = "$l_mail_incident_new_subject : $company_name : $label_mail";
     $message = "$cgp_host/incident/incident_index.php?action=detailconsult&param_incident=$i_id
 
-State: $status
+$l_status: $status
+$l_contract: $contract
 $comment";
     send_mail($subject, $message, array($logger, $owner), array("$cmail_incident"), 1);
   }
@@ -756,26 +760,37 @@ function run_query_cat1_links($c_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the company name from the incident contract
+// Get Incident infos
 // Parameters:
-//   - $c_id : contract id
+//   - $id : incident id
 ///////////////////////////////////////////////////////////////////////////////
-function get_company_name_from_contract($c_id) {
+function get_incident_info($id) {
   global $cdg_sql;
 
-  $query = "SELECT contract_id,
+  $query = "SELECT
+      incident_id,
+      incident_label,
+      incidentstatus_label,
+      contract_label,
       company_name
-    FROM Contract LEFT JOIN Company on contract_company_id=company_id
-    WHERE contract_id='$c_id'";
+    FROM Incident
+      LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
+      LEFT JOIN Contract on incident_contract_id=contract_id
+      LEFT JOIN Company on contract_company_id=company_id
+    WHERE incident_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("company_name");
+  $res["id"] = $obm_q->f("incident_id");
+  $res["label"] = $obm_q->f("incident_label");
+  $res["status"] = $obm_q->f("incidentstatus_label");
+  $res["contract"] = $obm_q->f("contract_label");
+  $res["company"] = $obm_q->f("company_name");
 
-  return $retour;
+  return $res;
 }
 
 
