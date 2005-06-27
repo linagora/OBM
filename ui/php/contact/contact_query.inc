@@ -453,7 +453,7 @@ function run_query_contact_insert($contact) {
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
   $priv = (isset($contact["priv"]) ? $contact["priv"] : '0');
 
-  $query = "insert into Contact (contact_timeupdate,
+  $query = "INSERT INTO Contact (contact_timeupdate,
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
@@ -524,14 +524,14 @@ function run_query_contact_insert($contact) {
     run_query_company_contact_number_update($comp_id);
   }
 
-  $query = "select contact_id
-    from Contact
-    where contact_lastname = '$lname'
-      and contact_kind_id ='$kind'
-      and contact_company_id ='$comp_id'
-      and contact_email ='$email'
-      and contact_phone = '$phone'
-      and contact_zipcode = '$zip'";
+  $query = "SELECT contact_id
+    FROM Contact
+    WHERE contact_lastname = '$lname'
+      AND contact_kind_id ='$kind'
+      AND contact_company_id ='$comp_id'
+      AND contact_email ='$email'
+      AND contact_phone = '$phone'
+      AND contact_zipcode = '$zip'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -912,23 +912,26 @@ function run_query_contact_publication_links($p_id) {
 function run_query_contact_delete($p_id) {
   global $cdg_sql;
 
-  $comp_id = get_contact_company_id($p_id);
+  $c = get_contact_info($p_id);
+  $comp_id = $c["company_id"];
   run_query_delete_document_links($p_id, "contact");    
-  run_query_company_contact_number_update($comp_id);
   run_query_delete_contact_subscription($p_id);    
 
-  $query = "delete from Contact where contact_id='$p_id'";
+  $query = "DELETE FROM Contact WHERE contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+  // After contact deletion to get correct number
+  run_query_company_contact_number_update($comp_id);
 
   return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact Subscription deletion query execution                             //
+// Contact Subscription deletion query execution
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
@@ -959,18 +962,18 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
 
   $where_id = "";
   if ($cid != "") {
-    $where_id = "and contact_id!='$cid'";
+    $where_id = "contact_id!='$cid' AND";
   }
-  $query = "select distinct contact_id,
+  $query = "SELECT DISTINCT contact_id,
       contact_company_id,
       contact_lastname,
       contact_firstname,
       company_name 
-    from Contact, Company
-    where contact_company_id=company_id
-      $where_id
-      and ((contact_lastname='$lname' and contact_firstname='$fname')
-          or (contact_company_id='$comp_id' and contact_lastname='$lname'))";
+    FROM Contact
+      LEFT JOIN Company on contact_company_id=company_id
+    WHERE $where_id
+      ((contact_lastname='$lname' AND contact_firstname='$fname')
+        OR (contact_company_id='$comp_id' AND contact_lastname='$lname'))";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -981,7 +984,7 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact environment checking (same contacts exists ?)                     //
+// Contact environment checking (same contacts exists ?)
 // Parameters:
 //   - $cid       : contact id
 //   - $contact[] : contact's values
@@ -1091,23 +1094,26 @@ function check_contact_data_form($cid, $contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the contact's company id                                              //
+// Get the contact infos
 // Parameters:
 //   - $con_id : contact id
-// Returns: company id
+// Returns: $c hash with contact infos
 ///////////////////////////////////////////////////////////////////////////////
-function get_contact_company_id($con_id) {
+function get_contact_info($con_id) {
   global $cdg_sql;
 
-  $query = "select contact_company_id from Contact where contact_id='$con_id'";
+  $query = "SELECT
+      contact_company_id
+    FROM Contact
+    WHERE contact_id='$con_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $retour = $obm_q->f("contact_company_id");
+  $c["company_id"] = $obm_q->f("contact_company_id");
 
-  return $retour;
+  return $c;
 }
 
 

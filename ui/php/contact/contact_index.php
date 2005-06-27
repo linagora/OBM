@@ -79,8 +79,8 @@ if ($action == "ext_get_ids") {
   $display["detail"] =  html_category2_list($contact);
 
 } elseif ($action == "vcard") {
-    dis_vcard_export($contact);
-    exit();
+  dis_vcard_export($contact);
+  exit();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -132,8 +132,11 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contact_data_form("", $contact)) {
 
+    echo "<p>1-";
+
     // If the context (same contacts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
+      echo "<p>11-";
       $id = run_query_contact_insert($contact);
       if ($id > 0) {
         $contact["id"] = $id;
@@ -146,13 +149,17 @@ if ($action == "ext_get_ids") {
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
+      echo "<p>2-";
       $obm_q = check_contact_context("", $contact);
       if ((is_object($obm_q)) && ($obm_q->num_rows() > 0)) {
+	echo "<p>21-";
 	$display["title"] = display_title("$l_contact : $l_insert");
         $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
       } else {
+	echo "<p>22-";
         $id = run_query_contact_insert($contact);
         if ($id > 0) {
+	echo "<p>221-";
           $contact["id"] = $id;
           $display["msg"] .= display_ok_msg($l_insert_ok);
           require("contact_js.inc");
@@ -284,7 +291,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-}elseif ($action == "function_insert")  {
+} elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_function_insert($contact);
   if ($retour) {
@@ -384,12 +391,12 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
   if ($contact["id"] > 0) {
-      require("contact_js.inc");
-      $display["detail"] = dis_contact_consult($contact);
+    require("contact_js.inc");
+    $display["detail"] = dis_contact_consult($contact);
   }    
 }
 
-
+	echo "<p>3-";
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -401,6 +408,7 @@ if (! $contact["popup"]) {
 }
 
 display_page($display);
+//exit;
 
 
 ///////////////////////////////////////////////////////////////////////////////
