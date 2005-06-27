@@ -137,6 +137,7 @@ function run_query_add($todo) {
         todo_date,
         todo_deadline,
         todo_priority,
+        todo_percent,
         todo_title,
         todo_content)
       values (
@@ -148,6 +149,7 @@ function run_query_add($todo) {
         '$now',
         '$deadline',
         '$priority',
+        '$percent',
         '$title',
         '$content'
       )";
@@ -188,6 +190,7 @@ function run_query_update($todo) {
     todo_user = '$user',
     todo_deadline = '$deadline',
     todo_priority = '$priority',
+    todo_percent = '$percent',
     todo_title = '$title',
     todo_content = '$content'
   WHERE todo_id = '$t_id'
@@ -207,19 +210,29 @@ function run_query_update($todo) {
 //   - $parms : correponding to page parameters
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($parms) {
-  global $cdg_sql;
+  global $cdg_sql, $c_use_connectors;
 
   foreach($parms as $key => $val) {
     $id_todo = strstr($key,"_"); 
     if ($id_todo != "") {
       $id_todo = substr($id_todo, 1);  
     
-      if ($val == "on"){ 
-        $query = "delete from Todo where todo_id = '$id_todo'";
-
+      if ($val == "on"){
+        $query = "DELETE FROM Todo WHERE todo_id = '$id_todo'";
 	display_debug_msg($query, $cdg_sql, "run_query_delete");
         $delete_query = new DB_OBM;
         $delete_query->query($query);
+
+	// If connectors in use
+	if ($c_use_connectors) {
+	  $now = date("Y-m-d H:i:s");
+	  $query = "INSERT INTO
+            DeletedTodo (deletedtodo_user_id, deletedtodo_timestamp)
+            VALUES ('$id_todo', '$now')";
+	  display_debug_msg($query, $cdg_sql);
+	  $retour = $delete_query->query($query);
+	}
+
       }    
     }
   }

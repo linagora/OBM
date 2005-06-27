@@ -74,27 +74,6 @@ function run_query_event_customers($param_event) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return events users array
-// Parameters: 
-//   - $param_event
-///////////////////////////////////////////////////////////////////////////////
-function run_query_event_customers_array($param_event) {
-  $obm_db = new DB_OBM;
-  $db_typ = $obm_db->type;
-  $query = "SELECT DISTINCT userobm_id
-            FROM UserObm, CalendarUser
-            WHERE  calendaruser_event_id = '$param_event'
-	    AND calendaruser_user_id = userobm_id";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  while($obm_db->next_record()) {
-    $p_arrayuserobm_id[] = $obm_db->f("userobm_id");
-  }
-  return $p_arrayuserobm_id;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return all the name and first name of users
 // Parameters: 
 //   - $users : users id array, the event is assigned to 
@@ -207,33 +186,31 @@ function run_query_waiting_events() {
     $query .= " AND calendaruser_user_id IN (";
     $num = count($writable_user);
     foreach($writable_user as $user) {
-      $query.= "'$user',";
+      $query .= "'$user',";
     }
-    $query.="'".$auth->auth["uid"]."')";
+    $query.= "'".$auth->auth["uid"]."')";
   } else {
-    $query.="AND calendaruser_user_id = '".$auth->auth["uid"]."'";
+    $query .= " AND calendaruser_user_id = '".$auth->auth["uid"]."'";
   }
-  $query .= "ORDER BY userobm_id"; 
+  $query .= " ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Delete all events of a evenements, and the event
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
-//    - $agenda
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Delete all participation to an event
+// Parameters:
+//   - $agenda[] : hash values for the event
+///////////////////////////////////////////////////////////////////////////////
 function run_query_delete_user_event($agenda) {
-  global $cdg_sql,$l_delete_event_mail_head,$l_delete_event_mail_subject,$l_delete_event_mail_body,$l_to,$l_from;
+  global $cdg_sql;
 
-  $obm_db = new DB_OBM;
-  $event_id = $agenda["id"];
-  $query = "DELETE FROM CalendarUser WHERE calendaruser_event_id = $event_id";
-  $obm_db->query($query);
+  $obm_q = new DB_OBM;
+  $e_id = $agenda["id"];
+  $query = "DELETE FROM CalendarUser WHERE calendaruser_event_id = '$e_id'";
+  $obm_q->query($query);
 } 
 
 
@@ -434,7 +411,7 @@ function run_query_get_eventcategories() {
 //   - $users_array : List of the users 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_event_update($agenda,$users_array,&$event_id) {
-  global $uid, $l_date;
+  global $c_use_connectors, $uid, $l_date;
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
 
   $datebegin = $agenda["datebegin"];
@@ -456,6 +433,42 @@ function run_query_event_update($agenda,$users_array,&$event_id) {
   $event_data = run_query_detail($event_id);
   $old_begin = isodate_format($event_data->f("calendarevent_date"),"", 1);
   $old_end = isodate_format($event_data->f("calendarevent_date") + $event_data->f("calendarevent_duration"),"",1);
+
+  // Handle Connectors data
+  if ($c_use_connectors) {
+    $obm_q = new DB_OBM;
+    $now = date("Y-m-d H:i:s");
+    $old_users = get_event_users_info($event_id);
+    $removed_users = array_diff($old_users, $users_array);
+    $new_users = array_diff($users_array, $old_users);
+
+    // If users have been removed, we note it in DeletedCalendarEvent
+    if (count($removed_users) > 0) {
+      foreach($removed_users as $u_id) {
+	$query = "INSERT INTO DeletedCalendarEvent (
+        deletedcalendarevent_event_id,
+        deletedcalendarevent_user_id,
+        deletedcalendarevent_timestamp)
+      VALUES (
+        '$event_id',
+        '$u_id',
+        '$now')";
+	display_debug_msg($query, $cdg_sql);
+	$retour = $obm_q->query($query);
+      }
+    }
+
+    // If users have been inserted they must not appear in DeletedCalendarEvent
+    if (count($new_users) > 0) {
+      foreach($new_users as $u_id) {
+	$query = "DELETE FROM DeletedCalendarEvent
+      WHERE deletedcalendarevent_event_id = '$event_id'
+        AND deletedcalendarevent_user_id = '$u_id'";
+	display_debug_msg($query, $cdg_sql);
+	$retour = $obm_q->query($query);
+      }
+    }
+  }
 
   // XXXX bizarre les old_end et old_begin semblent etre affectes par l'update
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
@@ -533,33 +546,51 @@ function run_query_update_event_data($agenda) {
 //   - $agenda : agenda infos hash
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($agenda) {
-  global $cdg_sql, $l_to, $l_from;
+  global $cdg_sql, $c_use_connectors, $l_to, $l_from;
   global $l_delete_event_mail_head,$l_delete_event_mail_subject,$l_delete_event_mail_body;
 
-  $obm_db = new DB_OBM;
+  $obm_q = new DB_OBM;
   $event_id = $agenda["id"];
   $mail = $agenda["mail"]; 
   
-  $query = "SELECT calendaruser_user_id
-    FROM CalendarUser
-    WHERE calendaruser_event_id = '$event_id'";
-  $obm_db->query($query);
-  while($obm_db->next_record()) {
-    $users_array[] = $obm_db->f("calendaruser_user_id");
-  }
+  $users_array = get_event_users_info($event_id);
+
   $query = "SELECT calendarevent_title
     FROM CalendarEvent
     WHERE calendarevent_id = '$event_id'";
-  $obm_db->query($query); 
-  $obm_db->next_record();
-  $title = $obm_db->f("calendarevent_title");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $title = $obm_q->f("calendarevent_title");
 
   $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
-  $obm_db->query($query);
-  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $event_id";
-  $obm_db->query($query);
-  $query = "DELETE FROM CalendarUser WHERE calendaruser_event_id = $event_id";
-  $obm_db->query($query);
+  $obm_q->query($query);
+  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
+  $obm_q->query($query);
+  $query = "DELETE FROM CalendarUser WHERE calendaruser_event_id = '$event_id'";
+  $obm_q->query($query);
+
+  // If connectors in use
+  if ($c_use_connectors) {
+    $now = date("Y-m-d H:i:s");
+    
+    // We purge the individual user entries
+    $query = "DELETE FROM DeletedCalendarEvent
+      WHERE deletedcalendarevent_event_id = '$event_id'";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+
+    // We note the event deletion
+    $query = "INSERT INTO DeletedCalendarEvent (
+        deletedcalendarevent_event_id,
+        deletedcalendarevent_user_id,
+        deletedcalendarevent_timestamp)
+      VALUES (
+        '$event_id',
+        null,
+        '$now')";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+  }
 
   $message = $l_delete_event_mail_head.$title;   
   $subject = "$l_delete_event_mail_subject" . $title;
@@ -1035,6 +1066,35 @@ function get_event_info($id) {
   $e["owner"] = $obm_q->f("calendarevent_owner");
 
   return $e;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the event users id
+// Parameters:
+//   - $id : event id
+///////////////////////////////////////////////////////////////////////////////
+function get_event_users_info($id) {
+  global $cdg_sql;
+
+  $users_array = array();
+
+  if ($id == "") {
+    return $users_array;
+  }
+
+  $query = "SELECT calendaruser_user_id
+    FROM CalendarUser
+    WHERE calendaruser_event_id = '$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  while ($obm_q->next_record()) {
+    $users_array[] = $obm_q->f("calendaruser_user_id");
+  }
+
+  return $users_array;
 }
 
 

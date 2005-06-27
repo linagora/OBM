@@ -262,8 +262,8 @@ if ($param_event > 0) {
   $grp_obm = run_query_group_writable();
   $cat_event = run_query_get_eventcategories();
   $eve_q = run_query_detail($param_event);  
-  $p_user_array = run_query_event_customers_array($param_event);
-  $user_obm = run_query_userobm_in($p_user_array);  
+  $p_user_array = get_event_users_info($param_event);
+  $user_obm = run_query_userobm_in($p_user_array);
   $display["detailInfo"] = display_record_info($eve_q);
   $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm,$grp_obm, $cat_event, $p_user_array);
   }

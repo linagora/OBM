@@ -132,11 +132,8 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contact_data_form("", $contact)) {
 
-    echo "<p>1-";
-
     // If the context (same contacts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      echo "<p>11-";
       $id = run_query_contact_insert($contact);
       if ($id > 0) {
         $contact["id"] = $id;
@@ -149,17 +146,13 @@ if ($action == "ext_get_ids") {
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
-      echo "<p>2-";
       $obm_q = check_contact_context("", $contact);
       if ((is_object($obm_q)) && ($obm_q->num_rows() > 0)) {
-	echo "<p>21-";
 	$display["title"] = display_title("$l_contact : $l_insert");
         $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
       } else {
-	echo "<p>22-";
         $id = run_query_contact_insert($contact);
         if ($id > 0) {
-	echo "<p>221-";
           $contact["id"] = $id;
           $display["msg"] .= display_ok_msg($l_insert_ok);
           require("contact_js.inc");
@@ -396,7 +389,7 @@ if ($action == "ext_get_ids") {
   }    
 }
 
-	echo "<p>3-";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -408,7 +401,6 @@ if (! $contact["popup"]) {
 }
 
 display_page($display);
-//exit;
 
 
 ///////////////////////////////////////////////////////////////////////////////

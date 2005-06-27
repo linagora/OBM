@@ -910,7 +910,7 @@ function run_query_contact_publication_links($p_id) {
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_delete($p_id) {
-  global $cdg_sql;
+  global $cdg_sql, $c_use_connectors;
 
   $c = get_contact_info($p_id);
   $comp_id = $c["company_id"];
@@ -918,10 +918,19 @@ function run_query_contact_delete($p_id) {
   run_query_delete_contact_subscription($p_id);    
 
   $query = "DELETE FROM Contact WHERE contact_id='$p_id'";
-
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+  // If connectors in use
+  if ($c_use_connectors) {
+    $now = date("Y-m-d H:i:s");
+    $query = "INSERT INTO
+      DeletedContact (deletedcontact_contact_id, deletedcontact_timestamp)
+      VALUES ('$p_id', '$now')";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+  }
 
   // After contact deletion to get correct number
   run_query_company_contact_number_update($comp_id);

@@ -292,18 +292,27 @@ function run_query_update($p_id, $user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User delete query execution                                               //
+// User delete query execution
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($p_id) {
-  global $cdg_sql;
+  global $cdg_sql, $c_use_connectors;
 
-  $query = "delete from UserObm where userobm_id='$p_id'";
-
+  $query = "DELETE FROM UserObm WHERE userobm_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+  // If connectors in use
+  if ($c_use_connectors) {
+    $now = date("Y-m-d H:i:s");
+    $query = "INSERT INTO
+      DeletedUser (deleteduser_user_id, deleteduser_timestamp)
+      VALUES ('$p_id', '$now')";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+  }
 
   return $retour;
 }
