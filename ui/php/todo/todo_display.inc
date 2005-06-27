@@ -14,6 +14,7 @@
 $fieldnames["date_todo"] = $l_date;
 $fieldnames["date_deadline"] = $l_deadline;
 $fieldnames["todo_priority"] = $l_priority;
+$fieldnames["todo_percent"] = $l_percent;
 $fieldnames["todo_title"] = $l_todotitle;
 $fieldnames["todo_id"] = $l_update;
 
@@ -43,6 +44,12 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "todo_priority") {
     $res["align"] = "center";
+  }
+
+  else if ($fieldname == "todo_percent") {
+    $res["align"] = "center";
+    $percent = $OD->data_set->f("todo_percent");
+    $res["name"] = "$percent %";
   }
 
   else if ($fieldname == "date_todo") {
@@ -123,12 +130,13 @@ function dis_todo_list($todo, $todo_q) {
 function dis_todo_detail($todo, $todo_q) {
   global $display;
   global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date;
-  global $l_deadline, $l_content, $l_no_deadline;
+  global $l_deadline, $l_content, $l_no_deadline, $l_percent;
 
   $title = $todo_q->f("todo_title");
   $user = $todo_q->f("user_firstname") ." ". $todo_q->f("user_lastname");
   $author = $todo_q->f("author_firstname") ." ". $todo_q->f("author_lastname");
   $priority = $todo_q->f("todo_priority");
+  $percent = $todo_q->f("todo_percent");
 
   $date = date_format($todo_q->f("date_todo"));
   $deadline = $todo_q->f("date_deadline");
@@ -152,6 +160,9 @@ function dis_todo_detail($todo, $todo_q) {
      </tr><tr>
       <td class=\"detailLabel\">$l_priority</td>
       <td class=\"detailText\">$priority</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_percent</td>
+      <td class=\"detailText\">$percent</td>
      </tr><tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailText\">$date</td>
@@ -179,19 +190,20 @@ function dis_todo_form($todo, $todo_q = 0) {
   global $uid;
   global $set_theme, $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
   global $popup_width, $popup_height;
-  global $l_add, $l_update, $l_close,$display,$l_todo;
-  global $l_deadline, $l_priority, $l_todotitle, $l_user, $l_content;
+  global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
+  global $l_deadline, $l_priority, $l_todotitle, $l_percent, $l_content;
 
   $max_priority = 5;
   $action = $todo["action"];
   $popup = $todo["popup"];
  
-  if ($action == "update") {
+  if ($action == "detailupdate") {
     $t_id = $todo["id"];
     $uid = $todo_q->f("todo_user");
     $title = $todo_q->f("todo_title");
     $content = $todo_q->f("todo_content");
     $priority = $todo_q->f("todo_priority");
+    $percent = $todo_q->f("todo_percent");
     $deadline = $todo_q->f("date_deadline");
     $deadline = ($deadline != 0) ? date_format($deadline, 1) : $l_no_deadline;
   } else {
@@ -249,10 +261,10 @@ function dis_todo_form($todo, $todo_q = 0) {
   }
   $sel_priority .= "</select>";
 
-  if ($action == "update") {
+  if ($action == "detailupdate") {
     $dis_button = "
       <input type=\"hidden\" id=\"param_todo\" name=\"param_todo\" value=\"$t_id\" />
-      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"detailupdate\" />
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />
       <input type=\"submit\" value=\"$l_update\" />
     ";
@@ -281,6 +293,9 @@ function dis_todo_form($todo, $todo_q = 0) {
   </tr><tr>
     <td class=\"detailLabel\">$l_priority</td>
     <td class=\"detailForm\">$sel_priority</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_percent</td>
+    <td class=\"detailForm\"><input type=\"text\" id=\"tf_percent\" name=\"tf_percent\" maxlength=\"3\" size=\"3\" value=\"$percent\" />%</td>
   </tr><tr>
     <td class=\"detailLabel\">$l_deadline</td>
     <td class=\"detailForm\">
@@ -311,7 +326,7 @@ function dis_todo_form($todo, $todo_q = 0) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Todo display preference screen                                //
+// Display the Todo display preference screen
 // Parameters:
 //   - $display_newpref_q    : DBO : Field list to display
 //   - $display_searchpref_q : DBO : Field list to display

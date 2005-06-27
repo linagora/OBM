@@ -12,6 +12,7 @@ $l_date = "Date de saisie";
 $l_deadline = "Date limite";
 $l_todotitle = "Titre";
 $l_content = "Description";
+$l_percent = "Avancement";
 
 $l_del = "Suppr.";
 $l_delete = "Supprimer";

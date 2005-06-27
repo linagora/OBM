@@ -37,6 +37,7 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
     $date,
     $deadline,
     todo_priority,
+    todo_percent,
     todo_title
   FROM Todo
   $whereq
@@ -58,7 +59,7 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo detail query execution                                               //
+// Todo detail query execution
 // Parameters:
 //   - $todo[]       : company search criteria
 //     keys used       id
@@ -76,7 +77,7 @@ function run_query_detail($todo) {
   $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
 
   $query = "
-  select
+  SELECT
     Todo.*,
     uu.userobm_login as userupdate,
     uc.userobm_login as usercreate,
@@ -88,12 +89,12 @@ function run_query_detail($todo) {
     u.userobm_firstname as user_lastname,
     Author.userobm_lastname as author_firstname,
     Author.userobm_firstname as author_lastname
-  from Todo
+  FROM Todo
        left join UserObm as uc on todo_usercreate = uc.userobm_id
        left join UserObm as uu on todo_userupdate = uu.userobm_id
        left join UserObm as u on todo_user = u.userobm_id,
      UserObm as Author
-  where todo_id = $t_id
+  WHERE todo_id = $t_id
     and Author.userobm_id = todo_usercreate
   ";
 
@@ -119,8 +120,8 @@ function run_query_add($todo) {
   $title = $todo["title"];
   $users = $todo["sel_user"];
   $priority = $todo["priority"];
+  $percent = $todo["percent"];
   $deadline = $todo["deadline"];
-  $percent = "0";
   $content = $todo["content"];
 
   $obm_q = new DB_OBM;
@@ -128,7 +129,7 @@ function run_query_add($todo) {
   if (is_array($users)) {
     foreach ($users as $user) {
 
-      $query = "insert into Todo (
+      $query = "INSERT INTO Todo (
         todo_timeupdate,
         todo_timecreate,
         todo_userupdate,
@@ -140,7 +141,7 @@ function run_query_add($todo) {
         todo_percent,
         todo_title,
         todo_content)
-      values (
+      VALUES (
         null,
         '$now',
         null,
@@ -182,7 +183,7 @@ function run_query_update($todo) {
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];
   $content = $todo["content"];
-  $percent = "0";
+  $percent = $todo["percent"];
 
   $query = "UPDATE Todo SET
     todo_timeupdate = '$now',

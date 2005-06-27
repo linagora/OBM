@@ -93,12 +93,12 @@ if ($action == "index" || $action == "") {
   else
     $display["msg"] .= display_info_msg($l_no_found);
 
-} else if ($action == "update") {
+} else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $todo_q = run_query_detail($todo);
   $display["result"] = dis_todo_form($todo, $todo_q);
 
-} else if ($action == "detailupdate") {
+} else if ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_update($todo);
     
@@ -169,6 +169,7 @@ display_page($display);
 function get_param_todo() {
   global $uid, $param_todo, $action, $popup;
   global $tf_title, $sel_user_id, $sel_priority, $tf_deadline, $ta_content;
+  global $tf_percent;
 
   if (isset ($uid)) $todo["uid"] = $uid;
   if (isset ($action)) $todo["action"] = $action;
@@ -180,6 +181,7 @@ function get_param_todo() {
   if (isset ($tf_deadline)) $todo["deadline"] = $tf_deadline;
   if (isset ($sel_user_id)) $todo["sel_user"] = $sel_user_id;
   if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
+  if (isset ($tf_percent)) $todo["percent"] = $tf_percent;
   if (isset ($ta_content)) $todo["content"] = $ta_content;
 
   display_debug_param($todo);
@@ -195,7 +197,7 @@ function get_todo_action() {
   global $todo, $actions, $path;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_todo_list, $l_header_delete, $l_header_update;
-  global $l_header_admin, $l_header_display;
+  global $l_header_consult, $l_header_admin, $l_header_display;
 
 // Index
   $actions["todo"]["index"] = array (
@@ -207,9 +209,10 @@ function get_todo_action() {
 
 // Search
   $actions["todo"]["detailconsult"] = array (
-    'Url'      => "$path/todo/todo_index.php?action=add",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/todo/todo_index.php?action=detailconsult&amp;param_todo=". $todo["id"],
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
                                     	 );
 
 // Add a todo
@@ -228,17 +231,17 @@ function get_todo_action() {
 
 // Update
   $actions["todo"]["update"]  = array (
-    'Name'     => $l_header_update,
     'Url'      => "$path/todo/todo_index.php?action=update&amp;param_todo=". $todo["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate') 
+    'Condition'=> array ('None') 
                                       );
 
 // Update
   $actions["todo"]["detailupdate"]  = array (
+    'Name'     => $l_header_update,
     'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;param_todo=". $todo["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailconsult', 'detailupdate') 
                                       );
 
 // Delete a todo

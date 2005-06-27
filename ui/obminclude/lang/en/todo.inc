@@ -11,6 +11,7 @@ $l_author = "Author";
 $l_deadline = "Deadline";
 $l_todotitle = "Title";
 $l_content = "Content";
+$l_percent = "Progress";
 
 $l_del = "Del.";
 $l_delete = "Delete";
