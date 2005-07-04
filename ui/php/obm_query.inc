@@ -658,7 +658,8 @@ function run_query_days_unfilled() {
 
   $uid = $auth->auth["uid"];
 
-  $begindate = get_user_entrydate($uid);
+  $u = get_user_info($uid);
+  $begindate = $u["datebegin"];
   $unix_ts = $begindate["unix_timestamp"];
   $iso = $begindate["iso"];
   $jan_first = mktime (0, 0, 0, 1, 1, date("Y"));

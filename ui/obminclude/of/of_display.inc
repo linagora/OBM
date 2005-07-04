@@ -1,10 +1,10 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : global_display.inc                                           //
-//     - Desc : Global Display File (OBM_DISPLAY)                            //
-// 2000-01-20 Pierre Baudracco                                               //
+// OBM - File : of_display.inc                                               //
+//     - Desc : OBM Framework Display Objects and functions                  //
+// 2005-07-01 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id$ //
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 class OBM_DISPLAY {

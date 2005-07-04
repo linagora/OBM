@@ -22,9 +22,11 @@ if ($obmdb_dbtype == $db_type_pgsql) {
   require_once("$obminclude/phplib/db_mysql.inc");
 }
 
-require("$obminclude/phplib/ct_sql.inc");
-require("$obminclude/of/of_session.inc");
-require("$obminclude/phplib/auth.inc");
+require_once("$obminclude/phplib/ct_sql.inc");
+require_once("$obminclude/of/of_session.inc");
+require_once("$obminclude/phplib/auth.inc");
+require_once("$obminclude/of/of_query.inc");
+require_once("$obminclude/of/of_display.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM Classes                                                               //

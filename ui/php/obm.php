@@ -359,7 +359,7 @@ function dis_contract_portal() {
 
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("contract/contract_index.php?action=search&amp;sel_market=$uid")."\">$l_my_contract</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("contract/contract_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_contract</a></div>
   </div>
   ";
   return $block;
