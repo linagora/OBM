@@ -437,7 +437,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 
   $display["msg"] .= display_info_msg("$nb_list $l_found");
 
-  $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;sel_market=$mark$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA", $pref_q, "list");
 /*  if ($popup) {

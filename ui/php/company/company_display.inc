@@ -746,27 +746,30 @@ function html_company_consult($co_q, $cat_q) {
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
+  $newline = "\\r\\n";
+  $copy = addslashes($name).$newline;
   if ($ad1 != "") {
-    $copy .= "$ad1\\n";
+    $copy .= addslashes($ad1).$newline;
   }
   if ($ad2 != "") {
-    $copy .= "$ad2\\n";
+    $copy .= addslashes($ad2).$newline;
   }
   if ($ad3 != "") {
-    $copy .= "$ad3\\n";
+    $copy .= addslashes($ad3).$newline;
   }
   if ($zip != "" ) {
-    $copy .=  "$zip ";
+    $copy .= addslashes($zip) . " ";
   } else {
     $copy .= " ";
   }
   if ($town != "" ) {
-    $copy .= $town;
+    $copy .= addslashes($town);
   }
   if ($ctry_name != "" ) {
-    $copy .= " $ctry_name";
+    $copy .= $newline . addslashes($ctry_name);
   }
-  $copy = "'".addslashes($copy)."'"; 
+  $copy = "'$copy'"; 
+
   // Number field
   if ($show_number) {
     $block_num = "
@@ -935,7 +938,7 @@ function dis_company_form($action, $company) {
     $users[] = $company["marketing_manager"];
   }
   if ($company["id"] > 0) {
-    $users[] = array($comp_q->f("company_marketingmanager_id"));
+    $users[] = $comp_q->f("company_marketingmanager_id");
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();

@@ -57,9 +57,11 @@ ALTER TABLE UserObm ADD COLUMN userobm_calendar_version timestamp;
 ALTER TABLE Contract ADD COLUMN contract_datesignature date;
 ALTER TABLE Contract ADD COLUMN contract_daterenew date;
 ALTER TABLE Contract ADD COLUMN contract_datecancel date;
-ALTER TABLE Contract ADD COLUMN contract_priority_id integer NOT NULL;
+ALTER TABLE Contract ADD COLUMN contract_priority_id integer;
+ALTER TABLE Contract ALTER COLUMN contract_priority_id SET NOT NULL;
 ALTER TABLE Contract ALTER COLUMN contract_priority_id SET DEFAULT 0;
-ALTER TABLE Contract ADD COLUMN contract_status_id integer NOT NULL;
+ALTER TABLE Contract ADD COLUMN contract_status_id integer;
+ALTER TABLE Contract ALTER COLUMN contract_status_id SET NOT NULL;
 ALTER TABLE Contract ALTER COLUMN contract_status_id SET DEFAULT 0;
 ALTER TABLE Contract ADD COLUMN contract_kind integer;
 ALTER TABLE Contract ALTER COLUMN contract_kind SET DEFAULT 0;
@@ -105,9 +107,9 @@ CREATE TABLE ContractStatus (
   contractstatus_id     	serial,
   contractstatus_timeupdate  	timestamp,
   contractstatus_timecreate  	timestamp,
-  contractstatus_userupdate  	integer DEFAULT	NULL,
-  contractstatus_usercreate  	integer DEFAULT	NULL,
-  contractstatus_order  	integer DEFAULT	NULL,
+  contractstatus_userupdate  	integer DEFAULT NULL,
+  contractstatus_usercreate  	integer DEFAULT NULL,
+  contractstatus_order  	integer DEFAULT NULL,
   contractstatus_label  	varchar(64) DEFAULT NULL,
 PRIMARY KEY (contractstatus_id)
 );

@@ -63,10 +63,10 @@ switch ($action) {
     dis_data_index($mode, $acts, $target_modules, $langs, $themes);
     break;
   case "data_show":
-    dis_data($action, $mode, $module);
+    dis_data($action, $mode, $target_module);
     break;
   case "data_update":
-    dis_data($action, $mode, $module);
+    dis_data($action, $mode, $target_module);
     break;
   case "sound_aka_update":
     dis_sound_aka_update($mode);
@@ -121,7 +121,7 @@ Ex: php4 admin_data_index.php -a data_show -m company
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
   global $debug, $acts, $target_modules;
-  global $action, $module;
+  global $action, $target_module;
 
   // We skip the program name [0]
   next($argv);
@@ -135,11 +135,11 @@ function parse_arg($argv) {
     case '-m':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $target_modules)) {
-        $module = $val2;
-        if ($debug > 0) { echo "-m -> \$module=$val2\n"; }
+        $target_module = $val2;
+        if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }
       else {
-        dis_command_use("Invalid module ($val2)");
+        dis_command_use("Invalid target_module ($val2)");
 	return false;
       }
       break;
@@ -157,7 +157,7 @@ function parse_arg($argv) {
     }
   }
 
-  if (! $module) $module = "company";
+  if (! $target_module) $target_module = "company";
   if (! $action) $action = "data_show";
 }
 

@@ -46,7 +46,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $where .= " and deal_label $like '%$label%'";
   }
   if (($kind != $c_all) && ($kind != "")) {
-    $where .= " and dealtype_id='$kind'";
+    $where .= " and deal_type_id='$kind'";
   }
   if (($tt != $c_all) && ($tt != "")) {
     $where .= " and deal_tasktype_id='$tt'";

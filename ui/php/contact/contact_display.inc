@@ -286,8 +286,8 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "country_name") {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("country_name") != "") {
-	$res["name"] .= $OD->data_set->f("country_name");
+      if ($OD->data_set->f("contact_country") != "") {
+	$res["name"] .= $OD->data_set->f("contact_country");
       }
       // else we get the contact Company address
     } else {
@@ -696,7 +696,8 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $c_cdx = $co_q->f("company_expresspostal");
   $c_ctry_name = $co_q->f("company_country_name");
   $id = $co_q->f("contact_id");
-  $kind = "[" . $co_q->f("kind_lang") . "] " . $co_q->f("kind_minilabel");
+  $kind_minilabel = $co_q->f("kind_minilabel");
+  $kind = "[" . $co_q->f("kind_lang") . "] $kind_minilabel";
   $kind_header = $co_q->f("kind_header");
   if ($kind_header != $kind) $kind .= " ($kind_header)";
   $function = $co_q->f("function_label");
@@ -721,6 +722,13 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $town = ("$c_town" != "" ? "( $c_town )" : "");
     $cdx = ("$c_cdx" != "" ? "( $c_cdx )" : "");
     $ctry_name = $c_ctry_name;
+    $copy_addr_comp .= ($c_ad1 != "") ? addslashes($c_ad1) . $newline : "";
+    $copy_addr_comp .= ($c_ad2 != "") ? addslashes($c_ad2) . $newline : "";
+    $copy_addr_comp .= ($c_ad3 != "") ? addslashes($c_ad3) . $newline : "";
+    $copy_addr_comp .= ($c_zip != "") ? addslashes($c_zip) . $newline : "";
+    $copy_addr_comp .= ($c_town != "") ? addslashes($c_town) . $newline : "";
+    $copy_addr_comp .= ($c_cdx != "") ? addslashes($c_cdx) . $newline : "";
+    $copy_addr_comp .= ($c_ctry_name != "") ? addslashes($c_ctry_name) . $newline : "";
   }
   $func = $co_q->f("contact_function");
   $phone = trim($co_q->f("contact_phone"));
@@ -753,26 +761,37 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
 
-  
-  if ($ad1 != "") {
-    $copy .= "$ad1\\n";
+  $copy = addslashes("$kind_minilabel $lname $fname") . $newline;
+  if ($title != "") {
+    $copy .= addslashes($title) . $newline;
   }
-  if ($ad2 != "") {
-    $copy .= "$ad2\\n";
+  if ($service != "") {
+    $copy .= addslashes($service) . $newline;
   }
-  if ($ad3 != "") {
-    $copy .= "$ad3\\n";
-  }
-  if ($zip != "" ) {
-    $copy .=  "$zip ";
+  // If contact address is empty, get the company one
+  if ($copy_addr_comp != "") {
+    $copy .= $copy_addr_comp;
   } else {
-    $copy .= " ";
-  }
-  if ($town != "" ) {
-    $copy .= $town;
-  }
-  if ($ctry_name != "" ) {
-    $copy .= " $ctry_name";
+    if ($ad1 != "") {
+      $copy .= addslashes($ad1) . $newline;
+    }
+    if ($ad2 != "") {
+      $copy .= addslashes($ad2) . $newline;
+    }
+    if ($ad3 != "") {
+      $copy .= addslashes($ad3) . $newline;
+    }
+    if ($zip != "" ) {
+      $copy .= addslashes($zip) . " ";
+    } else {
+      $copy .= " ";
+    }
+    if ($town != "" ) {
+      $copy .= addslashes($town);
+    }
+    if ($ctry_name != "" ) {
+      $copy .= $newline . addslashes($ctry_name);
+    }
   }
 
   // Function field
@@ -962,7 +981,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">
       $l_address 1
-      <a href=\"javascript: return false;\" onclick=\"copy_clip('".addslashes($copy)."');return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
+      <a href=\"javascript: return false;\" onclick=\"copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
       </td>
       <td class=\"detailText\">$ad1</td>
     </tr><tr>

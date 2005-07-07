@@ -435,6 +435,11 @@ function run_query_contacts_list($list, $entity="") {
   $order_dir = $list["order_dir"];
   $lang = get_lang();
 
+  $obm_q = new DB_OBM; 
+  $db_type = $obm_q->type;
+  $if_country = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name");
+
+
   // Order exceptions (order on calculated rows)
   // Addresses are taken from contact or from company (if empty for contact)
 
@@ -489,7 +494,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_town,
          contact_expresspostal,
          contact_country_iso3166,
-         ctry1.country_name as country_name,
+         ctry1.country_name as contact_country,
          contact_function_id,
          function_label,
          contact_title,
@@ -508,7 +513,8 @@ function run_query_contacts_list($list, $entity="") {
          company_zipcode,
          company_town,
          company_expresspostal,
-         ctry2.country_name as company_country
+         ctry2.country_name as company_country,
+         $if_country as country_name
       FROM ContactList
          LEFT JOIN Contact ON contactlist_contact_id=contact_id
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
@@ -521,7 +527,6 @@ function run_query_contacts_list($list, $entity="") {
       WHERE contactlist_list_id='$id'
       $orderq";
 
-  $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   return $obm_q;

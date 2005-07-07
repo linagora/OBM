@@ -59,7 +59,7 @@ function html_data_index($actions, $modules) {
   global $l_execute, $l_help;
 
   // modules SELECT
-  $sel_module = "<select name=\"module\">";
+  $sel_module = "<select name=\"target_module\">";
   while (list ($key, $val) = each ($modules)) {
     $sel_module .= "<option value=\"$val\">$val";
   }

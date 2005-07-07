@@ -892,7 +892,7 @@ function html_project_form($action, $project_q, $project) {
   if (isset($project["deal"])) { $deal = $project["deal"]; }
   if (isset($project["soldtime"])) { $soldtime = $project["soldtime"]; }
   if (isset($project["estimated"])) { $estimated = $project["estimated"]; }
-  if (isset($project["company_name"])) { $company_name = $project["company_name"]; }
+  if (isset($project["company_name"])) { $company_name = stripslashes($project["company_name"]); }
   if (isset($project["deal_label"])) { $deal_label = $project["deal_label"]; }
   if (isset($project["tasklabel"])) { $task = $project["tasklabel"]; }
   if (isset($project["member"])) { $member = $project["member"]; }

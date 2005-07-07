@@ -39,6 +39,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
+  $if_country = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name");
 
   // only the one which are allowed (ie. publics )
   $where .= sql_obm_entity_privacy("contact");
@@ -141,7 +142,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $where .= " and contact_archive=0";
   }
   
-  $whereq = "where $where";
+  $whereq = "WHERE $where";
 
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contact_lastname";
@@ -193,7 +194,8 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_archive,
       contact_privacy,
       $company_fields
-      function_label as contact_function
+      function_label as contact_function,
+      $if_country as country_name
     FROM Contact
         $join_comp
         left join Kind on contact_kind_id = kind_id

@@ -139,6 +139,7 @@ function run_query_get_list($id) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Request a list of company Id with a list from list module
 // Parametes: The query to make the list of company
@@ -147,23 +148,26 @@ function run_query_get_selected_company($query,$id) {
   global $cdg_sql;
 
   if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
-   $query_f = "select distinct(company_id) ". $matches[1];
-   $or = "OR";
+    $query_f = "select distinct(company_id) ". $matches[1];
+    $or = "OR";
   }
   else {
-    $query_f = "select distinct(company_id) from Contact 
-     LEFT JOIN Company ON Contact.contact_company_id = Company.company_id where";
+    $query_f = "SELECT distinct(company_id)
+    FROM Contact 
+       LEFT JOIN Company ON Contact.contact_company_id=Company.company_id
+    WHERE";
   }
-  $query_c = "select distinct(contact_id) as id from ContactList
-         LEFT JOIN Contact ON contactlist_contact_id=contact_id
-         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-	 where
-         contactlist_list_id='$id'";
+  $query_c = "SELECT distinct(contact_id) AS id
+    FROM ContactList
+      LEFT JOIN Contact ON contactlist_contact_id=contact_id
+      LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+    WHERE
+      contactlist_list_id='$id'";
 
-  display_debug_msg($query_c, $cdg_sql);
+  display_debug_msg($query_c, $cdg_sql, "run_query_get_selected_company(1)");
   $obm_q = new DB_OBM;
   $obm_q->query($query_c, 1);
-  if($obm_q->nf() != 0) {
+  if ($obm_q->nf() != 0) {
     $query_f .= "$or contact_id IN (";
     while($obm_q->next_record()) {
       $query_f .= $coma .$obm_q->f("id");
@@ -171,20 +175,22 @@ function run_query_get_selected_company($query,$id) {
     }
     $query_f .= " )";
   }
-  display_debug_msg($query_f, $cdg_sql);
+  display_debug_msg($query_f, $cdg_sql, "run_query_get_selected_company(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query_f, 1);
   
   return $obm_q;
   
 }
-  
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // statistic about category and country
 // Parametes: the list of the company to select
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_selected_company_per_country_per_cat($obm_q) {
   global $cdg_sql;
+
   $lang = get_lang();
   if($obm_q->nf()!= 0) { 
     $where = " where company_id in(";
@@ -194,22 +200,22 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
     }
     $where .= ")";
   }
-  $query = "Select  
+  $query = "SELECT  
       country_iso3166,
       country_name,
       companycategory_id,
       companycategory_code,
       companycategory_label,
       count(company_id) as nb 
-    from Company
-      left join Country ON company_country_iso3166 = country_iso3166
-                           and country_lang='$lang'
-      left join CompanyCategoryLink ON companycategorylink_company_id = company_id
-      left join CompanyCategory ON companycategory_id = companycategorylink_category_id
+    FROM Company
+      LEFT JOIN Country ON company_country_iso3166 = country_iso3166
+                           AND country_lang='$lang'
+      LEFT JOIN CompanyCategoryLink ON companycategorylink_company_id = company_id
+      LEFT JOIN CompanyCategory ON companycategory_id = companycategorylink_category_id
     $where
-    group by country_iso3166, country_name,
+    GROUP BY country_iso3166, country_name,
       companycategory_id, companycategory_code,companycategory_label
-    order by country_iso3166, companycategory_id";
+    ORDER BY country_iso3166, companycategory_id";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -217,4 +223,6 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
 
   return $obm_q;
 }
+
+
 </script>
