@@ -13,7 +13,7 @@ class OBM_DISPLAY {
     // - DATA         : to display all elements, for exemple all contacts
   var $display_module;    // module where to find the entity in use
   var $display_entity;    // entity used (deal, contact, parentdeal,...)
-  var $display_pref;      // User preferences : DB_OBM : query from PrefDisplay
+  var $display_pref;      // User preferences : Array[fieldname] order,status
   var $display_link = 1;  // If false, extern links aren't displayed
   var $display_ext = "";  // External action called (allow Special handling)
 
@@ -76,7 +76,7 @@ class OBM_DISPLAY {
   // Function that check if DATA variables are set, if not die               //
   /////////////////////////////////////////////////////////////////////////////
   function check_data_vars() {
-    if(!is_object($this->display_pref)) {
+    if (!is_array($this->display_pref)) {
       die("THE display_pref VARIABLE MUST BE SET");
     }
   }
@@ -85,7 +85,7 @@ class OBM_DISPLAY {
   // Function that check if PREFERENCES variables are set, if not die        //
   /////////////////////////////////////////////////////////////////////////////
   function check_preferences_vars() {
-    if (!is_object($this->display_pref)) {
+    if (! is_array($this->display_pref)) {
       die("THE display_pref VARIABLE MUST BE SET");
     }
     if (!isset($this->display_entity)) {
@@ -101,13 +101,13 @@ class OBM_DISPLAY {
   // Function that display the preferences screen for the dataset            //
   /////////////////////////////////////////////////////////////////////////////
   function dis_preferences() {
-    global $l_displayed, $l_order, $l_field, $l_move, $l_mandatory;
+    global $l_default, $l_displayed, $l_order, $l_field, $l_move, $l_mandatory;
     global $l_display_no, $l_display_yes, $l_down, $l_up;
     // Images
     global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
     global $fieldnames, $cgp_hide;
     
-    $nb_field = $this->display_pref->nf() - 1;
+    $nb_field = count($this->display_pref) - 1;
 
     // actions names
     $action_display = "dispref_display";
@@ -124,9 +124,10 @@ class OBM_DISPLAY {
     $block = "
     <table class=\"resultPref\" >
     <tr>
-      <td class=\"resultHead\" colspan=\"4\">".$this->pref_title."</td>
+      <td class=\"resultHead\" colspan=\"5\">".$this->pref_title."</td>
     </tr>
     <tr>
+      <td class=\"resultLabel\">$l_default</td>
       <td class=\"resultLabel\">$l_displayed</td>
       <td class=\"resultLabel\">$l_order</td>
       <td class=\"resultLabel\">$l_field</td>
@@ -135,10 +136,17 @@ class OBM_DISPLAY {
 
     $i = 0;
     $nb_field_hidden = 0;
-    while ($this->display_pref->next_record()) {
+    while ( list($fieldname, $fieldinfo) = each($this->display_pref) ) {
       $entity = $this->display_entity;
-      $fieldname = $this->display_pref->f("display_fieldname");
-      $disstatus = $this->display_pref->f("display_display");
+      $disstatus = $fieldinfo["status"];
+      $fieldorder = $fieldinfo["order"];
+      $fielddefault = (! $fieldinfo["notdefault"]);
+
+      if ($fielddefault) {
+        $dis_default = "X";
+      } else {
+        $dis_default = "&nbsp;";
+      }
 
       if ($cgp_hide[$entity][$fieldname]) {
 	$td_class = "resultPrefHide";
@@ -148,6 +156,7 @@ class OBM_DISPLAY {
 
       $block .= "
     <tr>
+    <td class=\"$td_class\">$dis_default</td>
     <td class=\"$td_class\">";
 
       if ($disstatus == 0) {
@@ -171,7 +180,7 @@ class OBM_DISPLAY {
       if ($disstatus == 0) {
 	$block .= "&nbsp;";
       } else {
-	$pos = $this->display_pref->f("display_fieldorder") - $nb_field_hidden;
+	$pos = $fieldorder - $nb_field_hidden;
 	$block .= "$pos";
       }
       $block .= "</td>
@@ -186,7 +195,7 @@ class OBM_DISPLAY {
         <td>&nbsp;</td>";
       } else {
 	$block .= "
-        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
+        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=$fieldorder")."\">
           <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
       }
       
@@ -197,7 +206,7 @@ class OBM_DISPLAY {
       } else {
 	$block .= "
         <td>
-          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
+          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=$fieldorder")."\">
           <img alt=\"$l_up\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       $block .= "
@@ -307,7 +316,7 @@ class OBM_DISPLAY {
     $block_header = $this->dis_data_header($this->data_url);
     $block .= $block_header;
 
-    $this->display_pref->seek(0);
+    reset($this->display_pref);
     $cpt = 0;
 
     // Iteration on each data row of dataset
@@ -357,9 +366,8 @@ class OBM_DISPLAY {
 
       // For each field in the data row we walk through the pref dbo ordered
       // and for each entry (field) we set special parameters and display it
-      while ($this->display_pref->next_record()) {
+      while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
 	// Default values
-	$fieldname = $this->display_pref->f("display_fieldname");
 
 	if (! $cgp_hide[$entity][$fieldname]) {
 
@@ -456,7 +464,7 @@ class OBM_DISPLAY {
 	  $block .= "<td class=\"resultText\">&nbsp;</td>";
       }
 
-      $this->display_pref->seek(0);
+      reset($this->display_pref);
       $block .= "</tr>";
     }
 
@@ -609,7 +617,6 @@ class OBM_DISPLAY {
     if ($entity == "") {
       $entity = $module;
     }
-    $this->display_pref->seek(0);
     $block = "
     <tr>";
     
@@ -624,8 +631,8 @@ class OBM_DISPLAY {
       $block .= "<td class=\"resultHead\">".$this->data_cb_text."</td>";
     }
 
-    while ($this->display_pref->next_record()) {
-      $fieldname = $this->display_pref->f("display_fieldname");
+    reset($this->display_pref);
+    while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
 
       if (! $cgp_hide[$entity][$fieldname]) {
 	$label = $fieldnames[$fieldname];

@@ -430,13 +430,13 @@ function dis_company_search_list($company) {
   global $auth, $new_order, $order_dir;
 
   $popup = $company["popup"];
-  $pref_q = run_query_display_pref($auth->auth["uid"], "company");
+  $prefs = get_display_pref($auth->auth["uid"], "company");
   $obm_q = run_query_search($company, $new_order, $order_dir);
   $nb_company = $obm_q->num_rows_total();
   if ($nb_company == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_company_search_list($obm_q,$pref_q,$nb_company,$company,$popup);
+    $block = html_company_search_list($obm_q,$prefs,$nb_company,$company,$popup);
   }
 
   return $block;
@@ -447,12 +447,12 @@ function dis_company_search_list($company) {
 // Display: Returns the XHTML result display
 // Parameters : 
 //   - $comp_q     : list of companies
-//   - $pref_q     : the fields which have to be displayed
+//   - $prefs      : Display preferences
 //   - $nb_company : nb companies returned by the search query
 //   - $company[]  : company search criteria
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup) {
+function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) {
   global $display, $l_found,$l_close;
 
   if ($popup) {
@@ -484,7 +484,7 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
 
   $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;tf_cat_code=$cat_code&amp;cb_cat_tree=$cat_tree&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
 
-  $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
+  $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
     $comp_d->display_link = false;
     if ($ext_url != "") {
@@ -2473,14 +2473,14 @@ function dis_nafcode_links($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the Company Display preference screen                            //
+// Display: the Company Display preference screen
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_company_display_pref($display_pref_q) {
+function dis_company_display_pref($prefs) {
   global $l_company_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "company"; 
   $dis_pref->pref_title = $l_company_display;
   $dis_pref->pref_dis_help = 1;

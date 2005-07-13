@@ -299,43 +299,115 @@ function run_query_display_pref($u_id, $entity, $all=0) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - get the User's entity display preferences
+// Get the User's entity display preferences
 // Parameters:
 //   - $u_id   : user id to retrieve the pref
 //   - $entity : entity to retrieve field from
 //   - $all    : if not 0, get all fields (even those marked not to display)
 // Returns:
-//   - DBO : ordered list of entity fields to display
+//   - $prefs  : prefs[$fieldname] : ["order"], ["status"], ["notdefault"]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_display_pref2($u_id, $entity, $all=0) {
+function get_display_pref($u_id, $entity, $all=0) {
   global $cdg_sql;
+
+  if ($all == 0) {
+    $hide = true;
+  }
   
   $query = "SELECT *
     FROM DisplayPref
     WHERE (display_user_id='0' OR display_user_id='$u_id')
-      AND display_entity='$entity'";
-  if ($all == 0) { 
-    $query .= " AND display_display != 0";
-  }
-  $query .= " ORDER BY display_user_id, display_fieldorder"; 
+      AND display_entity='$entity'
+    ORDER BY display_user_id, display_fieldorder"; 
 
   display_debug_msg($query, $cdg_sql, "run_query_display_pref()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
+  // The query is sorted by user_id, hence default values first
   while ($obm_q->next_record()) {
     $user_id = $obm_q->f("display_user_id");
     $fieldname = $obm_q->f("display_fieldname");
     $fieldorder = $obm_q->f("display_fieldorder");
-    $disstatus = $obm_q->f("display_display");
+    $fieldstatus = $obm_q->f("display_display");
 
-    if ($user_id == 0) {
-      $prefs[""];
+    // For specifi user values, get them only if defined
+    if ($user_id > 0) {
+      if (isset($prefs[$fieldname])) {
+        if ( ($prefs[$fieldname]["order"] != $fieldorder)
+             || ($prefs[$fieldname]["status"] != $fieldstatus) ) {
+          $prefs[$fieldname]["notdefault"] = true;
+        }
+        if ($hide) {
+          if ($fieldstatus == 0) {
+            $hidden[$fieldname] = true;
+          } elseif (($hidden[$fieldname] == true) && ($fieldstatus != 0)) {
+            unset($hidden[$fieldname]);
+          }
+        }
+        $index_sort[$prefs[$fieldname]["order"]] = $fieldorder;
+        $prefs[$fieldname]["order"] = $fieldorder;
+        $prefs[$fieldname]["status"] = $fieldstatus;
+      }
+    } else {
+      $prefs[$fieldname]["order"] = $fieldorder;
+      $prefs[$fieldname]["status"] = $fieldstatus;
+      $index_sort[$fieldorder] = $fieldorder;
+      if (($hide) && ($fieldstatus == 0)) {
+        $hidden[$fieldname] = true;
+      }
     }
   }
 
-  return $obm_q;	
-}      
+  // Sort the $prefs array according to the final fieldorder
+  array_multisort($index_sort, $prefs);
+
+  // If we do not show hidden fields, we remove these from result
+  if ($hide) {
+    while (list($key, $value) = each($hidden)) {
+      unset($prefs[$key]);
+    }
+  }
+
+  return $prefs;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get One User's entity field display preference
+// Parameters:
+//   - $u_id   : user id to retrieve the pref
+//   - $entity : entity to retrieve field from
+//   - $field  : field
+// Returns:
+//   - $prefs  : prefs[$fieldname] : ["order"], ["status"], ["notdefault"]
+///////////////////////////////////////////////////////////////////////////////
+function get_one_display_pref($u_id, $entity, $field) {
+  global $cdg_sql;
+  
+  $query = "SELECT *
+    FROM DisplayPref
+    WHERE (display_user_id='0' OR display_user_id='$u_id')
+      AND display_entity='$entity'
+      AND display_fieldname='$field'
+    ORDER BY display_user_id"; 
+
+  display_debug_msg($query, $cdg_sql, "get_one_display_pref()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  // The query is sorted by user_id, hence default values first
+  while ($obm_q->next_record()) {
+    $user_id = $obm_q->f("display_user_id");
+    $fieldorder = $obm_q->f("display_fieldorder");
+    $fieldstatus = $obm_q->f("display_display");
+
+    $prefs[$user_id]["order"] = $fieldorder;
+    $prefs[$user_id]["status"] = $fieldstatus;
+  }
+
+  return $prefs;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -345,7 +417,118 @@ function run_query_display_pref2($u_id, $entity, $all=0) {
 //   - $fieldname : fieldname to change the display value
 //   - $disstatus : current display value
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_display_pref_update($entity, $fieldname, $disstatus) {
+function update_display_pref($entity, $fieldname, $disstatus) {
+  global $auth, $cdg_sql;
+
+  $uid = $auth->auth["uid"];
+  $prefs = get_one_display_pref($uid, $entity, $fieldname);
+  $default_order = $prefs[0]["order"];
+  $default_status = $prefs[0]["status"];
+  $user_order = $prefs[$uid]["order"];
+
+  // Invert the display value (0,1)  
+  $new_status = ($disstatus == 0) ? 1 : 0;
+
+  // if new field values = default values and user value exists, erase it
+  if ($new_status == $default_status) {
+    if ($user_order == $default_order) {
+
+      $query = "DELETE FROM DisplayPref
+      WHERE display_user_id='$uid'
+        AND display_entity='$entity'
+        AND display_fieldname='$fieldname'";
+
+      display_debug_msg($query, $cdg_sql);
+      $obm_q = new DB_OBM; 
+      $obm_q->query($query);
+    } elseif (! isset($prefs[$uid])) {
+      // This should not happen cause status was different so user entry exists
+      echo "This should not happen !! except on migration !";
+    } else {
+      // user entry is different (=> update it)
+      run_query_display_pref_update($uid, $entity, $fieldname, $new_status);
+    }
+  } else {  // $new status != default status
+    if (isset($prefs[$uid])) {
+      // if user entry exists, we update it
+      run_query_display_pref_update($uid, $entity, $fieldname, $new_status);
+    } else {
+      // if no user entry, we create it
+      run_query_display_pref_insert($uid, $entity, $fieldname, $new_status, $default_order);
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Update a display value for the entity, user, field
+// Parameters:
+//   - $u_id      : user id
+//   - $entity    : entity affected
+//   - $fieldname : fieldname to change the display value
+//   - $status    : field status to set
+//   - $order     : [opt] field order to set
+///////////////////////////////////////////////////////////////////////////////
+function run_query_display_pref_update($u_id, $entity, $fieldname, $status, $order="") {
+  global $auth, $cdg_sql;
+
+  if ($order != "") {
+    $update_order = ",
+      display_fieldorder='$order'";
+  }
+
+  $query = "UPDATE DisplayPref SET
+      display_display='$status'
+      $update_order
+    WHERE display_user_id='$u_id'
+      AND display_entity='$entity'
+      AND display_fieldname='$fieldname'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM; 
+  $obm_q->query($query);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Create a display value for the entity, user, field
+// Parameters:
+//   - $u_id      : user id
+//   - $entity    : entity affected
+//   - $fieldname : fieldname to change the display value
+//   - $status    : field status to set
+//   - $order     : field order to set
+///////////////////////////////////////////////////////////////////////////////
+function run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $order) {
+  global $auth, $cdg_sql;
+
+  $query = "INSERT INTO DisplayPref (
+      display_user_id,
+      display_entity,
+      display_fieldname,
+      display_fieldorder,
+      display_display)
+    VALUES (
+      '$u_id',
+      '$entity',
+      '$fieldname',
+      '$order',
+      '$status')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM; 
+  $obm_q->query($query);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Store the new display value for the entity, field
+// Parameters:
+//   - $entity    : entity affected
+//   - $fieldname : fieldname to change the display value
+//   - $disstatus : current display value
+///////////////////////////////////////////////////////////////////////////////
+function run_query_display_pref_update_old($entity, $fieldname, $disstatus) {
   global $auth, $cdg_sql;
 
   // Invert the display value (0,1)  

@@ -732,7 +732,7 @@ function run_query_deal_potential($users_id="") {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_uid
-    GROUP BY deal_marketingmanager_id
+    GROUP BY deal_marketingmanager_id, userobm_lastname, userobm_firstname
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_deal_potential");
@@ -784,7 +784,7 @@ function run_query_deal_status($user_id) {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       AND deal_marketingmanager_id = '$user_id'
-    GROUP BY deal_status_id
+    GROUP BY deal_status_id, dealstatus_label
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_deal_status");
@@ -816,7 +816,7 @@ function run_query_incident_status($user_id) {
       LEFT Join IncidentStatus on incident_status_id = incidentstatus_id
     WHERE incident_archive = '0'
       AND incident_owner = '$user_id'
-    GROUP BY incident_status_id
+    GROUP BY incident_status_id, incidentstatus_label
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_incident_status");
