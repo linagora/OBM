@@ -114,7 +114,7 @@ class obmCASClient extends CASClient {
         
 	} else {
 	  
-	  $this->_url = ($_SERVER['x-aliacom-proxy-protocol'] == "HAVE_x-aliacom-proxy-protocol") ? 'https' : 'http';
+	  $this->_url = ($_SERVER['x-aliacom-proxy-protocol'] == "https") ? 'https' : 'http';
 	  $this->_url .= '://';
 
           $this->_url .= obmCAS::getFirstForwarder($$_SERVER['HTTP_X_FORWARDED_SERVER']);
