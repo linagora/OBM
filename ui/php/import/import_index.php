@@ -66,7 +66,6 @@ if ($cgp_site_include) {
 ///////////////////////////////////////////////////////////////////////////////
 
 require("$obminclude/global_pref.inc");
-
 include("import_display.inc");
 include("import_query.inc");
 

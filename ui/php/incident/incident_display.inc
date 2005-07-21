@@ -263,14 +263,18 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 //   - $incident[]    
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_consult($incident) {
-  global $display;
+  global $display, $l_query_error;
 
   $id = $incident["id"];
 
   if ($id > 0) {
     $inc_q = run_query_detail($id);
-    $display["detailInfo"] = display_record_info($inc_q);
-    $block = html_incident_consult($inc_q);
+    if ($inc_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($inc_q);
+      $block = html_incident_consult($inc_q);
+    } else {
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $inc_q->query . " !");
+    }
   }
 
   return $block;

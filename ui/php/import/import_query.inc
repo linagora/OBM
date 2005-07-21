@@ -798,10 +798,10 @@ function get_similar_contact($fields, $cid) {
   $lname = addslashes($fields["con_ln"]);
   $fname = $fields["con_fn"];
 
-  $query = "select distinct contact_id, contact_lastname, contact_firstname 
-            from Contact
-            where contact_lastname $like '$lname%'
-              and contact_company_id = '$cid'";
+  $query = "SELECT DISTINCT contact_id, contact_lastname, contact_firstname 
+            FROM Contact
+            WHERE contact_lastname $like '$lname%'
+              AND contact_company_id = '$cid'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -853,6 +853,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   } else {
     $kind_id = "0";
   }
+<<<<<<< import_query.inc
   // If a function name has been found we get the corresponding id
   if (isset($functions[$fields["con_func"]])) {
     $function_id = $functions[$fields["con_func"]];
@@ -860,6 +861,17 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   } else {
     $function_id = $fields["con_func"];
   }
+=======
+  // If a function name has been found we get the corresponding id
+  if (isset($functions[$fields["con_func"]])) {
+    $function_id = $functions[$fields["con_func"]];
+    // else we get the entry as an id
+  } else if (($fields["con_func"] != "") && ($fields["con_func"] > 0)) {
+    $function_id = $fields["con_func"];
+  } else {
+    $function_id = "0";
+  }
+>>>>>>> 1.26.2.3
   $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
   $ad2 = addslashes($fields["con_ad2"]);
@@ -989,6 +1001,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     $kind_id = $kinds[$fields["con_lang"]];
     $q_kind = "contact_kind_id='$kind_id',";
   }
+<<<<<<< import_query.inc
   // If a function name has been found we get the corresponding id
   if (isset($functions[$fields["con_func"]])) {
     $function_id = $functions[$fields["con_func"]];
@@ -996,6 +1009,16 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   } else {
     $function_id = $fields["con_func"];
   }
+=======
+  // If a function name has been found we get the corresponding id
+  if (isset($functions[$fields["con_func"]])) {
+    $function_id = $functions[$fields["con_func"]];
+    // else we get the entry as an id
+  } else if (($fields["con_func"] != "") && ($fields["con_func"] > 0)) {
+    $function_id = $fields["con_func"];
+    $q_function = "contact_function_id='$function_id',";
+  }
+>>>>>>> 1.26.2.3
   $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
   $ad2 = addslashes($fields["con_ad2"]);
@@ -1025,6 +1048,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_userupdate='$uid',
     contact_datasource_id='$dsrc',
     $q_kind
+    $q_function
     contact_marketingmanager_id='$market',
     contact_lastname='$lname',
     contact_firstname='$fname',

@@ -690,6 +690,15 @@ function get_deal_action() {
     'Condition'=> array ('None') 
                                      	    );
 					    
+  // Parent Detail Consult
+  $actions["deal"]["parent_detailconsult"] = array (
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$deal["parent"],
+    'Right'    => $cright_read,
+    'Privacy'  => true,
+    'Condition'=> array ('parent_detailupdate', 'parent_update') 
+                                    	    );
+
   // Parent Detail Update
   $actions["deal"]["parent_detailupdate"] = array (
     'Name'     => $l_header_update,

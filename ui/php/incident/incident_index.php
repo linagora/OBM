@@ -72,20 +72,22 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-    if ($param_incident > 0) {
-      $display["detail"] = dis_incident_consult($incident);
-    } else $display["msg"] .= display_err_msg($l_error_visibility);
-    	
+  if ($incident["id"] > 0) {
+    $display["detail"] = dis_incident_consult($incident);
+  } else {
+    $display["msg"] .= display_err_msg($l_error_visibility);
+  }
+
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-    if ($param_incident > 0) {
-      require("incident_js.inc");
-      $display["detailInfo"] = display_record_info($inc_q);
-      $display["detail"] = dis_incident_form($action,$incident);
-    } else {
-        $display["msg"] = display_err_msg($l_query_error . " - " . $con_q->query . " !");
-        $display["search"] = dis_incident_search_form($incident);
-      }
+  if ($incident["id"] > 0) {
+    require("incident_js.inc");
+    $display["detailInfo"] = display_record_info($inc_q);
+    $display["detail"] = dis_incident_form($action,$incident);
+  } else {
+    $display["msg"] = display_err_msg($l_query_error . " - " . $con_q->query . " !");
+    $display["search"] = dis_incident_search_form($incident);
+  }
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
