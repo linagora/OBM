@@ -16,7 +16,7 @@
 function run_query_companycategory() {
   global $cdg_sql;
 
-  $query = "select * from CompanyCategory order by companycategory_code"; 
+  $query = "SELECT * FROM CompanyCategory ORDER BY companycategory_code"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -62,7 +62,7 @@ function run_query_company_contact_number_update($comp_id) {
 function run_query_datasource() {
   global $cdg_sql;
 
-  $query = "select * from DataSource order by datasource_name"; 
+  $query = "SELECT * FROM DataSource ORDER BY datasource_name"; 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

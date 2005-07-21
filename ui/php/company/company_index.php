@@ -344,7 +344,6 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($auth->auth["uid"], "company", 1);
@@ -352,15 +351,15 @@ if ($action == "ext_get_id") {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $disstatus);
+  update_display_pref($entity, $fieldname, $fieldstatus);
   $prefs = get_display_pref($auth->auth["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
-  $display["detail"] = dis_company_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "company", 1);
+  $display["detail"] = dis_company_display_pref($prefs);
 
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////

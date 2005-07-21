@@ -331,16 +331,19 @@ function get_display_pref($u_id, $entity, $all=0) {
     $fieldorder = $obm_q->f("display_fieldorder");
     $fieldstatus = $obm_q->f("display_display");
 
-    // For specifi user values, get them only if defined
+    // For specific user values, get them only if defined
     if ($user_id > 0) {
       if (isset($prefs[$fieldname])) {
+	// Note if user value different from default value
         if ( ($prefs[$fieldname]["order"] != $fieldorder)
              || ($prefs[$fieldname]["status"] != $fieldstatus) ) {
           $prefs[$fieldname]["notdefault"] = true;
         }
+	// If get only not hidden fields
         if ($hide) {
           if ($fieldstatus == 0) {
             $hidden[$fieldname] = true;
+	    // If user has set the field visible, show it
           } elseif (($hidden[$fieldname] == true) && ($fieldstatus != 0)) {
             unset($hidden[$fieldname]);
           }
@@ -349,6 +352,7 @@ function get_display_pref($u_id, $entity, $all=0) {
         $prefs[$fieldname]["order"] = $fieldorder;
         $prefs[$fieldname]["status"] = $fieldstatus;
       }
+      // Default values (user id = 0)
     } else {
       $prefs[$fieldname]["order"] = $fieldorder;
       $prefs[$fieldname]["status"] = $fieldstatus;
@@ -413,11 +417,12 @@ function get_one_display_pref($u_id, $entity, $field) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Store the new display value for the entity, field
 // Parameters:
-//   - $entity    : entity affected
-//   - $fieldname : fieldname to change the display value
-//   - $disstatus : current display value
+//   - $entity     : entity affected
+//   - $fieldname  : fieldname to change the display value
+//   - $new_status : new display status value; "" if not updated
+//   - $new_order  : new display order; "" if not updated
 ///////////////////////////////////////////////////////////////////////////////
-function update_display_pref($entity, $fieldname, $disstatus) {
+function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -425,14 +430,19 @@ function update_display_pref($entity, $fieldname, $disstatus) {
   $default_order = $prefs[0]["order"];
   $default_status = $prefs[0]["status"];
   $user_order = $prefs[$uid]["order"];
+  $current_order = ($user_order > 0 ? $user_order : $default_order);
 
-  // Invert the display value (0,1)  
-  $new_status = ($disstatus == 0) ? 1 : 0;
+  // if order is updated, update other field concerned too (with current order)
+  if ($new_order != "") {
+    run_query_display_pref_level_update($uid, $entity, $new_order, $current_order);
+  } else {
+    $new_order = $current_order;
+  }
 
   // if new field values = default values and user value exists, erase it
   if ($new_status == $default_status) {
-    if ($user_order == $default_order) {
-
+    if ($new_order == $default_order) {
+      
       $query = "DELETE FROM DisplayPref
       WHERE display_user_id='$uid'
         AND display_entity='$entity'
@@ -441,22 +451,28 @@ function update_display_pref($entity, $fieldname, $disstatus) {
       display_debug_msg($query, $cdg_sql);
       $obm_q = new DB_OBM; 
       $obm_q->query($query);
-    } elseif (! isset($prefs[$uid])) {
-      // This should not happen cause status was different so user entry exists
-      echo "This should not happen !! except on migration !";
     } else {
-      // user entry is different (=> update it)
-      run_query_display_pref_update($uid, $entity, $fieldname, $new_status);
+      
+      // if user entry does not exist
+      if (! isset($prefs[$uid])) {
+	run_query_display_pref_insert($uid, $entity, $fieldname, $new_status, $new_order);
+      } else {
+	// user entry is different (=> update it)
+	run_query_display_pref_update($uid, $entity, $fieldname, $new_status, $new_order);
+      }
     }
+    
   } else {  // $new status != default status
+    
     if (isset($prefs[$uid])) {
       // if user entry exists, we update it
-      run_query_display_pref_update($uid, $entity, $fieldname, $new_status);
+      run_query_display_pref_update($uid, $entity, $fieldname, $new_status, $new_order);
     } else {
-      // if no user entry, we create it
+      // user entry does not exist, we create it
       run_query_display_pref_insert($uid, $entity, $fieldname, $new_status, $default_order);
     }
   }
+  
 }
 
 
@@ -472,21 +488,30 @@ function update_display_pref($entity, $fieldname, $disstatus) {
 function run_query_display_pref_update($u_id, $entity, $fieldname, $status, $order="") {
   global $auth, $cdg_sql;
 
-  if ($order != "") {
-    $update_order = ",
-      display_fieldorder='$order'";
+  $coma = "";
+  if ($status != "") {
+    $update_status = "$coma
+      display_display='$status'";
+    $coma = ",";
   }
-
-  $query = "UPDATE DisplayPref SET
-      display_display='$status'
+  if ($order != "") {
+    $update_order = "$coma
+      display_fieldorder='$order'";
+    $coma = ",";
+  }
+  
+  if ($coma != "") {
+    $query = "UPDATE DisplayPref SET
+      $update_status
       $update_order
     WHERE display_user_id='$u_id'
       AND display_entity='$entity'
       AND display_fieldname='$fieldname'";
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM; 
-  $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM; 
+    $obm_q->query($query);
+  }
 }
 
 
@@ -546,46 +571,23 @@ function run_query_display_pref_update_old($entity, $fieldname, $disstatus) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Update the level of the field in the entity given
+// Update the level of the field in the entity given identified by the order
 // Parameters:
+//   - $u_id       : user id
 //   - $entity     : entity affected
-//   - $fieldname  : fieldname to change the display level
-//   - $fieldorder : position of field
+//   - $fieldorder : actual position
+//   - $new_level  : new position
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
-  global $auth, $cdg_sql;
+function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_level) {
+  global $cdg_sql;
 
-  $num_new_level = ($new_level == "up") ? $fieldorder-1 : $fieldorder+1;
-  $uid = $auth->auth["uid"];
-  $obm_q = new DB_OBM;
-  
-  //Aim: To know which fieldname  will be changed
-  $query = "SELECT display_fieldname
-    FROM DisplayPref
-    WHERE display_user_id='$uid'
-      AND display_entity='$entity'
-      AND display_fieldorder='$num_new_level'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $fieldname_near_change = $obm_q->f("display_fieldname");
-
-  //Aim: To change the first field's level
   $query = "UPDATE DisplayPref
-    SET display_fieldorder='$num_new_level'
-    WHERE display_user_id='$uid'
+    SET display_fieldorder='$new_level'
+    WHERE display_user_id='$u_id'
       AND display_entity='$entity'
       AND display_fieldorder='$fieldorder'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
 
-  //Aim: To change the second field's level of $fieldname_near_change
-  $query = "UPDATE DisplayPref
-    SET display_fieldorder='$fieldorder'
-    WHERE display_user_id='$uid'
-      AND display_entity='$entity'
-      AND display_fieldname='$fieldname_near_change'";
+  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 }
