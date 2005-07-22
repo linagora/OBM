@@ -92,9 +92,9 @@ function dis_todo_list($todo, $todo_q) {
      <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
     "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
      ";
-  $pref_q = run_query_display_pref($auth->auth["uid"], "todo");
+  $prefs = get_display_pref($auth->auth["uid"], "todo");
 
-  $todo_d = new OBM_DISPLAY("DATA", $pref_q);
+  $todo_d = new OBM_DISPLAY("DATA", $prefs);
   $todo_d->data_set = $todo_q;
   $todo_d->data_url = $url;
   $todo_d->data_idfield = "todo_id";
@@ -328,13 +328,12 @@ function dis_todo_form($todo, $todo_q = 0) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Todo display preference screen
 // Parameters:
-//   - $display_newpref_q    : DBO : Field list to display
-//   - $display_searchpref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_todo_display_pref($display_searchpref_q) {
+function dis_todo_display_pref($prefs) {
   global $l_todo_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "todo";
   $dis_pref->pref_title = $l_todo_display;
 

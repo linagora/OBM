@@ -196,13 +196,13 @@ function dis_user_search_list($user) {
 
   $popup = $user["popup"];
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "user");
+  $prefs = get_display_pref($auth->auth["uid"], "user");
   $obm_q = run_query_search($user, $new_order, $order_dir);
   $nb_user = $obm_q->num_rows_total();
   if ($nb_user == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup);
+    $block = html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup);
   }
 
   return $block;
@@ -213,13 +213,13 @@ function dis_user_search_list($user) {
 // HTML Display the User Search result
 // Parameters:
 //   - $obm_q    : database result (user list)
-//   - $pref_q   : the fields which have to be displayed
+//   - $prefs    : the fields which have to be displayed
 //   - $nb_user  : nb users returned by the search query
 //   - $user[]   : user search criteria
 //     keys used : login, lastname, pemrs
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
+function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
   global $display, $l_found, $l_close, $l_add;
 
   $login = urlencode($user["login"]);
@@ -242,7 +242,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;tf_desc=$desc&amp;tf_group=$group&amp;cb_archive=$archive$url_ext");
 
-  $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
+  $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
@@ -793,14 +793,14 @@ function dis_delete_form($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the User Display preference screen                               //
+// Display: the User Display preference screen
 // Parameters:
-//   - $pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_display_pref($pref_q) {
+function dis_user_display_pref($prefs) {
   global $l_user_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "user"; 
   $dis_pref->pref_title = $l_user_display;
   $dis_pref->pref_dis_help = 1;

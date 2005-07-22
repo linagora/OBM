@@ -546,13 +546,13 @@ function dis_contact_search_list($contact) {
 
   $popup = $contact["popup"];
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "contact");
+  $prefs = get_display_pref($auth->auth["uid"], "contact");
   $obm_q = run_query_contact_search($contact, $new_order, $order_dir);
   $nb_contact = $obm_q->num_rows_total();
   if ($nb_contact == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_contact_search_list($obm_q, $pref_q, $nb_contact, $contact, $popup);
+    $block = html_contact_search_list($obm_q, $prefs, $nb_contact, $contact, $popup);
   }
 
   return $block;
@@ -563,13 +563,13 @@ function dis_contact_search_list($contact) {
 // Display: Contact search result
 // Parameters : 
 //   - $obm_q     : list of the contacts to display 
-//   - $pref_q    : the fields which have to be displayed
+//   - $prefs     : the fields which have to be displayed
 //   - $nb_con    : nb contacts returned by the search query 
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
+function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   global $display, $l_found, $l_add, $l_close;
 
   if ($popup) {
@@ -598,7 +598,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 
   $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark&amp;sel_cat1=$cat1&amp;sel_cat2=$cat2$url_ext");
 
-  $dis_contact_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
+  $dis_contact_list = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
     $dis_contact_list->display_link = false;
     $dis_contact_list->data_cb_text = "X";
@@ -2812,7 +2812,7 @@ function html_contact_kind_form($kind_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Kind links                                                //
+// Display: Kind links
 // Parameters:
 //   - $ref : kind hash info : keys used : id, name
 ///////////////////////////////////////////////////////////////////////////////
@@ -2974,14 +2974,14 @@ function html_category2_list($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contact Display preference screen                             //
+// Display the Contact Display preference screen
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_contact_display_pref($display_pref_q) {
+function dis_contact_display_pref($prefs) {
   global $l_contact_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "contact";
   $dis_pref->pref_title = $l_contact_display;
   $dis_pref->pref_dis_help = 1;

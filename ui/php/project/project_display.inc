@@ -232,14 +232,14 @@ function dis_project_search_list($project) {
   $new_order = $project["new_order"];
   $order_dir = $project["order_dir"];
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
+  $prefs = get_display_pref($auth->auth["uid"], "project", 0);
   $obm_q = run_query_search($project, $new_order, $order_dir);
   $nb_project = $obm_q->num_rows_total();
 
   if ($nb_project == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_project_search_list($obm_q, $pref_q, $nb_project, $project);
+    $block = html_project_search_list($obm_q, $prefs, $nb_project, $project);
   }
 
   return $block;
@@ -250,12 +250,12 @@ function dis_project_search_list($project) {
 // XHTML Display the Project Search result
 // Parameters:
 //   - $proj_q    : list of projects
-//   - $pref_q    : fields to display in the list of projects 
+//   - $prefs     : fields to display in the list of projects 
 //   - $nb_deal   : nb projects found
 //   - $project[] : project search criteria
 //     keys used  : name, company_name, tt, manager, member
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_search_list($proj_q, $pref_q, $nb_project, $project) {
+function html_project_search_list($proj_q, $prefs, $nb_project, $project) {
   global $display, $l_found;
 
   $popup = $project["popup"];
@@ -278,7 +278,7 @@ function html_project_search_list($proj_q, $pref_q, $nb_project, $project) {
 
   $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;cb_archive=$archive$url_ext");
 
-  $proj_d = new OBM_DISPLAY("DATA", $pref_q, "project");
+  $proj_d = new OBM_DISPLAY("DATA", $prefs, "project");
   if ($popup) {
     $proj_d->display_link = false;
     if ($ext_url != "") {
@@ -2096,13 +2096,12 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Project Display preference screen
 // Parameters:
-//   - $display_newpref_q    : DBO : Field list to display
-//   - $display_searchpref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_project_display_pref($display_searchpref_q) {
+function dis_project_display_pref($prefs) {
   global $l_project_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "project"; 
   $dis_pref->pref_title = $l_project_display;
 
@@ -2114,4 +2113,4 @@ function dis_project_display_pref($display_searchpref_q) {
   return $block;
 }
 
-</SCRIPT>
+</script>

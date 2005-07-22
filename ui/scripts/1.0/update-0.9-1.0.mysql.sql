@@ -12,6 +12,12 @@ UPDATE ObmInfo set obminfo_value='1.0.0' where obminfo_name='db_version';
 
 
 -------------------------------------------------------------------------------
+-- Update Display Prefs (should already been done)
+-------------------------------------------------------------------------------
+UPDATE DisplayPref SET display_fieldname='company_name' WHERE display_entity='contact' AND display_fieldname='contact_company_name';
+
+
+-------------------------------------------------------------------------------
 -- Update Todo table
 -------------------------------------------------------------------------------
 -- Add columns privacy, dateend, percent, status, webpage

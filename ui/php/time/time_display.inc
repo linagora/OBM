@@ -472,8 +472,8 @@ function dis_time_task_list($time) {
   $nb_task = $task_q->num_rows();
 
   if ($nb_task != 0) {
-    $pref_q = run_query_display_pref($uid, "time");
-    $block .= dis_time_list_result($task_q, $pref_q, $time);
+    $prefs = get_display_pref($uid, "time");
+    $block .= dis_time_list_result($task_q, $prefs, $time);
   }
 
   return $block;
@@ -481,13 +481,13 @@ function dis_time_task_list($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Task  result                                        //
+// HTML Display the Time Task  result
 // Parameters : 
 //   - $task_q : list of tasks to be displayed
-//   - $pref_q : the fields which have to be displayed
+//   - $prefs  : the fields which have to be displayed
 //   - $time[] : time search criteria
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_list_result($task_q,$pref_q,$time) {
+function dis_time_list_result($task_q,$prefs,$time) {
   global $set_date;
   global $l_delete, $l_task_del, $l_task_list;
 
@@ -497,7 +497,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
      <form method=\"post\" name=\"f_task_del\" action=\"$url\"
        onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
-  $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
+  $dis_task_list = new OBM_DISPLAY("DATA",$prefs);
   $dis_task_list->data_set = $task_q;
   $dis_task_list->data_header = "top";
   $dis_task_list->data_page = false;
@@ -944,9 +944,9 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   global $l_tt_stats, $l_no_tt_stats;
 
   if ($statproj_q->num_rows() != 0) {
-    $pref_pq = run_query_display_pref($auth->auth["uid"], "time_proj");
+    $prefs_p = get_display_pref($auth->auth["uid"], "time_proj");
 
-    $dis_projuser_list = new OBM_DISPLAY("DATA",$pref_pq);
+    $dis_projuser_list = new OBM_DISPLAY("DATA",$prefs_p);
     $dis_projuser_list->data_set = $statproj_q;
     $dis_projuser_list->data_order = false;
     $dis_projuser_list->data_page = false;
@@ -959,9 +959,9 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   }
   
   if ($stattt_q->num_rows() != 0) {
-    $pref_tq = run_query_display_pref($auth->auth["uid"], "time_tt");
+    $prefs_t = get_display_pref($auth->auth["uid"], "time_tt");
 
-    $dis_ttuser_list = new OBM_DISPLAY("DATA",$pref_tq);
+    $dis_ttuser_list = new OBM_DISPLAY("DATA",$prefs_t);
     $dis_ttuser_list->data_set = $stattt_q;
     $dis_ttuser_list->data_order = false;
     $dis_ttuser_list->data_page = false;
@@ -978,15 +978,14 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Time Display preference screen                             //
+// Display the Time Display preference screen
 // Parameters:
-//   - $display_newpref_q    : DBO : Field list to display
-//   - $display_searchpref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_display_pref($display_searchpref_q) {
+function dis_time_display_pref($prefs) {
   global $l_searchtime_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "time";
   $dis_pref->pref_title = $l_searchtime_display;
 

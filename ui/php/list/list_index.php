@@ -221,23 +221,23 @@ else if ($action == "new_criterion") {
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pref_q = run_query_display_pref($uid, "list", 1);
-  $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
-  $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
+  $prefs = get_display_pref($uid, "list", 1);
+  $prefs_con = get_display_pref($uid, "list_contact", 1);
+  $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
-} else if($action == "dispref_display") {
+} else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_q = run_query_display_pref($uid, "list", 1);
-  $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
-  $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($uid, "list", 1);
+  $prefs_con = get_display_pref($uid, "list_contact", 1);
+  $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($uid, "list", 1);
-  $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
-  $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($uid, "list", 1);
+  $prefs_con = get_display_pref($uid, "list_contact", 1);
+  $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
 } else if($action == "export_add") {
 ///////////////////////////////////////////////////////////////////////////////

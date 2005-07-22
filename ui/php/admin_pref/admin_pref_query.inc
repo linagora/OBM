@@ -16,10 +16,10 @@
 function get_default_user_pref() {
   global $cdg_sql;
 
-  $query = "select *
-            from UserObmPref
-            where userobmpref_user_id = '0'
-            order by userobmpref_option";
+  $query = "SELECT *
+            FROM UserObmPref
+            WHERE userobmpref_user_id = '0'
+            ORDER BY userobmpref_option";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -40,10 +40,10 @@ function get_userpref_value($option) {
   global $cdg_sql;
 
   $uid = $auth->auth["uid"];
-  $query = "select userobmpref_value
-            from UserObmPref
-            where userobmpref_user_id = '$uid'
-              and userobmpref_option = '$option'";
+  $query = "SELECT userobmpref_value
+            FROM UserObmPref
+            WHERE userobmpref_user_id = '$uid'
+              AND userobmpref_option = '$option'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -55,7 +55,7 @@ function get_userpref_value($option) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Admin Preferences Form Data checking and formatting                       //
+// Admin Preferences Form Data checking and formatting
 // Parameters:
 //   - $pref[]   : values checked
 // Returns:

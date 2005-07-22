@@ -7,9 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms Management                                             //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $module = "account";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -136,7 +133,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] = display_ok_msg ("FIXME PERMISSIONS");
     //$q_account = run_query_detail ($account["account"]);
     //    $payments_options = run_query_display_options ($auth->auth["uid"],"payment");
-    $payments_prefs = run_query_display_pref ($auth->auth["uid"], "payment");
+    $payments_prefs = get_display_pref ($auth->auth["uid"], "payment");
 
     $display["detail"] = html_compute_balance ($account["account"], $payments_prefs, $tf_balance_date);
 
@@ -164,23 +161,23 @@ $q_account = run_query_detail ($account["account"]);
     
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $account_options=run_query_display_pref($auth->auth["uid"], "account",1);
-  $payment_options=run_query_display_pref ($auth->auth["uid"], "payment",1);
-  $display["detail"] = dis_account_display_pref ($account_options, $payment_options); 
+  $prefs = get_display_pref($auth->auth["uid"], "account",1);
+  $prefs_p = get_display_pref ($auth->auth["uid"], "payment",1);
+  $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 
 } else if($action =="dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_account_q = run_query_display_pref($uid,"account",1);
-  $pref_payment_q = run_query_display_pref($uid,"payment",1);
-  $display["detail"] = dis_account_display_pref($pref_account_q, $pref_payment_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($auth->auth["uid"], "account",1);
+  $prefs_p = get_display_pref ($auth->auth["uid"], "payment",1);
+  $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_account_q = run_query_display_pref($uid,"account",1);
-  $pref_payment_q = run_query_display_pref($uid,"payment",1);
-  $display["detail"] = dis_account_display_pref($pref_account_q, $pref_payment_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "account",1);
+  $prefs_p = get_display_pref ($auth->auth["uid"], "payment",1);
+  $display["detail"] = dis_account_display_pref ($prefs, $prefs_p); 
 }
 
 

@@ -143,21 +143,21 @@ if ($action == "index") {
   $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
 
 } elseif ($action == "display") {
-/////////////////////////////////////////////////////////////////////////
-  $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
-  $display["detail"] = dis_time_display_pref($pref_search_q);
+///////////////////////////////////////////////////////////////////////////////
+  $prefs = get_display_pref($auth->auth["uid"], "time", 1);
+  $display["detail"] = dis_time_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
-/////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
-  $display["detail"] = dis_time_display_pref($pref_search_q);
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($auth->auth["uid"], "time", 1);
+  $display["detail"] = dis_time_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
-/////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
-  $display["detail"] = dis_time_display_pref($pref_search_q);
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "time", 1);
+  $display["detail"] = dis_time_display_pref($prefs);
 }  
 
 

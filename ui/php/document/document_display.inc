@@ -152,7 +152,7 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Document search result                                         //
+// Display the Document search result
 // Parameters:
 //   - $document[] : document search criteria
 //     keys used  : name, kind, zip
@@ -161,13 +161,13 @@ function dis_document_search_list($document) {
   global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "document");
+  $prefs = get_display_pref($auth->auth["uid"], "document");
   $obm_q = run_query_search($document, $new_order, $order_dir);
   $nb_document = $obm_q->num_rows_total();
   if ($nb_document == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_document_search_list($obm_q,$pref_q,$nb_document,$document);
+    $block = html_document_search_list($obm_q,$prefs,$nb_document,$document);
   }
 
   return $block;
@@ -178,12 +178,12 @@ function dis_document_search_list($document) {
 // Display: Returns the XHTML result display
 // Parameters : 
 //   - $doc_q     : list of documents
-//   - $pref_q     : the fields which have to be displayed
+//   - $prefs     : the fields which have to be displayed
 //   - $nb_document : nb documents returned by the search query
 //   - $document[]  : document search criteria
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
+function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
   global $display, $l_found, $l_add,$l_close;
 
   // we urlencode to avoid breakage for space char
@@ -209,7 +209,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 
   $doc_q->seek($first_row);
 
-  $doc_d = new OBM_DISPLAY("DATA", $pref_q, "document");
+  $doc_d = new OBM_DISPLAY("DATA", $prefs, "document");
 
   if ($popup) {
     $doc_d->display_link = false;
@@ -1340,15 +1340,17 @@ function dis_mime_links($document) {
 
   return $dis_link;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the Document Display preference screen                            //
+// Display: the Document Display preference screen
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_document_display_pref($display_pref_q) {
+function dis_document_display_pref($prefs) {
   global $l_document_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "document"; 
   $dis_pref->pref_title = $l_document_display;
   $dis_pref->pref_dis_help = 1;
@@ -1357,6 +1359,8 @@ function dis_document_display_pref($display_pref_q) {
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Document Tree
 // Parameters:

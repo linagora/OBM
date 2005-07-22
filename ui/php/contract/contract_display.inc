@@ -313,13 +313,13 @@ function dis_contract_search_list($contract) {
   global $display, $auth, $new_order, $order_dir;
   
   $popup = $contract["popup"];
-  $pref_q = run_query_display_pref($auth->auth["uid"], "contract");
+  $prefs = get_display_pref($auth->auth["uid"], "contract");
   $obm_q = run_query_search($contract, $new_order, $order_dir);
   $nb_contract = $obm_q->num_rows_total();
   if ($nb_contract == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_contract_search_list($obm_q,$pref_q,$nb_contract,$contract, $popup);
+    $block = html_contract_search_list($obm_q,$prefs,$nb_contract,$contract, $popup);
   }
 
   return $block;
@@ -330,13 +330,13 @@ function dis_contract_search_list($contract) {
 // XHTML Display the Contract Search result
 // Parameters :
 //   - $contract_q : contracts list
-//   - $pref_q     : fields to display in the contracts list
+//   - $prefs      : fields to display in the contracts list
 //   - $nb_con     : nb contract found
 //   - $contract[] : contract search criteria
 //     keys used   : label, type, dateafter, datebefore, company_name, market
 //   - $popup      : popup flag tell if external parameters to handle
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract, $popup) {
+function html_contract_search_list($contract_q, $prefs, $nb_con, $contract, $popup) {
   global $display, $l_found, $l_close;
 
   if ($popup) {
@@ -365,7 +365,7 @@ function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract, $po
   $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_tech=$tech&amp;sel_market=$market&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
   
   $contract_q->seek($first_row);
-  $contract_d = new OBM_DISPLAY("DATA", $pref_q, "contract");
+  $contract_d = new OBM_DISPLAY("DATA", $prefs, "contract");
   if ($popup) {
     $contract_d->display_link = false;
     if ($ext_url != "") {
@@ -2183,12 +2183,12 @@ function dis_type_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Contract Display preference screen
 // Parameters:
-//   - $pref_q : DBO : Contract Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_contract_display_pref($pref_q) {
+function dis_contract_display_pref($prefs) {
   global $l_contract_display;
   
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "contract"; 
   $dis_pref->pref_title = $l_contract_display;
   $dis_pref->pref_dis_help = 1;
@@ -2202,7 +2202,7 @@ function dis_contract_display_pref($pref_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// display contract select form                                              //
+// Display contract select form
 // parameters:
 //   - $comp_q : company database result
 //   - $title  : title to be displayed

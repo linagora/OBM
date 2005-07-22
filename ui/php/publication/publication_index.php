@@ -207,11 +207,13 @@ if ($action == "ext_get_id") {
     require("publication_js.inc");
     $display["detail"] =html_subscription_form($action,$cont_q, $recept_q, $publication);        
   }
+
 } elseif ($action == "new_group_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
   $pub_q = run_query_detail($param_publication);
   $concat1_q = run_query_publication_contactcategory1();
   $display["detail"] = html_group_subscription_form($action,$pub_q, $concat1_q,$publication);
+
 } elseif ($action == "insert_group_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
   // If the context (same publications) was confirmed ok, we proceed
@@ -397,20 +399,20 @@ if ($action == "ext_get_id") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pref_q = run_query_display_pref($auth->auth["uid"], "publication", 1);
-  $display["detail"] = dis_publication_display_pref($pref_q);
+  $prefs = get_display_pref($auth->auth["uid"], "publication", 1);
+  $display["detail"] = dis_publication_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "publication", 1);
-  $display["detail"] = dis_publication_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($auth->auth["uid"], "publication", 1);
+  $display["detail"] = dis_publication_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "publication", 1);
-  $display["detail"] = dis_publication_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "publication", 1);
+  $display["detail"] = dis_publication_display_pref($prefs);
 }
 
 

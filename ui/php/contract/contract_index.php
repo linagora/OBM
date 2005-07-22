@@ -28,9 +28,6 @@
 // - ext_get_id      -- $title          -- select a contract (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms Management                                             //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $module = "contract";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -250,20 +247,20 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pref_q = run_query_display_pref($auth->auth["uid"], "contract", 1);
-  $display["detail"] = dis_contract_display_pref($pref_q);
+  $prefs = get_display_pref($auth->auth["uid"], "contract", 1);
+  $display["detail"] = dis_contract_display_pref($prefs);
   
 } elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "contract", 1);
-  $display["detail"] = dis_contract_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($auth->auth["uid"], "contract", 1);
+  $display["detail"] = dis_contract_display_pref($prefs);
   
 } elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "contract", 1);
-  $display["detail"] = dis_contract_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "contract", 1);
+  $display["detail"] = dis_contract_display_pref($prefs);
   
 } elseif ($action == "admin")  {
 //////////////////////////////////////////////////////////////////////////////

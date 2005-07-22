@@ -198,7 +198,7 @@ function html_group_search_form ($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Group search result                                           //
+// Display the Group search result
 // Parameters:
 //   - $group[]   : group search criteria
 //     keys used  : name, description, email
@@ -209,7 +209,7 @@ function dis_group_search_group($group) {
   $child_res = $group["children_restriction"];
   $widget = $group["ext_widget"];
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "group");
+  $prefs = get_display_pref($auth->auth["uid"], "group");
   if ($child_res) {
     $obm_q = run_query_search_possible_children($group);
   }  else {
@@ -220,7 +220,7 @@ function dis_group_search_group($group) {
   if ($nb_group == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group);
+    $block = html_group_search_group($obm_q, $prefs, $nb_group, $group);
   }
 
   return $block;
@@ -231,12 +231,12 @@ function dis_group_search_group($group) {
 // HTML Display the Group search result
 // Parameters : 
 //   - $obm_q     : list of the groups to display 
-//   - $pref_q    : the fields which have to be displayed
+//   - $prefs     : the fields which have to be displayed
 //   - $nb_group  : nb groups returned by the search query 
 //   - $group[]   : group search criteria
 //     keys used  : name, user, popup
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
+function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
   global $display, $l_found, $l_add, $l_close;
 
   $child_res = $group["children_restriction"];
@@ -259,7 +259,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
 
   $url = url_prepare("group_index.php?action=search&amp;tf_name=$namet&amp;tf_user=$user$url_ext");
   
-  $dis_group = new OBM_DISPLAY("DATA", $pref_q);
+  $dis_group = new OBM_DISPLAY("DATA", $prefs);
   if ($popup) {
     $dis_group->display_link = false;
     $dis_group->data_cb_text = "X";
@@ -407,20 +407,20 @@ function dis_group_consult($group, $uid) {
 
   $group_q = run_query_detail($g_id);
 
-  $pref_u_q = run_query_display_pref($uid, "group_user");
+  $prefs_u = get_display_pref($uid, "group_user");
   $u_q = run_query_user_group($group);
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id=$g_id");
     $u_q->set_num_rows_total($count);
   }
 
-  $pref_g_q = run_query_display_pref($uid, "group_group");
+  $prefs_g = get_display_pref($uid, "group_group");
   $g_q = run_query_group_group($group);
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
     $g_q->set_num_rows_total($count);
   }
-  $block = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+  $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
 
   return $block;
 }
@@ -430,10 +430,12 @@ function dis_group_consult($group, $uid) {
 // HTML Display Group Consultation
 // Parameters:
 //   - $group_q  : group database result 
-//   - $pref_u_q : group user preference display 
+//   - $prefs_u  : group user preference display
 //   - $u_q      : user database result 
+//   - $prefs_g  : group group preference display
+//   - $g_q      : group database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
+function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $auth;
   global $l_yes, $l_no, $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
@@ -511,7 +513,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $pref_g_q);
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_g);
     $dis_infos->data_set = $g_q;
     $dis_infos->display_entity = "group_group";
     $dis_infos->data_url = $url;
@@ -553,7 +555,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   if ($nb_u != 0) {
 
     $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
-    $dis_infos = new OBM_DISPLAY("DATA", $pref_u_q);
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_u);
     $dis_infos->data_set = $u_q;
     $dis_infos->display_entity = "group_user";
     $dis_infos->data_url = $url;
@@ -587,15 +589,15 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Group Display preference screen                               //
+// Display the Group Display preference screen
 // Parameters:
-//   - $pref_group_q : DBO : Group Field group to display
-//   - $pref_u_q     : DBO : User Field group to display
+//   - $prefs_g : Group Display preferences
+//   - $prefs_u : User Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_group_display_pref($pref_group_q, $pref_u_q) {
+function dis_group_display_pref($prefs_g, $prefs_u) {
   global $l_group_display, $l_user_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_group_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g);
   $dis_pref->display_entity = "group"; 
   $dis_pref->pref_title = $l_group_display;
   $dis_pref->pref_dis_help = 0;
@@ -605,7 +607,7 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
     <tr>
       <td>" . $dis_pref->display() . "</td>";
 
-  $dis_pref->display_pref = $pref_u_q;
+  $dis_pref->display_pref = $prefs_u;
   $dis_pref->display_module = "group";
   $dis_pref->display_entity = "group_user";
   $dis_pref->pref_title = $l_user_display;

@@ -145,13 +145,13 @@ function dis_publication_search_list($publication) {
 
   $popup = $publication["popup"];
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "publication");
+  $prefs = get_display_pref($auth->auth["uid"], "publication");
   $obm_q = run_query_search($publication, $new_order, $order_dir);
   $nb_pub = $obm_q->num_rows_total();
   if ($nb_pub == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_publication_search_list($obm_q,$pref_q,$nb_pub,$publication,$popup);
+    $block = html_publication_search_list($obm_q,$prefs,$nb_pub,$publication,$popup);
   }
 
   return $block;
@@ -162,12 +162,12 @@ function dis_publication_search_list($publication) {
 // Display: Returns the XHTML result display
 // Parameters : 
 //   - $pub_q      : publication list
-//   - $pref_q     : the fields which have to be displayed
+//   - $prefs      : the fields which have to be displayed
 //   - $nb_pub     : nb publications returned by the search query
 //   - $publication[]  : publication search criteria
 //     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_search_list($pub_q, $pref_q, $nb_pub,$publication,$popup) {
+function html_publication_search_list($pub_q, $prefs, $nb_pub,$publication,$popup) {
   global $display, $l_found,$l_close;
 
   if ($popup) {
@@ -186,7 +186,7 @@ function html_publication_search_list($pub_q, $pref_q, $nb_pub,$publication,$pop
  
   $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;sel_type=$type&amp;tf_year=$year&amp;tf_lang=$lang$url_ext");
 
-  $pub_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
+  $pub_d = new OBM_DISPLAY("DATA", $prefs, "publication");
   if ($popup) {
     $pub_d->display_link = false;
     $pub_d->display_ext = "ext_get_id";
@@ -211,12 +211,12 @@ function html_publication_search_list($pub_q, $pref_q, $nb_pub,$publication,$pop
 // Display: Returns the XHTML result display
 // Parameters : 
 //   - $pub_q      : publication list
-//   - $pref_q     : the fields which have to be displayed
+//   - $prefs      : the fields which have to be displayed
 //   - $nb_pub     : nb publications returned by the search query
 //   - $publication[]  : publication search criteria
 //     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_search_list($pub_q, $pref_q, $nb_pub,$publication,$popup) {
+function html_subscription_search_list($pub_q, $prefs, $nb_pub,$publication,$popup) {
   global $display, $l_found,$l_close;
 
   // we urlencode to avoid breakage for space char
@@ -233,7 +233,7 @@ function html_subscription_search_list($pub_q, $pref_q, $nb_pub,$publication,$po
 
   $pub_q->seek($first_row);
 
-  $pub_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
+  $pub_d = new OBM_DISPLAY("DATA", $prefs, "publication");
   if ($popup) {
     $pub_d->display_ext = "ext_get_id";
     $display_popup_end = "
@@ -1294,14 +1294,14 @@ function dis_recept_links($publication) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the Publication Display preference screen                            //
+// Display: the Publication Display preference screen
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_publication_display_pref($display_pref_q) {
+function dis_publication_display_pref($prefs) {
   global $l_publication_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "publication"; 
   $dis_pref->pref_title = $l_publication_display;
   $dis_pref->pref_dis_help = 1;
@@ -1334,14 +1334,12 @@ function dis_subscription_external_list($hash_table) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Task  result                                        //
+// HTML Display the Time Task  result
 // Parameters : 
-//   - $obm_q    : list of tasks to be displayed
-//   - $pref_q   : the fields which have to be displayed
-//   - $nb_task  : nb tasks returned by the search query 
-//   - $time[]   : time search criteria
-//     keys used : week
+//   - $sub_q   : subscription list
+//   - $nb_sub  : nb subscriptions
 ///////////////////////////////////////////////////////////////////////////////
 function html_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme, $ico_update, $ico_delete, $ico_crow;
@@ -1424,4 +1422,4 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
 
 
 
-</SCRIPT>
+</script>

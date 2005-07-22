@@ -249,20 +249,20 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pref_q = run_query_display_pref($uid, "incident", 1);
-  $display["detail"] = dis_incident_display_pref($pref_q); 
+  $prefs = get_display_pref($uid, "incident", 1);
+  $display["detail"] = dis_incident_display_pref($prefs); 
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_q = run_query_display_pref($uid, "incident", 1);
-  $display["detail"] = dis_incident_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($uid, "incident", 1);
+  $display["detail"] = dis_incident_display_pref($prefs);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($uid, "incident", 1);
-  $display["detail"] = dis_incident_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($uid, "incident", 1);
+  $display["detail"] = dis_incident_display_pref($prefs);
 }
 
 

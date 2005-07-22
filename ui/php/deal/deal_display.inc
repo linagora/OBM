@@ -436,8 +436,8 @@ function dis_deal_search_list($deal) {
   if ($nb_deal == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $pref_q = run_query_display_pref($auth->auth["uid"], "deal", 0);
-    $block = html_deal_search_list($obm_q, $pref_q, $nb_deal, $deal);
+    $prefs = get_display_pref($auth->auth["uid"], "deal", 0);
+    $block = html_deal_search_list($obm_q, $prefs, $nb_deal, $deal);
   }
 
   return $block;
@@ -448,13 +448,13 @@ function dis_deal_search_list($deal) {
 // HTML Display the Deal Search result
 // Parameters:
 //   - $deal_q   : list of deals
-//   - $pref_q   : fields to display in the list of deals 
+//   - $prefs    : fields to display in the list of deals 
 //   - $nb_deal  : nb deals found
 //   - $deal[]   : deal search criteria
 //     keys used : parent, label, company_name, archive, kind, tt, status,
 //                 manager, dateafter, datebefore
 //////////////////////////////////////////////////////////////////////////////
-function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
+function html_deal_search_list($deal_q, $prefs, $nb_deal, $deal) {
   global $display, $l_found, $l_close;
 
   $popup = $deal["popup"];
@@ -484,7 +484,7 @@ function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
 
   $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
 
-  $deal_d = new OBM_DISPLAY("DATA", $pref_q, "deal");
+  $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   if ($popup) {
     $deal_d->display_link = false;
     if ($ext_url != "") {
@@ -1873,11 +1873,11 @@ function dis_deal_stats($deal) {
   <div class=\"detailHead\">$l_module_deal</div>";
 
   $deal_q = run_query_deal_stats($deal);
-  $pref_q = run_query_display_pref($uid, "deal", 0);
+  $prefs = get_display_pref($uid, "deal", 0);
 
   $url=url_prepare("deal_index.php?action=stats&amp;param_list=$id");
     
-  $dis_deal = new OBM_DISPLAY("DATA", $pref_q, "deal");
+  $dis_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
   $dis_deal->data_set = $deal_q;
   $dis_deal->data_url = $url;
   $dis_deal->display_entity = "deal";
@@ -2529,14 +2529,14 @@ function dis_status_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Deal Display preference screen
 // Parameters:
-//   - $pref_q        : DBO : Deal Field list to display
-//   - $pref_parent_q : DBO : ParentDeal Field list to display
-//   - $pref_invoice  : DBO : Invoice Field list to display
+//   - $prefs        : Deal Display preferences
+//   - $prefs_parent : Parent Deal Display preferences
+//   - $prefs_invoice: Invoice Deal Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
+function dis_deal_display_pref($prefs, $prefs_parent, $prefs_invoice) {
   global $l_deal_display, $l_parentdeal_display, $l_invoice_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "deal";
   $dis_pref->pref_title = $l_deal_display;
 
@@ -2546,7 +2546,7 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
   $block .= "
     </td>";
 
-  $dis_pref->display_pref = $pref_parent_q;
+  $dis_pref->display_pref = $prefs_parent;
   $dis_pref->display_module = "deal";
   $dis_pref->display_entity = "parentdeal";
   $dis_pref->pref_title = $l_parentdeal_display;
@@ -2554,7 +2554,7 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
   $block .= "<td>";
   $block .= $dis_pref->display();
   $block .= "</td><td>";
-  $dis_pref->display_pref = $pref_invoice;
+  $dis_pref->display_pref = $prefs_invoice;
   $dis_pref->display_entity = "invoice";
   $dis_pref->pref_title = $l_invoice_display;
   
@@ -2573,7 +2573,7 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Parent Deal search result                                        //
+// Display: Parent Deal search result
 // Parameters:
 //   - $deal[]    : deal search criteria
 //     keys used  : company_id, name, company
@@ -2591,24 +2591,24 @@ function dis_parentdeal_search_list($deal) {
   if ($nb_parent == 0) {
     $display["msg"] .= display_warn_msg($l_no_found_parent);
   } else {
-    $pref_q = run_query_display_pref($auth->auth["uid"], "parentdeal");
-    $block = html_parentdeal_search_list($obm_q, $pref_q, $nb_parent, $deal);
+    $prefs = get_display_pref($auth->auth["uid"], "parentdeal");
+    $block = html_parentdeal_search_list($obm_q, $prefs, $nb_parent, $deal);
   }
   return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: XHTML Parent Deal Search result                                  //
+// Display: XHTML Parent Deal Search result
 // Parameters:
 //   - $obm_q        : list of parent deals
-//   - $option_dis_q : fields to display in the list of deals 
+//   - $prefs        : fields to display in the list of deals 
 //   - $nb_pdeal     : nb parent deals found
 //   - $deal[]       : parent deal search criteria
 //     keys used     : plabel, pmanager, parchive
 // Display the results of the parentdeal search
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_search_list($obm_q, $pref_q, $nb_parentdeals, $deal) {
+function html_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal) {
   global $display, $l_found_parent; 
 
   $plabel = urlencode(stripslashes($deal["plabel"]));
@@ -2618,7 +2618,7 @@ function html_parentdeal_search_list($obm_q, $pref_q, $nb_parentdeals, $deal) {
 
   $url = url_prepare("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
 
-  $parentdeal_d = new OBM_DISPLAY("DATA", $pref_q, "deal");
+  $parentdeal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   $parentdeal_d->data_set = $obm_q;
   $parentdeal_d->data_url = $url;
   $parentdeal_d->data_header = "both";
@@ -2643,7 +2643,7 @@ function dis_parentdeal_consult($deal) {
   $order_dir = $deal["order_dir"];
 
   $obm_q = run_query_detail_parentdeal($deal["parent"]);
-  $pref_q = run_query_display_pref ($uid, "deal");
+  $prefs = get_display_pref ($uid, "deal");
   $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
   $kind_q = run_query_dealtype();
@@ -2652,7 +2652,7 @@ function dis_parentdeal_consult($deal) {
   $status_q = run_query_dealstatus();
   $usr_q = run_query_userobm();
 
-  $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $pref_q, $num_rows, $kind_q, $tt_q, $cat_q, $status_q, $usr_q);
+  $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tt_q, $cat_q, $status_q, $usr_q);
 
   return $block;
 }
@@ -2665,7 +2665,7 @@ function dis_parentdeal_consult($deal) {
 //   - $deal_q   : DBO : parentdeal deal list
 //   - deal[]    : default or transmitted values
 //     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
-//   - $pref_q   : display preferences for the deal list
+//   - $prefs    : display preferences for the deal list
 //   - $nbdeals  : number of deals in the list
 //     //---> used by the deal search form :
 //   - $kind_q   : list of deal types available
@@ -2673,7 +2673,7 @@ function dis_parentdeal_consult($deal) {
 //   - $status_q : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$tt_q,$cat_q,$status_q,$usr_q) {
+function html_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tt_q,$cat_q,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_status;
@@ -2783,7 +2783,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
 
   // Display the list of deals attached to the parentdeal
-  $dis_list_deal = new OBM_DISPLAY("DATA", $pref_q, "deal");
+  $dis_list_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
   $dis_list_deal->data_set = $deal_q;
   $dis_list_deal->data_url = $url;
   $dis_list_deal->data_header = "both";

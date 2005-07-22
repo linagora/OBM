@@ -86,7 +86,7 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function check_preferences_vars() {
     if (! is_array($this->display_pref)) {
-      die("AATHE display_pref VARIABLE MUST BE SET");
+      die("THE display_pref VARIABLE MUST BE SET");
     }
     if (!isset($this->display_entity)) {
       die("THE display_entity VARIABLE MUST BE SET");
@@ -170,7 +170,7 @@ class OBM_DISPLAY {
 	$block .= "
       <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldstatus=$new_status")."\">
       <img alt=\"$l_display_no\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_ball\" /></a>";
-      } else if ($disstatus == 2) {
+      } else if ($fieldstatus == 2) {
 	$block .= "
       <img alt=\"$l_mandatory\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_forbidden\" />";
       }
@@ -198,7 +198,7 @@ class OBM_DISPLAY {
       } else {
         $new_order = $fieldorder + 1;
 	$block .= "
-        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=$new_order")."\">
+        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;new_level=down&amp;fieldorder=$new_order")."\">
           <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
       }
       
@@ -210,7 +210,7 @@ class OBM_DISPLAY {
         $new_order = $fieldorder - 1;
 	$block .= "
         <td>
-          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=$new_order")."\">
+          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;new_level=up&amp;fieldorder=$new_order")."\">
           <img alt=\"$l_up\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       $block .= "

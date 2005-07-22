@@ -187,20 +187,20 @@ if ($action == "ext_get_ids") {
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pref_q = run_query_display_pref($auth->auth["uid"], "user", 1);
-  $display["detail"] = dis_user_display_pref($pref_q);
+  $prefs = get_display_pref($auth->auth["uid"], "user", 1);
+  $display["detail"] = dis_user_display_pref($prefs);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "user", 1);
-  $display["detail"] = dis_user_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($auth->auth["uid"], "user", 1);
+  $display["detail"] = dis_user_display_pref($prefs);
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($auth->auth["uid"], "user", 1);
-  $display["detail"] = dis_user_display_pref($pref_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($auth->auth["uid"], "user", 1);
+  $display["detail"] = dis_user_display_pref($prefs);
 }
 
 
@@ -402,7 +402,7 @@ function get_user_action() {
     'Condition'=> array ('all') 
                                     );
 
-// Dispay
+// Display
   $actions["user"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/user/user_index.php?action=display",
@@ -410,13 +410,13 @@ function get_user_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-// Dispay
+// Display
   $actions["user"]["dispref_display"] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
-// Dispay
+// Display
   $actions["user"]["dispref_level"] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_level",
     'Right'    => $cright_read,

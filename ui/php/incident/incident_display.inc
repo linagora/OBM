@@ -202,13 +202,13 @@ function dis_incident_search_list($incident) {
   global $l_no_found;
   global $auth, $new_order, $order_dir;
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "incident");
+  $prefs = get_display_pref($auth->auth["uid"], "incident");
   $obm_q = run_query_search($incident, $new_order, $order_dir);
   $nb_incident = $obm_q->num_rows_total();
   if ($nb_incident == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
+    $block = html_incident_search_list($obm_q,$prefs,$nb_incident,$incident);
   }
   
   return $block;
@@ -219,12 +219,12 @@ function dis_incident_search_list($incident) {
 // HTML Display Search result
 // Parameters : 
 //   - $in_q        : list of incidents
-//   - $pref_q      : the fields which have to be displayed
+//   - $prefs       : the fields which have to be displayed
 //   - $nb_incident : nb incidents to return by the query search
 //   - $company[]   : incidents search criteria
 //     keys used    : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
+function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
   global $display;
   global $l_found, $l_no_found;
 
@@ -243,7 +243,7 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
   $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_cat1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
 
   $in_q->seek($first_row);
-  $dis_incidents_list=new OBM_DISPLAY("DATA", $pref_q, "incident");
+  $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
   $dis_incidents_list->data_url = $url;
   $dis_incidents_list->data_header = "both";
@@ -1353,14 +1353,14 @@ function dis_cat1_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Incidnet Display preference screen                            //
+// Display the Incidnet Display preference screen
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_incident_display_pref($display_pref_q) {
+function dis_incident_display_pref($prefs) {
   global $l_incident_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "incident";
   $dis_pref->pref_title = $l_incident_display;
   $dis_pref->pref_dis_help = 1;

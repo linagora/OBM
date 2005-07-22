@@ -192,23 +192,23 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pref_q = run_query_display_pref($uid, "group", 1);
-  $pref_u_q = run_query_display_pref($uid, "group_user", 1);
-  $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
+  $prefs = get_display_pref($uid, "group", 1);
+  $prefs_u = get_display_pref($uid, "group_user", 1);
+  $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $disstatus);
-  $pref_q = run_query_display_pref($uid, "group", 1);
-  $pref_u_q = run_query_display_pref($uid, "group_user", 1);
-  $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($uid, "group", 1);
+  $prefs_u = get_display_pref($uid, "group_user", 1);
+  $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q = run_query_display_pref($uid, "group", 1);
-  $pref_u_q = run_query_display_pref($uid, "group_user", 1);
-  $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($uid, "group", 1);
+  $prefs_u = get_display_pref($uid, "group_user", 1);
+  $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -444,12 +444,25 @@ function get_group_action() {
     'Condition'=> array ('all') 
                                     );
 
-// Dispay
+// Display
   $actions["group"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/group/group_index.php?action=display",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
+                                      	 );
+
+// Display
+  $actions["group"]["dispref_display"] = array (
+    'Url'      => "$path/group/group_index.php?action=dispref_display",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                      	 );
+// Display
+  $actions["group"]["dispref_level"] = array (
+    'Url'      => "$path/group/group_index.php?action=dispref_level",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
                                       	 );
 
 }

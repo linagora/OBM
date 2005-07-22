@@ -269,13 +269,13 @@ function dis_invoice_search_list($invoice) {
   global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "invoice");
+  $prefs = get_display_pref($auth->auth["uid"], "invoice");
   $inv_q = run_query_search($invoice, $new_order, $order_dir);
   $nb_inv = $inv_q->num_rows_total();
   if ($nb_inv == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_invoice_search_list($inv_q,$pref_q,$nb_inv,$invoice);
+    $block = html_invoice_search_list($inv_q,$prefs,$nb_inv,$invoice);
   }
 
   return $block;
@@ -286,10 +286,10 @@ function dis_invoice_search_list($invoice) {
 // Display the Invoice search result
 // Paratemers:
 // $inv_q  : list of invoices
-// $pref_q : fields to display
+// $prefs  : fields to display
 // $nb_invoices : number of invoices
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
+function html_invoice_search_list ($inv_q, $prefs, $nb_invoice, $invoice) {
   global $col_frs, $col_client;
   global $l_found, $l_deal;
   global $l_label, $l_number, $l_amount_ht, $l_amount_ttc, $l_date, $l_status;
@@ -325,7 +325,7 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
 		    "&amp;param_project=$proj_id".
 		    "&amp;cb_archive=$archive"); 
 
-  $dis_invoice = new OBM_DISPLAY ("DATA", $pref_q, "invoice");
+  $dis_invoice = new OBM_DISPLAY ("DATA", $prefs, "invoice");
   $dis_invoice->data_set = $inv_q;
   $dis_invoice->data_header = "top";
   $dis_invoice->data_url = $url;
@@ -354,9 +354,9 @@ function dis_invoice_consult($invoice) {
   }
   if ($id > 0) {
     $pay_q = run_query_invoice_payment($id);
-    $pref_pay_q = run_query_display_pref($uid, "payment");
+    $prefs_p = get_display_pref($uid, "payment");
     $display["detailInfo"] = display_record_info($inv_q);
-    $block = html_invoice_consult($inv_q, $pay_q, $pref_pay_q);
+    $block = html_invoice_consult($inv_q, $pay_q, $prefs_p);
   }
 
   return $block;
@@ -366,11 +366,11 @@ function dis_invoice_consult($invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display invoice detail screen
 // Parameters:
-//   - $inv_q     : DBO invoice info
-//   - $pay_q     : DBO : payments for the invoice
-//   - pref_pay_q : display pref for payments
+//   - $inv_q  : DBO invoice info
+//   - $pay_q  : DBO : payments for the invoice
+//   - prefs_p : display pref for payments
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
+function html_invoice_consult($inv_q, $pay_q, $prefs_p) {
   global $display, $set_theme;
   global $l_delete, $l_invoice_infos;
   global $l_list_payment, $l_no_payment, $l_payments_todel;
@@ -395,7 +395,7 @@ function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
   } else {
     $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=$i_id");
 
-    $dis_payment = new OBM_DISPLAY("DATA", $pref_pay_q, "invoice");
+    $dis_payment = new OBM_DISPLAY("DATA", $prefs_p, "invoice");
     $dis_payment->data_set = $pay_q;
     $dis_payment->data_header = "top";
     $dis_payment->data_url = $url;
@@ -966,14 +966,14 @@ function dis_invoice_delete_form($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Invoice Display preference screen                             //
+// Display the Invoice Display preference screen
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_invoice_display_pref($display_pref_q) {
+function dis_invoice_display_pref($prefs) {
   global $l_invoice_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "invoice";
   $dis_pref->pref_title = $l_invoice_display;
   $dis_pref->pref_dis_help = 1;

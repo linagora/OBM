@@ -681,7 +681,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
 ///////////////////////////////////////////////////////////////////////////////
 // matching payment found display
 ///////////////////////////////////////////////////////////////////////////////
-function html_payment_search_list ($payment_q, $pref_q, $nb_payment, $payment){
+function html_payment_search_list ($payment_q, $prefs, $nb_payment, $payment){
   global $col_frs, $col_client;
   global $l_found;
   global $display;
@@ -703,7 +703,7 @@ function html_payment_search_list ($payment_q, $pref_q, $nb_payment, $payment){
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;rd_inout=$inout");
 
-  $dis_payment = new OBM_DISPLAY("DATA", $pref_q, "payment");
+  $dis_payment = new OBM_DISPLAY("DATA", $prefs, "payment");
   $dis_payment->data_set = $payment_q;
   $dis_payment->data_header = "top";
   $dis_payment->data_url = $url;
@@ -1294,17 +1294,15 @@ function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices
 //////////////////////////////////////////////////////////////////////////
 // Display the screen used to change the display parameters of payments
 //////////////////////////////////////////////////////////////////////////
-function dis_payment_display_pref ($payment_options, $invoices_options, $et_options) {
-  // Label
-   global $l_payment_options, $l_invoice_options, $l_et_options;
-  //Image
+function dis_payment_display_pref ($prefs, $prefs_i, $prefs_t) {
+  global $l_payment_options, $l_invoice_options, $l_et_options;
   global $set_theme ;
  
-  $block .=  "<center>\n";
-  $block .=  "<table><tr valign=\"top\">";
+  $block .=  "<center>
+  <table><tr valign=\"top\">";
  
-  $block .=  "<td>";
-  $dis_pref = new OBM_DISPLAY("PREFERENCES",$payment_options) ;
+  $block .= "<td>";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs) ;
   $dis_pref->pref_title = $l_payment_options;
   $dis_pref->display_entity = "payment" ;
   $dis_pref->pref_dis_help = 0 ; // help is displayed after et options
@@ -1313,7 +1311,7 @@ function dis_payment_display_pref ($payment_options, $invoices_options, $et_opti
 
   $block .=  "</td><td>" ;
 
-  $invoice_prefs = new OBM_DISPLAY("PREFERENCES",$invoices_options) ;
+  $invoice_prefs = new OBM_DISPLAY("PREFERENCES", $prefs_i) ;
   $invoice_prefs->display_entity = "payment"; 
   $invoice_prefs->pref_title = $l_invoice_options;
   $invoice_prefs->pref_dis_help = 0 ;
@@ -1322,7 +1320,7 @@ function dis_payment_display_pref ($payment_options, $invoices_options, $et_opti
  
   $block .=  "</td><td>" ;
 
-  $et_prefs = new OBM_DISPLAY("PREFERENCES",$et_options) ;
+  $et_prefs = new OBM_DISPLAY("PREFERENCES", $prefs_t) ;
   $et_prefs->display_entity = "payment"; 
   $et_prefs->pref_title = $l_et_options;
   $et_prefs->pref_dis_help =  0;
@@ -1375,7 +1373,7 @@ return $block;
 // display all $q_entrytemp and asks the user if everything is ok
 // $q_et_prefs display prefs for EntryTemp
 ///////////////////////////////////////////////////////////////////////////////
-function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
+function html_reconcile_import ($q_entrytemp, $prefs_t) {
   global $l_import_ok, $l_restart_import;
 
   // il faut displayer les entrytemp, puis un form de confirm..
@@ -1386,7 +1384,7 @@ function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
   $url_dm = url_prepare("payment_index.php?action=reconcile_import".
 		       "&amp;import_file=no");
 
-  $et_dis = new OBM_DISPLAY ("DATA", $q_et_prefs, "payment");
+  $et_dis = new OBM_DISPLAY ("DATA", $prefs_t, "payment");
   $et_dis->data_set = $q_entrytemp;
   $et_dis->data_header = "top";
   $et_dis->data_order=false;
@@ -1418,7 +1416,7 @@ return $block;
 ///////////////////////////////////////////////////////////////////////////////
 // page to check payments
 ///////////////////////////////////////////////////////////////////////////////
-function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
+function html_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t) {
   global $border, $cellspacing;
   global $set_rows;
   global $l_reconcile, $l_nb_payments_to_reconcile;
@@ -1427,7 +1425,7 @@ function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
   $url = url_prepare ("payment_index.php?action=select_reconcile");
 
   // preparing the payments display :
-  $pay_dis = new OBM_DISPLAY("DATA", $q_pay_pref, "payment");
+  $pay_dis = new OBM_DISPLAY("DATA", $prefs, "payment");
   $pay_dis->data_set = $q_payments;
   $pay_dis->data_header = "both";
   $pay_dis->data_order = false; // 2 simultaneous displays => trouble on sight
@@ -1440,7 +1438,7 @@ function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
   $pay_dis->data_cb_name = "check_pay_";
   
   // preparing the entrytemp display :
-  $et_dis = new OBM_DISPLAY ("DATA", $q_et_pref, "payment");
+  $et_dis = new OBM_DISPLAY ("DATA", $prefs_t, "payment");
   $et_dis->data_set = $q_et;
   $et_dis->data_header = "both";
   $et_dis->data_order=false;

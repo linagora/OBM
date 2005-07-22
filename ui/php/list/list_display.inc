@@ -396,13 +396,13 @@ function dis_list_search_list($list, $popup=false) {
   global $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "list");
+  $prefs = get_display_pref($auth->auth["uid"], "list");
   $obm_q = run_query_search($list, $new_order, $order_dir);
   $nb_list = $obm_q->num_rows_total();
   if ($nb_list == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup);
+    $block = html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup);
   }
 
   return $block;
@@ -413,13 +413,13 @@ function dis_list_search_list($list, $popup=false) {
 // HTML Display the List search result
 // Parameters : 
 //   - $obm_q    : list of the lists to display 
-//   - $pref_q   : fields that have to be displayed
+//   - $prefs    : fields that have to be displayed
 //   - $nb_list  : nb lists returned by the search query 
 //   - $list[]   : list search criteria
 //     keys used : name, contact, ext_id, ext_url, ext_action
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
+function html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup) {
   global $display, $l_found, $l_add, $l_close;
 
   if ($popup) {
@@ -439,7 +439,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 
   $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;sel_market=$mark$url_ext");
   
-  $dis_list = new OBM_DISPLAY("DATA", $pref_q, "list");
+  $dis_list = new OBM_DISPLAY("DATA", $prefs, "list");
 /*  if ($popup) {
     $dis_list->display_link = false;
     $dis_list->data_cb_text = "X";
@@ -496,9 +496,9 @@ function dis_list_consult($list) {
   $id = $list["id"];
 
   $list_q = run_query_detail($id);
-  $pref_con_q = run_query_display_pref($uid, "list_contact");
+  $prefs_con = get_display_pref($uid, "list_contact");
   $con_q = run_query_contacts_list($list, "list_contact");
-  $block = html_list_consult($list_q, $pref_con_q, $con_q);
+  $block = html_list_consult($list_q, $prefs_con, $con_q);
 
   return $block;
 }
@@ -507,11 +507,11 @@ function dis_list_consult($list) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display List Consultation
 // Parameters:
-//   - $list_q     : list database result 
-//   - $pref_con_q : contact display preferences database result 
-//   - $con_q      : contact database result 
+//   - $list_q    : list database result 
+//   - $prefs_con : contact display preferences database result 
+//   - $con_q     : contact database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_list_consult($list_q, $pref_con_q, $con_q) {
+function html_list_consult($list_q, $prefs_con, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query, $l_static;
   global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
   global $display, $perm, $module, $cright_write, $ctu_sql_limit, $cdg_sql;
@@ -631,7 +631,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
     $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list");
     $dis_infos->data_set = $con_q;
     $dis_infos->data_url = $url;
     $dis_infos->display_entity = "list_contact";
@@ -678,7 +678,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $query_limit = "$query $limit";
     display_debug_msg($query_limit, $cdg_sql, "dynamic list()");
     $conq_q->query("$query_limit");
-    $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list");
     $dis_infos->data_set = $conq_q;
     $dis_infos->data_url = $url;
     $dis_infos->display_entity = "list_contact_2";
@@ -1066,8 +1066,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Form to add a Criterion
 // Parameters:
-//   - $pref_list_q    : DBO : List Field list to display
-//   - $pref_contact_q : DBO : Contact Field list to display
+//   - $list[]    : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_add_criterion_form($list) {
   global $l_list_display, $l_contact_display,$l_add_criterion;
@@ -1392,7 +1391,7 @@ function html_publication_criterion($rec_q,$pub_q){
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_subscription_timebefore,'$path/agenda/agenda_index.php?action=calendar&popup=1');\">
       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
-    </td>     
+    </td>
   </tr>
   
   </table>
@@ -1402,15 +1401,15 @@ function html_publication_criterion($rec_q,$pub_q){
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the List Display preference screen                                //
+// Display the List Display preference screen
 // Parameters:
-//   - $pref_list_q    : DBO : List Field list to display
-//   - $pref_contact_q : DBO : Contact Field list to display
+//   - $prefs     : List Display preferences
+//   - $prefs_con : Contact list Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_list_display_pref($pref_list_q, $pref_contact_q) {
+function dis_list_display_pref($prefs, $prefs_con) {
   global $l_list_display, $l_contact_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_list_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "list"; 
   $dis_pref->pref_title = $l_list_display;
   $dis_pref->pref_dis_help = 0;
@@ -1418,7 +1417,7 @@ function dis_list_display_pref($pref_list_q, $pref_contact_q) {
   $block = "<center><table><tr><td>";
   $block .= $dis_pref->display();
 
-  $dis_pref->display_pref = $pref_contact_q;
+  $dis_pref->display_pref = $prefs_con;
   $dis_pref->display_module = "list";
   $dis_pref->display_entity = "list_contact";
   $dis_pref->pref_title = $l_contact_display;

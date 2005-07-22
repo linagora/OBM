@@ -139,13 +139,13 @@ function dis_import_search_list($import, $popup=false) {
   global $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "import");
+  $prefs = get_display_pref($auth->auth["uid"], "import");
   $obm_q = run_query_search($import, $new_order, $order_dir);
   $nb = $obm_q->num_rows_total();
   if ($nb == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_import_search_list($obm_q, $pref_q, $nb, $import, $popup);
+    $block = html_import_search_list($obm_q, $prefs, $nb, $import, $popup);
   }
 
   return $block;
@@ -156,13 +156,13 @@ function dis_import_search_list($import, $popup=false) {
 // HTML Display the Import search result
 // Parameters : 
 //   - $obm_q    : list of the imports to display 
-//   - $pref_q   : fields that have to be displayed
+//   - $prefs    : fields that have to be displayed
 //   - $nb       : nb imports returned by the search query 
 //   - $import   : import search criteria
 //     keys used : name, contact, ext_id, ext_url, ext_action
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_import_search_list($obm_q, $pref_q, $nb, $import, $popup) {
+function html_import_search_list($obm_q, $prefs, $nb, $import, $popup) {
   global $display, $l_found, $l_add, $l_close;
 
   $name = urlencode(stripslashes($import["name"]));
@@ -172,7 +172,7 @@ function html_import_search_list($obm_q, $pref_q, $nb, $import, $popup) {
 
   $url = url_prepare("import_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact");
 
-  $od = new OBM_DISPLAY("DATA", $pref_q, "import");
+  $od = new OBM_DISPLAY("DATA", $prefs, "import");
   $od->data_set = $obm_q;
   $od->data_header = "both";
   $od->data_url = $url;

@@ -121,7 +121,7 @@ function html_account_search_form ($p_action, $account) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Account search result                                         //
+// Display the Account search result
 // Parameters:
 //   - $account[] : account search criteria
 //     keys used   : label, bank, number
@@ -130,13 +130,13 @@ function dis_account_search_list($account) {
   global $l_no_found;
   global $auth, $new_order, $order_dir,$display;
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "account");
+  $prefs = get_display_pref($auth->auth["uid"], "account");
   $obm_q = run_query_search($account, $new_order, $order_dir);
   $nb_account = $obm_q->num_rows_total();
   if ($nb_account == 0) {
     $display["msg"] = display_info_msg($l_no_found);
   } else {
-    return html_account_search_list($obm_q, $pref_q, $nb_account, $account);
+    return html_account_search_list($obm_q, $prefs, $nb_account, $account);
   }
 }
 
@@ -145,12 +145,12 @@ function dis_account_search_list($account) {
 // HTML Display Search result
 // Parameters:
 //   - $acc_q      : list of accounts
-//   - $pref_q     : the fields which have to be displayed
+//   - $prefs      : the fields which have to be displayed
 //   - $nb_account : number of accounts
 //   - $account[]  : accounts search criteria
 //     keys used   : label, bank, number
 ///////////////////////////////////////////////////////////////////////////////
-function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
+function html_account_search_list ($acc_q, $prefs, $nb_account, $account) {
   global $l_label, $l_bank, $l_number, $l_found,$display;
 
   $label = urlencode($account["label"]);
@@ -159,7 +159,7 @@ function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
 
   $url = url_prepare("account_index.php?action=search&amp;tf_label=$label&amp;tf_bank=$bank&amp;tf_number=$number");
 
-  $dis_account = new OBM_DISPLAY("DATA", $pref_q, "account");
+  $dis_account = new OBM_DISPLAY("DATA", $prefs, "account");
   $dis_account->data_set = $acc_q;
   $dis_account->data_url = $url;
   $dis_account->data_header = "both";
@@ -397,32 +397,30 @@ function html_account_form($obm_q_account, $action) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Display the screen used to change the display parameters of accounts
-//////////////////////////////////////////////////////////////////////////
 // Parameters :
-// ------------
-//    $obm_q_options_display : list of fields to display or not
+//   - $prefs   : Account Display preferences
+//   - $prefs_p : Payment Display preferences
 ///////////////////////////////////////////////////////////////////////////
-function dis_account_display_pref ($account_options, $payment_options) {
-  // Label
-   global $l_account_options, $l_payment_options;
-  // Image
-  global $set_theme ;
+function dis_account_display_pref ($prefs, $prefs_p) {
+  global $l_account_options, $l_payment_options;
+  global $set_theme;
+
   $block .= "<center>\n";
  
  $block .= "<table><tr valign=\"top\">";
    $block .= "<td>";
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES",$account_options) ;
-  $dis_pref->display_entity = "account" ; // not used but must be set
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
+  $dis_pref->display_entity = "account"; // not used but must be set
   $dis_pref->pref_title = $l_account_options;
-  $dis_pref->pref_dis_help = 0 ;
-  $dis_pref->display() ;
+  $dis_pref->pref_dis_help = 0;
+  $dis_pref->display();
 
-  $block .= "</td><td>" ;
+  $block .= "</td><td>";
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $payment_options);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_p);
   $dis_pref->display_entity = "payment";
   $dis_pref->pref_title = $l_payment_options;
   $dis_pref->pref_dis_help = 0;
@@ -431,8 +429,9 @@ function dis_account_display_pref ($account_options, $payment_options) {
   $block .=  "</td></tr></table>";
   $dis_pref->dis_pref_help ();
 
-  $block .=  "</center>" ;
- return $block;
+  $block .=  "</center>";
+
+  return $block;
 }
 
 
