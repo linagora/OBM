@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Actions
 // - index
-// - user_pref_update
+// - user_pref_reset
 // - user_pref_update_one -- update one preference for all users
 ///////////////////////////////////////////////////////////////////////////////
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
@@ -23,8 +23,8 @@ include("$obminclude/global.inc");
 require("admin_pref_display.inc");
 require("admin_pref_query.inc");
 
-$debug=1;
-$actions = array ('help', 'index', 'user_pref_update', 'user_pref_update_one');
+//$set_debug=1;
+$actions = array ('help', 'index', 'user_pref_reset', 'user_pref_update_one');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -40,7 +40,6 @@ switch ($mode) {
    break;
  case "html":
    $pref = get_param_pref();
-   $debug = $set_debug;
    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
@@ -62,8 +61,8 @@ switch ($action) {
   case "index":
     dis_pref_index($mode);
     break;
-  case "user_pref_update":
-    dis_user_pref_update($mode);
+  case "user_pref_reset":
+    dis_user_pref_reset($mode);
     break;
   case "user_pref_update_one":
     $option = $pref["up_option"];
@@ -92,23 +91,6 @@ switch ($mode) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution - User list                                               //
-///////////////////////////////////////////////////////////////////////////////
-function get_user_list() {
-  global $cdg_sql;
-
-  $query = "select userobm_id, userobm_login
-          from UserObm order by userobm_login";
-
-  display_debug_msg($query, $cdg_sql);
-
-  $u_q = new DB_OBM;
-  $u_q->query($query);
-  return $u_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
@@ -127,7 +109,7 @@ where Options:
 -o option, --option option
 -v value, --value value
 
-Ex: php4 admin_pref_index.php -a user_pref_update
+Ex: php4 admin_pref_index.php -a user_pref_reset
 Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 ";
 }
@@ -137,7 +119,7 @@ Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $actions, $action;
+  global $cdg_param, $actions, $action;
   global $sel_userpref, $tf_pref_value;
 
   // We skip the program name [0]
@@ -153,7 +135,9 @@ function parse_arg($argv) {
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $actions)) {
         $action = $val2;
-        if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
+	if (debug_level_isset($cdg_param)) {
+	  echo "-a -> \$action=$val2\n";
+	}
       }
       else {
 	dis_command_use("Invalid action ($val2)");
@@ -164,18 +148,22 @@ function parse_arg($argv) {
     case '--option':
       list($nb2, $val2) = each ($argv);
       $sel_userpref = $val2;
-      if ($debug > 0) { echo "-o -> \$sel_userpref=$val2\n"; }
+      if (debug_level_isset($cdg_param)) {
+	echo "-o -> \$sel_userpref=$val2\n";
+      }
       break;
     case '-v':
     case '--value':
       list($nb2, $val2) = each ($argv);
       $tf_pref_value = $val2;
-      if ($debug > 0) { echo "-v -> \$tf_pref_value=$val2\n"; }
+      if (debug_level_isset($cdg_param)) {
+	echo "-v -> \$tf_pref_value=$val2\n";
+      }
       break;
     }
   }
 
-  if (! $action) $action = "user_pref_update";
+  if (! $action) $action = "user_pref_reset";
 }
 
 
@@ -223,10 +211,10 @@ function get_admin_pref_action() {
      'Right' 	=> $cright_read_admin,
      'Condition'=> array ('all') 
                                     	);
-  // user_pref_update : update (set to default) all users prefs
-  $actions["admin_pref"]["user_pref_update"] = array (
+  // user_pref_reset : reset (drop) all users prefs
+  $actions["admin_pref"]["user_pref_reset"] = array (
      'Name'     => $l_header_pref_update,
-     'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update&amp;mode=html",
+     'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_reset&amp;mode=html",
      'Right' 	=> $cright_write_admin,
      'Condition'=> array ('index') 
                                     	);

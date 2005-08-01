@@ -127,11 +127,6 @@ function generate_menu($module, $section) {
   global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
   global $l_login, $l_logout, $l_profile;
 
-  if ($module == "")
-    $path = "";
-  else 
-    $path = "..";
-
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
   $profil = $auth->auth["perm"];

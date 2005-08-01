@@ -18,12 +18,12 @@ $uid = $auth->auth["uid"];
 if ($param_lang != "") {
   $set_lang=$param_lang;
   $sess->register("set_lang");
-  run_query_set_user_pref($uid, "set_lang", $set_lang);
+  update_user_pref($uid, "set_lang", $set_lang);
 }
 if ($param_theme != "") {
   $set_theme=$param_theme;
   $sess->register("set_theme");
-  run_query_set_user_pref($uid, "set_theme", $set_theme);
+  update_user_pref($uid, "set_theme", $set_theme);
 }
 
 // Validate user preferences
@@ -32,12 +32,12 @@ if ($form_user_pref) {
   $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
   $set_debug=$param_debug;
   $sess->register("set_debug");
-  run_query_set_user_pref($uid, "set_debug", $set_debug);
+  update_set_user_pref($uid, "set_debug", $set_debug);
 
   if ($param_menu != "") {
     $set_menu = $param_menu;
     $sess->register("set_menu");
-    run_query_set_user_pref($uid, "set_menu", $set_menu);
+    update_user_pref($uid, "set_menu", $set_menu);
   }
 
   if ($param_display == "yes") {
@@ -46,38 +46,38 @@ if ($form_user_pref) {
     $set_display = "no";
   }
   $sess->register("set_display");
-  run_query_set_user_pref($uid, "set_display", $set_display);
+  update_user_pref($uid, "set_display", $set_display);
 
   if ($param_rows != "") {
     $set_rows = $param_rows;
     $_SESSION['set_rows'] = $set_rows;
     //    $sess->register("set_rows");
-    run_query_set_user_pref($uid, "set_rows", $set_rows);
+    update_user_pref($uid, "set_rows", $set_rows);
   }
 
   if (($param_todo != "") && ($param_todo != "$set_todo")) {
     $set_todo = $param_todo;
     $sess->register("set_todo");
-    run_query_set_user_pref($uid, "set_todo", $set_todo);
+    update_user_pref($uid, "set_todo", $set_todo);
     session_load_user_todos($set_todo);
   }
 
   if ($param_dsrc != "") {
     $set_dsrc = $param_dsrc;
     $sess->register("set_dsrc");
-    run_query_set_user_pref($uid, "set_dsrc", $set_dsrc);
+    update_user_pref($uid, "set_dsrc", $set_dsrc);
   }
 
   if ($param_date != "") {
     $set_date = $param_date;
     $sess->register("set_date");
-    run_query_set_user_pref($uid, "set_date", $set_date);
+    update_user_pref($uid, "set_date", $set_date);
   }
 
   if ($param_commentorder != "") {
     $set_commentorder = $param_commentorder;
     $sess->register("set_commentorder");
-    run_query_set_user_pref($uid, "set_commentorder", $set_commentorder);
+    update_user_pref($uid, "set_commentorder", $set_commentorder);
   }
 
   if ($param_mail == "yes") {
@@ -86,18 +86,18 @@ if ($form_user_pref) {
     $set_mail = "no";
   }
   $sess->register("set_mail");
-  run_query_set_user_pref($uid, "set_mail", $set_mail);
+  update_user_pref($uid, "set_mail", $set_mail);
 
   if ($param_cal_interval != "") {
     $set_cal_interval = $param_cal_interval;
     $sess->register("set_cal_interval");
-    run_query_set_user_pref($uid, "set_cal_interval", $set_cal_interval, 1);
+    update_user_pref($uid, "set_cal_interval", $set_cal_interval, 1);
   }
 
   if ($param_csv_sep != "") {
     $set_csv_sep = $param_csv_sep;
     $sess->register("set_csv_sep");
-    run_query_set_user_pref($uid, "set_csv_sep", $set_csv_sep);
+    update_user_pref($uid, "set_csv_sep", $set_csv_sep);
   }
 
 }

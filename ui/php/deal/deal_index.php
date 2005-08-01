@@ -922,6 +922,9 @@ function update_deal_action_url() {
   // Detail Update
   $actions["deal"]["detailupdate"]['Url'] = "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"];
 
+  // Quick Detail
+  $actions["deal"]["quick_detail"]['Url'] = "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=".$deal["id"];
+
   // Parent Detail Update
   $actions["deal"]["parent_detailupdate"]['Url'] = "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"];
 

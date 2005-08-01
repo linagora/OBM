@@ -56,7 +56,7 @@ function dis_pref_index($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_pref_index() {
   global $l_validate, $l_execute, $l_help, $l_user_pref;
-  global $l_user_pref_update, $l_user_pref_update_one;
+  global $l_user_pref_reset, $l_user_pref_update_one;
 
   $userpref_q = get_default_user_pref();
   // User preferences SELECT
@@ -68,7 +68,7 @@ function html_pref_index() {
   }
   $sel_userpref .= "</select>";
 
-  echo "
+  $block = "
     <br />
     <form method=\"get\" action=\"" . url_prepare("admin_pref_index.php"). "\">
     <table class=\"admin\">
@@ -76,11 +76,11 @@ function html_pref_index() {
       <td class=\"adminHead\" colspan=\"2\">$l_user_pref</td>
     </tr>
     <tr>
-      <td class=\"adminText\">action : user_pref_update
-        <br />$l_user_pref_update</td>
+      <td class=\"adminText\">action : user_pref_reset
+        <br />$l_user_pref_reset</td>
       <td class=\"adminLabel\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"user_pref_update\" />
+        <input type=\"hidden\" name=\"action\" value=\"user_pref_reset\" />
         <input type=\"submit\" value=\"$l_execute\" /></td>
     </tr>
     </table>
@@ -109,6 +109,8 @@ function html_pref_index() {
     </table>
     </form>
 ";
+
+  echo $block;
 }
 
 
@@ -117,94 +119,23 @@ function html_pref_index() {
 // Parameters:
 //   - $mode   : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_pref_update($mode) {
-  global $debug;
-
-  // Get the user list
-  $u_q = get_user_list();
-  $cpt_u = 0;
-  $nb_u = $u_q->num_rows();
+function dis_user_pref_reset($mode) {
+  global $l_reset_ok;
   
-  if ($mode == "txt") {
-    echo "
-------------------------------------------------------------------------------
-*** User : $nb_u to parse
-------------------------------------------------------------------------------
-";
-  } else {
-    $update = "<td class=\"adminHead\">Update</td>";
-
-    echo "<table class=\"admin\">
-      <tr>
-        <td class=\"adminHead\" colspan=\"2\">User ($nb_u)</td>
-        $update
-      </tr><tr>
-        <td class=\"adminHead\">Id</td>
-        <td class=\"adminHead\">Login</td>
-        $update
-      </tr>";
-  }
-
-  while ($u_q->next_record()) {
-    $cpt_u++;
-
-    $id = $u_q->f("userobm_id");
-    $login = $u_q->f("userobm_login");
-
-    if ($mode == "txt") {
-      echo "User (id=$id) : $login ";
-    } else {
-      echo "<tr>
-        <td class=\"adminText\">$id</td>
-        <td class=\"adminText\">$login</td>";
-    }
-
-    $retour = run_query_default_preferences_insert($id);
-
-    if ($retour) {
-      if ($mode == "txt") {
-	echo "OK";
-      } else {
-	echo "<td class=\"adminLabel\">OK</td>";
-      }
-    } else {
-      if ($mode == "txt") {
-	echo "Problem !";
-      } else {
-	echo "<td class=\"adminLabel\">Problem !</td>";
-      }
-    }
-
-    if ($mode == "html") {
-      echo "</tr>";
-    }
-
-    if ($cpt_u % 10 == 0) {
-      if ($mode == "txt") {
-	echo ".";
-      } else {
-	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"3\">$cpt_u</td>
-          </tr>";
-	flush();
-      }
-    }
-
-  }
+  //-- Reset default values (drop all specific users values)
+  reset_preferences_to_default("");
 
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** User : $nb_u to parse, $cpt_u updated
+*** $l_reset_ok
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"3\">
-          User : $nb_u to parse, $cpt_u updated</td>
-      </tr>
-      </table>";
+    $block = display_ok_msg($l_reset_ok);
+    echo $block;
   }
+
 }
 
 
@@ -216,100 +147,28 @@ function dis_user_pref_update($mode) {
 //   - $val  : optional : value to set for all users
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_pref_update_one($mode, $pref, $val="") {
-  global $debug;
+  global $cdg_sql;
 
-  // Get the user list
-  $u_q = get_user_list();
-  $cpt_u = 0;
-  $nb_u = $u_q->num_rows();
-
-  //-- Drop current preference for all users and default (0)
+  //-- Drop specific user preference if same as new value
   $obm_q = new DB_OBM;
-  $query = "delete from UserObmPref where userobmpref_option='$pref'";
+  $query = "DELETE FROM UserObmPref
+    WHERE userobmpref_option='$pref'
+      AND userobmpref_value='$val'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
-  
-  if ($mode == "txt") {
-    echo "
-------------------------------------------------------------------------------
-*** User : $nb_u to parse
-------------------------------------------------------------------------------
-";
-  } else {
-    $update = "<td class=\"adminHead\">Update</td>";
 
-    echo "<table class=\"admin\">
-      <tr>
-        <td class=\"adminHead\" colspan=\"2\">User ($nb_u)</td>
-        $update
-      </tr><tr>
-        <td class=\"adminHead\">Id</td>
-        <td class=\"adminHead\">Login</td>
-        $update
-      </tr>";
-  }
-
-  // Insert new default value
-  $retour = run_query_set_user_pref(0, $pref, $val);
-
-  while ($u_q->next_record()) {
-    $cpt_u++;
-
-    $id = $u_q->f("userobm_id");
-    $login = $u_q->f("userobm_login");
-
-    if ($mode == "txt") {
-      echo "User (id=$id) : $login ";
-    } else {
-      echo "<tr>
-        <td class=\"adminText\">$id</td>
-        <td class=\"adminText\">$login</td>";
-    }
-
-    $retour = run_query_set_user_pref($id, $pref, $val);
-
-    if ($retour) {
-      if ($mode == "txt") {
-	echo "OK";
-      } else {
-	echo "<td class=\"adminLabel\">OK</td>";
-      }
-    } else {
-      if ($mode == "txt") {
-	echo "Problem !";
-      } else {
-	echo "<td class=\"adminLabel\">Problem !</td>";
-      }
-    }
-
-    if ($mode == "html") {
-      echo "</tr>";
-    }
-
-    if ($cpt_u % 10 == 0) {
-      if ($mode == "txt") {
-	echo ".";
-      } else {
-	echo "<tr>
-          <td class=\"adminLabel\" colspan=\"3\">$cpt_u</td>
-          </tr>";
-	flush();
-      }
-    }
-
-  }
+  //-- Update default value
+  run_query_user_pref_update(0, $pref, $val);
 
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** User : $nb_u to parse, $cpt_u updated
+*** Default value to $pref set to $val
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<tr>
-        <td class=\"adminLabel\" colspan=\"3\">
-          User : $nb_u to parse, $cpt_u updated</td>
-      </tr>
-      </table>";
+    $block = display_ok_msg("Default value to $pref set to $val");
+    echo $block;
   }
+
 }

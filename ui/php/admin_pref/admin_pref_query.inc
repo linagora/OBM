@@ -37,7 +37,7 @@ function get_default_user_pref() {
 //   - $value : of the preference
 ///////////////////////////////////////////////////////////////////////////////
 function get_userpref_value($option) {
-  global $cdg_sql;
+  global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
   $query = "SELECT userobmpref_value

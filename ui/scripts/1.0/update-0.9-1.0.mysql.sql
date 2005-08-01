@@ -8,7 +8,7 @@
 -------------------------------------------------------------------------------
 -- Global Information table
 -------------------------------------------------------------------------------
-UPDATE ObmInfo set obminfo_value='1.0.0' where obminfo_name='db_version';
+UPDATE ObmInfo set obminfo_value='1.0' where obminfo_name='db_version';
 
 
 -------------------------------------------------------------------------------

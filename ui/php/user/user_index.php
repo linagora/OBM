@@ -96,9 +96,6 @@ if ($action == "ext_get_ids") {
       $retour = run_query_insert($obm_user);
       if ($retour) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
-        // insertion of his default preferences : 
-        $user_id = get_user_id($obm_user["login"]);
-        run_query_default_preferences_insert($user_id);
       } else {
 	$display["msg"] .= display_err_msg($l_insert_error);
       }
@@ -112,9 +109,6 @@ if ($action == "ext_get_ids") {
       } else {
         $retour = run_query_insert($obm_user);
         if ($retour) {
-          // insertion of his default preferences :
-          $user_id = get_user_id($obm_user["login"]);
-          run_query_default_preferences_insert($user_id);
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
@@ -131,7 +125,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "reset")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_default_preferences_insert($obm_user["id"]);
+  reset_preferences_to_default($obm_user["id"]);
   session_load_user_prefs();
   $display["msg"] .= display_ok_msg($l_reset_ok);
   $display["detail"] = dis_user_consult($obm_user);

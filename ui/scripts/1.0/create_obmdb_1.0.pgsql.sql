@@ -660,10 +660,15 @@ CREATE TABLE Todo (
   todo_userupdate  integer,
   todo_usercreate  integer,
   todo_user        integer,
+  todo_privacy     integer NOT NULL DEFAULT 0,
   todo_date        timestamp,
   todo_deadline    timestamp,
+  todo_dateend     timestamp,
   todo_priority    integer DEFAULT NULL,
+  todo_percent     integer,
   todo_title       varchar(80) DEFAULT NULL,
+  todo_status      varchar(32),
+  todo_webpage     varchar(255),
   todo_content     text DEFAULT NULL,
   PRIMARY KEY (todo_id)
 );
@@ -1315,6 +1320,51 @@ CREATE TABLE Import (
   import_desc                 text,
   PRIMARY KEY (import_id),
   UNIQUE (import_name)
+);
+
+
+-------------------------------------------------------------------------------
+-- Tables needed for Connectors sync
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'DeletedCalendarEvent'
+--
+CREATE TABLE DeletedCalendarEvent (
+  deletedcalendarevent_event_id   integer,
+  deletedcalendarevent_user_id    integer,
+  deletedcalendarevent_timestamp  timestamp
+);
+create INDEX idx_dce_event_id ON DeletedCalendarEvent (deletedcalendarevent_event_id);
+create INDEX idx_dce_user_id ON DeletedCalendarEvent (deletedcalendarevent_user_id);
+
+
+--
+-- Table structure for the table 'DeletedContact'
+--
+CREATE TABLE DeletedContact (
+  deletedcontact_contact_id  integer,
+  deletedcontact_timestamp   timestamp,
+  PRIMARY KEY (deletedcontact_contact_id)
+);
+
+
+--
+-- Table structure for the table 'DeletedUser'
+--
+CREATE TABLE DeletedUser (
+  deleteduser_user_id    integer,
+  deleteduser_timestamp  timestamp,
+  PRIMARY KEY (deleteduser_user_id)
+);
+
+
+--
+-- Table structure for the table 'DeletedTodo'
+--
+CREATE TABLE DeletedTodo (
+  deletedtodo_todo_id    integer,
+  deletedtodo_timestamp  timestamp,
+  PRIMARY KEY (deletedtodo_todo_id)
 );
 
 
