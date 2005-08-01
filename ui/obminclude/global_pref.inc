@@ -301,9 +301,21 @@ if ($cgp_show["module"]["user"]) {
                                    'Url' => "$path/user/user_index.php",
                                    'Right'=> $cright_read);
 }
+if ($cgp_show["module"]["resource"]) {
+  $modules["resource"] = array('Name'=> $l_module_resource,
+                                   'Ico' => "$ico_resource",
+                                   'Url' => "$path/resource/resource_index.php",
+                                   'Right'=> $cright_read);
+}
 if ($cgp_show["module"]["group"]) {
   $modules["group"] = array('Name'=> $l_module_group,
                                     'Ico' => "$ico_group",
                                     'Url' => "$path/group/group_index.php",
+			            'Right'=> $cright_read);
+}
+if ($cgp_show["module"]["resourcegroup"]) {
+  $modules["resourcegroup"] = array('Name'=> $l_module_resourcegroup,
+                                    'Ico' => "$ico_resourcegroup",
+                                    'Url' => "$path/resourcegroup/resourcegroup_index.php",
 			            'Right'=> $cright_read);
 }

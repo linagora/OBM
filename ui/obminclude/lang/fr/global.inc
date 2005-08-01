@@ -98,7 +98,9 @@ $l_account = "Compte";
 $l_invoice = "Facture";
 $l_payment = "Paiement";
 $l_user = "Utilisateur";
+$l_resource = "Resource";
 $l_group = "Groupe";
+$l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
 
 // OBM_DISPLAY
@@ -178,7 +180,9 @@ $l_module_payment = "Paiements";
 
 $l_module_settings = "Configuration";
 $l_module_user = "Utilisateurs";
+$l_module_resource = "Ressources";
 $l_module_group = "Groupes";
+$l_module_resourcegroup = "Groupes de ressources";
 
 $l_module_admin = "Administration";
 $l_module_admin_lang = "Langue";

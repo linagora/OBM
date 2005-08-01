@@ -64,8 +64,12 @@ $ico_statistic      = "ico_stat.gif";
 //$ico_project        = "ico_project.png";
 $ico_user           = "ico_user.gif";
 $ico_add_user       = "ico_user_new.gif";
+$ico_resource       = "ico_resource.gif";
+$ico_add_resource   = "ico_resource_new.gif";
 $ico_group          = "ico_group.gif";
 $ico_add_group      = "ico_group_new.gif";
+$ico_resourcegroup  = "ico_resourcegroup.gif";
+$ico_add_resourcegroup = "ico_resourcegroup_new.gif";
 $ico_setting        = "ico_setting.gif";
 
 // Admin icons

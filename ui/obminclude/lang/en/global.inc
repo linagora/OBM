@@ -95,7 +95,9 @@ $l_account = "Account";
 $l_invoice = "Invoice";
 $l_payment = "Payment";
 $l_user = "User";
+$l_resource = "Resource";
 $l_group = "Group";
+$l_resourcegroup = "Resources Group";
 $l_settings = "Settings";
 
 // Global display
@@ -176,7 +178,9 @@ $l_module_payment = "Payments";
 
 $l_module_settings = "Settings";
 $l_module_user = "Users";
+$l_module_resource = "Ressources";
 $l_module_group = "Groups";
+$l_module_resourcegroup = "Ressources group";
 
 $l_module_admin = "Administration";
 $l_module_admin_lang = "Lang";
