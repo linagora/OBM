@@ -342,7 +342,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$resourcegroup["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'update')
+    'Condition'=> array ('detailupdate')
                                   );
 
 // Detail Update

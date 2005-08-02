@@ -357,10 +357,10 @@ function run_query_resourceresourcegroup_delete($group) {
   $cpt_del = 0;
   while ($cpt < $group["resource_nb"]) {
     $cpt++;
-    $u_id = $group["resource$cpt"];
+    $r_id = $group["resource$cpt"];
 
     $query = "delete from ResourceGroup
-      where resourcegroup_rgroup_id='$id' and resourcegroup_resource_id='$u_id'";
+      where resourcegroup_rgroup_id='$id' and resourcegroup_resource_id='$r_id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -472,14 +472,15 @@ function run_query_resource_resourcegroup($group) {
     $order = "order by resource_label";
   }
 
-  $query = "SELECT resourcegroup_resource_id as group_resource_id,
+  $query = "SELECT resourcegroup_resource_id as resourcegroup_resource_id,
          resourcegroup_resource_id as id,
          resource_timeupdate as group_resource_timeupdate,
          resource_timecreate as group_resource_timecreate,
          resource_userupdate as group_resource_userupdate,
          resource_usercreate as group_resource_usercreate,
          resource_label as resourcegroup_resource_label,
-         resource_description as resourcegroup_resource_desc
+         resource_description as resourcegroup_resource_desc,
+         resource_qty as resourcegroup_resource_qty
       FROM ResourceGroup LEFT JOIN Resource ON resourcegroup_resource_id=resource_id
       WHERE resourcegroup_rgroup_id='$id'
          $order

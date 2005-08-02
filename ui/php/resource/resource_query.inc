@@ -129,7 +129,7 @@ function run_query_insert($resource) {
     ". $auth->auth["uid"] . ",
     '$label',
     '$desc',
-    '$qty'
+    $qty
    )";
 
   display_debug_msg($query, $cdg_sql);

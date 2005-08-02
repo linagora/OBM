@@ -45,7 +45,7 @@ if (! check_privacy($module, "Resource", $action, $resource["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("resource", $contact["id"], $action);
+  update_last_visit("resource", $resource["id"], $action);
 }
 page_close();
 

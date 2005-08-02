@@ -655,6 +655,44 @@ function get_last_invoice_text($id) {
   return;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Get the resource label from the resource Id
+// Parameters:
+//   - $id : resource id
+///////////////////////////////////////////////////////////////////////////////
+function get_last_resource_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "select resource_label from Resource where resource_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("resource_label");
+  }
+  return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the resourcegroup label from the resourcegroup Id
+// Parameters:
+//   - $id : resourcegroup id
+///////////////////////////////////////////////////////////////////////////////
+function get_last_resourcegroup_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "select rgroup_name from RGroup where rgroup_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("rgroup_name");
+  }
+  return;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the payment label from the payment Id

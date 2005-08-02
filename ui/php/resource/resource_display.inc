@@ -315,8 +315,7 @@ function dis_resource_consult($resource) {
 //   - $obm_q : Resource database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_consult($obm_q) {
-  global $l_label, $l_desc, $l_qty;
-  global $l_resource;
+  global $l_resource, $l_label, $l_desc, $l_qty;
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("resource_id");
@@ -325,7 +324,7 @@ function html_resource_consult($obm_q) {
   $qty = $obm_q->f("resource_qty");
 
   $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = "<div class=\"title\">$l_label : $fname $lname</div>";
+  $display["title"] = "<div class=\"title\">$l_resource : $fname $lname</div>";
 
   $block = "
   <div class=\"detailHead\">$l_resource</div>

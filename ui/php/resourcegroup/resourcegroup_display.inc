@@ -41,7 +41,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "hidden_field") && $ext_element != "") {
     $res["name"] = "<span id=\"data".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
     $OD->data_set->f("rgroup_name")."</span>";
-  } else if ($fieldname == "resourcegroup_nb_resource") {
+  } else if ($fieldname == "rgroup_nb_resource") {
     $nb_q = new DB_OBM;
     $id = $OD->data_set->f("rgroup_id");
     $query = "select count(*) from ResourceGroup where resourcegroup_rgroup_id='$id'";
@@ -50,7 +50,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
     $res["name"] = $nb_q->f(0);
     $res["align"] = "center";
   }
-  // For Resource member lists
+  // For RGroup resource lists
   elseif (($fieldname == "resourcegroup_resource_label")  && $link_ok) {
     //$res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("group_user_id");
     $res["url"] = "";
@@ -348,7 +348,7 @@ function dis_resourcegroup_consult($group, $uid) {
     $r_q->set_num_rows_total($count);
   }
 
-  $block = html_resourcegroup_consult($group_q, $pref_r_q, $r_q);
+  $block = html_resourcegroup_consult($group_q, $prefs_r, $r_q);
 
   return $block;
 }
@@ -358,10 +358,10 @@ function dis_resourcegroup_consult($group, $uid) {
 // HTML Display Group Consultation
 // Parameters:
 //   - $group_q  : group database result 
-//   - $pref_r_q : group user preference display 
+//   - $prefs_r  : group resource preference display 
 //   - $r_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_resourcegroup_consult($group_q, $pref_r_q, $r_q) {
+function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   global $auth;
   global $l_yes, $l_no, $ico_mail;
   global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_resourcegroup_resourcegroup;
@@ -432,9 +432,8 @@ function html_resourcegroup_consult($group_q, $pref_r_q, $r_q) {
   $block .= display_info_msg($message);
 
   if ($nb_r != 0) {
-
     $url = url_prepare("resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=$id");
-    $dis_infos = new OBM_DISPLAY("DATA", $pref_r_q);
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_r);
     $dis_infos->data_set = $r_q;
     $dis_infos->display_entity = "resourcegroup_resource";
     $dis_infos->data_url = $url;
@@ -513,10 +512,7 @@ function dis_warn_delete($id) {
   global $uid, $l_cant_delete_public;
 
   $lgroup = get_resourcegroup_info($id);
-  if ($lgroup["system"] != "0") {
-    $display["msg"] .= display_warn_msg($l_cant_delete_system);
-    $dis_delete = "";
-  } else if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != "$uid")) {
+  if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != "$uid")) {
     $display["msg"] .= display_warn_msg($l_cant_delete_public);
     $dis_delete = "";
   } else {

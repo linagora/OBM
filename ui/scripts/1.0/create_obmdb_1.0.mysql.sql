@@ -1399,12 +1399,10 @@ CREATE TABLE RGroup (
 );
 
 --
--- New table 'RGroupKind'
+-- Table structure for table 'ResourceGroup'
 --
-CREATE TABLE RGroupKind (
-  rgroupkind_id          int(8) NOT NULL auto_increment,
-  rgroupkind_shortlabel  varchar(3) NOT NULL DEFAULT '',
-  rgroupkind_longlabel   varchar(40) NOT NULL DEFAULT '',
-  PRIMARY KEY (rgroupkind_id)
+CREATE TABLE ResourceGroup (
+  resourcegroup_rgroup_id    int(8) DEFAULT 0 NOT NULL,
+  resourcegroup_resource_id  int(8) DEFAULT 0 NOT NULL
 );
 

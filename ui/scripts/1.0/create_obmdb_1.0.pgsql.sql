@@ -1367,6 +1367,48 @@ CREATE TABLE DeletedTodo (
   PRIMARY KEY (deletedtodo_todo_id)
 );
 
+-------------------------------------------------------------------------------
+-- Resource module tables 
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Resource'
+--
+CREATE TABLE Resource (
+  resource_id                serial,
+  resource_timeupdate        timestamp,
+  resource_timecreate        timestamp,
+  resource_userupdate        integer,
+  resource_usercreate        integer,
+  resource_label             varchar(32) DEFAULT '' NOT NULL,
+  resource_description       varchar(255),
+  resource_qty               integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (resource_id),
+  UNIQUE (resource_label)
+);
+CREATE UNIQUE INDEX k_label_resource_Resource_index ON Resource (resource_label);
+
+--
+-- Table structure for table 'RGroup'
+--
+CREATE TABLE RGroup (
+  rgroup_id          serial,
+  rgroup_timeupdate  timestamp,
+  rgroup_timecreate  timestamp,
+  rgroup_userupdate  integer,
+  rgroup_usercreate  integer,
+  rgroup_privacy     integer NULL DEFAULT 0,
+  rgroup_name        varchar(32) NOT NULL,
+  rgroup_desc        varchar(128),
+  PRIMARY KEY (rgroup_id)
+);
+
+--
+-- Table structure for table 'ResourceGroup'
+--
+CREATE TABLE ResourceGroup (
+  resourcegroup_rgroup_id    integer DEFAULT 0 NOT NULL,
+  resourcegroup_resource_id  integer DEFAULT 0 NOT NULL
+);
 
 COMMIT;
 

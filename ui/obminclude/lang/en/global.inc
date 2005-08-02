@@ -178,9 +178,9 @@ $l_module_payment = "Payments";
 
 $l_module_settings = "Settings";
 $l_module_user = "Users";
-$l_module_resource = "Ressources";
+$l_module_resource = "Resources";
 $l_module_group = "Groups";
-$l_module_resourcegroup = "Ressources group";
+$l_module_resourcegroup = "Resources group";
 
 $l_module_admin = "Administration";
 $l_module_admin_lang = "Lang";
@@ -204,6 +204,7 @@ $l_header_update = "Update";
 $l_header_delete = "Delete";
 $l_header_add_contact = "Add contact";
 $l_header_add_user = "Add user";
+$l_header_add_resource = "Add resource";
 $l_header_add_group = "Add group";
 $l_header_upd_group = "Update groups";
 $l_header_add_deal = "Add deal";
