@@ -34,15 +34,6 @@ $fieldnames["parentdeal_dateproposal"] = $l_date_proposal;
 $fieldnames["parentdeal_datealarm"] = $l_date_alarm;
 $fieldnames["parentdeal_amountprovider"] = $l_amount_out;
 $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
-// fields linked to invoices
-$fieldnames["invoice_number"] = $l_invoice_number;
-$fieldnames["invoice_date"] = $l_invoice_date;
-$fieldnames["invoice_label"] = $l_invoice_label;
-$fieldnames["invoice_amount_ht"] = $l_invoice_ht;
-$fieldnames["invoice_amount_ttc"] = $l_invoice_ttc;
-$fieldnames["invoice_status"] = $l_invoice_status;
-$fieldnames["invoice_deal"] = $l_deal;
-$fieldnames["invoice_company"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,24 +104,6 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $res["name"] = $datealarm;
   }
 
-  // Invoice fields ?????? USED ??????
-  else if ($fieldname == "deal_invoice_label") {
-    $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$OD->data_set->f("invoice_id");
-  }
-
-  else if ( ($fieldname == "deal_invoice_ht") 
-	   || ($fieldname == "deal_invoice_ttc") ) {
-    $amount = $OD->data_set->f($fieldname);
-    if ($OD->data_set->f("invoice_inout") == '+') {
-      $col = $col_client;
-    }
-    else {
-      $col = $col_frs;
-    }
-    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
-    $res["name"] = "$amount";
-  }
-  
   return $res;
 }
 
@@ -581,32 +554,46 @@ function html_deal_links($deal_q) {
     $contract_nb = run_query_linked_contract_nb($id, "deal");
     $contract_nb_arch = run_query_linked_contract_nb($id, "deal", 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
-    $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
-    $block_contract = "
-  <div class=\"linkTitle\">:: $l_module_contract</div>
-  <ul class=\"linkList\">
+    $dis_contract = "
     <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
-        $l_module_contract (<a href=\"$url_contract\">$contract_nb</a> / <a href=\"$url_contract_arch\">$contract_nb_arch</a>)</li>
-    <li><a href=\"$url_contract_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
-        <a href=\"$url_contract_new\">$l_new</a></li>
-  </ul>";
+        $l_module_contract (<a href=\"$url_contract\">$contract_nb</a> / <a href=\"$url_contract_arch\">$contract_nb_arch</a>)</li>";
+
+    // New Contracts allowed only if hitrate = 100
+    if ($hitrate == "100") {
+      $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
+      $dis_contract .= "
+      <li><a href=\"$url_contract_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
+        <a href=\"$url_contract_new\">$l_new</a></li>";
+    }
+    $block_contract = "
+     <div class=\"linkTitle\">:: $l_module_contract</div>
+     <ul class=\"linkList\">
+       $dis_contract
+     </ul>";
   }
 
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
-    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id&amp;deal_label=$ulabel&amp;param_company=$cid&amp;company_name=$uname");
     $nb_inv_tot = run_query_linked_invoice_nb($id, "deal", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "deal");
+    $dis_invoice = "
+    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
+        <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>";
+
+    // New Contracts allowed only if hitrate = 100
+    if ($hitrate == "100") {
+      $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id&amp;deal_label=$ulabel&amp;param_company=$cid&amp;company_name=$uname");
+      $dis_invoice .= "
+    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        <a href=\"$url_inv_new\">$l_new</a></li>";
+    }
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
-        <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>
-    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        <a href=\"$url_inv_new\">$l_new</a></li>
+    $dis_invoice
   </ul>";
   }
 
@@ -681,7 +668,7 @@ function html_deal_consult($deal_q) {
   global $l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_status,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal,$l_category;
-  global $l_invoice, $l_no_invoice, $incl_arch, $param_deal;
+  global $incl_arch, $param_deal;
   global $display, $path, $auth, $cgp_hide, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
@@ -1729,7 +1716,7 @@ function dis_check_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
+// Displays the delete form (button)
 // Parameters:
 //   - $p_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
@@ -2531,33 +2518,27 @@ function dis_status_links($id) {
 // Parameters:
 //   - $prefs        : Deal Display preferences
 //   - $prefs_parent : Parent Deal Display preferences
-//   - $prefs_invoice: Invoice Deal Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_display_pref($prefs, $prefs_parent, $prefs_invoice) {
-  global $l_deal_display, $l_parentdeal_display, $l_invoice_display;
+function dis_deal_display_pref($prefs, $prefs_parent) {
+  global $l_deal_display, $l_parentdeal_display;
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
   $dis_pref->display_entity = "deal";
   $dis_pref->pref_title = $l_deal_display;
 
   $block = "
-    <table class=\"detail\"><tr><td>";
+    <table class=\"detail\">
+    <tr>
+      <td>";
   $block .= $dis_pref->display();
   $block .= "
-    </td>";
+    </td><td>";
 
   $dis_pref->display_pref = $prefs_parent;
   $dis_pref->display_module = "deal";
   $dis_pref->display_entity = "parentdeal";
   $dis_pref->pref_title = $l_parentdeal_display;
 
-  $block .= "<td>";
-  $block .= $dis_pref->display();
-  $block .= "</td><td>";
-  $dis_pref->display_pref = $prefs_invoice;
-  $dis_pref->display_entity = "invoice";
-  $dis_pref->pref_title = $l_invoice_display;
-  
   $block .= $dis_pref->display();
   
   $block .= "</td></tr></table>";

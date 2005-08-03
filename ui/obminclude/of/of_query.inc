@@ -536,15 +536,58 @@ function run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $ord
 function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_level) {
   global $cdg_sql;
 
-  $query = "UPDATE DisplayPref
-    SET display_fieldorder='$new_level'
-    WHERE display_user_id='$u_id'
+  // Get the current field with this order (specific or default)
+  $query = "SELECT
+      display_user_id,
+      display_fieldname,
+      display_display
+    FROM DisplayPref
+    WHERE (display_user_id='$u_id' OR display_user_id='0')
       AND display_entity='$entity'
-      AND display_fieldorder='$fieldorder'";
+      AND display_fieldorder='$fieldorder'
+    ORDER BY display_user_id";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_display_pref_level_update()");
   $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $user_id = $obm_q->f("display_user_id");
+    $fieldname = $obm_q->f("display_fieldname");
+    $fieldstatus = $obm_q->f("display_display");
+    $prefs[$user_id]["name"] = $fieldname;
+    $prefs[$user_id]["status"] = $fieldstatus;
+  }
+
+  // If a specific user entry exists, we just update its order
+  if (isset($prefs[$u_id])) {
+
+    $query = "UPDATE DisplayPref
+      SET display_fieldorder='$new_level'
+      WHERE display_user_id='$u_id'
+        AND display_entity='$entity'
+        AND display_fieldorder='$fieldorder'";
+
+  } else {
+    // We insert the user specific value
+    $query = "INSERT INTO DisplayPref(
+      display_user_id,
+      display_entity,
+      display_fieldname,
+      display_fieldorder,
+      display_display
+      ) VALUES (
+      '$u_id',
+      '$entity',
+      '$fieldname',
+      '$new_level',
+      '$fieldstatus')";
+  }    
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "run_query_display_pref_level_update()");
+  $obm_q->query($query);
+
 }
 
 

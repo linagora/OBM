@@ -32,7 +32,7 @@ if ($form_user_pref) {
   $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
   $set_debug=$param_debug;
   $sess->register("set_debug");
-  update_set_user_pref($uid, "set_debug", $set_debug);
+  update_user_pref($uid, "set_debug", $set_debug);
 
   if ($param_menu != "") {
     $set_menu = $param_menu;
