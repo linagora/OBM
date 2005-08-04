@@ -7,16 +7,13 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // Actions              -- Parameter
-// - index (default)    -- search fields  -- show the company search form
-// - add                -- search fields  -- show the result set of search
-// - delete             --                -- show the new company form
-// - delete_unique      --                -- show the new company form
-// - update             --                -- show the new company form
+// - index (default)    -- search fields  -- show the todo index
+// - insert             -- search fields  -- insert a new todo
+// - delete             --                -- delete selected todos
+// - delete_unique      --                -- delete one todo
+// - update             --                -- update a todo
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session, Auth, Perms  Management                                          //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $module = "todo";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -42,10 +39,11 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["result"] = dis_todo_form($todo);
   $todo_q = run_query_todolist($todo, $new_order, $order_dir);
-  if ($todo_q->num_rows_total() != 0)
+  if ($todo_q->num_rows_total() != 0) {
     $display["result"] .= dis_todo_list($todo, $todo_q);
-  else
+  } else {
     $display["msg"] .= display_info_msg($l_no_found);
+  }
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,45 +51,51 @@ if ($action == "index" || $action == "") {
   $display["detailInfo"] = display_record_info($todo_q);
   $display["result"] .= dis_todo_detail($todo, $todo_q);
 
-} else if ($action == "add") {
+} else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_add($todo);
-  $todo_q = run_query_todolist($todo, "", "");
+  if (check_todo_data_form($todo)) {
+    $retour = run_query_insert($todo);
+    $todo_q = run_query_todolist($todo, "", "");
+    $display["result"] = dis_todo_form($todo);
+    if ($todo_q->nf() != 0) {
+      $display["result"] .= dis_todo_list($todo, $todo_q);
+    } else {
+      $display["msg"] = display_info_msg($l_no_found);
+    }
 
-  $display["result"] = dis_todo_form($todo);
-
-  if ($todo_q->nf() != 0)
-    $display["result"] .= dis_todo_list($todo, $todo_q);
-  else
-    $display["msg"] = display_info_msg($l_no_found);
+  // Form data are not valid
+  } else {
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["detail"] = dis_todo_form($todo);
+  }
 
 } else if ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($HTTP_POST_VARS);
+
   $todo_q = run_query_todolist($todo, "", "");
-
   $display["result"] = dis_todo_form($todo);
-
-  if ($todo_q->nf() != 0)
+  if ($todo_q->nf() != 0) {
     $display["result"] .= dis_todo_list($todo, $todo_q);
-  else
+  } else {
     $display["msg"] = display_info_msg($l_no_found);
+  }
 
 } else if ($action == "delete_unique") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete_unique($param_todo);
-  $todo_q = run_query_todolist($todo, "", "");
-  $display["result"] = dis_todo_form($todo);
-
   if ($retour)
     $display["msg"] = display_ok_msg($l_delete_ok);
   else
     $display["msg"] = display_err_msg($l_delete_error);
 
-  if ($todo_q->nf() != 0)
+  $todo_q = run_query_todolist($todo, "", "");
+  $display["result"] = dis_todo_form($todo);
+  if ($todo_q->nf() != 0) {
     $display["result"] .= dis_todo_list($todo, $todo_q);
-  else
+  } else {
     $display["msg"] .= display_info_msg($l_no_found);
+  }
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,29 +104,31 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_update($todo);
-    
-  if ($popup) {
-    $display["result"] .= "
-    <script language=\"javascript\">
-     window.opener.location.href=\"$path/todo/todo_index.php?action=index\";
-     window.close();
-    </script>
-    ";
+  if (check_todo_data_form($todo)) {
+    $retour = run_query_update($todo);
 
-  } else if ($uid == $todo["sel_user"]) {
-    $todo_q = run_query_detail($todo);
-    $display["detailInfo"] = display_record_info($todo_q);
-    $display["result"] .= dis_todo_detail($todo, $todo_q);
+    if ($popup) {
+      $display["result"] .= "
+      <script language=\"javascript\">
+       window.opener.location.href=\"$path/todo/todo_index.php?action=index\";
+       window.close();
+      </script>";
 
+    } else {
+      $action = "index";
+      $todo_q = run_query_todolist($todo, "", "");
+      $display["result"] = dis_todo_form("");
+      if ($todo_q->num_rows_total() != 0) {
+	$display["result"] .= dis_todo_list($todo, $todo_q);
+      } else {
+	$display["msg"] .= display_info_msg($l_no_found);
+      }
+    }
+
+    // Form data are not valid
   } else {
-    $action = "index";
-    $todo_q = run_query_todolist($todo, "", "");
-    $display["result"] = dis_todo_form($todo);
-    if ($todo_q->num_rows_total() != 0)
-      $display["result"] .= dis_todo_list($todo, $todo_q);
-    else
-      $display["msg"] .= display_info_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["detail"] = dis_todo_form($todo);
   }
 
 }  elseif ($action == "display") {
@@ -147,15 +153,16 @@ if ($action == "index" || $action == "") {
 // Todo top list (same as the bookmarks : id and titles are registered)
 ///////////////////////////////////////////////////////////////////////////////
 // If the todo list was updated, we reload the todo in session
-if (in_array($action, array("add", "detailupdate", "delete", "delete_unique")))
+if (in_array($action, array("insert", "detailupdate", "delete", "delete_unique")))
   session_load_user_todos();
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-if (($action != "update") or (!($popup)))
+if (! $popup) {
   $display["header"] = generate_menu($module, $section);
+}
 $display["head"] = display_head($l_todo);
 $display["end"] = display_end();
      
@@ -215,9 +222,9 @@ function get_todo_action() {
     'Condition'=> array ('detailupdate') 
                                     	 );
 
-// Add a todo
-  $actions["todo"]["add"] = array (
-    'Url'      => "$path/todo/todo_index.php?action=add",
+// Insert a todo
+  $actions["todo"]["insert"] = array (
+    'Url'      => "$path/todo/todo_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     	 );

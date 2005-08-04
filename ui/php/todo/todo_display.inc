@@ -16,7 +16,8 @@ $fieldnames["date_deadline"] = $l_deadline;
 $fieldnames["todo_priority"] = $l_priority;
 $fieldnames["todo_percent"] = $l_percent;
 $fieldnames["todo_title"] = $l_todotitle;
-$fieldnames["todo_id"] = $l_update;
+$fieldnames["todo_percent"] = $l_percent;
+$fieldnames["todo_update"] = $l_update;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,12 +57,12 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
   }
 
-  else if ($fieldname == "todo_id") {
+  else if ($fieldname == "todo_update") {
     $t_id = $OD->data_set->f("todo_id");
     $res["popup"] = true;
     $res["popup_width"] = 700;
     $res["popup_height"] = 260;
-    $res["url"] = "todo_index.php?action=update&amp;param_todo=$t_id&amp;popup=1";
+    $res["url"] = "todo_index.php?action=detailupdate&amp;param_todo=$t_id&amp;popup=1";
     $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
@@ -187,7 +188,7 @@ function dis_todo_detail($todo, $todo_q) {
 //   - $todo_q : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $todo_q = 0) {
-  global $uid;
+  global $path, $uid;
   global $set_theme, $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
   global $popup_width, $popup_height;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
@@ -199,7 +200,7 @@ function dis_todo_form($todo, $todo_q = 0) {
  
   if ($action == "detailupdate") {
     $t_id = $todo["id"];
-    $uid = $todo_q->f("todo_user");
+    $u_id = $todo_q->f("todo_user");
     $title = $todo_q->f("todo_title");
     $content = $todo_q->f("todo_content");
     $priority = $todo_q->f("todo_priority");
@@ -207,16 +208,27 @@ function dis_todo_form($todo, $todo_q = 0) {
     $deadline = $todo_q->f("date_deadline");
     $deadline = ($deadline != 0) ? date_format($deadline, 1) : $l_no_deadline;
   } else {
-    $uid = $todo["uid"];
+    $u_id = $todo["uid"];
     $priority = intval(($max_priority+1)/2);
     $deadline = date("Y-m-d");
   }
 
+  // If parameters have been given, they supercede the default action value
+  if (isset($todo["id"])) { $t_id = $todo["id"]; }
+  if (isset($todo["title"])) { $title = $todo["title"]; }
+  if (isset($todo["priority"])) { $priority = $todo["priority"]; }
+  if (isset($todo["percent"])) { $percent = $todo["percent"]; }
+  if (isset($todo["deadline"])) { $deadline = $todo["deadline"]; }
+  if (isset($todo["content"])) { $content = $todo["content"]; }
   if (is_array($todo["sel_user"])) {
     $p_user_array = $todo["sel_user"];
+  } else if ($u_id > 0) {
+    $p_user_array = array($u_id);
   } else {
     $p_user_array = array($uid);
   }
+
+  print_r($p_user_array);
   $usr_q = run_query_userobm_in($p_user_array);
 
   // UserObm section
@@ -252,16 +264,16 @@ function dis_todo_form($todo, $todo_q = 0) {
     </td>";
 
   $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
+
   // Priority select
   $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">";
-
   for ($i=1; $i<=$max_priority; $i++) {
     $selected = ($i == $priority) ? "selected=\"selected\"" : "";
     $sel_priority .= "<option value=\"$i\" $selected>$i</option>";
   }
   $sel_priority .= "</select>";
 
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <input type=\"hidden\" id=\"param_todo\" name=\"param_todo\" value=\"$t_id\" />
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update\" />
@@ -270,7 +282,7 @@ function dis_todo_form($todo, $todo_q = 0) {
     ";
   } else {
     $dis_button = "
-      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"add\" />
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_add\" />
     ";
   }

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.0.0pre6";
+$obm_version = "1.0.0pre7";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -397,6 +397,7 @@ $js_regexp_import_name = "/^[0-9A-Za-z_- ]+$/";  // Import name
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_number = "/^[0-9]*$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
+$php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
 
 
 // Path to the OBM php root (if not set)

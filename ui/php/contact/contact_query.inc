@@ -161,7 +161,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     }
   }
 
-  $orderq = " order by $order $p_order_dir $order_next";
+  $orderq = " ORDER BY $order $p_order_dir $order_next";
 
   $query = "SELECT
       contact_id as id,

@@ -26,6 +26,7 @@ $l_delete_error = "The deletion of the reminder has failed !";
 $l_delete_confirm = "Confirm entry deletion";
 $l_j_fill_title = "Fill the title";
 $l_j_fill_deadline = "Fill the deadline with a valid date";
+$l_err_percent = "The progress should be between 0 and 100";
 
 $l_todo_display = "Display options for todo list";
 $l_todo_prefs = "Display options for priority list";

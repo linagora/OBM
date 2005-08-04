@@ -31,6 +31,14 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
 
   $whereq = "WHERE todo_user = '$uid'";
 
+  // Order exceptions (order on calculated rows)
+  if (strcmp($p_new_order, "todo_update") == 0) {
+    $order = "todo_priority";
+  } else if (strcmp($p_new_order,"") == 0) {
+    $order = "todo_priority";
+  }
+  $orderq = " ORDER BY $order $p_order_dir $order_next";
+
   $query = "SELECT
     todo_id as id,
     todo_id,
@@ -41,7 +49,7 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
     todo_title
   FROM Todo
   $whereq
-  ORDER BY $order $p_order_dir
+  $orderq
   $limit
   ";
 
@@ -107,12 +115,12 @@ function run_query_detail($todo) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo add query execution
+// Todo insert query execution
 // Parametes:
 //   - $todo[]       : company search criteria
 //     keys used       uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_add($todo) {
+function run_query_insert($todo) {
   global $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
@@ -253,4 +261,40 @@ function run_query_delete_unique($t_id) {
   display_debug_msg($query, $cdg_sql, "run_query_delete_unique");
   $delete_query = new DB_OBM;
   return $delete_query->query($query);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Todo Form Data checking and formatting
+// Parameters:
+//   - $todo[] : values checked
+///////////////////////////////////////////////////////////////////////////////
+function check_todo_data_form($todo) {
+  global $php_regexp_percent, $l_err_percent, $l_j_fill_title;
+  global $err_msg;
+
+  $t_id = $todo["id"];
+  $uid = $todo["uid"];
+  $title = $todo["title"];
+  $users = $todo["sel_user"];
+  $user = $users[0];
+  $priority = $todo["priority"];
+  $deadline = $todo["deadline"];
+  $content = $todo["content"];
+  $percent = $todo["percent"];
+
+  echo "ti=$title";
+  // MANDATORY: Todo title
+  if (trim($title) == "") {
+    $err_msg = $l_j_fill_title;
+    return false;
+  }
+
+  // Percent
+  if (($percent != "") && (preg_match($php_regexp_percent, $percent) == 0)) {
+    $err_msg = $l_err_percent . " : $percent";
+    return false;
+  }
+
+  return true;
 }

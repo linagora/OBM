@@ -27,6 +27,7 @@ $l_delete_error = "La suppression du post-it a échoué !";
 $l_delete_confirm = "Confirmer la suppression de ces entrées";
 $l_j_fill_title = "Remplissez le titre";
 $l_j_fill_deadline = "Remplissez la date limite avec une date valide";
+$l_err_percent = "Le pourcentage doit être compris entre 0 et 100";
 
 $l_todo_display = "Options d'affichage des listes de tâches à faire";
 $l_todo_prefs = "Options d'affichage des listes de tâches urgentes";
