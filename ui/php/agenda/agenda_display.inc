@@ -2043,6 +2043,164 @@ END:VCALENDAR";
 
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Perform the export meeting to the vCalendar format
+// Parameters:
+//   - $label : category label
+///////////////////////////////////////////////////////////////////////////////
+function dis_export_meeting($agenda) {
+  global $obm_version,$cagenda_weekstart,$auth;
+
+  $iso_date = $agenda["date"];
+  $ts_date = strtotime($iso_date);  
+ 
+  $start_time = strtotime("-1 year", $ts_date);
+  $end_time = strtotime("+1 year", $ts_date);
+
+  $calendar_user = array ($auth->auth["uid"] => "dummy");  
+  $obm_event = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
+
+  header("Content-Type: text/x-vCalendar");
+  header("Content-Disposition: inline; filename=ObmCalendar.ics");
+  echo "
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OBM/OBM V$obm_version Calendar//EN
+METHOD:PUBLISH";
+  while($obm_event->next_record()) {
+    $id = $obm_event->f("calendarevent_id");
+    $title = "SUMMARY:" . $obm_event->f("calendarevent_title");
+    $title = wordwrap($title,74,"\n ",1);
+    $priority = $obm_event->f("calendarevent_priority");
+    $category = strtoupper($obm_event->f("calendarcategory_label")); 
+    $date_ts = $obm_event->f("calendarevent_timeupdate");
+    $date_ts = gmdate("Ymd\THis\Z",$date_ts);
+    if ($obm_event->f("calendarevent_description") != "") {
+      $description = preg_replace("/\\r?\\n/","\\n",$obm_event->f("calendarevent_description"));
+      $description = "DESCRIPTION:" . $description;
+      $description = "\n" . wordwrap($description,74,"\n ",1);
+    } else {
+      $description = "";
+    }
+    $date_b = $obm_event->f("calendarevent_date");
+    $date_b = gmdate("Ymd\THis\Z",$date_b);
+    $date_e = $obm_event->f("calendarevent_date") + $obm_event->f("calendarevent_duration") ;
+    $date_e = gmdate("Ymd\THis\Z",$date_e);
+    switch($priority) {
+      case 1 : $priority = 3;
+	break;
+      case 3 : $priority = 1;
+	break;
+    }
+    $private = $obm_event->f("calendarevent_privacy");
+    switch($private) {
+      case 0 : $private = "PUBLIC";
+	break;
+      case 1 : $private = "PRIVATE";
+	break;
+    }        
+    echo "
+BEGIN:VEVENT
+UID:$id    
+$title
+CLASS:$private
+CATEGORIES:$category
+STATUS:CONFIRMED$description
+DTSTART:$date_b
+DTEND:$date_e
+DTSTAMP:$date_ts
+END:VEVENT";
+  }
+  
+  $obm_event = run_query_repeat_events($start_time,$end_time,$calendar_user);
+  
+  while($obm_event->next_record()) {
+    $id = $obm_event->f("calendarevent_id");
+    $title = $obm_event->f("calendarevent_title");
+    $priority = $obm_event->f("calendarevent_priority"); 
+    $category = strtoupper($obm_event->f("calendarcategory_label")); 
+    if ($obm_event->f("calendarevent_description") != "") {
+      $description = "\nDESCRIPTION:".$obm_event->f("calendarevent_description");
+    } else {
+      $description = "";
+    }
+    $date_b = $obm_event->f("calendarevent_date");
+    $date_b = date("Ymd",$date_b)."T".date("His",$date_b);
+    $start_date = $date_b;
+    $date_e = $obm_event->f("calendarevent_date") + $obm_event->f("calendarevent_duration") ;
+    $date_e = date("Ymd",$date_e)."T".date("His",$date_e);
+    $kind = $obm_event->f("calendarevent_repeatkind");
+    $end = $obm_event->f("calendarevent_endrepeat");
+    $end = date("Ymd",$end)."T".date("His",$end);
+    $repeat_days = $obm_event->f("calendarevent_repeatdays");
+    $repeat_frequence = $obm_event->f("calendarevent_repeatfrequence");
+    switch($priority) {
+      case 1 : $priority = 3;
+	break;
+      case 3 : $priority = 1;
+	break;
+    }
+    $private = $obm_event->f("calendarevent_privacy");
+    switch($private) {
+      case 0 : $private = "PUBLIC";
+	break;
+      case 1 : $private = "PRIVATE";
+	break;
+    }   
+    if ($kind == "daily") {
+      $repeat = "FREQ=DAILY;UNTIL=$end;INTERVAL=$repeat_frequence";
+    } elseif($kind == "weekly") {
+      $l_day_repeat = array("SU","MO","TU","WE","TH","FR","SA");
+      $start_week_day = strtotime($cagenda_weekstart);
+      for ($i=0; $i<7; $i++) {
+      	$day_num = date("w", $start_week_day);
+      	$day = $l_day_repeat[$day_num];
+	if (strcmp(substr($repeat_days,$i,1),"1")==0) {
+	  if ($i!=0) {
+	    $dis_repeat_days .= ",";
+	  }
+	  $dis_repeat_days .= "$day";
+	}
+       	$start_week_day = strtotime("+1 day", $start_week_day); 
+      } 
+      $repeat = "FREQ=WEEKLY;UNTIL=$end;INTERVAL=1;BYDAY=$dis_repeat_days";
+    }
+    elseif ($kind == "monthlybydate") {
+      $day = date("d",$start_date);
+      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$day"; 
+    }
+    elseif ($kind == "monthlybyday") {
+      $start_week_day = date("w",$start_date);
+      $daypos = ceil(substr($start_date,6,2)/7);
+      $day_num = date("w",strtotime("+ $start_week_day days",$start_date));
+      $day = $l_day_repeat[$day_num];
+      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$daypos$day";
+    }
+    elseif($kind == "yearly") {
+      $monthpos = date("m",$start_date);
+      $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYMONTH=$monthpos";
+    }
+    echo "
+BEGIN:VEVENT
+UID:$id    
+SUMMARY:$title
+CLASS:$private
+CATEGORIES:$category
+STATUS:CONFIRMED$description
+DTSTART:$date_b
+DTEND:$date_e
+RRULE:$repeat
+END:VEVENT";
+  }
+  echo "
+END:VCALENDAR";
+
+}
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the week beginning at the specified date
 // Parameters:

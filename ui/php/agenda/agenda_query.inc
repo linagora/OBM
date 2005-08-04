@@ -249,10 +249,16 @@ function run_query_add_event($agenda,$users_array,&$event_id) {
   }
 
   $subject = "$l_add_event_mail_subject" . $mail_title;
-  $message = "$l_add_event_mail_head $mail_title
-$l_date : $l_from $datebegin $l_to $dateend";
+  $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend";
   $recipient_array = array_diff($users_array, array($uid));
-  send_mail($subject, $message, $recipient_array,"",$mail);
+  $h_file = array(
+    array (
+      "filename" => "/tmp/meeting.ics",
+      "name" => "meeting.ics",
+      "type" => "ics"
+    )
+  );
+  send_mail($subject, $message, $recipient_array,"",$mail, $h_file);
 }
 
 

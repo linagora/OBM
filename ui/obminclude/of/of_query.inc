@@ -1293,7 +1293,7 @@ function get_all_users_from_group($g_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Send a Mail to an user set
+// Send a Mail to an user set in mime format (one attachment)
 // If recipient list is empty, no mail is sent
 // Parameters:
 //  - $subject    : mail subject
@@ -1301,10 +1301,12 @@ function get_all_users_from_group($g_id) {
 //  - $recipients : Id Recipients array
 //  - $r_addr     : adresses array to add to recipients
 //  - $force      : Mail should be forced (all user even with no set_mail)
+//  - $h_file     : Attachments (array of ("name"=> "", "type=""))
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject, $message, $recipients, $r_addr, $force="") {
+function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file="") {
   global $cgp_mail_enabled;
-  global $aliasuite_enabled;  
+  global $aliasuite_enabled; 
+  global $obm_version; 
 
   $message = stripslashes($message);
   if (! $cgp_mail_enabled) {
@@ -1353,17 +1355,73 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="") {
     }
   }
 
+  // Headers
+  $charset="iso-8859-9";
+  $ctencoding="8bit";
+  $boundary='--' . md5( uniqid("myboundary") );
+
   $headers .= "From: ";
   // If AliaSuite, construct sender address.
   if( $aliasuite_enabled ) {
-    $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@".$local_domain;
+    $headers .= strtok($send_q->f("userobm_email"), "\r\n")."@"."$local_domain\n";
   } else {
-    $headers .= $send_q->f("userobm_email");
+    $headers .= $send_q->f("userobm_email")."\n";
   }
-  
+  if ($h_file !="") {
+    $headers.="Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
+    $headers.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM $obm_version\n";
+  } else {
+    $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
+    $headers.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM $obm_version\n";
+  } 
+
+  // Message 
+  $type = array(
+    'gif'  => 'image/gif',
+    'jpg'  => 'image/jpeg',
+    'jpeg' => 'image/jpeg',
+    'jpe'  => 'image/jpeg',
+    'bmp'  => 'image/bmp',
+    'png'  => 'image/png',
+    'tif'  => 'image/tiff',
+    'tiff' => 'image/tiff',
+    'swf'  => 'application/x-shockwave-flash',
+    'doc'  => 'application/x-msword',
+    'xls'  => 'application/x-msexcel',
+    'ics'  => 'application/text-plain',
+    'r'  => '"application/x-unknown-content-type"'
+  );
+  $priorities = array( '1 (Highest)', '2 (High)', '3 (Normal)', '4 (Low)', '5 (Lowest)' );
+  $priority=$priorities[3];
+  $body=$message;
+  $sep= chr(13) . chr(10);
+  $disposition="inline";
+
+  // message
+  $msg="";
+  if ($h_file !="") {
+    $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
+    $msg .= "Content-Type: text/plain; charset=$charset\n";
+    $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
+    for($i=0;$i<count($h_file);$i++){
+      $filename=$h_file[$i]["filename"];
+      $name=$h_file[$i]["name"];
+      $ctype=$h_file[$i]["ics"];
+
+      $msg .="--$boundary\nContent-type: $ctype;\n name=\"$name\"\n";
+      $msg .="Content-Transfer-Encoding: base64\nContent-Disposition: $disposition;\n  filename=\"$filename\"\n";
+      $linesz= filesize($filename)+1;
+      $fp= fopen($filename, 'r');
+      $content = chunk_split(base64_encode(fread($fp,$linesz)));
+      fclose($fp);
+      $msg .=    $sep.$content;
+    }
+  } else {
+      $msg = "$message";
+  }
+
   if ($reci_list != "") {
-    // echo "<p>mail: $reci_list<br>$subject<br>$message<br>$headers";
-    mail ($reci_list, $subject, $message, $headers);      
+    mail ($reci_list, $subject, $msg, $headers);      
   }
 }
 
@@ -1477,5 +1535,46 @@ function get_modules_array() {
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Send mail with attachment without specific class 
+///////////////////////////////////////////////////////////////////////////////
+/*
+function mail_mime($subject, $message, $recipient_array,"",$mail) {
+
+
+  // Initialisation
+  $header="";
+  $message="";
+
+  $sep= chr(13) . chr(10);
+  $ctype=$type["bilinmiyor"];
+  $path[]="/tmp/meeting.ics";
+  $disposition="inline";
+
+  // message
+  for($i=0;$i<count($path);$i++){
+    $message .="This is a multi-part message in MIME format.\n--$boundary\n";
+    $message .= "Content-Type: text/plain; charset=$charset\n";
+    $message .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
+    $basename=basename($path[$i]);
+
+    $message .="--$boundary\nContent-type: $ctype;\n name=\"$basename\"\n";
+    $message .="Content-Transfer-Encoding: base64\nContent-Disposition: $disposition;\n  filename=\"$basename\"\n";
+       $linesz= filesize( $path[$i])+1;
+       $fp= fopen( $path[$i], 'r' );
+       $content = chunk_split(base64_encode(fread( $fp, $linesz)));
+       fclose($fp);
+    $message .=    $sep.$content;
+  }
+  //_________________________________header_____________________
+  $header.="From: $from\nX-Priority: $priority\nCC: $cc\n";
+  $header.="Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
+  $header.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM\n";
+
+
+  mail($to,$subject,$message."\n",$header);
+}
+*/
  
 ?>
