@@ -1357,6 +1357,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
 
   // Headers
   $charset="iso-8859-9";
+  $charset="utf-8";
   $ctencoding="8bit";
   $boundary='--' . md5( uniqid("myboundary") );
 
@@ -1369,11 +1370,10 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   }
   if ($h_file !="") {
     $headers.="Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
-    $headers.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM $obm_version\n";
   } else {
     $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
-    $headers.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM $obm_version\n";
   } 
+  $headers.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM $obm_version\n";
 
   // Message 
   $type = array(
@@ -1388,7 +1388,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
     'swf'  => 'application/x-shockwave-flash',
     'doc'  => 'application/x-msword',
     'xls'  => 'application/x-msexcel',
-    'ics'  => 'application/text-plain',
+    'ics'  => 'text/calendar',
     'r'  => '"application/x-unknown-content-type"'
   );
   $priorities = array( '1 (Highest)', '2 (High)', '3 (Normal)', '4 (Low)', '5 (Lowest)' );
@@ -1406,13 +1406,14 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
     for($i=0;$i<count($h_file);$i++){
       $filename=$h_file[$i]["filename"];
       $name=$h_file[$i]["name"];
-      $ctype=$h_file[$i]["ics"];
+      $ctype=$type[$h_file[$i]["type"]];
 
-      $msg .="--$boundary\nContent-type: $ctype;\n name=\"$name\"\n";
-      $msg .="Content-Transfer-Encoding: base64\nContent-Disposition: $disposition;\n  filename=\"$filename\"\n";
+      $msg .="--$boundary\nContent-type: $ctype;charset=$charset;name=\"$name\"\n";
+      $msg .="Content-Transfer-Encoding: 8bit\nContent-Disposition: $disposition;\n  filename=\"$name\"\n";
       $linesz= filesize($filename)+1;
       $fp= fopen($filename, 'r');
-      $content = chunk_split(base64_encode(fread($fp,$linesz)));
+//      $content = chunk_split(base64_encode(fread($fp,$linesz)));
+      $content = fread($fp,$linesz);
       fclose($fp);
       $msg .=    $sep.$content;
     }
@@ -1456,7 +1457,7 @@ function run_query_get_recipients($recipients, $force) {
     return false;
   }
 
-  $query = "SELECT userobm_email
+  $query = "SELECT userobm_email, userobm_lastname, userobm_firstname
     FROM UserObm $join
     WHERE $user_in
       userobm_email != ''
@@ -1477,7 +1478,7 @@ function run_query_get_sender() {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
-  $query = "SELECT userobm_email
+  $query = "SELECT userobm_email, userobm_lastname, userobm_firstname
     FROM UserObm
     WHERE userobm_id = '$uid'";
 
@@ -1534,47 +1535,61 @@ function get_modules_array() {
   return $modules;
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// Send mail with attachment without specific class 
+// Create a file with a unique filename 
+// Return 
+//   - false if file creation is impossible 
+//   - unique filename if file is created
 ///////////////////////////////////////////////////////////////////////////////
-/*
-function mail_mime($subject, $message, $recipient_array,"",$mail) {
+function secure_tmpname($postfix = '.tmp', $prefix = 'tmp', $dir = null) {
+   // validate arguments
+   if (! (isset($postfix) && is_string($postfix))) {
+       return false;
+   }
+   if (! (isset($prefix) && is_string($prefix))) {
+       return false;
+   }
+   if (! isset($dir)) {
+       $dir = getcwd();
+   }
 
+   // find a temporary name
+   $tries = 1;
+   do {
+       // get a known, unique temporary file name
+       $sysFileName = tempnam($dir, $prefix);
+       if ($sysFileName === false) {
+           return false;
+       }
 
-  // Initialisation
-  $header="";
-  $message="";
+       // tack on the extension
+       $newFileName = $sysFileName . $postfix;
+       if ($sysFileName == $newFileName) {
+           return $sysFileName;
+       }
 
-  $sep= chr(13) . chr(10);
-  $ctype=$type["bilinmiyor"];
-  $path[]="/tmp/meeting.ics";
-  $disposition="inline";
+       // move or point the created temporary file to the new filename
+       // NOTE: these fail if the new file name exist
+       $newFileCreated = (isWindows() ? @rename($sysFileName, $newFileName) : @link($sysFileName, $newFileName));
+       if ($newFileCreated) {
+           return $newFileName;
+       }
 
-  // message
-  for($i=0;$i<count($path);$i++){
-    $message .="This is a multi-part message in MIME format.\n--$boundary\n";
-    $message .= "Content-Type: text/plain; charset=$charset\n";
-    $message .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
-    $basename=basename($path[$i]);
+       unlink ($sysFileName);
+       $tries++;
+   } while ($tries <= 5);
 
-    $message .="--$boundary\nContent-type: $ctype;\n name=\"$basename\"\n";
-    $message .="Content-Transfer-Encoding: base64\nContent-Disposition: $disposition;\n  filename=\"$basename\"\n";
-       $linesz= filesize( $path[$i])+1;
-       $fp= fopen( $path[$i], 'r' );
-       $content = chunk_split(base64_encode(fread( $fp, $linesz)));
-       fclose($fp);
-    $message .=    $sep.$content;
-  }
-  //_________________________________header_____________________
-  $header.="From: $from\nX-Priority: $priority\nCC: $cc\n";
-  $header.="Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
-  $header.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM\n";
-
-
-  mail($to,$subject,$message."\n",$header);
+   return false;
 }
-*/
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if OS is Windows 
+// Return 
+//   - true if os is Windows 
+//   - false otherwise 
+///////////////////////////////////////////////////////////////////////////////
+function isWindows() {
+   return (DIRECTORY_SEPARATOR == '\\' ? true : false);
+}
  
 ?>

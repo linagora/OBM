@@ -2047,10 +2047,15 @@ END:VCALENDAR";
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the export meeting to the vCalendar format
 // Parameters:
-//   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
-function dis_export_meeting($agenda) {
+function dis_export_meeting($agenda, $event_id, $attendees, $filename) {
   global $obm_version,$cagenda_weekstart,$auth;
+  global $l_file_error, $l_write_error, $l_read_error;
+
+  $fd_dest = fopen ($filename,"w");
+  if ($fd_dest == false) {
+    die ($l_file_error.$dest."dead");
+  }
 
   $iso_date = $agenda["date"];
   $ts_date = strtotime($iso_date);  
@@ -2059,16 +2064,15 @@ function dis_export_meeting($agenda) {
   $end_time = strtotime("+1 year", $ts_date);
 
   $calendar_user = array ($auth->auth["uid"] => "dummy");  
-  $obm_event = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
+  $obm_event = run_query_detail($event_id);
 
-  header("Content-Type: text/x-vCalendar");
-  header("Content-Disposition: inline; filename=ObmCalendar.ics");
-  echo "
+  $msg =  "
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//OBM/OBM V$obm_version Calendar//EN
-METHOD:PUBLISH";
-  while($obm_event->next_record()) {
+METHOD:REQUEST";
+
+  if ($obm_event->f("calendarevent_repeatkind") == 'none') {
     $id = $obm_event->f("calendarevent_id");
     $title = "SUMMARY:" . $obm_event->f("calendarevent_title");
     $title = wordwrap($title,74,"\n ",1);
@@ -2100,22 +2104,34 @@ METHOD:PUBLISH";
       case 1 : $private = "PRIVATE";
 	break;
     }        
-    echo "
+    $organizer_q = run_query_get_recipients(array($obm_event->f("calendarevent_owner")), 1);
+    $organizer_q->next_record();
+    $organizer_cn = $organizer_q->f("userobm_lastname")." ".$organizer_q->f("userobm_firstname");
+    $organizer_email=$organizer_q->f("userobm_email");
+    $attendee_q=run_query_get_recipients($attendees, 1);
+    $msg_attendee="";
+    while ($attendee_q->next_record()) {
+      $msg_attendee .= "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=\"'";
+      $msg_attendee .= $attendee_q->f("userobm_lastname")." ".$attendee_q->f("userobm_firstname");
+      $msg_attendee .= "'\":MAILTO:";
+      $msg_attendee .= $attendee_q->f("userobm_email");
+    }
+    $msg .= "
 BEGIN:VEVENT
 UID:$id    
 $title
 CLASS:$private
+ORGANIZER;CN=\"$organizer_cn\":MAILTO:$organizer_email
+$msg_attendee
+LOCATION:
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
 DTEND:$date_e
 DTSTAMP:$date_ts
 END:VEVENT";
-  }
-  
-  $obm_event = run_query_repeat_events($start_time,$end_time,$calendar_user);
-  
-  while($obm_event->next_record()) {
+
+  } else {  
     $id = $obm_event->f("calendarevent_id");
     $title = $obm_event->f("calendarevent_title");
     $priority = $obm_event->f("calendarevent_priority"); 
@@ -2137,16 +2153,16 @@ END:VEVENT";
     $repeat_frequence = $obm_event->f("calendarevent_repeatfrequence");
     switch($priority) {
       case 1 : $priority = 3;
-	break;
+  	  break;
       case 3 : $priority = 1;
-	break;
+	  break;
     }
     $private = $obm_event->f("calendarevent_privacy");
     switch($private) {
       case 0 : $private = "PUBLIC";
-	break;
+	  break;
       case 1 : $private = "PRIVATE";
-	break;
+	  break;
     }   
     if ($kind == "daily") {
       $repeat = "FREQ=DAILY;UNTIL=$end;INTERVAL=$repeat_frequence";
@@ -2154,34 +2170,31 @@ END:VEVENT";
       $l_day_repeat = array("SU","MO","TU","WE","TH","FR","SA");
       $start_week_day = strtotime($cagenda_weekstart);
       for ($i=0; $i<7; $i++) {
-      	$day_num = date("w", $start_week_day);
+  	$day_num = date("w", $start_week_day);
       	$day = $l_day_repeat[$day_num];
 	if (strcmp(substr($repeat_days,$i,1),"1")==0) {
 	  if ($i!=0) {
 	    $dis_repeat_days .= ",";
 	  }
 	  $dis_repeat_days .= "$day";
-	}
-       	$start_week_day = strtotime("+1 day", $start_week_day); 
+  	}
+      	$start_week_day = strtotime("+1 day", $start_week_day); 
       } 
       $repeat = "FREQ=WEEKLY;UNTIL=$end;INTERVAL=1;BYDAY=$dis_repeat_days";
-    }
-    elseif ($kind == "monthlybydate") {
+    } elseif ($kind == "monthlybydate") {
       $day = date("d",$start_date);
       $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$day"; 
-    }
-    elseif ($kind == "monthlybyday") {
+    } elseif ($kind == "monthlybyday") {
       $start_week_day = date("w",$start_date);
       $daypos = ceil(substr($start_date,6,2)/7);
       $day_num = date("w",strtotime("+ $start_week_day days",$start_date));
       $day = $l_day_repeat[$day_num];
       $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$daypos$day";
-    }
-    elseif($kind == "yearly") {
+    } elseif($kind == "yearly") {
       $monthpos = date("m",$start_date);
       $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYMONTH=$monthpos";
     }
-    echo "
+    $msg .= "
 BEGIN:VEVENT
 UID:$id    
 SUMMARY:$title
@@ -2193,9 +2206,13 @@ DTEND:$date_e
 RRULE:$repeat
 END:VEVENT";
   }
-  echo "
+
+  $msg .= "
 END:VCALENDAR";
 
+  // we don't forget the last line :
+  fputs($fd_dest, $msg);
+  fclose ($fd_dest);
 }
 
 

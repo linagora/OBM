@@ -28,6 +28,7 @@ function run_query_detail($param_event) {
       u.userobm_login as userupdate,
       $timeupdate,
       $timecreate,
+      calendarevent_owner, 
       calendarevent_title, 
       calendarevent_description,
       calendarevent_category_id,
@@ -251,14 +252,24 @@ function run_query_add_event($agenda,$users_array,&$event_id) {
   $subject = "$l_add_event_mail_subject" . $mail_title;
   $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend";
   $recipient_array = array_diff($users_array, array($uid));
+  $tmp_filename = secure_tmpname(".ics","ics_");
+  print_r($users_array); 
+  print_r($recipient_array); 
+  echo "dis_export_meeting($agenda, $event_id, $tmp_filename)";
+  dis_export_meeting($agenda, $event_id, $recipient_array, $tmp_filename);
+  print_r($users_array); 
+  print_r($recipient_array); 
+  echo "dis_export_meeting($agenda, $event_id, $tmp_filename)";
+  
   $h_file = array(
     array (
-      "filename" => "/tmp/meeting.ics",
+      "filename" => "$tmp_filename",
       "name" => "meeting.ics",
       "type" => "ics"
     )
   );
-  send_mail($subject, $message, $recipient_array,"",$mail, $h_file);
+  send_mail($subject, $message, $recipient_array, "",$mail, $h_file);
+  //unlink($tmp_filename);
 }
 
 
