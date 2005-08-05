@@ -31,6 +31,7 @@ function run_query_detail($param_event) {
       calendarevent_owner, 
       calendarevent_title, 
       calendarevent_description,
+      calendarevent_location, 
       calendarevent_category_id,
       calendarcategory_label,
       calendarevent_privacy,
@@ -168,6 +169,7 @@ function run_query_waiting_events() {
       attendee.userobm_firstname,
       calendarevent_id,		  
       calendarevent_title, 
+      calendarevent_location, 
       calendarcategory_label,
       calendarevent_privacy,
       calendarevent_priority,
@@ -269,7 +271,7 @@ function run_query_add_event($agenda,$users_array,&$event_id) {
     )
   );
   send_mail($subject, $message, $recipient_array, "",$mail, $h_file);
-  //unlink($tmp_filename);
+  unlink($tmp_filename);
 }
 
 
@@ -287,6 +289,7 @@ function run_query_insert_event_data($agenda) {
   $category_id = $agenda["category"];
   $priority = $agenda["priority"];
   $description = $agenda["description"];
+  $location = $agenda["location"];
   $all_day = $agenda["allday"]; 
   $datebegin = $agenda["datebegin"];
   $dateend = $agenda["dateend"];
@@ -312,6 +315,7 @@ function run_query_insert_event_data($agenda) {
     calendarevent_title, 
     calendarevent_date,     
     calendarevent_description,
+    calendarevent_location, 
     calendarevent_category_id,
     calendarevent_priority,
     calendarevent_privacy, 
@@ -329,6 +333,7 @@ function run_query_insert_event_data($agenda) {
     '$title',
     '$datebegin',
     '$description',
+    '$location',
     '$category_id',
     '$priority',
     '$privacy',
@@ -525,6 +530,7 @@ function run_query_update_event_data($agenda) {
   $category_id = $agenda["category"];
   $priority = $agenda["priority"];
   $description = $agenda["description"];
+  $location = $agenda["location"];
   $datebegin = $agenda["datebegin"];
   $event_duration = $agenda["event_duration"];
   $all_day = $agenda["allday"];
@@ -541,6 +547,7 @@ function run_query_update_event_data($agenda) {
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',
+    calendarevent_location = '$location',
     calendarevent_category_id = '$category_id',
     calendarevent_priority = '$priority',
     calendarevent_privacy = '$privacy', 
@@ -1312,6 +1319,7 @@ function run_query_no_repeat_events($start,$end,$users_array) {
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
+      calendarevent_location, 
       calendaruser_user_id,
       calendarcategory_label,
       $calendarevent_date_l,
@@ -1363,6 +1371,7 @@ function run_query_conflict_events($start,$end,$users_array,$event_id) {
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
+      calendarevent_location, 
       calendaruser_user_id,
       userobm_lastname,
       userobm_firstname,
@@ -1419,6 +1428,7 @@ function run_query_repeat_events($start,$end,$users_array) {
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
+      calendarevent_location, 
       calendarcategory_label,
       $calendarevent_date_l,
       calendarevent_duration,
@@ -1470,6 +1480,7 @@ function events_model($start_time, $end_time, $calendar_user) {
     $title = $obm_no_repeat->f("calendarevent_title");
     $privacy = $obm_no_repeat->f("calendarevent_privacy");
     $description = $obm_no_repeat->f("calendarevent_description"); 
+    $location = $obm_no_repeat->f("calendarevent_location"); 
     $category = $obm_no_repeat->f("calendarcategory_label");
     $date = $obm_no_repeat->f("calendarevent_date");
     $duration = $obm_no_repeat->f("calendarevent_duration");
@@ -1486,6 +1497,7 @@ function events_model($start_time, $end_time, $calendar_user) {
     $title = $obm_repeat->f("calendarevent_title");
     $privacy = $obm_repeat->f("calendarevent_privacy");
     $description = $obm_repeat->f("calendarevent_description"); 
+    $location = $obm_repeat->f("calendarevent_location"); 
     $category = $obm_repeat->f("calendarcategory_label");
     $date = $obm_repeat->f("calendarevent_date");
     $duration = $obm_repeat->f("calendarevent_duration");

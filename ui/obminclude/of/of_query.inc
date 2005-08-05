@@ -1356,9 +1356,10 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   }
 
   // Headers
-  $charset="iso-8859-9";
+  $charset="iso-8859-1";
   $charset="utf-8";
   $ctencoding="8bit";
+  $ctencoding="quoted-printable";
   $boundary='--' . md5( uniqid("myboundary") );
 
   $headers .= "From: ";
@@ -1400,16 +1401,22 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   // message
   $msg="";
   if ($h_file !="") {
+    //$body=iconv("ISO-8859-1","UTF-8",$body);
     $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
-    $msg .= "Content-Type: text/plain; charset=$charset\n";
+    $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
     $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
     for($i=0;$i<count($h_file);$i++){
       $filename=$h_file[$i]["filename"];
       $name=$h_file[$i]["name"];
       $ctype=$type[$h_file[$i]["type"]];
 
-      $msg .="--$boundary\nContent-type: $ctype;charset=$charset;name=\"$name\"\n";
-      $msg .="Content-Transfer-Encoding: 8bit\nContent-Disposition: $disposition;\n  filename=\"$name\"\n";
+      $msg .= "--$boundary\n";
+      if ($ctype == "text/calendar") {
+        $msg .= "content-class: urn:content-classes:calendarmessage\n"; 
+      }
+      $msg .= "Content-type: $ctype;charset=$charset;name=\"$name\"\n";
+      $msg .= "Content-Transfer-Encoding: 8bit\n";
+      $msg .= "filename=\"$name\"\n";
       $linesz= filesize($filename)+1;
       $fp= fopen($filename, 'r');
 //      $content = chunk_split(base64_encode(fread($fp,$linesz)));
@@ -1422,6 +1429,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   }
 
   if ($reci_list != "") {
+    $subject=encode($subject,"ISO-8859-1");
     mail ($reci_list, $subject, $msg, $headers);      
   }
 }
@@ -1572,15 +1580,49 @@ function secure_tmpname($postfix = '.tmp', $prefix = 'tmp', $dir = null) {
        // NOTE: these fail if the new file name exist
        $newFileCreated = (isWindows() ? @rename($sysFileName, $newFileName) : @link($sysFileName, $newFileName));
        if ($newFileCreated) {
+           unlink ($sysFileName);
            return $newFileName;
        }
-
        unlink ($sysFileName);
+
        $tries++;
    } while ($tries <= 5);
 
    return false;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Encode string 
+// Return 
+//   - encoded string 
+///////////////////////////////////////////////////////////////////////////////
+function encode($in_str, $charset) {
+   $out_str = $in_str;
+   if ($out_str && $charset) {
+
+       // define start delimimter, end delimiter and spacer
+       $end = "?=";
+       $start = "=?" . $charset . "?B?";
+       $spacer = $end . "\r\n " . $start;
+
+       // determine length of encoded text within chunks
+       // and ensure length is even
+       $length = 75 - strlen($start) - strlen($end);
+       $length = floor($length/2) * 2;
+
+       // encode the string and split it into chunks
+       // with spacers after each chunk
+       $out_str = base64_encode($out_str);
+       $out_str = chunk_split($out_str, $length, $spacer);
+
+       // remove trailing spacer and
+       // add start and end delimiters
+       $spacer = preg_quote($spacer);
+       $out_str = preg_replace("/" . $spacer . "$/", "", $out_str);
+       $out_str = $start . $out_str . $end;
+   }
+   return $out_str;
+} 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if OS is Windows 

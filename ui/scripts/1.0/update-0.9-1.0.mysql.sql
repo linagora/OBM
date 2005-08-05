@@ -139,3 +139,10 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resourcegroup_resource', 'resourcegroup_resource_qty', 3, 1);
 
 
+-------------------------------------------------------------------------------
+-- Update CalendarEvent table (support for location)
+-------------------------------------------------------------------------------
+-- Add column location 
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_location varchar(100) after calendarevent_description;
+
+

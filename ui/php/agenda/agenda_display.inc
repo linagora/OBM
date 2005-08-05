@@ -323,13 +323,14 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_conflict($agenda,$conflict) {
   global $set_theme,$auth;
-  global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
+  global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
 
   $user_id = $agenda["user_id"];
   while ($conflict->next_record()) {
     $id = $conflict->f("calendarevent_id"); 
     $title =  $conflict->f("calendarevent_title");
+    $location =  $conflict->f("calendarevent_location");
     $user_id =  $conflict->f("calendaruser_id");
     $user_name =  $conflict->f("userobm_lastname")." ".$conflict->f("userobm_firstname");
     $date_begin =  $conflict->f("calendarevent_date");
@@ -347,6 +348,7 @@ function html_dis_conflict($agenda,$conflict) {
     $dis_conflict .= "
       <tr>
         <td class=\"detailForm\">$title</td>
+        <td class=\"detailForm\">$location</td>
         <td class=\"detailForm\">$date_b</td>
         <td class=\"detailForm\">$date_e</td>
         <td class=\"detailForm\">$user_name</td>";
@@ -359,6 +361,7 @@ function html_dis_conflict($agenda,$conflict) {
   <table class=\"detail\">
    <tr>
     <td class=\"detailText\">$l_title</td>
+    <td class=\"detailText\">$l_location</td>
     <td class=\"detailText\">$l_datebegin</td>
     <td class=\"detailText\">$l_dateend</td>
     <td class=\"detailText\">$l_user</td>    
@@ -418,7 +421,7 @@ function dis_event_form($action, $agenda,$event_q, $usr_q, $grp_q, $category_lis
   global $ico_mini_cal, $ico_add_user, $ico_add_group,$ico_delete;
   global $cagenda_first_hour, $cagenda_last_hour;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_cat, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
   global $l_repeatkind,$l_repeatdays, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort;
@@ -429,6 +432,7 @@ function dis_event_form($action, $agenda,$event_q, $usr_q, $grp_q, $category_lis
 
   if ($action == "detailupdate") {
     $title = htmlspecialchars($event_q->f("calendarevent_title"));
+    $location = htmlspecialchars($event_q->f("calendarevent_location"));
     $category_id = $event_q->f("calendarevent_category_id");
     $priority = $event_q->f("calendarevent_priority");
     $desc = $event_q->f("calendarevent_description");
@@ -455,6 +459,7 @@ function dis_event_form($action, $agenda,$event_q, $usr_q, $grp_q, $category_lis
   if (is_array($agenda["group"])) { $p_grp_array = $agenda["group"];}
   if (!is_array($p_grp_array)) {$p_grp_array = array();}
   if (isset($agenda["title"])) { $title = $agenda["title"]; }
+  if (isset($agenda["location"])) { $location = $agenda["location"]; }
   if (isset($agenda["category"])) { $category_id = $agenda["category"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
   if (isset($agenda["force"])) { $desc = $agenda["force"]; }
@@ -692,6 +697,10 @@ function dis_event_form($action, $agenda,$event_q, $usr_q, $grp_q, $category_lis
      <td class=\"detailForm\"><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"25\" value=\"$title\" /></td>
     </tr> 
     <tr>
+     <td class=\"detailLabel\">$l_location</td>
+     <td class=\"detailForm\"><input type=\"text\" id=\"tf_location\" name=\"tf_location\" maxlength=\"60\" size=\"25\" value=\"$location\" /></td>
+    </tr> 
+    <tr>
      <td class=\"detailLabel\">$l_sendamail</td>
      <td class=\"detailForm\"><input type=\"checkbox\" id=\"cb_mail\" value=\"1\" name=\"cb_mail\" /></td>
     </tr>       
@@ -789,7 +798,7 @@ function dis_event_form($action, $agenda,$event_q, $usr_q, $grp_q, $category_lis
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
-  global $l_users, $l_title, $l_priority, $l_cat,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_location, $l_priority, $l_cat,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$cagenda_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
@@ -816,6 +825,7 @@ function html_waiting_events($obm_wait) {
 	<table class=\"detail\">
 	 <tr>
 	  <td class=\"detailText\">$l_title</td>
+	  <td class=\"detailText\">$l_location</td>
 	  <td class=\"detailText\">$l_cat</td>
 	  <td class=\"detailText\">$l_priority</td>
 	  <td class=\"detailText\">$l_from</td>
@@ -863,6 +873,7 @@ function html_waiting_events($obm_wait) {
     $dis_events .= "
     <tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
+     <td class=\"detailForm\">".$obm_wait->f("calendarevent_location")."</td>
      <td class=\"detailForm\">".$obm_wait->f("calendarcategory_label")."</td>
      <td class=\"detailForm\">$priority</td>
      <td class=\"detailForm\">$user_create</td>
@@ -899,6 +910,7 @@ function html_waiting_events($obm_wait) {
   <table class=\"detail\">
    <tr>
     <td class=\"detailText\">$l_title</td>
+    <td class=\"detailText\">$l_location</td>
     <td class=\"detailText\">$l_cat</td>
     <td class=\"detailText\">$l_priority</td>
     <td class=\"detailText\">$l_from</td>
@@ -922,7 +934,7 @@ function html_waiting_events($obm_wait) {
 function html_calendar_consult($event_q,$obm_q_cust,$obm_q_grp) {
   global $display, $set_theme,$cagenda_weekstart;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
+  global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $auth,$l_change_state,$l_groups,$l_all_day;
@@ -932,6 +944,7 @@ function html_calendar_consult($event_q,$obm_q_cust,$obm_q_grp) {
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   $title = $event_q->f("calendarevent_title");
+  $location = $event_q->f("calendarevent_location");
   $category = $event_q->f("calendarcategory_label");
   $priority = $event_q->f("calendarevent_priority"); 
   $description = $event_q->f("calendarevent_description");
@@ -1001,6 +1014,10 @@ function html_calendar_consult($event_q,$obm_q_cust,$obm_q_grp) {
     <tr>
      <td class=\"detailLabel\">$l_title</td>
      <td class=\"detailText\">$title</td>
+    </tr>  
+    <tr>
+     <td class=\"detailLabel\">$l_location</td>
+     <td class=\"detailText\">$location</td>
     </tr>  
     <tr>
      <td class=\"detailLabel\">$l_private</td>
@@ -1917,6 +1934,7 @@ METHOD:PUBLISH";
     $id = $obm_event->f("calendarevent_id");
     $title = "SUMMARY:" . $obm_event->f("calendarevent_title");
     $title = wordwrap($title,74,"\n ",1);
+    $location = $obm_event->f("calendarevent_location");
     $priority = $obm_event->f("calendarevent_priority");
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     $date_ts = $obm_event->f("calendarevent_timeupdate");
@@ -1950,6 +1968,7 @@ BEGIN:VEVENT
 UID:$id    
 $title
 CLASS:$private
+LOCATION:$location
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
@@ -1963,6 +1982,7 @@ END:VEVENT";
   while($obm_event->next_record()) {
     $id = $obm_event->f("calendarevent_id");
     $title = $obm_event->f("calendarevent_title");
+    $location = $obm_event->f("calendarevent_location");
     $priority = $obm_event->f("calendarevent_priority"); 
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     if ($obm_event->f("calendarevent_description") != "") {
@@ -2031,6 +2051,7 @@ BEGIN:VEVENT
 UID:$id    
 SUMMARY:$title
 CLASS:$private
+LOCATION:$location
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
@@ -2076,6 +2097,7 @@ METHOD:REQUEST";
     $id = $obm_event->f("calendarevent_id");
     $title = "SUMMARY:" . $obm_event->f("calendarevent_title");
     $title = wordwrap($title,74,"\n ",1);
+    $location = $obm_event->f("calendarevent_location");
     $priority = $obm_event->f("calendarevent_priority");
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     $date_ts = $obm_event->f("calendarevent_timeupdate");
@@ -2123,7 +2145,7 @@ $title
 CLASS:$private
 ORGANIZER;CN=\"$organizer_cn\":MAILTO:$organizer_email
 $msg_attendee
-LOCATION:
+LOCATION:$location
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
@@ -2134,6 +2156,7 @@ END:VEVENT";
   } else {  
     $id = $obm_event->f("calendarevent_id");
     $title = $obm_event->f("calendarevent_title");
+    $location = $obm_event->f("calendarevent_location");
     $priority = $obm_event->f("calendarevent_priority"); 
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     if ($obm_event->f("calendarevent_description") != "") {
@@ -2199,6 +2222,7 @@ BEGIN:VEVENT
 UID:$id    
 SUMMARY:$title
 CLASS:$private
+LOCATION:$location
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
@@ -2209,6 +2233,8 @@ END:VEVENT";
 
   $msg .= "
 END:VCALENDAR";
+
+  $msg=iconv("ISO-8859-1","UTF-8",$msg);
 
   // we don't forget the last line :
   fputs($fd_dest, $msg);

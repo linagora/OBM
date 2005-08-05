@@ -429,7 +429,7 @@ display_page($display);
 // returns : $agenda hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_agenda() {
-  global $param_date,$param_event,$param_group,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
+  global $param_date,$param_event,$param_group,$tf_title,$sel_category_id,$sel_priority,$ta_event_description, $tf_location;
   global $cagenda_first_hour, $cagenda_last_hour,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
@@ -456,6 +456,7 @@ function get_param_agenda() {
   if (isset($sel_category_id)) $agenda["category"] = $sel_category_id;
   if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
   if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;
+  if (isset($tf_location)) $agenda["location"] = $tf_location;
   if (isset($cb_force)) $agenda["force"] = $cb_force;
   if (isset($cb_privacy)) $agenda["privacy"] = $cb_privacy;
   if (is_array($rd_conflict_event)) $agenda["conflict_event"] = $rd_conflict_event;
