@@ -28,34 +28,43 @@ fi
 echo $PHP : PHP interpreter found
 
 
-# Database creation
-echo "Database creation"
-mysql -u $U -p$P < create_obmdb_0.9.mysql.sql
+echo "*** Database creation"
+
+echo "  Delete old database if exists"
+mysql -u $U -p$P -e "DROP DATABASE IF EXISTS $DB"
+
+echo "  Create new $DB database"
+mysql -u $U -p$P -e "CREATE DATABASE $DB"
+
+echo "  Create new $DB database model"
+mysql -u $U -p$P $DB < create_obmdb_1.0.mysql.sql
+
+
+echo "*** Database filling"
 
 # Dictionnary data insertion
-echo "Dictionnary data insertion"
-mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_ref_0.9.sql
+echo "  Dictionnary data insertion"
+mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_ref_1.0.sql
 
 # Company Naf Code data insertion
-echo "Company Naf Code data insertion"
-mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_nafcode_0.9.sql
+echo "  Company Naf Code data insertion"
+mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_nafcode_1.0.sql
 
 # Test data insertion
-echo "Test data insertion"
-mysql -u $U -p$P $DB < obmdb_test_values_0.9.sql
+echo "  Test data insertion"
+mysql -u $U -p$P $DB < obmdb_test_values_1.0.sql
 
 # Default preferences data insertion
-echo "Default preferences data insertion"
-mysql -u $U -p$P $DB < obmdb_default_values_0.9.sql
+echo "  Default preferences data insertion"
+mysql -u $U -p$P $DB < obmdb_default_values_1.0.sql
 
-# Default preferences propagation on created users
-echo "Default preferences propagation on created users"
-$PHP ../../php/admin_pref/admin_pref_index.php -a user_pref_update
+
+echo "*** Data checking and validation"
 
 # Update calculated values
-echo "Update calculated values"
+echo "  Update calculated values"
 $PHP ../../php/admin_data/admin_data_index.php -a data_update
 
 # Update phonetics ans approximative searches
-echo "Update phonetics and approximative searches"
+echo "  Update phonetics and approximative searches"
 $PHP ../../php/admin_data/admin_data_index.php -a sound_aka_update

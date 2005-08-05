@@ -28,29 +28,40 @@ fi
 echo $PHP : PHP interpreter found
 
 
-# Database creation
-echo "Postgres Database creation"
-psql -U $U $DB < create_obmdb_0.9.pgsql.sql
+echo "*** Database creation"
+
+echo "  Delete old database if exists"
+psql -U $U $DB -c "DROP DATABASE $DB"
+
+## XXXXXX obm postgres user creation ?
+
+echo "  Create new $DB database"
+psql -U $U $DB -c "CREATE DATABASE $DB with owner = $U"
+
+echo "  Create new $DB database model"
+psql -U $U $DB < create_obmdb_1.0.pgsql.sql
+
+
+echo "*** Database filling"
 
 # Dictionnary data insertion
-echo "Dictionnary data insertion"
-cat postgres-pre.sql data-$DATA_LANG/obmdb_ref_0.9.sql | psql -U $U $DB
+echo "  Dictionnary data insertion"
+cat postgres-pre.sql data-$DATA_LANG/obmdb_ref_1.0.sql | psql -U $U $DB
 
 # Company Naf Code data insertion
-echo "Company Naf Code data insertion"
-cat postgres-pre.sql data-$DATA_LANG/obmdb_nafcode_0.9.sql | psql -U $U $DB
+echo "  Company Naf Code data insertion"
+cat postgres-pre.sql data-$DATA_LANG/obmdb_nafcode_1.0.sql | psql -U $U $DB
 
 # Test data insertion
-echo "Test data insertion"
-cat postgres-pre.sql obmdb_test_values_0.9.sql | psql -U $U $DB
+echo "  Test data insertion"
+cat postgres-pre.sql obmdb_test_values_1.0.sql | psql -U $U $DB
 
 # Default preferences data insertion
 echo "Default preferences data insertion"
-cat postgres-pre.sql obmdb_default_values_0.9.sql | psql -U $U $DB 
+cat postgres-pre.sql obmdb_default_values_1.0.sql | psql -U $U $DB 
 
-# Default preferences propagation on created users
-echo "Default preferences propagation on created users"
-$PHP ../../php/admin_pref/admin_pref_index.php -a user_pref_update
+
+echo "*** Data checking and validation"
 
 # Update calculated values
 echo "Update calculated values"
