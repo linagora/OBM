@@ -163,6 +163,7 @@ CREATE TABLE EventEntity (
   PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
 );
 
+-- Update table EventEntity
 INSERT INTO EventEntity (
   evententity_timeupdate,
   evententity_timecreate,
@@ -186,7 +187,40 @@ SELECT
   calendaruser_required 
 FROM CalendarUser;
 
+-- DROP table EventEntity
 DROP TABLE IF EXISTS CalendarUser;
+
+-------------------------------------------------------------------------------
+-- Create table 'CalendarEntityRight'
+-------------------------------------------------------------------------------
+-- Create table CalendarEntityRight 
+CREATE TABLE CalendarEntityRight (
+  calendarentityright_entity_id     int(8) NOT NULL default '0',
+  calendarentityright_entity        varchar(32) NOT NULL default '',
+  calendarentityright_customer_id   int(8) NOT NULL default '0',
+  calendarentityright_write         int(1) NOT NULL default '0',
+  calendarentityright_read          int(1) NOT NULL default '0',
+  PRIMARY KEY (calendarentityright_entity_id,calendarentityright_entity,calendarentityright_customer_id)
+);
+
+-- Update table CalendarEntityRight 
+INSERT INTO CalendarEntityRight (
+  calendarentityright_entity_id,
+  calendarentityright_entity,
+  calendarentityright_customer_id,
+  calendarentityright_write,
+  calendarentityright_read
+)
+SELECT 
+  calendarright_ownerid,
+  'user',
+  calendarright_customerid,
+  calendarright_write,
+  calendarright_read
+FROM CalendarRight;
+
+-- DROP table CalendarEntityRight 
+DROP TABLE IF EXISTS CalendarRight;
 
 -------------------------------------------------------------------------------
 -- Update Document table
