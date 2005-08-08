@@ -745,13 +745,14 @@ CREATE TABLE Document (
   document_title       	 varchar(255) default NULL,
   document_name        	 varchar(255) default NULL,
   document_kind        	 int(2) default NULL,
-  document_mimetype    	 varchar(255) default NULL,
+  document_mimetype_id	 int(8) not null default 0,
   document_category1_id  int(8) not null default 0,
   document_category2_id  int(8) not null default 0,
-  document_author      	 varchar(255) default NULL,
   document_privacy     	 int(2) not null default 0,
-  document_path        	 text default NULL,
   document_size        	 int(15) default NULL,
+  document_author      	 varchar(255) default NULL,
+  document_path        	 text default NULL,
+  document_acl        	 text default NULL,
   PRIMARY KEY (document_id)
 );
 

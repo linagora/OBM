@@ -372,6 +372,11 @@ $cr_date_current = 2;
 $cr_date_torenew = 3;
 $cr_date_ended = 4;
 
+// Document Kind
+$cdoc_kind_dir = 0;
+$cdoc_kind_file = 1;
+$cdoc_kind_link = 2;
+
 // Perms XXXXX Deprecated : to be removed
 $perms_user = "user";
 $perms_editor = "editor";

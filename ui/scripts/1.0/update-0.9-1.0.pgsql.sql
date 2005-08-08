@@ -149,3 +149,15 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 -- Add column location
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_location varchar(100);
 
+
+-------------------------------------------------------------------------------
+-- Update Document table
+-------------------------------------------------------------------------------
+-- correctness : _mimetype -> mimetype_id
+ALTER TABLE Document ADD COLUMN document_mimetype_id integer;
+UPDATE Document SET document_mimetype_id = 0;
+ALTER TABLE Document ALTER COLUMN document_mimetype_id SET DEFAULT 0;
+ALTER TABLE Document DROP COLUMN document_mimetype;
+
+-- Add ACL column
+ALTER TABLE Document ADD COLUMN document_acl text;

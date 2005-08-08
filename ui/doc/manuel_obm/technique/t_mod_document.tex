@@ -1,0 +1,238 @@
+% Documentation technique d'OBM : module Document
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{Le module Document}
+
+Le module \doc \obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \doc utilise 5 tables :
+\begin{itemize}
+ \item Document
+ \item DocumentEntity
+ \item DocumentMimeType
+ \item DocumentCategory1
+ \item DocumentCategory2
+\end{itemize}
+
+\subsection{Document}
+Table principale des informations d'un document.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_title & varchar 255 & Titre du document & \\
+\hline
+\_name & varchar 255 & Nom du document & \\
+\hline
+\_kind & int 8 & Type de document & (répertoire, fichier, lien)\\
+\hline
+\_mymetype\_id & int 8 & Type Mime du fichier & \\
+\hline
+\_category1\_id & int 8 & Catégorie 1 &\\
+\hline
+\_category2\_id & int 8 & Catégorie 2 &\\
+\hline
+\_privacy & int 1 & Visibilité du Document & Voir aussi \_acl\\
+\hline
+\_size & int 15 & Taille du document & en octets \\
+\hline
+\_author & varchar 255 & Auteur du document & \\
+\hline
+\_path & text (64k) & Chemin du document &\\
+\hline
+\_acl & text (64k) & Liste de contrôle d'accés &\\
+\hline
+\end{tabular}
+
+\subsubsection{Le champ kind (type de document)}
+
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{variable} & \textbf{valeur} & \textbf{Description}\\
+\hline
+\$cdoc\_kind\_dir & 0 & Répertoire \\
+\hline
+\$cdoc\_kind\_file & 1 & Fichier \\
+\hline
+\$cdoc\_kind\_link & 2 & Lien (http, https) \\
+\end{tabular}
+
+
+\subsection{DocumentEntity}
+
+Table de liaison entre les documents et différentes entités d'\obm.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_document\_id & int 8 & Identifiant du document & \\
+\hline
+\_entity\_id & int 8 & Identifiant de l'entité & \\
+\hline
+\_entity & varchar 255 & Entité (company, contact,...) & \\
+\hline
+\end{tabular}
+
+
+\subsection{DocumentMimeType}
+Table des informations de types MIME.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_label & varchar 255 & Label du type MIME & \\
+\hline
+\_extension & varchar 10 & Extension du type (jpg, gif, txt,..) & \\
+\hline
+\_mime & varchar 255 & Type MIME \\
+\hline
+\end{tabular}
+
+
+\subsection{DocumentCategory1}
+Table des informations de catégorisation des documents :  category 1.
+Lien monovalué.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_label & varchar 255 & Label de la catégorie & \\
+\hline
+\end{tabular}
+
+
+\subsection{DocumentCategory2}
+Table des informations de catégorisation des documents :  category 2.
+Lien monovalué.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_label & varchar 255 & Label de la catégorie & \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche de documents. \\ 
+ \hline
+  search & read & Résultat de recherche de documents. \\
+ \hline
+  new & write & Formulaire de création d'un document. \\
+ \hline
+  new\_repository & write & Formulaire de création d'un répertoire. \\
+ \hline
+  tree & read & Visualisation en arborescence. \\
+ \hline
+  detailconsult & read & Fiche détail d'un document. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'un document. \\
+ \hline
+  insert & write & Insertion d'un document. \\
+ \hline
+  insert\_repository & write & Insertion d'un répertoire. \\
+ \hline
+  update & write & Mise à jour du document. \\
+ \hline
+  check\_delete & write & Vérification avant suppression du document. \\
+ \hline
+  delete & write & Suppression du document. \\
+ \hline
+  folder\_check\_delete & write & Vérification avant suppression du répertoire. \\
+ \hline
+  admin & write & Ecran d'administartion (gestion des catégories). \\
+ \hline
+  cat1\_insert & write\_admin & Insertion de la catégorie 1. \\
+ \hline
+  cat1\_update & write\_admin & Modification de la catégorie 1. \\
+ \hline
+  cat1\_checklink & write\_admin & Vérification des liens de la catégorie 1. \\
+ \hline
+  cat1\_delete & write\_admin & Suppression de la catégorie 1. \\
+ \hline
+  cat2\_insert & write\_admin & Insertion de la catégorie 2. \\
+ \hline
+  cat2\_update & write\_admin & Modification de la catégorie 2. \\
+ \hline
+  cat2\_checklink & write\_admin & Vérification des liens de la catégorie 2. \\
+ \hline
+  cat2\_delete & write\_admin & Suppression de la catégorie 2. \\
+ \hline
+  mime\_insert & write\_admin & Insertion du type MIME. \\
+ \hline
+  mime\_update & write\_admin & Modification du type MIME. \\
+ \hline
+  mime\_checklink & write\_admin & Vérification des liens du type MIME. \\
+ \hline
+  mime\_delete & write\_admin & Suppression du type MIME. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ \hline
+ \hline
+  ext\_get\_path & read & Appel externe pour sélection d'un chemin. \\
+ \hline
+  ext\_get\_ids & read & Appel externe pour sélection de documents. \\
+ \hline
+\end{tabular}

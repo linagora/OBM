@@ -603,8 +603,8 @@ CREATE TABLE CalendarException (
 --
 CREATE TABLE CalendarCategory (
   calendarcategory_id          serial,
-  calendarcategory_timeupdate  TIMESTAMP,
-  calendarcategory_timecreate  TIMESTAMP,
+  calendarcategory_timeupdate  timestamp,
+  calendarcategory_timecreate  timestamp,
   calendarcategory_userupdate  integer DEFAULT NULL,
   calendarcategory_usercreate  integer DEFAULT NULL,
   calendarcategory_label       varchar(128) DEFAULT NULL,
@@ -629,8 +629,8 @@ CREATE TABLE CalendarRight (
 --
 CREATE TABLE RepeatKind (
   repeatkind_id          serial,
-  repeatkind_timeupdate  TIMESTAMP,
-  repeatkind_timecreate  TIMESTAMP,
+  repeatkind_timeupdate  timestamp,
+  repeatkind_timecreate  timestamp,
   repeatkind_userupdate  integer,
   repeatkind_usercreate  integer,
   repeatkind_label       varchar(128),
@@ -742,20 +742,21 @@ CREATE TABLE SubscriptionReception (
 --
 CREATE TABLE Document (
   document_id            serial,
-  document_timeupdate    TIMESTAMP,
-  document_timecreate    TIMESTAMP,
+  document_timeupdate    timestamp,
+  document_timecreate    timestamp,
   document_userupdate  	 integer DEFAULT NULL,
   document_usercreate  	 integer DEFAULT NULL,
   document_title       	 varchar(255) DEFAULT NULL,
   document_name        	 varchar(255) DEFAULT NULL,
   document_kind        	 integer DEFAULT NULL,
-  document_mimetype    	 varchar(255) DEFAULT NULL,
+  document_mimetype_id	 integer NOT NULL DEFAULT 0,
   document_category1_id  integer NOT NULL DEFAULT 0,
   document_category2_id  integer NOT NULL DEFAULT 0,
-  document_author      	 varchar(255) DEFAULT NULL,
   document_privacy     	 integer NOT NULL DEFAULT 0,
-  document_path        	 text DEFAULT NULL,
   document_size        	 integer DEFAULT NULL,
+  document_author      	 varchar(255) DEFAULT NULL,
+  document_path        	 text DEFAULT NULL,
+  document_acl        	 text DEFAULT NULL,
   PRIMARY KEY (document_id)
 );
 
@@ -765,8 +766,8 @@ CREATE TABLE Document (
 --
 CREATE TABLE DocumentCategory1 (
   documentcategory1_id          serial,
-  documentcategory1_timeupdate  TIMESTAMP,
-  documentcategory1_timecreate  TIMESTAMP,
+  documentcategory1_timeupdate  timestamp,
+  documentcategory1_timecreate  timestamp,
   documentcategory1_userupdate  integer DEFAULT NULL,
   documentcategory1_usercreate  integer DEFAULT NULL,
   documentcategory1_label       varchar(255) DEFAULT NULL,
@@ -779,8 +780,8 @@ CREATE TABLE DocumentCategory1 (
 --
 CREATE TABLE DocumentCategory2 (
   documentcategory2_id          serial,
-  documentcategory2_timeupdate  TIMESTAMP,
-  documentcategory2_timecreate  TIMESTAMP,
+  documentcategory2_timeupdate  timestamp,
+  documentcategory2_timecreate  timestamp,
   documentcategory2_userupdate  integer DEFAULT NULL,
   documentcategory2_usercreate  integer DEFAULT NULL,
   documentcategory2_label       varchar(255) DEFAULT NULL,
@@ -793,8 +794,8 @@ CREATE TABLE DocumentCategory2 (
 --
 CREATE TABLE DocumentMimeType (
   documentmimetype_id          serial,
-  documentmimetype_timeupdate  TIMESTAMP,
-  documentmimetype_timecreate  TIMESTAMP,
+  documentmimetype_timeupdate  timestamp,
+  documentmimetype_timecreate  timestamp,
   documentmimetype_userupdate  integer DEFAULT NULL,
   documentmimetype_usercreate  integer DEFAULT NULL,
   documentmimetype_label       varchar(255) DEFAULT NULL,

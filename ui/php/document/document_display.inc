@@ -24,7 +24,7 @@ $fieldnames["documentmimetype_label"] = $l_mimetype;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Document specific dataset fields                                  //
+// Display Document specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -52,7 +52,7 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 //     keys used  : archive, name, cat1, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
-  global $display, $l_title, $l_category1, $l_mimetype,$l_name;
+  global $display, $l_title, $l_category1, $l_mimetype, $l_name;
   global $l_all, $l_find, $l_author, $l_category2, $l_document_add; 
   global $c_all;
 
@@ -242,15 +242,16 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Document Form                                                     //
+// Display Document Form
 // Parameters:
-//   - $action    : action called
+//   - $action     : action called
 //   - $doc_q      : document database result 
-//   - $kind_q    : kind database result 
+//   - $cat1_q     : category 1 database result 
+//   - $cat2_q     : category 2 database result 
+//   - $mime_q     : Mime types database result 
 //   - $document[] : default values
-//     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
-//                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display, $path, $document_path, $default_path, $set_theme;
@@ -268,7 +269,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $cat2 = $doc_q->f("document_category2_id");
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
-    $mime = $doc_q->f("document_mimetype");
+    $mime = $doc_q->f("document_mimetype_id");
     if (islink($doc_q->f("document_name"))) {
       $kind = "link";
       $fi_path = $doc_q->f("document_path");
@@ -382,7 +383,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $checked = "";
   }
 
-   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link &nbsp;&nbsp;";
+   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link &nbsp;&nbsp;";
 
   if ($kind == "link" && $proto == "https") {
      $dis_field = " style=\"display: none;\" ";
@@ -522,7 +523,7 @@ function html_repository_form($action, $document) {
 
    
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Document Consultation                                        //
+// HTML Display Document Consultation
 // Parameters:
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1367,6 +1368,7 @@ function dis_document_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_documents_tree($document,$display_file) {
   global $l_close;
+  global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   
   $popup = $document["popup"];
   $obm_d = run_query_get_tree($display_file);
@@ -1375,7 +1377,7 @@ function html_documents_tree($document,$display_file) {
     $link_end ="</a>";
   }
   $name = '/';
-  $kind = "0";
+  $kind = $cdoc_kind_dir;
   $realpath = $path.$name;
   $block.= "
   <div class=\"documentTree\">
@@ -1387,8 +1389,8 @@ function html_documents_tree($document,$display_file) {
     while($obm_d->next_record()) {
       $id = $obm_d->f("document_id");
       $kind = $obm_d->f("document_kind");
-      if($kind == 2) {
-	$kind =1;
+      if ($kind == $cdoc_kind_link) {
+	$kind = $cdoc_kind_file;
       }
       $doc_info = array("name" =>$obm_d->f("document_name"),
                       "title" =>$obm_d->f("document_title"),
@@ -1400,7 +1402,7 @@ function html_documents_tree($document,$display_file) {
     while($obm_d->next_record()) {
       $id = $obm_d->f("document_id");
       $kind = $obm_d->f("document_kind");
-      if($kind == 0) {
+      if ($kind == $cdoc_kind_dir) {
        	$doc_info = array("name" =>$obm_d->f("document_name"),
                       "title" =>$obm_d->f("document_title"),
 		      "author" => $obm_d->f("document_author"));
@@ -1419,7 +1421,9 @@ $block.= "
   ";
 
   return $block;
-} 
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Document Tree
 // Parameters:
