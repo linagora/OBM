@@ -360,24 +360,24 @@ function run_query_insert($company) {
   $retour = $obm_q->query($query);
 
   if ($kind != 0) {
-    $kind_sql = "and company_type_id='$kind'";
+    $kind_sql = "AND company_type_id='$kind'";
   }
   if ($market != 0) {
-    $marquet_sql = "and company_marketingmanager_id='$market'";
+    $marquet_sql = "AND company_marketingmanager_id='$market'";
   }
   if ($act != 0) {
-    $act_sql = "and company_activity_id='$act'";
+    $act_sql = "AND company_activity_id='$act'";
   }
 
-  $query = "select company_id as id
-    from Company
-    where company_name = '$name'
-      and company_timecreate='$now'
+  $query = "SELECT company_id as id
+    FROM Company
+    WHERE company_name = '$name'
+      AND company_timecreate='$now'
       $kind_sql
       $marquet_sql
       $act_sql
-      and company_phone = '$phone'
-      and company_zipcode = '$zip'";
+      AND company_phone = '$phone'
+      AND company_zipcode = '$zip'";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

@@ -525,7 +525,7 @@ function run_query_quick_update($deal) {
 //   deal Id if found else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_id($deal) {
-  global $cdg_sql,$c_id;
+  global $cdg_sql;
 
   $num = $deal["num"];
   $label = $deal["label"];

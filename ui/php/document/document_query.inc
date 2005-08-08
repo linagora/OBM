@@ -218,8 +218,6 @@ function run_query_insert(&$document) {
   $entity = $document["entity"];
   $entity_id = $document["entity_id"];
   $path = format_path($path);
-  $final_path = get_final_path($path);
-  $dest_doc = $final_path.$name;
 
   if ($size == "") $size = 0;
   
@@ -240,14 +238,6 @@ function run_query_insert(&$document) {
   }
   if ($kind == "new_file") {
     $file_kind = $cdoc_kind_file;
-    if (!run_query_create_file($document)){
-      $err_msg = $l_creation_error;
-      return false;
-    }
-  }
-
-  if (strrpos($path,'/') != strlen($path) -1) {
-    $path = $path.'/';
   }
 
   $query = "INSERT INTO Document (
@@ -286,26 +276,81 @@ function run_query_insert(&$document) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if ($entity != "") {
-    $document["entity_id"] = "";
-    $document["entity"] = "";
-    $new_doc = run_query_search ($document, $new_order, $order_dir);
-    $new_doc->next_record();
-    $new_doc_id = $new_doc->f("document_id");
-    
-    $query = "INSERT INTO DocumentEntity (
-      documententity_entity,
-      documententity_entity_id,
-      documententity_document_id
-    ) VALUES (    
-      '$entity',
-      '$entity_id',
-      '$new_doc_id'
-    )";
-    $obm_q->query($query);
+  $doc_id = run_query_document_id($document);
+  $document["id"] = $doc_id;
+
+  // If the document is correctly inserted in db
+  if ($doc_id > 0) {
+
+    // We create the document on disk
+    if ($kind == "new_file") {
+      if (! run_query_create_file($document)){
+	$err_msg = $l_creation_error;
+	return false;
+      }
+    }
+
+    // We insert links if entity given
+    if ($entity != "") {
+      $query = "INSERT INTO DocumentEntity (
+        documententity_entity,
+        documententity_entity_id,
+        documententity_document_id
+      ) VALUES (    
+        '$entity',
+        '$entity_id',
+        '$doc_id'
+      )";
+      $obm_q->query($query);
+    }
   }
 
-  return $retour;
+  return $doc_id;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Document ID : Get the id of the document inserted.
+// Parameters:
+//   - $document[] : document hash info
+// Returns:
+//   document Id if found else false
+///////////////////////////////////////////////////////////////////////////////
+function run_query_document_id($document) {
+  global $cdg_sql;
+
+  $title = $document["title"];
+  $cat1 = $document["category1"];
+  $cat2 = $document["category2"];
+  $author = $document["author"];
+  $name = $document["name"];
+  $path = $document["path"];
+  $path = format_path($path);
+  $size = $document["size"];
+
+  $query = "SELECT document_id
+    FROM Document
+    WHERE 
+      document_title='$title'
+      AND document_category1_id='$cat1'
+      AND document_category2_id='$cat2'
+      AND document_author='$author'
+      AND document_name='$name'
+      AND document_path='$path'
+      AND document_size='$size'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $obm_q->next_record();
+    $id = $obm_q->f("document_id");
+  } else {
+    $id = false;
+  }
+
+  return $id;
 }
 
 
@@ -315,7 +360,6 @@ function run_query_insert(&$document) {
 //   - $p_path : path parameter
 ///////////////////////////////////////////////////////////////////////////////
 function format_path($p_path) {
-  global $document_path;
 
   // Ensure that the path end with a /
   if (strrpos($p_path,'/') != strlen($p_path)-1) {
@@ -326,6 +370,7 @@ function format_path($p_path) {
   return $path; 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the final path from the path parameter entered
 // Parameters:
@@ -333,6 +378,7 @@ function format_path($p_path) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_final_path($path) {
   global $document_path;
+
   // Ensure a / separate the document_path from the path
   if (strpos($path,'/') === 0) {
     $final_path = $document_path.$path;
@@ -345,28 +391,50 @@ function get_final_path($path) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Create File query execution                                               //
+// Calculate the real disk document path
+// Parameters:
+//   - $id   : document id
+//   - $size : document size
+// Returns:
+//   real disk path
+///////////////////////////////////////////////////////////////////////////////
+function get_document_disk_path($id, $size) {
+  global $document_path;
+
+  // The document disk path set in the subdirectory named "last id number"
+  // Get the last number from Id
+  $rel = substr($id, -1, 1);
+
+  $disk_path = $document_path . "/" . $rel . "/";
+  
+  return $disk_path; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Create File query execution
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_create_file($document) {
   global $document_path;
-  $path = $document["path"];
-  $name = $document["name"];
+
+  $id = $document["id"];
+  $size = $document["size"];
   $file = $document["file"];
-  $path = format_path($path);
-  $final_path = get_final_path($path);
-  
+
+  $disk_path = get_document_disk_path($id, $size);
+  $disk_fullname = $disk_path . $id; 
+
+  echo "<p>dp=$disk_path; df=$disk_fullname";
   // Ensure that the final path is a directory
-  if (! is_dir($final_path)) {
+  if (! is_dir($disk_path)) {
     return false;
   }
 
-  $dest_doc = $final_path.$name;
-
-  if (is_writable($final_path)) {
-    if (!move_uploaded_file($file, $dest_doc)) {
+  if (is_writable($disk_path)) {
+    if (!move_uploaded_file($file, $disk_fullname)) {
       return false;
     }
   } else {

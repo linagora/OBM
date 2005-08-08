@@ -44,14 +44,30 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Document search Form
+// Display Document search form
+// Parameters:
+//   - $document[] : hash with document values
+///////////////////////////////////////////////////////////////////////////////
+function dis_document_search_form($document="") {
+
+  $cat1_q = run_query_documentcategory1();
+  $cat2_q = run_query_documentcategory2();
+  $mime_q = run_query_documentmime();
+
+  $block .= html_document_search_form($document, $cat1_q, $cat2_q, $mime_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: XHTML Document search Form
 // Parameters:
 //   - $cat1_q    : database object with cat1 list
 //   - $cat2_q     : database object with cat2ivity list
 //   - $document[] : default form values
-//     keys used  : archive, name, cat1, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
+function html_document_search_form ($document, $cat1_q, $cat2_q, $mime_q) {
   global $display, $l_title, $l_category1, $l_mimetype, $l_name;
   global $l_all, $l_find, $l_author, $l_category2, $l_document_add; 
   global $c_all;
@@ -247,13 +263,32 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
 // Display Document Form
 // Parameters:
 //   - $action     : action called
+//   - $document[] : hash values
+//   - $doc_q      : document database result 
+///////////////////////////////////////////////////////////////////////////////
+function dis_document_form($action, $document, $doc_q) {
+
+  $cat1_q = run_query_documentcategory1();
+  $cat2_q = run_query_documentcategory2();
+  $mime_q = run_query_documentmime();
+
+  $block = html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Document Form
+// Parameters:
+//   - $action     : action called
+//   - $document[] : Document hash values
 //   - $doc_q      : document database result 
 //   - $cat1_q     : category 1 database result 
 //   - $cat2_q     : category 2 database result 
 //   - $mime_q     : Mime types database result 
-//   - $document[] : default values
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
+function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_q) {
   global $display, $path, $document_path, $default_path, $set_theme;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;

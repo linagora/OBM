@@ -54,10 +54,7 @@ if ($action == "ext_get_path") {
     $display["msg"] .= display_err_msg("$l_no_document !");
   }  
 } elseif ($action == "ext_get_ids") {
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
-  $mime_q = run_query_documentmime();    
-  $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,$document);
+  $display["search"] = dis_document_search_form($document);
   if ($set_display == "yes") {
     $display["result"] = dis_document_search_list($document);
   } else {
@@ -69,10 +66,7 @@ if ($action == "ext_get_path") {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
-  $mime_q = run_query_documentmime();
-  $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,  $document);
+  $display["search"] = dis_document_search_form($document);
   if ($set_display == "yes") {
     $display["result"] = dis_document_search_list($document);
   } else {
@@ -81,19 +75,13 @@ if ($action == "ext_get_path") {
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
-  $mime_q = run_query_documentmime();
-  $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,  $document);
+  $display["search"] = dis_document_search_form($document);
   $display["result"] = dis_document_search_list($document);
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
-  $mime_q = run_query_documentmime();
-  $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q,  $document);
+  $display["detail"] = dis_document_form($action, $document, "");
   
 } elseif ($action == "new_repository")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,12 +110,9 @@ if ($action == "ext_get_path") {
 if ($document["id"] > 0) {
     $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
-      $cat1_q = run_query_documentcategory1();
-      $cat2_q = run_query_documentcategory2();
-      $mime_q = run_query_documentmime();
       require("document_js.inc");
       $display["detailInfo"] = display_record_info($doc_q);
-      $display["detail"] = html_document_form($action,$doc_q,$cat1_q, $cat2_q,$mime_q, $document);
+      $display["detail"] = dis_document_form($action, $document, $doc_q);
   } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $doc_q->query . " !");
     }
@@ -136,25 +121,19 @@ if ($document["id"] > 0) {
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $document)) {
-    $retour = run_query_insert($document);
-    if ($retour) {
+    $document["id"] = run_query_insert($document);
+    if ($document["id"]) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error." ".$err_msg);
     }    
-    $cat1_q = run_query_documentcategory1();
-    $cat2_q = run_query_documentcategory2();
-    $mime_q = run_query_documentmime();
-    $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $document);
+    $display["search"] = dis_document_search_form($document);
     $display["result"] = dis_document_search_list($document);
   // Form data are not valid
   } else {
     require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $cat1_q = run_query_documentcategory1();
-    $cat2_q = run_query_documentcategory2();
-    $mime_q = run_query_documentmime();
-    $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $document);
+    $display["detail"] = dis_document_form($action, $document, "");
   }
 
 } elseif ($action == "insert_repository")  {
@@ -190,10 +169,7 @@ if ($document["id"] > 0) {
   } else {
     require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $cat1_q = run_query_documentcategory1();
-    $cat2_q = run_query_documentcategory2();
-    $mime_q = run_query_documentmime();
-    $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $document);
+    $display["detail"] = dis_document_form($action, $document, "");
   }
 
 } elseif ($action == "check_delete")  {
@@ -209,10 +185,7 @@ if ($document["id"] > 0) {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
-  $mime_q = run_query_documentmime();
-  $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $document);
+  $display["search"] = dis_document_search_form($document);
   $display["result"] = dis_document_search_list($document);
 
 } elseif ($action == "folder_check_delete")  {

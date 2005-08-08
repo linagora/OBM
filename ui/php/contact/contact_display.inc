@@ -1028,7 +1028,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consultation                                         //
+// HTML Display Contact Consultation
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////

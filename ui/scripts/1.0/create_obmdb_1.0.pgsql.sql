@@ -554,7 +554,6 @@ CREATE TABLE CalendarEvent (
   calendarevent_owner        integer default NULL,    
   calendarevent_title        varchar(255) default NULL,
   calendarevent_location     varchar(100) default NULL,
-  calendarevent_description  text,
   calendarevent_category_id  integer,
   calendarevent_priority     integer,
   calendarevent_privacy      integer,
@@ -565,8 +564,10 @@ CREATE TABLE CalendarEvent (
   calendarevent_repeatfrequence  integer default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
   calendarevent_endrepeat    timestamp NOT NULL,
+  calendarevent_description  text,
   PRIMARY KEY (calendarevent_id)
 );
+
 
 --
 -- Table structure for the table  'EventEntity'
