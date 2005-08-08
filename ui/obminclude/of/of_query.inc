@@ -359,14 +359,14 @@ function get_display_pref($u_id, $entity, $all=0) {
 // Returns:
 //   - $prefs  : prefs[user_id] : ["order"],["status"], user_id in (0, $u_id)
 ///////////////////////////////////////////////////////////////////////////////
-function get_one_display_pref($u_id, $entity, $field) {
+function get_one_display_pref($u_id, $entity, $fieldname) {
   global $cdg_sql;
   
   $query = "SELECT *
     FROM DisplayPref
     WHERE (display_user_id='0' OR display_user_id='$u_id')
       AND display_entity='$entity'
-      AND display_fieldname='$field'
+      AND display_fieldname='$fieldname'
     ORDER BY display_user_id"; 
 
   display_debug_msg($query, $cdg_sql, "get_one_display_pref()");
@@ -404,7 +404,11 @@ function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
   $default_status = $prefs[0]["status"];
   $user_status = $prefs[$uid]["status"];
   $user_order = $prefs[$uid]["order"];
-  $current_status = ($user_status > 0 ? $user_status : $default_status);
+  if (($user_status != "") && ($user_status >= 0)) {
+    $current_status = $user_status;
+  } else {
+    $current_status = $default_status;
+  }
   $current_order = ($user_order > 0 ? $user_order : $default_order);
 
   // if status not set new_status set to current_status
@@ -555,21 +559,52 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
     $user_id = $obm_q->f("display_user_id");
     $fieldname = $obm_q->f("display_fieldname");
     $fieldstatus = $obm_q->f("display_display");
-    $prefs[$user_id]["name"] = $fieldname;
-    $prefs[$user_id]["status"] = $fieldstatus;
+    $current[$user_id]["name"] = $fieldname;
+    $current[$user_id]["status"] = $fieldstatus;
   }
 
-  // If a specific user entry exists, we just update its order
-  if (isset($prefs[$u_id])) {
+  // Get the default field for the new order (target)
+  $query = "SELECT
+      display_user_id,
+      display_fieldname,
+      display_display
+    FROM DisplayPref
+    WHERE display_user_id='0'
+      AND display_entity='$entity'
+      AND display_fieldorder='$new_level'";
 
-    $query = "UPDATE DisplayPref
+  display_debug_msg($query, $cdg_sql, "run_query_display_pref_level_update()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $target[0]["name"] = $obm_q->f("display_fieldname");
+  $target[0]["status"] = $obm_q->f("display_display");
+
+  // If a specific user entry exists
+  if (isset($current[$u_id])) {
+
+    // If new values to set same as default values, we drop specific user value
+    if ( ($target[0]["name"] == $current[$u_id]["name"])
+	 && ($target[0]["status"] == $current[$u_id]["status"]) ) {
+
+      $query = "DELETE FROM DisplayPref
+      WHERE display_user_id='$u_id'
+        AND display_entity='$entity'
+        AND display_fieldname='" . $target[0]["name"] . "'
+        AND display_display='" . $target[0]["status"] . "'
+        AND display_fieldorder='$fieldorder'";
+
+    // Else we update the specific user value
+    } else {
+
+      $query = "UPDATE DisplayPref
       SET display_fieldorder='$new_level'
       WHERE display_user_id='$u_id'
         AND display_entity='$entity'
         AND display_fieldorder='$fieldorder'";
+    }
 
   } else {
-    // We insert the user specific value
+    // Only default values, nothing to drop, we insert the new specific value
     $query = "INSERT INTO DisplayPref(
       display_user_id,
       display_entity,
@@ -579,7 +614,7 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
       ) VALUES (
       '$u_id',
       '$entity',
-      '$fieldname',
+      '".$current[0]["name"]."',
       '$new_level',
       '$fieldstatus')";
   }    
@@ -637,37 +672,6 @@ function reset_preferences_to_default($user_id="") {
   $obm_q->query($query);
 
   return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Update an user preference
-// Parameters:
-//   - $user_id  : user Id
-//   - $option   : preference name
-//   - $value    : new preference value
-///////////////////////////////////////////////////////////////////////////////
-function run_query_set_user_pref($user_id, $option, $value) {
-  global $cdg_sql;
-
-  // Delete actual value
-  $query = "DELETE FROM UserObmPref
-    WHERE userobmpref_user_id ='$user_id'
-      AND userobmpref_option = '$option'";   
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM ;
-  $ret = $obm_q->query($query);
-
-  // Insert new value
-  $query = "INSERT INTO UserObmPref
-      (userobmpref_user_id, userobmpref_option, userobmpref_value)
-    VALUES
-      ('$user_id', '$option', '$value')";
-  display_debug_msg($query, $cdg_sql);
-  $ret = $obm_q->query($query);
-
-  return $ret;
 }
 
 

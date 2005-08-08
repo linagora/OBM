@@ -1,0 +1,279 @@
+% Documentation technique d'OBM : Gestion des preferences utilisateur et affichage
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\subsection{Gestion des préférences utilisateurs}
+
+Les préférences utilisateurs sont les préférences spécifiques de l'utilisateur comme par exemple le format d'affichage des dates ou le nombre d'enregistrements par page de résultat de recherche.
+Ces préférences sont accessibles et modifiables par l'utilisateur dans le module \settings.
+
+
+\subsubsection{Principe général de gestion}
+
+Les préférences utilisateurs sont stockées en base de données dans une table dédiée : UserObmPref.\\
+
+Les préférences d'un utilisateur sont chargées et stockées dans sa session à la connexion de l'utilisateur.\\
+
+Les préférences renseignées pour l'utilisateur d'Id 0, représentent les préférences par défaut.
+Depuis \obm 1.0, pour chaque utilisateur, seules les préférences différentes des valeurs par défaut doivent être stockées en base. Sans préférence spécifique, l'utilisateur bénéfice de la préférence par défaut.
+
+La récupération des préférenes d'un utilisateur sélectionn les préférences par défaut plus les préférences de l'utilisateur. Si une préférence spécifique de l'utilisateur existe elle se substitue à la préférence par défaut.\\
+
+Jusqu'aux versions 0.9.x d'\obm chaque préférence devait être stockée pour chaque utilisateur. La mise à jour était plus simple, mais pour un grand nombre d'utilisateurs cela représentait un volume de données très important (900 Mo sur une base de 1,2 Go !).
+
+
+\subsubsection{Table UserObmPref}
+
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_user\_id & int 8 & Identifiant utilisateur & (0 pour valeur par défaut) \\
+\hline
+\_option & varchar 50 & Nom de la préférence ou du paramètre & (ex: set\_lang, set\_date,...) \\
+\hline
+\_value & varchar 50 & Valeur du paramètre & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Gestion des modifications et ordre d'affichage}
+
+Les modifications des préférences d'un utilisateur tiennent compte des valeurs par défaut.
+
+Si la modification spécique à l'utilisateur aboutit à la valeur par défaut de la préférence, l'entrée spécifique à l'utilisateur est supprimée.
+Sinon, si l'entrée de l'utilisateur n'existe pas, elle est créée sinon modifiée.
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function get_user_pref($u_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+Récupération des préférences de l'utilisateur \$u\_id.
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function update_user_pref($user_id, $option, $new_value="") {
+\end{verbatim}
+\end{minipage}
+}
+Mise à jour de la préférence \$option pour l'utilisateur \$user\_id avec la valeur \$new\_value.
+
+
+\subsubsection{Implémentation : fonctions utilitaires internes}
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function get_one_user_pref($u_id, $option) {
+\end{verbatim}
+\end{minipage}
+}
+Récupération d'une préférence utilisateur.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function run_query_user_pref_update($user_id, $option, $value) {
+\end{verbatim}
+\end{minipage}
+}
+Mise à jour en base de données d'une préférence utilisateur.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function run_query_user_pref_insert($user_id, $option, $value) {
+\end{verbatim}
+\end{minipage}
+}
+Insertion en base de données d'une préférence utilisateur.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function reset_preferences_to_default($user_id="") {
+\end{verbatim}
+\end{minipage}
+}
+Re-initialisation des préférences aux valeurs par défaut pour un utilisateur (ou pour tous les utilisateurs si \$user\_id est vide).
+Cette fonction réinitialise aussi les préférences de l'utilisateur.
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function session_load_user_prefs() {
+\end{verbatim}
+\end{minipage}
+}
+Chargement en session des préférences d'un utilisateur.
+
+
+
+
+
+\clearpage
+\subsection{Gestion des préférences d'affichage}
+
+Les préférences d'affichage sont les sélections des champs affichés dans chaque résultat de recherche pour chaque utilisateur. Pour chaque module elle sont accessibes et modifiables par le menu "Affichage".
+
+
+\subsubsection{Principe général de gestion}
+
+Les préférences d'affichage sont stockées en base de données dans une table dédiée : DisplayPref.\\
+
+Les préférences renseignées pour l'utilisateur d'Id 0, représentent les préférences par défaut.
+Depuis \obm 1.0, pour chaque utilisateur, seules les préférences différentes des valeurs par défaut doivent être stockées en base. Sans préférence spécifique, l'utilisateur bénéfice de la préférence par défaut.
+
+La récupération des préférenes d'affichage d'un utilisateur sélectionne les préférences par défaut plus les préférences de l'utilisateur. Si une préférence spécifique de l'utilisateur existe elle se substitue à la préférence par défaut.\\
+
+Jusqu'aux versions 0.9.x d'\obm chaque préférence devait être stockée pour chaque utilisateur. La mise à jour était plus simple, mais pour un grand nombre d'utilisateurs cela représentait un volume de données très important (900 Mo sur une base de 1,2 Go !).
+
+
+\subsubsection{Table DisplayPref}
+
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_user\_id & int 8 & Identifiant utilisateur & (0 pour valeur par défaut) \\
+\hline
+\_entity & varchar 32 & Entité concernée (company, contact,...) & \\
+\hline
+\_fieldname & varchar 64 & Nom du champ & champ réel ou calculé \\
+\hline
+\_fieldorder & int 8 & Ordre d'affichage & \\
+\hline
+\_display & int 8 & Etat d'affichage & (0: masqué; 1: affiché; 2: obligatoire)\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Champ \_entity}
+
+Le champ entity ne désigne par forcémment un module (\company, \contact,...) mais peut être une vue. Par exemple la liste des contacts dans le module \List (entity=list\_contact) peut être différente de la liste des contacts du module \contact.
+
+
+\subsubsection{Les champs calculés}
+
+La colonne fieldname doit contenir une valeur retournée par la requète de recherche. Ce peut être un champ de base de données, mais aussi un champ calculé.
+
+L'affichage des champs est générique mais peut être spécialisé par champ (voir la classe of\_display du framework \obm).
+
+
+\subsubsection{Gestion des modifications et ordre d'affichage}
+
+Les modifications des préférences d'affichage tiennent compte des valeurs par défaut.
+
+Si la modification spécique à l'utilisateur aboutit à la valeur par défaut de la préférence, l'entrée spécifique à l'utilisateur est supprimée.
+Sinon, si l'entrée de l'utilisateur n'existe pas, elle est créée sinon modifiée.\\
+
+Dans le cas de l'ordre d'affichage, la modification implique nécessairement 2 champs; le champ modifié directement et le champ déplacé par rebond.
+Pour ces  2 champs, si la modification aboutit à la valeur par défaut, l'entrée spécifique à l'utilisateur est supprimée.
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function get_display_pref($u_id, $entity, $all=0) {
+\end{verbatim}
+\end{minipage}
+}
+
+Récupération des préférences d'affichage de l'utilisateur \$u\_id pour l'entité \$entity. Si \$all vaut 0, les préférences sont limitées aux champs visibles, sinon tous les champs sont retournés (par exemple pour afficher l'écran de personnalisation de l'affichage).\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
+\end{verbatim}
+\end{minipage}
+}
+Mises à jour d'une préférence d'affichage (champ \$fieldname) de l'utilisateur connecté pour l'entité \$entity.
+
+\subsubsection{Implémentation : fonctions utilitaires internes}
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function get_one_display_pref($u_id, $entity, $field) {
+\end{verbatim}
+\end{minipage}
+}
+Récupération d'une préférence d'affichage d'après le nom du champ.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+run_query_display_pref_update($u_id, $entity, $fieldname, $status, $order="") {
+\end{verbatim}
+\end{minipage}
+}
+Mise à jour en base de données d'une préférence d'affichage.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $order) {
+\end{verbatim}
+\end{minipage}
+}
+Insertion en base de données d'une préférence d'affichage.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_level) {
+\end{verbatim}
+\end{minipage}
+}
+Gestion de la modification de l'ordre d'un champ (2 champs impactés) avec gestion de l'effacement ou mise à jour en base.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+function reset_preferences_to_default($user_id="") {
+\end{verbatim}
+\end{minipage}
+}
+Re-initialisation des préférences aux valeurs par défaut pour un utilisateur (ou pour tous les utilisateurs si \$user\_id est vide).
+Cette fonction réinitialise aussi les préférences de l'utilisateur.
+
+
+\subsubsection{Exemple d'utilisation}
+
+Gestion des préférences d'affichage du module \company.\\
+
+\shadowbox{
+\begin{minipage}{15cm}
+\begin{verbatim}
+}  elseif ($action == "display") {
+///////////////////////////////////////////////////////////////////////////////
+  $prefs = get_display_pref($uid, "company", 1);
+  $display["detail"] = dis_company_display_pref($prefs);
+
+} else if ($action == "dispref_display") {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($uid, "company", 1);
+  $display["detail"] = dis_company_display_pref($prefs);
+
+} else if ($action == "dispref_level") {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($uid, "company", 1);
+  $display["detail"] = dis_company_display_pref($prefs);
+\end{verbatim}
+\end{minipage}
+}
