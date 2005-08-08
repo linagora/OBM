@@ -538,7 +538,6 @@ CREATE TABLE ContactList (
   contactlist_contact_id  int(8) DEFAULT 0 NOT NULL
 );
 
-
 -------------------------------------------------------------------------------
 -- Calendar module tables
 -------------------------------------------------------------------------------
@@ -553,6 +552,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_usercreate       int(8) default NULL,
   calendarevent_owner	         int(8) default NULL, 
   calendarevent_title            varchar(255) default NULL,
+  calendarevent_location         varchar(100) default NULL,
   calendarevent_description      text,
   calendarevent_category_id      int(8) default NULL,
   calendarevent_priority         int(2) default NULL,
@@ -567,22 +567,21 @@ CREATE TABLE CalendarEvent (
   PRIMARY KEY (calendarevent_id)
 );
 
-
 --
--- Table structure for the table  'CalendarEvent'
+-- Table structure for the table  'EntityEvent'
 --
-CREATE TABLE CalendarUser (
-  calendaruser_timeupdate   timestamp(14),
-  calendaruser_timecreate   timestamp(14),
-  calendaruser_userupdate   int(8) default NULL,
-  calendaruser_usercreate   int(8) default NULL,
-  calendaruser_user_id      int(8) NOT NULL default 0,
-  calendaruser_event_id     int(8) NOT NULL default 0,
-  calendaruser_state        char(1) NOT NULL default 0,
-  calendaruser_required     int(1) NOT NULL default 0,
-  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
+CREATE TABLE EventEntity (
+  evententity_timeupdate   timestamp(14),
+  evententity_timecreate   timestamp(14),
+  evententity_userupdate   int(8) default NULL,
+  evententity_usercreate   int(8) default NULL,
+  evententity_event_id     int(8) NOT NULL default 0,
+  evententity_entity_id    int(8) NOT NULL default 0,
+  evententity_entity       varchar(32) NOT NULL default 0,
+  evententity_state        char(1) NOT NULL default 0,
+  evententity_required     int(1) NOT NULL default 0,
+  PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
 );
-
 
 --
 -- Table structure for table 'CalendarException'

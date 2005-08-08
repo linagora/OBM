@@ -149,6 +149,47 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 -- Add column location
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_location varchar(100);
 
+-------------------------------------------------------------------------------
+-- Create EventEntity table (support for entity Calendar)
+-------------------------------------------------------------------------------
+-- Create table EventEntity
+CREATE TABLE EventEntity (
+  evententity_timeupdate   timestamp,
+  evententity_timecreate   timestamp,
+  evententity_userupdate   integer default NULL,
+  evententity_usercreate   integer default NULL,
+  evententity_event_id     integer NOT NULL default 0,
+  evententity_entity_id    integer NOT NULL default 0,
+  evententity_entity       varchar(32) NOT NULL default '',
+  evententity_state        char(1) NOT NULL default '',
+  evententity_required     integer NOT NULL default 0,
+  PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
+);
+
+INSERT INTO EventEntity (
+  evententity_timeupdate,
+  evententity_timecreate,
+  evententity_userupdate,
+  evententity_usercreate,
+  evententity_event_id,
+  evententity_entity_id,
+  evententity_entity,
+  evententity_state,
+  evententity_required
+)
+SELECT
+  calendaruser_timeupdate,
+  calendaruser_timecreate,
+  calendaruser_userupdate,
+  calendaruser_usercreate,
+  calendaruser_event_id,
+  calendaruser_user_id,
+  'user',
+  calendaruser_state,
+  calendaruser_required
+FROM CalendarUser;
+
+DROP TABLE CalendarUser;
 
 -------------------------------------------------------------------------------
 -- Update Document table

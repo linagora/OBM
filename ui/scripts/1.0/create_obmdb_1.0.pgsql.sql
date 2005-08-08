@@ -553,6 +553,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_usercreate   integer,
   calendarevent_owner        integer default NULL,    
   calendarevent_title        varchar(255) default NULL,
+  calendarevent_location     varchar(100) default NULL,
   calendarevent_description  text,
   calendarevent_category_id  integer,
   calendarevent_priority     integer,
@@ -567,22 +568,21 @@ CREATE TABLE CalendarEvent (
   PRIMARY KEY (calendarevent_id)
 );
 
-
 --
--- Table structure for the table  'CalendarUser'
+-- Table structure for the table  'EventEntity'
 --
-CREATE TABLE CalendarUser (
-  calendaruser_timeupdate   timestamp,
-  calendaruser_timecreate   timestamp,
-  calendaruser_userupdate   integer default NULL,
-  calendaruser_usercreate   integer default NULL,
-  calendaruser_user_id      integer NOT NULL default 0,
-  calendaruser_event_id     integer NOT NULL default 0,
-  calendaruser_state        char(1) NOT NULL default '',
-  calendaruser_required     integer NOT NULL default 0,
-  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
+CREATE TABLE EventEntity (
+  evententity_timeupdate   timestamp,
+  evententity_timecreate   timestamp,
+  evententity_userupdate   integer default NULL,
+  evententity_usercreate   integer default NULL,
+  evententity_event_id     integer NOT NULL default 0,
+  evententity_entity_id    integer NOT NULL default 0,
+  evententity_entity       varchar(32) NOT NULL default '',
+  evententity_state        char(1) NOT NULL default '',
+  evententity_required     integer NOT NULL default 0,
+  PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
 );
-
 
 --
 -- Table structure for the table  'CalendarException'
