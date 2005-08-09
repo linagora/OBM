@@ -137,12 +137,6 @@ INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Réunions',2);
 
 
 --
--- Default Document root
---
-INSERT INTO Document (document_title, document_name, document_kind, document_privacy, document_path) VALUES ('Root', 'Default', 0, 0, '/');
-
-
---
 -- Dumping data for table 'DocumentCategory1'
 --
 INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('Divers');

@@ -36,9 +36,9 @@ Table principale des informations d'un document.\\
 \hline
 \_usercreate & int 8 & Id du créateur & \\
 \hline
-\_title & varchar 255 & Titre du document & \\
+\_title & varchar 255 & Titre du document & Description\\
 \hline
-\_name & varchar 255 & Nom du document & \\
+\_name & varchar 255 & Nom du document & Nom du fichier\\
 \hline
 \_kind & int 8 & Type de document & (répertoire, fichier, lien)\\
 \hline
@@ -71,6 +71,7 @@ Table principale des informations d'un document.\\
 \$cdoc\_kind\_file & 1 & Fichier \\
 \hline
 \$cdoc\_kind\_link & 2 & Lien (http, https) \\
+\hline
 \end{tabular}
 
 
@@ -159,6 +160,105 @@ Lien monovalué.\\
 \_usercreate & int 8 & Id du créateur & \\
 \hline
 \_label & varchar 255 & Label de la catégorie & \\
+\hline
+\end{tabular}
+
+
+\subsection{Gestion du dépot de documents}
+
+\subsubsection{Principe}
+
+Les informations d'un document sont stockées en base de données.
+Les documents eux-même sont stockés sur disque.\\
+
+\obm gère de façon autonome le dépôt de documents; \obm gère automatiquement :
+\begin{itemize}
+\item L'arborescence physique des documents
+\item Le nommage et l'emplacement des documents sur disque
+\end{itemize}
+\vspace{0.3cm}
+
+Ceci permêt d'éviter :
+\begin{itemize}
+\item Les problèmes de sécurité d'accès aux fichiers du serveur 
+\item Les problèmes de nommage des documents (jeux de caractères, caractères spéciaux,...) sur disque
+\end{itemize}
+
+
+\subsubsection{Implémentation et gestion par défaut}
+
+La racine de l'arborescence des documents sur le serveur est spécifiée par le paramètre de configuration \variable{\$document\_path}.\\
+
+Par défaut \obm créé 9 répertoires nommés 1, 2, 3, 4, 5, 6, 7, 8 et 9 à la racine du dépôt de documents.
+
+\paragraph{Le chemin d'un document} est calculé en fonction de l'id du document. Le dernier chiffre de l'identifiant du document définit le répertoire de stockage du document.
+Ceci permet de répartir les documents dans plusieurs réperoires.
+
+\paragraph{Le nom d'un document} est égal à son id. Ceci évite tout problème de nommage des fichiers.
+
+\paragraph{Exemples} :
+\begin{tabular}{|l|c|l|}
+ \hline
+ \textbf{Id Document} & \textbf{Chemin relatif} & \textbf{nom physique} \\
+ \hline
+  123 & 3 & \$document\_path/3/123 \\ 
+ \hline
+  4 & 4 & \$document\_path/4/4 \\ 
+ \hline
+  12156 & 6 & \$document\_path/6/12156 \\ 
+ \hline
+\end{tabular}
+
+
+\subsubsection{Modification du stockage des documents}
+
+\obm permet une modification simple de la gestion du dépôt des documents. Une fonction dédiée est utilisée pour calculer le chemin d'un fichier en fonction de son Id. Cette fonction est aisément modifiable.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function get_document_disk_path($id) {
+\end{verbatim}
+\end{minipage}
+}
+Fonction de calcul du chemin physique réel d'un document sur disque.\\
+
+Il est par exemple possible de définir 99 répertoires initiaux (à la place des 9) pour mieux supporter de gros volumes de documents.
+
+
+\subsubsection{Gestion des liens}
+
+Les liens sont stockés uniquement en base de données sans stockage physique sur disque.
+
+
+\subsection{Gestion des types MIME}
+
+A la création ou modification d'un document, le type MIME peut être sélectionné ou laissé par défaut.
+Si le type MIME est laissé par défaut, \obm essaie de déterminer automatiquement le type MIME associé au fichier.
+
+Ceci s'effectue en fonction de l'extention du fichier par exemple.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function get_auto_mime_type($document) {
+\end{verbatim}
+\end{minipage}
+}
+Fonction de détermination automatique du type MIME d'un document.\\
+
+Si aucun type MIME n'est déterminé (en fonction des types MIME enregistrés en base), le type MIME par défaut est sélectionné selon le paramètre de configuration \variable{\$default\_mime}.
+
+
+\subsection{Paramètres de configuration du module \doc}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Paramètre} & \textbf{par défaut} & \textbf{Description}\\
+\hline
+\$document\_path & /var/www/obmdocuments & Racine du dépôt de document sur disque \\
+\hline
+\$default\_mime & application/octet-stream & Type MIME par défaut d'un fichier quand non déterminé \\
 \hline
 \end{tabular}
 

@@ -101,8 +101,8 @@ $l_invalid_link_file = "No puede crear un alias sobre un vínculo";
 $l_invalid_url = "URL Incorrecto";
 $l_noupdate_file = "NO actualice archivo";
 $l_update_file = "Actualizar archivo";
-$l_already_exist_error = "Este archivo ya existe";
-$l_creation_error = "Error en la creación de Archivo";
+$l_create_file_error = "Error en la creación de Archivo";
+$l_delete_file_error = "Error en la eliminación de Archivo";
 
 $l_have_link = "Este documento esta vinculado a otros elementos en OBM";
 $l_have_no_link = "Este documento NO esta vinculado y puede ser borrado";

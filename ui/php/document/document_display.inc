@@ -291,7 +291,7 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
   global $display, $path, $document_path, $default_path, $set_theme;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
-  global $l_author, $l_category1, $l_category2, $l_path, $l_kind; 
+  global $l_name, $l_author, $l_category1, $l_category2, $l_path, $l_kind; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $popup_width, $popup_height;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
@@ -300,15 +300,16 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
   if ($action == "detailupdate") {
     $id = $doc_q->f("document_id");
     $title = $doc_q->f("document_title");
+    $name = $doc_q->f("document_name");
+    $kind = $doc_q->f("document_kind");
     $cat1 = $doc_q->f("document_category1_id");
     $cat2 = $doc_q->f("document_category2_id");
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype_id");
-    if (islink($doc_q->f("document_name"))) {
-      $kind = $cdoc_kind_link;
+    if ($kind == $cdoc_kind_link) {
       $fi_path = $doc_q->f("document_path");
-      $url_parse = parse_url($doc_q->f("document_name"));
+      $url_parse = parse_url($name);
       $proto = $url_parse["scheme"];
       $url = $url_parse["host"].$url_parse["path"];
       if (strrpos($fi_path,'/') != strlen($fi_path) -1)  {
@@ -321,9 +322,13 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
     $update_file = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">
-       <input checked=\"checked\" onclick=\"basic_hide('file_update')\" type=\"radio\" name=\"rd_file_update\" value=\"no\"/>$l_noupdate_file
-       <input onclick=\"basic_show('file_update')\" type=\"radio\" name=\"rd_file_update\" value=\"yes\"/>$l_update_file
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailForm\">$name</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\" colspan=\"2\">
+       <input checked=\"checked\" onclick=\"basic_hide('file_update')\" type=\"radio\" name=\"rd_file_update\" id=\"no\" value=\"no\"/><label for=\"no\">$l_noupdate_file</label>
+       <input onclick=\"basic_show('file_update')\" type=\"radio\" name=\"rd_file_update\" id=\"yes\" value=\"yes\"/><label for=\"yes\">$l_update_file</label>
       </td>
     </tr>
     </table>
@@ -333,6 +338,7 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
+  if (isset($document["name"])) { $title = stripslashes($document["name"]); }
   if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked=\"checked\"" : ""); }
   if (isset($document["category1"])) { $cat1 = $document["category1"]; }
   if (isset($document["category2"])) { $cat2 = $document["category2"]; }
@@ -430,8 +436,9 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
   }
 
   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" id=\"https\" value=\"$cdoc_kind_link\" $checked/><label for=\"https\">$l_links</label>";
- 
-  $display["title"] = "<div class=\"title\">$l_document : $title</div>";
+
+  $dname =  ($name != "") ? "($name)" : ""; 
+  $display["title"] = "<div class=\"title\">$l_document : $title $dname</div>";
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 
@@ -464,6 +471,7 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
 
     <div class=\"detailHead\">$l_file</div>
     $update_file
+
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_mimetype</td>
@@ -491,7 +499,8 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
       <td class=\"detailForm\"><input type=\"text\" disabled=\"true\" name=\"preurl\" value=\"$tp\" size=\"5\" /><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
    </table>
-   $update_file_end
+   </div>
+   $update_file_ende
    <div class=\"detailButton\">
     <p class=\"detailButtons\">
     <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\">
@@ -519,8 +528,9 @@ function html_repository_form($action, $document) {
   global $set_theme,$l_document;
   global $l_path, $l_name,$path,$ico_browse;
   global $l_repository,$l_add_repos;
-  $name = $document["repository_name"];
-  $re_path = $document["repository_path"];
+
+  $name = $document["name"];
+  $re_path = $document["path"];
   $dis_button = "
   <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_repository\" />
   <input type=\"submit\" value=\"$l_add_repos\" />
@@ -537,11 +547,11 @@ function html_repository_form($action, $document) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_repository_name\" name=\"tf_repository_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_path</td>
       <td class=\"detailForm\">
-     <input type=\"text\" id=\"tf_repository_path\" name=\"tf_repository_path\" value=\"$re_path\" size=\"50\"/>
+     <input type=\"text\" id=\"tf_path\" name=\"tf_path\" value=\"$re_path\" size=\"50\"/>
        <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a>
       </td>
     </tr>
@@ -708,9 +718,28 @@ function dis_check_links($p_id) {
 function dis_check_repository_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_rep_have_link,$l_rep_have_no_link;
-  global $path, $display;
+  global $path, $display, $cdg_sql, $default_path;
 
   $delete_ok = true;
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT * FROM Document WHERE document_id = '$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $kind = $obm_q->f("document_kind");
+  $path = $obm_q->f("document_path");
+
+  if ($kind != $cdoc_kind_dir) {
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $delete_ok = false;
+    return;
+  }
+
+  if (($path == "/") || ($path == $default_path)) {
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    return;
+  }
 
   // Links from Contact
   $obm_q = run_query_repository_links($p_id);
@@ -1591,26 +1620,30 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
 // Consult File
 ///////////////////////////////////////////////////////////////////////////////
 function dis_file($doc_q) {
-  global $document_path;
-
-  $id = $doc_q->f("document_id");
-  $disk_path = get_document_disk_path($id);
-  $disk_fullname = $disk_path . $id; 
+  global $cdoc_kind_link;
 
   $name = $doc_q->f("document_name");  
-  $mime = $doc_q->f("documentmimetype_mime");  
-  //    $mime = run_query_get_mimetype($name);
+  $kind = $doc_q->f("document_kind");
 
-  if (islink($name)) {
-    $link = getlink($name,$path);
-    header("location: $link");
+  // If document is a link we transfer to the link
+  if ($kind == $cdoc_kind_link) {
+    header("location: $name");
     exit;
+
+  } else {
+
+    $id = $doc_q->f("document_id");
+    $mime = $doc_q->f("documentmimetype_mime");  
+    $disk_path = get_document_disk_path($id);
+    $disk_fullname = $disk_path . $id; 
+
+    // Else Document is a file, we send the file
+    $handle = fopen ($disk_fullname, "r");
+    header("Content-Type: $mime");
+    header("Content-Disposition: inline; filename=$name");
+    echo fread($handle, filesize ($disk_fullname));
+    fclose ($handle); 
+  
   }
 
-  $handle = fopen ($disk_fullname, "r");
-  header("Content-Type: $mime");
-  header("Content-Disposition: inline; filename=$name");
-  echo fread($handle, filesize ($disk_fullname));
-  fclose ($handle); 
-  
 }

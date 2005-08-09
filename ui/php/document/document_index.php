@@ -11,13 +11,11 @@
 // - search             -- search fields  -- show the result set of search
 ///////////////////////////////////////////////////////////////////////////////
 
+// run_query_repository_links (document_type ??)
 // gestion des repertoires
 // vues
-// reagir a erreur d'insertion du fichier (suppression de la bd ?)
-// check_data et verif path (a supprimer ?)
-// Traitement des liens
-// Doc: calcul de diskpath auto, gestion du mime auto, kind: lien
-// name, titre
+// outil d'admin
+// migration ???
 
 $path = "..";
 $module = "document";
@@ -41,16 +39,13 @@ if (! check_privacy($module, "Document", $action, $document["id"], $uid)) {
   update_last_visit("document", $document["id"], $action);
 }
 page_close();
-if(isset($document_path)) {
-  $document_path = realpath($document_path);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
   require("document_js.inc");
-  $display["detail"] = html_documents_tree($document,$ext_disp_file);
+  $display["detail"] = html_documents_tree($document, $ext_disp_file);
 } elseif ($action == "accessfile") {
   if ($document["id"] > 0) {
     $doc_q = run_query_detail($document);
@@ -103,7 +98,7 @@ if ($action == "ext_get_path") {
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($document["id"] > 0 || $name_document != "") {
+  if ($document["id"] > 0) {
     $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($doc_q);
@@ -354,24 +349,22 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_document() {
   global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_repository_path;
-  global $tf_cat1,$tf_cat2,$tf_extension,$tf_mimetype,$tf_repository_name;
+  global $tf_cat1, $tf_cat2, $tf_extension, $tf_mimetype, $tf_name;
   global $fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
   global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url;
-  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target,$name_document;
+  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
   global $param_document, $popup, $param_entity, $entity,$rd_file_update; 
 
   if (isset ($param_document)) $document["id"] = $param_document;
-  if (isset ($name_document)) $document["name"] = $name_document;
   if (isset ($param_entity)) $document["entity_id"] = $param_entity;
   if (isset ($entity)) $document["entity"] = $entity;
   if (isset($rd_file_update)) $document["file_update"] = $rd_file_update;
   if (isset ($tf_url)) $document["url"] = $tf_url;
-  if (isset ($tf_repository_name)) $document["repository_name"] = $tf_repository_name;
-  if (isset ($tf_repository_path)) $document["repository_path"] = $tf_repository_path;
   
   if (isset ($tf_title)) $document["title"] = $tf_title;
+  if (isset ($tf_name)) $document["name"] = $tf_name; // repository
   if (isset ($tf_author)) $document["author"] = $tf_author;
-  if (isset ($tf_path)) $document["path"] = $tf_path;
+  if (isset ($tf_path)) $document["path"] = format_path(trim($tf_path));
   if (isset ($tf_filename)) $document["filename"] = $tf_filename;
 
   if (isset ($rd_kind)) $document["kind"] = $rd_kind;

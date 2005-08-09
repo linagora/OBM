@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : document_js.inc                                              //
 //     - Desc : Document javascript functions File                           //
-// 2003-08-22 Rande Mehdi                                               //
+// 2003-08-22 Aliacom - Rande Mehdi                                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,18 +29,12 @@ function check_document(form) {
     return false;
   }
 
-  // Check the path
-  if (trim(form.tf_path.value) == \"\") {
-    alert (\"$l_fill_path\");
-    return false;
-  }
-
   return true;
 }
 
 function check_repository(form) {
   // MANDATORY : Check that the Document title is not empty
-  if (trim(form.tf_repository_name.value) == \"\") {
+  if (trim(form.tf_name.value) == \"\") {
     alert (\"$l_fill_repository_name\");
     return false;
   }
@@ -168,25 +162,22 @@ W3C = (document.getElementById) ? 1 : 0;
 function show_hide_repo(name)
 {
   if (W3C) {
-    if(document.getElementById(name).style.display != \"none\") {
+    if (document.getElementById(name).style.display != \"none\") {
       hide(name);
-     }
-     else{
+     } else {
         show(name);
      }
   } else if (NS4) {
-    if(document.layers[name].display != \"none\") {
+    if (document.layers[name].display != \"none\") {
       hide(name);
-    }
-    else{
+    } else {
       show(name);
      }
 
   } else {
-    if(document.all[name].style.display != \"none\") {
+    if (document.all[name].style.display != \"none\") {
        hide(name);
-    }
-    else{
+    } else {
       show(name);
     }
   

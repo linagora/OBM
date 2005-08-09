@@ -120,11 +120,6 @@ function run_query_detail($document) {
   global $cdg_sql;
 
   $p_id = $document["id"];
-  $name = $document["name"];
-  $path = $document["path"];
-  if (islink($name)) {
-    $name = getlink($name,$path);
-  }
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -160,7 +155,7 @@ function run_query_detail($document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert(&$document) {
   global $auth, $cdg_sql, $c_auto, $document_path;
-  global $err_msg, $l_already_exist_error, $l_creation_error;
+  global $err_msg, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = $auth->auth["uid"];
@@ -179,15 +174,16 @@ function run_query_insert(&$document) {
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
   $entity = $document["entity"];
   $entity_id = $document["entity_id"];
-  $path = format_path($path);
 
   if ($size == "") $size = 0;
   
+  // If Mime type set to Auto, try to determine it
   if ($mime == $c_auto) {
     $mime = get_auto_mime_type($document);
     $document["mime"] = $mime;
   }
 
+  // If document is a link, set the name as the url
   if ($kind == $cdoc_kind_link) {
     $name = $url;
     $document["name"] = $name;
@@ -238,7 +234,9 @@ function run_query_insert(&$document) {
     // We create the document on disk
     if ($kind == $cdoc_kind_file) {
       if (! run_query_create_file($document)){
-	$err_msg = $l_creation_error;
+	$err_msg = $l_create_file_error;
+	// If error, we delete The document infos to keep bd and rep on sync
+	run_query_delete($doc_id);
 	return false;
       }
     }
@@ -278,7 +276,6 @@ function run_query_document_id($document) {
   $author = $document["author"];
   $name = $document["name"];
   $path = $document["path"];
-  $path = format_path($path);
   $size = $document["size"];
 
   $query = "SELECT document_id
@@ -314,8 +311,8 @@ function run_query_document_id($document) {
 //   - $document[] : Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($did, &$document) {
-  global $auth, $cdg_sql,$document_path,$c_auto;
-  global $l_creation_error, $err_msg;
+  global $auth, $cdg_sql, $c_auto;
+  global $err_msg, $l_delete_file_error, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = $auth->auth["uid"];
@@ -334,7 +331,6 @@ function run_query_update($did, &$document) {
   $url = $document["url"];
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
   $file_update = $document["file_update"];
-  $path = format_path($path);
 
   if ($size == "") { $size = 0; }
   
@@ -375,11 +371,11 @@ function run_query_update($did, &$document) {
   if (($kind == $cdoc_kind_file) && ($file_update == "yes")) {
 
     if (! run_query_delete_file($id)) { 
-      $err_msg = $l_creation_error;
+      $err_msg = $l_delete_file_error;
       return false;
     }
     if (! run_query_create_file($document)) {
-      $err_msg = $l_creation_error;
+      $err_msg = $l_create_file_error;
       return false;
     }
   }
@@ -457,7 +453,6 @@ function get_document_disk_path($id) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_create_file($document) {
-  global $document_path;
 
   $id = $document["id"];
   $file = $document["file"];
@@ -514,10 +509,8 @@ function get_auto_mime_type($document) {
   // If doc is a link
   if ($kind == $cdoc_kind_link) {
 
-    echo "<br>na=$name";
     // If name ended by / we assume mime type is html
     if (strrpos($name,'/') == (strlen($name) -1)) {
-      echo "<br>2222222na=$name";
       $html_mime = run_query_get_type_by_ext("html");
       if ($html_mime) {
 	return $html_mime;
@@ -601,12 +594,16 @@ function run_query_get_type_by_ext($ext) {
 //   - $type : Mime-Type
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_links($document_id) {
+  global $cdg_sql;
 
-  $obm_q = new DB_OBM;
   $query = "SELECT *
     FROM DocumentEntity
     WHERE documententity_document_id = '$document_id'";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
+
   return $obm_q->nf();
 }
 
@@ -617,23 +614,16 @@ function run_query_document_links($document_id) {
 //   - $document_id : Id of the Document
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_repository_links($document_id) {
-  global $cdg_sql, $default_path;
+  global $cdg_sql, $cdoc_kind_dir;
 
-  $obm_q = new DB_OBM;
-  $query = "SELECT * FROM Document WHERE document_id = '$document_id'";
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $doc_type = $obm_q->f("document_type");
-  $path = addslashes($obm_q->f("document_path").$obm_q->f("document_name"));
-  
-  if ($path == $default_path || $doc_type == 1) {
-    return 1;
-  }
   $query = "SELECT count(document_id) as nb
     FROM Document 
     WHERE document_path LIKE '$path%'";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
-  $obm_q->next_record();  
+  $obm_q->next_record();
 
   return $obm_q->f("nb");
 }
@@ -691,6 +681,46 @@ function run_query_documentmime() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if a path exists in DB (a directory)
+// Parameters:
+//   - $dpath : path to check
+// Returns:
+//   true if a directory for that path exists, else false
+///////////////////////////////////////////////////////////////////////////////
+function path_exists($dpath) {
+  global $cdg_sql, $cdoc_kind_dir;
+
+  // Root is a valid path
+  if ($dpath == "/") {
+    return true;
+  }
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $ctt[] = array("type" => "field", "value" => "document_path");
+  $ctt[] = array("type" => "field", "value" => "document_name");
+  $ctt[] = array("type" => "string", "value" => "/");
+  $concat = sql_string_concat($db_type, $ctt);
+
+  $query = "SELECT count(document_id) as nb
+    FROM Document
+    WHERE document_kind = '$cdoc_kind_dir'
+      AND $concat = '$dpath';"; 
+
+  display_debug_msg($query, $cdg_sql, "path_exists");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f("nb");
+
+  if ($nb > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Document Form Data checking and formatting
 // Parameters:
 //   - $cid   : document id
@@ -701,9 +731,9 @@ function run_query_documentmime() {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($cid, $document) {
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
-  global $l_fill_title, $l_fill_author, $l_fill_path, $l_invalid_repository_path;
-  global $l_invalid_file,$l_invalid_existing_file,$l_invalid_url;
-  global $err_msg,$document_path,$l_invalid_link_file;
+  global $l_fill_title, $l_fill_author, $l_fill_path;
+  global $l_invalid_file, $l_invalid_existing_file, $l_invalid_url;
+  global $err_msg, $l_invalid_link_file, $l_invalid_repository_path;
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -715,33 +745,6 @@ function check_data_form($cid, $document) {
   $kind = $document["kind"];
   $url = $document["url"];
   $file_update = $document["file_update"];
-  
-  if (strpos($path,'/') === 0) {
-    $final_path = $document_path.$path;
-  } else {
-    $final_path = $document_path.'/'.$path;
-  }
-
-  if (($kind == $cdoc_kind_file) && !is_dir($final_path) && $file_update != "no") {
-    $err_msg = "$l_invalid_repository_path ($final_path)";
-    return false;
-  }
-  
-  $realpath = realpath($final_path);
-  if (substr($realpath,0,strlen($document_path)) != $document_path) {
-    $err_msg = $l_invalid_repository_path;
-    return false;
-  }
-
-  if (($kind == $cdoc_kind_file) && $file_update != "no" && ($name == "" || $size == "")) {
-    $err_msg = $l_invalid_file;
-    return false;
-  }
-  
-  if (($kind == $cdoc_kind_link) && ($url == "") && ($file_update != "no")) {
-    $err_msg = $l_invalid_url;
-    return false;
-  } 
 
   // MANDATORY: Document Title 
   if (trim($title) == "") {
@@ -754,6 +757,25 @@ function check_data_form($cid, $document) {
     $err_msg = $l_fill_author;
     return false;
   }
+
+  // If doc is a file, check that name and size are not empty
+  if (($kind == $cdoc_kind_file) && $file_update != "no" && ($name == "" || $size == "")) {
+    $err_msg = $l_invalid_file;
+    return false;
+  }
+  
+  // If doc is a file, check the path exists
+  if ( ($kind == $cdoc_kind_file) && $file_update != "no"
+       && (! path_exists($path)) ) {
+    $err_msg = "$l_invalid_repository_path ($path)";
+    return false;
+  }
+
+  // If document is a link, check that the url is filled
+  if (($kind == $cdoc_kind_link) && ($url == "") && ($file_update != "no")) {
+    $err_msg = $l_invalid_url;
+    return false;
+  } 
 
   return true; 
 }
@@ -1130,9 +1152,8 @@ function run_query_insert_repository($document) {
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
 
-  $path = $document["repository_path"];
-  $name = $document["repository_name"];
-  $path = format_path($path);
+  $path = $document["path"];
+  $name = $document["name"];
 
   $query = "INSERT INTO Document (
     document_timeupdate,
@@ -1161,7 +1182,7 @@ function run_query_insert_repository($document) {
     '0',
     '0',
     '0',
-    '',
+    '0',
     '0'
     )";
 
@@ -1182,53 +1203,24 @@ function run_query_insert_repository($document) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_repository_data_form($document) {
-  global $document_path,$err_msg;
-  global $l_invalid_repository_path,$l_fill_repository_name;
+  global $err_msg, $l_invalid_repository_path, $l_fill_repository_name;
 
-  $name = $document["repository_name"];
-  $path = $document["repository_path"];
+  $name = $document["name"];
+  $path = $document["path"];
+
   // MANDATORY: Document Title 
   if (trim($name) == "") {
     $err_msg = $l_fill_repository_name;
     return false;
   }
-  $final_path = $document_path.$path;
-  $realpath = realpath($final_path);
-  if (substr($realpath,0,strlen($document_path)) != $document_path) {
-    $err_msg = $l_invalid_repository_path;
-    return false;
-  }
 
-
-  // MANDATORY: Document Title 
-  if (!@opendir($final_path)) {
-    $err_msg = $l_invalid_repository_path;
+  // If doc is a file, check the path exists
+  if (! path_exists($path)) {
+    $err_msg = "$l_invalid_repository_path ($path)";
     return false;
   }
 
   return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Tell if the file is a link or not.
-// return true if it is false else
-///////////////////////////////////////////////////////////////////////////////
-function islink($filename) {
-
-  if(substr_count($filename,'/')>0) {
-    return true;
-  }
-  return false;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Tell if the file is a link or not.
-// return true if it is false else
-///////////////////////////////////////////////////////////////////////////////
-function getlink($name,$path) {
-  return $name;
 }
 
 
