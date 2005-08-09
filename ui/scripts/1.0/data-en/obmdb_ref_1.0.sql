@@ -171,7 +171,7 @@ VALUES ('PNG Image','png','image/png');
 INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES ('Gif Image','gif','image/gif');
 INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES ('JPG Image','JPG','image/jpg');
+VALUES ('JPG Image','jpg','image/jpg');
 INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES ('PDF File','pdf','application/pdf');
 INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 

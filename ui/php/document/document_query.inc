@@ -153,53 +153,14 @@ function run_query_detail($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Detail query execution                                                    //
-// Parameters :
-//   - $p_id  : document id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail_by_path($path,$name) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $timecreate = sql_date_format($db_type, "document_timecreate", "timecreate");
-  $timeupdate = sql_date_format($db_type, "document_timeupdate", "timeupdate");
-
-  $query = "SELECT *,
-      $timeupdate,
-      $timecreate,
-      c.userobm_login as usercreate,
-      u.userobm_login as userupdate
-    FROM Document
-      LEFT JOIN DocumentCategory1 on document_category1_id=documentcategory1_id
-      LEFT JOIN DocumentCategory2 on document_category2_id=documentcategory2_id
-      LEFT JOIN DocumentMimeType on document_mimetype_id = documentmimetype_id
-      LEFT JOIN UserObm as c on document_usercreate=c.userobm_id
-      LEFT JOIN UserObm as u on document_userupdate=u.userobm_id
-    WHERE document_name='$name'
-      AND (document_path='$path' OR document_path='$path/'
-           OR document_path='/$path' OR document_path='/$path/')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  if ($obm_q->nf()>0) {
-    $obm_q->next_record();
-    return $obm_q;
-  }
-
-  return false;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Insertion query execution
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert(&$document) {
-  global $auth, $cdg_sql,$c_auto,$document_path,$err_msg;
-  global $l_already_exist_error,$l_creation_error;
+  global $auth, $cdg_sql, $c_auto, $document_path;
+  global $err_msg, $l_already_exist_error, $l_creation_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = $auth->auth["uid"];
@@ -215,6 +176,7 @@ function run_query_insert(&$document) {
   $size = $document["size"];
   $kind = $document["kind"];
   $url = $document["url"];
+  $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
   $entity = $document["entity"];
   $entity_id = $document["entity_id"];
   $path = format_path($path);
@@ -222,22 +184,13 @@ function run_query_insert(&$document) {
   if ($size == "") $size = 0;
   
   if ($mime == $c_auto) {
-    $mime = run_query_get_mime($document);
+    $mime = get_auto_mime_type($document);
     $document["mime"] = $mime;
   }
 
-  $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
-
-  if ($kind == "link") {
+  if ($kind == $cdoc_kind_link) {
     $name = $url;
     $document["name"] = $name;
-    $file_kind = $cdoc_kind_link;
-  } elseif (file_exists($dest_doc)) {
-    $err_msg = $l_already_exist_error;
-    return false;
-  }
-  if ($kind == "new_file") {
-    $file_kind = $cdoc_kind_file;
   }
 
   $query = "INSERT INTO Document (
@@ -264,7 +217,7 @@ function run_query_insert(&$document) {
     '$author',
     '$name',
     '$path',
-    '$file_kind',
+    '$kind',
     '$size',
     '$cat1',
     '$cat2',
@@ -283,7 +236,7 @@ function run_query_insert(&$document) {
   if ($doc_id > 0) {
 
     // We create the document on disk
-    if ($kind == "new_file") {
+    if ($kind == $cdoc_kind_file) {
       if (! run_query_create_file($document)){
 	$err_msg = $l_creation_error;
 	return false;
@@ -355,6 +308,112 @@ function run_query_document_id($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Update query execution
+// Parameters:
+//   - $did        : document id
+//   - $document[] : Entry's values
+///////////////////////////////////////////////////////////////////////////////
+function run_query_update($did, &$document) {
+  global $auth, $cdg_sql,$document_path,$c_auto;
+  global $l_creation_error, $err_msg;
+  global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
+
+  $uid = $auth->auth["uid"];
+  $now = date("Y-m-d H:i:s");
+
+  $id = $document["id"];
+  $title = $document["title"];
+  $cat1 = $document["category1"];
+  $cat2 = $document["category2"];
+  $author = $document["author"];
+  $mime = $document["mime"];
+  $path = $document["path"];
+  $size = $document["size"];
+  $name = $document["name"];
+  $kind = $document["kind"];
+  $url = $document["url"];
+  $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
+  $file_update = $document["file_update"];
+  $path = format_path($path);
+
+  if ($size == "") { $size = 0; }
+  
+  if (($mime == $c_auto) && ($file_update == "yes")) {
+    $mime = get_auto_mime_type($document);
+    $document["mime"] = $mime;
+  }
+
+  if ($kind == $cdoc_kind_link) {
+    $name = $url;
+    $document["name"] = $name;
+  }
+
+  if ($file_update == "yes") {
+    $query_file = ",
+    document_path='$path',
+    document_size='$size',
+    document_name='$name',
+    document_mimetype_id='$mime'";
+  }
+  
+  $query = "UPDATE Document SET
+    document_timeupdate='$now',
+    document_userupdate='$uid',
+    document_title='$title',
+    document_kind='$kind',
+    document_author='$author',
+    document_category1_id='$cat1',
+    document_category2_id='$cat2',
+    document_privacy='$privacy'
+    $query_file
+  WHERE document_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  if (($kind == $cdoc_kind_file) && ($file_update == "yes")) {
+
+    if (! run_query_delete_file($id)) { 
+      $err_msg = $l_creation_error;
+      return false;
+    }
+    if (! run_query_create_file($document)) {
+      $err_msg = $l_creation_error;
+      return false;
+    }
+  }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Deletion query execution
+// Parameters:
+//   - $p_id : document id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete($p_id) {
+  global $cdg_sql;
+
+  // Delete all links to documents
+  run_query_delete_document_links("", "", $p_id);
+
+  // Delete the file
+  run_query_delete_file($p_id);
+
+  // Delete the database entry
+  $query = "DELETE FROM Document WHERE document_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Add the final slash if necessary.
 // Parameters:
 //   - $p_path : path parameter
@@ -372,33 +431,13 @@ function format_path($p_path) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the final path from the path parameter entered
-// Parameters:
-//   - $p_path : path parameter
-///////////////////////////////////////////////////////////////////////////////
-function get_final_path($path) {
-  global $document_path;
-
-  // Ensure a / separate the document_path from the path
-  if (strpos($path,'/') === 0) {
-    $final_path = $document_path.$path;
-  } else {
-    $final_path = $document_path.'/'.$path;
-  }
-
-  return $final_path; 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Calculate the real disk document path
 // Parameters:
 //   - $id   : document id
-//   - $size : document size
 // Returns:
 //   real disk path
 ///////////////////////////////////////////////////////////////////////////////
-function get_document_disk_path($id, $size) {
+function get_document_disk_path($id) {
   global $document_path;
 
   // The document disk path set in the subdirectory named "last id number"
@@ -421,13 +460,11 @@ function run_query_create_file($document) {
   global $document_path;
 
   $id = $document["id"];
-  $size = $document["size"];
   $file = $document["file"];
 
-  $disk_path = get_document_disk_path($id, $size);
+  $disk_path = get_document_disk_path($id);
   $disk_fullname = $disk_path . $id; 
 
-  echo "<p>dp=$disk_path; df=$disk_fullname";
   // Ensure that the final path is a directory
   if (! is_dir($disk_path)) {
     return false;
@@ -446,239 +483,69 @@ function run_query_create_file($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update query execution
+// Delete File from Disk
 // Parameters:
-//   - $cid       : document id
-//   - $document[] : Entry's values
-//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email, com
+//   - $id : id of file to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($did, &$document) {
-  global $auth, $cdg_sql,$document_path,$c_auto;
-  global $l_already_exist_error, $l_creation_error, $err_msg;
+function run_query_delete_file($id) {
+
+  $disk_path = get_document_disk_path($id);
+  $disk_fullname = $disk_path . $id; 
+
+  @rmdir($disk_fullname);
+  @unlink($disk_fullname);
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the Mime Type of an uploaded file from file infos
+// Parameters:
+//   - $document[] : Entry's values
+///////////////////////////////////////////////////////////////////////////////
+function get_auto_mime_type($document) {
+  global $default_mime;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
-  $uid = $auth->auth["uid"];
-  $now = date("Y-m-d H:i:s");
-
-  $title = $document["title"];
-  $cat1 = $document["category1"];
-  $cat2 = $document["category2"];
-  $author = $document["author"];
-  $mime = $document["mime"];
-  $path = $document["path"];
-  $size = $document["size"];
   $name = $document["name"];
   $kind = $document["kind"];
-  $url = $document["url"];
-  $id = $document["id"];
-  $file_update = $document["file_update"];
-  $path = format_path($path);
-  $final_path = get_final_path($path);
-  $dest_doc = $final_path.$name;
 
-  $obm_q = run_query_detail($document);
-  $old_path = $document_path.$obm_q->f("document_path").$obm_q->f("document_name");
+  // If doc is a link
+  if ($kind == $cdoc_kind_link) {
 
-  if ($size == "") { $size = 0; }
+    echo "<br>na=$name";
+    // If name ended by / we assume mime type is html
+    if (strrpos($name,'/') == (strlen($name) -1)) {
+      echo "<br>2222222na=$name";
+      $html_mime = run_query_get_type_by_ext("html");
+      if ($html_mime) {
+	return $html_mime;
+      }
+
+      // If named not ended by / we try to resolve the mime from extension
+    } else {
+      $ext = strtolower(substr(strrchr($name,'.'), 1));
+      $guess_mime = run_query_get_type_by_ext($ext);
+      if ($guess_mime) {
+	return $guess_mime;
+      }
+    }
+ 
+  // If document is a file, try to get the mime type from its file extension
+  } elseif ($kind == $cdoc_kind_file) {
   
-  if ($mime == $c_auto && $file_update=="yes") {
-    $mime = run_query_get_mime($document);
-    $document["mime"] = $mime;
-  }
-
-  $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
-
-  if ($kind == "link") {
-    $name = $url;
-    $document["name"] = $name;
-    $file_kind = $cdoc_kind_link;
-  } elseif (file_exists($dest_doc) && $file_update=="yes" && realpath($dest_doc) != realpath($old_path)) {
-    $err_msg = $l_already_exist_error;
-    return false;
-  }
-  if ($kind == "new_file" && $file_update=="yes") {
-    $file_kind = $cdoc_kind_file;
-    if (!run_query_delete_file($obm_q->f("document_path"),$obm_q->f("document_name"))){ 
-      $err_msg = $l_creation_error;
-      return false;
-    }
-    if (!run_query_create_file($document)) {
-      $err_msg = $l_creation_error;
-      return false;
-    }
-  }
-  
-  $query = "update Document set
-    document_timeupdate='$now',
-    document_userupdate='$uid',
-    document_title='$title',
-    document_author='$author',
-    document_category1_id='$cat1',
-    document_category2_id='$cat2',
-    document_privacy='$privacy'";
-  if ($file_update=="yes") {
-    $query .= ",
-    document_path='$path',
-    document_size='$size',
-    document_name='$name',
-    document_mimetype_id='$mime'";
-  }
-  $query .= "
-  where document_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution
-// Parameters:
-//   - $p_id : document id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
-  global $cdg_sql;
-
-  $query = "select * from Document where document_id ='$p_id'";
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $path = addslashes($obm_q->f("document_path"));
-  $name = addslashes($obm_q->f("document_name"));
-
-  $query = "select count(*) as link from Document
-    where document_path = '$path'
-      and document_name ='$name'";
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  if ($obm_q->f("link") == 1) {
-    run_query_delete_file($path,$name);
-  }
-
-  // Delete all links to documents
-  run_query_delete_document_links("", "", $p_id);
-
-  $query = "delete from Document where document_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Mime Type of an uploaded file
-// Parameters:
-//   - $document[] : Entry's values
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_mime($document) {
-  global $default_mime;
-
-  $path = $document["path"];
-  $file = $document["name"];
-  $mime = $document["mime_file"];
-  $kind = $document["kind"];
-
-  if ($mime != "") {
-    $return = run_query_get_type_by_mime($mime);
-    if ($return) {
-      return $return;
-    }
-  }
-  if (strrpos($file,'/') == (strlen($file) -1) && $kind == "link") {
-    $return = run_query_get_type_by_ext("html");
-    if ($return) {
-      return $return;
-    }
-  }
-  
-  if ($kind == "file") {
-    $ext = substr($path,strrpos($path,'/'));
-    $ext = substr(strrchr($path,'.'),1);
-    $return = run_query_get_type_by_ext($ext);
-    if ($return) {
-      return $return;
-    }
-  } else {
-    $ext = substr($name,strrpos($name,'/'));
-    $ext = substr(strrchr($name,'.'),1);
-    $return = run_query_get_type_by_ext($ext);
-    if ($return) {
-      return $return;
+    $ext = strtolower(substr(strrchr($name,'.'), 1));
+    $guess_mime = run_query_get_type_by_ext($ext);
+    if ($guess_mime) {
+      return $guess_mime;
     }
   }
 
+  // If mime not guessed, return default mime
   $return = run_query_get_type_by_mime($default_mime);
+
   return $return ;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Mime Type of a disk file
-// Parameters:
-//   - $document[] : Entry's values
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_mimetype($path){
-  global $default_mime;
-
-  $ext = substr(strrchr($path,'.'),1);
-  $return = run_query_get_type_mime_by_ext($ext);
-  if ($return) {
-    return $return;
-  }
-  $return = run_query_get_type_mime_by_mime($default_mime);
-  return $return ;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Mime Type of a file
-// Parameters:
-//   - $type : Mime-Type
-///////////////////////////////////////////////////////////////////////////////
-function run_query_document_links($document_id) {
-
-  $obm_q = new DB_OBM;
-  $query = "select * from DocumentEntity where documententity_document_id =
-           '$document_id'";
-  $obm_q->query($query);
-  return $obm_q->nf();
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get if the document can be deleted
-// Parameters:
-//   - $document_id : Id of the Document
-///////////////////////////////////////////////////////////////////////////////
-function run_query_repository_links($document_id) {
-  global $cdg_sql, $default_path;
-
-  $obm_q = new DB_OBM;
-  $query = "select * from Document where document_id = '$document_id'";
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $doc_type = $obm_q->f("document_type");
-  $path = addslashes($obm_q->f("document_path").$obm_q->f("document_name"));
-  
-  if ($path == $default_path || $doc_type == 1) {
-    return 1;
-  }
-  $query = "select count(document_id) as nb from Document 
-  where document_path LIKE '$path%'";
-  $obm_q->query($query);
-  $obm_q->next_record();  
-
-  return $obm_q->f("nb");
 }
 
 
@@ -731,60 +598,44 @@ function run_query_get_type_by_ext($ext) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
-//   - $ext : Extension 
+//   - $type : Mime-Type
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_type_mime_by_ext($ext) {
-  global $cdg_sql;
+function run_query_document_links($document_id) {
 
-  $query = "SELECT *
-    FROM DocumentMimeType
-    WHERE documentmimetype_extension ='$ext'";
   $obm_q = new DB_OBM;
+  $query = "SELECT *
+    FROM DocumentEntity
+    WHERE documententity_document_id = '$document_id'";
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-  if ($obm_q->nf() > 0) {
-    $obm_q->next_record();
-    return $obm_q->f("documentmimetype_mime");
-  } else { 
-    return false;
-  }
+  return $obm_q->nf();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the Mime Type of a file
+// Get if the document can be deleted
 // Parameters:
-//   - $ext : Extension 
+//   - $document_id : Id of the Document
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_type_mime_by_mime($mime) {
-  global $cdg_sql;
+function run_query_repository_links($document_id) {
+  global $cdg_sql, $default_path;
 
-  $query = "SELECT *
-    FROM DocumentMimeType
-    WHERE documentmimetype_mime ='$mime'";
   $obm_q = new DB_OBM;
+  $query = "SELECT * FROM Document WHERE document_id = '$document_id'";
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-  if ($obm_q->nf() > 0) {
-    $obm_q->next_record();
-    return $obm_q->f("documentmimetype_mime");
-  } else {
-    return false;
+  $obm_q->next_record();
+  $doc_type = $obm_q->f("document_type");
+  $path = addslashes($obm_q->f("document_path").$obm_q->f("document_name"));
+  
+  if ($path == $default_path || $doc_type == 1) {
+    return 1;
   }
-}
+  $query = "SELECT count(document_id) as nb
+    FROM Document 
+    WHERE document_path LIKE '$path%'";
+  $obm_q->query($query);
+  $obm_q->next_record();  
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Delete File query execution
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_file($path,$name) {
-  global $document_path;
-
-  @rmdir($document_path.'/'.$path.'/'.$name);
-  @unlink($document_path.'/'.$path.'/'.$name);
-
-  return true;
+  return $obm_q->f("nb");
 }
 
 
@@ -796,7 +647,7 @@ function run_query_delete_file($path,$name) {
 function run_query_documentcategory1() {
   global $cdg_sql;
 
-  $query = "select * from DocumentCategory1 order by documentcategory1_label"; 
+  $query = "SELECT * FROM DocumentCategory1 ORDER BY documentcategory1_label"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -813,7 +664,7 @@ function run_query_documentcategory1() {
 function run_query_documentcategory2() {
   global $cdg_sql;
 
-  $query = "select * from DocumentCategory2 order by documentcategory2_label"; 
+  $query = "SELECT * FROM DocumentCategory2 ORDER BY documentcategory2_label"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -840,7 +691,7 @@ function run_query_documentmime() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Document Form Data checking and formatting                                //
+// Document Form Data checking and formatting
 // Parameters:
 //   - $cid   : document id
 //   - $document[] : values checked
@@ -849,6 +700,7 @@ function run_query_documentmime() {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($cid, $document) {
+  global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   global $l_fill_title, $l_fill_author, $l_fill_path, $l_invalid_repository_path;
   global $l_invalid_file,$l_invalid_existing_file,$l_invalid_url;
   global $err_msg,$document_path,$l_invalid_link_file;
@@ -870,7 +722,7 @@ function check_data_form($cid, $document) {
     $final_path = $document_path.'/'.$path;
   }
 
-  if ($kind == "new_file" && !is_dir($final_path) && $file_update != "no") {
+  if (($kind == $cdoc_kind_file) && !is_dir($final_path) && $file_update != "no") {
     $err_msg = "$l_invalid_repository_path ($final_path)";
     return false;
   }
@@ -881,12 +733,12 @@ function check_data_form($cid, $document) {
     return false;
   }
 
-  if ($kind == "new_file"  && $file_update != "no" && ($name == "" || $size == "")) {
+  if (($kind == $cdoc_kind_file) && $file_update != "no" && ($name == "" || $size == "")) {
     $err_msg = $l_invalid_file;
     return false;
   }
   
-  if ($kind == "link" && $url == "" && $file_update != "no") {
+  if (($kind == $cdoc_kind_link) && ($url == "") && ($file_update != "no")) {
     $err_msg = $l_invalid_url;
     return false;
   } 
@@ -919,11 +771,11 @@ function run_query_cat1_insert($document) {
   $usercreate = $auth->auth["uid"];
   $cat1 = $document["cat1_label"];
 
-  $query = "insert into DocumentCategory1 (
+  $query = "INSERT INTO DocumentCategory1 (
     documentcategory1_timecreate,
     documentcategory1_usercreate,
     documentcategory1_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$cat1')";
@@ -948,11 +800,11 @@ function run_query_cat2_insert($document) {
   $usercreate = $auth->auth["uid"];
   $cat2 = $document["cat2_label"];
 
-  $query = "insert into DocumentCategory2 (
+  $query = "INSERT INTO DocumentCategory2 (
     documentcategory2_timecreate,
     documentcategory2_usercreate,
     documentcategory2_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$cat2')";
@@ -979,13 +831,13 @@ function run_query_mime_insert($document) {
   $extension = $document["extension"];
   $mimetype = $document["mimetype"];
 
-  $query = "insert into DocumentMimeType (
+  $query = "INSERT INTO DocumentMimeType (
     documentmimetype_timecreate,
     documentmimetype_usercreate,
     documentmimetype_label,
     documentmimetype_extension,
     documentmimetype_mime)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$mime',
@@ -1014,11 +866,11 @@ function run_query_cat2_update($document) {
   $id = $document["category2"];
   $cat2 = $document["cat2_label"];
 
-  $query = "update DocumentCategory2 set
+  $query = "UPDATE DocumentCategory2 SET
       documentcategory2_label='$cat2',
       documentcategory2_timeupdate='$timeupdate',
       documentcategory2_userupdate='$userupdate'
-    where
+    WHERE
       documentcategory2_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1042,11 +894,11 @@ function run_query_cat1_update($document) {
   $id = $document["category1"];
   $cat1 = $document["cat1_label"];
 
-  $query = "update DocumentCategory1 set
+  $query = "UPDATE DocumentCategory1 SET
       documentcategory1_label='$cat1',
       documentcategory1_timeupdate='$timeupdate',
       documentcategory1_userupdate='$userupdate'
-    where
+    WHERE
       documentcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1071,13 +923,13 @@ function run_query_mime_update($document) {
   $extension = $document["extension"];
   $mimetype = $document["mimetype"];
 
-  $query = "update DocumentMimeType set
+  $query = "UPDATE DocumentMimeType SET
       documentmimetype_label='$mime',
       documentmimetype_extension='$extension',
       documentmimetype_mime='$mimetype',
       documentmimetype_timeupdate='$timeupdate',
       documentmimetype_userupdate='$userupdate'
-    where
+    WHERE
       documentmimetype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1088,16 +940,16 @@ function run_query_mime_update($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id                                  //
+// Get the label of an Category from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_cat1_label($id) {
   global $cdg_sql;
 
-  $query = "select documentcategory1_label
-    from DocumentCategory1
-    where documentcategory1_id='$id'";
+  $query = "SELECT documentcategory1_label
+    FROM DocumentCategory1
+    WHERE documentcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1117,8 +969,9 @@ function get_cat1_label($id) {
 function run_query_cat1_links($p_id) {
   global $cdg_sql;
 
-  $query = "select document_title, document_id, document_category1_id
-    from Document where document_category1_id='$p_id'";
+  $query = "SELECT document_title, document_id, document_category1_id
+    FROM Document
+    WHERE document_category1_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1129,16 +982,16 @@ function run_query_cat1_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id                                  //
+// Get the label of an Category from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_cat2_label($id) {
   global $cdg_sql;
 
-  $query = "select documentcategory2_label
-    from DocumentCategory2
-    where documentcategory2_id='$id'";
+  $query = "SELECT documentcategory2_label
+    FROM DocumentCategory2
+    WHERE documentcategory2_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1151,15 +1004,16 @@ function get_cat2_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Document links query execution                                 //
+// Category 2 - Document links query execution
 // Parameters:
 //   - $p_id : activity id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat2_links($p_id) {
   global $cdg_sql;
 
-  $query = "select document_title, document_id, document_category2_id
-    from Document where document_category2_id='$p_id'";
+  $query = "SELECT document_title, document_id, document_category2_id
+    FROM Document
+    WHERE document_category2_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1219,7 +1073,7 @@ function run_query_mime_links($p_id) {
 function run_query_cat1_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from DocumentCategory1 where documentcategory1_id='$id'";
+  $query = "DELETE FROM DocumentCategory1 WHERE documentcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1237,7 +1091,7 @@ function run_query_cat1_delete($id) {
 function run_query_cat2_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from DocumentCategory2 where documentcategory2_id='$id'";
+  $query = "DELETE FROM DocumentCategory2 WHERE documentcategory2_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1279,15 +1133,8 @@ function run_query_insert_repository($document) {
   $path = $document["repository_path"];
   $name = $document["repository_name"];
   $path = format_path($path);
-  $final_path = get_final_path($path);
-  $dest_dir = $final_path.$name;
 
-  if (file_exists($dest_dir)) {
-    return false;
-  }
-  run_query_create_repository($document);
-
-  $query = "insert into Document (
+  $query = "INSERT INTO Document (
     document_timeupdate,
     document_timecreate,
     document_userupdate,
@@ -1302,8 +1149,7 @@ function run_query_insert_repository($document) {
     document_category2_id,
     document_mimetype_id,
     document_privacy
-)
-  values (null,
+  ) VALUES (null,
     '$now',
     null,
     '$uid',
@@ -1324,38 +1170,6 @@ function run_query_insert_repository($document) {
   $obm_q->query($query);
 
   return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Repository Creation
-// Parameters:
-//   - $id : Mime Type id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_create_repository($document) {
-  global $document_path;
-
-  $path = $document["repository_path"];
-  $name = $document["repository_name"];
-  if(strpos($path,'/') === 0) {
-    $final_path = $document_path.$path;
-  } else {
-    $final_path = $document_path.'/'.$path;
-  }
-  
-  if (!is_dir($final_path)) {
-    return false;
-  }
-
-  if (strrpos($finalpath,'/') == (strlen($finalpath) -1)) {
-    $directory = $final_path.$name;
-  } else {
-    $directory = $final_path.'/'.$name;
-  }
-  if (!@mkdir($directory,0755))
-    return false;
-
-  return true; 
 }
 
 

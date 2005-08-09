@@ -171,7 +171,6 @@ function html_document_search_form ($document, $cat1_q, $cat2_q, $mime_q) {
 // Display the Document search result
 // Parameters:
 //   - $document[] : document search criteria
-//     keys used  : name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_list($document) {
   global $display, $l_no_found;
@@ -295,6 +294,7 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
   global $l_author, $l_category1, $l_category2, $l_path, $l_kind; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $popup_width, $popup_height;
+  global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -306,26 +306,26 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype_id");
     if (islink($doc_q->f("document_name"))) {
-      $kind = "link";
+      $kind = $cdoc_kind_link;
       $fi_path = $doc_q->f("document_path");
       $url_parse = parse_url($doc_q->f("document_name"));
       $proto = $url_parse["scheme"];
       $url = $url_parse["host"].$url_parse["path"];
-      if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
+      if (strrpos($fi_path,'/') != strlen($fi_path) -1)  {
 	$fi_path = $doc_q->f("document_path").'/';
       }
     } else {
-      $kind = "file";
+      $kind = $cdoc_kind_file;
       $fi_path = $doc_q->f("document_path");
     }
     $update_file = "
     <table class=\"detail\">
-     <tr>
+    <tr>
       <td class=\"detailLabel\">
        <input checked=\"checked\" onclick=\"basic_hide('file_update')\" type=\"radio\" name=\"rd_file_update\" value=\"no\"/>$l_noupdate_file
        <input onclick=\"basic_show('file_update')\" type=\"radio\" name=\"rd_file_update\" value=\"yes\"/>$l_update_file
       </td>
-     </tr>
+    </tr>
     </table>
     <div id=\"file_update\" style=\"display: none\">";
     $update_file_end = "</div>";
@@ -399,7 +399,7 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
       ";
   }
 
-  if ($kind == "new_file" || $kind == "" || $kind =="file") { 
+  if (($kind == $cdoc_kind_file) || ($kind == "")) { 
     $checked = "checked=\"checked\"";
     $dis_img2 = " style=\"display: none;\" ";
     $dis_url = " style=\"display: none;\" ";
@@ -407,9 +407,9 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
     $checked = "";
   }
 
-  $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"new_file\" $checked/> $l_new_file<br /> ";
+  $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" id=\"$cdoc_kind_file\" value=\"$cdoc_kind_file\" $checked /><label for=\"$cdoc_kind_file\">$l_new_file</label> &nbsp;";
 
-  if ($kind == "link" && $proto == "http") {
+  if (($kind == $cdoc_kind_link) && ($proto == "http")) {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
@@ -418,9 +418,9 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
     $checked = "";
   }
 
-   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link &nbsp;&nbsp;";
+   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" id=\"$cdoc_kind_link\" value=\"$cdoc_kind_link\" $checked /><label for=\"$cdoc_kind_link\">$l_link</label> &nbsp;";
 
-  if ($kind == "link" && $proto == "https") {
+  if (($kind == $cdoc_kind_link) && ($proto == "https")) {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
@@ -429,7 +429,7 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
     $checked = "";
   }
 
-  $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_links<br />";
+  $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" id=\"https\" value=\"$cdoc_kind_link\" $checked/><label for=\"https\">$l_links</label>";
  
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
@@ -1407,7 +1407,7 @@ function html_documents_tree($document,$display_file) {
   
   $popup = $document["popup"];
   $obm_d = run_query_get_tree($display_file);
-  if($popup) {
+  if ($popup) {
     $link = "<a class=\"documentRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
@@ -1417,10 +1417,10 @@ function html_documents_tree($document,$display_file) {
   $block.= "
   <div class=\"documentTree\">
   ";
-  if($popup) {
+  if ($popup) {
     $fill = " onclick=\"fill_ext_form('$realpath');return false;\"";
   }
-  if($display_file == "true") {
+  if ($display_file == "true") {
     while($obm_d->next_record()) {
       $id = $obm_d->f("document_id");
       $kind = $obm_d->f("document_kind");
@@ -1445,10 +1445,9 @@ function html_documents_tree($document,$display_file) {
       }
     }
   }
-  if($display_file == "true") {
+  if ($display_file == "true") {
     $block .= @display_tree($tree,'/','/',0,0);
-  }
-  else {
+  } else {
     $block .= @display_popup_tree($tree,'/','/',0);
   }
 $block.= "
@@ -1538,7 +1537,6 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-
 function display_popup_tree($tree,$current_directory,$name,$indent) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $popup;
@@ -1595,26 +1593,24 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
 function dis_file($doc_q) {
   global $document_path;
 
-  $path = $doc_q->f("document_path");
+  $id = $doc_q->f("document_id");
+  $disk_path = get_document_disk_path($id);
+  $disk_fullname = $disk_path . $id; 
+
   $name = $doc_q->f("document_name");  
-  if(islink($name)) {
+  $mime = $doc_q->f("documentmimetype_mime");  
+  //    $mime = run_query_get_mimetype($name);
+
+  if (islink($name)) {
     $link = getlink($name,$path);
     header("location: $link");
     exit;
   }
 
-  $doc_q = run_query_detail_by_path($path,$name);
-  if(!$doc_q) {
-    $mime = run_query_get_mimetype($name);
-  }
-  else {
-    $mime = $doc_q->f("documentmimetype_mime");  
-  }
-  $final_path = $document_path.'/'.$path.'/'.$name; 
-  $handle = fopen ($final_path, "r");
+  $handle = fopen ($disk_fullname, "r");
   header("Content-Type: $mime");
   header("Content-Disposition: inline; filename=$name");
-  echo  fread($handle, filesize ($final_path));
+  echo fread($handle, filesize ($disk_fullname));
   fclose ($handle); 
   
 }

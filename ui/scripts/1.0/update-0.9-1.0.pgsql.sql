@@ -236,3 +236,6 @@ ALTER TABLE Document DROP COLUMN document_mimetype;
 
 -- Add ACL column
 ALTER TABLE Document ADD COLUMN document_acl text;
+
+-- Correct MIMETYPE extension case
+UPDATE DocumentMimeType SET documentmimetype_extension='jpg' WHERE documentmimetype_extension='JPG';

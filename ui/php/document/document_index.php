@@ -11,6 +11,14 @@
 // - search             -- search fields  -- show the result set of search
 ///////////////////////////////////////////////////////////////////////////////
 
+// gestion des repertoires
+// vues
+// reagir a erreur d'insertion du fichier (suppression de la bd ?)
+// check_data et verif path (a supprimer ?)
+// Traitement des liens
+// Doc: calcul de diskpath auto, gestion du mime auto, kind: lien
+// name, titre
+
 $path = "..";
 $module = "document";
 $obminclude = getenv("OBM_INCLUDE_VAR");
