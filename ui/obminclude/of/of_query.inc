@@ -1405,7 +1405,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   // message
   $msg="";
   if ($h_file !="") {
-    //$body=iconv("ISO-8859-1","UTF-8",$body);
+    $body=iconv("ISO-8859-1","UTF-8",$body);
     $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
     $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
     $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";

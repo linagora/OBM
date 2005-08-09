@@ -29,7 +29,7 @@ function check_calendar(form) {
   return true;
   
 }
-  
+
 function show_hide_dates(field) {
   target = window.document;
   begin = target.getElementById('hour_begin');   
@@ -45,6 +45,18 @@ function show_hide_dates(field) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Remove all elements in the list form
+///////////////////////////////////////////////////////////////////////////////
+function remove_allelements(parentId) {
+  target = window.document;
+  container = target.getElementById(parentId)
+  while(container.hasChildNodes()==true){
+    var ChildN=container.childNodes[0];
+    container.removeChild(ChildN);
+  }
+} 
+
+///////////////////////////////////////////////////////////////////////////////
 // Remove an element line in the list form
 ///////////////////////////////////////////////////////////////////////////////
 function remove_element(elemId,parentId) {
@@ -53,6 +65,31 @@ function remove_element(elemId,parentId) {
   container = target.getElementById(parentId)
   container.removeChild(content); 
 } 
+
+function show_hide_read_right(field) {
+  target = window.document;
+  lnk_read = target.getElementById('lnk_accept_read');
+  sel_read = target.getElementById('sel_accept_read');
+  if(field.checked) {
+    remove_allelements('sel_accept_read');
+    lnk_read.style.display = 'none';
+  } else {
+    lnk_read.style.display = 'inline';
+  }
+}
+
+function show_hide_write_right(field) {
+  target = window.document;
+  lnk_write = target.getElementById('lnk_accept_write');
+  sel_write = target.getElementById('sel_accept_write');
+  if(field.checked) {
+    remove_allelements('sel_accept_write');
+    lnk_write.style.display = 'none';
+  } else {
+    lnk_write.style.display = 'inline';
+  }
+}
+
 
 function check_count_user(formulaire) {
   var selectObject = formulaire.elements[0];
@@ -69,7 +106,24 @@ function check_count_user(formulaire) {
   }
   return true;
 }
-  
+
+function check_count_resource(formulaire) {
+  var selectObject = formulaire.elements[0];
+  var selectCount  = selectObject.length;
+  var nb_select = 0;
+  for (var i = 0; i < selectCount; i++)
+  {
+    if( selectObject.options[i].selected == true)
+      nb_select ++;
+  }
+  if( nb_select > 6) {
+    alert('$l_too_much_resource');
+    return false;
+  }
+  return true;
+}
+
+
 NS4 = (document.layers) ? 1 : 0;
 IE4 = (document.all) ? 1 : 0;
 W3C = (document.getElementById) ? 1 : 0;	

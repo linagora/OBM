@@ -95,6 +95,13 @@ $cgp_mailing_default = true;
 // Contact : is a new contact private by default
 $ccontact_private_default = false;
 
+// Calendar entities
+$cagenda_entities = array(
+  "user" => "user",
+  "resource" => "resource",
+  "document" => "document"
+);
+
 // Calendar : show public groups
 $cagenda_public_groups = true;
 

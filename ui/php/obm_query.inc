@@ -21,19 +21,21 @@ function run_query_waiting_events() {
   $query = "SELECT
       count(userobm_id) as num
     FROM CalendarEvent LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
-      LEFT JOIN CalendarUser ON calendarevent_id  = calendaruser_event_id
-      LEFT JOIN UserObm ON calendaruser_user_id = userobm_id
-    WHERE calendaruser_state = 'W'";
+      LEFT JOIN EventEntity ON calendarevent_id  = evententity_event_id
+      LEFT JOIN UserObm ON evententity_entity_id = userobm_id AND
+      evententity_entity = '".$cagenda_entities['user']."'
+    WHERE 
+      evententity_state = 'W'";
 
   if (is_array($writable_user)) {
-    $query .= " AND calendaruser_user_id IN (";
+    $query .= " AND evententity_entity_id IN (";
     $num = count($writable_user);
     foreach($writable_user as $user) {
       $query.= "'$user',";
     }
     $query.="'".$auth->auth["uid"]."')";
   } else {
-    $query.="AND calendaruser_user_id = '".$auth->auth["uid"]."'";
+    $query.="AND evententity_entity_id = '".$auth->auth["uid"]."'";
   }
   $query .= " GROUP BY userobm_id ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql);
@@ -47,16 +49,19 @@ function run_query_waiting_events() {
 // Get the list of writable agenda users for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_writable() {
-  global $cdg_sql,$auth;
+  global $cdg_sql,$auth,$cagenda_entities;
 
   $uid = $auth->auth["uid"];
   $query = "SELECT u.userobm_id,
-      c.calendarright_write
+      c.calendarentityright_write
     FROM UserObm as u
-      LEFT OUTER JOIN CalendarRight as c 
-        ON u.userobm_id = c.calendarright_ownerid
-          AND c.calendarright_customerid = '$uid'
-    WHERE (c.calendarright_write = 1 OR u.userobm_id='$uid') 
+      LEFT OUTER JOIN CalendarEntityRight as c 
+        ON 
+          u.userobm_id = c.calendarentityright_entity_id AND
+          c.calendarentityright_customer_id = '$uid' AND
+          c.calendarentityright_entity = '".$cagenda_entities['user']."'
+    WHERE 
+      (c.calendarentityright_write = 1 OR u.userobm_id='$uid') AND 
     ORDER BY u.userobm_lastname";
 
   $obm_db = new DB_OBM;
@@ -99,7 +104,7 @@ function get_date_day_of_week($timestamp, $day) {
 //   - $users_array : users id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_no_repeat_events($start,$end,$users_array) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $uid, $cagenda_entities;
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -111,22 +116,23 @@ function run_query_no_repeat_events($start,$end,$users_array) {
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
-      calendaruser_user_id,
+      evententity_entity_id,
       calendarcategory_label,
       $calendarevent_date_l,
       calendarevent_duration,
       calendarevent_allday
-    FROM CalendarEvent, CalendarCategory, CalendarUser 
+    FROM CalendarEvent, CalendarCategory, EventEntity 
     WHERE calendarevent_category_id = calendarcategory_id
-      AND calendarevent_id = calendaruser_event_id
-      AND calendaruser_state = 'A'
+      AND calendarevent_id = evententity_event_id
+      AND evententity_entity = '".$cagenda_entities['user']."'
+      AND evententity_state = 'A'
       AND calendarevent_repeatkind = 'none'
       AND $calendarevent_date >= $start - calendarevent_duration
       AND $calendarevent_date <= $end 
 ";	
 
   if (is_array($users_array) && (count($users_array)>0) ) {
-    $query .= " AND calendaruser_user_id IN (";
+    $query .= " AND evententity_entity_id IN (";
     foreach($users_array as $id => $value) {
       $query.= "$coma'$id'";
       $coma = ",";
@@ -148,7 +154,7 @@ function run_query_no_repeat_events($start,$end,$users_array) {
 //   - $groups_array : group id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_repeat_events($start,$end,$users_array) {
-  global $cdg_sql, $uid;
+  global $cdg_sql, $uid, $cagenda_entities;
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -168,13 +174,14 @@ function run_query_repeat_events($start,$end,$users_array) {
       calendarevent_repeatkind,
       $calendarevent_endrepeat_l,
       calendarevent_repeatfrequence,
-      calendaruser_user_id,
+      evententity_entity_id,
       calendarevent_repeatdays,
       calendarevent_allday
-    FROM CalendarEvent, CalendarCategory, CalendarUser 
+    FROM CalendarEvent, CalendarCategory, EventEntity 
     WHERE calendarevent_category_id = calendarcategory_id
-      AND calendarevent_id = calendaruser_event_id
-      AND calendaruser_state = 'A'
+      AND calendarevent_id = evententity_event_id
+      AND evententity_entity = '".$cagenda_entities['user']."'
+      AND evententity_state = 'A'
       AND calendarevent_repeatkind != 'none'
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
@@ -182,7 +189,7 @@ function run_query_repeat_events($start,$end,$users_array) {
 ";		  
 
   if (is_array($users_array) && (count($users_array)>0) ) {
-    $query .= " AND calendaruser_user_id IN (";
+    $query .= " AND evententity_entity_id IN (";
     foreach($users_array as $id => $value) {
       $query.= "$coma'$id'";
       $coma = ",";
@@ -219,7 +226,7 @@ function events_model($start_time, $end_time, $calendar_user) {
     $category = $obm_no_repeat->f("calendarcategory_label");
     $date = $obm_no_repeat->f("calendarevent_date");
     $duration = $obm_no_repeat->f("calendarevent_duration");
-    $user_id = $obm_no_repeat->f("calendaruser_user_id");
+    $user_id = $obm_no_repeat->f("evententity_entity_id");
     $all_day = $obm_no_repeat->f("calendarevent_allday");    
     $event = &new Event($id,$duration,$title,$category,$privacy,$description);
     store_event($date, $event, $day_events, $user_id, $all_day, $end_time);
@@ -237,13 +244,14 @@ function events_model($start_time, $end_time, $calendar_user) {
     $duration = $obm_repeat->f("calendarevent_duration");
     $repeatkind = $obm_repeat->f("calendarevent_repeatkind");
     $endrepeat = $obm_repeat->f("calendarevent_endrepeat");
-    $all_day = $obm_no_repeat->f("calendaruser_allday");     
+//    $all_day = $obm_no_repeat->f("calendaruser_allday");     XXXX
+    $all_day = $obm_no_repeat->f("calendarevent_allday");     
     if (!$endrepeat) {
       $endrepeat = $end_time;
     }
     $repeatfrequence = $obm_repeat->f("calendarevent_repeatfrequence");
     $repeatdays = $obm_repeat->f("calendarevent_repeatdays");
-    $user_id = $obm_repeat->f("calendaruser_user_id");    
+    $user_id = $obm_repeat->f("evententity_entity_id");    
     $all_day = $obm_repeat->f("calendarevent_allday");       
     $event = &new Event($id,$duration,$title,$category,$privacy,$description);
     $temp_date = $date;

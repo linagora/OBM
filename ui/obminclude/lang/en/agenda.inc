@@ -33,6 +33,7 @@ $l_repeatkind = "Frequency type";
 $l_repeatdays = "Repetition days (weekly type)";
 $l_date_repeatend = "End repeatition";
 $l_too_much_user = "No more than six users";
+$l_too_much_resource = "No more than six resources";
 $l_waiting_events = "Waiting events";
 $l_calendar_visible = "Select calendars";
 $l_calendar_displayed = "Calendars displayed";

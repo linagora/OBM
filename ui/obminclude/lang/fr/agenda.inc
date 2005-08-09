@@ -83,6 +83,7 @@ $l_force_insert = "Forcer l'insertion";
 $l_refuse_insert = "Refuser l'évenement";
 $l_cancel_insert = "Ne rien faire";
 $l_too_much_user = "Vous ne pouvez sélectionner au maximum que six utilisateurs";
+$l_too_much_resource = "Vous ne pouvez sélectionner au maximum que six ressources";
 $l_insert_ok = "Insertion effectuée avec succès";
 $l_update_ok = "Mise à jour effectuée avec succès";
 $l_update_warning = "Attention des conflits ont été détectés";
