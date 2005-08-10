@@ -666,35 +666,6 @@ function run_query_delete($agenda) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get active Users or archived with rights set with their permissions
-///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_right($uid) {
-  global $cdg_sql, $cagenda_entities;
-
-  $query = "
-    SELECT userobm_id,
-      calendarentityright_customer_id,
-      u.userobm_lastname, u.userobm_firstname,
-      c.calendarentityright_write, c.calendarentityright_read 
-    FROM CalendarEntityRight as c
-    LEFT JOIN UserObm as u
-    ON 
-      c.calendarentityright_customer_id = userobm_id 
-    WHERE
-      (userobm_id IS NULL OR userobm_id != '$uid') AND
-      (userobm_archive IS NULL OR userobm_archive != '1') AND
-      c.calendarentityright_entity_id = '$uid' AND 
-      c.calendarentityright_entity = '".$cagenda_entities['user']."' AND
-      (c.calendarentityright_write != '0' OR  c.calendarentityright_read != '0')
-    ORDER BY u.userobm_lastname";
-
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  return $obm_db;
-}  
-
-///////////////////////////////////////////////////////////////////////////////
 // Get the list of default agenda resources for the current group
 ///////////////////////////////////////////////////////////////////////////////
 function get_default_group_resource_ids($p_group) {
@@ -947,68 +918,6 @@ function run_query_resource_group() {
   return $obm_db;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of writable agenda users for the current user
-///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_writable() {
-  global $cdg_sql,$auth,$cagenda_entities;
-
-  $uid = $auth->auth["uid"];
-  $query = "SELECT u.userobm_id,
-      c.calendarentityright_write
-    FROM UserObm as u
-      LEFT OUTER JOIN CalendarEntityRight as c 
-        ON 
-          u.userobm_id = c.calendarentityright_entity_id AND 
-          c.calendarentityright_customer_id = '$uid' AND
-          c.calendarentityright_entity = '".$cagenda_entities['user']."'
-    WHERE (c.calendarentityright_write = 1 OR u.userobm_id='$uid')  
-    ORDER BY u.userobm_lastname";
-
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);	    
-  $obm_db->query($query);
-  $ret_array = array();
-  while($obm_db->next_record()) {
-    $ret_array[] = $obm_db->f("userobm_id");
-  }
-  return $ret_array;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of writable agenda users for the current user
-///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_label_writable() {
-  global $cdg_sql,$auth,$cagenda_entities;
-
-  $uid = $auth->auth["uid"];
-  $query = "SELECT u.userobm_id,u.userobm_lastname,u.userobm_firstname,
-      c.calendarentityright_write
-    FROM UserObm as u
-      LEFT OUTER JOIN CalendarEntityRight as c 
-        ON 
-          u.userobm_id = c.calendarentityright_entity_id AND 
-          c.calendarentityright_customer_id = '$uid' AND
-          c.calendarentityright_entity = '".$cagenda_entities['user']."'
-    WHERE (c.calendarentityright_write = 1 OR u.userobm_id='$uid')
-    ORDER BY u.userobm_lastname";
-
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);	    
-  $obm_db->query($query);
-  $ret_array = array();
-  while($obm_db->next_record()) {
-       $ret_array[] = array("id"=>$obm_db->f("userobm_id"),
-       "firstname" => $obm_db->f("userobm_firstname"),
-       "lastname" => $obm_db->f("userobm_lastname"));
-  }
-  return $ret_array;
-
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Get groups infos from the gid array given
 // Parameters:
@@ -1048,74 +957,6 @@ function run_query_group_writable() {
   display_debug_msg($query, $cdg_sql);	    
   $obm_db->query($query);
   return $obm_db;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Update the list of the rights give to users. 
-//////////////////////////////////////////////////////////////////////////////
-function run_query_update_right($agenda) {
-  global $cdg_sql,$auth,$cagenda_entities;  
-
-  $uid = $agenda["user_id"];
-  $accept_write = $agenda["accept_w"];
-  $accept_read = $agenda["accept_r"];
-  $public_write = $agenda["public_w"];
-  $public_read = $agenda["public_r"];
- 
-  if($uid != $auth->auth["uid"]){
-    $writable_user = run_query_userobm_writable();  
-    if(!in_array($uid,$writable_user)) 
-      return 0;
-  }
-  $obm_db = new DB_OBM;
-  $query = "DELETE From CalendarEntityRight
-            where  calendarentityright_entity_id = '$uid' AND
-                   calendarentityright_entity = '".$cagenda_entities['user']."'";
-  display_debug_msg($query, $cdg_sql);	    
-  $obm_db->query($query);
-  
-  if ($public_write) {
-    $query = "INSERT INTO CalendarEntityRight VALUES('$uid','".$cagenda_entities['user']."','0',1,0)";
-    display_debug_msg($query, $cdg_sql);	    
-    $obm_db->query($query);
-    $accept_write = "";
-  }
-  if (is_array($accept_write)) {
-    foreach ($accept_write as $key => $id) {
-      $query = "INSERT INTO CalendarEntityRight VALUES('$uid','".$cagenda_entities['user']."','$id',1,0)";
-      display_debug_msg($query, $cdg_sql);	    
-      $obm_db->query($query);
-    }
-  }
-  if ($public_read) {
-    $query = "UPDATE CalendarEntityRight SET calendarentityright_read = 1
-      WHERE calendarentityright_entity_id = '$uid'
-        AND calendarentityright_customer_id = '0'
-        AND calendarentityright_entity = '".$cagenda_entities['user']."'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_db->query($query);
-    if ($obm_db->affected_rows() == 0) {
-      $query = "INSERT INTO CalendarEntityRight VALUES('$uid','".$cagenda_entities['user']."','0',0,1)";
-      display_debug_msg($query, $cdg_sql);
-      $obm_db->query($query);
-    }
-  }
-  if (is_array($accept_read)) {
-    foreach($accept_read as $key => $id) {
-      $query = "UPDATE CalendarEntityRight SET calendarentityright_read = 1
-        WHERE calendarentityright_entity_id = '$uid'
-          AND calendarentityright_customer_id = '$id'
-          AND calendarentityright_entity = '".$cagenda_entities['user']."'";
-      display_debug_msg($query, $cdg_sql);	    
-      $obm_db->query($query);
-      if ($obm_db->affected_rows() == 0) {
-	$query = "INSERT INTO CalendarEntityRight VALUES('$uid','".$cagenda_entities['user']."','$id',0,1)";
-      	display_debug_msg($query, $cdg_sql);	    
-       	$obm_db->query($query);
-      }
-    } 
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

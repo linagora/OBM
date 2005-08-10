@@ -9,6 +9,7 @@
 
 $l_agenda = "Calendrier";
 $l_users = "Utilisateurs";
+$l_resources = "Ressources";
 $l_groups = "Groupes";
 $l_title = "Titre";
 $l_location = "Lieu";
@@ -36,6 +37,7 @@ $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
 $l_group_members = "Parmi membres du groupe";
 $l_everybody = "Tout le monde";
+$l_everyresources = "Toutes les ressources";
 $l_all_day = "Toute la journée";
 $l_begin = "Début";
 $l_end = "Fin";
@@ -96,6 +98,7 @@ $l_category_checkdelete = "Vérifier ou Supprimer la Catégorie";
 $l_category_delete = "Supprimer la Catégorie";
 $l_category_insert = "Créer la Catégorie";
 $l_agenda_select_group = "Sélectionner les groupes.";
+$l_view_type = "Type de vue";
 
 // Messages
 $l_category_delete_ok = "La suppression de la catégorie a été correctement effectuée.";
@@ -132,11 +135,10 @@ $l_header_right = "Gestion des droits";
 $l_header_admin = "Administration";
 $l_authorize_list = "Personnes autorisées";
 $l_denie_list = "Personnes non-autorisées";
-$l_read_permission = "Gestion des permissions de lecture de votre agenda";
-$l_write_permission = "Gestion des permissions d'écriture sur votre agenda";
+$l_read_permission = "Gestion des permissions de lecture de l'agenda";
+$l_write_permission = "Gestion des permissions d'écriture sur l'agenda";
 $l_everyone = "Autoriser tout le monde";
 $l_noone = "N'autoriser personne";
-$l_list = "Autoriser les personnes de la liste";
 $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
 
@@ -156,6 +158,8 @@ $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 $l_unknown = "Inconnu";
 $l_calendar_visible = "Agendas Visibles";
 $l_calendar_displayed = "Agendas affichés";
+$l_resource_visible = "Ressources";
+$l_resource_displayed = "Ressources choisies";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "La durée ne peux pas être nulle";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";

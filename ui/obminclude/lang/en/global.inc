@@ -16,6 +16,10 @@ $l_validate = "Validate";
 $l_execute = "Execute action";
 $l_confirm = "Confirm";
 $l_home = "Home";
+$l_entity_right = "Manage rights for";
+$l_read_permission = "Read access management";
+$l_write_permission = "Write access management";
+$l_list_right = "Authorize list people";
 
 // Common messages
 $l_yes = "Yes";
@@ -218,6 +222,9 @@ $l_header_compute_balance = "Compute balance";
 $l_header_duplicate = "Dupplicate";
 
 $l_header_add_contact = "Add contact";
+
+// Project Agenda
+$l_header_right = "Right management"
 
 // Project headers
 $l_header_man_task = "Tasks";

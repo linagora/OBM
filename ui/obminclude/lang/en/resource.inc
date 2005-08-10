@@ -18,6 +18,7 @@ $l_fill_label = "You have to fill the label before submitting.";
 // Titres
 $l_resource = "Resource";
 $l_resources = "Resources";
+$l_users = "Users";
 
 // Actions
 $l_insert = "Insert the resource";

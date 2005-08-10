@@ -18,6 +18,7 @@ $l_fill_label = "Vous devez renseigner le label avant de valider.";
 // Titres
 $l_resource = "Ressource";
 $l_resources = "Ressources";
+$l_users = "Utilisateurs";
 
 // Actions
 $l_insert = "Enregistrer la ressource";

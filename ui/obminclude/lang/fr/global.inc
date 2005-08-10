@@ -17,6 +17,10 @@ $l_validate = "Valider";
 $l_execute = "Exécuter";
 $l_confirm = "Confirmer";
 $l_home = "Accueil";
+$l_entity_right = "Gérer les droits de";
+$l_read_permission = "Gestion des permissions de lecture de l'agenda";
+$l_write_permission = "Gestion des permissions d'écriture sur l'agenda";
+$l_list_right = "Autoriser les personnes de la liste";
 
 // Common messages
 $l_yes = "Oui";
@@ -220,6 +224,9 @@ $l_header_duplicate = "Dupliquer";
 $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
+
+// Project Agenda 
+$l_header_right = "Gestion des droits";
 
 // Project headers
 $l_header_man_task = "Tâches";

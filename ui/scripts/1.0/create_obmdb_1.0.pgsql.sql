@@ -1375,7 +1375,7 @@ CREATE TABLE Resource (
   resource_usercreate        integer,
   resource_label             varchar(32) DEFAULT '' NOT NULL,
   resource_description       varchar(255),
-  resource_qty               integer DEFAULT 0 NOT NULL,
+  resource_qty               integer DEFAULT 0,
   PRIMARY KEY (resource_id),
   UNIQUE (resource_label)
 );

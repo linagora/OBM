@@ -9,6 +9,7 @@
 
 $l_agenda = "Calendar";
 $l_users = "Users";
+$l_resources = "Resources";
 $l_groups = "Groups";
 $l_title = "Title";
 $l_location = "Location";
@@ -37,9 +38,12 @@ $l_too_much_resource = "No more than six resources";
 $l_waiting_events = "Waiting events";
 $l_calendar_visible = "Select calendars";
 $l_calendar_displayed = "Calendars displayed";
+$l_resource_visible = "Select Resources";
+$l_resource_displayed = "Resources displayed";
 $l_repeatdays2 = "Repeatition days";
 $l_group_members = "From members of group";
 $l_everybody = "Everybody";
+$l_everyresources = "Every resources";
 $l_all_day = "All day";
 $l_begin = "Beginning";
 $l_end = "End";
@@ -102,6 +106,7 @@ $l_update_warning = "Warning : some conflicts have been detected";
 $l_insert_warning = "Warning : some conflicts have been detected";
 $l_update_error = "Conflicts have been detected, update cancelled";
 $l_insert_error = "Conflicts have been detected, insertion cancelled";
+$l_view_type = "View type";
 
 // Messages
 $l_sendamail = "Force the notification by mail.";
@@ -146,7 +151,6 @@ $l_read_permission = "Read access management";
 $l_write_permission = "Write access management";
 $l_everyone = "Authorized everybody";
 $l_noone = "Authorized nobody";
-$l_list = "Authorized list people";
 $l_authorize = "Authorize";
 $l_deny = "&gt;&gt;&gt;&gt;";
 

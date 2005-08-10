@@ -111,7 +111,7 @@ function run_query_insert($resource) {
 
   $label = $resource["label"];
   $desc = $resource["desc"];
-  $qty = $resource["qty"];
+  $qty = $resource["qty"];if ($qty == "") $qty = "0";
 
   $query = "
    insert into Resource (
@@ -129,7 +129,7 @@ function run_query_insert($resource) {
     ". $auth->auth["uid"] . ",
     '$label',
     '$desc',
-    $qty
+    '$qty'
    )";
 
   display_debug_msg($query, $cdg_sql);
@@ -138,7 +138,7 @@ function run_query_insert($resource) {
 
   if ($retour) {
     $id=get_resource_id($label);
-    run_query_users_right($id);
+    run_query_right_init($id);
   }
 
   return $retour;
@@ -150,32 +150,38 @@ function run_query_insert($resource) {
 // Parameters:
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_users_right($resource_id) {
-  global $cdg_sql,$ctype_resource;
+function run_query_right_init($resource_id) {
+  global $cdg_sql,$cagenda_entities;
 
   $obm_q = new DB_OBM;
   $line_q = new DB_OBM;
-  //-- We get all users
-  $query = "select * from UserObm";
+
+  $query = " DELETE 
+    FROM CalendarEntityRight 
+    WHERE 
+      calendarentityright_entity = '".$cagenda_entities['resource']. "' AND
+      calendarentityright_entity_id = " . $resource_id;
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    //-- Drop current resource rights for all users
-    $query = " DELETE FROM CalendarRight WHERE calendarright_customerid = ". $obm_q->f("userobm_id") . " and calendarright_ownerid = " . $resource_id;
-    display_debug_msg($query, $cdg_sql);
-    $line_q->query($query);
-  }
+  $line_q->query($query);
 
   //---------------------------------------------------------------------------
-  // For each  entry, we give read and right permission
+  // we give public read and right permission
   //---------------------------------------------------------------------------
-  $obm_q->seek(0);
-  while ($obm_q->next_record()) {
-    $query = "insert into CalendarRight(calendarright_ownerid,calendarright_customerid,calendarright_write,calendarright_read) values ('$resource_id','".$obm_q->f("userobm_id")."', '1', '1')";
-    display_debug_msg($query, $cdg_sql);
-    $line_q->query($query);
-  }
+  $query = "INSERT INTO CalendarEntityRight (
+    calendarentityright_entity_id,
+    calendarentityright_entity,
+    calendarentityright_customer_id,
+    calendarentityright_write,
+    calendarentityright_read
+  ) values (
+    '$resource_id',
+    '".$cagenda_entities['resource']."',
+    '0',
+    '1',
+    '1'
+  )";
+  display_debug_msg($query, $cdg_sql);
+  $line_q->query($query);
 
   return true;
 }
@@ -215,9 +221,20 @@ function run_query_update($p_id, $resource) {
 //   - $p_id : resource id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($p_id) {
-  global $cdg_sql;
+  global $cdg_sql,$cagenda_entities;
 
   $query = "delete from Resource where resource_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  if (!$retour) return $retour;
+
+  $query = "delete from CalendarEntityRight 
+    where 
+      calendarentityright_entity_id='$p_id' AND
+      calendarentityright_entity = '".$cagenda_entities['resource']."'
+  ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -286,38 +303,6 @@ function check_data_form($p_id, $resource) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Executions - Purge a deleted resource 
-// Delete all references to the resource (UserObmPref, DisplayPref)
-// Move all resource private contact to public 
-// Parameters:
-//   - $param_resource : resource id
-// WWWWWWWWWWWWWWWWWWWWW
-///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_profile($param_resource) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-
-  $query = "Delete from UserObmPref where userobmpref_user_id='$param_user'"; 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  $query = "Delete from DisplayPref where display_user_id='$param_user'"; 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  // Move all the user events from private to public
-  // Not activated ! case of private event with multiple users..... to handle
-  $query = "Update CalendarEvent set
-      calendarevent_privacy='0'
-    where calendarevent_usercreate='$param_resource'
-      and calendarevent_privacy != '0'"; 
-  //display_debug_msg($query, $cdg_sql);
-  //$obm_q->query($query);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one Ressource from its label
 // Parameters:
 //   - $label  : label
@@ -372,51 +357,5 @@ function get_all_users() {
   display_debug_msg($query, $cdg_sql);
   $retour = $obm_q->query($query) ;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Insert ressources Right for one user                    //
-// Parameters:
-//   - $user_id : user id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_ressources_right($user_id) {
-  global $cdg_sql,$ctype_resource;
-
-  $obm_q = new DB_OBM;
-
-  //-- Drop current user rights for all resources
-  $query = "
-    delete 
-    from CalendarRight as cr 
-    where
-      calendarright_customerid='$user_id' and 
-      calendarright_ownerid in (
-        select resource_id 
-        from Resource 
-        where 
-          resource_id = calendarright_ownerid 
-      )
-  ";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  //---------------------------------------------------------------------------
-  // We copy each entry with user id = 0 to the new user
-  //---------------------------------------------------------------------------
-  $obm_q = new DB_OBM;
-  //-- We get all resources 
-  $query = "select * from Resource";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  $line_q = new DB_OBM;
-  while ($obm_q->next_record()) {
-    $query = "insert into CalendarRight(calendarright_ownerid,calendarright_customerid,calendarright_write,calendarright_read) values ('$user_id', '".$obm_q->f("resource_id")."', '1', '1')";
-    display_debug_msg($query, $cdg_sql);
-    $line_q->query($query);
-  }
-
-  return true;
-}
-
 
 </script>

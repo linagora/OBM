@@ -61,7 +61,7 @@ function run_query_userobm_writable() {
           c.calendarentityright_customer_id = '$uid' AND
           c.calendarentityright_entity = '".$cagenda_entities['user']."'
     WHERE 
-      (c.calendarentityright_write = 1 OR u.userobm_id='$uid') AND 
+      (c.calendarentityright_write = 1 OR u.userobm_id='$uid') 
     ORDER BY u.userobm_lastname";
 
   $obm_db = new DB_OBM;

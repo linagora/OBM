@@ -57,3 +57,4 @@ function check_money(field){
   return field.match($js_regexp_money);
 }
 ";
+</script>

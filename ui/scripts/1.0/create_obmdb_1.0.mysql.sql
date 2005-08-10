@@ -1370,7 +1370,7 @@ CREATE TABLE Resource (
   resource_usercreate        int(8),
   resource_label             varchar(32) DEFAULT '' NOT NULL,
   resource_description       varchar(255),
-  resource_qty               int(8) DEFAULT 0 NOT NULL,
+  resource_qty               int(8) DEFAULT 0,
   PRIMARY KEY (resource_id),
   UNIQUE k_label_resource (resource_label)
 );

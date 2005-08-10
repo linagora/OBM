@@ -785,5 +785,4 @@ function get_email_used($id="", $gid="", $lid="") {
   return $mails;
 }
 
-
 ?>

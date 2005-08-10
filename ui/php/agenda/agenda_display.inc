@@ -173,12 +173,13 @@ function html_bar_date_selector($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_bar_legend($calendar_user) {
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied; 
-  global $l_calendar_displayed;
+  global $l_calendar_displayed, $l_resource_displayed;
+  global $agenda_view_type;
 
   // Legend
-  if ($action == "perform_meeting") {
+  if ($action == "perform_meeting" || $action == "perform_res_meeting") {
     $l_legend = $l_meeting_legend;
-    $dis_leg_user = "
+    $dis_legend = "
     <tr>
       <td class=\"agendaPossible\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
       <td class=\"detailText\">&nbsp;$l_possible</td>
@@ -191,13 +192,22 @@ function html_bar_legend($calendar_user) {
       <td class=\"agendaOccupied\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
       <td class=\"detailText\">&nbsp;$l_occupied</td>
     </tr>";
-  } else {
+  } elseif ($agenda_view_type == "U") {
     $l_legend = $l_calendar_displayed;
     foreach ($calendar_user as $user_id => $user_data) {
-      $dis_leg_user .= "
+      $dis_legend .= "
       <tr>
        <td style=\"width:10%;\" class=\"".$user_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
        <td class=\"detailLabel\">&nbsp;&nbsp;".$user_data["name"]."</td>
+      </tr>";
+    }
+  } elseif ($agenda_view_type == "R") {
+    $l_legend = $l_resource_displayed;
+    foreach ($calendar_res as $res_id => $res_data) {
+      $dis_legend .="
+      <tr>
+       <td style=\"width:10%;\" class=\"".$res_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;&nbsp;".$res_data["name"]."</td>
       </tr>";
     }
   }
@@ -207,7 +217,7 @@ function html_bar_legend($calendar_user) {
 
   <div class=\"lastTitle\">:: $l_legend</div>
   <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-    $dis_leg_user
+    $dis_legend
   </table>
 
   </div>";
@@ -216,6 +226,46 @@ function html_bar_legend($calendar_user) {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the "View type" navigation bar component 
+// Parameters:
+//   - $agenda: agenda parameters
+///////////////////////////////////////////////////////////////////////////////
+function html_bar_view_type($new_action) {
+  global $l_view_type,$l_users,$l_resources,$dis_duration,$new_action;
+  global $agenda_view_type;
+
+  //-- View type
+  $block = "
+      <div class=\"last\">
+      <div class=\"lastTitle\">:: $l_view_type</div>
+      <table class=\"agendaCal\" cellpadding=\"0\" cellspacing=\"0\">
+
+      <tbody><tr>
+       <td class=\"detailLabel\">
+         <form action=\"\">
+           <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+           $dis_duration
+           <input";
+  if ($agenda_view_type == "U")
+    $block .= " checked=\"checked\"";
+  $block .= " name=\"rd_view_type\" value=\"U\" onclick=\"this.form.submit()\" type=\"radio\">$l_users<br>
+           <input";
+  if ($agenda_view_type == "R")
+    $block .= " checked=\"checked\"";
+  $block .= " name=\"rd_view_type\" value=\"R\" onclick=\"this.form.submit()\" type=\"radio\">$l_resources
+         </form>
+       </td>
+      </tr>
+
+      </tbody></table>
+     </div>
+  ";
+
+  return $block;
+
+}
+  
 ///////////////////////////////////////////////////////////////////////////////
 // Display the navigation bar
 // Parameters:
@@ -226,11 +276,14 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
   global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
-  global $c_all, $l_select_group, $l_everybody, $l_group_members;
-  global $cagenda_entities, $l_entity;
+  global $c_all, $l_select_group, $l_everybody, $l_group_members,$l_everyresources;
+  global $cagenda_entities, $l_entity,$l_users,$l_resources;
+  global $l_resource_visible, $l_resource_displayed, $l_back_mono;
+  global $agenda_view_type;
   global $action, $uid;
  
   $iso_date = $agenda["date"];
+  $this_group = ($agenda["agenda_group"] ? $agenda["agenda_group"] : $c_all);
   $this_group = ($agenda["agenda_group"] ? $agenda["agenda_group"] : $c_all);
 
   // Dealing with Entities
@@ -243,13 +296,12 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
   }
 
   // Entity Selection
-  if ($action == "perform_meeting") {
+  if (($action == "perform_meeting") || ($action == "find_resource")) {
     $duration = $agenda["duration"];     
     $dis_duration = "<input type=\"hidden\" name=\"param_duration\" value=\"$duration\" />";
     $new_action = "$action";
     $p_duration = "&amp;param_duration=$duration";
-  } elseif ( ($action != "view_day") && ($action != "view_week") &&
-       ($action != "view_month") && ($action != "view_year") ) {
+  } elseif ( ($action != "view_day") && ($action != "view_week") && ($action != "view_month") && ($action != "view_year") ) {
     $new_action = "view_week";
     $check_sel_user = "onsubmit=\"if (check_count_user(this)) return true; else return false;\"";
     $check_sel_resource = "onsubmit=\"if (check_count_resource(this)) return true; else return false;\"";
@@ -291,8 +343,44 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
     <input type=\"submit\" value=\"$l_validate\" />";
   //-- End User selection 
 
+  //-- Resource selection
+  $dis_sel_resource = "<select name=\"sel_resource_id[]\" size=\"6\" multiple=\"multiple\" style=\"font-size:10px\">";
+  while ($entity_readable["resource"]->next_record()) {
+    $r_id = $res_q->f("resource_id");
+    $r_label = $res_q->f("resource_login");
+    $dis_sel_resource .= "\n<option value=\"$r_id\"";
 
-  // Group selection
+    if (count($p_res_array)>0) {
+      $tag_res = "";
+      while ( (list($key, $res_id) = each($p_res_array) )
+              && ($tag_er == "") ) {
+        if ($r_id == $res_id ) {
+          $tag_res = " selected=\"selected\"";
+        }
+      }
+      reset($p_res_array);
+    }
+
+    $dis_sel_resource .= " $tag_res>$r_label</option>";
+  }
+  $dis_sel_resource .= "</select>
+    <br />
+    <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+    $dis_duration
+    <input type=\"submit\" value=\"$l_validate\" />";
+
+  $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id[]&amp;ext_widget=frm_sel_resource.elements[0]";
+  $block_resource = "
+    $l_resources
+    <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_resource\" alt=\"[Add]\" />
+      </a>
+   ";
+  //-- End Resource selection 
+
+  //-- Group selection
   if ($this_group == $c_all) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
   } else {
@@ -320,36 +408,87 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
   }
   $sel_group .= "</optgroup>
   </select>";
+  //-- End Group selection
+
+  //-- Resource Group selection
+  if ($this_group == $c_all) {
+    $sel_grpres = "<option selected=\"selected\">$l_select_group</option>";
+  } else {
+    $dis_back_all_resources = "<br /><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;param_group=$c_all&amp;sel_resource_id[]=$uid\" >$l_everyresources</a>";
+  }
+
+  while ($entity_readable["resourcegroup"]->next_record()) {
+    $g_id = $entity_readable["resourcegroup"]->f("rgroup_id");
+    $g_title = $entity_readable["resourcegroup"]->f("rgroup_name");
+
+    if ($g_id == $this_group) {
+      $selected_s = "selected=\"selected\"";
+    } else {
+      $selected_s = "";
+    }
+    $sel_grpres .=  "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$g_id")."\" $selected_s>$g_title</option>\n";
+  }
+  //-- End Resource Group selection
 
 
+  // DISPLAY BLOCK
   $block = html_bar_legend($entity_store);
- 
-  $block .= "
+  $block .= html_bar_view_type($new_action);
+
+  if ($agenda_view_type == "U") {
+    $block .= "
 <!-- User select -->
-  <div class=\"last\">
+    <div class=\"last\">
 
-  <div class=\"lastTitle\">:: $l_calendar_visible</div>
-  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-  <tr align=\"center\">
-    <td>
-      $l_group_members
-      <form action=\"\" onsubmit=\"return false;\">
-      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-      $sel_group
-      </select>
-      $dis_back_all_users
-      </form>
-      <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
-      $dis_sel_user
-      <input type=\"hidden\" name=\"param_date\" value=\"$iso_date\" />
-      $dis_back_monoview
-      </form>
-    </td>
-  </tr>
-  </table>
-  </div>
+    <div class=\"lastTitle\">:: $l_calendar_visible</div>
+    <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+    <tr align=\"center\">
+      <td>
+        $l_group_members
+        <form action=\"\" onsubmit=\"return false;\">
+        <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+        $sel_group
+        </select>
+        $dis_back_all_users
+        </form>
+        <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
+        $dis_sel_user
+        <input type=\"hidden\" name=\"param_date\" value=\"$iso_date\" />
+        $dis_back_monoview
+        </form>
+      </td>
+    </tr>
+    </table>
+    </div>
+    ";
+  } elseif ($agenda_view_type == "R") {
+    $block .= "
+<!-- Resource select -->
+    <div class=\"last\">
 
-";
+     <div class=\"lastTitle\">:: $l_resource_visible</div>
+       <tr>
+      <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+       <tr align=\"center\">
+        <td class=\"detailLabel\">
+        $l_groups
+         <form action=\"\" onsubmit=\"return false;\">
+          <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+            $sel_grpres
+          </select>
+         </form>
+         <form name=\"frm_sel_resource\" action=\"agenda_index.php\" method=\"get\" $check_sel_resource>
+          $dis_sel_resource
+          <input type=\"hidden\" name=\"param_date\" value=\"$getdate\" />
+          $dis_back_resource_reset
+         </form>
+         $block_resource
+        </td>
+       </tr>
+      </table>
+     </div>
+     ";
+  }
 
   $block .=  html_bar_date_selector($agenda);
 
@@ -1156,199 +1295,6 @@ function html_dis_delete($agenda) {
   ";
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Rights admin panel
-// Parameters:
-//   - $user_q :
-///////////////////////////////////////////////////////////////////////////////
-function dis_right_admin($agenda) {
-  global $display,$auth;
-
-  if (isset($agenda["user_id"])) {
-    $user_id = $agenda["user_id"];
-  } else {
-    $user_id = $auth->auth["uid"];
-  }
-  $writable_user = run_query_userobm_label_writable(); 
-  $user_obm = run_query_userobm_right($user_id);
-  $display["features"] = html_userwritable_bar($writable_user,$user_id);
-  return html_dis_right_admin($user_obm,$user_id);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// User selection for agenda management admin panel
-// Parameters:
-//   - $writable_user : Array of user on who you can manage the calandar
-///////////////////////////////////////////////////////////////////////////////
-function html_userwritable_bar($writable_user,$user_id) {
-  global $l_user_right,$l_validate;
-
-// User Selection
-  if (count($writable_user) > 0) {  
-    $dis_sel_user .= "<select name=\"param_user\">";
-    foreach ($writable_user as $user) {
-      $u_id = $user["id"];
-      $u_lname =  $user["lastname"];
-      $u_fname = $user["firstname"];
-      $dis_sel_user .= "\n<option value=\"$u_id\"";
-      if ($u_id == $user_id ) {
-	$tag_user = " selected=\"selected\"";
-      }
-      $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
-      $tag_user = "";
-    }
-    $dis_sel_user .= "</select>
-    <br />
-    <input type=\"hidden\" name=\"action\" value=\"rights_admin\" />
-    $dis_duration
-    <input type=\"submit\" value=\"$l_validate\" />
-    ";
-
-    $block = "<div class=\"agendaBar\">
-      <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-       <tr>
-        <td class=\"agendaHead2\">$l_user_right</td>
-       </tr>
-       <tr>
-        <td class=\"agendaNoEvent\" align=\"left\">
- 	 <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
-	  $dis_sel_user
-	 </form>
-	</td>
-       </tr>              
-      </table>
-     </div>";
-
-  }
-  return $block;
-} 
-
-  
-///////////////////////////////////////////////////////////////////////////////
-// Display Rights admin panel
-// Parameters:
-//   - $user_q :
-///////////////////////////////////////////////////////////////////////////////
-function html_dis_right_admin($user_q,$user_id) {
-  global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
-  global $l_everyone,  $l_list,$l_authorize,$l_deny,$set_theme, $ico_delete;
-  global $l_public;
-  global $ico_add_user,$popup_height,$popup_width,$l_users,$path;
-  
-  while ($user_q->next_record()) {
-    $u_id = $user_q->f("userobm_id");
-    $lname = $user_q->f("userobm_lastname");
-    $fname = $user_q->f("userobm_firstname");
-
-    if ($u_id == 0) {
-      if ($user_q->f("calendarentityright_read") == 1) {
-        $style_read = "display:none;";
-        $public_read_checked = "checked=\"checked\"";
-      }
-      if ($user_q->f("calendarentityright_write") == 1) {
-        $style_write = "display:none;";
-        $public_write_checked = "checked=\"checked\"";
-      }
-    } else {
-      if ($user_q->f("calendarentityright_write") == 1) {
-        $dis_write_ok .= "<div class=\"elementRow\" id=\"sel_accept_write$u_id\">
-        <a href=\"javascript: remove_element('sel_accept_write$u_id','sel_accept_write');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
-        $lname $fname
-       <input value=\"$u_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
-       </div>";
-      }
-      if ($user_q->f("calendarentityright_read") == 1) {
-        $dis_read_ok .= "<div class=\"elementRow\" id=\"sel_accept_read$u_id\">
-        <a href=\"javascript: remove_element('sel_accept_read$u_id','sel_accept_read');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
-        $lname $fname
-       <input value=\"$u_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
-       </div>";	
-      }
-    }
-  }
-
-   $block_user_read_public = "
-    <td class=\"detailLabel\">
-    $l_public
-    </td>
-    <td class=\"detailForm\" id=\"cb_read_public\">
-      <input onchange=\"show_hide_read_right(this)\" onclick=\"show_hide_read_right(this)\" name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
-    </td>
-   ";
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
-    $block_user_read = "
-    <td class=\"detailLabel\" id=\"head_accept_read\">
-    $l_users
-    <a style=\"$style_read\" id=\"lnk_accept_read\" href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
-      </a>
-     </td>    
-     <td class=\"detailForm\" id=\"sel_accept_read\">
-       $dis_read_ok
-     </td>
-     ";
-
-   $block_user_write_public = "
-    <td class=\"detailLabel\">
-    $l_public
-    </td>
-    <td class=\"detailForm\" id=\"cb_write_public\">
-      <input onchange=\"show_hide_write_right(this)\" onclick=\"show_hide_write_right(this)\" name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
-    </td>
-   ";
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
-    $block_user_write = "
-    <td class=\"detailLabel\" id=\"head_accept_write\">
-    $l_users
-    <a style=\"$style_write\" id=\"lnk_accept_write\" href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
-      </a>
-     </td>    
-     <td class=\"detailForm\" id=\"sel_accept_write\">
-       $dis_write_ok
-     </td>
-     ";
-     
-  $block = "
-  <form method=\"get\" name=\"f_mod_calendar\"
-   action=\"".url_prepare("agenda_index.php")."\">
-  
-   <div class=\"detailHead\">$l_read_permission</div>  
-  <table class=\"detail\">  
-   <tr>
-   $block_user_read_public
-   </tr>
-   <tr>
-   $block_user_read
-   </tr>
-  </table>
-   
-   <div class=\"detailHead\">$l_write_permission</div>   
-  <table class=\"detail\">  
-   <tr>
-   $block_user_write_public
-   </tr>
-   <tr>
-   $block_user_write
-   </tr>
-   </table>
-   <div class=\"detailButton\">   
-    <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
-    <input type=\"hidden\" name=\"action\" value=\"rights_update\" /> 
-    <input type=\"submit\" value=\"$l_list\" /> 
-   </div>
-   </form>
-   ";
-  return $block;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form

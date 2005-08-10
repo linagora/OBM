@@ -17,6 +17,11 @@
 // - update          -- form fields        -- update the resource 
 // - check_delete    -- $param_resource    -- check links before delete
 // - delete          -- $param_resource    -- delete the resource 
+// - rights_admin    -- access rights screen
+// - rights_update   -- Update resource agenda access rights
+// - display         --                -- display and set display parameters
+// - dispref_display --                -- update one field display value
+// - dispref_level   --                -- update one field display position
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple resources (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,6 +29,7 @@
 $set_debug=0;
 
 $path = "..";
+$extra_css = "resource.css";
 $module = "resource";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -101,9 +107,7 @@ if ($action == "ext_get_ids") {
     $retour = run_query_insert($resource);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
-      // insertion of his default preferences : 
       $resource_id = get_resource_id($resource["label"]);
-      //run_query_default_preferences_insert($resource_id);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error);
     }
@@ -148,6 +152,21 @@ if ($action == "ext_get_ids") {
   //run_query_delete_profile($resource["id"]);
   $display["search"] = html_resource_search_form($resource);
 
+} elseif ($action == "rights_admin") {
+///////////////////////////////////////////////////////////////////////////////
+  require("$obminclude/javascript/right_js.inc");
+  require("$obminclude/lib/right.inc");
+
+  $display["detail"] = dis_right_admin($resource["entity_id"], $cagenda_entities["resource"]);
+
+} elseif ($action == "rights_update") {
+///////////////////////////////////////////////////////////////////////////////
+  require("$obminclude/javascript/right_js.inc");
+  require("$obminclude/lib/right.inc");
+
+  run_query_update_right($resource,$cagenda_entities["resource"]);
+  $display["detail"] = dis_right_admin($resource["entity_id"], $cagenda_entities["resource"]);
+
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($auth->auth["uid"], "resource", 1);
@@ -188,6 +207,7 @@ function get_param_resource() {
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $ext_widget,$ext_element;
   global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
+  global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity;
 
   if (isset ($param_ext)) $resource["id"] = $param_ext;
   if (isset ($param_resource)) $resource["id"] = $param_resource;
@@ -213,6 +233,13 @@ function get_param_resource() {
     $http_obm_vars = $HTTP_GET_VARS;
   }
 
+  // Rights parameters
+  if (isset($param_entity)) $resource["entity_id"] = $param_entity;
+  if (is_array($sel_accept_write)) $resource["accept_w"] = $sel_accept_write;
+  if (is_array($sel_accept_read)) $resource["accept_r"] = $sel_accept_read;
+  if (isset($cb_write_public)) $resource["public_w"] = $cb_write_public;
+  if (isset($cb_read_public)) $resource["public_r"] = $cb_read_public;
+
   display_debug_param($resource);
 
   return $resource;
@@ -225,7 +252,7 @@ function get_param_resource() {
 function get_resource_action() {
   global $resource, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset;
+  global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset,$l_header_right;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
@@ -248,8 +275,8 @@ function get_resource_action() {
   $actions["resource"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/resource/resource_index.php?action=new",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display') 
+    'Right'    => $cright_write,
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','rights_admin','rights_update') 
                                   );
 
 // Search
@@ -276,21 +303,21 @@ function get_resource_action() {
   $actions["resource"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/resource/resource_index.php?action=detailupdate&amp;param_resource=".$resource["id"]."",
-     'Right'    => $cright_write_admin,
+     'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update') 
                                      	   );
 
 // Insert
   $actions["resource"]["insert"] = array (
     'Url'      => "$path/resource/resource_index.php?action=insert",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
 // Update
   $actions["resource"]["update"] = array (
     'Url'      => "$path/resource/resource_index.php?action=update",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
@@ -298,8 +325,23 @@ function get_resource_action() {
   $actions["resource"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/resource/resource_index.php?action=delete&amp;param_resource=".$resource["id"]."",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
+                                     );
+
+// Rights Admin.
+  $actions["resource"]["rights_admin"] = array (
+    'Name'     => $l_header_right,
+    'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;param_entity=".$resource["id"]."",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+                                     );
+
+// Rights Update
+  $actions["resource"]["rights_update"] = array (
+    'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;param_entity=".$resource["id"]."",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
                                      );
 
 // Admin

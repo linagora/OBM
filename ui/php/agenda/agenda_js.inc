@@ -43,19 +43,6 @@ function show_hide_dates(field) {
   }     
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Remove all elements in the list form
-///////////////////////////////////////////////////////////////////////////////
-function remove_allelements(parentId) {
-  target = window.document;
-  container = target.getElementById(parentId)
-  while(container.hasChildNodes()==true){
-    var ChildN=container.childNodes[0];
-    container.removeChild(ChildN);
-  }
-} 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Remove an element line in the list form
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,31 +52,6 @@ function remove_element(elemId,parentId) {
   container = target.getElementById(parentId)
   container.removeChild(content); 
 } 
-
-function show_hide_read_right(field) {
-  target = window.document;
-  lnk_read = target.getElementById('lnk_accept_read');
-  sel_read = target.getElementById('sel_accept_read');
-  if(field.checked) {
-    remove_allelements('sel_accept_read');
-    lnk_read.style.display = 'none';
-  } else {
-    lnk_read.style.display = 'inline';
-  }
-}
-
-function show_hide_write_right(field) {
-  target = window.document;
-  lnk_write = target.getElementById('lnk_accept_write');
-  sel_write = target.getElementById('sel_accept_write');
-  if(field.checked) {
-    remove_allelements('sel_accept_write');
-    lnk_write.style.display = 'none';
-  } else {
-    lnk_write.style.display = 'inline';
-  }
-}
-
 
 function check_count_user(formulaire) {
   var selectObject = formulaire.elements[0];

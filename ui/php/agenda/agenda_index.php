@@ -36,7 +36,7 @@ $uid = $auth->auth["uid"];
 
 require("agenda_query.inc");
 require("agenda_display.inc");
-
+require("$obminclude/lib/right.inc");
 
 // Session parameters
 if (isset($rd_view_type)) {
@@ -326,13 +326,15 @@ if ($param_event > 0) {
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_right_admin($agenda);
+  require("$obminclude/javascript/right_js.inc");
+  $display["detail"] = dis_right_admin($agenda["entity_id"], $cagenda_entities["user"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  run_query_update_right($agenda);
-  $display["detail"] = dis_right_admin($agenda);
+  run_query_update_right($agenda,$cagenda_entities["user"]);
+  require("$obminclude/javascript/right_js.inc");
+  $display["detail"] = dis_right_admin($agenda["entity_id"], $cagenda_entities["user"]);
 
 } elseif ($action == "new_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -417,9 +419,9 @@ function get_param_agenda() {
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
-  global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
-  global $cb_read_public, $cb_write_public; 
+  global $sel_deny_write,$sel_deny_read,$sel_time_duration,$sel_min_duration;
   global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id,$sel_user_meeting_id, $sel_group_meeting_id;
+  global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
   global $ch_all_day;
   
   // Agenda fields
@@ -447,12 +449,8 @@ function get_param_agenda() {
   if (isset($hd_old_begin)) $agenda["old_begin"] = $hd_old_begin;
   if (isset($hd_old_end)) $agenda["old_end"] = $hd_old_end;
   if (isset($cb_mail)) $agenda["mail"] = $cb_mail;
-  if (is_array($sel_accept_write)) $agenda["accept_w"] = $sel_accept_write;
-  if (isset($cb_write_public)) $agenda["public_w"] = $cb_write_public;
   if (is_array($sel_deny_write)) $agenda["deny_w"] = $sel_deny_write;
   if (is_array($sel_deny_read)) $agenda["deny_r"] = $sel_deny_read;
-  if (is_array($sel_accept_read)) $agenda["accept_r"] = $sel_accept_read;
-  if (isset($cb_read_public)) $agenda["public_r"] = $cb_read_public;
   if (is_array($sel_user_meeting_id)) $agenda["user_meeting"] = $sel_user_meeting_id;
   if (is_array($sel_group_meeting_id)) $agenda["group_meeting"] = $sel_group_meeting_id;
 
@@ -466,6 +464,13 @@ function get_param_agenda() {
   if (isset($param_duration)) $agenda["duration"] = $param_duration;
   if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;
   if (isset($cb_repeat_update)) $agenda["repeat_update"] = 1;
+
+  // Rights parameters
+  if (isset($param_entity)) $agenda["entity_id"] = $param_entity;
+  if (is_array($sel_accept_write)) $agenda["accept_w"] = $sel_accept_write;
+  if (is_array($sel_accept_read)) $agenda["accept_r"] = $sel_accept_read;
+  if (isset($cb_write_public)) $agenda["public_w"] = $cb_write_public;
+  if (isset($cb_read_public)) $agenda["public_r"] = $cb_read_public;
 
   if (isset($sel_time_begin)) {
     $start_hour = $sel_time_begin;
