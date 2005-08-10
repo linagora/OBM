@@ -226,11 +226,12 @@ function get_document_list() {
   $ctt[1]["value"] = "document_name";
   $concat = sql_string_concat($db_type, $ctt);
 
-  $query = "select document_id,
+  $query = "SELECT document_id,
       document_path,
       document_name,
       document_kind
-      from Document order by $concat";
+    FROM Document
+    ORDER BY $concat";
 
   display_debug_msg($query, $cdg_sql);
 
@@ -241,17 +242,59 @@ function get_document_list() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get file list from Filesystem
+// Calculate the real disk document path
+// Parameters:
+//   - $id   : document id
+// Returns:
+//   real disk path
+///////////////////////////////////////////////////////////////////////////////
+function get_document_disk_path($id) {
+  global $document_path;
+
+  // The document disk path set in the subdirectory named "last id number"
+  // Get the last number from Id
+  $rel = substr($id, -1, 1);
+
+  $disk_path = $document_path . "/" . $rel . "/";
+  
+  return $disk_path; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Calculate the real disk document path
+// Parameters:
+//   - $id   : document id
+// Returns:
+//   real disk path
+///////////////////////////////////////////////////////////////////////////////
+function get_document_disk_relative_path($id) {
+  global $document_path;
+
+  // The document disk path set in the subdirectory named "last id number"
+  // Get the last number from Id
+  $rel = substr($id, -1, 1);
+
+  $disk_path = "/" . $rel . "/" . $id;
+  
+  return $disk_path; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get file list from Filesystem. includes Files + directories
+// Returns:
+// Array( [$fullname] => array([0]=>$path [1]=>$name), ..)
 ///////////////////////////////////////////////////////////////////////////////
 function get_file_list($repository) {
   global $document_path;
 
   $root_handler = opendir($repository);
   $relative_path = substr($repository,strlen($document_path));
-  while($file = readdir($root_handler)) {
+  while ($file = readdir($root_handler)) {
     $path = "$repository$file";
     if ($file != ".." && $file != ".") {
-      $ret[$path] =$file;
+      $ret[$path] = $file;
     }
   }
   closedir($root_handler);

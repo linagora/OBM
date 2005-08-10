@@ -11,8 +11,6 @@
 // - search             -- search fields  -- show the result set of search
 ///////////////////////////////////////////////////////////////////////////////
 
-// run_query_repository_links (document_type ??)
-// gestion des repertoires
 // vues
 // outil d'admin
 // migration ???
@@ -48,7 +46,7 @@ if ($action == "ext_get_path") {
   $display["detail"] = html_documents_tree($document, $ext_disp_file);
 } elseif ($action == "accessfile") {
   if ($document["id"] > 0) {
-    $doc_q = run_query_detail($document);
+    $doc_q = run_query_detail($document["id"]);
     if ($doc_q->num_rows() == 1) {
       dis_file($doc_q);
       exit();
@@ -98,20 +96,12 @@ if ($action == "ext_get_path") {
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($document["id"] > 0) {
-    $doc_q = run_query_detail($document);
-    if ($doc_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($doc_q);
-      $display["detail"] = html_document_consult($doc_q);
-    } else {
-      $display["msg"] .= display_err_msg("$l_no_document !");
-    }
-  }
+  $display["detail"] = dis_document_consult($document);
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
 if ($document["id"] > 0) {
-    $doc_q = run_query_detail($document);
+    $doc_q = run_query_detail($document["id"]);
     if ($doc_q->num_rows() == 1) {
       require("document_js.inc");
       $display["detailInfo"] = display_record_info($doc_q);
@@ -126,12 +116,13 @@ if ($document["id"] > 0) {
   if (check_data_form("", $document)) {
     $document["id"] = run_query_insert($document);
     if ($document["id"]) {
+      update_last_visit("document", $document["id"], $action);
       $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["detail"] = dis_document_consult($document);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error." ".$err_msg);
-    }    
-    $display["search"] = dis_document_search_form($document);
-    $display["result"] = dis_document_search_list($document);
+      $display["detail"] = dis_document_form($action, $document, "");
+    }
   // Form data are not valid
   } else {
     require("document_js.inc");
@@ -166,7 +157,7 @@ if ($document["id"] > 0) {
     } else {
       $display["msg"] .= display_err_msg($l_update_error."  ".$err_msg);
     }
-    $doc_q = run_query_detail($document);
+    $doc_q = run_query_detail($document["id"]);
     $display["detailInfo"] .= display_record_info($doc_q);
     $display["detail"] = html_document_consult($doc_q);
   } else {
@@ -178,7 +169,13 @@ if ($document["id"] > 0) {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = dis_check_links($document["id"]);
+  if (check_can_delete($document["id"])) {
+    $display["msg"] .= display_info_msg($err_msg);
+    $display["detail"] = dis_can_delete($document["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg);
+    $display["detail"] = dis_document_consult($document);
+  }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,10 +188,31 @@ if ($document["id"] > 0) {
   $display["search"] = dis_document_search_form($document);
   $display["result"] = dis_document_search_list($document);
 
-} elseif ($action == "folder_check_delete")  {
+} elseif ($action == "dir_check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = dis_check_repository_links($document["id"]);
+  if (check_can_delete_dir($document["id"])) {
+    $display["detail"] = dis_can_delete_dir($document["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
+    $display["detail"] = dis_document_consult($document);
+    $display["detail"] = html_documents_tree($document,"true");
+  }
+
+} elseif ($action == "dir_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_can_delete_dir($document["id"])) {
+    $retour = run_query_delete($document["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+  } else {
+    $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
+  }
+  require("document_js.inc");
+  $display["detail"] = html_documents_tree($document,"true");
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -439,7 +457,7 @@ function get_document_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/document/document_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','detailconsult','new_repository','insert','insert_repository', 'tree','update','admin','display') 
+    'Condition'=> array ('search','index', 'tree','detailconsult','new_repository','insert','insert_repository', 'delete', 'dir_delete','update','admin','display') 
                                      );
 
 // New Repository
@@ -447,8 +465,7 @@ function get_document_action() {
     'Name'     => $l_header_new_repository,
     'Url'      => "$path/document/document_index.php?action=new_repository",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','detailconsult','new','insert','insert_repository','update',
-                         'tree','admin','display') 
+    'Condition'=> array ('search','index', 'tree','detailconsult','new','insert','insert_repository', 'delete', 'dir_delete','update','admin','display') 
                                      );
 
 // Detail Consult
@@ -501,12 +518,20 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      	      );
 
-// Folder Check Delete
-  $actions["document"]["folder_check_delete"] = array (
-    'Url'      => "$path/document/document_index.php?action=folder_check_delete&amp;param_document=".$document["id"]."",
+// Directory Check Delete
+  $actions["document"]["dir_check_delete"] = array (
+    'Url'      => "$path/document/document_index.php?action=dir_check_delete&amp;param_document=".$document["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')
+                                     	      );
+
+// Directory Delete
+  $actions["document"]["dir_delete"] = array (
+    'Url'      => "$path/document/document_index.php?action=dir_delete",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None') 
                                      	      );
 
 // Insert

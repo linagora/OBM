@@ -259,6 +259,114 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Document Detail
+// Parameters:
+//   - $action     : action called
+//   - $document[] : hash values
+//   - $doc_q      : document database result 
+///////////////////////////////////////////////////////////////////////////////
+function dis_document_consult($document) {
+  global $display, $l_no_document;
+
+  if ($document["id"] > 0) {
+    $doc_q = run_query_detail($document["id"]);
+    if ($doc_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($doc_q);
+      $block = html_document_consult($doc_q);
+    } else {
+      $display["msg"] .= display_err_msg("$l_no_document !");
+    }
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Document Consultation
+// Parameters:
+//   - $co_q   : document database result 
+///////////////////////////////////////////////////////////////////////////////
+function html_document_consult($doc_q) {
+  global $display, $set_theme;
+  global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
+  global $l_author, $l_category1, $l_category2, $l_path, $l_name; 
+  global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
+  global $c_yes, $c_no;
+
+  // if update mode and first display values are taken from database
+  $id = $doc_q->f("document_id");
+  $title = $doc_q->f("document_title");
+  $cat1 = $doc_q->f("documentcategory1_label");
+  $cat2 = $doc_q->f("documentcategory2_label");
+  $author = $doc_q->f("document_author");
+  $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
+  $mimetype = $doc_q->f("documentmimetype_label");
+  $path = $doc_q->f("document_path");
+  $size = $doc_q->f("document_size");
+  $name = $doc_q->f("document_name");
+
+  $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
+  $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
+
+  $display["title"] = "<div class=\"title\">$l_document : $title</div>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <div class=\"detailHead\">$l_document</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailText\">$title</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_author</td>
+      <td class=\"detailText\">$author</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_private</td>
+      <td class=\"detailText\">$privacy</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category1</td>
+      <td class=\"detailText\">$cat1</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category2</td>
+      <td class=\"detailText\">$cat2</td>
+    </tr>
+    </table>
+
+    <div class=\"detailHead\">$l_file</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_mimetype</td>
+      <td class=\"detailText\">$mimetype</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_path</td>
+      <td class=\"detailText\">$path</td>
+    </tr>    
+    <tr>
+      <td class=\"detailLabel\">$l_size</td>
+      <td class=\"detailText\">$size $l_bytes</td>
+     </tr>    
+    </table>
+    <div class=\"detailHead\">
+    <a target=\"_blank\" href=\"$url\">
+     $l_consult
+    </a>
+    </div>
+   ";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Document Form
 // Parameters:
 //   - $action     : action called
@@ -566,145 +674,28 @@ function html_repository_form($action, $document) {
   return $block;
 }
 
-   
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display Document Consultation
-// Parameters:
-//   - $co_q   : document database result 
-///////////////////////////////////////////////////////////////////////////////
-function html_document_consult($doc_q) {
-  global $display, $set_theme;
-  global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
-  global $l_author, $l_category1, $l_category2, $l_path, $l_name; 
-  global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
-  global $c_yes, $c_no;
-
-  // if update mode and first display values are taken from database
-  $id = $doc_q->f("document_id");
-  $title = $doc_q->f("document_title");
-  $cat1 = $doc_q->f("documentcategory1_label");
-  $cat2 = $doc_q->f("documentcategory2_label");
-  $author = $doc_q->f("document_author");
-  $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
-  $mimetype = $doc_q->f("documentmimetype_label");
-  $path = $doc_q->f("document_path");
-  $size = $doc_q->f("document_size");
-  $name = $doc_q->f("document_name");
-
-  $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
-  $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
-
-  $display["title"] = "<div class=\"title\">$l_document : $title</div>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <div class=\"detailHead\">$l_document</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailText\">$title</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_author</td>
-      <td class=\"detailText\">$author</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailText\">$privacy</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailText\">$cat1</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailText\">$cat2</td>
-    </tr>
-    </table>
-
-    <div class=\"detailHead\">$l_file</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_mimetype</td>
-      <td class=\"detailText\">$mimetype</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_path</td>
-      <td class=\"detailText\">$path</td>
-    </tr>    
-    <tr>
-      <td class=\"detailLabel\">$l_size</td>
-      <td class=\"detailText\">$size $l_bytes</td>
-     </tr>    
-    </table>
-    <div class=\"detailHead\">
-    <a target=\"_blank\" href=\"$url\">
-     $l_consult
-    </a>
-    </div>
-   ";
-
-  return $block;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Display and check the document links (and delete form if ok)
+// Display the validation that the document can be deleted, and teh form
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
-  global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_have_link,$l_have_no_link;
-  global $path, $display;
+function dis_can_delete($p_id) {
+  global $display, $l_can_delete, $l_cant_delete, $l_back;
 
-  $delete_ok = true;
-
-  // Links from Contact
-  $obm_q = run_query_document_links($p_id);
-
-  if ($obm_q > 0) {
-    $delete_ok = false;
-    $display_linkc ="
-      <tr>
-        <td class=\"detailHead\">$l_have_link</td>
-      </tr>";
-  } else {
-    $display_linkc = "
-      <tr>
-        <td class=\"detailHead\">$l_have_no_link</td>
-      </tr>";
-  }
- 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
+  $dis_back = "<form name=\"form_back\" method=\"get\"
     action=\"".url_prepare("document_index.php") ."\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  $block .= "<table class=\"detail\">
-   $display_linkc
-   $display_linkd
-   </table>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
+  $display["msg"] .= display_ok_msg($l_can_delete);
+  $block .= "
       <div class=\"detailButton\">
         <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
         <p class=\"detailButtons\">$dis_back</p>
       </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
 
   return $block;
 }
@@ -715,81 +706,35 @@ function dis_check_links($p_id) {
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_repository_links($p_id) {
-  global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_rep_have_link,$l_rep_have_no_link;
-  global $path, $display, $cdg_sql, $default_path;
+function dis_can_delete_dir($p_id) {
+  global $display, $l_dir_can_delete, $l_dir_delete, $l_back;
 
-  $delete_ok = true;
-
-  $obm_q = new DB_OBM;
-  $query = "SELECT * FROM Document WHERE document_id = '$p_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $kind = $obm_q->f("document_kind");
-  $path = $obm_q->f("document_path");
-
-  if ($kind != $cdoc_kind_dir) {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $delete_ok = false;
-    return;
-  }
-
-  if (($path == "/") || ($path == $default_path)) {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    return;
-  }
-
-  // Links from Contact
-  $obm_q = run_query_repository_links($p_id);
-
-  if ($obm_q > 0) {
-    $delete_ok = false;
-    $display_linkc ="
-      <tr>
-        <td class=\"detailHead\">$l_rep_have_link</td>
-      </tr>";
-  } else {
-    $display_linkc = "
-      <tr>
-        <td class=\"detailHead\">$l_rep_have_no_link</td>
-      </tr>";
-  }
-
- 
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("document_index.php") ."\">
-    <input type=\"hidden\" name=\"action\" value=\"index\" />
+    <input type=\"hidden\" name=\"action\" value=\"tree\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  $block .= "<table class=\"detail\">
-   $display_linkc
-   $display_linkd
-   </table>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
+  $display["msg"] .= display_ok_msg($l_dir_can_delete);
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">
+        <form name=\"form_delete\" method=\"post\"
+        action=\"" . url_prepare("document_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"dir_delete\" />
+        <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
+        <input type=\"submit\" value=\"$l_dir_delete\" />
+        </form>
+      </p>
+      <p class=\"detailButtons\">$dis_back</p>
+    </div>";
 
   return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
+// Displays the delete form (button)
 // Parameters:
 //   - $p_id : document Id
 ///////////////////////////////////////////////////////////////////////////////
@@ -800,8 +745,7 @@ function dis_delete_form($p_id) {
       action=\"" . url_prepare("document_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
   return $ret;
@@ -1234,7 +1178,7 @@ function dis_cat1_links($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the cat2 links                                               //
+// Display: the cat2 links
 // Parameters:
 //   - $document : document hash info : keys used : cat2
 ///////////////////////////////////////////////////////////////////////////////
@@ -1321,7 +1265,7 @@ function dis_cat2_links($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the mime links                                               //
+// Display: the mime links
 // Parameters:
 //   - $document : document hash info : keys used : mime
 ///////////////////////////////////////////////////////////////////////////////
@@ -1548,7 +1492,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"document_index.php?action=folder_check_delete&amp;param_document=$d_id\" onclick=\"return confirm('$l_j_repo_delete');\"> 
+	 <a href=\"document_index.php?action=dir_check_delete&amp;param_document=$d_id\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
 	 ".$name."

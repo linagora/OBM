@@ -116,10 +116,8 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
 // Parameters :
 //   - $p_id  : document id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($document) {
+function run_query_detail($p_id) {
   global $cdg_sql;
-
-  $p_id = $document["id"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -593,10 +591,10 @@ function run_query_get_type_by_ext($ext) {
 // Parameters:
 //   - $type : Mime-Type
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_document_links($document_id) {
+function get_document_link_nb($document_id) {
   global $cdg_sql;
 
-  $query = "SELECT *
+  $query = "SELECT count(*) as nb
     FROM DocumentEntity
     WHERE documententity_document_id = '$document_id'";
 
@@ -604,21 +602,27 @@ function run_query_document_links($document_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
-  return $obm_q->nf();
+  return $obm_q->f("nb");
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get if the document can be deleted
+// Get the document number in a directory
 // Parameters:
-//   - $document_id : Id of the Document
+//   - $dpath : directory full name (path+name)
+//   - $kind  : Limit the search to document kind
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_repository_links($document_id) {
-  global $cdg_sql, $cdoc_kind_dir;
+function get_dir_document_nb($dpath, $kind) {
+  global $cdg_sql, $cdoc_kind_dir, $c_all;
+
+  if ($kind != $c_all) {
+    $where_kind = "AND document_kind = '$kind'";
+  }
 
   $query = "SELECT count(document_id) as nb
     FROM Document 
-    WHERE document_path LIKE '$path%'";
+    WHERE document_path = '$dpath'
+      $where_kind";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -1217,6 +1221,85 @@ function check_repository_data_form($document) {
   // If doc is a file, check the path exists
   if (! path_exists($path)) {
     $err_msg = "$l_invalid_repository_path ($path)";
+    return false;
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Display and check the document links (and delete form if ok)
+// Parameters:
+//   - $p_id : document id
+// Returns:
+//   true if document can be deleted (for now always), else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete($p_id) {
+  global $err_msg, $l_can_delete, $l_cant_delete, $l_back;
+  global $l_have_link, $l_have_no_link;
+  global $path, $display;
+
+  $delete_ok = true;
+
+  // Links to entities
+  $nb = get_document_link_nb($p_id);
+
+  // Warn if document has links
+  if ($nb > 0) {
+    $err_msg = $l_have_link;
+  } else {
+    $err_msg = $l_have_no_link;
+  }
+ 
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if a directory can be deleted
+// Parameters:
+//   - $id : document id
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_dir($id) {
+  global $cdoc_kind_dir, $c_all, $default_path;
+  global $err_msg, $l_err_reference, $l_err_system_path, $l_err_dir_no_empty;
+
+  $delete_ok = true;
+
+  $obm_q = run_query_detail($id);
+  $db_id = $obm_q->f("document_id");
+  $kind = $obm_q->f("document_kind");
+  $dpath = $obm_q->f("document_path");
+  $name = $obm_q->f("document_name");
+  $fullname = $dpath . $name . "/";
+
+  // Forbid to delete Root or path defined as default
+  if (($fullname == "/") || ($fullname == $default_path)) {
+    $err_msg .= $l_err_system_path;
+    return false;
+  }
+
+  // Check that document really exists !
+  if ($db_id != $id) {
+    $err_msg .= $l_err_reference;
+    $delete_ok = false;
+    return false;
+  }
+
+  // Check that document is really a directory
+  if ($kind != $cdoc_kind_dir) {
+    $err_msg .= $l_cant_delete;
+    $delete_ok = false;
+    return false;
+  }
+
+  // Check that directory is empty
+  $nb = get_dir_document_nb($fullname, $c_all);
+  if ($nb > 0) {
+    $err_msg .= $l_err_dir_no_empty;
     return false;
   }
 

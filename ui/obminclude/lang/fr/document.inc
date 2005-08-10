@@ -103,9 +103,14 @@ $l_noupdate_file = "Ne pas changer le fichier";
 $l_update_file = "Changer le fichier";
 $l_create_file_error = "Erreur lors de la création du fichier";
 $l_delete_file_error = "La suppression du fichier du document a échoué !";
+$l_can_delete = "Le document peut être supprimé.";
+$l_cant_delete = "Le document ne peut être supprimé !";
+$l_err_system_path = "The Root and the Default directories can't be deleted !"; 
+$l_err_dir_no_empty = "The directory is not empty !"; 
+$l_dir_can_delete = "Le répertoire peut être supprimé.";
+$l_dir_cant_delete = "Le répertoire ne peut être supprimé !";
 
 $l_have_link = "Ce document est lié à divers éléments d'obm";
-$l_rep_have_link = "Ce répertoire soit est un répertoire system, soit contient des documents";
 $l_have_no_link = "Ce document n'est lié à aucun éléments et peut être supprimé";
 $l_rep_have_no_link = "Ce répertoire n'est lié à aucun éléments et peut être supprimé";
 $l_no_document = "Document introuvable";
@@ -115,6 +120,7 @@ $l_checkdelete = "Vérifier ou Supprimer le document";
 $l_delete = "Supprimer le document";
 $l_insert = "Enregistrer le document";
 $l_update = "Modifier le document";
+$l_dir_delete = "Suuprimer le répertoire";
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Titre avant de valider.";

@@ -104,19 +104,25 @@ $l_header_tree = "Tree";
 $l_invalid_link_file = "Cannot create a alias over a link";
 $l_have_link = "This document is linked with various objects";
 $l_have_no_link = "This document isn't linked and can be deleted";
-$l_rep_have_link = "This repository might be a system repository, or contains others documents";
 $l_rep_have_no_link = "This repository can be deleted";
 
 $l_no_document = "Document not found";
 $l_invalid_url = "Incorrect URL";
+$l_can_delete = "The document can be deleted.";
+$l_cant_delete = "The document can not be deleted !";
 $l_create_file_error = "File creation error !";
 $l_delete_file_error = "Error during file deletion !";
+$l_err_system_path = "The Root and the Default directories can't be deleted !"; 
+$l_err_dir_no_empty = "The directory is not empty !"; 
+$l_dir_can_delete = "The directory can be deleted.";
+$l_dir_cant_delete = "The directory can not be deleted !";
 
 // Actions
 $l_checkdelete = "Check or Delete the Document";
 $l_delete = "Delete the Document";
 $l_insert = "Insert the Document";
 $l_update = "Update the Document";
+$l_dir_delete = "Delete the Directory";
 
 // JavaScript Messages
 $l_fill_title = "You have to fill the Title before submitting.";
@@ -131,7 +137,7 @@ $l_j_mime_update = "You have to fill all the fields before submitting.";
 $l_j_mime_delete = "You have to select a mime-type";
 $l_j_cat1_delete = "You have to select a category1";
 $l_j_cat2_delete = "You have to select a category2";
-$l_j_repo_delete = "Do you want to delete this répository?";
+$l_j_repo_delete = "Confirm Directory Deletion ?";
 $l_fill_repository_name = "You have to fill the directory";
 $l_invalid_repository_path = "The path specified does not exists !";
 $l_invalid_file = "Incorrect file";
