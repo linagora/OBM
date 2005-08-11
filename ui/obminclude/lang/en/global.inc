@@ -225,7 +225,7 @@ $l_header_duplicate = "Dupplicate";
 $l_header_add_contact = "Add contact";
 
 // Project Agenda
-$l_header_right = "Right management"
+$l_header_right = "Right management";
 
 // Project headers
 $l_header_man_task = "Tasks";

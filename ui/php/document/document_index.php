@@ -11,9 +11,10 @@
 // - search             -- search fields  -- show the result set of search
 ///////////////////////////////////////////////////////////////////////////////
 
-// vues
-// outil d'admin
-// migration ???
+// vues (par societe,...)
+// migration ??? ou outil d'import d'un depot (repertoire classique)
+// script de creation du depot
+// acl
 
 $path = "..";
 $module = "document";
@@ -457,7 +458,7 @@ function get_document_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/document/document_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index', 'tree','detailconsult','new_repository','insert','insert_repository', 'delete', 'dir_delete','update','admin','display') 
+    'Condition'=> array ('search','index', 'tree','detailconsult','new_repository','insert','insert_repository', 'check_delete', 'delete', 'dir_check_delete', 'dir_delete','update','admin','display') 
                                      );
 
 // New Repository
@@ -465,7 +466,7 @@ function get_document_action() {
     'Name'     => $l_header_new_repository,
     'Url'      => "$path/document/document_index.php?action=new_repository",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index', 'tree','detailconsult','new','insert','insert_repository', 'delete', 'dir_delete','update','admin','display') 
+    'Condition'=> array ('search','index', 'tree','detailconsult','new','insert','insert_repository', 'check_delete', 'delete', 'dir_check_delete', 'dir_delete','update','admin','display') 
                                      );
 
 // Detail Consult

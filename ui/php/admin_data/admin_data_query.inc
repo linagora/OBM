@@ -282,18 +282,23 @@ function get_document_disk_relative_path($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get file list from Filesystem. includes Files + directories
+// Get file list from Filesystem. includes Files and optionnally directories
+// Parameters:
+//   - $root     : root directory to list
+//   - $with_dir : if true, returns directories too
 // Returns:
 // Array( [$fullname] => array([0]=>$path [1]=>$name), ..)
 ///////////////////////////////////////////////////////////////////////////////
-function get_file_list($repository) {
+function get_file_list($root, $with_dir=false) {
   global $document_path;
 
-  $root_handler = opendir($repository);
-  $relative_path = substr($repository,strlen($document_path));
+  $tree= array();
+
+  $root_handler = opendir($root);
+  $relative_path = substr($root, strlen($document_path));
   while ($file = readdir($root_handler)) {
-    $path = "$repository$file";
-    if ($file != ".." && $file != ".") {
+    $path = "$root$file";
+    if (($file != "..") && ($file != ".")) {
       $ret[$path] = $file;
     }
   }
@@ -301,16 +306,23 @@ function get_file_list($repository) {
   if ($ret) {
     ksort($ret);
     foreach($ret as $path=>$file) {
-      $tree[$relative_path.$file] = array($relative_path,$file);;
+      $tree[$relative_path.$file] = array($relative_path,$file);
+
+      // If entry is a directory
       if (is_dir($path)) {
+	// We drop the entry if directory not te be returned
+	if (! $with_dir) {
+	  unset($tree[$relative_path.$file]);
+	}
+	// We recurse into it
 	$result =  get_file_list("$path/");
 	if ($result) {
 	  $tree = array_merge($tree,$result);
 	}
       }
     }
-    return $tree;
   }
+  return $tree;
 }
 
 

@@ -27,6 +27,7 @@ require("admin_data_display.inc");
 require("admin_data_query.inc");
 
 $target_modules = array ('company', 'deal', 'list', 'document');
+$target_upd_modules = array ('company', 'deal', 'list');
 //$target_modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 
@@ -60,7 +61,7 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_data_index($mode, $acts, $target_modules, $langs, $themes);
+    dis_data_index($mode, $acts, $target_modules, $target_upd_modules);
     break;
   case "data_show":
     dis_data($action, $mode, $target_module);

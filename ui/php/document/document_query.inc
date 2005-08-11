@@ -426,6 +426,7 @@ function format_path($p_path) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Calculate the real disk document path
+// XXXXX Copy of this function is admin_data_query.inc
 // Parameters:
 //   - $id   : document id
 // Returns:

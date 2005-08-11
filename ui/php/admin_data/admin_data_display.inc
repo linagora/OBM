@@ -33,16 +33,19 @@ function dis_help($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the search form for data module
 // Parameters:
-//   - $mode : "txt" ou "html"
+//   - $mode        : "txt" ou "html"
+//   - $actions     : actions allowed
+//   - $modules     : target modules to show action
+//   - $upd_modules : target modules to update action
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_index($mode, $actions, $modules) {
+function dis_data_index($mode, $actions, $modules, $upd_modules) {
 
   switch ($mode) {
   case "txt":
     echo "try -h to help\n";
     break;
   case "html":
-    html_data_index($actions, $modules);
+    html_data_index($actions, $modules, $upd_modules);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -54,16 +57,26 @@ function dis_data_index($mode, $actions, $modules) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the HTML search form for lang module
 // Parameters:
+//   - $actions     : actions allowed
+//   - $modules     : target modules to show action
+//   - $upd_modules : target modules to update action
 ///////////////////////////////////////////////////////////////////////////////
-function html_data_index($actions, $modules) {
+function html_data_index($actions, $modules, $upd_modules) {
   global $l_execute, $l_help;
 
-  // modules SELECT
+  // show : modules select
   $sel_module = "<select name=\"target_module\">";
   while (list ($key, $val) = each ($modules)) {
     $sel_module .= "<option value=\"$val\">$val";
   }
   $sel_module .= "</select>";
+
+  // update : modules select
+  $sel_upd_module = "<select name=\"target_module\">";
+  while (list ($key, $val) = each ($upd_modules)) {
+    $sel_upd_module .= "<option value=\"$val\">$val";
+  }
+  $sel_upd_module .= "</select>";
 
   echo "
     <br />
@@ -96,7 +109,7 @@ function html_data_index($actions, $modules) {
         <input type=\"submit\" value=\"$l_execute\" /></td>
     </tr><tr>
       <td class=\"adminText\">Update inconsistencies in data</td>
-      <td class=\"adminText\">$sel_module</td>
+      <td class=\"adminText\">$sel_upd_module</td>
     </tr>
     </table>
     </form>
@@ -557,6 +570,7 @@ function dis_data_list($action, $mode) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display (/and update) data inconsistency for the Document module
+// For now, no update is done
 // Parametres:
 //   - $action : data_show || data_update (proceed the update)
 //   - $mode : "txt" or "html"
@@ -568,6 +582,7 @@ function dis_data_document($action, $mode) {
   // Get the document list
   $d_q = get_document_list();
   $disk_array = get_file_list("$document_path/");
+  $nb_files = count ($disk_array);
   $cpt_err = 0;
   $nb_document = $d_q->num_rows();
   $db = new DB_OBM;
@@ -578,6 +593,7 @@ function dis_data_document($action, $mode) {
 *** Document : $nb_document to parse in database and
 at least as much in the file system.
 ------------------------------------------------------------------------------
+Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
 ";
   } else {
     if ($action == "data_update") {
@@ -592,52 +608,50 @@ at least as much in the file system.
         <td class=\"adminHead\">Document Path</td>
         <td class=\"adminHead\">Document Name</td>
         <td class=\"adminHead\">Document Kind</td>
-        <td class=\"adminHead\">Disk Path</td>
-	<td class=\"adminHead\">Missing <br> in Database</td>
-        <td class=\"adminHead\">Missing <br> in File System</td>
+        <td class=\"adminHead\">Disk Path <br />($document_path)</td>
+	<td class=\"adminHead\">Missing <br /> in Database</td>
+        <td class=\"adminHead\">Missing <br /> in File System</td>
         $update
       </tr>";
   }
 
-  print_r($disk_array);
-
-  if ($mode == "html") {
-
-    // First Loop through DB
-    $miss_bd = "";
-    while ($d_q->next_record()) {
-      $is_ok = true;
-      $id = $d_q->f("document_id");
-      $kind = $d_q->f("document_kind");
-      $dpath = $d_q->f("document_path");
-      $name = $d_q->f("document_name");
-      if ($kind == $cdoc_kind_dir) {
-	$type = "Directory";
-      } elseif ($kind == $cdoc_kind_file) {
-	$type = "File";
-      } elseif ($kind == $cdoc_kind_link) {
-	$type = "Link";
+  // First Loop through DB
+  $miss_bd = "";
+  while ($d_q->next_record()) {
+    $is_ok = true;
+    $id = $d_q->f("document_id");
+    $kind = $d_q->f("document_kind");
+    $dpath = $d_q->f("document_path");
+    $name = $d_q->f("document_name");
+    if ($kind == $cdoc_kind_dir) {
+      $type = "Directory";
+    } elseif ($kind == $cdoc_kind_file) {
+      $type = "File";
+    } elseif ($kind == $cdoc_kind_link) {
+      $type = "Link";
+    }
+    $disk_path = get_document_disk_path($id);
+    $disk_fn = $disk_path . $id;
+    $disk_rel = get_document_disk_relative_path($id);
+    
+    // If document is a file, check if present in filesystem
+    if ($kind == $cdoc_kind_file) {
+      if (file_exists($disk_fn)) {
+	$miss_fs = "";
+      } else {
+	$is_ok = false;
+	$miss_fs = "X";
       }
-      $disk_path = get_document_disk_path($id);
-      $disk_fn = $disk_path . $id;
-      $disk_rel = get_document_disk_relative_path($id);
-  
-      // If document is a file, check if present in filesystem
-      if ($kind == $cdoc_kind_file) {
-	if (file_exists($disk_fn)) {
-	  $miss_fs = "";
-	} else {
-	  $is_ok = false;
-	  $miss_fs = "X";
-	}
-      }
+    }
 
-      // If problem, display the entry
-      //      if (! $is_ok) {
-      if (1) {
-	$cpt_err++;
+    // If problem, display the entry
+    if (! $is_ok) {
+      $cpt_err++;
+      if ($mode == "txt") {
+	$dis_id = $id;
+	$line = "$dis_id | $dpath | $name | $type | $disk_rel | $miss_bd | $miss_fs - $update\n";
+      } else {
 	$dis_id = "<a href=\"$path/document/document_index.php?action=detailconsult&amp;param_document=$id\">$id</a>";
-
 	$line = "
      <tr>
 	<td class=\"adminText\">$dis_id</td>
@@ -649,16 +663,42 @@ at least as much in the file system.
         <td class=\"adminText\">$miss_fs</td>
         $update
       </tr>";
-	echo $line;
-	unset($disk_array[$disk_rel]);
-      } else {
+      }
+      echo $line;
+
+      // Entry is ok
+    } else {
+      // We delete it from the disk_array (only if is a file)
+      if ($kind == $cdoc_kind_file) {
 	unset($disk_array[$disk_rel]);
       }
-    } // End Loop through BD
+    }
+  } // End Loop through BD
+
+
+  // Loop through Files inf filesystem not present in DB
+  foreach($disk_array as $disk_rel=>$info) {
+    $cpt_err++;
+    $type = "File";
+
+    if ($mode == "txt") {
+      $line = " | | | $type | $disk_rel | X | |\n";
+    } else {
+      $line = "
+     <tr>
+	<td class=\"adminText\"></td>
+        <td class=\"adminText\"></td>
+        <td class=\"adminText\"></td>
+        <td class=\"adminText\">$type</td>
+        <td class=\"adminText\">$disk_rel</td>
+	<td class=\"adminText\">X</td>
+        <td class=\"adminText\"></td>
+      </tr>";
+    }
+    echo $line;
   }
 
   if ($mode == "txt") {
-
     echo "
 ------------------------------------------------------------------------------
 *** Document : $nb_document to parse, $cpt_err inconsistencies
@@ -667,11 +707,11 @@ at least as much in the file system.
   } else {
     echo "<tr>
         <td class=\"adminLabel\" colspan=\"8\">
-          Document : $nb_document to parse, $cpt_err inconsistencies</td>
+          Document : $nb_document from DB, $nb_files Files from disk, $cpt_err inconsistencies</td>
       </tr>
       </table>";
   }
-  print_r($disk_array);
+
 }
 
 
