@@ -45,7 +45,7 @@ if (isset($rd_view_type)) {
   $agenda_user_view = $sel_user_id;
   $sel_resource_id=array();
   $agenda_resource_view = $sel_resource_id;
-  $param_group="";
+  unset($param_group);
 } elseif (($action == "perform_meeting") || (!isset($agenda_view_type))) {
   $agenda_view_type = "U";
 } elseif ($action == "perform_res_meeting") {
@@ -106,16 +106,20 @@ if ($popup) {
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  $sel_entities = slice_entities($sel_user_id, $sel_resource_id);
   $obm_wait = run_query_waiting_events();
   if($obm_wait->nf() != 0) {
     $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
     $display["detail"] = html_waiting_events($obm_wait);
   } else {
-    $entity_store = store_entities(run_query_get_entity_label($sel_entities));
-    $entity_readable = run_query_entity_readable();
     require("agenda_js.inc");
-    $display["result"] = dis_week_planning($agenda,$entity_store);
+    $entity_readable = run_query_entity_readable();
+    $sel_entities = slice_entities($sel_user_id, $sel_resource_id, $entity_readable);
+    $entity_store = store_entities(run_query_get_entity_label($sel_entities));
+    if (count($entity_store) === 0) {
+      $display["msg"] .= display_warn_msg($l_err_no_agenda_selected);
+    } else {
+      $display["result"] = dis_week_planning($agenda,$entity_store);
+    }
     $display["features"]  = html_planning_bar($agenda,$sel_entities,$entity_store,$entity_readable);
   }
 } elseif($action == "decision") {
@@ -138,44 +142,64 @@ if ($action == "index") {
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg($l_update_ok); 
       $sel_user_id = array($uid);
-      $sel_entities = slice_entities($sel_user_id, $sel_resource_id);
-      $entity_store = store_entities(run_query_get_entity_label($sel_entities));
       $entity_readable = run_query_entity_readable();
-      $display["result"] = dis_week_planning($agenda,$entity_store);
+      $sel_entities = slice_entities($sel_user_id, $sel_resource_id, $entity_readable);
+      $entity_store = store_entities(run_query_get_entity_label($sel_entities));
+      if (count($entity_store) === 0) {
+        $display["msg"] .= display_warn_msg($l_err_no_agenda_selected);
+      } else {
+        $display["result"] = dis_week_planning($agenda,$entity_store);
+      }
       $display["features"]  = html_planning_bar($agenda,$sel_entities,$entity_store,$entity_readable);
     }
   }
 } elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
-  $sel_entities = slice_entities($sel_user_id, $sel_resource_id);
   require("agenda_js.inc");
-  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
   $entity_readable = run_query_entity_readable();
-  $display["result"] = dis_day_planning($agenda,$entity_store);
+  $sel_entities = slice_entities($sel_user_id, $sel_resource_id, $entity_readable);
+  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
+  if (count($entity_store) === 0) {
+    $display["msg"] .= display_warn_msg($l_err_no_agenda_selected);
+  } else {
+    $display["result"] = dis_day_planning($agenda,$entity_store);
+  }
   $display["features"]  = html_planning_bar($agenda,$sel_entities,$entity_store,$entity_readable);
 } elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
-  $sel_entities = slice_entities($sel_user_id, $sel_resource_id);
   require("agenda_js.inc");
-  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
   $entity_readable = run_query_entity_readable();
-  $display["result"] = dis_week_planning($agenda,$entity_store);
+  $sel_entities = slice_entities($sel_user_id, $sel_resource_id, $entity_readable);
+  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
+  if (count($entity_store) === 0) {
+    $display["msg"] .= display_warn_msg($l_err_no_agenda_selected);
+  } else {
+    $display["result"] = dis_week_planning($agenda,$entity_store);
+  }
   $display["features"]  = html_planning_bar($agenda,$sel_entities,$entity_store,$entity_readable);
 } elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
-  $sel_entities = slice_entities($sel_user_id, $sel_resource_id);
   require("agenda_js.inc");
-  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
   $entity_readable = run_query_entity_readable();
-  $display["result"] = dis_month_planning($agenda,$entity_store);
+  $sel_entities = slice_entities($sel_user_id, $sel_resource_id, $entity_readable);
+  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
+  if (count($entity_store) === 0) {
+    $display["msg"] .= display_warn_msg($l_err_no_agenda_selected);
+  } else {
+    $display["result"] = dis_month_planning($agenda,$entity_store);
+  }
   $display["features"]  = html_planning_bar($agenda,$sel_entities,$entity_store,$entity_readable);
 } elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
-  $sel_entities = slice_entities($sel_user_id, $sel_resource_id);
   require("agenda_js.inc");
-  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
   $entity_readable = run_query_entity_readable();
-  $display["result"] = dis_year_planning($agenda,$entity_store);
+  $sel_entities = slice_entities($sel_user_id, $sel_resource_id, $entity_readable);
+  $entity_store = store_entities(run_query_get_entity_label($sel_entities));
+  if (count($entity_store) === 0) {
+    $display["msg"] .= display_warn_msg($l_err_no_agenda_selected);
+  } else {
+    $display["result"] = dis_year_planning($agenda,$entity_store);
+  }
   $display["features"]  = html_planning_bar($agenda,$sel_entities,$entity_store,$entity_readable);
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -515,6 +539,11 @@ function get_param_agenda() {
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
   if (is_array($sel_group_id)) $agenda["group"] = $sel_group_id;
   if (isset($param_group)) $agenda["agenda_group"] = $param_group;
+  if (isset($param_group) && ($param_group != "")) {
+    $agenda["agenda_group"] = $param_group;
+  } else {
+    $agenda["agenda_group"] = $c_all;
+  }
 
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {

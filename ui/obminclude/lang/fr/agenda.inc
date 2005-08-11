@@ -118,6 +118,7 @@ $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
 $l_fill_dateend = "Veuillez remplir le champ [ $l_dateend ]";
 $l_fill_datebegin = "Veuillez remplir le champ [ $l_datebegin ]";
+$l_err_no_agenda_selected = "Aucun agenda séléctionné";
 $l_err_begin_end = "La date de fin doit être supérieure à la date de début";
 $l_err_end_repeat = "La fin de répétition doit être supérieure à la date de fin";
 $l_err_end_repeat2 = "La durée maximum d'une répétition est de 1 an";
