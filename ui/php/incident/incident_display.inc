@@ -460,7 +460,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
   global $l_label,$l_contract,$l_status,$l_cat1, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
-  global $l_update, $l_checkdelete, $l_insert;
+  global $l_update, $l_insert;
   global $l_duration,$l_solution,$l_date, $l_archive_new,$l_res_duration;
   global $popup_height, $popup_width, $l_select_contract,$l_comment,$l_upd_comment,$l_add_comment;
 
@@ -709,6 +709,40 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the incident delete validation screen
+// Parameters:
+//   - $p_id : incident id
+///////////////////////////////////////////////////////////////////////////////
+function dis_can_delete_incident($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
+
+  $url = url_prepare("incident_index.php");
+
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_incident\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_incident\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\" />
+    </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
+
+  return $block;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Incident administration index                                 //
@@ -857,9 +891,8 @@ function html_priority_form($pri_q) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Incident Status section                                                   //
+// Incident Status section
 // Parameters:
 //   - $sta_q : Status list database object
 ///////////////////////////////////////////////////////////////////////////////

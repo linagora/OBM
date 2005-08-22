@@ -222,6 +222,7 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Resource Form
 // Parameters:
@@ -346,6 +347,7 @@ function html_resource_consult($obm_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Displays and check the resource links (and delete form if ok)             //
 // Parameters:
@@ -450,7 +452,7 @@ function dis_delete_form($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the Resource Display preference screen                           //
+// Display: the Resource Display preference screen
 // Parameters:
 //   - $prefs : DBO : Field list to display
 ///////////////////////////////////////////////////////////////////////////////

@@ -15,20 +15,20 @@
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
 
-$debug = 0;
+$debug = 1;
 $path = "..";
 $module = "admin_data";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 
-include("$obminclude/global.inc"); 
+include("$obminclude/global.inc");
 require("admin_data_display.inc");
 require("admin_data_query.inc");
+require("$path/document/document_query.inc");
 
 $target_modules = array ('company', 'deal', 'list', 'document');
 $target_upd_modules = array ('company', 'deal', 'list');
-//$target_modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 
 ///////////////////////////////////////////////////////////////////////////////

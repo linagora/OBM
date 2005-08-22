@@ -21,6 +21,8 @@ $l_update = "Modifier";
 
 $l_no_found = "Pas de tâches à faire";
 $l_no_deadline = "Non spécifiée";
+$l_insert_ok = "L'insertion du post-it a été correctement effectuée.";
+$l_insert_error = "L'insertion du post-it a échoué !";
 $l_delete_ok = "La suppression du post-it a été correctement effectuée.";
 $l_delete_error = "La suppression du post-it a échoué !";
 

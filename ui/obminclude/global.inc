@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.0.0pre8";
+$obm_version = "1.0.0pre9";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -125,7 +125,7 @@ $c_week_first_day = 1;
 $cmail_incident = "";
 
 // Document : constants
-$document_path = "/var/www/docs";            // Root of the document repository
+$cdocument_root = "/var/www/docs";           // Root of the document repository
 $default_path = "/Default";                  // Default directory
 $default_mime = "application/octet-stream";  // Default Mime Type
 

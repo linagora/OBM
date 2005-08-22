@@ -49,7 +49,7 @@ $l_name_list_nomatch = "Nombre de la lista no es válido";
 $l_check_samelist = "Estas listas lucen similar a la nueva entrada !";
 $l_list_exists = "Lo siento pero esta lista ya existe";
 $l_j_check_email = "Dirección de correo electrónico no es válido.";
-$l_warn_delete = "contatos registrados en esta lista";
+$l_has_contact = "contatos registrados en esta lista";
 
 $l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener las listas";
 $l_found = "listas encontradas.";

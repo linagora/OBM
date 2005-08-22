@@ -23,7 +23,7 @@
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position
 // External API ---------------------------------------------------------------
-// - ext_get_ids     --                -- select multiple resources (return id) 
+// - ext_get_ids     --                -- select multiple resources (ret id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 $set_debug=0;
@@ -76,20 +76,20 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_resource_search_form($resource);
   $display["result"] = dis_resource_search_list($resource);
 
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_resource_form("",$resource);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_resource_consult($resource);
 
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($resource["id"]);
   if ($obm_q->num_rows() == 1) {
@@ -99,7 +99,7 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $resource)) {
 
@@ -119,14 +119,14 @@ if ($action == "ext_get_ids") {
     $display["detail"] = html_resource_form("", $resource);
   }
 
-} elseif ($action == "reset")  {
+} elseif ($action == "reset") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_default_preferences_insert($resource["id"]);
   session_load_resource_prefs();
   $display["msg"] .= display_ok_msg($l_reset_ok);
   $display["detail"] = dis_resource_consult($resource);
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($resource["id"], $resource)) {
     $retour = run_query_update($resource["id"], $resource);
@@ -141,7 +141,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = html_resource_form("", $resource);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($resource["id"]);
   if ($retour) {

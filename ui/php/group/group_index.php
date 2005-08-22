@@ -138,17 +138,31 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_warn_delete($group["id"]);
+  if (check_can_delete_group($group["id"])) {
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_group($group["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_group_consult($group, $uid);
+  }
+  //  $display["detail"] = dis_warn_delete($group["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($hd_group_id);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_group($group["id"])) {
+    $retour = run_query_delete($hd_group_id);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = html_group_search_form("");
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_group_consult($group, $uid);
   }
-  $display["search"] = html_group_search_form("");
 
 } elseif ($action == "user_add")  {
 ///////////////////////////////////////////////////////////////////////////////

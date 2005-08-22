@@ -222,26 +222,26 @@ function run_query_delete($parms) {
   global $cdg_sql, $c_use_connectors;
 
   foreach($parms as $key => $val) {
-    $id_todo = strstr($key,"_"); 
+    $id_todo = strstr($key,"_");
+
     if ($id_todo != "") {
-      $id_todo = substr($id_todo, 1);  
+      $id_todo = substr($id_todo, 1);
     
-      if ($val == "on"){
+      if ($val == "on") {
         $query = "DELETE FROM Todo WHERE todo_id = '$id_todo'";
 	display_debug_msg($query, $cdg_sql, "run_query_delete");
-        $delete_query = new DB_OBM;
-        $delete_query->query($query);
+        $obm_q = new DB_OBM;
+        $obm_q->query($query);
 
 	// If connectors in use
 	if ($c_use_connectors) {
 	  $now = date("Y-m-d H:i:s");
 	  $query = "INSERT INTO
-            DeletedTodo (deletedtodo_user_id, deletedtodo_timestamp)
+            DeletedTodo (deletedtodo_todo_id, deletedtodo_timestamp)
             VALUES ('$id_todo', '$now')";
 	  display_debug_msg($query, $cdg_sql);
-	  $retour = $delete_query->query($query);
+	  $retour = $obm_q->query($query);
 	}
-
       }    
     }
   }
@@ -254,13 +254,26 @@ function run_query_delete($parms) {
 //   - $t_id = todo id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete_unique($t_id) {
-  global $cdg_sql;
+  global $cdg_sql, $c_use_connectors;
 
-  $query = "delete from Todo where todo_id = '$t_id'";
+  $query = "DELETE FROM Todo WHERE todo_id = '$t_id'";
   
   display_debug_msg($query, $cdg_sql, "run_query_delete_unique");
-  $delete_query = new DB_OBM;
-  return $delete_query->query($query);
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+
+  // If connectors in use
+  if ($c_use_connectors) {
+    $now = date("Y-m-d H:i:s");
+    $query = "INSERT INTO
+      DeletedTodo (deletedtodo_todo_id, deletedtodo_timestamp)
+      VALUES ('$t_id', '$now')";
+
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+  }
+
+  return $ret;
 }
 
 
@@ -283,7 +296,6 @@ function check_todo_data_form($todo) {
   $content = $todo["content"];
   $percent = $todo["percent"];
 
-  echo "ti=$title";
   // MANDATORY: Todo title
   if (trim($title) == "") {
     $err_msg = $l_j_fill_title;
@@ -297,4 +309,20 @@ function check_todo_data_form($todo) {
   }
 
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the todo can be deleted
+// Parameters:
+//   - $p_id : todo id
+// Returns:
+//   true if the todo can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_todo($p_id) {
+  global $err_msg, $ok_msg;
+
+  $delete_ok = true;
+
+  return $delete_ok;
 }

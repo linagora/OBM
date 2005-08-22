@@ -171,6 +171,71 @@ function run_query_tasktype($tt_cat="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of contacts linked to an entity
+// Parameters:
+//   - $id     : Id of entity
+//   - $entity : entity (company)
+//   - $arch   : flag to tell if archived contacts should be counted (if true)
+// Return:
+//   - $nb     : number of Contact
+///////////////////////////////////////////////////////////////////////////////
+function get_linked_contact_nb ($id, $entity, $arch="") {
+  global $cdg_sql;
+
+  $query = "SELECT count(contact_id) as nb
+    FROM Contact
+    WHERE contact_${entity}_id = '$id'";
+
+  if (! $arch) {
+    $query .= " and contact_archive='0'";
+  }
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of deals linked to an entity
+// Parameters:
+//   - $id      : Id of entity
+//   - $entity  : entity (company, contact)
+//   - $arch    : flag to tell if archived deal should be counted (if true)
+//   - $entity2 : entity 2 (for contact as deal can have 2 contacts)
+// Return:
+//   - $nb      : number of Deal
+///////////////////////////////////////////////////////////////////////////////
+function get_linked_deal_nb ($id, $entity, $arch="", $entity2="") {
+  global $cdg_sql;
+
+  if ($entity2 != "") {
+    $where_ent = "(deal_${entity}_id = '$id' OR deal_${entity2}_id = '$id')";
+  } else {
+    $where_ent = "deal_${entity}_id = '$id'";
+  }
+
+  $query = "SELECT count(deal_id) as nb
+    FROM Deal
+    WHERE $where_ent";
+
+  if (! $arch) {
+    $query .= " AND deal_archive='0'";
+  }
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of projects linked to an entity
 // Parameters:
 //   - $id     : Id of entity
@@ -179,7 +244,7 @@ function run_query_tasktype($tt_cat="") {
 // Return:
 //   - $nb     : number of Project
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_linked_project_nb ($id, $entity, $arch="") {
+function get_linked_project_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
   $query = "SELECT count(project_id) as nb
@@ -202,21 +267,57 @@ function run_query_linked_project_nb ($id, $entity, $arch="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of contract linked to an entity
 // Parameters:
-//   - $id     : Id of entity
-//   - $entity : entity (deal, company)
-//   - $arch   : flag to tell if archived contract should be counted (if true)
+//   - $id      : Id of entity
+//   - $entity  : entity (deal, company)
+//   - $arch    : flag to tell if archived contract should be counted (if true)
+//   - $entity2 : entity 2 (for contact as contract can have 2 contacts)
 // Return:
-//   - $nb     : number of contract
+//   - $nb      : number of contract
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_linked_contract_nb ($id, $entity, $arch="") {
+function get_linked_contract_nb ($id, $entity, $arch="", $entity2="") {
   global $cdg_sql;
+
+  if ($entity2 != "") {
+    $where_ent = "(contract_${entity}_id = '$id' OR contract_${entity2}_id = '$id')";
+  } else {
+    $where_ent = "contract_${entity}_id = '$id'";
+  }
 
   $query = "SELECT count(contract_id) as nb
     FROM Contract
-    WHERE contract_${entity}_id = '$id'";
+    WHERE $where_ent";
 
   if (! $arch) {
     $query .= " and contract_archive='0'";
+  }
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of incidents linked to an entity
+// Parameters:
+//   - $id     : Id of entity
+//   - $entity : entity (contract))
+//   - $arch   : flag to tell if archived incidents should be counted (if true)
+// Return:
+//   - $nb     : # Incident
+///////////////////////////////////////////////////////////////////////////////
+function get_linked_incident_nb ($id, $entity, $arch="") {
+  global $cdg_sql;
+
+  $query = "SELECT count(incident_id) as nb
+    FROM Incident
+    WHERE incident_{$entity}_id = '$id'";
+
+  if (! $arch) {
+    $query .= " and incident_archive='0'";
   }
 
   $obm_q = new DB_OBM;
@@ -237,11 +338,12 @@ function run_query_linked_contract_nb ($id, $entity, $arch="") {
 // Return:
 //   - $nb     : number of invoice
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_linked_invoice_nb ($id, $entity, $arch="") {
+function get_linked_invoice_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
-  $query = "select count(invoice_id) as nb from Invoice
-    where invoice_${entity}_id = '$id'";
+  $query = "SELECT count(invoice_id) as nb
+    FROM Invoice
+    WHERE invoice_${entity}_id = '$id'";
 
   if (! $arch) {
     $query .= " and invoice_archive='0'";
@@ -267,10 +369,11 @@ function run_query_linked_invoice_nb ($id, $entity, $arch="") {
 function run_query_document_nb ($id,$entity) {
   global $cdg_sql;
 
-  $query = "select count(*) as nb
-    from DocumentEntity
-    where documententity_entity = '$entity'
-      and documententity_entity_id = '$id'"; 
+  $query = "SELECT count(*) as nb
+    FROM DocumentEntity
+    WHERE documententity_entity = '$entity'
+      AND documententity_entity_id = '$id'"; 
+
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);

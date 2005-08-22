@@ -102,13 +102,13 @@ $l_cat1_update = "Mettre à jour la catégorie 1";
 $l_cat1_insert = "Insérer une catégorie 1"; 
 
 $l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";
-$l_link_deal = "Le contact est référencé par ces affaires";
+$l_link_deal = "Le contact est référencé par des affaires";
 $l_link_deal_no = "Le contact n'est pas référencé dans les affaires";
-$l_link_contract = "Le contact est référencé par ces contrats";
+$l_link_contract = "Le contact est référencé par des contrats";
 $l_link_contract_no = "Le contact n'est pas référencé dans les contrats";
-$l_link_list = "Le contact est enregistré dans ces listes";
+$l_link_list = "Le contact est enregistré dans des listes";
 $l_link_list_no = "Le contact n'est pas référencé dans les listes";
-$l_link_publication = "Le contact est abonné à ces publications";
+$l_link_publication = "Le contact est abonné à des publications";
 $l_link_publication_no = "Le contact n'est pas abonné à des publications";
 $l_cant_delete = "Le contact ne peut être supprimé !";
 $l_can_delete = "Le contact peut être supprimé.";
@@ -141,8 +141,8 @@ $l_kind_update_ok = "La modification du genre a été correctement effectuée";
 $l_kind_update_error = "La modification du genre a échoué !";
 $l_kind_link_contact = "Ces contacts sont du genre";
 $l_kind_link_contact_no = "Pas de contacts du genre";
-$l_kind_cant_delete = "Le contact ne peut être supprimé !";
-$l_kind_can_delete = "Le contact peut être supprimé.";
+$l_kind_cant_delete = "Le genre ne peut être supprimé !";
+$l_kind_can_delete = "Le genre peut être supprimé.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";

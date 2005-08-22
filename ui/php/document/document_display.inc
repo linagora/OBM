@@ -396,7 +396,7 @@ function dis_document_form($action, $document, $doc_q) {
 //   - $mime_q     : Mime types database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_q) {
-  global $display, $path, $document_path, $default_path, $set_theme;
+  global $display, $path, $default_path, $set_theme;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
   global $l_name, $l_author, $l_category1, $l_category2, $l_path, $l_kind; 
@@ -626,31 +626,31 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Repository Form
+// Display Directory Form
 // Parameters:
 //   - $document[] : default values
 //     keys used  : uri, name
 ///////////////////////////////////////////////////////////////////////////////
-function html_repository_form($action, $document) {
+function html_dir_form($action, $document) {
   global $display,$popup_height,$popup_width;
   global $set_theme,$l_document;
   global $l_path, $l_name,$path,$ico_browse;
-  global $l_repository,$l_add_repos;
+  global $l_dir, $l_add_dir;
 
   $name = $document["name"];
   $re_path = $document["path"];
   $dis_button = "
-  <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_repository\" />
-  <input type=\"submit\" value=\"$l_add_repos\" />
+  <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_dir\" />
+  <input type=\"submit\" value=\"$l_add_dir\" />
   ";
   $url = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].elements[1]&amp;ext_disp_file=false"; 
 
   $block = "
-    <form method=\"get\" name=\"f_new_repository\"
-      onsubmit=\"if (check_repository(this)) return true; else return false;\"
+    <form method=\"get\" name=\"f_new_dir\"
+      onsubmit=\"if (check_dir(this)) return true; else return false;\"
       action=\"".url_prepare("document_index.php")."\">
 
-    <div class=\"detailHead\">$l_repository</div>
+    <div class=\"detailHead\">$l_dir</div>
 
     <table class=\"detail\">
     <tr>
@@ -676,7 +676,7 @@ function html_repository_form($action, $document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the validation that the document can be deleted, and teh form
+// Display the validation that the document can be deleted, and the form
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
@@ -702,7 +702,7 @@ function dis_can_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Display and check the repository links (and delete form if ok)
+// Display: Display and check the directory links (and delete form if ok)
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1381,7 +1381,7 @@ function html_documents_tree($document,$display_file) {
   $popup = $document["popup"];
   $obm_d = run_query_get_tree($display_file);
   if ($popup) {
-    $link = "<a class=\"documentRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link = "<a class=\"documentDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
   $name = '/';
@@ -1437,7 +1437,8 @@ $block.= "
 ///////////////////////////////////////////////////////////////////////////////
 function display_tree($tree,$current_directory,$name,$indent,$d_id) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
-  global $ico_del_directory,$popup,$l_j_repo_delete;
+  global $ico_del_directory,$popup;
+
   $directories = $tree[$current_directory][0];
   $files = $tree[$current_directory][1];
   $indent_file = $indent + 15;
@@ -1472,8 +1473,8 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
     $block= 
     "<table class=\"document\">
        <tr>
-	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_repo('$current_dir_id');return false;\"> 
+	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 <a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
 	 </a>
 	 ".$name."
@@ -1491,7 +1492,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
     $block= 
     "<table class=\"document\">
        <tr>
-	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"document_index.php?action=dir_check_delete&amp;param_document=$d_id\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
@@ -1525,11 +1526,11 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
     $block= 
     "<table class=\"document\">
        <tr>
-	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_repo('$current_dir_id');return false;\"> 
+	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 <a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	 </a>
-	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
+	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>	 
 	</td>
@@ -1545,9 +1546,9 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
     $block= 
     "<table class=\"document\">
        <tr>
-	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
-	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
+	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>
 	</td>

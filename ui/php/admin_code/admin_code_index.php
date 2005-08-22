@@ -206,7 +206,7 @@ function get_admin_code_action() {
                                         );
 
   // function_uses : show function uses
-  $actions["admin_code"]["func_unused"]	= array (
+  $actions["admin_code"]["function_uses"]	= array (
      'Name'     => $l_header,
      'Url'      => "$path/admin_code/admin_code_index.php?action=function_uses&amp;mode=html",
      'Right'    => $cright_write_admin,

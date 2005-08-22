@@ -81,16 +81,18 @@ $l_cat_update = "Update category";
 $l_cat_insert = "Insert a category";
 
 // Messages
-$l_link_contract = "The deal is involved in these contracts";
+$l_link_contract = "The deal is involved in some contracts";
 $l_link_contract_no = "The deal isn't involved in any contracts";
-$l_link_project = "The deal is involved in these projects";
+$l_link_project = "The deal is involved in some projects";
 $l_link_project_no = "The deal isn't involved in any projects";
-$l_link_invoice = "The deal is involved in these invoices";
+$l_link_invoice = "The deal is involved in some invoices";
 $l_link_invoice_no = "The deal isn't involved in any invoices";
-$l_cant_delete = "The deal can't be deleted !";
 $l_can_delete = "The deal can be deleted.";
+$l_cant_delete = "The deal can't be deleted !";
 
-$l_err_parent_has_deal = "Deals are attached to this ParentDeal, it can't be deleted !";
+$l_link_deal = "Deals are attached to this ParentDeal";
+$l_cant_delete_parent = "The parent deal can't be deleted !";
+
 $l_err_label_empty = "You must fill the Parentdeal label !";
 $l_err_kind_empty = "You must fill the deal kind !";
 $l_err_task_empty = "You must fill the deal category !";

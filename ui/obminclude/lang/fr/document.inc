@@ -34,9 +34,9 @@ $l_updatetime = "Dernière modification";
 $l_document_display = "Options d'affichage des listes de documents";
 $l_size = "Taille";
 $l_bytes = "octets";
-$l_header_new_repository = "Nouveau répertoire";
-$l_repository = "Répertoire";
-$l_add_repos = "Créer le répertoire";
+$l_header_new_dir = "Nouveau répertoire";
+$l_dir = "Répertoire";
+$l_add_dir = "Créer le répertoire";
 $l_header_tree = "Arborescence";
 $l_auto = "Par défaut";
 $l_consult = "Consulter le document";
@@ -111,8 +111,7 @@ $l_dir_can_delete = "Le répertoire peut être supprimé.";
 $l_dir_cant_delete = "Le répertoire ne peut être supprimé !";
 
 $l_have_link = "Ce document est lié à divers éléments d'obm";
-$l_have_no_link = "Ce document n'est lié à aucun éléments et peut être supprimé";
-$l_rep_have_no_link = "Ce répertoire n'est lié à aucun éléments et peut être supprimé";
+$l_have_no_link = "Ce document n'est lié à aucun éléments";
 $l_no_document = "Document introuvable";
 
 // Actions
@@ -120,7 +119,7 @@ $l_checkdelete = "Vérifier ou Supprimer le document";
 $l_delete = "Supprimer le document";
 $l_insert = "Enregistrer le document";
 $l_update = "Modifier le document";
-$l_dir_delete = "Suuprimer le répertoire";
+$l_dir_delete = "Supprimer le répertoire";
 
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Titre avant de valider.";
@@ -135,8 +134,7 @@ $l_j_mime_update = "Vous devez renseigner tous les champ du type MIME";
 $l_j_mime_delete = "Vous devez sélectionner un type MIME";
 $l_j_cat1_delete = "Vous devez sélectionner une categorie 1";
 $l_j_cat2_delete = "Vous devez sélectionner une categorie 2";
-$l_j_repo_delete = "Voulez vous supprimer ce répertoire?";
-$l_fill_repository_name = "Vous devez donner un nom à vote répertoire";
-$l_invalid_repository_path = "Le chemin spécifié est invalide";
+$l_fill_dir_name = "Vous devez donner un nom à vote répertoire";
+$l_invalid_dir_path = "Le chemin spécifié est invalide";
 $l_invalid_file = "Fichier incorrect";
 $l_invalid_existing_file = "Le chemin spécifié ne pointe pas vers un fichier valid";

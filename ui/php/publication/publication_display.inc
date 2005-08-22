@@ -45,7 +45,7 @@ function dis_data_publication(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Publication search Form                                               //
+// Display Publication search Form
 // Parameters:
 //   - $type_q    : database object with type list
 //   - $act_q     : database object with activity list
@@ -63,7 +63,7 @@ function html_publication_search_form ($type_q,$publication) {
   $type = $publication["type"];
   $year = $publication["year"];
 
-  if(!$popup) {
+  if (!$popup) {
     $dis_title = "
     <div class=\"searchLabel\">$l_publication_title<br />
       <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"24\" value=\"$title\" />
@@ -254,12 +254,33 @@ function html_subscription_search_list($pub_q, $prefs, $nb_pub,$publication,$pop
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Publication Detail screen
+// Parameters:
+//   - $publication[] : publication values
+///////////////////////////////////////////////////////////////////////////////
+function dis_publication_consult($publication) {
+  global $display, $l_query_error;
+
+  if ($publication["id"] > 0) {
+    $pub_q = run_query_detail($publication["id"]);
+    if ($pub_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($pub_q);
+      $block = html_publication_consult($pub_q);
+    } else {
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $pub_q->query . " !");
+    }
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HTML Display Publication Consultation
 // Parameters:
 //   - $pub_q : publication database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_consult($pub_q) {
-  // - Themes
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_publication;
   global $display, $c_yes, $c_no,$l_desc;
 
@@ -310,17 +331,48 @@ function html_publication_consult($pub_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Publication Form                                                      //
+// Display Publication Form
+// Parameters:
+//   - $action      : action called
+//   - $publication : hash values
+///////////////////////////////////////////////////////////////////////////////
+function dis_publication_form($action, $publication) {
+  global $display, $l_query_error;
+
+  if ($publication["id"] > 0) {
+    $pub_q = run_query_detail($publication["id"]);
+    if ($pub_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($pub_q);
+    } else {
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $pub_q->query . " !");
+    }
+    $concat1_q = "";
+  } else {
+    $pub_q = "";
+    // We retrieve contact category 1 only on new
+    // (auto subscription to all contact from a category only on insert)
+    $concat1_q = run_query_publication_contactcategory1();
+  }
+
+  $type_q = run_query_publicationtype();
+  $recept_q = run_query_subscriptionreception(); 
+
+
+  $block = html_publication_form($action, $pub_q, $type_q, $concat1_q, $recept_q, $publication);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Publication Form
 // Parameters:
 //   - $action    : action called
-//   - $pub_q      : publication database result 
-//   - $dsrc_q    : datasource database result 
+//   - $pub_q     : publication database result 
 //   - $type_q    : type database result 
-//   - $usr_q     : userobm database result 
-//   - $ctry_q    : country database result 
+//   - $cat1_q    : contact category
+//   - $recept_q  : reception modes database result 
 //   - $publication[] : default values
-//     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publication) {
   global $display, $auth, $set_dsrc, $l_none, $ico_add;
@@ -358,9 +410,6 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
     $sel_type .= ">". $type_q->f("publicationtype_label") . "</option>\n";
   }
   $sel_type .= "</select>";
-
-
-  
   
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
@@ -380,14 +429,14 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
       $cat_id = $cat1_q->f("contactcategory1_id");
       $cat_label = $cat1_q->f("contactcategory1_label");
       $sel_contcat1 .= "<option value=\"".$cat_id ."\" ";
-      if($cat_id = current($auto_sub)) {
+      if ($cat_id = current($auto_sub)) {
 	$sel_contcat1 .= "selected=\"selected\" ";
 	next($auto_sub);
       }
       $sel_contcat1 .= ">$cat_label</option>";
     }
     $sel_contcat1 .= "</select>";
-    $dis_auto_sub = " <div class=\"detailHead\">$l_auto_sub</div>
+    $dis_auto_sub = "<div class=\"detailHead\">$l_auto_sub</div>
    
     <table class=\"detail\">
      <tr>
@@ -412,8 +461,6 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    $js_ctry
-
     <form method=\"post\" name=\"form_publication\"
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
@@ -761,86 +808,50 @@ function html_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Display and check the publication links (and delete form if ok)
+// Display the publication delete validation screen
 // Parameters:
 //   - $p_id : publication id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_publication_links($p_id) {
-  global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
-  global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
-  global $path, $display;
+function dis_can_delete_publication($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
-  $delete_ok = true;
+  $url = url_prepare("publication_index.php");
 
-  // Links from Contact
-  $obm_q = run_query_publication_contact_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkc ="
-      <tr>
-        <td class=\"detailHead\">$l_link_contact</td>
-      </tr>";
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
-      $display_linkc .= "
-      <tr>
-        <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_linkc = "
-      <tr>
-        <td class=\"detailHead\">$l_link_contact_no</td>
-      </tr>";
-  }
-
-
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-    action=\"".url_prepare("publication_index.php") ."\">
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"param_publication\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  $block .= "<table class=\"detail\">
-   $display_linkc
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_publication\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
 
-   </table>";
+  $display["msg"] .= display_ok_msg($l_can_delete);
 
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_publication_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
 
   return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a publication insertion or update                   //
+// Display the context about a publication insertion or update
 // When similar companies exists we show these and ask confirmation
 // Parameters:
 //   - $cid       : publication id
 //   - $pub_q      : publication database result (at least 1 row)
 //   - $publication[] : default values
-//     keys used  : num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email, com
 /////////////////////////////////////////////////////////////////////////////
 function dis_publication_warn_insert($cid, $pub_q, $publication) {
   global $display, $l_check_samepublication, $l_confirm, $l_back;
@@ -903,27 +914,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
-// Parameters:
-//   - $p_id : publication Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_publication_delete_form($p_id) {
-  global $l_delete;
-
-  $ret = "<form name=\"form_delete\" method=\"post\"
-      action=\"" . url_prepare("publication_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"hd_publication_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
-    </form>";
-
-  return $ret;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the publication administration index                                  //
+// Display the publication administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_admin_index() {
 
@@ -937,7 +928,7 @@ function dis_publication_admin_index() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Publication Kind section                                             //
+// Display: Publication Kind section
 // Parameters:
 //   - $type_q : Kind list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1032,7 +1023,7 @@ function html_publication_type_form($type_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the type links                                                   //
+// Displays the type links
 // Parameters:
 //   - $publication : publication hash info : keys used : type
 ///////////////////////////////////////////////////////////////////////////////

@@ -152,7 +152,7 @@ function run_query_detail($p_id) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert(&$document) {
-  global $auth, $cdg_sql, $c_auto, $document_path;
+  global $auth, $cdg_sql, $c_auto;
   global $err_msg, $l_create_file_error;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
@@ -425,21 +425,20 @@ function format_path($p_path) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Calculate the real disk document path
-// XXXXX Copy of this function is admin_data_query.inc
+// Calculate the real disk document path for a document
 // Parameters:
 //   - $id   : document id
 // Returns:
 //   real disk path
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_disk_path($id) {
-  global $document_path;
+  global $cdocument_root;
 
   // The document disk path set in the subdirectory named "last id number"
   // Get the last number from Id
   $rel = substr($id, -1, 1);
 
-  $disk_path = $document_path . "/" . $rel . "/";
+  $disk_path = $cdocument_root . "/" . $rel . "/";
   
   return $disk_path; 
 }
@@ -602,6 +601,7 @@ function get_document_link_nb($document_id) {
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
+  $obm_q->next_record();
 
   return $obm_q->f("nb");
 }
@@ -734,11 +734,11 @@ function path_exists($dpath) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($cid, $document) {
+function check_document_data_form($cid, $document) {
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   global $l_fill_title, $l_fill_author, $l_fill_path;
   global $l_invalid_file, $l_invalid_existing_file, $l_invalid_url;
-  global $err_msg, $l_invalid_link_file, $l_invalid_repository_path;
+  global $err_msg, $l_invalid_link_file, $l_invalid_dir_path;
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -772,7 +772,7 @@ function check_data_form($cid, $document) {
   // If doc is a file, check the path exists
   if ( ($kind == $cdoc_kind_file) && $file_update != "no"
        && (! path_exists($path)) ) {
-    $err_msg = "$l_invalid_repository_path ($path)";
+    $err_msg = "$l_invalid_dir_path ($path)";
     return false;
   }
 
@@ -1147,11 +1147,11 @@ function run_query_mime_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Repository Creation
+// Dir Creation
 // Parameters:
 //   - $id : Mime Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_repository($document) {
+function run_query_insert_dir($document) {
   global $cdg_sql, $auth, $cdoc_kind_dir;
 
   $uid = $auth->auth["uid"];
@@ -1207,21 +1207,21 @@ function run_query_insert_repository($document) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_repository_data_form($document) {
-  global $err_msg, $l_invalid_repository_path, $l_fill_repository_name;
+function check_dir_data_form($document) {
+  global $err_msg, $l_invalid_dir_path, $l_fill_dir_name;
 
   $name = $document["name"];
   $path = $document["path"];
 
   // MANDATORY: Document Title 
   if (trim($name) == "") {
-    $err_msg = $l_fill_repository_name;
+    $err_msg = $l_fill_dir_name;
     return false;
   }
 
   // If doc is a file, check the path exists
   if (! path_exists($path)) {
-    $err_msg = "$l_invalid_repository_path ($path)";
+    $err_msg = "$l_invalid_dir_path ($path)";
     return false;
   }
 
@@ -1230,16 +1230,14 @@ function check_repository_data_form($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Display and check the document links (and delete form if ok)
+// Check the document can be deleted
 // Parameters:
 //   - $p_id : document id
 // Returns:
 //   true if document can be deleted (for now always), else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete($p_id) {
-  global $err_msg, $l_can_delete, $l_cant_delete, $l_back;
-  global $l_have_link, $l_have_no_link;
-  global $path, $display;
+function check_can_delete_document($p_id) {
+  global $err_msg, $l_have_link, $l_have_no_link;
 
   $delete_ok = true;
 

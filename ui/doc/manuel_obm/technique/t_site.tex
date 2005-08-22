@@ -33,125 +33,124 @@ Fichier de configuration spécifique & obminclude/obm\_conf.inc \\
 Liste des paramètres définis :\\
 
 
-\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+\begin{longtable}{|p{3.5cm}|p{1.0cm}|p{2cm}|p{8cm}|}
 \hline
-\textbf{Option} & \textbf{Valeur défaut} & \textbf{Description} \\
-\hline
-\hline
-\multicolumn{3}{c}{\textbf{Paramètres globaux}}\\
+\textbf{Option} & \textbf{Depuis} & \textbf{Défaut} & \textbf{Description} \\
 \hline
 \hline
-\$cgp\_host & http://obm/ & Hôte utilisé dans les liens (ex dans les mails envoyés) \\ 
+\multicolumn{4}{c}{\textbf{Paramètres globaux}}\\
 \hline
-\$cgp\_site\_include & false & Si vrai OBM utilise le répertoire spécifique obminclude/site pour les langues.\\ 
 \hline
-\$cgp\_todo\_nb & 5 & Nombre de Todo affichés \\ 
+\$cgp\_host & & http://obm/ & Hôte utilisé dans les liens (ex dans les mails envoyés) \\ 
 \hline
-\$popup\_width & 620 & Largeur en pixels des popus \\ 
+\$cgp\_site\_include & & false & Si vrai OBM utilise le répertoire spécifique obminclude/site pour les langues.\\ 
 \hline
-\$popup\_height & 480 & Hauteur en pixels des popus \\ 
+\$cgp\_todo\_nb & & 5 & Nombre de Todo affichés \\ 
 \hline
-\$cak\_prev & P & ACCESSKEY pour page précédente \\ 
+\$popup\_width & & 620 & Largeur en pixels des popus \\ 
 \hline
-\$cak\_next & N & ACCESSKEY pour page suivante \\ 
+\$popup\_height & & 480 & Hauteur en pixels des popus \\ 
 \hline
-\$cak\_page\_prev & 4 & ACCESSKEY pour groupe de pages précédent \\ 
+\$cak\_prev & & P & ACCESSKEY pour page précédente \\ 
 \hline
-\$cak\_page\_prev & 6 & ACCESSKEY pour groupe de pages suivant \\ 
+\$cak\_next & & N & ACCESSKEY pour page suivante \\ 
 \hline
-\$cak\_begin & B & ACCESSKEY pour début de résultat \\ 
+\$cak\_page\_prev & & 4 & ACCESSKEY pour groupe de pages précédent \\ 
 \hline
-\$cak\_prev & E & ACCESSKEY pour fin de résultat \\ 
+\$cak\_page\_prev & & 6 & ACCESSKEY pour groupe de pages suivant \\ 
 \hline
-\$cg\_adm & 1 & Groupe Administrateur utilisé par section Administration \\ 
+\$cak\_begin & & B & ACCESSKEY pour début de résultat \\ 
 \hline
-\$cg\_com & 2 & Groupe Commercial utilisé par section Commercial \\ 
+\$cak\_prev & & E & ACCESSKEY pour fin de résultat \\ 
 \hline
-\$cg\_prod & 3 & Groupe Production utilisé par section Production \\ 
+\$cg\_adm & & 1 & Groupe Administrateur utilisé par section Administration \\ 
 \hline
-\$cql\_max\_row & 50 000 & Maximum de lignes de résultat autorisé pour une requète manuelle utilisateur (module \List)\\ 
+\$cg\_com & & 2 & Groupe Commercial utilisé par section Commercial \\ 
 \hline
-\$cql\_max\_cost & 100 000 & Coût maximum autorisé pour une requète manuelle utilisateur (module \List)\\ 
+\$cg\_prod & & 3 & Groupe Production utilisé par section Production \\ 
 \hline
-\$cgp\_sql\_star & true & Traite le caractère * comme un joker dans les recherches \\ 
+\$cql\_max\_row & & 50 000 & Maximum de lignes de résultat autorisé pour une requète manuelle utilisateur (module \List)\\ 
 \hline
-\$ctu\_sql\_limit & false & Indique si les requètes envoyées à la base de données doivent gérer la clause limit afin de restreindre les résultats au niveau base de données à la place de l'affichage \\ 
+\$cql\_max\_cost & & 100 000 & Coût maximum autorisé pour une requète manuelle utilisateur (module \List)\\ 
 \hline
-\$cmy\_character\_set & & Indique le jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
+\$cgp\_sql\_star & & true & Traite le caractère * comme un joker dans les recherches \\ 
 \hline
-\$cmy\_charset\_collation & & Indique la collation du jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
+\$ctu\_sql\_limit & & false & Indique si les requètes envoyées à la base de données doivent gérer la clause limit afin de restreindre les résultats au niveau base de données à la place de l'affichage \\ 
 \hline
-\$cgp\_mail\_enabled & false & Indique si l'envoi de mail est activé pour OBM\\
+\$cmy\_character\_set & & & Indique le jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
 \hline
-\$cs\_lifetime & 7200 & Durée de session. Temps d'inactivité avant déconnexion \\ 
+\$cmy\_charset\_collation & & & Indique la collation du jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
 \hline
-\$cgp\_sess\_db & false & Indication de stockage des sessions en base de données \\ 
+\$cgp\_mail\_enabled & & false & Indique si l'envoi de mail est activé pour OBM\\
 \hline
-\$auth\_kind\footnotemark[1] & 'standalone' & "standalone" pour gérer les
+\$cs\_lifetime & & 7200 & Durée de session. Temps d'inactivité avant déconnexion \\ 
+\hline
+\$cgp\_sess\_db & & false & Indication de stockage des sessions en base de données \\ 
+\hline
+\$auth\_kind\footnotemark[1] & & 'standalone' & "standalone" pour gérer les
 authentifications dans la base OBM, "CAS" pour passer par un serveur CAS \\ 
 \hline
-\$cas\_server & aucune & nom ou IP du serveur CAS. Utilisé seulement
+\$cas\_server & & aucune & nom ou IP du serveur CAS. Utilisé seulement
 si le mode d'authentification est "CAS". \\ 
 \hline
-\$cas\_server\_port & aucune & port du service CAS sur le serveur. Utilisé seulement
-si le mode d'authentification est "CAS". \\ 
+\$cas\_server\_port & & aucune & port du service CAS sur le serveur. Utilisé seulement si le mode d'authentification est "CAS". \\ 
 \hline
-\$cas\_server\_uri & aucune  &  URI du service CAS sur le
+\$cas\_server\_uri & & aucune  &  URI du service CAS sur le
 serveur. Utilisé seulement si le mode d'authentification est "CAS".\\  
 \hline
-\$auth\_encryption & true & Indique si la page de login doit chiffrer le mot de passe transmis (support de md5 uniquement) \\ 
+\$auth\_encryption & & true & Indique si la page de login doit chiffrer le mot de passe transmis (support de md5 uniquement) \\ 
 \hline
-\$password\_encryption & md5 & Indique le format de stockage des mots de passe en base de données (plain | md5 | crypt) \\ 
+\$password\_encryption & & md5 & Indique le format de stockage des mots de passe en base de données (plain | md5 | crypt) \\ 
 \hline
-\$c\_use\_connectors & false & Indique l'utilisation de connecteurs (Evolution, Outlook) qui engendre des traitements supplémentaires \\ 
+\$c\_use\_connectors & & false & Indique l'utilisation de connecteurs (Evolution, Outlook) qui engendre des traitements supplémentaires \\ 
 
 \hline
 \hline
-\multicolumn{3}{c}{\textbf{Paramètres spéciques aux modules}}\\
+\multicolumn{4}{c}{\textbf{Paramètres spéciques aux modules}}\\
 \hline
 \hline
-\$caf\_company\_name & false & Indicateur de formattage automatique du nom de société \\ 
+\$caf\_company\_name & & false & Indicateur de formattage automatique du nom de société \\ 
 \hline
-\$caf\_town & false & Indicateur de formattage automatique du nom de ville \\ 
+\$caf\_town & & false & Indicateur de formattage automatique du nom de ville \\ 
 \hline
-\$cgp\_mailing\_default & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
+\$cgp\_mailing\_default & & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
 \hline
-\$ccontact\_private\_default & false & Indicateur contacts sont privés par défaut \\ 
+\$ccontact\_private\_default & & false & Indicateur contacts sont privés par défaut \\ 
 \hline
-\$cagenda\_public\_groups & false & Indicateur d'affichage des groupes publics dans l'agenda \\ 
+\$cagenda\_public\_groups & & false & Indicateur d'affichage des groupes publics dans l'agenda \\ 
 \hline
-\$cagenda\_weekstart & ``monday + 2 hours'' & 1er jour d'une semaine dans l'agenda \\ 
+\$cagenda\_weekstart & & ``monday + 2 hours'' & 1er jour d'une semaine dans l'agenda \\ 
 \hline
-\$cagenda\_first\_hour & 8 & Heure de début de journée affichée dans l'agenda \\ 
+\$cagenda\_first\_hour & & 8 & Heure de début de journée affichée dans l'agenda \\ 
 \hline
-\$cagenda\_last\_hour & 20 & Heure de fin de journée affichée dans l'agenda \\ 
+\$cagenda\_last\_hour & & 20 & Heure de fin de journée affichée dans l'agenda \\ 
 \hline
-\$c\_day\_fraction & 8 & Nombre de fractions d'une journée (gestion des temps)\\ 
+\$c\_day\_fraction & & 8 & Nombre de fractions d'une journée (gestion des temps)\\ 
 \hline
-\$c\_working\_days & 0,1,1,1,1,1,0 & Journées travaillées, débute à dimanche (gestion des temps)\\ 
+\$c\_working\_days & & 0,1,1,1,1,1,0 & Journées travaillées, débute à dimanche (gestion des temps)\\ 
 \hline
-\$c\_week\_first\_day & 1 & Premier jour de la semaine (0=dimanche, 1=lundi,..) (gestion des temps)\\ 
+\$c\_week\_first\_day & & 1 & Premier jour de la semaine (0=dimanche, 1=lundi,..) (gestion des temps)\\ 
 \hline
-\$cmail\_incident & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
+\$cmail\_incident & & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
 \hline
-\$document\_path & /var/www/obmdocuments & Chemin du dépôt de document sur disque \\ 
+\$cdocument\_root & 1.0.0 & /var/www/obmdocs & Chemin du dépôt de document sur disque \\ 
 \hline
-\$default\_path & / & Répertoire par défaut dans le dépot de documents \\ 
+\$default\_path & & / & Répertoire par défaut dans le dépot de documents \\ 
 \hline
-\$default\_mime & application/octet-stream & Type mime par défaut des documents \\ 
+\$default\_mime & & application/octet-stream & Type mime par défaut des documents \\ 
 \hline
-\$tmp\_path & /tmp & Chemin pour stocake temporaire (module import) \\ 
+\$tmp\_path & & /tmp & Chemin pour stocake temporaire (module import) \\ 
 \hline
-\$cgroup\_private\_default & false & Indicateur groupes sont privés par défaut \\ 
+\$cgroup\_private\_default & & false & Indicateur groupes sont privés par défaut \\ 
 
 \hline
 \hline
-\multicolumn{3}{c}{\textbf{Paramètres d'affichage des sections, modules et champs}}\\
+\multicolumn{4}{c}{\textbf{Paramètres d'affichage des sections, modules et champs}}\\
 \hline
 \hline
-\$cgp\_show & Voir \ref{cgp_show_section} et \ref{cgp_show_module} & Indicateurs d'affichage des sections et modules \\ 
+\$cgp\_show & & Voir \ref{cgp_show_section} et \ref{cgp_show_module} & Indicateurs d'affichage des sections et modules \\ 
 \hline
-\$cgp\_hide & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
+\$cgp\_hide & & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
 \hline
 \end{longtable}
 

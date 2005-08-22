@@ -589,94 +589,42 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Group Display preference screen
+// Display the group delete validation screen
 // Parameters:
-//   - $prefs_g : Group Display preferences
-//   - $prefs_u : User Display preferences
+//   - $p_id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_group_display_pref($prefs_g, $prefs_u) {
-  global $l_group_display, $l_user_display;
+function dis_can_delete_group($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g);
-  $dis_pref->display_entity = "group"; 
-  $dis_pref->pref_title = $l_group_display;
-  $dis_pref->pref_dis_help = 0;
+  $url = url_prepare("group_index.php");
 
-  $block = "
-    <table class=\"detail\">
-    <tr>
-      <td>" . $dis_pref->display() . "</td>";
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_group\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
 
-  $dis_pref->display_pref = $prefs_u;
-  $dis_pref->display_module = "group";
-  $dis_pref->display_entity = "group_user";
-  $dis_pref->pref_title = $l_user_display;
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_group\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\" />
+    </form>";
 
-  $block .= "<td>" . $dis_pref->display() . "</td>
-      </td>
-    </tr>
-    </table>";
+  $display["msg"] .= display_ok_msg($l_can_delete);
 
-  $block .= $dis_pref->dis_pref_help();
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
 
   return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display warning before a group deletion
-// We ask confirmation or cancel
-// Parameters:
-//   - $id : group id
-///////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($id) {
-  global $display, $l_warn_delete, $l_delete, $l_back, $l_cant_delete_system;
-  global $uid, $l_cant_delete_public;
-
-  $lgroup = get_group_info($id);
-  if ($lgroup["system"] != "0") {
-    $display["msg"] .= display_warn_msg($l_cant_delete_system);
-    $dis_delete = "";
-  } else if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != "$uid")) {
-    $display["msg"] .= display_warn_msg($l_cant_delete_public);
-    $dis_delete = "";
-  } else {
-    $nb_u = get_group_nb_user($id);
-    $display["msg"] .= display_warn_msg("$nb_u $l_warn_delete");
-
-    $dis_delete = "
-    <p class=\"detailButtons\">
-      <form method=\"get\" name=\"form_delete\"
-      action=\"" .url_prepare("group_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input type=\"hidden\" name=\"hd_group_id\" value=\"$id\" />
-      <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
-      </form>
-    </p>";
-  }
-
-  $dis_back = "
-    <p class=\"detailButtons\">
-      <form name=\"form_back\" method=\"get\"
-      action=\"" .url_prepare("group_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_group\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>";
-
-  $block = "
-  <div class=\"detailButton\">
-    $dis_delete
-    $dis_back
-  </div>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the context about a group insertion or update                     //
+// Display the context about a group insertion or update
 // When similar groups exist we show these and ask confirmation
 // Parameters:
 //   - $id       : group id
@@ -727,6 +675,41 @@ function dis_group_warn_insert($id, $g_q, $group) {
       </form>
     </p>
   </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Group Display preference screen
+// Parameters:
+//   - $prefs_g : Group Display preferences
+//   - $prefs_u : User Display preferences
+///////////////////////////////////////////////////////////////////////////////
+function dis_group_display_pref($prefs_g, $prefs_u) {
+  global $l_group_display, $l_user_display;
+
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g);
+  $dis_pref->display_entity = "group"; 
+  $dis_pref->pref_title = $l_group_display;
+  $dis_pref->pref_dis_help = 0;
+
+  $block = "
+    <table class=\"detail\">
+    <tr>
+      <td>" . $dis_pref->display() . "</td>";
+
+  $dis_pref->display_pref = $prefs_u;
+  $dis_pref->display_module = "group";
+  $dis_pref->display_entity = "group_user";
+  $dis_pref->pref_title = $l_user_display;
+
+  $block .= "<td>" . $dis_pref->display() . "</td>
+      </td>
+    </tr>
+    </table>";
+
+  $block .= $dis_pref->dis_pref_help();
 
   return $block;
 }

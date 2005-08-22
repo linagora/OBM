@@ -22,6 +22,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   $email = sql_search_text_parse($list["email"]);
   $contact = sql_search_text_parse($list["contact"]);
   $market = $list["marketing_manager"];
+  $contact_id = $list["contact_id"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -33,33 +34,38 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   $where .= sql_obm_entity_privacy("list");
 
   if ($name != '') {
-    $where .= " and list_name $like '$name%'";
+    $where .= " AND list_name $like '$name%'";
   }
   if ($contact != '') {
-    $where .= " and contact_lastname $like '$contact%'";
+    $where .= " AND contact_lastname $like '$contact%'";
+    $join_con = "LEFT JOIN ContactList ON list_id=contactlist_list_id
+    LEFT JOIN Contact ON contactlist_contact_id=contact_id";
+  }
+  if ($contact_id > 0) {
+    $where .= " AND contact_id = '$contact_id'";
     $join_con = "LEFT JOIN ContactList ON list_id=contactlist_list_id
     LEFT JOIN Contact ON contactlist_contact_id=contact_id";
   }
   if ($email != '') {
-    $where .= " and list_email $like '%$email%'";
+    $where .= " AND list_email $like '%$email%'";
   }
   if (($market != $c_all) && ($market != "")) { 
-    $where .= " and (list_usercreate='$market')";
+    $where .= " AND (list_usercreate='$market')";
   }
 
-  $whereq = "where $where";
+  $whereq = "WHERE $where";
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
 
-  $orderq .= " order by $order $p_order_dir $order_next";
+  $orderq .= " ORDER BY $order $p_order_dir $order_next";
 
-  $query = "select distinct List.*, list_id as id,
+  $query = "SELECT DISTINCT List.*, list_id as id,
     $timecreate,
     $timeupdate,
     A.userobm_login as usercreate,
     B.userobm_login as userupdate
-  from List
+  FROM List
     LEFT JOIN ContactList ON list_id=contactlist_list_id
     LEFT JOIN Contact ON ContactList.contactlist_contact_id=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
@@ -95,15 +101,15 @@ function run_query_detail($id) {
   $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
 
-  $query = "select *,
+  $query = "SELECT *,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-  from List
+  FROM List
        LEFT JOIN UserObm as c on list_usercreate=c.userobm_id
        LEFT JOIN UserObm as u on list_userupdate=u.userobm_id
-  where list_id = '$id'";
+  WHERE list_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query) ;
@@ -168,7 +174,7 @@ function run_query_insert($list) {
     $list_critery = addslashes(serialize($ss_criteria));
   }
   echo $query;
-  $query = "insert into List (list_timeupdate,
+  $query = "INSERT INTO List (list_timeupdate,
     list_timecreate,
     list_userupdate,
     list_usercreate,
@@ -181,7 +187,7 @@ function run_query_insert($list) {
     list_info_publication,
     list_query,
     list_structure)
-  values (null,
+  VALUES (null,
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
@@ -759,6 +765,26 @@ function check_data_form($id, $list) {
     }
   }
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the list can be deleted
+// Parameters:
+//   - $p_id : list id
+// Returns:
+//   true if the list can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_list($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_has_contact;
+
+  $delete_ok = true;
+
+  $nb_con = get_list_static_contact_nb($p_id);
+  $ok_msg .= "$nb_con $l_has_contact";
+
+  return $delete_ok;
 }
 
 

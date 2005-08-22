@@ -68,5 +68,7 @@ $l_no_group_deleted = "Pas de groupes à supprimer";
 $l_check_samegroup = "Ces groupes sembles similaires au groupe saisi";
 $l_cant_delete_system = "Les groupes système ne peuvent être supprimés !";
 $l_cant_delete_public = "Les groupes publics ne peuvent être supprimés que par leur créateur !";
+$l_can_delete = "Le groupe peut être supprimé.";
+$l_cant_delete = "Le groupe ne peut être supprimé !";
 
 $l_add_groups = "Ajouter des groupes";

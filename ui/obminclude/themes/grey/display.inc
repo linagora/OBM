@@ -443,11 +443,17 @@ function display_title($title) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display an error message
+// Parameters:
+//   - $msg     : message to display
+//   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
-function display_err_msg($msg) {
+function display_err_msg($msg, $special=true) {
 
   if ($msg != "") {
-    $ret = "<p class=\"messageError\">".htmlspecialchars($msg)."</p>";
+    if ($special) {
+      $msg = htmlspecialchars($msg);
+    }
+    $ret = "<p class=\"messageError\">$msg</p>";
   }
   
   return $ret;
@@ -456,11 +462,17 @@ function display_err_msg($msg) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display a warning message
+// Parameters:
+//   - $msg     : message to display
+//   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
-function display_warn_msg($msg) {
+function display_warn_msg($msg, $special=true) {
   
   if ($msg != "") {
-    $ret = "<p class=\"messageWarning\">".htmlspecialchars($msg)."</p>";
+    if ($special) {
+      $msg = htmlspecialchars($msg);
+    }
+    $ret = "<p class=\"messageWarning\">$msg</p>";
   }
   
   return $ret;
@@ -469,11 +481,17 @@ function display_warn_msg($msg) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display an OK message
+// Parameters:
+//   - $msg     : message to display
+//   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
-function display_ok_msg($msg) {
+function display_ok_msg($msg, $special=true) {
 
   if ($msg != "") {
-    $ret = "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
+    if ($special) {
+      $msg = htmlspecialchars($msg);
+    }
+    $ret = "<p class=\"messageOk\">$msg</p>";
   }
   
   return $ret;
@@ -482,13 +500,18 @@ function display_ok_msg($msg) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display an Info message
+// Parameters:
+//   - $msg     : message to display
+//   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
-function display_info_msg($msg) {
+function display_info_msg($msg, $special=true) {
 
   if ($msg != "") {
-    $ret = "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
+    if ($special) {
+      $msg = htmlspecialchars($msg);
+    }
+    $ret = "<p class=\"messageInfo\">$msg</p>";
   }
   
   return $ret;
 }
-k

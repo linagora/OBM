@@ -13,7 +13,6 @@
 
 // vues (par societe,...)
 // migration ??? ou outil d'import d'un depot (repertoire classique)
-// script de creation du depot
 // acl
 
 $path = "..";
@@ -85,10 +84,10 @@ if ($action == "ext_get_path") {
   require("document_js.inc");
   $display["detail"] = dis_document_form($action, $document, "");
   
-} elseif ($action == "new_repository")  {
+} elseif ($action == "new_dir")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = html_repository_form($action, $document);
+  $display["detail"] = html_dir_form($action, $document);
   
 } elseif ($action == "tree")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,7 +113,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $document)) {
+  if (check_document_data_form("", $document)) {
     $document["id"] = run_query_insert($document);
     if ($document["id"]) {
       update_last_visit("document", $document["id"], $action);
@@ -131,10 +130,10 @@ if ($document["id"] > 0) {
     $display["detail"] = dis_document_form($action, $document, "");
   }
 
-} elseif ($action == "insert_repository")  {
+} elseif ($action == "insert_dir")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_repository_data_form($document)) {
-    $retour = run_query_insert_repository($document);
+  if (check_dir_data_form($document)) {
+    $retour = run_query_insert_dir($document);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
@@ -146,12 +145,12 @@ if ($document["id"] > 0) {
   } else {
     require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = html_repository_form($action, $document);
+    $display["detail"] = html_dir_form($action, $document);
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($document["id"], $document)) {
+  if (check_document_data_form($document["id"], $document)) {
     $retour = run_query_update($document["id"], $document);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
@@ -170,7 +169,7 @@ if ($document["id"] > 0) {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  if (check_can_delete($document["id"])) {
+  if (check_can_delete_document($document["id"])) {
     $display["msg"] .= display_info_msg($err_msg);
     $display["detail"] = dis_can_delete($document["id"]);
   } else {
@@ -180,14 +179,19 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($document["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_document($document["id"])) {
+    $retour = run_query_delete($document["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = dis_document_search_form($document);
+    $display["result"] = dis_document_search_list($document);
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg("$err_msg $l_cant_delete");
+    $display["detail"] = dis_document_consult($document);
   }
-  $display["search"] = dis_document_search_form($document);
-  $display["result"] = dis_document_search_list($document);
 
 } elseif ($action == "dir_check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,7 +200,6 @@ if ($document["id"] > 0) {
     $display["detail"] = dis_can_delete_dir($document["id"]);
   } else {
     $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
-    $display["detail"] = dis_document_consult($document);
     $display["detail"] = html_documents_tree($document,"true");
   }
 
@@ -367,7 +370,7 @@ display_page($display);
 // returns : $document hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_document() {
-  global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_repository_path;
+  global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_dir_path;
   global $tf_cat1, $tf_cat2, $tf_extension, $tf_mimetype, $tf_name;
   global $fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
   global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url;
@@ -381,7 +384,7 @@ function get_param_document() {
   if (isset ($tf_url)) $document["url"] = $tf_url;
   
   if (isset ($tf_title)) $document["title"] = $tf_title;
-  if (isset ($tf_name)) $document["name"] = $tf_name; // repository
+  if (isset ($tf_name)) $document["name"] = $tf_name; // dir
   if (isset ($tf_author)) $document["author"] = $tf_author;
   if (isset ($tf_path)) $document["path"] = format_path(trim($tf_path));
   if (isset ($tf_filename)) $document["filename"] = $tf_filename;
@@ -426,7 +429,7 @@ function get_document_action() {
   global $document, $actions, $path;
   global $l_header_tree, $l_header_find, $l_header_new, $l_header_consult;
   global $l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_admin,$l_header_new_repository;
+  global $l_header_display,$l_header_admin,$l_header_new_dir;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 
@@ -458,15 +461,15 @@ function get_document_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/document/document_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index', 'tree','detailconsult','new_repository','insert','insert_repository', 'check_delete', 'delete', 'dir_check_delete', 'dir_delete','update','admin','display') 
+    'Condition'=> array ('search','index', 'tree','detailconsult','new_dir','insert','insert_dir', 'check_delete', 'delete', 'dir_check_delete', 'dir_delete','update','admin','display') 
                                      );
 
-// New Repository
-  $actions["document"]["new_repository"] = array (
-    'Name'     => $l_header_new_repository,
-    'Url'      => "$path/document/document_index.php?action=new_repository",
+// New Dir
+  $actions["document"]["new_dir"] = array (
+    'Name'     => $l_header_new_dir,
+    'Url'      => "$path/document/document_index.php?action=new_dir",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index', 'tree','detailconsult','new','insert','insert_repository', 'check_delete', 'delete', 'dir_check_delete', 'dir_delete','update','admin','display') 
+    'Condition'=> array ('search','index', 'tree','detailconsult','new','insert','insert_dir', 'check_delete', 'delete', 'dir_check_delete', 'dir_delete','update','admin','display') 
                                      );
 
 // Detail Consult
@@ -542,9 +545,9 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      	 );  
 
-// Repository Insert
-  $actions["document"]["insert_repository"] = array (
-    'Url'      => "$path/document/document_index.php?action=insert_repository",
+// Dir Insert
+  $actions["document"]["insert_dir"] = array (
+    'Url'      => "$path/document/document_index.php?action=insert_dir",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );  

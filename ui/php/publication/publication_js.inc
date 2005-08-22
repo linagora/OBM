@@ -1,6 +1,6 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : publication_js.inc                                              //
+// OBM - File  : publication_js.inc                                          //
 //     - Desc  : Company javascript functions File                           //
 // 2000-01-13 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,48 +43,13 @@ function confirm_del() {
 
 function check_publication(form) {
 
-  // MANDATORY : Check that the Company name is not empty
-  if (trim(form.tf_name.value) == \"\") {
+  // MANDATORY : Check that the publication name is not empty
+  if (trim(form.tf_title.value) == \"\") {
     alert (\"$l_fill_name\");
     return false;
   }
 
-  // Check the zip code
-  lzip = form.tf_zip.value;
-  if ((lzip != \"\") && (check_zip(lzip) == null)) {
-    alert (\"$l_j_check_zip\");
-    return false;
-  }
-
-  // Check the phone number
-  lphone = form.tf_phone.value;
-  if ((lphone != \"\") && (check_phone(lphone) == null)) {
-    alert (\"$l_j_check_phone\");
-    return false;
-  }
-
-  // Check the fax number
-  lfax = form.tf_fax.value;
-  if ((lfax != \"\") && (check_fax(lfax) == null)) {
-    alert (\"$l_j_check_fax\");
-    return false;
-  }
-
-  // Check the Email
-  lemail = form.tf_email.value;
-  if ((lemail != \"\") && (check_email(lemail) == null)) {
-    alert (\"$l_j_check_email\");
-    return false;
-  }
-
-  // Check the web
-  lweb = form.tf_web.value;
-  if ((lweb != \"\") && (check_web(lweb) == null)) {
-    alert (\"$l_j_check_web\");
-    return false;
-  }
-  else
-    return true;
+  return true;
 } 
 
 
@@ -95,7 +60,7 @@ function check_subscription(form) {
     return false;
   }
 
-  // Check the zip code
+  // Check the quantity
   quantity = form.tf_quantity.value;
   if (quantity == \"\") {
     alert (\"$l_j_fill_quantity\");
@@ -140,7 +105,7 @@ function check_type_upd(form,formd)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the cat creation is possible                                    //
+// Check if the type creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_type_new(form)
 {
@@ -155,7 +120,7 @@ function check_type_new(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the renew check or deletion is possible                           //
+// Check if the renew check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_renew_checkdel(form)
 {
@@ -187,7 +152,7 @@ function check_renew_upd(form,formd)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the renew creation is possible                                    //
+// Check if the renew creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_renew_new(form)
 {
@@ -202,7 +167,7 @@ function check_renew_new(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the recept check or deletion is possible                           //
+// Check if the recept check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_recept_checkdel(form)
 {

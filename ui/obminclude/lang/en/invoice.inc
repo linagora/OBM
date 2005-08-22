@@ -96,10 +96,10 @@ $l_cant_delete = "The invoice can't be deleted !";
 $l_can_delete = "The invoice can be deleted.";
 
 $l_fill_label = "The label must be filled !";
-$l_fill_number = "The number must be filled !";
+$l_fill_number = "The number must be filled (for this status) !";
 $l_fill_company = "The company must be filled !";
 $l_fill_inout = "You must select the kind : $l_client or $l_supplier !";
-$l_fill_date = "The date must be filled !";
+$l_fill_date = "The date must be filled (for this status) !";
 $l_fill_amount = "Tha amounts must be correctly filled !";
 $l_error_number_exist = "This invoice number is already used !";
 

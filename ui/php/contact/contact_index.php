@@ -192,18 +192,31 @@ if ($action == "ext_get_ids") {
   
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contact_js.inc");
-  $display["detail"] = dis_check_contact_links($contact["id"]);
-  
+  if (check_can_delete_contact($contact["id"])) {
+    require("contact_js.inc");
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_contact($contact["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_contact_consult($contact);
+  }
+
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_delete($contact["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_contact($contact["id"])) {
+    $retour = run_query_contact_delete($contact["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = dis_contact_search_form($contact);
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_contact_consult($contact);
   }
-  $display["search"] = dis_contact_search_form($contact);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -534,7 +547,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','index','search','new','detailconsult','update','delete','admin','display') 
+    'Condition'=> array ('','index','search','new','detailconsult','update','check_delete','delete','admin','display') 
                                      );
 
 // Detail Consult
@@ -543,7 +556,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','detailupdate') 
+    'Condition'=> array ('detailconsult','detailupdate','check_delete') 
                                     		 );
 
 // Vcard Export
@@ -552,7 +565,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,    
-    'Condition'=> array ('detailconsult','detailupdate','update') 
+    'Condition'=> array ('detailconsult','detailupdate','update','check_delete') 
                                        );
 
 // Detail Update
@@ -561,7 +574,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'insert', 'update')
+    'Condition'=> array ('detailconsult', 'insert', 'update','check_delete')
                                      		 );
 
 // Insert
@@ -579,7 +592,7 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                      	);
 					
-// Update
+// Document Add
   $actions["contact"]["document_add"] = array (
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -592,7 +605,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update','check_delete') 
                                      	      );
 
 // Delete

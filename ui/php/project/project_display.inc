@@ -351,8 +351,8 @@ function html_project_links($p_q) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id&amp;cb_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_project=$id&amp;project_name=$uname&amp;param_company=$cid&amp;company_name=$ucname&amp;param_deal=$did&amp;deal_label=$udlabel");
-    $nb_inv_tot = run_query_linked_invoice_nb($id, "project", 1);
-    $nb_inv = run_query_linked_invoice_nb($id, "project");
+    $nb_inv_tot = get_linked_invoice_nb($id, "project", 1);
+    $nb_inv = get_linked_invoice_nb($id, "project");
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
@@ -1087,91 +1087,38 @@ function html_project_form($action, $project_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Display and check the project links (and delete form if ok)
+// Display the project delete validation screen
 // Parameters:
 //   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
-  global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_timetask, $l_link_timetask_no;
-  global $path, $display;
+function dis_can_delete_project($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
-  $delete_ok = true;
+  $url = url_prepare("project_index.php");
 
-  // Links from Time management
-  $obm_q = run_query_project_timetask_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkt ="
-      <tr>
-        <td class=\"detailHead\">$l_link_timetask</td>
-      </tr>";
-    while ($obm_q->next_record()) {
-      $tlabel = $obm_q->f("projecttask_label");
-      $uid = $obm_q->f("userobm_id");
-      $uname = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
-      $display_linkt .= "
-      <tr>
-        <td class=\"detailLabel\">$tlabel
-        (<a class=\"detailLabel\" href=\"" . url_prepare("$path/user/user_index.php?action=detailconsult&amp;param_user=$uid") . "\">$uname</a>)
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_linkt = "
-      <tr>
-        <td class=\"detailHead\">$l_link_timetask_no</td>
-      </tr>";
-  }
-
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-    action=\"".url_prepare("project_index.php") ."\">
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  $block .= "<table class=\"detail\">
-   $display_linkt
-   </table>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)
-// Parameters:
-//   - $p_id : project Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $ret = "<form name=\"form_delete\" method=\"get\"
-      action=\"" . url_prepare("project_index.php") . "\">
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
 
-  return $ret;
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
+
+  return $block;
 }
 
 

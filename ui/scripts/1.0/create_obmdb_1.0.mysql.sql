@@ -701,6 +701,7 @@ CREATE TABLE PublicationType (
 -- Table structure for table 'Subscription'
 --
 CREATE TABLE Subscription (
+  subscription_id               int(8) NOT NULL auto_increment,
   subscription_publication_id 	int(8) NOT NULL,
   subscription_contact_id       int(8) NOT NULL,
   subscription_timeupdate       timestamp(14),
@@ -712,7 +713,7 @@ CREATE TABLE Subscription (
   subscription_reception_id     int(8) DEFAULT 0 NOT NULL,
   subscription_date_begin       timestamp(14),
   subscription_date_end         timestamp(14),
-  PRIMARY KEY (subscription_publication_id,subscription_contact_id)
+  PRIMARY KEY (subscription_id)
 );
 
 
@@ -1127,6 +1128,7 @@ CREATE TABLE Invoice (
 CREATE TABLE InvoiceStatus (
   invoicestatus_id       int(8) NOT NULL auto_increment,
   invoicestatus_payment  int(1) DEFAULT 0 NOT NULL,
+  invoicestatus_created  int(1) DEFAULT 0 NOT NULL,
   invoicestatus_archive  int(1) DEFAULT 0 NOT NULL,
   invoicestatus_label    varchar(24) default '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)

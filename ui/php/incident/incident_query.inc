@@ -39,43 +39,43 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 
   $where = "1=1";
   if ($lincident != "") {
-     $where .= " and Incident.incident_label $like '$lincident%'";
+     $where .= " AND Incident.incident_label $like '$lincident%'";
   }
   if (($priority != $c_all) && ($priority != "")) { 
-     $where .= " and Incident.incident_priority_id = '$priority'";
+     $where .= " AND Incident.incident_priority_id = '$priority'";
   }
   if ($owner != $c_all && ($owner != "")) {
-     $where .=" and (Incident.incident_owner = '$owner') ";
+     $where .=" AND (Incident.incident_owner = '$owner') ";
   }
   if ($dateafter !="") {
-     $where .=" and (Incident.incident_date >= '$dateafter') ";
+     $where .=" AND (Incident.incident_date >= '$dateafter') ";
   }
   if ($datebefore !="") {
-     $where .=" and (Incident.incident_date <= '$datebefore') ";
+     $where .=" AND (Incident.incident_date <= '$datebefore') ";
   }
   if ($contract_id != "") {
-     $where .= " and incident_contract_id = '$contract_id'";
+     $where .= " AND incident_contract_id = '$contract_id'";
   }
   if ($lcontract != "") {
-     $where .= " and contract_label $like '$lcontract%'";
-     $join_contr = "left join Contract on incident_contract_id=contract_id";
+     $where .= " AND contract_label $like '$lcontract%'";
+     $join_contr = "LEFT JOIN Contract ON incident_contract_id=contract_id";
   }
   if ($company != "") {
-     $where .= " and company_name $like '$company%'";
-     $join_contr = "left join Contract on incident_contract_id=contract_id";
-     $join_comp = "left join Company on contract_company_id=company_id";
+     $where .= " AND company_name $like '$company%'";
+     $join_contr = "LEFT JOIN Contract ON incident_contract_id=contract_id";
+     $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }
   if (($status != $c_all) && ($status != "")) { 
-     $where .= " and Incident.incident_status_id = '$status'";
+     $where .= " AND Incident.incident_status_id = '$status'";
   }
   if ($archive == "0") {
-     $where .= " and Incident.incident_archive != '1'";
+     $where .= " AND Incident.incident_archive != '1'";
   }
-  $whereq = "where $where";
+  $whereq = "WHERE $where";
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_order";
-  $orderq .= " order by $order $p_order_dir, incidentpriority_order";
+  $orderq .= " ORDER BY $order $p_order_dir, incidentpriority_order";
 
   $req = "SELECT
       Incident.incident_id as id,
@@ -99,12 +99,12 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
     FROM Incident
-         left join Contract on incident_contract_id=contract_id
-         left join Company on contract_company_id=company_id
-         left join UserObm as u1 on incident_logger=u1.userobm_id
-         left join UserObm as u2 on incident_owner=u2.userobm_id
-         left join IncidentPriority on incident_priority_id=incidentpriority_id
-         left join IncidentStatus on incident_status_id=incidentstatus_id
+         LEFT JOIN Contract ON incident_contract_id=contract_id
+         LEFT JOIN Company ON contract_company_id=company_id
+         LEFT JOIN UserObm as u1 ON incident_logger=u1.userobm_id
+         LEFT JOIN UserObm as u2 ON incident_owner=u2.userobm_id
+         LEFT JOIN IncidentPriority ON incident_priority_id=incidentpriority_id
+         LEFT JOIN IncidentStatus ON incident_status_id=incidentstatus_id
     $whereq
     $orderq
     $limit
@@ -162,18 +162,18 @@ function run_query_detail($id) {
         c1.contact_phone as phone_c1, c2.contact_phone as phone_c2,
         c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2
       FROM Incident
-        left join Contract on incident_contract_id=contract_id
-        left join ContractStatus on contract_status_id=contractstatus_id
-        left join Company on contract_company_id=company_id
-        left join UserObm u1 on incident_logger=u1.userobm_id
-        left join UserObm u2 on incident_owner=u2.userobm_id
-        left join IncidentPriority on incident_priority_id=incidentpriority_id
-        left join IncidentStatus on incident_status_id=incidentstatus_id
-        left join IncidentCategory1 on incident_cat1_id=incidentcategory1_id
-        left join UserObm as c on incident_usercreate=c.userobm_id
-        left join UserObm as u on incident_userupdate=u.userobm_id
-        left join Contact c1 on contract_contact1_id=c1.contact_id
-        left join Contact c2 on contract_contact2_id=c2.contact_id
+        LEFT JOIN Contract on incident_contract_id=contract_id
+        LEFT JOIN ContractStatus on contract_status_id=contractstatus_id
+        LEFT JOIN Company on contract_company_id=company_id
+        LEFT JOIN UserObm u1 on incident_logger=u1.userobm_id
+        LEFT JOIN UserObm u2 on incident_owner=u2.userobm_id
+        LEFT JOIN IncidentPriority on incident_priority_id=incidentpriority_id
+        LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
+        LEFT JOIN IncidentCategory1 on incident_cat1_id=incidentcategory1_id
+        LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
+        LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
+        LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
+        LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
       WHERE incident_id='$id'";
  
   display_debug_msg($query, $cdg_sql);
@@ -309,13 +309,13 @@ function run_query_incident_id($incident) {
   $query = "SELECT incident_id
     FROM Incident
     WHERE incident_contract_id='$contract_id'
-      and incident_label = '$lincident'
-      and incident_owner $owner
-      and incident_logger $logger
-      and incident_date='$call_date'
-      and incident_priority_id $pri
-      and incident_status_id $status
-      and incident_archive='$archive'";
+      AND incident_label = '$lincident'
+      AND incident_owner $owner
+      AND incident_logger $logger
+      AND incident_date='$call_date'
+      AND incident_priority_id $pri
+      AND incident_status_id $status
+      AND incident_archive='$archive'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -369,21 +369,21 @@ function run_query_update($incident) {
     $duration = $duration + $add_duration;
   }
   $query = "UPDATE Incident SET
-    incident_timeupdate='". date("Y-m-d H:i:s")."',
-    incident_userupdate='".$auth->auth["uid"]."',
-    incident_logger $logger,
-    incident_owner $owner,
-    incident_label='$lincident',
-    incident_date='$call_date', 
-    incident_priority_id='$priority',
-    incident_status_id='$status',
-    incident_cat1_id='$cat1',
-    incident_resolution = '$solu',
-    incident_duration = '$duration',
-    incident_comment='$comment',
-    incident_archive='$archive',
-    incident_contract_id = '$contract_id'
-   where incident_id='$param_incident'";
+      incident_timeupdate='". date("Y-m-d H:i:s")."',
+      incident_userupdate='".$auth->auth["uid"]."',
+      incident_logger $logger,
+      incident_owner $owner,
+      incident_label='$lincident',
+      incident_date='$call_date', 
+      incident_priority_id='$priority',
+      incident_status_id='$status',
+      incident_cat1_id='$cat1',
+      incident_resolution = '$solu',
+      incident_duration = '$duration',
+      incident_comment='$comment',
+      incident_archive='$archive',
+      incident_contract_id = '$contract_id'
+    WHERE incident_id='$param_incident'";
 
   $inc_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -401,7 +401,7 @@ function run_query_update($incident) {
 function run_query_delete($i_id) {
   global $auth, $cdg_sql;
  
-  $query = "delete from Incident where incident_id='$i_id'";
+  $query = "DELETE FROM Incident WHERE incident_id='$i_id'";
 
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -415,7 +415,7 @@ function run_query_delete($i_id) {
 function run_query_priority() {
   global $cdg_sql;
 
-  $query = "select * from IncidentPriority order by incidentpriority_order";
+  $query = "SELECT * FROM IncidentPriority ORDER BY incidentpriority_order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -426,12 +426,12 @@ function run_query_priority() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Incident Status list                                    //
+// Query execution : Incident Status list
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status() {
   global $cdg_sql;
 
-  $query = "select * from IncidentStatus order by incidentstatus_order";
+  $query = "SELECT * FROM IncidentStatus ORDER BY incidentstatus_order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -442,12 +442,12 @@ function run_query_status() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Incident Status list                                    //
+// Query execution : Incident Status list
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat1() {
   global $cdg_sql;
 
-  $query = "select * from IncidentCategory1 order by incidentcategory1_order";
+  $query = "SELECT * FROM IncidentCategory1 ORDER BY incidentcategory1_order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -471,13 +471,13 @@ function run_query_priority_insert($incident) {
   $color = $incident["pri_color"];
   $label = $incident["pri_label"];
 
-  $query = "insert into IncidentPriority (
+  $query = "INSERT INTO IncidentPriority (
     incidentpriority_timecreate,
     incidentpriority_usercreate,
     incidentpriority_order,
     incidentpriority_color,
     incidentpriority_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$order',
@@ -493,7 +493,7 @@ function run_query_priority_insert($incident) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Priority update                                         //
+// Query execution : Priority update
 // Parameters:
 //   - $incident[] : incident hash info :
 //     keys used : priority, pri_label, pri_order
@@ -508,12 +508,13 @@ function run_query_priority_update($incident) {
   $color = $incident["pri_color"];
   $label = $incident["pri_label"];
 
-  $query = "update IncidentPriority set incidentpriority_label='$label',
+  $query = "UPDATE IncidentPriority SET
+    incidentpriority_label='$label',
     incidentpriority_timeupdate='$timeupdate',
     incidentpriority_userupdate='$userupdate',
     incidentpriority_order='$order',
     incidentpriority_color='$color'
-  where incidentpriority_id='$priority'";
+  WHERE incidentpriority_id='$priority'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -524,14 +525,14 @@ function run_query_priority_update($incident) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Priority deletion                                       //
+// Query execution : Priority deletion
 // Parameters:
 //   - $id : Priority id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from IncidentPriority where incidentpriority_id='$id'";
+  $query = "DELETE FROM IncidentPriority WHERE incidentpriority_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -542,15 +543,16 @@ function run_query_priority_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Priority given                             //
+// Query execution : Links to the Priority given
 // Parameters:
 //   - $s_id : priority id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority_links($p_id) {
   global $cdg_sql;
 
-  $query = "select incident_id, incident_label
-    from Incident where incident_priority_id='$p_id'";
+  $query = "SELECT incident_id, incident_label
+    FROM Incident
+    WHERE incident_priority_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $pri_q = new DB_OBM;
@@ -561,7 +563,7 @@ function run_query_priority_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Status insert                                           //
+// Query execution : Status insert
 // Parameters:
 //   - $incdident[] : incident hash info : keys used : sta_label, sta_order
 ///////////////////////////////////////////////////////////////////////////////
@@ -573,12 +575,12 @@ function run_query_status_insert($incident) {
   $label = $incident["sta_label"];
   $order = $incident["sta_order"];
 
-  $query = "insert into IncidentStatus (
+  $query = "INSERT INTO IncidentStatus (
     incidentstatus_timecreate,
     incidentstatus_usercreate,
     incidentstatus_label,
     incidentstatus_order)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$label',
@@ -593,7 +595,7 @@ function run_query_status_insert($incident) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Status update                                           //
+// Query execution : Status update
 // Parameters:
 //   - $incident[] : incident hash info :
 //     keys used : status, sta_label, sta_order
@@ -607,11 +609,12 @@ function run_query_status_update($incident) {
   $label = $incident["sta_label"];
   $order = $incident["sta_order"];
 
-  $query = "update IncidentStatus set incidentstatus_label='$label',
+  $query = "UPDATE IncidentStatus SET
+    incidentstatus_label='$label',
     incidentstatus_timeupdate='$timeupdate',
     incidentstatus_userupdate='$userupdate',
     incidentstatus_order='$order'
-  where incidentstatus_id='$status'";
+  WHERE incidentstatus_id='$status'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -622,14 +625,14 @@ function run_query_status_update($incident) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Status deletion                                         //
+// Query execution : Status deletion
 // Parameters:
 //   - $id : Status id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from IncidentStatus where incidentstatus_id='$id'";
+  $query = "DELETE FROM IncidentStatus WHERE incidentstatus_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -640,15 +643,16 @@ function run_query_status_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Status given                               //
+// Query execution : Links to the Status given
 // Parameters:
 //   - $s_id : status id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_links($s_id) {
   global $cdg_sql;
 
-  $query = "select incident_id, incident_label
-    from Incident where incident_status_id='$s_id'";
+  $query = "SELECT incident_id, incident_label
+    FROM Incident
+    WHERE incident_status_id='$s_id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -656,7 +660,6 @@ function run_query_status_links($s_id) {
 
   return $sta_q;
 }
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -672,12 +675,12 @@ function run_query_cat1_insert($incident) {
   $label = $incident["cat1_label"];
   $order = $incident["cat1_order"];
 
-  $query = "insert into IncidentCategory1 (
+  $query = "INSERT INTO IncidentCategory1 (
     incidentcategory1_timecreate,
     incidentcategory1_usercreate,
     incidentcategory1_label,
     incidentcategory1_order)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$label',
@@ -706,12 +709,12 @@ function run_query_cat1_update($incident) {
   $label = $incident["cat1_label"];
   $order = $incident["cat1_order"];
 
-  $query = "update IncidentCategory1 set 
+  $query = "UPDATE IncidentCategory1 SET
     incidentcategory1_label='$label',
     incidentcategory1_timeupdate='$timeupdate',
     incidentcategory1_userupdate='$userupdate',
     incidentcategory1_order='$order'
-  where incidentcategory1_id='$cat1'";
+  WHERE incidentcategory1_id='$cat1'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -729,7 +732,7 @@ function run_query_cat1_update($incident) {
 function run_query_cat1_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from IncidentCategory1 where incidentcategory1_id='$id'";
+  $query = "DELETE FROM IncidentCategory1 WHERE incidentcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -905,3 +908,18 @@ function check_incident_form($incident) {
   return true;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the incident can be deleted
+// Parameters:
+//   - $p_id : incident id
+// Returns:
+//   true if the incident can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_incident($p_id) {
+  global $cdg_sql, $err_msg, $ok_msg;
+
+  $delete_ok = true;
+
+  return $delete_ok;
+}

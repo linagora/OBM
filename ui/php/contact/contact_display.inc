@@ -465,7 +465,6 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
     </div>";
   }
 
-
   if ($popup) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
@@ -640,24 +639,26 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
-  global $auth, $display, $l_no_found, $path, $l_query_error;
+  global $display, $l_no_found, $path, $l_query_error;
 
   $view = $contact["view"];
-  $param_contact = $contact["id"];
-  $con_q = run_query_contact_detail($param_contact);
+  $id = $contact["id"];
+  $con_q = run_query_contact_detail($id);
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
   }
   $display["detailInfo"] = display_record_info($con_q);
+  $display["link"] = html_contact_links($id);
+  $block .= html_contact_header($con_q);
+
   if ($view != "") {
-    $block .= html_contact_header($con_q);
     include("$path/$view/".$view."_display.inc");
     include("$path/$view/".$view."_query.inc");
     $block .= dis_subscription_external_list($contact);
   } else {
     $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
     $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
-    $block .= html_contact_body($con_q,$cat1_q,$cat2_q);
+    $block .= html_contact_view_main($con_q,$cat1_q,$cat2_q);
   }
 
   return $block;
@@ -665,27 +666,125 @@ function dis_contact_consult($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consultation                                         //
+// HTML Display Contact Consultation
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_body($co_q,$cat1_q,$cat2_q) {
-  global $l_company,$l_lastname,$l_firstname,$l_kind,$l_function,$l_title;
-  global $l_phone, $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode;
-  global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
-  global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
-  global $l_email_other, $l_service,$ico_clipboard;
-  global $l_update,$l_delete,$l_insert, $l_coord, $l_contact,$ico_clipboard;
-  global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
-  global $display, $path, $action, $auth, $cgp_show, $cgp_hide;
+function html_contact_header($co_q) {
+  global $l_company,$l_lastname,$l_firstname,$l_kind, $l_function, $l_title;
+  global $l_contact, $l_market, $l_archive;
+  global $l_public, $l_private, $l_visibility;
+  global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
+  global $display, $path, $action, $auth;
 
-  $usercreate = $co_q->f("contact_usercreate");
   $c_id = $co_q->f("contact_company_id");
+  $usercreate = $co_q->f("contact_usercreate");
+  $c_name = $co_q->f("company_name");
+  $id = $co_q->f("contact_id");
+  $kind_minilabel = $co_q->f("kind_minilabel");
+  $kind = "[" . $co_q->f("kind_lang") . "] $kind_minilabel";
+  $kind_header = $co_q->f("kind_header");
+  if ($kind_header != $kind) $kind .= " ($kind_header)";
+  $function = $co_q->f("function_label");
+  $title = $co_q->f("contact_title");
+  $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
+  $lname = $co_q->f("contact_lastname");
+  $fname = $co_q->f("contact_firstname");
+  $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
+  $priv = $co_q->f("contact_privacy");
+  
+ // Conditionnal fields
+  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  $show_title = (! $cgp_hide["contact"]["contact_title"]);
+  $show_resp = (! $cgp_hide["contact"]["responsible"]);
+
+  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+
+  // Company Display
   if ($cgp_show["module"]["company"]) {
-    $c_name = $co_q->f("company_name");
+    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
   } else {
-    $c_name = $co_q->f("contact_company");
+    $dis_company = $c_name;
   }
+
+  // Function field
+  if ($show_func) {
+    $block_func = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_function</td>
+      <td class=\"detailText\">$function</td>";
+  }
+
+  // Title field
+  if ($show_title) {
+    $block_title = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailText\">$title</td>";
+  }
+
+  // Responsible field
+  if ($show_resp) {
+    $block_resp = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailText\">$market</td>";
+  }
+
+  if ($usercreate == $auth->auth["uid"]) {
+    if ($priv == 1) 
+      $l_priv = $l_private;
+    else 
+      $l_priv = $l_public;  
+    $l_priv = "</tr><tr>
+      <td class=\"detailLabel\">$l_visibility</td>
+      <td class=\"detailText\">$l_priv</td>";
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <div class=\"detailHead\">$l_contact</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_lastname</td>
+      <td class=\"detailText\">$lname</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_firstname</td>
+      <td class=\"detailText\">$fname</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailText\">$kind</td>
+    $l_priv
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_company</td>
+      <td class=\"detailText\">$dis_company</td>
+    $block_func
+    $block_title
+    $block_resp
+    </tr>
+    </table>"; 
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Contact Consultation : main info tab
+// Parameters:
+//   - $co_q : contact database result
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
+  global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
+  global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
+  global $l_comment, $l_email_other, $l_service, $l_coord, $ico_clipboard;
+  global $c_yes, $c_no, $set_theme, $ico_mail, $l_category1, $l_category2;
+  global $display, $cgp_show, $cgp_hide;
+
+  $id = $co_q->f("contact_id");
   $c_phone = $co_q->f("company_phone");
   $c_fax = $co_q->f("company_fax");
   $c_ad1 = $co_q->f("company_address1");
@@ -695,14 +794,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $c_town = $co_q->f("company_town");
   $c_cdx = $co_q->f("company_expresspostal");
   $c_ctry_name = $co_q->f("company_country_name");
-  $id = $co_q->f("contact_id");
   $kind_minilabel = $co_q->f("kind_minilabel");
-  $kind = "[" . $co_q->f("kind_lang") . "] $kind_minilabel";
-  $kind_header = $co_q->f("kind_header");
-  if ($kind_header != $kind) $kind .= " ($kind_header)";
-  $function = $co_q->f("function_label");
-  $title = $co_q->f("contact_title");
-  $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
   $lname = $co_q->f("contact_lastname");
   $fname = $co_q->f("contact_firstname");
   $service = $co_q->f("contact_service");
@@ -730,7 +822,6 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $copy_addr_comp .= ($c_cdx != "") ? addslashes($c_cdx) . $newline : "";
     $copy_addr_comp .= ($c_ctry_name != "") ? addslashes($c_ctry_name) . $newline : "";
   }
-  $func = $co_q->f("contact_function");
   $phone = trim($co_q->f("contact_phone"));
   if ( (($phone == "") && ($c_phone != "")) ||
        (($phone != "") && ($phone == $c_phone)) ) {
@@ -747,14 +838,8 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
   $com = beautify_comment(nl2br($co_q->f("contact_comment")));
-  $priv = $co_q->f("contact_privacy");
-  $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
 
-  $display["link"] = html_contact_links($id);
   // Conditionnal fields
-  $show_func = (! $cgp_hide["contact"]["contact_function"]);
-  $show_title = (! $cgp_hide["contact"]["contact_title"]);
-  $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
@@ -794,30 +879,6 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     }
   }
 
-  // Function field
-  if ($show_func) {
-    $block_func = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_function</td>
-      <td class=\"detailText\">$function</td>";
-  }
-
-  // Title field
-  if ($show_title) {
-    $block_title = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailText\">$title</td>";
-  }
-
-  // Responsible field
-  if ($show_resp) {
-    $block_resp = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_market</td>
-      <td class=\"detailText\">$market</td>";
-  }
-
   // Service field
   if ($show_service) {
     $block_service = "
@@ -842,16 +903,6 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">$cdx</td>";
   }
 
-  if ($usercreate == $auth->auth["uid"]) {
-    if ($priv == 1) 
-      $l_priv = $l_private;
-    else 
-      $l_priv = $l_public;  
-    $l_priv = "</tr><tr>
-      <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$l_priv</td>";
-  }
-
   if ($email != "") {
     $link_email = "
       <a href=\"mailto:$email\">
@@ -866,9 +917,6 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
       </a>";
   }
   
-  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
-
-
   // Category 1 field
   if ($show_cat1) {
     $nb_col_cat1 = 3;
@@ -928,40 +976,9 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </table>";
   }
 
-  // Company Display
-  if ($cgp_show["module"]["company"]) {
-    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
-  } else {
-    $dis_company = $c_name;
-  }
-
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detailHead\">$l_contact</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailText\">$lname</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailText\">$fname</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
-    $l_priv
-    </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$archive</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">$dis_company</td>
-    $block_func
-    $block_title
-    $block_resp
-    </tr>
-    </table>
-
     <div class=\"detailHead\">$l_coord</div>
 
     <table class=\"detail\">
@@ -1028,64 +1045,6 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consultation
-// Parameters:
-//   - $co_q : contact database result
-///////////////////////////////////////////////////////////////////////////////
-function html_contact_header($co_q) {
-  global $l_company,$l_lastname,$l_firstname,$l_kind;
-  global $l_update,$l_delete,$l_insert,$l_contact;
-  global $cgp_show, $c_yes, $c_no, $set_theme;
-  global $display, $path, $action, $auth;
-
-  $usercreate = $co_q->f("contact_usercreate");
-  $c_id = $co_q->f("contact_company_id");
-  $c_name = $co_q->f("company_name");
-  $id = $co_q->f("contact_id");
-  $kind = $co_q->f("kind_minilabel");
-  $kind_header = $co_q->f("kind_header");
-  if ($kind_header != $kind) $kind .= " ($kind_header)";
-  $title = $co_q->f("contact_title");
-  $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
-  $lname = $co_q->f("contact_lastname");
-  $fname = $co_q->f("contact_firstname");
-  $display["link"] = html_contact_links($id);
-  
-  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
-
-  // Company Display
-  if ($cgp_show["module"]["company"]) {
-    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
-  } else {
-    $dis_company = $c_name;
-  }
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <div class=\"detailHead\">$l_contact</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailText\">$lname</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailText\">$fname</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
-    $l_priv
-    </tr><tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">$dis_company</td>
-    </tr>
-    </table>"; 
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display: Contact links menu
 // Parameters:
 //   - $deal_q : DBO : information about the deal
@@ -1094,11 +1053,57 @@ function html_contact_header($co_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
-  global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
+  global $set_theme, $ico_document, $ico_document_new, $ico_deal,$ico_contract;
+  global $ico_list, $ico_publication,$ico_publication_new;
   global $l_module_document, $l_contact;
+  global $l_module_deal, $l_module_list, $l_module_contract;
   global $l_document_new,$l_document_add;
   global $l_subscription_new, $l_subscription, $l_subscription_list;
-  global $path, $auth, $cgp_show, $popup_height,$popup_width;
+  global $path, $cgp_show, $popup_height,$popup_width;
+
+  // Deal
+  if ($cgp_show["module"]["deal"]) {
+    $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_contact=$id");
+    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_contact=$id&amp;cb_archive=1");
+    $deal_active = get_linked_deal_nb($id, "contact1", false, "contact2");
+    $deal_total = get_linked_deal_nb($id, "contact1", true, "contact2");
+    $block_deal = "
+  <div class=\"linkTitle\">:: $l_module_deal</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_deal_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
+        $l_module_deal (
+        <a href=\"$url_deal_list\">$deal_active</a> /
+        <a href=\"$url_deal_total\">$deal_total</a> )</li>
+  </ul>";
+  }
+
+  // List
+  if ($cgp_show["module"]["list"]) {
+    $url_list = url_prepare("$path/list/list_index.php?action=search&amp;param_contact=$id");
+    $list_nb = get_linked_contact_list_nb($id);
+    $block_list = "
+  <div class=\"linkTitle\">:: $l_module_list</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_list\" /></a>
+        $l_module_list ( <a href=\"$url_list\">$list_nb</a> )</li>
+  </ul>";
+  }
+
+  // Contract
+  if ($cgp_show["module"]["contract"]) {
+    $contract_active = get_linked_contract_nb($id,"contact1",false,"contact2");
+    $contract_total = get_linked_contract_nb($id,"contact1",true,"contact2");
+    $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_contact=$id");
+    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_contact=$id&amp;cb_archive=1");
+    $block_contract = "
+  <div class=\"linkTitle\">:: $l_module_contract</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
+        $l_module_contract (
+        <a href=\"$url_contract\">$contract_active</a> /
+        <a href=\"$url_contract_total\">$contract_total</a> )</li>
+  </ul>";
+  }
 
   // Document  
   if ($cgp_show["module"]["document"]) {
@@ -1131,7 +1136,7 @@ function html_contact_links($id) {
   <ul class=\"linkList\">
     <li><a href=\"$url_subscription\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription_list ($nb_subscription)</a></li>
-    <li><a  href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"\" /></a>
+    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"\" /></a>
 	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
   </ul>";
   }
@@ -1139,6 +1144,9 @@ function html_contact_links($id) {
   // Links Template  
   $block = "
 <div class=\"link\">
+  $block_deal
+  $block_list
+  $block_contract
   $block_doc
   $block_publi
 </div>
@@ -1862,149 +1870,38 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays and check the contact links (and delete form if ok)              //
+// Display the contact delete validation screen
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_contact_links($p_id) {
-  global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
-  global $l_link_list, $l_link_list_no, $l_link_publication, $l_link_publication_no;
-  global $path, $display;
-
-  $delete_ok = true;
-
-  // Links from deals
-  $obm_q = run_query_contact_deal_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_link_d = "<tr><td class=\"detailHead\">$l_link_deal</td></tr>";
-    while ($obm_q->next_record()) {
-      $did = $obm_q->f("deal_id");
-      $dlabel = $obm_q->f("deal_label");
-      $display_link_d .= "
-      <tr>
-        <td class=\"detailLabel\">
-          <a class=\"detailLabel\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
-          $dlabel</a>
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_link_d = "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>";
-  }
-
-  // Links from Contracts
-  $obm_q = run_query_contact_contract_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_link_c = "<tr><td class=\"detailHead\">$l_link_contract</td></tr>";
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contract_id");
-      $clabel = $obm_q->f("contract_label");
-      $display_link_c .= "
-      <tr>
-        <td class=\"detailLabel\">
-          <a class=\"detailLabel\" href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid")."\">
-          $clabel</a>
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_link_c = "<tr><td class=\"detailHead\">$l_link_contract_no</td></tr>";
-  }
-
-  // Links from lists
-  $obm_q = run_query_contact_list_links($p_id);
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_link_l = "<tr><td class=\"detailHead\">$l_link_list</td></tr>";
-    while ($obm_q->next_record()) {
-      $lid = $obm_q->f("list_id");
-      $lname = $obm_q->f("list_name");
-      $display_link_l .= "
-        <tr>
-          <td class=\"detailLabel\">
-            <a class=\"detailLabel\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
-            $lname</a>
-          </td>
-        </tr>";
-    }
-  } else {
-    $display_link_l = "<tr><td class=\"detailHead\">$l_link_list_no</td></tr>";
-  }
-
-  // Links from Publications (Subscriptions)
-  $obm_q = run_query_contact_publication_links($p_id);
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_link_p = "<tr><td class=\"detailHead\">$l_link_publication</td></tr>";
-    while ($obm_q->next_record()) {
-      $pid = $obm_q->f("publication_id");
-      $ptitle = $obm_q->f("publication_title");
-      $display_link_p .= "
-        <tr>
-          <td class=\"detailLabel\">
-            <a class=\"detailLabel\" href=\"".url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$pid")."\">
-            $ptitle</a>
-          </td>
-        </tr>";
-    }
-  } else {
-    $display_link_p = "<tr><td class=\"detailHead\">$l_link_publication_no</td></tr>";
-  }
+function dis_can_delete_contact($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
-     action=\"".url_prepare("contact_index.php") ."\">
-     <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
-     <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
-     <input type=\"submit\" value=\"$l_back\" />
-     </form>";
+    action=\"".url_prepare("contact_index.php") ."\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
 
-  $block .= "<table class=\"detail\">
-    $display_link_d
-    $display_link_c
-    $display_link_l
-    $display_link_p
-    </table>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_contact_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
-// Parameters:
-//   - $p_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_contact_delete_form($p_id) {
-  global $l_delete;
-
-  // --- HTML Template --------------------------------------------------------
-  return "
-    <form name=\"form_delete\" method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
+  $dis_delete = "<form name=\"form_delete\" method=\"post\"
+      action=\"" . url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
-  </form>";
+    </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
+
+  return $block;
 }
 
 
@@ -2543,7 +2440,7 @@ function dis_cat2_links($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the function links                                               //
+// Displays the function links
 // Parameters:
 //   - $contact : contact hash info : keys used : function
 ///////////////////////////////////////////////////////////////////////////////
@@ -2941,7 +2838,7 @@ function html_category2_list($contact) {
   $popup = $contact["popup"];
   $cat_q = run_query_contactcategory2();
   if ($popup) {
-    $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link = "<a class=\"categoryDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
   $name = '/';

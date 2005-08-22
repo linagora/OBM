@@ -32,9 +32,6 @@ $clist_mode_normal = "normal";
 $clist_mode_expert = "expert";
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms Management                                             //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $module = "list";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -183,17 +180,30 @@ else if ($action == "new_criterion") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_warn_delete($list["id"]);
+  if (check_can_delete_list($list["id"])) {
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_list($list["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_list_consult($list);
+  }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($list["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_list($list["id"])) {
+    $retour = run_query_delete($list["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = dis_list_search_form("");
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_list_consult($list);
   }
-  $display["search"] = dis_list_search_form("");
 
 } elseif ($action == "contact_add")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,22 +289,22 @@ function get_param_list() {
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate;
   global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
   global $new_order, $order_dir, $popup, $row_index;
-  global $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
+  global $param_contact, $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
 
-  global $tf_company_name,$tf_company_zipcode,$tf_company_town;
-  global $tf_company_timeafter,$tf_company_timebefore;
+  global $tf_company_name, $tf_company_zipcode, $tf_company_town;
+  global $tf_company_timeafter, $tf_company_timebefore;
   global $sel_company_country_iso3166, $sel_company_marketingmanager_id;
-  global $sel_company_datasource_id,$sel_companycategory_code;
+  global $sel_company_datasource_id, $sel_companycategory_code;
 
-  global $tf_contact_firstname,$tf_contact_lastname;
-  global $tf_contact_zipcode,$tf_contact_town,$sel_kind_lang;
-  global $tf_contact_timeafter,$tf_contact_timebefore;
+  global $tf_contact_firstname, $tf_contact_lastname;
+  global $tf_contact_zipcode, $tf_contact_town, $sel_kind_lang;
+  global $tf_contact_timeafter, $tf_contact_timebefore;
   global $sel_contact_country_iso3166, $sel_contact_marketingmanager_id;
-  global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
-  global $sel_contactcategory2link_category_id,$sel_contact_function_id;
+  global $sel_contact_datasource_id, $sel_contactcategory1link_category_id;
+  global $sel_contactcategory2link_category_id, $sel_contact_function_id;
   
   global $sel_subscription_publication_id,$tf_publication_lang,$tf_publication_year;
-  global $sel_subscription_reception_id,$tf_subscription_renewal;
+  global $sel_subscription_reception_id, $tf_subscription_renewal;
   global $tf_subscription_timeafter, $tf_subscription_timebefore;
   
   global $sel_log_and,$sel_log_not;
@@ -304,6 +314,7 @@ function get_param_list() {
   // List fields
   if (isset ($param_ext)) $list["id"] = $param_ext;
   if (isset ($param_list)) $list["id"] = $param_list;
+  if (isset ($param_contact)) $list["contact_id"] = $param_contact;
   if (isset ($tf_name)) $list["name"] = trim($tf_name);
   if (isset ($tf_subject)) $list["subject"] = trim($tf_subject);
   if (isset ($tf_email)) $list["email"] = $tf_email;
@@ -311,10 +322,10 @@ function get_param_list() {
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
   if (isset ($row_index)) $list["row_index"] = $row_index;
-  if (isset( $cb_priv)) $list["priv"] = ($cb_priv == "1") ? 1 : 0;
-  if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0; 
+  if (isset($cb_priv)) $list["priv"] = ($cb_priv == "1") ? 1 : 0;
+  if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0;
   if (isset($cb_contact_arch)) $list["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
-  if (isset($cb_info_pub)) $list["info_pub"] = $cb_info_pub == 1 ? 1 : 0; 
+  if (isset($cb_info_pub)) $list["info_pub"] = $cb_info_pub == 1 ? 1 : 0;
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;

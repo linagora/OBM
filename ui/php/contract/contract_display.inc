@@ -1484,7 +1484,43 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Incident Priority section                                                 //
+// Display the contract delete validation screen
+// Parameters:
+//   - $p_id : contract id
+///////////////////////////////////////////////////////////////////////////////
+function dis_can_delete_contract($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
+
+  $url = url_prepare("contract_index.php");
+
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Incident Priority section
 // Parameters:
 //   - $pri_q : Priority list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1617,8 +1653,9 @@ function html_priority_form($pri_q) {
   return $r;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the priority links                                               //
+// Displays the priority links
 // Parameters:
 //   - $id : priority id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1701,7 +1738,7 @@ function dis_priority_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contract Status section                                                   //
+// Contract Status section
 // Parameters:
 //   - $sta_q : Status list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1824,8 +1861,7 @@ function html_status_form($sta_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Displays the status links                                                //
+// Displays the status links
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1903,90 +1939,6 @@ function dis_status_links($id) {
   }
   return $dis_link;
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays and check the contract links (and delete form if ok)             //
-// Parameters:
-//   - $p_id : contract id
-///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
-  global $display, $path, $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_incident, $l_link_incident_no;
-
-  $delete_ok = true;
-
-  // Links from Incident
-  $obm_q = run_query_contract_incident_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linki ="<tr><td class=\"detailHead\">$l_link_incident</td></tr>";
-    while ($obm_q->next_record()) {
-      $iid = $obm_q->f("incident_id");
-      $ilabel = $obm_q->f("incident_label");
-      $display_linki .= "
-      <tr>
-        <td class=\"detailLabel\"><a class=\"detail\" href=\"" . url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a></td>
-      </tr>";
-    }
-  } else {
-    $display_linki = "
-      <tr>
-        <td class=\"detailHead\">$l_link_incident_no</td>
-      </tr>";
-  }
-
-  $block .= "<table class=\"detail\">
-   $display_linki
-   </table>";
-
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-    action=\"".url_prepare("contract_index.php") ."\">
-    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
-// Parameters:
-//   - $p_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $ret = "<form name=\"form_delete\" method=\"post\"
-      action=\"" . url_prepare("contract_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
-    </form>";
-
-  return $ret;
-}
-
 
 
 ///////////////////////////////////////////////////////////////////////////////

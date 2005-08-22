@@ -50,7 +50,9 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "todo_percent") {
     $res["align"] = "center";
     $percent = $OD->data_set->f("todo_percent");
-    $res["name"] = "$percent %";
+    if ($percent != "") {
+      $res["name"] = "$percent %";
+    }
   }
 
   else if ($fieldname == "date_todo") {
@@ -72,14 +74,38 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Todo search result
+// Parameters:
+//   - $todo[]    : todo search criteria
+///////////////////////////////////////////////////////////////////////////////
+function dis_todo_search_list($todo) {
+  global $display, $auth, $l_no_found;
+
+  $new_order = $todo["new_order"];
+  $order_dir = $todo["order_dir"];
+
+  $todo_q = run_query_todolist($todo, $new_order, $order_dir);
+  $nb_todo = $todo_q->num_rows_total();
+  if ($nb_todo == 0) {
+    $display["msg"] .= display_info_msg($l_no_found);
+  } else {
+    $prefs = get_display_pref($auth->auth["uid"], "todo", 0);
+    $display["result"] .= html_todo_search_list($todo, $todo_q, $prefs);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Todo Full list
 // Parameters:
-//   - $todo_q    : todo list
-//   - $todo[]    : default values
-//     keys used  : uid
+//   - $todo[] : hash values
+//   - $todo_q : todo list
+//   - $prefs  : fields to display in the todo list
 ///////////////////////////////////////////////////////////////////////////////
-function dis_todo_list($todo, $todo_q) {
-  global $auth, $l_del, $l_delete;
+function html_todo_search_list($todo, $todo_q, $prefs) {
+  global $l_del, $l_delete;
 
   $uid = $todo["uid"];
   $title = $todo["title"];
@@ -93,7 +119,6 @@ function dis_todo_list($todo, $todo_q) {
      <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
     "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
      ";
-  $prefs = get_display_pref($auth->auth["uid"], "todo");
 
   $todo_d = new OBM_DISPLAY("DATA", $prefs);
   $todo_d->data_set = $todo_q;
@@ -111,7 +136,7 @@ function dis_todo_list($todo, $todo_q) {
     <p class=\"detailButton\">
      <p class=\"detailButtons\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />
      </p>
     </p>
     </form>
@@ -228,7 +253,6 @@ function dis_todo_form($todo, $todo_q = 0) {
     $p_user_array = array($uid);
   }
 
-  print_r($p_user_array);
   $usr_q = run_query_userobm_in($p_user_array);
 
   // UserObm section

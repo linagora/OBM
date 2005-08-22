@@ -209,7 +209,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Detail query execution                                                    //
+// Detail query execution
 // Parameters :
 //   - $p_id  : company id
 ///////////////////////////////////////////////////////////////////////////////
@@ -223,14 +223,14 @@ function run_query_detail($p_id) {
   $timecreate = sql_date_format($db_type, "company_timecreate", "timecreate");
   $lang = get_lang();
 
-  $query = "select *,
+  $query = "SELECT *,
       $timeupdate,
       $timecreate,
       m.userobm_lastname as market_lname,
       m.userobm_firstname as market_fname,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-    from Company
+    FROM Company
          LEFT JOIN CompanyType on company_type_id=companytype_id
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
@@ -240,7 +240,7 @@ function run_query_detail($p_id) {
          LEFT JOIN DataSource on company_datasource_id=datasource_id
          LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
-    where company_id='$p_id'";
+    WHERE company_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -453,7 +453,7 @@ function run_query_update($cid, $company) {
   }
   $compcat = $company["cat"];
 
-  $query = "update Company set
+  $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
     company_userupdate='". $auth->auth["uid"] ."',
     company_datasource_id='$dsrc',
@@ -479,24 +479,24 @@ function run_query_update($cid, $company) {
     company_web='$web',
     company_email='$email',
     company_comment='$comment'
-  where company_id='$cid'";
+  WHERE company_id='$cid'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $query = "delete
-    from CompanyCategoryLink
-    where companycategorylink_company_id='$cid'";
+  $query = "DELETE
+    FROM CompanyCategoryLink
+    WHERE companycategorylink_company_id='$cid'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
-      $query = "insert into CompanyCategoryLink (
+      $query = "INSERT INTO CompanyCategoryLink (
 	companycategorylink_company_id,
 	companycategorylink_category_id)
-	values
+	VALUES
 	('$cid','$categoryid')";
       display_debug_msg($query, $cdg_sql);
       $obm_q->query($query);
@@ -516,7 +516,7 @@ function run_query_update($cid, $company) {
 function run_query_delete($p_id) {
   global $cdg_sql;
 
-  $query = "delete from Company where company_id='$p_id'";
+  $query = "DELETE FROM Company WHERE company_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -524,8 +524,8 @@ function run_query_delete($p_id) {
 
   run_query_delete_document_links($p_id, "company");
 
-  $query = "delete from CompanyCategoryLink
-    where companycategorylink_company_id='$p_id'";
+  $query = "DELETE FROM CompanyCategoryLink
+    WHERE companycategorylink_company_id='$p_id'";
   $obm_q->query($query);
 
   return $retour;
@@ -552,85 +552,6 @@ function get_format_company_name($name) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the contacts attached to the company
-// Parameters:
-//   - $p_id : company Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_contact_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select distinct contact_id, contact_lastname, contact_firstname 
-            from Contact
-            where contact_company_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the deals attached to the company
-// Parameters:
-//   - $p_id : company Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_deal_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select distinct deal_id, deal_label
-    from Deal
-    where deal_company_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the contracts attached to the company
-// Parameters:
-//   - $p_id : company Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_contract_links($p_id) {
-  global $cdg_sql;
-
-  $query = "select distinct contract_id, contract_label 
-            from Contract
-            where contract_company_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the projects attached to the company
-// Parameters:
-//   - $p_id : company Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_project_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select distinct project_id, project_name 
-            from Project
-            where project_company_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return the companies with this name and zip (not with this id if set)
 // Parameters:
 //   - $p_id : company Id not to return
@@ -648,9 +569,9 @@ function run_query_check_company($p_id, $name, $zip) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
-  $query = "select distinct company_id, company_name, company_zipcode 
-            from Company
-            where company_name $like '$name%'
+  $query = "SELECT DISTINCT company_id, company_name, company_zipcode 
+            FROM Company
+            WHERE company_name $like '$name%'
               $where_id";
 
   display_debug_msg($query, $cdg_sql);
@@ -661,7 +582,7 @@ function run_query_check_company($p_id, $name, $zip) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Kind company query execution                                              //
+// Kind company query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -670,7 +591,7 @@ function run_query_companytype() {
 
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   if ($show_kind) {
-    $query = "select * from CompanyType order by companytype_label"; 
+    $query = "SELECT * FROM CompanyType ORDER BY companytype_label"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -683,7 +604,7 @@ function run_query_companytype() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Kind insertion query construction and execution                           //
+// Kind insertion query construction and execution
 // Parameters:
 //   - $company : company hash info : keys used : kind_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -694,11 +615,11 @@ function run_query_kind_insert($company) {
   $usercreate = $auth->auth["uid"];
   $kind = $company["kind_label"];
 
-  $query = "insert into CompanyType (
+  $query = "INSERT INTO CompanyType (
     companytype_timecreate,
     companytype_usercreate,
     companytype_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$kind')";
@@ -712,7 +633,7 @@ function run_query_kind_insert($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Kind update query execution                                               //
+// Kind update query execution
 // Parameters:
 //   - $company : company hash info : keys used : kind, kind_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -724,11 +645,11 @@ function run_query_kind_update($company) {
   $id = $company["kind"];
   $kind = $company["kind_label"];
 
-  $query = "update CompanyType set
+  $query = "UPDATE CompanyType SET
     companytype_label='$kind',
     companytype_timeupdate='$timeupdate',
     companytype_userupdate='$userupdate'
-      where
+  WHERE
     companytype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -740,14 +661,14 @@ function run_query_kind_update($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Kind deletion query execution                                             //
+// Kind deletion query execution
 // Parameters:
 //   - $id : Kind id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_kind_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from CompanyType where companytype_id='$id'";
+  $query = "DELETE FROM CompanyType WHERE companytype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -758,14 +679,16 @@ function run_query_kind_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Kind - Company links query execution                                      //
+// Kind - Company links query execution
 // Parameters:
 //   - $p_id : kind id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_kind_links($p_id) {
   global $cdg_sql;
 
-  $query = "select company_name, company_id, company_type_id from Company where company_type_id='$p_id'";
+  $query = "SELECT company_name, company_id, company_type_id
+    FROM Company
+    WHERE company_type_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -776,7 +699,7 @@ function run_query_kind_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category company query execution                                          //
+// Category company query execution
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
@@ -785,7 +708,7 @@ function get_ordered_companycat() {
 
   $show_cat = (! $cgp_hide["company"]["category"]);
   if ($show_cat) {
-    $query = "select * from CompanyCategory order by companycategory_code";
+    $query = "SELECT * FROM CompanyCategory ORDER BY companycategory_code";
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -810,11 +733,11 @@ function get_company_cat($id) {
 
   $show_cat = (! $cgp_hide["company"]["category"]);
   if ($show_cat) {
-    $query = "select CompanyCategory.*
-    from CompanyCategoryLink, CompanyCategory
-    where companycategorylink_company_id = '$id' 
-      and companycategorylink_category_id = companycategory_id
-    order by companycategory_code"; 
+    $query = "SELECT CompanyCategory.*
+    FROM CompanyCategoryLink, CompanyCategory
+    WHERE companycategorylink_company_id = '$id' 
+      AND companycategorylink_category_id = companycategory_id
+    ORDER BY companycategory_code"; 
 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -838,12 +761,12 @@ function run_query_get_companycat_name($id) {
 
   $show_cat = (! $cgp_hide["company"]["category"]);
   if ($show_cat) {
-    $query = "select *
-    from CompanyCategoryLink,
+    $query = "SELECT *
+    FROM CompanyCategoryLink,
       CompanyCategory
-    where companycategorylink_company_id = '$id' 
-      and companycategorylink_category_id = companycategory_id
-    order by companycategory_code"; 
+    WHERE companycategorylink_company_id = '$id' 
+      AND companycategorylink_category_id = companycategory_id
+    ORDER BY companycategory_code"; 
 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -857,7 +780,7 @@ function run_query_get_companycat_name($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie insertion query construction and execution                      //
+// Categorie insertion query construction and execution
 // Parameters:
 //   - $company : company hash info : keys used : cat_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -869,12 +792,12 @@ function run_query_cat_insert($company) {
   $cat = $company["cat_label"];
   $code = $company["cat_code"];
 
-  $query = "insert into CompanyCategory (
+  $query = "INSERT INTO CompanyCategory (
     companycategory_timecreate,
     companycategory_usercreate,
     companycategory_label,
     companycategory_code)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$cat',
@@ -889,7 +812,7 @@ function run_query_cat_insert($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie update query execution                                          //
+// Categorie update query execution
 // Parameters:
 //   - $company : company hash info : keys used : cat, cat_label,cat_code
 ///////////////////////////////////////////////////////////////////////////////
@@ -902,12 +825,12 @@ function run_query_cat_update($company) {
   $cat = $company["cat_label"];
   $code = $company["cat_code"];
 
-  $query = "update CompanyCategory set
+  $query = "UPDATE CompanyCategory SET
     companycategory_label='$cat',
     companycategory_code='$code',
     companycategory_timeupdate='$timeupdate',
     companycategory_userupdate='$userupdate'
-      where
+  WHERE
     companycategory_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -919,14 +842,14 @@ function run_query_cat_update($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie deletion query execution                                        //
+// Categorie deletion query execution
 // Parameters:
 //   - $id : Categorie id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from CompanyCategory where companycategory_id='$id'";
+  $query = "DELETE FROM CompanyCategory WHERE companycategory_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -937,20 +860,20 @@ function run_query_cat_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie - Company links query execution                                 //
+// Categorie - Company links query execution
 // Parameters:
 //   - $p_id : cat id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat_links($p_id) {
   global $cdg_sql;
 
-  $query = "select company_name,
+  $query = "SELECT company_name,
       company_id,
       '$p_id' as company_category_id
-    from Company,
+    FROM Company,
       CompanyCategoryLink
-    where company_id=companycategorylink_company_id
-      and companycategorylink_category_id = '$p_id'";
+    WHERE company_id=companycategorylink_company_id
+      AND companycategorylink_category_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -961,7 +884,7 @@ function run_query_cat_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity company query execution                                          //
+// Activity company query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -970,7 +893,7 @@ function run_query_companyactivity() {
 
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   if ($show_act) {
-    $query = "select * from CompanyActivity order by companyactivity_label"; 
+    $query = "SELECT * FROM CompanyActivity ORDER BY companyactivity_label"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -983,7 +906,7 @@ function run_query_companyactivity() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity insertion query construction and execution                       //
+// Activity insertion query construction and execution
 // Parameters:
 //   - $company : company hash info : keys used : act_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -994,11 +917,11 @@ function run_query_activity_insert($company) {
   $usercreate = $auth->auth["uid"];
   $act = $company["act_label"];
 
-  $query = "insert into CompanyActivity (
+  $query = "INSERT INTO CompanyActivity (
       companyactivity_timecreate,
       companyactivity_usercreate,
       companyactivity_label)
-    values (
+    VALUES (
       '$timecreate',
       '$usercreate',
       '$act')";
@@ -1012,7 +935,7 @@ function run_query_activity_insert($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity update query execution                                           //
+// Activity update query execution
 // Parameters:
 //   - $company : company hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -1024,11 +947,11 @@ function run_query_activity_update($company) {
   $id = $company["activity"];
   $activity = $company["act_label"];
 
-  $query = "update CompanyActivity set
+  $query = "UPDATE CompanyActivity SET
       companyactivity_label='$activity',
       companyactivity_timeupdate='$timeupdate',
       companyactivity_userupdate='$userupdate'
-    where
+    WHERE
       companyactivity_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1040,14 +963,14 @@ function run_query_activity_update($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity deletion query execution                                         //
+// Activity deletion query execution
 // Parameters:
 //   - $id : Activity id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_activity_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from CompanyActivity where companyactivity_id='$id'";
+  $query = "DELETE FROM CompanyActivity WHERE companyactivity_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1058,15 +981,16 @@ function run_query_activity_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Company links query execution                                  //
+// Activity - Company links query execution
 // Parameters:
 //   - $p_id : activity id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_activity_links($p_id) {
   global $cdg_sql;
 
-  $query = "select company_name, company_id, company_activity_id
-    from Company where company_activity_id='$p_id'";
+  $query = "SELECT company_name, company_id, company_activity_id
+    FROM Company
+    WHERE company_activity_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1086,7 +1010,7 @@ function run_query_companynafcode() {
 
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   if ($show_naf) {
-    $query = "select * from CompanyNafCode order by companynafcode_code"; 
+    $query = "SELECT * FROM CompanyNafCode ORDER BY companynafcode_code"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -1112,13 +1036,13 @@ function run_query_nafcode_insert($company) {
   $code = $company["naf_code"];
   $label = $company["naf_label"];
 
-  $query = "insert into CompanyNafCode (
+  $query = "INSERT INTO CompanyNafCode (
       companynafcode_timecreate,
       companynafcode_usercreate,
       companynafcode_title,
       companynafcode_code,
       companynafcode_label)
-    values (
+    VALUES (
       '$timecreate',
       '$usercreate',
       '$title',
@@ -1147,12 +1071,12 @@ function run_query_nafcode_update($company) {
   $code = $company["naf_code"];
   $label = $company["naf_label"];
 
-  $query = "update CompanyNafCode set
+  $query = "UPDATE CompanyNafCode SET
       companynafcode_code='$code',
       companynafcode_label='$label',
       companynafcode_timeupdate='$timeupdate',
       companynafcode_userupdate='$userupdate'
-    where
+    WHERE
       companynafcode_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1171,7 +1095,7 @@ function run_query_nafcode_update($company) {
 function run_query_nafcode_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from CompanyNafCode where companynafcode_id='$id'";
+  $query = "DELETE FROM CompanyNafCode WHERE companynafcode_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1189,8 +1113,9 @@ function run_query_nafcode_delete($id) {
 function run_query_nafcode_links($p_id) {
   global $cdg_sql;
 
-  $query = "select company_name, company_id, company_nafcode_id
-    from Company where company_nafcode_id='$p_id'";
+  $query = "SELECT company_name, company_id, company_nafcode_id
+    FROM Company
+    WHERE company_nafcode_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1208,9 +1133,9 @@ function run_query_nafcode_links($p_id) {
 function get_kind_label($id) {
   global $cdg_sql;
 
-  $query = "select companytype_label
-    from CompanyType
-    where companytype_id='$id'";
+  $query = "SELECT companytype_label
+    FROM CompanyType
+    WHERE companytype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1230,9 +1155,9 @@ function get_kind_label($id) {
 function get_cat_label($id) {
   global $cdg_sql;
 
-  $query = "select companycategory_label
-    from CompanyCategory
-    where companycategory_id='$id'";
+  $query = "SELECT companycategory_label
+    FROM CompanyCategory
+    WHERE companycategory_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1245,16 +1170,16 @@ function get_cat_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Activity from its id                                  //
+// Get the label of an Activity from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_activity_label($id) {
   global $cdg_sql;
 
-  $query = "select companyactivity_label
-    from CompanyActivity
-    where companyactivity_id='$id'";
+  $query = "SELECT companyactivity_label
+    FROM CompanyActivity
+    WHERE companyactivity_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1274,10 +1199,10 @@ function get_activity_label($id) {
 function get_nafcode_label($id) {
   global $cdg_sql;
 
-  $query = "select companynafcode_code,
+  $query = "SELECT companynafcode_code,
       companynafcode_label
-    from CompanyNafCode
-    where companynafcode_id='$id'";
+    FROM CompanyNafCode
+    WHERE companynafcode_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1290,7 +1215,7 @@ function get_nafcode_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company environment checking (same companies exists ?)                    //
+// Company environment checking (same companies exists ?)
 // Parameters: :/ Tous les champs ici
 //   - $cid       : company id
 //   - $company[] : company's values
@@ -1310,7 +1235,7 @@ function check_company_context($cid, $company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Form Data checking and formatting                                 //
+// Company Form Data checking and formatting
 // Parameters:
 //   - $cid   : company id
 //   - $company[] : values checked
@@ -1344,7 +1269,6 @@ function check_data_form($cid, $company) {
   //    $err_msg = $l_err_act_empty;
   //    return false;
   //  }
-
 
   // Company Zip code
   if (($zip != "") && (preg_match($php_regexp_zip, $zip) == 0)) {
@@ -1381,14 +1305,79 @@ function check_data_form($cid, $company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if the company can be deleted
+// Parameters:
+//   - $p_id : company id
+// Returns:
+//   true if the company can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_company($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
+  global $l_link_contract, $l_link_contract_no, $l_link_project;
+  global $l_link_invoice, $l_link_invoice_no, $l_link_project_no;
+
+  $delete_ok = true;
+
+  // Links from Contact
+  $nb = get_linked_contact_nb($p_id, "company", true);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "$l_link_contact";
+  } else {
+    $ok_msg .= "$l_link_contact_no";
+  }
+
+  // Links from deals
+  $nb = get_linked_deal_nb($p_id, "company", true);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_deal";
+  } else {
+    $ok_msg .= "<br />$l_link_deal_no";
+  }
+
+  // Links from Contracts
+  $nb = get_linked_contract_nb($p_id, "company", true);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_contract";
+  } else {
+    $ok_msg .= "<br />$l_link_contract_no";
+  }
+
+  // Links from Project
+  $nb = get_linked_project_nb($p_id, "company", true);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_project";
+  } else {
+    $ok_msg .= "<br />$l_link_project_no";
+  }
+
+  // Links from Invoice
+  $nb = get_linked_invoice_nb($p_id, "company", true);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_invoice";
+  } else {
+    $ok_msg .= "<br />$l_link_invoice_no";
+  }
+
+  return $delete_ok;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query to build the category tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_tree() {
-  global $cdg_sql,$auth;
+  global $cdg_sql;
 
-  $query = "select *  from CompanyCategory $where 
-  order by companycategory_code";
+  $query = "SELECT *
+  FROM CompanyCategory 
+  ORDER BY companycategory_code";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

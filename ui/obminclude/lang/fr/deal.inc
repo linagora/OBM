@@ -89,16 +89,18 @@ $l_cat_insert = "Insérer une catégorie";
 $l_add_cats = "Ajouter ces categories";
 
 // Messages
-$l_link_contract = "L'affaire est référencée par ces contrats";
+$l_link_contract = "L'affaire est référencée par des contrats";
 $l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
-$l_link_project = "L'affaire est référencée par ces projets";
+$l_link_project = "L'affaire est référencée par des projets";
 $l_link_project_no = "L'affaire n'est pas référencée dans les projets";
-$l_link_invoice = "L'affaire est référencée par ces factures";
+$l_link_invoice = "L'affaire est référencée par des factures";
 $l_link_invoice_no = "L'affaire n'est pas référencée dans les factures";
-$l_cant_delete = "L'affaire ne peut être supprimée !";
 $l_can_delete = "L'affaire peut être supprimée.";
+$l_cant_delete = "L'affaire ne peut être supprimée !";
 
-$l_err_parent_has_deal = "Cette suraffaire contient des affaires, elle ne peut être supprimée !";
+$l_link_deal = "La suraffaire possède des affaires";
+$l_cant_delete_parent = "La suraffaire ne peut être supprimée !";
+
 $l_err_label_empty = "Le label doit être renseigné !";
 $l_err_kind_empty = "Le type d'affaire doit être renseigné !";
 $l_err_task_empty = "La catégorie d'affaire doit être renseignée !";

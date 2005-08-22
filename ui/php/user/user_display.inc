@@ -690,15 +690,33 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays and check the user links (and delete form if ok)                 //
+// Display the user delete validation screen
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
+function dis_can_delete_user($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
   global $l_no_user, $l_check_usercreate, $l_check_userupdate;
+  global $display, $l_user, $l_infos;
 
-  $delete_ok = true;
+  $url = url_prepare("user_index.php");
 
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_user\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_user\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  // Display entities where the user is referenced
   $obm_q = new DB_OBM;
   $tables = $obm_q->table_names();
 
@@ -726,13 +744,13 @@ function dis_check_links($p_id) {
 	$j++;
       }
       if ($fieldexist_uc) {
-	$query = "select count(*) from $table where $usercreate='$p_id'";
+	$query = "SELECT count(*) FROM $table WHERE $usercreate='$p_id'";
 	$c_q = new DB_OBM($query);
 	$c_q->next_record();
 	$nbc = $c_q->f("0");
       }
       if ($fieldexist_uu) {
-	$query = "select count(*) from $table where $userupdate='$p_id'";
+	$query = "SELECT count(*) FROM $table WHERE $userupdate='$p_id'";
 	$c_q = new DB_OBM($query);
 	$c_q->next_record();
 	$nbu = $c_q->f("0");
@@ -759,34 +777,17 @@ function dis_check_links($p_id) {
     $i++;
   }
  
-  $block = "<table class=\"detail\">
-    $dis_user
-  </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-   " . dis_delete_form($p_id) . "
-    </p>
-  </div>";
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>
+    <br />
+    <div class=\"detailHead\">$l_user : $l_infos</div>
 
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
-// Parameters:
-//   - $p_id : user Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $block = "<form name=\"form_delete\"
-      method=\"post\" action=\"" . url_prepare("user_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_user\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onClick=\"if (confirm_del(this.form)) return true; else return false;\" />
-    </form>";
+    <table class=\"detail\">
+      $dis_user
+    </table>";
 
   return $block;
 }

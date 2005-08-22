@@ -149,6 +149,7 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 -- Add column location
 ALTER TABLE CalendarEvent ADD COLUMN calendarevent_location varchar(100);
 
+
 -------------------------------------------------------------------------------
 -- Create EventEntity table (support for entity Calendar)
 -------------------------------------------------------------------------------
@@ -193,6 +194,7 @@ FROM CalendarUser;
 -- Drop table CalendarUser 
 DROP TABLE CalendarUser;
 
+
 -------------------------------------------------------------------------------
 -- Create table 'CalendarEntityRight'
 -------------------------------------------------------------------------------
@@ -224,6 +226,18 @@ FROM CalendarRight;
 
 -- Drop table CalendarRight
 DROP TABLE CalendarRight;
+
+
+-------------------------------------------------------------------------------
+-- InvoiceStatus table update
+-------------------------------------------------------------------------------
+-- add invoicestatus_created field
+ALTER TABLE InvoiceStatus ADD COLUMN invoicestatus_created integer;
+UPDATE InvoiceStatus SET invoicestatus_created=1;
+ALTER TABLE InvoiceStatus ALTER COLUMN invoicestatus_created SET NOT NULL;
+ALTER TABLE InvoiceStatus ALTER COLUMN invoicestatus_created SET DEFAULT 0;
+UPDATE InvoiceStatus SET invoicestatus_created=0 WHERE invoicestatus_label ilike '%to create%' OR invoicestatus_label ilike '%A c%';
+
 
 -------------------------------------------------------------------------------
 -- Update Document table

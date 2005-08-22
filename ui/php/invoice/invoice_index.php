@@ -118,18 +118,32 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
-  $display["detail"] = dis_check_invoice_links($invoice["id"]);
+  if (check_can_delete_invoice($invoice["id"])) {
+    require("invoice_js.inc");
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_invoice($invoice["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_invoice_consult($invoice);
+  }
+  //  $display["detail"] = dis_check_invoice_links($invoice["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_invoice_delete($invoice["id"]); 
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
-    require ("invoice_js.inc");
-    $display["search"] = dis_invoice_search_form($invoice);
+  if (check_can_delete_invoice($invoice["id"])) {
+    $retour = run_query_invoice_delete($invoice["id"]); 
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+      require ("invoice_js.inc");
+      $display["search"] = dis_invoice_search_form($invoice);
+    } else {
+      $display["msg"] .= display_err_msg ($l_delete_error);
+      $display["detail"] = dis_invoice_consult($invoice);
+    }
   } else {
-    $display["msg"] .= display_err_msg ($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_invoice_consult($invoice);
   }
 

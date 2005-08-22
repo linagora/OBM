@@ -85,7 +85,7 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Detail query execution                                                    //
+// Detail query execution
 // Parameters :
 //   - $p_id  : publication id
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,16 +98,16 @@ function run_query_detail($p_id) {
   $timeupdate = sql_date_format($type, "publication_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type, "publication_timecreate", "timecreate");
 
-  $query = "select *,
+  $query = "SELECT *,
       $timeupdate,
       $timecreate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-    from Publication
+    FROM Publication
          LEFT JOIN PublicationType on publication_type_id=publicationtype_id
          LEFT JOIN UserObm as c on publication_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on publication_userupdate=u.userobm_id
-    where publication_id='$p_id'";
+    WHERE publication_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -124,15 +124,17 @@ function run_query_detail($p_id) {
 function run_query_publication_contactcategory1() {
   global $cdg_sql;
 
-  $query = "select * from ContactCategory1 order by contactcategory1_code"; 
+  $query = "SELECT * FROM ContactCategory1 ORDER BY contactcategory1_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
 
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Insertion query execution                                                 //
+// Insertion query execution
 // Parameters:
 //   - $publication[] : Entry's values
 //     keys used  : num, archive, title, type, ad1, ad2, ad3, zip, town, cdx
@@ -149,7 +151,7 @@ function run_query_insert($publication) {
   $auto_sub =   $publication["auto_sub"];
   $time = date("Y-m-d H:i:s");
   
-  $query = "insert into Publication (
+  $query = "INSERT INTO Publication (
     publication_timeupdate,
     publication_timecreate,
     publication_userupdate,
@@ -159,7 +161,7 @@ function run_query_insert($publication) {
     publication_lang,
     publication_year,
     publication_desc)
-  values (null,
+  VALUES (null,
     '$time',
     null,
     '" . $auth->auth["uid"] . "',
@@ -173,17 +175,18 @@ function run_query_insert($publication) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-  $query = "select publication_id from Publication where
-  publication_timecreate = '$time' and 
-  publication_usercreate = '" . $auth->auth["uid"] . "' and
-  publication_title = '$title' and
-  publication_year = '$year'";
+  $query = "SELECT publication_id
+    FROM Publication
+    WHERE publication_timecreate = '$time'
+      AND publication_usercreate = '" . $auth->auth["uid"] . "'
+      AND publication_title = '$title'
+      AND publication_year = '$year'";
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $obm_q->next_record();
   $p_id = $obm_q->f("publication_id");
   
-  if(is_array($auto_sub) && count($auto_sub)>0) {
+  if (is_array($auto_sub) && count($auto_sub)>0) {
     run_query_auto_subscription($publication,$p_id);
   }
   return $retour;
@@ -203,7 +206,7 @@ function run_query_auto_insert($publication){
   $id_orig = $publication["id_orig"];
   $recept = $publication["recept"];
   
-  $query = "insert into Subscription (
+  $query = "INSERT INTO Subscription (
     subscription_timeupdate,
     subscription_timecreate,
     subscription_userupdate,
@@ -213,7 +216,7 @@ function run_query_auto_insert($publication){
     subscription_renewal,
     subscription_reception_id,
     subscription_quantity)
-  select 
+  SELECT 
     null,
     '" . date("Y-m-d H:i:s") . "',
     null,
@@ -223,13 +226,10 @@ function run_query_auto_insert($publication){
     '1',
     '$recept',
     subscription_quantity  
-  from Subscription 
-  where 
-  subscription_renewal = '1' 
-  and
-  subscription_reception_id = '$recept'
-  and
-  subscription_publication_id = '$id_orig'";
+  FROM Subscription 
+  WHERE subscription_renewal = '1' 
+    AND subscription_reception_id = '$recept'
+    AND subscription_publication_id = '$id_orig'";
   
   display_debug_msg($query, $cdg_sql);
 
@@ -255,7 +255,7 @@ function run_query_auto_subscription($publication,$p_id){
   $type = $obm_q->type;  
   $like = sql_casei_like($type);     
   $lang_array = split("-",$lang);
-  $query = "insert into Subscription (
+  $query = "INSERT INTO Subscription (
     subscription_timeupdate,
     subscription_timecreate,
     subscription_userupdate,
@@ -265,7 +265,7 @@ function run_query_auto_subscription($publication,$p_id){
     subscription_renewal,
     subscription_reception_id,
     subscription_quantity)
-  select 
+  SELECT 
     null,
     '" . date("Y-m-d H:i:s") . "',
     null,
@@ -275,11 +275,11 @@ function run_query_auto_subscription($publication,$p_id){
     '1',
     '$recept',
     '1'  
-  from Contact Left Join 
-  ContactCategory1Link ON contactcategory1link_contact_id = contact_id
-  Left Join Kind ON kind_id = contact_kind_id
-  where 
-  contactcategory1link_category_id IN (";
+  FROM Contact
+    LEFT JOIN ContactCategory1Link
+         ON contactcategory1link_contact_id = contact_id
+    LEFT JOIN Kind ON kind_id = contact_kind_id
+  WHERE contactcategory1link_category_id IN (";
 
   foreach($auto_sub as $category_id) {
     $query .= "$coma '$category_id'";
@@ -325,7 +325,7 @@ function run_query_insert_subscription($publication) {
   if($obm_q->f("num") != 0) {
     return true;
   }*/  
-  $query = "insert into Subscription (
+  $query = "INSERT INTO Subscription (
     subscription_timeupdate,
     subscription_timecreate,
     subscription_userupdate,
@@ -335,7 +335,7 @@ function run_query_insert_subscription($publication) {
     subscription_renewal,
     subscription_reception_id,
     subscription_quantity)
-  values (null,
+  VALUES (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
     " . $auth->auth["uid"] . ",
@@ -367,14 +367,14 @@ function run_query_update_subscription($publication) {
   $renew = $publication["renew"];
   $recept = $publication["recept"];
   
-  $query = "Update Subscription 
-    set subscription_timeupdate = '". date("Y-m-d H:i:s") ."',
-        subscription_userupdate='". $auth->auth["uid"] ."',
-        subscription_renewal='$renew',
-        subscription_reception_id='$recept',
-        subscription_quantity='$quantity'
-    Where	
-        subscription_id = '$s_id'";
+  $query = "UPDATE Subscription SET 
+      subscription_timeupdate = '". date("Y-m-d H:i:s") ."',
+      subscription_userupdate='". $auth->auth["uid"] ."',
+      subscription_renewal='$renew',
+      subscription_reception_id='$recept',
+      subscription_quantity='$quantity'
+    WHERE	
+      subscription_id = '$s_id'";
     
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -384,12 +384,10 @@ function run_query_update_subscription($publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update query execution                                                    //
+// Update query execution
 // Parameters:
 //   - $cid       : publication id
 //   - $publication[] : Entry's values
-//     keys used  : num, archive, title, type, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($pid, $publication) {
   global $auth, $cdg_sql;
@@ -400,15 +398,15 @@ function run_query_update($pid, $publication) {
   $year = $publication["year"];
   $desc = $publication["desc"];
 
-  $query = "update Publication set
-    publication_timeupdate='". date("Y-m-d H:i:s") ."',
-    publication_userupdate='". $auth->auth["uid"] ."',
-    publication_title='$title',
-    publication_lang='$lang',
-    publication_year='$year',
-    publication_desc='$desc',
-    publication_type_id='$type'
-    where publication_id='$pid'";
+  $query = "UPDATE Publication SET
+      publication_timeupdate='". date("Y-m-d H:i:s") ."',
+      publication_userupdate='". $auth->auth["uid"] ."',
+      publication_title='$title',
+      publication_lang='$lang',
+      publication_year='$year',
+      publication_desc='$desc',
+      publication_type_id='$type'
+    WHERE publication_id='$pid'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -418,14 +416,14 @@ function run_query_update($pid, $publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : publication id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($p_id) {
   global $cdg_sql;
 
-  $query = "delete from Publication where publication_id='$p_id'";
+  $query = "DELETE FROM Publication WHERE publication_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -435,7 +433,7 @@ function run_query_delete($p_id) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : publication id
 //   - $c_id : contact id
@@ -461,9 +459,9 @@ function run_query_publication_contact_links($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $query = "select distinct contact_id, contact_lastname, contact_firstname 
-            from Contact Left Join Subscription ON subscription_contact_id = contact_id
-            where subscription_publication_id='$p_id'";
+  $query = "SELECT DISTINCT contact_id, contact_lastname, contact_firstname 
+    FROM Contact LEFT JOIN Subscription ON subscription_contact_id = contact_id
+    WHERE subscription_publication_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
@@ -487,12 +485,13 @@ function run_query_check_publication($p_id, $title, $lang) {
 
   $where_id = "";
   if ($p_id != "") {
-    $where_id = "and publication_id!='$p_id'";
+    $where_id = "AND publication_id!='$p_id'";
   }
-  $query = "select distinct publication_id, publication_title, publication_lang
-    from Publication
-    where publication_title $like '$title%'and publication_lang $like '$lang%'
-          $where_id";
+  $query = "SELECT distinct publication_id, publication_title, publication_lang
+    FROM Publication
+    WHERE publication_title $like '$title%'
+      AND publication_lang $like '$lang%'
+      $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -509,7 +508,7 @@ function run_query_check_publication($p_id, $title, $lang) {
 function run_query_publicationtype() {
   global $cdg_sql;
 
-  $query = "select * from PublicationType order by publicationtype_label"; 
+  $query = "SELECT * FROM PublicationType ORDER BY publicationtype_label"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -524,12 +523,12 @@ function run_query_publicationtype() {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_subscriptionreception() {
-  global $cdg_sql,$c_focsys;
+  global $cdg_sql, $c_focsys;
 
-  $query = "select *
-    from SubscriptionReception
-    where subscriptionreception_id != '$c_focsys'
-    order by subscriptionreception_label DESC "; 
+  $query = "SELECT *
+    FROM SubscriptionReception
+    WHERE subscriptionreception_id != '$c_focsys'
+    ORDER BY subscriptionreception_label DESC "; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -540,7 +539,7 @@ function run_query_subscriptionreception() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Type insertion query construction and execution                           //
+// Type insertion query construction and execution
 // Parameters:
 //   - $publication : publication hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -551,11 +550,11 @@ function run_query_type_insert($publication) {
   $usercreate = $auth->auth["uid"];
   $type = $publication["type_label"];
 
-  $query = "insert into PublicationType (
+  $query = "INSERT INTO PublicationType (
     publicationtype_timecreate,
     publicationtype_usercreate,
     publicationtype_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$type')";
@@ -566,6 +565,8 @@ function run_query_type_insert($publication) {
 
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Reception mode insertion query construction and execution
 // Parameters:
@@ -578,11 +579,11 @@ function run_query_recept_insert($publication) {
   $usercreate = $auth->auth["uid"];
   $recept = $publication["recept_label"];
 
-  $query = "insert into SubscriptionReception (
+  $query = "INSERT INTO SubscriptionReception (
     subscriptionreception_timecreate,
     subscriptionreception_usercreate,
     subscriptionreception_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$recept')";
@@ -594,8 +595,9 @@ function run_query_recept_insert($publication) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Type update query execution                                               //
+// Type update query execution
 // Parameters:
 //   - $publication : publication hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -607,12 +609,12 @@ function run_query_type_update($publication) {
   $id = $publication["type"];
   $type = $publication["type_label"];
 
-  $query = "update PublicationType set
-    publicationtype_label='$type',
-    publicationtype_timeupdate='$timeupdate',
-    publicationtype_userupdate='$userupdate'
-      where
-    publicationtype_id='$id'";
+  $query = "UPDATE PublicationType SET
+      publicationtype_label='$type',
+      publicationtype_timeupdate='$timeupdate',
+      publicationtype_userupdate='$userupdate'
+    WHERE
+      publicationtype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -622,7 +624,7 @@ function run_query_type_update($publication) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Reception update query execution                                               //
+// Reception update query execution
 // Parameters:
 //   - $publication : publication hash info : keys used : recept, recept_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -634,12 +636,12 @@ function run_query_recept_update($publication) {
   $id = $publication["recept"];
   $recept = $publication["recept_label"];
 
-  $query = "update SubscriptionReception set
-    subscriptionreception_label='$recept',
-    subscriptionreception_timeupdate='$timeupdate',
-    subscriptionreception_userupdate='$userupdate'
-      where
-    subscriptionreception_id='$id'";
+  $query = "UPDATE SubscriptionReception SET
+      subscriptionreception_label='$recept',
+      subscriptionreception_timeupdate='$timeupdate',
+      subscriptionreception_userupdate='$userupdate'
+    WHERE
+      subscriptionreception_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -650,14 +652,14 @@ function run_query_recept_update($publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Type deletion query execution                                             //
+// Type deletion query execution
 // Parameters:
 //   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_type_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from PublicationType where publicationtype_id='$id'";
+  $query = "DELETE FROM PublicationType WHERE publicationtype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -665,15 +667,19 @@ function run_query_type_delete($id) {
 
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Reception deletion query execution                                        //
+// Reception deletion query execution
 // Parameters:
 //   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_recept_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from SubscriptionReception where subscriptionreception_id='$id'";
+  $query = "DELETE
+    FROM SubscriptionReception
+    WHERE subscriptionreception_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -682,15 +688,18 @@ function run_query_recept_delete($id) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Type - Publication links query execution                                      //
+// Type - Publication links query execution
 // Parameters:
 //   - $p_id : type id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_type_links($p_id) {
   global $cdg_sql;
 
-  $query = "select publication_title, publication_id, publication_type_id from Publication where publication_type_id='$p_id'";
+  $query = "SELECT publication_title, publication_id, publication_type_id
+    FROM Publication
+    WHERE publication_type_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -701,17 +710,22 @@ function run_query_type_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Reception - Subscription links query execution                                      //
+// Reception - Subscription links query execution
 // Parameters:
 //   - $p_id : type id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_recept_links($p_id) {
   global $cdg_sql;
 
-  $query = "select publication_title, publication_id, subscription_reception_id, contact_firstname, contact_id  
-            from (Subscription LEFT JOIN Publication ON publication_id = subscription_publication_id) 
-	    LEFT JOIN Contact ON contact_id = subscription_contact_id
-	    where subscription_reception_id='$p_id'";
+  $query = "SELECT publication_title,
+      publication_id,
+      subscription_reception_id,
+      contact_firstname,
+      contact_id  
+    FROM Subscription
+      LEFT JOIN Publication ON publication_id = subscription_publication_id
+      LEFT JOIN Contact ON contact_id = subscription_contact_id
+    WHERE subscription_reception_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -720,17 +734,18 @@ function run_query_recept_links($p_id) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Type from its id                                       //
+// Get the label of a Type from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_type_label($id) {
   global $cdg_sql;
 
-  $query = "select publicationtype_label
-    from PublicationType
-    where publicationtype_id='$id'";
+  $query = "SELECT publicationtype_label
+    FROM PublicationType
+    WHERE publicationtype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -742,18 +757,17 @@ function get_type_label($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Reception Mode from its id                             //
+// Get the label of a Reception Mode from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_recept_label($id) {
   global $cdg_sql;
 
-  $query = "select subscriptionreception_label
-    from SubscriptionReception 
-    where subscriptionreception_id='$id'";
+  $query = "SELECT subscriptionreception_label
+    FROM SubscriptionReception 
+    WHERE subscriptionreception_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -763,7 +777,6 @@ function get_recept_label($id) {
   $retour = $obm_q->f("subscriptionreception_label");
   return $retour;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -855,7 +868,56 @@ function check_data_subscription_form($cid, $publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact detail query execution                                            //
+// Check if the publication can be deleted
+// Parameters:
+//   - $p_id : publication id
+// Returns:
+//   true if the publication can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_publication($p_id) {
+  global $err_msg, $ok_msg, $block;
+  global $path;
+  global $l_contact, $l_link_contact, $l_link_contact_no;
+
+  $delete_ok = true;
+
+  // Links from Contact
+  $obm_q = run_query_publication_contact_links($p_id);
+  $nb = $obm_q->num_rows();
+
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg = $l_link_contact;
+    $display_linkc ="
+      <tr>
+        <td class=\"detailHead\">$l_contact</td>
+      </tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contact_id");
+      $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
+      $display_linkc .= "
+      <tr>
+        <td class=\"detailLabel\">
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        </td>
+      </tr>";
+    }
+  } else {
+    $ok_msg = "$l_link_contact_no";
+  }
+
+  $block .= "
+  <table class=\"detail\">
+    $display_linkc
+  </table>";
+
+
+  return $delete_ok;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact detail query execution
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
@@ -863,10 +925,9 @@ function run_query_get_contact_lang($p_id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
-    $query = "select kind_lang from
-        Contact LEFT JOIN Kind ON contact_kind_id = kind_id
-        where
-        contact_id='$p_id'";
+    $query = "SELECT kind_lang
+      FROM Contact LEFT JOIN Kind ON contact_kind_id = kind_id
+      WHERE contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -875,35 +936,45 @@ function run_query_get_contact_lang($p_id) {
   return $obm_q->f("kind_lang");
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-//                                       //
+//
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_subscription_external_search($hash_table) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+
   $contact = $hash_table["id"];
   $obm_q = new DB_OBM;
   $type = $obm_q->type;     
   $timeupdate = sql_date_format($type, "subscription_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type, "subscription_timecreate", "timecreate");
 
-    $query = "
-        SELECT
-	      $timeupdate,$timecreate,subscription_id,subscription_contact_id,subscription_publication_id,
-	      publication_title,publication_year, publication_lang,subscription_renewal,
-	      subscriptionreception_label, subscription_quantity 
-        FROM Subscription 
-	LEFT JOIN Publication ON publication_id = subscription_publication_id
-	LEFT JOIN SubscriptionReception ON subscriptionreception_id = subscription_reception_id 	
-        where
-        subscription_contact_id='$contact'
-	Order by  subscription_timecreate desc";
+  $query = "SELECT
+      $timeupdate,
+      $timecreate,
+      subscription_id,
+      subscription_contact_id,
+      subscription_publication_id,
+      publication_title,
+      publication_year,
+      publication_lang,
+      subscription_renewal,
+      subscriptionreception_label,
+      subscription_quantity 
+    FROM Subscription 
+      LEFT JOIN Publication ON publication_id = subscription_publication_id
+      LEFT JOIN SubscriptionReception ON subscriptionreception_id = subscription_reception_id 	
+    WHERE subscription_contact_id='$contact'
+    ORDER BY subscription_timecreate desc";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //                                       //
 // Parameters:
@@ -911,18 +982,19 @@ function run_query_subscription_external_search($hash_table) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_subscription_detail($s_id){
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+
   $obm_q = new DB_OBM;
 
-    $query = "
-        SELECT
-	      subscription_contact_id,subscription_publication_id,
-	      publication_title, subscription_renewal,
-	      subscription_reception_id, subscription_quantity 
-        FROM Subscription 
+  $query = "SELECT
+      subscription_contact_id,
+      subscription_publication_id,
+      publication_title,
+      subscription_renewal,
+      subscription_reception_id,
+      subscription_quantity 
+    FROM Subscription 
 	LEFT JOIN Publication ON publication_id = subscription_publication_id
-        where
-        subscription_id='$s_id'
-	";
+    WHERE subscription_id='$s_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

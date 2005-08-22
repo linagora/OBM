@@ -178,18 +178,31 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
-  $display["detail"] = dis_check_links($company["id"]);
+  if (check_can_delete_company($company["id"])) {
+    require("company_js.inc");
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_company($company["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_company_consult($company["id"]);
+  }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($company["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_company($company["id"])) {
+    $retour = run_query_delete($company["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = dis_company_search_form($company);
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_company_consult($company["id"]);
   }
-  $display["search"] = dis_company_search_form($company);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////

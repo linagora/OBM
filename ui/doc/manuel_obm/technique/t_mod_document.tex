@@ -187,7 +187,7 @@ Ceci permêt d'éviter :
 
 \subsubsection{Implémentation et gestion par défaut}
 
-La racine de l'arborescence des documents sur le serveur est spécifiée par le paramètre de configuration \variable{\$document\_path}.\\
+La racine de l'arborescence des documents sur le serveur est spécifiée par le paramètre de configuration \variable{\$cdocument\_root}.\\
 
 Par défaut \obm créé 9 répertoires nommés 1, 2, 3, 4, 5, 6, 7, 8 et 9 à la racine du dépôt de documents.
 
@@ -201,11 +201,11 @@ Ceci permet de répartir les documents dans plusieurs réperoires.
  \hline
  \textbf{Id Document} & \textbf{Chemin relatif} & \textbf{nom physique} \\
  \hline
-  123 & 3 & \$document\_path/3/123 \\ 
+  123 & 3 & \$cdocument\_root/3/123 \\ 
  \hline
-  4 & 4 & \$document\_path/4/4 \\ 
+  4 & 4 & \$cdocument\_root/4/4 \\ 
  \hline
-  12156 & 6 & \$document\_path/6/12156 \\ 
+  12156 & 6 & \$cdocument\_root/6/12156 \\ 
  \hline
 \end{tabular}
 
@@ -269,7 +269,7 @@ Si aucun type MIME n'est déterminé (en fonction des types MIME enregistrés en ba
 \hline
 \textbf{Paramètre} & \textbf{par défaut} & \textbf{Description}\\
 \hline
-\$document\_path & /var/www/obmdocuments & Racine du dépôt de document sur disque \\
+\$cdocument\_root & /var/www/obmdocuments & Racine du dépôt de document sur disque \\
 \hline
 \$default\_mime & application/octet-stream & Type MIME par défaut d'un fichier quand non déterminé \\
 \hline
@@ -291,7 +291,7 @@ Voici la liste des actions du module \project, avec le droit d'accès requis ains
  \hline
   new & write & Formulaire de création d'un document. \\
  \hline
-  new\_repository & write & Formulaire de création d'un répertoire. \\
+  new\_dir & write & Formulaire de création d'un répertoire. \\
  \hline
   tree & read & Visualisation en arborescence. \\
  \hline
@@ -301,7 +301,7 @@ Voici la liste des actions du module \project, avec le droit d'accès requis ains
  \hline
   insert & write & Insertion d'un document. \\
  \hline
-  insert\_repository & write & Insertion d'un répertoire. \\
+  insert\_dir & write & Insertion d'un répertoire. \\
  \hline
   update & write & Mise à jour du document. \\
  \hline

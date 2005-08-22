@@ -307,7 +307,7 @@ NS4 = (document.layers) ? 1 : 0;
 IE4 = (document.all) ? 1 : 0;
 W3C = (document.getElementById) ? 1 : 0;	
 
-function show_hide_repo(name)
+function show_hide_dir(name)
 {
   if (W3C) {
     if(document.getElementById('div_'+name).style.display != \"none\") {
@@ -381,9 +381,9 @@ function get_elem(doc, name ) {
 
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
-   function fill_ext_form(repo_path) {
+   function fill_ext_form(dir_path) {
      ext_field = window.opener.document.$ext_target;
-     ext_field.value = repo_path;
+     ext_field.value = dir_path;
      window.close();
   } 
   

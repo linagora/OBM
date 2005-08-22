@@ -69,5 +69,7 @@ $l_no_group_deleted = "No group to remove";
 $l_check_samegroup = "These groups seem similar to the filled group";
 $l_cant_delete_system = "System groups can't be deleted !";
 $l_cant_delete_public = "Public groups can only be deleted by the group creator !";
+$l_can_delete = "The group can be deleted.";
+$l_cant_delete = "The group can't be deleted !";
 
 $l_add_groups = "Add groups";

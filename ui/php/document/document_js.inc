@@ -32,10 +32,10 @@ function check_document(form) {
   return true;
 }
 
-function check_repository(form) {
+function check_dir(form) {
   // MANDATORY : Check that the Document title is not empty
   if (trim(form.tf_name.value) == \"\") {
-    alert (\"$l_fill_repository_name\");
+    alert (\"$l_fill_dir_name\");
     return false;
   }
 
@@ -159,7 +159,7 @@ NS4 = (document.layers) ? 1 : 0;
 IE4 = (document.all) ? 1 : 0;
 W3C = (document.getElementById) ? 1 : 0;	
 
-function show_hide_repo(name)
+function show_hide_dir(name)
 {
   if (W3C) {
     if (document.getElementById(name).style.display != \"none\") {
@@ -299,9 +299,9 @@ function basic_show(name)
 
 if (isset($ext_target)) {
   $extra_js .= "
-   function fill_ext_form(repo_path) {
+   function fill_ext_form(dir_path) {
      ext_field = window.opener.document.$ext_target;
-     ext_field.value = repo_path;
+     ext_field.value = dir_path;
      window.close();
   }
   ";

@@ -488,30 +488,27 @@ function run_query_update($pid, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the timetask entries assigned to the project
+// Return the number of timetask entries assigned to the project
 // Parameters:
 //   - $p_id : project Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_timetask_links($p_id) {
+function get_linked_project_timetask_nb($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $query = "select distinct timetask_id,
-      projecttask_label,
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname
-    from TimeTask
-         left join UserObm on timetask_user_id=userobm_id,
-      ProjectTask
-    where projecttask_project_id = '$p_id'
-      and timetask_projecttask_id = projecttask_id
+  $query = "SELECT count(timetask_id) as nb
+    FROM TimeTask,
+         ProjectTask
+    WHERE projecttask_project_id = '$p_id'
+      AND timetask_projecttask_id = projecttask_id
   ";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_linked_project_timetask_nb($p_id)");
   $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f("nb");
 
-  return $obm_q;
+  return $nb;
 }
 
 
@@ -523,32 +520,25 @@ function run_query_project_timetask_links($p_id) {
 function run_query_delete($p_id) {
   global $cdg_sql;
 
-  // Check that no Links from Time management
-  $obm_q = run_query_project_timetask_links($p_id);
+  $obm_q = new DB_OBM;
 
-  if ($obm_q->num_rows() > 0) {
-    $retour = false;
-  } else {
-    $obm_q = new DB_OBM;
+  // Delete all links to documents
+  run_query_delete_document_links($p_id, "project");
 
-    // Delete all links to documents
-    run_query_delete_document_links($p_id, "project");
+  // Delete all users associations to the project
+  $query = "DELETE FROM ProjectUser WHERE projectuser_project_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $retour = $obm_q->query($query);
 
-    // Delete all users associations to the project
-    $query = "delete from ProjectUser where projectuser_project_id='$p_id'";
-    display_debug_msg($query, $cdg_sql);
-    $retour = $obm_q->query($query);
+  // Delete all task assigned to the project
+  $query = "DELETE FROM ProjectTask WHERE projecttask_project_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $retour = $obm_q->query($query);
 
-    // Delete all task assigned to the project
-    $query = "delete from ProjectTask where projecttask_project_id='$p_id'";
-    display_debug_msg($query, $cdg_sql);
-    $retour = $obm_q->query($query);
-
-    // Delete the project
-    $query = "delete from Project where project_id='$p_id'";
-    display_debug_msg($query, $cdg_sql);
-    $retour = $obm_q->query($query);
-  }
+  // Delete the project
+  $query = "DELETE FROM Project WHERE project_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $retour = $obm_q->query($query);
 
   return $retour;
 }
@@ -1218,21 +1208,22 @@ function run_query_statlog($p_id) {
 function run_query_tasks($pid) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $if_parentgroup = sql_if($db_type, "(projecttask_parenttask_id != 0)", "projecttask_parenttask_id", "projecttask_id");
+
   $query = "
-    select
+    SELECT
       projecttask_id,
       projecttask_label,
       projecttask_parenttask_id as parent_id,
-      CASE when projecttask_parenttask_id=0 THEN projecttask_id
-           else projecttask_parenttask_id
-      END as parent_group
-    from ProjectTask
-    where projecttask_project_id = '$pid'
-    order by parent_group, parent_id, projecttask_rank
+      $if_parentgroup as parent_group
+    FROM ProjectTask
+    WHERE projecttask_project_id = '$pid'
+    ORDER BY parent_group, parent_id, projecttask_rank
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_tasks");
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
@@ -1464,6 +1455,32 @@ function check_project_form($pid, $project) {
   //   }
 
   return true; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the project can be deleted
+// Parameters:
+//   - $p_id : project id
+// Returns:
+//   true if the project can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_project($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_link_timetask, $l_link_timetask_no;
+
+  $delete_ok = true;
+
+  // Links from Time management
+  $nb = get_linked_project_timetask_nb($p_id);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "$l_link_timetask";
+  } else {
+    $ok_msg .= "$l_link_timetask_no";
+  }
+
+  return $delete_ok;
 }
 
 

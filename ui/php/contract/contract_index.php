@@ -158,18 +158,36 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
-  $display["detail"] = dis_check_links($contract["id"]);
+  if (check_can_delete_contract($contract["id"])) {
+    require("contract_js.inc");
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_contract($contract["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_contract_consult($contract);
+  }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $ret = run_query_delete($contract["id"]);
-  if ($ret) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_contract($contract["id"])) {
+    $ret = run_query_delete($contract["id"]);
+    if ($ret) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = dis_contract_search_form($contract);
+    if ($set_display == "yes") {
+      $display["result"] = dis_contract_search_list($contract);
+    } else {
+      $display["msg"] .= display_info_msg($l_no_display);
+    }
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_contract_consult($contract);
   }
-  $display["search"] = dis_contract_search_form($contract);
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -326,9 +344,9 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contract() {
   global $tf_label,$tf_company,$sel_type, $tf_type,$rd_kind,$cb_autorenew;
-  global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
-  global $param_contract,$tf_num,$sel_market, $sel_tech, $sel_con1, $sel_con2;
-  global $ta_clause;
+  global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc;
+  global $param_contract, $param_company, $param_contact;
+  global $tf_num,$sel_market, $sel_tech, $sel_con1, $sel_con2, $ta_clause;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_datebegin,$tf_dateexp,$tf_daterenew,$tf_datecancel,$tf_datesignature;
   global $hd_usercreate,$cb_archive,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
@@ -346,6 +364,7 @@ function get_param_contract() {
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
   if (isset ($param_company)) $contract["company_id"] = $param_company;
+  if (isset ($param_contact)) $contract["contact_id"] = $param_contact;
   if (isset ($sel_priority)) $contract["priority"] = $sel_priority;
   if (isset ($sel_status)) $contract["status"] = $sel_status;
   if (isset( $cb_vis)) $contract["privacy"] = $cb_vis; 
@@ -491,7 +510,7 @@ function get_contract_action() {
     'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,  
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'insert', 'update') 
                                      	 );
 
 // Delete

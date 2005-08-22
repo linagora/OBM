@@ -1133,6 +1133,7 @@ CREATE TABLE Invoice (
 CREATE TABLE InvoiceStatus (
   invoicestatus_id       serial,
   invoicestatus_payment  integer DEFAULT 0 NOT NULL,
+  invoicestatus_created  integer DEFAULT 0 NOT NULL,
   invoicestatus_archive  integer DEFAULT 0 NOT NULL,
   invoicestatus_label    varchar(24) DEFAULT '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)

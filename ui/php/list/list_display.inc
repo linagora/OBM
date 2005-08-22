@@ -1434,36 +1434,34 @@ function dis_list_display_pref($prefs, $prefs_con) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display warning before a list deletion                                    //
-// We ask confirmation or cancel
+// Display the list delete validation screen
 // Parameters:
-//   - $id : list id
-/////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($id) {
-  global $display, $l_warn_delete, $l_delete, $l_back;
+//   - $p_id : list id
+///////////////////////////////////////////////////////////////////////////////
+function dis_can_delete_list($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
-  $nb_con = get_list_static_contact_nb($id);
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+    action=\"".url_prepare("list_index.php") ."\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_list\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
 
-  $display["msg"] .= display_warn_msg("$nb_con $l_warn_delete");
+  $dis_delete = "<form name=\"form_delete\" method=\"form\"
+      action=\"" . url_prepare("list_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_list\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\" />
+    </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
     <div class=\"detailButton\">
-      <p class=\"detailButtons\">
-        <form method=\"get\" name=\"form_delete\"
-          action=\"" .url_prepare("list_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
-        </form>
-      </p>
-      <p class=\"detailButtons\">
-        <form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("list_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-        <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </p>
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
     </div>";
 
   return $block;
@@ -1471,7 +1469,7 @@ function dis_warn_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a list insertion or update                      //
+// Display the context about a list insertion or update
 // When similar lists exist we show these and ask confirmation
 // Parameters:
 //   - $list_q   : list database result (at least 1 row)

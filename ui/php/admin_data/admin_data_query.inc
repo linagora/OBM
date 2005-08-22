@@ -242,34 +242,13 @@ function get_document_list() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Calculate the real disk document path
-// Parameters:
-//   - $id   : document id
-// Returns:
-//   real disk path
-///////////////////////////////////////////////////////////////////////////////
-function get_document_disk_path($id) {
-  global $document_path;
-
-  // The document disk path set in the subdirectory named "last id number"
-  // Get the last number from Id
-  $rel = substr($id, -1, 1);
-
-  $disk_path = $document_path . "/" . $rel . "/";
-  
-  return $disk_path; 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Calculate the real disk document path
+// Calculate the relative disk document path (from document_path)
 // Parameters:
 //   - $id   : document id
 // Returns:
 //   real disk path
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_disk_relative_path($id) {
-  global $document_path;
 
   // The document disk path set in the subdirectory named "last id number"
   // Get the last number from Id
@@ -284,18 +263,18 @@ function get_document_disk_relative_path($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get file list from Filesystem. includes Files and optionnally directories
 // Parameters:
-//   - $root     : root directory to list
+//   - $root     : root directory to list (complete path)
 //   - $with_dir : if true, returns directories too
 // Returns:
 // Array( [$fullname] => array([0]=>$path [1]=>$name), ..)
 ///////////////////////////////////////////////////////////////////////////////
 function get_file_list($root, $with_dir=false) {
-  global $document_path;
+  global $cdocument_root;
 
-  $tree= array();
+  $tree = array();
 
   $root_handler = opendir($root);
-  $relative_path = substr($root, strlen($document_path));
+  $relative_path = substr($root, strlen($cdocument_root));
   while ($file = readdir($root_handler)) {
     $path = "$root$file";
     if (($file != "..") && ($file != ".")) {

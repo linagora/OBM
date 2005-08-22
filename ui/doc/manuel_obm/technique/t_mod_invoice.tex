@@ -71,6 +71,8 @@ Table des informations des états des factures.\\
 \hline
 \_payment & int 1 & Indicateur facture doit avoir des paiements & (1 = Oui) \\
 \hline
+\_created & int 1 & Indicateur facture créée (nécessite numéro et dates) & (1 = Oui) \\
+\hline
 \_archive & char 1 & Indicateur facture de cet Etat est archivable & (1 = Oui)\\
 \hline
 \_label & varchar 24 & Label de l'état & \\
@@ -82,23 +84,23 @@ Table des informations des états des factures.\\
 
 Il est possible de gérer ses propres états de factures mais des états par défaut sont définis :\\
 
-\begin{tabular}{|p{3cm}|c|c|p{6cm}|}
+\begin{tabular}{|p{3cm}|c|c|c|p{4cm}|}
 \hline
-\textbf{Etat} & \textbf{Paiement} & \textbf{Archivable} & \textbf{Commentaire} \\
+\textbf{Etat} & \textbf{Paiement} & \textbf{Création} & \textbf{Archivable} & \textbf{Commentaire} \\
 \hline
-A créer &  &  & \\
+A créer & & & & \\
 \hline
-Envoyée & X  &  & \\
+Envoyée & X & X & & \\
 \hline
-Payée en partie & X &  & \\
+Payée en partie & X & X & & \\
 \hline
-Litige & X &  & \\
+Litige & X & X & & \\
 \hline
-Annulée &  & X & \\
+Annulée & & X & X & \\
 \hline
-Pertes et profits &  & X & \\
+Pertes et profits & & X & X & \\
 \hline
-Payée & X & X & \\
+Payée & X & X & X & \\
 \hline
 \end{tabular}
 

@@ -52,7 +52,7 @@ $l_name_list_nomatch = "Nome lista non valido";
 $l_list_exists = "Lista già esistente";
 $l_check_samelist = "Liste simili alla nuova!";
 $l_j_check_email = "Email non valida.";
-$l_warn_delete = "Contatti in lista";
+$l_has_contact = "Contatti in lista";
 
 $l_no_display = "Scrivi i campi e click < TROVA > per la ricerca";
 $l_found = "Liste trovate.";

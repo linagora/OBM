@@ -77,7 +77,9 @@ $l_name_list_nomatch = "Le nom de la liste n'est pas valide";
 $l_check_samelist = "Ces listes sembles similaires à la nouvelle !";
 $l_list_exists = "Cette liste existe déjà !";
 $l_j_check_email = "L'adresse e-mail n'est pas valide !";
-$l_warn_delete = "contacts enregistrés dans cette liste";
+$l_has_contact = "contacts enregistrés dans cette liste";
+$l_cant_delete = "La liste ne peut être supprimée !";
+$l_can_delete = "La liste peut être supprimée.";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les listes correspondantes.";
 $l_found = "listes trouvées.";

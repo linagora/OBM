@@ -211,7 +211,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Contact $join_comp_count $join_cat1 $join_cat2 $whereq");
+    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_cat1 $join_cat2 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -308,7 +308,7 @@ function run_query_contact_company($c_id) {
 
   $lang = get_lang();
 
-  $query = "select company_id,
+  $query = "SELECT company_id,
       company_name,
       company_phone,
       company_fax,
@@ -320,10 +320,10 @@ function run_query_contact_company($c_id) {
       company_expresspostal,
       company_country_iso3166,
       country_name as company_country_name
-    from Company
-    left join Country on company_country_iso3166 = country_iso3166
+    FROM Company
+    LEFT JOIN Country on company_country_iso3166 = country_iso3166
                          and country_lang='$lang'
-    where company_id='$c_id'";
+    WHERE company_id='$c_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -341,13 +341,13 @@ function run_query_contact_company($c_id) {
 function run_query_kind() {
   global $cdg_sql;
 
-  $query = "select kind_id,
+  $query = "SELECT kind_id,
       kind_minilabel,
       kind_header,
       kind_lang,
       kind_default
-    from Kind
-    order by kind_lang, kind_minilabel, kind_header";
+    FROM Kind
+    ORDER BY kind_lang, kind_minilabel, kind_header";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -366,7 +366,7 @@ function run_query_contactcategory1() {
   global $cdg_sql, $cgp_hide;
 
   if (! $cgp_hide["contact"]["category1"]) {
-    $query = "select * from ContactCategory1 order by contactcategory1_code"; 
+    $query = "SELECT * FROM ContactCategory1 ORDER BY contactcategory1_code"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -387,7 +387,7 @@ function run_query_contactcategory2() {
   global $cdg_sql, $cgp_hide;
 
   if (! $cgp_hide["contact"]["category2"]) {
-    $query = "select * from ContactCategory2 order by contactcategory2_code"; 
+    $query = "SELECT * FROM ContactCategory2 ORDER BY contactcategory2_code"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -486,7 +486,7 @@ function run_query_contact_insert($contact) {
     contact_archive,
     contact_privacy,
     contact_comment)
-  values (null,
+  VALUES (null,
     '$now',
     null,
     '$uid',
@@ -542,10 +542,10 @@ function run_query_contact_insert($contact) {
 
   if ($retour && is_array($cat1)) {
     foreach($cat1 as $categoryid) {
-      $query = "insert into ContactCategory1Link (
+      $query = "INSERT INTO ContactCategory1Link (
 	  contactcategory1link_contact_id,
 	  contactcategory1link_category_id)
-	values (
+	VALUES (
           '$id',
           '$categoryid')";
       display_debug_msg($query, $cdg_sql);
@@ -554,10 +554,10 @@ function run_query_contact_insert($contact) {
   }
   if ($retour && is_array($cat2)) {
     foreach($cat2 as $categoryid) {
-      $query = "insert into ContactCategory2Link (
+      $query = "INSERT INTO ContactCategory2Link (
 	  contactcategory2link_contact_id,
 	  contactcategory2link_category_id)
-	values (
+	VALUES (
           '$id',
           '$categoryid')";
       display_debug_msg($query, $cdg_sql);
@@ -626,7 +626,7 @@ function run_query_contact_update($contact) {
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
   
-  $query = "update Contact set
+  $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
     contact_userupdate='".$auth->auth["uid"]."',
     contact_datasource_id='$dsrc',
@@ -656,24 +656,24 @@ function run_query_contact_update($contact) {
     contact_archive='$arch',
     contact_privacy='$priv',
     contact_comment='$comment'
-  where contact_id='$id'";
+  WHERE contact_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $query = "delete
-    from ContactCategory1Link
-    where contactcategory1link_contact_id='$id'";
+    $query = "DELETE
+      FROM ContactCategory1Link
+      WHERE contactcategory1link_contact_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
     if (is_array($cat1)) {
       foreach($cat1 as $categoryid) {
-	$query = "insert into ContactCategory1Link (
+	$query = "INSERT INTO ContactCategory1Link (
 	  contactcategory1link_contact_id,
 	  contactcategory1link_category_id)
-	values (
+	VALUES (
           '$id',
           '$categoryid')";
 	display_debug_msg($query, $cdg_sql);
@@ -690,10 +690,10 @@ function run_query_contact_update($contact) {
     $obm_q->query($query);    
     if (is_array($cat2)) {
       foreach($cat2 as $categoryid) {
-	$query = "insert into ContactCategory2Link (
+	$query = "INSERT INTO ContactCategory2Link (
 	  contactcategory2link_contact_id,
 	  contactcategory2link_category_id)
-	values (
+	VALUES (
           '$id',
           '$categoryid')";
 	display_debug_msg($query, $cdg_sql);
@@ -724,11 +724,11 @@ function run_query_get_contactcategory1($c_id) {
 
   $cats = array();
 
-  $query = "select contactcategory1_id
-    from ContactCategory1Link, ContactCategory1
-    where contactcategory1link_category_id = contactcategory1_id
-      and contactcategory1link_contact_id = '$c_id'
-    order by contactcategory1_id";     
+  $query = "SELECT contactcategory1_id
+    FROM ContactCategory1Link, ContactCategory1
+    WHERE contactcategory1link_category_id = contactcategory1_id
+      AND contactcategory1link_contact_id = '$c_id'
+    ORDER BY contactcategory1_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -750,11 +750,11 @@ function run_query_get_contactcategory1($c_id) {
 function run_query_get_contactcategory1_label($c_id) {
     global $cdg_sql;
 
-  $query = "select contactcategory1_label,contactcategory1_code
-    from ContactCategory1Link, ContactCategory1
-    where contactcategory1link_category_id = contactcategory1_id
-      and contactcategory1link_contact_id = '$c_id'
-    order by contactcategory1_id";     
+  $query = "SELECT contactcategory1_label, contactcategory1_code
+    FROM ContactCategory1Link, ContactCategory1
+    WHERE contactcategory1link_category_id = contactcategory1_id
+      AND contactcategory1link_contact_id = '$c_id'
+    ORDER BY contactcategory1_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -774,11 +774,11 @@ function run_query_get_contactcategory1_label($c_id) {
 function run_query_get_contactcategory2_label($c_id) {
   global $cdg_sql;
 
-  $query = "select contactcategory2_label,contactcategory2_code
-    from ContactCategory2Link, ContactCategory2
-    where contactcategory2link_category_id = contactcategory2_id
-      and contactcategory2link_contact_id = '$c_id'
-    order by contactcategory2_id";     
+  $query = "SELECT contactcategory2_label, contactcategory2_code
+    FROM ContactCategory2Link, ContactCategory2
+    WHERE contactcategory2link_category_id = contactcategory2_id
+      AND contactcategory2link_contact_id = '$c_id'
+    ORDER BY contactcategory2_id";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -819,90 +819,46 @@ function run_query_get_contactcategory2($c_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the deals attached to the contact
+// Get the number of static lists where the contact is registered
 // Parameters:
 //   - $p_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_deal_links($p_id) {
+function get_linked_contact_list_nb($p_id) {
   global $cdg_sql;
 
-  $query = "select distinct deal_id, deal_label 
-            from Deal, Contact
-            where deal_contact1_id='$p_id'
-              or deal_contact2_id='$p_id'";
+  $query = "SELECT count(DISTINCT contactlist_list_id) as nb
+    FROM ContactList
+    WHERE contactlist_contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f("nb");
 
-  return $obm_q;
+  return $nb;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the contracts attached to the contact
+// Get the number of publications where the contact has subscribed
 // Parameters:
 //   - $p_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_contract_links($p_id) {
+function get_linked_contact_publication_nb($p_id) {
   global $cdg_sql;
 
-  $query = "select distinct contract_id, contract_label 
-            from Contract, Contact
-            where contract_contact1_id='$p_id'
-              or contract_contact2_id='$p_id'";
+  $query = "SELECT DISTINCT subscription_publication_id as nb
+    FROM Subscription 
+    WHERE subscription_contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f("nb");
 
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the lists where the contact is registered
-// Parameters:
-//   - $p_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_list_links($p_id) {
-  global $cdg_sql;
-
-  $query = "select distinct list_id,
-      list_name,
-      contactlist_contact_id,
-      contactlist_list_id
-    from List, ContactList
-    where list_id=contactlist_list_id
-      and contactlist_contact_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the publications where the contact has subscribed
-// Parameters:
-//   - $p_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_publication_links($p_id) {
-  global $cdg_sql;
-
-  $query = "select distinct subscription_publication_id,
-      publication_title
-    from Subscription 
-         Left join Publication on subscription_publication_id=publication_id
-    where subscription_contact_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
+  return $nb;
 }
 
 
@@ -1101,6 +1057,60 @@ function check_contact_data_form($cid, $contact) {
   }
 
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the contact can be deleted
+// Parameters:
+//   - $p_id : contact id
+// Returns:
+//   true if the contact can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_contact($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
+  global $l_link_list, $l_link_list_no, $l_link_publication, $l_link_publication_no;
+
+  $delete_ok = true;
+
+  // Links from deals
+  $nb = get_linked_deal_nb($p_id, "contact1", true, "contact2");
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "$l_link_deal";
+  } else {
+    $ok_msg .= "$l_link_deal_no";
+  }
+
+  // Links from lists
+  $nb = get_linked_contact_list_nb($p_id);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_list";
+  } else {
+    $ok_msg .= "<br />$l_link_list_no";
+  }
+
+  // Links from Contract
+  $nb = get_linked_contract_nb($p_id, "contact1", true, "contact2");
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_contract";
+  } else {
+    $ok_msg .= "<br />$l_link_contract_no";
+  }
+
+  // Links from Publications (Subscriptions)
+  $nb = get_linked_contact_publication_nb($p_id);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "<br />$l_link_publication";
+  } else {
+    $ok_msg .= "<br />$l_link_publication_no";
+  }
+
+  return $delete_ok;
 }
 
 

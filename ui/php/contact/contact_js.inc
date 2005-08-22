@@ -351,9 +351,9 @@ if (isset($ext_target) && $ext_target!="") {
     return doc.getElementById(name);
   }  
 
-  function fill_ext_form(repo_path) {
+  function fill_ext_form(dir_path) {
     ext_field = window.opener.document.$ext_target;
-    ext_field.value = repo_path;
+    ext_field.value = dir_path;
     window.close();
   } 
   

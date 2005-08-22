@@ -20,6 +20,8 @@ $l_update = "Update";
 
 $l_no_found = "No to do tasks registered";
 $l_no_deadline = "Not specified";
+$l_insert_ok = "The reminder has been inserted successfully.";
+$l_insert_error = "The insertion of the reminder has failed !";
 $l_delete_ok = "The reminder has been deleted successfully.";
 $l_delete_error = "The deletion of the reminder has failed !";
 

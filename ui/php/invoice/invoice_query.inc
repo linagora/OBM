@@ -133,7 +133,7 @@ function run_query_detail($p_invoice_id) {
   $timecreate = sql_date_format($db_type, "invoice_timecreate", "timecreate");
 
   // XXXXX ???? exporter le calcul des paiements a par (pour eviter group by)
-  $query = "select Invoice.*,
+  $query = "SELECT Invoice.*,
       $date,
       $edate,
       $pdate,
@@ -147,16 +147,16 @@ function run_query_detail($p_invoice_id) {
       project_name,
       invoicestatus_label,
       sum(paymentinvoice_amount) as invoice_paid
-    from Invoice
-      left join Company on invoice_company_id=company_id
-      left join Deal on invoice_deal_id=deal_id
-      left join Project on invoice_project_id=project_id
-      left join InvoiceStatus on invoice_status_id=invoicestatus_id
-      left outer join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
-      left join UserObm as c on invoice_usercreate=c.userobm_id
-      left join UserObm as u on invoice_userupdate=u.userobm_id
-    where invoice_id='$p_invoice_id'
-    group by Invoice.invoice_id, invoice_timeupdate, invoice_timecreate,
+    FROM Invoice
+      LEFT JOIN Company on invoice_company_id=company_id
+      LEFT JOIN Deal on invoice_deal_id=deal_id
+      LEFT JOIN Project on invoice_project_id=project_id
+      LEFT JOIN InvoiceStatus on invoice_status_id=invoicestatus_id
+      LEFT OUTER join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
+      LEFT JOIN UserObm as c on invoice_usercreate=c.userobm_id
+      LEFT JOIN UserObm as u on invoice_userupdate=u.userobm_id
+    WHERE invoice_id='$p_invoice_id'
+    GROUP BY Invoice.invoice_id, invoice_timeupdate, invoice_timecreate,
       invoice_userupdate, invoice_usercreate, invoice_company_id,
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
@@ -212,7 +212,7 @@ function run_query_insert($invoice) {
   }
   $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');
 
-  $query = "insert into Invoice (
+  $query = "INSERT INTO Invoice (
       invoice_timeupdate,
       invoice_timecreate,
       invoice_userupdate,
@@ -230,8 +230,8 @@ function run_query_insert($invoice) {
       invoice_expiration_date,
       invoice_payment_date,
       invoice_inout,
-      invoice_archive
-    ) values (
+      invoice_archive)
+    VALUES (
       null,
      '$now',
      null,
@@ -299,7 +299,7 @@ function run_query_update ($invoice) {
   if ($proj_id < 1) { $proj_id = $invoice["project_id"]; }
   if ($proj_id == "") { $proj_id = "0"; }
 
-  $query = "update Invoice set
+  $query = "UPDATE Invoice SET
       invoice_timeupdate='$now',
       invoice_userupdate='$uid',
       invoice_company_id='$comp_id',
@@ -316,7 +316,7 @@ function run_query_update ($invoice) {
       invoice_payment_date='$pdate',
       invoice_inout='$inout',
       invoice_archive='$arch'
-    where invoice_id='$id'"; 
+    WHERE invoice_id='$id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_update()");
   $obm_q = new DB_OBM;
@@ -332,10 +332,10 @@ function run_query_update ($invoice) {
 function run_query_invoicestatus() {
   global $cdg_sql;
 
-  $query = "select invoicestatus_id,
+  $query = "SELECT invoicestatus_id,
       invoicestatus_label
-    from InvoiceStatus
-     order by invoicestatus_archive, invoicestatus_payment";
+    FROM InvoiceStatus
+    ORDER BY invoicestatus_archive, invoicestatus_payment";
   display_debug_msg($query, $cdg_sql, "run_query_invoicestatus()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -359,7 +359,7 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
   $date = sql_date_format($db_type, "payment_date", "payment_date");
   $exp_date = sql_date_format($db_type, "payment_expected_date", "payment_expect_date");
 
-  $query = "select
+  $query = "SELECT
       paymentinvoice_amount,
       payment_id,
       payment_label,
@@ -367,9 +367,9 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
       $date,
       $exp_date,
       payment_amount
-    from PaymentInvoice
-         left join Payment on paymentinvoice_payment_id=payment_id
-    where paymentinvoice_invoice_id = '$p_invoice'";
+    FROM PaymentInvoice
+         LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
+    WHERE paymentinvoice_invoice_id = '$p_invoice'";
 
   if ($not_paid == 1) {
     $query .= " and paymentinvoice_amount = 0.0 ";
@@ -427,7 +427,7 @@ function run_query_remove_payment ($p_invoice_id, $p_payment_id=""){
 function run_query_invoice_delete($p_id) {
   global $cdg_sql;
 
-  $query = "delete from Invoice where invoice_id='$p_id'";
+  $query = "DELETE FROM Invoice WHERE invoice_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -446,13 +446,13 @@ function run_query_invoice_delete($p_id) {
 // Parameters:
 //   - $p_id : invoice Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_payment_links($p_id) {
+function run_query_linked_invoice_payment($p_id) {
   global $cdg_sql;
 
-  $query = "select distinct payment_id, payment_label, payment_amount 
-    from Payment
-         left join PaymentInvoice on payment_id=paymentinvoice_payment_id
-    where paymentinvoice_invoice_id='$p_id'";
+  $query = "SELECT distinct payment_id, payment_label, payment_amount 
+    FROM Payment
+         LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id
+    WHERE paymentinvoice_invoice_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -468,9 +468,10 @@ function run_query_invoice_payment_links($p_id) {
 function run_query_deal_get_inout ($p_deal_id) {
   global $cdg_sql;
 
-  $query = "select dealtype_inout from Deal,DealType
-      where deal_id = '$p_deal_id'
-        and deal_type_id = dealtype_id";
+  $query = "SELECT dealtype_inout
+    FROM Deal, DealType
+    WHERE deal_id = '$p_deal_id'
+      AND deal_type_id = dealtype_id";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -491,12 +492,13 @@ function get_invoice_nb_having_number ($number, $id="") {
   global $cdg_sql;
 
   if ($id != "") {
-    $where_id = "and invoice_id != '$id'";
+    $where_id = "AND invoice_id != '$id'";
   }
 
-  $query = "select invoice_id from Invoice
-      where invoice_number = '$number'
-        $where_id";
+  $query = "SELECT invoice_id
+    FROM Invoice
+    WHERE invoice_number = '$number'
+      $where_id";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -504,6 +506,37 @@ function get_invoice_nb_having_number ($number, $id="") {
   $nb = $obm_q->num_rows();
 
   return $nb;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the InvoiceStatus info
+// Parameters:
+//   - $p_id : invoicestatus_id
+// Returns: array of invoicestatus infos
+///////////////////////////////////////////////////////////////////////////////
+function get_invoicestatus_info($p_id) {
+  global $cdg_sql;
+
+  if ($p_id > 0) {
+    $query = "SELECT *
+      FROM InvoiceStatus
+      WHERE invoicestatus_id='$p_id'";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+
+    $res["label"] = $obm_q->f("invoicestatus_label");
+    $res["payment"] = $obm_q->f("invoicestatus_payment");
+    $res["created"] = $obm_q->f("invoicestatus_created");
+    $res["archive"] = $obm_q->f("invoicestatus_archive");
+  } else {
+    $res = "";
+  }
+
+  return $res;
 }
 
 
@@ -531,6 +564,9 @@ function check_invoice_data_form($id, $invoice) {
   $ttc = $invoice["ttc"];
   $c_id = $invoice["company_id"];
   $c_new_id = $invoice["comp_new_id"];
+  $status = $invoice["status"];
+  $istatus = get_invoicestatus_info($status);
+  $status_created = $istatus["created"];
 
   // MANDATORY: Invoice label
   if (trim($label) == "") {
@@ -546,8 +582,11 @@ function check_invoice_data_form($id, $invoice) {
 
   // Date check
   if ($date == "") {
-    $err_msg = $l_fill_date;
-    return false;
+    // If invoice in a status "created", exp date must be set
+    if ($status_created) {
+      $err_msg = $l_fill_date;
+      return false;
+    }
   } else if (preg_match($php_regexp_isodate, $date) == 0) {
     $err_msg = "$l_date : $date : $l_invalid_date"; 
     return false;
@@ -555,8 +594,11 @@ function check_invoice_data_form($id, $invoice) {
 
   // Expiration Date check
   if ($edate == "") {
-    $err_msg = "$l_expiration_date : $l_fill_date";
-    return false;
+    // If invoice in a status "created", exp date must be set
+    if ($status_created) {
+      $err_msg = "$l_expiration_date : $l_fill_date";
+      return false;
+    }
   } else if (preg_match($php_regexp_isodate, $edate) == 0) {
     $err_msg = "$l_expiration_date : $edate : $l_invalid_date"; 
     return false;
@@ -586,8 +628,8 @@ function check_invoice_data_form($id, $invoice) {
     return false;
   }
 
-  // XXXXX MANDATORY: Invoice number, if state not "to be created"
-  if (true) {
+  // MANDATORY: Invoice number, if state not "to be created"
+  if ($status_created) {
     if (trim($number) == "") {
       $err_msg = $l_fill_number;
       return false;
@@ -600,8 +642,34 @@ function check_invoice_data_form($id, $invoice) {
     }
   }
 
-
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the invoice can be deleted
+// Parameters:
+//   - $p_id : invoice id
+// Returns:
+//   true if the invoice can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_invoice($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_link_payment, $l_link_payment_no;
+
+  $delete_ok = true;
+
+  // Links from Payment
+  $obm_q = run_query_linked_invoice_payment($p_id);
+  $nb = $obm_q->num_rows();
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "$l_link_payment";
+  } else {
+    $ok_msg .= "$l_link_payment_no";
+  }
+
+  return $delete_ok;
 }
 
 

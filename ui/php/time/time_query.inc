@@ -42,7 +42,7 @@ function run_query_task_list($time) {
   $if_status = sql_if($db_type, "(timetask_status != 2)", 1, 0);
 
   $query = "
-    select timetask_id,
+    SELECT timetask_id,
       $datetask,
       $timeupdate,
       $timecreate,
@@ -55,17 +55,17 @@ function run_query_task_list($time) {
       timetask_status,
       $if_status as test_status,
       SUBSTRING(timetask_date,8,1) as date_parity
-    from TimeTask
-      left join ProjectTask on timetask_projecttask_id = projecttask_id
-      left join Project on projecttask_project_id = project_id
-      left join Company on project_company_id = company_id, TaskType 
-    where timetask_tasktype_id = tasktype_id
-      and timetask_date >='". $array_date[0] ."' 
-      and timetask_date <'". $array_date[1] ."'
-      and timetask_user_id = '$user_id'
-    order by timetask_date
+    FROM TimeTask
+      LEFT JOIN ProjectTask ON timetask_projecttask_id = projecttask_id
+      LEFT JOIN Project ON projecttask_project_id = project_id
+      LEFT JOIN Company ON project_company_id = company_id, TaskType 
+    WHERE timetask_tasktype_id = tasktype_id
+      AND timetask_date >='". $array_date[0] ."' 
+      AND timetask_date <'". $array_date[1] ."'
+      AND timetask_user_id = '$user_id'
+    ORDER BY timetask_date
     ";
-   
+
   display_debug_msg($query, $cdg_sql,"run_query_search");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -74,7 +74,7 @@ function run_query_task_list($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task grouped by month and summed by task project                          //
+// Task grouped by month and summed by task project
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       date
@@ -105,19 +105,19 @@ function run_query_stat_project($time) {
 
   // task_valid 0 if checkbox not to be shown
   $query = "
-    select
+    SELECT
       project_name,
       company_name,
       FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
       FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
       FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
-    from TimeTask, ProjectTask, Project
-    left join Company on project_company_id = company_id
-    where timetask_date <= '$month_end'
-      and timetask_projecttask_id = projecttask_id
-      and projecttask_project_id = project_id
-      and timetask_user_id in $uid_tab
-    group by project_id
+    FROM TimeTask, ProjectTask, Project
+      LEFT JOIN Company ON project_company_id = company_id
+    WHERE timetask_date <= '$month_end'
+      AND timetask_projecttask_id = projecttask_id
+      AND projecttask_project_id = project_id
+      AND timetask_user_id in $uid_tab
+    GROUP BY project_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
     ";
 
@@ -130,7 +130,7 @@ function run_query_stat_project($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task grouped by month and summed by tasktype                              //
+// Task grouped by month and summed by tasktype
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       date
@@ -161,16 +161,16 @@ function run_query_stat_tasktype($time) {
 
   // task_valid 0 if checkbox not to be shown
   $query = "
-    select
+    SELECT
       tasktype_label,
       FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
       FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
       FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
-    from TimeTask, TaskType
-    where timetask_date <= '$month_end'
-      and timetask_tasktype_id = tasktype_id
-      and timetask_user_id in $uid_tab
-    group by tasktype_id
+    FROM TimeTask, TaskType
+    WHERE timetask_date <= '$month_end'
+      AND timetask_tasktype_id = tasktype_id
+      AND timetask_user_id in $uid_tab
+    GROUP BY tasktype_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
     ";
 
@@ -199,24 +199,24 @@ function run_query_valid_search($time) {
   $db_type = $obm_q->type;
   $datetask = sql_date_format($db_type, "timetask_date", "date_task");
 
-  $query = "select 
+  $query = "SELECT 
       $datetask,
       timetask_status
-    from TimeTask 
-    where timetask_status != 0 
-      and timetask_date >= '". $week_span[0] ."' 
-      and timetask_date <= '". $week_span[1]. "'";
+    FROM TimeTask 
+    WHERE timetask_status != 0 
+      AND timetask_date >= '". $week_span[0] ."' 
+      AND timetask_date <= '". $week_span[1]. "'";
 
   // user_id : array -> size 1 or more 
   if (sizeof($time["user_ids"]) == 1) {
-    $query .= " and timetask_user_id = '". $time["user_id"] . "'";
+    $query .= " AND timetask_user_id = '". $time["user_id"] . "'";
   } else {
     $users_list = array_to_list($time["user_ids"]);
-    $query .= " and timetask_user_id in $users_list";
+    $query .= " AND timetask_user_id in $users_list";
   }
 
   // Group
-  $query .= " group by timetask_date, timetask_status ";
+  $query .= " GROUP BY timetask_date, timetask_status ";
   
   display_debug_msg($query, $cdg_sql, "run_query_valid_search");
   $obm_q->query($query);
@@ -243,13 +243,13 @@ function run_query_get_task($id) {
   $datetask = sql_date_format($db_type, "timetask_date", "date_task");
 
   $query = "
-    select
+    SELECT
       TimeTask.*,
       $datetask,
       projecttask_project_id as timetask_project_id  
-    from TimeTask
-      left join ProjectTask on timetask_projecttask_id = projecttask_id
-    where timetask_id = '$id'";
+    FROM TimeTask
+      LEFT JOIN ProjectTask ON timetask_projecttask_id = projecttask_id
+    WHERE timetask_id = '$id'";
   
   display_debug_msg($query, $cdg_sql, "run_query_get_task");
   $obm_q->query($query);
@@ -280,7 +280,7 @@ function run_query_insert($task) {
     if (is_array($date)) {
       foreach ($date as $key => $value) {
 	$query = "
-       insert into TimeTask (
+       INSERT INTO TimeTask (
          timetask_timeupdate,
          timetask_timecreate,
          timetask_userupdate,
@@ -292,7 +292,8 @@ function run_query_insert($task) {
          timetask_tasktype_id,
          timetask_label,
          timetask_status)
-       values(null,
+       VALUES (
+         null,
          '" . date("Y-m-d H:i:s") . "',
          null,
          '$uid',
@@ -310,7 +311,7 @@ function run_query_insert($task) {
       }
     } else {
       $query = "
-       insert into TimeTask (
+       INSERT INTO TimeTask (
          timetask_timeupdate,
          timetask_timecreate,
          timetask_userupdate,
@@ -322,7 +323,8 @@ function run_query_insert($task) {
          timetask_tasktype_id,
          timetask_label,
          timetask_status)
-       values(null,
+       VALUES (
+         null,
          '" . date("Y-m-d H:i:s") . "',
          null,
          '$uid',
@@ -359,13 +361,13 @@ function run_query_update($task) {
   $date = $task["sel_date"];
   
   $query = "
-  update TimeTask set
+  UPDATE TimeTask SET
     timetask_date='$date',
     timetask_tasktype_id='$ttype',
     timetask_length='$time',
     timetask_label='$label',
     timetask_projecttask_id='$projecttask'
-  where timetask_id='$id'";
+  WHERE timetask_id='$id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_update");
   $obm_db = new DB_OBM;
@@ -387,7 +389,7 @@ function run_query_delete($parms) {
       $id_task = substr($id_task, 1);  
     
       if ($val == "on") { 
-        $query = "delete from TimeTask where timetask_id = '$id_task'";
+        $query = "DELETE FROM TimeTask WHERE timetask_id = '$id_task'";
 	display_debug_msg($query, $cdg_sql, "run_query_delete");
         $obm_q = new DB_OBM;
         $obm_q->query($query);
@@ -398,7 +400,7 @@ function run_query_delete($parms) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task Validation                                                          //
+// Task Validation
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used

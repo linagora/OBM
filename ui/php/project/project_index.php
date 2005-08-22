@@ -68,7 +68,6 @@ $perm->check_permissions($module, $action);
 // External calls
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  require("project_js.inc");
   $display["search"] = dis_project_search_form($project);
   if ($set_display == "yes") {
     $display["result"] = dis_project_search_list($project);
@@ -82,7 +81,11 @@ if ($action == "ext_get_id") {
 } else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($project);
-  $display["msg"] .= display_info_msg($l_no_display);
+  if ($set_display == "yes") {
+    $display["result"] = dis_project_search_list($project);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -144,17 +147,34 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_check_links($project["id"]);
+  if (check_can_delete_project($project["id"])) {
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_project($project["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_project_consult($project["id"]);
+  }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($project["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
-    $display["search"] = dis_project_search_form($project);
-    $display["msg"] .= display_info_msg($l_no_display);
+  if (check_can_delete_project($project["id"])) {
+    $retour = run_query_delete($project["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["search"] = dis_project_search_form($project);
+      if ($set_display == "yes") {
+        $display["result"] = dis_project_search_list($project);
+      } else {
+        $display["msg"] .= display_info_msg($l_no_display);
+      }
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["detail"] = dis_project_consult($project["id"]);
+    }
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_project_consult($project["id"]);
   }
 
@@ -569,7 +589,7 @@ function get_project_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/project/project_index.php?action=check_delete&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'insert')
                                      	      );
 
 // Delete

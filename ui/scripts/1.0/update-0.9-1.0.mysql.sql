@@ -81,7 +81,7 @@ CREATE TABLE DeletedTodo (
 -- Table structure for table 'Resource'
 --
 CREATE TABLE Resource (
-  resource_id                int(8) DEFAULT 0 NOT NULL auto_increment,
+  resource_id                int(8) NOT NULL auto_increment,
   resource_timeupdate        timestamp(14),
   resource_timecreate        timestamp(14),
   resource_userupdate        int(8),
@@ -115,6 +115,7 @@ CREATE TABLE ResourceGroup (
   resourcegroup_rgroup_id    int(8) DEFAULT 0 NOT NULL,
   resourcegroup_resource_id  int(8) DEFAULT 0 NOT NULL
 );
+
 
 -------------------------------------------------------------------------------
 -- Insert Display Prefs (Resource modules)
@@ -222,14 +223,48 @@ FROM CalendarRight;
 -- DROP table CalendarEntityRight 
 DROP TABLE IF EXISTS CalendarRight;
 
+
 -------------------------------------------------------------------------------
 -- Update Document table
 -------------------------------------------------------------------------------
 -- correctness : _mimetype -> mimetype_id
-ALTER TABLE Document CHANGE document_mimetype document_mimentype_id int(8) not null default 0;
+ALTER TABLE Document CHANGE document_mimetype document_mimetype_id int(8) not null default 0;
 
 -- Add ACL column
 ALTER TABLE Document ADD COLUMN document_acl text;
 
 -- Correct MIMETYPE extension case
 UPDATE DocumentMimeType SET documentmimetype_extension='jpg' WHERE documentmimetype_extension='JPG';
+
+
+-------------------------------------------------------------------------------
+-- InvoiceStatus table update
+-------------------------------------------------------------------------------
+-- add invoicestatus_created field
+ALTER TABLE InvoiceStatus ADD COLUMN invoicestatus_created int(1) DEFAULT 0 NOT NULL after invoicestatus_payment;
+UPDATE InvoiceStatus SET invoicestatus_created=1;
+UPDATE InvoiceStatus SET invoicestatus_created=0 WHERE invoicestatus_label like '%to create%' OR invoicestatus_label like '%A c%';
+
+
+-------------------------------------------------------------------------------
+-- Subscription MySQL table was missing auto_increment
+-------------------------------------------------------------------------------
+DROP TABLE Subscription;
+--
+-- Table structure for table 'Subscription'
+--
+CREATE TABLE Subscription (
+  subscription_id               int(8) NOT NULL auto_increment,
+  subscription_publication_id 	int(8) NOT NULL,
+  subscription_contact_id       int(8) NOT NULL,
+  subscription_timeupdate       timestamp(14),
+  subscription_timecreate       timestamp(14),
+  subscription_userupdate       int(8),
+  subscription_usercreate       int(8),
+  subscription_quantity       	int(8),
+  subscription_renewal          int(1) DEFAULT 0 NOT NULL,
+  subscription_reception_id     int(8) DEFAULT 0 NOT NULL,
+  subscription_date_begin       timestamp(14),
+  subscription_date_end         timestamp(14),
+  PRIMARY KEY (subscription_id)
+);

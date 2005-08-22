@@ -49,10 +49,6 @@
 // - ext_get_id      -- $ext_params    -- select a deal (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms Management                                             //
-///////////////////////////////////////////////////////////////////////////////
-
 $path = "..";
 $module = "deal";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -61,7 +57,6 @@ include("$obminclude/global.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-
 require("deal_query.inc");
 require("deal_display.inc");
 
@@ -205,19 +200,32 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("deal_js.inc");
-  $display["detail"] = dis_check_links($deal["id"]);
+  if (check_can_delete_deal($deal["id"])) {
+    require("deal_js.inc");
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_deal($deal["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_deal_consult($deal);
+  }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($deal["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_deal($deal["id"])) {
+    $retour = run_query_delete($deal["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = dis_deal_index();
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_deal_consult($deal);
   }
-  $display["search"] = dis_deal_index();
-  
+
 } elseif ($action == "stats")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_deal_potential($deal);
@@ -257,7 +265,7 @@ if ($action == "ext_get_id") {
   $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
 
 } elseif ($action == "cat_checklink")  {
-///////////////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////////////
 $display["detail"] .= dis_cat_links($deal);
  
 } elseif ($action == "cat_delete")  {
@@ -271,26 +279,6 @@ $display["detail"] .= dis_cat_links($deal);
   require("deal_js.inc");
   $display["detail"] .= html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
 
-} elseif ($action == "display") {
-///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($uid,"deal",1);
-  $prefs_parent = get_display_pref($uid,"parentdeal",1);
-  $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
-  
-} else if ($action == "dispref_display") {
-///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($uid,"deal",1);
-  $prefs_parent = get_display_pref($uid,"parentdeal",1);
-  $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
-
-} else if ($action == "dispref_level") {
-///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($uid,"deal",1);
-  $prefs_parent = get_display_pref($uid,"parentdeal",1);
-  $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
-  
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
@@ -417,22 +405,23 @@ $display["detail"] .= dis_cat_links($deal);
   
 } elseif ($action == "parent_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_parent_has_deal($deal["parent"])) {
-    $display["msg"] .= display_err_msg($l_err_parent_has_deal);
-    $display["search"] = dis_parentdeal_consult($deal);
-  } else {
+  if (check_can_delete_parentdeal($deal["parent"])) {
     run_query_delete_parentdeal($deal["parent"]); 
     $display["msg"] .= display_ok_msg($l_delete_ok); 
     require("deal_js.inc");
     $display["search"] = html_parentdeal_search_form($deal, run_query_userobm());
-  }    
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete_parent, false);
+    $display["search"] = dis_parentdeal_consult($deal);
+  }
   
 } elseif  ($action == "parent_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_parent_form("", $deal)) {
     $retour = run_query_update_parentdeal($deal);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok); 
+      $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
@@ -457,6 +446,27 @@ $display["detail"] .= dis_cat_links($deal);
 
     $display["detail"] = dis_deal_consult($deal);
   }
+
+} elseif ($action == "display") {
+///////////////////////////////////////////////////////////////////////////////
+  $prefs = get_display_pref($uid,"deal",1);
+  $prefs_parent = get_display_pref($uid,"parentdeal",1);
+  $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
+  
+} else if ($action == "dispref_display") {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus);
+  $prefs = get_display_pref($uid,"deal",1);
+  $prefs_parent = get_display_pref($uid,"parentdeal",1);
+  $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
+
+} else if ($action == "dispref_level") {
+///////////////////////////////////////////////////////////////////////////////
+  update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
+  $prefs = get_display_pref($uid,"deal",1);
+  $prefs_parent = get_display_pref($uid,"parentdeal",1);
+  $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
+  
 }
 
 
@@ -488,7 +498,7 @@ function get_param_deal() {
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
   global $sel_cat, $tf_code, $tf_cat;
-  global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
+  global $param_deal, $param_contact, $hd_usercreate, $hd_timeupdate;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir;
@@ -514,6 +524,7 @@ function get_param_deal() {
   if (isset ($sel_kind)) $deal["kind"] = $sel_kind;
   if (isset ($sel_tt)) $deal["tasktype"] = $sel_tt;
   if (isset ($param_company)) $deal["company"] = $param_company;
+  if (isset ($param_contact)) $deal["contact_id"] = $param_contact;
   if (isset ($sel_contact1)) $deal["contact1"] = $sel_contact1;
   if (isset ($sel_contact2)) $deal["contact2"] = $sel_contact2;
   if (isset ($sel_market)) $deal["market"] = $sel_market;

@@ -87,9 +87,9 @@ $l_cant_delete = "La facture ne peut être supprimée !";
 $l_can_delete = "La facture peut être supprimée.";
 
 $l_fill_label = "Le label doit être renseigné !";
-$l_fill_number = "Le numéro doit être renseigné !";
+$l_fill_number = "Le numéro doit être renseigné (pour l'état choisi) !";
 $l_fill_company = "La société doit être renseignée !";
-$l_fill_date = "La date doit être renseignée !";
+$l_fill_date = "La date doit être renseignée (pour l'état choisi) !";
 $l_fill_inout = "Le type doit être sélectionné : $l_client ou $l_supplier !";
 $l_fill_amount = "Les montants doivent être correctement renseignés !";
 $l_error_number_exist = "Ce numéro de facture est déjà attribué !";

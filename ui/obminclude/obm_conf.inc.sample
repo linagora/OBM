@@ -91,7 +91,7 @@ $cagenda_last_hour = 20;
 //$cmail_incident = "support@mydomain";
 
 // Document : Root of the document repository
-$document_path = "/var/www/obmdocuments";
+$cdocument_root = "/var/www/obmdocuments";
 $default_path = "/Default";                  // Default directory
 
 // Group : is a new group private by default

@@ -576,12 +576,12 @@ function dis_data_list($action, $mode) {
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_document($action, $mode) {
-  global $debug, $c_all, $php_regexp_number, $document_path;
+  global $debug, $c_all, $php_regexp_number, $cdocument_root;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   // Get the document list
   $d_q = get_document_list();
-  $disk_array = get_file_list("$document_path/");
+  $disk_array = get_file_list("$cdocument_root/");
   $nb_files = count ($disk_array);
   $cpt_err = 0;
   $nb_document = $d_q->num_rows();
@@ -608,7 +608,7 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
         <td class=\"adminHead\">Document Path</td>
         <td class=\"adminHead\">Document Name</td>
         <td class=\"adminHead\">Document Kind</td>
-        <td class=\"adminHead\">Disk Path <br />($document_path)</td>
+        <td class=\"adminHead\">Disk Path <br />($cdocument_root)</td>
 	<td class=\"adminHead\">Missing <br /> in Database</td>
         <td class=\"adminHead\">Missing <br /> in File System</td>
         $update

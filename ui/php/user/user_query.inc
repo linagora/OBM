@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_query.inc                                               //
 //     - Desc : User query & db File                                         //
-// 2000-01-13 Florent Goalabre : Last Update 2001-07-27 Francois Bloque      //
+// 2000-01-13 Aliacom - Florent Goalabre                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,43 +42,43 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
   // If a user perms indication has been specified, get it
   if (($perms != $c_all) && ($perms != "")) {
-     if (trim($where) != "") $where .= " and";
+     if (trim($where) != "") $where .= " AND";
      $where .= " userobm_perms='$perms'";
   }
 
   // If a lastname indication has been specified, get it
   if (trim($lname) != "") {
-     if (trim($where) != "") $where .= " and";
+     if (trim($where) != "") $where .= " AND";
      $where .= " userobm_lastname $like '$lname%'";
   }
 
   // If an email indication has been specified, get it
   if (trim($email) != "") {
-     if (trim($where) != "") $where .= " and";
+     if (trim($where) != "") $where .= " AND";
      $where .= " userobm_email like '%$email%'";
   }
 
   // If a description indication has been specified, get it
   if (trim($desc) != "") {
-     if (trim($where) != "") $where .= " and";
+     if (trim($where) != "") $where .= " AND";
      $where .= " userobm_description like '%$desc%'";
   }
 
   // If a group indication has been specified, get it
   if (trim($group) != "") {
-     if (trim($where) != "") $where .= " and";
+     if (trim($where) != "") $where .= " AND";
      $where .= " group_name like '%$group%'";
      $join_grp = "LEFT JOIN UserObmGroup ON userobm_id=userobmgroup_userobm_id
                   LEFT JOIN UGroup ON userobmgroup_group_id=group_id";
   }
 
   if ($archive != "1") {
-    if (trim($where) != "") $where .= " and";
+    if (trim($where) != "") $where .= " AND";
     $where .= " userobm_archive = '0'";
   }
 
   if (trim($where) != "") {
-    $whereq = " where $where";
+    $whereq = " WHERE $where";
   }
 
   $select = "SELECT distinct UserObm.*,
@@ -91,7 +91,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
-  $orderq .= " order by $order $p_order_dir";
+  $orderq .= " ORDER BY $order $p_order_dir";
 
   $query = "$select
     $whereq
@@ -128,17 +128,17 @@ function run_query_detail($p_id) {
   $datebegin = sql_date_format($db_type, "UserObm.userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
 
-  $query = "select UserObm.*,
+  $query = "SELECT UserObm.*,
       $timeupdate,
       $timecreate,
       $datebegin,
       $lastaccess,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
-    from UserObm
-         left join UserObm as c on UserObm.userobm_usercreate=c.userobm_id
-         left join UserObm as u on UserObm.userobm_userupdate=u.userobm_id
-    where UserObm.userobm_id='$p_id'";
+    FROM UserObm
+         LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u ON UserObm.userobm_userupdate=u.userobm_id
+    WHERE UserObm.userobm_id='$p_id'";
 
   $obm_q->query($query);
   $obm_q->next_record();
@@ -180,7 +180,7 @@ function run_query_insert($user) {
   $email = $user["email"];
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
 
-  $query = "insert into UserObm (userobm_timeupdate,
+  $query = "INSERT INTO UserObm (userobm_timeupdate,
     userobm_timecreate,
     userobm_userupdate,
     userobm_usercreate,
@@ -198,7 +198,7 @@ function run_query_insert($user) {
     userobm_email,
     userobm_description,
     userobm_timelastaccess)
-  values (
+  VALUES (
     null,
     '" . date("Y-m-d H:i:s") . "',
     null,
@@ -227,7 +227,7 @@ function run_query_insert($user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User update query execution                                               //
+// User update query execution
 // Parameters:
 //   - $p_id     : user id
 //   - $user[]   : entry values
@@ -260,7 +260,7 @@ function run_query_update($p_id, $user) {
   $email = $user["email"];
   $desc = $user["description"];
 
-  $query = "update UserObm set
+  $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate=". $auth->auth["uid"] .",
     userobm_login='$login',
@@ -276,7 +276,7 @@ function run_query_update($p_id, $user) {
     userobm_fax2='$fax2',
     userobm_email='$email',
     userobm_description='$desc'
-  where userobm_id='$p_id'";
+  WHERE userobm_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -319,7 +319,7 @@ function run_query_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User Groups query execution                                               //
+// User Groups query execution
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
@@ -328,9 +328,9 @@ function run_query_user_group($p_id) {
 
   $query = "SELECT *
     FROM UGroup
-    LEFT join UserObmGroup on group_id = userobmgroup_group_id
+      LEFT JOIN UserObmGroup ON group_id = userobmgroup_group_id
     WHERE userobmgroup_userobm_id='$p_id'
-      and (group_privacy=0 OR group_usercreate='$uid')";
+      AND (group_privacy=0 OR group_usercreate='$uid')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -341,7 +341,7 @@ function run_query_user_group($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Unsubscribe the user from all groups                                      //
+// Unsubscribe the user from all groups
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ function run_query_unsubscribe_all_groups($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Groups query execution                                                    //
+// Groups query execution
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group() {
   global $cdg_sql, $uid;
@@ -379,7 +379,7 @@ function run_query_group() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : UserObmGroup global update                              //
+// Query execution : UserObmGroup global update
 // Parameters:
 //   - $user[] : user hash info : keys used : id, group_nb, group_X
 // Return: number of usergroup inserted
@@ -388,7 +388,7 @@ function run_query_update_user_group($user) {
   global $cdg_sql;
 
   $uid = $user["id"];
-  $query = "delete from UserObmGroup where userobmgroup_userobm_id = '$uid'";
+  $query = "DELETE FROM UserObmGroup WHERE userobmgroup_userobm_id = '$uid'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -400,8 +400,12 @@ function run_query_update_user_group($user) {
     $cpt++;
     $g_id = $user["group_$cpt"];
 
-    $query = "insert into UserObmGroup (userobmgroup_group_id,
-        userobmgroup_userobm_id) values ($g_id, $uid)";
+    $query = "INSERT INTO UserObmGroup (
+        userobmgroup_group_id,
+        userobmgroup_userobm_id)
+      VALUES (
+        $g_id,
+        $uid)";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
@@ -417,7 +421,7 @@ function run_query_update_user_group($user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User environment checking (same user exists ?)                            //
+// User environment checking (same user exists ?)
 // Parameters:
 //   - $p_id   : user id
 //   - $user[] : user's values
@@ -454,13 +458,13 @@ function run_query_check_user($p_id, $login) {
   $like = sql_casei_like($db_type);
 
   if ($p_id) {
-    $where_user = "and userobm_id != '$p_id'";
+    $where_user = "AND userobm_id != '$p_id'";
   }
 
-  $query = "select distinct userobm_id, userobm_login
-            from UserObm
-            where userobm_login $like '$login%'
-              $where_user";
+  $query = "SELECT distinct userobm_id, userobm_login
+    FROM UserObm
+    WHERE userobm_login $like '$login%'
+          $where_user";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -470,7 +474,7 @@ function run_query_check_user($p_id, $login) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data checking and formatting                                              //
+// Data checking and formatting
 // Parameters:
 //   - $p_id     : user id
 //   - $user[]   : values checked
@@ -514,9 +518,9 @@ function check_data_form($p_id, $user) {
   /////////////////////////////////////////////////////////////////////////////
   // if a user with the same name already exists  return false               //
   /////////////////////////////////////////////////////////////////////////////
-  $query = "select * from UserObm where userobm_login='$login'";
+  $query = "SELECT * FROM UserObm WHERE userobm_login='$login'";
   if ($p_id > 0) {
-    $query .= " and userobm_id!='$p_id'";
+    $query .= " AND userobm_id!='$p_id'";
   }
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -527,6 +531,57 @@ function check_data_form($p_id, $user) {
   }
 
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the number of timetask entries referencing to the user (and where
+// project is set)
+// Parameters:
+//   - $p_id : user Id
+///////////////////////////////////////////////////////////////////////////////
+function get_linked_user_timetask_nb($p_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT count(timetask_id) as nb
+    FROM TimeTask
+    WHERE timetask_user_id='$p_id'
+      AND timetask_projecttask_id > 0
+  ";
+
+  display_debug_msg($query, $cdg_sql, "get_linked_user_timetask_nb($p_id)");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f("nb");
+
+  return $nb;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the user can be deleted
+// Parameters:
+//   - $p_id : user id
+// Returns:
+//   true if the user can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_user($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_link_timetask, $l_link_timetask_no;
+
+  $delete_ok = true;
+
+  // Links from Time management (referencing projects)
+  $nb = get_linked_user_timetask_nb($p_id);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "$l_link_timetask";
+  } else {
+    $ok_msg .= "$l_link_timetask_no";
+  }
+
+  return $delete_ok;
 }
 
 
@@ -542,46 +597,48 @@ function run_query_delete_profile($param_user)  {
 
   $obm_q = new DB_OBM;
 
-  $query = "Delete from UserObmPref where userobmpref_user_id='$param_user'"; 
+  $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$param_user'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
-  $query = "Delete from DisplayPref where display_user_id='$param_user'"; 
+  $query = "DELETE FROM DisplayPref WHERE display_user_id='$param_user'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   // Move all the user contact from private to public
-  $query = "Update Contact set
+  $query = "UPDATE Contact SET
       contact_privacy='0'
-    where contact_usercreate='$param_user'
-      and contact_privacy != '0'"; 
+    WHERE contact_usercreate='$param_user'
+      AND contact_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   // Move all the user deal from private to public
-  $query = "Update Deal set
+  $query = "UPDATE Deal SET
       deal_privacy='0'
-    where deal_usercreate='$param_user'
-      and deal_privacy != '0'"; 
+    WHERE deal_usercreate='$param_user'
+      AND deal_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   // Move all the user list from private to public
-  $query = "Update List set
+  $query = "UPDATE List SET
       list_privacy='0'
-    where list_usercreate='$param_user'
-      and list_privacy != '0'"; 
+    WHERE list_usercreate='$param_user'
+      AND list_privacy != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   // Move all the user events from private to public
   // Not activated ! case of private event with multiple users..... to handle
-  $query = "Update CalendarEvent set
+  $query = "UPDATE CalendarEvent SET
       calendarevent_privacy='0'
-    where calendarevent_usercreate='$param_user'
-      and calendarevent_privacy != '0'"; 
+    WHERE calendarevent_usercreate='$param_user'
+      AND calendarevent_privacy != '0'"; 
   //display_debug_msg($query, $cdg_sql);
   //$obm_q->query($query);
+
+  // XXXXXX what to do with : project allocation entries and timetask entries
 }
 
 

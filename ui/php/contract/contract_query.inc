@@ -30,8 +30,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $priority = $contract["priority"];
   $status = $contract["status"];
   $company_id = $contract["company_id"];
+  $contact_id = $contract["contact_id"];
   $archive = $contract["archive"];
   $contract_kind = $contract["kind"];
+
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
@@ -41,45 +43,49 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $where .= sql_obm_entity_privacy("contract");
 
   if (($type != $c_all) && ($type != ""))
-    $where .= " and contract_type_id = '$type'";
+    $where .= " AND contract_type_id = '$type'";
 
   if ($num != "")
-    $where .= " and (contract_number $like '%$num%')";
+    $where .= " AND (contract_number $like '%$num%')";
 
   if (($status != $c_all) && ($status != ""))
-    $where .= " and (contract_status_id = '$status')";
+    $where .= " AND (contract_status_id = '$status')";
 
   if (($contract_kind != $c_all) && ($contract_kind != ""))
-    $where .= " and (contract_kind = '$contract_kind')";
+    $where .= " AND (contract_kind = '$contract_kind')";
 
   if (($priority != $c_all) && ($priority != ""))
-    $where .= " and (contract_priority_id = '$priority')";
+    $where .= " AND (contract_priority_id = '$priority')";
 
   if ($comp != "") {
-    $where .= " and (company_name $like '$comp%')";
-    $join_comp = "left join Company on contract_company_id=company_id";
+    $where .= " AND (company_name $like '$comp%')";
+    $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }
-  if ($company_id != "")
+  if ($company_id != "") {
     $where .= " and contract_company_id = '$company_id'";
-
+  }
+  if ($contact_id != "") {
+    $where .= " AND (contract_contact1_id = '$contact_id'
+                     OR contract_contact2_id = '$contact_id')";
+  }
   if ($dateafter != "")
-    $where .= " and (contract_dateexp >= '$dateafter')";
+    $where .= " AND (contract_dateexp >= '$dateafter')";
 
   if ($datebefore != "")
-    $where .= " and (contract_dateexp <= '$datebefore')";
+    $where .= " AND (contract_dateexp <= '$datebefore')";
 
   if ($label != "")
-    $where .= " and (contract_label $like '%$label%')";
+    $where .= " AND (contract_label $like '%$label%')";
   
   if (($manager != $c_all) && ($manager != "")) {
-    $where .= " and (contract_techmanager_id='$manager'
-                    or contract_marketmanager_id='$manager') ";
+    $where .= " AND (contract_techmanager_id='$manager'
+                    OR contract_marketmanager_id='$manager') ";
   }
   if ($deal != "") {
-    $where .= " and (contract_deal_id = '$deal')";
+    $where .= " AND (contract_deal_id = '$deal')";
   }
   if ($archive != "1") {
-    $where .= " and contract_archive != '1'";
+    $where .= " AND contract_archive != '1'";
   }
 
   $whereq = "WHERE $where";
@@ -121,12 +127,12 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       $datebegin,
       $dateexp
     FROM Contract
-         left join Company on contract_company_id=company_id
-         left join UserObm u1 on contract_techmanager_id=u1.userobm_id
-         left join UserObm u2 on contract_marketmanager_id=u2.userobm_id
-         left join ContractType on contract_type_id=contracttype_id
-         left join ContractPriority on contract_priority_id=contractpriority_id
-         left join ContractStatus on contract_status_id = contractstatus_id
+         LEFT JOIN Company on contract_company_id=company_id
+         LEFT JOIN UserObm u1 on contract_techmanager_id=u1.userobm_id
+         LEFT JOIN UserObm u2 on contract_marketmanager_id=u2.userobm_id
+         LEFT JOIN ContractType on contract_type_id=contracttype_id
+         LEFT JOIN ContractPriority on contract_priority_id=contractpriority_id
+         LEFT JOIN ContractStatus on contract_status_id = contractstatus_id
     $whereq
     $orderq
     $limit
@@ -147,7 +153,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contract detail query execution                                           //
+// Contract detail query execution
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
   global $cdg_sql;  
@@ -191,17 +197,17 @@ function run_query_detail($id) {
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM Contract
-         left join UserObm u1 on contract_marketmanager_id=u1.userobm_id
-         left join UserObm u2 on contract_techmanager_id=u2.userobm_id
-         left join Contact c1 on contract_contact1_id=c1.contact_id
-         left join Contact c2 on contract_contact2_id=c2.contact_id
-         left join Company on contract_company_id=company_id
-         left join ContractPriority p on contract_priority_id=p.contractpriority_id
-         left join ContractStatus s on contract_status_id=s.contractstatus_id
-         left join ContractType on contract_type_id=contracttype_id
-         left join Deal on contract_deal_id=deal_id
-         left join UserObm as c on contract_usercreate=c.userobm_id
-         left join UserObm as u on contract_userupdate=u.userobm_id
+         LEFT JOIN UserObm u1 on contract_marketmanager_id=u1.userobm_id
+         LEFT JOIN UserObm u2 on contract_techmanager_id=u2.userobm_id
+         LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
+         LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
+         LEFT JOIN Company on contract_company_id=company_id
+         LEFT JOIN ContractPriority p on contract_priority_id=p.contractpriority_id
+         LEFT JOIN ContractStatus s on contract_status_id=s.contractstatus_id
+         LEFT JOIN ContractType on contract_type_id=contracttype_id
+         LEFT JOIN Deal on contract_deal_id=deal_id
+         LEFT JOIN UserObm as c on contract_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u on contract_userupdate=u.userobm_id
     WHERE contract_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -213,7 +219,7 @@ function run_query_detail($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Insertion query construction                                              //
+// Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($contract) {
   global $display, $cdg_sql, $auth, $cgp_show;
@@ -329,7 +335,7 @@ function run_query_insert($contract) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update query construction                                                 //
+// Update query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($contract) {
   global $auth, $cdg_sql, $ccf_ticket, $ccf_duration;
@@ -382,7 +388,7 @@ function run_query_update($contract) {
   }
   $archive = ($contract["archive"] ? $contract["archive"] : "0");
   
-  $query = "update Contract set
+  $query = "UPDATE Contract SET
       contract_timeupdate = '". date("Y-m-d H:i:s")."',
       contract_userupdate = '".$auth->auth["uid"]."',
       contract_privacy = '$vis',
@@ -410,7 +416,7 @@ function run_query_update($contract) {
       contract_comment = '$comment',
       contract_clause = '$clause',
       contract_archive = '$archive'
-    where contract_id = '$id'";
+    WHERE contract_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -428,7 +434,7 @@ function run_query_update($contract) {
 function run_query_delete($p_id) {
   global $cdg_sql;
   
-  $query = "delete from Contract where contract_id='$p_id'";
+  $query = "DELETE FROM Contract WHERE contract_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -462,14 +468,14 @@ function run_query_contract_incident($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Contract Priority list                                  //
+// Query execution : Contract Priority list
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority() {
   global $cdg_sql;
 
-  $query = "select * 
-            from ContractPriority 
-            order by contractpriority_order";
+  $query = "SELECT * 
+    FROM ContractPriority 
+    ORDER BY contractpriority_order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -478,16 +484,15 @@ function run_query_priority() {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Incident Status list                                    //
+// Query execution : Incident Status list
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status() {
   global $cdg_sql;
 
-  $query = "select * 
-            from ContractStatus 
-            order by contractstatus_order";
+  $query = "SELECT * 
+    FROM ContractStatus 
+    ORDER BY contractstatus_order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -496,9 +501,8 @@ function run_query_status() {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Priority insert                                         //
+// Query execution : Priority insert
 // Parameters:
 //   - $contract[] : contract hash info : keys used : pri_label, pri_order
 ///////////////////////////////////////////////////////////////////////////////
@@ -509,14 +513,14 @@ function run_query_priority_insert($contract) {
   $color = $contract["pri_color"];
   $label = $contract["pri_label"];
 
-  $query = "insert into ContractPriority (
+  $query = "INSERT INTO ContractPriority (
     contractpriority_timeupdate,
     contractpriority_timecreate,
     contractpriority_usercreate,
     contractpriority_order,
     contractpriority_color,
     contractpriority_label)
-  values ('null',
+	values ('null',
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '$order',
@@ -531,9 +535,8 @@ function run_query_priority_insert($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Priority update                                         //
+// Query execution : Priority update
 // Parameters:
 //   - $contract[] : contract hash info :
 //     keys used : priority, pri_label, pri_order
@@ -546,13 +549,13 @@ function run_query_priority_update($contract) {
   $color = $contract["pri_color"];
   $label = $contract["pri_label"];
 
-  $query = "update ContractPriority set 
+  $query = "UPDATE ContractPriority SET
     contractpriority_label='$label',
     contractpriority_timeupdate='".date("Y-m-d H:i:s")."',
     contractpriority_userupdate='".$auth->auth["uid"]."',
     contractpriority_order='$order',
     contractpriority_color='$color'
-  where contractpriority_id='$priority' ";
+  WHERE contractpriority_id='$priority' ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -562,16 +565,15 @@ function run_query_priority_update($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Priority deletion                                       //
+// Query execution : Priority deletion
 // Parameters:
 //   - $id : Priority id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from ContractPriority where contractpriority_id='$id'";
+  $query = "DELETE FROM ContractPriority WHERE contractpriority_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -581,20 +583,19 @@ function run_query_priority_delete($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Priority given                             //
+// Query execution : Links to the Priority given
 // Parameters:
 //   - $s_id : priority id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority_links($p_id) {
   global $cdg_sql;
 
-  $query = "select 
-                 contract_id, 
-                 contract_label
-            from Contract 
-            where contract_priority_id='$p_id'";
+  $query = "SELECT
+      contract_id, 
+      contract_label
+    FROM Contract 
+    WHERE contract_priority_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $pri_q = new DB_OBM;
@@ -604,9 +605,8 @@ function run_query_priority_links($p_id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Status insert                                           //
+// Query execution : Status insert
 // Parameters:
 //   - $contract[] : contract hash info : keys used : sta_label, sta_order
 ///////////////////////////////////////////////////////////////////////////////
@@ -618,12 +618,12 @@ function run_query_status_insert($contract) {
   $label = $contract["sta_label"];
   $order = $contract["sta_order"];
 
-  $query = "insert into ContractStatus (
+  $query = "INSERT INTO ContractStatus (
     contractstatus_timecreate,
     contractstatus_usercreate,
     contractstatus_label,
     contractstatus_order)
-  values (
+	values (
     '$timecreate',
     '$usercreate',
     '$label',
@@ -637,9 +637,8 @@ function run_query_status_insert($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Status update                                           //
+// Query execution : Status update
 // Parameters:
 //   - $contract[] : contract hash info :
 //     keys used : status, sta_label, sta_order
@@ -653,11 +652,12 @@ function run_query_status_update($contract) {
   $label = $contract["sta_label"];
   $order = $contract["sta_order"];
 
-  $query = "update ContractStatus set contractstatus_label='$label',
+  $query = "UPDATE ContractStatus SET
+    contractstatus_label='$label',
     contractstatus_timeupdate='$timeupdate',
     contractstatus_userupdate='$userupdate',
     contractstatus_order='$order'
-  where contractstatus_id='$status'";
+  WHERE contractstatus_id='$status'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -667,16 +667,15 @@ function run_query_status_update($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Status deletion                                         //
+// Query execution : Status deletion
 // Parameters:
 //   - $id : Status id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from ContractStatus where contractstatus_id='$id'";
+  $query = "DELETE FROM ContractStatus WHERE contractstatus_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -686,20 +685,19 @@ function run_query_status_delete($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Status given                               //
+// Query execution : Links to the Status given
 // Parameters:
 //   - $s_id : status id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_links($s_id) {
   global $cdg_sql;
 
-  $query = "select 
-                 contract_id, 
-                 contract_label
-            from Contract 
-            where contract_status_id='$s_id'";
+  $query = "SELECT
+      contract_id, 
+      contract_label
+    FROM Contract 
+    WHERE contract_status_id='$s_id'";
 
   display_debug_msg($query, $cdg_sql);
   $sta_q = new DB_OBM;
@@ -709,19 +707,18 @@ function run_query_status_links($s_id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Get a priority label                                                      //
+// Get a priority label
 // Parameters:
 //   - $id : priority id
 ///////////////////////////////////////////////////////////////////////////////
 function get_priority_label($id) {
   global $cdg_sql;
 
-  $query = "select 
-                 contractpriority_label
-            from ContractPriority
-            where contractpriority_id='$id'";
+  $query = "SELECT
+      contractpriority_label
+    FROM ContractPriority
+    WHERE contractpriority_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -733,19 +730,18 @@ function get_priority_label($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Get a status label                                                        //
+// Get a status label
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
 function get_status_label($id) {
   global $cdg_sql;
 
-  $query = "select 
-              contractstatus_label
-            from ContractStatus
-            where contractstatus_id='$id'";
+  $query = "SELECT
+      contractstatus_label
+    FROM ContractStatus
+    WHERE contractstatus_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -757,7 +753,6 @@ function get_status_label($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Query : get contracttype entries                                          //
 ///////////////////////////////////////////////////////////////////////////////
@@ -765,35 +760,12 @@ function run_query_contracttype() {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $query = "select contracttype_label,contracttype_id from ContractType";
+  $query = "SELECT contracttype_label, contracttype_id FROM ContractType";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   return $obm_q;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the incidents attached to the contract
-// Parameters:
-//   - $p_id : contract Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contract_incident_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select distinct 
-                 incident_id, 
-                 incident_label 
-            from Incident
-            where incident_contract_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -804,24 +776,23 @@ function run_query_contract_incident_links($p_id) {
 function run_query_company_info($id) {
   global $cdg_sql;
 
-  $query = "select 
-                 company_name, 
-                 company_marketingmanager_id, 
-                 company_address1,
-                 company_zipcode,
-                 company_town 
-           from Company 
-           where company_id='$id'";
+  $query = "SELECT
+      company_name, 
+      company_marketingmanager_id, 
+      company_address1,
+      company_zipcode,
+      company_town 
+    FROM Company 
+    WHERE company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db = new DB_OBM;
-  $connect_db->query($query);
-  $connect_db->next_record();
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
 
-  return $connect_db;
+  return $obm_q;
 }
  
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query   : company contacts contract  :  Table Contact                     //
@@ -829,19 +800,19 @@ function run_query_company_info($id) {
 function run_query_contact_contract($p_company_id) {
   global $cdg_sql;
 
-  $connect_db = new DB_OBM;
-  $query = "select 
-                 contact_id,
-                 contact_lastname,
-                 contact_firstname,
-                 contact_phone 
-            from Contact 
-            where contact_company_id='$p_company_id'";
+  $query = "SELECT
+      contact_id,
+      contact_lastname,
+      contact_firstname,
+      contact_phone 
+    FROM Contact 
+    WHERE contact_company_id='$p_company_id'";
   
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
 
-  return $connect_db;
+  return $obm_q;
 }
 
 
@@ -881,12 +852,12 @@ function run_query_type_insert($contract) {
 	
   $label = $contract["type_label"];
 
-  $query = "insert into ContractType (
+  $query = "INSERT INTO ContractType (
     contracttype_timeupdate,
     contracttype_timecreate,
     contracttype_usercreate,
     contracttype_label)
-  values (null,
+  VALUES (null,
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '$label')";
@@ -899,9 +870,8 @@ function run_query_type_insert($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Type update                                             //
+// Query execution : Type update
 // Parameters:
 //   - $contract[] : contract hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -911,12 +881,11 @@ function run_query_type_update($contract) {
   $type = $contract["type"];
   $label = $contract["type_label"];
 
-  $query = "update ContractType 
-            set 
+  $query = "UPDATE ContractType SET 
       contracttype_label='$label',
       contracttype_timeupdate='".date("Y-m-d H:i:s")."',
       contracttype_userupdate='".$auth->auth["uid"]."'
-            where contracttype_id='$type'";
+    WHERE contracttype_id='$type'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -926,16 +895,15 @@ function run_query_type_update($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Type deletion                                           //
+// Query execution : Type deletion
 // Parameters:
 //   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_type_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from ContractType where contracttype_id='$id'";
+  $query = "DELETE FROM ContractType WHERE contracttype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -945,20 +913,19 @@ function run_query_type_delete($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Type given                                 //
+// Query execution : Links to the Type given
 // Parameters:
 //   - $t_id : type id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_type_links($t_id) {
   global $cdg_sql;
 
-  $query = "select 
-                 contract_id, 
-                 contract_label
-            from Contract
-            where contract_type_id='$t_id'";
+  $query = "SELECT
+      contract_id, 
+      contract_label
+    from Contract
+    where contract_type_id='$t_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -968,19 +935,18 @@ function run_query_type_links($t_id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a type                                                   //
+// Get the label of a type
 // Parameters:
 //   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
 function get_type_label($id) {
   global $cdg_sql;
 
-  $query = "select 
-                 contracttype_label
-            from ContractType
-            where contracttype_id='$id'";
+  $query = "SELECT
+      contracttype_label
+    FROM ContractType
+    WHERE contracttype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1019,7 +985,7 @@ function get_contract_info($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contract ID : Get the id of the contract inserted.                        //
+// Contract ID : Get the id of the contract inserted
 // Parameters:
 //   - $contract[] : contract hash info : keys used : all
 // Returns:
@@ -1085,25 +1051,24 @@ function run_query_check_contract($c_id, $name) {
 
   $where_id = "";
   if ($c_id != "") {
-    $where_id = "and contract_id!='$c_id'";
+    $where_id = "AND contract_id!='$c_id'";
   }
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
-  $query = "select distinct 
-                 contract_id, 
-                 contract_label 
-            from Contract
-            where contract_label $like '$name%'
-              $where_id";
+  $query = "SELECT DISTINCT 
+      contract_id, 
+      contract_label 
+    FROM Contract
+    WHERE contract_label $like '$name%'
+      $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   return $obm_q;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1229,8 +1194,34 @@ function check_contract_form($cid, $contract) {
     }
   }  
 
-
   return true;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the contract can be deleted
+// Parameters:
+//   - $p_id : contract id
+// Returns:
+//   true if the contract can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_contract($p_id) {
+  global $err_msg, $ok_msg;
+  global $l_link_incident, $l_link_incident_no;
+
+  $delete_ok = true;
+
+  // Links from Incident
+  $nb = get_linked_incident_nb($p_id, "contract", true);
+  if ($nb > 0) {
+    $delete_ok = false;
+    $err_msg .= "$l_link_incident";
+  } else {
+    $ok_msg .= "$l_link_incident_no";
+  }
+
+  return $delete_ok;
+}
+
 
 </script>

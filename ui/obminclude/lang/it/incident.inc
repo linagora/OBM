@@ -37,7 +37,7 @@ $l_closed = "Chiuso";
 $l_select_contract = "Seleziona il Contratto ";
 $l_insert = "Registra l'operazione";
 $l_update = "Modofica the Operazione";
-$l_checkdelete = "Elimina the Operazione";
+$l_delete = "Elimina the Operazione";
 
 // Messages
 $l_found = "Operazione trovate";

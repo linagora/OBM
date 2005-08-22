@@ -28,6 +28,10 @@ fi
 echo $PHP : PHP interpreter found
 
 
+echo "*** Document repository creation"
+$PHP install_document.php || exit $?
+
+
 echo "*** Database creation"
 
 echo "  Delete old database if exists"
@@ -61,10 +65,13 @@ mysql -u $U -p$P $DB < obmdb_default_values_1.0.sql
 
 echo "*** Data checking and validation"
 
+# Set the current dir to php/admin_data (to resolve includes then)
+cd ../../php/admin_data
+
 # Update calculated values
 echo "  Update calculated values"
-$PHP ../../php/admin_data/admin_data_index.php -a data_update
+$PHP admin_data_index.php -a data_update
 
 # Update phonetics ans approximative searches
 echo "  Update phonetics and approximative searches"
-$PHP ../../php/admin_data/admin_data_index.php -a sound_aka_update
+$PHP admin_data_index.php -a sound_aka_update

@@ -38,31 +38,25 @@ $perm->check_permissions($module, $action);
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["result"] = dis_todo_form($todo);
-  $todo_q = run_query_todolist($todo, $new_order, $order_dir);
-  if ($todo_q->num_rows_total() != 0) {
-    $display["result"] .= dis_todo_list($todo, $todo_q);
-  } else {
-    $display["msg"] .= display_info_msg($l_no_found);
-  }
+  $display["result"] .= dis_todo_search_list($todo);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $todo_q = run_query_detail($todo);
   $display["detailInfo"] = display_record_info($todo_q);
-  $display["result"] .= dis_todo_detail($todo, $todo_q);
+  $display["detail"] .= dis_todo_detail($todo, $todo_q);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_todo_data_form($todo)) {
     $retour = run_query_insert($todo);
-    $todo_q = run_query_todolist($todo, "", "");
-    $display["result"] = dis_todo_form($todo);
-    if ($todo_q->nf() != 0) {
-      $display["result"] .= dis_todo_list($todo, $todo_q);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
-      $display["msg"] = display_info_msg($l_no_found);
+      $display["msg"] .= display_err_msg($l_insert_error);
     }
-
+    $display["result"] = dis_todo_form("");
+    $display["result"] .= dis_todo_search_list($todo);
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
@@ -72,29 +66,25 @@ if ($action == "index" || $action == "") {
 } else if ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($HTTP_POST_VARS);
-
-  $todo_q = run_query_todolist($todo, "", "");
   $display["result"] = dis_todo_form($todo);
-  if ($todo_q->nf() != 0) {
-    $display["result"] .= dis_todo_list($todo, $todo_q);
-  } else {
-    $display["msg"] = display_info_msg($l_no_found);
-  }
+  $display["result"] .= dis_todo_search_list($todo);
 
 } else if ($action == "delete_unique") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete_unique($param_todo);
-  if ($retour)
-    $display["msg"] = display_ok_msg($l_delete_ok);
-  else
-    $display["msg"] = display_err_msg($l_delete_error);
-
-  $todo_q = run_query_todolist($todo, "", "");
-  $display["result"] = dis_todo_form($todo);
-  if ($todo_q->nf() != 0) {
-    $display["result"] .= dis_todo_list($todo, $todo_q);
+  if (check_can_delete_todo($todo["id"])) {
+    $retour = run_query_delete_unique($todo["id"]);
+    if ($retour) {
+      $display["msg"] = display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] = display_err_msg($l_delete_error);
+    }
+    $display["result"] = dis_todo_form($todo);
+    $display["result"] .= dis_todo_search_list($todo);
   } else {
-    $display["msg"] .= display_info_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $todo_q = run_query_detail($todo);
+    $display["detail"] .= dis_todo_detail($todo, $todo_q);
   }
 
 } else if ($action == "detailupdate") {
@@ -113,16 +103,10 @@ if ($action == "index" || $action == "") {
        window.opener.location.href=\"$path/todo/todo_index.php?action=index\";
        window.close();
       </script>";
-
     } else {
       $action = "index";
-      $todo_q = run_query_todolist($todo, "", "");
       $display["result"] = dis_todo_form("");
-      if ($todo_q->num_rows_total() != 0) {
-	$display["result"] .= dis_todo_list($todo, $todo_q);
-      } else {
-	$display["msg"] .= display_info_msg($l_no_found);
-      }
+      $display["result"] .= dis_todo_search_list($todo);
     }
 
     // Form data are not valid
@@ -174,7 +158,7 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_todo() {
-  global $uid, $param_todo, $action, $popup;
+  global $uid, $param_todo, $action, $popup, $new_order, $order_dir;
   global $tf_title, $sel_user_id, $sel_priority, $tf_deadline, $ta_content;
   global $tf_percent;
 
@@ -182,6 +166,8 @@ function get_param_todo() {
   if (isset ($action)) $todo["action"] = $action;
   if (isset ($popup)) $todo["popup"] = $popup;
   if (isset ($param_todo)) $todo["id"] = $param_todo;
+  if (isset ($new_order)) $todo["new_order"] = $new_order;
+  if (isset ($order_dir)) $todo["order_dir"] = $order_dir;
 
   // Todo form
   if (isset ($tf_title)) $todo["title"] = $tf_title;

@@ -526,8 +526,8 @@ function html_deal_links($deal_q) {
 
   // Project
   if ($cgp_show["module"]["project"]) {
-    $nb_pro = run_query_linked_project_nb ($id, "deal");
-    $nb_pro_arch = run_query_linked_project_nb ($id, "deal", 1);
+    $nb_pro = get_linked_project_nb ($id, "deal");
+    $nb_pro_arch = get_linked_project_nb ($id, "deal", 1);
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
     $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $dis_ico_project = "
@@ -551,12 +551,15 @@ function html_deal_links($deal_q) {
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $contract_nb = run_query_linked_contract_nb($id, "deal");
-    $contract_nb_arch = run_query_linked_contract_nb($id, "deal", 1);
+    $contract_active = get_linked_contract_nb($id, "deal");
+    $contract_total = get_linked_contract_nb($id, "deal", 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
+    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $dis_contract = "
     <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
-        $l_module_contract (<a href=\"$url_contract\">$contract_nb</a> / <a href=\"$url_contract_arch\">$contract_nb_arch</a>)</li>";
+        $l_module_contract (
+        <a href=\"$url_contract\">$contract_active</a> /
+        <a href=\"$url_contract_total\">$contract_total</a> )</li>";
 
     // New Contracts allowed only if hitrate = 100
     if ($hitrate == "100") {
@@ -576,14 +579,14 @@ function html_deal_links($deal_q) {
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
-    $nb_inv_tot = run_query_linked_invoice_nb($id, "deal", 1);
-    $nb_inv = run_query_linked_invoice_nb($id, "deal");
+    $nb_inv_tot = get_linked_invoice_nb($id, "deal", 1);
+    $nb_inv = get_linked_invoice_nb($id, "deal");
     $dis_invoice = "
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>";
 
-    // New Contracts allowed only if hitrate = 100
+    // New Invoices allowed only if hitrate = 100
     if ($hitrate == "100") {
       $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id&amp;deal_label=$ulabel&amp;param_company=$cid&amp;company_name=$uname");
       $dis_invoice .= "
@@ -641,11 +644,10 @@ function html_deal_links($deal_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Deal Detail screen
 // Parameters:
-//   - $deal[]    : deal search criteria
-//     keys used  : company_id, name, company
+//   - $deal[] : deal values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_consult($deal) {
-  global $display, $uid, $action, $incl_arch;
+  global $display;
 
   if ($deal["id"] > 0) {
     $deal_q = run_query_detail($deal["id"]);
@@ -1603,135 +1605,38 @@ $js_status_loop
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays and check the deal links (and delete form if ok)
+// Display the deal delete validation screen
 // Parameters:
 //   - $p_id : deal id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
-  global $display, $path, $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
-  global $l_link_invoice, $l_link_invoice_no;
+function dis_can_delete_deal($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
-  $delete_ok = true;
+  $url = url_prepare("deal_index.php");
 
-  // Links from Contract
-  $obm_q = run_query_deal_contract_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkc ="<tr><td class=\"detailHead\">$l_link_contract</td></tr>";
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contract_id");
-      $clabel = $obm_q->f("contract_label");
-      $display_linkc .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
-      </td>
-    </tr>";
-    }
-  } else {
-    $display_linkc = "
-    <tr>
-      <td class=\"detailHead\">$l_link_contract_no</td>
-    </tr>";
-  }
-
-  // Links from Project
-  $obm_q = run_query_deal_project_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkp ="<tr><td class=\"detailHead\">$l_link_project</td></tr>";
-    while ($obm_q->next_record()) {
-      $pid = $obm_q->f("project_id");
-      $pname = $obm_q->f("project_name");
-      $display_linkp .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$pname</a>
-      </td>
-    </tr>";
-    }
-  } else {
-    $display_linkp = "
-    <tr>
-      <td class=\"detailHead\">$l_link_project_no</td>
-    </tr>";
-  }
-
-  // Links from Invoice
-  $obm_q = run_query_deal_invoice_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linki ="<tr><td class=\"detailHead\">$l_link_invoice</td></tr>";
-    while ($obm_q->next_record()) {
-      $iid = $obm_q->f("invoice_id");
-      $ilabel = $obm_q->f("invoice_label");
-      $display_linki .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$iid") . "\">$ilabel</a>
-      </td>
-    </tr>";
-    }
-  } else {
-    $display_linki = "
-    <tr>
-      <td class=\"detailHead\">$l_link_invoice_no</td>
-    </tr>";
-  }
-
-  $block .= "<table class=\"detail\">
-   $display_linkc
-   $display_linkp
-   $display_linki
-   </table>";
-
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-    action=\"".url_prepare("deal_index.php") ."\">
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"param_deal\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)
-// Parameters:
-//   - $p_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $ret = "<form name=\"form_delete\" method=\"post\"
-      action=\"" . url_prepare("deal_index.php") . "\">
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_deal\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
 
-  return $ret;
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+    <p class=\"detailButtons\">$dis_back</p>
+    </div>";
+
+  return $block;
 }
 
 

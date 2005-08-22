@@ -124,13 +124,40 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_incident_form($action,$incident);
   }
  
+} elseif ($action == "check_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_can_delete_incident($incident["id"])) {
+    require("incident_js.inc");
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_incident($incident["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_incident_consult($incident);
+  }
+
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_delete($incident["id"]);
-  $display["msg"] = display_ok_msg($l_delete_ok);
-  require("incident_js.inc");
-  $display["search"] = dis_incident_search_form($incident);
-  
+  if (check_can_delete_incident($incident["id"])) {
+    $retour = run_query_delete($incident["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    require("incident_js.inc");
+    $display["search"] = dis_incident_search_form($incident);
+    if ($set_display == "yes") {
+      $display["result"] = dis_incident_search_list($incident);
+    } else {
+      $display["msg"] .= display_info_msg($l_no_display);
+    }
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_incident_consult($incident);
+  }
+
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
     require("incident_js.inc");
@@ -398,12 +425,20 @@ function get_incident_action() {
     'Condition'=> array ('None') 
                                      	 );
 
+  // Check Delete
+  $actions["incident"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/incident/incident_index.php?action=check_delete&amp;param_incident=".$incident["id"],
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('detailconsult') 
+                                     );
+
 //  Delete
   $actions["incident"]["delete"] = array (
-    'Name'     => $l_header_delete,
     'Url'      => "$path/incident/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('None') 
                                      	 );
 //  Admin
   $actions["incident"]["admin"] = array (
@@ -535,7 +570,7 @@ function update_incident_action() {
     $actions["incident"]["detailupdate"]['Condition'] = array('detailconsult', 'insert', 'update');
     
     // Check Delete
-    $actions["incident"]["delete"]['Url'] = "$path/incident/incident_index.php?action=delete&amp;param_incident=$id";
+    $actions["incident"]["check_delete"]['Url'] = "$path/incident/incident_index.php?action=check_delete&amp;param_incident=$id";
     $actions["incident"]["delete"]['Condition'] = array('detailconsult', 'insert', 'update');
   }
 

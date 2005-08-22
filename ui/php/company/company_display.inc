@@ -592,8 +592,8 @@ function html_company_links($co_q) {
   if ($cgp_show["module"]["project"]) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
     $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
-    $nb_pro = run_query_linked_project_nb($id, "company");
-    $nb_pro_total = run_query_linked_project_nb ($id, "company", 1);
+    $nb_pro = get_linked_project_nb($id, "company");
+    $nb_pro_total = get_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_project = "
   <div class=\"linkTitle\">:: $l_module_project</div>
@@ -608,8 +608,8 @@ function html_company_links($co_q) {
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $nb_ctra = run_query_linked_contract_nb($id, "company");
-    $nb_ctra_total = run_query_linked_contract_nb($id, "company", 1);
+    $nb_ctra = get_linked_contract_nb($id, "company");
+    $nb_ctra_total = get_linked_contract_nb($id, "company", 1);
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id");
     $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
@@ -630,8 +630,8 @@ function html_company_links($co_q) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_company=$id&amp;company_name=$uname");
-    $nb_inv_tot = run_query_linked_invoice_nb($id, "company", 1);
-    $nb_inv = run_query_linked_invoice_nb($id, "company");
+    $nb_inv_tot = get_linked_invoice_nb($id, "company", 1);
+    $nb_inv = get_linked_invoice_nb($id, "company");
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
@@ -1380,112 +1380,13 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Display and check the company links (and delete form if ok)
+// Display the company delete validation screen
 // Parameters:
 //   - $p_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
-  global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
-  global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
-  global $path, $display;
-
-  $delete_ok = true;
-
-  // Links from Contact
-  $obm_q = run_query_company_contact_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkc ="
-      <tr>
-        <td class=\"detailHead\">$l_link_contact</td>
-      </tr>";
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
-      $display_linkc .= "
-      <tr>
-        <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_linkc = "
-      <tr>
-        <td class=\"detailHead\">$l_link_contact_no</td>
-      </tr>";
-  }
-
-  // Links from deals
-  $obm_q = run_query_company_deal_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkd = "
-      <tr>
-        <td class=\"detailHead\">$l_link_deal</td>
-      </tr>";
-    while ($obm_q->next_record()) {
-      $did = $obm_q->f("deal_id");
-      $dlabel = $obm_q->f("deal_label");
-      $display_linkd .="<tr>
-        <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_linkd = "
-      <tr>
-        <td class=\"detailHead\">$l_link_deal_no</td>
-      </tr>";
-  }
-
-  // Links from Contracts
-  $obm_q = run_query_company_contract_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_link_cr = "<tr><td class=\"detailHead\">$l_link_contract</td></tr>";
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("contract_id");
-      $clabel = $obm_q->f("contract_label");
-      $display_link_cr .= "
-      <tr>
-        <td class=\"detailLabel\">
-          <a class=\"detailLabel\" href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid")."\">
-          $clabel</a>
-        </td>
-      </tr>";
-    }
-  } else {
-    $display_link_cr = "<tr><td class=\"detailHead\">$l_link_contract_no</td></tr>";
-  }
-
-  // Links from Project
-  $obm_q = run_query_company_project_links($p_id);
-
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $display_linkp ="<tr><td class=\"detailHead\">$l_link_project</td></tr>";
-    while ($obm_q->next_record()) {
-      $pid = $obm_q->f("project_id");
-      $pname = $obm_q->f("project_name");
-      $display_linkp .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$pname</a>
-      </td>
-    </tr>";
-    }
-  } else {
-    $display_linkp = "
-    <tr>
-      <td class=\"detailHead\">$l_link_project_no</td>
-    </tr>";
-  }
+function dis_can_delete_company($p_id) {
+  global $l_can_delete, $l_back, $l_delete;
+  global $display;
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("company_index.php") ."\">
@@ -1494,27 +1395,21 @@ function dis_check_links($p_id) {
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  $block .= "<table class=\"detail\">
-   $display_linkc
-   $display_linkd
-   $display_link_cr
-   $display_linkp
-   </table>";
+  $dis_delete = "<form name=\"form_delete\" method=\"post\"
+      action=\"" . url_prepare("company_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
 
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_can_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
+  $display["msg"] .= display_ok_msg($l_can_delete);
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_delete</p>
+      <p class=\"detailButtons\">$dis_back</p>
+    </div>";
 
   return $block;
 }
@@ -1640,26 +1535,6 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   </div>";
 
   return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
-// Parameters:
-//   - $p_id : company Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $ret = "<form name=\"form_delete\" method=\"post\"
-      action=\"" . url_prepare("company_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
-    </form>";
-
-  return $ret;
 }
 
 
@@ -2535,7 +2410,7 @@ function html_category_tree($company) {
   $popup = $company["popup"];
   $obm_d = run_query_get_tree();
   if ($popup) {
-    $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link = "<a class=\"categoryDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
   $name = '/';
@@ -2613,8 +2488,8 @@ function display_popup_tree($tree,$indent) {
       $block= 
       "<table class=\"category\">
 	 <tr>
-	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\"> 
+	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
+	   <a href=\"\" onclick=\"show_hide_dir('$code');return false;\"> 
 	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
 	  <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
@@ -2629,7 +2504,7 @@ function display_popup_tree($tree,$indent) {
       $block= 
       "<table class=\"category\">
 	 <tr>
-	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
 	     <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
@@ -2655,7 +2530,7 @@ function html_category_code_tree($category) {
   $popup = $category["popup"];
   $obm_d = run_query_get_tree();
   if ($popup) {
-    $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link = "<a class=\"categoryDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
   $name = '/';
@@ -2727,8 +2602,8 @@ function display_popup_code_tree($tree,$indent) {
       $block= 
       "<table class=\"category\">
 	 <tr>
-	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" > 
+	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
+	   <a href=\"\" onclick=\"show_hide_dir('$code');return false;\" > 
 	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
 	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
@@ -2742,7 +2617,7 @@ function display_popup_code_tree($tree,$indent) {
       $block= 
       "<table class=\"category\">
 	 <tr>
-	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
 	     <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
 	  </td>
