@@ -1,9 +1,9 @@
-\section{Installation pas à pas d'OBM 0.9.x}
+\section{Installation pas à pas d'OBM 1.0.x}
 
-Cette documentation est valide pour la version 0.9.0. Seules les
+Cette documentation est valide pour la version 1.0.0. Seules les
 manipulations spécifiques à OBM sont décrites. Pour l'installation de
-PHP, MySQL, PostgreSQL, Apache ou autres composants libres, merci de vous référer
-à la documentation de votre distribution.
+PHP, MySQL, PostgreSQL, Apache ou autres composants libres, merci de vous référer à la documentation de votre distribution.
+
 
 \subsection{Hypothèses}
 
@@ -27,10 +27,10 @@ racine de votre OBM).
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-wget http://obm.aliacom.fr/obm-archives/obm-0.9.0.tar.gz
-tar -C /var/www -xzvf obm-0.9.0.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-1.0.0.tar.gz
+tar -C /var/www -xzvf obm-1.0.0.tar.gz
 cd /var/www
-ln -s obm-0.9.0 obm
+ln -s obm-1.0.0 obm
 \end{verbatim}
   \end{minipage}
 }
@@ -325,15 +325,15 @@ $gp_mail_enabled = false;
 \subsubsection{Configuration et création de la base de données}
 
 Les scripts de création de la base de données se trouvent dans le
-répertoire \fichier{scripts/0.9}.
+répertoire \fichier{scripts/1.0}.
 
 \subsubsection*{Langue par défaut des données}
 
 Certaines valeurs de références sont insérées par défaut. Ces valeurs
 peuvent être en français (par défaut) ou en anglais. Pour passer de
 l'un à l'autre, il faut éditer le fichier
-\fichier{scripts/0.9/install\_obmdb\_0.9.mysql.sh} (ou
-\fichier{scripts/0.9/install\_obmdb\_0.9.pgsql.sh}) pour changer la
+\fichier{scripts/1.0/install\_obmdb\_1.0.mysql.sh} (ou
+\fichier{scripts/1.0/install\_obmdb\_1.0.pgsql.sh}) pour changer la
 valeur de DATA\_LANG à \texttt{en} : 
 
 \shadowbox{
@@ -372,16 +372,16 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
   \end{minipage}
 }
 
-Le script \fichier{install\_obmdb\_0.9.mysql.sh} gère les différentes
+Le script \fichier{install\_obmdb\_1.0.mysql.sh} gère les différentes
 étapes de création de la base de données. Positionner les bonnes
 valeurs de login/mot de passe dans ce script et le lancer :
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-cd obm/scripts/0.9
-emacs install_obmdb_0.9.mysql.sh
-./install_obmdb_0.9.mysql.sh
+cd obm/scripts/1.0
+emacs install_obmdb_1.0.mysql.sh
+./install_obmdb_1.0.mysql.sh
 \end{verbatim}
   \end{minipage}
 }
@@ -401,10 +401,10 @@ create database obm with owner = obm;
   \end{minipage}
 }
 
-\subsubsection{Pour OBM depuis la version 0.8.3}
+\subsubsection{Jeux de caractères}
 
 Si votre server PostgreSQL n'est pas configuré pour le jeu de
-caractères latin1, éditez le fichier \fichier{scripts/0.9/postgres-pre.sql}
+caractères latin1, éditez le fichier \fichier{scripts/1.0/postgres-pre.sql}
 et décommentez la ligne : 
 
 \shadowbox{
@@ -417,7 +417,7 @@ et décommentez la ligne :
 
 \subsubsection{Pour toutes les versions d'OBM}
 
-Le script \fichier{install\_obmdb\_0.9.pgsql.sh} gère toutes les
+Le script \fichier{install\_obmdb\_1.0.pgsql.sh} gère toutes les
 étapes de création de la base de données.
 
 Ajoutez les informations login/mot de passe (et base de données) dans
@@ -426,9 +426,9 @@ ce script et lancez-le :
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-cd obm/scripts/0.9
-emacs install_obmdb_0.9_pgsql.sh
-./install_obmdb_0.9_pgsql.sh
+cd obm/scripts/1.0
+emacs install_obmdb_1.0_pgsql.sh
+./install_obmdb_1.0_pgsql.sh
 \end{verbatim}
   \end{minipage}
 }

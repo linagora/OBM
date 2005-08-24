@@ -160,7 +160,7 @@ $l_header_add_contact = "Neuer Kontakt";
 $l_header_add_user = "Neuer Benutzer";
 $l_header_add_group = "Neue Gruppe";
 $l_header_add_deal = "Neuer Vertrag";
-$l_header_todo_list = "Liste";
+$l_header_list = "Liste";
 
 $l_header_new_child = "Neuer Untervertrag";
 $l_header_new_parent = "Neuer Hauptvertrag";

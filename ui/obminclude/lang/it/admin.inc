@@ -9,7 +9,6 @@
 
 // labels
 $l_check = "Controllo ";
-$l_version = "Versione OBM ";
 $l_database_server = "Suporto Database ";
 $l_database = "Database";
 $l_host = "Host";

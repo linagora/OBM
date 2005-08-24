@@ -268,6 +268,10 @@ $modules["import"] = array('Name'=> $l_module_import,
                   'Ico' => "$ico_ref",
                   'Url' => "$path/import/import_index.php",
                   'Right'=> $cright_read_admin);
+$modules["backup"] = array('Name'=> $l_module_backup,
+                  'Ico' => "$ico_ref",
+                  'Url' => "$path/backup/backup_index.php",
+                  'Right'=> $cright_read_admin);
 
 if ($cgp_show["module"]["account"]) {
   $modules["account"] = array('Name'=> $l_module_account,

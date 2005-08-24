@@ -171,7 +171,7 @@ if ($document["id"] > 0) {
   require("document_js.inc");
   if (check_can_delete_document($document["id"])) {
     $display["msg"] .= display_info_msg($err_msg);
-    $display["detail"] = dis_can_delete($document["id"]);
+    $display["detail"] = dis_can_delete_document($document["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
     $display["detail"] = dis_document_consult($document);

@@ -14,14 +14,14 @@
 function get_company_list() {
   global $cdg_sql;
 
-  $query = "select company_id,
+  $query = "SELECT company_id,
       company_name,
       company_aka,
       company_sound,
       company_contact_number,
       company_deal_number,
       company_deal_total
-    from Company";
+    FROM Company";
 
   display_debug_msg($query, $cdg_sql);
 
@@ -39,8 +39,9 @@ function get_company_list() {
 function get_company_contact_number($id) {
   global $cdg_sql;
 
-  $query = "select count(contact_id) as nb from Contact
-            where contact_company_id='$id'";
+  $query = "SELECT count(contact_id) as nb
+    FROM Contact
+    WHERE contact_company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -60,8 +61,9 @@ function get_company_contact_number($id) {
 function get_company_active_deal_number($id) {
   global $cdg_sql;
 
-  $query = "select count(deal_id) as nb from Deal
-            where deal_company_id='$id' and deal_archive='0'";
+  $query = "SELECT count(deal_id) as nb
+    FROM Deal
+    WHERE deal_company_id='$id' AND deal_archive='0'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -81,8 +83,9 @@ function get_company_active_deal_number($id) {
 function get_company_total_deal_number($id) {
   global $cdg_sql;
 
-  $query = "select count(deal_id) as nb from Deal
-            where deal_company_id='$id'";
+  $query = "SELECT count(deal_id) as nb
+    FROM Deal
+    WHERE deal_company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -105,11 +108,11 @@ function get_company_total_deal_number($id) {
 function update_one_company($id, $con_num, $deal_num, $deal_total) {
   global $cdg_sql;
 
-  $query = "update Company set
+  $query = "UPDATE Company SET
       company_contact_number='$con_num',
       company_deal_number='$deal_num',
       company_deal_total='$deal_total'
-    where company_id='$id'";
+    WHERE company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -119,19 +122,19 @@ function update_one_company($id, $con_num, $deal_num, $deal_total) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution - Deal list                                               //
+// Query execution - Deal list
 ///////////////////////////////////////////////////////////////////////////////
 function get_deal_list() {
   global $cdg_sql;
 
-  $query = "select deal_id,
+  $query = "SELECT deal_id,
       deal_hitrate,
       deal_status_id,
       deal_archive,
       dealstatus_label,
       dealstatus_hitrate
-    from Deal
-      left join DealStatus on deal_status_id = dealstatus_id";
+    FROM Deal
+      LEFT JOIN DealStatus ON deal_status_id = dealstatus_id";
 
   display_debug_msg($query, $cdg_sql);
 
@@ -150,9 +153,9 @@ function get_deal_list() {
 function update_one_deal($id, $hitrate) {
   global $cdg_sql;
 
-  $query = "update Deal set
+  $query = "UPDATE Deal SET
       deal_hitrate='$hitrate'
-    where deal_id='$id'";
+    WHERE deal_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -167,7 +170,7 @@ function update_one_deal($id, $hitrate) {
 function get_list_list() {
   global $cdg_sql;
 
-  $query = "select list_id,
+  $query = "SELECT list_id,
       list_name,
       list_subject,
       list_email,
@@ -176,8 +179,8 @@ function get_list_list() {
       list_query_nb,
       list_query,
       list_structure
-    from List
-    order by list_name";
+    FROM List
+    ORDER BY list_name";
 
   display_debug_msg($query, $cdg_sql);
 
@@ -198,11 +201,11 @@ function get_list_list() {
 function update_one_list($id, $sta_nb, $dyn_nb, $new_query) {
   global $cdg_sql;
 
-  $query = "update List set
+  $query = "UPDATE List SET
       list_static_nb='$sta_nb',
       list_query_nb='$dyn_nb',
       list_query='$new_query'
-    where list_id='$id'";
+    WHERE list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -212,7 +215,7 @@ function update_one_list($id, $sta_nb, $dyn_nb, $new_query) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution - document list                                           //
+// Query execution - document list
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_list() {
   global $cdg_sql;
@@ -275,7 +278,7 @@ function get_file_list($root, $with_dir=false) {
 
   $root_handler = opendir($root);
   $relative_path = substr($root, strlen($cdocument_root));
-  while ($file = readdir($root_handler)) {
+  while ( ($file = readdir($root_handler)) !== false ) {
     $path = "$root$file";
     if (($file != "..") && ($file != ".")) {
       $ret[$path] = $file;
@@ -317,10 +320,10 @@ function update_sound_aka_one_company($id, $aka, $sound) {
 
   $aka_s = addslashes($aka);
 
-  $query = "update Company set
+  $query = "UPDATE Company SET
       company_aka='$aka_s',
       company_sound='$sound'
-    where company_id='$id'";
+    WHERE company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;

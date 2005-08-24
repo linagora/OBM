@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.0.0pre9";
+$obm_version = "1.0.0pre10";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -21,8 +21,8 @@ $c_focsys = 3;
 
 // Global parameters --------------------------------------------------------//
 
-// OBM host (for mail links)
-$cgp_host = "http://jaguar.aliacom.local/";
+// OBM host
+$cgp_host = "http://obm/";
 
 // Todo lines to display
 $cgp_todo_nb = 5;
@@ -231,6 +231,7 @@ $cgp_show["module"]["admin_lang"] = "admin";
 $cgp_show["module"]["admin_code"] = "admin";
 $cgp_show["module"]["admin_ref"] = "admin";
 $cgp_show["module"]["import"] = "admin";
+$cgp_show["module"]["backup"] = "admin";
 
 
 require_once("$obminclude/obm_conf.inc");
@@ -410,6 +411,7 @@ $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_number = "/^[0-9]*$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
+$php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}.dump$/";
 
 
 // Path to the OBM php root (if not set)
@@ -939,6 +941,25 @@ function check_privacy($module, $table, $action, $id, $p_uid="") {
   } else {
     return false;
   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Format a disk path to ensure it is correct: Add the final slash if necessary
+// Parameters:
+//   - $p_path : path parameter
+// Returns:
+//   correct path
+///////////////////////////////////////////////////////////////////////////////
+function format_path($p_path) {
+
+  // Ensure that the path end with a /
+  if (strrpos($p_path,'/') != strlen($p_path)-1) {
+    $path = $p_path.'/';
+  } else {
+    $path = $p_path;
+  }
+  return $path; 
 }
 
 

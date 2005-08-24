@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : admin.inc                                                //
@@ -9,7 +9,6 @@
 
 // labels
 $l_check = "Checking";
-$l_version = "OBM version";
 $l_database_server = "Database Engine";
 $l_database = "Database";
 $l_host = "Host";

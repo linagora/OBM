@@ -680,20 +680,27 @@ function html_dir_form($action, $document) {
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete($p_id) {
+function dis_can_delete_document($p_id) {
   global $display, $l_can_delete, $l_cant_delete, $l_back;
 
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-    action=\"".url_prepare("document_index.php") ."\">
+  $url = url_prepare("document_index.php");
+
+  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\" />
+    </form>";
+
   $display["msg"] .= display_ok_msg($l_can_delete);
   $block .= "
       <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_delete</p>
         <p class=\"detailButtons\">$dis_back</p>
       </div>";
 
@@ -709,18 +716,19 @@ function dis_can_delete($p_id) {
 function dis_can_delete_dir($p_id) {
   global $display, $l_dir_can_delete, $l_dir_delete, $l_back;
 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-    action=\"".url_prepare("document_index.php") ."\">
+  $url = url_prepare("document_index.php");
+
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"tree\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $display["msg"] .= display_ok_msg($l_dir_can_delete);
+
   $block .= "
     <div class=\"detailButton\">
       <p class=\"detailButtons\">
-        <form name=\"form_delete\" method=\"post\"
-        action=\"" . url_prepare("document_index.php") . "\">
+        <form name=\"form_delete\" method=\"post\" action=\"$url\">
         <input type=\"hidden\" name=\"action\" value=\"dir_delete\" />
         <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
         <input type=\"submit\" value=\"$l_dir_delete\" />
@@ -730,25 +738,6 @@ function dis_can_delete_dir($p_id) {
     </div>";
 
   return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)
-// Parameters:
-//   - $p_id : document Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $ret = "<form name=\"form_delete\" method=\"post\"
-      action=\"" . url_prepare("document_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\" />
-    </form>";
-
-  return $ret;
 }
 
 

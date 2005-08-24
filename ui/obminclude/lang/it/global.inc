@@ -70,6 +70,7 @@ $l_logout = "Logout";
 $l_profile = "Profile";
 $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
+$l_version = "Versione";
 
 // Entities
 $l_company = "Azienda";
@@ -177,6 +178,7 @@ $l_header_upd_group = "Modifica gruppi";
 $l_header_new_child = "Nuovo Affare Collegato";
 $l_header_new_parent = "Nuovo Affare";
 $l_header_find_parent = "Trova Affare";
+$l_header_list = "Lista";
 
 $l_header_reconcile =  "Riconcili";
 $l_header_duplicate =  "Duplicato";

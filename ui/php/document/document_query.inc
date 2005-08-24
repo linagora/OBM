@@ -408,23 +408,6 @@ function run_query_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Add the final slash if necessary.
-// Parameters:
-//   - $p_path : path parameter
-///////////////////////////////////////////////////////////////////////////////
-function format_path($p_path) {
-
-  // Ensure that the path end with a /
-  if (strrpos($p_path,'/') != strlen($p_path)-1) {
-    $path = $p_path.'/';
-  } else {
-    $path = $p_path;
-  }
-  return $path; 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Calculate the real disk document path for a document
 // Parameters:
 //   - $id   : document id
@@ -1251,7 +1234,7 @@ function check_can_delete_document($p_id) {
     $err_msg = $l_have_no_link;
   }
  
-  return true;
+  return $delete_ok;
 }
 
 

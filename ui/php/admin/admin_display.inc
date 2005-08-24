@@ -53,7 +53,7 @@ function dis_index($mode, $lifetime) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Admin Status                                                      //
+// Display Admin Status
 // Parameters
 //   - $lifetime    : session lifetime
 //   - $nb_user_ses : user session number

@@ -35,7 +35,7 @@ $PHP install_document.php || exit $?
 echo "*** Database creation"
 
 echo "  Delete old database if exists"
-psql -U $U $DB -c "DROP DATABASE $DB"
+psql -U $U template1 -c "DROP DATABASE $DB"
 
 ## XXXXXX obm postgres user creation ?
 

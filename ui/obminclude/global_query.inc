@@ -9,6 +9,26 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get an OBM info
+// Parameters:
+//   - $info : info name
+///////////////////////////////////////////////////////////////////////////////
+function get_obm_info($info) {
+  global $cdg_sql;
+
+  $query = "SELECT obminfo_value FROM ObmInfo WHERE obminfo_name='$info'";
+
+  display_debug_msg($query, $cdg_sql, "get_obm_info($info)");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("obminfo_value");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // CompanyCategory query execution
 // Return:
 //   Database Object
@@ -80,9 +100,9 @@ function run_query_country_for_lang() {
   global $cdg_sql;
 
   $lang = get_lang();
-  $query = "select * from Country
-    where country_lang='$lang'
-    order by country_name, country_iso3166"; 
+  $query = "SELECT * FROM Country
+    WHERE country_lang='$lang'
+    ORDER BY country_name, country_iso3166"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -99,8 +119,8 @@ function run_query_country_for_lang() {
 function run_query_country() {
   global $cdg_sql;
 
-  $query = "select * from Country
-     order by country_name, country_iso3166"; 
+  $query = "SELECT * FROM Country
+     ORDER BY country_name, country_iso3166"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -146,22 +166,22 @@ function run_query_tasktype($tt_cat="") {
   global $cdg_sql, $ctt_sales, $ctt_research;
 
   $query = "
-    select
+    SELECT
       tasktype_id,
       tasktype_label, 
       tasktype_internal
-    from TaskType ";
+    FROM TaskType ";
 
   if (($tt_cat == "") || ($tt_cat == "all")) {
     $query .= "";
   } elseif ($tt_cat == "project") {
-    $query .= "where (tasktype_internal = '$ctt_sales'
+    $query .= "WHERE (tasktype_internal = '$ctt_sales'
                       or tasktype_internal = '$ctt_research')";
   } else {
-    $query .= "where tasktype_internal = '$tt_cat'";
+    $query .= "WHERE tasktype_internal = '$tt_cat'";
   }
 
-  $query .= " order by tasktype_internal, tasktype_label";
+  $query .= " ORDER BY tasktype_internal, tasktype_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_tasktype");
   $obm_q = new DB_OBM;
@@ -187,7 +207,7 @@ function get_linked_contact_nb ($id, $entity, $arch="") {
     WHERE contact_${entity}_id = '$id'";
 
   if (! $arch) {
-    $query .= " and contact_archive='0'";
+    $query .= " AND contact_archive='0'";
   }
 
   $obm_q = new DB_OBM;
@@ -252,7 +272,7 @@ function get_linked_project_nb ($id, $entity, $arch="") {
     WHERE project_${entity}_id = '$id'";
 
   if (! $arch) {
-    $query .= " and project_archive='0'";
+    $query .= " AND project_archive='0'";
   }
 
   $obm_q = new DB_OBM;
@@ -288,7 +308,7 @@ function get_linked_contract_nb ($id, $entity, $arch="", $entity2="") {
     WHERE $where_ent";
 
   if (! $arch) {
-    $query .= " and contract_archive='0'";
+    $query .= " AND contract_archive='0'";
   }
 
   $obm_q = new DB_OBM;
@@ -317,7 +337,7 @@ function get_linked_incident_nb ($id, $entity, $arch="") {
     WHERE incident_{$entity}_id = '$id'";
 
   if (! $arch) {
-    $query .= " and incident_archive='0'";
+    $query .= " AND incident_archive='0'";
   }
 
   $obm_q = new DB_OBM;
@@ -346,7 +366,7 @@ function get_linked_invoice_nb ($id, $entity, $arch="") {
     WHERE invoice_${entity}_id = '$id'";
 
   if (! $arch) {
-    $query .= " and invoice_archive='0'";
+    $query .= " AND invoice_archive='0'";
   }
 
   $obm_q = new DB_OBM;
@@ -396,16 +416,16 @@ function run_query_delete_document_links($ent_id, $entity, $doc_id="") {
   $where = "1=1";
 
   if ($ent_id != "") {
-    $where .= " and documententity_entity_id = '$ent_id'";
+    $where .= " AND documententity_entity_id = '$ent_id'";
   }
   if ($entity != "") {
-    $where .= " and documententity_entity = '$entity'";
+    $where .= " AND documententity_entity = '$entity'";
   }
   if ($doc_id != "") {
-    $where .= " and documententity_document_id = '$doc_id'";
+    $where .= " AND documententity_document_id = '$doc_id'";
   }
 
-  $query = "Delete from DocumentEntity where $where";
+  $query = "DELETE FROM DocumentEntity WHERE $where";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -431,22 +451,23 @@ function run_query_insert_documents($ids, $entity) {
     $cpt++;
     $d_id = $ids["doc$cpt"];
     
-    $query = "select * from DocumentEntity
-      where documententity_entity='$entity'
-      and documententity_entity_id='$id'
-      and documententity_document_id = '$d_id'";
+    $query = "SELECT *
+      FROM DocumentEntity
+      WHERE documententity_entity='$entity'
+        AND documententity_entity_id='$id'
+        AND documententity_document_id = '$d_id'";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
-      $query = "insert into DocumentEntity (
+      $query = "INSERT INTO DocumentEntity (
        	documententity_entity,
 	documententity_entity_id,
 	documententity_document_id
       )
-      values (    
+      VALUES (    
 	'$entity',
 	'$id',
 	'$d_id'
@@ -519,7 +540,7 @@ function get_last_company_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select company_name from Company where company_id='$id'";
+    $query = "SELECT company_name FROM Company WHERE company_id='$id'";
     $obm_q = new DB_OBM;
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
@@ -540,7 +561,7 @@ function get_last_contact_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select contact_lastname from Contact where contact_id='$id'";
+    $query = "SELECT contact_lastname FROM Contact WHERE contact_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -561,7 +582,7 @@ function get_last_deal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select deal_label from Deal where deal_id='$id'";
+    $query = "SELECT deal_label FROM Deal WHERE deal_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_db = new DB_OBM;
     $obm_db->query($query);
@@ -582,9 +603,9 @@ function get_last_parentdeal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select parentdeal_label
-    from ParentDeal
-    where parentdeal_id='$id'";
+    $query = "SELECT parentdeal_label
+    FROM ParentDeal
+    WHERE parentdeal_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -605,7 +626,7 @@ function get_last_list_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select list_name from List where list_id='$id'";
+    $query = "SELECT list_name FROM List WHERE list_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_db = new DB_OBM;
     $obm_db->query($query);
@@ -626,8 +647,9 @@ function get_last_publication_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select publication_title from Publication
-     where publication_id='$id'";
+    $query = "SELECT publication_title
+      FROM Publication
+      WHERE publication_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -647,7 +669,7 @@ function get_last_project_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select project_name from Project where project_id='$id'";
+    $query = "SELECT project_name FROM Project WHERE project_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -667,7 +689,7 @@ function get_last_contract_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select contract_label from Contract where contract_id='$id'";
+    $query = "SELECT contract_label FROM Contract WHERE contract_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -687,7 +709,7 @@ function get_last_incident_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select incident_label from Incident where incident_id='$id'";
+    $query = "SELECT incident_label FROM Incident WHERE incident_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -707,7 +729,7 @@ function get_last_document_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select document_name from Document where document_id='$id'";
+    $query = "SELECT document_name FROM Document WHERE document_id='$id'";
     $obm_q = new DB_OBM;
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
@@ -728,7 +750,7 @@ function get_last_account_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select account_label from Account where account_id='$id'";
+    $query = "SELECT account_label FROM Account WHERE account_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -748,7 +770,7 @@ function get_last_invoice_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select invoice_label from Invoice where invoice_id='$id'";
+    $query = "SELECT invoice_label FROM Invoice WHERE invoice_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -767,7 +789,7 @@ function get_last_resource_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select resource_label from Resource where resource_id='$id'";
+    $query = "SELECT resource_label FROM Resource WHERE resource_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -786,7 +808,7 @@ function get_last_resourcegroup_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "select rgroup_name from RGroup where rgroup_id='$id'";
+    $query = "SELECT rgroup_name FROM RGroup WHERE rgroup_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -806,7 +828,7 @@ function get_last_payment_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "select payment_label from Payment where payment_id='$id'";
+    $query = "SELECT payment_label FROM Payment WHERE payment_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);

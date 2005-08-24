@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : admin.inc                                                //
@@ -9,7 +9,6 @@
 
 // labels
 $l_check = "Vérifications";
-$l_version = "version d'OBM";
 $l_database_server = "Serveur SQL";
 $l_database = "Base de données";
 $l_host = "Hôte";

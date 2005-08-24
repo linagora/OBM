@@ -151,7 +151,7 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_group($group["id"])) {
-    $retour = run_query_delete($hd_group_id);
+    $retour = run_query_delete($group["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {

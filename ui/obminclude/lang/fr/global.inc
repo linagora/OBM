@@ -86,6 +86,7 @@ $l_logout = "Déconnexion";
 $l_profile = "Profil";
 $l_connection_end = "Fin de connexion";
 $l_reconnect = "Cliquer ici pour se reconnecter";
+$l_version = "Version";
 
 // Entities
 $l_company = "Société";
@@ -196,6 +197,7 @@ $l_module_admin_pref = "Préférences";
 $l_module_admin_code = "Code";
 $l_module_admin_ref = "Référentiel";
 $l_module_import = "Import";
+$l_module_backup = "Sauvegarde";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "Nouvelle";
@@ -215,7 +217,7 @@ $l_header_add_resource = "Ajouter ressource";
 $l_header_add_group = "Ajouter groupe";
 $l_header_upd_group = "Modifier groupes";
 $l_header_add_deal = "Ajouter affaire";
-$l_header_todo_list = "Liste";
+$l_header_list = "Liste";
 
 $l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";

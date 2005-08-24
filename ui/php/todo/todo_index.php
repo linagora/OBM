@@ -189,12 +189,12 @@ function get_param_todo() {
 function get_todo_action() {
   global $todo, $actions, $path;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  global $l_header_todo_list, $l_header_delete, $l_header_update;
+  global $l_header_list, $l_header_delete, $l_header_update;
   global $l_header_consult, $l_header_admin, $l_header_display;
 
 // Index
   $actions["todo"]["index"] = array (
-    'Name'     => $l_header_todo_list,
+    'Name'     => $l_header_list,
     'Url'      => "$path/todo/todo_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
@@ -269,5 +269,6 @@ function get_todo_action() {
                                      		 );
 
 }
+
 
 </script>

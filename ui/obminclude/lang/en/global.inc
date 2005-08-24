@@ -83,6 +83,7 @@ $l_logout = "Logout";
 $l_profile = "Profile";
 $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
+$l_version = "Version";
 
 // Entities
 $l_company = "Company";
@@ -194,6 +195,7 @@ $l_module_admin_pref = "Prefs";
 $l_module_admin_code = "Code";
 $l_module_admin_ref = "Referential";
 $l_module_import = "Import";
+$l_module_backup = "Backup";
 
 $l_header_admin = "Administration";
 $l_header_new_f = "New";
@@ -213,7 +215,7 @@ $l_header_add_resource = "Add resource";
 $l_header_add_group = "Add group";
 $l_header_upd_group = "Update groups";
 $l_header_add_deal = "Add deal";
-$l_header_todo_list = "List";
+$l_header_list = "List";
 
 $l_header_new_child = "New linked Deal";
 $l_header_new_parent = "New ParentDeal";
