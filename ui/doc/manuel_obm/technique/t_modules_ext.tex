@@ -233,13 +233,13 @@ De même, le code de génération du formulaire de récupération des données (ex: sé
     $user_d->data_idfield = "userobm_id";
     $user_d->data_cb_name = "cb_u";
     if ($ext_widget != "") {
-      $display_popup_head = "
+      $user_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } else {
-      $display_popup_head = "
+      $user_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
-    $display_popup_end = "
+    $user_d->data_form_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
@@ -247,7 +247,9 @@ De même, le code de génération du formulaire de récupération des données (ex: sé
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
       </p>
-      </form>
+      </form>'';
+
+    $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";

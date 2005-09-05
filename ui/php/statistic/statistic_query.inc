@@ -9,19 +9,19 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// statistic Contact Per responsible query execution                         //
+// statistic Contact Per responsible query execution
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_per_resp() {
   global $cdg_sql;
 
-  $query = "select userobm_id,
+  $query = "SELECT userobm_id,
       userobm_lastname,
       userobm_firstname,
       COUNT(contact_id) as cont_stat 
-    from Contact, UserObm
-    where contact_marketingmanager_id = userobm_id
-    group by contact_marketingmanager_id,
+    FROM Contact, UserObm
+    WHERE contact_marketingmanager_id = userobm_id
+    GROUP BY contact_marketingmanager_id,
       userobm_id, userobm_lastname,userobm_firstname
    ";
 
@@ -34,19 +34,19 @@ function run_query_contact_per_resp() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// statistic Company Per responsible query execution                         //
+// statistic Company Per responsible query execution
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_per_resp() {
   global $cdg_sql;
 
-  $query = "select userobm_id,
+  $query = "SELECT userobm_id,
       userobm_lastname,
       userobm_firstname,
       COUNT(company_id) as comp_stat 
-    from Company, UserObm
-    where company_marketingmanager_id = userobm_id
-    group by company_marketingmanager_id,userobm_id,userobm_firstname,
+    FROM Company, UserObm
+    WHERE company_marketingmanager_id = userobm_id
+    GROUP BY company_marketingmanager_id,userobm_id,userobm_firstname,
       userobm_lastname";
 
   display_debug_msg($query, $cdg_sql);
@@ -66,21 +66,21 @@ function run_query_company_per_country_per_cat() {
 
   $lang = get_lang();
 
-  $query = "Select  
+  $query = "SELECT  
       country_iso3166,
       country_name,
       companycategory_id,
       companycategory_code,
       companycategory_label,
       count(company_id) as nb 
-    from Company
-      left join Country ON company_country_iso3166 = country_iso3166
-                           and country_lang='$lang'
-      left join CompanyCategoryLink ON companycategorylink_company_id = company_id
-      left join CompanyCategory ON companycategory_id = companycategorylink_category_id
-    group by country_iso3166, country_name,
+    FROM Company
+      LEFT JOIN Country ON company_country_iso3166 = country_iso3166
+                           AND country_lang='$lang'
+      LEFT JOIN CompanyCategoryLink ON companycategorylink_company_id = company_id
+      LEFT JOIN CompanyCategory ON companycategory_id = companycategorylink_category_id
+    GROUP BY country_iso3166, country_name,
       companycategory_id, companycategory_code,companycategory_label
-    order by country_iso3166, companycategory_id";
+    ORDER BY country_iso3166, companycategory_id";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -97,7 +97,7 @@ function run_query_company_per_country_per_cat() {
 function run_query_nb_company() {
   global $cdg_sql;
  
-  $query = "Select count(*) as nb from Company";
+  $query = "SELECT count(*) as nb FROM Company";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -107,6 +107,7 @@ function run_query_nb_company() {
   return $obm_q->f("nb");
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // return all the lists
 // Parametes:
@@ -114,7 +115,7 @@ function run_query_nb_company() {
 function run_query_get_lists() {
   global $cdg_sql;
  
-  $query = "Select list_id, list_name from List Order by list_name";
+  $query = "SELECT list_id, list_name FROM List ORDER BY list_name";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -130,7 +131,7 @@ function run_query_get_lists() {
 function run_query_get_list($id) {
   global $cdg_sql;
  
-  $query = "Select * from List where list_id = '$id'";
+  $query = "SELECT * FROM List WHERE list_id = '$id'";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -147,8 +148,11 @@ function run_query_get_list($id) {
 function run_query_get_selected_company($query,$id) {
   global $cdg_sql;
 
+  // We remove the ORDER BY clause
+  $query = preg_replace('/order by .*$/i','',$query);
+
   if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
-    $query_f = "select distinct(company_id) ". $matches[1];
+    $query_f = "SELECT distinct(company_id) ". $matches[1];
     $or = "OR";
   }
   else {
@@ -180,7 +184,6 @@ function run_query_get_selected_company($query,$id) {
   $obm_q->query($query_f, 1);
   
   return $obm_q;
-  
 }
 
 

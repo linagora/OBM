@@ -16,6 +16,7 @@ $l_update = "Valider les modifications";
 $l_validate = "Valider";
 $l_execute = "Exécuter";
 $l_confirm = "Confirmer";
+$l_add = "Ajouter";
 $l_home = "Accueil";
 $l_entity_right = "Gérer les droits de";
 $l_read_permission = "Gestion des permissions de lecture de l'agenda";

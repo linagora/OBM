@@ -172,7 +172,7 @@ function dis_calendar_portal() {
   $block = "
     <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda_portal\" alt=\"\" />
    </div>
    <div class=\"portalTitle\">$l_module_agenda</div>
    <div class=\"portalContent\">
@@ -203,7 +203,7 @@ function dis_time_portal() {
   $block = "
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_time_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_time_portal\" alt=\"\" />
    </div>
    <div class=\"portalTitle\">$l_module_time</div>
    <div class=\"portalContent\">
@@ -244,7 +244,7 @@ function dis_deal_portal() {
   $block = "
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_portal\" alt=\"\" />
    </div>
    <div class=\"portalTitle\">$l_module_deal</div>
    <div class=\"portalContent\">
@@ -296,7 +296,7 @@ function dis_incident_portal() {
   $block = "
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident_portal\" alt=\"\" />
    </div>
    <div class=\"portalTitle\">$l_module_incident</div>
    <div class=\"portalContent\">
@@ -343,7 +343,7 @@ function dis_contract_portal() {
   $block = "
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract_portal\" alt=\"\" />
    </div>
    <div class=\"portalTitle\">$l_module_contract</div>
    <div class=\"portalContent\">

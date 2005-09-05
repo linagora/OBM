@@ -15,6 +15,7 @@ $l_close = "Close the window";
 $l_validate = "Validate";
 $l_execute = "Execute action";
 $l_confirm = "Confirm";
+$l_add = "Add";
 $l_home = "Home";
 $l_entity_right = "Manage rights for";
 $l_read_permission = "Read access management";

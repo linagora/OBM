@@ -729,7 +729,7 @@ function run_query_deal_potential($users_id="") {
       deal_marketingmanager_id AS uid,
       count(*) as nb,
       sum(deal_amount) as amount,
-      sum(deal_amount/deal_hitrate) as amount_balanced,
+      sum(deal_amount * deal_hitrate / 100) as amount_balanced,
       userobm_lastname,
       userobm_firstname
     FROM Deal

@@ -107,8 +107,8 @@ function run_query_detail($id) {
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
   FROM List
-       LEFT JOIN UserObm as c on list_usercreate=c.userobm_id
-       LEFT JOIN UserObm as u on list_userupdate=u.userobm_id
+       LEFT JOIN UserObm as c ON list_usercreate=c.userobm_id
+       LEFT JOIN UserObm as u ON list_userupdate=u.userobm_id
   WHERE list_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -533,7 +533,7 @@ function run_query_contacts_list($list, $entity="") {
       WHERE contactlist_list_id='$id'
       $orderq";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contacts_list()");
   $obm_q->query($query);
   return $obm_q;
 }
@@ -547,7 +547,7 @@ function run_query_contacts_list($list, $entity="") {
 function get_list_static_contact_nb($id) {
   global $cdg_sql;
 
-  $query = "select count(*) from ContactList where contactlist_list_id='$id'";
+  $query = "SELECT count(*) FROM ContactList WHERE contactlist_list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -593,12 +593,12 @@ function get_list_name_exists($name, $id="") {
   global $cdg_sql;
 
   if ($id != "") {
-    $where_id = "and list_id != '$id'";
+    $where_id = "AND list_id != '$id'";
   }
 
-  $query = "select list_id, list_name
-    from List
-    where list_name='$name'
+  $query = "SELECT list_id, list_name
+    FROM List
+    WHERE list_name='$name'
       $where_id";
 
   display_debug_msg($query, $cdg_sql);
@@ -629,7 +629,7 @@ function run_query_check_list($id, $name, $subject) {
   $like = sql_casei_like($db_type);
 
   if ($id != "") {
-    $where_id = "list_id != '$id' and";
+    $where_id = "list_id != '$id' AND";
   }
 
   // We search for a similar name (as same name is already excluded)
@@ -642,9 +642,9 @@ function run_query_check_list($id, $name, $subject) {
     $wsubject = "list_subject = '$subject'";
   }
 
-  $query = "select distinct list_id, list_name, list_subject
-     from List
-     where $where_id
+  $query = "SELECT distinct list_id, list_name, list_subject
+     FROM List
+     WHERE $where_id
        ($wname or $wsubject)";
 
   display_debug_msg($query, $cdg_sql);
@@ -669,7 +669,7 @@ function run_query_update_num_rows($id, $nb) {
   if ($nb == "") {
     $nb = "0";
   }
-  $query = "update List set list_query_nb='$nb' where list_id='$id'";
+  $query = "UPDATE List SET list_query_nb='$nb' WHERE list_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
@@ -701,6 +701,55 @@ function check_list_context($id, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if the query is is coherent (publication info should not be On if
+// same Publication field combined with AND 
+// Parameters:
+//   - $list[]   : list search criteria
+//     keys used : $criteria.
+///////////////////////////////////////////////////////////////////////////////
+function check_list_query_coherence($list) {
+  global $err_msg, $l_err_list_coh_pub;;
+
+  $coherence_ok = true;
+
+  $id = $list["id"];
+  $criteria = $list["criteria"]["modules"];
+  $logical_criterion = $list["criteria"]["logical"]["AND"];
+  $info_pub = $list["info_pub"];
+
+  // If info pub is set, Check it is ok (no 2 pub titles combines by AND)
+  if ($info_pub == 1) {
+    $info_pub_allowed = true;
+
+    if (is_array($criteria["publication"])) {
+      $pub_criteria = $criteria["publication"];
+      foreach($pub_criteria as $field => $criterion) {
+	if (is_array($criterion)) {
+	  foreach($criterion as $line => $value) {
+	    if ($value != "") {
+	      if (!isset($join_nb[$field])) {
+		$join_nb[$field] = 0;
+	      } elseif ($logical_criterion[$line] == "AND"
+		      && $line == $old_line + 1) {
+		// AND on same criteria
+		$info_pub_allowed = false;
+		$join_nb[$field] ++;
+		$coherence_ok = false;
+		$err_msg = $l_err_list_coh_pub;
+	      }
+	    }
+	    $old_line = $line;
+	  }
+	}
+      }
+    }
+  }
+
+  return $coherence_ok;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // List Form Data checking and formatting
 // Parameters:
 //   - $id       : list id  (empty on insertion)
@@ -709,8 +758,8 @@ function check_list_context($id, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($id, $list) {
   global $php_regexp_email, $l_j_check_email, $l_list_exists, $l_fill_name;
-  global $l_invalid_query, $l_banned_word, $l_hungry_query;
-  global $cdg_sql, $err_msg, $cql_max_row, $cql_max_cost;
+  global $l_banned_word, $l_incoherent_criteria, $l_hungry_query;
+  global $cdg_sql, $err_msg, $cql_max_row, $cql_max_cost, $l_invalid_query;
 
   $name = $list["name"];
   $subject = $list["subject"];
@@ -744,6 +793,12 @@ function check_data_form($id, $list) {
 	$err_msg = "$l_invalid_query $l_banned_word : $value";
 	return false;
       }
+    }
+
+    // Check that criteria are coherent
+    if (! check_list_query_coherence($list)) {
+	$err_msg = "$l_incoherent_criteria : $err_msg";
+      return false;
     }
 
     // Check if query is syntaxically correct
@@ -932,7 +987,7 @@ function get_list_dynamic_company_nb($query) {
 
   if ($pos > 1) {
     // The query is has a sub-query
-    if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
+    if (preg_match('/FROM .* (FROM (.*))(\) GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
       $query_f = "SELECT count(distinct(company_id)) as nb ". $matches[1];
     } else {
       return 0;
@@ -1129,7 +1184,7 @@ function run_query_publication() {
 
   $query = "SELECT publication_title, publication_id
     FROM Publication
-    ORDER by publication_year desc, publication_type_id, publication_title";
+    ORDER by publication_year DESC, publication_type_id, publication_title";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -1205,7 +1260,7 @@ function make_query_from_db(&$list_q) {
 //     keys used : $criteria.
 ///////////////////////////////////////////////////////////////////////////////
 function make_query_from_criteria($list) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $id = $list["id"];
   $criteria = $list["criteria"]["modules"];
@@ -1222,17 +1277,18 @@ function make_query_from_criteria($list) {
   
   $common_like = "%f $like '%v%'";
   $common_equal = "%f = '%v'";
+  $subscription_equal = "s%j.%f = '%v'";
   $category_equal = "(cc%j.%f $like '%v.%' OR cc%j.%f = '%v')";
   $connection_equal = "%j.%f = '%v'";
-  $pub_lang_like = "%f $like '%%v%'";
+  $pub_lang_like = "p%j.%f $like '%%v%'";
   $comp_time_sup = "(company_timecreate >= '%v' OR company_timeupdate >= '%v')";
   $comp_time_inf = "(company_timecreate <= '%v' OR company_timeupdate <= '%v')";
   $cont_time_sup = "(contact_timecreate >= '%v' OR contact_timeupdate >= '%v')";
   $cont_time_inf = "(contact_timecreate <= '%v' OR contact_timeupdate <= '%v')";
   // Contact Country specific case (if not set, test with company one)
   $contact_country = "%f = '%v' OR (%f = '' AND company_country_iso3166 = '%v')";   
-  $sub_time_aft = "(subscription_timecreate >= '%v' OR subscription_timeupdate >= '%v')";
-  $sub_time_bef = "(subscription_timecreate <= '%v' OR subscription_timeupdate <= '%v')";
+  $sub_time_aft = "(s%j.subscription_timecreate >= '%v' OR s%j.subscription_timeupdate >= '%v')";
+  $sub_time_bef = "(s%j.subscription_timecreate <= '%v' OR s%j.subscription_timeupdate <= '%v')";
 
   $operateurs = array(
     "company_name" => $common_like,
@@ -1256,25 +1312,50 @@ function make_query_from_criteria($list) {
     "contactcategory1link_category_id" => "cc1l".$connection_equal,
     "contactcategory2link_category_id" => "cc2l".$connection_equal,
     "contact_function_id" => $common_equal,
-    "subscription_publication_id"  => $common_equal,
+    "subscription_publication_id"  => $subscription_equal,
     "publication_lang"  => $pub_lang_like,
-    "publication_year"  => $common_like,
-    "subscription_renewal"  => $common_equal,
-    "subscription_reception_id"  => $common_equal,
+    "publication_year"  => "p%j.".$common_like,
+    "subscription_renewal"  => "s%j.".$common_equal,
+    "subscription_reception_id"  => "s%j.".$common_equal,
     "subscription_timeafter"  => $sub_time_aft,
     "subscription_timebefore" => $sub_time_bef,
     "kind_lang"  => $common_equal
   );
-    
-  $add_join = array (
-    "publication" => " left join Subscription on subscription_contact_id = contact_id
-                       left join Publication on subscription_publication_id = publication_id ",
-    "companycategory_code" => " left join CompanyCategoryLink ccl%j on company_id = ccl%j.companycategorylink_company_id 
-          	                left join CompanyCategory cc%j on cc%j.companycategory_id = ccl%j.companycategorylink_category_id ",
-    "contactcategory1link_category_id" => " left join ContactCategory1Link cc1l%j on contact_id = cc1l%j.contactcategory1link_contact_id ",
-    "contactcategory2link_category_id" => " left join ContactCategory2Link cc2l%j on contact_id = cc2l%j.contactcategory2link_contact_id ",
-  );
 
+  // hash field criteria -> join asociated needed
+  $add_join = array (
+    "subscription_publication_id" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "publication_title" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "publication_lang" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "publication_year" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "subscription_renewal" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "subscription_reception_id" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "subscription_timeafter" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "subscription_timebefore" => "
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+    "companycategory_code" => "
+       LEFT JOIN CompanyCategoryLink ccl%j ON company_id = ccl%j.companycategorylink_company_id 
+       LEFT JOIN CompanyCategory cc%j ON cc%j.companycategory_id = ccl%j.companycategorylink_category_id ",
+    "contactcategory1link_category_id" => "
+       LEFT JOIN ContactCategory1Link cc1l%j ON contact_id = cc1l%j.contactcategory1link_contact_id ",
+    "contactcategory2link_category_id" => "
+       LEFT JOIN ContactCategory2Link cc2l%j ON contact_id = cc2l%j.contactcategory2link_contact_id ",
+  );
 
   $select = "
         contact_id as id,
@@ -1313,49 +1394,11 @@ function make_query_from_criteria($list) {
         company_fax,
         ctry2.country_name as company_country";
 
- 
-  $join = " Contact left join Company on contact_company_id=company_id
-                    left join Country as ctry1 on Contact.contact_country_iso3166=ctry1.country_iso3166 and ctry1.country_lang='$lang'
-                    left join Country as ctry2 on Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
-                    left join Kind on contact_kind_id = kind_id
-                    left join Function on contact_function_id = function_id";
-
-
-  //--------------------------------------------------------------------------
-  // If publication info must be displayed we prepare a Subquery
-  // SELECT $over_select FROM (SELECT $select ...) AS FOO GROUP BY $over_group
-  if ($info_pub == 1) {
-    // We add Subscription and publication infos in Select and Join
-    $select .= ", subscription_id
-                , subscription_timecreate
-                , subscription_quantity
-                , publication_lang
-                , publication_title";
-    $join .= "
-       left join Subscription on subscription_contact_id = contact_id
-       left join Publication on subscription_publication_id = publication_id";
-    // We prevent to re-add subscription and publication (from criteria)
-    $add_select["publication"] = "";
-    $add_join["publication"] = "";
-
-    $info_over_select = ",
-        SUM(subscription_quantity) as subscription_quantity,
-        publication_lang,
-        publication_title";
-    $info_over_group = ",
-        publication_lang,
-        publication_title";
-    // We transform field "column_name as col" to col
-    $conv_select .= preg_replace('/^(.* as) (.*)$/mi', '$2', $select);
-    // We add extra info to the Over select
-    $over_select .= "$conv_select $info_over_select";
-    $over_select = "SELECT $over_select FROM (";
-
-    $over_end = ") AS FOO
-        GROUP BY
-        $conv_select
-        $info_over_group";
-  }
+  $join = " Contact LEFT JOIN Company ON contact_company_id=company_id
+                    LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166=ctry1.country_iso3166 and ctry1.country_lang='$lang'
+                    LEFT JOIN Country as ctry2 ON Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
+                    LEFT JOIN Kind ON contact_kind_id = kind_id
+                    LEFT JOIN Function ON contact_function_id = function_id";
 
 
   if (is_array($criteria)) {
@@ -1367,17 +1410,18 @@ function make_query_from_criteria($list) {
               if ($value != "") {
 		$select .= $add_select[$field];
 		// $group .= $add_group[$field];
-		if (!isset($join_name[$field])) {
-		  $join_name[$field] = 0;
-		  $join .= str_replace('%j',$join_name[$field],$add_join[$field]);
+		if (!isset($join_nb[$field])) {
+		  $join_nb[$field] = 0;
+		  $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		} elseif ($logical_criterion[$line] == "AND"
+			  && $line == $old_line + 1) {
+		  // AND on same criteria, increment the join cpt associated
+		  $join_nb[$field] ++;
+		  $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
 		}
-		elseif($logical_criterion[$line] == "AND" && $line == $old_line + 1) {
-		  $join_name[$field] ++;
-		  $join .= str_replace('%j',$join_name[$field],$add_join[$field]);
-		}
-		$module_fill = 1;
+		$module_fill[$module] = true;
 		$operation = $operateurs[$field];
-		$operation = str_replace('%j',$join_name[$field],$operation);
+		$operation = str_replace('%j',$join_nb[$field],$operation);
 		$operation = str_replace('%f',$field,$operation);
 		$operation = str_replace('%v',$value,$operation);
 		$condition[$line] .= $and[$line]." ". $operation;
@@ -1390,12 +1434,6 @@ function make_query_from_criteria($list) {
             }
           }
         }
-       	if ($module_fill == 1) {
-      	  $join .= $add_join[$module];
-	  $select .= $add_select[$module];
-	  $group .= $add_group[$module];
-	  $module_fill = 0;
-	}
       }
     }
     foreach($condition as $line=>$value) {
@@ -1405,7 +1443,6 @@ function make_query_from_criteria($list) {
       $where .= " " . $logical_criterion[$line]." ".$boulean_criterion[$line]." ($value)";
     }
   }
-
 
   // Handle the Mailing enable flag
   if ($mailing_ok == 1) {
@@ -1442,6 +1479,37 @@ function make_query_from_criteria($list) {
     } else {
       $where = "WHERE $where";
     }
+  }
+
+  //--------------------------------------------------------------------------
+  // If publication info asked without any pub criteria, add pub infos
+  // and prepare a Subquery
+  // SELECT $over_select FROM (SELECT $select ...) AS FOO GROUP BY $over_group
+  if ($info_pub == 1) {
+
+    // Add Subscription and publication infos in Select
+    $select .= ", subscription_id
+                , subscription_timecreate
+                , subscription_quantity
+                , publication_lang
+                , publication_title";
+
+    // If no pub criteria selected add Subscription and publication Join
+    if (! $module_fill["publication"]) {
+      $join .= "
+        LEFT JOIN Subscription ON subscription_contact_id = contact_id
+        LEFT JOIN Publication ON subscription_publication_id = publication_id";
+    }
+
+    // We transform field "column_name as col" to col
+    $conv_select .= preg_replace('/^(.* as) (.*)$/mi', '$2', $select);
+    // We add extra info to the Over select
+    $over_select .= "$conv_select";
+    $over_select = "SELECT $over_select FROM (";
+
+    $over_end = ") AS FOO
+        GROUP BY
+        $conv_select";
   }
 
   $query = trim("$over_select SELECT distinct $select FROM $join $where $over_end ORDER BY contact_lastname");

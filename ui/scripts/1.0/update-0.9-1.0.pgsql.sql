@@ -253,3 +253,18 @@ ALTER TABLE Document ADD COLUMN document_acl text;
 
 -- Correct MIMETYPE extension case
 UPDATE DocumentMimeType SET documentmimetype_extension='jpg' WHERE documentmimetype_extension='JPG';
+
+
+-------------------------------------------------------------------------------
+-- ContactCategory tables updates
+-------------------------------------------------------------------------------
+-- update _code to varchar(10)
+ALTER TABLE ContactCategory1 ADD COLUMN temp_code VARCHAR(10);
+UPDATE ContactCategory1 SET temp_code = contactcategory1_code;
+ALTER TABLE ContactCategory1 DROP COLUMN contactcategory1_code;
+ALTER TABLE ContactCategory1 RENAME COLUMN temp_code TO contactcategory1_code;
+
+ALTER TABLE ContactCategory2 ADD COLUMN temp_code VARCHAR(10);
+UPDATE ContactCategory2 SET temp_code = contactcategory2_code;
+ALTER TABLE ContactCategory2 DROP COLUMN contactcategory2_code;
+ALTER TABLE ContactCategory2 RENAME COLUMN temp_code TO contactcategory2_code;

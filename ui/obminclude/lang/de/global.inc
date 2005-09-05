@@ -16,6 +16,7 @@ $l_close = "Schließen";
 $l_validate = "Prüfen";
 $l_execute = "Ausführen";
 $l_confirm = "Bestätigung";
+$l_add = "Add";
 
 // Common messages
 $l_yes = "Ja";

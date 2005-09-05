@@ -250,17 +250,17 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
     $user_d->data_cb_name = "cb_u";
     if ($ext_element != "") {
       $user_d->data_cb_name = "";
-      $display_popup_head = "
+      $user_d->data_form_head = "
       <form onsubmit=\"fill_ext_form2(this); return false;\">";
     }
     elseif ($ext_widget != "") {
-      $display_popup_head = "
+      $user_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } else {
-      $display_popup_head = "
+      $user_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
-    $display_popup_end = "
+    $user_d->data_form_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
@@ -268,7 +268,9 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
       </p>
-      </form>
+      </form>";
+
+    $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
@@ -279,7 +281,6 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
 
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_info_msg("$nb_user $l_found");
-  $block = $display_popup_head;
   $block .= $user_d->display("dis_data_user");
   $block .= $display_popup_end;
 

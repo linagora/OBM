@@ -2,15 +2,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : resource_js.inc                                             //
 //     - Desc  : Resource javascript functions File                          //
-// 2000-01-13 Florent Goalabre                                               //
+// 2005-08-01 Aliacom - Florent Goalabre                                     //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id$               //
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script LANGUAGE=\"JavaScript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 
@@ -129,7 +125,5 @@ function check_resource(form) {
   return true;
 }
 
-// -->
-</script>
 ";
 

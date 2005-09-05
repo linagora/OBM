@@ -7,23 +7,21 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script language=\"JavaScript\">" ;
 
-require("$obminclude//javascript/check_js.inc");
+require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 function check_import_name(iname) {
   // allow only valid import name
-  return iname.match($js_regexp_import_name) ;
+  return iname.match($js_regexp_import_name);
 }
 
 function check_import_form(form) {
-  name = form.tf_name.value ;
+  name = form.tf_name.value;
 
   if (trim(name) == \"\") {
-     alert(\"$l_fill_name\") ;
-     return false ;
+     alert(\"$l_fill_name\");
+     return false;
   }
 
   if ( (name != \"\") && (check_import_name(name) == null)) {
@@ -31,7 +29,7 @@ function check_import_form(form) {
     return false;
   }
 
-  return true ;
+  return true;
 }
 
-</script>" ;
+";

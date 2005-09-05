@@ -7,11 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
-
 require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
@@ -103,16 +98,14 @@ function check_company(form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind check or deletion is possible                           //
+// Check if the kind check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_checkdel(form)
 {
    if (form.sel_kind.selectedIndex >= 0)
    {
       return true;
-   }
-   else
-   {
+   } else {
       alert(\"$l_j_kind_delete\");
       return false;
    }
@@ -120,7 +113,7 @@ function check_kind_checkdel(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind update is possible                                    //
+// Check if the kind update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_upd(form,formd)
 {
@@ -151,16 +144,13 @@ function check_kind_new(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind check or deletion is possible                           //
+// Check if the kind check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_cat_checkdel(form)
 {
-   if (form.sel_cat.selectedIndex >= 0)
-   {
+   if (form.sel_cat.selectedIndex >= 0) {
       return true;
-   }
-   else
-   {
+   } else {
       alert(\"$l_j_cat_delete\");
       return false;
    }
@@ -205,16 +195,13 @@ function check_cat_upd(form,formd)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the activity check or deletion is possible                       //
+// Check if the activity check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_act_checkdel(form)
 {
-   if (form.sel_act.selectedIndex >= 0)
-   {
+   if (form.sel_act.selectedIndex >= 0) {
       return true;
-   }
-   else
-   {
+   } else {
       alert(\"$l_j_act_delete\");
       return false;
    }
@@ -222,7 +209,7 @@ function check_act_checkdel(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the activity update is possible                                  //
+// Check if the activity update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_act_upd(form,formd)
 {
@@ -238,34 +225,30 @@ function check_act_upd(form,formd)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the activity creation is possible                                //
+// Check if the activity creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_act_new(form)
 {
-   if (form.tf_act.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_act_create\");
-      return false;
-   }
+  if (form.tf_act.value != \"\") {
+    return true;
+  } else {
+    alert(\"$l_j_act_create\");
+    return false;
+  }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Naf code check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_naf_checkdel(form)
-{
-   if (form.sel_naf.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_naf_delete\");
-      return false;
-   }
+function check_naf_checkdel(form) {
+
+  if (form.sel_naf.selectedIndex >= 0) {
+    return true;
+  } else {
+    alert(\"$l_j_naf_delete\");
+    return false;
+  }
 }
 
 
@@ -300,108 +283,26 @@ function check_naf_new(form)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Category Functions
-///////////////////////////////////////////////////////////////////////////////
-NS4 = (document.layers) ? 1 : 0;
-IE4 = (document.all) ? 1 : 0;
-W3C = (document.getElementById) ? 1 : 0;	
-
-function show_hide_dir(name)
-{
-  if (W3C) {
-    if(document.getElementById('div_'+name).style.display != \"none\") {
-      hide(name);
-     }
-     else{
-        show(name);
-     }
-  } else if (NS4) {
-    if(document.layers['div_'+name].display != \"none\") {
-      hide(name);
-    }
-    else{
-      show(name);
-     }
-
-  } else {
-    if(document.all['div_'+name].style.display != \"none\") {
-       hide(name);
-    }
-    else{
-      show(name);
-    }
-  
-  }
-
-}
-
-function hide ( name ) {
-  if (W3C) {
-    document.getElementById('div_'+name).style.display = \"none\";
-    document.getElementById('div_'+name).style.height = \"0px\";
-    document.getElementById('img_'+name).src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";    
-  } else if (NS4) {
-    document.layers['div_'+name].display = \"hide\";
-    document.layers['div_'+name].height = \"0px\";
-    document.layers['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";    
-  } else {
-    document.all['div_'+name].style.display = \"none\";
-    document.all['div_'+name].style.height = \"0px\";
-    document.all['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";
-  }
-}
-
-function show ( name ) {
-  if (W3C) {
-    document.getElementById('div_'+name).style.display = \"\";
-    document.getElementById('div_'+name).style.height = \"auto\"; 
-    document.getElementById('img_'+name).src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
-  } else if (NS4) {
-    document.layers['div_'+name].display = \"\";
-    document.layers['div_'+name].height = \"auto\";
-    document.layers['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
-  } else {
-    document.all['div_'+name].style.display = \"\";
-    document.all['div_'+name].style.height = \"auto\";
-    document.all['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
-  }
-}
-
-function get_elem(doc, name ) {
-  if (W3C) {
-    return doc.getElementById(name);
-  } else if (NS4) {
-    return doc.layers[name]  
-  } else {
-    return doc.all[name];
-  }
-}
 ";
 
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
-   function fill_ext_form(dir_path) {
-     ext_field = window.opener.document.$ext_target;
-     ext_field.value = dir_path;
-     window.close();
-  } 
   
-  function fill_ext_form2(int_form) {
+  function fill_ext_form2old(int_form) {
    size = int_form.length;
    ext_field = get_elem(window.opener.document, '$ext_target' );
-   for(i=0; i <size; i++) {
-     if(int_form.elements[i].type == 'checkbox'){
-       if(int_form.elements[i].checked == true) {
+   for (i=0; i <size; i++) {
+     if (int_form.elements[i].type == 'checkbox') {
+       if (int_form.elements[i].checked == true) {
 	 ext_size = ext_field.length;
-	 bool= false;
-	 for(j=0; j< ext_size  && bool == false; j++) {
-	   if(ext_field.options[j].value == int_form.elements[i].name) {
-	     ext_field.options[j].selected =true;
-	     bool=true;
+	 is_present = false;
+	 for (j=0; j<ext_size && is_present == false; j++) {
+	   if (ext_field.options[j].value == int_form.elements[i].name) {
+	     ext_field.options[j].selected = true;
+	     is_present = true;
 	   }
 	 }
-	 if(bool==false) {
+	 if (is_present == false) {
 	    cat_name = get_elem(document,'data'+int_form.elements[i].name);
 	    cat_name_text = cat_name.innerHTML;
 	    //IE Hack!
@@ -414,6 +315,8 @@ if (isset($ext_target) && $ext_target!="") {
      }
    }
  }
+
+
  function fill_ext_code_form(value) {
    ext_field = window.opener.document.$ext_target;
    ext_size = ext_field.length;
@@ -477,7 +380,5 @@ function copy_clip(text)
   return false;
 }
 
- -->
-</script>
 ";
 

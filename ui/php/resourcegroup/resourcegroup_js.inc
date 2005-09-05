@@ -1,14 +1,11 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : group_js.inc                                                 //
-//     - Desc : Group javascript functions File                              //
-// 2003-08-22 Pierre Baudracco                                               //
+// OBM - File : resourcegroup_js.inc                                         //
+//     - Desc : ResourceGroup javascript functions File                      //
+// 2005-08-01 Aliacom - Pierre Baudracco                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-
-$extra_js .= "
-<script language=\"JavaScript\">";
 
 require("obminclude/javascript/check_js.inc");
 
@@ -84,5 +81,3 @@ function add_element(fieldName,fieldValue,fieldLabel) {
   
 ";
 }
-  $extra_js .= "
-</script>";

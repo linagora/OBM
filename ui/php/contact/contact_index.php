@@ -32,6 +32,8 @@
 // - ext_get_ids     --                -- select multiple contacts (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
+// XXXXXXX dis_contact_form ? pourquoi param co_q et pas fait a l'interieur a la company ??
+
 $path = "..";
 $module = "contact";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -41,6 +43,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("contact_display.inc");
 require("contact_query.inc");
+require_once("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -71,12 +74,12 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "ext_get_cat1_ids") {
   $extra_css = "category.css";
   require("contact_js.inc");
-  $display["detail"] =  html_category1_list($contact);
+  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category1");
 
 } elseif ($action == "ext_get_cat2_ids") {
   $extra_css = "category.css";
   require("contact_js.inc");
-  $display["detail"] =  html_category2_list($contact);
+  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category2");
 
 } elseif ($action == "vcard") {
   dis_vcard_export($contact);

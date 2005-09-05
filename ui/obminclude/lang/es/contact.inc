@@ -47,7 +47,6 @@ $l_kind_update = "Actualizar Tipo";
 $l_kind_checkdelete = "Seleccionar o Borrar  Tipo";
 $l_kind_delete = "Borrar Tipo";
 $l_kind_insert = "Ingresar Tipo";
-$l_add = "Adicionar estos contactos";
 
 // Messages
 $l_check_samecontact = "Estos contactos lucen similares a la nueva entrada !";

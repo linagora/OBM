@@ -7,11 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
-
 
 require("$obminclude/javascript/check_js.inc");
 
@@ -421,7 +416,4 @@ function copy_clip(text)
   }
   return false;
 }
-
-// -->
-</script>
 ";

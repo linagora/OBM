@@ -81,24 +81,71 @@ td.agendaHead		{
 }
 
 	
-a.agendaLink		{ text-decoration:	none; }
-a.agendaLink:link	{ font-family: sans-serif; font-size: 11px;color: #0454c4; background-color: transparent; }
-a.agendaLink:visited	{ font-family: sans-serif; font-size: 11px;color: #0454c4; background-color: transparent; }
-a.agendaLink:active	{ font-family: sans-serif; font-size: 11px;color: #3366cc; background-color: transparent; }
-a.agendaLink:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: transparent; }
+a.agendaLink		{
+        font-family:       sans-serif;
+        font-size:         11px;
+        text-decoration:   none;
+}
+a.agendaLink:link	{
+        color:             #0454c4;
+        background-color:  transparent;
+}
+a.agendaLink:visited	{
+        color:             #0454c4;
+        background-color:  transparent;
+}
+a.agendaLink:active	{
+        color:             #3366cc;
+        background-color:  transparent;
+}
+a.agendaLink:hover	{
+        color:             #000099;
+        background-color:  transparent;
+}
 
-a.agendaLink2		{ text-decoration:	none; }
-a.agendaLink2:link	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
-a.agendaLink2:visited	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
-a.agendaLink2:active	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
-a.agendaLink2:hover	{ font-family: sans-serif; font-size: 11px;color: #a1a5a9; background-color: transparent; }
+a.agendaLink2		{
+        font-family:       sans-serif;
+        font-size:         11px;
+        text-decoration:   none;
+}
+a.agendaLink2:link	{
+        color:             #a1a5a9;
+        background-color:  transparent;
+}
+a.agendaLink2:visited	{
+        color:             #a1a5a9;
+        background-color:  transparent;
+}
+a.agendaLink2:active	{
+        color:             #a1a5a9;
+        background-color:  transparent;
+}
+a.agendaLink2:hover	{
+        color:             #a1a5a9;
+        background-color:  transparent;
+}
 
-a.agendaLink3		{ text-decoration:	none; }
-a.agendaLink3:link	{ font-family: sans-serif; font-size: 11px;color: #0454c4; background-color: #ffcc00; }
-a.agendaLink3:visited	{ font-family: sans-serif; font-size: 11px;color: #0454c4; background-color: #ffcc00; }
-a.agendaLink3:active	{ font-family: sans-serif; font-size: 11px;color: #3366cc background-color:  #ffcc00; }
-a.agendaLink3:hover	{ font-family: sans-serif; font-size: 11px;color: #000099; background-color: #ffcc00; }
-
+a.agendaLink3		{
+        font-family:       sans-serif;
+        font-size:         11px;
+        text-decoration:   none;
+}
+a.agendaLink3:link	{
+        color:             #0454c4;
+        background-color:  #ffcc00;
+}
+a.agendaLink3:visited	{
+        color:             #0454c4;
+        background-color:  #ffcc00;
+}
+a.agendaLink3:active	{
+        color:             #3366cd;
+        background-color:  #ffcc00;
+}
+a.agendaLink3:hover	{
+        color:             #000099;
+        background-color:  #ffcc00;
+}
 
 
 /*---------------------------------------------------------------------------*/

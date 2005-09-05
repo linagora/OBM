@@ -34,17 +34,17 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
   $where = "import_name $like '$name%'";
 
   if (($dsrc != $c_all) && ($dsrc != "")) { 
-    $where .= " and import_datasource_id='$dsrc'";
+    $where .= " AND import_datasource_id='$dsrc'";
   }
   if (($market != $c_all) && ($market != "")) { 
-    $where .= " and import_marketingmanager_id='$market'";
+    $where .= " AND import_marketingmanager_id='$market'";
   }
 
   $whereq = "WHERE $where";
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "import_name";
-  $orderq = " order by $order $p_order_dir";
+  $orderq = " ORDER BY $order $p_order_dir";
 
   $query = "SELECT DISTINCT import_id as id,
     import_id,
@@ -98,7 +98,7 @@ function run_query_detail($id) {
   $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
 
-  $query = "select *,
+  $query = "SELECT *,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
@@ -106,12 +106,12 @@ function run_query_detail($id) {
       datasource_name,
       m.userobm_lastname as market_lastname,
       m.userobm_firstname as market_firstname
-  from Import
-       LEFT JOIN DataSource on import_datasource_id = datasource_id
-       LEFT JOIN UserObm as c on import_usercreate=c.userobm_id
-       LEFT JOIN UserObm as u on import_userupdate=u.userobm_id
-       LEFT JOIN UserObm as m on import_marketingmanager_id=m.userobm_id
-  where import_id = '$id'";
+  FROM Import
+       LEFT JOIN DataSource ON import_datasource_id = datasource_id
+       LEFT JOIN UserObm as c ON import_usercreate=c.userobm_id
+       LEFT JOIN UserObm as u ON import_userupdate=u.userobm_id
+       LEFT JOIN UserObm as m ON import_marketingmanager_id=m.userobm_id
+  WHERE import_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query) ;
@@ -137,7 +137,7 @@ function run_query_insert($import) {
   $enc = $import["enclosed"];
   $desc = get_import_desc($import);
 
-  $query = "insert into Import (import_timeupdate,
+  $query = "INSERT INTO Import (import_timeupdate,
     import_timecreate,
     import_userupdate,
     import_usercreate,
@@ -147,7 +147,7 @@ function run_query_insert($import) {
     import_separator,
     import_enclosed,
     import_desc)
-  values (null,
+  VALUES (null,
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
@@ -182,7 +182,7 @@ function run_query_update($import) {
   $enc = $import["enclosed"];
   $desc = get_import_desc($import);
   
-  $query = "update Import set import_timeupdate='". date("Y-m-d H:i:s")."',
+  $query = "UPDATE Import SET import_timeupdate='". date("Y-m-d H:i:s")."',
     import_userupdate='".$auth->auth["uid"]."',
     import_name='$name',
     import_datasource_id='$dsrc',
@@ -190,7 +190,7 @@ function run_query_update($import) {
     import_separator='$sep',
     import_enclosed='$enc',
     import_desc='$desc'
-  where import_id='$id'";
+  WHERE import_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -209,7 +209,7 @@ function run_query_delete($p_id) {
   global $cdg_sql;
 
   // Delete the Import
-  $query = "delete from Import where import_id='$p_id'";
+  $query = "DELETE FROM Import WHERE import_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -230,12 +230,12 @@ function get_import_name_exists($name, $id="") {
   global $cdg_sql;
 
   if ($id != "") {
-    $where_id = "and import_id != '$id'";
+    $where_id = "AND import_id != '$id'";
   }
 
-  $query = "select import_id, import_name
-    from Import
-    where import_name='$name'
+  $query = "SELECT import_id, import_name
+    FROM Import
+    WHERE import_name='$name'
       $where_id";
 
   display_debug_msg($query, $cdg_sql);
@@ -528,8 +528,8 @@ function get_similar_company($fields, $map) {
 
   $query = "SELECT distinct company_id, company_name, company_zipcode 
     FROM Company
-    WHERE (company_name $like '$name%' or company_aka $like '%$name%')
-      and (company_zipcode $like '$zip' or company_town $like '$town')";
+    WHERE (company_name $like '$name%' OR company_aka $like '%$name%')
+      AND (company_zipcode $like '$zip' OR company_town $like '$town')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -599,7 +599,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $email = $fields["comp_mail"];
   $com = addslashes($fields["comp_com"]);
 
-  $query = "insert into Company (company_timeupdate,
+  $query = "INSERT INTO Company (company_timeupdate,
     company_timecreate,
     company_userupdate,
     company_usercreate,
@@ -622,7 +622,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     company_web,
     company_email,
     company_comment)
-  values (null,
+  VALUES (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
     '$uid',
@@ -651,9 +651,9 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $retour = $obm_q->query($query);
 
   // Get the company Id
-  $query = "select company_id as id
-      from Company
-      where company_name = '$name'
+  $query = "SELECT company_id as id
+      FROM Company
+      WHERE company_name = '$name'
         and company_phone = '$phone'
         and company_address1 = '$ad1'
         and company_zipcode = '$zip'
@@ -668,10 +668,10 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $cat = $cats[$fields["comp_cat"]];
   if ($cat != "") {
 
-    $query = "insert into CompanyCategoryLink (
+    $query = "INSERT INTO CompanyCategoryLink (
         companycategorylink_company_id,
 	companycategorylink_category_id)
-      values (
+      VALUES (
         '$id',
         '$cat')";
     display_debug_msg($query, $cdg_sql);
@@ -732,7 +732,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $email = $fields["comp_mail"];
   $com = addslashes($fields["comp_com"]);
 
-  $query = "update Company set
+  $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
     company_userupdate='$uid',
     company_datasource_id='$dsrc',
@@ -751,7 +751,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     company_web='$web',
     company_email='$email',
     company_comment='$com'
-  where company_id='$company_id'";
+  WHERE company_id='$company_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -761,17 +761,17 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $cat = $cats[$fields["comp_cat"]];
   if ($cat != "") {
 
-    $query = "delete
-      from CompanyCategoryLink
-      where companycategorylink_company_id='$company_id'
-        and companycategorylink_category_id='$cat'";
+    $query = "DELETE
+      FROM CompanyCategoryLink
+      WHERE companycategorylink_company_id='$company_id'
+        AND companycategorylink_category_id='$cat'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
   
-    $query = "insert into CompanyCategoryLink (
+    $query = "INSERT INTO CompanyCategoryLink (
         companycategorylink_company_id,
         companycategorylink_category_id)
-      values (
+      VALUES (
           '$company_id',
           '$cat')";
     display_debug_msg($query, $cdg_sql);
@@ -853,15 +853,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   } else {
     $kind_id = "0";
   }
-<<<<<<< import_query.inc
-  // If a function name has been found we get the corresponding id
-  if (isset($functions[$fields["con_func"]])) {
-    $function_id = $functions[$fields["con_func"]];
-    // else we get the entry as an id
-  } else {
-    $function_id = $fields["con_func"];
-  }
-=======
+
   // If a function name has been found we get the corresponding id
   if (isset($functions[$fields["con_func"]])) {
     $function_id = $functions[$fields["con_func"]];
@@ -871,7 +863,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   } else {
     $function_id = "0";
   }
->>>>>>> 1.26.2.3
+
   $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
   $ad2 = addslashes($fields["con_ad2"]);
@@ -896,7 +888,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $arch = '0';
   $priv = '0';
 
-  $query = "insert into Contact (contact_timeupdate,
+  $query = "INSERT INTO Contact (contact_timeupdate,
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
@@ -924,7 +916,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_archive,
     contact_privacy,
     contact_comment)
-  values (null,
+  VALUES (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
     '$uid',
@@ -1001,15 +993,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     $kind_id = $kinds[$fields["con_lang"]];
     $q_kind = "contact_kind_id='$kind_id',";
   }
-<<<<<<< import_query.inc
-  // If a function name has been found we get the corresponding id
-  if (isset($functions[$fields["con_func"]])) {
-    $function_id = $functions[$fields["con_func"]];
-    // else we get the entry as an id
-  } else {
-    $function_id = $fields["con_func"];
-  }
-=======
+
   // If a function name has been found we get the corresponding id
   if (isset($functions[$fields["con_func"]])) {
     $function_id = $functions[$fields["con_func"]];
@@ -1018,7 +1002,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     $function_id = $fields["con_func"];
     $q_function = "contact_function_id='$function_id',";
   }
->>>>>>> 1.26.2.3
+
   $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
   $ad2 = addslashes($fields["con_ad2"]);
@@ -1043,7 +1027,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $arch = '0';
   $priv = '0';
 
-  $query = "update Contact set
+  $query = "UPDATE Contact SET
     contact_timeupdate='". date("Y-m-d H:i:s") ."',
     contact_userupdate='$uid',
     contact_datasource_id='$dsrc',
@@ -1070,7 +1054,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_archive='$arch',
     contact_privacy='$priv',
     contact_comment='$com'
-  where contact_id='$contact_id'";
+  WHERE contact_id='$contact_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1163,11 +1147,11 @@ function get_import_function_hash() {
 function run_query_import_kind() {
   global $cdg_sql;
 
-  $query = "select kind_id,
+  $query = "SELECT kind_id,
       kind_lang,
       kind_default
-    from Kind
-    order by kind_lang, kind_default desc";
+    FROM Kind
+    ORDER BY kind_lang, kind_default DESC";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;

@@ -439,7 +439,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	top: 16px;
 /*	border: 3px solid #FF9EC6;*/
 	text-align: center;
-	background-color: #FF;
+	background-color: #FFFFFF;
 }
 
 .detailButtons {
@@ -448,12 +448,12 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 }
 
 .elementRow {
-  color: #7B9EAD;  
-  background-color: #FFFFFF;  
-  overflow : hidden;
-  width : 150px;
-  float : left; 
-  white-space: nowrap;
+	font-size:         10px;
+        background-color:  #FFFFFF;  
+        overflow:          hidden;
+        width:             150px;
+        float:             left; 
+        white-space:       nowrap;
 }
 /* ------------------------------------------------------------------------- */
 /* link */
@@ -800,9 +800,9 @@ table.classic {
   border-collapse:		collapse;
 }
 table.classic th {
-  background-color : 		#1482ab;
-  border :			1px solid black;
-  color :			#ffffff;
+  background-color: 		#1482ab;
+  border:			1px solid black;
+  color:			#ffffff;
   font-size:			12px;
 }
 
@@ -813,11 +813,11 @@ table.classic td {
 }
 
 table.classic tr.pair {
-  background-color : 		#eff3f7;
+  background-color: 		#eff3f7;
 }
 
 table.classic tr.impair {
-  background-color : 		#ffffff;
+  background-color: 		#ffffff;
 }
 
 table.classic td.totals {
@@ -825,9 +825,9 @@ table.classic td.totals {
 }
 
 span.hiddenLegend {
-  display:none;
-  background-color: #ffffcc;
-  font-size: 8px;
-  border: 1px solid black;
-  moz-border-radius:
+  display:           none;
+  background-color:  #ffffcc;
+  font-size:         8px;
+  border:            1px solid black;
+/*   moz-border-radius: */
 }

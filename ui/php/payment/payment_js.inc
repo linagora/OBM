@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : invoice_js.inc                                              //
 //     - Desc  : invoice javascript functions File                           //
@@ -7,11 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-$extra_js .= "
-<SCRIPT LANGUAGE=\"JavaScript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
@@ -176,6 +171,4 @@ function update_values (share, old_share, not_paid_before, still_not_paid, insta
   old_share.value = v_share;
 }
 
-// --> 
-</SCRIPT>
 ";

@@ -386,10 +386,10 @@ function run_query_insert($company) {
 
   if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
-      $query = "insert into CompanyCategoryLink (
+      $query = "INSERT INTO CompanyCategoryLink (
 	  companycategorylink_company_id,
 	  companycategorylink_category_id)
-	values (
+	VALUES (
           '$id',
           '$categoryid')";
       display_debug_msg($query, $cdg_sql);
@@ -563,7 +563,7 @@ function run_query_check_company($p_id, $name, $zip) {
 
   $where_id = "";
   if ($p_id != "") {
-    $where_id = "and company_id!='$p_id'";
+    $where_id = "AND company_id!='$p_id'";
   }
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -693,87 +693,6 @@ function run_query_kind_links($p_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category company query execution
-// Return:
-//   Array with orderer categories
-///////////////////////////////////////////////////////////////////////////////
-function get_ordered_companycat() {
-  global $cdg_sql, $cgp_hide;
-
-  $show_cat = (! $cgp_hide["company"]["category"]);
-  if ($show_cat) {
-    $query = "SELECT * FROM CompanyCategory ORDER BY companycategory_code";
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-    $comps = get_ordered_category($obm_q);
-  } else {
-    $comps = "";
-  }
-
-  return $comps;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Category of a company and sort it as a table
-// Parameters:
-//   - $id : Company ID
-// Return:
-//   - $links array of array : links[1]=[id, label, code]
-///////////////////////////////////////////////////////////////////////////////
-function get_company_cat($id) { 
-  global $cdg_sql, $cgp_hide;
-
-  $show_cat = (! $cgp_hide["company"]["category"]);
-  if ($show_cat) {
-    $query = "SELECT CompanyCategory.*
-    FROM CompanyCategoryLink, CompanyCategory
-    WHERE companycategorylink_company_id = '$id' 
-      AND companycategorylink_category_id = companycategory_id
-    ORDER BY companycategory_code"; 
-
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-    $links = get_ordered_category($obm_q);
-  } else {
-    $links = "";
-  }
-
-  return $links;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// get detail from the Category of a company 
-// Parameters:
-//   - $id : Company ID
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_companycat_name($id) { 
-  global $cdg_sql, $cgp_hide;
-
-  $show_cat = (! $cgp_hide["company"]["category"]);
-  if ($show_cat) {
-    $query = "SELECT *
-    FROM CompanyCategoryLink,
-      CompanyCategory
-    WHERE companycategorylink_company_id = '$id' 
-      AND companycategorylink_category_id = companycategory_id
-    ORDER BY companycategory_code"; 
-
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-  } else {
-    $obm_q = "";
-  }
 
   return $obm_q;
 }
@@ -1365,79 +1284,6 @@ function check_can_delete_company($p_id) {
   }
 
   return $delete_ok;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query to build the category tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_tree() {
-  global $cdg_sql;
-
-  $query = "SELECT *
-  FROM CompanyCategory 
-  ORDER BY companycategory_code";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;  
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// place Category in the correct order
-// Parameters: DB object of categories.
-// Return:
-//   - array of array [id, label, code]
-///////////////////////////////////////////////////////////////////////////////
-function get_ordered_category($cat_q) {
-
-  $wc = 0; 
-  while ($cat_q->next_record()) {
-    $id = $cat_q->f("companycategory_id");
-    $code = $cat_q->f("companycategory_code");
-    $label = $cat_q->f("companycategory_label");
-    $doc_info = array(
-      "id" =>$id,
-      "label" =>$label,
-      "code" => $code);
-    $categories[] = $doc_info;
-  }
-
-  if (count($categories) > 0) {
-    usort($categories,"category_compare");
-  }
-
-  return $categories;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Compare 2 categories with their code
-// Parameters: 
-//   - $cats   : categories array
-//   - $m      : index of first category
-//   - $n      : index of second category
-///////////////////////////////////////////////////////////////////////////////
-function category_compare($m, $n) {
-  global $wc;
-
-  $wc++;
-  $code_1 = explode(".",$m["code"]);
-  $code_2 = explode(".",$n["code"]);
-  $i=0;
-  while (isset($code_1[$i]) || isset($code_2[$i])) {
-    if ($code_1[$i] > $code_2[$i]){
-      return 1;
-    } elseif($code_1[$i] < $code_2[$i]) {
-      return -1;
-    }
-    $i++;
-  }
-  return 0;
 }
 
 

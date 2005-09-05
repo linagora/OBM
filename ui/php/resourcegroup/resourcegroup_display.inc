@@ -24,7 +24,7 @@ $fieldnames["resourcegroup_resource_desc"] = $l_desc;
 $fieldnames["resourcegroup_resource_qty"] = $l_qty;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group specific dataset fields                                     //
+// Display Group specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -214,8 +214,8 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $gr
       $form_attr = "onsubmit=\"fill_ext_form(this);return false;\"";
       $input_target = "<input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />";
     }
-    $display_popup_head = "<form $form_attr>";
-    $display_popup_end = "
+    $dis_group->data_form_head = "<form $form_attr>";
+    $dis_group->data_form_end = "
     <p class=\"detailButton\">
     <p class=\"detailButtons\">
       <input type=\"submit\" value=\"$l_add\" />
@@ -224,7 +224,8 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $gr
       $input_target
     </p>
     </p>
-    </form>
+    </form>";
+    $display_popup_end = "
     <p><a href=\"\" onclick='window.close();'>$l_close</a></p>";
   }
 
@@ -233,7 +234,6 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $gr
 
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_info_msg("$nb_group $l_found");
-  $block .= $display_popup_head;
   $block .= $dis_group->display("dis_data_resourcegroup");
   $block .= $display_popup_end;
 

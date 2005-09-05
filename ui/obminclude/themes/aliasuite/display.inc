@@ -106,7 +106,11 @@ function display_head($p_module) {
   <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" /> 
   <title>$l_obm_title - $p_module</title>
   $dis_extra_css
+<script type=\"text/javascript\">
+<!--
   $extra_js
+// -->
+</script>
   
 </head>
 

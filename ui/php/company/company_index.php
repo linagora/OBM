@@ -49,6 +49,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("company_query.inc");
 require("company_display.inc");
+include("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
 update_last_visit("company", $param_company, $action);
@@ -79,14 +80,13 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] =  html_category_tree($company);
+  $display["detail"] = of_category_dis_tree($company, $action, "company", "category");
 
 } elseif ($action == "ext_get_cat_code") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] =  html_category_code_tree($company);
-
+  $display["detail"] = of_category_dis_tree($company, $action, "company", "category");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -411,7 +411,7 @@ function get_param_company() {
   global $tf_email, $sel_act, $sel_naf, $sel_kind, $sel_cat, $sel_market;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_dateafter, $tf_datebefore, $cb_cat_tree, $cb_fuzzy;
-  global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
+  global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat;
   global $tf_naf_code, $tf_naf_label, $cb_naf_title, $tf_vat;
   global $param_company;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  

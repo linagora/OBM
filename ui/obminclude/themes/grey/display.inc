@@ -109,7 +109,11 @@ function display_head($p_module) {
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" />
   $dis_extra_css
+<script type=\"text/javascript\">
+<!--
   $extra_js
+// -->
+</script>
 </head>
 
 <body onload=\"if (document.f_search) { document.f_search.submit.focus();} \">

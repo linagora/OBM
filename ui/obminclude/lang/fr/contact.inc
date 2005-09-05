@@ -81,7 +81,6 @@ $l_kind_update = "Modifier le Genre";
 $l_kind_checkdelete = "Vérifier ou Supprimer le Genre";
 $l_kind_delete = "Supprimer le Genre";
 $l_kind_insert = "Créer le Genre";
-$l_add = "Ajouter ces contacts";
 $l_add_cats1 = "Ajouter ces categories 1";
 $l_add_cats2 = "Ajouter ces categories 2";
 $l_subscription = "Abonnements";

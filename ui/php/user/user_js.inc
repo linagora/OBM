@@ -7,10 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script LANGUAGE=\"JavaScript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 
@@ -115,7 +111,5 @@ function check_user(form) {
   return true;
 }
 
-// -->
-</script>
 ";
 

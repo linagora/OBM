@@ -1205,10 +1205,10 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contact Criterion Form //
+// Display the Contact Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q){
+function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q) {
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
   global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
@@ -1216,42 +1216,55 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   global $set_theme,$ico_mini_cal;  
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
-  while($cty_q->next_record()) {
+  while ($cty_q->next_record()) {
     $sel_cty .= "\n<option value=\"".$cty_q->f("country_iso3166")."\">".$cty_q->f("country_name")."</option>";
-  }  
-  if($cty_q->nf()!=0)   
+  }
+  if ($cty_q->nf() != 0) {
     $cty_q->seek(0);
+  }
+
   $sel_usr .= "\n<option value=\"\">$l_all</option>";
-  while($usr_q->next_record()) {
+  while ($usr_q->next_record()) {
     $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
   }
-  if($usr_q->nf()!=0) 
+  if ($usr_q->nf() != 0) {
     $usr_q->seek(0);
+  }
+
   $sel_dsr .= "\n<option value=\"\">$l_all</option>";
-  while($dsr_q->next_record()) {
+  while ($dsr_q->next_record()) {
     $sel_dsr .= "\n<option value=\"".$dsr_q->f("datasource_id")."\">".$dsr_q->f("datasource_name")."</option>";
-  }  
-  if($dsr_q->nf()!=0) 
+  }
+  if ($dsr_q->nf() != 0) {
     $dsr_q->seek(0);
+  }
+
   $sel_cat1 .= "\n<option value=\"\">$l_all</option>";
-  while($cat1_q->next_record()) {
+  while ($cat1_q->next_record()) {
     $sel_cat1 .= "\n<option value=\"".$cat1_q->f("contactcategory1_id")."\">".$cat1_q->f("contactcategory1_label")."</option>";
-  }  
-  if($cat1_q->nf()!=0) 
+  }
+  if ($cat1_q->nf() != 0) {
     $cat1_q->seek(0);
+  }
+
   $sel_cat2 .= "\n<option value=\"\">$l_all</option>";
-  while($cat2_q->next_record()) {
+  while ($cat2_q->next_record()) {
     $sel_cat2 .= "\n<option value=\"".$cat2_q->f("contactcategory2_id")."\">".$cat2_q->f("contactcategory2_label")."</option>";
-  }   
-  if($cat2_q->nf()!=0) 
+  }
+  if ($cat2_q->nf() != 0) {
     $cat2_q->seek(0);
-  $sel_fct .= "\n<option value=\"\">$l_all</option>";
-  while($fct_q->next_record()) {
-    $sel_fct .= "\n<option value=\"".$fct_q->f("function_id")."\">".$fct_q->f("function_label")."</option>";
-  }   
-  if($fct_q->nf()!=0) 
-    $fct_q->seek(0);
-    
+  }
+
+  if ($fct_q != "") {
+    $sel_fct .= "\n<option value=\"\">$l_all</option>";
+    while ($fct_q->next_record()) {
+      $sel_fct .= "\n<option value=\"".$fct_q->f("function_id")."\">".$fct_q->f("function_label")."</option>";
+    }
+    if ($fct_q->nf() != 0) {
+      $fct_q->seek(0);
+    }
+  }
+
   $sel_lag .= "\n<option value=\"\">$l_all</option>";
   while($lag_q->next_record()) {
     $sel_lag .= "\n<option value=\"".$lag_q->f("kind_lang")."\">".$lag_q->f("kind_lang")."</option>";
@@ -1336,17 +1349,19 @@ function html_publication_criterion($rec_q,$pub_q){
   global $l_publication, $l_title, $l_lang, $l_year;
   global $l_renew,$l_recept, $l_after, $l_before;
 
-  if ($rec_q->nf()!=0) {
+  if ($rec_q->nf() !=0 ) {
     $rec_q->seek(0);
   }
   $sel_rec .= "\n<option value=\"\">$l_all</option>";
-  while($rec_q->next_record()) {
+  while ($rec_q->next_record()) {
     $sel_rec .= "\n<option value=\"".$rec_q->f("subscriptionreception_id")."\">".$rec_q->f("subscriptionreception_label")."</option>";
-  }  
-  if($pub_q->nf()!=0) 
+  }
+
+  if ($pub_q->nf() !=0) {
     $pub_q->seek(0);
+  }
   $sel_pub .= "\n<option value=\"\">$l_all</option>";
-  while($pub_q->next_record()) {
+  while ($pub_q->next_record()) {
     $sel_pub .= "\n<option value=\"".$pub_q->f("publication_id")."\">".$pub_q->f("publication_title")."</option>";
   }   
   
@@ -1533,7 +1548,7 @@ function dis_list_warn_insert($list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the export format form                                            //
+// Display the export format form
 // Parameters:
 //   - $list[]    : list search criteria
 //     keys used  : name, subject, email

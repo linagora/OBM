@@ -7,10 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 
@@ -241,6 +237,4 @@ function select_default(sel_list, def_value) {
       sel_list.options[i].selected=true;
   }
 }
-// -->
-</script>
 ";

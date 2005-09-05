@@ -8,11 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$extra_js .= "
-<script Language=\"JavaScript\">
-<!--
-";
-
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
@@ -127,6 +122,4 @@ function compute_tax (form, auto) {
   form.tf_amount_ttc.value = (Math.round (ht * rate*100))/100;
 }
 
-// --> 
-</script>
 ";

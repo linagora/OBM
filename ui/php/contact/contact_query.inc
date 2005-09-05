@@ -46,10 +46,10 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 
   // If company module used (external from Contact)
   if ($cgp_show["module"]["company"]) {
-    $join_comp = "LEFT JOIN Company on contact_company_id=company_id";
+    $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
     $join_ctry2 = "LEFT JOIN Country as ctry2 ON
                   Company.company_country_iso3166 = ctry2.country_iso3166
-                  and ctry2.country_lang='$lang'";
+                  AND ctry2.country_lang='$lang'";
     $company_fields = "company_name,
       company_phone,
       company_fax,
@@ -66,80 +66,80 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 
   // If a lastname has been specified, get it 
   if ($lname != "") {
-    $where .= " and contact_lastname $like '$lname%'";
+    $where .= " AND contact_lastname $like '$lname%'";
   }
   // If a firstname has been specified, get it 
   if ($fname != "") {
-    $where .= " and contact_firstname $like '$fname%'";
+    $where .= " AND contact_firstname $like '$fname%'";
   }
   // If a phone number has been specified, get it 
   if ($phone != "") {
-    $where .= " and (contact_phone $like '$phone%' or
-                 contact_homephone $like '$phone%' or
+    $where .= " AND (contact_phone $like '$phone%' OR
+                 contact_homephone $like '$phone%' OR
                  contact_mobilephone $like '$phone%')";
   }
   // If an email indication has been specified, get it 
   if ($email != "") {
-    $where .= " and (contact_email $like '$email%' or
+    $where .= " AND (contact_email $like '$email%' OR
                      contact_email2 $like '$email%')";
   }
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {
     if ($cgp_show["module"]["company"]) {
-      $where .= " and company_name $like '$company%'";
-      $join_comp_count = "left join Company on contact_company_id=company_id";
+      $where .= " AND company_name $like '$company%'";
+      $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
     } else {
-      $where .= " and contact_company $like '$company%'";
+      $where .= " AND contact_company $like '$company%'";
     }
   }
   // If a company was sent as parameter, get it
   if ($company_id != "") {
-    $where .= " and contact_company_id='$company_id'";
+    $where .= " AND contact_company_id='$company_id'";
   }
   // If a post code has been specified, get it 
   if ($zip != "") {
-    $where .= " and contact_zipcode $like '$zip%'";
+    $where .= " AND contact_zipcode $like '$zip%'";
   }
   // If a town has been specified, get it 
   if ($town != "") {
-    $where .= " and contact_town $like '$town%'";
+    $where .= " AND contact_town $like '$town%'";
   }
   // If a country has been set
   if (($ctry != $c_all) && ($ctry != "")) {
     if ($cgp_show["module"]["company"]) {
-      $where .= " and (contact_country_iso3166='$ctry' or
-       contact_country_iso3166='' and company_country_iso3166='$ctry')";
-      $join_comp_count = "left join Company on contact_company_id=company_id";
+      $where .= " AND (contact_country_iso3166='$ctry' OR
+       contact_country_iso3166='' AND company_country_iso3166='$ctry')";
+      $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
     } else {
-      $where .= " and contact_country_iso3166='$ctry'";
+      $where .= " AND contact_country_iso3166='$ctry'";
     }
   }
 
   // If a person in charge has been set
   if (($market != $c_all) && ($market != "")) { 
-    $where .= " and contact_marketingmanager_id='$market'";
+    $where .= " AND contact_marketingmanager_id='$market'";
   }
   // If a function has been set
   if (($func != $c_all) && ($func != "")) { 
-    $where .= " and contact_function_id='$func'";
+    $where .= " AND contact_function_id='$func'";
   }
   // If a title has been specified, get it 
   if ($title != "") {
-    $where .= " and contact_title $like '$title%'";
+    $where .= " AND contact_title $like '$title%'";
   }
   // If a Category 1 has been set
   if (($cat1 != $c_all) && ($cat1 != "")) {
-    $join_cat1 = "left join ContactCategory1Link on contact_id=contactcategory1link_contact_id";
-    $where .= " and contactcategory1link_category_id='$cat1'";
+    $join_cat1 = "LEFT JOIN ContactCategory1Link ON contact_id=contactcategory1link_contact_id";
+    $where .= " AND contactcategory1link_category_id='$cat1'";
   }
   // If a Category 2 has been set
   if (($cat2 != $c_all) && ($cat2 != "")) {
-    $join_cat2 = "left join ContactCategory2Link on contact_id=contactcategory2link_contact_id";
-    $where .= " and contactcategory2link_category_id='$cat2'";
+    $join_cat2 = "LEFT JOIN ContactCategory2Link ON contact_id=contactcategory2link_contact_id";
+    $where .= " AND contactcategory2link_category_id='$cat2'";
   }
   // Get only not archived by default
   if ($archive != "1") {
-    $where .= " and contact_archive=0";
+    $where .= " AND contact_archive=0";
   }
   
   $whereq = "WHERE $where";
@@ -198,11 +198,11 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       $if_country as country_name
     FROM Contact
         $join_comp
-        left join Kind on contact_kind_id = kind_id
-        left join Function on contact_function_id=function_id
-        left join Country as ctry1 ON
+        LEFT JOIN Kind ON contact_kind_id = kind_id
+        LEFT JOIN Function ON contact_function_id=function_id
+        LEFT JOIN Country as ctry1 ON
                   contact_country_iso3166 = ctry1.country_iso3166
-                  and ctry1.country_lang='$lang'
+                  AND ctry1.country_lang='$lang'
         $join_ctry2
         $join_cat1
         $join_cat2
@@ -240,10 +240,10 @@ function run_query_contact_detail($p_id) {
   $lang = get_lang();
 
   if ($cgp_show["module"]["company"]) {
-    $join_comp = "LEFT JOIN Company on contact_company_id=company_id";
+    $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
     $join_ctry2 = "LEFT JOIN Country as C2
-                   on company_country_iso3166=C2.country_iso3166
-                    and C2.country_lang='$lang'";
+                   ON company_country_iso3166=C2.country_iso3166
+                    AND C2.country_lang='$lang'";
     $company_fields = "company_id,
         company_name,
         company_phone,
@@ -277,15 +277,15 @@ function run_query_contact_detail($p_id) {
       FROM
         Contact
         $join_comp
-        LEFT JOIN Kind on kind_id=contact_kind_id
-        LEFT JOIN UserObm as m on contact_marketingmanager_id=m.userobm_id
-        LEFT JOIN Function on contact_function_id=function_id
-        LEFT JOIN Country as C1 on contact_country_iso3166=C1.country_iso3166
-                  and C1.country_lang='$lang'
+        LEFT JOIN Kind ON kind_id=contact_kind_id
+        LEFT JOIN UserObm as m ON contact_marketingmanager_id=m.userobm_id
+        LEFT JOIN Function ON contact_function_id=function_id
+        LEFT JOIN Country as C1 ON contact_country_iso3166=C1.country_iso3166
+                  AND C1.country_lang='$lang'
         $join_ctry2
-        LEFT JOIN DataSource on contact_datasource_id=datasource_id
-        LEFT JOIN UserObm as c on contact_usercreate=c.userobm_id
-        LEFT JOIN UserObm as u on contact_userupdate=u.userobm_id
+        LEFT JOIN DataSource ON contact_datasource_id=datasource_id
+        LEFT JOIN UserObm as c ON contact_usercreate=c.userobm_id
+        LEFT JOIN UserObm as u ON contact_userupdate=u.userobm_id
       WHERE
         contact_id='$p_id'";
 
@@ -321,8 +321,8 @@ function run_query_contact_company($c_id) {
       company_country_iso3166,
       country_name as company_country_name
     FROM Company
-    LEFT JOIN Country on company_country_iso3166 = country_iso3166
-                         and country_lang='$lang'
+    LEFT JOIN Country ON company_country_iso3166 = country_iso3166
+                         AND country_lang='$lang'
     WHERE company_id='$c_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -352,48 +352,6 @@ function run_query_kind() {
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 1 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contactcategory1() {
-  global $cdg_sql, $cgp_hide;
-
-  if (! $cgp_hide["contact"]["category1"]) {
-    $query = "SELECT * FROM ContactCategory1 ORDER BY contactcategory1_code"; 
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-  } else {
-    $obm_q = "";
-  }
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 2 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contactcategory2() {
-  global $cdg_sql, $cgp_hide;
-
-  if (! $cgp_hide["contact"]["category2"]) {
-    $query = "SELECT * FROM ContactCategory2 ORDER BY contactcategory2_code"; 
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-  } else {
-    $obm_q = "";
-  }
 
   return $obm_q;
 }
@@ -937,7 +895,7 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
       contact_firstname,
       company_name 
     FROM Contact
-      LEFT JOIN Company on contact_company_id=company_id
+      LEFT JOIN Company ON contact_company_id=company_id
     WHERE $where_id
       ((contact_lastname='$lname' AND contact_firstname='$fname')
         OR (contact_company_id='$comp_id' AND contact_lastname='$lname'))";
@@ -1139,7 +1097,7 @@ function get_contact_info($con_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Function insertion query construction and execution                       //
+// Function insertion query construction and execution
 // Parameters:
 //   - $contact : contact hash info : keys used : func_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -1150,11 +1108,11 @@ function run_query_function_insert($contact) {
   $usercreate = $auth->auth["uid"];
   $function = $contact["func_label"];
 
-  $query = "insert into Function (
+  $query = "INSERT INTO Function (
     function_timecreate,
     function_usercreate,
     function_label)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$function')";
@@ -1168,7 +1126,7 @@ function run_query_function_insert($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Function update query execution                                           //
+// Function update query execution
 // Parameters:
 //   - $contact : contact hash info : keys used : function, func_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -1180,11 +1138,11 @@ function run_query_function_update($contact) {
   $id = $contact["function"];
   $function = $contact["func_label"];
 
-  $query = "update Function set
+  $query = "UPDATE Function SET
       function_label='$function',
       function_timeupdate='$timeupdate',
       function_userupdate='$userupdate'
-    where
+    WHERE
       function_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1196,14 +1154,14 @@ function run_query_function_update($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Function deletion query execution                                         //
+// Function deletion query execution
 // Parameters:
 //   - $id : Function id to delete
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_function_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from Function where function_id='$id'";
+  $query = "DELETE FROM Function WHERE function_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1214,18 +1172,19 @@ function run_query_function_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fuction - Contact links query execution                                   //
+// Fuction - Contact links query execution
 // Parameters:
 //   - $id : function id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_function_links($id) {
   global $cdg_sql;
 
-  $query = "select contact_lastname,
+  $query = "SELECT contact_lastname,
       contact_firstname,
       contact_id,
       contact_function_id
-    from Contact where contact_function_id='$id'";
+    FROM Contact
+    WHERE contact_function_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1243,9 +1202,9 @@ function run_query_function_links($id) {
 function get_function_label($id) {
   global $cdg_sql;
 
-  $query = "select function_label
-    from Function
-    where function_id='$id'";
+  $query = "SELECT function_label
+    FROM Function
+    WHERE function_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1278,14 +1237,14 @@ function run_query_kind_insert($contact) {
     run_query_kind_clear_default($lang);
   }
 
-  $query = "insert into Kind (
+  $query = "INSERT INTO Kind (
     kind_timecreate,
     kind_usercreate,
     kind_minilabel,
     kind_header,
     kind_lang,
     kind_default)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$label',
@@ -1309,9 +1268,9 @@ function run_query_kind_insert($contact) {
 function run_query_kind_clear_default($lang) {
   global $cdg_sql;
 
-  $query = "update Kind
-    set kind_default=0
-    where kind_lang = '$lang'";
+  $query = "UPDATE Kind
+    SET kind_default=0
+    WHERE kind_lang = '$lang'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1343,14 +1302,14 @@ function run_query_kind_update($contact) {
     run_query_kind_clear_default($lang);
   }
 
-  $query = "update Kind set
+  $query = "UPDATE Kind SET
       kind_timeupdate='$timeupdate',
       kind_userupdate='$userupdate',
       kind_minilabel='$label',
       kind_header='$header',
       kind_lang='$lang',
       kind_default='$default'
-    where
+    WHERE
       kind_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1369,7 +1328,7 @@ function run_query_kind_update($contact) {
 function run_query_kind_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from Kind where kind_id='$id'";
+  $query = "DELETE FROM Kind WHERE kind_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1387,11 +1346,12 @@ function run_query_kind_delete($id) {
 function run_query_kind_links($id) {
   global $cdg_sql;
 
-  $query = "select contact_lastname,
+  $query = "SELECT contact_lastname,
       contact_firstname,
       contact_id,
       contact_kind_id
-    from Contact where contact_kind_id='$id'";
+    FROM Contact
+    WHERE contact_kind_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1409,9 +1369,9 @@ function run_query_kind_links($id) {
 function get_kind_label($id) {
   global $cdg_sql;
 
-  $query = "select kind_lang, kind_minilabel, kind_header
-    from Kind
-    where kind_id='$id'";
+  $query = "SELECT kind_lang, kind_minilabel, kind_header
+    FROM Kind
+    WHERE kind_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1437,12 +1397,12 @@ function run_query_cat1_insert($contact) {
   $cat1 = $contact["cat1_label"];
   $cat1_code = $contact["cat1_code"];
 
-  $query = "insert into ContactCategory1 (
+  $query = "INSERT INTO ContactCategory1 (
     contactcategory1_timecreate,
     contactcategory1_usercreate,
     contactcategory1_label,
     contactcategory1_code)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$cat1',
@@ -1470,12 +1430,12 @@ function run_query_cat2_insert($contact) {
   $cat2_code = $contact["cat2_code"];
   
 
-  $query = "insert into ContactCategory2 (
+  $query = "INSERT INTO ContactCategory2 (
     contactcategory2_timecreate,
     contactcategory2_usercreate,
     contactcategory2_label,
     contactcategory2_code)
-  values (
+  VALUES (
     '$timecreate',
     '$usercreate',
     '$cat2',
@@ -1503,12 +1463,12 @@ function run_query_cat2_update($contact) {
   $cat2 = $contact["cat2_label"];
   $cat2_code = $contact["cat2_code"];
 
-  $query = "update ContactCategory2 set
+  $query = "UPDATE ContactCategory2 SET
       contactcategory2_label='$cat2',
       contactcategory2_code='$cat2_code',
       contactcategory2_timeupdate='$timeupdate',
       contactcategory2_userupdate='$userupdate'
-    where
+    WHERE
       contactcategory2_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1533,12 +1493,12 @@ function run_query_cat1_update($contact) {
   $cat1 = $contact["cat1_label"];
   $cat1_code = $contact["cat1_code"];
   
-  $query = "update ContactCategory1 set
+  $query = "UPDATE ContactCategory1 SET
       contactcategory1_label='$cat1',
       contactcategory1_code='$cat1_code',
       contactcategory1_timeupdate='$timeupdate',
       contactcategory1_userupdate='$userupdate'
-    where
+    WHERE
       contactcategory1_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1548,16 +1508,16 @@ function run_query_cat1_update($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id                                  //
+// Get the label of a Category from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_cat1_label($id) {
   global $cdg_sql;
 
-  $query = "select contactcategory1_label
-    from ContactCategory1
-    where contactcategory1_id='$id'";
+  $query = "SELECT contactcategory1_label
+    FROM ContactCategory1
+    WHERE contactcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1577,10 +1537,10 @@ function get_cat1_label($id) {
 function run_query_cat1_links($p_id) {
   global $cdg_sql;
 
-  $query = "select contact_title, contact_id, '$p_id' as contact_category1
-    from Contact,ContactCategory1Link
-    where contact_id = contactcategory1link_contact_id
-      and contactcategory1link_category_id = '$p_id'";
+  $query = "SELECT contact_title, contact_id, '$p_id' as contact_category1
+    FROM Contact,ContactCategory1Link
+    WHERE contact_id = contactcategory1link_contact_id
+      AND contactcategory1link_category_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1591,16 +1551,16 @@ function run_query_cat1_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category from its id                                   //
+// Get the label of a Category from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
 function get_cat2_label($id) {
   global $cdg_sql;
 
-  $query = "select contactcategory2_label
-    from ContactCategory2
-    where contactcategory2_id='$id'";
+  $query = "SELECT contactcategory2_label
+    FROM ContactCategory2
+    WHERE contactcategory2_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1613,17 +1573,17 @@ function get_cat2_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category - Contact links query execution                                 //
+// Category - Contact links query execution
 // Parameters:
 //   - $p_id : activity id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat2_links($p_id) {
   global $cdg_sql;
 
-  $query = "select contact_title, contact_id, '$p_id' as contact_category2
-    from Contact, ContactCategory2Link
-    where contact_id = contactcategory2link_contact_id
-      and contactcategory2link_category_id = '$p_id'";
+  $query = "SELECT contact_title, contact_id, '$p_id' as contact_category2
+    FROM Contact, ContactCategory2Link
+    WHERE contact_id = contactcategory2link_contact_id
+      AND contactcategory2link_category_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1642,7 +1602,7 @@ function run_query_cat1_delete($id) {
   global $cdg_sql;
 
   if ($id != '') {
-    $query = "delete from ContactCategory1 where contactcategory1_id='$id'";
+    $query = "DELETE FROM ContactCategory1 WHERE contactcategory1_id='$id'";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
@@ -1665,7 +1625,7 @@ function run_query_cat2_delete($id) {
 
   if ($id != '') {
 
-    $query = "delete from ContactCategory2 where contactcategory2_id='$id'";
+    $query = "DELETE FROM ContactCategory2 WHERE contactcategory2_id='$id'";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
@@ -1687,7 +1647,9 @@ function run_query_subscription_nb($id) {
   global $cdg_sql;
 
   if ($id != '') {
-    $query = "select count(*) as nb from Subscription where subscription_contact_id = '$id'";
+    $query = "SELECT count(*) as nb
+      FROM Subscription
+      WHERE subscription_contact_id = '$id'";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;

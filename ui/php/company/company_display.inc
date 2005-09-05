@@ -169,7 +169,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 function dis_company_search_form($company="") {
 
   $type_q = run_query_companytype();
-  $cats = get_ordered_companycat();
+  $cats = of_category_get_ordered("company", "category");
   $act_q = run_query_companyactivity();
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
@@ -245,7 +245,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   // Category select
   if ($show_cat) {
     $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\"
-      onChange=\"if (this.options[this.selectedIndex].value != '$c_all') {
+      onchange=\"if (this.options[this.selectedIndex].value != '$c_all') {
           mytext = this.options[this.selectedIndex].text;
           pos = mytext.indexOf(' ');
           code = mytext.substr(0, pos);
@@ -257,7 +257,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
       foreach ($cats as $one_cat) {
 	$c_id = $one_cat["id"];
 	$c_code = str_pad($one_cat["code"] . " ", 10, ".");
-	$c_label = $one_cat["label"];
+	$c_label = htmlentities($one_cat["label"]);
 	$sel_cat .= "\n<option value=\"$c_id\"";
 	if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
 	$sel_cat .= ">$c_code $c_label</option>\n";
@@ -309,7 +309,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
     if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+    $sel_ctry .= ">". htmlentities($ctry_q->f("country_name")) . "</option>\n";
   }
   $sel_ctry .= "</select>";
 
@@ -668,10 +668,10 @@ function dis_company_consult($cid) {
 
   if ($cid > 0) {
     $comp_q = run_query_detail($cid);
-    $cat_q = run_query_get_companycat_name($cid);
+    $cats = of_category_get_ordered("company", "category", $cid);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $block = html_company_consult($comp_q, $cat_q);
+      $block = html_company_consult($comp_q, $cats);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -685,8 +685,9 @@ function dis_company_consult($cid) {
 // XHTML Display Company Consultation
 // Parameters:
 //   - $co_q : company database result 
+//   - $cats : array of compant categories
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult($co_q, $cat_q) {
+function html_company_consult($co_q, $cats) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode, $l_vat;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
@@ -843,10 +844,9 @@ function html_company_consult($co_q, $cat_q) {
   }
 
   $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  if ( ($show_cat) && ($cat_q->nf() > 0) ) {
-    $cat_a = get_ordered_category($cat_q);
+  if ( ($show_cat) && (count($cats) > 0) ) {
     $i = 0;
-    foreach($cat_a as $cat_info) {
+    foreach($cats as $cat_info) {
       if ($i == 0) {
 	$cat_disp .= "<tr>";
       }
@@ -912,11 +912,14 @@ function dis_company_form($action, $company) {
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
 
-  if ($company["id"] > 0) {
-    $comp_q = run_query_detail($company["id"]);
+  $c_id = $company["id"];
+  if ($c_id > 0) {
+    $comp_q = run_query_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $compcat = get_company_cat($company["id"]);
+      if ($show_cat) {
+	$compcat = of_category_get_ordered("company", "category", $c_id);
+      }
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -929,9 +932,6 @@ function dis_company_form($action, $company) {
   if ($show_naf) {
     $naf_q = run_query_companynafcode();
   }
-  if ($show_cat) {
-    $cat_q = get_ordered_companycat();
-  }
 
   $users = array($uid);
   if ($company["marketing_manager"] > 0) {
@@ -943,7 +943,7 @@ function dis_company_form($action, $company) {
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();
 
-  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cat_q, $compcat, $ctry_q, $company);
+  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $compcat, $ctry_q, $company);
 
   return $block;
 }
@@ -959,14 +959,13 @@ function dis_company_form($action, $company) {
 //   - $act_q     : activity database result 
 //   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
-//   - $cats      : ordered array of category
 //   - $compcat   : array of category referenced by the company
 //   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cats, $compcat, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $compcat, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
@@ -1106,12 +1105,12 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if ($show_cat) {
     $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
     $j = 0;
-    if (is_array($cats)) {
-      foreach ($cats as $cat_info) {
+    if (is_array($compcat)) {
+      foreach ($compcat as $cat_info) {
 	$c_id = $cat_info["id"];
 	$c_code = $cat_info["code"];
 	$c_label = $cat_info["label"];
-	if ($compcat[$j]["id"] == $c_id) { 
+
 	  $sel_cat .= "\n<option value=\"$c_id\"";
 	  $sel_cat .= " selected=\"selected\""; 
 	  $j++;
@@ -1122,7 +1121,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 	  }
 	  $label .= "$c_label";
 	  $sel_cat .= ">$label</option>";
-	}
+
       }
     }
     $sel_cat .= "</select>";
@@ -1142,6 +1141,10 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 	</td></tr>
        </table>
       </td>";
+
+  // Category select field
+  $block_cat = of_category_dis_entity_form($cats, "", "company");
+
   }
 
   // Activity select field
@@ -1539,7 +1542,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the company administration index                                  //
+// Display the company administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
   global $cgp_hide;
@@ -1550,7 +1553,7 @@ function dis_admin_index() {
   }
 
   if (! $cgp_hide["company"]["category"]) {
-    $cats = get_ordered_companycat();
+    $cats = of_category_get_ordered("company", "category");
     $block .= html_company_cat_form($cats);
   }
 
@@ -1569,7 +1572,7 @@ function dis_admin_index() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Company Kind section                                             //
+// Display: Company Kind section
 // Parameters:
 //   - $kind_q : Kind list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1870,7 +1873,7 @@ function html_company_cat_form($cats) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the cat links                                                   //
+// Displays the cat links
 // Parameters:
 //   - $company : company hash info : keys used : cat
 ///////////////////////////////////////////////////////////////////////////////
@@ -2399,237 +2402,5 @@ function dis_select_companynafcode($naf_q, $line1, $selected) {
   return $sel_naf;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: category Tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function html_category_tree($company) {
-  global $l_close,$l_add,$l_cat_no;
-
-  $popup = $company["popup"];
-  $obm_d = run_query_get_tree();
-  if ($popup) {
-    $link = "<a class=\"categoryDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
-    $link_end ="</a>";
-  }
-  $name = '/';
-  $kind = "0";
-  $realpath = $path.$name;
-  
-  $block.= "
-  <div class=\"categoryTree\">
-   <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
-   ";
-   $cat_a = get_ordered_category($obm_d);
-   if(is_array($cat_a)) {
-     foreach($cat_a as $cat_info) {
-       $hash_code = explode(".",$cat_info["code"]);
-       $deep = count($hash_code);
-       switch ($deep) {
-	 case 1:
-	   $tree[$hash_code[0]] = $cat_info;
-	   break;
-	 case 2:
-	   $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
-	   break;
-	 case 3:
-	   $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
-	   break;
-	 }
-    }
-    foreach($tree as $level => $info) { 
-      $block .= @display_popup_tree($info,0);
-    }
-  }
-  else {
-    $block.= "$l_cat_no";
-  }
-  $block.= "
-  <br />
-  <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
-  <input name=\"popup\" type=\"hidden\" value=\"1\" />
-  <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
-  </form>
-  </div>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Document Tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function display_popup_tree($tree,$indent) {
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
-  global $popup;
-
-  $code = $tree["code"];
-  $label = $tree["label"];
-  $id = $tree["id"]; 
-  if($code != "") {
-    $is_valid = true;
-    $indent_file = $indent + 15;
-  }
-  else {
-    $is_valid = false;
-  }
-    
-  foreach($tree as $level => $info) {
-    if("$level" != "code" && "$level" != "label" && "$level" != "id") {    
-       $content.= display_popup_tree($info,$indent_file);
-      $bool = true;
-    }
-  }
- 
-  if($is_valid) {
-    if($bool == true) {
-      $block= 
-      "<table class=\"category\">
-	 <tr>
-	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	   <a href=\"\" onclick=\"show_hide_dir('$code');return false;\"> 
-	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
-	   </a>
-	  <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
-	  </td>
-	 </tr>
-	</table>
-	<div id='div_$code' style=\"display:none;\" >
-	 $content
-	</div>";
-    }
-    else {
-      $block= 
-      "<table class=\"category\">
-	 <tr>
-	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
-	     <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
-	  </td>
-	 </tr>
-	</table>";
-    }
-  }
-  else {
-    $block = $content;
-  }
-    
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: category Tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function html_category_code_tree($category) {
-  global $l_close,$l_add,$l_cat_no;
-
-  $popup = $category["popup"];
-  $obm_d = run_query_get_tree();
-  if ($popup) {
-    $link = "<a class=\"categoryDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
-    $link_end ="</a>";
-  }
-  $name = '/';
-  $kind = "0";
-  $realpath = $path.$name;
-  
-  $block.= "
-  <div class=\"categoryTree\">
-   ";
-   $cat_a = get_ordered_category($obm_d);
-   if(is_array($cat_a)) {
-     foreach($cat_a as $cat_info) {
-       $hash_code = explode(".",$cat_info["code"]);
-       $deep = count($hash_code);
-       switch ($deep) {
-	 case 1:
-	   $tree[$hash_code[0]] = $cat_info;
-	   break;
-	 case 2:
-	   $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
-	   break;
-	 case 3:
-	   $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
-	   break;
-	 }
-    }
-    foreach($tree as $level => $info) { 
-      $block .= @display_popup_code_tree($info,0);
-    }
-  }
-  else {
-    $block.= "$l_cat_no";
-  }
-  $block.= "
-  </div>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Category Tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function display_popup_code_tree($tree,$indent) {
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory;
-  global $popup, $set_theme;
-
-  $code = $tree["code"];
-  $label = $tree["label"];
-  $id = $tree["id"]; 
-  if ($code != "") {
-    $is_valid = true;
-    $indent_file = $indent + 15;
-  }
-  else {
-    $is_valid = false;
-  }
-    
-  foreach($tree as $level => $info) {
-    if("$level" != "code" && "$level" != "label" && "$level" != "id") {    
-       $content.= display_popup_code_tree($info,$indent_file);
-      $bool = true;
-    }
-  }
- 
-  if ($is_valid) {
-    if ($bool == true) {
-      $block= 
-      "<table class=\"category\">
-	 <tr>
-	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	   <a href=\"\" onclick=\"show_hide_dir('$code');return false;\" > 
-	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
-	   </a>
-	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
-	  </td>
-	 </tr>
-	</table>
-	<div id='div_$code' style=\"display:none;\" >
-	 $content
-	</div>";
-    } else {
-      $block= 
-      "<table class=\"category\">
-	 <tr>
-	  <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
-	     <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
-	  </td>
-	 </tr>
-	</table>";
-    }
-  }
-  else {
-    $block = $content;
-  }
-    
-  return $block;
-}
 
 </script>

@@ -7,9 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script language=\"JavaScript\">" ;
-
 require("$obminclude//javascript/check_js.inc");
 
 $extra_js .= "
@@ -527,4 +524,4 @@ function show_query_field(value_exp, value_nor, field) {
   for(i=0;i<len;i++) 
     table.deleteRow(0);  
 }
-</script>";
+";

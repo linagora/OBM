@@ -8,11 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
-
 require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
@@ -160,7 +155,4 @@ function check_tt_new(form)
    }
 }
 
-
-// -->
-</script>
 ";

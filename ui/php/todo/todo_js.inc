@@ -7,11 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
-
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
@@ -100,4 +95,4 @@ function killCalendar()
     }
 }
 
---></script>\n\n";
+";

@@ -96,14 +96,7 @@ function get_param_export() {
   if (isset ($call_module)) $params["module"] = $call_module;
   if (isset ($func_data)) $params["function"] = $func_data;
 
-  if ($debug > 0) {
-    if ( $params ) {
-      while ( list( $key, $val ) = each( $params ) ) {
-        echo "<br />param[$key]=$val";
-      }
-      echo "<br />";
-    }
-  }
+  display_debug_param($params);
 
   return $params;
 }

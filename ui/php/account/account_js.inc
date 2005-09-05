@@ -1,17 +1,12 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : account_js.inc                                              //
 //     - Desc  : account javascript functions File                           //
 // 2001-08-01 Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
-// $I$ //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-$extra_js .= "
-<SCRIPT LANGUAGE=\"JavaScript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
@@ -71,9 +66,4 @@ function check_balance_form (f_acc) {
  return true;
 }
 
-
-// --> 
-</SCRIPT>
 ";
-
-//</SCRIPT>

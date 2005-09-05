@@ -268,3 +268,11 @@ CREATE TABLE Subscription (
   subscription_date_end         timestamp(14),
   PRIMARY KEY (subscription_id)
 );
+
+
+-------------------------------------------------------------------------------
+-- ContactCategory tables updates
+-------------------------------------------------------------------------------
+-- 
+ALTER TABLE ContactCategory1 MODIFY COLUMN contactcategory1_code varchar(10) DEFAULT '';
+ALTER TABLE ContactCategory2 MODIFY COLUMN contactcategory2_code varchar(10) DEFAULT '';

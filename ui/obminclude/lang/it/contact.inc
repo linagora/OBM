@@ -31,7 +31,6 @@ $l_insert = "Inserisci Contatto ";
 $l_update = "Modifica Contatto";
 $l_checkdelete = "Controlla o elimina il Contatto";
 $l_delete = "Elimina il ";
-$l_add = "Aggiungi i contatti";
 
 // Messages
 $l_check_samecontact = "Quasti contatti sembrano simili al nuovo";

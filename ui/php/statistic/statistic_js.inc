@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : contact_js.inc                                              //
 //     - Desc  : Contact javascript functions File                           //
@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_js .= "
-<script type=\"text/javascript\">
-<!--
  
 NS4 = (document.layers) ? 1 : 0;
 IE4 = (document.all) ? 1 : 0;
@@ -95,6 +93,4 @@ function hide ( name ) {
   }
 }
 
-// -->
-</script>
 ";

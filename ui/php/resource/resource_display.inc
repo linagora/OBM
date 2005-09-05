@@ -186,17 +186,17 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
     $resource_d->data_idfield = "resource_id";
     $resource_d->data_cb_name = "cb_u";
     if ($ext_widget != "") {
-      $display_popup_head = "
+      $resource_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } elseif ($ext_element != "") {
       $resource_d->data_cb_name = "";
-      $display_popup_head = "
+      $resource_d->data_form_head = "
       <form onsubmit=\"fill_ext_form2(this); return false;\">";
     } else {
-      $display_popup_head = "
+      $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
-    $display_popup_end = "
+    $resource_d->data_form_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
@@ -204,7 +204,9 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
       </p>
-      </form>
+      </form>";
+
+    $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
@@ -215,7 +217,6 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
 
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_info_msg("$nb_resource $l_found");
-  $block = $display_popup_head;
   $block .= $resource_d->display("dis_data_resource");
   $block .= $display_popup_end;
 

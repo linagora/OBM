@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : publication_js.inc                                          //
 //     - Desc  : Company javascript functions File                           //
@@ -7,10 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 
@@ -213,8 +209,5 @@ function check_recept_new(form)
 }
 
 
--->
-</script>
 ";
-// -->
-</script>
+

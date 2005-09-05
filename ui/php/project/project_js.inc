@@ -8,11 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
-
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
@@ -317,6 +312,4 @@ function fill_parenttask(sel_pt, sel_t, tf_tname) {
   tf_tname.value = trim(new_text);
 }
 
-// -->
-</script>
 ";

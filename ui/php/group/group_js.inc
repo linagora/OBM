@@ -7,8 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script language=\"JavaScript\">";
 
 require("obminclude/javascript/check_js.inc");
 
@@ -84,5 +82,3 @@ function add_element(fieldName,fieldValue,fieldLabel) {
   
 ";
 }
-  $extra_js .= "
-</script>";

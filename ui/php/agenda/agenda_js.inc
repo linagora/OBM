@@ -1,10 +1,5 @@
 <script language="php">
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
-
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
@@ -239,6 +234,4 @@ function check_meeting(form) {
   return true;
 } 
 
--->
-</script>
 ";

@@ -353,7 +353,7 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_timecreate  timestamp,
   contactcategory1_userupdate  integer default 0,
   contactcategory1_usercreate  integer default 0,
-  contactcategory1_code        integer default 0,
+  contactcategory1_code        varchar(10) default '',
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
@@ -378,7 +378,7 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_timecreate  timestamp,
   contactcategory2_userupdate  integer default 0,
   contactcategory2_usercreate  integer default 0,
-  contactcategory2_code        integer  default 0,
+  contactcategory2_code        varchar(10) default '',
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );

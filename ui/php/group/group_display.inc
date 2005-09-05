@@ -276,8 +276,8 @@ function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
       $form_attr = "onsubmit=\"fill_ext_form(this);return false;\"";
       $input_target = "<input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />";
     }
-    $display_popup_head = "<form $form_attr>";
-    $display_popup_end = "
+    $dis_group->data_form_head = "<form $form_attr>";
+    $dis_group->data_form_end = "
     <p class=\"detailButton\">
     <p class=\"detailButtons\">
       <input type=\"submit\" value=\"$l_add\" />
@@ -286,7 +286,9 @@ function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
       $input_target
     </p>
     </p>
-    </form>
+    </form>";
+
+    $display_popup_end = "
     <p><a href=\"\" onclick='window.close();'>$l_close</a></p>";
   }
 
@@ -295,7 +297,6 @@ function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
 
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_info_msg("$nb_group $l_found");
-  $block .= $display_popup_head;
   $block .= $dis_group->display("dis_data_group");
   $block .= $display_popup_end;
 

@@ -13,6 +13,7 @@ $l_back = "Back";
 $l_cancel = "Cancel";
 $l_close = "Close the window";
 $l_validate = "Validate";
+$l_add = "Add";
 
 // Common messages
 $l_all = "Alle";

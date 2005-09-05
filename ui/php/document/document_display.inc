@@ -231,9 +231,9 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
     $doc_d->data_cb_text = "X";
     $doc_d->data_idfield = "document_id";
     $doc_d->data_cb_name = "cb_d";
-    $display_popup_head = "
+    $doc_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
-    $display_popup_end = "
+    $doc_d->data_form_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
@@ -241,7 +241,8 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
       </p>
-      </form>
+      </form>";
+    $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
@@ -251,7 +252,6 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
   $doc_d->data_url = $url;
   $doc_d->data_header = "both";
   $display["msg"] .= display_info_msg("$nb_document $l_found");
-  $block = $display_popup_head;
   $block .= $doc_d->display("dis_data_document");
   $block .= $display_popup_end;
   return $block;

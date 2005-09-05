@@ -112,7 +112,11 @@ function display_head($p_module) {
   <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" />
   $dis_extra_css
   $file_js
+<script type=\"text/javascript\">
+<!--
   $extra_js
+// -->
+</script>
 </head>
 
 <body onload=\"if (document.f_search) { document.f_search.submit.focus();} \">

@@ -7,10 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$extra_js .= "
-<script type=\"text/javascript\">
-<!--
-";
 
 require("$obminclude/javascript/check_js.inc");
 
@@ -307,8 +303,4 @@ if (isset($ext_target)) {
   ";
 }
 
-$extra_js .= "
--->
-</script>
 ";
-</script>
