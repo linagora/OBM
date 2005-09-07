@@ -1286,7 +1286,7 @@ function make_query_from_criteria($list) {
   $cont_time_sup = "(contact_timecreate >= '%v' OR contact_timeupdate >= '%v')";
   $cont_time_inf = "(contact_timecreate <= '%v' OR contact_timeupdate <= '%v')";
   // Contact Country specific case (if not set, test with company one)
-  $contact_country = "%f = '%v' OR (%f = '' AND company_country_iso3166 = '%v')";   
+  $contact_country = "(%f = '%v' OR (%f = '' AND company_country_iso3166 = '%v'))";
   $sub_time_aft = "(s%j.subscription_timecreate >= '%v' OR s%j.subscription_timeupdate >= '%v')";
   $sub_time_bef = "(s%j.subscription_timecreate <= '%v' OR s%j.subscription_timeupdate <= '%v')";
 
@@ -1325,9 +1325,6 @@ function make_query_from_criteria($list) {
   // hash field criteria -> join asociated needed
   $add_join = array (
     "subscription_publication_id" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "publication_title" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "publication_lang" => "
@@ -1412,12 +1409,18 @@ function make_query_from_criteria($list) {
 		// $group .= $add_group[$field];
 		if (!isset($join_nb[$field])) {
 		  $join_nb[$field] = 0;
-		  $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		  if (! isset($join_nb[$module])) {
+		    $join_nb[$module] = 0;
+		    $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		  }
 		} elseif ($logical_criterion[$line] == "AND"
 			  && $line == $old_line + 1) {
 		  // AND on same criteria, increment the join cpt associated
 		  $join_nb[$field] ++;
-		  $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		  if ($join_nb[$field] > $join_nb[$module]) {
+		    $join_nb[$module] = $join_nb[$field];
+		    $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		  }
 		}
 		$module_fill[$module] = true;
 		$operation = $operateurs[$field];

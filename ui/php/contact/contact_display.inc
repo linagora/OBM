@@ -293,6 +293,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     } else {
       if ($OD->data_set->f("company_country") != "") {
 	$res["name"] .= "(".$OD->data_set->f("company_country").")";
+	$res["txt_name"] .= $OD->data_set->f("company_country");
       }
     }
   }
@@ -818,8 +819,7 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
     $copy_addr_comp .= ($c_ad1 != "") ? addslashes($c_ad1) . $newline : "";
     $copy_addr_comp .= ($c_ad2 != "") ? addslashes($c_ad2) . $newline : "";
     $copy_addr_comp .= ($c_ad3 != "") ? addslashes($c_ad3) . $newline : "";
-    $copy_addr_comp .= ($c_zip != "") ? addslashes($c_zip) . $newline : "";
-    $copy_addr_comp .= ($c_town != "") ? addslashes($c_town) . $newline : "";
+    $copy_addr_comp .= ($c_zip . $c_town != "") ? addslashes("$c_zip $c_town") . $newline : "";
     $copy_addr_comp .= ($c_cdx != "") ? addslashes($c_cdx) . $newline : "";
     $copy_addr_comp .= ($c_ctry_name != "") ? addslashes($c_ctry_name) . $newline : "";
   }
@@ -847,7 +847,7 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
 
-  $copy = addslashes("$kind_minilabel $lname $fname") . $newline;
+  $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
   if ($title != "") {
     $copy .= addslashes($title) . $newline;
   }

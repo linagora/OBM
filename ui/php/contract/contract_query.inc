@@ -243,13 +243,13 @@ function run_query_insert($contract) {
   $dateexp = ($contract["dateexp"] ? "'".$contract["dateexp"]."'" : "null");
   $daterenew = ($contract["daterenew"] ? "'".$contract["daterenew"]."'" : "null");
   $datecancel = ($contract["datecancel"] ? "'".$contract["datecancel"]."'" : "null");
-  $priority = $contract["priority"];
+  $priority = ($contract["priority"] ? $contract["priority"] : "0");
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
   $format = $contract["format"];
-  $ticket_nb = $contract["ticketnumber"];
+  $ticket_nb = ($contract["ticketnumber"] ? $contract["ticketnumber"] : "0");
   $duration = $contract["duration"];
-  $autorenewal =$contract["autorenewal"];
+  $autorenewal = ($contract["autorenewal"] ? $contract["autorenewal"] : "0");
   $sel_type = $contract["type"];
   $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
   $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
@@ -349,16 +349,16 @@ function run_query_update($contract) {
   $dateexp = ($contract["dateexp"] ? "'".$contract["dateexp"]."'" : "null");
   $daterenew = ($contract["daterenew"] ? "'".$contract["daterenew"]."'" : "null");
   $datecancel = ($contract["datecancel"] ? "'".$contract["datecancel"]."'" : "null");
-  $priority = $contract["priority"];
+  $priority = ($contract["priority"] ? $contract["priority"] : "0");
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
   $type = $contract["type"];
-  $autorenewal = $contract["autorenewal"];
+  $autorenewal = ($contract["autorenewal"] ? $contract["autorenewal"] : "0");
   $format = $contract["format"];
   if ($format == $ccf_ticket) {
-    $ticket_nb = $contract["ticketnumber"];
+    $ticket_nb = ($contract["ticketnumber"] ? $contract["ticketnumber"] : "0");
   } else {
-    $ticket_nb =0;
+    $ticket_nb = 0;
   }
   if ($format == $ccf_duration) {
     $duration = $contract["duration"];

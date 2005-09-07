@@ -758,16 +758,9 @@ function html_company_consult($co_q, $cats) {
   if ($ad3 != "") {
     $copy .= addslashes($ad3).$newline;
   }
-  if ($zip != "" ) {
-    $copy .= addslashes($zip) . " ";
-  } else {
-    $copy .= " ";
-  }
-  if ($town != "" ) {
-    $copy .= addslashes($town);
-  }
+  $copy .= ($zip . $town != "") ? addslashes("$zip $town") . $newline : "";
   if ($ctry_name != "" ) {
-    $copy .= $newline . addslashes($ctry_name);
+    $copy .= addslashes($ctry_name);
   }
   $copy = "'$copy'"; 
 
