@@ -268,6 +268,7 @@ CREATE TABLE CompanyCategoryLink (
   companycategorylink_company_id   integer NOT NULL default 0,
   PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id)
 );
+CREATE INDEX compcat_idx_comp ON CompanyCategoryLink (companycategorylink_company_id);
 
 
 -------------------------------------------------------------------------------
@@ -367,6 +368,7 @@ CREATE TABLE ContactCategory1Link (
   contactcategory1link_contact_id   integer NOT NULL default 0,
   PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id)
 );
+CREATE INDEX contcat1_idx_cont ON ContactCategory1Link (contactcategory1link_contact_id);
 
 
 --
@@ -392,6 +394,7 @@ CREATE TABLE ContactCategory2Link (
   contactcategory2link_contact_id   integer NOT NULL default 0,
   PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
 );
+CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_contact_id);
 
 
 -------------------------------------------------------------------------------

@@ -276,3 +276,11 @@ CREATE TABLE Subscription (
 -- 
 ALTER TABLE ContactCategory1 MODIFY COLUMN contactcategory1_code varchar(10) DEFAULT '';
 ALTER TABLE ContactCategory2 MODIFY COLUMN contactcategory2_code varchar(10) DEFAULT '';
+
+
+-------------------------------------------------------------------------------
+-- Company and Contact Category Link tables index for performance
+-------------------------------------------------------------------------------
+CREATE INDEX compcat_idx_comp ON CompanyCategoryLink (companycategorylink_company_id);
+CREATE INDEX contcat1_idx_cont ON ContactCategory1Link (contactcategory1link_contact_id);
+CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_contact_id);

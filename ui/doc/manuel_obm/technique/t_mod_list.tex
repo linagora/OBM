@@ -123,6 +123,54 @@ function check_list_mode(&$query, &$criteria) {
 \end{itemize}
 
 
+\subsection{Construction des requètes dynamiques}
+
+La construction de la requète selon les critères demandés est effectuée par la fonction \fonction{maque\_query\_from\_criteria()}.
+
+
+\subsubsection{Informations de publication}
+
+La série de critère "\publication" permet de rechercher des contacts selon leurs abonnements aux publications.
+
+La sélection de la case à cocher "Information des publications" permet d'afficher dans les listes de résultat les informations de publication associées aux contacts.
+Une conséquence importante est que ceci modifie en profondeur le résultat de la liste, qui devient une liste d'associations contact - publication (un contact pourra apparaître plusieurs fois selon ses abonnements).
+
+Lorsque les informations de publication sont demandées, il devient impossible de cumuler un même critère de publication par un ET. (Exemple : publication dont le titre est "TITRE1" et dont le titre est "TITRE2"), car une ligne de résultat ne contient qu'une publication et ne correspondra donc jamais.
+
+
+\subsubsection{Problématique des liaisons n-n}
+
+Certains critères comme les catégories de société ou de contact et les publications correspondent à des liaisons n-n entre contact et le critère demandé.
+
+Ceci impose un traitement particulier des liens.
+La demande d'un de ces critères nécessite l'insertion d'une jointure (LEFT JOIN) dans la requète.
+La complexité vient de trois facteurs :\\
+\begin{itemize}
+\item Lorsqu'un de ces critères est combiné avec lui-même par un ET, cela implique de créer une jointure supplémentaire (Société de catégorie 1 ET de catégorie 2 va nécessiter 2 jointures vers les catégories de société).
+\item Dans le cas des informations de publication, tous les critères ajoutent la même jointure.
+Il faut donc veiller à ne pas ajouter la jointure si elle a déjà été ajoutée par un critère différent de publication.
+\end{itemize}
+\vspace{0.3cm}
+
+La variable \variable{\$join\_nb["field"]} permet de référencer le nombre de jointures associé au champ field.
+
+La variable \variable{\$join\_nb["module"]} permet de référencer le nombre de jointures associé au module, nécessaire pour le module \publication ou tous les critères impliquent la même jointure.\\
+
+L'algorithme de gestion des critères et d'ajout des jointures pour la construction de la requète est donc, au traitement d'un critère :\\
+
+\begin{tabular}{|l|p{4.5cm}|p{5.5cm}|}
+ \hline
+ \textbf{Condition} & \textbf{Condition} & \textbf{Action de jointure} \\
+ \hline
+ \hline
+  \#join champ est null & \#join module null OU module!=publication & Ajout de la jointure assoicée au champ. \\ 
+ \hline
+  \#join champ est null & \#join module non null ET module=publication & Rien. \\ 
+ \hline
+  \#join champ non null & ligne combinée par AND et même critère & Ajout de la jointure (si \#join du champ > \#join du module, ceci pour traiter le cas du module publication). \\
+ \hline
+\end{tabular}
+
 
 \subsection{Actions et droits}
 

@@ -1406,13 +1406,22 @@ function make_query_from_criteria($list) {
             foreach($criterion as $line => $value) {
               if ($value != "") {
 		$select .= $add_select[$field];
-		// $group .= $add_group[$field];
+
+		// If field has not already create a join
 		if (!isset($join_nb[$field])) {
 		  $join_nb[$field] = 0;
-		  if (! isset($join_nb[$module])) {
+		  // If module nb is set And module = publication, do nothing
+		  // else add a join
+		  if ( (! isset($join_nb[$module]))
+		       || ($module != "publication") ) {
 		    $join_nb[$module] = 0;
 		    $join .= str_replace('%j',$join_nb[$field],$add_join[$field]);
 		  }
+		    
+		  // XXXX not optimal as same criteria not tested
+		  // But what about crit1 AND toto OR B AND crit2
+		  // => crit1 AND (toto OR ( B AND crit2 )) not so easy
+		  // %join should increment but same crit not on line+1 
 		} elseif ($logical_criterion[$line] == "AND"
 			  && $line == $old_line + 1) {
 		  // AND on same criteria, increment the join cpt associated

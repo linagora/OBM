@@ -268,3 +268,11 @@ ALTER TABLE ContactCategory2 ADD COLUMN temp_code VARCHAR(10);
 UPDATE ContactCategory2 SET temp_code = contactcategory2_code;
 ALTER TABLE ContactCategory2 DROP COLUMN contactcategory2_code;
 ALTER TABLE ContactCategory2 RENAME COLUMN temp_code TO contactcategory2_code;
+
+
+-------------------------------------------------------------------------------
+-- Company and Contact Category Link tables index for performance
+-------------------------------------------------------------------------------
+CREATE INDEX compcat_idx_comp ON CompanyCategoryLink (companycategorylink_company_id);
+CREATE INDEX contcat1_idx_cont ON ContactCategory1Link (contactcategory1link_contact_id);
+CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_contact_id);
