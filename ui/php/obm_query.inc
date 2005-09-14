@@ -13,7 +13,8 @@
 function run_query_waiting_events() {
   global $auth, $cdg_sql;
   
-  $writable_user = run_query_userobm_writable();
+  $uid = $auth->auth["uid"];
+  $writable_entity = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
@@ -27,11 +28,11 @@ function run_query_waiting_events() {
     WHERE 
       evententity_state = 'W'";
 
-  if (is_array($writable_user)) {
+  if (is_array($writable_user["ids"])) {
     $query .= " AND evententity_entity_id IN (";
     $num = count($writable_user);
-    foreach($writable_user as $user) {
-      $query.= "'$user',";
+    foreach($writable_user["ids"] as $user_id) {
+      $query.= "'$user_id',";
     }
     $query.="'".$auth->auth["uid"]."')";
   } else {
@@ -42,36 +43,6 @@ function run_query_waiting_events() {
   $obm_db->query($query);
   $obm_db->next_record();
   return $obm_db->f("num");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of writable agenda users for the current user
-///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_writable() {
-  global $cdg_sql,$auth,$cagenda_entities;
-
-  $uid = $auth->auth["uid"];
-  $query = "SELECT u.userobm_id,
-      c.calendarentityright_write
-    FROM UserObm as u
-      LEFT OUTER JOIN CalendarEntityRight as c 
-        ON 
-          u.userobm_id = c.calendarentityright_entity_id AND
-          c.calendarentityright_customer_id = '$uid' AND
-          c.calendarentityright_entity = '".$cagenda_entities['user']."'
-    WHERE 
-      (c.calendarentityright_write = 1 OR u.userobm_id='$uid') 
-    ORDER BY u.userobm_lastname";
-
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);	    
-  $obm_db->query($query);
-  $ret_array = array();
-  while($obm_db->next_record()) {
-       $ret_array[] = $obm_db->f("userobm_id");
-  }
-  return $ret_array;
 }
 
 

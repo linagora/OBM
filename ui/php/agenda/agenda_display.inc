@@ -7,277 +7,50 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the navigation date selector 
-// Parameters:
-//   - $agenda: agenda parameters
-///////////////////////////////////////////////////////////////////////////////
-function html_bar_date_selector($agenda) {
-  global $set_theme, $cagenda_weekstart, $ico_spacer;
-  global $l_go, $l_go_to, $l_daysofweekfirst;
-
-  $iso_date = $agenda["date"];
-  $ts_date = strtotime($iso_date);
-
-  $this_month = get_month($ts_date);
-  $this_year = get_year($ts_date);
-
-  $check_week = $ts_date;
-  $start_week_time = get_date_day_of_week(strtotime("$this_year-01-01"), $cagenda_weekstart);
-  $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-
-  $month_time = strtotime("$this_year-01-01");
-  $year_time = strtotime(($this_year-3)."-01-01");
-  $dis_month = localizeDate ("month", $ts_date);
-  $start_week_day = strtotime($cagenda_weekstart);
-  $start_day = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
-
-  $whole_month = TRUE;
-  $nb_user = count($calendar_user);
-
-
-  // Week Selection
-  do {
-    $weekdate     = isodate_format($start_week_time);
-    $select_week1 = localizeDate("week_jump", $start_week_time);
-    $select_week2 = localizeDate("week_jump", $end_week_time);
-    if (($check_week >= $start_week_time) && ($check_week <= $end_week_time)) {
-      $sel_week .= "         <option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$weekdate")."\" selected=\"selected\">$select_week1 - $select_week2</option>";
-    } else {
-      $sel_week .= "         <option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$weekdate")."\">$select_week1 - $select_week2</option>";
-    }
-    $start_week_time = strtotime ("+1 week", $start_week_time);
-    $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-  } while (get_year($start_week_time) <= $this_year);
-
-  // Month Selection
-  for ($i=0; $i<12; $i++) {
-    $monthdate = isodate_format($month_time);
-    $month_month = date("m", $month_time);
-    $select_month = localizeDate("month", $month_time);
-    if ($month_month == $this_month) {
-      $sel_month .= "<option value=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthdate")."\" selected=\"selected\">$select_month</option>\n";
-    } else {
-      $sel_month .= "<option value=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthdate")."\">$select_month</option>\n";
-    }
-    $month_time = strtotime ("+1 month", $month_time);
-  }
-
-  // Year Selection
-  for ($i=-3; $i < (3); $i++) {
-    $year_year = get_year($year_time);
-    $yeardate = isodate_format($year_time);
-    if ($year_year == $this_year) {
-      $sel_year .= "<option value=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=$yeardate")."\" selected=\"selected\">$year_year</option>\n";
-    } else {
-      $sel_year .= "<option value=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=$yeardate")."\">$year_year</option>\n";
-    }
-    $year_time = strtotime ("+1 year", $year_time);
-  }
-
-  // Minicalendar Head
-  for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $start_week_day);
-    $day = $l_daysofweekfirst[$day_num];
-    $dis_minical_head .= "<td align=\"center\" class=\"agendaHead2\">$day</td>\n";
-    $start_week_day = strtotime("+1 day", $start_week_day);
-  }
-
-  // Minicalendar
-  $i = 0;
-  do {
-    $day = date ("j", $start_day);
-    $iso_day = isodate_format($start_day);
-    $check_month = get_month($start_day);
-    if ($check_month != $this_month) {
-      $day = "<a class=\"agendaLink2\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_day")."\">$day</a>";
-    } else {
-      if (isodate_format() == $iso_day) {
-        $day = "<a class=\"agendaLink3\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_day")."\">$day</a>";
-      } else {
-        $day = "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_day")."\">$day</a>";
-      }
-    }
-    if ($i == 0) $dis_minical .= "<tr>\n";
-    $dis_minical .= "<td class=\"agendaCell\">$day</td>\n";
-    $start_day = strtotime("+1 day", $start_day);
-    $i++;
-    if ($i == 7) {
-      $dis_minical .= "</tr>\n";
-      $i = 0;
-      $checkagain = get_month($start_day);
-      if ($checkagain != $this_month) $whole_month = FALSE;
-    }
-  } while ($whole_month == TRUE);
-
-  $block = "
-  <div class=\"last\">
-  <div class=\"lastTitle\">:: $dis_month</div>
-  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-  <tr>
-    $dis_minical_head
-  </tr>
-    $dis_minical
-  </table>
-  </div>
-
-  <div class=\"last\">
-  <div class=\"lastTitle\">:: $l_go_to</div>
-  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-  <tr>
-    <td>
-      <form action=\"\" onsubmit=\"return false;\">
-      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-      $sel_year
-      </select>
-      <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);\" />
-      </form>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
-  </tr>
-  <tr>
-    <td >
-      <form action=\"\">
-      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-      $sel_month
-      </select>
-      <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
-      </form>
-    </td>
-  </tr>
-  <tr>
-    <td >
-      <form action=\"\">
-      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-      $sel_week
-      </select>
-      <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
-      </form>
-    </td>
-  </tr>
-  </table>
-  </div>
-";
-
-  return $block;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the navigation bar
 // Parameters:
-//   - $agenda: agenda parameters
+//   - $agenda        : agenda parameters
+//   - $sel_entity_id : array of entity Id
+//   - $p_view        : view selected "year", "month", "week" or "day"
 ///////////////////////////////////////////////////////////////////////////////
-function html_bar_legend($entity_store) {
-  global $l_meeting_legend, $l_possible, $l_free, $l_occupied; 
-  global $l_calendar_displayed, $l_resource_displayed;
-  global $agenda_view_type;
+function dis_calendar_view($agenda, $sel_entity_id, $p_view="week") {
+  global $display;
 
-  // Legend
-  if ($action == "perform_meeting" || $action == "perform_res_meeting") {
-    $l_legend = $l_meeting_legend;
-    $dis_legend = "
-    <tr>
-      <td class=\"agendaPossible\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"detailText\">&nbsp;$l_possible</td>
-    </tr>
-    <tr>
-      <td class=\"agendaFree\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"detailText\">&nbsp;$l_free</td>
-    </tr>
-    <tr>
-      <td class=\"agendaOccupied\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"detailText\">&nbsp;$l_occupied</td>
-    </tr>";
-  } elseif ($agenda_view_type == "U") {
-    $l_legend = $l_calendar_displayed;
-    foreach ($entity_store as $id => $data) {
-      $dis_legend .= "
-      <tr>
-       <td style=\"width:10%;\" class=\"".$data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;&nbsp;".$data["name"]."</td>
-      </tr>";
-    }
-  } elseif ($agenda_view_type == "R") {
-    $l_legend = $l_resource_displayed;
-    foreach ($entity_store as $id => $data) {
-      $dis_legend .="
-      <tr>
-       <td style=\"width:10%;\" class=\"".$data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;&nbsp;".$data["name"]."</td>
-      </tr>";
-    }
+  $entity_readable = run_query_entity_readable();
+  $visible_entities_id = slice_entities($sel_entity_id["user"], $sel_entity_id["resource"], $entity_readable);
+  $entity_store = store_entities(run_query_get_entity_label($visible_entities_id));
+  $display["features"] = html_planning_bar($agenda, $visible_entities_id, $entity_store, $entity_readable);
+
+  if ($p_view == "year") {
+    $block = dis_year_planning($agenda, $entity_store);
+  } else if ($p_view == "month") {
+    $block = dis_month_planning($agenda, $entity_store);
+  } else if ($p_view == "week") {
+    $block = dis_week_planning($agenda, $entity_store);
+  } else if ($p_view == "day") {
+    $block = dis_day_planning($agenda, $entity_store);
   }
-
-  $block = "
-  <div class=\"last\">
-
-  <div class=\"lastTitle\">:: $l_legend</div>
-  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-    $dis_legend
-  </table>
-
-  </div>";
-
-  return $block;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the "View type" navigation bar component 
-// Parameters:
-//   - $agenda: agenda parameters
-///////////////////////////////////////////////////////////////////////////////
-function html_bar_view_type($new_action) {
-  global $l_view_type,$l_users,$l_resources,$dis_duration,$new_action;
-  global $agenda_view_type;
-
-  //-- View type
-  $block = "
-      <div class=\"last\">
-      <div class=\"lastTitle\">:: $l_view_type</div>
-      <table class=\"agendaCal\" cellpadding=\"0\" cellspacing=\"0\">
-
-      <tbody><tr>
-       <td class=\"detailLabel\">
-         <form action=\"\">
-           <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
-           $dis_duration
-           <input";
-  if ($agenda_view_type == "U")
-    $block .= " checked=\"checked\"";
-  $block .= " name=\"rd_view_type\" value=\"U\" onclick=\"this.form.submit()\" type=\"radio\">$l_users<br>
-           <input";
-  if ($agenda_view_type == "R")
-    $block .= " checked=\"checked\"";
-  $block .= " name=\"rd_view_type\" value=\"R\" onclick=\"this.form.submit()\" type=\"radio\">$l_resources
-         </form>
-       </td>
-      </tr>
-
-      </tbody></table>
-     </div>
-  ";
-
-  return $block;
-
-}
   
+  return $block;    
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display the navigation bar
+// XHTML Display the navigation bar
 // Parameters:
 //   - $agenda: agenda parameters
+//   - $sel_entity      : array of entity Id
+//   - $entity_store    : array of entities elements to display
+//   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
+function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable) {
   global $set_theme, $cagenda_weekstart, $set_cal_interval, $ico_spacer;
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
   global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
   global $c_all, $l_select_group, $l_everybody, $l_group_members,$l_everyresources;
-  global $cagenda_entities, $l_entity,$l_users,$l_resources;
+  global $l_entity,$l_users,$l_resources;
   global $l_resource_visible, $l_resource_displayed, $l_back_mono;
   global $ico_add_resource, $popup_width, $popup_height;
   global $agenda_view_type;
@@ -288,11 +61,11 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
 
   // Dealing with Entities
   if ($agenda_view_type == 'U') {
-    $nb_entity = count($entity_store);  
-    $l_entity = "user"; 
+    $nb_entity = count($entity_store);
+    $l_entity = "user";
   } elseif ($agenda_view_type == 'R') {
     $nb_entity = count($entity_store);
-    $l_entity = "resource"; 
+    $l_entity = "resource";
   }
 
   // Entity Selection
@@ -317,25 +90,26 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
   }
 
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\" style=\"font-size:10px\">";
-  while ($entity_readable["user"]->next_record()) {
-    $u_id = $entity_readable["user"]->f("userobm_id");
-    $u_lname = $entity_readable["user"]->f("userobm_lastname");
-    $u_fname = $entity_readable["user"]->f("userobm_firstname");
-    $dis_sel_user .= "\n<option value=\"$u_id\"";
-       
-    if (count($sel_entity["user"]) > 0) {
-      $tag_user = "";
-      while ( (list($key, $user_id) = each($sel_entity["user"]))
-              && ($tag_user == "") ) {
-	if ($u_id == $user_id ) {
-	  $tag_user = " selected=\"selected\"";
+  if (is_array($entity_readable["user"]["entity"])) {
+    foreach ($entity_readable["user"]["entity"] as $one_entity) {
+      $u_id = $one_entity["id"];
+      $u_label = $one_entity["label"];
+      $dis_sel_user .= "\n<option value=\"$u_id\"";
+      
+      if (count($sel_entity["user"]) > 0) {
+	$tag_user = "";
+	while ( (list($key, $user_id) = each($sel_entity["user"]))
+		&& ($tag_user == "") ) {
+	  if ($u_id == $user_id ) {
+	    $tag_user = " selected=\"selected\"";
+	  }
 	}
+	reset($sel_entity["user"]);
       }
-      reset($sel_entity["user"]);
-    }
-    
-    $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
-  } 
+      
+      $dis_sel_user .= " $tag_user>$u_label</option>";
+    } 
+  }
   $dis_sel_user .= "</select>
     <br />
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
@@ -345,23 +119,25 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
 
   //-- Resource selection
   $dis_sel_resource = "<select name=\"sel_resource_id[]\" size=\"6\" multiple=\"multiple\" style=\"font-size:10px\">";
-  while ($entity_readable["resource"]->next_record()) {
-    $r_id = $entity_readable["resource"]->f("resource_id");
-    $r_label = $entity_readable["resource"]->f("resource_label");
-    $dis_sel_resource .= "\n<option value=\"$r_id\"";
+  if (is_array($entity_readable["resource"]["entity"])) {
+    foreach ($entity_readable["resource"]["entity"] as $one_entity) {
+      $r_id = $one_entity["id"];
+      $r_label = $one_entity["label"];
+      $dis_sel_resource .= "\n<option value=\"$r_id\"";
 
-    if (count($sel_entity["resource"])>0) {
-      $tag_res = "";
-      while ( (list($key, $res_id) = each($sel_entity["resource"]) )
-              && ($tag_er == "") ) {
-        if ($r_id == $res_id ) {
-          $tag_res = " selected=\"selected\"";
-        }
+      if (count($sel_entity["resource"])>0) {
+	$tag_res = "";
+	while ( (list($key, $res_id) = each($sel_entity["resource"]) )
+		&& ($tag_er == "") ) {
+	  if ($r_id == $res_id ) {
+	    $tag_res = " selected=\"selected\"";
+	  }
+	}
+	reset($sel_entity["resource"]);
       }
-      reset($sel_entity["resource"]);
+      
+      $dis_sel_resource .= " $tag_res>$r_label</option>";
     }
-
-    $dis_sel_resource .= " $tag_res>$r_label</option>";
   }
   $dis_sel_resource .= "</select>
     <br />
@@ -499,6 +275,267 @@ function html_planning_bar($agenda,$sel_entity,$entity_store,$entity_readable) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the navigation date selector 
+// Parameters:
+//   - $agenda: agenda parameters
+///////////////////////////////////////////////////////////////////////////////
+function html_bar_date_selector($agenda) {
+  global $set_theme, $cagenda_weekstart, $ico_spacer;
+  global $l_go, $l_go_to, $l_daysofweekfirst;
+
+  $iso_date = $agenda["date"];
+  $ts_date = strtotime($iso_date);
+
+  $this_month = get_month($ts_date);
+  $this_year = get_year($ts_date);
+
+  $check_week = $ts_date;
+  $start_week_time = get_date_day_of_week(strtotime("$this_year-01-01"), $cagenda_weekstart);
+  $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
+
+  $month_time = strtotime("$this_year-01-01");
+  $year_time = strtotime(($this_year-3)."-01-01");
+  $dis_month = localizeDate ("month", $ts_date);
+  $start_week_day = strtotime($cagenda_weekstart);
+  $start_day = get_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
+
+  $whole_month = TRUE;
+  $nb_user = count($calendar_user);
+
+
+  // Week Selection
+  do {
+    $weekdate     = isodate_format($start_week_time);
+    $select_week1 = localizeDate("week_jump", $start_week_time);
+    $select_week2 = localizeDate("week_jump", $end_week_time);
+    if (($check_week >= $start_week_time) && ($check_week <= $end_week_time)) {
+      $sel_week .= "
+<option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$weekdate")."\" selected=\"selected\">$select_week1 - $select_week2</option>";
+    } else {
+      $sel_week .= "
+<option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$weekdate")."\">$select_week1 - $select_week2</option>";
+    }
+    $start_week_time = strtotime ("+1 week", $start_week_time);
+    $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
+  } while (get_year($start_week_time) <= $this_year);
+
+  // Month Selection
+  for ($i=0; $i<12; $i++) {
+    $monthdate = isodate_format($month_time);
+    $month_month = date("m", $month_time);
+    $select_month = localizeDate("month", $month_time);
+    if ($month_month == $this_month) {
+      $sel_month .= "<option value=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthdate")."\" selected=\"selected\">$select_month</option>\n";
+    } else {
+      $sel_month .= "<option value=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthdate")."\">$select_month</option>\n";
+    }
+    $month_time = strtotime ("+1 month", $month_time);
+  }
+
+  // Year Selection
+  for ($i=-3; $i < (3); $i++) {
+    $year_year = get_year($year_time);
+    $yeardate = isodate_format($year_time);
+    if ($year_year == $this_year) {
+      $sel_year .= "<option value=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=$yeardate")."\" selected=\"selected\">$year_year</option>\n";
+    } else {
+      $sel_year .= "<option value=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=$yeardate")."\">$year_year</option>\n";
+    }
+    $year_time = strtotime ("+1 year", $year_time);
+  }
+
+  // Minicalendar Head
+  for ($i=0; $i<7; $i++) {
+    $day_num = date("w", $start_week_day);
+    $day = $l_daysofweekfirst[$day_num];
+    $dis_minical_head .= "<td align=\"center\" class=\"agendaHead2\">$day</td>\n";
+    $start_week_day = strtotime("+1 day", $start_week_day);
+  }
+
+  // Minicalendar
+  $i = 0;
+  do {
+    $day = date ("j", $start_day);
+    $iso_day = isodate_format($start_day);
+    $check_month = get_month($start_day);
+    if ($check_month != $this_month) {
+      $day = "<a class=\"agendaLink2\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_day")."\">$day</a>";
+    } else {
+      if (isodate_format() == $iso_day) {
+        $day = "<a class=\"agendaLink3\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_day")."\">$day</a>";
+      } else {
+        $day = "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_day")."\">$day</a>";
+      }
+    }
+    if ($i == 0) $dis_minical .= "<tr>\n";
+    $dis_minical .= "<td class=\"agendaCell\">$day</td>\n";
+    $start_day = strtotime("+1 day", $start_day);
+    $i++;
+    if ($i == 7) {
+      $dis_minical .= "</tr>\n";
+      $i = 0;
+      $checkagain = get_month($start_day);
+      if ($checkagain != $this_month) $whole_month = FALSE;
+    }
+  } while ($whole_month == TRUE);
+
+  $block = "
+  <div class=\"last\">
+  <div class=\"lastTitle\">:: $dis_month</div>
+  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+  <tr>
+    $dis_minical_head
+  </tr>
+    $dis_minical
+  </table>
+  </div>
+
+  <div class=\"last\">
+  <div class=\"lastTitle\">:: $l_go_to</div>
+  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+  <tr>
+    <td>
+      <form action=\"\" onsubmit=\"return false;\">
+      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+      $sel_year
+      </select>
+      <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);\" />
+      </form>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
+  </tr>
+  <tr>
+    <td >
+      <form action=\"\">
+      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+      $sel_month
+      </select>
+      <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
+      </form>
+    </td>
+  </tr>
+  <tr>
+    <td >
+      <form action=\"\">
+      <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+      $sel_week
+      </select>
+      <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
+      </form>
+    </td>
+  </tr>
+  </table>
+  </div>
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the navigation bar
+// Parameters:
+//   - $agenda: agenda parameters
+///////////////////////////////////////////////////////////////////////////////
+function html_bar_legend($entity_store) {
+  global $l_meeting_legend, $l_possible, $l_free, $l_occupied; 
+  global $l_calendar_displayed, $l_resource_displayed;
+  global $agenda_view_type;
+
+  // Legend
+  if ($action == "perform_meeting" || $action == "perform_res_meeting") {
+    $l_legend = $l_meeting_legend;
+    $dis_legend = "
+    <tr>
+      <td class=\"agendaPossible\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailText\">&nbsp;$l_possible</td>
+    </tr>
+    <tr>
+      <td class=\"agendaFree\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailText\">&nbsp;$l_free</td>
+    </tr>
+    <tr>
+      <td class=\"agendaOccupied\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailText\">&nbsp;$l_occupied</td>
+    </tr>";
+  } elseif ($agenda_view_type == "U") {
+    $l_legend = $l_calendar_displayed;
+    foreach ($entity_store as $id => $data) {
+      $dis_legend .= "
+      <tr>
+       <td style=\"width:10%;\" class=\"".$data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;&nbsp;".$data["name"]."</td>
+      </tr>";
+    }
+  } elseif ($agenda_view_type == "R") {
+    $l_legend = $l_resource_displayed;
+    foreach ($entity_store as $id => $data) {
+      $dis_legend .="
+      <tr>
+       <td style=\"width:10%;\" class=\"".$data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;&nbsp;".$data["name"]."</td>
+      </tr>";
+    }
+  }
+
+  $block = "
+  <div class=\"last\">
+
+  <div class=\"lastTitle\">:: $l_legend</div>
+  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+    $dis_legend
+  </table>
+
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the "View type" navigation bar component (User, Resource)
+// Parameters:
+//   - $agenda: agenda parameters
+///////////////////////////////////////////////////////////////////////////////
+function html_bar_view_type($new_action) {
+  global $l_view_type,$l_users,$l_resources,$dis_duration,$new_action;
+  global $agenda_view_type;
+
+  //-- View type
+  $block = "
+      <div class=\"last\">
+      <div class=\"lastTitle\">:: $l_view_type</div>
+      <table class=\"agendaCal\" cellpadding=\"0\" cellspacing=\"0\">
+      <tbody>
+      <tr>
+       <td class=\"detailLabel\">
+         <form action=\"\">
+           <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+           $dis_duration
+           <input";
+  if ($agenda_view_type == "U")
+    $block .= " checked=\"checked\"";
+  $block .= " name=\"rd_view_type\" value=\"U\" onclick=\"this.form.submit()\" type=\"radio\">$l_users<br>
+           <input";
+  if ($agenda_view_type == "R")
+    $block .= " checked=\"checked\"";
+  $block .= " name=\"rd_view_type\" value=\"R\" onclick=\"this.form.submit()\" type=\"radio\">$l_resources
+         </form>
+       </td>
+      </tr>
+      </tbody>
+     </table>
+     </div>
+  ";
+
+  return $block;
+}
+
+  
 ///////////////////////////////////////////////////////////////////////////////
 // Display Conflicts
 // Parameters:
@@ -2188,7 +2225,7 @@ METHOD:REQUEST";
     $organizer_q->next_record();
     $organizer_cn = $organizer_q->f("userobm_lastname")." ".$organizer_q->f("userobm_firstname");
     $organizer_email=$organizer_q->f("userobm_email");
-    $attendee_q=run_query_get_recipients($attendees, 1);
+    $attendee_q = run_query_get_recipients($attendees, 1);
     $msg_attendee="";
     while ($attendee_q->next_record()) {
       $msg_attendee .= "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=\"'";
@@ -2677,7 +2714,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
 //    - $agenda          : agenda parameters
 //    - $calendar_entity : array of selected contacts 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_week_planning($agenda,$calendar_user) {
+function dis_week_planning($agenda, $calendar_user) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $cagenda_first_hour, $cagenda_last_hour;

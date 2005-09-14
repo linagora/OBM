@@ -1,6 +1,5 @@
 <?php
-$extra_js .= "<script type=\"text/javascript\">
-<!--
+$extra_js .= "
 var calendarWindow = null;
 var calendarColors = new Array();
 calendarColors['bgColor'] = '#BDC5D0';
@@ -51,7 +50,5 @@ function killCalendar()
         calendarWindow.close();
     }
 }
--->
-</script>
 ";
 php?>

@@ -198,31 +198,39 @@ DROP TABLE CalendarUser;
 -------------------------------------------------------------------------------
 -- Create table 'CalendarEntityRight'
 -------------------------------------------------------------------------------
--- Create table CalendarEntityRight
-CREATE TABLE CalendarEntityRight (
-  calendarentityright_entity_id    integer NOT NULL DEFAULT 0,
-  calendarentityright_entity       varchar(32) NOT NULL DEFAULT '',
-  calendarentityright_customer_id  integer NOT NULL DEFAULT 0,
-  calendarentityright_write        integer NOT NULL DEFAULT 0,
-  calendarentityright_read         integer NOT NULL DEFAULT 0,
-  PRIMARY KEY (calendarentityright_entity_id,calendarentityright_entity,calendarentityright_customer_id)
+CREATE TABLE EntityRight (
+  entityright_entity       varchar(32) NOT NULL DEFAULT '',
+  entityright_entity_id    integer NOT NULL DEFAULT 0,
+  entityright_consumer     varchar(32) NOT NULL DEFAULT '',
+  entityright_consumer_id  integer NOT NULL DEFAULT 0,
+  entityright_read         integer NOT NULL DEFAULT 0,
+  entityright_write        integer NOT NULL DEFAULT 0,
+  PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_customer, entityright_customer_id)
 );
+CREATE INDEX entright_idx_ent_id ON EntityRight (entityright_entity_id);
+CREATE INDEX entright_idx_ent ON EntityRight (entityright_entity);
+CREATE INDEX entright_idx_con_id ON EntityRight (entityright_consumer_id);
+CREATE INDEX entright_idx_con ON EntityRight (entityright_consumer);
 
--- Create table CalendarEntityRight
-INSERT INTO CalendarEntityRight ( 
-  calendarentityright_entity_id,
-  calendarentityright_entity,
-  calendarentityright_customer_id,
-  calendarentityright_write,
-  calendarentityright_read
+
+-- Update table EntityRight 
+INSERT INTO EntityRight (
+  entityright_entity,
+  entityright_entity_id,
+  entityright_consumer,
+  entityright_consumer_id,
+  entityright_read,
+  entityright_write
 )
 SELECT 
+  'calendar',
   calendarright_ownerid,
   'user',
   calendarright_customerid,
-  calendarright_write,
-  calendarright_read
+  calendarright_read,
+  calendarright_write
 FROM CalendarRight;
+
 
 -- Drop table CalendarRight
 DROP TABLE CalendarRight;

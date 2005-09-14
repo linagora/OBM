@@ -29,7 +29,7 @@ echo $PHP : PHP interpreter found
 
 
 echo "*** Document repository creation"
-$PHP install_document.php || exit $?
+$PHP install_document_1.0.php || exit $?
 
 
 echo "*** Database creation"

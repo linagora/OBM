@@ -615,15 +615,20 @@ CREATE TABLE CalendarCategory (
 );
 
 --
--- Table structure for table 'CalendarEntityRight'
+-- Table structure for table 'EntityRight'
 --
-CREATE TABLE CalendarEntityRight (
-  calendarentityright_entity_id     int(8) NOT NULL default '0',
-  calendarentityright_entity        varchar(32) NOT NULL default '',
-  calendarentityright_customer_id   int(8) NOT NULL default '0',
-  calendarentityright_write         int(1) NOT NULL default '0',
-  calendarentityright_read          int(1) NOT NULL default '0',
-  PRIMARY KEY (calendarentityright_entity_id,calendarentityright_entity,calendarentityright_customer_id)
+CREATE TABLE EntityRight (
+  entityright_entity        varchar(32) NOT NULL default '',
+  entityright_entity_id     int(8) NOT NULL default 0,
+  entityright_consumer      varchar(32) NOT NULL default '',
+  entityright_consumer_id   int(8) NOT NULL default 0,
+  entityright_read          int(1) NOT NULL default 0,
+  entityright_write         int(1) NOT NULL default 0,
+  PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id),
+  INDEX entright_idx_ent_id (entityright_entity_id),
+  INDEX entright_idx_ent (entityright_entity),
+  INDEX entright_idx_con_id (entityright_consumer_id),
+  INDEX entright_idx_con (entityright_consumer)
 );
 
 

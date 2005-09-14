@@ -1270,7 +1270,8 @@ function run_query_all_users_from_group($g_id, $ids="") {
 // Recursive search to handle group trees
 // Parameters:
 //   - $group_id : Group id
-// Used by: agenda, deal
+// Returns:
+//   array of user ids
 ///////////////////////////////////////////////////////////////////////////////
 function get_all_users_from_group($g_id) {
   global $cdg_sql;
@@ -1299,8 +1300,7 @@ function get_all_users_from_group($g_id) {
   // Users members of this group
   $query = "SELECT userobmgroup_userobm_id as user_id
     FROM UserObmGroup
-    WHERE userobmgroup_group_id='$g_id'
-  ";
+    WHERE userobmgroup_group_id='$g_id'";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);

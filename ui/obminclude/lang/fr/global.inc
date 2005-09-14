@@ -277,6 +277,11 @@ $l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \
 
 
 //---------------------------------------------------------------------------//
+// OF messages
+//---------------------------------------------------------------------------//
+$l_of_right_err_auth = "Droits insuffisants pour exécuter la modification des droits !";
+
+//---------------------------------------------------------------------------//
 // Home page portlets
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Evénement(s) en attente";

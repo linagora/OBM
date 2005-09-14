@@ -1,0 +1,125 @@
+% Documentation technique d'OBM : Gestion des droits ACL
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\subsection{Gestion des droits ACL sur les entités}
+
+La gestion des droits standards permet de donner les droits sur une action d'un module (créer un rdv). Cependant elle ne permet pas de spécifier des droits particuliers sur une entité identifiée (La société Aliacom, le calendrier d'un utilisateur, une ressource,...). 
+
+La gestion des droits ACL est le mécanisme qui complète la gestion des droits standard en ajoutant la posibilité de définir des droits sur une entité identifiée (Définir qui peut consulter le calendrier de l'utilisateur, une ressource,...).
+
+La définition des droits sur une entité précise correspond au principe d'ACL (liste de contrôle d'accès).
+Il s'agit de définir les listes d'utilisateurs qui ont le droit de lire ou de modifier l'entité.\\
+
+L'implémentation de la gestion des droits ACL a été effectuée avec les objectifs suivants :\\
+\begin{itemize}
+\item Système générique : stockage commun des ACL ou droits indépendant du type d'entité
+\item API commune (interrogations base de données, affichage,...)
+\item Solution évolutive
+\end{itemize}
+\vspace{0.3cm}
+
+Les fonctionalités d'ACL sont fournies par le fichier \fichier{of/of\_acl.text}
+
+\begin{itemize}
+\item Une entité peut être définie publique en lecture ou se voir définir une liste de consommateurs (utilisateurs) en lecture
+\item Une entité peut être définie publique en écriture ou se voir définir une liste de consommateurs (utilisateurs) en écriture
+\item Le type de consommateur groupe n'est pas implémenté (1.0) mais prévu et possible
+\end{itemize}
+
+
+\subsubsection{Modèle de stockage : table EntityRight}
+
+Table des informations des ACL.\\
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_entity & varchar 32 & Nom de l'entité & ``calendar'', ``resource'' \\
+\hline
+\_entity\_id & int 8 & Id de l'entité & \\
+\hline
+\_consumer & varchar 32 & Type du consommateur & `user'' ou ``group'' (non implémenté); a qui sont attribués les droits \\
+\hline
+\_consumer\_id & int 8 & Id du consommateur & (si 0, alors public)\\
+\hline
+\_read & int 8 & Droit de lecture (1=Oui) & \\
+\hline
+\_write & int 8 & Droit d'écriture & \\
+\hline
+\end{tabular}
+
+\paragraph{Définition de droits publics} : La cible public est définie par la valeur 0 dans le champs consumer\_id. Dans ce cas le champ type de consommateur (\_consumer) n'a plus de signification.
+
+\paragraph{Accumulation et droits publics} : Si la cible public est positionnée pour les droit de lecture d'une entité, cela prime sur toute autre règle.
+Si pour une entité la cible public est positionnée en lecture mais propose un ``0'' en écriture dans la ligne, cette ligne est neutre pour la définition des droits en écriture. Le droit d'écriture pour la personne sera valable si une autre ACL le précise.
+
+En résumé, si l'indicateur public est positionné sur un droit, il définit ce droit; s'il n'est pas positionné, il n'influe pas sur le droit qui sera le résultat des autres acl.
+
+\paragraph{Indexs} : Pour des raisons de performance, les 4 champs (entity, entity\_id, consumer et consuler\_id) sont indexés.
+
+
+\subsubsection{Type d'entité et consommateur définis}
+
+Types d'entités définis (version 1.0) :\\
+\begin{itemize}
+\item \textbf{calendar} : calendrier d'un utilisateur (entity\_id est l'id d'un utilisateur)
+\item \textbf{resource} : Ressource
+\end{itemize}
+\vspace{0.3cm}
+
+Types de consommateurs définis (version 1.0) :\\
+\begin{itemize}
+\item \textbf{user} : Utilisateurs
+\item \textbf{group} : Groupe (Non implémenté encore)
+\end{itemize}
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_right_entity_for_consumer($entity, $consumer, $consumer_id,
+$right="read", $ids_set="") {
+\end{verbatim}
+\end{minipage}
+}
+Récupération des entités du type \$entity dont le consommateur \$consumer\_id de type \$consumer a le droit \$right.
+Le résultat peut être restreint à un sous ensemble (\$ids\_set).
+Exemple: Liste des agendas visibles par l'utilisateur pierre, liste restreinte aux membres du groupe commercial.\\
+
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_right_consumer_for_entity($entity, $entity_id, consumer,
+$right="read") {
+\end{verbatim}
+\end{minipage}
+}
+Récupération des consommateurs du type \$consumer qui ont le droit \$right sur l'entité \$entity\_id de type \$entity.\\
+Exemple: Liste des utilisateurs qui ont le droit de voir l'agenda d'un utilisateur.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_right_dis_admin($entity, $entity_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+Fonction d'affichage de l'écran de modification des droits pour l'entité \$entity\_id du type \$entity.\\
+
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_right_update_right($param, $entity) {
+\end{verbatim}
+\end{minipage}
+}
+
+Fonction de mise à jour des droits en base de données.

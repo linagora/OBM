@@ -14,6 +14,8 @@
 //   - $param_event
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($param_event) {
+  global $cdg_sql;
+
 //XXXXXXXX user resource
 
   $obm_q = new DB_OBM;
@@ -133,8 +135,8 @@ function run_query_get_resource_label($resources) {
 function run_query_get_entity_label($entities) {
 
   return array (
-    "user" => run_query_get_user_name($entities["user"]),
-    "resource" => run_query_get_resource_label($entities["resource"]) 
+    "user" => run_query_get_user_name($entities["user"])
+    //    "resource" => run_query_get_resource_label($entities["resource"]) 
   );
 
 }
@@ -199,8 +201,10 @@ function run_query_update_occurence_state($event_id,$user_id,$state){
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_waiting_events() {
   global $auth, $cdg_sql, $cagenda_entities;
+
+  $uid = $auth->auth["uid"];
   
-  $writable_user = run_query_userobm_writable();
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
@@ -230,15 +234,15 @@ function run_query_waiting_events() {
       evententity_state = 'W' AND 
       evententity_entity = '".$cagenda_entities['user']."'";
 
-  if (is_array($writable_user)) {
+  if (is_array($writable_cal)) {
     $query .= " AND evententity_entity_id IN (";
-    $num = count($writable_user);
-    foreach($writable_user as $user) {
-      $query .= "'$user',";
+    $num = count($writable_cal["ids"]);
+    foreach($writable_cal["ids"] as $user_id) {
+      $query .= "'$user_id',";
     }
-    $query.= "'".$auth->auth["uid"]."')";
+    $query.= "'$uid')";
   } else {
-    $query .= " AND evententity_entity_id = '".$auth->auth["uid"]."'";
+    $query .= " AND evententity_entity_id = '$uid'";
   }
   $query .= " ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql);
@@ -272,7 +276,7 @@ function run_query_add_event($agenda,$users_array,&$event_id) {
   global $uid, $l_from, $l_to, $l_date;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
 
-  $writable_user = run_query_userobm_writable(); 
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $mail  = $agenda["mail"];
   $groups = $agenda["group"];
   $mail_title = stripslashes($agenda["title"]);
@@ -289,7 +293,7 @@ function run_query_add_event($agenda,$users_array,&$event_id) {
   
   $event_id = run_query_insert_event_data($agenda);   
   foreach ($users_array as $user_id) {
-    if ($user_id == $uid || in_array($user_id,$writable_user)) {
+    if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
       run_query_insert_user_event($user_id,$event_id,'A');	
     } else {
       run_query_insert_user_event($user_id,$event_id,'W');	
@@ -424,7 +428,7 @@ function run_query_insert_user_event($user_id,$event_id,$state){
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurence of each event,
 ///////////////////////////////////////////////////////////////////////////////
-function check_for_conflict($agenda,$sel_user_id) {
+function check_for_conflict($agenda, $sel_user_id) {
   
   $ts_begin = isodate_to_timestamp($agenda["datebegin"]);
   $ts_end = isodate_to_timestamp($agenda["dateend"]);
@@ -485,7 +489,7 @@ function run_query_event_update($agenda,$users_array,&$event_id) {
   $groups = $agenda["group"];
   $mail = $agenda["mail"];
   $mail_title = stripslashes($agenda["title"]);
-  $writable_user = run_query_userobm_writable(); 
+  $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
 
   if (is_array($groups)) {
     foreach($groups as $group_id) {
@@ -540,7 +544,7 @@ function run_query_event_update($agenda,$users_array,&$event_id) {
   run_query_update_event_data($agenda);  
   run_query_delete_user_event($agenda);
   foreach($users_array as $user_id) {
-    if ($user_id == $uid || in_array($user_id,$writable_user)) {
+    if ($user_id == $uid || in_array($user_id,$writable_cal["ids"])) {
       run_query_insert_user_event($user_id,$event_id,'A');	
     } else {
       run_query_insert_user_event($user_id,$event_id,'W');	
@@ -736,16 +740,8 @@ function get_default_group_user_ids($p_group) {
       (c.calendarentityright_read = 1 OR u.userobm_id='$uid') 
     ORDER BY u.userobm_lastname";
   } else {
-    $query = "SELECT u.*,
-        c.calendarentityright_read
-      FROM UserObm as u
-        LEFT OUTER JOIN CalendarEntityRight as c
-          ON 
-            c.calendarentityright_customer_id = '$uid' AND 
-            u.userobm_id = c.calendarentityright_entity_id AND
-            c.calendarentityright_entity = '".$cagenda_entities['user']."'
-      WHERE (c.calendarentityright_read = 1 OR u.userobm_id='$uid') 
-      ORDER BY u.userobm_lastname";
+    $ar_ent = of_right_entity_for_consumer("calendar", "user", "$uid", "read");
+    return $ar_ent;
   }
 
   $obm_db = new DB_OBM;
@@ -754,14 +750,15 @@ function get_default_group_user_ids($p_group) {
 
   $ret_array = array();
   while($obm_db->next_record()) {
-    $ret_array[] = $obm_db->f("userobm_id");
+    $ret_array["ids"] = $obm_db->f("userobm_id");
   }
-  if (count($ret_array) == 0) {
-    $ret_array = array($uid);
+  if (count($ret_array["ids"]) == 0) {
+    $ret_array["ids"] = array($uid);
   }
 
   return $ret_array;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable agenda entities for the current user:
@@ -772,56 +769,32 @@ function get_default_group_user_ids($p_group) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_entity_readable() {
 
-  return array(
-    "user" => run_query_userobm_readable(),
+  $ent = array(
+    "user" => get_calendar_readable(),
     "group" => run_query_userobm_group(),
-    "resource" => run_query_resource_readable(),
+    //    "resource" => run_query_resource_readable(),
     "resourcegroup" => run_query_resource_group()
   );
 
+  return $ent;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable agenda users for the current user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_readable() {
-  global $cdg_sql, $auth, $agenda, $c_all, $cagenda_entities;
+function get_calendar_readable() {
+  global $cdg_sql, $auth, $agenda, $c_all;
 
   $uid = $auth->auth["uid"];
+  $gusers = "";
   if (isset($agenda["agenda_group"]) && ($agenda["agenda_group"] != $c_all)) {
     $group = $agenda["agenda_group"];
-    $query = "SELECT u.*,
-        c.calendarentityright_read
-      FROM UGroup g, UserObmGroup ug, UserObm as u
-        LEFT OUTER JOIN CalendarEntityRight as c
-          ON
-            c.calendarentityright_customer_id = '$uid' AND 
-            u.userobm_id = c.calendarentityright_entity_id AND 
-            c.calendarentityright_entity = '".$cagenda_entities['user']."'
-      WHERE
-        g.group_id = '$group' AND
-        ug.userobmgroup_group_id = g.group_id AND
-        ug.userobmgroup_userobm_id = u.userobm_id AND
-        (c.calendarentityright_read = 1 OR u.userobm_id='$uid') 
-      ORDER BY u.userobm_lastname";
-  } else {
-    $query = "SELECT u.*,
-        c.calendarentityright_read
-      FROM UserObm as u
-        LEFT OUTER JOIN CalendarEntityRight as c
-          ON 
-            c.calendarentityright_customer_id = '$uid' AND
-            u.userobm_id = c.calendarentityright_entity_id AND
-            c.calendarentityright_entity = '".$cagenda_entities['user']."'
-      WHERE (c.calendarentityright_read = 1 OR u.userobm_id='$uid')
-      ORDER BY u.userobm_lastname";
+    $gusers = get_all_users_from_group($group);
   }
+  $entity = of_right_entity_for_consumer("calendar", "user", $uid, "read", $gusers);
 
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-
-  return $obm_db;
+  return $entity;
 }
 
 
@@ -877,20 +850,8 @@ function run_query_resource_readable() {
         (c.calendarentityright_read = 1) 
       ORDER BY r.resource_label";
   } else {
-    $query = "SELECT 
-       distinct r.*,
-       c.calendarentityright_customer_id,
-       c.calendarentityright_read
-      FROM Resource as r
-        LEFT OUTER JOIN CalendarEntityRight as c
-          ON 
-            (c.calendarentityright_customer_id = '$uid' OR c.calendarentityright_customer_id = 0) AND 
-            r.resource_id = c.calendarentityright_entity_id AND 
-            c.calendarentityright_entity = '".$cagenda_entities['resource']."'
-      WHERE
-            $where
-            (c.calendarentityright_read = 1 )
-      ORDER BY r.resource_label";
+    $entity = of_right_entity_for_consumer("resource", "user", $uid, "read");
+    return $entity;
   }
 
   $obm_db = new DB_OBM;
@@ -1100,12 +1061,13 @@ function valid_event($status_event) {
   return ($status_event != -1);
   
 }
+
  
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed entities.
 // Parameters :
 //  - $entities_array : hashed array of userobm and resource DBO
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function store_entities($entities_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2,$ico_calendar_user3,$ico_calendar_user4;
   global $ico_calendar_user5;
@@ -1113,30 +1075,33 @@ function store_entities($entities_q) {
 
   $i = 0;
   $entity_tab = array();
-    $user_q = $entities_q["user"];
-    while($user_q->next_record()) {
-      $entity_tab[$user_q->f("userobm_id")] = array(
-        "name"=>$user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname"),
-        "class"=>"agendaEventBg$i",
-        "image"=>${"ico_calendar_user".$i},
-         "type"=>"user",
-        "id"=>$user_q->f("userobm_id"));
-      $i++;
-    }
-    $resource_q = $entities_q["resource"];
+  $user_q = $entities_q["user"];
+  while($user_q->next_record()) {
+    $entity_tab[$user_q->f("userobm_id")] = array(
+      "name"=>$user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname"),
+      "class"=>"agendaEventBg$i",
+      "image"=>${"ico_calendar_user".$i},
+      "type"=>"user",
+      "id"=>$user_q->f("userobm_id"));
+    $i++;
+  }
+  $resource_q = $entities_q["resource"];
+  if (is_object($resource_q)) {
     while($resource_q->next_record()) {
       $entity_tab[$resource_q->f("resource_id")] = array(
-         "name"=>$resource_q->f("resource_label"),
-         "class"=>"agendaEventBg$i",
-         "image"=>${"ico_calendar_user".$i},
-         "type"=>"resource",
-         "id"=>$resource_q->f("resource_id")
+        "name"=>$resource_q->f("resource_label"),
+        "class"=>"agendaEventBg$i",
+        "image"=>${"ico_calendar_user".$i},
+        "type"=>"resource",
+        "id"=>$resource_q->f("resource_id")
       );
       $i++;
     }
+  }
 
   return $entity_tab;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return the event infos
@@ -1336,13 +1301,12 @@ function get_date_day_of_week($timestamp, $day) {
   return $ret_ts;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Slice the entities to display 
-//------------------------------------------------------------------------
-// Argument:
-// ---------
-//     - $sel_user
-//     - $sel_resource
+// Parameters:
+//   - $sel_user
+//   - $sel_resource
 ///////////////////////////////////////////////////////////////////////////////
 function slice_entities($sel_user_id, $sel_resource_id, $entity_readable) {
   global $auth;
@@ -1350,28 +1314,29 @@ function slice_entities($sel_user_id, $sel_resource_id, $entity_readable) {
 
   if ($agenda_view_type == "U") {
     // users 
-    if($action != "perform_meeting" && count($sel_user_id) > 6) {
+    if ($action != "perform_meeting" && count($sel_user_id) > 6) {
       $sel_user_id = array_slice ($sel_user_id, 0, 6);
     }
-    if(count($sel_user_id) == 0){
-      $sel_user_id =  array($auth->auth["uid"]);
+    if (count($sel_user_id) == 0) {
+      $sel_user_id = array($auth->auth["uid"]);
     }
-    $sel_resource_id =   array(0);
+    $sel_resource_id = array(0);
+
   } elseif ($agenda_view_type == "R") {
     // resources
-    if($action != "find_resource" && count($sel_resource_id) > 6) {
+    if ($action != "find_resource" && count($sel_resource_id) > 6) {
       $sel_resource_id = array_slice ($sel_resource_id, 0, 6);
     }
-    if(count($sel_resource_id) == 0){
+    if (count($sel_resource_id) == 0){
       if ($entity_readable["resource"]->num_rows() != 0) {
         $entity_readable["resource"]->next_record();
-        $sel_resource_id =  array($entity_readable["resource"]->f("resource_id"));
+        $sel_resource_id = array($entity_readable["resource"]->f("resource_id"));
         $entity_readable["resource"]->seek(0);
       } else {
-        $sel_resource_id =  array(0);
+        $sel_resource_id = array(0);
       }
     }
-    $sel_user_id =  array(0);
+    $sel_user_id = array(0);
   }
 
   return array(
@@ -1406,7 +1371,7 @@ function get_week_num($date) {
 //   - $entities_array : users id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_no_repeat_events($start,$end,$entities_array) {
-  global $cdg_sql, $uid, $cagenda_entities;
+  global $cdg_sql, $uid;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
