@@ -61,15 +61,12 @@ if (isset($rd_view_type)) {
 }
 $sess->register("agenda_view_type");
 
-// If a group is given, automatically select all its members
-if (isset($param_group)) {
-  $agenda_group_view = $param_group;
+// If a group has just been selected, automatically select all its members
+if (isset($agenda["agenda_group"]) && ($agenda["new_group"] == "1")) {
   $hd_resource_store = array();
-  $user_readable = get_calendar_readable();
-  $sel_user_id = $user_readable["ids"];
+  $sel_user_id = get_all_users_from_group($agenda["agenda_group"]);
   //  $sel_resource_id = get_default_group_resource_ids($param_group);
 }
-$sess->register("agenda_group_view");
 if (count($sel_user_id) != 0 ) {
   $agenda_user_view = $sel_user_id;
 }
@@ -86,7 +83,6 @@ page_close();
 
 $sel_user_id = $agenda_user_view;
 $sel_resource_id = $agenda_resource_view;
-$param_group = $agenda_group_view;
 // end Session parameters
 $sel_entity_id["user"] = $sel_user_id;
 $sel_entity_id["resource"] = $sel_resource_id;
@@ -169,7 +165,7 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
-  $cat_event = run_query_get_eventcategories();
+  $cat_q = run_query_get_eventcategories();
   if ($p_user_meeting == 1) {
     $p_user_array =  $agenda["user_meeting"] ;
     $grp_obm = run_query_group_in($agenda["group_meeting"]);
@@ -177,7 +173,7 @@ if ($action == "index") {
     $p_user_array = array($uid);
   }
   $user_obm = run_query_userobm_in($p_user_array);
-  $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $p_user_array);
+  $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_q, $p_user_array);
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,9 +207,9 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
     $eve_q = run_query_detail($param_event);
-    $cust_q = run_query_event_customers($param_event);
+    $attendee_q = run_query_event_attendees($param_event);
     $display["detailInfo"] = display_record_info($eve_q);
-    $display["detail"] = html_calendar_consult($eve_q, $cust_q,$obm_q_grp);
+    $display["detail"] = html_calendar_consult($eve_q, $attendee_q);
   }
 
 } elseif ($action == "detailupdate") {
@@ -297,9 +293,8 @@ if ($param_event > 0) {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
-  $p_user_array = array($uid);  
-  $user_obm = run_query_userobm_in($p_user_array);
-  $display["detail"] = dis_meeting_form($agenda, $user_obm, $p_user_array);
+  $user_obm = run_query_userobm_in($sel_entity_id["user"]);
+  $display["detail"] = dis_meeting_form($agenda, $user_obm, $sel_entity_id["user"]);
 
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -370,14 +365,15 @@ display_page($display);
 // returns : $agenda hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_agenda() {
-  global $param_date,$param_event,$param_group,$tf_title,$sel_category_id,$sel_priority,$ta_event_description, $tf_location;
+  global $param_date,$param_event,$param_group,$new_group,$tf_title;
+  global $sel_category_id,$sel_priority,$ta_event_description, $tf_location;
   global $cagenda_first_hour, $cagenda_last_hour,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
   global $sel_deny_write,$sel_deny_read,$sel_time_duration,$sel_min_duration;
-  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id,$sel_user_meeting_id, $sel_group_meeting_id;
+  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id, $sel_group_meeting_id;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
   global $ch_all_day;
   
@@ -408,7 +404,6 @@ function get_param_agenda() {
   if (isset($cb_mail)) $agenda["mail"] = $cb_mail;
   if (is_array($sel_deny_write)) $agenda["deny_w"] = $sel_deny_write;
   if (is_array($sel_deny_read)) $agenda["deny_r"] = $sel_deny_read;
-  if (is_array($sel_user_meeting_id)) $agenda["user_meeting"] = $sel_user_meeting_id;
   if (is_array($sel_group_meeting_id)) $agenda["group_meeting"] = $sel_group_meeting_id;
 
   if (isset($sel_time_duration)) {
@@ -471,7 +466,7 @@ function get_param_agenda() {
 
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
   if (is_array($sel_group_id)) $agenda["group"] = $sel_group_id;
-  if (isset($param_group)) $agenda["agenda_group"] = $param_group;
+  if (isset($new_group)) $agenda["new_group"] = $new_group;
   if (isset($param_group) && ($param_group != "")) {
     $agenda["agenda_group"] = $param_group;
   } else {
