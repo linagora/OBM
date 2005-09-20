@@ -622,13 +622,16 @@ END:VCALENDAR";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurence of each event,
+// Parameters:
+//   - $agenda       : agenda parameters
+//   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
-function check_for_conflict($agenda, $sel_user_id) {
+function check_for_conflict($agenda, $sel_entity_id) {
   
   $ts_begin = isodate_to_timestamp($agenda["datebegin"]);
   $ts_end = isodate_to_timestamp($agenda["dateend"]);
   $id = $agenda["id"];
-  $obm_q = run_query_conflict_events($ts_begin,$ts_end,$sel_user_id,$id);
+  $obm_q = run_query_conflict_events($ts_begin, $ts_end, $sel_entity_id, $id);
   if ($obm_q->nf() == 0) {
     return false;
   }
@@ -641,7 +644,7 @@ function check_for_conflict($agenda, $sel_user_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_for_decision_conflict($agenda) {
   
-  $user[] = $agenda["user_id"];
+  $user["user"] = $agenda["user_id"];
   $event_id = $agenda["id"];
   $event_data = run_query_detail($event_id);
   $ts_begin = $event_data->f("calendarevent_date");
@@ -654,9 +657,9 @@ function check_for_decision_conflict($agenda) {
 }
 
 
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Get all event categories
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function run_query_get_eventcategories() {
   global $cdg_sql;
 
@@ -664,6 +667,7 @@ function run_query_get_eventcategories() {
   display_debug_msg($query, $cdg_sql, "run_query_get_eventcategories()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;
 }
 
@@ -927,7 +931,7 @@ function run_query_entity_readable() {
 
   $ent = array(
     "user" => get_calendar_readable(),
-    "group" => run_query_userobm_group(),
+    "group" => get_group_readable(),
     //    "resource" => run_query_resource_readable(),
     "resourcegroup" => run_query_resource_group()
   );
@@ -958,9 +962,9 @@ function get_calendar_readable() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the list of calendar group for the current user
+// Get the list of readable calendar group for the current user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_group() {
+function get_group_readable() {
   global $cdg_sql, $auth, $cagenda_public_groups;
 
   $uid = $auth->auth["uid"];
@@ -976,11 +980,12 @@ function run_query_userobm_group() {
     ORDER BY group_privacy DESC, group_name";
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_userobm_group()");
+  display_debug_msg($query, $cdg_sql, "get_group_readable()");
   $obm_q->query($query);
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable agenda ressource for the current user
@@ -1051,19 +1056,23 @@ function run_query_resource_group() {
 function run_query_group_in($groups) {
   global $cdg_sql;
 
-  $where = "(0";
-  foreach($groups as $group) {
-    $where .= ", $group";
-  }
-  $where .= ")";
-  $query = "SELECT *
+  if (is_array($groups)) {
+    $where = "(0";
+    foreach($groups as $group) {
+      $where .= ", $group";
+    }
+    $where .= ")";
+    $query = "SELECT *
     FROM UGroup
     WHERE 
       group_id IN $where
     ORDER by group_name";
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_group_in()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, "run_query_group_in()");
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }
@@ -1575,15 +1584,14 @@ function run_query_no_repeat_events($start,$end,$entities_array) {
 // Parameters:
 //   - $start        : event start datetime (timestamp)
 //   - $end          : event end datetime (timestamp)
+//   - $sel_entity_id : selected entities id
 //   - $agenda       : agenda params
-//   - $users_array  : contact id array, the event is assigned to 
-//   - $groups_array : group id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_conflict_events($start,$end,$users_array,$event_id) {
+function run_query_conflict_events($start,$end,$sel_entity_id,$event_id) {
   global $cdg_sql, $uid;
 //XXXXXXXXXX
   
-  $obm_db = new DB_OBM;
+  $obm_q = new DB_OBM;
   $db_type = $obm_db->type;
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
@@ -1611,21 +1619,22 @@ function run_query_conflict_events($start,$end,$users_array,$event_id) {
       AND $calendarevent_date > $start - calendarevent_duration
       AND $calendarevent_date < $end 
             ";	
-  if (is_array($users_array) && (count($users_array)>0) ) {
+  if (is_array($sel_entity_id["user"]) && (count($sel_entity_id["user"])>0) ) {
     $query .= " AND evententity_entity_id IN (";
-    foreach($users_array as $id) {
-      $query.= "$coma'$id'";
+    foreach($sel_entity_id["user"] as $id) {
+      $query .= "$coma'$id'";
       $coma = ",";
     }
-    $query.=")";
-  }   	     
-  if($event_id != "") {
+    $query .= ")";
+  }
+  if ($event_id != "") {
     $query .= " AND calendarevent_id != '$event_id' ";
   }
   $query.=" ORDER BY calendarevent_date";
   display_debug_msg($query, $cdg_sql, "run_query_conflict_events(()");
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 
