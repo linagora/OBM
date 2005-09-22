@@ -634,20 +634,6 @@ CREATE INDEX entright_idx_con_id ON EntityRight (entityright_consumer_id);
 CREATE INDEX entright_idx_con ON EntityRight (entityright_consumer);
 
 
---
--- structure fot table 'RepeatKind'
---
-CREATE TABLE RepeatKind (
-  repeatkind_id          serial,
-  repeatkind_timeupdate  timestamp,
-  repeatkind_timecreate  timestamp,
-  repeatkind_userupdate  integer,
-  repeatkind_usercreate  integer,
-  repeatkind_label       varchar(128),
-  PRIMARY KEY(repeatkind_id)	
-);
-
-
 -------------------------------------------------------------------------------
 -- Todo
 -------------------------------------------------------------------------------
@@ -1290,7 +1276,8 @@ CREATE TABLE UGroup (
 --
 CREATE TABLE UserObmGroup (
   userobmgroup_group_id    integer DEFAULT 0 NOT NULL,
-  userobmgroup_userobm_id  integer DEFAULT 0 NOT NULL
+  userobmgroup_userobm_id  integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (userobmgroup_group_id, userobmgroup_userobm_id)
 );
 
 
@@ -1299,7 +1286,8 @@ CREATE TABLE UserObmGroup (
 --
 CREATE TABLE GroupGroup (
   groupgroup_parent_id  integer DEFAULT 0 NOT NULL,
-  groupgroup_child_id   integer DEFAULT 0 NOT NULL
+  groupgroup_child_id   integer DEFAULT 0 NOT NULL,
+  PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id)
 );
 
 

@@ -284,3 +284,17 @@ ALTER TABLE ContactCategory2 RENAME COLUMN temp_code TO contactcategory2_code;
 CREATE INDEX compcat_idx_comp ON CompanyCategoryLink (companycategorylink_company_id);
 CREATE INDEX contcat1_idx_cont ON ContactCategory1Link (contactcategory1link_contact_id);
 CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_contact_id);
+
+
+-------------------------------------------------------------------------------
+-- Add missing primary key
+-------------------------------------------------------------------------------
+ALTER TABLE UserObmGroup ADD PRIMARY KEY (userobmgroup_group_id, userobmgroup_userobm_id);
+ALTER TABLE GroupGroup ADD PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id);
+
+
+-------------------------------------------------------------------------------
+-- Drop Deprecated tables
+-------------------------------------------------------------------------------
+DROP TABLE RepeatKind;
+DROP TABLE CalendarEventData;

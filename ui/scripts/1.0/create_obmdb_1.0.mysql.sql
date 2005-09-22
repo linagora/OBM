@@ -632,20 +632,6 @@ CREATE TABLE EntityRight (
 );
 
 
---
--- structure fot table 'RepeatKind'
---
-CREATE TABLE RepeatKind (
-  repeatkind_id          int(8) NOT NULL auto_increment,
-  repeatkind_timeupdate  timestamp(14),
-  repeatkind_timecreate  timestamp(14),
-  repeatkind_userupdate  int(8),
-  repeatkind_usercreate  int(8),
-  repeatkind_label       varchar(128),
-  PRIMARY KEY(repeatkind_id)	
-);
-
-
 -------------------------------------------------------------------------------
 -- Todo
 -------------------------------------------------------------------------------
@@ -1285,7 +1271,8 @@ CREATE TABLE UGroup (
 --
 CREATE TABLE UserObmGroup (
   userobmgroup_group_id    int(8) DEFAULT 0 NOT NULL,
-  userobmgroup_userobm_id  int(8) DEFAULT 0 NOT NULL
+  userobmgroup_userobm_id  int(8) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (userobmgroup_group_id, userobmgroup_userobm_id)
 );
 
 
@@ -1294,7 +1281,8 @@ CREATE TABLE UserObmGroup (
 --
 CREATE TABLE GroupGroup (
   groupgroup_parent_id  int(8) DEFAULT 0 NOT NULL,
-  groupgroup_child_id   int(8) DEFAULT 0 NOT NULL
+  groupgroup_child_id   int(8) DEFAULT 0 NOT NULL,
+  PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id)
 );
 
 

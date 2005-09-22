@@ -445,7 +445,7 @@ function html_bar_date_selector($agenda) {
 function html_bar_legend($entity_store) {
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied; 
   global $l_calendar_displayed, $l_resource_displayed;
-  global $agenda_view_type;
+  global $agenda_view_type, $action;
 
   // Legend
   if ($action == "perform_meeting" || $action == "perform_res_meeting") {

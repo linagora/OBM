@@ -261,7 +261,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
 //   - $right       : right to get and select from : "read" or "write"
 //   - $ids_set     : array of ids restricting the result
 // Returns:
-//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2))
+//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="read", $ids_set="") {
   global $cdg_sql;
@@ -316,7 +316,7 @@ function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="
       $id_array[] = $id;
       $ent_array[] = array(
 			   "id"    => $id,
-			   "label" => $label,
+			   "label" => $label
 			   );
     }
   }
@@ -399,7 +399,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
 			 "label" => $label,
 			 "entity_id" => $entity_id,
 			 "read" => $read,
-			 "write" => $write,
+			 "write" => $write
 			 );
   }
 

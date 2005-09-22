@@ -11,16 +11,17 @@ simultanés.
 
 \subsection{Organisation de la base de données}
 
-Le \calendar utilise quatre tables :
+Le \calendar utilise 5 tables :
 \begin{itemize}
- \item CalendarCategory
  \item CalendarEvent
- \item CalendarUser
- \item CalendarRight
+ \item CalendarException
+ \item CalendarCategory
+ \item EntityEvent
+ \item EntityRight
 \end{itemize}
 
 \subsubsection{CalendarCategory}
-Cette table est utilisée pour sotcker les catégories des événements.
+Cette table est utilisée pour sotcker les catégories des événements.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -41,7 +42,7 @@ Cette table est utilisée pour sotcker les catégories des événements.
 \end{tabular}
 
 \subsubsection{CalendarEvent}
-Cette table stocke toute la description d'un évenement ainsi que ces caractéristiques.
+Cette table stocke toute la description d'un évenement ainsi que ces caractéristiques.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -59,7 +60,9 @@ Cette table stocke toute la description d'un évenement ainsi que ces caractérist
 \hline
 \_owner & int 8 & Id du propriétaire & Clé etrangère\\
 \hline
-\_title & varchar 255 & Titre  & \\
+\_title & varchar 255 & Titre & \\
+\hline
+\_location & varchar 100 & Lieu & \\
 \hline
 \_description & text & Description & \\
 \hline
@@ -86,10 +89,10 @@ hebdomadaire & \\
 \hline
 \end{tabular}
 
-\subsubsection{CalendarUser}
 
-Cette table stocke toutes les relations entre les utilisateurs et les
-événements
+\subsubsection{CalendarException}
+
+Cette table stocke les exceptions des événements périodiques.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -103,9 +106,35 @@ Cette table stocke toutes les relations entre les utilisateurs et les
 \hline
 \_usercreate & int 8 & Id du créateur & Clé etrangère\\
 \hline
-\_user\_id & int 8 & Id de l'utilisateur & Clé etrangère - Clé primaire \\
+\_event\_id & int 8 & Id de l'événement & Clé etrangère - Clé primaire \\
+\hline
+\_date & timestamp & Date de l'exception & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{EventEntity}
+
+Cette table stocke toutes les relations entre les événements et les entités (utilisateurs, groupes, resources,...).\\
+
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & Clé etrangère\\
+\hline
+\_usercreate & int 8 & Id du créateur & Clé etrangère\\
 \hline
 \_event\_id & int 8 & Id de l'événement & Clé etrangère - Clé primaire \\
+\hline
+\_entity\_id & int 8 & Id de l'entité & Clé etrangère - Clé primaire \\
+\hline
+\_entity & varchar 32 & nom de l'entité & Clé primaire - 'user', 'resource',... \\
 \hline
 \_state & char 1 & Etat de l'événément : <R> Refusé, <W> En attente, et <A> 
 Accepté  & \\
@@ -115,19 +144,30 @@ Accepté  & \\
 \hline
 \end{tabular}
 
-\subsubsection{CalendarRight}
+
+\subsubsection{EntityRight}
+
+Table générique de gestion des droits individuels ou ACL.
+L'entité est l'objet sur lequel on fixe les droits (un calendrier, une ressource,...).
+Le consommateur est l'objet à qui on donne les droits (utilisateur ou groupe).
+
+Voir section \ref{acl}.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_ownerid & int 8 & Id du propriétaire de l'agenda & Clé etrangère - Clé primaire\\
+\_entity &varchar 32 & type de l'entité & Clé primaire - 'calendar', 'resource'\\
 \hline
-\_customerid & int 8 & Id de l'utilisateur concerné par ces droits & Clé etrangère - Clé primaire\\
+\_entity\_id & int 8 & Id de l'entité & Clé primaire\\
 \hline
-\_write & int 1 & Droit d'ecriture <0> Non <1> Oui & \\
+\_consumer & varchar 32 & type du consommateur & Clé primaire - 'user, 'group\\
+\hline
+\_consumer\_id & int 8 & Id du consommateur & Clé primaire\\
 \hline 
 \_read & int 1 & Droit de lecture <0> Non <1> Oui  & \\
+\hline
+\_write & int 1 & Droit d'ecriture <0> Non <1> Oui & \\
 \hline
 \end{tabular}
 
@@ -179,20 +219,122 @@ ainsi qu'une description sommaire de chacune d'entre elles.\\
  \hline
 \end{tabular}
 
+
+\subsection{Sélection et stockage des utilisateurs, resources, groupes}
+
+Lors de la sélection de plusieurs utilisateurs ou entités, ceux-ci sont gardés en session afin de maintenir la sélection en changeant de vue ou en se déplaçant dans le calendrier.
+De même quand un événement est créé pour plusieurs utilisateurs, la vue passe automatiquement en vue multi-utilisateurs avec ces utilisateurs sélectionnés.
+
+Qaund un group est sélectionné, la vue passe automatiquement en vue membres du groupe, et le choix des utilisateurs est limité au groupe (restreint à ceux qui ont donné les droits en lecture).
+
+Règles utilisées pour la sélection et le stockage en session des entités :\\
+
+Les entités sélectionnées sont stockées dans le tableau \variable{\$cal\_entity\_id} qui comprend plusieurs entrées :
+\begin{itemize}
+\item[user] : tableau d'id d'utilisateurs
+\item[resource] : tableau d'id de ressources
+\item[group] : tableau d'id de groupes
+\end{itemize}
+\vspace{0.3cm}
+
+\#nb correspond au nombre maximal de calendriers affichables simultanément.\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Action} & \textbf{Sélection} \\
+
+\hline
+Affichage d'une vue
+&
+\begin{itemize}
+\item Session inchangée
+\item Affichage calendriers  : contenu de [user], [resource] 
+\item Affichage liste utilisateurs : visible; sélection = contenu de [user] 
+\item Group sélectionné : ? 
+\end{itemize}
+\\ 
+
+\hline
+Sélection de 1 ou plusieurs utilisateurs en mode vue
+&
+\begin{itemize}
+\item[-] [user] = sélection d'utilisateurs, limitée à \#nb
+\item[-] [group] = inchangé ?
+\item[-] [resource] = vide
+\item Affichage calendriers : contenu de [user] 
+\item Affichage liste utilisateurs : visible; sélection = contenu de [user] 
+\item Group sélectionné : ? 
+\end{itemize}
+\\ 
+
+\hline
+Sélection de 1 groupe mode vue
+&
+\begin{itemize}
+\item[-] [user] = utilisateurs du groupe sélectionné, limité à \#nb
+\item[-] [group] = groupe sélectionné ?
+\item[-] [resource] = vide
+\item Affichage calendriers : contenu de [user] 
+\item Affichage liste utilisateurs : visible du groupe; sélection = contenu de [user] 
+\item Group sélectionné : Le groupe
+\end{itemize}
+\\ 
+
+\hline
+Fenêtre nouveau rdv
+&
+\begin{itemize}
+\item Utilisateurs pré-sélectionnés : contenu de [user] 
+\item Groupes pré-sélectionnés : contenu de [group] 
+\item Ressources pré-sélectionnées : contenu de [resource] 
+\end{itemize}
+\\ 
+
+\hline
+Création rdv : Sélection de 1 ou plusieurs utilisateurs, groupes, ressources
+&
+\begin{itemize}
+\item[-] [user] = utilisateurs sélectionnés, limité à \#nb
+\item[-] [group] = groupes sélectionnés
+\item[-] [resource] = ressources sélectionnées
+\item[-] ``total\_user'' = [user] + users fournis par [group], limité à \#nb
+\item Affichage calendriers  : contenu de ``total\_user'', [resource] 
+\item Affichage liste utilisateurs : visible; sélection = ``total\_user'' 
+\item Group sélectionné : ? 
+\end{itemize}
+\\
+
+\hline
+Fenêtre nouvelle réunion
+&
+\begin{itemize}
+\item Utilisateurs pré-sélectionnés : contenu de [user] 
+\item Groupes pré-sélectionnés : contenu de [group] 
+\item Ressources pré-sélectionnées : contenu de [resource] 
+\end{itemize}
+\\ 
+
+\hline
+Recherche crénneaux disponibles
+&
+\begin{itemize}
+\item[-] [user] = utilisateurs sélectionnés
+\item[-] [group] = groupes sélectionnés
+\item[-] [resource] = ressources sélectionnées
+\end{itemize}
+\\
+\hline
+\end{tabular}
+
+
+
 \subsubsection{Remarques}
-  Par défaut l'action \textbf{index} affiche la vue mensuelle de la semaine
+  Par défaut l'action \textbf{index} affiche la vue hebdomadaire de la semaine
   courante. Cependant si l'utilisateur courant ou bien un utilisateur qui lui à 
   céder les droits d'ecriture sur son agenda à des événements en attente cette
   action affichera la liste des événements en attente.
 
-\subsection{Fonctionnement}
- Dans cette partie seront abordées le fonctionnement général du module \agenda.
- Seul le point de vue technique sera ici abordé et non utilisateur. Il va donc 
- plus etre sujet du fonctionnement que de l'utilité et de l'utilisation du module.
- De plus seules les parties complexes de l'agenda seront abordés à savoir
- principalement la construction d'une vue de l'agenda.
- 
-\subsubsection{Principe de fonctionnement}
+\subsection{Principe de fonctionnement d'affichage d'une vue}
  Les etapes de construction de la vue sont :
  \begin{itemize}
   \item{Récupération des informations en base de données}

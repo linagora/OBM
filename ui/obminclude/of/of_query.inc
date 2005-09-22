@@ -1053,19 +1053,23 @@ function get_last_group_text($id) {
 function run_query_userobm_in($users) {
   global $cdg_sql;
 
-  $where = "(0";
-  foreach($users as $user) {
-    $where .= ", $user";
-  }
-  $where .= ")";
-  $query = "SELECT *
+  if (is_array($users)) {
+    $where = "(0";
+    foreach($users as $user) {
+      $where .= ", $user";
+    }
+    $where .= ")";
+    $query = "SELECT *
     FROM UserObm
     WHERE userobm_archive = 0
       AND userobm_id IN $where 
     ORDER by userobm_lastname"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_userobm()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, "run_query_userobm()");
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }

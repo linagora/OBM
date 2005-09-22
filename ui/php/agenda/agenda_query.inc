@@ -956,6 +956,11 @@ function get_calendar_readable() {
 
   // Add the user own calendar
   $entity["ids"][] = $uid;
+  $obm_q = run_query_get_user_name(array($uid));
+  $obm_q->next_record();
+  $id = $obm_q->f("userobm_id");
+  $label = $obm_q->f("userobm_lastname") ." ". $obm_q->f("userobm_firstname");
+  $entity["entity"][] = array("id" => $id, "label" => $label);
 
   return $entity;
 }
@@ -1459,11 +1464,12 @@ function get_date_day_of_week($timestamp, $day) {
 // Slice the entities to display. Limit the entities selected to the entities
 // really readable by the user, and limit to a max (=6) for display
 // Parameters:
-//   - $sel_user_id      : user ids
-//   - $sel_resource_id  : resource ids
+//   - $sel_user_id     : user ids
+//   - $sel_resource_id : resource ids
+//   - $entity_readable : if given, entities eligibles
 ///////////////////////////////////////////////////////////////////////////////
-function slice_entities($sel_user_id, $sel_resource_id, $entity_readable) {
-  global $auth, $agenda_view_type;
+function slice_entities($sel_user_id, $sel_resource_id, $entity_readable="") {
+  global $auth, $agenda_view_type, $max_display;
 
   if ($agenda_view_type == "U") {
     // users 
@@ -1471,14 +1477,18 @@ function slice_entities($sel_user_id, $sel_resource_id, $entity_readable) {
     if ($action != "perform_meeting") {
       if (is_array($sel_user_id)) {
 	foreach ($sel_user_id as $u_id) {
-	  if (in_array($u_id, $entity_readable["user"]["ids"])) {
+	  if (is_array($entity_readable)) {
+	    if (in_array($u_id, $entity_readable["user"]["ids"])) {
+	      $res_user_id[] = $u_id;
+	    }
+	  } else {
 	    $res_user_id[] = $u_id;
 	  }
 	}
       }
     }
-    if (count($res_user_id) > 6) {
-      $res_user_id = array_slice ($res_user_id, 0, 6);
+    if (count($res_user_id) > $max_display) {
+      $res_user_id = array_slice ($res_user_id, 0, $max_display);
     }
     if (count($res_user_id) == 0) {
       $res_user_id = array($auth->auth["uid"]);
@@ -1486,9 +1496,9 @@ function slice_entities($sel_user_id, $sel_resource_id, $entity_readable) {
     $sel_resource_id = array(0);
 
   } elseif ($agenda_view_type == "R") {
-    // resources
-    if ($action != "find_resource" && count($sel_resource_id) > 6) {
-      $sel_resource_id = array_slice ($sel_resource_id, 0, 6);
+    // resources XXXXXXX transform to array
+    if ($action != "find_resource" && count($sel_resource_id) > $max_display) {
+      $sel_resource_id = array_slice ($sel_resource_id, 0, $max_display);
     }
     if (count($sel_resource_id) == 0){
       if ($entity_readable["resource"]->num_rows() != 0) {

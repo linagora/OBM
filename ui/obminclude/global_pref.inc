@@ -29,6 +29,9 @@ if (($set_debug & $cdg_sess) == $cdg_sess) {
     <tr><th>Session content</th></tr>
     <tr><td>";
   while (list($key, $val) = each ($_SESSION)) {
+    if (is_array($val)) {
+      $val = var_export($val, true);
+    }
     $dis_session .= "$key = $val<br />\n";
   }
   $dis_session .= "</td></tr></table>";
