@@ -53,7 +53,7 @@ function show_hide_write_right(field) {
 //   - $entity_id : entity id
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_dis_admin($entity, $entity_id) {
-  global $display, $auth, $cagenda_entities;
+  global $display, $auth;
 
   $uid = $auth->auth["uid"];
   $consumer = "user";
@@ -64,7 +64,7 @@ function of_right_dis_admin($entity, $entity_id) {
   if (!isset($entity_id) || ($entity_id == "")) {
     if ($entity == "calendar") {
       $entity_id = $auth->auth["uid"];
-    } elseif ($entity == $cagenda_entities["resource"]) {
+    } elseif ($entity == "resource") {
       $entity_id = $writable_entity["entity"][0]["id"];
     }
   }

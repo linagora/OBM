@@ -26,8 +26,6 @@
 // - ext_get_ids     --                -- select multiple resources (ret id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-$set_debug=0;
-
 $path = "..";
 $extra_css = "resource.css";
 $module = "resource";
@@ -154,18 +152,15 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("$obminclude/javascript/right_js.inc");
   require("$obminclude/lib/right.inc");
-
-  $display["detail"] = dis_right_admin($resource["entity_id"], $cagenda_entities["resource"]);
+  $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("$obminclude/javascript/right_js.inc");
   require("$obminclude/lib/right.inc");
-
-  run_query_update_right($resource,$cagenda_entities["resource"]);
-  $display["detail"] = dis_right_admin($resource["entity_id"], $cagenda_entities["resource"]);
+  of_right_update_right($resource, "resource");
+  $display["msg"] .= display_warn_msg($err_msg);
+  $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////

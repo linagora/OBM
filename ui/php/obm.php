@@ -49,6 +49,7 @@ $display["title"] = "
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
 </div>";
 if ($cgp_show["module"]["agenda"]) { 
+  require("$path/agenda/agenda_query.inc");
   $block .= dis_calendar_portal();
 }
 
@@ -119,7 +120,8 @@ function dis_calendar_portal() {
   global $l_module_agenda,$l_daysofweekfirst,$l_my_agenda,$l_waiting_events;
   global $auth, $cagenda_weekstart;
 
-  $num = run_query_waiting_events() ;
+  $obm_q = run_query_waiting_events() ;
+  $num = $obm_q->num_rows();
 
   $ts_date = time();  
   $this_month = get_month($ts_date);
@@ -128,8 +130,8 @@ function dis_calendar_portal() {
   $end_time = strtotime("+1 month +6 days", $start_time);
 
   $current_time = $start_time; 
-  $calendar_user = array ($auth->auth["uid"] => "dummy"); 
-  $events_list = events_model($start_time,$end_time,$calendar_user);
+  $calendar_entity["user"] = array($auth->auth["uid"] => array("dummy"));
+  $events_list = events_model($start_time,$end_time, $calendar_entity);
   $whole_month = TRUE;
   $num_of_events = 0;
   $i = 0;
@@ -162,8 +164,7 @@ function dis_calendar_portal() {
   } while ($whole_month == TRUE);
 
   
- // Minicalendar Head
-
+  // Minicalendar Head
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $current_time);
     $day = $l_daysofweekfirst[$day_num];
@@ -171,7 +172,7 @@ function dis_calendar_portal() {
     $current_time = strtotime("+1 day", $current_time); 
   } 
   $block = "
-    <div class=\"portalModule\"> 
+   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda_portal\" alt=\"\" />
    </div>

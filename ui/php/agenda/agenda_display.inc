@@ -47,10 +47,10 @@ function dis_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
 // Parameters:
 //   - $agenda: agenda parameters
 //   - $sel_ent_id      : array of entity Id
-//   - $entity_store    : array of entities elements to display
+//   - $calendar_entity : array of entities elements to display
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_planning_bar($agenda, $sel_ent_id, $entity_store,$entity_readable) {
+function html_planning_bar($agenda, $sel_ent_id, $calendar_entity, $entity_readable) {
   global $set_theme, $cagenda_weekstart, $set_cal_interval, $ico_spacer;
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
@@ -64,10 +64,9 @@ function html_planning_bar($agenda, $sel_ent_id, $entity_store,$entity_readable)
  
   $iso_date = $agenda["date"];
   $this_group = $agenda["entity"]["group_view"];
-  echo "<p>gr: $this_group";
   // Dealing with Entities
   //  if ($agenda_view_type == 'U') {
-    $nb_entity = count($entity_store);
+
     $l_entity = "user";
     /*     } elseif ($agenda_view_type == 'R') {
     $nb_entity = count($entity_store);
@@ -109,7 +108,7 @@ function html_planning_bar($agenda, $sel_ent_id, $entity_store,$entity_readable)
 	  $tag_user = " selected=\"selected\"";
 	}
       }
-      $dis_sel_user .= " $tag_user>$u_label</option>";
+      $dis_sel_user .= " $tag_user>$u_id $u_label</option>";
     } 
   }
   $dis_sel_user .= "</select>
@@ -214,7 +213,7 @@ function html_planning_bar($agenda, $sel_ent_id, $entity_store,$entity_readable)
 
   // DISPLAY BLOCK
   //-- Legend
-  $block = html_bar_legend($entity_store);
+  $block = html_bar_legend($calendar_entity);
   $block .= html_bar_view_type($new_action);
 
   //  if ($agenda_view_type == "U") {
@@ -468,7 +467,14 @@ function html_bar_legend($entity_store) {
     </tr>";
   } /* elseif ($agenda_view_type == "U") {*/
     $l_legend = $l_calendar_displayed;
-    foreach ($entity_store as $id => $data) {
+    foreach ($entity_store["user"] as $id => $data) {
+      $dis_legend .= "
+      <tr>
+       <td style=\"width:10%;\" class=\"".$data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;&nbsp;".$data["name"]."</td>
+      </tr>";
+    }
+    foreach ($entity_store["resource"] as $id => $data) {
       $dis_legend .= "
       <tr>
        <td style=\"width:10%;\" class=\"".$data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -534,7 +540,7 @@ function html_bar_view_type($new_action) {
       </tbody>
      </table>
      </div>
-  ";
+";
 
   return $block;
 }
@@ -548,29 +554,32 @@ function html_bar_view_type($new_action) {
 //   - $event_id: 
 //   - $force: 
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_conflict($agenda,$conflict) {
+function html_dis_conflict($agenda, $c_q) {
   global $set_theme,$auth;
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
 
-  $user_id = $agenda["user_id"];
-  while ($conflict->next_record()) {
-    $id = $conflict->f("calendarevent_id"); 
-    $title =  $conflict->f("calendarevent_title");
-    $location =  $conflict->f("calendarevent_location");
-    $user_id =  $conflict->f("calendaruser_id");
-    $user_name =  $conflict->f("userobm_lastname")." ".$conflict->f("userobm_firstname");
-    $date_begin =  $conflict->f("calendarevent_date");
-    $all_day =  $conflict->f("calendarevent_allday");
-    $date_end =  $conflict->f("calendarevent_date") + $conflict->f("calendarevent_duration");
+  while ($c_q->next_record()) {
+    $id = $c_q->f("calendarevent_id"); 
+    $title = $c_q->f("calendarevent_title");
+    $location = $c_q->f("calendarevent_location");
+    $entity = $c_q->f("evententity_entity");
+    if ($entity == "user") {
+      $name = $c_q->f("userobm_lastname")." ".$c_q->f("userobm_firstname");
+    } else if ($entity == "resource") {
+      $name = $c_q->f("resource_name");
+    }
+    $date_begin = $c_q->f("calendarevent_date");
+    $all_day = $c_q->f("calendarevent_allday");
+    $date_end = $c_q->f("calendarevent_date") + $c_q->f("calendarevent_duration");
 
     if ($all_day) {
       $dis_all_day = "<tr><td colspan=\"2\" class=\"detailLabel\">$l_all_day</td></tr>";
       $date_b = isodate_format($date_begin);
-      $date_e =  isodate_format($date_end);
+      $date_e = isodate_format($date_end);
     } else {
       $date_b = datetime_format($date_begin);
-      $date_e =  datetime_format($date_end);
+      $date_e = datetime_format($date_end);
     }       
     $dis_conflict .= "
       <tr>
@@ -578,7 +587,7 @@ function html_dis_conflict($agenda,$conflict) {
         <td class=\"detailForm\">$location</td>
         <td class=\"detailForm\">$date_b</td>
         <td class=\"detailForm\">$date_e</td>
-        <td class=\"detailForm\">$user_name</td>";
+        <td class=\"detailForm\">$name</td>";
 
      $dis_conflict .= "</tr>";
   }
@@ -599,8 +608,8 @@ function html_dis_conflict($agenda,$conflict) {
    <p class=\"detailButtons\">$dis_form_button</p>
   </div>
 
-  $dis_form_end
-  ";
+  $dis_form_end";
+
   return $block;
 }
 
@@ -2207,12 +2216,10 @@ END:VCALENDAR";
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the week beginning at the specified date
 // Parameters:
-//    - $agenda         : agenda parameters
-//    - $event_qs   : list of event's records 
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array   : array of selected groups 
+//   - $agenda          : agenda parameters
+//   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_year_planning($agenda,$calendar_user) {
+function dis_year_planning($agenda, $calendar_entity) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;  
@@ -2232,7 +2239,7 @@ function dis_year_planning($agenda,$calendar_user) {
   $td_heigth = 8;
   $td_width = 8;
   
-  $events = events_model($start_time,$end_time,$calendar_user);
+  $events = events_model($start_time,$end_time, $calendar_entity);
   
   for ($i=0; $i<7; $i++) {
     $day_num = date("w","$start_day");
@@ -2281,7 +2288,7 @@ function dis_year_planning($agenda,$calendar_user) {
 	$dayObj = $events[$iso_day];
 	$dis_event_cal ="<table class=\"agendaEventYear\"><tr>";
 	$tr_users = 0;
-	foreach($calendar_user as $id => $data ) {
+	foreach($calendar_entity["user"] as $id => $data) {
 	  $events_data = $dayObj->get_events($id);
 	  $days_events = $dayObj->day_events;
 	  if ($tr_users == 3) {
@@ -2387,10 +2394,9 @@ function dis_year_planning($agenda,$calendar_user) {
 // Display the planning for the month
 // Parameters:
 //   - $agenda: agenda parameters
-//   - $contacts_array : array of selected contacts 
-//   - $groups_array : array of selected groups 
+//   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_month_planning($agenda,$calendar_user) { 
+function dis_month_planning($agenda, $calendar_entity) { 
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $cagenda_first_hour, $cagenda_last_hour;
@@ -2408,10 +2414,10 @@ function dis_month_planning($agenda,$calendar_user) {
   $display_date = localizeDate("month", $ts_date);  
   $start_week_day = strtotime($cagenda_weekstart);
   $whole_month = TRUE;
-  $nb_user = count($calendar_user);
+  $nb_user = count($calendar_entity["user"]);
   $td_width = floor(100/$nb_user)."px";
    
-  $events = events_model($start_time,$end_time,$calendar_user);
+  $events = events_model($start_time,$end_time, $calendar_entity);
 
   // Display the day of a week
   for ($i=0; $i<7; $i++) {
@@ -2457,7 +2463,7 @@ function dis_month_planning($agenda,$calendar_user) {
       $day = $events[$iso_day];
       $user_indice = 0;
       $days_events = $day->day_events;
-      foreach ($calendar_user as $id => $properties) {
+      foreach ($calendar_entity["user"] as $id => $properties) {
 	$dis_month_cal .= "<td><table style=\"heigth:100%;width:$td_width;\">";
         $list_events = $days_events[$id];
 	if ($list_events != null) {
@@ -2576,13 +2582,14 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
   </div>";
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the week beginning at the specified date
 // Parameters:
 //    - $agenda          : agenda parameters
-//    - $calendar_entity : array of selected contacts 
+//    - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_week_planning($agenda, $calendar_user) {
+function dis_week_planning($agenda, $calendar_entity) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $cagenda_first_hour, $cagenda_last_hour;
@@ -2605,10 +2612,12 @@ function dis_week_planning($agenda, $calendar_user) {
   $end_week = localizeDate("week", $end_week_time);
   
   $display_date = "$start_week - $end_week"; 
-  $events = events_model($start_week_day,$end_week_time,$calendar_user);
+  $events = events_model($start_week_day,$end_week_time,$calendar_entity);
 
-  $nb_user = count($calendar_user);
-  $td_width = floor(70/$nb_user)."px"; 
+  $nb_user = count($calendar_entity["user"]);
+  $nb_res = count($calendar_entity["resource"]);
+  $nb_ent = $nb_user + $nb_res;
+  $td_width = floor(70/$nb_ent)."px"; 
  
   $day_duration = 86400; 
   /* Week Days headers */
@@ -2619,7 +2628,7 @@ function dis_week_planning($agenda, $calendar_user) {
     $daylink_end = urlencode(isodate_format(strtotime("+$cagenda_last_hour hours",$ts),"",1));
     $daylink_end = urlencode(isodate_format($ts + $dis_day_second,"",1));
     $week_day_list .= "
-     <td class=\"agendaCell\" colspan=\"$nb_user\" style=\"width:72px\">
+     <td class=\"agendaCell\" colspan=\"$nb_ent\" style=\"width:72px\">
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_date")."\">$this_date_l</a>
       <br />
       <a href=\"agenda_index.php?action=new&amp;tf_date_begin=$daylink_begin&amp;tf_date_end=$daylink_end\" > 
@@ -2629,14 +2638,14 @@ function dis_week_planning($agenda, $calendar_user) {
     $day = $events[$iso_date];
     if (is_object($day) && is_array($day->day_events)) {
       $days_events = $day->day_events;
-      foreach($calendar_user as $id => $properties) {
+      foreach($calendar_entity["user"] as $id => $properties) {
 	$user_indice ++;
 	$list_events = $days_events[$id];
-	if ($list_events != null)  {
+	if ($list_events != null) {
 	  $have_day_events = true;
 	  $days_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	  foreach($list_events as $event) {
-	    $days_cal .= allday_event_display(&$hidden_div,$event,$nb_user,$properties);	
+	    $days_cal .= allday_event_display(&$hidden_div,$event,$nb_ent,$properties);	
 	  }
 	  $days_cal .= "</td>";
 	} else {
@@ -2644,7 +2653,7 @@ function dis_week_planning($agenda, $calendar_user) {
 	}
       }
     } else {
-      $days_cal .= "<td colspan=\"$nb_user\" style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
+      $days_cal .= "<td colspan=\"$nb_ent\" style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
     }
   }
 
@@ -2673,7 +2682,7 @@ function dis_week_planning($agenda, $calendar_user) {
         if (isset($events[$iso_date])) {
           $day = $events[$iso_date];
           $user_indice = 0;
-          foreach($calendar_user as $id => $properties) {
+          foreach($calendar_entity["user"] as $id => $properties) {
             $user_indice ++;
             if ($j == $cagenda_first_hour && $delta2 == 0) {
               $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
@@ -2686,12 +2695,12 @@ function dis_week_planning($agenda, $calendar_user) {
 		$list_events = $events_data["events"];
 		$week_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;text-align:left;\" rowspan=\"".ceil($duration/($time_unit_sec))."\">";
 		foreach($list_events as $event) {
-		  week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties);	
+		  week_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties);	
 		}
 		$week_cal .= "</td>";
 	      }
 	    } else {
-	      if( $user_indice == 1) {
+	      if ($user_indice == 1) {
 		$class = " border";
 	      } else {
 		$class = "";
@@ -2704,13 +2713,13 @@ function dis_week_planning($agenda, $calendar_user) {
 	} else {
           $week_cal .= "<td class=\"agendaNoEvent border\"  onclick=\"window.location='$goto'\"
              onmouseover=\"this.className='agendaNoEventHover border';this.style.cursor = 'pointer'\"
-             onmouseout=\"this.className ='agendaNoEvent border'\" colspan=\"$nb_user\">&nbsp;</td>";
+             onmouseout=\"this.className ='agendaNoEvent border'\" colspan=\"$nb_ent\">&nbsp;</td>";
         }
       }
       $week_cal .= "</tr>";
     }
   }
-  $col_span = (7 * $nb_user) - 1;
+  $col_span = (7 * $nb_ent) - 1;
   $block = "
   <div class=\"agendaMain\">
    <table class=\"agendaCalWeek\">
@@ -2783,7 +2792,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
     <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>        
     <li class=\"lastList\">$description</li>
    </ul>
-  </div>  ";	  
+  </div>";
 }
 
 
@@ -2791,10 +2800,9 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
 // Display the planning for the day
 // Parameters:
 //   - $agenda         : agenda parameters
-//   - $contacts_array : array of selected contacts 
-//   - $groups_array   : array of selected groups 
+//   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_day_planning($agenda,$calendar_user) {
+function dis_day_planning($agenda, $calendar_entity) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
   global $cagenda_first_hour, $cagenda_last_hour,$set_cal_interval;
   global $l_private,$auth,$l_all_day,$ico_agenda;
@@ -2814,8 +2822,8 @@ function dis_day_planning($agenda,$calendar_user) {
   
   $display_date = localizeDate("day", $ts_date);
    
-  $events = events_model($start_time,$end_time,$calendar_user);
-  $nb_user = count($calendar_user);
+  $events = events_model($start_time,$end_time, $calendar_entity);
+  $nb_user = count($calendar_entity["user"]);
   
   $day = $events[$iso_date];
   
@@ -2824,7 +2832,7 @@ function dis_day_planning($agenda,$calendar_user) {
   
   if (is_array($days_events)) {
     $hour_day_list .= "<tr><td class=\"agendaHour\" ><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda\" alt=\"$l_all_day\" /></td>";
-    foreach($calendar_user as $id => $properties) {
+    foreach($calendar_entity["user"] as $id => $properties) {
       $user_indice ++;
       $list_events = $days_events[$id];
       if ($list_events != null) {
@@ -2851,7 +2859,7 @@ function dis_day_planning($agenda,$calendar_user) {
       $current_time = strtotime("+$i hours +$delta2 minutes",$ts_date);   
       if (is_object($day)) {
 	$user_indice = 0;
-	foreach ($calendar_user as $id => $properties) {
+	foreach ($calendar_entity["user"] as $id => $properties) {
 	  $user_indice ++;
 	  if ($i == $cagenda_first_hour && $delta2 == 0) {
 	    $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);

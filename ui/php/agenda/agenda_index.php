@@ -163,7 +163,7 @@ if ($action == "index") {
   if (!$agenda["force"] && $conflicts = check_for_decision_conflict($agenda)) {
     require("$obminclude/calendar.js");
     require("agenda_js.inc");
-    $display["search"] = html_dis_conflict($agenda,$conflicts) ;
+    $display["search"] = html_dis_conflict($agenda, $conflicts) ;
     $display["detail"] = html_conflict_form($agenda);
     $display["msg"] .= display_err_msg($l_insert_error);
   } else {
