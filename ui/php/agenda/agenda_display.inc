@@ -11,16 +11,22 @@
 // Display the navigation bar
 // Parameters:
 //   - $agenda        : agenda parameters
-//   - $sel_entity_id : array of entity Id
+//   - $sel_entity_id : array of entity Id ["user"] ["resource"]
+//     by reference as it can restrict the user selection
 //   - $p_view        : view selected "year", "month", "week" or "day"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_view($agenda, $sel_entity_id, $p_view="week") {
+function dis_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
   global $display;
 
-  $entity_readable = run_query_entity_readable();
-  $visible_entities_id = slice_entities($sel_entity_id["user"], $sel_entity_id["resource"], $entity_readable);
-  $entity_store = store_entities(run_query_get_entity_label($visible_entities_id));
-  $display["features"] = html_planning_bar($agenda, $visible_entities_id, $entity_store, $entity_readable);
+  $group_view = $agenda["entity"]["group_view"];
+  $entity_readable = get_entity_readable();
+  $visible_entities_id = slice_entities($sel_entity_id, $entity_readable);
+  $sel_entity_id = $visible_entities_id;
+  // we restore the selected group for session storage
+  $sel_entity_id["group_view"] = $group_view;
+
+  $entity_store = store_entities(run_query_get_entity_label($sel_entity_id));
+  $display["features"] = html_planning_bar($agenda, $sel_entity_id, $entity_store, $entity_readable);
 
   if ($p_view == "year") {
     $block = dis_year_planning($agenda, $entity_store);
@@ -32,7 +38,7 @@ function dis_calendar_view($agenda, $sel_entity_id, $p_view="week") {
     $block = dis_day_planning($agenda, $entity_store);
   }
   
-  return $block;    
+  return $block;
 }
 
 
@@ -40,11 +46,11 @@ function dis_calendar_view($agenda, $sel_entity_id, $p_view="week") {
 // XHTML Display the navigation bar
 // Parameters:
 //   - $agenda: agenda parameters
-//   - $sel_entity      : array of entity Id
+//   - $sel_ent_id      : array of entity Id
 //   - $entity_store    : array of entities elements to display
 //   - $entity_readable : array of readable entities (["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable) {
+function html_planning_bar($agenda, $sel_ent_id, $entity_store,$entity_readable) {
   global $set_theme, $cagenda_weekstart, $set_cal_interval, $ico_spacer;
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
@@ -57,16 +63,17 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
   global $action, $uid;
  
   $iso_date = $agenda["date"];
-  $this_group = ($agenda["agenda_group"] ? $agenda["agenda_group"] : $c_all);
-
+  $this_group = $agenda["entity"]["group_view"];
+  echo "<p>gr: $this_group";
   // Dealing with Entities
-  if ($agenda_view_type == 'U') {
+  //  if ($agenda_view_type == 'U') {
     $nb_entity = count($entity_store);
     $l_entity = "user";
-  } elseif ($agenda_view_type == 'R') {
+    /*     } elseif ($agenda_view_type == 'R') {
     $nb_entity = count($entity_store);
     $l_entity = "resource";
   }
+    */
 
   // Entity Selection
   if (($action == "perform_meeting") || ($action == "find_resource")) {
@@ -85,8 +92,8 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
   }
 
   //-- User selection 
-  if (count($sel_entity["user"])>1 || !in_array($uid, $sel_entity["user"])) {
-    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;param_group=$c_all&amp;sel_user_id[]=$uid\" >$l_back_mono</a>";
+  if (count($sel_ent_id["user"])>1 || !in_array($uid, $sel_ent_id["user"])) {
+    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;new_group=1&amp;param_group=$c_all&amp;sel_user_id[]=$uid\" >$l_back_mono</a>";
   }
 
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\" style=\"font-size:10px\">";
@@ -96,17 +103,12 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
       $u_label = $one_entity["label"];
       $dis_sel_user .= "\n<option value=\"$u_id\"";
       
-      if (count($sel_entity["user"]) > 0) {
-	$tag_user = "";
-	while ( (list($key, $user_id) = each($sel_entity["user"]))
-		&& ($tag_user == "") ) {
-	  if ($u_id == $user_id ) {
-	    $tag_user = " selected=\"selected\"";
-	  }
+      $tag_user = "";
+      if (is_array($sel_ent_id["user"])) {
+	if (in_array($u_id, $sel_ent_id["user"])) {
+	  $tag_user = " selected=\"selected\"";
 	}
-	reset($sel_entity["user"]);
       }
-      
       $dis_sel_user .= " $tag_user>$u_label</option>";
     } 
   }
@@ -125,15 +127,16 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
       $r_label = $one_entity["label"];
       $dis_sel_resource .= "\n<option value=\"$r_id\"";
 
-      if (count($sel_entity["resource"])>0) {
+      //XXXXXXXXX optimisation : voir user ci-dessus
+      if (count($sel_ent_id["resource"])>0) {
 	$tag_res = "";
-	while ( (list($key, $res_id) = each($sel_entity["resource"]) )
+	while ( (list($key, $res_id) = each($sel_ent_id["resource"]) )
 		&& ($tag_er == "") ) {
 	  if ($r_id == $res_id ) {
 	    $tag_res = " selected=\"selected\"";
 	  }
 	}
-	reset($sel_entity["resource"]);
+	reset($sel_ent_id["resource"]);
       }
       
       $dis_sel_resource .= " $tag_res>$r_label</option>";
@@ -162,7 +165,7 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
   if ($this_group == $c_all) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
   } else {
-    $dis_back_all_users = "<br /><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;param_group=$c_all&amp;sel_user_id[]=$uid\" >$l_everybody</a>";
+    $dis_back_all_users = "<br /><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;new_group=1&amp;param_group=$c_all\" >$l_everybody</a>";
   }
 
   $sel_group .= "<optgroup label=\"$l_private\">";
@@ -214,7 +217,7 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
   $block = html_bar_legend($entity_store);
   $block .= html_bar_view_type($new_action);
 
-  if ($agenda_view_type == "U") {
+  //  if ($agenda_view_type == "U") {
     $block .= "
 <!-- User select -->
     <div class=\"last\">
@@ -241,7 +244,7 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
     </table>
     </div>
     ";
-  } elseif ($agenda_view_type == "R") {
+    /*  } elseif ($agenda_view_type == "R") {
     $block .= "
 <!-- Resource select -->
     <div class=\"last\">
@@ -269,7 +272,7 @@ function html_planning_bar($agenda, $sel_entity, $entity_store,$entity_readable)
      </div>
      ";
   }
-
+    */
   $block .=  html_bar_date_selector($agenda);
 
   return $block;
@@ -463,7 +466,7 @@ function html_bar_legend($entity_store) {
       <td class=\"agendaOccupied\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
       <td class=\"detailText\">&nbsp;$l_occupied</td>
     </tr>";
-  } elseif ($agenda_view_type == "U") {
+  } /* elseif ($agenda_view_type == "U") {*/
     $l_legend = $l_calendar_displayed;
     foreach ($entity_store as $id => $data) {
       $dis_legend .= "
@@ -472,7 +475,7 @@ function html_bar_legend($entity_store) {
        <td class=\"detailLabel\">&nbsp;&nbsp;".$data["name"]."</td>
       </tr>";
     }
-  } elseif ($agenda_view_type == "R") {
+    /*  } elseif ($agenda_view_type == "R") {
     $l_legend = $l_resource_displayed;
     foreach ($entity_store as $id => $data) {
       $dis_legend .="
@@ -482,7 +485,7 @@ function html_bar_legend($entity_store) {
       </tr>";
     }
   }
-
+    */
   $block = "
   <div class=\"last\">
 
@@ -838,10 +841,9 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
      </td>    
      <td class=\"detailForm\" id=\"sel_user_id\">
        $dis_sel_user
-     </td>
-";
+     </td>";
 
-    // group select
+  // group select
   if (is_object($grp_q)) {
     while ($grp_q->next_record()) {
       $g_id = $grp_q->f("group_id");
@@ -1367,7 +1369,7 @@ function html_calendar_consult($event_q, $attendee_q) {
 
     $dis_decision_radio
   </form>
-  ";
+";
   return $block;
 }
 
@@ -1405,7 +1407,7 @@ function html_dis_delete($agenda) {
      $l_cancel
    </div>
   </div>
-  ";
+";
   return $block;
 }
 
@@ -1413,13 +1415,14 @@ function html_dis_delete($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
-//   - $agenda : agenda parameters
-//   - $usr_q  : array of selected contacts 
-//   - $groups_array : array of selected groups 
+//   - $agenda        : agenda parameters
+//   - $usr_q         : array of selected contacts 
+//   - $grp_q         : DBO : Group list
+//   - $sel_entity_id : array of entity Id ["user"] ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function dis_meeting_form($agenda, $usr_q, $p_user_array) {
-  global $display, $path,$ico_delete, $ico_mini_cal, $ico_add_user;
-  global $set_theme, $set_cal_interval;
+function dis_meeting_form($agenda, $usr_q, $grp_q, $sel_entity_id) {
+  global $display, $path, $set_theme, $set_cal_interval;
+  global $ico_delete, $ico_mini_cal, $ico_add_user, $ico_add_group;
   global $popup_height,$popup_width;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
@@ -1431,14 +1434,14 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
      <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
      <input type=\"submit\" value=\"$l_meeting_perform\" /> 
-     ";
+";
 
-  // userobm select
+  // user select
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $u_lname = $usr_q->f("userobm_lastname");
     $u_fname = $usr_q->f("userobm_firstname");
-    if (in_array($u_id, $p_user_array)) {
+    if (in_array($u_id, $sel_entity_id["user"])) {
       $dis_sel_user .= "
       <div class=\"elementRow\" id=\"sel_user_id$u_id\">
         <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
@@ -1466,19 +1469,38 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
 ";
 
   // group select
+  if (is_object($grp_q)) {
+    while ($grp_q->next_record()) {
+      $g_id = $grp_q->f("group_id");
+      $g_lname = $grp_q->f("group_name");
+      if (in_array($g_id, $sel_entity_id["group"])) {
+	$dis_sel_group .= "
+          <div class=\"elementRow\" id=\"sel_group_id$g_id\">
+          <a href=\"javascript: remove_element('sel_group_id$g_id','sel_group_id');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+          </a>
+          $g_lname
+          <input value=\"$g_id\" name=\"sel_group_id[]\" type=\"hidden\" />
+          </div>";
+      }
+    }
+  }
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
   $block_group = "
     <td class=\"detailLabel\">
     $l_groups
-    <a href=\"javascript: return false;\"
+    <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
-    </a>
-    </td>
-    <td class=\"detailForm\" id=\"sel_group_id\"></td>
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_group\" alt=\"[Add]\" />
+      </a>
+     </td>    
+     <td class=\"detailForm\" id=\"sel_group_id\">
+       $dis_sel_group
+     </td>
 ";
+
 
   $dis_hour_d = "<select name=\"sel_time_duration\">";
   for ($i=0;$i<24;$i++) {
@@ -1545,10 +1567,10 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
 ///////////////////////////////////////////////////////////////////////////////
 // Free meeting performing and display
 // Parameters:
-//   - $agenda        : agenda parameters
-//   - $calendar_user : array of selected users 
+//   - $agenda       : agenda parameters
+//   - $entity_store : array of entities to display
 ///////////////////////////////////////////////////////////////////////////////
-function dis_free_interval($agenda, $calendar_user) {
+function dis_free_interval($agenda, $entity_store) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_cal_interval,$ico_new_event;
   global $cagenda_weekstart, $cagenda_first_hour, $cagenda_last_hour;
@@ -1572,7 +1594,7 @@ function dis_free_interval($agenda, $calendar_user) {
   $start_week = localizeDate("week", $start_week_time);
   $end_week = localizeDate("week", $end_week_time);
   $display_date = "$start_week - $end_week"; 
-  $events = events_model($start_week_day,$end_week_time,$calendar_user);
+  $events = events_model($start_week_day,$end_week_time,$entity_store);
   $day_duration = 86400; 
 
   /* Week Days headers */
@@ -1586,7 +1608,7 @@ function dis_free_interval($agenda, $calendar_user) {
   /* Events of the week */
   for ($j = $cagenda_first_hour; $j < $cagenda_last_hour; $j++) {
     $delta = $j - $cagenda_first_hour;
-    for ($k=0;$k<$set_cal_interval;$k++) {
+    for ($k=0; $k<$set_cal_interval; $k++) {
       if ($k==0) {
 	$week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"agendaHour\" >".($j).":00</td>";
       } else {
@@ -1633,11 +1655,11 @@ function dis_free_interval($agenda, $calendar_user) {
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user$param_group&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
-      </a>     
+      </a>
      </td>
      <td colspan=\"$col_span\" class=\"agendaHead\">
       $display_date
-     </td>  
+     </td>
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user$param_group&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
@@ -1674,7 +1696,7 @@ function dis_free_interval($agenda, $calendar_user) {
 //   - $contacts_array : array of selected contacts 
 //   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_free_ressource($agenda,$calendar_user){
+function dis_free_ressource($agenda,$entity_store){
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $cagenda_first_hour, $cagenda_last_hour;
@@ -1698,7 +1720,7 @@ function dis_free_ressource($agenda,$calendar_user){
   $start_week = localizeDate("week", $start_week_time);
   $end_week = localizeDate("week", $end_week_time);
   $display_date = "$start_week - $end_week"; 
-  $events = events_model($start_week_day,$end_week_time,$calendar_user);
+  $events = events_model($start_week_day,$end_week_time,$entity_store);
   $day_duration = 86400; 
 
   /* Week Days headers */
@@ -1729,7 +1751,7 @@ function dis_free_ressource($agenda,$calendar_user){
 	  $day = $events[$iso_day];
 	  $begin_date = isodate_format($current_time,"",1);
 	  $end_date = isodate_format($end_time,"",1);
-	  foreach ($calendar_user as $id => $data ) {
+	  foreach ($entity_store as $id => $data ) {
 	    $have_event = $day->user_have_events_between($current_time, $current_time + $time_unit_sec,$id);
             $will_have_event = $day->user_have_events_between($current_time, $end_time,$id);
 	    if (!$have_event) {
@@ -1755,12 +1777,12 @@ function dis_free_ressource($agenda,$calendar_user){
 	    $week_cal .= "<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
 	  }
 	} else {
-	  $first = reset($calendar_user);
+	  $first = reset($entity_store);
 	  $week_cal .=  "<td class=\"agendaPossible\" onclick=\"window.location='$goto&amp;sel_user_id[]=".$first["id"]."'\"
 	   onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';show(event,'$current_time')\"
 	   onmouseout=\"this.className='agendaPossible';hide('$current_time');\">&nbsp;</td>\n";
 	   $restricted=array();
-	   $hidden_div .= ressources_free_display($calendar_user,$restricted,$current_time);
+	   $hidden_div .= ressources_free_display($entity_store,$restricted,$current_time);
         }
       }
       $week_cal .=  "</tr>";
@@ -1937,7 +1959,7 @@ function html_agenda_category_form($category_q) {
     </tr>
     </table>
 ";
-return $block;
+  return $block;
 }
 
 

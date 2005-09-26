@@ -225,21 +225,31 @@ ainsi qu'une description sommaire de chacune d'entre elles.\\
 Lors de la sélection de plusieurs utilisateurs ou entités, ceux-ci sont gardés en session afin de maintenir la sélection en changeant de vue ou en se déplaçant dans le calendrier.
 De même quand un événement est créé pour plusieurs utilisateurs, la vue passe automatiquement en vue multi-utilisateurs avec ces utilisateurs sélectionnés.
 
-Qaund un group est sélectionné, la vue passe automatiquement en vue membres du groupe, et le choix des utilisateurs est limité au groupe (restreint à ceux qui ont donné les droits en lecture).
-
-Règles utilisées pour la sélection et le stockage en session des entités :\\
-
-Les entités sélectionnées sont stockées dans le tableau \variable{\$cal\_entity\_id} qui comprend plusieurs entrées :
+Cependant les données stockées en session ne sont pas systématiquement les données sélectionnées; exemple :
 \begin{itemize}
-\item[user] : tableau d'id d'utilisateurs
-\item[resource] : tableau d'id de ressources
-\item[group] : tableau d'id de groupes
+\item Quand un groupe est sélectionné, la vue passe automatiquement en vue membres du groupe, et le choix des utilisateurs est limité au groupe (restreint à ceux qui ont donné les droits en lecture).
+\item La sélection est limitée par défaut au nombre d'utilisateurs affichables simultanément (par défaut 6).
 \end{itemize}
 \vspace{0.3cm}
 
+Règles utilisées pour la sélection et le stockage en session des entités :\\
+
+Les entités sélectionnées sont stockées dans le tableau \variable{\$cal\_entity\_id} qui est stocké en session à la fin de l'exécution (car la sélection peut être modifiée par les traitements, comme la restriction au nombre d'utilisateurs affichables simultanément) et qui comprend plusieurs entrées :
+\begin{itemize}
+\item[-] [user] : tableau d'id d'utilisateurs
+\item[-] [resource] : tableau d'id de ressources
+\item[-] [group] : tableau d'id de groupes
+\item[-] [group\_view] : groupe sélectionné pour l'affichage des utilisateurs
+\end{itemize}
+\vspace{0.3cm}
+
+Le tableau \variable{\$cal\_entity\_id} est copié dans le hashage global \variable{\$agenda[entity]} afin de le mettre directement à disposition des différentes fonctions.\\
+
 \#nb correspond au nombre maximal de calendriers affichables simultanément.\\
 
-\begin{tabular}{|p{4cm}|p{10cm}|}
+Si aucune entité n'est sélectionnée (utilisateur, groupe, ressource) l'utilisateur connecté est automatiquement sélectionné.\\
+
+\begin{longtable}{|p{4cm}|p{10cm}|}
 \hline
 \textbf{Action} & \textbf{Sélection} \\
 
@@ -247,10 +257,10 @@ Les entités sélectionnées sont stockées dans le tableau \variable{\$cal\_entity\
 Affichage d'une vue
 &
 \begin{itemize}
-\item Session inchangée
-\item Affichage calendriers  : contenu de [user], [resource] 
-\item Affichage liste utilisateurs : visible; sélection = contenu de [user] 
-\item Group sélectionné : ? 
+\item Session inchangée (listes déjà été limitées à \#nb)
+\item Affichage calendriers  : contenu de [user], [resource]
+\item Affichage liste utilisateurs : visible; sélection = [user]
+\item Group sélectionné : inchangé
 \end{itemize}
 \\ 
 
@@ -258,12 +268,12 @@ Affichage d'une vue
 Sélection de 1 ou plusieurs utilisateurs en mode vue
 &
 \begin{itemize}
-\item[-] [user] = sélection d'utilisateurs, limitée à \#nb
-\item[-] [group] = inchangé ?
+\item[-] [user] = sélection d'utilisateurs limitée à \#nb
+\item[-] [group] = inchangé
 \item[-] [resource] = vide
-\item Affichage calendriers : contenu de [user] 
-\item Affichage liste utilisateurs : visible; sélection = contenu de [user] 
-\item Group sélectionné : ? 
+\item Affichage calendriers : contenu de [user]
+\item Affichage liste utilisateurs : visible (selon groupe); sélection = [user]
+\item Groupe sélectionné : inchangé 
 \end{itemize}
 \\ 
 
@@ -271,12 +281,25 @@ Sélection de 1 ou plusieurs utilisateurs en mode vue
 Sélection de 1 groupe mode vue
 &
 \begin{itemize}
-\item[-] [user] = utilisateurs du groupe sélectionné, limité à \#nb
-\item[-] [group] = groupe sélectionné ?
+\item[-] [user] = utilisateurs du groupe sélectionné limité à \#nb
+\item[-] [group] = groupe sélectionné
 \item[-] [resource] = vide
-\item Affichage calendriers : contenu de [user] 
-\item Affichage liste utilisateurs : visible du groupe; sélection = contenu de [user] 
-\item Group sélectionné : Le groupe
+\item Affichage calendriers : contenu de [user]
+\item Affichage liste utilisateurs : visible du groupe; sélection = [user]
+\item Group sélectionné : le groupe sélectionné
+\end{itemize}
+\\ 
+
+\hline
+Sélection ``Tout le monde'' (desselection d'un groupe)
+&
+\begin{itemize}
+\item[-] [user] = [user]
+\item[-] [group] = vide
+\item[-] [resource] = vide
+\item Affichage calendriers : contenu de [user]
+\item Affichage liste utilisateurs : visible; sélection = [user]
+\item Group sélectionné : aucun
 \end{itemize}
 \\ 
 
@@ -284,6 +307,7 @@ Sélection de 1 groupe mode vue
 Fenêtre nouveau rdv
 &
 \begin{itemize}
+\item Session inchangée (listes déjà été limitées à \#nb)
 \item Utilisateurs pré-sélectionnés : contenu de [user] 
 \item Groupes pré-sélectionnés : contenu de [group] 
 \item Ressources pré-sélectionnées : contenu de [resource] 
@@ -297,10 +321,10 @@ Création rdv : Sélection de 1 ou plusieurs utilisateurs, groupes, ressources
 \item[-] [user] = utilisateurs sélectionnés, limité à \#nb
 \item[-] [group] = groupes sélectionnés
 \item[-] [resource] = ressources sélectionnées
-\item[-] ``total\_user'' = [user] + users fournis par [group], limité à \#nb
-\item Affichage calendriers  : contenu de ``total\_user'', [resource] 
-\item Affichage liste utilisateurs : visible; sélection = ``total\_user'' 
-\item Group sélectionné : ? 
+%%\item[-] ``total\_user'' = [user] + users fournis par [group], limité à \#nb
+\item Affichage calendriers  : contenu de [user], [resource] 
+\item Affichage liste utilisateurs : visible; sélection = [user]
+\item Group sélectionné : aucun
 \end{itemize}
 \\
 
@@ -324,7 +348,7 @@ Recherche crénneaux disponibles
 \end{itemize}
 \\
 \hline
-\end{tabular}
+\end{longtable}
 
 
 

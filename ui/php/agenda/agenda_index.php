@@ -45,24 +45,56 @@ get_agenda_action();
 $perm->check_permissions($module, $action);
 
 $max_display = 6;
-
 // If a group has just been selected, automatically select all its members
-if (isset($agenda["agenda_group"]) && ($agenda["new_group"] == "1")) {
+if ( ($agenda["new_group"] == "1")
+     && ($agenda["group_view"] != "") ) {
+  // If group selected is ALL, reset group
+  if ($agenda["group_view"] == $c_all) {
+    $cal_entity_id["group"] = array();
+  } else {
+    $cal_entity_id["user"] = get_all_users_from_group($agenda["group_view"]);
+    $cal_entity_id["group"] = array($agenda["group_view"]);
+  }
+  $cal_entity_id["group_view"] = $agenda["group_view"];
+  $cal_entity_id["resource"] = array();
   $hd_resource_store = array();
-  $cal_entity_id["user"] = get_all_users_from_group($agenda["agenda_group"]);
   //  $sel_resource_id = get_default_group_resource_ids($param_group);
+}  
+// If user or resources selection present we override session content
+if (is_array($sel_user_id)) {
+  $cal_entity_id["user"] = $sel_user_id;
+} else if (($action == "insert") || ($action == "insert")) {
+  // If event creation (form submission) we set session even if selection empty
+  $cal_entity_id["user"] = $sel_user_id;
 }
-// If user selection present we slice it
-if ((is_array($sel_user_id)) || (is_array($sel_resource_id))) {
-  $cal_entity_id = slice_entities($sel_user_id, $sel_resource_id, "");
+if (is_array($sel_group_id)) {
+  $cal_entity_id["group"] = $sel_group_id;
+} else if (($action == "insert") || ($action == "insert")) {
+  // If event creation (form submission) we set session even if selection empty
+  $cal_entity_id["group"] = $sel_group_id;
 }
+if (is_array($sel_resource_id)) {
+  $cal_entity_id["resource"] = $sel_resource_id;
+} else if (($action == "insert") || ($action == "insert")) {
+  // If event creation (form submission) we set session even if selection empty
+  $cal_entity_id["resource"] = $sel_resource_id;
+}
+
 // If no user selected, we select the connected user
-if (((! is_array($cal_entity_id["user"])) || (count($cal_entity_id["user"]) == 0))
-    && ((! is_array($sel_resource_id)) || (count($sel_resource_id) == 0))) {
+if ( ( (! is_array($cal_entity_id["user"]))
+       || (count($cal_entity_id["user"]) == 0) )
+     && ( (! is_array($cal_entity_id["resource"]))
+	  || (count($cal_entity_id["resource"]) == 0)) ) {
   $cal_entity_id["user"] = array($uid);
 }
 
-$sess->register("cal_entity_id");
+
+echo "<p>res=";
+print_r($sel_resource_id);
+echo "Fin";
+print_r($cal_entity_id);
+// We copy the entity array structure to the parameter hash
+$agenda["entity"] = $cal_entity_id;
 
 /*
 // Session parameters
@@ -80,12 +112,6 @@ if (isset($rd_view_type)) {
 }
 $sess->register("agenda_view_type");
 
-// If a group has just been selected, automatically select all its members
-if (isset($agenda["agenda_group"]) && ($agenda["new_group"] == "1")) {
-  $hd_resource_store = array();
-  $sel_user_id = get_all_users_from_group($agenda["agenda_group"]);
-  //  $sel_resource_id = get_default_group_resource_ids($param_group);
-}
 if (count($sel_user_id) != 0 ) {
   $agenda_user_view = $sel_user_id;
 }
@@ -99,24 +125,7 @@ if (isset($hd_resource_store)) {
 }
 $sess->register("agenda_resource_store");
 page_close();
-
-$sel_user_id = $agenda_user_view;
-$sel_resource_id = $agenda_resource_view;
 // end Session parameters
-
-// If no user selected, we select the connected user
-if ((! is_array($sel_user_id)) || (count($sel_user_id) == 0)) {
-  $sel_user_id = array($uid);
-}
-
-$sel_entity_id["user"] = $sel_user_id;
-$sel_entity_id["resource"] = $sel_resource_id;
-$sel_entity_id["group"] = $agenda["group_ids"];
-
-echo "<br>sel_user_id:";
-print_r($sel_user_id);
-echo "<br>sel_entity_id:";
-print_r($sel_entity_id);
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +187,7 @@ if ($action == "index") {
 } elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["result"] = dis_calendar_view($agenda, $cal_entity_id, "week");
+  $display["result"] = dis_calendar_view($agenda, &$cal_entity_id, "week");
 
 } elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -207,7 +216,7 @@ if ($action == "index") {
       $display["msg"] .= display_err_msg($l_insert_error);
       $display["detail"] = dis_event_form($action, $agenda, "", $cal_entity_id);
     } else {
-      run_query_add_event($agenda,$sel_user_id,$event_id);
+      run_query_add_event($agenda, $cal_entity_id, $event_id);
       $display["msg"] .= display_ok_msg($l_insert_ok);
       $agenda["date"] = $agenda["datebegin"];
       $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
@@ -299,14 +308,15 @@ if ($agenda["id"] > 0) {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
-  $user_obm = run_query_userobm_in($cal_entity_id["user"]);
-  $display["detail"] = dis_meeting_form($agenda, $user_obm, $cal_entity_id["user"]);
+  $user_q = run_query_userobm_in($cal_entity_id["user"]);
+  $group_q = run_query_group_in($cal_entity_id["group"]);
+  $display["detail"] = dis_meeting_form($agenda, $user_q, $group_q, $cal_entity_id);
 
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   $cal_entity_id["user"] = run_query_get_allusers($cal_entity_id["user"], $agenda["group_ids"]);
-  $entity_readable = run_query_entity_readable();
+  $entity_readable = get_entity_readable();
   $entity_store = store_entities(run_query_get_entity_label($cal_entity_id));
   $display["features"] = html_planning_bar($agenda, $cal_entity_id, $entity_store, $entity_readable);
   $display["detail"] = dis_free_interval($agenda, $entity_store);
@@ -353,9 +363,10 @@ if ($agenda["id"] > 0) {
   require("agenda_js.inc");
   $display["detail"] = dis_admin_index();
 }
-if (count($sel_user_id) != 0 ) {
-  $agenda_user_view = $sel_user_id;
-}
+
+$sess->register("cal_entity_id");
+//echo "<p>";
+//print_r($cal_entity_id);
 $display["head"] = display_head($l_agenda);
 $display["header"] = generate_menu($module,$section);      
 $display["end"] = display_end();
@@ -407,6 +418,11 @@ function get_param_agenda() {
   if (is_array($sel_deny_write)) $agenda["deny_w"] = $sel_deny_write;
   if (is_array($sel_deny_read)) $agenda["deny_r"] = $sel_deny_read;
   if (is_array($sel_group_id)) $agenda["group_ids"] = $sel_group_id;
+  if (isset($new_group)) $agenda["new_group"] = $new_group;
+  if (isset($param_group) && ($param_group != "")) {
+    $agenda["group_view"] = $param_group;
+    $agenda["group_ids"] = array($param_group);
+  }
 
   if (isset($sel_time_duration)) {
     $agenda["duration"] = $sel_time_duration;
@@ -464,17 +480,9 @@ function get_param_agenda() {
     } else {
       $agenda["repeat_days"] .= '0';
     }
-  }  
-
-  if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
-  //  if (is_array($sel_group_id)) $agenda["group"] = $sel_group_id;
-  if (isset($new_group)) $agenda["new_group"] = $new_group;
-  if (isset($param_group) && ($param_group != "")) {
-    $agenda["agenda_group"] = $param_group;
-  } else {
-    $agenda["agenda_group"] = $c_all;
   }
 
+  if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {
       while ( list( $key, $val ) = each( $agenda ) ) {
@@ -528,12 +536,12 @@ function get_agenda_action() {
     'Url'      => "$path/agenda/agenda_index.php?action=new",
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
-		  'update_decision','decision','update','delete',
-                  'view_month','view_week','view_day','view_year',
+       'update_decision','decision','update','delete', 'new_meeting',
+       'view_month','view_week','view_day','view_year',
 		  'rights_admin','rights_update')
 		);
-		
-//Detail Update
+
+  // Detail Update
   $actions["agenda"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/agenda/agenda_index.php?action=detailconsult&amp;param_event=$id&amp;param_date=$date",
@@ -541,8 +549,7 @@ function get_agenda_action() {
     'Condition'=> array ('detailupdate') 
   );
 
-		
-//Detail Update
+  // Detail Update
   $actions["agenda"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=$id&amp;param_date=$date",
@@ -550,32 +557,29 @@ function get_agenda_action() {
     'Condition'=> array ('detailconsult') 
   );
 
-//Check Delete
-
+  // Check Delete
   $actions["agenda"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/agenda/agenda_index.php?action=check_delete&amp;param_event=$id&amp;param_date=$date",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult')
                                      		 );
 
-//Delete
+  // Delete
   $actions["agenda"]["delete"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=$id&amp;param_date=$date",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      		 );
 
-					 
-//Insert
-
+  // Insert
   $actions["agenda"]["insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
-                                         );					 
-//View Year
+                                         );
 
+  // View Year
   $actions["agenda"]["view_year"] = array (
     'Name'     => $l_header_year,
     'Url'      => "$path/agenda/agenda_index.php?action=view_year",
@@ -583,8 +587,7 @@ function get_agenda_action() {
     'Condition'=> array ('all') 
                                     	    );
 
-//View Month
-
+  // View Month
   $actions["agenda"]["view_month"] = array (
     'Name'     => $l_header_month,
     'Url'      => "$path/agenda/agenda_index.php?action=view_month",
@@ -592,8 +595,7 @@ function get_agenda_action() {
     'Condition'=> array ('all') 
                                     	    );
 
-//View Week
-
+  // View Week
   $actions["agenda"]["view_week"] = array (
     'Name'     => $l_header_week,
     'Url'      => "$path/agenda/agenda_index.php?action=view_week",
@@ -601,8 +603,7 @@ function get_agenda_action() {
     'Condition'=> array ('all') 
                                     	  );
 
-//View Day
-
+  // View Day
   $actions["agenda"]["view_day"] = array (
     'Name'     => $l_header_day,
     'Url'      => "$path/agenda/agenda_index.php?action=view_day",
@@ -610,23 +611,21 @@ function get_agenda_action() {
     'Condition'=> array ('all') 
                                     	 );
 
-//Update
-
+  // Update
   $actions["agenda"]["update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
 					 
-//Update
-
+  // Update
   $actions["agenda"]["update_decision"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
 					 
-//Meeting managment.					 
+  // New meeting
   $actions["agenda"]["new_meeting"] = array (
     'Name'     => $l_header_meeting,
     'Url'      => "$path/agenda/agenda_index.php?action=new_meeting",
@@ -634,7 +633,7 @@ function get_agenda_action() {
     'Condition'=> array ('all') 
                                          );
 
-//Meeting managment.					 
+  // Search meeting
   $actions["agenda"]["perform_meeting"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=perform_meeting",
     'Right'    => $cright_write,
