@@ -1236,7 +1236,6 @@ function run_query_category_links($p_id) {
 function store_entities($entities_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
   global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
-  global $agenda_view_type;
 
   $i = 0;
   $entity_tab = array();
@@ -1476,56 +1475,59 @@ function get_date_day_of_week($timestamp, $day) {
 //   - $entity_readable : if given, entities eligibles
 ///////////////////////////////////////////////////////////////////////////////
 function slice_entities($sel_entity_id, $entity_readable="") {
-  global $auth, $agenda_view_type, $max_display;
+  global $auth, $max_display;
 
   $sel_user_id = $sel_entity_id["user"];
   $sel_group_id = $sel_entity_id["group"];
   $sel_resource_id = $sel_entity_id["resource"];
 
-  if ($agenda_view_type == "U" || 1 == 1) {
-    // users : slice only if users are selected 
-    if (is_array($sel_user_id)) {
-      $res_user_id = array();
-      if ($action != "perform_meeting") {
-	foreach ($sel_user_id as $u_id) {
-	  if (is_array($entity_readable)) {
+  // users : slice only if users are selected 
+  if (is_array($sel_user_id)) {
+    $res_user_id = array();
+    if ($action != "perform_meeting") {
+      foreach ($sel_user_id as $u_id) {
+	if (is_array($entity_readable)) {
 	    if (in_array($u_id, $entity_readable["user"]["ids"])) {
 	      $res_user_id[] = $u_id;
 	    }
-	  } else {
-	    $res_user_id[] = $u_id;
-	  }
+	} else {
+	  $res_user_id[] = $u_id;
 	}
       }
     }
-    if (count($res_user_id) > $max_display) {
-      $res_user_id = array_slice ($res_user_id, 0, $max_display);
-    }
-    if (count($res_user_id) == 0) {
-      $res_user_id = array($auth->auth["uid"]);
-    }
+  }
+  if (count($res_user_id) > $max_display) {
+    $res_user_id = array_slice ($res_user_id, 0, $max_display);
+  }
+  if (count($res_user_id) == 0) {
+    $res_user_id = array($auth->auth["uid"]);
+  }
+  $nb_user = count($res_user_id);
 
-  } elseif ($agenda_view_type == "R") {
-    // resources XXXXXXX transform to array
-    if ($action != "find_resource" && count($sel_resource_id) > $max_display) {
-      $sel_resource_id = array_slice ($sel_resource_id, 0, $max_display);
-    }
-    if (count($sel_resource_id) == 0){
-      if ($entity_readable["resource"]->num_rows() != 0) {
-        $entity_readable["resource"]->next_record();
-        $sel_resource_id = array($entity_readable["resource"]->f("resource_id"));
-        $entity_readable["resource"]->seek(0);
-      } else {
-        $sel_resource_id = array(0);
+  // resources : slice only if resources are selected 
+  if (is_array($sel_resource_id)) {
+    $res_resource_id = array();
+    if ($action != "perform_meeting") {
+      foreach ($sel_resource_id as $r_id) {
+	if (is_array($entity_readable)) {
+	    if (in_array($r_id, $entity_readable["resource"]["ids"])) {
+	      $res_resource_id[] = $r_id;
+	    }
+	} else {
+	  $res_resource_id[] = $r_id;
+	}
       }
     }
-    $res_user_id = array(0);
+  }
+  $max_res = $max_display - $nb_user;
+  if (count($res_resource_id) > $max_res) {
+    $res_resource_id = array_slice ($res_resource_id, 0, $max_res);
   }
 
   return array(
     "user" => $res_user_id,
     "group" => $sel_group_id,
-    "resource" => $sel_resource_id
+    "resource" => $res_resource_id
   );
 }
 

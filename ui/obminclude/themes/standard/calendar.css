@@ -244,18 +244,6 @@ td.agendaHead		{
 }
 
 
-td.agendaVide		{
-	font-family:		sans-serif;
-	font-size:		14px;
-	font-weight:		bold;
-	color:			#000000;
-	text-align:		center;
-	background-color:	#ffffff;
-        border: 		1px solid #a1a4a8;
-        border-top: 		1px dashed #a1a4a8;
-        border-bottom: 		1px dashed #a1a4a8;	
-}
-
 td.agendaNoEvent	{
 	font-family:		sans-serif;
 	font-size:		14px;
@@ -265,6 +253,24 @@ td.agendaNoEvent	{
 	background-color:	#ffffff;
         border-top: 		1px dashed #a1a4a8;
         border-bottom: 		1px dashed #a1a4a8;
+}
+td.agendaAllDay1	{
+	background-image: 	url(bg_cell_allday.png);
+}
+td.agendaAllDay2	{
+	background-image: 	url(bg_cell_allday2.png);
+}
+td.agendaAllDay3	{
+	background-image: 	url(bg_cell_allday3.png);
+}
+td.agendaAllDay4	{
+	background-image: 	url(bg_cell_allday4.png);
+}
+td.agendaAllDay5	{
+	background-image: 	url(bg_cell_allday5.png);
+}
+td.agendaAllDay6	{
+	background-image: 	url(bg_cell_allday6.png);
 }
 
 td.border {

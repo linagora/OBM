@@ -220,6 +220,25 @@ td.agendaNoEvent	{
         border-bottom: 		1px dashed #a1a4a8;	
 }
 
+td.agendaAllDay1	{
+	background-image: 	url(bg_cell_allday.png);
+}
+td.agendaAllDay2	{
+	background-image: 	url(bg_cell_allday2.png);
+}
+td.agendaAllDay3	{
+	background-image: 	url(bg_cell_allday3.png);
+}
+td.agendaAllDay4	{
+	background-image: 	url(bg_cell_allday4.png);
+}
+td.agendaAllDay5	{
+	background-image: 	url(bg_cell_allday5.png);
+}
+td.agendaAllDay6	{
+	background-image: 	url(bg_cell_allday6.png);
+}
+
 td.border {
 	        border-left:            1px solid #a1a4a8;
 }

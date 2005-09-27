@@ -57,9 +57,11 @@ if ( ($agenda["new_group"] == "1")
   }
   $cal_entity_id["group_view"] = $agenda["group_view"];
   $cal_entity_id["resource"] = array();
-  $hd_resource_store = array();
   //  $sel_resource_id = get_default_group_resource_ids($param_group);
 }  
+// If no group view selected, explicitely set it
+if ($cal_entity_id["group_view"] == "") $cal_entity_id["group_view"] = $c_all;
+
 // If user or resources selection present we override session content
 if (is_array($sel_user_id)) {
   $cal_entity_id["user"] = $sel_user_id;
@@ -88,46 +90,11 @@ if ( ( (! is_array($cal_entity_id["user"]))
   $cal_entity_id["user"] = array($uid);
 }
 
-
-echo "<p>res=";
-print_r($sel_resource_id);
-echo "Fin";
 //  $cal_entity_id["resource"] = array(1);
-print_r($cal_entity_id);
+//print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
 $agenda["entity"] = $cal_entity_id;
 
-/*
-// Session parameters
-if (isset($rd_view_type)) {
-  $agenda_view_type = $rd_view_type;
-  $sel_user_id = array();
-  $agenda_user_view = $sel_user_id;
-  $sel_resource_id = array();
-  $agenda_resource_view = $sel_resource_id;
-  unset($param_group);
-} elseif (($action == "perform_meeting") || (!isset($agenda_view_type))) {
-  $agenda_view_type = "U";
-} elseif ($action == "perform_res_meeting") {
-  $agenda_view_type = "R";
-}
-$sess->register("agenda_view_type");
-
-if (count($sel_user_id) != 0 ) {
-  $agenda_user_view = $sel_user_id;
-}
-$sess->register("agenda_user_view");
-if (count($sel_resource_id["ids"]) != 0 ) {
-  $agenda_resource_view = $sel_resource_id["ids"];
-}
-$sess->register("agenda_resource_view");
-if (isset($hd_resource_store)) {
-  $agenda_resource_store = $hd_resource_store;
-}
-$sess->register("agenda_resource_store");
-page_close();
-// end Session parameters
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //

@@ -587,7 +587,7 @@ function check_can_delete_user($p_id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query Executions - Purge a deleted user
-// Delete all references to the user (UserObmPref, DisplayPref)
+// Delete all references to the user (UserObmPref, DisplayPref, acl)
 // Move all user private contact to public 
 // Parameters:
 //   - $param_user : user id
@@ -630,13 +630,25 @@ function run_query_delete_profile($param_user)  {
   $obm_q->query($query);
 
   // Move all the user events from private to public
-  // Not activated ! case of private event with multiple users..... to handle
+  // Not activated ! case of private event with multiple users XXXXX to handle
   $query = "UPDATE CalendarEvent SET
       calendarevent_privacy='0'
     WHERE calendarevent_usercreate='$param_user'
       AND calendarevent_privacy != '0'"; 
   //display_debug_msg($query, $cdg_sql);
   //$obm_q->query($query);
+
+  // Remove all acl to the user and user's one
+  $query = "DELETE FROM EntityRight
+    WHERE entityright_entity = 'calendar'
+      AND entityright_entity_id = '$param_user'"; 
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile()");
+  $obm_q->query($query);
+  $query = "DELETE FROM EntityRight
+    WHERE entityright_consumer = 'user'
+      AND entityright_consumer_id = '$param_user'"; 
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile()");
+  $obm_q->query($query);
 
   // XXXXXX what to do with : project allocation entries and timetask entries
 }

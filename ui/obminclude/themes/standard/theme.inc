@@ -63,8 +63,10 @@ $ico_statistic      = "ico_stat.gif";
 //$ico_time           = "ico_time.gif";
 //$ico_project        = "ico_project.png";
 $ico_user           = "ico_user.gif";
+$ico_mini_user      = "ico_user_mini.gif";
 $ico_add_user       = "ico_user_new.gif";
 $ico_resource       = "ico_resource.gif";
+$ico_mini_resource  = "ico_resource_mini.gif";
 $ico_add_resource   = "ico_resource_new.gif";
 $ico_group          = "ico_group.gif";
 $ico_add_group      = "ico_group_new.gif";
@@ -80,7 +82,7 @@ $ico_data           = "ico_data.gif";
 $ico_lang           = "ico_lang.gif";
 $ico_ref            = "ico_ref.gif";
 
-// OBM DISPLAY Icons
+// OBM agDISPLAY Icons
 $ico_export         = "ico_export.gif";
 $ico_export_all     = "ico_export_all.gif";
 $ico_begin          = "ico_begin.gif";
@@ -129,6 +131,12 @@ $ico_mini_larrow2   = "arrows_l_anim.gif";
 $ico_mini_rarrow    = "arrows_r_still.gif";
 $ico_mini_rarrow2   = "arrows_r_anim.gif";
 $ico_mini_cal       = "calendar.png";
+$ico_cal_user1      = "ico_cal_user1.gif";
+$ico_cal_user2      = "ico_cal_user2.gif";
+$ico_cal_user3      = "ico_cal_user3.gif";
+$ico_cal_user4      = "ico_cal_user4.gif";
+$ico_cal_user5      = "ico_cal_user5.gif";
+$ico_cal_user6      = "ico_cal_user6.gif";
 // Export icons
 $ico_html = "ico_netscape.png";
 $ico_excel = "ico_excel.png";
