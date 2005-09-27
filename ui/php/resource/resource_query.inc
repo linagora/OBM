@@ -19,7 +19,7 @@ function run_query_search($resource, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
   global $ctype_resource;
 
-  $label = sql_search_text_parse($resource["label"]);
+  $name = sql_search_text_parse($resource["name"]);
   $desc = sql_search_text_parse($resource["description"]);
 
   $obm_q = new DB_OBM;
@@ -32,9 +32,9 @@ function run_query_search($resource, $p_new_order, $p_order_dir) {
 
   $where = " 1=1";
 
-  // If a label indication has been specified, get it
-  if (trim($label) != "") {
-     $where .= " AND resource_label $like '$label%'";
+  // If a name indication has been specified, get it
+  if (trim($name) != "") {
+     $where .= " AND resource_name $like '$name%'";
   }
 
   // If a description indication has been specified, get it
@@ -47,7 +47,7 @@ function run_query_search($resource, $p_new_order, $p_order_dir) {
   }
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "resource_label";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "resource_name";
   $orderq .= " ORDER BY $order $p_order_dir";
 
   $query = "$select
@@ -105,12 +105,12 @@ function run_query_detail($p_id) {
 // Resource insert query execution
 // Parameters:
 //   - $resource[]   : entry values
-//     keys used : label, desc 
+//     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($resource) {
   global $auth, $cdg_sql, $ctype_resource;
 
-  $label = $resource["label"];
+  $name = $resource["name"];
   $desc = $resource["desc"];
   $qty = $resource["qty"];if ($qty == "") $qty = "0";
 
@@ -119,7 +119,7 @@ function run_query_insert($resource) {
      resource_timecreate,
      resource_userupdate,
      resource_usercreate,
-     resource_label,
+     resource_name,
      resource_description,
      resource_qty
    ) VALUES (
@@ -127,7 +127,7 @@ function run_query_insert($resource) {
     '" . date("Y-m-d H:i:s") . "',
     null,
     ". $auth->auth["uid"] . ",
-    '$label',
+    '$name',
     '$desc',
     '$qty'
    )";
@@ -137,7 +137,7 @@ function run_query_insert($resource) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $id=get_resource_id($label);
+    $id=get_resource_id($name);
     run_query_right_init($id);
   }
 
@@ -195,19 +195,19 @@ function run_query_right_init($resource_id) {
 // Parameters:
 //   - $p_id     : resource id
 //   - $resource[]   : entry values
-//     keys used : label, desc 
+//     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($p_id, $resource) {
   global $auth, $cdg_sql, $ctype_resource;
 
-  $label = $resource["label"];
+  $name = $resource["name"];
   $desc = $resource["desc"];
   $qty = $resource["qty"];
 
   $query = "UPDATE Resource SET
     resource_timeupdate='". date("Y-m-d H:i:s")."',
     resource_userupdate=". $auth->auth["uid"] .",
-    resource_label='$label',
+    resource_name='$name',
     resource_description='$desc',
     resource_qty='$qty'
   WHERE resource_id='$p_id'";
@@ -259,11 +259,11 @@ function run_query_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_resource_context($p_id, $resource) {
 
-  $label = $resource["label"];
+  $name = $resource["name"];
   $desc  = $resource["desc"];
 
   // if a resource with same name exists, return false
-  $co_q = run_query_check_resource($p_id, $label);
+  $co_q = run_query_check_resource($p_id, $name);
   return $co_q;
 }
 
@@ -273,27 +273,27 @@ function check_resource_context($p_id, $resource) {
 // Parameters:
 //   - $p_id     : resource id
 //   - $resource[]   : values checked
-//     keys used : label, resource 
+//     keys used : name, resource 
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($p_id, $resource) {
-  global $l_exist_error, $l_label_error, $l_desc_error;
+  global $l_exist_error, $l_name_error, $l_desc_error;
   global $l_lname_error;
   global $err_msg, $action, $cdg_sql;
 
   $id = $resource["id"];
-  $label = $resource["label"];
+  $name = $resource["name"];
   $desc = $resource["desc"];
 
-  // MANDATORY: label 
-  if (trim($label) == "") {
-    $err_msg = $l_label_error." : ". $label;
+  // MANDATORY: name 
+  if (trim($name) == "") {
+    $err_msg = $l_name_error." : ". $name;
     return false;
   }
 
   /////////////////////////////////////////////////////////////////////////////
   // if a resource with the same name already exists  return false           //
   /////////////////////////////////////////////////////////////////////////////
-  $query = "SELECT * FROM Resource WHERE resource_label='$label'";
+  $query = "SELECT * FROM Resource WHERE resource_name='$name'";
   if ($p_id > 0) {
     $query .= " AND resource_id!='$p_id'";
   }
@@ -301,7 +301,7 @@ function check_data_form($p_id, $resource) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
-    $err_msg = "$label : $l_exist_error";
+    $err_msg = "$name : $l_exist_error";
     return false;
   }
 
@@ -310,18 +310,18 @@ function check_data_form($p_id, $resource) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get the Id of one Ressource from its label
+// Query Execution : get the Id of one Ressource from its name
 // Parameters:
-//   - $label  : label
+//   - $name  : name
 // Returns:
 //   - resource's Id
 ///////////////////////////////////////////////////////////////////////////////
-function get_resource_id($label) {
+function get_resource_id($name) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM ;
-  if (isset($label)) {
-    $query = "SELECT resource_id FROM Resource WHERE resource_label='$label'";
+  if (isset($name)) {
+    $query = "SELECT resource_id FROM Resource WHERE resource_name='$name'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query) ;
     $obm_q->next_record() ;

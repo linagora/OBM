@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : resourcegroup_query.inc                                        //
+// OBM - File : resourcegroup_query.inc                                      //
 //     - Desc : Resource group query File                                    //
 // 2005-03-15 Florent Goalabré                                               //
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ function run_query_search($group) {
     $join_resource = "
       LEFT JOIN ResourceGroup ON rgroup_id=ResourceGroup_rgroup_id
       LEFT JOIN Resource as C ON ResourceGroup.resourcegroup_resource_id=C.resource_id";
-    $where .= " and C.resource_label $like '$resource%'";
+    $where .= " and C.resource_name $like '$resource%'";
   }
   // only the one which are allowed (ie. publics )
   $where .=  " and " .sql_obm_entity_privacy("rgroup");
@@ -101,7 +101,7 @@ function run_query_search_possible_children($group) {
   // only the one which are allowed (ie. publics )
   $where .=  " and " .sql_obm_entity_privacy("rgroup");
   if ($resource != '') {
-    $where .= " and C.resource_label $like '$resource%'";
+    $where .= " and C.resource_name $like '$resource%'";
   }
   while (list ($key, $g_id) = each($parents)) {
     $where .= " and rgroup_id != '$g_id'";
@@ -469,7 +469,7 @@ function run_query_resource_resourcegroup($group) {
   if (($entity == "resourcegroup_resource") && (trim($new_order) != "")) {
     $order = "order by $new_order $order_dir";
   } else {
-    $order = "order by resource_label";
+    $order = "order by resource_name";
   }
 
   $query = "SELECT resourcegroup_resource_id as resourcegroup_resource_id,
@@ -478,7 +478,7 @@ function run_query_resource_resourcegroup($group) {
          resource_timecreate as group_resource_timecreate,
          resource_userupdate as group_resource_userupdate,
          resource_usercreate as group_resource_usercreate,
-         resource_label as resourcegroup_resource_label,
+         resource_name as resourcegroup_resource_name,
          resource_description as resourcegroup_resource_desc,
          resource_qty as resourcegroup_resource_qty
       FROM ResourceGroup LEFT JOIN Resource ON resourcegroup_resource_id=resource_id

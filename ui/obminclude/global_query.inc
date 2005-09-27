@@ -789,12 +789,12 @@ function get_last_resource_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT resource_label FROM Resource WHERE resource_id='$id'";
+    $query = "SELECT resource_name FROM Resource WHERE resource_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("resource_label");
+    return $obm_q->f("resource_name");
   }
   return;
 }

@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_name = "Nom";
 $l_desc = "Description";
 $l_email = "E-mail";
 $l_creator = "Créateur";
@@ -27,7 +26,6 @@ $l_resourcegroup = "Groupe de ressources";
 $l_resourcegroups = "Groupe de ressources";
 
 // Resources 
-$l_label = "Label";
 $l_qty = "Quantité";
 
 // Actions

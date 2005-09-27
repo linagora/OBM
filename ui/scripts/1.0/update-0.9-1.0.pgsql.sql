@@ -89,13 +89,13 @@ CREATE TABLE Resource (
   resource_timecreate        timestamp,
   resource_userupdate        integer,
   resource_usercreate        integer,
-  resource_label             varchar(32) DEFAULT '' NOT NULL,
+  resource_name              varchar(32) DEFAULT '' NOT NULL,
   resource_description       varchar(255),
   resource_qty               integer DEFAULT 0,
   PRIMARY KEY (resource_id),
-  UNIQUE (resource_label)
+  UNIQUE (resource_name)
 );
-CREATE UNIQUE INDEX k_label_resource_Resource_index ON Resource (resource_label);
+CREATE UNIQUE INDEX k_label_resource_Resource_index ON Resource (resource_name);
 
 --
 -- Table structure for table 'RGroup'
@@ -124,7 +124,7 @@ CREATE TABLE ResourceGroup (
 -- Insert Display Prefs (Resource modules)
 -------------------------------------------------------------------------------
 -- module 'resource'
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resource_label', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resource_name', 1, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resource_description', 2, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resource', 'resource_qty', 3, 1);
 
@@ -138,7 +138,7 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resourcegroup', 'timeupdate', 7, 1);
 
 -- module 'resourcegroup_resource'
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resourcegroup_resource', 'resourcegroup_resource_label', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resourcegroup_resource', 'resourcegroup_resource_name', 1, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resourcegroup_resource', 'resourcegroup_resource_desc', 2, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'resourcegroup_resource', 'resourcegroup_resource_qty', 3, 1);
 

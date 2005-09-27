@@ -105,7 +105,7 @@ if ($action == "ext_get_ids") {
     $retour = run_query_insert($resource);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
-      $resource_id = get_resource_id($resource["label"]);
+      $resource_id = get_resource_id($resource["name"]);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error);
     }
@@ -197,7 +197,7 @@ display_page($display);
 // returns : $resource hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_resource() {
-  global $param_resource, $tf_label, $tf_desc, $ta_desc, $tf_qty, $tf_qtyinf, $tf_qtysup;
+  global $param_resource, $tf_name, $tf_desc, $ta_desc, $tf_qty, $tf_qtyinf, $tf_qtysup;
   global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $ext_widget,$ext_element;
@@ -206,7 +206,7 @@ function get_param_resource() {
 
   if (isset ($param_ext)) $resource["id"] = $param_ext;
   if (isset ($param_resource)) $resource["id"] = $param_resource;
-  if (isset ($tf_label)) $resource["label"] = $tf_label;
+  if (isset ($tf_name)) $resource["name"] = $tf_name;
   if (isset ($tf_desc)) $resource["desc"] = $tf_desc;
   if (isset ($ta_desc)) $resource["desc"] = $ta_desc;
   if (isset ($tf_qty)) $resource["qty"] = $tf_qty;

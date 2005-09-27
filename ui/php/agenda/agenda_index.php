@@ -92,6 +92,7 @@ if ( ( (! is_array($cal_entity_id["user"]))
 echo "<p>res=";
 print_r($sel_resource_id);
 echo "Fin";
+//  $cal_entity_id["resource"] = array(1);
 print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
 $agenda["entity"] = $cal_entity_id;

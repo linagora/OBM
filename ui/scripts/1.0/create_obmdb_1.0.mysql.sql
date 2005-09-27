@@ -1366,11 +1366,11 @@ CREATE TABLE Resource (
   resource_timecreate        timestamp(14),
   resource_userupdate        int(8),
   resource_usercreate        int(8),
-  resource_label             varchar(32) DEFAULT '' NOT NULL,
+  resource_name              varchar(32) DEFAULT '' NOT NULL,
   resource_description       varchar(255),
   resource_qty               int(8) DEFAULT 0,
   PRIMARY KEY (resource_id),
-  UNIQUE k_label_resource (resource_label)
+  UNIQUE k_label_resource (resource_name)
 );
 
 --

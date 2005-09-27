@@ -282,7 +282,7 @@ function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="
   } else if ($entity == "resource") {
     $table_entity = "Resource";
     $e_id = "e.resource_id";
-    $e_label = "e.resource_label";
+    $e_label = "e.resource_name";
   }
 
   if ($right != "all") {

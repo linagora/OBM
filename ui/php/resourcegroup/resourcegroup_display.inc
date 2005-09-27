@@ -19,7 +19,7 @@ $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
 $fieldnames["timeupdate"] = $l_date_last_update;
 // Calculated fields
-$fieldnames["resourcegroup_resource_label"] = $l_label;
+$fieldnames["resourcegroup_resource_name"] = $l_name;
 $fieldnames["resourcegroup_resource_desc"] = $l_desc;
 $fieldnames["resourcegroup_resource_qty"] = $l_qty;
 
@@ -51,7 +51,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
   }
   // For RGroup resource lists
-  elseif (($fieldname == "resourcegroup_resource_label")  && $link_ok) {
+  elseif (($fieldname == "resourcegroup_resource_name")  && $link_ok) {
     //$res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("group_user_id");
     $res["url"] = "";
   }

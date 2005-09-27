@@ -7,13 +7,12 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_label = "Label";
 $l_desc  = "Description";
 $l_qty  = "Quantité";
 $l_check_resourcecreate = " entrées créées par cet utilisateur.";
 $l_check_resourceupdate = " entrées modifiées par cet utilisateur.";
 $l_no_resource = "Pas de champs ressources dans cette table";
-$l_fill_label = "Vous devez renseigner le label avant de valider.";
+$l_fill_name = "Vous devez renseigner le nom avant de valider.";
 
 // Titres
 $l_resource = "Ressource";
@@ -39,15 +38,13 @@ $l_insert_error = "L'insertion de la ressource a échoué !";
 $l_update_ok = "La modification de la ressource a été correctement effectuée";
 $l_update_error = "La modification de la ressource a échoué !";
 $l_reset_ok = "Les préférences de la ressource ont été remises aux valeurs par défaut";
-$l_query_error = "Problème en exécutant la requête";
-$l_label_error = "Le label doit être renseigné !";
-$l_check_samelabel = "Ces ressources semblent similaires à cette nouvelle entrée !";
-$l_exist_error = "Ce label est déjà utilisé !";
+$l_name_error = "Le nom doit être renseigné !";
+$l_check_samename = "Ces ressources semblent similaires à cette nouvelle entrée !";
+$l_exist_error = "Ce nom est déjà utilisé !";
 
 $l_add_resources = "Ajouter des ressources";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_fill_label = "Vous devez renseigner le label avant de valider.";
 $l_j_check_number = "La quantité renseignée n'est pas correct.";
 
 $l_resource_display = "Options d'affichage des listes de ressources";

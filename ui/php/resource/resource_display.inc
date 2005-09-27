@@ -12,7 +12,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["resource_label"] = $l_label; // label
+$fieldnames["resource_name"] = $l_name;
 $fieldnames["resource_description"] = $l_desc; // description 
 $fieldnames["resource_qty"] = $l_qty; // quantity 
 $fieldnames["resource_id"] = $l_update;
@@ -29,12 +29,12 @@ $fieldnames["resource_id"] = $l_update;
 function dis_data_resource(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ext_element;
 
-  if (($fieldname == "resource_label") && $link_ok) {
+  if (($fieldname == "resource_name") && $link_ok) {
     $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("resource_id");
   }
   if (($fieldname == "hidden_field") && $ext_element != "") {
     $res["name"] = "<span id=\"data".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
-    $OD->data_set->f("resource_label").
+    $OD->data_set->f("resource_name").
     "</span>";
   }
   else if ($fieldname == "resource_id") {
@@ -52,14 +52,14 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
 // Display resource search form
 // Parameters:
 //   - $resource[]   : default form values
-//     keys used : label, desc, qty, popup
+//     keys used : name, desc, qty, popup
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_search_form($resource) {
-  global $l_label, $l_desc, $l_qty, $l_find, $l_all;
+  global $l_name, $l_desc, $l_qty, $l_find, $l_all;
   global $l_add_resources;
   global $display, $c_all;
 
-  $llabel = $resource["label"];
+  $lname = $resource["name"];
   $ldesc = stripslashes($resource["desc"]);
   $qtyinf = $resource["qtyinf"];
   $qtysup = $resource["qtysup"];
@@ -91,9 +91,9 @@ function html_resource_search_form($resource) {
     action=\"". url_prepare("resource_index.php")."\">
 
   <div class=\"search\">
-    <div class=\"searchLabel\">$l_label<br />
-      <input type=\"text\" name=\"tf_label\" size=\"30\" maxlength=\"120\"
-      value=\"$llabel\" />
+    <div class=\"searchLabel\">$l_name<br />
+      <input type=\"text\" name=\"tf_name\" size=\"30\" maxlength=\"120\"
+      value=\"$lname\" />
     </div>
     <div class=\"searchLabel\">$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
@@ -128,7 +128,7 @@ function html_resource_search_form($resource) {
 // Display the reseource search result
 // Parameters:
 //   - $resource[]   : resource search criteria
-//     keys used : label, desc 
+//     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resource_search_list($resource) {
   global $l_no_found;
@@ -156,13 +156,13 @@ function dis_resource_search_list($resource) {
 //   - $prefs   : the fields which have to be displayed
 //   - $nb_resource  : nb resources returned by the search query
 //   - $resource[]   : resource search criteria
-//     keys used : label, desc 
+//     keys used : name, desc 
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $popup) {
   global $display, $l_found, $l_close, $l_add;
 
-  $llabel = urlencode($resource["label"]);
+  $lname = urlencode($resource["name"]);
   $ldesc = urlencode($resource["desc"]);
   $lqtyinf = urlencode($resource["qtyinf"]);
   $lqtysup = urlencode($resource["qtysup"]);
@@ -177,7 +177,7 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
-  $url = url_prepare("resource_index.php?action=search&amp;tf_label=$llabel&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup$url_ext");
+  $url = url_prepare("resource_index.php?action=search&amp;tf_name=$lname&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup$url_ext");
 
   $resource_d = new OBM_DISPLAY("DATA", $prefs, "resource");
   if ($popup) {
@@ -232,21 +232,21 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_form($usr_q, $resource) {
-  global $l_label, $l_desc, $l_qty;
+  global $l_name, $l_desc, $l_qty;
   global $l_resource, $l_insert, $l_update;
   global $action;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
     $id = $usr_q->f("resource_id");
-    $label = $usr_q->f("resource_label");
+    $name = $usr_q->f("resource_name");
     $desc = $usr_q->f("resource_description");
     $qty = $usr_q->f("resource_qty");
   }
 
   // If parameters have been given, they supercede the default action value
   if (isset($resource["id"])) { $id = $resource["id"]; }
-  if (isset($resource["label"])) { $label = $resource["label"]; }
+  if (isset($resource["name"])) { $name = $resource["name"]; }
   if (isset($resource["qty"])) { $qty = $resource["qty"]; }
 
   // Buttons
@@ -270,8 +270,8 @@ function html_resource_form($usr_q, $resource) {
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input id=\"tf_label\" name=\"tf_label\" size=\"40\" maxlength=\"120\" value=\"$label\" /></td>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailForm\"><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"120\" value=\"$name\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_qty</td>
       <td class=\"detailForm\"><input id=\"tf_qty\" name=\"tf_qty\" size=\"4\" maxlength=\"8\" value=\"$qty\" /></td>
@@ -317,11 +317,11 @@ function dis_resource_consult($resource) {
 //   - $obm_q : Resource database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_consult($obm_q) {
-  global $l_resource, $l_label, $l_desc, $l_qty;
+  global $l_resource, $l_name, $l_desc, $l_qty;
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("resource_id");
-  $label = $obm_q->f("resource_label");
+  $name = $obm_q->f("resource_name");
   $desc = $obm_q->f("resource_description");
   $qty = $obm_q->f("resource_qty");
 
@@ -333,8 +333,8 @@ function html_resource_consult($obm_q) {
  
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_qty</td>
       <td class=\"detailText\">$qty</td>

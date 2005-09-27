@@ -120,12 +120,12 @@ function run_query_get_resource_label($resources) {
   $in = "'".implode ("','", $resources)."'";
 
   $obm_q = new DB_OBM;
-  $query = "SELECT resource_label, resource_id
+  $query = "SELECT resource_name, resource_id
             FROM Resource 
             WHERE resource_id IN ($in)";
 
   $query.= " ORDER BY resource_id";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_resource_label()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -139,11 +139,14 @@ function run_query_get_resource_label($resources) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_entity_label($entities) {
 
-  return array (
-    "user" => run_query_get_user_name($entities["user"])
-    //    "resource" => run_query_get_resource_label($entities["resource"]) 
-  );
+  if (is_array($entities["user"])) {
+    $ret["user"] = run_query_get_user_name($entities["user"]);
+  }
+  if (is_array($entities["resource"])) {
+    $ret["resource"] = run_query_get_resource_label($entities["resource"]);
+  }
 
+  return $ret;
 }
 
 
@@ -406,7 +409,7 @@ function run_query_insert_event_data($agenda) {
     '$all_day',
     '$repeat_end')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_insert_event_data()");
   $obm_q->query($query);
 
   return $max_id;
@@ -628,7 +631,7 @@ END:VCALENDAR";
 //   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
 function check_for_conflict($agenda, $sel_entity_id) {
-  
+
   $ts_begin = isodate_to_timestamp($agenda["datebegin"]);
   $ts_end = isodate_to_timestamp($agenda["dateend"]);
   $id = $agenda["id"];
@@ -647,14 +650,14 @@ function check_for_decision_conflict($agenda) {
   
   $user["user"] = $agenda["user_id"];
   $event_id = $agenda["id"];
-  $event_data = run_query_detail($event_id);
-  $ts_begin = $event_data->f("calendarevent_date");
-  $ts_end = $event_data->f("calendarevent_date") + $event_data->f("calendarevent_duration");
-  $obm_conflict = run_query_conflict_events($ts_begin,$ts_end,$user,$event_id);
-  if ($obm_conflict->nf() == 0) {
+  $e_q = run_query_detail($event_id);
+  $ts_begin = $e_q->f("calendarevent_date");
+  $ts_end = $e_q->f("calendarevent_date") + $e_q->f("calendarevent_duration");
+  $c_q = run_query_conflict_events($ts_begin,$ts_end,$user,$event_id);
+  if ($c_q->nf() == 0) {
     return false;
   }
-  return $obm_conflict;
+  return $c_q;
 }
 
 
@@ -873,6 +876,7 @@ function run_query_delete($agenda) {
   send_mail($subject, $message, $recipient_array, "", $mail);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of default agenda resources for the current group
 ///////////////////////////////////////////////////////////////////////////////
@@ -895,7 +899,7 @@ function get_default_group_resource_ids($p_group) {
       rg.resourcegroup_rgroup_id = g.rgroup_id AND
       rg.resourcegroup_resource_id = r.resource_id AND
       (c.entityright_read = 1 OR r.resource_id='$uid') 
-    ORDER BY r.resource_label";
+    ORDER BY r.resource_name";
   } else {
     $query = "SELECT r.*,
         c.entityright_read
@@ -906,10 +910,10 @@ function get_default_group_resource_ids($p_group) {
             r.resource_id = c.entityright_entity_id AND
             c.entityright_entity = 'resource'
       WHERE (c.entityright_read = 1 OR r.resource_id='$uid')
-      ORDER BY r.resource_label";
+      ORDER BY r.resource_name";
   }
   $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_default_group_resource_ids()");
   $obm_db->query($query);
 
   $ret_array = array();
@@ -933,8 +937,8 @@ function get_entity_readable() {
   $ent = array(
     "user" => get_calendar_readable(),
     "group" => get_group_readable(),
-    //    "resource" => run_query_resource_readable(),
-        "resourcegroup" => run_query_resource_group()
+    "resource" => get_resource_readable(),
+    "resourcegroup" => run_query_resource_group()
   );
 
   return $ent;
@@ -994,6 +998,19 @@ function get_group_readable() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the list of readable calendar group for the current user
+///////////////////////////////////////////////////////////////////////////////
+function get_resource_readable() {
+  global $cdg_sql, $auth, $cagenda_public_groups;
+
+  $uid = $auth->auth["uid"];
+  $entity = of_right_entity_for_consumer("resource", "user", $uid, "read");
+
+  return $entity;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable agenda ressource for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_readable() {
@@ -1020,14 +1037,14 @@ function run_query_resource_readable() {
         rg.resourcegroup_rgroup_id = g.rgroup_id AND
         rg.resourcegroup_resource_id = r.resource_id AND
         (c.calendarentityright_read = 1) 
-      ORDER BY r.resource_label";
+      ORDER BY r.resource_name";
   } else {
     $entity = of_right_entity_for_consumer("resource", "user", $uid, "read");
     return $entity;
   }
 
   $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_readable()");
   $obm_db->query($query);
   return $obm_db;
 }
@@ -1049,7 +1066,7 @@ function run_query_resource_group() {
   $query .= " ORDER BY rgroup_name";
 
   $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_group()");
   $obm_db->query($query);
   return $obm_db;
 }
@@ -1095,7 +1112,7 @@ function run_query_group_writable() {
 
   $query = "SELECT * from UGroup";
   $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);	    
+  display_debug_msg($query, $cdg_sql, "run_query_group_writable()");	    
   $obm_db->query($query);
   return $obm_db;
 }
@@ -1210,21 +1227,7 @@ function run_query_category_links($p_id) {
   return $obm_q;
 }
 
-  
-/////////////////////////////////////////////////////////////////////////////
-// Return if the event is valid or not. It permit to keep only valid event in
-// a table.
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
-//    $status_event : status of a event
-/////////////////////////////////////////////////////////////////////////////
-function valid_event($status_event) {
-  return ($status_event != -1);
-  
-}
 
- 
 ///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed entities.
 // Parameters :
@@ -1254,7 +1257,7 @@ function store_entities($entities_q) {
     while($resource_q->next_record()) {
       $id = $resource_q->f("resource_id");
       $entity_tab["resource"][$id] = array(
-        "name"  => $resource_q->f("resource_label"),
+        "name"  => $resource_q->f("resource_name"),
         "class" => "agendaEventBg$i",
         "image" => ${"ico_calendar_user".$i},
         "type"  => "resource",
@@ -1560,6 +1563,53 @@ function run_query_conflict_events($start,$end,$sel_entity_id,$event_id) {
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
 
+  // get all users (from groups too)
+  $users = run_query_get_allusers($sel_entity_id["user"], $sel_entity_id["group"]);
+
+  if ((is_array($users)) && (count($users) > 0)) {
+    $has_user = true;
+  }
+  if (is_array($sel_entity_id["resource"])
+      && (count($sel_entity_id["resource"]) > 0) ) {
+    $has_resource = true;
+  }
+
+  if ($has_user) {
+    $where_user .= "( evententity_entity_id IN (";
+    foreach($users as $id) {
+      $where_user .= "$coma'$id'";
+      $coma = ",";
+    }
+    $where_user.= ")";
+    $where_user .= " AND evententity_entity = 'user' )"; 
+    $select_user = "userobm_lastname,
+      userobm_firstname,";
+    $join_user = "LEFT JOIN UserObm ON evententity_entity_id = userobm_id";
+  }   	     	    
+
+  if ($has_resource) {
+    $coma = "";
+    $where_res .= "( evententity_entity_id IN (";
+    foreach($sel_entity_id["resource"] as $id) {
+      $where_res .= "$coma'$id'";
+      $coma = ",";
+    }
+    $where_res.= ")";
+    $where_res .= " AND evententity_entity = 'resource' )"; 
+    $select_resource = "resource_name,";
+    $join_resource = "LEFT JOIN Resource ON evententity_entity_id = resource_id";
+  }   	     	    
+
+  if ($has_user && $has_resource) {
+    $where_ent = "AND ( $where_user || $where_res)";
+  } elseif ($has_user || $has_resource) {
+    $where_ent = "AND $where_user $where_res";
+  }
+
+  if ($event_id != "") {
+    $where_event .= " AND calendarevent_id != '$event_id' ";
+  }
+
   $query = "SELECT
       calendarevent_id,
       calendarevent_title,
@@ -1568,8 +1618,8 @@ function run_query_conflict_events($start,$end,$sel_entity_id,$event_id) {
       calendarevent_location, 
       evententity_entity,
       evententity_entity_id,
-      userobm_lastname,
-      userobm_firstname,
+      $select_user
+      $select_resource
       calendarcategory_label,
       $calendarevent_date_l,
       calendarevent_duration,
@@ -1577,24 +1627,15 @@ function run_query_conflict_events($start,$end,$sel_entity_id,$event_id) {
     FROM CalendarEvent
       LEFT JOIN CalendarCategory ON calendarcategory_id = calendarevent_category_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-      LEFT JOIN UserObm ON evententity_entity_id = userobm_id
+      $join_user
+      $join_resource
     WHERE evententity_state = 'A'
       AND $calendarevent_date > $start - calendarevent_duration
       AND $calendarevent_date < $end 
-";	
+      $where_ent
+      $where_event
+    ORDER BY calendarevent_date";
 
-  if (is_array($sel_entity_id["user"]) && (count($sel_entity_id["user"])>0) ) {
-    $query .= " AND evententity_entity_id IN (";
-    foreach($sel_entity_id["user"] as $id) {
-      $query .= "$coma'$id'";
-      $coma = ",";
-    }
-    $query .= ")";
-  }
-  if ($event_id != "") {
-    $query .= " AND calendarevent_id != '$event_id' ";
-  }
-  $query.=" ORDER BY calendarevent_date";
   display_debug_msg($query, $cdg_sql, "run_query_conflict_events(()");
   $obm_q->query($query);
 
@@ -1637,6 +1678,7 @@ function run_query_no_repeat_events($start,$end, $calendar_entity) {
   }   	     	    
 
   if ($has_resource) {
+    $coma = "";
     $where_res .= "( evententity_entity_id IN (";
     foreach($calendar_entity["resource"] as $id => $prop) {
       $where_res .= "$coma'$id'";
@@ -1648,8 +1690,7 @@ function run_query_no_repeat_events($start,$end, $calendar_entity) {
 
   if ($has_user && $has_resource) {
     $where_ent = "AND ( $where_user || $where_res)";
-  }
-  if ($has_user || $has_resource) {
+  } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
   }
 
@@ -1717,6 +1758,7 @@ function run_query_repeat_events($start, $end, $calendar_entity) {
   }   	     	    
 
   if ($has_resource) {
+    $coma = "";
     $where_res .= "( evententity_entity_id IN (";
     foreach($calendar_entity["resource"] as $id => $prop) {
       $where_res .= "$coma'$id'";
@@ -1728,8 +1770,7 @@ function run_query_repeat_events($start, $end, $calendar_entity) {
 
   if ($has_user && $has_resource) {
     $where_ent = "AND ( $where_user || $where_res)";
-  }
-  if ($has_user || $has_resource) {
+  } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
   }
 

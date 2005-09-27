@@ -109,9 +109,9 @@ function valider_suppression() {
 }
 
 function check_resource(form) {
-  // MANDATORY : Check that Label is not empty
-  if (trim(form.tf_label.value) == \"\") {
-    alert (\"$l_fill_label\");
+  // MANDATORY : Check that name is not empty
+  if (trim(form.tf_name.value) == \"\") {
+    alert (\"$l_fill_name\");
     return false;
   }
 

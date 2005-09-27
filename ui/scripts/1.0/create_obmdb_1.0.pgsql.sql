@@ -1370,13 +1370,13 @@ CREATE TABLE Resource (
   resource_timecreate        timestamp,
   resource_userupdate        integer,
   resource_usercreate        integer,
-  resource_label             varchar(32) DEFAULT '' NOT NULL,
+  resource_name              varchar(32) DEFAULT '' NOT NULL,
   resource_description       varchar(255),
   resource_qty               integer DEFAULT 0,
   PRIMARY KEY (resource_id),
-  UNIQUE (resource_label)
+  UNIQUE (resource_name)
 );
-CREATE UNIQUE INDEX k_label_resource_Resource_index ON Resource (resource_label);
+CREATE UNIQUE INDEX k_label_resource_Resource_index ON Resource (resource_name);
 
 --
 -- Table structure for table 'RGroup'
