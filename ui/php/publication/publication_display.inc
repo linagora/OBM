@@ -584,7 +584,7 @@ function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Subscription Form                                                      //
+// Display Subscription Form
 // Parameters:
 //   - $action    : action called
 //   - $pub_q      : publication database result 
@@ -603,6 +603,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
 
   $popup = $publication["popup"];
+  $ext_url = $publication["ext_url"];
 
   if($action == "detailupdate_subscription") {
    $pub_id = $sub_q->f("subscription_publication_id"); 
@@ -639,19 +640,15 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
   if (($action == "detailupdate_subscription") || ($action == "update_subscription")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_contact\" id=\"param_contact\" value=\"$cont_id\" />
       <input type=\"hidden\" name=\"param_subscription\" id=\"param_subscription\" value=\"$sub_id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update_subscription\" />
-      <input type=\"submit\" value=\"$l_update_sub\" /> 
-      ";
+      <input type=\"submit\" value=\"$l_update_sub\" />";
      $block_publi = "$title<input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />";
      	
   } elseif (($action == "new_subscription") || ($action == "insert_subscription")) {
     $dis_button = "
-      <input type=\"hidden\" id=\"param_contact\" name=\"param_contact\" value=\"$cont_id\" />
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_subscription\" />
-      <input type=\"submit\" value=\"$l_insert_sub\" />
-      ";
+      <input type=\"submit\" value=\"$l_insert_sub\" />";
     $block_publi = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
@@ -660,7 +657,9 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
     ";     
   }
-  $dis_button .= "<input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
+  $dis_button .= "<input type=\"hidden\" id=\"param_contact\" name=\"param_contact\" value=\"$cont_id\" />
+      <input type=\"hidden\" id=\"ext_url\" name=\"ext_url\" value=\"$ext_url\" />
+      <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
 
   $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
 
@@ -1107,7 +1106,7 @@ function dis_type_links($publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Subscription Reception section                                     //
+// Display: Subscription Reception section
 // Parameters:
 //   - $recept_q : Renewal list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1202,7 +1201,7 @@ function html_subscription_reception_form($recept_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the recept links                                                   //
+// Displays the recept links
 // Parameters:
 //   - $publication : publication hash info : keys used : recept
 ///////////////////////////////////////////////////////////////////////////////
@@ -1284,6 +1283,7 @@ function dis_recept_links($publication) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: the Publication Display preference screen
 // Parameters:
@@ -1301,6 +1301,7 @@ function dis_publication_display_pref($prefs) {
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Subscription search result in an external module
@@ -1363,13 +1364,22 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     $c_id = $sub_q->f("subscription_contact_id");
     $p_id = $sub_q->f("subscription_publication_id");
     $s_id = $sub_q->f("subscription_id");
-    if($sub_q->f("timeupdate") != "") {
-      $date_update = datetime_format($sub_q->f("timeupdate"));
+    $title = $sub_q->f("publication_title");
+    $year = $sub_q->f("publication_year");
+    $lang = $sub_q->f("publication_lang");
+    $rec_label = $sub_q->f("subscriptionreception_label");
+    $quantity = $sub_q->f("subscription_quantity");
+    $timecreate = datetime_format($sub_q->f("timecreate"));
+    if ($sub_q->f("timeupdate") != "") {
+      $timeupdate = datetime_format($sub_q->f("timeupdate"));
+    } else {
+      $timeupdate = "&nbsp;";
     }
     $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
+    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$c_id&amp;view=publication"));
 
     if ($has_write_right) {
-      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1");
+      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1&amp;ext_url=$ext_url");
       $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
 
       $display_write = "
@@ -1385,32 +1395,26 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
       </td>";
     }
 
-    if($sub_q->f("subscription_renewal") == "1") {
+    if ($sub_q->f("subscription_renewal") == "1") {
       $dis_renew = $l_yes;
-    }else {
-       $dis_renew = $l_no;
-     }
+    } else {
+      $dis_renew = $l_no;
+    }
     $block .= "
     <tr>
-    <td class=\"resultText\">
-    <a href=\"$url_publication_consult\">
-     ".$sub_q->f("publication_title")."
-    </a>
-    </td>
-    <td class=\"resultText\">".$sub_q->f("publication_year")."</td>
-    <td class=\"resultText\">".$sub_q->f("publication_lang")."</td>
+    <td class=\"resultText\"><a href=\"$url_publication_consult\">$title</a></td>
+    <td class=\"resultText\">$year</td>
+    <td class=\"resultText\">$lang</td>
     <td class=\"resultText\">$dis_renew</td>
-    <td class=\"resultText\">".$sub_q->f("subscriptionreception_label")."</td>
-    <td class=\"resultText\">".$sub_q->f("subscription_quantity")."</td>
-    <td class=\"resultText\">".datetime_format($sub_q->f("timecreate"))."</td>
-    <td class=\"resultText\">$date_update</td>    
+    <td class=\"resultText\">$rec_label</td>
+    <td class=\"resultText\">$quantity</td>
+    <td class=\"resultText\">$timecreate</td>
+    <td class=\"resultText\">$timeupdate</td>    
     $display_write
-    </tr>
-    ";
+    </tr>";
   }
   return $block;
 }
-
 
 
 </script>

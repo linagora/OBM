@@ -642,13 +642,10 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
       $dis_infos->data_idfield = "contact_id";
       $dis_infos->data_cb_name = "cb_con";
       $dis_infos->data_cb_field = "";
-      $block .= "<form method=\"get\" action=\"list_index.php\">";
-    }
+      $dis_infos->data_form_head = "
+      <form method=\"get\" action=\"list_index.php\">";
 
-    $block .= $dis_infos->display("dis_data_list");
-
-    if ($perm->check_right($module, $cright_write)) {
-      $block .= "
+      $dis_infos->data_form_end = "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_del_contact_sel\" />
@@ -658,6 +655,9 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
       </p>
       </form>";
     }
+
+    $block .= $dis_infos->display("dis_data_list");
+
   }
 
   // Dynamic Contacts

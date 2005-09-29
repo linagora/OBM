@@ -166,7 +166,7 @@ if ($action == "ext_get_id") {
     $retour = run_query_insert_subscription($publication);
     $quit = "
     <br />
-    <a href=\"javascript: void(0);\" onclick=\"window.opener.location.reload();window.close();\" >
+    <a href=\"javascript: void(0);\" onclick=\"window.opener.location.href='".$publication["ext_url"]."';window.close();\" >
     $l_close
     </a>";
     if ($retour) {
@@ -237,7 +237,7 @@ if ($action == "ext_get_id") {
     $retour = run_query_update_subscription($publication);
     $quit = "
     <br />
-    <a href=\"javascript: void(0);\" onclick=\"window.opener.location.reload();window.close();\" >
+    <a href=\"javascript: void(0);\" onclick=\"window.opener.location.href='".$publication["ext_url"]."';window.close();\" >
     $l_close
     </a>";
     if ($retour) {

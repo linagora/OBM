@@ -854,6 +854,9 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
   if ($service != "") {
     $copy .= addslashes($service) . $newline;
   }
+  if ($c_name != "") {
+    $copy .= addslashes($c_name) . $newline;
+  }
   // If contact address is empty, get the company one
   if ($copy_addr_comp != "") {
     $copy .= $copy_addr_comp;
@@ -1048,8 +1051,7 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact links menu
 // Parameters:
-//   - $deal_q : DBO : information about the deal
-//   - $inv_nb : invoices number
+//   - $id : contact id
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
@@ -1131,7 +1133,8 @@ function html_contact_links($id) {
   if ($cgp_show["module"]["publication"]) {
     $nb_subscription = run_query_subscription_nb($id);
     $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;param_contact=$id");
-    $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1");
+    $url = urlencode($url_subscription);
+    $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1&amp;ext_url=$url");
     $block_publi = "
   <div class=\"linkTitle\">:: $l_subscription</div>
   <ul class=\"linkList\">

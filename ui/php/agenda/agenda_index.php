@@ -182,7 +182,7 @@ if ($action == "index") {
       require("$obminclude/calendar.js");
       $display["search"] = html_dis_conflict($agenda,$conflicts) ;
       $display["msg"] .= display_err_msg($l_insert_error);
-      $display["detail"] = dis_event_form($action, $agenda, "", $cal_entity_id);
+      $display["detail"] = dis_event_form($action, $agenda, "",$cal_entity_id);
     } else {
       run_query_add_event($agenda, $cal_entity_id, $event_id);
       $display["msg"] .= display_ok_msg($l_insert_ok);
