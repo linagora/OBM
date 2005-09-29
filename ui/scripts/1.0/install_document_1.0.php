@@ -13,7 +13,7 @@ include("$obminclude/global.inc");
 include("../../php/admin_data/admin_data_query.inc");
 
 // Check Document path is set
-if (! isset($cdoc_root)) {
+if (! isset($cdocument_root)) {
   echo "The document repository root is not set ! (\$cdocument_root)\n";
   exit(1);
 }
