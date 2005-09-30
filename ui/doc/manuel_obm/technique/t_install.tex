@@ -2,7 +2,7 @@
 
 Cette documentation est valide pour la version 1.0.0. Seules les
 manipulations spécifiques à OBM sont décrites. Pour l'installation de
-PHP, MySQL, PostgreSQL, Apache ou autres composants libres, merci de vous référer à la documentation de votre distribution.
+PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposés correspondant à la version Debian mais il est préférable de vous référer à la documentation de votre distribution.
 
 
 \subsection{Hypothèses}
@@ -53,7 +53,7 @@ chown -R apache:apache *  (sur Redhat)
 Fichier de configuration de PHP : 
 
 \begin{description}
-\item[sur debian] \fichier{/etc/php/apache/php.ini}
+\item[sur debian] \fichier{/etc/php4/apache/php.ini}
 \item[sur RedHat] \fichier{/etc/php.ini}
 \end{description}
 
@@ -67,12 +67,12 @@ sont aussi utilisables dans ce mode de fonctionnement).
 \end{description}
 
 
-La directive include\_path doit être renseignée ainsi : 
+La directive include\_path doit être renseignée ainsi (ou contenir au moins ces chemins) : 
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-include_path = ".:/php/includes:/var/www/obm"
+include_path = ".:/var/www/obm"
 \end{verbatim}
   \end{minipage}
 }
@@ -150,13 +150,28 @@ font dans le fichier \fichier{httpd.conf} d'Apache.
 
 \subsubsection*{Configurer Apache pour le traitement des fichiers PHP}
 
-Éditer le fichier \fichier{httpd.conf} (ou \fichier{srm.conf}) et
+Attention, les différents chemins et fichiers peuvent varier entre les distributions et les versions d'apache (apache 1 et 2).
+
+\paragraph{Définition du type de fichier .php}
+Éditer le fichier \fichier{httpd.conf} (ou \fichier{apache2.conf}) et
 ajouter :
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
 AddType application/x-httpd-php .php
+\end{verbatim}
+  \end{minipage}
+}
+
+\paragraph{Inclure le module php dans Apache}
+Éditer le fichier \fichier{modules.conf} (ou \fichier{mods-available/php4}) et
+ajouter :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+LoadModule php4_module /usr/lib/apache2/modules/libphp4.so
 \end{verbatim}
   \end{minipage}
 }
@@ -274,7 +289,7 @@ Vérifier que votre IP soit définie comme un \emph{named virtual
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-NameVirtualHost 127.0.0.1
+NameVirtualHost 192.168.1.5
 
 <VirtualHost 192.168.1.5>
  ServerAdmin root@localhost
@@ -290,6 +305,33 @@ NameVirtualHost 127.0.0.1
   \end{minipage}
 }
 
+
+\subsection{Créer le dépôt de documents}
+\label{install_doc}
+
+Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude}.
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+$cdocument_root = "/var/www/obmdocuments";
+\end{verbatim}
+  \end{minipage}
+}
+
+
+Créer le répertoire et le faire appartenir à l'utilisateur exécutant le serveur apache (www-data sous Debian).
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+mkdir /var/www/obmdocuments
+chown www-data:www-data /var/www/obmdocuments
+\end{verbatim}
+  \end{minipage}
+}
+
+
 \subsection{Création de la base de données OBM}
 
 \subsubsection{Configuration d'OBM}
@@ -301,6 +343,7 @@ NameVirtualHost 127.0.0.1
 \item la déclarer ;
 \item déclarer le nom d'utilisateur et le mot de passe à utiliser.
 \item déclarer l'url d'accès à OBM (\$cgp\_host).
+\item déclarer le dépôt de documents (voir \ref{install_doc}).
 \end{itemize}
 
 Il est également possible de modifier des préférences globales dans ce
@@ -316,11 +359,16 @@ $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
+$cgp\_host = "http://obm/";
+...
+$cdocument\_root = "/var/www/obmdocuments/";
+...
 // is Mail enabled ? (agenda)
 $gp_mail_enabled = false;
 \end{verbatim}
   \end{minipage}
 }
+
 
 \subsubsection{Configuration et création de la base de données}
 

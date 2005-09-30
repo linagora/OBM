@@ -485,7 +485,6 @@ function html_bar_legend($calendar_entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_bar_view_type($new_action) {
   global $l_view_type,$l_users,$l_resources,$dis_duration,$new_action;
-  global $agenda_view_type;
 
   //-- View type
   $block = "
@@ -498,14 +497,8 @@ function html_bar_view_type($new_action) {
          <form action=\"\">
            <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
            $dis_duration
-           <input";
-  if ($agenda_view_type == "U")
-    $block .= " checked=\"checked\"";
-  $block .= " name=\"rd_view_type\" value=\"U\" onclick=\"this.form.submit()\" type=\"radio\">$l_users<br>
-           <input";
-  if ($agenda_view_type == "R")
-    $block .= " checked=\"checked\"";
-  $block .= " name=\"rd_view_type\" value=\"R\" onclick=\"this.form.submit()\" type=\"radio\">$l_resources
+           <input checked=\"checked\" name=\"rd_view_type\" value=\"U\" onclick=\"this.form.submit()\" type=\"radio\">$l_users<br>
+           <input name=\"rd_view_type\" value=\"R\" onclick=\"this.form.submit()\" type=\"radio\">$l_resources
          </form>
        </td>
       </tr>
