@@ -37,14 +37,14 @@ function get_elem(doc, name ) {
   return doc.getElementById(name);
 }  
 
-function fill_ext_form2(int_form) {
+function fill_ext_element(int_form) {
   size = int_form.length;
   for(i=0; i <size; i++) {
-    if(int_form.elements[i].type == 'checkbox'){
-      if(int_form.elements[i].checked == true) {
+    if (int_form.elements[i].type == 'checkbox') {
+      if (int_form.elements[i].checked == true) {
         elemid = '$ext_element'+int_form.elements[i].name;
-        if(!get_elem(window.opener.document, elemid )) {
- 	  elemid = 'data'+int_form.elements[i].name;
+        if (!get_elem(window.opener.document, elemid )) {
+ 	  elemid = 'data-group-'+int_form.elements[i].name;
 	  span = get_elem(window.document,elemid);
 	  add_element('$ext_element' + '[]',int_form.elements[i].name, span.innerHTML);
         }

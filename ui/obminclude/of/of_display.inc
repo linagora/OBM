@@ -309,7 +309,6 @@ class OBM_DISPLAY {
     if ($entity == "") {
       $entity = $module;
     }
-
     $block .= "<div class=\"result\">";
 
     // We display page management only if enabled and a search url is given
@@ -360,11 +359,11 @@ class OBM_DISPLAY {
 	    $cb_check = "";
 	  }
 	  if (function_exists($dis_data_entity)) {
-	    $hidden_field = $dis_data_entity($this, "hidden_field", $link_ok);
-	    $hidden_field = $hidden_field["name"];
+	    $data_element = $dis_data_entity($this, "data_element", $link_ok);
+	    $data_element = $data_element["name"];
 	  }	  
 	  $block .= "<td $style>
-                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check />$hidden_field </td>";
+                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check />$data_element </td>";
 	}
 	else
 	  $block .= "<td $style>&nbsp;</td>";

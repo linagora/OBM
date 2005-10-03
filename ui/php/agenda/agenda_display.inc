@@ -195,7 +195,7 @@ function html_planning_bar($agenda, $sel_ent_id, $calendar_entity, $entity_reada
 
   //-- Legend
   $block = html_bar_legend($calendar_entity);
-  $block .= html_bar_view_type($new_action);
+  $block .= html_select_calendar_entity($calendar_entity, $new_action);
 
   $block .= "
 <!-- User select -->
@@ -250,6 +250,149 @@ function html_planning_bar($agenda, $sel_ent_id, $calendar_entity, $entity_reada
      </div>";
 
   $block .=  html_bar_date_selector($agenda);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the navigation bar
+// Parameters:
+//   - $calendar_entity : array of entities elements to display
+///////////////////////////////////////////////////////////////////////////////
+function html_bar_legend($calendar_entity) {
+  global $set_theme, $ico_user, $ico_resource, $popup_width, $popup_height;
+  global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
+  global $l_calendar_displayed, $l_resource_displayed;
+  global $action;
+
+  // Legend
+  if ($action == "perform_meeting" || $action == "perform_res_meeting") {
+    $l_legend = $l_meeting_legend;
+    $dis_legend = "
+    <tr>
+      <td class=\"agendaPossible\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailText\">&nbsp;$l_possible</td>
+    </tr>
+    <tr>
+      <td class=\"agendaFree\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailText\">&nbsp;$l_free</td>
+    </tr>
+    <tr>
+      <td class=\"agendaOccupied\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailText\">&nbsp;$l_occupied</td>
+    </tr>";
+  }
+  $l_legend = $l_calendar_displayed;
+  if (is_array($calendar_entity["user"])) {
+    foreach ($calendar_entity["user"] as $id => $data) {
+      $dis_legend .= "
+      <tr>
+       <td style=\"width:10%;\" class=\"".$data["class"]."\" >
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_user\" alt=\"[User]\" />&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;".$data["name"]."</td>
+      </tr>";
+    }
+  }
+  if (is_array($calendar_entity["resource"])) {
+    foreach ($calendar_entity["resource"] as $id => $data) {
+      $dis_legend .= "
+      <tr>
+       <td style=\"width:10%;\" class=\"".$data["class"]."\" >
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_resource\" alt=\"[resource]\" />&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;".$data["name"]."</td>
+      </tr>";
+    }
+  }
+
+  $block = "
+  <div class=\"last\">
+
+  <div class=\"lastTitle\">:: $l_legend</div>
+  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+    $dis_legend
+  </table>
+
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the "View type" navigation bar component (User, Resource)
+// Parameters:
+//   - $calendar_entity : array of entities elements to display
+///////////////////////////////////////////////////////////////////////////////
+function html_select_calendar_entity($calendar_entity, $new_action) {
+  global $path, $set_theme, $popup_height, $popup_width, $ico_add;
+  global $l_selection, $l_users,$l_resources,$dis_duration, $l_validate;
+  global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
+  global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
+
+  // loop through ["user"], ["resource"]
+  foreach ($calendar_entity as $type => $entity) {
+    foreach ($entity as $id => $data) {
+      $name = $data["name"];
+      $ico = $data["image"];
+      $data_id = "data-$type-$id";
+      $sel_ent .= "<div class=\"elementRow\" id=\"$data_id\">
+        <a href=\"javascript: remove_element('$data_id','sel_ent');\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico\">
+        </a>
+        $name
+        <input value=\"data-$type-$id\" name=\"sel_ent[]\" type=\"hidden\" />
+        </div>";
+    }
+  }
+  $label = "toto";
+  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=$label&amp;ext_element=sel_ent";
+  $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=$label&amp;ext_element=sel_ent";
+
+
+  //-- View type
+  $block = "
+    <div class=\"last\">
+    <div class=\"lastTitle\">:: $l_selection</div>
+    <form action=\"agenda_index.php\" method=\"get\">
+    <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+    <table class=\"agendaCal\" cellpadding=\"0\" cellspacing=\"0\">
+    <tbody>
+    <tr>
+      <td class=\"detailLabel\">
+        $dis_duration
+      </td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">
+      <a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url_user','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>
+      $l_users
+      </td>    
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">
+      <a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>
+      $l_resources
+      </td>    
+    </tr>
+    <tr>
+      <td class=\"detail\" id=\"sel_ent\">
+      $sel_ent
+      </td>
+    </tr>
+    </tbody>
+    </table>
+    <input type=\"submit\" value=\"$l_validate\" />
+    </form>
+    </div>";
 
   return $block;
 }
@@ -409,102 +552,6 @@ function html_bar_date_selector($agenda) {
   </table>
   </div>
 ";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the navigation bar
-// Parameters:
-//   - $agenda: agenda parameters
-///////////////////////////////////////////////////////////////////////////////
-function html_bar_legend($calendar_entity) {
-  global $set_theme, $ico_user, $ico_resource, $popup_width, $popup_height;
-  global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
-  global $l_calendar_displayed, $l_resource_displayed;
-  global $action;
-
-  // Legend
-  if ($action == "perform_meeting" || $action == "perform_res_meeting") {
-    $l_legend = $l_meeting_legend;
-    $dis_legend = "
-    <tr>
-      <td class=\"agendaPossible\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"detailText\">&nbsp;$l_possible</td>
-    </tr>
-    <tr>
-      <td class=\"agendaFree\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"detailText\">&nbsp;$l_free</td>
-    </tr>
-    <tr>
-      <td class=\"agendaOccupied\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"detailText\">&nbsp;$l_occupied</td>
-    </tr>";
-  }
-  $l_legend = $l_calendar_displayed;
-  if (is_array($calendar_entity["user"])) {
-    foreach ($calendar_entity["user"] as $id => $data) {
-      $dis_legend .= "
-      <tr>
-       <td style=\"width:10%;\" class=\"".$data["class"]."\" >
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_user\" alt=\"[User]\" />&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;".$data["name"]."</td>
-      </tr>";
-    }
-  }
-  if (is_array($calendar_entity["resource"])) {
-    foreach ($calendar_entity["resource"] as $id => $data) {
-      $dis_legend .= "
-      <tr>
-       <td style=\"width:10%;\" class=\"".$data["class"]."\" >
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_resource\" alt=\"[resource]\" />&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;".$data["name"]."</td>
-      </tr>";
-    }
-  }
-
-  $block = "
-  <div class=\"last\">
-
-  <div class=\"lastTitle\">:: $l_legend</div>
-  <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-    $dis_legend
-  </table>
-
-  </div>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the "View type" navigation bar component (User, Resource)
-// Parameters:
-//   - $agenda: agenda parameters
-///////////////////////////////////////////////////////////////////////////////
-function html_bar_view_type($new_action) {
-  global $l_view_type,$l_users,$l_resources,$dis_duration,$new_action;
-
-  //-- View type
-  $block = "
-      <div class=\"last\">
-      <div class=\"lastTitle\">:: $l_view_type</div>
-      <table class=\"agendaCal\" cellpadding=\"0\" cellspacing=\"0\">
-      <tbody>
-      <tr>
-       <td class=\"detailLabel\">
-         <form action=\"\">
-           <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
-           $dis_duration
-           <input checked=\"checked\" name=\"rd_view_type\" value=\"U\" onclick=\"this.form.submit()\" type=\"radio\">$l_users<br>
-           <input name=\"rd_view_type\" value=\"R\" onclick=\"this.form.submit()\" type=\"radio\">$l_resources
-         </form>
-       </td>
-      </tr>
-      </tbody>
-     </table>
-     </div>";
 
   return $block;
 }

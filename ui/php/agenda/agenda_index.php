@@ -38,7 +38,6 @@ require("agenda_query.inc");
 require("agenda_display.inc");
 require("$obminclude/lib/right.inc");
 
-
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();
 get_agenda_action();
@@ -346,7 +345,7 @@ display_page($display);
 // returns : $agenda hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_agenda() {
-  global $param_date,$param_event,$param_group,$new_group,$tf_title;
+  global $param_date,$param_event,$param_group,$new_group,$tf_title,$sel_ent;
   global $sel_category_id,$sel_priority,$ta_event_description, $tf_location;
   global $cagenda_first_hour, $cagenda_last_hour,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
@@ -357,6 +356,7 @@ function get_param_agenda() {
   global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
   global $ch_all_day;
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
   
   // Agenda fields
   if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
@@ -447,6 +447,31 @@ function get_param_agenda() {
       $agenda["repeat_days"] .= '1';
     } else {
       $agenda["repeat_days"] .= '0';
+    }
+  }
+
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    print_r($http_obm_vars["sel_ent"]);
+    if (is_array($http_obm_vars["sel_ent"])) {
+      $nb_data = 0;
+      $nb_user = 0;
+      $nb_resource = 0;
+      while ( list( $key, $value ) = each( $http_obm_vars["sel_ent"] ) ) {
+	if (strcmp(substr($value, 0, 5),"data-") == 0) {
+	  $nb_data++;
+	  $data = explode("-", $value);
+	  echo "<br>";
+	  print_r($data);
+	}
+      }
+      $group["user_nb"] = $nb_u;
+      $group["group_nb"] = $nb_group;
     }
   }
 

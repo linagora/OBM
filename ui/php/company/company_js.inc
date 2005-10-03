@@ -288,36 +288,7 @@ function check_naf_new(form)
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
   
-  function fill_ext_form2old(int_form) {
-   size = int_form.length;
-   ext_field = get_elem(window.opener.document, '$ext_target' );
-   for (i=0; i <size; i++) {
-     if (int_form.elements[i].type == 'checkbox') {
-       if (int_form.elements[i].checked == true) {
-	 ext_size = ext_field.length;
-	 is_present = false;
-	 for (j=0; j<ext_size && is_present == false; j++) {
-	   if (ext_field.options[j].value == int_form.elements[i].name) {
-	     ext_field.options[j].selected = true;
-	     is_present = true;
-	   }
-	 }
-	 if (is_present == false) {
-	    cat_name = get_elem(document,'data'+int_form.elements[i].name);
-	    cat_name_text = cat_name.innerHTML;
-	    //IE Hack!
-	    ext_field.length = ext_size + 1;
-	    ext_field.options[ext_size].value = int_form.elements[i].name;
-	    ext_field.options[ext_size].text = cat_name_text
-	    ext_field.options[ext_size].selected =true;
-	 }
-       }
-     }
-   }
- }
-
-
- function fill_ext_code_form(value) {
+function fill_ext_code_form(value) {
    ext_field = window.opener.document.$ext_target;
    ext_size = ext_field.length;
    ext_field = window.opener.document.$ext_target;
@@ -333,6 +304,7 @@ if (isset($ext_target) && $ext_target!="") {
 
 ";
 }
+
 $extra_js .= "
 function copy_clip(text)
 {

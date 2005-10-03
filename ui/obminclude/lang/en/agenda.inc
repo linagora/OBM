@@ -73,6 +73,9 @@ $l_conflicts = "Conflict(s) found";
 $l_date = "Date";
 $l_user = "User";
 $l_meeting_legend = "Legend";
+$l_selection = "Selection";
+
+
 // actions 
 $l_insert = "Insert the event";
 $l_update = "Update the event";

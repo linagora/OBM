@@ -79,6 +79,7 @@ function show ( name ) {
   }
 }
 
+
 function get_elem(doc, name ) {
   if (W3C) {
     return doc.getElementById(name);
@@ -88,35 +89,74 @@ function get_elem(doc, name ) {
     return doc.all[name];
   }
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Remove an element line from the list form
+///////////////////////////////////////////////////////////////////////////////
+function remove_element(elemId,parentId) {
+  target = window.document;
+  content = target.getElementById(elemId);
+  container = target.getElementById(parentId)
+  container.removeChild(content); 
+} 
+  
 ";
 
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
-  function get_elem(doc, name ) {
-    return doc.getElementById(name);
-  }  
+function get_elem(doc, name ) {
+  return doc.getElementById(name);
+}  
 
-  function fill_ext_form(dir_path) {
-    ext_field = window.opener.document.$ext_target;
-    ext_field.value = dir_path;
-    window.close();
-  } 
+function fill_ext_form(dir_path) {
+  ext_field = window.opener.document.$ext_target;
+  ext_field.value = dir_path;
+  window.close();
+} 
   
-  function fill_ext_form2(int_form) {
-   size = int_form.length;
-   for(i=0; i <size; i++) {
-     if(int_form.elements[i].type == 'checkbox'){
-       if(int_form.elements[i].checked == true) {
-	 elemid = '$ext_target'+int_form.elements[i].name;
-	 if(!get_elem(window.opener.document, elemid )) {
-	   elemid = 'data'+int_form.elements[i].name;
-	   span = get_elem(window.document,elemid);
-	   add_element('$ext_target' + '[]',int_form.elements[i].name, span.innerHTML);
-	 }
-       }
-     }
-   }
- }
+function fill_ext_cat_element(int_form) {
+  size = int_form.length;
+  for (i=0; i <size; i++) {
+    if (int_form.elements[i].type == 'checkbox') {
+      if (int_form.elements[i].checked == true) {
+	elemid = '$ext_target'+int_form.elements[i].name;
+        if (!get_elem(window.opener.document, elemid )) {
+          elemid = 'data'+int_form.elements[i].name;
+	  span = get_elem(window.document,elemid);
+	  add_element('$ext_target' + '[]',int_form.elements[i].name, span.innerHTML);
+        }
+      }
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Add an element line in the list form
+///////////////////////////////////////////////////////////////////////////////
+function add_element(fieldName,fieldValue,fieldLabel) {
+  target = window.opener.document;
+  container = get_elem(target, '$ext_target' );
+  row = target.createElement('div');
+  row.id = '$ext_target'+fieldValue;
+  row.className = 'elementRow';
+  field = target.createElement('input');
+  field.type = 'hidden';
+  field.name = fieldName;
+  field.value = fieldValue;
+  link = target.createElement('a');
+  link.href = 'javascript: remove_element(\'$ext_target'+fieldValue+'\',\'$ext_target\');';
+  link.onclick = '';
+  image = target.createElement('img');
+  image.src = '".C_IMAGE_PATH."/$set_theme/$ico_crow';
+  link.appendChild(image);
+  content = target.createTextNode(fieldLabel);
+  row.appendChild(link);
+  row.appendChild(content);
+  row.appendChild(field);
+  container.appendChild(row);
+} 
 
 ";
 }
@@ -207,7 +247,7 @@ function of_category_dis_tree($params, $action, $entity, $cat) {
   // For multiple select we set a form
   if ($multi_select) {
     $block .= "
-    <form onsubmit=\"fill_ext_form2(this); window.close(); return false;\">";
+    <form onsubmit=\"fill_ext_cat_element(this); window.close(); return false;\">";
   }
 
   if (is_array($cats)) {

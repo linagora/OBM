@@ -117,13 +117,6 @@ if ($action == "ext_get_ids") {
     $display["detail"] = html_resource_form("", $resource);
   }
 
-} elseif ($action == "reset") {
-///////////////////////////////////////////////////////////////////////////////
-  run_query_default_preferences_insert($resource["id"]);
-  session_load_resource_prefs();
-  $display["msg"] .= display_ok_msg($l_reset_ok);
-  $display["detail"] = dis_resource_consult($resource);
-
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($resource["id"], $resource)) {
@@ -147,7 +140,6 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  //run_query_delete_profile($resource["id"]);
   $display["search"] = html_resource_search_form($resource);
 
 } elseif ($action == "rights_admin") {

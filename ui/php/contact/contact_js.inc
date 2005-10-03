@@ -280,44 +280,6 @@ function fill_select_label(source)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Add an element line in the list form
-///////////////////////////////////////////////////////////////////////////////
-function add_element(fieldName,fieldValue,fieldLabel) {
-  target = window.opener.document;
-  container = get_elem(target, '$ext_target' );
-  row = target.createElement('div');
-  row.id = '$ext_target'+fieldValue;
-  row.className = 'elementRow';
-  field = target.createElement('input');
-  field.type = 'hidden';
-  field.name = fieldName;
-  field.value = fieldValue;
-  link = target.createElement('a');
-  link.href = 'javascript: remove_element(\'$ext_target'+fieldValue+'\',\'$ext_target\');';
-  link.onclick = '';
-  image = target.createElement('img');
-  image.src = '".C_IMAGE_PATH."/$set_theme/$ico_crow';
-  link.appendChild(image);
-  content = target.createTextNode(fieldLabel);
-  row.appendChild(link);
-  row.appendChild(content);
-  row.appendChild(field);
-  container.appendChild(row);
-} 
-  
-///////////////////////////////////////////////////////////////////////////////
-// Remove an element line from the list form
-///////////////////////////////////////////////////////////////////////////////
-function remove_element(elemId,parentId) {
-  target = window.document;
-  content = target.getElementById(elemId);
-  container = target.getElementById(parentId)
-  container.removeChild(content); 
-} 
-  
-  
-
-///////////////////////////////////////////////////////////////////////////////
 // Fill the Kind's header select.
 ///////////////////////////////////////////////////////////////////////////////
 function fill_select_header(source) 
@@ -342,9 +304,6 @@ function fill_select_header(source)
 
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
-  function get_elem(doc, name ) {
-    return doc.getElementById(name);
-  }  
 
   function fill_ext_form(dir_path) {
     ext_field = window.opener.document.$ext_target;
@@ -352,22 +311,6 @@ if (isset($ext_target) && $ext_target!="") {
     window.close();
   } 
   
-  function fill_ext_form2(int_form) {
-   size = int_form.length;
-   for(i=0; i <size; i++) {
-     if(int_form.elements[i].type == 'checkbox'){
-       if(int_form.elements[i].checked == true) {
-	 elemid = '$ext_target'+int_form.elements[i].name;
-	 if(!get_elem(window.opener.document, elemid )) {
-	   elemid = 'data'+int_form.elements[i].name;
-	   span = get_elem(window.document,elemid);
-	   add_element('$ext_target' + '[]',int_form.elements[i].name, span.innerHTML);
-	 }
-       }
-     }
-   }
- }
-
 ";
 }
 $extra_js .= "

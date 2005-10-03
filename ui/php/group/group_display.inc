@@ -46,8 +46,8 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "group_name") && $link_ok) {
     $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;param_group=".$OD->data_set->f("group_id");
   }
-  if (($fieldname == "hidden_field") && $ext_element != "") {
-    $res["name"] = "<span id=\"data".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
+  if (($fieldname == "data_element") && $ext_element != "") {
+    $res["name"] = "<span id=\"data-group-".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
     $OD->data_set->f("group_name")."</span>";
   }  
 
@@ -268,7 +268,7 @@ function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
     if ($ext_element != "") {
       $dis_group->data_cb_name = "";
       $form_attr = "
-      onsubmit=\"fill_ext_form2(this); return false;\" ";
+      onsubmit=\"fill_ext_element(this); return false;\" ";
     }
     elseif ($widget == "") {
       $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";

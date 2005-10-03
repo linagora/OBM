@@ -38,8 +38,8 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "rgroup_name") && $link_ok) {
     $res["url"] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$OD->data_set->f("rgroup_id");
   }
-  if (($fieldname == "hidden_field") && $ext_element != "") {
-    $res["name"] = "<span id=\"data".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
+  if (($fieldname == "data_element") && $ext_element != "") {
+    $res["name"] = "<span id=\"data-resurcegroup-".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
     $OD->data_set->f("rgroup_name")."</span>";
   } else if ($fieldname == "rgroup_nb_resource") {
     $nb_q = new DB_OBM;
@@ -206,7 +206,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $gr
     if ($ext_element != "") {
       $dis_group->data_cb_name = "";
       $form_attr = "
-      onsubmit=\"fill_ext_form2(this); return false;\" ";
+      onsubmit=\"fill_ext_element(this); return false;\" ";
     }
     elseif ($widget == "") {
       $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";

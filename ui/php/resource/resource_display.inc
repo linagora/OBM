@@ -32,8 +32,8 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "resource_name") && $link_ok) {
     $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("resource_id");
   }
-  if (($fieldname == "hidden_field") && $ext_element != "") {
-    $res["name"] = "<span id=\"data".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
+  if (($fieldname == "data-element") && $ext_element != "") {
+    $res["name"] = "<span id=\"data-resource-".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
     $OD->data_set->f("resource_name").
     "</span>";
   }
@@ -191,7 +191,7 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
     } elseif ($ext_element != "") {
       $resource_d->data_cb_name = "";
       $resource_d->data_form_head = "
-      <form onsubmit=\"fill_ext_form2(this); return false;\">";
+      <form onsubmit=\"fill_ext_element(this); return false;\">";
     } else {
       $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";

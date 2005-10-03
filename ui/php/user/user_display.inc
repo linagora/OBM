@@ -44,8 +44,8 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "userobm_login") && $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("userobm_id");
   }
-  if (($fieldname == "hidden_field") && $ext_element != "") {
-    $res["name"] = "<span id=\"data".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
+  if (($fieldname == "data_element") && $ext_element != "") {
+    $res["name"] = "<span id=\"data-user-".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
     $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname").
     "</span>";
   }  
@@ -251,7 +251,7 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
     if ($ext_element != "") {
       $user_d->data_cb_name = "";
       $user_d->data_form_head = "
-      <form onsubmit=\"fill_ext_form2(this); return false;\">";
+      <form onsubmit=\"fill_ext_element(this); return false;\">";
     }
     elseif ($ext_widget != "") {
       $user_d->data_form_head = "

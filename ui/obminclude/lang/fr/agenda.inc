@@ -47,6 +47,7 @@ $l_free = "Libre mais restreint";
 $l_possible = "Libre";
 $l_occupied = "Non disponible";
 $l_meeting_legend = "Légende";
+$l_selection = "Sélection";
 
 
 $l_accepted = "Accepté";
