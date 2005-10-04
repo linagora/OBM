@@ -62,11 +62,11 @@ if ( ($agenda["new_group"] == "1")
 if ($cal_entity_id["group_view"] == "") $cal_entity_id["group_view"] = $c_all;
 
 // If user or resources selection present we override session content
-if (is_array($sel_user_id)) {
-  $cal_entity_id["user"] = $sel_user_id;
+if (is_array($agenda["sel_user_id"])) {
+  $cal_entity_id["user"] = $agenda["sel_user_id"];
 } else if (($action == "insert") || ($action == "insert")) {
   // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["user"] = $sel_user_id;
+  $cal_entity_id["user"] = $agenda["sel_user_id"];
 }
 if (is_array($sel_group_id)) {
   $cal_entity_id["group"] = $sel_group_id;
@@ -74,11 +74,11 @@ if (is_array($sel_group_id)) {
   // If event creation (form submission) we set session even if selection empty
   $cal_entity_id["group"] = $sel_group_id;
 }
-if (is_array($sel_resource_id)) {
-  $cal_entity_id["resource"] = $sel_resource_id;
+if (is_array($agenda["sel_resource_id"])) {
+  $cal_entity_id["resource"] = $agenda["sel_resource_id"];
 } else if (($action == "insert") || ($action == "insert")) {
   // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["resource"] = $sel_resource_id;
+  $cal_entity_id["resource"] = $agenda["sel_resource_id"];
 }
 
 // If no user selected, we select the connected user
@@ -225,7 +225,7 @@ if ($agenda["id"] > 0) {
       $display["msg"] .= display_err_msg($l_insert_error);
       $display["detail"] = dis_event_form($action, $agenda, "", $cal_entity_id);
     } else {
-      run_query_event_update($agenda,$sel_user_id,$event_id);
+      run_query_event_update($agenda, $cal_entity_id, $event_id);
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg($l_update_ok);
       $agenda["date"] = $agenda["datebegin"];
@@ -345,10 +345,14 @@ display_page($display);
 // returns : $agenda hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_agenda() {
-  global $param_date,$param_event,$param_group,$new_group,$tf_title,$sel_ent;
-  global $sel_category_id,$sel_priority,$ta_event_description, $tf_location;
-  global $cagenda_first_hour, $cagenda_last_hour,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
-  global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
+  global $action, $cagenda_first_hour, $cagenda_last_hour;
+  global $param_date, $tf_title, $tf_location, $ta_event_description;
+  global $param_event, $sel_category_id, $sel_priority;
+  global $tf_date_begin, $sel_time_begin, $sel_min_begin;
+  global $tf_date_end, $sel_time_end, $sel_min_end;
+  global $sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
+  global $param_user, $param_group, $new_group, $sel_user_id, $sel_group_id;
+  global $sel_ent;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
@@ -450,6 +454,7 @@ function get_param_agenda() {
     }
   }
 
+  if (is_array($sel_user_id)) $agenda["sel_user_id"] = $sel_user_id;
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
@@ -457,17 +462,20 @@ function get_param_agenda() {
   }
 
   if (isset ($http_obm_vars)) {
+    echo "sel_ent=";
     print_r($http_obm_vars["sel_ent"]);
     if (is_array($http_obm_vars["sel_ent"])) {
       $nb_data = 0;
-      $nb_user = 0;
-      $nb_resource = 0;
+      $nb["user"] = 0;
+      $nb["resource"] = 0;
       while ( list( $key, $value ) = each( $http_obm_vars["sel_ent"] ) ) {
 	if (strcmp(substr($value, 0, 5),"data-") == 0) {
 	  $nb_data++;
 	  $data = explode("-", $value);
-	  echo "<br>";
-	  print_r($data);
+	  $ent = $data[1];
+	  $id = $data[2];
+	  $nb[$ent]++;
+	  $agenda["sel_${ent}_id"][] = $id;
 	}
       }
       $group["user_nb"] = $nb_u;

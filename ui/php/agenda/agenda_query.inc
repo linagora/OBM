@@ -680,9 +680,9 @@ function run_query_get_eventcategories() {
 // Event Update Execution
 // Parameters: 
 //   - $agenda      : Agenda params
-//   - $users_array : List of the users 
+//   - $sel_entity_id : List entitis id ["user"] ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_event_update($agenda,$users_array,&$event_id) {
+function run_query_event_update($agenda, $sel_entity_id, &$event_id) {
   global $c_use_connectors, $uid, $l_date;
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
 
@@ -694,6 +694,7 @@ function run_query_event_update($agenda,$users_array,&$event_id) {
   $mail_title = stripslashes($agenda["title"]);
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
 
+  $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
     foreach($groups as $group_id) {
       $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));

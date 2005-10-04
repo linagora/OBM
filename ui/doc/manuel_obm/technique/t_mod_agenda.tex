@@ -220,6 +220,29 @@ ainsi qu'une description sommaire de chacune d'entre elles.\\
 \end{tabular}
 
 
+\subsection{Paramètres}
+
+Différents paramètres concernant les utilisateurs, groupes et leur stockage dans le tableau de paramètres :\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Haschage \$agenda} & \textbf{Paramètre} & \textbf{Description} \\
+ \hline
+  [``user\_id''] & param\_user & Utilisateur spécifié lors de l'acceptation d'événement (déléguation) \\ 
+ \hline
+  [``group\_view''] & param\_group & Groupe sélectionné pour l'affichage du calendrier d'un groupe \\ 
+ \hline
+  [``new\_group''] & new\_group & Indicateur de sélection d'un nouveau groupe\\
+ \hline
+  [``group\_ids''] & sel\_group\_id & Groupes sélectionnés (formulaire rdv) \\ 
+ \hline
+  [``sel\_user\_id''] & sel\_ent[``user''] & Utilisateurs sélectionnés \\ 
+ \hline
+  [``sel\_resource\_id''] & sel\_ent[``resource] & Ressources sélectionnées \\ 
+ \hline
+\end{tabular}
+
+
 \subsection{Sélection et stockage des utilisateurs, resources, groupes}
 
 Lors de la sélection de plusieurs utilisateurs ou entités, ceux-ci sont gardés en session afin de maintenir la sélection en changeant de vue ou en se déplaçant dans le calendrier.
@@ -353,10 +376,10 @@ Recherche crénneaux disponibles
 
 
 \subsubsection{Remarques}
-  Par défaut l'action \textbf{index} affiche la vue hebdomadaire de la semaine
-  courante. Cependant si l'utilisateur courant ou bien un utilisateur qui lui à 
-  céder les droits d'ecriture sur son agenda à des événements en attente cette
-  action affichera la liste des événements en attente.
+ Par défaut l'action \textbf{index} affiche la vue hebdomadaire de la semaine
+ courante. Cependant si l'utilisateur courant ou bien un utilisateur qui lui a 
+ cédé les droits d'ecriture sur son agenda à des événements en attente cette
+ action affichera la liste des événements en attente.
 
 \subsection{Principe de fonctionnement d'affichage d'une vue}
  Les etapes de construction de la vue sont :

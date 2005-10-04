@@ -32,7 +32,7 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "resource_name") && $link_ok) {
     $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("resource_id");
   }
-  if (($fieldname == "data-element") && $ext_element != "") {
+  if (($fieldname == "data_element") && $ext_element != "") {
     $res["name"] = "<span id=\"data-resource-".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
     $OD->data_set->f("resource_name").
     "</span>";

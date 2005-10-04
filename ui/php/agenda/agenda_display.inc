@@ -1978,9 +1978,9 @@ function html_waiting_events($obm_wait) {
     $current_user = $obm_wait->f("userobm_id");
     $current_lname = $obm_wait->f("userobm_lastname");
     $current_fname = $obm_wait->f("userobm_firstname");
-    if($current_user != $old_user) {
+    if ($current_user != $old_user) {
       $old_user = $current_user;
-      if($dis_events != "") {
+      if ($dis_events != "") {
 	if($is_repeat) {
 	  $dis_kind = $l_repeatkind;
 	  $dis_day = $l_repeatdays2;
@@ -2503,12 +2503,12 @@ function dis_free_interval($agenda, $entity_store) {
         $end_time = $current_time + $duration;
 	$begin_date = urlencode(isodate_format($current_time,"",1));
 	$end_date = urlencode(isodate_format($end_time,"",1));
-	$goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date$param_user$param_group";
+	$goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date";
 	if (isset($events[$dayLink])) {
 	  $day = $events[$dayLink];
 	  $have_event = $day->have_events_between($current_time, $current_time + $time_unit_sec);
 	  $will_have_event = $day->have_events_between($current_time,$end_time);
-	  $goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date$param_user$param_group";
+	  $goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date";
 	  if ($have_event) {
 	    $week_cal .= "<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
           } elseif ($will_have_event) {
@@ -2535,7 +2535,7 @@ function dis_free_interval($agenda, $entity_store) {
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user$param_group&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
       </a>
      </td>
@@ -2543,7 +2543,7 @@ function dis_free_interval($agenda, $entity_store) {
       $display_date
      </td>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user$param_group&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
       </a>     
      </td>
@@ -2676,7 +2676,7 @@ function dis_free_ressource($agenda,$entity_store){
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
       </a>     
      </td>
@@ -2684,7 +2684,7 @@ function dis_free_ressource($agenda,$entity_store){
       $display_date
      </td>  
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
       </a>     
      </td>

@@ -62,7 +62,7 @@ function fill_ext_element(int_form) {
         if (!get_elem(window.opener.document, elemid )) {
  	  elemid = 'data-resource-'+int_form.elements[i].name;
 	  span = get_elem(window.document,elemid);
-	  add_element('$ext_element' + '[]',int_form.elements[i].name, span.innerHTML);
+	  add_element('$ext_element' + '[]', elemid, span.innerHTML);
         }
       }
     }
@@ -71,7 +71,7 @@ function fill_ext_element(int_form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Add an element line in the list form                                     //
+// Add an element line in the list form                                     //
 ///////////////////////////////////////////////////////////////////////////////
 function add_element(fieldName,fieldValue,fieldLabel) {
   target = window.opener.document;

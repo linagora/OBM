@@ -39,6 +39,11 @@ function get_elem(doc, name ) {
   return doc.getElementById(name);
 }  
 
+///////////////////////////////////////////////////////////////////////////////
+// Fill the source form with checked values from a result set
+// Parameters:
+//   - int_form : source form where to get values
+///////////////////////////////////////////////////////////////////////////////
 function fill_ext_element(int_form) {
   size = int_form.length;
   for (i=0; i <size; i++) {
@@ -48,8 +53,7 @@ function fill_ext_element(int_form) {
         if (!get_elem(window.opener.document, elemid )) {
  	  elemid = 'data-user-'+int_form.elements[i].name;
 	  span = get_elem(window.document,elemid);
-	  add_element('$ext_element' + '[]',int_form.elements[i].name, span.innerHTML);
-alert(int_form.elements[i].name + span.innerHTML);
+	  add_element('$ext_element' + '[]', elemid, span.innerHTML);
         }
       }
     }
@@ -58,7 +62,7 @@ alert(int_form.elements[i].name + span.innerHTML);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Add an element line in the list form                                     //
+// Add an element line in the list form                                     //
 ///////////////////////////////////////////////////////////////////////////////
 function add_element(fieldName,fieldValue,fieldLabel) {
   target = window.opener.document;
