@@ -586,7 +586,6 @@ class OBM_DISPLAY {
     // Export - Uses forms to allow big queries to be transmitted
     $module = $this->display_module;
     $query = $this->data_set->obm_query;
-    $query_pref = $this->display_pref->obm_query;
     $export_url = "$path/exportcsv/exportcsv_index.php";
 
     $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
@@ -596,7 +595,6 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"first_row\" value=\"$first_row\" />
       <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"query_pref\" value=\"$query_pref\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
       <input type=\"image\" style=\"border: 0px; vertical-align: bottom;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_export\" alt=\"$l_export\" />
       </form>
@@ -607,7 +605,6 @@ class OBM_DISPLAY {
       <input type=\"hidden\" name=\"first_row\" value=\"0\" />
       <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"query_pref\" value=\"$query_pref\" />
       <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
       <input type=\"image\" style=\"border: 0px; vertical-align: bottom;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_export_all\" alt=\"$l_export_all\" />
       </form>
@@ -697,11 +694,14 @@ class OBM_DISPLAY {
     global $cgp_hide, $fieldnames, $cdg_id, $set_debug;
 
     $module = $this->display_module;
-    $this->display_pref->seek(0);
-    
-    while ($this->display_pref->next_record()) {
-      $fieldname = $this->display_pref->f("display_fieldname");
-      if (! $cgp_hide[$module][$fieldname]) {
+    $entity = $this->display_entity;
+    if ($entity == "") {
+      $entity = $module;
+    }
+
+    reset($this->display_pref);
+    while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
+      if (! $cgp_hide[$entity][$fieldname]) {
 	$label = $fieldnames[$fieldname];
 	// if label empty or is an image or a link, we display the column name
 	if ( ($label == "") || (preg_match("/.*<.*>.*/", $label) ) ) {
@@ -722,6 +722,10 @@ class OBM_DISPLAY {
     global $cgp_hide, $cdg_id, $set_debug, $ctu_sql_limit;
 
     $module = $this->display_module;
+    $entity = $this->display_entity;
+    if ($entity == "") {
+      $entity = $module;
+    }
     $this->dis_data_header_file($sep);
 
     // If limit is not used, we seek to the first row to display
@@ -733,13 +737,12 @@ class OBM_DISPLAY {
     $cpt = 0;
     while (($this->data_set->next_record()) && ($cpt < $nb_rows)) {
 
-      // For each field in the data row we walk through the pref dbo ordered
+      // For each field in the data row we walk through the pref array
       // and for each entry (field) we set special parameters and display it
-      $this->display_pref->seek(0);
-      while ($this->display_pref->next_record()) {
-	$fieldname = $this->display_pref->f("display_fieldname");
+      reset($this->display_pref);
+      while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
 
-	if (! $cgp_hide[$module][$fieldname]) {
+	if (! $cgp_hide[$entity][$fieldname]) {
 	  $txt_name = $this->data_set->f($fieldname);
 
 	  //--------------------------------------------------
