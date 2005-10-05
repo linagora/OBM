@@ -57,26 +57,30 @@ if ( ($agenda["new_group"] == "1")
   $cal_entity_id["group_view"] = $agenda["group_view"];
   $cal_entity_id["resource"] = array();
   //  $sel_resource_id = get_default_group_resource_ids($param_group);
-}  
+}
+// If event insert or update, reset the selected group
+if (($action == "insert") || ($action == "update")) {
+  $cal_entity_id["group_view"] = $c_all;
+}
 // If no group view selected, explicitely set it
 if ($cal_entity_id["group_view"] == "") $cal_entity_id["group_view"] = $c_all;
 
 // If user or resources selection present we override session content
 if (is_array($agenda["sel_user_id"])) {
   $cal_entity_id["user"] = $agenda["sel_user_id"];
-} else if (($action == "insert") || ($action == "insert")) {
+} else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
   $cal_entity_id["user"] = $agenda["sel_user_id"];
 }
-if (is_array($sel_group_id)) {
-  $cal_entity_id["group"] = $sel_group_id;
-} else if (($action == "insert") || ($action == "insert")) {
+if (is_array($agenda["sel_group_id"])) {
+  $cal_entity_id["group"] = $agenda["sel_group_id"];
+} else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["group"] = $sel_group_id;
+  $cal_entity_id["group"] = $agenda["sel_group_id"];
 }
-if (is_array($agenda["sel_resource_id"])) {
+if (($agenda["new_sel"]) || (is_array($agenda["sel_resource_id"]))) {
   $cal_entity_id["resource"] = $agenda["sel_resource_id"];
-} else if (($action == "insert") || ($action == "insert")) {
+} else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
   $cal_entity_id["resource"] = $agenda["sel_resource_id"];
 }
@@ -89,8 +93,7 @@ if ( ( (! is_array($cal_entity_id["user"]))
   $cal_entity_id["user"] = array($uid);
 }
 
-//  $cal_entity_id["resource"] = array(1);
-//print_r($cal_entity_id);
+print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
 $agenda["entity"] = $cal_entity_id;
 
@@ -188,7 +191,7 @@ if ($action == "index") {
       $agenda["date"] = $agenda["datebegin"];
       $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
     }
-  }  else {
+  } else {
     require("$obminclude/calendar.js");
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_event_form($action, $agenda, "", $cal_entity_id);
@@ -282,7 +285,7 @@ if ($agenda["id"] > 0) {
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $cal_entity_id["user"] = run_query_get_allusers($cal_entity_id["user"], $agenda["group_ids"]);
+  $cal_entity_id["user"] = run_query_get_allusers($cal_entity_id["user"], $agenda["sel_group_id"]);
   $entity_readable = get_entity_readable();
   $entity_store = store_entities(run_query_get_entity_label($cal_entity_id));
   $display["features"] = html_planning_bar($agenda, $cal_entity_id, $entity_store, $entity_readable);
@@ -352,11 +355,11 @@ function get_param_agenda() {
   global $tf_date_end, $sel_time_end, $sel_min_end;
   global $sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
   global $param_user, $param_group, $new_group, $sel_user_id, $sel_group_id;
-  global $sel_ent;
+  global $sel_ent, $new_sel;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
-  global $sel_deny_write,$sel_deny_read,$sel_time_duration,$sel_min_duration;
+  global $sel_time_duration,$sel_min_duration;
   global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
   global $ch_all_day;
@@ -387,14 +390,11 @@ function get_param_agenda() {
   if (isset($hd_old_begin)) $agenda["old_begin"] = $hd_old_begin;
   if (isset($hd_old_end)) $agenda["old_end"] = $hd_old_end;
   if (isset($cb_mail)) $agenda["mail"] = $cb_mail;
-  if (is_array($sel_deny_write)) $agenda["deny_w"] = $sel_deny_write;
-  if (is_array($sel_deny_read)) $agenda["deny_r"] = $sel_deny_read;
-  if (is_array($sel_group_id)) $agenda["group_ids"] = $sel_group_id;
   if (isset($new_group)) $agenda["new_group"] = $new_group;
   if (isset($param_group) && ($param_group != "")) {
     $agenda["group_view"] = $param_group;
-    $agenda["group_ids"] = array($param_group);
   }
+  if (isset($new_sel)) $agenda["new_sel"] = $new_sel;
 
   if (isset($sel_time_duration)) {
     $agenda["duration"] = $sel_time_duration;
@@ -454,7 +454,36 @@ function get_param_agenda() {
     }
   }
 
-  if (is_array($sel_user_id)) $agenda["sel_user_id"] = $sel_user_id;
+  // sel_group_id can be filled by sel_group_id
+  if (is_array($sel_group_id)) {
+    while ( list( $key, $value ) = each( $sel_group_id ) ) {
+      // sel_group_id contains select infos (data-group-$id)
+      if (strcmp(substr($value, 0, 11),"data-group-") == 0) {
+	$data = explode("-", $value);
+	$id = $data[2];
+	$agenda["sel_group_id"][] = $id;
+      } else {
+	// direct id
+	$agenda["sel_group_id"][] = $value;
+      }
+    }
+  }
+
+  // sel_user_id can be filled by sel_user_id or sel_ent (see below)
+  if (is_array($sel_user_id)) {
+    while ( list( $key, $value ) = each( $sel_user_id ) ) {
+      // sel_user_id contains select infos (data-user-$id)
+      if (strcmp(substr($value, 0, 10),"data-user-") == 0) {
+	$data = explode("-", $value);
+	$id = $data[2];
+	$agenda["sel_user_id"][] = $id;
+      } else {
+	// direct id
+	$agenda["sel_user_id"][] = $value;
+      }
+    }
+  }
+
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
@@ -462,7 +491,6 @@ function get_param_agenda() {
   }
 
   if (isset ($http_obm_vars)) {
-    echo "sel_ent=";
     print_r($http_obm_vars["sel_ent"]);
     if (is_array($http_obm_vars["sel_ent"])) {
       $nb_data = 0;
@@ -478,8 +506,6 @@ function get_param_agenda() {
 	  $agenda["sel_${ent}_id"][] = $id;
 	}
       }
-      $group["user_nb"] = $nb_u;
-      $group["group_nb"] = $nb_group;
     }
   }
 

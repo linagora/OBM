@@ -14,9 +14,10 @@
 //     keys used  : name, perms
 //   - $p_new_order : infos for order clause
 //   - $p_order_dir : direction for order clause (asc, desc)
+//   - $restriction : if and which restriction to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($user, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql, $ctu_sql_limit;
+function run_query_search($user, $p_new_order, $p_order_dir, $restriction="") {
+  global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $login = sql_search_text_parse($user["login"]);
   $perms = $user["perms"];
@@ -32,6 +33,19 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
+
+  if ($restriction == "calendar") {
+    $uid = $auth->auth["uid"];
+    $users = of_right_entity_for_consumer("calendar", "user", $uid, "read");
+    if ((is_array($users["ids"])) && (count($users["ids"]) > 0)) {
+      $where_restriction = " AND (userobm_id IN (";
+      foreach($users["ids"] as $u_id) {
+	$where_restriction .= "$coma'$u_id'";
+	$coma = ",";
+      }
+      $where_restriction .= "))";
+    }
+  }
 
   $where = "";
 
@@ -77,8 +91,8 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
     $where .= " userobm_archive = '0'";
   }
 
-  if (trim($where) != "") {
-    $whereq = " WHERE $where";
+  if ((trim($where) != "") || (trim($where_restriction) != "")) {
+    $whereq = " WHERE $where $where_restriction";
   }
 
   $select = "SELECT distinct UserObm.*,

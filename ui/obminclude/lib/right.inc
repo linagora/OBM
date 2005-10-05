@@ -18,6 +18,7 @@ function remove_allelements(parentId) {
   }
 }
 
+
 function show_hide_read_right(field) {
   // Show/Hide read rights
   target = window.document;
@@ -154,17 +155,21 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       }
     } else {
       if ($write == 1) {
-        $dis_write_ok .= "<div class=\"elementRow\" id=\"sel_accept_write$id\">
-        <a href=\"javascript: remove_element('sel_accept_write$id','sel_accept_write');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
+	$sel_id = "data-user-$id";
+	$div_id = "sel_accept_write-data-user-$id";
+        $dis_write_ok .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_write');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
         $label
-       <input value=\"$id\" name=\"sel_accept_write[]\" type=\"hidden\" />
+       <input value=\"$sel_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
        </div>";
       }
       if ($read == 1) {
-        $dis_read_ok .= "<div class=\"elementRow\" id=\"sel_accept_read$id\">
-        <a href=\"javascript: remove_element('sel_accept_read$id','sel_accept_read');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
+	$sel_id = "data-user-$id";
+	$div_id = "sel_accept_read-data-user-$id";
+        $dis_read_ok .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_read');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
         $label
-       <input value=\"$id\" name=\"sel_accept_read[]\" type=\"hidden\" />
+       <input value=\"$sel_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
        </div>";
       }
     }
@@ -449,13 +454,13 @@ function of_right_update_right($param, $entity) {
     }
   }
 
-  $obm_db = new DB_OBM;
+  $obm_q = new DB_OBM;
   $query = "DELETE
     FROM EntityRight
     WHERE entityright_entity_id = '$eid'
       AND entityright_entity = '$entity'";
   display_debug_msg($query, $cdg_sql, "of_right_update_right(1)");
-  $obm_db->query($query);
+  $obm_q->query($query);
 
   if ($public_read || $public_write) {
     $pr = ($public_read ? 1 : 0);
@@ -475,36 +480,16 @@ function of_right_update_right($param, $entity) {
       '$pr',
       '$pw')";
     display_debug_msg($query, $cdg_sql, "of_right_update_right(2)");
-    $obm_db->query($query);
+    $obm_q->query($query);
   }
 
   if (! $public_read) {
     // Insert all read entries (with write right correctly set)
-    foreach ($accept_read as $key => $id) {
-      $w = (in_array($id, $accept_write) ? 1 : 0);
-      $query = "INSERT INTO EntityRight (
-        entityright_entity,
-        entityright_entity_id,
-        entityright_consumer,
-        entityright_consumer_id,
-        entityright_read,
-        entityright_write
-      ) VALUES (
-        '$entity',
-        '$eid',
-        '$consumer',
-        '$id',
-        '1',
-        '$w')";
-      display_debug_msg($query, $cdg_sql, "of_right_update_right(3)");
-      $obm_db->query($query);
-    }
-  }
-
-  if (! $public_write) {
-    // Insert all write entries not already done by the read loop
-    foreach ($accept_write as $key => $id) {
-      if (! in_array($id, $accept_read)) {
+    foreach ($accept_read as $key => $ref) {
+      $ref_ent = substr($ref, 0, 10);
+      if ($ref_ent == "data-user-") {
+	$id = str_replace("data-user-","", $ref);
+	$w = (in_array($ref, $accept_write) ? 1 : 0);
 	$query = "INSERT INTO EntityRight (
           entityright_entity,
           entityright_entity_id,
@@ -517,10 +502,38 @@ function of_right_update_right($param, $entity) {
           '$eid',
           '$consumer',
           '$id',
-          '0',
-          '1')";
-	display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");
-	$obm_db->query($query);
+          '1',
+          '$w')";
+	display_debug_msg($query, $cdg_sql, "of_right_update_right(3)");
+	$obm_q->query($query);
+      }
+    }
+  }
+
+  if (! $public_write) {
+    // Insert all write entries not already done by the read loop
+    foreach ($accept_write as $key => $ref) {
+      $ref_ent = substr($ref, 0, 10);
+      if ($ref_ent == "data-user-") {
+	if (! in_array($ref, $accept_read)) {
+	  $id = str_replace("data-user-","", $ref);
+	  $query = "INSERT INTO EntityRight (
+            entityright_entity,
+            entityright_entity_id,
+            entityright_consumer,
+            entityright_consumer_id,
+            entityright_read,
+            entityright_write
+          ) VALUES (
+            '$entity',
+            '$eid',
+            '$consumer',
+            '$id',
+            '0',
+            '1')";
+	  display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");
+	  $obm_q->query($query);
+	}
       }
     }
   }

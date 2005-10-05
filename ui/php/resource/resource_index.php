@@ -37,6 +37,7 @@ include("$obminclude/global_pref.inc");
 require("resource_display.inc");
 require("resource_query.inc");
 require("resource_js.inc");
+require("$obminclude/lib/right.inc");
 
 
 $uid = $auth->auth["uid"];
@@ -144,12 +145,10 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("$obminclude/lib/right.inc");
   $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("$obminclude/lib/right.inc");
   of_right_update_right($resource, "resource");
   $display["msg"] .= display_warn_msg($err_msg);
   $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
@@ -190,7 +189,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_resource() {
   global $param_resource, $tf_name, $tf_desc, $ta_desc, $tf_qty, $tf_qtyinf, $tf_qtysup;
-  global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive;
+  global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive, $restriction;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $ext_widget,$ext_element;
   global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
@@ -204,6 +203,8 @@ function get_param_resource() {
   if (isset ($tf_qty)) $resource["qty"] = $tf_qty;
   if (isset ($tf_qtyinf)) $resource["qtyinf"] = $tf_qtyinf;
   if (isset ($tf_qtysup)) $resource["qtysup"] = $tf_qtysup;
+
+  if (isset ($restriction)) $resource["restriction"] = $restriction;
 
   // External param
   if (isset ($popup)) $resource["popup"] = $popup;

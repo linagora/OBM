@@ -64,6 +64,9 @@ function html_resource_search_form($resource) {
   $qtyinf = $resource["qtyinf"];
   $qtysup = $resource["qtysup"];
   $popup = $resource["popup"];
+  if ($resource["restriction"]) {
+    $dis_restriction = "<input name=\"restriction\" type=\"hidden\" value=\"user\">";
+  }
 
   if ($popup) {
     $ext_action = $resource["ext_action"];
@@ -114,6 +117,7 @@ function html_resource_search_form($resource) {
       <input name=\"action\" type=\"hidden\" value=\"search\">
       <input name=\"submit\" type=\"submit\" value=\"$l_find\">
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+      $dis_restriction
       $ext&nbsp;
     </div>
     <div class=\"searchEnd\"></div>
@@ -135,9 +139,10 @@ function dis_resource_search_list($resource) {
   global $display, $auth, $new_order, $order_dir;
 
   $popup = $resource["popup"];
+  $restriction = $resource["restriction"];
 
   $prefs = get_display_pref($auth->auth["uid"], "resource");
-  $obm_q = run_query_search($resource, $new_order, $order_dir);
+  $obm_q = run_query_search($resource, $new_order, $order_dir, $restriction);
   $nb_resource = $obm_q->num_rows_total();
   if ($nb_resource == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -191,7 +196,7 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
     } elseif ($ext_element != "") {
       $resource_d->data_cb_name = "";
       $resource_d->data_form_head = "
-      <form onsubmit=\"fill_ext_element(this); return false;\">";
+      <form onsubmit=\"of_extmod_fill_ext_element(this); return false;\">";
     } else {
       $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";

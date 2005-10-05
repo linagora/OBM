@@ -79,35 +79,10 @@ function show ( name ) {
   }
 }
 
-
-function get_elem(doc, name ) {
-  if (W3C) {
-    return doc.getElementById(name);
-  } else if (NS4) {
-    return doc.layers[name]  
-  } else {
-    return doc.all[name];
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Remove an element line from the list form
-///////////////////////////////////////////////////////////////////////////////
-function remove_element(elemId,parentId) {
-  target = window.document;
-  content = target.getElementById(elemId);
-  container = target.getElementById(parentId)
-  container.removeChild(content); 
-} 
-  
 ";
 
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
-function get_elem(doc, name ) {
-  return doc.getElementById(name);
-}  
 
 function fill_ext_form(dir_path) {
   ext_field = window.opener.document.$ext_target;

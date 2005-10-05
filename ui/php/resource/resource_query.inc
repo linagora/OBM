@@ -14,10 +14,10 @@
 //     keys used  : name, perms
 //   - $p_new_order : infos for order clause
 //   - $p_order_dir : direction for order clause (asc, desc)
+//   - $restriction : if and which restriction to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($resource, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql, $ctu_sql_limit;
-  global $ctype_resource;
+function run_query_search($resource, $p_new_order, $p_order_dir, $restriction="") {
+  global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = sql_search_text_parse($resource["name"]);
   $desc = sql_search_text_parse($resource["description"]);
@@ -26,6 +26,20 @@ function run_query_search($resource, $p_new_order, $p_order_dir) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
+
+  if ($restriction == "user") {
+    $uid = $auth->auth["uid"];
+    $rs = of_right_entity_for_consumer("resource", "user", $uid, "read");
+    if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
+      $where_restriction = " AND (resource_id IN (";
+      foreach($rs["ids"] as $r_id) {
+	$where_restriction .= "$coma'$r_id'";
+	$coma = ",";
+      }
+      $where_restriction .= "))";
+    }
+  }
+  echo "<p>res=$where_restriction";
 
   $select = "SELECT Resource.*, resource_id as id
     FROM Resource";
@@ -42,8 +56,8 @@ function run_query_search($resource, $p_new_order, $p_order_dir) {
      $where .= " AND resource_description like '%$desc%'";
   }
 
-  if (trim($where) != "") {
-    $whereq = " WHERE $where";
+  if ((trim($where) != "") || (trim($where_restriction) != "")) {
+    $whereq = " WHERE $where $where_restriction";
   }
 
   // ORDER construction
@@ -108,7 +122,7 @@ function run_query_detail($p_id) {
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($resource) {
-  global $auth, $cdg_sql, $ctype_resource;
+  global $auth, $cdg_sql;
 
   $name = $resource["name"];
   $desc = $resource["desc"];
@@ -137,7 +151,7 @@ function run_query_insert($resource) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $id=get_resource_id($name);
+    $id = get_resource_id($name);
     run_query_right_init($id);
   }
 
@@ -198,7 +212,7 @@ function run_query_right_init($resource_id) {
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($p_id, $resource) {
-  global $auth, $cdg_sql, $ctype_resource;
+  global $auth, $cdg_sql;
 
   $name = $resource["name"];
   $desc = $resource["desc"];
@@ -373,7 +387,7 @@ function set_resource_calendar_rights($id) {
 //   - users Id
 ///////////////////////////////////////////////////////////////////////////////
 function get_all_users() {
-  global $cdg_sql,$ctype_resource;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $query = "SELECT userobm_id FROM UserObm";

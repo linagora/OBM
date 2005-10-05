@@ -1,4 +1,11 @@
 <script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : agenda_js.inc                                               //
+//     - Desc  : Agenda javascript functions File                            //
+// 2005-01-13 Aliacom                                                        //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
 
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
@@ -22,8 +29,8 @@ function check_calendar(form) {
   }
 
   return true;
-  
 }
+
 
 function show_hide_dates(field) {
   target = window.document;
@@ -36,48 +43,6 @@ function show_hide_dates(field) {
     end.style.display = 'inline';
     begin.style.display = 'inline';
   }     
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Remove an element line in the list form
-///////////////////////////////////////////////////////////////////////////////
-function remove_element(elemId,parentId) {
-  target = window.document;
-  content = target.getElementById(elemId);
-  container = target.getElementById(parentId)
-  container.removeChild(content); 
-} 
-
-function check_count_user(formulaire) {
-  var selectObject = formulaire.elements[0];
-  var selectCount  = selectObject.length;
-  var nb_select = 0;
-  for (var i = 0; i < selectCount; i++)
-  {
-    if( selectObject.options[i].selected == true)
-      nb_select ++;
-  }
-  if( nb_select > 6) {
-    alert('$l_too_much_user');
-    return false;
-  }
-  return true;
-}
-
-function check_count_resource(formulaire) {
-  var selectObject = formulaire.elements[0];
-  var selectCount  = selectObject.length;
-  var nb_select = 0;
-  for (var i = 0; i < selectCount; i++)
-  {
-    if( selectObject.options[i].selected == true)
-      nb_select ++;
-  }
-  if( nb_select > 6) {
-    alert('$l_too_much_resource');
-    return false;
-  }
-  return true;
 }
 
 

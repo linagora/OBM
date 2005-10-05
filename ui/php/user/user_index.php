@@ -33,6 +33,7 @@ include("$obminclude/global_pref.inc");
 require("user_display.inc");
 require("user_query.inc");
 require("user_js.inc");
+require("$obminclude/lib/right.inc"); // needed by call from calendar
 
 //There is no page_close(). yes, at the end
 if ($action == "") $action = "index";
@@ -232,7 +233,7 @@ function get_param_user() {
   global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive;
   global $tf_desc, $tf_phone, $tf_phone2, $tf_fax, $tf_fax2;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
-  global $ext_widget,$ext_element;
+  global $ext_widget,$ext_element, $restriction_calendar;
   global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
@@ -251,6 +252,8 @@ function get_param_user() {
   if (isset ($tf_fax)) $obm_user["fax"] = $tf_fax;
   if (isset ($tf_fax2)) $obm_user["fax2"] = $tf_fax2;
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
+
+  if (isset ($restriction_calendar)) $obm_user["restriction_calendar"] = $restriction_calendar;
 
   // External param
   if (isset ($popup)) $obm_user["popup"] = $popup;

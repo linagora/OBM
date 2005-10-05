@@ -308,7 +308,7 @@ function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
     $users_array = array_merge($users_array, $user_group_array);
     $users_array = array_unique($users_array);
   }
-  
+
   $event_id = run_query_insert_event_data($agenda);   
   foreach ($users_array as $user_id) {
     if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
@@ -323,6 +323,7 @@ function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
   $recipient_array = array_diff($users_array, array($uid));
   
   if (count($recipient_array) > 0) {
+    print_r($recipient_array);
     $tmp_filename = secure_tmpname(".ics","ics_");
     create_ics_meeting_file($agenda, $event_id, $recipient_array, $tmp_filename);
     $h_file = array(
@@ -938,8 +939,7 @@ function get_entity_readable() {
   $ent = array(
     "user" => get_calendar_readable(),
     "group" => get_group_readable(),
-    "resource" => get_resource_readable(),
-    "resourcegroup" => run_query_resource_group()
+    "resource" => get_resource_readable()
   );
 
   return $ent;
@@ -1019,10 +1019,10 @@ function run_query_resource_readable() {
 
   $uid = $auth->auth["uid"];
 
-  if ( (is_array($agenda["group_ids"]))
-       && (count($agenda["group_ids"]) == 1)
-       && ($agenda["group_ids"][0] != $c_all) ) {
-    $group_id = $agenda["group_ids"][0];
+  if ( (is_array($agenda["sel_group_id"]))
+       && (count($agenda["sel_group_id"]) == 1)
+       && ($agenda["sel_group_id"][0] != $c_all) ) {
+    $group_id = $agenda["sel_group_id"][0];
     $query = "SELECT distinct r.*,
         c.calendarentityright_read,
         c.calendarentityright_customer_id
@@ -1046,28 +1046,6 @@ function run_query_resource_readable() {
 
   $obm_db = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_resource_readable()");
-  $obm_db->query($query);
-  return $obm_db;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of resource group for the current user
-///////////////////////////////////////////////////////////////////////////////
-function run_query_resource_group() {
-  global $cdg_sql, $auth;
-
-  $uid = $auth->auth["uid"];
-  $where = sql_obm_entity_privacy("rgroup");
-  $query = "
-    SELECT *
-    FROM RGroup
-    WHERE ";
-  $query .= $where;
-  $query .= " ORDER BY rgroup_name";
-
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_resource_group()");
   $obm_db->query($query);
   return $obm_db;
 }

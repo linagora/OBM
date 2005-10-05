@@ -112,6 +112,9 @@ function html_user_search_form($user) {
   $group = $user["group"];
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
+  if ($user["restriction_calendar"]) {
+    $dis_restriction = "<input name=\"restriction_calendar\" type=\"hidden\" value=\"calendar\">";
+  }
 
   if ($popup) {
     $ext_action = $user["ext_action"];
@@ -174,7 +177,8 @@ function html_user_search_form($user) {
       <input name=\"action\" type=\"hidden\" value=\"search\">
       <input name=\"submit\" type=\"submit\" value=\"$l_find\">
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      $ext&nbsp;
+      $dis_restriction
+      $ext
     </div>
     <div class=\"searchEnd\"></div>
   </div>
@@ -195,9 +199,10 @@ function dis_user_search_list($user) {
   global $display, $auth, $new_order, $order_dir;
 
   $popup = $user["popup"];
+  $restriction = $user["restriction_calendar"];
+  $obm_q = run_query_search($user, $new_order, $order_dir, $restriction);
 
   $prefs = get_display_pref($auth->auth["uid"], "user");
-  $obm_q = run_query_search($user, $new_order, $order_dir);
   $nb_user = $obm_q->num_rows_total();
   if ($nb_user == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -251,7 +256,7 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
     if ($ext_element != "") {
       $user_d->data_cb_name = "";
       $user_d->data_form_head = "
-      <form onsubmit=\"fill_ext_element(this); return false;\">";
+      <form onsubmit=\"of_extmod_fill_ext_element(this); return false;\">";
     }
     elseif ($ext_widget != "") {
       $user_d->data_form_head = "

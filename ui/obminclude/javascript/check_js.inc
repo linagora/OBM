@@ -56,5 +56,28 @@ function check_money(field){
   // digits and eventually a '.'
   return field.match($js_regexp_money);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get an Element by its id
+// Parameters:
+//   - doc  :
+//   - name : element id (or name)
+///////////////////////////////////////////////////////////////////////////////
+function get_elem(doc, name) {
+  return doc.getElementById(name);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Remove an element line from the list form
+///////////////////////////////////////////////////////////////////////////////
+function remove_element(elemId,parentId) {
+  target = window.document;
+  content = target.getElementById(elemId);
+  container = target.getElementById(parentId)
+  container.removeChild(content); 
+} 
+
 ";
 </script>

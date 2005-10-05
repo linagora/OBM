@@ -224,7 +224,7 @@ ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 Différents paramètres concernant les utilisateurs, groupes et leur stockage dans le tableau de paramètres :\\
 
-\begin{tabular}{|l|c|p{9.5cm}|}
+\begin{tabular}{|l|p{3cm}|p{8cm}|}
  \hline
  \textbf{Haschage \$agenda} & \textbf{Paramètre} & \textbf{Description} \\
  \hline
@@ -234,11 +234,11 @@ Différents paramètres concernant les utilisateurs, groupes et leur stockage dans
  \hline
   [``new\_group''] & new\_group & Indicateur de sélection d'un nouveau groupe\\
  \hline
-  [``group\_ids''] & sel\_group\_id & Groupes sélectionnés (formulaire rdv) \\ 
+  [``sel\_group\_id''] & sel\_group\_id & Groupes sélectionnés (formulaire rdv) \\ 
  \hline
-  [``sel\_user\_id''] & sel\_ent[``user''] & Utilisateurs sélectionnés \\ 
+  [``sel\_user\_id''] & sel\_user\_id ou sel\_ent[``user''] & Utilisateurs sélectionnés \\ 
  \hline
-  [``sel\_resource\_id''] & sel\_ent[``resource] & Ressources sélectionnées \\ 
+  [``sel\_resource\_id''] & sel\_resource\_id ou sel\_ent[``resource] & Ressources sélectionnées \\ 
  \hline
 \end{tabular}
 
@@ -282,21 +282,19 @@ Affichage d'une vue
 \begin{itemize}
 \item Session inchangée (listes déjà été limitées à \#nb)
 \item Affichage calendriers  : contenu de [user], [resource]
-\item Affichage liste utilisateurs : visible; sélection = [user]
 \item Group sélectionné : inchangé
 \end{itemize}
 \\ 
 
 \hline
-Sélection de 1 ou plusieurs utilisateurs en mode vue
+Sélection de 1 ou plusieurs utilisateurs ou ressources en mode vue
 &
 \begin{itemize}
 \item[-] [user] = sélection d'utilisateurs limitée à \#nb
 \item[-] [group] = inchangé
-\item[-] [resource] = vide
-\item Affichage calendriers : contenu de [user]
-\item Affichage liste utilisateurs : visible (selon groupe); sélection = [user]
-\item Groupe sélectionné : inchangé 
+\item[-] [resource] = sélection de ressources limitée à \#nb - \#nb\_users
+\item Affichage calendriers : contenu de [user] [resource]
+\item Groupe sélectionné : aucun 
 \end{itemize}
 \\ 
 
@@ -308,21 +306,7 @@ Sélection de 1 groupe mode vue
 \item[-] [group] = groupe sélectionné
 \item[-] [resource] = vide
 \item Affichage calendriers : contenu de [user]
-\item Affichage liste utilisateurs : visible du groupe; sélection = [user]
 \item Group sélectionné : le groupe sélectionné
-\end{itemize}
-\\ 
-
-\hline
-Sélection ``Tout le monde'' (desselection d'un groupe)
-&
-\begin{itemize}
-\item[-] [user] = [user]
-\item[-] [group] = vide
-\item[-] [resource] = vide
-\item Affichage calendriers : contenu de [user]
-\item Affichage liste utilisateurs : visible; sélection = [user]
-\item Group sélectionné : aucun
 \end{itemize}
 \\ 
 
@@ -333,7 +317,7 @@ Fenêtre nouveau rdv
 \item Session inchangée (listes déjà été limitées à \#nb)
 \item Utilisateurs pré-sélectionnés : contenu de [user] 
 \item Groupes pré-sélectionnés : contenu de [group] 
-\item Ressources pré-sélectionnées : contenu de [resource] 
+\item Ressources pré-sélectionnées : contenu de [resource]
 \end{itemize}
 \\ 
 
@@ -341,13 +325,12 @@ Fenêtre nouveau rdv
 Création rdv : Sélection de 1 ou plusieurs utilisateurs, groupes, ressources
 &
 \begin{itemize}
+\item[Note] Les vues limitent les sélections, non les insertions
 \item[-] [user] = utilisateurs sélectionnés, limité à \#nb
 \item[-] [group] = groupes sélectionnés
-\item[-] [resource] = ressources sélectionnées
-%%\item[-] ``total\_user'' = [user] + users fournis par [group], limité à \#nb
+\item[-] [resource] = ressources sélectionnées limité à \#nb - \#nb\_users
 \item Affichage calendriers  : contenu de [user], [resource] 
-\item Affichage liste utilisateurs : visible; sélection = [user]
-\item Group sélectionné : inchangé
+\item Group sélectionné : aucun
 \end{itemize}
 \\
 
