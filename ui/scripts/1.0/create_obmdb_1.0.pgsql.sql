@@ -439,6 +439,7 @@ CREATE TABLE Deal (
   deal_marketingmanager_id  integer,
   deal_technicalmanager_id  integer,
   deal_dateproposal         date,
+  deal_dateexpected         date,
   deal_amount               decimal(12,2),
   deal_hitrate              integer DEFAULT 0,
   deal_status_id            integer,
@@ -491,7 +492,7 @@ CREATE TABLE DealCategory (
   dealcategory_timecreate  timestamp,
   dealcategory_userupdate  integer default 0,
   dealcategory_usercreate  integer default 0,
-  dealcategory_code        integer default 0,
+  dealcategory_code        varchar(10) default '',
   dealcategory_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (dealcategory_id)
 );

@@ -279,6 +279,16 @@ ALTER TABLE ContactCategory2 RENAME COLUMN temp_code TO contactcategory2_code;
 
 
 -------------------------------------------------------------------------------
+-- DealCategory table update
+-------------------------------------------------------------------------------
+-- update _code to varchar(10)
+ALTER TABLE DealCategory ADD COLUMN temp_code VARCHAR(10);
+UPDATE DealCategory SET temp_code = dealcategory_code;
+ALTER TABLE DealCategory DROP COLUMN dealcategory_code;
+ALTER TABLE DealCategory RENAME COLUMN temp_code TO dealcategory_code;
+
+
+-------------------------------------------------------------------------------
 -- Company and Contact Category Link tables index for performance
 -------------------------------------------------------------------------------
 CREATE INDEX compcat_idx_comp ON CompanyCategoryLink (companycategorylink_company_id);
@@ -291,6 +301,13 @@ CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_con
 -------------------------------------------------------------------------------
 ALTER TABLE UserObmGroup ADD PRIMARY KEY (userobmgroup_group_id, userobmgroup_userobm_id);
 ALTER TABLE GroupGroup ADD PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id);
+
+
+-------------------------------------------------------------------------------
+-- Deal table update
+-------------------------------------------------------------------------------
+-- add _dateexpected
+ALTER TABLE Deal ADD COLUMN deal_dateexpected date;
 
 
 -------------------------------------------------------------------------------

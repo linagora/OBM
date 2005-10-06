@@ -282,9 +282,16 @@ CREATE TABLE Subscription (
 -------------------------------------------------------------------------------
 -- ContactCategory tables updates
 -------------------------------------------------------------------------------
--- 
+-- update _code to varchar(10)
 ALTER TABLE ContactCategory1 MODIFY COLUMN contactcategory1_code varchar(10) DEFAULT '';
 ALTER TABLE ContactCategory2 MODIFY COLUMN contactcategory2_code varchar(10) DEFAULT '';
+
+
+-------------------------------------------------------------------------------
+-- DealCategory table update
+-------------------------------------------------------------------------------
+-- update _code to varchar(10)
+ALTER TABLE DealCategory MODIFY COLUMN dealcategory_code varchar(10) DEFAULT '';
 
 
 -------------------------------------------------------------------------------
@@ -300,6 +307,13 @@ CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_con
 -------------------------------------------------------------------------------
 ALTER TABLE UserObmGroup ADD PRIMARY KEY (userobmgroup_group_id, userobmgroup_userobm_id);
 ALTER TABLE GroupGroup ADD PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id);
+
+
+-------------------------------------------------------------------------------
+-- Deal table update
+-------------------------------------------------------------------------------
+-- add _dateexpected
+ALTER TABLE Deal ADD COLUMN deal_dateexpected date after deal_dateproposal;
 
 
 -------------------------------------------------------------------------------
