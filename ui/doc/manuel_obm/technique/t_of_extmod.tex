@@ -1,0 +1,104 @@
+% Documentation technique d'OBM : OF : Gestion de modules externes
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\subsection{Aide à la gestion de modules externes}
+\label{of_extmod}
+
+L'appel de modules externes est standardisé dans obm (voir \ref{extmod}) et constitue le mécanisme qui permet de récupérer des informations d'un module depuis un autre (exemple: ajouter des utilisateurs à un groupe; le module groupe fait appel au module utilisateur).\\
+
+L'aide à la gestion de modules externes propose une série de fonctions génériques implémentant la communication entre les fenêtres appelante et popup.
+
+Actuellement les communications prises en comptes sont :\\
+
+\begin{itemize}
+\item Liste de résultat (Popup) renseigne un ensemble d'éléments (fenêtre appelante) (exemple: ajout d'utilisateur dans l'écran de création de rendez-vous, ou dans la gestion des droits).
+\end{itemize}
+\vspace{0.3cm}
+
+Ces fonctionalités sont fournies par le fichier \fichier{of/of\_extmod.tex}
+
+
+\subsubsection{Liste de résultat vers ensemble d'éléments}
+
+Ce mode permet de renseigner un objet Multivalué en présentant un affichage plus riche et convivial qu'un widget de type SELECT, avec les fonctionnalités :\\ 
+
+\begin{itemize}
+\item Seules sont affichées les entités sélectionnées
+\item Possibilité de supprimer une entité de l'ensemble
+\item Possibilité d'insérer dans l'ensemble des entités de types différents (des utilisateurs + des ressources)
+\end{itemize}
+\vspace{0.3cm}
+
+Ce mode est par exemple utilisé par la gestion des droits acl, par la sélection d'utilisateurs et de ressources dans les vues de l'agenda, par la sélection d'utilisateurs et groupes pour un nouvel événement,...
+
+
+\paragraph{Le principe} consiste à gérer un widget multivalué (sel[]) caché, et de gérer simultanément un élément <div> (pour l'affichage) pour chaque entité sélectionnée.
+
+L'élément désigne le widget global et doit être le nom donné au container et au widget multivalué (chaque champ input).
+
+Pour chaque entité on trouve :\\
+\begin{itemize}
+\item une ligne de l'élément : <div>
+\item un champ input du widget
+\end{itemize}
+\vspace{0.3cm}
+
+La section <div> contient un texte et une image et le clic sur l'image efface automatiquement cette ligne.
+Le champ input est inclus dans le div. La suppression de la ligne div supprime par ce fait le champ input et donc l'entité ou ligne de l'élément.
+
+\paragraph{Le nommage de l'élément} : Une ligne d'élément div doit être unique pour la page.
+Comme il peut y avoir plusieurs éléments dans une même page (exemple: liste d'utilisateurs avec droits de lecture et liste d'utilisateurs avec droits d'écriture dans une page de gestion des droits acl), le nom (ou id) du div doit contenir le nom de l'élément.
+Comme un élément peut contenir plusieurs types d'entités (exemple: utilisateurs et ressources), le nom du div doit contenir le type de l'entité en plus de l'id de l'entité.
+
+Principe de nommage.\\
+
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Elément} & \textbf{Input (valeur)} & \textbf{Id du div} \\
+\hline
+sel\_user\_id & data-user-\$id & sel\_user\_id-data-user-\$id \\
+\hline
+\end{tabular}
+
+
+\paragraph{Code XHTML d'un Elément avec 1 ligne} :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+<td class="detail" id="sel_ent">
+  <div class="elementRow" id="sel_ent-data-user-6">
+    <a href="javascript: remove_element('sel_ent-data-user-6','sel_ent');">
+    <img src="http://obm/images/standard/ico_calendar0.gif">
+    </a>
+    Pierre BAUDRACCO
+    <input value="data-user-6" name="sel_ent[]" type="hidden" />
+  </div>
+\end{verbatim}
+\end{minipage}
+}
+
+
+\paragraph{Implémentation : module popup}
+
+Le module appelé va utiliser les fonctions définies par cette bibliothèque pour renseigner l'élément du module appelant.
+
+C'est le module appelé (popup) qui doit donc inclure la librairie (\fichier{of\_extmod.inc}).
+Ce module doit aussi ajouter un cas à la fonction \fonction{dis\_data\_module()} (qui gère l'affichage des résultats), pour retourner la valeur à insérer (data-module-\$id) dans l'élément pour une ligne de résultat cochée.
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_extmod_fill_ext_element(int_form) {
+\end{verbatim}
+\end{minipage}
+}
+Fonction Javascript qui renseigne l'élément de la fenêtre appelante en fonction des cases cochées dans la liste de résultat.
+Exemple: Liste des utilisateurs qui ont le droit de voir l'agenda d'un utilisateur.
+
+Cette fonction est appelée à la validation (soumission du formulaire) des résultats sélectionnés dans la fenêtre popup.

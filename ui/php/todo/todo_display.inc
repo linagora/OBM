@@ -109,7 +109,7 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 
   $uid = $todo["uid"];
   $title = $todo["title"];
-  $users = $todo["sel_user"];
+  $users = $todo["sel_user_id"];
   $user = $users[0];
   $priority = $todo["priority"];
 
@@ -245,8 +245,8 @@ function dis_todo_form($todo, $todo_q = 0) {
   if (isset($todo["percent"])) { $percent = $todo["percent"]; }
   if (isset($todo["deadline"])) { $deadline = $todo["deadline"]; }
   if (isset($todo["content"])) { $content = $todo["content"]; }
-  if (is_array($todo["sel_user"])) {
-    $p_user_array = $todo["sel_user"];
+  if (is_array($todo["sel_user_id"])) {
+    $p_user_array = $todo["sel_user_id"];
   } else if ($u_id > 0) {
     $p_user_array = array($u_id);
   } else {
@@ -261,12 +261,14 @@ function dis_todo_form($todo, $todo_q = 0) {
     $u_lname = $usr_q->f("userobm_lastname");
     $u_fname = $usr_q->f("userobm_firstname");
     if (in_array($u_id, $p_user_array)) {
-      $dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
-      <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
+      $sel_id = "data-user-$u_id";
+      $div_id = "sel_user_id-$sel_id";
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $u_lname $u_fname
-      <input value=\"$u_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
     }
   }

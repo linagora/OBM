@@ -13,8 +13,6 @@
 // EntityCategory (id, time and user * update and create, code, label)
 // EntityCategoryLink (category_id, entity_id)
 
-// Passer en mode suppression type category contact
- 
 $extra_js .= "
 ///////////////////////////////////////////////////////////////////////////////
 // Category Functions
@@ -95,11 +93,12 @@ function fill_ext_cat_element(int_form) {
   for (i=0; i <size; i++) {
     if (int_form.elements[i].type == 'checkbox') {
       if (int_form.elements[i].checked == true) {
-	elemid = '$ext_target'+int_form.elements[i].name;
+        id = int_form.elements[i].name;
+	elemid = '$ext_target-data-'+id;
         if (!get_elem(window.opener.document, elemid )) {
-          elemid = 'data'+int_form.elements[i].name;
+          elemid = 'data'+id;
 	  span = get_elem(window.document,elemid);
-	  add_element('$ext_target' + '[]',int_form.elements[i].name, span.innerHTML);
+	  add_element('$ext_target' + '[]', id, span.innerHTML);
         }
       }
     }
@@ -158,12 +157,14 @@ function of_category_dis_entity_form($cats, $cat_num="", $entity) {
 	$c_id = $one_cat["id"];
 	$c_code = $one_cat["code"];
 	$c_label = htmlentities($one_cat["label"]);
-	$sel_cat .= "<div class=\"elementRow\" id=\"data$c_id\">
-        <a href=\"javascript: remove_element('data$c_id','sel_cat$cat_num');\">
+	$sel_name = "sel_cat$cat_num";
+	$div_id = "$sel_name-data-$c_id";
+	$sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','$sel_name');\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
         </a>
         $c_code $c_label
-        <input value=\"$c_id\" name=\"sel_cat${cat_num}[]\" type=\"hidden\" />
+        <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
         </div>";
       }
     }
@@ -420,7 +421,6 @@ function of_category_compare($m, $n) {
 
   return 0;
 }
-
 
 
 ?>

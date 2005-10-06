@@ -911,7 +911,7 @@ function dis_company_form($action, $company) {
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
       if ($show_cat) {
-	$compcat = of_category_get_ordered("company", "category", $c_id);
+	$cats = of_category_get_ordered("company", "category", $c_id);
       }
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
@@ -936,7 +936,7 @@ function dis_company_form($action, $company) {
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();
 
-  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $compcat, $ctry_q, $company);
+  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cats, $ctry_q, $company);
 
   return $block;
 }
@@ -958,7 +958,7 @@ function dis_company_form($action, $company) {
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $compcat, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cats, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
@@ -1094,50 +1094,9 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
       <td class=\"detailForm\">$sel_kind</td>";
   }
 
-  // Cat select field
-  if ($show_cat) {
-    $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
-    $j = 0;
-    if (is_array($compcat)) {
-      foreach ($compcat as $cat_info) {
-	$c_id = $cat_info["id"];
-	$c_code = $cat_info["code"];
-	$c_label = $cat_info["label"];
-
-	  $sel_cat .= "\n<option value=\"$c_id\"";
-	  $sel_cat .= " selected=\"selected\""; 
-	  $j++;
-	  $length = 8 - strlen($c_code);
-	  $label = $c_code;
-	  for ($i=0;$i<$length;$i++) {
-	    $label .= "&nbsp;";
-	  }
-	  $label .= "$c_label";
-	  $sel_cat .= ">$label</option>";
-
-      }
-    }
-    $sel_cat .= "</select>";
-
-    $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=sel_cat"; 
-    $block_cat = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category</td>
-      <td class=\"detailForm\">    
-       <table>
-	<tr><td>
-	  $sel_cat 
-	</td><td>
-	  <a href=\"javascript: return false;\" style=\"float:right;\"
-	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" /></a>
-	</td></tr>
-       </table>
-      </td>";
-
   // Category select field
-  $block_cat = of_category_dis_entity_form($cats, "", "company");
-
+  if ($show_cat) {
+    $block_cat = of_category_dis_entity_form($cats, "", "company");
   }
 
   // Activity select field

@@ -1,0 +1,95 @@
+% Documentation technique d'OBM : Gestion des catégories
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\subsection{Gestion des catégories}
+\label{of_category}
+
+\obm gère des catégories multivaluées (n-n) pour plusieurs modules : \company, \contact, \deal... et il est souvent demandé d'ajouter des catégories lors de l'intégration de projets clients.
+
+Toutes ces catégories fonctionnent selon le même principe et possèdent le même format de stockage.
+
+Cette librairie propose une gestion générique des catégories avec liaisons n-n offrant :\\
+
+\begin{itemize}
+\item Gestion de catégories avec codes (1.2.10, 3.2,...) et labels
+\item Fonctions de gestion des champs catégorie de formulaire
+\item Affichage en mode arborescence, avec sélection simple ou multiple
+\end{itemize}
+\vspace{0.3cm}
+
+Les fonctionalités de catégories sont fournies par le fichier \fichier{of/of\_category.tex}
+
+
+\subsubsection{Modèle de stockage générique}
+
+Pour une catégorie d'un module, 2 tables doivent être créées :\\
+
+\begin{itemize}
+\item ModuleCategory (ou ModuleCategory2 si plusieurs catégories pour le module)
+\item ModuleCategoryLink (ou ModuleCategory2Link)
+\end{itemize}
+\vspace{0.3cm}
+
+Table des informations d'une catégorie, ModuleCategory (ex: CompanyCategory) :\\
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Id de la catégorie & \\
+\hline
+\_code & varchar 10 & Code de la catégorie & ex: 1.0, 1.1, 1.1.4 \\
+\hline
+\_label & varchar 100 & Label de la catégorie & \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Table des informations de liaison d'une catégorie avec un module, ModuleCategoryLink (ex: CompanyCategoryLink) :\\
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description}\\
+\hline
+\_category\_id & int 8 & Id de la catégorie\\
+\hline
+\_company\_id & int 8 & Id de l'entité du module\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_category_dis_tree($params, $action, $entity, $cat) {
+\end{verbatim}
+\end{minipage}
+}
+Affichage de l'arborescence de la catégorie ``\$cat'' pour l'entité (souvent module) \$entity.
+Si l'action demandée est du type ext\_get\_cat[1-9]?\_ids, l'affichage propose une sélection par checkbox, sinon une sélection directe unique par lien.\\
+
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_category_get_ordered($entity, $cat, $entity_id=0) {
+$right="read") {
+\end{verbatim}
+\end{minipage}
+}
+Récupération de la liste des catégories pour la catégorie ``\$cat\" de l'entité ``\$entity''. Si un id est donné (\$entity\_id), seules les catégories liées à cette entité sont retournées.\\
+
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function of_category_dis_entity_form($cats, $cat_num="", $entity) {
+\end{verbatim}
+\end{minipage}
+}
+
+Fonction d'affichage du champ catégorie pour le formulaire du module \$entity. \$cat\_num est le numéro de la catégorie (cas ou plusieurs catégories pour la même entité).

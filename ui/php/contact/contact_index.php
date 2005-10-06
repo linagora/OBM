@@ -72,16 +72,19 @@ if ($action == "ext_get_ids") {
   }
 
 } elseif ($action == "ext_get_cat1_ids") {
+///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category1");
 
 } elseif ($action == "ext_get_cat2_ids") {
+///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category2");
 
 } elseif ($action == "vcard") {
+///////////////////////////////////////////////////////////////////////////////
   dis_vcard_export($contact);
   exit();
 

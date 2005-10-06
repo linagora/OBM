@@ -172,10 +172,24 @@ function get_param_todo() {
   // Todo form
   if (isset ($tf_title)) $todo["title"] = $tf_title;
   if (isset ($tf_deadline)) $todo["deadline"] = $tf_deadline;
-  if (isset ($sel_user_id)) $todo["sel_user"] = $sel_user_id;
   if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
   if (isset ($tf_percent)) $todo["percent"] = $tf_percent;
   if (isset ($ta_content)) $todo["content"] = $ta_content;
+
+  // sel_user_id can be filled by sel_user_id or sel_ent (see below)
+  if (is_array($sel_user_id)) {
+    while ( list( $key, $value ) = each( $sel_user_id ) ) {
+      // sel_user_id contains select infos (data-user-$id)
+      if (strcmp(substr($value, 0, 10),"data-user-") == 0) {
+	$data = explode("-", $value);
+	$id = $data[2];
+	$todo["sel_user_id"][] = $id;
+      } else {
+	// direct id
+	$todo["sel_user_id"][] = $value;
+      }
+    }
+  }
 
   display_debug_param($todo);
 
