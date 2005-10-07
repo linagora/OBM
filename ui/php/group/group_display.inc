@@ -402,7 +402,7 @@ function html_group_form($action, $group_q, $group) {
 //   - $uid     : user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_consult($group, $uid) {
-  global $c_all, $cdg_sql, $ctu_sql_limit;
+  global $ctu_sql_limit;
 
   $g_id = $group["id"];
 

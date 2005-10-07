@@ -217,7 +217,7 @@ if (($action == "index") || ($action == "")) {
   $prefs_u = get_display_pref($uid, "group_user", 1);
   $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
 
-} else if($action == "dispref_level") {
+} else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
   $prefs = get_display_pref($uid, "group", 1);

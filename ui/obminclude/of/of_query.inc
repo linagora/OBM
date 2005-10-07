@@ -1110,13 +1110,15 @@ function run_query_resource_in($resources) {
 function get_user_id($login) {
   global $cdg_sql;
 
-  $obm_q = new DB_OBM ;
   if (isset($login)) {
-    $query = "select userobm_id from UserObm where userobm_login='$login'";
+    $query = "SELECT userobm_id FROM UserObm WHERE userobm_login='$login'";
+
     display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
     $obm_q->query($query) ;
     $obm_q->next_record() ;
     return $obm_q->f("userobm_id") ;
+
   } else {
     return "" ;
   }
@@ -1140,22 +1142,18 @@ function get_user_info($id="") {
 
   if ($id == "") $id = $auth->auth["uid"];
 
-  $query = "SELECT userobm_login,
-      userobm_perms,
-      userobm_lastname,
-      userobm_firstname,
-      userobm_datebegin,
+  $query = "SELECT *,
       $datebegin
     FROM UserObm
     WHERE userobm_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query) ;
-  $obm_q->next_record() ;
-  $u["login"] = $obm_q->f("userobm_login");
-  $u["perms"] = $obm_q->f("userobm_perms");
-  $u["lastname"] = $obm_q->f("userobm_lastname");
-  $u["firstname"] = $obm_q->f("userobm_firstname");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  foreach ($obm_q->Record as $key => $user) {
+    $small_key = str_replace("userobm_", "", $key);
+    $u[$small_key] = $user;
+  }
   $u["datebegin"]["iso"] = $obm_q->f("userobm_datebegin");
   $u["datebegin"]["unix_timestamp"] = $obm_q->f("datebegin");
 

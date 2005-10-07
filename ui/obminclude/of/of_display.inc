@@ -200,7 +200,7 @@ class OBM_DISPLAY {
       } else {
         $new_order = $fieldorder + 1;
 	$block .= "
-        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;new_level=down&amp;fieldorder=$new_order")."\">
+        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$new_order")."\">
           <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
       }
       
@@ -212,7 +212,7 @@ class OBM_DISPLAY {
         $new_order = $fieldorder - 1;
 	$block .= "
         <td>
-          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;new_level=up&amp;fieldorder=$new_order")."\">
+          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$new_order")."\">
           <img alt=\"$l_up\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       $block .= "
