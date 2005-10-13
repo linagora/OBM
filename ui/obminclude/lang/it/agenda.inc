@@ -90,7 +90,6 @@ $l_conflict_events = "Conflitto di appuntamenti";
 $l_unknown="Sconosciuto";
 
 $l_header_meeting		= "Nuova riunione";
-$l_header_right			= "gestione dei diritti";
 $l_header_admin			= "amministratore";
 $l_header_export		= "esporta";
 $l_meeting_legend		= "legenda";

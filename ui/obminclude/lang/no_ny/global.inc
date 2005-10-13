@@ -137,5 +137,6 @@ $l_header_day = "Jour";
 $l_header_week = "Semaine";
 $l_header_month = "Mois";
 $l_header_new_event = "Nouveau rdv";
+$l_header_right = "Right management";
 
 $l_header_admin_ref = "Referential";

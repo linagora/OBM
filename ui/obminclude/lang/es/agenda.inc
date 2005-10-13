@@ -121,7 +121,6 @@ $l_category_manage = "Manejo de Categorías de Agenda";
 $l_category_exist = "Categorías Existentes";
 $l_header_meeting = "Nueva reunión";
 $l_category_new = "Nueva Categoría";
-$l_header_right = "Manejo de permisos";
 $l_header_export = "Exportar";
 $l_header_admin = "Administración";
 $l_authorize_list = "Personas autorizadas";

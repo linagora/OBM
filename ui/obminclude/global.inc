@@ -104,6 +104,8 @@ $cagenda_weekstart = "monday + 2 hours";
 // Calendar first and last hour display
 $cagenda_first_hour = 8;
 $cagenda_last_hour = 20;
+// Calendar Resource usage
+$cagenda_resource = true;
 
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;

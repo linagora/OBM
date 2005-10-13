@@ -25,7 +25,6 @@ if (! is_dir($cdocument_root)) {
     echo "The document repository root can not be created. Check the path\n";
     exit(1);
   }
-  exit(1);
 }
 
 // Check that repository root is writable
@@ -58,5 +57,5 @@ for ($dir_num = 1; $dir_num < 10; $dir_num++) {
 }
 
 echo "Success : Document repository created and initialized\n";
-
+exit(0);
 </script>

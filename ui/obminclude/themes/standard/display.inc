@@ -113,9 +113,7 @@ function display_head($p_module) {
   $dis_extra_css
   $file_js
 <script type=\"text/javascript\">
-<!--
   $extra_js
-// -->
 </script>
 </head>
 
@@ -151,7 +149,7 @@ function generate_menu($module) {
 <a href=\"$path/obm.php\">
 <img src=\"".C_IMAGE_PATH."/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' />
 </a>
-<span id='version'>OBM v.".$obm_version." Société Aliacom</span> 
+<span id='version'>OBM v.".$obm_version." Aliacom</span> 
 <!-- Login -->
 <ul class='login'>
 <li><img src='".C_IMAGE_PATH."/".$set_theme."/login.gif' alt='' /> $l_login : $login</li>

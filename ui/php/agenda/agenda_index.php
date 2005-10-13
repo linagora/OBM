@@ -128,7 +128,7 @@ if ($action == "index") {
     $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
   }
 
-} elseif($action == "decision") {
+} elseif ($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
   if (!$agenda["force"] && $conflicts = check_for_decision_conflict($agenda)) {
     require("$obminclude/calendar.js");
@@ -201,9 +201,9 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($agenda["id"] > 0) {
     $eve_q = run_query_detail($agenda["id"]);
-    $attendee_q = run_query_event_attendees($agenda["id"]);
+    $entities = get_event_entity($agenda["id"]);
     $display["detailInfo"] = display_record_info($eve_q);
-    $display["detail"] = html_calendar_consult($eve_q, $attendee_q);
+    $display["detail"] = html_calendar_consult($eve_q, $entities);
   }
 
 } elseif ($action == "detailupdate") {
@@ -211,7 +211,7 @@ if ($action == "index") {
 if ($agenda["id"] > 0) {  
   require("$obminclude/calendar.js");
   require("agenda_js.inc");
-  $eve_q = run_query_detail($agenda["id"]);  
+  $eve_q = run_query_detail($agenda["id"]);
   $cal_entity_id["user"] = get_event_users_info($agenda["id"]);
   $display["detailInfo"] = display_record_info($eve_q);
   $display["detail"] = dis_event_form($action, $agenda, $eve_q, $cal_entity_id);
@@ -355,7 +355,7 @@ function get_param_agenda() {
   global $tf_date_end, $sel_time_end, $sel_min_end;
   global $sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
   global $param_user, $param_group, $new_group, $sel_user_id, $sel_group_id;
-  global $sel_ent, $new_sel;
+  global $sel_resource_id, $sel_ent, $new_sel;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
@@ -484,6 +484,21 @@ function get_param_agenda() {
     }
   }
 
+  // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
+  if (is_array($sel_resource_id)) {
+    while ( list( $key, $value ) = each( $sel_resource_id ) ) {
+      // sel_resource_id contains select infos (data-resource-$id)
+      if (strcmp(substr($value, 0, 14),"data-resource-") == 0) {
+	$data = explode("-", $value);
+	$id = $data[2];
+	$agenda["sel_resource_id"][] = $id;
+      } else {
+	// direct id
+	$agenda["sel_resource_id"][] = $value;
+      }
+    }
+  }
+
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
@@ -491,7 +506,7 @@ function get_param_agenda() {
   }
 
   if (isset ($http_obm_vars)) {
-    print_r($http_obm_vars["sel_ent"]);
+    //    print_r($http_obm_vars["sel_ent"]);
     if (is_array($http_obm_vars["sel_ent"])) {
       $nb_data = 0;
       $nb["user"] = 0;

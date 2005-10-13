@@ -39,13 +39,15 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $if_country = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name");
 
   // only the one which are allowed (ie. publics )
   $where .= sql_obm_entity_privacy("contact");
 
   // If company module used (external from Contact)
   if ($cgp_show["module"]["company"]) {
+    $if_ctry = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name");
+    $if_country = ",
+      $if_ctry as country_name";
     $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
     $join_ctry2 = "LEFT JOIN Country as ctry2 ON
                   Company.company_country_iso3166 = ctry2.country_iso3166
@@ -61,6 +63,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       company_expresspostal,
       ctry2.country_name as company_country,";
   } else {
+    $company_fields = "contact_company as company_name,";
     $company_fields = "contact_company as company_name,";
   }
 
@@ -194,8 +197,8 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_archive,
       contact_privacy,
       $company_fields
-      function_label as contact_function,
-      $if_country as country_name
+      function_label as contact_function
+      $if_country
     FROM Contact
         $join_comp
         LEFT JOIN Kind ON contact_kind_id = kind_id

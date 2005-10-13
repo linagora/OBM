@@ -61,33 +61,6 @@ function run_query_detail($param_event) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return events users
-// Parameters: 
-//   - $param_event
-///////////////////////////////////////////////////////////////////////////////
-function run_query_event_attendees($param_event) {
-  global $cdg_sql;
-
-  $query = "SELECT DISTINCT
-    userobm_id,
-    userobm_lastname,
-    userobm_firstname,
-    evententity_state as state
-  FROM EventEntity
-    LEFT JOIN UserObm ON evententity_entity_id = userobm_id
-  WHERE 
-    evententity_event_id = '$param_event' AND 
-    evententity_entity = 'user'";
-
-  display_debug_msg($query, $cdg_sql, "run_query_event_attendees()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return all the name and first name of users
 // Parameters: 
 //   - $users : users id array, the event is assigned to 
@@ -108,6 +81,7 @@ function run_query_get_user_name($users="") {
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the label of resources
@@ -271,13 +245,13 @@ function run_query_waiting_events() {
 // Parameters:
 //   - $agenda[] : hash values for the event
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_user_event($agenda) {
+function run_query_delete_event_entity($agenda) {
   global $cdg_sql;
 
   $e_id = $agenda["id"];
   $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$e_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_user_event()");
+  display_debug_msg($query, $cdg_sql, "run_query_delete_event_entity()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 } 
@@ -293,13 +267,16 @@ function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
   global $uid, $l_from, $l_to, $l_date;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
 
+  echo "<p>sel:";
+  print_r($sel_entity_id);
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $mail  = $agenda["mail"];
   $groups = $sel_entity_id["group"];
   $mail_title = stripslashes($agenda["title"]);
   $datebegin = $agenda["datebegin"];
   $dateend = $agenda["dateend"];
-  
+
+  // Get the final user list (merge group)
   $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
     foreach($groups as $group_id) {
@@ -310,20 +287,33 @@ function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
   }
 
   $event_id = run_query_insert_event_data($agenda);   
+
   foreach ($users_array as $user_id) {
     if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
-      run_query_insert_user_event($user_id,$event_id,'A');	
+      run_query_insert_entity_event("user", $user_id, $event_id, 'A');
     } else {
-      run_query_insert_user_event($user_id,$event_id,'W');	
+      run_query_insert_entity_event("user", $user_id, $event_id, 'W');
     }
   }
+
+  // Get the final resource list and insert resource links
+  $resources_array = $sel_entity_id["resource"];
+  if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
+    $resources_array = array_unique($resources_array);
+    $writable_res = of_right_entity_for_consumer("resource", "user", $uid, "write");
+    foreach ($resources_array as $res_id) {
+      if (in_array($res_id, $writable_res["ids"])) {
+	run_query_insert_entity_event("resource", $res_id, $event_id, 'A');
+      }
+    }
+  }    
 
   $subject = "$l_add_event_mail_subject" . $mail_title;
   $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend";
   $recipient_array = array_diff($users_array, array($uid));
   
   if (count($recipient_array) > 0) {
-    print_r($recipient_array);
+    //    print_r($recipient_array);
     $tmp_filename = secure_tmpname(".ics","ics_");
     create_ics_meeting_file($agenda, $event_id, $recipient_array, $tmp_filename);
     $h_file = array(
@@ -420,11 +410,12 @@ function run_query_insert_event_data($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 // Insert an occurence of a event
 // Parameters: 
-//   - $user_id :
-//   - $event_id :
-//   - $state :
+//   - $entity : entity type "user", "resource"
+//   - $entity_id :
+//   - $event_id  :
+//   - $state     :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_user_event($user_id,$event_id,$state){
+function run_query_insert_entity_event($entity, $entity_id,$event_id, $state) {
   global $cdg_sql;
 
   $query = "INSERT INTO EventEntity (
@@ -435,12 +426,12 @@ function run_query_insert_user_event($user_id,$event_id,$state){
     evententity_state) 
   VALUES (
     '$event_id',
-    '$user_id',
-    'user',
+    '$entity_id',
+    '$entity',
     '0',
     '$state')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_insert_user_event()");
+  display_debug_msg($query, $cdg_sql, "run_query_entity_user_event()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q; 
@@ -695,6 +686,7 @@ function run_query_event_update($agenda, $sel_entity_id, &$event_id) {
   $mail_title = stripslashes($agenda["title"]);
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
 
+  // Get the final user list
   $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
     foreach($groups as $group_id) {
@@ -703,7 +695,14 @@ function run_query_event_update($agenda, $sel_entity_id, &$event_id) {
     $users_array = array_merge($users_array,$user_group_array);
     $users_array = array_unique($users_array);
   }
-  
+
+  // Get the final resource list
+  $resources_array = $sel_entity_id["resource"];
+  if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
+    $resources_array = array_unique($resources_array);
+    $writable_res = of_right_entity_for_consumer("resource", "user", $uid, "write");
+  }    
+
   $event_data = run_query_detail($event_id);
   $old_begin = isodate_format($event_data->f("calendarevent_date"),"", 1);
   $old_end = isodate_format($event_data->f("calendarevent_date") + $event_data->f("calendarevent_duration"),"",1);
@@ -747,12 +746,23 @@ function run_query_event_update($agenda, $sel_entity_id, &$event_id) {
   // XXXX bizarre les old_end et old_begin semblent etre affectes par l'update
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
   run_query_update_event_data($agenda);  
-  run_query_delete_user_event($agenda);
+  run_query_delete_event_entity($agenda);
+
+  // User insertion
   foreach($users_array as $user_id) {
-    if ($user_id == $uid || in_array($user_id,$writable_cal["ids"])) {
-      run_query_insert_user_event($user_id,$event_id,'A');	
+    if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
+      run_query_insert_entity_event("user", $user_id, $event_id, 'A');	
     } else {
-      run_query_insert_user_event($user_id,$event_id,'W');	
+      run_query_insert_entity_event("user", $user_id, $event_id, 'W');	
+    }
+  }
+
+  // Resource insertion
+  if (is_array($resources_array)) {
+    foreach ($resources_array as $res_id) {
+      if (in_array($res_id, $writable_res["ids"])) {
+	run_query_insert_entity_event("resource", $res_id, $event_id, 'A');
+      }
     }
   }
 
@@ -1300,6 +1310,71 @@ function get_event_users_info($id) {
   }
 
   return $users_array;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return event entities
+// Parameters: 
+//   - $param_event
+///////////////////////////////////////////////////////////////////////////////
+function get_event_entity($param_event) {
+  global $cdg_sql;
+
+  // Optimisation possible : 1 seule requete pour toutes les entites
+
+  $query = "SELECT DISTINCT
+    userobm_id,
+    userobm_lastname,
+    userobm_firstname,
+    evententity_entity,
+    evententity_entity_id,
+    evententity_state as state
+  FROM EventEntity
+    LEFT JOIN UserObm ON evententity_entity_id = userobm_id
+  WHERE 
+    evententity_event_id = '$param_event' AND 
+    evententity_entity = 'user'";
+
+  display_debug_msg($query, $cdg_sql, "get_event_entity(1)");
+  $u_q = new DB_OBM;
+  $u_q->query($query);
+  while ($u_q->next_record()) {
+    $entity = $u_q->f("evententity_entity");
+    $entity_id = $u_q->f("evententity_entity_id");
+    $state = $u_q->f("state");
+    $label = $u_q->f("userobm_lastname"). " " .$u_q->f("userobm_firstname");
+    $entities[$entity]["ids"][] = $entity_id;
+    $entities[$entity]["entity"][$entity_id] = array("label"=> $label,
+						     "state" => $state);
+  }
+
+  $query = "SELECT DISTINCT
+    resource_id,
+    resource_name,
+    evententity_entity,
+    evententity_entity_id,
+    evententity_state as state
+  FROM EventEntity
+    LEFT JOIN Resource ON evententity_entity_id = resource_id
+  WHERE 
+    evententity_event_id = '$param_event'
+    AND evententity_entity = 'resource'";
+
+  display_debug_msg($query, $cdg_sql, "get_event_entity(2)");
+  $r_q = new DB_OBM;
+  $r_q->query($query);
+  while ($r_q->next_record()) {
+    $entity = $r_q->f("evententity_entity");
+    $entity_id = $r_q->f("evententity_entity_id");
+    $state = $r_q->f("state");
+    $label = $r_q->f("resource_name");
+    $entities[$entity]["ids"][] = $entity_id;
+    $entities[$entity]["entity"][$entity_id] = array("label"=> $label,
+						     "state" => $state);
+  }
+
+  return $entities;
 }
 
 

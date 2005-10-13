@@ -205,7 +205,7 @@ CREATE TABLE EntityRight (
   entityright_consumer_id  integer NOT NULL DEFAULT 0,
   entityright_read         integer NOT NULL DEFAULT 0,
   entityright_write        integer NOT NULL DEFAULT 0,
-  PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_customer, entityright_customer_id)
+  PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id)
 );
 CREATE INDEX entright_idx_ent_id ON EntityRight (entityright_entity_id);
 CREATE INDEX entright_idx_ent ON EntityRight (entityright_entity);

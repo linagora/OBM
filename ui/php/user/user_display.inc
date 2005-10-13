@@ -123,7 +123,7 @@ function html_user_search_form($user) {
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
-    $ext_element =  $user["ext_element"];
+    $ext_element = $user["ext_element"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
@@ -241,7 +241,7 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
-    $ext_element =  $user["ext_element"];
+    $ext_element = $user["ext_element"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 

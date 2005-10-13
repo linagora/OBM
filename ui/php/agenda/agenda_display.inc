@@ -145,6 +145,7 @@ function html_bar_legend($calendar_entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_select_calendar_entity($new_action, $agenda, $calendar_entity, $entity_readable) {
   global $path, $uid,$c_all, $set_theme, $popup_height, $popup_width, $ico_add;
+  global $cagenda_resource;
   global $l_selection, $l_users,$l_resources, $l_validate;
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2;
   global $ico_calendar_user3,$ico_calendar_user4,$ico_calendar_user5;
@@ -199,7 +200,21 @@ function html_select_calendar_entity($new_action, $agenda, $calendar_entity, $en
   }
 
   $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction_calendar=calendar";
-  $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
+
+  if ($cagenda_resource) {
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
+    $dis_block_resource = "
+    <tr>
+      <td class=\"detailLabel\">
+      <a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>
+      $l_resources
+      </td>
+    </tr>";
+  }
 
   $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;new_group=1&amp;param_group=$c_all&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
 
@@ -239,16 +254,7 @@ function html_select_calendar_entity($new_action, $agenda, $calendar_entity, $en
       $l_users
       </td>    
     </tr>
-    <tr>
-      <td class=\"detailLabel\">
-      <a href=\"javascript: return false;\" style=\"float:right;\"
-      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
-      </a>
-      $l_resources
-      </td>    
-    </tr>
+    $dis_block_resource
     <tr>
       <td class=\"detail\" id=\"sel_ent\">
       $sel_ent
@@ -829,6 +835,8 @@ function dis_week_planning($agenda, $calendar_entity) {
   global $ico_agenda;
   global $ico_cal_user1, $ico_cal_user2, $ico_cal_user3, $ico_cal_user4;
   global $ico_cal_user5, $ico_cal_user6;
+  global $ico_cal_resource1, $ico_cal_resource2, $ico_cal_resource3;
+  global $ico_cal_resource4, $ico_cal_resource5, $ico_cal_resource6;
   global $cagenda_weekstart, $set_cal_interval;
   global $cagenda_first_hour, $cagenda_last_hour;
   global $l_private, $l_all_day;
@@ -1291,7 +1299,7 @@ function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
     <li class=\"lastList\">$category</li>
     <li class=\"lastList\">$description</li>
    </ul>
-  </div>  ";	   
+  </div>";
 
   return $dis_calendar;
 }
@@ -1406,8 +1414,9 @@ function dis_event_form($action, $agenda, $event_q, $sel_entity_id) {
 
   $user_q = run_query_userobm_in($sel_entity_id["user"]);
   $group_q = run_query_group_in($sel_entity_id["group"]);
+  $res_q = run_query_resource_in($sel_entity_id["resource"]);
   $cat_q = run_query_get_eventcategories();
-  $block = html_event_form($action, $agenda, $event_q, $user_q, $group_q, $cat_q, $sel_entity_id);      
+  $block = html_event_form($action, $agenda, $event_q, $user_q, $group_q, $res_q, $cat_q, $sel_entity_id);      
 
   return $block;
 }
@@ -1421,11 +1430,13 @@ function dis_event_form($action, $agenda, $event_q, $sel_entity_id) {
 //   - $event_q      : DBO : event result
 //   - $usr_q        : DBO : User listresult
 //   - $grp_q        : DBO : Group list
+//   - $res_q        : DBO : Resource list
 //   - $cat_q        : DBO : Category list
 //   - sel_entity_id : array of entities id selected ["user"], ["resource"]..
 ///////////////////////////////////////////////////////////////////////////////
-function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $sel_entity_id) {
-  global $path, $display, $set_theme,$cagenda_weekstart, $set_cal_interval;
+function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $res_q, $cat_q, $sel_entity_id) {
+  global $path, $display, $set_theme;
+  global $cagenda_resource, $cagenda_weekstart, $set_cal_interval;
   global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
   global $cagenda_first_hour, $cagenda_last_hour;
   // -- Labels
@@ -1456,7 +1467,7 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
     $all_day = $event_q->f("calendarevent_allday");
     $privacy = $event_q->f("calendarevent_privacy");
     $repeat_kind = $event_q->f("calendarevent_repeatkind");
-    $repeat_days =$event_q->f("calendarevent_repeatdays");
+    $repeat_days = $event_q->f("calendarevent_repeatdays");
     if ($event_q->f("calendarevent_endrepeat")) {
       $repeat_end = isodate_format($event_q->f("calendarevent_endrepeat"));
     }
@@ -1606,7 +1617,7 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
   if (is_object($grp_q)) {
     while ($grp_q->next_record()) {
       $g_id = $grp_q->f("group_id");
-      $g_lname = $grp_q->f("group_name");
+      $g_name = $grp_q->f("group_name");
       if (in_array($g_id, $sel_entity_id["group"])) {
 	$sel_id = "data-group-$g_id";
 	$div_id = "sel_group_id-$sel_id";
@@ -1615,7 +1626,7 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
           <a href=\"javascript: remove_element('$div_id','sel_group_id');\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
           </a>
-          $g_lname
+          $g_name
           <input value=\"$sel_id\" name=\"sel_group_id[]\" type=\"hidden\" />
           </div>";
       }
@@ -1637,19 +1648,24 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
      </td>
 ";
 
+  if ($cagenda_resource) {
     // resource select
-/*
-    while ($res_q->next_record()) {
-      $r_id = $res_q->f("userobm_id");
-      $r_llabel = $res_q->f("userobm_login");
-      if (in_array($r_id, $p_resource_array)) {
-        $dis_sel_resource .= "<div class=\"elementRow\" id=\"sel_resource_id$r_id\">
-      <a href=\"javascript: remove_element('sel_resource_id$r_id','sel_resource_id');\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
-      </a>
-      $r_llabel
-      <input value=\"$r_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
-      </div>";
+    if (is_object($res_q)) {
+      while ($res_q->next_record()) {
+	$r_id = $res_q->f("resource_id");
+	$r_name = $res_q->f("resource_name");
+	if (in_array($r_id, $sel_entity_id["resource"])) {
+	  $sel_id = "data-resource-$r_id";
+	  $div_id = "sel_resource_id-$sel_id";
+	  $dis_sel_resource .= "
+          <div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+          </a>
+          $r_name
+          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+          </div>";
+	}
       }
     }
     $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
@@ -1657,17 +1673,17 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
     $block_resource = "
     <td class=\"detailLabel\">
     $l_resources
-    <a href=\"javascript: return false;\"
+    <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_resource\" alt=\"[Add]\" />
       </a>
-     </td>
+     </td>    
      <td class=\"detailForm\" id=\"sel_resource_id\">
        $dis_sel_resource
      </td>
-     ";
-*/
+";
+  }
 
   if ($force == 1) {
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
@@ -1681,7 +1697,6 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" name=\"cb_privacy\" />";
   }
 
-  
   $dis_hour_b = "<select name=\"sel_time_begin\">";
   for ($i=$cagenda_first_hour; $i<$cagenda_last_hour; $i++) {
     $current_hour = substr("0$i",-2,2); 
@@ -1767,6 +1782,9 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $cat_q, $se
   </tr>
   <tr>
     $block_group
+  </tr>    
+  <tr>
+    $block_resource
   </tr>    
   </table>
 
@@ -1981,12 +1999,12 @@ function html_waiting_events($obm_wait) {
 // Display Calendar Consult
 // Parameters:
 //   - $event_q    : event_query result
-//   - $$attendee_q : attendee query result
+//   - $entities   : entities linked to the event ["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_consult($event_q, $attendee_q) {
-  global $auth, $display, $set_theme,$cagenda_weekstart;
+function html_calendar_consult($event_q, $entities) {
+  global $auth, $display, $set_theme, $cagenda_weekstart, $cagenda_resource;
   // -- Labels
-  global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
+  global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_change_state,$l_groups,$l_all_day;
@@ -2038,14 +2056,15 @@ function html_calendar_consult($event_q, $attendee_q) {
     }
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
-    
-  while ($attendee_q->next_record()) {
-    $lname = $attendee_q->f("userobm_lastname");
-    $fname = $attendee_q->f("userobm_firstname");
-    $state = $attendee_q->f("state");
-    if ($auth->auth["uid"] == $attendee_q->f("userobm_id")) {
-      $$state = "checked=\"checked\"";
-      $dis_decision_radio = "  
+
+  $attendee = $entities["user"];
+  if (is_array($attendee["entity"])) {
+    foreach ($attendee["entity"] as $u_id => $entity) {
+      $label = $entity["label"];
+      $state = $entity["state"];
+      if ($auth->auth["uid"] == $u_id) {
+	$$state = "checked=\"checked\"";
+	$dis_decision_radio = "  
       <div class=\"detailHead\">$l_change_state</div>
       <table class=\"detail\">  
       <tr>
@@ -2058,8 +2077,26 @@ function html_calendar_consult($event_q, $attendee_q) {
         </td>
       </tr>
       </table>";
+      }
+      $dis_user_list .= "$label ($state)<br />";
     }
-    $dis_user_list .= "$lname $fname ($state)<br />";
+  }
+
+  if ($cagenda_resource) {
+    $res = $entities["resource"];
+    if (is_array($res["entity"])) {
+      foreach ($res["entity"] as $r_id => $entity) {
+	$label = $entity["label"];
+	$state = $entity["state"];
+	$dis_resource_list .= "$label<br />";
+      }
+    }
+    $dis_resource_block = "
+  <tr>
+    <td class=\"detailLabel\">$l_resources</td>
+    <td class=\"detailText\">$dis_resource_list</td>
+  </tr>
+";
   }
 
   $display["title"] = "<div class=\"title\">$l_module_agenda : $title</div>";
@@ -2067,28 +2104,29 @@ function html_calendar_consult($event_q, $attendee_q) {
   $block = "
   <form method=\"get\" name=\"f_mod_decision\">
   <div class=\"detailHead\">$l_module_agenda</div>
-   <table class=\"detail\">
-    <tr>
-     <td class=\"detailLabel\">$l_title</td>
-     <td class=\"detailText\">$title</td>
-    </tr>  
-    <tr>
-     <td class=\"detailLabel\">$l_location</td>
-     <td class=\"detailText\">$location</td>
-    </tr>  
-    <tr>
-     <td class=\"detailLabel\">$l_private</td>
-     <td class=\"detailText\">$privacy</td>
-    </tr> 
-    <tr>
-     <td class=\"detailLabel\">$l_cat</td>
-     <td class=\"detailText\">$category</td>
-    </tr>    
-    <tr>
-     <td class=\"detailLabel\">$l_users</td>
-     <td class=\"detailText\">$dis_user_list</td>
-    </tr>
-   </table>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\">$l_title</td>
+    <td class=\"detailText\">$title</td>
+  </tr>  
+  <tr>
+    <td class=\"detailLabel\">$l_location</td>
+    <td class=\"detailText\">$location</td>
+  </tr>  
+  <tr>
+    <td class=\"detailLabel\">$l_private</td>
+    <td class=\"detailText\">$privacy</td>
+  </tr> 
+  <tr>
+    <td class=\"detailLabel\">$l_cat</td>
+    <td class=\"detailText\">$category</td>
+  </tr>    
+  <tr>
+    <td class=\"detailLabel\">$l_users</td>
+    <td class=\"detailText\">$dis_user_list</td>
+  </tr>
+  $dis_resource_block
+  </table>
   <div class=\"detailHead\">$l_carac</div>
    <table class=\"detail\">   
    $dis_all_day

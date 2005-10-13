@@ -126,7 +126,6 @@ $l_unknown="Inconnu";
 $l_category_manage = "Calendar Category Management";
 $l_category_exist = "Existing Categorys";
 $l_category_new = "New Category";
-$l_header_right = "Right management";
 $l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
 $l_header_export = "Export";

@@ -137,6 +137,12 @@ $ico_cal_user3      = "ico_cal_user3.gif";
 $ico_cal_user4      = "ico_cal_user4.gif";
 $ico_cal_user5      = "ico_cal_user5.gif";
 $ico_cal_user6      = "ico_cal_user6.gif";
+$ico_cal_resource1  = "ico_cal_res1.gif";
+$ico_cal_resource2  = "ico_cal_res2.gif";
+$ico_cal_resource3  = "ico_cal_res3.gif";
+$ico_cal_resource4  = "ico_cal_res4.gif";
+$ico_cal_resource5  = "ico_cal_res5.gif";
+$ico_cal_resource6  = "ico_cal_res6.gif";
 // Export icons
 $ico_html = "ico_netscape.png";
 $ico_excel = "ico_excel.png";

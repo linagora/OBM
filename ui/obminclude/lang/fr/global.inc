@@ -21,7 +21,7 @@ $l_home = "Accueil";
 $l_entity_right = "Gérer les droits de";
 $l_read_permission = "Gestion des permissions de lecture de l'agenda";
 $l_write_permission = "Gestion des permissions d'écriture sur l'agenda";
-$l_list_right = "Autoriser les personnes de la liste";
+$l_right_validate = "Valider les permissions";
 
 // Common messages
 $l_yes = "Oui";
@@ -229,7 +229,7 @@ $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
 
-// Project Agenda 
+// Agenda 
 $l_header_right = "Gestion des droits";
 
 // Project headers

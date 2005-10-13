@@ -861,9 +861,10 @@ function session_load_user_prefs() {
     if (substr($option, 0, 5) == "last_") {
       $entity = substr($option, 5);
       $function_get_last_text = "get_last_${entity}_text";
-      $last_v[$entity]["id"] = $$option;
-      $last_v[$entity]["text"] = $function_get_last_text($$option);
-
+      if (function_exists($function_get_last_text)) {
+	$last_v[$entity]["id"] = $$option;
+	$last_v[$entity]["text"] = $function_get_last_text($$option);
+      }
       // Other preferences
     } else {
       $sess->register("$option");
@@ -1077,27 +1078,31 @@ function run_query_userobm_in($users) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get resource infos from the uid array given
 // Parameters:
-//   - users : array of users id
+//   - $resources : array of resources id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_in($resources) {
   global $cdg_sql;
 
-  $where = "(0";
-  foreach($resources as $resource) {
-    $where .= ", $resource";
-  }
-  $where .= ")";
-  $query = "SELECT *
+  if (is_array($resources)) {
+    $where = "(0";
+    foreach($resources as $resource) {
+      $where .= ", $resource";
+    }
+    $where .= ")";
+    $query = "SELECT *
     FROM Resource 
-    WHERE 
-      AND resource_id IN $where
-    ORDER by resource_label";
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_resource_in()");
+    WHERE resource_id IN $where
+    ORDER by resource_name";
+    display_debug_msg($query, $cdg_sql, "run_query_resource_in()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+  } else {
+    $obm_q = "";
+  }
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login

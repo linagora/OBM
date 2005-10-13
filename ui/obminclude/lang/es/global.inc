@@ -200,6 +200,7 @@ $l_header_duplicate = "Duplicado";
 
 $l_header_add_contact = "Nuevo contacto";
 
+$l_header_right = "Manejo de permisos";
 
 // Project headers
 $l_header_man_task = "Tareas";

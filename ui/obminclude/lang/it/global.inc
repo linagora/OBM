@@ -188,6 +188,7 @@ $l_header_compute_balance =  "Calcola saldo";
 $l_header_export = "Esporta";
 $l_header_global_export = "Esporta";
 
+$l_header_right = "gestione dei diritti";
 
 // Admin headers
 $l_header_index = "Indice";

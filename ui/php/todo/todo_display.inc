@@ -115,10 +115,6 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 
   $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
 
-  $block .= "
-     <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
-    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
-     ";
 
   $todo_d = new OBM_DISPLAY("DATA", $prefs);
   $todo_d->data_set = $todo_q;
@@ -129,18 +125,20 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
   $todo_d->data_cb_name = "delete_";
   $todo_d->data_cb_show = 1;
   $todo_d->data_header = "both";
+  $todo_d->data_form_head = "
+     <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
+    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
-  $block .= $todo_d->display("dis_data_todo");
-
-  $block .= "
-    <p class=\"detailButton\">
-     <p class=\"detailButtons\">
+  $todo_d->data_form_end = "
+  <p class=\"detailButton\">
+    <p class=\"detailButtons\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />
-     </p>
     </p>
-    </form>
-    ";
+  </p>
+  </form>";
+
+  $block .= $todo_d->display("dis_data_todo");
 
   return $block;
 }

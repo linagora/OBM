@@ -134,7 +134,7 @@ function html_entitywritable_bar($writable_entity,$entity_id, $entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_right_admin(&$consumers, $entity_id) {
   global $l_authorize_list,$l_read_permission, $l_write_permission;
-  global $l_list_right,$l_authorize,$l_deny,$set_theme, $ico_delete;
+  global $l_right_validate ,$l_authorize,$l_deny,$set_theme, $ico_delete;
   global $l_public;
   global $ico_add_user,$popup_height,$popup_width,$l_users,$path;
 
@@ -243,7 +243,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <div class=\"detailButton\">
     <input type=\"hidden\" name=\"param_entity\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
-    <input type=\"submit\" value=\"$l_list_right\" />
+    <input type=\"submit\" value=\"$l_right_validate\" />
   </div>
   </form>
 ";
