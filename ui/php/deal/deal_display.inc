@@ -14,6 +14,7 @@
 // Direct fields
 $fieldnames["deal_label"] = $l_label;
 $fieldnames["deal_datealarm"] = $l_date_alarm;
+$fieldnames["deal_dateexpected"] = $l_date_expected;
 $fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
@@ -667,8 +668,9 @@ function dis_deal_consult($deal) {
 function html_deal_consult($deal_q) {
   global $set_theme, $ico_company, $ico_contact, $display;
   global $l_infos, $l_company, $l_contact, $l_label,$l_date_init,$l_kind;
-  global $l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
-  global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_status,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
+  global $l_tt,$l_marketing_manager,$l_technical_manager,$l_date_proposal;
+  global $l_number, $l_amount,$l_hitrate,$l_date_expected;
+  global $l_date_alarm,$l_status,$l_last_update,$l_archive,$l_comment,$l_at;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal,$l_category;
   global $incl_arch, $param_deal;
   global $display, $path, $auth, $cgp_hide, $c_yes, $c_no;
@@ -687,6 +689,7 @@ function html_deal_consult($deal_q) {
   $datepro = date_format($deal_q->f("dateproposal"), 1);
   $amount = $deal_q->f("deal_amount");
   $hitrate = $deal_q->f("deal_hitrate");
+  $dateexpected = date_format($deal_q->f("dateexpected"), 1);
   $datealarm = date_format($deal_q->f("datealarm"), 1);
   $status = $deal_q->f("dealstatus_label");
   $dateu = date_format($deal_q->f("timeupdate"));
@@ -781,7 +784,7 @@ function html_deal_consult($deal_q) {
         <td class=\"detailLabel\">$l_technical_manager</td>
         <td class=\"detailText\">$tech</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_proposition date</td>
+        <td class=\"detailLabel\">$l_date_proposal</td>
         <td class=\"detailText\">$datepro</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_amount</td>
@@ -789,7 +792,9 @@ function html_deal_consult($deal_q) {
       </tr><tr>
         <td class=\"detailLabel\">$l_hitrate</td>
         <td class=\"detailText\">$hitrate %</td>
-      
+      </tr><tr>
+        <td class=\"detailLabel\">$l_date_expected</td>
+        <td class=\"detailText\">$dateexpected</td>
       </table>
       </td>
       <td>
@@ -972,7 +977,8 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   global $c_php_isodate_format, $l_update,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
   global $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
-  global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_status;
+  global $l_date_proposal,$l_amount,$l_hitrate,$l_date_expected;
+  global $l_contact,$l_date_alarm,$l_status;
   global $l_last_update, $l_archive, $l_at, $l_todo, $l_category;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
@@ -1000,6 +1006,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
     $hitrate = $deal_q->f("deal_hitrate");
     $con1 = $deal_q->f("deal_contact1_id");
     $con2 = $deal_q->f("deal_contact2_id");
+    $dateexpected = isodate_format($deal_q->f("dateexpected"), 1);
     $datealarm = isodate_format($deal_q->f("datealarm"), 1);
     $status = $deal_q->f("deal_status_id");
     $archive = ($deal_q->f("deal_archive") == 1 ? " checked" : "");
@@ -1046,6 +1053,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["contact1"])) { $con1 = $deal["contact1"]; }
   if (isset($deal["contact2"])) { $con2 = $deal["contact2"]; }
+  if (isset($deal["dateexpected"])) { $dateexpected = stripslashes($deal["dateexpected"]); }
   if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
   if (isset($deal["status"])) { $status = $deal["status"]; }
   if (isset($deal["timeupdate"])) { $timeupdate = $deal["timeupdate"]; }
@@ -1349,14 +1357,17 @@ $js_status_loop
       <td class=\"detailLabel\">$l_technical_manager</td>
       <td class=\"detailForm\">$sel_tech</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_proposition date</td>
+      <td class=\"detailLabel\">$l_date_proposal</td>
       <td class=\"detailForm\"><input name=\"tf_dateprop\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateprop\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_proposition $l_amount</td>
+      <td class=\"detailLabel\">$l_amount</td>
       <td class=\"detailForm\"><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_hitrate</td>
       <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_date_expected</td>
+      <td class=\"detailForm\"><input name=\"tf_dateexpected\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateexpected\" /></td>
     </tr><tr>
      
      $block_cat 
@@ -1444,8 +1455,8 @@ function dis_deal_quick_form($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $c_php_isodate_format, $l_update, $l_none;
-  global $l_deal, $l_infos, $l_label;
-  global $l_last_update,$l_date_alarm, $l_status, $l_hitrate, $l_todo;
+  global $l_deal, $l_infos, $l_label, $l_last_update;
+  global $l_date_expected, $l_date_alarm, $l_status, $l_hitrate, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
   global $path, $display, $action, $auth, $cgp_hide;
@@ -1457,6 +1468,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   // if update mode and first time, values are taken from db
   if ($action == "quick_detail") {
+    $dateexpected = isodate_format($deal_q->f("dateexpected"), 1);
     $datealarm = isodate_format($deal_q->f("datealarm"), 1);
     $status = $deal_q->f("deal_status_id");
     $hitrate = $deal_q->f("deal_hitrate");
@@ -1471,6 +1483,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   // If parameters have been given, they supercede the default action value
   if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
+  if (isset($deal["dateexpected"])) { $dateexp = stripslashes($deal["dateexpected"]); }
   if (isset($deal["status"])) { $status = $deal["status"]; }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
@@ -1564,6 +1577,10 @@ $js_status_loop
     </tr><tr>
       <td class=\"detailLabel\">$l_hitrate</td>
       <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_date_expected</td>
+      <td class=\"detailForm\"><input name=\"tf_dateexpected\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateexp\" /></td>
     </tr>
     </table>
 

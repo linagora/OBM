@@ -21,6 +21,7 @@ $l_technical_manager = "Resp. Tecnico ";
 $l_date_proposal = "Data Proposta";
 $l_amount = "Totale";
 $l_hitrate = "Hit Rate";
+$l_date_expected = "Data";
 $l_date_alarm = "Data Avviso";
 $l_date_comment = "Data Commento";
 

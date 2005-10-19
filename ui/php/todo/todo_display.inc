@@ -251,26 +251,23 @@ function dis_todo_form($todo, $todo_q = 0) {
     $p_user_array = array($uid);
   }
 
-  $usr_q = run_query_userobm_in($p_user_array);
-
-  // UserObm section
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
-    $u_lname = $usr_q->f("userobm_lastname");
-    $u_fname = $usr_q->f("userobm_firstname");
-    if (in_array($u_id, $p_user_array)) {
+  $users = get_userobm_from_ids($p_user_array);
+  // user select
+  if (is_array($users["entity"])) {
+    foreach ($users["entity"] as $u_id => $u_ent) {
+      $u_name = $u_ent["label"];
       $sel_id = "data-user-$u_id";
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
-      $u_lname $u_fname
+      $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
     }
   }
-  
+
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
   $block_user = "

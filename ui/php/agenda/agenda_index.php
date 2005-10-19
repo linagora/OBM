@@ -56,7 +56,6 @@ if ( ($agenda["new_group"] == "1")
   }
   $cal_entity_id["group_view"] = $agenda["group_view"];
   $cal_entity_id["resource"] = array();
-  //  $sel_resource_id = get_default_group_resource_ids($param_group);
 }
 // If event insert or update, reset the selected group
 if (($action == "insert") || ($action == "update")) {
@@ -65,19 +64,14 @@ if (($action == "insert") || ($action == "update")) {
 // If no group view selected, explicitely set it
 if ($cal_entity_id["group_view"] == "") $cal_entity_id["group_view"] = $c_all;
 
-// If user or resources selection present we override session content
-if (is_array($agenda["sel_user_id"])) {
+// If user selection present we override session content
+if (($agenda["new_sel"]) || (is_array($agenda["sel_user_id"]))) {
   $cal_entity_id["user"] = $agenda["sel_user_id"];
 } else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
   $cal_entity_id["user"] = $agenda["sel_user_id"];
 }
-if (is_array($agenda["sel_group_id"])) {
-  $cal_entity_id["group"] = $agenda["sel_group_id"];
-} else if (($action == "insert") || ($action == "update")) {
-  // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["group"] = $agenda["sel_group_id"];
-}
+// If resources selection present we override session content
 if (($agenda["new_sel"]) || (is_array($agenda["sel_resource_id"]))) {
   $cal_entity_id["resource"] = $agenda["sel_resource_id"];
 } else if (($action == "insert") || ($action == "update")) {
@@ -85,7 +79,15 @@ if (($agenda["new_sel"]) || (is_array($agenda["sel_resource_id"]))) {
   $cal_entity_id["resource"] = $agenda["sel_resource_id"];
 }
 
-// If no user selected, we select the connected user
+// If group selection present we override session content
+if (is_array($agenda["sel_group_id"])) {
+  $cal_entity_id["group"] = $agenda["sel_group_id"];
+} else if (($action == "insert") || ($action == "update")) {
+  // If event creation (form submission) we set session even if selection empty
+  $cal_entity_id["group"] = $agenda["sel_group_id"];
+}
+
+// If no user or resource selected, we select the connected user
 if ( ( (! is_array($cal_entity_id["user"]))
        || (count($cal_entity_id["user"]) == 0) )
      && ( (! is_array($cal_entity_id["resource"]))
@@ -93,7 +95,7 @@ if ( ( (! is_array($cal_entity_id["user"]))
   $cal_entity_id["user"] = array($uid);
 }
 
-print_r($cal_entity_id);
+//print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
 $agenda["entity"] = $cal_entity_id;
 
@@ -208,13 +210,13 @@ if ($action == "index") {
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-if ($agenda["id"] > 0) {  
-  require("$obminclude/calendar.js");
-  require("agenda_js.inc");
-  $eve_q = run_query_detail($agenda["id"]);
-  $cal_entity_id["user"] = get_event_users_info($agenda["id"]);
-  $display["detailInfo"] = display_record_info($eve_q);
-  $display["detail"] = dis_event_form($action, $agenda, $eve_q, $cal_entity_id);
+  if ($agenda["id"] > 0) {  
+    require("$obminclude/calendar.js");
+    require("agenda_js.inc");
+    $eve_q = run_query_detail($agenda["id"]);
+    $entities = get_event_entity($agenda["id"]);
+    $display["detailInfo"] = display_record_info($eve_q);
+    $display["detail"] = dis_event_form($action, $agenda, $eve_q, $entities);
   }
 
 } elseif ($action == "update") {
@@ -278,9 +280,7 @@ if ($agenda["id"] > 0) {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
-  $user_q = run_query_userobm_in($cal_entity_id["user"]);
-  $group_q = run_query_group_in($cal_entity_id["group"]);
-  $display["detail"] = dis_meeting_form($agenda, $user_q, $group_q, $cal_entity_id);
+  $display["detail"] = dis_meeting_form($agenda, $cal_entity_id);
 
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////

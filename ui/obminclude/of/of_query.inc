@@ -1047,11 +1047,13 @@ function get_last_group_text($id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get users infos from the uid array given
+// Used by: Agenda, todo
 // Parameters:
 //   - users : array of users id
-// Used by: Agenda, todo
+// Returns:
+//   array [ids], [entity] (label=>)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_in($users) {
+function get_userobm_from_ids($users) {
   global $cdg_sql;
 
   if (is_array($users)) {
@@ -1065,42 +1067,21 @@ function run_query_userobm_in($users) {
     WHERE userobm_archive = 0
       AND userobm_id IN $where 
     ORDER by userobm_lastname"; 
+    display_debug_msg($query, $cdg_sql, "get_userobm_from_ids()");
     $obm_q = new DB_OBM;
     $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql, "run_query_userobm()");
-  } else {
-    $obm_q = "";
-  }
-
-  return $obm_q;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Get resource infos from the uid array given
-// Parameters:
-//   - $resources : array of resources id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_resource_in($resources) {
-  global $cdg_sql;
-
-  if (is_array($resources)) {
-    $where = "(0";
-    foreach($resources as $resource) {
-      $where .= ", $resource";
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f("userobm_id");
+      $lname = $obm_q->f("userobm_lastname");
+      $fname = $obm_q->f("userobm_firstname");
+      $res["ids"][] = $id;
+      $res["entity"][$id] = array("label" => "$lname $fname");
     }
-    $where .= ")";
-    $query = "SELECT *
-    FROM Resource 
-    WHERE resource_id IN $where
-    ORDER by resource_name";
-    display_debug_msg($query, $cdg_sql, "run_query_resource_in()");
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
   } else {
-    $obm_q = "";
+    $res = "";
   }
 
-  return $obm_q;
+  return $res;
 }
 
 

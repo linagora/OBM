@@ -162,7 +162,6 @@ function run_query_insert($todo) {
         '$title',
         '$content'
       )";
-
       display_debug_msg($query, $cdg_sql);
       $retour = $obm_q->query($query);
     }

@@ -228,7 +228,6 @@ $cgp_show["module"]["admin_ref"] = "admin";
 $cgp_show["module"]["import"] = "admin";
 $cgp_show["module"]["backup"] = "admin";
 
-
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 

@@ -46,7 +46,7 @@ if ($nb > 0) {
 
 
 // Populate the repository root with storage dirs
-for ($dir_num = 1; $dir_num < 10; $dir_num++) {
+for ($dir_num = 0; $dir_num < 10; $dir_num++) {
   $sdir = "$cdocument_root/$dir_num";
   if (! mkdir($sdir)) {
     echo "Error creating the storage directory : $sdir !\n";

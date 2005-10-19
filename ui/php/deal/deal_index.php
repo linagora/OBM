@@ -492,6 +492,7 @@ function get_param_deal() {
   global $tf_num, $tf_label, $tf_datebegin, $param_parent, $sel_kind, $sel_tt;
   global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
   global $tf_dateprop, $tf_amount, $sel_status, $tf_datealarm, $ta_com;
+  global $tf_dateexpected;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
   global $tf_plabel, $sel_pmanager, $cb_parchive,$cb_archive,$tf_todo,$cb_priv;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
@@ -534,6 +535,7 @@ function get_param_deal() {
   if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
   if (isset ($sel_status)) $deal["status"] = $sel_status;
   if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
+  if (isset ($tf_dateexpected)) $deal["dateexpected"] = $tf_dateexpected;
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
   if (isset ($tf_code)) $deal["cat_code"] = $tf_code;
   if (isset ($sel_cat)) $deal["category"] = $sel_cat;

@@ -1405,18 +1405,39 @@ function html_conflict_form($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the event form
 // Parameters:
-//   - $action         : action called
-//   - $agenda         : agenda parameters
-//   - $event_q        : DBO : event result
-//   - sel_entity_id   : array of entities id selected ["user"], ["resource"]..
+//   - $action   : action called
+//   - $agenda   : agenda parameters
+//   - $event_q  : DBO : event result
+//   - $entities : entities linked (event) or selected ["user"], ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function dis_event_form($action, $agenda, $event_q, $sel_entity_id) {
+function dis_event_form($action, $agenda, $event_q, $entities) {
 
-  $user_q = run_query_userobm_in($sel_entity_id["user"]);
-  $group_q = run_query_group_in($sel_entity_id["group"]);
-  $res_q = run_query_resource_in($sel_entity_id["resource"]);
+  if ($action == "detailupdate") {
+    $users = $entities["user"];
+    $resources = $entities["resource"];
+  } else {
+    $users_id = $entities["user"];
+    if (count($users_id > 0)) {
+      $users = get_userobm_from_ids($users_id);
+    } else {
+      $users = array();
+    }
+    $res_id = $entities["resource"];
+    if (count($res_id > 0)) {
+      $resources = get_resource_from_ids($res_id);
+    } else {
+      $resources = array();
+    }
+    $groups_id = $entities["group"];
+    if (count($groups_id > 0)) {
+      $groups = get_group_from_ids($groups_id);
+    } else {
+      $groups = array();
+    }
+  }
+
   $cat_q = run_query_get_eventcategories();
-  $block = html_event_form($action, $agenda, $event_q, $user_q, $group_q, $res_q, $cat_q, $sel_entity_id);      
+  $block = html_event_form($action, $agenda, $event_q, $users, $resources, $groups, $cat_q);
 
   return $block;
 }
@@ -1428,13 +1449,12 @@ function dis_event_form($action, $agenda, $event_q, $sel_entity_id) {
 //   - $action       : action called
 //   - $agenda       : agenda parameters
 //   - $event_q      : DBO : event result
-//   - $usr_q        : DBO : User listresult
-//   - $grp_q        : DBO : Group list
-//   - $res_q        : DBO : Resource list
+//   - $users        : Array : Event users or selected users [ids] [entity]
+//   - $res          : Array : Event resources or selected res [ids] [entity]
+//   - $groups       : Array : selected groups [ids] [entity]
 //   - $cat_q        : DBO : Category list
-//   - sel_entity_id : array of entities id selected ["user"], ["resource"]..
 ///////////////////////////////////////////////////////////////////////////////
-function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $res_q, $cat_q, $sel_entity_id) {
+function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat_q) {
   global $path, $display, $set_theme;
   global $cagenda_resource, $cagenda_weekstart, $set_cal_interval;
   global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
@@ -1582,22 +1602,23 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $res_q, $ca
   }
   
   // userobm select
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
-    $u_lname = $usr_q->f("userobm_lastname");
-    $u_fname = $usr_q->f("userobm_firstname");
-    if (in_array($u_id, $sel_entity_id["user"])) {
+  echo "<p>user:";
+  print_r($users["entity"]);
+  if (is_array($users["entity"])) {
+    foreach ($users["entity"] as $u_id => $u_ent) {
+      $u_name = $u_ent["label"];
       $sel_id = "data-user-$u_id";
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
-      $u_lname $u_fname
+      $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
     }
   }
+
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
   $block_user = "
@@ -1614,24 +1635,22 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $res_q, $ca
      </td>";
 
   // group select
-  if (is_object($grp_q)) {
-    while ($grp_q->next_record()) {
-      $g_id = $grp_q->f("group_id");
-      $g_name = $grp_q->f("group_name");
-      if (in_array($g_id, $sel_entity_id["group"])) {
-	$sel_id = "data-group-$g_id";
-	$div_id = "sel_group_id-$sel_id";
-	$dis_sel_group .= "
-          <div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_group_id');\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
-          </a>
-          $g_name
-          <input value=\"$sel_id\" name=\"sel_group_id[]\" type=\"hidden\" />
-          </div>";
-      }
+  if (is_array($groups["entity"])) {
+    foreach ($groups["entity"] as $g_id => $g_ent) {
+      $g_name = $g_ent["label"];
+      $sel_id = "data-group-$g_id";
+      $div_id = "sel_group_id-$sel_id";
+      $dis_sel_group .= "
+        <div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_group_id');\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+        </a>
+        $g_name
+        <input value=\"$sel_id\" name=\"sel_group_id[]\" type=\"hidden\" />
+        </div>";
     }
   }
+
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
   $block_group = "
@@ -1649,15 +1668,15 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $res_q, $ca
 ";
 
   if ($cagenda_resource) {
+  echo "<p>res:";
+  print_r($res);
     // resource select
-    if (is_object($res_q)) {
-      while ($res_q->next_record()) {
-	$r_id = $res_q->f("resource_id");
-	$r_name = $res_q->f("resource_name");
-	if (in_array($r_id, $sel_entity_id["resource"])) {
-	  $sel_id = "data-resource-$r_id";
-	  $div_id = "sel_resource_id-$sel_id";
-	  $dis_sel_resource .= "
+    if (is_array($res["entity"])) {
+      foreach ($res["entity"] as $r_id => $r_ent) {
+	$r_name = $r_ent["label"];
+	$sel_id = "data-resource-$r_id";
+	$div_id = "sel_resource_id-$sel_id";
+	$dis_sel_resource .= "
           <div class=\"elementRow\" id=\"$div_id\">
           <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
@@ -1665,9 +1684,9 @@ function html_event_form($action, $agenda, $event_q, $usr_q, $grp_q, $res_q, $ca
           $r_name
           <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
           </div>";
-	}
       }
     }
+
     $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
 
     $block_resource = "
@@ -2215,11 +2234,9 @@ function html_dis_delete($agenda) {
 // Display the new event form
 // Parameters:
 //   - $agenda        : agenda parameters
-//   - $usr_q         : array of selected contacts 
-//   - $grp_q         : DBO : Group list
 //   - $sel_entity_id : array of entity Id ["user"] ["resource"]
 ///////////////////////////////////////////////////////////////////////////////
-function dis_meeting_form($agenda, $usr_q, $grp_q, $sel_entity_id) {
+function dis_meeting_form($agenda, $sel_entity_id) {
   global $display, $path, $set_theme, $set_cal_interval;
   global $ico_delete, $ico_mini_cal, $ico_add_user, $ico_add_group;
   global $popup_height,$popup_width;
@@ -2235,24 +2252,41 @@ function dis_meeting_form($agenda, $usr_q, $grp_q, $sel_entity_id) {
      <input type=\"submit\" value=\"$l_meeting_perform\" /> 
 ";
 
+  $users_id = $sel_entity_id["user"];
+  if (count($users_id > 0)) {
+    $users = get_userobm_from_ids($users_id);
+  } else {
+    $users = array();
+  }
+  $res_id = $sel_entity_id["resource"];
+  if (count($res_id > 0)) {
+    $resources = get_resource_from_ids($res_id);
+  } else {
+    $resources = array();
+  }
+  $groups_id = $sel_entity_id["group"];
+  if (count($groups_id > 0)) {
+    $groups = get_group_from_ids($groups_id);
+  } else {
+    $groups = array();
+  }
+
   // user select
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
-    $u_lname = $usr_q->f("userobm_lastname");
-    $u_fname = $usr_q->f("userobm_firstname");
-    if (in_array($u_id, $sel_entity_id["user"])) {
+  if (is_array($users["entity"])) {
+    foreach ($users["entity"] as $u_id => $u_ent) {
+      $u_name = $u_ent["label"];
       $sel_id = "data-user-$u_id";
       $div_id = "sel_user_id-$sel_id";
-      $dis_sel_user .= "
-      <div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
-        </a>
-        $u_lname $u_fname
-        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
     }
   }
+
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
   $block_user = "
@@ -2269,25 +2303,24 @@ function dis_meeting_form($agenda, $usr_q, $grp_q, $sel_entity_id) {
     </td>
 ";
 
+
   // group select
-  if (is_object($grp_q)) {
-    while ($grp_q->next_record()) {
-      $g_id = $grp_q->f("group_id");
-      $g_lname = $grp_q->f("group_name");
-      if (in_array($g_id, $sel_entity_id["group"])) {
-	$sel_id = "data-group-$g_id";
-	$div_id = "sel_group_id-$sel_id";
-	$dis_sel_group .= "
-          <div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_group_id');\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
-          </a>
-          $g_lname
-          <input value=\"$sel_id\" name=\"sel_group_id[]\" type=\"hidden\" />
-          </div>";
-      }
+  if (is_array($groups["entity"])) {
+    foreach ($groups["entity"] as $g_id => $g_ent) {
+      $g_name = $g_ent["label"];
+      $sel_id = "data-group-$g_id";
+      $div_id = "sel_group_id-$sel_id";
+      $dis_sel_group .= "
+        <div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_group_id');\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+        </a>
+        $g_name
+        <input value=\"$sel_id\" name=\"sel_group_id[]\" type=\"hidden\" />
+        </div>";
     }
   }
+
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
   $block_group = "

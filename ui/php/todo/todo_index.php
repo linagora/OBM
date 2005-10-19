@@ -190,7 +190,6 @@ function get_param_todo() {
       }
     }
   }
-
   display_debug_param($todo);
 
   return $todo;

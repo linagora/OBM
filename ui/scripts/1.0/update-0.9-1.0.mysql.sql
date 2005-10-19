@@ -317,6 +317,18 @@ ALTER TABLE Deal ADD COLUMN deal_dateexpected date after deal_dateproposal;
 
 
 -------------------------------------------------------------------------------
+-- Datasource fields definition update
+-------------------------------------------------------------------------------
+-- company, contact and import
+UPDATE Company set company_datasource_id=0 where company_datasource_id is null;
+ALTER TABLE Company CHANGE COLUMN company_datasource_id company_datasource_id int (8) default 0;
+UPDATE Contact set contact_datasource_id=0 where contact_datasource_id is null;
+ALTER TABLE Contact CHANGE COLUMN contact_datasource_id contact_datasource_id int (8) default 0;
+UPDATE Import set import_datasource_id=0 where import_datasource_id is null;
+ALTER TABLE Import CHANGE COLUMN import_datasource_id import_datasource_id int (8) default 0;
+
+
+-------------------------------------------------------------------------------
 -- Drop Deprecated tables
 -------------------------------------------------------------------------------
 DROP TABLE IF EXISTS RepeatKind;

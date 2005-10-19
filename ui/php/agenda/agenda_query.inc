@@ -51,11 +51,12 @@ function run_query_detail($param_event) {
       LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
       LEFT JOIN UserObm AS c ON calendarevent_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON calendarevent_userupdate = u.userobm_id
-    WHERE calendarevent_id = $param_event";
+    WHERE calendarevent_id = '$param_event'";
 
   display_debug_msg($query, $cdg_sql, "run_query_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
+
   return $obm_q;
 }
 
@@ -1062,11 +1063,50 @@ function run_query_resource_readable() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get groups infos from the gid array given
+// Get resource infos from the resources id array given
+// Parameters:
+//   - $resources : array of resources id
+// Returns:
+// array [ids], [entity] (label=>)
+///////////////////////////////////////////////////////////////////////////////
+function get_resource_from_ids($resources) {
+  global $cdg_sql;
+
+  if (is_array($resources)) {
+    $where = "(0";
+    foreach($resources as $resource) {
+      $where .= ", $resource";
+    }
+    $where .= ")";
+    $query = "SELECT *
+    FROM Resource 
+    WHERE resource_id IN $where
+    ORDER by resource_name";
+    display_debug_msg($query, $cdg_sql, "get_resource_from_ids()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f("resource_id");
+      $name = $obm_q->f("resource_name");
+      $res["ids"][] = $id;
+      $res["entity"][$id] = array("label" => $name);
+    }
+  } else {
+    $res = "";
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get groups infos from the group id array given
 // Parameters:
 //   - groups : array of groups id
+// Returns:
+// array [ids], [entity] (label=>)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_in($groups) {
+function get_group_from_ids($groups) {
   global $cdg_sql;
 
   if (is_array($groups)) {
@@ -1080,14 +1120,20 @@ function run_query_group_in($groups) {
     WHERE 
       group_id IN $where
     ORDER by group_name";
-    display_debug_msg($query, $cdg_sql, "run_query_group_in()");
+    display_debug_msg($query, $cdg_sql, "get_group_from_ids()");
     $obm_q = new DB_OBM;
     $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f("group_id");
+      $name = $obm_q->f("group_name");
+      $res["ids"][] = $id;
+      $res["entity"][$id] = array("label" => $name);
+    }
   } else {
-    $obm_q = "";
+    $res = "";
   }
 
-  return $obm_q;
+  return $res;
 }
 
 
