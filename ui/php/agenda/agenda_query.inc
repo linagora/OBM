@@ -947,7 +947,7 @@ function get_default_group_resource_ids($p_group) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_entity_readable() {
 
-  $ent = array(
+  $ent = array (
     "user" => get_calendar_readable(),
     "group" => get_group_readable(),
     "resource" => get_resource_readable()
@@ -1019,46 +1019,6 @@ function get_resource_readable() {
   $entity = of_right_entity_for_consumer("resource", "user", $uid, "read");
 
   return $entity;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of readable agenda ressource for the current user
-///////////////////////////////////////////////////////////////////////////////
-function run_query_resource_readable() {
-  global $cdg_sql, $auth, $agenda, $c_all;
-
-  $uid = $auth->auth["uid"];
-
-  if ( (is_array($agenda["sel_group_id"]))
-       && (count($agenda["sel_group_id"]) == 1)
-       && ($agenda["sel_group_id"][0] != $c_all) ) {
-    $group_id = $agenda["sel_group_id"][0];
-    $query = "SELECT distinct r.*,
-        c.calendarentityright_read,
-        c.calendarentityright_customer_id
-      FROM RGroup g, ResourceGroup rg, Resource as r
-        LEFT OUTER JOIN CalendarEntityRight as c
-          ON 
-            (c.calendarentityright_customer_id = '$uid' OR c.calendarentityright_customer_id = 0) AND 
-            r.resource_id = c.calendarentityright_entity_id AND 
-            c.calendarentityright_entity = 'resource'
-      WHERE
-        $where
-        g.rgroup_id = '$group_id' AND
-        rg.resourcegroup_rgroup_id = g.rgroup_id AND
-        rg.resourcegroup_resource_id = r.resource_id AND
-        (c.calendarentityright_read = 1) 
-      ORDER BY r.resource_name";
-  } else {
-    $entity = of_right_entity_for_consumer("resource", "user", $uid, "read");
-    return $entity;
-  }
-
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_resource_readable()");
-  $obm_db->query($query);
-  return $obm_db;
 }
 
 

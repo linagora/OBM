@@ -434,7 +434,7 @@ function run_query_contactlist_delete($list) {
 //   - $entity : dataset entity to order (to handle multiple Display in 1 p)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contacts_list($list, $entity="") {
-  global $cdg_sql;
+  global $cdg_sql, $ctu_sql_limit;
 
   $id = $list["id"];
   $new_order = $list["new_order"];
@@ -443,6 +443,7 @@ function run_query_contacts_list($list, $entity="") {
 
   $obm_q = new DB_OBM; 
   $db_type = $obm_q->type;
+  $limit = sql_limit($db_type);
   $if_country = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name");
 
 
@@ -531,10 +532,19 @@ function run_query_contacts_list($list, $entity="") {
          LEFT JOIN Function ON Contact.contact_function_id = function_id
          LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       WHERE contactlist_list_id='$id'
-      $orderq";
+      $orderq
+      $limit";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contacts_list()");
-  $obm_q->query($query);
+  if ($ctu_sql_limit) {
+    $count = get_query_count("select count(*) from ContactList where contactlist_list_id='$id'");
+    $obm_q->set_num_rows_total($count);
+  }
+
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, "run_query_contacts_list()");
+    $obm_q->query($query);
+  }
+
   return $obm_q;
 }
 

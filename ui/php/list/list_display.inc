@@ -618,7 +618,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     </table>";
 
   // Static Contacts
-  $nb_con = $con_q->num_rows();
+  $nb_con = $con_q->num_rows_total();
   if ($nb_con == 0) {
     $message = $l_no_static_contact;
   } else {
