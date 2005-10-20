@@ -14,6 +14,20 @@
 //   - $display : (by ref) $display hash with each content object
 ///////////////////////////////////////////////////////////////////////////////
 function display_page(&$display) {
+  global $output_target;
+
+  // If print activated, display only the detail
+  if ($output_target == "print") {
+    echo $display["head"] . "
+      <div class=\"detailpanelalone\">
+" .
+      $display["title"] .
+      $display["msg"] .
+      $display["detail"] . "
+      </div>" .
+      $display["end"];
+    return;
+  }
 
   // If header is null, display only the detail (Popup windows)
   if ($display["header"] == "") {
@@ -142,6 +156,10 @@ function generate_menu($module) {
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
 
+  if ($display["print_url"] != "") {
+    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"".C_IMAGE_PATH."/$set_theme/ico_printer.gif\" alt=\"Print\" id='print' /></a></li>";
+  }
+
   $block = "
 <!-- Bandeau -->
 
@@ -155,6 +173,7 @@ function generate_menu($module) {
 <li><img src='".C_IMAGE_PATH."/".$set_theme."/login.gif' alt='' /> $l_login : $login</li>
 <li><img src='".C_IMAGE_PATH."/".$set_theme."/profil.gif' alt='' /> $l_profile : $profil</li>
 <li><img src='".C_IMAGE_PATH."/".$set_theme."/logout.gif' alt='' /> <a href='".$path."/obm.php?action=logout'>$l_logout</a></li>
+$dis_printer
 </ul>
 <!-- Fin Login -->
 <div class=\"entries\">

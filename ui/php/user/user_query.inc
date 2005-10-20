@@ -611,6 +611,7 @@ function run_query_delete_profile($param_user)  {
 
   $obm_q = new DB_OBM;
 
+  // Delete all user prefs
   $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$param_user'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -651,6 +652,13 @@ function run_query_delete_profile($param_user)  {
       AND calendarevent_privacy != '0'"; 
   //display_debug_msg($query, $cdg_sql);
   //$obm_q->query($query);
+
+  // Remove all User event participation
+  $query = "DELETE FROM EventEntity
+    WHERE evententity_entity = 'user'
+      AND evententity_entity_id = '$param_user'"; 
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile()");
+  $obm_q->query($query);
 
   // Remove all acl to the user and user's one
   $query = "DELETE FROM EntityRight

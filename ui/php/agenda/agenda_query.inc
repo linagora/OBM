@@ -16,8 +16,6 @@
 function run_query_detail($param_event) {
   global $cdg_sql;
 
-//XXXXXXXX user resource
-
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, "calendarevent_timeupdate", "timeupdate");
@@ -263,13 +261,12 @@ function run_query_delete_event_entity($agenda) {
 // Parameters: 
 //   - $agenda        : Agenda params
 //   - $sel_entity_id : List entitis id ["user"] ["resource"]
+//   - $event_id      : var to get the id to be returned
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
   global $uid, $l_from, $l_to, $l_date;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
 
-  echo "<p>sel:";
-  print_r($sel_entity_id);
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $mail  = $agenda["mail"];
   $groups = $sel_entity_id["group"];
@@ -314,7 +311,6 @@ function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
   $recipient_array = array_diff($users_array, array($uid));
   
   if (count($recipient_array) > 0) {
-    //    print_r($recipient_array);
     $tmp_filename = secure_tmpname(".ics","ics_");
     create_ics_meeting_file($agenda, $event_id, $recipient_array, $tmp_filename);
     $h_file = array(
@@ -1235,16 +1231,18 @@ function store_entities($entities_q) {
   $i = 0;
   $entity_tab = array();
   $user_q = $entities_q["user"];
-  while ($user_q->next_record()) {
-    $id = $user_q->f("userobm_id");
-    $name = $user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname");
-    $entity_tab["user"][$id] = array(
-      "name"  => $name,
-      "class" => "agendaEventBg$i",
-      "image" => ${"ico_calendar_user".$i},
-      "type"  => "user",
-      "id"    => $user_q->f("userobm_id"));
-    $i++;
+  if (is_object($user_q)) {
+    while ($user_q->next_record()) {
+      $id = $user_q->f("userobm_id");
+      $name = $user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname");
+      $entity_tab["user"][$id] = array(
+        "name"  => $name,
+        "class" => "agendaEventBg$i",
+        "image" => ${"ico_calendar_user".$i},
+        "type"  => "user",
+        "id"    => $user_q->f("userobm_id"));
+      $i++;
+    }
   }
   $resource_q = $entities_q["resource"];
   if (is_object($resource_q)) {
@@ -1559,9 +1557,6 @@ function slice_entities($sel_entity_id, $entity_readable="") {
   if (count($res_user_id) > $max_display) {
     $res_user_id = array_slice ($res_user_id, 0, $max_display);
   }
-  if (count($res_user_id) == 0) {
-    $res_user_id = array($auth->auth["uid"]);
-  }
   $nb_user = count($res_user_id);
 
   // resources : slice only if resources are selected 
@@ -1580,8 +1575,13 @@ function slice_entities($sel_entity_id, $entity_readable="") {
     }
   }
   $max_res = $max_display - $nb_user;
-  if (count($res_resource_id) > $max_res) {
+  $nb_res = count($res_resource_id);
+  if ($nb_res > $max_res) {
     $res_resource_id = array_slice ($res_resource_id, 0, $max_res);
+  }
+  $nb_res = count($res_resource_id);
+  if (($nb_user == 0) && ($nb_res == 0)) {
+    $res_user_id = array($auth->auth["uid"]);
   }
 
   return array(

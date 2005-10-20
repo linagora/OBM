@@ -16,11 +16,12 @@
 //   - $p_view        : view selected "year", "month", "week" or "day"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
-  global $display;
+  global $display, $path;
 
   $group_view = $agenda["entity"]["group_view"];
   $entity_readable = get_entity_readable();
   $visible_entities_id = slice_entities($sel_entity_id, $entity_readable);
+
   $sel_entity_id = $visible_entities_id;
   // we restore the selected group for session storage
   $sel_entity_id["group_view"] = $group_view;
@@ -37,6 +38,7 @@ function dis_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
   } else if ($p_view == "day") {
     $block = dis_day_planning($agenda, $calendar_entity);
   }
+  $display["print_url"] = "$path/agenda/agenda_index.php?action=view_$p_view";
 
   return $block;
 }
@@ -1602,8 +1604,6 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   }
   
   // userobm select
-  echo "<p>user:";
-  print_r($users["entity"]);
   if (is_array($users["entity"])) {
     foreach ($users["entity"] as $u_id => $u_ent) {
       $u_name = $u_ent["label"];
@@ -1668,8 +1668,6 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
 ";
 
   if ($cagenda_resource) {
-  echo "<p>res:";
-  print_r($res);
     // resource select
     if (is_array($res["entity"])) {
       foreach ($res["entity"] as $r_id => $r_ent) {

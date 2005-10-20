@@ -127,7 +127,7 @@ if ($action == "index") {
     $display["detail"] = html_waiting_events($obm_wait);
   } else {
     require("agenda_js.inc");
-    $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
+    $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
   }
 
 } elseif ($action == "decision") {
@@ -147,29 +147,29 @@ if ($action == "index") {
     } else {
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg($l_update_ok); 
-      $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
+      $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
     }
   }
 
 } elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["result"] = dis_calendar_view($agenda, $cal_entity_id, "day");
+  $display["detail"] = dis_calendar_view($agenda, $cal_entity_id, "day");
 
 } elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["result"] = dis_calendar_view($agenda, &$cal_entity_id, "week");
+  $display["detail"] = dis_calendar_view($agenda, &$cal_entity_id, "week");
 
 } elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["result"] = dis_calendar_view($agenda, $cal_entity_id, "month");
+  $display["detail"] = dis_calendar_view($agenda, $cal_entity_id, "month");
 
 } elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["result"] = dis_calendar_view($agenda, $cal_entity_id, "year");
+  $display["detail"] = dis_calendar_view($agenda, $cal_entity_id, "year");
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ if ($action == "index") {
       run_query_add_event($agenda, $cal_entity_id, $event_id);
       $display["msg"] .= display_ok_msg($l_insert_ok);
       $agenda["date"] = $agenda["datebegin"];
-      $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
+      $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
     }
   } else {
     require("$obminclude/calendar.js");
@@ -234,7 +234,7 @@ if ($action == "index") {
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg($l_update_ok);
       $agenda["date"] = $agenda["datebegin"];
-      $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
+      $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
     }
   } else {
     require("agenda_js.inc");
@@ -248,7 +248,7 @@ if ($action == "index") {
   run_query_update_occurence_state($agenda["id"],$uid,$agenda["decision_event"]);
   require("agenda_js.inc");
   $display["msg"] .= display_ok_msg($l_update_ok);
-  $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
+  $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -262,7 +262,7 @@ if ($action == "index") {
   if ($agenda["id"] > 0) {
      run_query_delete($agenda);
   }
-  $display["result"] = dis_calendar_view($agenda, $cal_entity_id);
+  $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
