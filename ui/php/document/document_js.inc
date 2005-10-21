@@ -223,12 +223,10 @@ function show_hide_field()
     basic_hide('url_field');";
     if (!isset($document["path"])) {
       $extra_js .= "
-      document.f_mod_document.tf_path.value = '$default_path';
-      ";
+      document.f_mod_document.tf_path.value = '$default_path';";
     } else {
       $extra_js .= "
-      document.f_mod_document.tf_path.value = '".dirname($document["path"])."';
-      ";
+      document.f_mod_document.tf_path.value = '".dirname($document["path"])."';";
     }
     $extra_js .= "
   }
@@ -238,12 +236,10 @@ function show_hide_field()
     basic_show('url_field');";
     if (!isset($document["path"])) {
       $extra_js .= "
-      document.f_mod_document.tf_path.value = '$default_path';
-      ";
+      document.f_mod_document.tf_path.value = '$default_path';";
     } else {
       $extra_js .= "
-      document.f_mod_document.tf_path.value = '".dirname($document["path"])."';
-      ";
+      document.f_mod_document.tf_path.value = '".dirname($document["path"])."';";
     }
     $extra_js .= "
     document.f_mod_document.preurl.value = \"http://\";
@@ -251,16 +247,13 @@ function show_hide_field()
   else if(radios[2].checked == true) {
     basic_show('browse_img');
     basic_hide('browse_field');
-    basic_show('url_field');
-    ";
+    basic_show('url_field');";
     if (!isset($document["path"])) {
       $extra_js .= "
-      document.f_mod_document.tf_path.value = '$default_path';
-      ";
+      document.f_mod_document.tf_path.value = '$default_path';";
     } else {
       $extra_js .= "
-      document.f_mod_document.tf_path.value = '".dirname($document["path"])."';
-      ";
+      document.f_mod_document.tf_path.value = '".dirname($document["path"])."';";
     }
     $extra_js .= "
     document.f_mod_document.preurl.value =\"https://\";
@@ -302,5 +295,3 @@ if (isset($ext_target)) {
   }
   ";
 }
-
-";

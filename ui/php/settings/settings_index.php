@@ -16,12 +16,12 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 $uid = $auth->auth["uid"];
 
 if ($param_lang != "") {
-  $set_lang=$param_lang;
+  $set_lang = $param_lang;
   $sess->register("set_lang");
   update_user_pref($uid, "set_lang", $set_lang);
 }
 if ($param_theme != "") {
-  $set_theme=$param_theme;
+  $set_theme = $param_theme;
   $sess->register("set_theme");
   update_user_pref($uid, "set_theme", $set_theme);
 }
@@ -30,10 +30,9 @@ if ($param_theme != "") {
 if ($form_user_pref) {
 
   $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
-  $set_debug=$param_debug;
+  $set_debug = $param_debug;
   $sess->register("set_debug");
   update_user_pref($uid, "set_debug", $set_debug);
-
   if ($param_menu != "") {
     $set_menu = $param_menu;
     $sess->register("set_menu");
@@ -169,7 +168,6 @@ $sel_dsrc .= "</select>";
   <tr>
     <td class=\"adminLabel\">$l_set_debug ($set_debug)</td>
     <td class=\"adminText\">
-      <input type=\"hidden\" name=\"param_debug\" value=\"1\" />
       <input type=\"checkbox\" name=\"param_debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
       <input type=\"checkbox\" name=\"param_debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
       <input type=\"checkbox\" name=\"param_debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess

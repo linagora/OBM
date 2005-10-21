@@ -767,7 +767,7 @@ function update_user_pref($user_id, $option, $new_value="") {
   $current_value = ($user_value != "" ? $user_value : $default_value);
 
   // if new_value not set new_value set to current_value
-  if ($new_value == "") {
+  if ($new_value === "") {
     $new_value = $current_value;
   }
 
