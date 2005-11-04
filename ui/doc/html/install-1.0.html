@@ -275,6 +275,8 @@ NameVirtualHost 127.0.0.1
 
 <h3>4.1: OBM configuration</h3>
 
+<h4>4.1.1: Global infos</h4>
+
 # in obminclude copy the file <i>obm_conf.inc.sample</i> to your conf file <i>obm_conf.inc</i> and edit it.
 <br/>
 Sselect the database engine to use, declare the database, the database user and password.
@@ -302,6 +304,35 @@ $gp_mail_enabled = false;
 </tr>
 </table>
 
+
+<h4>4.1.2: Document repository</h4>
+
+Since OBM 1.0.0, the document repository is automatically handled by OBM.
+In the install step OBM populate the repository configured with some structured directories for internal storage.
+<br />
+Declare your document repository
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+// Document : Root of the document repository
+$cdocument_root = "/var/www/obmdocuments";
+</pre>
+  </td>
+</tr>
+</table>
+
+<br />
+Make sure this directory is writable by the apache process
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+$ chown www-data:www-data /var/www/obmdocuments
+or
+$ chmod a+rwx /var/www/obmdocuments
+</pre>
+  </td>
+</tr>
+</table>
 
 
 <h3>4.2: Database Configuration and Creation</h3>
@@ -343,13 +374,13 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* 
 </table>
 <p />
 
-The script <i>install_obmdb_0.9.mysql.sh</i> handle all the database creation steps.
+The script <i>install_obmdb_1.0.mysql.sh</i> handle all the database creation steps.
 <br>
 Set the correct User / password (or DB) in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-cd obm/scripts/0.9
+cd obm/scripts/1.0
 emacs /install_obmdb_1.0.mysql.sh
 ./install_obmdb_1.0.mysql.sh
 </pre>
@@ -384,7 +415,7 @@ If your Postgres server is not configured with latin1 character set:
 </tr>
 </table>
 
-OBM should soon be converted to UTF8 by default.
+OBM should in the future be converted to UTF8 by default.
 <p />
 
 <h5>4.2.3.2: Install</h5>
@@ -453,7 +484,7 @@ psql -U obm obm < scripts/1.0/obmdb_default_values_1.0.sql
 </table>
 
 <h3>Restore default display values for each user</h3>
-# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which drop preferences for each user, hence leading to default)
 
 <p>
 <h3>Update stored values that are not calculated</h3>
