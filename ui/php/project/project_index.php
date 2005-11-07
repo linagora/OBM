@@ -87,16 +87,16 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($project);
   $display["result"] = dis_project_search_list($project);
 
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_project_form($action, "", $project);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["id"] > 0) {
     $display["detail"] = dis_project_consult($project["id"]);
@@ -104,7 +104,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg($l_query_error);
   }
   
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["id"] > 0) {
     $project_q = run_query_detail($project["id"]);
@@ -145,7 +145,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = html_project_form($action, "", $project);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_project($project["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
@@ -156,7 +156,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_project_consult($project["id"]);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_project($project["id"])) {
     $retour = run_query_delete($project["id"]);
@@ -178,14 +178,14 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_project_consult($project["id"]);
   }
 
-} elseif ($action == "task")  {
+} elseif ($action == "task") {
 ///////////////////////////////////////////////////////////////////////////////
   $project["name"] = run_query_projectname($project["id"]);
   $tasks_q = run_query_tasks($project["id"]);
   $display["detail"]  = html_project_task_form($tasks_q, $project);
   $display["detail"] .= html_project_tasklist($tasks_q, $project);
 
-} elseif ($action == "task_add")  {
+} elseif ($action == "task_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_task_form($project["id"], $project)) {
     $retour = run_query_task_insert($project);
@@ -206,7 +206,7 @@ if ($action == "ext_get_id") {
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   }
 
-} elseif ($action == "task_update")  {
+} elseif ($action == "task_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_task_form($project["id"], $project)) {
     $retour = run_query_task_update($project);
@@ -227,7 +227,7 @@ if ($action == "ext_get_id") {
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   }
 
-} elseif ($action == "task_del")  {
+} elseif ($action == "task_del") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["tsk_nb"] > 0) {
     $nb = run_query_task_delete($project);
@@ -244,14 +244,14 @@ if ($action == "ext_get_id") {
   $display["detail"] = html_project_task_form($tasks_q, $project);
   $display["detail"] .= html_project_tasklist($tasks_q, $project);
       
-} elseif ($action == "member")  {
+} elseif ($action == "member") {
 ///////////////////////////////////////////////////////////////////////////////
   $project["name"] = run_query_projectname($project["id"]);
   $tasks_q = run_query_tasks($project["id"]);
   $members_q = run_query_members($project["id"]);
   $display["detail"] .= html_project_member_form($members_q, $project );
 
-} elseif ($action == "allocate")  {
+} elseif ($action == "allocate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["id"] > 0) {
     $project["name"] = run_query_projectname($project["id"]);
@@ -267,7 +267,7 @@ if ($action == "ext_get_id") {
     }
   }
 
-} elseif ($action == "advance")  {
+} elseif ($action == "advance") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["id"] > 0) {
     $project["name"] = run_query_projectname($project["id"]);
@@ -283,7 +283,7 @@ if ($action == "ext_get_id") {
     }
   }
 
-} elseif ($action == "allocate_update")  {
+} elseif ($action == "allocate_update") {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($project["id"], $project)) {
   $ins_err = run_query_allocate_update($project);
@@ -298,7 +298,7 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] = dis_project_consult($project["id"]);
 
-} elseif ($action == "advance_update")  {
+} elseif ($action == "advance_update") {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($project["id"], $project)) {
   $ins_err = run_query_advance_update($project);
@@ -313,13 +313,13 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] = dis_project_consult($project["id"]);
 
-} elseif ($action == "dashboard")  {
+} elseif ($action == "dashboard") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["id"] > 0) {
     $display["detail"] = dis_project_dashboard($project);
   }
   
-} elseif ($action == "member_add")  {
+} elseif ($action == "member_add") {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $project["ext_id"];
   $project["id"] = $pid;
@@ -334,7 +334,7 @@ if ($action == "ext_get_id") {
   $members_q = run_query_members($pid);
   $display["detail"] = html_project_member_form($members_q, $project);
 
-} elseif ($action == "member_del")  {
+} elseif ($action == "member_del") {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $project["id"];
   $project["name"] = run_query_projectname($project["id"]);
@@ -350,7 +350,7 @@ if ($action == "ext_get_id") {
   $members_q = run_query_members($pid);
   $display["detail"] = html_project_member_form($members_q, $project);
 
-} elseif ($action == "member_update")  {
+} elseif ($action == "member_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $project["id"];
   $project["name"] = run_query_projectname($pid);
@@ -359,7 +359,7 @@ if ($action == "ext_get_id") {
   $members_q = run_query_members($pid);
   $display["detail"] = html_project_member_form($members_q, $project);
 
-} elseif ($action == "document_add")  {
+} elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["doc_nb"] > 0) {
     $nb = run_query_insert_documents($project, "project");

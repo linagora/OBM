@@ -369,7 +369,7 @@ $display["detail"] .= dis_cat_links($deal);
 } elseif ($action == "parent_search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $usr_q = run_query_userobm_active();
+  $usr_q = run_query_deal_manager();
   $display["search"] = html_parentdeal_search_form($deal, $usr_q);
   $display["result"] = dis_parentdeal_search_list($deal);
 
@@ -396,11 +396,11 @@ $display["detail"] .= dis_cat_links($deal);
     } else {
       $display["msg"] .= display_err_msg($err_msg);
     }
-    $display["search"] = html_parentdeal_search_form($deal, run_query_userobm());
+    $display["search"] = html_parentdeal_search_form($deal, run_query_deal_manager(1));
   } else {
     require("deal_js.inc");
     $display["msg"] .= display_warn_msg($err_msg);
-    $display["search"] = html_parentdeal_search_form($deal, run_query_userobm());
+    $display["search"] = html_parentdeal_search_form($deal, run_query_deal_manager(1));
   }
   
 } elseif ($action == "parent_delete") {
@@ -409,7 +409,7 @@ $display["detail"] .= dis_cat_links($deal);
     run_query_delete_parentdeal($deal["parent"]); 
     $display["msg"] .= display_ok_msg($l_delete_ok); 
     require("deal_js.inc");
-    $display["search"] = html_parentdeal_search_form($deal, run_query_userobm());
+    $display["search"] = html_parentdeal_search_form($deal, run_query_deal_manager(1));
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete_parent, false);

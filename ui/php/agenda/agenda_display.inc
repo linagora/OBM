@@ -1405,6 +1405,29 @@ function html_conflict_form($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Event Consultation
+// Parameters:
+//   - $id : event id
+///////////////////////////////////////////////////////////////////////////////
+function dis_event_consult($id) {
+  global $display, $l_query_error;
+
+  if ($id > 0) {
+    $eve_q = run_query_detail($id);
+    if ($eve_q->num_rows() == 1) {
+      $entities = get_event_entity($id);
+      $display["detailInfo"] = display_record_info($eve_q);
+      $block = html_calendar_consult($eve_q, $entities);
+    } else {
+      $display["msg"] .= display_err_msg($l_query_error);
+    }
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the event form
 // Parameters:
 //   - $action   : action called

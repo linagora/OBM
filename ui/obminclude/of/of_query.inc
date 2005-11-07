@@ -1148,21 +1148,19 @@ function get_user_info($id="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Userobm query execution : All users
+// Userobm query execution : All users (or the one for the id given)
 // Parameters:
 //   - $id (optionnal) : UserObm Id 
 // Return:
 //   - Database Object : userobm list
-// Used by: deal, contract, incident
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm($id="") {
   global $cdg_sql;
 
-  if ($id) $where = "AND userobm_id='$id'";
+  if ($id) $where = "WHERE userobm_id='$id'";
   $query = "SELECT *
     FROM UserObm
-    WHERE userobm_archive = 0
-      $where
+    $where
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -1178,7 +1176,6 @@ function run_query_userobm($id="") {
 //   - $ids (optionnal) : array of UserObm Id to add to the result
 // Return:
 //   - Database Object : userobm list
-// Used by: company, contact, deal, list, invoice, incident
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_active($ids="") {
   global $cdg_sql;

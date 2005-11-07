@@ -907,7 +907,7 @@ function html_project_form($action, $project_q, $project) {
 
   if (($action == "new") || ($action == "insert")) {
     // member select
-    $mb_q = run_query_get_obmusers();
+    $mb_q = run_query_all_users_from_group($cg_prod);
     $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
       <option value=\"0\">$l_none</option>\n";
     while ($mb_q->next_record()) {

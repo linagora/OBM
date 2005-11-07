@@ -201,12 +201,7 @@ if ($action == "index") {
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($agenda["id"] > 0) {
-    $eve_q = run_query_detail($agenda["id"]);
-    $entities = get_event_entity($agenda["id"]);
-    $display["detailInfo"] = display_record_info($eve_q);
-    $display["detail"] = html_calendar_consult($eve_q, $entities);
-  }
+  $display["detail"] = dis_event_consult($agenda["id"]);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,17 +247,29 @@ if ($action == "index") {
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($agenda["id"] > 0) {
-    $display["detail"] = html_dis_delete($agenda);
+  if (check_can_delete_agenda($agenda["id"])) {
+    if ($agenda["id"] > 0) {
+      $display["detail"] = html_dis_delete($agenda);
+    }
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_event_consult($agenda["id"]);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("agenda_js.inc");
-  if ($agenda["id"] > 0) {
-     run_query_delete($agenda);
+  if (check_can_delete_agenda($agenda["id"])) {
+    require("agenda_js.inc");
+    if ($agenda["id"] > 0) {
+      run_query_delete($agenda);
+    }
+    $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_event_consult($agenda["id"]);
   }
-  $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////

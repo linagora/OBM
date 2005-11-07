@@ -1241,33 +1241,31 @@ function run_query_members($p_id = 0) {
   
   if ($p_id) {
     $query = "
-      select
+      SELECT
         userobm_id as member_id,
         userobm_firstname as member_firstname,
         userobm_lastname as member_lastname,
         projectuser_manager as member_manager
-      from ProjectUser
-           left join UserObm on projectuser_user_id = userobm_id
-      where projectuser_project_id = '$p_id'
+      FROM ProjectUser
+           LEFT JOIN UserObm ON projectuser_user_id = userobm_id
+      WHERE projectuser_project_id = '$p_id'
         and projectuser_projecttask_id is null
-        and userobm_archive = 0
-      group by member_id, member_firstname, member_lastname, member_manager
-      order by member_lastname
+      GROUP BY member_id, member_firstname, member_lastname, member_manager
+      ORDER BY member_lastname
       ";
   } else { 
     $query = "
-      select
+      SELECT
         userobm_id as member_id,
         userobm_firstname as member_firstname,
         userobm_lastname as member_lastname
-      from ProjectUser
-           left join UserObm on projectuser_user_id = userobm_id
-      where userobm_archive = 0
-        and projectuser_projecttask_id is null
-      group by member_id, member_firstname, member_lastname
-      order by member_lastname
+      FROM ProjectUser
+           LEFT JOIN UserObm ON projectuser_user_id = userobm_id
+      WHERE projectuser_projecttask_id is null
+      GROUP BY member_id, member_firstname, member_lastname
+      ORDER BY member_lastname
       ";
-  }  
+  }
   display_debug_msg($query, $cdg_sql, "run_query_members");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -1286,10 +1284,10 @@ function get_project_participants($p_id = 0) {
   global $cdg_sql;
   
   $query = "
-    select
+    SELECT
       projectuser_user_id
-    from ProjectUser
-      where projectuser_project_id = '$p_id'
+    FROM ProjectUser
+      WHERE projectuser_project_id = '$p_id'
       "; 
   display_debug_msg($query, $cdg_sql, "run_query_participants(1)");
   $obm_q = new DB_OBM;
@@ -1301,12 +1299,12 @@ function get_project_participants($p_id = 0) {
     array_push($users_arr, $u_id);
   }
 
- $query = "
-    select
+  $query = "
+    SELECT
       timetask_user_id
-    from TimeTask, ProjectTask
-      where timetask_projecttask_id = projecttask_id
-        and projecttask_project_id = '$p_id'
+    FROM TimeTask, ProjectTask
+      WHERE timetask_projecttask_id = projecttask_id
+        AND projecttask_project_id = '$p_id'
       "; 
   display_debug_msg($query, $cdg_sql, "run_query_participants(2)");
   $obm_q->query($query);
@@ -1330,18 +1328,18 @@ function get_project_participants($p_id = 0) {
 function run_query_managers($p_id = 0) {
   global $cdg_sql;
 
-  $query = "select userobm_id as manager_id,
+  $query = "SELECT userobm_id as manager_id,
       userobm_firstname as manager_firstname,
       userobm_lastname as manager_lastname
-    from ProjectUser, UserObm
-    where projectuser_user_id = userobm_id
-      and projectuser_manager = 1 ";
+    FROM ProjectUser, UserObm
+    WHERE projectuser_user_id = userobm_id
+      AND projectuser_manager = 1 ";
   
   if ($p_id)
-    $query .= "and projectuser_project_id = '$p_id' ";
+    $query .= "AND projectuser_project_id = '$p_id' ";
 
-  $query .= "group by manager_id, manager_firstname, manager_lastname
-             order by manager_lastname";
+  $query .= "GROUP BY manager_id, manager_firstname, manager_lastname
+             ORDER BY manager_lastname";
 
   display_debug_msg($query, $cdg_sql, "run_query_managers");
   $obm_q = new DB_OBM;
@@ -1350,25 +1348,8 @@ function run_query_managers($p_id = 0) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-// Get all the contacts of the companyusing obm
-//  -- THIS SHOULD CHANGE TO USE THE User TABLE --
-//////////////////////////////////////////////////////////////////////////
-function run_query_get_obmusers() {
-  global $cdg_sql;
- 
-  $obm_db=new DB_OBM;
-  $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm 
-          where userobm_archive!=1 order by userobm_lastname";
-  display_debug_msg($query, $cdg_sql, "run_query_get_obmusers");
-
-  $obm_db->query($query);
-  return $obm_db;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// New Project Form Data checking and formatting                             //
+// New Project Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
 //   - $project[] : values checked

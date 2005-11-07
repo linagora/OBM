@@ -39,7 +39,7 @@ function run_query_search($resource, $p_new_order, $p_order_dir, $restriction=""
       $where_restriction .= "))";
     }
   }
-  echo "<p>res=$where_restriction";
+  //  echo "<p>res=$where_restriction";
 
   $select = "SELECT Resource.*, resource_id as id
     FROM Resource";
@@ -249,10 +249,22 @@ function run_query_delete($p_id) {
   $retour = $obm_q->query($query);
   if (!$retour) return $retour;
 
+  // Delete Resource rights
   $query = "DELETE FROM EntityRight 
     WHERE
       entityright_entity_id='$p_id'
       AND entityright_entity = 'resource'
+";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  // Delete Resource events
+  $query = "DELETE FROM EventEntity 
+    WHERE
+      evententity_entity_id='$p_id'
+      AND evententity_entity = 'resource'
 ";
 
   display_debug_msg($query, $cdg_sql);
@@ -320,6 +332,22 @@ function check_data_form($p_id, $resource) {
   }
 
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the resource can be deleted
+// Parameters:
+//   - $id : resource id
+// Returns:
+//   true if the resource can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_resource($id) {
+  global $err_msg, $ok_msg;
+
+  $delete_ok = true;
+
+  return $delete_ok;
 }
 
 

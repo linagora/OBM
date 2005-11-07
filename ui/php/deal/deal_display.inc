@@ -117,7 +117,9 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 function dis_deal_index($deal="") {
   global $display, $ctt_sales;
 
-  $usr_q = run_query_userobm();
+  $archive = $deal["archive"];
+
+  $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
   $cat_q = run_query_dealcategory();
@@ -137,7 +139,9 @@ function dis_deal_index($deal="") {
 function dis_deal_search_form($deal="") {
   global $display, $ctt_sales;
 
-  $usr_q = run_query_userobm();
+  $archive = $deal["archive"];
+
+  $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
   $cat_q = run_query_dealcategory();
@@ -1703,15 +1707,15 @@ function html_deal_affect($parent_q, $p_deal_id) {
 // Display The Deal potential block
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_potential() {
-  global $display, $set_theme;
+  global $display, $set_theme, $l_total;
   global $l_deal, $l_forecast, $l_deal_total, $l_module_deal, $l_deal_balanced;
-  global $l_marketing_manager, $l_total, $l_help_deal_forecast;
+  global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
   $display["title"] = "<div class=\"title\">$l_deal : $l_forecast</div>";
 
   $cpt = 1;
   $potentials = run_query_deal_potential();
-  foreach($potentials as $u_id => $pu) {
+  foreach($potentials["market"] as $u_id => $pu) {
     if ($u_id != "0") {
       $cpt++;
       $data = "data" . ($cpt % 2);
@@ -1719,7 +1723,25 @@ function dis_deal_potential() {
       $balanced = number_format($pu["amount_balanced"]);
       $nb_potential = $pu["number"];
       $user = $pu["name"];
-      $dis_pot .= "
+      $dis_market_pot .= "
+      <tr class=\"$data\">
+        <td>$user</td>
+        <td style=\"text-align: center;\">$nb_potential</td>
+        <td style=\"text-align: right;\">$amount</td>
+        <td style=\"text-align: right;\">$balanced</td>
+      </tr>";
+    }
+  }
+
+  foreach($potentials["tech"] as $u_id => $pu) {
+    if ($u_id != "0") {
+      $cpt++;
+      $data = "data" . ($cpt % 2);
+      $amount = number_format($pu["amount"]);
+      $balanced = number_format($pu["amount_balanced"]);
+      $nb_potential = $pu["number"];
+      $user = $pu["name"];
+      $dis_tech_pot .= "
       <tr class=\"$data\">
         <td>$user</td>
         <td style=\"text-align: center;\">$nb_potential</td>
@@ -1741,7 +1763,23 @@ function dis_deal_potential() {
       <td class=\"resultHead\">$l_deal_total</td>
       <td class=\"resultHead\">$l_deal_balanced</td>
     </tr>
-    $dis_pot
+    $dis_market_pot
+    <tr class=\"data2\">
+      <td>$l_total</td>
+      <td style=\"text-align: center;\">$nb_potential_t</td>
+      <td style=\"text-align: right;\">$amount_t</td>
+      <td style=\"text-align: right;\">$balanced_t</td>
+    </tr>
+    </table>
+    <p />
+    <table class=\"resultTable\">
+    <tr>
+      <td class=\"resultHead\">$l_technical_manager</td>
+      <td class=\"resultHead\"># $l_module_deal</td>
+      <td class=\"resultHead\">$l_deal_total</td>
+      <td class=\"resultHead\">$l_deal_balanced</td>
+    </tr>
+    $dis_tech_pot
     <tr class=\"data2\">
       <td>$l_total</td>
       <td style=\"text-align: center;\">$nb_potential_t</td>
@@ -1750,7 +1788,6 @@ function dis_deal_potential() {
     </tr>
     </table>";
 
-  //  $deals = run_query_deal_status($uid);
   if (count($deals) > 0) {
     foreach ($deals as $status => $nb) {
       $dis_status .= "
@@ -2544,6 +2581,7 @@ function dis_parentdeal_consult($deal) {
 
   $new_order = $deal["new_order"];
   $order_dir = $deal["order_dir"];
+  $archive = $deal["archive"];
 
   $obm_q = run_query_detail_parentdeal($deal["parent"]);
   $prefs = get_display_pref ($uid, "deal");
@@ -2553,7 +2591,7 @@ function dis_parentdeal_consult($deal) {
   $tt_q = run_query_tasktype($ctt_sales);
   $cat_q = run_query_dealcategory();
   $status_q = run_query_dealstatus();
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_deal_manager($archive);
 
   $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tt_q, $cat_q, $status_q, $usr_q);
 

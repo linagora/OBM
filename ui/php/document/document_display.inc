@@ -681,7 +681,7 @@ function html_dir_form($action, $document) {
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_can_delete_document($p_id) {
-  global $display, $l_can_delete, $l_cant_delete, $l_back;
+  global $display, $l_delete, $l_can_delete, $l_back;
 
   $url = url_prepare("document_index.php");
 

@@ -726,13 +726,16 @@ function run_query_deal_potential($users_id="") {
   global $cdg_sql, $cdg_param;
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
-    $where_uid = "AND (";
+    $where_market_uid = "AND (";
+    $where_tech_uid = "AND (";
     $or = "";
     foreach ($users_id as $u_id) {
-      $where_uid .= " $or deal_marketingmanager_id='$u_id'";
+      $where_market_uid .= " $or deal_marketingmanager_id='$u_id'";
+      $where_tech_uid .= " $or deal_technicalmanager_id='$u_id'";
       $or = "OR";
     }
-    $where_uid .= ")";
+    $where_market_uid .= ")";
+    $where_tech_uid .= ")";
   }
 
   $query = "SELECT
@@ -749,11 +752,11 @@ function run_query_deal_potential($users_id="") {
       AND deal_hitrate > 0
       AND deal_hitrate < 100
       AND deal_archive = '0'
-      $where_uid
+      $where_market_uid
     GROUP BY deal_marketingmanager_id
 ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_deal_potential");
+  display_debug_msg($query, $cdg_sql, "run_query_deal_potential(1)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -763,18 +766,56 @@ function run_query_deal_potential($users_id="") {
 
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f("uid");
-    $res["$u_id"]["amount"] = $obm_q->f("amount");
-    $res["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
-    $res["$u_id"]["number"] = $obm_q->f("nb");
-    $res["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
-    $am += $res["$u_id"]["amount"];
-    $ab += $res["$u_id"]["amount_balanced"];
-    $nb += $res["$u_id"]["number"];
+    $res["market"]["$u_id"]["amount"] = $obm_q->f("amount");
+    $res["market"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
+    $res["market"]["$u_id"]["number"] = $obm_q->f("nb");
+    $res["market"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+    $am += $res["market"]["$u_id"]["amount"];
+    $ab += $res["market"]["$u_id"]["amount_balanced"];
+    $nb += $res["market"]["$u_id"]["number"];
   }
 
   $res["0"]["amount"] = $am;
   $res["0"]["amount_balanced"] = $ab;
   $res["0"]["number"] = $nb;
+
+  // Tech manager stats
+  $query = "SELECT
+      deal_technicalmanager_id AS uid,
+      count(*) as nb,
+      sum(deal_amount) as amount,
+      sum(deal_amount * deal_hitrate / 100) as amount_balanced,
+      userobm_lastname,
+      userobm_firstname
+    FROM Deal
+      LEFT JOIN DealType ON deal_type_id = dealtype_id
+      LEFT JOIN UserObm ON deal_technicalmanager_id=userobm_id
+    WHERE dealtype_inout = '+'
+      AND deal_hitrate > 0
+      AND deal_hitrate < 100
+      AND deal_archive = '0'
+      $where_tech_uid
+    GROUP BY deal_technicalmanager_id
+";
+
+  display_debug_msg($query, $cdg_sql, "run_query_deal_potential(2)");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $am = 0;
+  $ab = 0;
+  $nb = 0;
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f("uid");
+    $res["tech"]["$u_id"]["amount"] = $obm_q->f("amount");
+    $res["tech"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
+    $res["tech"]["$u_id"]["number"] = $obm_q->f("nb");
+    $res["tech"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+    $am += $res["tech"]["$u_id"]["amount"];
+    $ab += $res["tech"]["$u_id"]["amount_balanced"];
+    $nb += $res["tech"]["$u_id"]["number"];
+  }
 
   return $res;
 }
@@ -859,6 +900,49 @@ function run_query_deal_stats($deal, $users_id="") {
     display_debug_msg($query, $cdg_sql, "run_query_deal_stats()");
     $obm_q->query($query);
   }
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get Deal manager list
+// Parameters:
+//   - $archive : if true, get managers of archive deals too
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_manager($archive = false) {
+  global $cdg_sql;
+
+  if (! $archive) {
+    $where_arch .= " deal_archive=0";
+  }
+
+  if ($where_arch != "") {
+    $where = "WHERE $where_arch";
+  }
+
+  $query = "SELECT DISTINCT
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM Deal
+      LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
+    $where
+  UNION DISTINCT
+    SELECT DISTINCT
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM Deal
+      LEFT JOIN UserObm ON deal_technicalmanager_id=userobm_id
+    $where
+  ORDER BY userobm_lastname";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_deal_manager()");
 
   return $obm_q;
 }

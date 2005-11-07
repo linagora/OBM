@@ -824,6 +824,22 @@ function run_query_update_event_data($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if the event can be deleted
+// Parameters:
+//   - $id : event id
+// Returns:
+//   true if the event can be deleted, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_can_delete_agenda($id) {
+  global $err_msg, $ok_msg;
+
+  $delete_ok = true;
+
+  return $delete_ok;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Delete all events of a evenements, and the event
 // Parameters: 
 //   - $agenda : agenda infos hash
@@ -849,10 +865,10 @@ function run_query_delete($agenda) {
   $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, "run_query_delete(2)");
   $obm_q->query($query);
-  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
+  $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, "run_query_delete(3)");
   $obm_q->query($query);
-  $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$event_id'";
+  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, "run_query_delete(4)");
   $obm_q->query($query);
 

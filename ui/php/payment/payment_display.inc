@@ -40,7 +40,7 @@ $fieldnames["entrytemp_comment"] = $l_entrytemp_comment;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Payment specific dataset fields                                   //
+// Display Payment specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -685,6 +685,7 @@ function html_payment_search_list ($payment_q, $prefs, $nb_payment, $payment){
   global $col_frs, $col_client;
   global $l_found;
   global $display;
+
   // get payment data :
   $label = urlencode($payment["label"]);
   $number = urlencode($payment["number"]);
@@ -958,6 +959,40 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   return $block;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the validation that the payment can be deleted, and the form
+// Parameters:
+//   - $p_id : payment id
+///////////////////////////////////////////////////////////////////////////////
+function dis_can_delete_payment($p_id) {
+  global $display, $l_delete, $l_can_delete, $l_back;
+
+  $url = url_prepare("payment_index.php");
+
+  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_payment\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_payment\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\" />
+    </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+  $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_delete</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////
 // html_chose_invoice_form ()
 // used to search invoices that will be connected to the payment.
@@ -1218,9 +1253,9 @@ function html_banking_problem ($p_error, $p_payment, $p_invoices) {
   return $block;
 }
 
+
 //////////////////////////////////////////////////////////////////////////
 // checking associations between a payment and invoices connected
-// 
 //////////////////////////////////////////////////////////////////////////
 function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices, $invoices_display) {
   global $l_break_asso_strong_confirm, $l_break_asso_go;

@@ -26,6 +26,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $priority = $incident["priority"];
   $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];
+  $logger = $incident["logger"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
   $archive = $incident["archive"];
@@ -46,6 +47,9 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   }
   if ($owner != $c_all && ($owner != "")) {
      $where .=" AND (Incident.incident_owner = '$owner') ";
+  }
+  if ($logger != $c_all && ($owner != "")) {
+     $where .=" AND (Incident.incident_logger = '$logger') ";
   }
   if ($dateafter !="") {
      $where .=" AND (Incident.incident_date >= '$dateafter') ";
@@ -406,6 +410,76 @@ function run_query_delete($i_id) {
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $i_q->query($query);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get Incident owner list
+// Parameters:
+//   - $archive : if true, get owner of archive incidents too
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_incident_owner($archive = false) {
+  global $cdg_sql;
+
+  if (! $archive) {
+    $where_arch .= " incident_archive=0";
+  }
+
+  if ($where_arch != "") {
+    $where = "WHERE $where_arch";
+  }
+
+  $query = "SELECT DISTINCT
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM Incident
+      LEFT JOIN UserObm ON incident_owner=userobm_id
+    $where
+    ORDER BY userobm_lastname";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_incident_owner()");
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get Incident logger list
+// Parameters:
+//   - $archive : if true, get logger of archive incidents too
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_incident_logger($archive = false) {
+  global $cdg_sql;
+
+  if (! $archive) {
+    $where_arch .= " incident_archive=0";
+  }
+
+  if ($where_arch != "") {
+    $where = "WHERE $where_arch";
+  }
+
+  $query = "SELECT DISTINCT
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM Incident
+      LEFT JOIN UserObm ON incident_logger=userobm_id
+    $where
+    ORDER BY userobm_lastname";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_incident_logger()");
+
+  return $obm_q;
 }
 
 

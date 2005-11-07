@@ -33,10 +33,6 @@ page_close();
 $display["head"] = display_head("$l_treso");
 $display["header"] = generate_menu($module, $section);
 
-///////////////////////////////////////////////////////////////////////////////
-// ACTIONS :
-///////////////////////////////////////////////////////////////////////////////
-
 if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
@@ -238,7 +234,6 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   $display["msg"] = display_ok_msg ($l_insert_ok);
   $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment); 
 
-///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update ($payment); 
@@ -246,17 +241,41 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
 
   $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account(), $payment); 
 
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
+  if (check_can_delete_payment($payment["id"])) {
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_payment($payment["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $pay_q = run_query_detail($payment["id"]);
+    $inv_q = run_query_search_connected_invoices($payment["id"]);
+    $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
+    $display["detailInfo"] = display_record_info($pay_q);
+    $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $prefs_i);
+  }
+
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $success = run_query_delete ($payment["id"]);
-  if ($success) {
-    $display["msg"] = display_ok_msg ($l_delete_ok);
+  if (check_can_delete_payment($payment["id"])) {
+    $success = run_query_delete ($payment["id"]);
+    if ($success) {
+      $display["msg"] = display_ok_msg ($l_delete_ok);
+    } else {
+      $display["msg"] = display_err_msg ($l_delete_error);
+    }
+    $display["search"] = html_payment_search_form ($action,run_query_paymentkind(),run_query_account(),'','','');
   } else {
-    $display["msg"] = display_err_msg ($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $pay_q = run_query_detail($payment["id"]);
+    $inv_q = run_query_search_connected_invoices($payment["id"]);
+    $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
+    $display["detailInfo"] = display_record_info($pay_q);
+    $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $prefs_i);
   }
-  $display["search"] = html_payment_search_form ($action,run_query_paymentkind(),run_query_account(),'','','');
-  
+
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "break_asso") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -402,7 +421,7 @@ elseif ($action == "select_reconcile") {
 
   $et_array = array ();
   $pay_array = array ();
-  while (list($key) = each ($HTTP_POST_VARS)){
+  while (list($key) = each ($HTTP_POST_VARS)) {
     if (strcmp(substr($key,0,9),"check_et_")==0) {
       // we had this id to our list : 
       $et_array[] = substr($key,9);
@@ -730,12 +749,19 @@ function get_payment_action() {
     'Condition'=> array ('None') 
                                                 );
 
-// Delete
-  $actions["payment"]["delete"] = array (
+// Check Delete
+  $actions["payment"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$payment["payment"]."",
+    'Url'      => "$path/payment/payment_index.php?action=check_delete&amp;param_payment=".$payment["payment"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
+                                     	 );
+
+// Delete
+  $actions["payment"]["delete"] = array (
+    'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$payment["payment"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
                                      	 );
 
 // Break Association

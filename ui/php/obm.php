@@ -228,9 +228,10 @@ function dis_deal_portal() {
   global $l_deal_total, $l_module_deal, $l_my_deal, $l_my_deal_current, $l_deal_balanced;
 
   $potential = run_query_deal_potential(array($uid));
-  $amount = number_format($potential["$uid"]["amount"]);
-  $balanced = number_format($potential["$uid"]["amount_balanced"]);
-  $nb_potential = $potential["$uid"]["number"];
+  $m_amount = number_format($potential["market"]["$uid"]["amount"]);
+  $m_balanced = number_format($potential["market"]["$uid"]["amount_balanced"]);
+  $m_nb_potential = $potential["market"]["$uid"]["number"];
+  $t_nb_potential = $potential["tech"]["$uid"]["number"];
 
   $deals = run_query_deal_status($uid);
   if (count($deals) > 0) {
@@ -254,13 +255,13 @@ function dis_deal_portal() {
     <table>
     <tr>
       <td>$l_my_deal_current</td>
-      <td class=\"number\">$nb_potential</td>
+      <td class=\"number\">$m_nb_potential / $t_nb_potential</td>
     </tr><tr>
       <td>$l_deal_total</td>
-      <td class=\"number\">&nbsp; $amount</td>
+      <td class=\"number\">&nbsp; $m_amount</td>
     </tr><tr>
       <td>$l_deal_balanced</td>
-      <td class=\"number\">$balanced</td>
+      <td class=\"number\">$m_balanced</td>
     </tr>
     <tr><td>&nbsp;</td><td></td></tr>
     $dis_status

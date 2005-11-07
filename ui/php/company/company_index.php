@@ -100,28 +100,28 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $display["search"] = dis_company_search_form($company);
   $display["result"] = dis_company_search_list($company);
 
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $display["detail"] = dis_company_form($action, $company);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $display["detail"] = dis_company_consult($company["id"]);
 
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $display["detail"] = dis_company_form($action, $company);
 
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $company)) {
 
@@ -160,7 +160,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_company_form($action, $company);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($company["id"], $company)) {
     $retour = run_query_update($company["id"], $company);
@@ -176,7 +176,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_company_form($action, $company);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_company($company["id"])) {
     require("company_js.inc");
@@ -188,7 +188,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_company_consult($company["id"]);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_company($company["id"])) {
     $retour = run_query_delete($company["id"]);
@@ -204,7 +204,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_company_consult($company["id"]);
   }
 
-} elseif ($action == "admin")  {
+} elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $display["detail"] = dis_admin_index();
@@ -220,7 +220,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_update")  {
+} elseif ($action == "kind_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_update($company);
   if ($retour) {
@@ -231,11 +231,11 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_checklink")  {
+} elseif ($action == "kind_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_kind_links($company);
 
-} elseif ($action == "kind_delete")  {
+} elseif ($action == "kind_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_delete($company["kind"]);
   if ($retour) {
@@ -246,7 +246,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "activity_insert")  {
+} elseif ($action == "activity_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_insert($company);
   if ($retour) {
@@ -257,7 +257,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "activity_update")  {
+} elseif ($action == "activity_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_update($company);
   if ($retour) {
@@ -268,11 +268,11 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "activity_checklink")  {
+} elseif ($action == "activity_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_activity_links($company);
 
-} elseif ($action == "activity_delete")  {
+} elseif ($action == "activity_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_delete($company["activity"]);
   if ($retour) {
@@ -283,7 +283,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "nafcode_insert")  {
+} elseif ($action == "nafcode_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_nafcode_insert($company);
   if ($retour) {
@@ -294,7 +294,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "nafcode_update")  {
+} elseif ($action == "nafcode_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_nafcode_update($company);
   if ($retour) {
@@ -305,11 +305,11 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "nafcode_checklink")  {
+} elseif ($action == "nafcode_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_nafcode_links($company);
 
-} elseif ($action == "nafcode_delete")  {
+} elseif ($action == "nafcode_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_nafcode_delete($company["nafcode"]);
   if ($retour) {
@@ -320,7 +320,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat_insert")  {
+} elseif ($action == "cat_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_insert($company);
   if ($retour) {
@@ -331,7 +331,7 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat_update")  {
+} elseif ($action == "cat_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_update($company);
   if ($retour) {
@@ -342,11 +342,11 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat_checklink")  {
+} elseif ($action == "cat_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_cat_links($company);
 
-} elseif ($action == "cat_delete")  {
+} elseif ($action == "cat_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_delete($company["cat"]);
   if ($retour) {
@@ -374,7 +374,7 @@ if ($action == "ext_get_id") {
   $prefs = get_display_pref($uid, "company", 1);
   $display["detail"] = dis_company_display_pref($prefs);
 
-} elseif ($action == "document_add")  {
+} elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($company["doc_nb"] > 0) {
     $nb = run_query_insert_documents($company, "company");

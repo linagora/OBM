@@ -39,7 +39,6 @@ require("resource_query.inc");
 require("resource_js.inc");
 require("$obminclude/lib/right.inc");
 
-
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
@@ -133,15 +132,32 @@ if ($action == "ext_get_ids") {
     $display["detail"] = html_resource_form("", $resource);
   }
 
+} elseif ($action == "check_delete") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_can_delete_resource($resource["id"])) {
+    $display["msg"] .= display_info_msg($ok_msg, false);
+    $display["detail"] = dis_can_delete_resource($resource["id"]);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_resource_consult($resource);
+  }
+
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($resource["id"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+  if (check_can_delete_resource($resource["id"])) {
+    $retour = run_query_delete($resource["id"]);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_delete_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_delete_error);
+    }
+    $display["search"] = html_resource_search_form($resource);
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_warn_msg($err_msg, false);
+    $display["msg"] .= display_warn_msg($l_cant_delete, false);
+    $display["detail"] = dis_resource_consult($resource);
   }
-  $display["search"] = html_resource_search_form($resource);
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -309,12 +325,19 @@ function get_resource_action() {
     'Condition'=> array ('None') 
                                      );
 
+// Check Delete
+  $actions["resource"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/resource/resource_index.php?action=check_delete&amp;param_resource=".$resource["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'insert')
+                                     	      );
+
 // Delete
   $actions["resource"]["delete"] = array (
-    'Name'     => $l_header_delete,
     'Url'      => "$path/resource/resource_index.php?action=delete&amp;param_resource=".$resource["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
+    'Condition'=> array ('None') 
                                      );
 
 // Rights Admin.

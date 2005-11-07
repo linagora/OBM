@@ -72,11 +72,14 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_search_form($incident) {
 
-  $usr_q = run_query_userobm();
+  $archive = $incident["archive"];
+
+  $owner_q = run_query_incident_owner($archive);
+  $logger_q = run_query_incident_logger($archive);
   $type_q = run_query_cat1();
   $prio_q = run_query_priority();
   $stat_q = run_query_status();
-  $block = html_incident_search_form($usr_q,$prio_q,$stat_q,$incident,$type_q);
+  $block = html_incident_search_form($owner_q, $logger_q, $prio_q,$stat_q,$incident,$type_q);
 
   return $block;
 }
@@ -85,16 +88,18 @@ function dis_incident_search_form($incident) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Incident search Form
 // Parameters:
-//   - $usr_q      : DB result object (userobm list)
+//   - $owner_q    : DB result object (userobm list)
+//   - $logger_q   : DB result object (userobm list)
 //   - $pri_q      : DB result object (incident priority list)
 //   - $sta_q      : DB result object (incident status list)
 //   - $cat1_q     : DB result object (incident category1 list)
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident, $cat1_q) {
-  global $l_label,$l_company,$l_contract,$l_priority,$l_status,$l_find,$l_owner;
-  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$c_all,$l_all;
+function html_incident_search_form ($owner_q,$logger_q, $pri_q, $sta_q, $incident, $cat1_q) {
+  global $c_all, $l_all, $l_label,$l_priority,$l_status,$l_find;
+  global $l_owner, $l_logger,$l_company,$l_contract;
+  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_date_after,$l_date_before,$l_archive;
 
   $lincident = stripslashes($incident["lincident"]);
@@ -110,14 +115,25 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident, $cat1_q) 
 
   $dis_sel_owner="<select name=\"sel_owner\">
     <option value=\"$c_all\">$l_all</option>";
-  while($usr_q->next_record()) {
-    $id = $usr_q->f("userobm_id");
+  while($owner_q->next_record()) {
+    $id = $owner_q->f("userobm_id");
     $dis_sel_owner.="\n<option value=\"$id\"";
     if ($id == $owner) 
       $dis_sel_owner.=" selected=\"selected \"";
-    $dis_sel_owner.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+    $dis_sel_owner.=">". $owner_q->f("userobm_lastname") . " " . $owner_q->f("userobm_firstname")."</option>";
   }
   $dis_sel_owner.="</select>";
+
+  $dis_sel_logger="<select name=\"sel_logger\">
+    <option value=\"$c_all\">$l_all</option>";
+  while($logger_q->next_record()) {
+    $id = $logger_q->f("userobm_id");
+    $dis_sel_logger.="\n<option value=\"$id\"";
+    if ($id == $logger) 
+      $dis_sel_logger.=" selected=\"selected \"";
+    $dis_sel_logger.=">". $logger_q->f("userobm_lastname") . " " . $logger_q->f("userobm_firstname")."</option>";
+  }
+  $dis_sel_logger.="</select>";
 
   $sel_pri = "<select name=\"sel_priority\">
     <option value=\"$c_all\">$l_all</option>";
@@ -171,6 +187,9 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident, $cat1_q) 
        </div>
        <div class=\"searchLabel\">$l_status<br />
          $sel_sta
+       </div>
+       <div class=\"searchLabel\">$l_logger<br />
+         $dis_sel_logger
        </div>
        <div class=\"searchLabel\">$l_owner<br />
          $dis_sel_owner

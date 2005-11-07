@@ -445,6 +445,49 @@ function run_query_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get Contract manager list (include marketing + tech)
+// Parameters:
+//   - $archive : if true, get managers of archive contracts too
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contract_manager($archive = false) {
+  global $cdg_sql;
+
+  if (! $archive) {
+    $where_arch .= " contract_archive=0";
+  }
+
+  if ($where_arch != "") {
+    $where = "WHERE $where_arch";
+  }
+
+  $query = "SELECT DISTINCT
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM Contract
+      LEFT JOIN UserObm ON contract_marketmanager_id=userobm_id
+    $where
+  UNION DISTINCT
+    SELECT DISTINCT
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM Contract
+      LEFT JOIN UserObm ON contract_techmanager_id=userobm_id
+    $where
+  ORDER BY userobm_lastname";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_manager()");
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the contract incident list
 // Parameters:
 //   - $id : contract id

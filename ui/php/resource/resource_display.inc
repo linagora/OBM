@@ -355,103 +355,33 @@ function html_resource_consult($obm_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays and check the resource links (and delete form if ok)             //
+// Display the validation that the resource can be deleted, and the form
 // Parameters:
 //   - $p_id : resource id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
-  global $l_no_resource, $l_check_resourcecreate, $l_check_resourceupdate;
+function dis_can_delete_resource($p_id) {
+  global $display, $l_delete, $l_can_delete, $l_back;
 
-  $delete_ok = true;
+  $url = url_prepare("resource_index.php");
 
-  $obm_q = new DB_OBM;
-  $tables = $obm_q->table_names();
+  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_resource\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
 
-  $i = 0;
-  while ($tables[$i]["table_name"]) {
-    $table = $tables[$i]["table_name"];
-
-    // We exclude POSTGRES meta table (sql_xxxx)
-    if (! (substr($table, 0, 4) == "sql_")) {
-      $resourcecreate = $table . "_resourcecreate";
-      $resourceupdate = $table . "_resourceupdate";
-
-      $obm_qm = new DB_OBM;
-      $fields = $obm_qm->metadata($table, false);
-      $fieldexist_uc = false;
-      $fieldexist_uu = false;
-      $j = 0;
-      while ($fields[$j]["name"]) {
-	if (strtoupper($fields[$j]["name"]) == strtoupper($resourcecreate)) {
-	  $fieldexist_uc = true;
-	}
-	if (strtoupper($fields[$j]["name"]) == strtoupper($resourceupdate)) {
-	  $fieldexist_uu = true;
-	}
-	$j++;
-      }
-      if ($fieldexist_uc) {
-	$query = "select count(*) from $table where $resourcecreate='$p_id'";
-	$c_q = new DB_OBM($query);
-	$c_q->next_record();
-	$nbc = $c_q->f("0");
-      }
-      if ($fieldexist_uu) {
-	$query = "select count(*) from $table where $resourceupdate='$p_id'";
-	$c_q = new DB_OBM($query);
-	$c_q->next_record();
-	$nbu = $c_q->f("0");
-      }
-      if ($fieldexist_uc || $fieldexist_uu) {
-	$dis_resource .= "
-      <tr>
-        <td class=\"detailHead\" rowspan=\"2\">$table</td>
-        <td class=\"detailText\"><b>$nbc</b> $l_check_resourcecreate</td>
-      </tr><tr>
-        <td class=\"detailText\"><b>$nbu</b> $l_check_resourceupdate</td>
-      </tr>";
-      } else {
-	$dis_resource .= "
-      <tr>
-        <td class=\"detailHead\">$table</td>
-        <td class=\"detailText\">$l_no_resource</td>
-      </tr>";
-      }
-      $dis_resource .= "<tr>
-      <td colspan=\"2\"><hr /></td>
-    </tr>";
-    }
-    $i++;
-  }
- 
-  $block = "<table class=\"detail\">
-    $dis_resource
-  </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-   " . dis_delete_form($p_id) . "
-    </p>
-  </div>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
-// Parameters:
-//   - $p_id : resource Id
-///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
-  global $l_delete;
-
-  $block = "<form name=\"form_delete\"
-      method=\"post\" action=\"" . url_prepare("resource_index.php") . "\">
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_resource\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onClick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    <input type=\"submit\" value=\"$l_delete\" />
     </form>";
+
+  $display["msg"] .= display_ok_msg($l_can_delete);
+  $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_delete</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
 
   return $block;
 }

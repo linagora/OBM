@@ -29,7 +29,7 @@ echo $PHP : PHP interpreter found
 
 
 echo "*** Document repository creation"
-$PHP install_document_1.0.php || exit $?
+$PHP install_document_1.0.php || (echo $?; exit $?)
 
 
 echo "*** Database creation"
@@ -40,7 +40,7 @@ psql -U $U template1 -c "DROP DATABASE $DB"
 ## XXXXXX obm postgres user creation ?
 
 echo "  Create new $DB database"
-psql -U $U $DB -c "CREATE DATABASE $DB with owner = $U"
+psql -U $U template1 -c "CREATE DATABASE $DB with owner = $U"
 
 echo "  Create new $DB database model"
 psql -U $U $DB < create_obmdb_1.0.pgsql.sql

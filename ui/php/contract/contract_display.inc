@@ -125,7 +125,7 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_form($contract) {
 
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_contract_manager();
   $type_q = run_query_contracttype();
   $prio_q = run_query_priority();
   $stat_q = run_query_status();
@@ -397,13 +397,14 @@ function html_contract_search_list($contract_q, $prefs, $nb_con, $contract, $pop
 // Parameters:
 //   - $id         : contract id
 //   - $con_label  : contract label
+//   - $tech_id    : contract technical manager id
 //   - $deal_id    : deal id
 //   - $inc_nb     : incident number
 //   - $last       : last incident id
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
+function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last) {
   global $set_theme, $ico_incident, $ico_deal, $ico_document,$ico_document_new;
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
@@ -411,7 +412,7 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
   global $path, $auth, $cgp_show;
 
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
-  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;tf_lcontract=$con_label");
+  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
   
   $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
 
@@ -528,6 +529,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   $number = $contract_q->f("contract_number");
   $market = $contract_q->f("lname1") . " " . $contract_q->f("fname1");
   $tech = $contract_q->f("lname2") . " " . $contract_q->f("fname2");
+  $tech_id = $contract_q->f("contract_techmanager_id");
   $com = beautify_comment(nl2br($contract_q->f("contract_comment")));
   $clause = nl2br($contract_q->f("contract_clause"));
   $datebegin = date_format($contract_q->f("datebegin"), 1);
@@ -598,7 +600,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
 
   // --- HTML Template --------------------------------------------------------
 
-  $display["link"] = html_contract_links($id, $label, $deal_id, $inc_nb, $last_inc);
+  $display["link"] = html_contract_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
   $display["title"] = "<div class=\"title\">$l_contract : $label</div>";
 
 
@@ -2053,7 +2055,7 @@ function html_contract_admin_form($type_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the type links                                                   //
+// Displays the type links
 // Parameters:
 //   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
