@@ -96,7 +96,9 @@ function run_query_deal_potential($users_id="") {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_market_uid
-    GROUP BY deal_marketingmanager_id
+    GROUP BY deal_marketingmanager_id,
+      userobm_lastname,
+      userobm_firstname
 ";
   
   display_debug_msg($query, $cdg_sql, "run_query_deal_potential(1)");
@@ -138,7 +140,9 @@ function run_query_deal_potential($users_id="") {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_tech_uid
-    GROUP BY deal_technicalmanager_id
+    GROUP BY deal_technicalmanager_id,
+      userobm_lastname,
+      userobm_firstname
 ";
 
   display_debug_msg($query, $cdg_sql, "run_query_deal_potential(2)");

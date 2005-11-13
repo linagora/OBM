@@ -87,39 +87,6 @@ function display_page(&$display) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: XHTML Head
-///////////////////////////////////////////////////////////////////////////////
-function display_head($p_module) { 
-  global $l_obm_title, $set_theme, $obminclude, $extra_css, $extra_js;
-
-  if (isset($extra_css))
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
-
-  $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
-
-  return "$headers_e
-<head>
-  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
-
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" /> 
-  <title>$l_obm_title - $p_module</title>
-  $dis_extra_css
-<script type=\"text/javascript\">
-<!--
-  $extra_js
-// -->
-</script>
-  
-</head>
-
-<body onload=\"if (document.f_search) { document.f_search.submit.focus();} \">
-";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Function which perform the menu
 // Parametres:
 //   - $tab    : active tab 
@@ -178,11 +145,11 @@ function generate_menu($module) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the section display block
+// Theme specific :Display the section block
 // Parameters:
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
-function display_sections($section) {
+function display_sections_theme($section) {
   global $cgp_show, $sections, $perm;
   
   $ret = "<ul class='section'>\n";

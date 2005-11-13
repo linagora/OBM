@@ -1455,8 +1455,12 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
   $sel_kind_label = "<select name=\"sel_label\">";
 
   // Category 1 and 2 select field
-  $block_cat1 = of_category_dis_entity_form($cats1, "1", "contact");
-  $block_cat2 = of_category_dis_entity_form($cats2, "2", "contact");
+  if ($show_cat1) {
+    $block_cat1 = of_category_dis_entity_form($cats1, "1", "contact");
+  }
+  if ($show_cat2) {
+    $block_cat2 = of_category_dis_entity_form($cats2, "2", "contact");
+  }
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"

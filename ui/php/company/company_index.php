@@ -130,12 +130,13 @@ if ($action == "ext_get_id") {
       $cid = run_query_insert($company);
       if ($cid > 0) {
         $company["id"] = $cid;
+	$display["detail"] = dis_company_consult($cid);
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
+	require("company_js.inc");
+	$display["detail"] = dis_company_form($action, $company);
       }
-      require("company_js.inc");
-      $display["detail"] = dis_company_consult($cid);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
       $obm_q = check_company_context("", $company);
@@ -145,12 +146,13 @@ if ($action == "ext_get_id") {
         $cid = run_query_insert($company);
         if ($cid > 0) {
           $company["id"] = $cid;
+	  $display["detail"] = dis_company_consult($cid);
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
+	  require("company_js.inc");
+	  $display["detail"] = dis_company_form($action, $company);
         }
-        require("company_js.inc");
-        $display["detail"] = dis_company_consult($cid);
       }
     }
 
@@ -394,7 +396,7 @@ $display["head"] = display_head($l_company);
 $display["end"] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
 if (! $company["popup"]) {
-  update_company_action_url();
+  update_company_action();
   $display["header"] = generate_menu($module, $section);
 }
 
@@ -524,7 +526,7 @@ function get_company_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailconsult', 'detailupdate')
                                      		 );
 
 // Detail Update
@@ -532,21 +534,21 @@ function get_company_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update') 
+    'Condition'=> array ('detailconsult', 'update')
                                      	      );
 
 // Insert
   $actions["company"]["insert"] = array (
     'Url'      => "$path/company/company_index.php?action=insert",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	 );
 
 // Update
   $actions["company"]["update"] = array (
     'Url'      => "$path/company/company_index.php?action=update",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	 );
 
 // Check Delete
@@ -554,7 +556,7 @@ function get_company_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete
@@ -734,20 +736,25 @@ function get_company_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Actions URL updates (after processing, before displaying menu)
+// Company Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
-function update_company_action_url() {
+function update_company_action() {
   global $company, $actions, $path;
 
-  // Detail Consult
-  $actions["company"]["detailconsult"]["Url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"];
+  $id = $company["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["company"]["detailconsult"]["Url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=$id";
+    $actions["company"]["detailconsult"]['Condition'][] = 'insert';
 
-  // Detail Update
-  $actions["company"]["detailupdate"]['Url'] = "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"];
+    // Detail Update
+    $actions["company"]["detailupdate"]['Url'] = "$path/company/company_index.php?action=detailupdate&amp;param_company=$id";
+    $actions["company"]["detailupdate"]['Condition'][] = 'insert';
 
-  // Check Delete
-  $actions["company"]["check_delete"]['Url'] = "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"];
-
+    // Check Delete
+    $actions["company"]["check_delete"]['Url'] = "$path/company/company_index.php?action=check_delete&amp;param_company=$id";
+    $actions["company"]["check_delete"]['Condition'][] = 'insert';
+  }
 }
 
 </script>

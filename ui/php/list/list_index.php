@@ -270,7 +270,7 @@ else if ($action == "new_criterion") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 // Update actions url in case some values have been updated (id after insert) 
-update_list_action_url();
+update_list_action();
 $display["head"] = display_head($l_list);
 $display["end"] = display_end();
 if (! $popup) {
@@ -494,7 +494,7 @@ function get_list_action() {
     'Url'      => "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','contact_add','contact_del') 
+    'Condition'=> array ('detailconsult','detailupdate','contact_add','contact_del') 
                                            );
 
 // Delete
@@ -581,23 +581,24 @@ function get_list_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// List Actions URL updates (after processing, before displaying menu)  
+// List Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
-function update_list_action_url() {
+function update_list_action() {
   global $list, $actions, $path;
 
-  if ($list["id"] > 0) {
+  $id = $list["id"];
+  if ($id > 0) {
     // Detail Consult
-    $actions["list"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"];
-    $actions["list"]["detailconsult"]['Condition'] = array ('detailupdate', 'insert');
+    $actions["list"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;param_list=$id";
+    $actions["list"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["list"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"];
-    $actions["list"]["detailupdate"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
+    $actions["list"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;param_list=$id";
+    $actions["list"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["list"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"];
-    $actions["list"]["check_delete"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
+    $actions["list"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=$id";
+    $actions["list"]["check_delete"]['Condition'][] = 'insert';
   }
 
 }

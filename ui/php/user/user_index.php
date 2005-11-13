@@ -94,13 +94,15 @@ if ($action == "ext_get_ids") {
 
     // If the context (same user) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_insert($obm_user);
-      if ($retour) {
+      $cid = run_query_insert($obm_user);
+      if ($cid > 0) {
+	$obm_user["id"] = $cid;
         $display["msg"] .= display_ok_msg($l_insert_ok);
+	$display["detail"] = dis_user_consult($obm_user);
       } else {
 	$display["msg"] .= display_err_msg($l_insert_error);
+	$display["detail"] = html_user_form("",$obm_user);
       }
-      $display["search"] = html_user_search_form($obm_user);
 
     // If it is the first try, we warn the user if some user seem similar
     } else {
@@ -108,13 +110,15 @@ if ($action == "ext_get_ids") {
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_user_warn_insert("", $obm_q, $obm_user);
       } else {
-        $retour = run_query_insert($obm_user);
-        if ($retour) {
+        $cid = run_query_insert($obm_user);
+        if ($cid > 0) {
+	  $obm_user["id"] = $cid;
           $display["msg"] .= display_ok_msg($l_insert_ok);
+	  $display["detail"] = dis_user_consult($obm_user);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
+	  $display["detail"] = html_user_form("",$obm_user);
         }
-        $display["search"] = html_user_search_form($obm_user);
       }
     }
 
@@ -217,6 +221,7 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_user);
 if (! $obm_user["popup"]) {
+  update_user_action();
   $display["header"] = generate_menu($module,$section);
 }
 $display["end"] = display_end();
@@ -303,7 +308,7 @@ function get_user_action() {
     'Name'     => $l_header_find,
     'Url'      => "$path/user/user_index.php?action=index",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                     );
 
 // Get Ids
@@ -319,28 +324,28 @@ function get_user_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display') 
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display')
                                   );
 
 // Search
   $actions["user"]["search"] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                   );
   
 // Get user id from external window (js)
   $actions["user"]["getsearch"] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                   );
 // Detail Consult
   $actions["user"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/user/user_index.php?action=detailconsult&amp;param_user=".$obm_user["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'group_consult') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
                                   );
 
 // Detail Update
@@ -348,7 +353,7 @@ function get_user_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update') 
+     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
                                      	   );
 
 // Insert
@@ -370,8 +375,7 @@ function get_user_action() {
     'Name'     => $l_header_upd_group,
     'Url'      => "$path/user/user_index.php?action=group_consult&amp;param_user=".$obm_user["id"],
     'Right'    => $cright_read,
-//    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update') 
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update') 
                                      );
 
 // Group Update
@@ -433,6 +437,33 @@ function get_user_action() {
     'Condition'=> array ('None') 
                                       	 );
 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_user_action() {
+  global $obm_user, $actions, $path;
+
+  $id = $obm_user["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["user"]["detailconsult"]["Url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=$id";
+    $actions["user"]["detailconsult"]['Condition'][] = 'insert';
+
+    // Detail Update
+    $actions["user"]["detailupdate"]['Url'] = "$path/user/user_index.php?action=detailupdate&amp;param_user=$id";
+    $actions["user"]["detailupdate"]['Condition'][] = 'insert';
+
+    // Check Delete
+    $actions["user"]["check_delete"]['Url'] = "$path/user/user_index.php?action=check_delete&amp;param_user=$id";
+    $actions["user"]["check_delete"]['Condition'][] = 'insert';
+
+    // Group Consult
+    $actions["user"]["group_consult"]["Url"] = "$path/user/user_index.php?action=group_consult&amp;param_user=$id";
+    $actions["user"]["group_consult"]['Condition'][] = 'insert';
+  }
 }
 
 

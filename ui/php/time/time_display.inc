@@ -670,8 +670,7 @@ function dis_form_addtask($time, $validate_days) {
 	}
 	$projtask_data .= "\nnew Array (\n". $projtask_pid .",\n";
 	$previous_pid = $projtask_pid;
-      }
-      else {
+      } else {
 	$projtask_data .= ",\n";
       }
       $projtask_data .= "new Array(". $projtask_label .", ". $projtask_id .")";
@@ -680,7 +679,6 @@ function dis_form_addtask($time, $validate_days) {
   }
 
   $extra_js .= "
-<script type=\"text/javascript\">
   project = new Array (
     $proj_data
   )
@@ -688,7 +686,7 @@ function dis_form_addtask($time, $validate_days) {
   projecttask = new Array (
     $projtask_data
   )
-</script>\n";
+";
 
 
   // TaskType select construction

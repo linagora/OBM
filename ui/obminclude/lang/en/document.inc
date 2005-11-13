@@ -103,7 +103,7 @@ $l_update_error = "The update of the document has failed !";
 $l_header_tree = "Tree";
 $l_invalid_link_file = "Cannot create a alias over a link";
 $l_have_link = "This document is linked with various objects";
-$l_have_no_link = "This document isn't linked;
+$l_have_no_link = "This document has no link";
 
 $l_no_document = "Document not found";
 $l_invalid_url = "Incorrect URL";

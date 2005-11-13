@@ -28,10 +28,8 @@ page_close();
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
+// Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head("$l_treso");
-$display["header"] = generate_menu($module, $section);
 
 if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -525,11 +523,14 @@ elseif ($action == "display") {
   $display["detail"] = dis_payment_display_pref ($prefs, $prefs_i, $prefs_t); 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
+// Display
 ///////////////////////////////////////////////////////////////////////////////
+$display["head"] = display_head("$l_treso");
+update_payment_action();
+$display["header"] = generate_menu($module, $section);
 $display["end"] = display_end();
-//echo $display["end"];
 display_page($display);
 
 
@@ -687,7 +688,7 @@ function get_payment_action() {
 // Duplicate
   $actions["payment"]["duplicate"] = array (
      'Name'     => $l_header_duplicate,
-     'Url'      => "$path/payment/payment_index.php?action=duplicate&amp;param_payment=".$payment["payment"]."",
+     'Url'      => "$path/payment/payment_index.php?action=duplicate&amp;param_payment=".$payment["id"],
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult') 
                                            );
@@ -702,7 +703,7 @@ function get_payment_action() {
 // Detail Update
   $actions["payment"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=".$payment["payment"]."",
+    'Url'      => "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=".$payment["id"],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
@@ -739,7 +740,7 @@ function get_payment_action() {
   $actions["payment"]["insert"] = array (
     'Url'      => "$path/payment/payment_index.php?action=insert",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                                 );
 
 // Update
@@ -752,14 +753,14 @@ function get_payment_action() {
 // Check Delete
   $actions["payment"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/payment/payment_index.php?action=check_delete&amp;param_payment=".$payment["payment"]."",
+    'Url'      => "$path/payment/payment_index.php?action=check_delete&amp;param_payment=".$payment["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'detailupdate')
                                      	 );
 
 // Delete
   $actions["payment"]["delete"] = array (
-    'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$payment["payment"]."",
+    'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$payment["id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      	 );
@@ -829,6 +830,29 @@ function get_payment_action() {
     'Condition'=> array ('None') 
                                       	        );
 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Payment Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_payment_action() {
+  global $payment, $actions, $path;
+
+  $id = $payment["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["payment"]["detailconsult"]["Url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=$id";
+    $actions["payment"]["detailconsult"]['Condition'][] = 'insert';
+
+    // Detail Update
+    $actions["payment"]["detailupdate"]['Url'] = "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=$id";
+    $actions["payment"]["detailupdate"]['Condition'][] = 'insert';
+
+    // Check Delete
+    $actions["payment"]["check_delete"]['Url'] = "$path/payment/payment_index.php?action=check_delete&amp;param_payment=$id";
+    $actions["payment"]["check_delete"]['Condition'][] = 'insert';
+  }
 }
 
 </script>

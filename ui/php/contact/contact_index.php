@@ -415,7 +415,7 @@ if ($action == "ext_get_ids") {
 $display["head"] = display_head($l_contact);
 $display["end"] = display_end();
 if (! $contact["popup"]) {
-  update_contact_action_url();
+  update_contact_action();
   $display["header"] = generate_menu($module,$section);
 }
 
@@ -580,7 +580,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'insert', 'update','check_delete')
+    'Condition'=> array ('detailconsult', 'update','check_delete')
                                      		 );
 
 // Insert
@@ -611,7 +611,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update','check_delete') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update','check_delete') 
                                      	      );
 
 // Delete
@@ -768,20 +768,24 @@ function get_contact_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact Actions URL updates (after processing, before displaying menu)
+// Contact Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
-function update_contact_action_url() {
+function update_contact_action() {
   global $contact, $actions, $path;
 
-  // Detail Consult
-  $actions["contact"]["detailconsult"]["Url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"];
-
-  // Detail Update
-  $actions["contact"]["detailupdate"]['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"];
-
-  // Check Delete
-  $actions["contact"]["check_delete"]['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"];
-
+  $id = $contact["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["contact"]["detailconsult"]["Url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$id";
+    
+    // Detail Update
+    $actions["contact"]["detailupdate"]['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=$id";
+    $actions["contact"]["detailupdate"]['Condition'][] = 'insert';
+    
+    // Check Delete
+    $actions["contact"]["check_delete"]['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;param_contact=$id";
+    $actions["contact"]["check_delete"]['Condition'][] = 'insert';
+  }
 }
 
 </script>

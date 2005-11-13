@@ -14,7 +14,7 @@
 //     keys used  : name, perms
 //   - $p_new_order : infos for order clause
 //   - $p_order_dir : direction for order clause (asc, desc)
-//   - $restriction : if and which restriction to set (eg calendar readable)
+//   - $restriction : if and which restriction to set (eg user (who can read))
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($resource, $p_new_order, $p_order_dir, $restriction="") {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -39,7 +39,6 @@ function run_query_search($resource, $p_new_order, $p_order_dir, $restriction=""
       $where_restriction .= "))";
     }
   }
-  //  echo "<p>res=$where_restriction";
 
   $select = "SELECT Resource.*, resource_id as id
     FROM Resource";
@@ -126,7 +125,10 @@ function run_query_insert($resource) {
 
   $name = $resource["name"];
   $desc = $resource["desc"];
-  $qty = $resource["qty"];if ($qty == "") $qty = "0";
+  $qty = $resource["qty"];
+  if ($qty == "") {
+    $qty = "0";
+  }
 
   $query = "INSERT INTO Resource (
      resource_timeupdate,
@@ -155,7 +157,7 @@ function run_query_insert($resource) {
     run_query_right_init($id);
   }
 
-  return $retour;
+  return $id;
 }
 
 

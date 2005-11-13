@@ -1015,9 +1015,9 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
   global $cdg_param;
   
   if ($p_action == "search_invoice") {
-    $url = url_prepare("payment_index.php?action=search_invoice&amp;param_payment=".$payment["payment"]);
+    $url = url_prepare("payment_index.php?action=search_invoice&amp;param_payment=".$payment["id"]);
   } elseif ($p_action == "new_with_invoices") {
-    $url = url_prepare("payment_index.php?action=search_invoice_new&amp;param_payment=".$payment["payment"]);
+    $url = url_prepare("payment_index.php?action=search_invoice_new&amp;param_payment=".$payment["id"]);
   }
   
   // invoice search form  :

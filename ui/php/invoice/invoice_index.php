@@ -180,6 +180,7 @@ if ($action == "index" || $action == "") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_invoice");
+update_invoice_action();
 $display["header"] = generate_menu($module, $section);
 $display["end"] = display_end();
 display_page($display);
@@ -267,14 +268,14 @@ function get_invoice_action() {
     'Name'     => $l_header_find,
     'Url'      => "$path/invoice/invoice_index.php?action=index",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                        );
 
 // Search
   $actions["invoice"]["search"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=search",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                    );
 
 // New
@@ -282,14 +283,14 @@ function get_invoice_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/invoice/invoice_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','index','detailconsult','insert', 'update','delete','display') 
+    'Condition'=> array ('','search','index','detailconsult','insert', 'update','delete','display')
                                    );
 
 //Insert
   $actions["invoice"]["insert"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=insert",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                    );
 
 // Detail Consult
@@ -297,7 +298,7 @@ function get_invoice_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'duplicate', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'duplicate', 'update')
                                    );
 
 // Duplicate
@@ -313,14 +314,14 @@ function get_invoice_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/invoice/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'update')
                                      	       );
 
 // Update
   $actions["invoice"]["update"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=update",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                         );
 
 // Check Delete
@@ -328,14 +329,14 @@ function get_invoice_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/invoice/invoice_index.php?action=check_delete&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                      	      );
 
 // Delete
   $actions["invoice"]["delete"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=delete&amp;param_invoice=".$invoice["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	);
 
 // Display
@@ -343,21 +344,21 @@ function get_invoice_action() {
     'Name'     => $l_header_display,
     'Url'      => "$path/invoice/invoice_index.php?action=display",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                         );
 
 // Display Preferences
   $actions["invoice"]["dispref_display"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=dispref_display",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                         );
 
 // Display Préférences
   $actions["invoice"]["dispref_level"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=dispref_level",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                         );
 
 // Document add
@@ -366,6 +367,33 @@ function get_invoice_action() {
     'Condition'=> array ('None')
   );     
 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Invoice Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_invoice_action() {
+  global $invoice, $actions, $path;
+
+  $id = $invoice["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["invoice"]["detailconsult"]["Url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$id";
+    $actions["invoice"]["detailconsult"]['Condition'][] = 'insert';
+
+    // Detail Update
+    $actions["invoice"]["detailupdate"]['Url'] = "$path/invoice/invoice_index.php?action=detailupdate&amp;param_invoice=$id";
+    $actions["invoice"]["detailupdate"]['Condition'][] = 'insert';
+
+    // Duplicate
+    $actions["invoice"]["duplicate"]['Url'] = "$path/invoice/invoice_index.php?action=duplicate&amp;param_invoice=$id";
+    $actions["invoice"]["duplicate"]['Condition'][] = 'insert';
+
+    // Check Delete
+    $actions["invoice"]["check_delete"]['Url'] = "$path/invoice/invoice_index.php?action=check_delete&amp;param_invoice=$id";
+    $actions["invoice"]["check_delete"]['Condition'][] = 'insert';
+  }
 }
 
 </script>

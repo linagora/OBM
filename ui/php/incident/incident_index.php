@@ -400,7 +400,7 @@ function get_incident_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailconsult', 'detailupdate')
                                 	       );
 
 //  Detail Update
@@ -408,21 +408,21 @@ function get_incident_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/incident/incident_index.php?action=detailupdate&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update')
                                      	        );
 
 //  Insert
   $actions["incident"]["insert"] = array (
     'Url'      => "$path/incident/incident_index.php?action=insert",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	 );
 
 //  Update
   $actions["incident"]["update"] = array (
     'Url'      => "$path/incident/incident_index.php?action=update",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	 );
 
   // Check Delete
@@ -431,14 +431,14 @@ function get_incident_action() {
     'Url'      => "$path/incident/incident_index.php?action=check_delete&amp;param_incident=".$incident["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                      );
 
 //  Delete
   $actions["incident"]["delete"] = array (
     'Url'      => "$path/incident/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	 );
 //  Admin
   $actions["incident"]["admin"] = array (
@@ -565,13 +565,17 @@ function update_incident_action() {
   
   $id = $incident["id"];
   if ($id > 0) {
+    // Detail Consult
+    $actions["incident"]["detailconsult"]['Url'] = "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=$id";
+    $actions["incident"]["detailconsult"]['Condition'][] = 'insert';
+    
     // Detail Update
     $actions["incident"]["detailupdate"]['Url'] = "$path/incident/incident_index.php?action=detailupdate&amp;param_incident=$id";
-    $actions["incident"]["detailupdate"]['Condition'] = array('detailconsult', 'insert', 'update');
+    $actions["incident"]["detailupdate"]['Condition'][] = 'insert';
     
     // Check Delete
     $actions["incident"]["check_delete"]['Url'] = "$path/incident/incident_index.php?action=check_delete&amp;param_incident=$id";
-    $actions["incident"]["delete"]['Condition'] = array('detailconsult', 'insert', 'update');
+    $actions["incident"]["check_delete"]['Condition'][] = 'insert');
   }
 
 }

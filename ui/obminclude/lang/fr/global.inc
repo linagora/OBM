@@ -19,9 +19,10 @@ $l_confirm = "Confirmer";
 $l_add = "Ajouter";
 $l_home = "Accueil";
 $l_entity_right = "Gérer les droits de";
-$l_read_permission = "Gestion des permissions de lecture de l'agenda";
-$l_write_permission = "Gestion des permissions d'écriture sur l'agenda";
+$l_read_permission = "Gestion des permissions de lecture";
+$l_write_permission = "Gestion des permissions d'écriture";
 $l_right_validate = "Valider les permissions";
+$l_right_update_ok = "Nouvelles permissions validées";
 
 // Common messages
 $l_yes = "Oui";

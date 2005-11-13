@@ -166,12 +166,12 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     FROM Company";
 
   $left_join = "
-         LEFT JOIN CompanyType on company_type_id=companytype_id
+         LEFT JOIN CompanyType ON company_type_id=companytype_id
          $join_cat
-         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
-         LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
-         LEFT JOIN Country on company_country_iso3166=country_iso3166
-                   and country_lang='$lang'";
+         LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
+         LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
+         LEFT JOIN Country ON company_country_iso3166=country_iso3166
+                   AND country_lang='$lang'";
 
   if ((! $fuzzy) || ($name == "")) {
     if ($ctu_sql_limit) {
@@ -190,8 +190,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   // if fuzzy or unsuccessful search (meaningful only if name has been entered)
   if ( ( ($fuzzy) || ($count == 0) ) && ($name != "") ) {
-    $where_name = " ($where_name or company_aka $like '%$auto_aka%'
-                 or company_sound = '$sound')";
+    $where_name = " ($where_name OR company_aka $like '%$auto_aka%'
+                 OR company_sound = '$sound')";
     $whereq = " WHERE $where_name $where";
     if ($ctu_sql_limit) {
       $count = get_query_count("SELECT count(distinct company_id) FROM Company $left_join $whereq");
@@ -231,15 +231,15 @@ function run_query_detail($p_id) {
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM Company
-         LEFT JOIN CompanyType on company_type_id=companytype_id
-         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
-         LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
-         LEFT JOIN UserObm as m on company_marketingmanager_id=m.userobm_id
-         LEFT JOIN Country on company_country_iso3166=country_iso3166
-                   and country_lang='$lang'
-         LEFT JOIN DataSource on company_datasource_id=datasource_id
-         LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
-         LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
+         LEFT JOIN CompanyType ON company_type_id=companytype_id
+         LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
+         LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
+         LEFT JOIN UserObm as m ON company_marketingmanager_id=m.userobm_id
+         LEFT JOIN Country ON company_country_iso3166=country_iso3166
+                   AND country_lang='$lang'
+         LEFT JOIN DataSource ON company_datasource_id=datasource_id
+         LEFT JOIN UserObm as c ON company_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u ON company_userupdate=u.userobm_id
     WHERE company_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -369,6 +369,7 @@ function run_query_insert($company) {
     $act_sql = "AND company_activity_id='$act'";
   }
 
+  // Get the company id
   $query = "SELECT company_id as id
     FROM Company
     WHERE company_name = '$name'

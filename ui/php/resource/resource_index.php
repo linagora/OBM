@@ -100,17 +100,16 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $resource)) {
-
     // If the context (same resource) was confirmed ok, we proceed
-    $retour = run_query_insert($resource);
-    if ($retour) {
+    $rid = run_query_insert($resource);
+    if ($rid > 0) {
+      $resource["id"] = $rid;
       $display["msg"] .= display_ok_msg($l_insert_ok);
-      $resource_id = get_resource_id($resource["name"]);
+      $display["detail"] = dis_resource_consult($resource);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error);
+      $display["search"] = html_resource_search_form($resource);
     }
-    $display["search"] = html_resource_search_form($resource);
-
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
@@ -161,11 +160,14 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
+  $display["title"] = "<div class=\"title\">$l_resource</div>";
   $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
+  $display["title"] = "<div class=\"title\">$l_resource</div>";
   of_right_update_right($resource, "resource");
+  $display["msg"] .= display_ok_msg($l_right_update_ok);
   $display["msg"] .= display_warn_msg($err_msg);
   $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
 
@@ -192,6 +194,7 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_resource);
 if (! $resource["popup"]) {
+  update_resource_action();
   $display["header"] = generate_menu($module,$section);
 }
 $display["end"] = display_end();
@@ -204,13 +207,15 @@ display_page($display);
 // returns : $resource hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_resource() {
-  global $param_resource, $tf_name, $tf_desc, $ta_desc, $tf_qty, $tf_qtyinf, $tf_qtysup;
+  global $param_resource, $param_entity;
+  global $tf_name, $tf_desc, $ta_desc, $tf_qty, $tf_qtyinf, $tf_qtysup;
   global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive, $restriction;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $ext_widget,$ext_element;
   global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity;
 
+  if (isset ($param_entity)) $resource["id"] = $param_entity;
   if (isset ($param_ext)) $resource["id"] = $param_ext;
   if (isset ($param_resource)) $resource["id"] = $param_resource;
   if (isset ($tf_name)) $resource["name"] = $tf_name;
@@ -290,7 +295,7 @@ function get_resource_action() {
     'Condition'=> array ('None') 
                                   );
   
-// Get resource id from external window (js)
+  // Get resource id from external window (js)
   $actions["resource"]["getsearch"] = array (
     'Url'      => "$path/resource/resource_index.php?action=search",
     'Right'    => $cright_read,
@@ -301,14 +306,14 @@ function get_resource_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$resource["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'group_consult') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'rights_admin', 'rights_update') 
                                   );
 // Detail Update
   $actions["resource"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/resource/resource_index.php?action=detailupdate&amp;param_resource=".$resource["id"]."",
      'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update') 
+     'Condition'=> array ('detailconsult', 'insert', 'update')
                                      	   );
 
 // Insert
@@ -382,6 +387,24 @@ function get_resource_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                          );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Resource Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_resource_action() {
+  global $resource, $actions, $path;
+
+  // Detail Consult
+  $actions["resource"]["detailconsult"]["Url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$resource["id"];
+
+  // Detail Update
+  $actions["resource"]["detailupdate"]["Url"] = "$path/resource/resource_index.php?action=detailupdate&amp;param_resource=".$resource["id"];
+
+  // Check Delete
+  $actions["resource"]["check_delete"]["Url"] = "$path/resource/resource_index.php?action=check_delete&amp;param_resource=".$resource["id"];
 
 }
 

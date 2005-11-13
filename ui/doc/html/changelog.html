@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 1.0 ChangeLog</h1>
-version 1.0.0 - 2005-11-07
+version 1.0.1 - 2005-11-11
 <p>
 </center>
 
@@ -22,7 +22,6 @@ To do
 <LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> how to detect doublons ?
 <LI> Pour les listes : supprimer les listes dans export ? trier requete exports ?
-<LI> decouper : get_module_param() avant switch action, update_module_param() apres pour mise a jour url affectees
 <li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
 <li> move all ereg to pcre (preg) Regexps (done but 1 in payment !)
@@ -30,6 +29,20 @@ To do
 
 - admin code : verifier si des actions non utilisees
 
+
+2005-11-10 : version 1.0.1<br>
+
+<ul>
+<li> BUG#508 : Document : parse error in english lang file fixed
+<li> BUG#461 : Company : better category deletion now handled by of/of_category
+<li> BUG#444 : Time management : Improvement in javascript handling
+<li> BUG#430 : Incident : worksforme
+<li> Deal and home page sql fixes for postgres
+<li> Resource : After inserting a resource, display directly this resource
+<li> Todo : percent default to 0 if not filled (avoid an error with Postgres)
+<li> Global : get_module_action and update_module_action use now consistent
+<li> Rights management legend and improvement with Resources
+</ul>
 
 2005-11-07 : version 1.0.0<br>
 

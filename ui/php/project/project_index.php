@@ -402,15 +402,13 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-// Action menus are retrieved here too as $project values can be set in process
-// XXXXX to optimize here (update_project_action) with only needed action
-get_project_action();
-if (! $project["popup"]) {
-  $display["header"] = generate_menu($module,$section);
-}
-
 $display["head"] = display_head($l_project);
 $display["end"] = display_end();
+if (! $project["popup"]) {
+  // Update actions url in case some values have been updated (id after insert)
+  update_project_action();
+  $display["header"] = generate_menu($module,$section);
+}
 
 display_page($display);
 
@@ -732,6 +730,39 @@ function get_project_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Project Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_project_action() {
+  global $project, $actions, $path, $l_add_member, $l_project;
+
+  // Detail Consult
+  $actions["project"]["detailconsult"]["Url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"];
+
+  // Detail Update
+  $actions["project"]["detailupdate"]['Url'] = "$path/project/project_index.php?action=detailupdate&amp;param_project=".$project["id"];
+
+  // Check Delete
+  $actions["project"]["check_delete"]['Url'] = "$path/project/project_index.php?action=check_delete&amp;param_project=".$project["id"];
+
+  // Tasks
+  $actions["project"]["task"]['Url'] = "$path/project/project_index.php?action=task&amp;param_project=".$project["id"];
+
+  // Members
+  $actions["project"]["member"]['Url'] = "$path/project/project_index.php?action=member&amp;param_project=".$project["id"];
+
+  // Select Member
+  $actions["project"]["sel_member"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$project["id"]."&amp;ext_target=$l_project";
+
+  // Advance
+  $actions["project"]["advance"]['Url'] = "$path/project/project_index.php?action=advance&amp;param_project=".$project["id"];
+
+  // Dashboard
+  $actions["project"]["dashboard"]['Url'] = "$path/project/project_index.php?action=dashboard&amp;param_project=".$project["id"];
 
 }
 

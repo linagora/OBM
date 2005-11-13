@@ -164,15 +164,18 @@ class OBM_Challenge_Auth extends Auth {
       $this->auth["uname"] = $login; // provides access for loginform.ihtml
     }
 
-    $this->db->query(sprintf("select userobm_id,
+    $user_table = $this->database_table;
+    $user_login = addslashes($login);
+
+    $query_login = "SELECT
+        userobm_id,
         userobm_perms,
         userobm_password
-      from %s
-      where userobm_login = '%s'
-        and userobm_archive = '0'",
-                          $this->database_table,
-                          addslashes($login)));
+      FROM $user_table
+      WHERE userobm_login = '$user_login'
+        AND userobm_archive = '0'";
 
+    $this->db->query($query_login);
     while ($this->db->next_record()) {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");

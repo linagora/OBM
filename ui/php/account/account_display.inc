@@ -479,7 +479,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   $p_date = ($p_date =="") ? date("Y-m-d") : $p_date;
 
   // let's compute balance now : 
-  $data = account_compute_balance ($p_account["account"], $p_date);
+  $data = account_compute_balance ($p_account["id"], $p_date);
   $q_payments = $data["payments"];
   $q_expected = $data["expected"];
   $nb = $q_expected->nf();
@@ -487,15 +487,15 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   $col_today   = ($data["today"] > 0) ? $col_balance_pos:$col_balance_neg;
 
   // where we go when user clicks on compute :
-  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["account"]);
+  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["id"]);
 
   // we display all account data :
-  $q_account = run_query_detail ($p_account["account"]);
+  $q_account = run_query_detail ($p_account["id"]);
   html_account_consult ($q_account, "compute_balance");
 
   // the form allowing a date input :
   $block .= "<br><br>";
-  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["account"]);
+  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["id"]);
   $block .= "
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
@@ -606,7 +606,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   if ($q_expected->nf() != 0) { 
     $q_expected->seek(0);
     $url_expect = url_prepare ("account_index.php?action=compute_balance".
-			      "&amp;param_account=".$p_account["account"]);
+			      "&amp;param_account=".$p_account["id"]);
 
     $dis_expect  = new OBM_DISPLAY ("DATA", $payments_options, "account");
     $dis_expect->data_set = $q_expected;
@@ -621,7 +621,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   if ($q_payments->nf() != 0) { 
     $q_payments->seek(0);
     $url_done = url_prepare ("account_index.php?action=compute_balance".
-			      "&amp;param_account=".$p_account["account"]);
+			      "&amp;param_account=".$p_account["id"]);
 
     $dis_done  = new OBM_DISPLAY ("DATA", $payments_options, "account");
     $dis_done->data_set = $q_payments;

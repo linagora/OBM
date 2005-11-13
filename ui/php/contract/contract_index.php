@@ -327,11 +327,10 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-update_contract_action_url();
+update_contract_action();
 if (! $popup) {
   $display["header"] = generate_menu($module, $section);
 }
-
 $display["head"] = display_head($l_contract);
 $display["end"] = display_end();
 
@@ -484,7 +483,7 @@ function get_contract_action() {
     'Url'      => "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_read, 
     'Privacy'  => true,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailupdate')
                                     	);
 
 // Detail Update
@@ -493,7 +492,7 @@ function get_contract_action() {
     'Url'      => "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'insert', 'update') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      	 );
 
 // Update
@@ -510,7 +509,7 @@ function get_contract_action() {
     'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,  
-    'Condition'=> array ('detailconsult', 'insert', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	 );
 
 // Delete
@@ -654,26 +653,26 @@ function get_contract_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contract Actions URL updates (after processing, before displaying menu)  
+// Contract Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
-function update_contract_action_url() {
+function update_contract_action() {
   global $contract, $actions, $path;
 
-  // Detail Update
-               
-  $actions["contract"]["detailupdate"]['Url'] = "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."";
+  $id = $contract["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["contract"]["detailconsult"]['Url'] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$id";
+    $actions["contract"]["detailconsult"]['Condition'][] = 'insert';
+    
+    // Detail Update
+    $actions["contract"]["detailupdate"]['Url'] = "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=$id";
+    $actions["contract"]["detailupdate"]['Condition'][] = 'insert';
 
-  // Check Delete
-  $actions["contract"]["check_delete"]['Url'] = "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."";
-
+    // Check Delete
+    $actions["contract"]["check_delete"]['Url'] = "$path/contract/contract_index.php?action=check_delete&amp;param_contract=$id";
+    $actions["contract"]["check_delete"]['Condition'][] = 'insert';
+  }
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
-///////////////////////////////////////////////////////////////////////////////
-display_end();
 
 
 </script>

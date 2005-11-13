@@ -10,7 +10,7 @@
 // Fields Label
 $l_cat1 = "Category";
 $l_owner = "Owner";
-$l_logger = "Technical manager";
+$l_logger = "Logger";
 $l_duration = "Total duration";
 $l_solution = "Client synthesis";
 $l_date_before ="Date Before";

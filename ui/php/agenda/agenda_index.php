@@ -274,12 +274,15 @@ if ($action == "index") {
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
+  $display["title"] = "<div class=\"title\">$l_agenda</div>";
   $display["detail"] = of_right_dis_admin("calendar", $agenda["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
+  $display["title"] = "<div class=\"title\">$l_agenda</div>";
   of_right_update_right($agenda, "calendar");
+  $display["msg"] .= display_ok_msg($l_right_update_ok);
   $display["msg"] .= display_warn_msg($err_msg);
   $display["detail"] = of_right_dis_admin("calendar", $agenda["entity_id"]);
 
@@ -750,9 +753,5 @@ function get_agenda_action() {
 
 }
   
-///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
-///////////////////////////////////////////////////////////////////////////////
-display_end();
 
 ?>

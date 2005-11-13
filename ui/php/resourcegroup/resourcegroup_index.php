@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : resourcegroup_index.php                                        //
+// OBM - File : resourcegroup_index.php                                      //
 //     - Desc : Resource Group Index File                                    //
 // 2005-03-15 Florent Goalabré                                               //
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,13 +89,12 @@ if (($action == "index") || ($action == "")) {
     // If the context (same group) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
       $resourcegroup["id"] = run_query_insert($resourcegroup);
-
       if ($resourcegroup["id"]) {
 	$display["msg"] .= display_ok_msg($l_insert_ok);
 	$display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
       } else {
 	$display["msg"] .= display_err_msg($l_insert_error);
-	$display["search"] = html_resourcegroup_search_form($resourcegroup);
+	$display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
       }
       
       // If it is the first try, we warn the user if some groups seem similar
@@ -110,7 +109,7 @@ if (($action == "index") || ($action == "")) {
 	  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
 	} else {
 	  $display["msg"] .= display_err_msg($l_insert_error);
-	  $display["search"] = html_resourcegroup_search_form($resourcegroup);
+	  $display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
 	}
       }
     }
@@ -228,7 +227,7 @@ if (($action == "index") || ($action == "")) {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 // Update actions url in case some values have been updated (id after insert) 
-update_resourcegroup_action_url();
+update_resourcegroup_action();
 $display["head"] = display_head($l_resourcegroup);
 if (! $resourcegroup["popup"]) {
   $display["header"] = generate_menu($module,$section);
@@ -320,13 +319,13 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_find,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=index",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                     );
 
 // Search
   $actions["resourcegroup"]["search"] = array (
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                   );
 
 // New
@@ -334,7 +333,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','admin','detailconsult','display', 'resource_add', 'resource_del', 'resource_add', 'resource_del', 'insert', 'update', 'delete')
+    'Condition'=> array ('all')
                                   );
 
 // Detail Consult
@@ -342,7 +341,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$resourcegroup["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate')
+    'Condition'=> array ('detailconsult', 'detailupdate')
                                   );
 
 // Detail Update
@@ -350,7 +349,7 @@ function get_resourcegroup_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=".$resourcegroup["id"]."",
      'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'resource_add', 'resource_del', 'resource_add', 'resource_del', 'insert', 'update') 
+     'Condition'=> array ('detailconsult', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
                                      	   );
 
 // Insert
@@ -372,7 +371,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;param_resourcegroup=".$resourcegroup["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'insert', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
                                      	   );
 
 // Delete
@@ -405,7 +404,7 @@ function get_resourcegroup_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_resourcegroup,
-    'Condition'=> array ('detailconsult','resource_add','resource_del', 'resourcegroup_add','resourcegroup_del', 'insert', 'update') 
+    'Condition'=> array ('detailconsult','resource_add','resource_del', 'resourcegroup_add','resourcegroup_del', 'update')
                                     	  );
 
 // Resource add
@@ -419,21 +418,21 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["resource_del"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resource_del",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Group add
   $actions["resourcegroup"]["resourcegroup_add"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resourcegroup_add",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Group del
   $actions["resourcegroup"]["resourcegroup_del"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resourcegroup_del",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Admin
@@ -441,7 +440,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_admin,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=admin",
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                     );
 
 // Display
@@ -449,7 +448,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_display,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=display",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                     );
 // Display
   $actions["resourcegroup"]["dispref_display"] = array (
@@ -468,25 +467,33 @@ function get_resourcegroup_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Group Actions URL updates (after processing, before displaying menu)  
+// ResourceGroup Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
-function update_resourcegroup_action_url() {
+function update_resourcegroup_action() {
   global $resourcegroup, $actions, $path, $l_add_resource, $l_add_resourcegroup, $l_resourcegroup;
 
-  if ($resourcegroup["id"] > 0) {
+  $id = $resourcegroup["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["resourcegroup"]["detailconsult"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=$id";
+    $actions["resourcegroup"]["detailconsult"]['Condition'][] = 'insert';
+
     // Detail Update
-    $actions["resourcegroup"]["detailupdate"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=".$resourcegroup["id"];
+    $actions["resourcegroup"]["detailupdate"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=$id";
+    $actions["resourcegroup"]["detailupdate"]['Condition'][] = 'insert';
+
     // Check Delete
-    $actions["resourcegroup"]["check_delete"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;param_resourcegroup=".$resourcegroup["id"];
+    $actions["resourcegroup"]["check_delete"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;param_resourcegroup=$id";
+    $actions["resourcegroup"]["check_delete"]['Condition'][] = 'insert';
+
     // Sel Resource add
-    $actions["resourcegroup"]["sel_resource_add"]['Url'] = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resource)."&amp;ext_action=resource_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=".$resourcegroup["id"]."&amp;ext_target=$l_resourcegroup";
+    $actions["resourcegroup"]["sel_resource_add"]['Url'] = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resource)."&amp;ext_action=resource_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=$id&amp;ext_target=$l_resourcegroup";
+    $actions["resourcegroup"]["sel_resource_add"]['Condition'][] = 'insert';
+
     // Sel group add : Groups selection
-  $actions["resourcegroup"]["sel_resourcegroup_add"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resourcegroup)."&amp;ext_action=resourcegroup_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=".$resourcegroup["id"]."&amp;ext_target=$l_resourcegroup&amp;child_res=1";
-  } else {
-    $actions["resourcegroup"]["detailupdate"]['Condition'] = array('None');
+    $actions["resourcegroup"]["sel_resourcegroup_add"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resourcegroup)."&amp;ext_action=resourcegroup_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=$id&amp;ext_target=$l_resourcegroup&amp;child_res=1";
+    $actions["resourcegroup"]["sel_resourcegoup_add"]['Condition'][] = 'insert';
   }
-
-
 }
 
 </script>

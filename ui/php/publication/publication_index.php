@@ -404,7 +404,7 @@ $display["head"] = display_head($l_publication);
 $display["end"] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
 if (! $publication["popup"]) {
-  update_publication_action_url();
+  update_publication_action();
   $display["header"] = generate_menu($module, $section);
 }
 
@@ -473,7 +473,7 @@ function get_publication_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
-// Index
+// ext_get_id
   $actions["publication"]["ext_get_id"] = array (
     'Url'      => "$path/publication/publication_index.php?action=ext_get_id",
     'Right'    => $cright_read,
@@ -543,7 +543,7 @@ function get_publication_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
-// Insert
+// Insert auto
   $actions["publication"]["insert_auto"] = array (
     'Url'      => "$path/publication/publication_index.php?action=insert_auto",
     'Right'    => $cright_write,
@@ -686,20 +686,22 @@ function get_publication_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Actions URL updates (after processing, before displaying menu)
+// Company Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
-function update_publication_action_url() {
+function update_publication_action() {
   global $publication, $actions, $path;
 
-  // Detail Consult
-  $actions["publication"]["detailconsult"]["Url"] = "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$publication["id"];
+  $id = $publication["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["publication"]["detailconsult"]["Url"] = "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$id";
 
-  // Detail Update
-  $actions["publication"]["detailupdate"]['Url'] = "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"];
+    // Detail Update
+    $actions["publication"]["detailupdate"]['Url'] = "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=$id";
 
-  // Check Delete
-  $actions["publication"]["check_delete"]['Url'] = "$path/publication/publication_index.php?action=check_delete&amp;param_publication=".$publication["id"];
-
+    // Check Delete
+    $actions["publication"]["check_delete"]['Url'] = "$path/publication/publication_index.php?action=check_delete&amp;param_publication=$id";
+  }
 }
 
 </script>

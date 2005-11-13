@@ -166,7 +166,8 @@ function run_query_detail($p_id) {
 // User insert query execution
 // Parameters:
 //   - $user[]   : entry values
-//     keys used : login, passwd, perms, archive, *name, email
+// Returns:
+//   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($user) {
   global $auth, $cdg_sql, $password_encryption;
@@ -236,7 +237,23 @@ function run_query_insert($user) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  return $retour;
+  if ($retour) {
+    // Get the user id
+    $query = "SELECT userobm_id as id
+    FROM UserObm
+    WHERE userobm_login = '$login'
+      AND userobm_lastname='$lname'
+      AND userobm_firstname='$fname'";
+  
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $id = $obm_q->f("id");
+  } else {
+    $id = false;
+  }
+
+  return $id;
 }
 
 

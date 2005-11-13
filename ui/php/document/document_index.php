@@ -355,12 +355,12 @@ if ($document["id"] > 0) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-
 $display["head"] = display_head($l_document);
+$display["end"] = display_end();
 if (! $document["popup"]) {
+  update_document_action();
   $display["header"] = generate_menu($module, $section);
 }
-$display["end"] = display_end();
 
 display_page($display);
 
@@ -478,7 +478,7 @@ function get_document_action() {
     'Url'      => "$path/document/document_index.php?action=detailconsult&amp;param_document=".$document["id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailconsult', 'detailupdate') 
                                      		 );
 
 // Access Document
@@ -486,7 +486,7 @@ function get_document_action() {
     'Url'      => "$path/document/document_index.php?action=accessfile&amp;param_document=".$document["id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      		 );
 
 // Detail Update
@@ -495,23 +495,23 @@ function get_document_action() {
     'Url'      => "$path/document/document_index.php?action=detailupdate&amp;param_document=".$document["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'update')
                                      	      );
 // Update
   $actions["document"]["update"] = array (
     'Url'      => "$path/document/document_index.php?action=update",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      	      );
 
-// CheckDelete
+// Check_Delete
   $actions["document"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/document/document_index.php?action=check_delete&amp;param_document=".$document["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                      	      );
 
 // Delete
@@ -678,3 +678,29 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      		 );
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Document Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_document_action() {
+  global $document, $actions, $path;
+
+  $id = $document["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["document"]["detailconsult"]["Url"] = "$path/document/document_index.php?action=detailconsult&amp;param_document=$id";
+    $actions["document"]["detailconsult"]['Condition'][] = 'insert';
+
+    // Detail Update
+    $actions["document"]["detailupdate"]['Url'] = "$path/document/document_index.php?action=detailupdate&amp;param_document=$id";
+    $actions["document"]["detailupdate"]['Condition'][] = 'insert';
+
+    // Check Delete
+    $actions["document"]["check_delete"]['Url'] = "$path/document/document_index.php?action=check_delete&amp;param_document=$id";
+    $actions["document"]["check_delete"]['Condition'][] = 'insert';
+  }
+}
+
+
+</script>

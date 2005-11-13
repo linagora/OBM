@@ -797,4 +797,85 @@ class OBM_DISPLAY {
 
 }
 
+
+// Themes generic display functions -----------------------------------------//
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: XHTML Head
+///////////////////////////////////////////////////////////////////////////////
+function display_head($p_module) { 
+  global $l_obm_title, $set_theme, $extra_css, $extra_js, $extra_file_js;
+
+  // If a theme specif function is provided
+  if (function_exists("display_head_theme")) {
+    return display_head_theme($p_module);
+  }
+
+  // Else
+  if (isset($extra_css)) {
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
+  }
+
+  $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
+
+  //  if ($extra_file_js) {
+  //    $file_js = "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$extra_file_js\" />";
+  //  }
+
+  return "$headers_e
+<head>
+  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
+  <title>$l_obm_title - $p_module</title>
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" />
+  $dis_extra_css
+  $file_js
+<script type=\"text/javascript\">
+  $extra_js
+</script>
+</head>
+
+<body onload=\"if (document.f_search) { document.f_search.submit.focus();} \">
+";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display : Returns the section display block
+// Parameters:
+//   - $section : active section
+///////////////////////////////////////////////////////////////////////////////
+function display_sections($section) {
+  global $cgp_show, $sections, $perm;
+  
+  // If a theme specif function is provided
+  if (function_exists("display_sections_theme")) {
+    return display_sections_theme($p_module);
+  }
+
+  // Else
+  $ret = "<div class='section'>\n";
+  foreach ($cgp_show["section"] as $key => $show) {
+    if ($show) {
+      $value = $sections[$key];
+      $section_name = $value["Name"];
+      $section_right = $perm->get_section_rights($key);
+      if (($section_right & $value["Right"]) == $value["Right"]) {
+        if ($key == $section) {
+          $ret .= "<p class='actif'>$section_name</p>\n";
+        } else {
+	  $ret .= "<p class='inactif'><a href='".$value["Url"]."'>$section_name</a></p>\n";
+        }
+      }
+    }
+  }
+  $ret .= "</div>";
+
+  return $ret;
+}
+
+
+
+
 ?>

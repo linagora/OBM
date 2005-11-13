@@ -163,9 +163,9 @@ function run_query_update($account) {
   $number = $account["number"];
   $balance = $account["balance"];
   $comment = $account["comment"];
-  $account_id = $account["account"];
+  $account_id = $account["id"];
 
- $query = "update Account set 
+ $query = "UPDATE Account SET 
      account_label='$label',
      account_bank='$bank',
      account_number='$number',
@@ -173,7 +173,7 @@ function run_query_update($account) {
      account_comment='$comment',
      account_userupdate='$uid',
      account_timeupdate='$now'
-   where account_id='$account_id'";  
+   WHERE account_id='$account_id'";  
 
   display_debug_msg ($query, $cdg_sql, "run_query_update()");
   $obm_q = new DB_OBM;

@@ -90,12 +90,14 @@ function run_query_get_user_name($users="") {
 function run_query_get_resource_label($resources) {
   global $cdg_sql;
 
-  $in = "'".implode ("','", $resources)."'";
-
+  if (count($resources) > 0) {
+    $in = "'".implode ("','", $resources)."'";
+    $where = "WHERE resource_id IN ($in)";
+  }
   $obm_q = new DB_OBM;
   $query = "SELECT resource_name, resource_id
             FROM Resource 
-            WHERE resource_id IN ($in)";
+            $where";
 
   $query.= " ORDER BY resource_id";
   display_debug_msg($query, $cdg_sql, "run_query_get_resource_label()");
@@ -112,10 +114,12 @@ function run_query_get_resource_label($resources) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_entity_label($entities) {
 
-  if (is_array($entities["user"])) {
+  if ((is_array($entities["user"]))
+      && (count($entities["user"]) > 0)) {
     $ret["user"] = run_query_get_user_name($entities["user"]);
   }
-  if (is_array($entities["resource"])) {
+  if ((is_array($entities["resource"]))
+      && (count($entities["resource"]) > 0)) {
     $ret["resource"] = run_query_get_resource_label($entities["resource"]);
   }
 
@@ -1679,7 +1683,7 @@ function run_query_conflict_events($start,$end,$sel_entity_id,$event_id) {
   }   	     	    
 
   if ($has_user && $has_resource) {
-    $where_ent = "AND ( $where_user || $where_res)";
+    $where_ent = "AND ( $where_user OR $where_res)";
   } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
   }
@@ -1767,7 +1771,7 @@ function run_query_no_repeat_events($start,$end, $calendar_entity) {
   }   	     	    
 
   if ($has_user && $has_resource) {
-    $where_ent = "AND ( $where_user || $where_res)";
+    $where_ent = "AND ( $where_user OR $where_res)";
   } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
   }
@@ -1847,7 +1851,7 @@ function run_query_repeat_events($start, $end, $calendar_entity) {
   }   	     	    
 
   if ($has_user && $has_resource) {
-    $where_ent = "AND ( $where_user || $where_res)";
+    $where_ent = "AND ( $where_user OR $where_res)";
   } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
   }

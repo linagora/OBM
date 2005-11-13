@@ -17,6 +17,7 @@ $fieldnames["resource_description"] = $l_desc; // description
 $fieldnames["resource_qty"] = $l_qty; // quantity 
 $fieldnames["resource_id"] = $l_update;
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display resource specific dataset fields
 // Parameters:
@@ -331,7 +332,7 @@ function html_resource_consult($obm_q) {
   $qty = $obm_q->f("resource_qty");
 
   $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = "<div class=\"title\">$l_resource : $fname $lname</div>";
+  $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
 
   $block = "
   <div class=\"detailHead\">$l_resource</div>

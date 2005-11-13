@@ -474,7 +474,7 @@ $display["detail"] .= dis_cat_links($deal);
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 // Update actions url in case some values have been updated (id after insert) 
-update_deal_action_url();
+update_deal_action();
 if (! $popup) {
   $display["header"] = generate_menu($module, $section);
 }
@@ -663,7 +663,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailupdate', 'update', 'insert', 'quick_detail', 'quick_update') 
+    'Condition'=> array ('detailupdate', 'update', 'quick_detail', 'quick_update') 
                                     	    );
 
   // Quick Detail
@@ -672,7 +672,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update', 'quick_update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'quick_update')
                                     	    );
 
   // Detail Update
@@ -681,7 +681,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update','insert', 'quick_detail', 'quick_update')
+    'Condition'=> array ('detailconsult', 'update', 'quick_detail', 'quick_update')
                                      	    );
 					    
   //  Update
@@ -744,7 +744,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update','insert') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      );
 
   // Delete
@@ -924,25 +924,39 @@ function get_deal_action() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deal Actions URL updates (after processing, before displaying menu)  
+// Deal Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
-function update_deal_action_url() {
+function update_deal_action() {
   global $deal, $actions, $path;
 
-  // Detail Update
-  $actions["deal"]["detailupdate"]['Url'] = "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"];
+  $id = $deal["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["deal"]["detailconsult"]['Url'] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$id";
+    $actions["deal"]["detailonsult"]['Condition'][] = 'insert';
 
-  // Quick Detail
-  $actions["deal"]["quick_detail"]['Url'] = "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=".$deal["id"];
+    // Detail Update
+    $actions["deal"]["detailupdate"]['Url'] = "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=$id";
+    $actions["deal"]["detailupdate"]['Condition'][] = 'insert';
+    
+    // Quick Detail
+    $actions["deal"]["quick_detail"]['Url'] = "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=$id";
+    $actions["deal"]["quick_detail"]['Condition'][] = 'insert';
 
-  // Parent Detail Update
-  $actions["deal"]["parent_detailupdate"]['Url'] = "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"];
+    // Check Delete
+    $actions["deal"]["check_delete"]['Url'] = "$path/deal/deal_index.php?action=check_delete&amp;param_deal=$id";
+    $actions["deal"]["check_delete"]['Condition'][] = 'insert';
+  }
 
-  // Check Delete
-  $actions["deal"]["check_delete"]['Url'] = "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"];
+  $pid = $deal["parent"];
+  if ($pid > 0) {
+    // Parent Detail Update
+    $actions["deal"]["parent_detailupdate"]['Url'] = "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=$pid";
 
-  // Parent Check Delete
-  $actions["deal"]["parent_delete"]['Url'] = "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"];
+    // Parent Check Delete
+    $actions["deal"]["parent_delete"]['Url'] = "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=$pid";
+  }
+
 
 }
 

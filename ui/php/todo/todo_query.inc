@@ -98,13 +98,12 @@ function run_query_detail($todo) {
     Author.userobm_lastname as author_firstname,
     Author.userobm_firstname as author_lastname
   FROM Todo
-       left join UserObm as uc on todo_usercreate = uc.userobm_id
-       left join UserObm as uu on todo_userupdate = uu.userobm_id
-       left join UserObm as u on todo_user = u.userobm_id,
+       LEFT JOIN UserObm as uc ON todo_usercreate = uc.userobm_id
+       LEFT JOIN UserObm as uu ON todo_userupdate = uu.userobm_id
+       LEFT JOIN UserObm as u ON todo_user = u.userobm_id,
      UserObm as Author
   WHERE todo_id = $t_id
-    and Author.userobm_id = todo_usercreate
-  ";
+    AND Author.userobm_id = todo_usercreate";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -129,6 +128,9 @@ function run_query_insert($todo) {
   $users = $todo["sel_user_id"];
   $priority = $todo["priority"];
   $percent = $todo["percent"];
+  if ($percent == "") {
+    $percent = "0";
+  }
   $deadline = $todo["deadline"];
   $content = $todo["content"];
 
@@ -191,6 +193,9 @@ function run_query_update($todo) {
   $deadline = $todo["deadline"];
   $content = $todo["content"];
   $percent = $todo["percent"];
+  if ($percent == "") {
+    $percent = "0";
+  }
 
   $query = "UPDATE Todo SET
     todo_timeupdate = '$now',
@@ -201,8 +206,7 @@ function run_query_update($todo) {
     todo_percent = '$percent',
     todo_title = '$title',
     todo_content = '$content'
-  WHERE todo_id = '$t_id'
-";
+  WHERE todo_id = '$t_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

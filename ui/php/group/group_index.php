@@ -241,7 +241,7 @@ if (($action == "index") || ($action == "")) {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 // Update actions url in case some values have been updated (id after insert) 
-update_group_action_url();
+update_group_action();
 $display["head"] = display_head($l_group);
 if (! $group["popup"]) {
   $display["header"] = generate_menu($module,$section);
@@ -348,7 +348,7 @@ function get_group_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/group/group_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','admin','detailconsult','display', 'user_add', 'user_del', 'group_add', 'group_del', 'insert', 'update', 'delete')
+    'Condition'=> array ('all')
                                   );
 
 // Detail Consult
@@ -356,7 +356,7 @@ function get_group_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/group/group_index.php?action=detailconsult&amp;param_group=".$group["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                   );
 
 // Detail Update
@@ -364,7 +364,7 @@ function get_group_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"]."",
      'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'insert', 'update') 
+     'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Insert
@@ -386,7 +386,7 @@ function get_group_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/group/group_index.php?action=check_delete&amp;param_group=".$group["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'insert', 'update')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Delete
@@ -409,7 +409,7 @@ function get_group_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
-    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'insert', 'update') 
+    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
                                     	  );
 
 // Sel user add : Users selection
@@ -419,7 +419,7 @@ function get_group_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
-    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'insert', 'update') 
+    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
                                     	  );
 
 // User add
@@ -433,21 +433,21 @@ function get_group_action() {
   $actions["group"]["user_del"] = array (
     'Url'      => "$path/group/group_index.php?action=user_del",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Group add
   $actions["group"]["group_add"] = array (
     'Url'      => "$path/group/group_index.php?action=group_add",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Group del
   $actions["group"]["group_del"] = array (
     'Url'      => "$path/group/group_index.php?action=group_del",
     'Right'    => $cright_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // Admin
@@ -455,7 +455,7 @@ function get_group_action() {
     'Name'     => $l_header_admin,
     'Url'      => "$path/group/group_index.php?action=admin",
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                     );
 
 // Display
@@ -463,45 +463,54 @@ function get_group_action() {
     'Name'     => $l_header_display,
     'Url'      => "$path/group/group_index.php?action=display",
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('all')
                                       	 );
 
 // Display
   $actions["group"]["dispref_display"] = array (
     'Url'      => "$path/group/group_index.php?action=dispref_display",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                       	 );
 // Display
   $actions["group"]["dispref_level"] = array (
     'Url'      => "$path/group/group_index.php?action=dispref_level",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                       	 );
 
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Group Actions URL updates (after processing, before displaying menu)  
+// Group Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
-function update_group_action_url() {
+function update_group_action() {
   global $group, $actions, $path, $l_add_user, $l_add_group, $l_group;
 
-  if ($group["id"] > 0) {
+  $id = $group["id"];
+  if ($id > 0) {
+    // Detail Consult
+    $actions["group"]["detailconsult"]['Url'] = "$path/group/group_index.php?action=detailconsult&amp;param_group=$id";
+    $actions["group"]["detailconsult"]['Condition'][] = 'insert';
+
     // Detail Update
-    $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"];
+    $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;param_group=$id";
+    $actions["group"]["detailupdate"]['Condition'][] = 'insert';
+
     // Check Delete
-    $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;param_group=".$group["id"];
+    $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;param_group=$id";
+    $actions["group"]["check_delete"]['Condition'][] = 'insert';
+
     // Sel User add
-    $actions["group"]["sel_user_add"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group";
+    $actions["group"]["sel_user_add"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
+    $actions["group"]["sel_user_add"]['Condition'][] = 'insert';
+
     // Sel group add : Groups selection
-  $actions["group"]["sel_group_add"]['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group&amp;child_res=1";
-  } else {
-    $actions["group"]["detailupdate"]['Condition'] = array('None');
+  $actions["group"]["sel_group_add"]['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
+    $actions["group"]["sel_group_add"]['Condition'][] = 'insert';
   }
-
-
 }
+
 
 </script>
