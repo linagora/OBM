@@ -175,9 +175,9 @@ p			{
 }
 
 /* ------------------------------------------------------------------------- */
-/* menu */
+/* module */
 /* ------------------------------------------------------------------------- */
-.header .menu	{
+.header .module	{
   	clear:			left;
 	padding:		0px;
 	font-family: 		arial,sans-serif;
@@ -185,7 +185,7 @@ p			{
 		
 }
 
-.header .menu li {
+.header .module li {
 	margin-right:		 13px;
 }
 
@@ -194,7 +194,7 @@ p			{
 /* action */
 /* ------------------------------------------------------------------------- */
 
-table.menuBar		{
+table.action		{
         margin-left:		auto;
 	margin-right:		auto;
 	width:			90%;
@@ -202,7 +202,7 @@ table.menuBar		{
 	background-color:	transparent;	
 }
 		
-td.menuBarLabel		{
+td.actionLabel		{
 	font-family:		sans-serif;
 	font-size:		10px;
 	font-weight:		bold;
@@ -210,7 +210,7 @@ td.menuBarLabel		{
 	background-color:	#93919c;
 }
 
-td.menuBarText		{
+td.actionText		{
 	font-family:		sans-serif;
 	font-size:		10px;
 	font-weight:		bold;
@@ -219,7 +219,7 @@ td.menuBarText		{
 	text-align:		right;
 }
 
-img.menuBarIconG	{
+img.actionIconG	{
 	float:			right;
 	border:			0;
 	text-align:		right;
@@ -227,7 +227,7 @@ img.menuBarIconG	{
 	padding:		0;
 }
 
-img.menuBarIconD	{
+img.actionIconD	{
 	float:			left;
 	border:			0;
 	text-align:		left;
@@ -235,16 +235,15 @@ img.menuBarIconD	{
 	padding:		0;
 }
 
-a.menuBar:link { color: #ffffff; background-color: transparent;}
-a.menuBar:active { color: #ffffff; background-color: transparent;}
-a.menuBar:visited { color: #ffffff; background-color: transparent;}
+a.action:link { color: #ffffff; background-color: transparent;}
+a.action:active { color: #ffffff; background-color: transparent;}
+a.action:visited { color: #ffffff; background-color: transparent;}
 
 
 /* ------------------------------------------------------------------------- */
-/* last */
+/* generic block */
 /* ------------------------------------------------------------------------- */
-
-.last {
+.block {
 	padding-right:		5px;
 	padding-left:		5px;
 	font-weight:		normal;
@@ -255,20 +254,34 @@ a.menuBar:visited { color: #ffffff; background-color: transparent;}
 	padding-top:		3px;
 	background-color:	#ffffff;
 	border:			1px solid #009ec6; 
+	list-style-type: none;
 }
 
-.lastTitle {
+.blockTitle {
 	font-weight:		bold;
 	font-size:		13px;
 	color:			#7b9ead;
-	background-color:	#eff3f7; 
+	background-color:       #e7f3f7;
 }
 
-.lastList {
+.blockItem {
 /*	display: block;*/
 	list-style-type: none;
 	margin-top: 0px;
 	text-indent: -3em;
+}
+
+/* ------------------------------------------------------------------------- */
+/* last (addition to block) */
+/* ------------------------------------------------------------------------- */
+
+.last {
+}
+
+.lastTitle {
+}
+
+.lastItem {
 }
 
 
@@ -669,42 +682,6 @@ td.logoVersion		{
 	padding:		0;
 	margin:			0;		
 }
-
-
-/* ///////////////////MENUS////////////////// */
-/* /////// Menu item style definition /////// */
-/* ////////////////////////////////////////// */
-
-table.menus		{
-	width:			100%;
-	height:			100%;
-	border-spacing:		0;
-	padding:		0;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-		
-td.menusLabel		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		normal;
-	color:			#000000;
-	background-color:	#ffffff;
- 	white-space:		nowrap;
-}
-
-td.menusText		{
-	width:			100%;
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		normal;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-
-a.menus:link { color: #000000; background-color: transparent;}
-a.menus:active { color: #000000; background-color: transparent;}
-a.menus:visited { color: #000000; background-color: transparent;}
 
 
 /* //////////////////DIVERS////////////////// */

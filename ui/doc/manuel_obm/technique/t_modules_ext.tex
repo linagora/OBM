@@ -229,7 +229,7 @@ Le bandeau ou menu général ne sera affiché que si le paramètre popup n'est pas p
 \begin{minipage}{14cm}
 \begin{verbatim}
 if (! $obm_user["popup"]) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 \end{verbatim}
 \end{minipage}

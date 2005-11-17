@@ -59,7 +59,7 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if (! $popup) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -329,7 +329,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 update_contract_action();
 if (! $popup) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 $display["head"] = display_head($l_contract);
 $display["end"] = display_end();

@@ -655,7 +655,7 @@ function dis_deal_consult($deal) {
   global $display;
 
   if ($deal["id"] > 0) {
-    $deal_q = run_query_detail($deal["id"]);
+    $deal_q = run_query_deal_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $block = html_deal_consult($deal_q);
   }
@@ -927,7 +927,7 @@ function dis_deal_form($deal) {
   global $display, $uid, $action, $ctt_sales, $cg_com, $cg_prod;
 
   if ($action == "detailupdate") {
-    $deal_q = run_query_detail($deal["id"]);
+    $deal_q = run_query_deal_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $deal["company"] = $deal_q->f("deal_company_id");
     $users = array($uid, $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
@@ -1429,14 +1429,14 @@ $js_status_loop
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Deal quick form
 // Parameters:
-//   - $deal[]    : deal search criteria
+//   - $deal[]    : default or transmitted values
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_quick_form($deal) {
   global $display, $uid, $action;
 
   if ($deal["id"] > 0) {
-    $deal_q = run_query_detail($deal["id"]);
+    $deal_q = run_query_deal_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $usrc_q = run_query_all_users_from_group($cg_com, array($uid));
     $sta_q = run_query_dealstatus();
@@ -1705,55 +1705,73 @@ function html_deal_affect($parent_q, $p_deal_id) {
 	  
 ///////////////////////////////////////////////////////////////////////////////
 // Display The Deal potential block
+// Parameters:
+//   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_potential() {
+function dis_deal_potential($deal) {
   global $display, $set_theme, $l_total;
   global $l_deal, $l_forecast, $l_deal_total, $l_module_deal, $l_deal_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
   $display["title"] = "<div class=\"title\">$l_deal : $l_forecast</div>";
 
+  if (is_array($deal["manager"])) {
+    $users_id = $deal["manager"];
+  } else if ($deal["manager"] != "") {
+    $users_id = array($deal["manager"]);
+  } else {
+    $users_id = "";
+  }
+
   $cpt = 1;
-  $potentials = run_query_deal_potential();
-  foreach($potentials["market"] as $u_id => $pu) {
-    if ($u_id != "0") {
-      $cpt++;
-      $data = "data" . ($cpt % 2);
-      $amount = number_format($pu["amount"]);
-      $balanced = number_format($pu["amount_balanced"]);
-      $nb_potential = $pu["number"];
-      $user = $pu["name"];
-      $dis_market_pot .= "
+  $potentials = run_query_deal_potential($users_id);
+  if (is_array($potentials["market"])) {
+    foreach($potentials["market"] as $u_id => $pu) {
+      if ($u_id != "0") {
+	$cpt++;
+	$data = "data" . ($cpt % 2);
+	$amount = number_format($pu["amount"]);
+	$balanced = number_format($pu["amount_balanced"]);
+	$nb_potential = $pu["number"];
+	$user = $pu["name"];
+	$dis_market_pot .= "
       <tr class=\"$data\">
         <td>$user</td>
         <td style=\"text-align: center;\">$nb_potential</td>
         <td style=\"text-align: right;\">$amount</td>
         <td style=\"text-align: right;\">$balanced</td>
       </tr>";
+      }
     }
+
+    $m_amount = number_format($potentials["market"]["0"]["amount"]);
+    $m_balanced = number_format($potentials["market"]["0"]["amount_balanced"]);
+    $m_nb_potential = $potentials["market"]["0"]["number"];
   }
 
-  foreach($potentials["tech"] as $u_id => $pu) {
-    if ($u_id != "0") {
-      $cpt++;
-      $data = "data" . ($cpt % 2);
-      $amount = number_format($pu["amount"]);
-      $balanced = number_format($pu["amount_balanced"]);
-      $nb_potential = $pu["number"];
-      $user = $pu["name"];
-      $dis_tech_pot .= "
+  if (is_array($potentials["tech"])) {
+    foreach($potentials["tech"] as $u_id => $pu) {
+      if ($u_id != "0") {
+	$cpt++;
+	$data = "data" . ($cpt % 2);
+	$amount = number_format($pu["amount"]);
+	$balanced = number_format($pu["amount_balanced"]);
+	$nb_potential = $pu["number"];
+	$user = $pu["name"];
+	$dis_tech_pot .= "
       <tr class=\"$data\">
         <td>$user</td>
         <td style=\"text-align: center;\">$nb_potential</td>
         <td style=\"text-align: right;\">$amount</td>
         <td style=\"text-align: right;\">$balanced</td>
       </tr>";
+      }
     }
-  }
 
-  $amount_t = number_format($potentials["0"]["amount"]);
-  $balanced_t = number_format($potentials["0"]["amount_balanced"]);
-  $nb_potential_t = $potentials["0"]["number"];
+    $t_amount = number_format($potentials["tech"]["0"]["amount"]);
+    $t_balanced = number_format($potentials["tech"]["0"]["amount_balanced"]);
+    $t_nb_potential = $potentials["tech"]["0"]["number"];
+  }
 
   $dis_potential = "
     <table class=\"resultTable\">
@@ -1766,9 +1784,9 @@ function dis_deal_potential() {
     $dis_market_pot
     <tr class=\"data2\">
       <td>$l_total</td>
-      <td style=\"text-align: center;\">$nb_potential_t</td>
-      <td style=\"text-align: right;\">$amount_t</td>
-      <td style=\"text-align: right;\">$balanced_t</td>
+      <td style=\"text-align: center;\">$m_nb_potential</td>
+      <td style=\"text-align: right;\">$m_amount</td>
+      <td style=\"text-align: right;\">$m_balanced</td>
     </tr>
     </table>
     <p />
@@ -1782,9 +1800,9 @@ function dis_deal_potential() {
     $dis_tech_pot
     <tr class=\"data2\">
       <td>$l_total</td>
-      <td style=\"text-align: center;\">$nb_potential_t</td>
-      <td style=\"text-align: right;\">$amount_t</td>
-      <td style=\"text-align: right;\">$balanced_t</td>
+      <td style=\"text-align: center;\">$t_nb_potential</td>
+      <td style=\"text-align: right;\">$t_amount</td>
+      <td style=\"text-align: right;\">$t_balanced</td>
     </tr>
     </table>";
 
@@ -1810,18 +1828,28 @@ function dis_deal_potential() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display The Deal stats detail
+// Parameters:
+//   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_stats($deal) {
   global $display, $set_theme, $uid;
   global $l_module_deal;
 
+  if (is_array($deal["manager"])) {
+    $users_id = $deal["manager"];
+  } else if ($deal["manager"] != "") {
+    $users_id = array($deal["manager"]);
+  } else {
+    $users_id = "";
+  }
+
   $block .= "
   <div class=\"detailHead\">$l_module_deal</div>";
 
-  $deal_q = run_query_deal_stats($deal);
+  $deal_q = run_query_deal_stats($deal, $users_id);
   $prefs = get_display_pref($uid, "deal", 0);
 
-  $url=url_prepare("deal_index.php?action=stats&amp;param_list=$id");
+  $url = url_prepare("deal_index.php?action=stats&amp;sel_manager=".$deal["manager"]);
     
   $dis_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
   $dis_deal->data_set = $deal_q;
@@ -2583,7 +2611,7 @@ function dis_parentdeal_consult($deal) {
   $order_dir = $deal["order_dir"];
   $archive = $deal["archive"];
 
-  $obm_q = run_query_detail_parentdeal($deal["parent"]);
+  $obm_q = run_query_deal_parentdeal_detail($deal["parent"]);
   $prefs = get_display_pref ($uid, "deal");
   $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
@@ -2752,7 +2780,7 @@ function dis_parentdeal_form($action, $deal) {
   $users = array();
 
   if ($deal["parent"] > 0) {
-    $obm_q = run_query_detail_parentdeal($deal["parent"]);
+    $obm_q = run_query_deal_parentdeal_detail($deal["parent"]);
     if ($obm_q->num_rows() != 1) {
       $display["msg"] .= display_err_msg($l_no_found);
       return;

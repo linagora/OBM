@@ -298,7 +298,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 update_incident_action();
 $display["head"] = display_head($l_incident);
-$display["header"] = generate_menu($module,$section);
+$display["header"] = display_menu($module);
 $display["end"] = display_end();
 display_page($display);
 
@@ -575,7 +575,7 @@ function update_incident_action() {
     
     // Check Delete
     $actions["incident"]["check_delete"]['Url'] = "$path/incident/incident_index.php?action=check_delete&amp;param_incident=$id";
-    $actions["incident"]["check_delete"]['Condition'][] = 'insert');
+    $actions["incident"]["check_delete"]['Condition'][] = 'insert';
   }
 
 }

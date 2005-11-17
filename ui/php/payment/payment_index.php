@@ -529,7 +529,7 @@ elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_treso");
 update_payment_action();
-$display["header"] = generate_menu($module, $section);
+$display["header"] = display_menu($module);
 $display["end"] = display_end();
 display_page($display);
 

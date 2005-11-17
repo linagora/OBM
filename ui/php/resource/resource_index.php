@@ -195,7 +195,7 @@ if ($action == "ext_get_ids") {
 $display["head"] = display_head($l_resource);
 if (! $resource["popup"]) {
   update_resource_action();
-  $display["header"] = generate_menu($module,$section);
+  $display["header"] = display_menu($module);
 }
 $display["end"] = display_end();
 

@@ -186,7 +186,7 @@ if ($action == "index")  {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_header_admin_ref);
-$display["header"] = generate_menu($module, $section); // Menu
+$display["header"] = display_menu($module);
 $display["end"] = display_end();
 
 display_page($display);

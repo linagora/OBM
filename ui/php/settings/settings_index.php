@@ -136,7 +136,7 @@ $perm->check_permissions($module, $action);
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-$display["header"] = generate_menu($module, $section);
+$display["header"] = display_menu($module);
 
 // Todo Order select
 if ($set_todo == $cts_pri) { $todo_pri = "selected=\"selected\" "; }

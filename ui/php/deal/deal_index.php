@@ -163,7 +163,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
-    $retour = run_query_update($deal);
+    $retour = run_query_deal_update($deal);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -176,7 +176,7 @@ if ($action == "ext_get_id") {
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff == "archives") {
-      $obm_q = run_query_detail($deal["id"]);
+      $obm_q = run_query_deal_detail($deal["id"]);
       $obm_q->next_record();
       $deal["parent"] = $obm_q->f("deal_parentdeal_id");
       run_query_update_archive($deal["id"], $deal["parent"]);
@@ -213,7 +213,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_deal($deal["id"])) {
-    $retour = run_query_delete($deal["id"]);
+    $retour = run_query_deal_delete($deal["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -406,7 +406,7 @@ $display["detail"] .= dis_cat_links($deal);
 } elseif ($action == "parent_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_parentdeal($deal["parent"])) {
-    run_query_delete_parentdeal($deal["parent"]); 
+    run_query_deal_parentdeal_delete($deal["parent"]); 
     $display["msg"] .= display_ok_msg($l_delete_ok); 
     require("deal_js.inc");
     $display["search"] = html_parentdeal_search_form($deal, run_query_deal_manager(1));
@@ -419,7 +419,7 @@ $display["detail"] .= dis_cat_links($deal);
 } elseif  ($action == "parent_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_parent_form("", $deal)) {
-    $retour = run_query_update_parentdeal($deal);
+    $retour = run_query_deal_parentdeal_update($deal);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -476,7 +476,7 @@ $display["detail"] .= dis_cat_links($deal);
 // Update actions url in case some values have been updated (id after insert) 
 update_deal_action();
 if (! $popup) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 $display["head"] = display_head($l_deal);
 $display["end"] = display_end();

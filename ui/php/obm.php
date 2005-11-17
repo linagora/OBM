@@ -16,7 +16,7 @@ $extra_css = "portal.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-include_once("obm_query.inc"); 
+include_once("obm_query.inc");
 require("$obminclude/lib/right.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
@@ -43,7 +43,7 @@ page_close();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("OBM Version $obm_version");
-$display["header"] = generate_menu("","");
+$display["header"] = display_menu("");
 $display["title"] = "
 <div class=\"title\">
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
@@ -58,6 +58,7 @@ if ($cgp_show["module"]["time"]) {
 }
 
 if ($cgp_show["module"]["deal"]) { 
+  require("$path/deal/deal_query.inc");
   $block .= dis_deal_portal();
 }
 
@@ -231,7 +232,13 @@ function dis_deal_portal() {
   $m_amount = number_format($potential["market"]["$uid"]["amount"]);
   $m_balanced = number_format($potential["market"]["$uid"]["amount_balanced"]);
   $m_nb_potential = $potential["market"]["$uid"]["number"];
+  if ($m_nb_potential == "") {
+    $m_nb_potential = "0";
+  }
   $t_nb_potential = $potential["tech"]["$uid"]["number"];
+  if ($t_nb_potential == "") {
+    $t_nb_potential = "0";
+  }
 
   $deals = run_query_deal_status($uid);
   if (count($deals) > 0) {
@@ -254,7 +261,7 @@ function dis_deal_portal() {
     <div>
     <table>
     <tr>
-      <td>$l_my_deal_current</td>
+      <td><a href=\"".url_prepare("deal/deal_index.php?action=stats&amp;sel_manager=$uid")."\">$l_my_deal_current</a></td>
       <td class=\"number\">$m_nb_potential / $t_nb_potential</td>
     </tr><tr>
       <td>$l_deal_total</td>
@@ -270,8 +277,8 @@ function dis_deal_portal() {
     </div>
    </div>
    <div class=\"portalLink\"><a href=\"".url_prepare("deal/deal_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_deal</a></div>
-  </div>
-  ";
+  </div>";
+
   return $block;
 }
 

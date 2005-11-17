@@ -38,7 +38,7 @@ function dis_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
   } else if ($p_view == "day") {
     $block = dis_day_planning($agenda, $calendar_entity);
   }
-  $display["print_url"] = "$path/agenda/agenda_index.php?action=view_$p_view";
+  $display["print_url"] = "$path/agenda/agenda_index.php?action=view_$p_view&amp;param_date=".$agenda["date"];
 
   return $block;
 }
@@ -124,9 +124,9 @@ function html_bar_legend($calendar_entity) {
   }
 
   $block = "
-  <div class=\"last\">
+  <div class=\"block\">
 
-  <div class=\"lastTitle\">:: $l_legend</div>
+  <div class=\"blockTitle\">:: $l_legend</div>
   <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
     $dis_legend
   </table>
@@ -221,8 +221,8 @@ function html_select_calendar_entity($new_action, $agenda, $calendar_entity, $en
   $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;new_group=1&amp;param_group=$c_all&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
 
   $block = "
-    <div class=\"last\">
-    <div class=\"lastTitle\">:: $l_selection</div>
+    <div class=\"block\">
+    <div class=\"blockTitle\">:: $l_selection</div>
 
     <table class=\"agendaCal\">
     <tr style=\"text-align: center;\">
@@ -386,8 +386,8 @@ function html_bar_date_selector($agenda) {
   } while ($whole_month == TRUE);
 
   $block = "
-  <div class=\"last\">
-  <div class=\"lastTitle\">:: $dis_month</div>
+  <div class=\"block\">
+  <div class=\"blockTitle\">:: $dis_month</div>
   <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
   <tr>
     $dis_minical_head
@@ -396,8 +396,8 @@ function html_bar_date_selector($agenda) {
   </table>
   </div>
 
-  <div class=\"last\">
-  <div class=\"lastTitle\">:: $l_go_to</div>
+  <div class=\"block\">
+  <div class=\"blockTitle\">:: $l_go_to</div>
   <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
   <tr>
     <td>
@@ -814,13 +814,13 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties)
     onMouseOut=\"hide('$id-$usr_id'); return true;\"
     href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;position:absolute;z-index:1000;\">
-   <div class=\"lastTitle\">:: $title</div>
-   <ul class=\"lastList\">
-    <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
-    <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
-    <li class=\"lastList\">$description</li>
+  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
+   <div class=\"blockTitle\">:: $title</div>
+   <ul class=\"blockItem\">
+    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
+    <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
+    <li class=\"blockItem\">$description</li>
    </ul>
   </div>";
 }
@@ -1050,13 +1050,13 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) 
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;position:absolute;z-index:1000;\"> 
-   <div class=\"lastTitle\">:: $title</div>
-   <ul class=\"lastList\">  
-    <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
-    <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>        
-    <li class=\"lastList\">$description</li>
+  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\"> 
+   <div class=\"blockTitle\">:: $title</div>
+   <ul class=\"blockItem\">  
+    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
+    <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>        
+    <li class=\"blockItem\">$description</li>
    </ul>
   </div>";
 }
@@ -1252,13 +1252,13 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
   onMouseOut=\"hide('$id-$usr_id'); return true;\"
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\">
-   <div class=\"lastTitle\">:: $title</div>
-   <ul class=\"lastList\">
-    <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
-    <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
-    <li class=\"lastList\">$description</li>
+  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;\">
+   <div class=\"blockTitle\">:: $title</div>
+   <ul class=\"blockItem\">
+    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
+    <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
+    <li class=\"blockItem\">$description</li>
    </ul>
   </div>";
 }
@@ -1295,11 +1295,11 @@ function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a>";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;position:absolute;z-index:1000;\"> 
-   <div class=\"lastTitle\">:: $title</div>
-   <ul class=\"lastList\">  
-    <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">$description</li>
+  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\"> 
+   <div class=\"blockTitle\">:: $title</div>
+   <ul class=\"blockItem\">  
+    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$description</li>
    </ul>
   </div>";
 

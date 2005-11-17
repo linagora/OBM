@@ -153,7 +153,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
 // Parameters:
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_deal_detail($id) {
   global $cdg_sql, $db_type_mysql, $db_type_pgsql;
 
   $obm_q = new DB_OBM;
@@ -335,7 +335,7 @@ function run_query_insert($deal) {
 // Parameters:
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($deal) {
+function run_query_deal_update($deal) {
   global $auth, $cdg_sql, $l_no;
 
   $id = $deal["id"];
@@ -606,7 +606,7 @@ function run_query_deal_id($deal) {
 // Parameters:
 //   - $id : deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($id) {
+function run_query_deal_delete($id) {
   global $cdg_sql;
 
   $archive = get_deal_archive($id);
@@ -777,9 +777,9 @@ function run_query_deal_potential($users_id="") {
     $nb += $res["market"]["$u_id"]["number"];
   }
 
-  $res["0"]["amount"] = $am;
-  $res["0"]["amount_balanced"] = $ab;
-  $res["0"]["number"] = $nb;
+  $res["market"]["0"]["amount"] = $am;
+  $res["market"]["0"]["amount_balanced"] = $ab;
+  $res["market"]["0"]["number"] = $nb;
 
   // Tech manager stats
   $query = "SELECT
@@ -821,6 +821,10 @@ function run_query_deal_potential($users_id="") {
     $nb += $res["tech"]["$u_id"]["number"];
   }
 
+  $res["tech"]["0"]["amount"] = $am;
+  $res["tech"]["0"]["amount_balanced"] = $ab;
+  $res["tech"]["0"]["number"] = $nb;
+
   return $res;
 }
 
@@ -844,6 +848,7 @@ function run_query_deal_stats($deal, $users_id="") {
     $or = "";
     foreach ($users_id as $u_id) {
       $where_uid .= " $or deal_marketingmanager_id='$u_id'";
+      $where_uid .= " OR deal_technicalmanager_id='$u_id'";
       $or = "OR";
     }
     $where_uid .= ")";
@@ -1895,7 +1900,7 @@ function run_query_insert_parentdeal($deal) {
 // Parameters:
 //   - $pid : parentdeal id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail_parentdeal($pid) {
+function run_query_deal_parentdeal_detail($pid) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
@@ -1931,7 +1936,7 @@ function run_query_detail_parentdeal($pid) {
 // Parameters:
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update_parentdeal($deal) {
+function run_query_deal_parentdeal_update($deal) {
   global $auth, $cdg_sql;
 
   $pid = ($deal["parent"] ? $deal["parent"] : "null");
@@ -1987,7 +1992,7 @@ function run_query_affect_deal_parentdeal($id, $deal) {
 // Parameters:
 //   - $p_id : parent_deal id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_parentdeal($p_id) {
+function run_query_deal_parentdeal_delete($p_id) {
   global $cdg_sql;
 
   $query = "DELETE FROM ParentDeal WHERE parentdeal_id='$p_id'";

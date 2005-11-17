@@ -359,7 +359,7 @@ $display["head"] = display_head($l_document);
 $display["end"] = display_end();
 if (! $document["popup"]) {
   update_document_action();
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 
 display_page($display);

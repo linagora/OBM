@@ -82,7 +82,7 @@ require("import_js.inc");
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if (! $popup) {
-  $display["header"] = generate_menu($module, $section); // Menu
+  $display["header"] = display_menu($module);
 }
 
 

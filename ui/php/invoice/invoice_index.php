@@ -181,7 +181,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_invoice");
 update_invoice_action();
-$display["header"] = generate_menu($module, $section);
+$display["header"] = display_menu($module);
 $display["end"] = display_end();
 display_page($display);
 

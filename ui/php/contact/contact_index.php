@@ -416,7 +416,7 @@ $display["head"] = display_head($l_contact);
 $display["end"] = display_end();
 if (! $contact["popup"]) {
   update_contact_action();
-  $display["header"] = generate_menu($module,$section);
+  $display["header"] = display_menu($module);
 }
 
 display_page($display);

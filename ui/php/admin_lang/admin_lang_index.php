@@ -35,7 +35,7 @@ switch ($mode) {
    get_admin_lang_action();
    $perm->check_permissions($module, $action);
    $display["head"] = display_head("$module");
-   $display["header"] = generate_menu($module, $section);
+   $display["header"] = display_menu($module);
    echo $display["head"] . $display["header"];
    break;
 }

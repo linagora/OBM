@@ -46,7 +46,7 @@ switch ($mode) {
    get_admin_pref_action();
    $perm->check_permissions($module, $action);
    $display["head"] = display_head("Admin_Pref");
-   $display["header"] = generate_menu($module, $section);
+   $display["header"] = display_menu($module);
    echo $display["head"] . $display["header"];
    break;
  default:

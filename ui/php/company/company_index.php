@@ -397,7 +397,7 @@ $display["end"] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
 if (! $company["popup"]) {
   update_company_action();
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 
 display_page($display);

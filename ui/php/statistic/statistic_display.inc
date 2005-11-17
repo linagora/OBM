@@ -21,9 +21,9 @@ function dis_menu_stats() {
 
   $ret = "
   <div class=\"menusInner\">
-  <div class=\"last\">
-  <div class=\"lastTitle\">:: $l_statistic </div>
-  <ul class=\"lastList\">";
+  <div class=\"block\">
+  <div class=\"blockTitle\">:: $l_statistic </div>
+  <ul class=\"blockItem\">";
 
 
   if (is_array($actions[$module])) {
@@ -32,7 +32,7 @@ function dis_menu_stats() {
       if (in_array("content", $value["Condition"])) {
 	if (($module_right & $value["Right"]) == $value["Right"]) {
 	    $ret .= "
-        <li class=\"lastList\">
+        <li class=\"blockItem\">
 	<a href=\"".$value["Url"]."\"><img src=\"".C_IMAGE_PATH."/$set_theme/".$value["Ico"]."\" alt=\"\"></a>
          <a href=\"".$value["Url"]."\">".$value["Name"]."</a></li>";
 	}

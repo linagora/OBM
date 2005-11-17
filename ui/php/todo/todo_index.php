@@ -145,7 +145,7 @@ if (in_array($action, array("insert", "detailupdate", "delete", "delete_unique")
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 if (! $popup) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 $display["head"] = display_head($l_todo);
 $display["end"] = display_end();

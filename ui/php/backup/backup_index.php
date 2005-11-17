@@ -107,7 +107,7 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_backup);
 if (! $backup["popup"]) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 $display["end"] = display_end();
 

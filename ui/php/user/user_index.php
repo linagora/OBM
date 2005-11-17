@@ -222,7 +222,7 @@ if ($action == "ext_get_ids") {
 $display["head"] = display_head($l_user);
 if (! $obm_user["popup"]) {
   update_user_action();
-  $display["header"] = generate_menu($module,$section);
+  $display["header"] = display_menu($module);
 }
 $display["end"] = display_end();
 

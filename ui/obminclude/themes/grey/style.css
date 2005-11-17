@@ -16,22 +16,16 @@
 	padding:		10px 5px;
 	float:			left;
 	clear:			left;
-/*	padding: 2px;*/
 }
 
 .rightpanel {
 	width:			180px;
-/*	clear:			right;*/
 	float:			right;
-/*	margin-right: 		20px;*/
-/*	border: 1px solid #000000;*/
-/*	padding: 2px;*/
 }
 
 .middlepanel {
 	width: auto;
 	margin-right:		196px;
-/*	background-color: 	#0000FF;*/
 }
 
 .detailpanel {
@@ -40,8 +34,6 @@
 	margin-right: 		10px;
 	margin-left: 		200px;
 	width: 			auto;
-/*	height: 		100%;*/
-/*	background-color: 	#00FF00;*/
 }
 
 .detailpanelalone {
@@ -49,22 +41,51 @@
 	left: 			2px;
 	right: 			2px;
 	width: 			auto;
-/*	border: 		1px solid #000000;*/
 	padding: 		0px;
 	margin-top: 		10px;
-/*	background-color: 	#00FF00;*/
 }
+
 /* ------------------------------------------------------------------------- */
 /* header */
 /* ------------------------------------------------------------------------- */
+.header li	{
+	display: inline;
+	list-style-type: none;
+}
+.header .entries {
+  	float: 			left;
+	position: 		relative;
+	clear:			right;
+}
 
 /* ------------------------------------------------------------------------- */
 /* section */
 /* ------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------------- */
-/* menu */
+/* module */
 /* ------------------------------------------------------------------------- */
+
+.module {
+	text-align: center;
+	font-size: 11px;
+	background-color: #AEAEB1;
+	background-image: url(fond_bandeau03.png);
+	background-repeat: repeat-x;
+	background-position: top;
+	padding-top: 5px;
+	padding-left: 5px;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #DBDCDF;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	margin: 0px;
+}
+.module li {
+	margin-right:		 13px;
+	display: inline;
+}
 
 /* ------------------------------------------------------------------------- */
 /* action */
@@ -126,10 +147,10 @@
  .action a:visited { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
 
 /* ------------------------------------------------------------------------- */
-/* last */
+/* block */
 /* ------------------------------------------------------------------------- */
 
-.last {
+.block {
 	width: 			180px;
 	padding: 		0px;
 	font-size: 		10px;
@@ -141,7 +162,7 @@
 	border-left: 		2px solid #394D5A;
 }
 
-.lastTitle {
+.blockTitle {
 	font-size: 		13px;
 	color: 			#FFFFFF;
 	font-weight: 		bold;
@@ -153,7 +174,7 @@
 	background-image: 	url(fond_bandeau02.png);
 }
 
-.lastList {
+.blockItem {
 	list-style-type: 	none;
 	margin: 		0px;
 	width: 			100%;
@@ -171,10 +192,23 @@
 	border-bottom-color: 	#868791;
 }
 
- .lastList a {	border: 0px;	text-decoration: none;} 
- .lastList a:link { color: #FFFFFF;	border: 0px; text-decoration: none;} 
- .lastList a:active { color: #FFFFFF;	border: 0px; text-decoration: none;} 
- .lastList a:visited { color: #FFFFFF;	border: 0px; text-decoration: none;} 
+.blockItem a {	border: 0px;	text-decoration: none;} 
+.blockItem a:link { color: #FFFFFF;	border: 0px; text-decoration: none;} 
+.blockItem a:active { color: #FFFFFF;	border: 0px; text-decoration: none;} 
+.blockItem a:visited { color: #FFFFFF;	border: 0px; text-decoration: none;} 
+
+/* ------------------------------------------------------------------------- */
+/* last */
+/* ------------------------------------------------------------------------- */
+
+.last {
+}
+
+.lastTitle {
+}
+
+.lastItem {
+}
 
 /* ------------------------------------------------------------------------- */
 /* title */
@@ -807,40 +841,6 @@ a.menuBar:link { color: #ffffff; background-color: transparent;}
 a.menuBar:active { color: #ffffff; background-color: transparent;}
 a.menuBar:visited { color: #ffffff; background-color: transparent;}
 
-/* ///////////////////MENUS////////////////// */
-/* /////// Menu item style definition /////// */
-/* ////////////////////////////////////////// */
-
-table.menus		{
-	width:			100%;
-	height:			100%;
-	border-spacing:		0;
-	padding:		0;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-		
-td.menusLabel		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		normal;
-	color:			#000000;
-	background-color:	#ffffff;
- 	white-space:		nowrap;
-}
-
-td.menusText		{
-	width:			100%;
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		normal;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-a.menus {	font-weight: bold; text-decoration: none; text-transform: uppercase;}
-a.menus:link {	color: #FFFFFF;	background-color: transparent;}
-a.menus:active { color: #FFFFFF; background-color: transparent;}
-a.menus:visited { color: #FFFFFF; background-color: transparent;}
 
 /* /////////////////SECTIONS///////////////// */
 /* //// The tabs sections style definition/// */
@@ -1063,24 +1063,6 @@ div.documentBox {
 
 }
 
-.menu {
-	text-align: center;
-	font-size: 11px;
-	background-color: #AEAEB1;
-	background-image: url(fond_bandeau03.png);
-	background-repeat: repeat-x;
-	background-position: top;
-	padding-top: 5px;
-	padding-left: 5px;
-	border-bottom-width: 2px;
-	border-bottom-style: solid;
-	border-bottom-color: #DBDCDF;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	margin: 0px;
-
-
-}
 .formulaire01 {
 	width: 100%;
 	background-color: #FFFFFF;

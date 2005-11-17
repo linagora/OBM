@@ -39,8 +39,8 @@ switch ($mode) {
    if ($action == "") $action = "index";
    get_admin_action();
    $perm->check_permissions($module, $action);
-   $display["head"] = display_head("$module");
-   $display["header"] = generate_menu($module, $section);
+   $display["head"] = display_head($module);
+   $display["header"] = display_menu($module);
    echo $display["head"] . $display["header"];
    break;
 }

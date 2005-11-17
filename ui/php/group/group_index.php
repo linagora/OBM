@@ -244,7 +244,7 @@ if (($action == "index") || ($action == "")) {
 update_group_action();
 $display["head"] = display_head($l_group);
 if (! $group["popup"]) {
-  $display["header"] = generate_menu($module,$section);
+  $display["header"] = display_menu($module);
 }
 $display["end"] = display_end();
 

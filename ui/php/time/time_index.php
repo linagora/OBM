@@ -167,7 +167,7 @@ if ($action == "index") {
 $display["head"] = display_head($l_time);
 $display["end"] = display_end();
 if (! $popup) {
-  $display["header"] = generate_menu($module, $section);
+  $display["header"] = display_menu($module);
 }
 display_page($display);
 

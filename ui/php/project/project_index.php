@@ -407,7 +407,7 @@ $display["end"] = display_end();
 if (! $project["popup"]) {
   // Update actions url in case some values have been updated (id after insert)
   update_project_action();
-  $display["header"] = generate_menu($module,$section);
+  $display["header"] = display_menu($module);
 }
 
 display_page($display);

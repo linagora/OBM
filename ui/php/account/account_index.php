@@ -185,7 +185,7 @@ $q_account = run_query_detail ($account["id"]);
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 update_account_action();
-$display["header"] = generate_menu($module, $section);
+$display["header"] = display_menu($module);
 $display["head"] = display_head("$l_account");
 $display["end"] = display_end();
 display_page($display);
