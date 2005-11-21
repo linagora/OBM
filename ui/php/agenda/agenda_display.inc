@@ -40,6 +40,7 @@ function dis_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
   }
   $display["print_url"] = "$path/agenda/agenda_index.php?action=view_$p_view&amp;param_date=".$agenda["date"];
 
+
   return $block;
 }
 
