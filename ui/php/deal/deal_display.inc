@@ -980,7 +980,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format, $l_update,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
-  global $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
+  global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
   global $l_date_proposal,$l_amount,$l_hitrate,$l_date_expected;
   global $l_contact,$l_date_alarm,$l_status;
   global $l_last_update, $l_archive, $l_at, $l_todo, $l_category;
@@ -1352,7 +1352,7 @@ $js_status_loop
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
-      <td class=\"detailLabel\"> $l_cat</td>
+      <td class=\"detailLabel\">$l_tt</td>
       <td class=\"detailForm\">$sel_tt</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>
@@ -1463,7 +1463,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $l_date_expected, $l_date_alarm, $l_status, $l_hitrate, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $path, $display, $action, $auth, $cgp_hide;
+  global $path, $display, $action, $auth;
 
   $uid = $auth->auth["uid"];
 
@@ -2112,8 +2112,7 @@ function html_deal_admin_form($kind_q, $status_q) {
 
     </td>
   </tr>
-  </table>
-  ";
+  </table>";
 
   if (! $cgp_hide["deal"]["category1"]) {
     $cat_q = run_query_dealcategory();
@@ -2134,7 +2133,6 @@ function html_deal_admin_form($kind_q, $status_q) {
 function html_deal_cat_form($cat_q) {
   global $l_cat_manage,$l_cat_exist,$l_cat_no,$l_code,$l_label ;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_new,$l_cat_insert;
-
 
   if ( (is_object($cat_q)) && ($cat_q->num_rows() > 0) ) {
     $sel_cat = "<select name=\"sel_cat\" onChange=\"
