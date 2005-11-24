@@ -255,11 +255,12 @@ function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
   $cat1 = $incident["cat1"];
   $param_contract = $incident["contract_id"];
   $owner = $incident["owner"];
+  $logger = $incident["logger"];
   $archive = $incident["archive"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_cat1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_cat1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
 
   $in_q->seek($first_row);
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");

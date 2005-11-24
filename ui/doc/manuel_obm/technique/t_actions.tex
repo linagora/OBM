@@ -1,0 +1,70 @@
+% Documentation technique d'OBM : Actions d'un module
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\subsection{Les actions d'un module}
+\label{actions}
+
+Les actions d'un module représentent les traitements implémentés par ce module. Chaque traitement (consultation, création, modification, recherche,...) est défini par une action.
+
+Chaque action possède des propriétés qui vont définir son comportement (droits d'accès, contexte d'affichage,...).
+
+
+\subsubsection{Gestion des actions par un module}
+
+Les différentes actions proposées par un module sont définies dans le module (fichier \fichier{module\_index.php}.
+
+\begin{itemize}
+\item La fonction \fonction{get\_module\_action()} appelée en début de module renseigne le tableau global \variable{\$actions}.
+
+\item La fonction \fonction{update\_module\_action()} appelée en fin de module, après les traitements, permet de mettre à jour les actions en fonction du contexte et des résultats du traitement.
+\end{itemize}
+
+\subsubsection{Utilité de \fonction{update\_module\_action()}}
+
+\paragraph{Exemple :} pour l'action insertion :
+\begin{itemize}
+\item si l'action est un succès, une nouvelle entité est créée et le module l'affiche directement. Dans ce cas les actions ``modifier'' ou ``supprimer'', qui nécessitent d'être positionné sur une entité, peuvent être affichées
+\item si l'action échoue, n'étant pas positionné sur une entité, ces actions ne doivent pas être affichées.
+\end{itemize}
+
+\paragraph{Note :} l'affichage du bandeau est effectué après l'appel à \fonction{update\_module\_action()}.
+
+
+\subsubsection{Schéma de principe global de gestion des actions}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+get_module_action();
+
+// Traitements
+// if ($action == ...)
+// else if (...
+// }
+// Fin Traitements
+
+update_module_action(); // maj des actions
+$display[``header''] = display_menu($module) // affichage du bandeau
+\end{verbatim}
+\end{minipage}
+}
+
+
+\subsubsection{Propriétés d'une action}
+
+\begin{tabular}{|p{2cm}|p{5cm}|p{6cm}|}
+\hline
+\textbf{Nom} & \textbf{description} & \textbf{Valeur} \\
+\hline
+Name & label associé & \$l\_header\_find \\ 
+\hline
+Url & url de l'action & \$path/company/company\_index.php?action=.. \\ 
+\hline
+Right & Droit nécessaire pour exécution & \$cright\_read, \$cright\_write,.. \\ 
+\hline
+Condition & Condition d'affichage dans menu & array : 'all', 'None', 'action' \\ 
+\hline
+\end{tabular}
+
