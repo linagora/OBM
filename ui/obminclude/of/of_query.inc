@@ -1140,6 +1140,7 @@ function get_user_info($id="") {
     $small_key = str_replace("userobm_", "", $key);
     $u[$small_key] = $user;
   }
+  $u["datebegin"] = array();
   $u["datebegin"]["iso"] = $obm_q->f("userobm_datebegin");
   $u["datebegin"]["unix_timestamp"] = $obm_q->f("datebegin");
 

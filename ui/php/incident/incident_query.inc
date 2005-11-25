@@ -163,8 +163,9 @@ function run_query_detail($id) {
         $dateexp,
         contractstatus_label,
         c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
-        c1.contact_phone as phone_c1, c2.contact_phone as phone_c2,
-        c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2
+        c1.contact_phone as phone_c1, c1.contact_email as email_c1,
+        c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
+        c2.contact_phone as phone_c2, c2.contact_email as email_c2
       FROM Incident
         LEFT JOIN Contract on incident_contract_id=contract_id
         LEFT JOIN ContractStatus on contract_status_id=contractstatus_id

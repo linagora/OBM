@@ -307,12 +307,12 @@ function dis_incident_consult($incident) {
 //   - $inc_q : DBO : incident result
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_consult($inc_q) {
-  global $display, $path, $l_yes, $l_no;
-  global $set_theme,$ico_contract,$ico_company;
+  global $display, $path, $l_yes, $l_no, $cmail_incident;
+  global $set_theme, $ico_contract, $ico_company, $ico_mail;
   global $l_incident, $l_contract, $l_company;
   global $l_label, $l_logger, $l_owner, $l_priority, $l_status, $l_archive;
-  global $l_duration,$l_solution,$l_date;
-  global $l_client_manager,$l_cat1;
+  global $l_duration, $l_solution, $l_date;
+  global $l_client_manager, $l_cat1;
   global $l_comment;
 
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
@@ -323,7 +323,8 @@ function html_incident_consult($inc_q) {
   $date = datetime_format($inc_q->f("date"), 1);
   $inc_id = $inc_q->f("incident_id");
   $inc_dur = nl2br($inc_q->f("incident_duration"));
-  $inc_reso = nl2br(htmlentities($inc_q->f("incident_resolution")));
+  $resolution = $inc_q->f("incident_resolution");
+  $inc_reso = nl2br(htmlentities($resolution));
   $con_id = $inc_q->f("contract_id");
   $comp_id = $inc_q->f("contract_company_id");
   $comp_name = $inc_q->f("company_name");
@@ -337,6 +338,9 @@ function html_incident_consult($inc_q) {
   $dis_con1 = $inc_q->f("lname_c1") . " " . $inc_q->f("fname_c1") . " - " . $inc_q->f("phone_c1");
   $dis_con2 = $inc_q->f("lname_c2") . " " . $inc_q->f("fname_c2") . " - " . $inc_q->f("phone_c2");
   $archive = ($inc_q->f("incident_archive") == 1 ? $l_yes : $l_no);
+  $email_con1 = $inc_q->f("email_c1");
+  $email_con2 = $inc_q->f("email_c2");
+  $email_con = ($email_con1 != "" ? $email_con1 : $email_con2);
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
@@ -407,7 +411,8 @@ function html_incident_consult($inc_q) {
   </tr>
   </table>
 
-  <div class=\"detailHead\">$l_solution</div>
+  <div class=\"detailHead\">$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$resolution\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
+</div>
   <table class=\"detail\"> 
   <tr>
     <td colspan=\"2\" class=\"detailText\">$inc_reso</td>

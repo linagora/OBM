@@ -19,9 +19,8 @@ function run_query_days_unfilled() {
   $uid = $auth->auth["uid"];
 
   $u = get_user_info($uid);
-  $begindate = $u["datebegin"];
-  $unix_ts = $begindate["unix_timestamp"];
-  $iso = $begindate["iso"];
+  $unix_ts = $u["datebegin"]["unix_timestamp"];
+  $iso = $u["datebegin"]["iso"];
   $jan_first = mktime (0, 0, 0, 1, 1, date("Y"));
   if ($unix_ts > $jan_first) {
     $date = $iso;
@@ -31,13 +30,13 @@ function run_query_days_unfilled() {
 
   // First and last days of month
   $query = "
-    select
+    SELECT
       sum(timetask_length) as total_length
-    from TimeTask
-    where timetask_date <= '".date("Ymd")."'
-    and timetask_date >= '$date'
-      and timetask_user_id = '$uid'
-    ";
+    FROM TimeTask
+    WHERE timetask_date <= '".date("Ymd")."'
+      AND timetask_date >= '$date'
+      AND timetask_user_id = '$uid'
+";
   
   display_debug_msg($query, $cdg_sql, "run_query_days_unfilled");
   $obm_db = new DB_OBM;
@@ -55,6 +54,7 @@ function run_query_days_unfilled() {
     }
     $current_day = strtotime("+1 day",$current_day);
   }
+
   return $workingdays - $filled_days;
 }
 
