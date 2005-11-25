@@ -1,0 +1,361 @@
+% Manuel d'utilisation d'OBM : module Affaire
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\clearpage
+\section{Le module \deal}
+
+révision : \obm 1.0.2
+
+\subsection{Présentation du module \deal}
+
+Ce module est une gestion d'affaire.
+Il est destiné à gérer les relations commerciales et plus particulièrement l'avant-vente ou les opportunités en offrant des statistiques prévisionnelles. C'est un module central aux fonctionnalités de gestion de la relation client (GRC) d'\obm.\\
+
+Une affaire est une relation commerciale avec un tiers. Le tiers peut être un client, un fournisseur, un prospect, un partenaire,...
+
+Une affaire précise de nombreuses propriétés de cette relation comme son état, les interlocuteurs, le pourcentage de réussite, des dates, un historique,... et peut être liée à des projets, factures, documents.\\
+
+Une affaire décrit une relation commerciale pour un besoin précis. Il est fréquent qu'un projet global génère plusieurs affaires distinctes (chacune avec son état et ses caractéristiques propres).
+Un projet de développement aboutira souvent à une affaire initiale, puis à des affaires traçant chaque avenant. Ainsi chaque avenant pourra être suivi avec son état (être accepté, refusé) proposer un montant, un type, une date d'alarme spéciques..
+
+\subsection{Description d'une affaire}
+
+Composantes d'une affaire :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Label & Label ou titre de l'affaire \\
+\hline
+SurAffaire & Regroupement d'affaire à laquelle l'affaire est attachée \\
+\hline
+Accés & accés public ou privé \\
+\hline
+Date de début & Date de début d'année \\
+\hline
+Type & Typage de l'affaire : achât, vente,... \\
+\hline
+Type de tâche & Domaine de l'affaire : formation, développement,... \\
+\hline
+Responsables & Responsables internes commercial et technique de l'affaire \\
+\hline
+Montant & Montant estimé ou prévisionnel de l'affaire \\
+\hline
+\% de réussite & Estimation du taux de réussite de l'affaire \\
+\hline
+Date prévue & Date estimée de signature de l'affaire \\
+\hline
+Catégorie 1 & Catégorie 1 d'affaire. Une affaire peut appartenir ou être liée à plusieurs catégories. Les catégories sont paramétrables.\\
+\hline
+Société & Société en relation pour l'affaire (client, fournisseur).\\
+\hline
+Contacts & Interlocuteurs dans la société en relation.\\
+\hline
+Date alarme & Date d'alerte pour la prochaine action à réalsier sur l'affaire \\
+\hline
+Etat & Etat de l'affaire (contact, rdv, proposition,...).\\
+\hline
+A faire & Commentaire sur la prochaine action à effectuer sur l'affaire.\\
+\hline
+Archive & Etat d'archivage de l'affaire. Une affaire archivée ne sera plus listée par défaut et ne participera plus aux statistiques prévisionnelles.\\
+\hline
+Commentaire & Commentaire sur l'affaire. Ce commentaire est riche (horodaté et renseignement de son auteur automatiquement)\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Les attribus suivant peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
+
+\begin{itemize}
+\item Catégories 1
+\end{itemize}
+
+
+\subsubsection{Catégories d'une affaire}
+\label{deal_cat}
+
+La catégorie 1 d'une affaire est désactivable. Elle permêt de classifier et organiser les affaires selon des critères propres à la société utilisant \obm.
+
+Une affaire peut référencer plusieurs catégories 1.
+
+Les catégories sont administrables par la menu ``Administration'' du module \deal, et il est donc possible de les définir selon les besoins.
+
+Par exemple : une organisation géographique, une classification interne...
+
+
+\subsubsection{Les liens d'une affaire}
+
+Le module \deal étant central à la gestion de la relation client dans \obm, de nombreux liens sont disponibles depuis une affaire et permettent d'accéder directement aux entités liées à cette affaire :\\
+
+\begin{itemize}
+\item SurAffaire, qui est une entité permettant le regroupement des affaires
+\item Projets, résultant de l'affaire
+\item Contrats, générés via cette affaire
+\item Facture, liées à l'affaire
+\item Document
+\end{itemize}
+
+
+\subsubsection{Principe des suraffaires ou affaires parentes}
+
+Une suraffaire est une sorte de groupe d'affaire qui a pour but de permettre un groupement des affaires liées.
+Par exemple, un besoin complexe d'un client peut générer plusieurs affaires (une étude, un ou plusieurs développements, des avenants, un contrat de support, des formations...).
+
+L'idée est de permettre de regrouper ces affaires pour des raisons de comodité d'utilisation (recherche par exemple) mais aussi pour des raisons de statistiques.
+
+
+Une affaire ne peut être liée qu'à une seule affaire parente.
+
+Des totaux sont calculés sur l'ensemble des affaires d'une suraffaire.
+
+\paragraph{Cette notion de suraffaire pourrait être supprimée} car ne semble pas trop utilisée et :
+
+\begin{itemize}
+\item Les groupements d'affaire sont dans la pratique réalisés par le nom de la société (quoique ne couvre pas tous les cas)
+\item Les statistiques sont surtout utiles sur les projets ou factures (ce qui est réalisé et une donnée exacte), alors que les affaires proposent des chiffres approximatifs de prévisionnel.
+\end{itemize}
+
+
+\subsection{Description et gestion des types d'affaire}
+\label{deal_type}
+
+Une affaire est caractérisée par un type (Achat, vente, événement,..).
+Les types d'affaire sont paramétrables et sont gérés via le menu "Administration".\\
+
+Composantes d'un type :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Nom & Nom du type \\
+\hline
+(+ / -) & Défini si le montant doit être compté positivement ou négativement (entrée ou sortie).\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Le champ (+ / -) du "type d'affaire" indique si le montant renseigné de l'affaire doit être compté positivement ou négativement dans les calculs de prévisionnels effectués sur un ensemble d'affaire (aujourd'hui uniquement calculs sur l'ensemble des affaires d'une suraffaire)
+
+\paragraph{Exemple :} Une suraffaire possède 2 affaires :
+\begin{itemize}
+\item Affaire 1 : Prestation d'installation d'un serveur, de type "VENTE +" pour 10 000 \euro
+\item Affaire 2 : Achat d'un serveur, de type "ACHAT -" pour 4 000 \euro
+\end{itemize}
+
+La suraffaire affichera les montants des entrées (10 000 \euro) et des sorties (4 000 \euro) et un montant total de 10 000 - 4 000 = 6 000 \euro.
+
+
+\subsection{Description et gestion des états}
+\label{deal_state}
+
+Une affaire est caractérisée par un état.
+Les états sont paramétrables et sont gérés via le menu "Administration".\\
+
+Composantes d'un état :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Nom & Nom de l'état \\
+\hline
+Ordre & ordre d'affichage de l'état.\\
+\hline
+\% réussite & pourentage de réussite associé à l'état.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+ Si le champ \% de réussite de l'état est renseigné, lorsque l'affaire est basculée dans cet état, le \% de réussite de l'affaire est automatiquement positionné au \% de réussite de l'état.
+
+\paragraph{Exemple :} Si l'état "signé" est associé au pourcentage de réussite 100, lorsqu'une affaire passe à l'état signé, le pourcentage de réussite de l'affaire est automatiquement renseigné à 100.
+
+
+\subsection{Les sous-menus du module \deal}
+
+Le module \deal comporte 10 sous-menus :\\
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Chercher & Recherche multicritères des affaires ou suraffaires \\
+\hline
+Nouvelle & Créer une nouvelle société\\
+\hline
+Nouvelle SurAffaire & Créer une nouvelle suraffaire\\
+\hline
+Consulter & Consulter les informations d'une affaire ou d'une suraffaire\\
+\hline
+Maj rapide & Modifier rapidement les informations (de suivi) d'une affaire\\
+\hline
+Modifier & Modifier les informations d'une affaire ou d'une suraffaire\\
+\hline
+Supprimer & Vérifier puis si besoin Supprimer une affaire ou une suraffaire\\
+\hline
+Statistiques & statistiques prévisionnelles (portefeuille) des affaires\\
+\hline
+Administration & Administration des informations annexes (types d'affaire, états d'affaire, catégories d'affaires). Le type de tâches est administré via le module d'administration du référentiel car utilisé par d'autres modules.\\
+\hline
+Affichage & Personnalisation de l'affichage de la liste des affaires\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Chercher}
+
+Ce menu permet d'effectuer une recherche sur les suraffairees ou sur les affaires.
+
+La recherche sur les suraffaires propose les critères suivant :
+
+\begin{itemize}
+\item Nom de la suraffaire
+\item Responsable de la suraffaire
+\item Prise en compte des suraffaires archivées
+\end{itemize}
+\vspace{0.3cm}
+
+La recherche sur les affaires propose les critères suivant :
+
+\begin{itemize}
+\item Label de l'affaire
+\item Nom de la société
+\item Code postal de la société
+\item Date alarme postérieure à
+\item Date alarme antérieure à
+\item Type d'affaire
+\item Type de tâche de l'affaire
+\item Catégorie de l'affaire
+\item Etat de l'affaire
+\item Responsable de l'affaire (technique ou commercial)
+\item Prise en compte des affaires archivées
+\end{itemize}
+
+\subsubsection{Le sous-menu : Nouvelle}
+
+Ce menu permet de créer une affaire.
+
+Un écran s'ouvre et permet de sélectioner la société, ensuite un formulaire vierge d'affaire propose la saisie des champs :
+
+\begin{itemize}
+\item Contacts de la société,
+\item Privé,
+\item Label (obligatoire),
+\item Numéro,
+\item Date de début (pré-renseignée à la date du jour) (obligatoire),
+\item Type (obligatoire),
+\item Type de tâche (obligatoire),
+\item Responsable commercial (obligatoire),
+\item Responsable technique (obligatoire),
+\item Date de proposition,
+\item Montant,
+\item \% de Réussite,
+\item Date prévue,
+\item Catégorie (obligatoire),
+\item Date alarme (obligatoire),
+\item Etat (obligatoire),
+\item A faire,
+\item Archive,
+\item Date et auteur du nouveau commentaire,
+\item Envoyer par mail (Non, aux participants ou au groupe),
+\item Commentaire,
+\end{itemize}
+\vspace{0.3cm}
+
+L'indicateur "Envoyer par mail" permet d'envoyer une synthèse de l'affaire par mail :
+\begin{itemize}
+\item Non : ne pas envoyer
+\item Particpants : aux responsables technique et commercial de l'affaire
+\item Group : aux membres du  groupe Commercial
+\end{itemize}
+\vspace{0.3cm}
+
+Si l'affaire est valide, elle est insérée dans la base de données et un message d'acceptation est affiché; sinon le formulaire de saisie de nouvelle affaire est affiché de nouveau avec un message indiquant la cause de non validité.
+
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de retourner en mode consultation de l'affaire ou suraffaire en cours.
+
+
+\subsubsection{Le sous-menu : Maj rapide}
+
+Ce menu permet d'accéder à un écran de modification synthétique d'une affaire (toutes les informations ne sont pas proposées pour modification).
+
+Il est possible de modifier toutes les informations disponibles en mode création, excepté la société liée à l'affaire.
+
+\begin{itemize}
+\item \% de Réussite,
+\item Date prévue,
+\item Date alarme (obligatoire),
+\item Etat (obligatoire),
+\item A faire,
+\item Date et auteur du nouveau commentaire,
+\item Envoyer par mail (Non, aux participants ou au groupe),
+\item Commentaire,
+\end{itemize}
+\vspace{0.3cm}
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations de l'affaire ou suraffaire dans un formulaire de modification.
+Il est possible de modifier toutes les informations disponibles en mode création, excepté la société liée à l'affaire.
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+
+
+\subsubsection{Le sous-menu : Supprimer}
+Ce menu permet la suppression d'une affaire ou d'une suraffaire.
+
+\paragraph{Pour être supprimée} une affaire ne doit pas être référencé dans les contrats, dans les projets et dans les factures.
+
+
+\subsubsection{Le sous-menu : Statistiques}
+
+Ce menu offre 2 tableaux prévisionnels des affaires, regroupées selon leurs responsables : le premier tableau propose un regroupement par responsable commercial, le second par responsable technique.\\
+
+Une affaire est prise en compte dans le prévisionnel si elle rentre dans les critères suivants :
+\begin{itemize}
+\item Affaire non archivée
+\item Montant renseigné
+\item \% de réussite > 0 et < 100 (pour ne pas prendre en compte les affaires perdues ou gagnées)
+\end{itemize}
+\vspace{0.3cm}
+
+Les affaires prises en compte par ses statistiques sont listées sous ces 2 tableaux.\\
+
+La portlet ``Affaires'' de la page d'accueil de l'utilisateur d'\obm propose 2 liens : 
+\begin{itemize}
+\item ``Mes affaires en cours'', qui affiche ces mêmes statistiques mais uniquement pour l'utilisateur.
+\item ``Mes affaires'', qui affiche la liste des affaires dont l'utilisateur est responsable technique ou commercial.
+\end{itemize}
+
+
+
+\subsubsection{Le sous-menu : Administration}
+
+Ce menu permet l'administration des informations annexes des affaires :\\
+
+\begin{itemize}
+\item Types d'affaire
+\item Etats d'affaire
+\item Catégories 1
+\end{itemize}
+
+\paragraph{Gestion des types d'affaire : } Voir \ref{deal_type}
+
+\paragraph{Gestion des états d'affaire : } Voir \ref{deal_state}
+
+\paragraph{Gestion des catégories d'affaire : } Voir \ref{deal_cat}
+
+
+
+\subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des affaires. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
