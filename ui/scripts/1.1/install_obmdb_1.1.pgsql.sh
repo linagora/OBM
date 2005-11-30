@@ -1,7 +1,7 @@
 #!/bin/sh
 ###############################################################################
-# OBM - File : install_obmdb_1.0.pgsql.sh                                     #
-#     - Desc : PostgreSQL Database 1.0 installation script                    #
+# OBM - File : install_obmdb_1.1.pgsql.sh                                     #
+#     - Desc : PostgreSQL Database 1.1 installation script                    #
 # 2005-06-08 ALIACOM                                                          #
 ###############################################################################
 # $Id$
@@ -29,7 +29,7 @@ echo $PHP : PHP interpreter found
 
 
 echo "*** Document repository creation"
-$PHP install_document_1.0.php || (echo $?; exit $?)
+$PHP install_document_1.1.php || (echo $?; exit $?)
 
 
 echo "*** Database creation"
@@ -43,26 +43,26 @@ echo "  Create new $DB database"
 psql -U $U template1 -c "CREATE DATABASE $DB with owner = $U"
 
 echo "  Create new $DB database model"
-psql -U $U $DB < create_obmdb_1.0.pgsql.sql
+psql -U $U $DB < create_obmdb_1.1.pgsql.sql
 
 
 echo "*** Database filling"
 
 # Dictionnary data insertion
 echo "  Dictionnary data insertion"
-cat postgres-pre.sql data-$DATA_LANG/obmdb_ref_1.0.sql | psql -U $U $DB
+cat postgres-pre.sql data-$DATA_LANG/obmdb_ref_1.1.sql | psql -U $U $DB
 
 # Company Naf Code data insertion
 echo "  Company Naf Code data insertion"
-cat postgres-pre.sql data-$DATA_LANG/obmdb_nafcode_1.0.sql | psql -U $U $DB
+cat postgres-pre.sql data-$DATA_LANG/obmdb_nafcode_1.1.sql | psql -U $U $DB
 
 # Test data insertion
 echo "  Test data insertion"
-cat postgres-pre.sql obmdb_test_values_1.0.sql | psql -U $U $DB
+cat postgres-pre.sql obmdb_test_values_1.1.sql | psql -U $U $DB
 
 # Default preferences data insertion
 echo "Default preferences data insertion"
-cat postgres-pre.sql obmdb_default_values_1.0.sql | psql -U $U $DB 
+cat postgres-pre.sql obmdb_default_values_1.1.sql | psql -U $U $DB 
 
 
 echo "*** Data checking and validation"

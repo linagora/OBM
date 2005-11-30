@@ -1,7 +1,7 @@
 #!/bin/sh
 ###############################################################################
-# OBM - File : install_obmdb_1.0.sh                                           #
-#     - Desc : MySQL Database 1.0 installation script                         #
+# OBM - File : install_obmdb_1.1.sh                                           #
+#     - Desc : MySQL Database 1.1 installation script                         #
 # 2005-06-08 ALIACOM                                                          #
 ###############################################################################
 # $Id$
@@ -29,7 +29,7 @@ echo $PHP : PHP interpreter found
 
 
 echo "*** Document repository creation"
-$PHP install_document_1.0.php || (echo $?; exit $?)
+$PHP install_document_1.1.php || (echo $?; exit $?)
 
 
 echo "*** Database creation"
@@ -41,26 +41,26 @@ echo "  Create new $DB database"
 mysql -u $U -p$P -e "CREATE DATABASE $DB"
 
 echo "  Create new $DB database model"
-mysql -u $U -p$P $DB < create_obmdb_1.0.mysql.sql
+mysql -u $U -p$P $DB < create_obmdb_1.1.mysql.sql
 
 
 echo "*** Database filling"
 
 # Dictionnary data insertion
 echo "  Dictionnary data insertion"
-mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_ref_1.0.sql
+mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_ref_1.1.sql
 
 # Company Naf Code data insertion
 echo "  Company Naf Code data insertion"
-mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_nafcode_1.0.sql
+mysql -u $U -p$P $DB < data-$DATA_LANG/obmdb_nafcode_1.1.sql
 
 # Test data insertion
 echo "  Test data insertion"
-mysql -u $U -p$P $DB < obmdb_test_values_1.0.sql
+mysql -u $U -p$P $DB < obmdb_test_values_1.1.sql
 
 # Default preferences data insertion
 echo "  Default preferences data insertion"
-mysql -u $U -p$P $DB < obmdb_default_values_1.0.sql
+mysql -u $U -p$P $DB < obmdb_default_values_1.1.sql
 
 
 echo "*** Data checking and validation"
