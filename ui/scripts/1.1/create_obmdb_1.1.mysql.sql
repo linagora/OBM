@@ -665,6 +665,7 @@ CREATE TABLE CalendarCategory1 (
   calendarcategory1_timecreate  timestamp(14),
   calendarcategory1_userupdate  int(8) default NULL,
   calendarcategory1_usercreate  int(8) default NULL,
+  calendarcategory1_code        varchar(10) default '',
   calendarcategory1_label       varchar(128) default NULL,
   PRIMARY KEY (calendarcategory1_id)
 );

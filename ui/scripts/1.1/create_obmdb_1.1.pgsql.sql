@@ -246,29 +246,29 @@ CREATE TABLE Company (
 
 
 --
--- Table structure for table 'CompanyCategory'
+-- Table structure for table 'CompanyCategory1'
 --
-CREATE TABLE CompanyCategory (
-  companycategory_id          serial,
-  companycategory_timeupdate  TIMESTAMP,
-  companycategory_timecreate  TIMESTAMP,
-  companycategory_userupdate  integer,
-  companycategory_usercreate  integer NOT NULL default 0,
-  companycategory_code        varchar(10) NOT NULL default '',
-  companycategory_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (companycategory_id)
+CREATE TABLE CompanyCategory1 (
+  companycategory1_id          serial,
+  companycategory1_timeupdate  TIMESTAMP,
+  companycategory1_timecreate  TIMESTAMP,
+  companycategory1_userupdate  integer,
+  companycategory1_usercreate  integer NOT NULL default 0,
+  companycategory1_code        varchar(10) NOT NULL default '',
+  companycategory1_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (companycategory1_id)
 );
 
 
 --
--- Table structure for table 'CompanyCategoryLink'
+-- Table structure for table 'CompanyCategory1Link'
 --
-CREATE TABLE CompanyCategoryLink (
-  companycategorylink_category_id  integer NOT NULL default 0,
-  companycategorylink_company_id   integer NOT NULL default 0,
-  PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id)
+CREATE TABLE CompanyCategory1Link (
+  companycategory1link_category_id  integer NOT NULL default 0,
+  companycategory1link_company_id   integer NOT NULL default 0,
+  PRIMARY KEY (companycategory1link_category_id,companycategory1link_company_id)
 );
-CREATE INDEX compcat_idx_comp ON CompanyCategoryLink (companycategorylink_company_id);
+CREATE INDEX compcat1_idx_comp ON CompanyCategory1Link (companycategory1link_company_id);
 
 
 -------------------------------------------------------------------------------
@@ -541,26 +541,27 @@ CREATE TABLE DealType (
 
 
 --
--- Table structure for table 'DealCategory'
+-- Table structure for table 'DealCategory1'
 --
-CREATE TABLE DealCategory (
-  dealcategory_id          serial,
-  dealcategory_timeupdate  timestamp,
-  dealcategory_timecreate  timestamp,
-  dealcategory_userupdate  integer default 0,
-  dealcategory_usercreate  integer default 0,
-  dealcategory_code        varchar(10) default '',
-  dealcategory_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (dealcategory_id)
+CREATE TABLE DealCategory1 (
+  dealcategory1_id          serial,
+  dealcategory1_timeupdate  timestamp,
+  dealcategory1_timecreate  timestamp,
+  dealcategory1_userupdate  integer default 0,
+  dealcategory1_usercreate  integer default 0,
+  dealcategory1_code        varchar(10) default '',
+  dealcategory1_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (dealcategory1_id)
 );
 
--- Table structure for table 'DealCategoryLink'
+-- Table structure for table 'DealCategory1Link'
 --
-CREATE TABLE DealCategoryLink (
-  dealcategorylink_category_id  integer NOT NULL default 0,
-  dealcategorylink_deal_id      integer NOT NULL default 0,
-  PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
+CREATE TABLE DealCategory1Link (
+  dealcategory1link_category_id  integer NOT NULL default 0,
+  dealcategory1link_deal_id      integer NOT NULL default 0,
+  PRIMARY KEY (dealcategory1link_category_id,dealcategory1link_deal_id)
 );
+CREATE INDEX dealcat1_idx_deal ON DealCategory1Link (dealcategory1link_deal_id);
 
 
 -------------------------------------------------------------------------------
@@ -615,7 +616,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_owner        integer default NULL,    
   calendarevent_title        varchar(255) default NULL,
   calendarevent_location     varchar(100) default NULL,
-  calendarevent_category_id  integer,
+  calendarevent_category1_id integer,
   calendarevent_priority     integer,
   calendarevent_privacy      integer,
   calendarevent_date         timestamp NOT NULL,
@@ -661,16 +662,17 @@ CREATE TABLE CalendarException (
 
 
 --
--- Table structure for table 'CalendarCategory'
+-- Table structure for table 'CalendarCategory1'
 --
-CREATE TABLE CalendarCategory (
-  calendarcategory_id          serial,
-  calendarcategory_timeupdate  timestamp,
-  calendarcategory_timecreate  timestamp,
-  calendarcategory_userupdate  integer DEFAULT NULL,
-  calendarcategory_usercreate  integer DEFAULT NULL,
-  calendarcategory_label       varchar(128) DEFAULT NULL,
-  PRIMARY KEY (calendarcategory_id)
+CREATE TABLE CalendarCategory1 (
+  calendarcategory1_id          serial,
+  calendarcategory1_timeupdate  timestamp,
+  calendarcategory1_timecreate  timestamp,
+  calendarcategory1_userupdate  integer DEFAULT NULL,
+  calendarcategory1_usercreate  integer DEFAULT NULL,
+  calendarcategory1_code        varchar(10) default '',
+  calendarcategory1_label       varchar(128) DEFAULT NULL,
+  PRIMARY KEY (calendarcategory1_id)
 );
 
 
@@ -1092,7 +1094,7 @@ CREATE TABLE Incident (
   incident_date             timestamp,
   incident_priority_id      integer DEFAULT NULL,
   incident_status_id        integer DEFAULT NULL,
-  incident_cat1_id          integer DEFAULT NULL,
+  incident_category1_id     integer DEFAULT NULL,
   incident_logger           integer DEFAULT NULL,
   incident_owner            integer DEFAULT NULL,
   incident_duration         char(4) DEFAULT '0',
