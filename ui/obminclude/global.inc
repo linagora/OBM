@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.0.2pre4";
+$obm_version = "1.1.0pre1";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -189,13 +189,13 @@ $profiles["admin"] = array (
 // Default Displayed Infos //
 //-------------------------//
 // sections -- Urls
-$cgp_show["section"]["com"]["url"] = "$path/company/company_index.php";
+$cgp_show["section"]["com"]["url"] = "$path/contact/contact_index.php";
 $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
 $cgp_show["section"]["compta"]["url"] = "$path/account/account_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
-//$cgp_show["section"]["admin"]["right"] = "$cright_read_admin";
-$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
+$cgp_show["section"]["admin"]["right"] = "$cright_read_admin";
+//$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
 
 // modules
 $cgp_show["module"]["company"] = "com";
@@ -295,7 +295,6 @@ if ($auth_kind == "CAS") {
   echo "please edit \$auth_kind in obm_conf.inc";
   exit;
 }
-
 
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 
