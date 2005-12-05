@@ -38,6 +38,12 @@ $l_label = "Label";
 $l_category1 = "Categorie 1";
 $l_category2 = "Categorie 2";
 $l_letter = "En-tête de Lettre";
+$l_date = "Date";
+$l_no_date = "Non spécifiée";
+$l_comment2 = "Commentaire 2";
+$l_comment3 = "Commentaire 3";
+
+
 
 // Actions
 $l_cat1_delete_ok = "La suppression de la categorie 1 a été correctement effectuée.";
@@ -69,6 +75,7 @@ $l_j_cat1_update = "Vous devez renseigner le label de la categorie 1";
 $l_j_cat2_update = "Vous devez renseigner le label de la categorie 2";
 $l_j_cat1_delete = "Vous devez sélectionner une categorie 1";
 $l_j_cat2_delete = "Vous devez sélectionner une categorie 2";
+$l_j_check_date = "Remplissez la date avec une date valide";
 $l_insert = "Enregistrer le Contact";
 $l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";
@@ -86,6 +93,10 @@ $l_add_cats2 = "Ajouter ces categories 2";
 $l_subscription = "Abonnements";
 $l_subscription_list = "Abonnements";
 $l_subscription_new= "Nouvel abonnement";
+$l_add_comment2 = "Ajouter un commentaire 2";
+$l_upd_comment2 = "Modifier le commentaire 2";
+$l_add_comment3 = "Ajouter un commentaire 3";
+$l_upd_comment3 = "Modifier le commentaire 3";
 
 // Messages
 $l_cat1_manage = "Gestion des catégories 1";
@@ -178,3 +189,77 @@ $l_recept = "Mode de réception";
 $l_quantity = "Quantité";
 $l_quantity = "Quantité";
 $l_no_found_subscription = "Aucun abonnement lié à ce contact !";
+
+//---------------------------------------------------------------------------//
+// Category labels
+//---------------------------------------------------------------------------//
+$l_category1="catégorie 1";
+$l_category1_s="catégories 1";
+$l_category1_new = "Nouvelle";
+$l_category1_exist = "existantes";
+
+$l_category2="catégorie 2";
+$l_category2_s="catégories 2";
+$l_category2_s_upper="Catégories 2";
+$l_category2_new = "Nouvelle";
+$l_category2_exist = "existantes";
+
+$l_category3="catégorie 3";
+$l_category3_s="catégories 3";
+$l_category3_s_upper="Catégories 3";
+$l_category3_new = "Nouvelle";
+$l_category3_exist = "existantes";
+
+$l_category4="catégorie 4";
+$l_category4_s="catégories 4";
+$l_category4_s_upper="Catégories 4";
+$l_category4_new = "Nouvelle";
+$l_category4_exist = "existantes";
+
+
+/*
+for ($i=1; $i<=4; $i++) {
+  $l_cat_delete_ok[$i] = "La suppression $l_cat_of[$i] a été correctement effectuée.";
+  $l_cat_delete_error[$i] = "La suppression $l_cat_of[$i] a échoué !";
+  $l_cat_insert_ok[$i] = "L'insertion $l_cat_of[$i] a été correctement effectuée.";
+  $l_cat_insert_error[$i] = "L'insertion $l_cat_of[$i] a échoué !";
+  $l_cat_update_ok[$i] = "La modification $l_cat_of[$i] a été correctement effectuée";
+  $l_cat_update_error[$i] = "La modification $l_cat_of[$i] a échoué !";
+  $l_cat_link_contact[$i] = "$l_cat_the_upper[$i] est référencé(e) par ces contacts";
+  $l_cat_link_contact_no[$i] = "$l_cat_the_upper[$i] n'est référencée dans aucun contacts";
+  $l_cat_can_delete[$i] = " $l_cat_the_upper[$i] peut être supprimée";
+  $l_cat_cant_delete[$i] = " $l_cat_the_upper[$i] ne peut pas etre supprimée";
+  $l_j_cat_create[$i] = "Vous devez renseigner le label $l_cat_of[$i]";
+  $l_j_cat_update[$i] = "Vous devez renseigner le label $l_cat_of[$i]";
+  $l_j_cat_delete[$i] = "Vous devez sélectionner $l_cat_one[$i]";
+  $l_cat_manage[$i] = "Gestion des $l_cats[$i]";
+  $l_cat_exist[$i] = "$l_cats[$i] existantes";
+  $l_cat_new[$i] = "Nouvelle $l_cat[$i]";
+  $l_cat_delete[$i] =  "Supprimer";
+  $l_cat_checkdelete[$i] = "Vérifier ou supprimer $l_cat_the[$i]";
+  $l_cat_update[$i] = "Mettre à jour $l_cat_the[$i]";
+  $l_cat_insert[$i] = "Insérer $l_cat_one[$i]";
+}
+*/
+
+$l_delete_ok="la suppression a été correctement effectuée.";
+$l_delete_error="la suppression a été échoué !";
+$l_insert_ok="l'insertion a été correctement effectuée.";
+$l_insert_error="l'insertion a échoué !";
+$l_update_ok = "la modification a été correctement effectuée";
+$l_update_error = "la modification a échoué !";
+$l_link_contact = "$l_cat_the_upper[$i] est référencé(e) par ces contacts";
+$l_link_contact_no = "$l_cat_the_upper[$i] n'est référencée dans aucun contacts";
+$l_can_delete = " $l_cat_the_upper[$i] peut être supprimée";
+$l_cant_delete = " $l_cat_the_upper[$i] ne peut pas etre supprimée";
+$l_j_create = "Vous devez renseigner le label $l_cat_of[$i]";
+$l_j_update = "Vous devez renseigner le label $l_cat_of[$i]";
+$l_j_delete = "Vous devez sélectionner $l_cat_one[$i]";
+$l_manage = "Gestion des"; //
+$l_exist = " existant(e)s"; //
+$l_new = "Nouveau";
+$l_delete =  "Supprimer";
+$l_checkdelete = "Vérifier ou supprimer $l_cat_the[$i]";
+$l_update = "Mettre à jour $l_cat_the[$i]";
+$l_insert = "Insérer $l_cat_one[$i]";
+

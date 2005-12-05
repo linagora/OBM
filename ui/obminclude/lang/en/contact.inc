@@ -25,6 +25,9 @@ $l_code = "Code";
 $l_letter = "Letter Head";
 $l_category1 = "Category 1";
 $l_category2 = "Category 2";
+$l_comment2 = "Comment 2";
+$l_comment3 = "Comment 3";
+
 
 // Labels and texts
 $l_contact_name = "Contact Name";
@@ -59,6 +62,10 @@ $l_kind_delete = "Delete Kind";
 $l_kind_insert = "Insert Kind";
 $l_add_cats1 = "Add these categories 1";
 $l_add_cats2 = "Add these categories 2";
+$l_add_comment2 = "Add a comment 2";
+$l_upd_comment2 = "Update comment 2";
+$l_add_comment3 = "Add a comment 3";
+$l_upd_comment3 = "Update comment 3";
 
 // Messages
 $l_cat1_manage = "Category 1 management";

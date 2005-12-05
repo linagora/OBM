@@ -71,17 +71,29 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_cat1_ids") {
+} elseif ($action == "ext_get_category1_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category1");
 
-} elseif ($action == "ext_get_cat2_ids") {
+} elseif ($action == "ext_get_category2_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category2");
+
+} elseif ($action == "ext_get_category3_ids") {
+///////////////////////////////////////////////////////////////////////////////
+  $extra_css = "category.css";
+  require("contact_js.inc");
+  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category3");
+
+} elseif ($action == "ext_get_category4_ids") {
+///////////////////////////////////////////////////////////////////////////////
+  $extra_css = "category.css";
+  require("contact_js.inc");
+  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category4");
 
 } elseif ($action == "vcard") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -229,9 +241,9 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] = dis_contact_admin_index();
 
-} elseif ($action == "cat1_insert")  {
+} elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat1_insert($contact);
+  $retour = of_run_query_category_insert($contact, "contact", "category1");
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_cat1_insert_ok);
   } else {
@@ -240,9 +252,9 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "cat1_update")  {
+} elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat1_update($contact);
+  $retour = of_run_query_category_update($contact, "contact", "category1");
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_cat1_update_ok);
   } else {
@@ -251,13 +263,13 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "cat1_checklink")  {
+} elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_cat1_links($contact);
+  $display["detail"] .= of_dis_category_links($contact, "contact", "category1");
 
-} elseif ($action == "cat1_delete")  {
+} elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat1_delete($contact["category1"]);
+  $retour = of_run_query_category_delete($contact, "contact", "category1");
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_cat1_delete_ok);
   } else {
@@ -266,7 +278,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "cat2_insert")  {
+} elseif ($action == "category2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat2_insert($contact);
   if ($retour) {
@@ -277,7 +289,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "cat2_update")  {
+} elseif ($action == "category2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat2_update($contact);
   if ($retour) {
@@ -288,11 +300,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "cat2_checklink")  {
+} elseif ($action == "category2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_cat2_links($contact);
 
-} elseif ($action == "cat2_delete")  {
+} elseif ($action == "category2_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat2_delete($contact["category2"]);
   if ($retour) {
@@ -302,6 +314,81 @@ if ($action == "ext_get_ids") {
   }
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category3_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_insert($contact, "contact", "category3");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_insert_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category3_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_update($contact, "contact", "category3");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_update_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category3_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= of_dis_category_links($contact, "contact", "category3");
+
+} elseif ($action == "category3_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_delete($contact, "contact", "category3");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_delete_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category4_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_insert($contact, "contact", "category4");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_insert_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category4_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_update($contact, "contact", "category4");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_update_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category4_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= of_dis_category_links($contact, "contact", "category4");
+
+} elseif ($action == "category4_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_delete($contact, "contact", "category4");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_delete_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
 
 } elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -431,26 +518,39 @@ function get_param_contact() {
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_priv, $ta_com;
-  global $tf_datecomment, $sel_usercomment, $ta_add_comment, $cb_archive;
+  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_priv, $ta_com, $ta_com2, $ta_com3, $tf_date;
+  global $tf_datecomment , $sel_usercomment , $ta_add_comment ;
+  global $tf_datecomment2, $sel_usercomment2, $ta_add_comment2;
+  global $tf_datecomment3, $sel_usercomment3, $ta_add_comment3;
+  global $cb_archive;
   global $param_company, $param_contact, $hd_usercreate;
   global $company_name, $company_new_name, $company_new_id;
   global $tf_func, $tf_label, $tf_lang, $tf_header, $cb_default;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
-  global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2,$tf_code2,$tf_code1;
+  global $tf_category1_label, $tf_category1_code, $sel_category1; 
+  global $tf_category2_label, $tf_category2_code, $sel_category2; 
+  global $tf_category3_label, $tf_category3_code, $sel_category3; 
+  global $tf_category4_label, $tf_category4_code, $sel_category4; 
 
-  if (isset ($view)) $contact["view"] = $view;
-  if (isset ($sel_cat1)) $contact["category1"] = $sel_cat1;
-  if (isset ($sel_cat2)) $contact["category2"] = $sel_cat2;
-  if (isset ($tf_cat1)) $contact["cat1_label"] = $tf_cat1;
-  if (isset ($tf_cat2)) $contact["cat2_label"] = $tf_cat2;
-  if (isset ($tf_cat1)) $contact["cat1_code"] = $tf_code1;
-  if (isset ($tf_cat2)) $contact["cat2_code"] = $tf_code2;  
   if (isset ($param_contact)) $contact["id"] = $param_contact;
+  if (isset ($view)) $contact["view"] = $view;
+  if (isset ($tf_category1_label)) $contact["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $contact["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $contact["category1"] = $sel_category1;
+  if (isset ($tf_category2_label)) $contact["category2_label"] = $tf_category2_label;
+  if (isset ($tf_category2_code)) $contact["category2_code"] = $tf_category2_code;
+  if (isset ($sel_category2)) $contact["category2"] = $sel_category2;
+  if (isset ($tf_category3_label)) $contact["category3_label"] = $tf_category3_label;
+  if (isset ($tf_category3_code)) $contact["category3_code"] = $tf_category3_code;
+  if (isset ($sel_category3)) $contact["category3"] = $sel_category3;
+  if (isset ($tf_category4_label)) $contact["category4_label"] = $tf_category4_label;
+  if (isset ($tf_category4_code)) $contact["category4_code"] = $tf_category4_code;
+  if (isset ($sel_category4)) $contact["category4"] = $sel_category4;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
   if (isset ($sel_dsrc)) $contact["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $contact["kind"] = $sel_kind;
   if (isset ($sel_market)) $contact["marketing_manager"] = $sel_market;
+  if (isset ($tf_date)) $contact["date"] = $tf_date;
   if (isset ($tf_lname)) $contact["lname"] = trim($tf_lname);
   if (isset ($tf_fname)) $contact["fname"] = trim($tf_fname);
   if (isset ($param_company)) $contact["company_id"] = $param_company;
@@ -478,9 +578,17 @@ function get_param_contact() {
   if (isset ($cb_priv)) $contact["priv"] = ($cb_priv == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
+  if (isset ($ta_com2)) $contact["com2"] = $ta_com2;
+  if (isset ($ta_com3)) $contact["com3"] = $ta_com3;
   if (isset ($tf_datecomment)) $contact["datecomment"] = $tf_datecomment;
+  if (isset ($tf_datecomment2)) $contact["datecomment2"] = $tf_datecomment2;
+  if (isset ($tf_datecomment3)) $contact["datecomment3"] = $tf_datecomment3;
   if (isset ($sel_usercomment)) $contact["usercomment"] = $sel_usercomment;
+  if (isset ($sel_usercomment2)) $contact["usercomment2"] = $sel_usercomment2;
+  if (isset ($sel_usercomment3)) $contact["usercomment3"] = $sel_usercomment3;
   if (isset ($ta_add_comment)) $contact["add_comment"] = trim($ta_add_comment);
+  if (isset ($ta_add_comment2)) $contact["add_comment2"] = trim($ta_add_comment2);
+  if (isset ($ta_add_comment3)) $contact["add_comment3"] = trim($ta_add_comment3);
 
   // Admin - Function fields
   // $sel_func -> "function" is already set
@@ -508,7 +616,6 @@ function get_param_contact() {
   return $contact;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 //  Contact Action 
 ///////////////////////////////////////////////////////////////////////////////
@@ -524,12 +631,22 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                         );
 // Category1 Select 
-  $actions["contact"]["ext_get_cat1_ids"]  = array (
+  $actions["contact"]["ext_get_category1_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 // Category2 Select 
-  $actions["contact"]["ext_get_cat2_ids"]  = array (
+  $actions["contact"]["ext_get_category2_ids"]  = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );						 
+// Category3 Select 
+  $actions["contact"]["ext_get_category3_ids"]  = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );						 
+// Category4 Select 
+  $actions["contact"]["ext_get_category4_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );						 
@@ -687,62 +804,118 @@ function get_contact_action() {
                                      	       );
 
 // Category Insert
-  $actions["contact"]["cat1_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat1_insert",
+  $actions["contact"]["category1_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["contact"]["cat1_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat1_update",
+  $actions["contact"]["category1_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["contact"]["cat1_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat1_checklink",
+  $actions["contact"]["category1_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["contact"]["cat1_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat1_delete",
+  $actions["contact"]["category1_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
-  $actions["contact"]["cat2_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat2_insert",
+  $actions["contact"]["category2_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category2_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["contact"]["cat2_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat2_update",
+  $actions["contact"]["category2_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category2_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["contact"]["cat2_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat2_checklink",
+  $actions["contact"]["category2_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category2_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["contact"]["cat2_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=cat2_delete",
+  $actions["contact"]["category2_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category2_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
-// Dispay
+// Category Insert
+  $actions["contact"]["category3_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category3_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                             );
+
+// Category Update
+  $actions["contact"]["category3_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category3_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                              );
+
+// Category Check Link
+  $actions["contact"]["category3_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category3_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                                );
+
+// Category Delete
+  $actions["contact"]["category3_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category3_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                               );
+
+// Category Insert
+  $actions["contact"]["category4_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category4_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                             );
+
+// Category Update
+  $actions["contact"]["category4_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category4_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                              );
+
+// Category Check Link
+  $actions["contact"]["category4_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category4_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                                );
+
+// Category Delete
+  $actions["contact"]["category4_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category4_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                               );
+
+// Display
   $actions["contact"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contact/contact_index.php?action=display",
@@ -750,14 +923,14 @@ function get_contact_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-// Dispay Preferences
+// Display Preferences
   $actions["contact"]["dispref_display"]	= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	        );
 
-// Dispay Level
+// Dispilay Level
   $actions["contact"]["dispref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
     'Right'    => $cright_read,

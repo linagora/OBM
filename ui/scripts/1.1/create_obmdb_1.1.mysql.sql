@@ -245,28 +245,28 @@ CREATE TABLE Company (
 
 
 --
--- Table structure for table 'CompanyCategory'
+-- Table structure for table 'CompanyCategory1'
 --
-CREATE TABLE CompanyCategory (
-  companycategory_id          int(8) auto_increment,
-  companycategory_timeupdate  timestamp(14),
-  companycategory_timecreate  timestamp(14),
-  companycategory_userupdate  int(8) NOT NULL default 0,
-  companycategory_usercreate  int(8) NOT NULL default 0,
-  companycategory_code        varchar(10) NOT NULL default '',
-  companycategory_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (companycategory_id)
+CREATE TABLE CompanyCategory1 (
+  companycategory1_id          int(8) auto_increment,
+  companycategory1_timeupdate  timestamp(14),
+  companycategory1_timecreate  timestamp(14),
+  companycategory1_userupdate  int(8) NOT NULL default 0,
+  companycategory1_usercreate  int(8) NOT NULL default 0,
+  companycategory1_code        varchar(10) NOT NULL default '',
+  companycategory1_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (companycategory1_id)
 );
 
 
 --
--- Table structure for table 'CompanyCategoryLink'
+-- Table structure for table 'CompanyCategory1Link'
 --
-CREATE TABLE CompanyCategoryLink (
-  companycategorylink_category_id  int(8) NOT NULL default 0,
-  companycategorylink_company_id   int(8) NOT NULL default 0,
-  PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id),
-  INDEX compcat_idx_comp (companycategorylink_company_id)
+CREATE TABLE CompanyCategory1Link (
+  companycategory1link_category_id  int(8) NOT NULL default 0,
+  companycategory1link_company_id   int(8) NOT NULL default 0,
+  PRIMARY KEY (companycategory1link_category_id,companycategory1link_company_id),
+  INDEX compcat1_idx_comp (companycategory1link_company_id)
 );
 
 
@@ -308,7 +308,10 @@ CREATE TABLE Contact (
   contact_mailing_ok           char(1) DEFAULT '0',
   contact_archive              char(1) DEFAULT '0',
   contact_privacy              int(2) NOT NULL DEFAULT 0,
+  contact_date                 timestamp(14),
   contact_comment              text,
+  contact_comment2             text,
+  contact_comment3             text,
   PRIMARY KEY (contact_id)
 );
 
@@ -393,6 +396,57 @@ CREATE TABLE ContactCategory2Link (
   contactcategory2link_contact_id   int(8) NOT NULL default 0,
   PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id),
   INDEX contcat2_idx_cont (contactcategory2link_contact_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory3'
+--
+CREATE TABLE ContactCategory3 (
+  contactcategory3_id          int(8) auto_increment,
+  contactcategory3_timeupdate  timestamp(14),
+  contactcategory3_timecreate  timestamp(14),
+  contactcategory3_userupdate  int(8) default 0,
+  contactcategory3_usercreate  int(8) default 0,
+  contactcategory3_code        varchar(10) default '',
+  contactcategory3_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory3_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory3Link'
+--
+CREATE TABLE ContactCategory3Link (
+  contactcategory3link_category_id  int(8) NOT NULL default 0,
+  contactcategory3link_contact_id   int(8) NOT NULL default 0,
+  PRIMARY KEY (contactcategory3link_category_id,contactcategory3link_contact_id),
+  INDEX contcat3_idx_cont (contactcategory3link_contact_id)
+);
+
+--
+-- Table structure for table 'ContactCategory4'
+--
+CREATE TABLE ContactCategory4 (
+  contactcategory4_id          int(8) auto_increment,
+  contactcategory4_timeupdate  timestamp(14),
+  contactcategory4_timecreate  timestamp(14),
+  contactcategory4_userupdate  int(8) default 0,
+  contactcategory4_usercreate  int(8) default 0,
+  contactcategory4_code        varchar(10) default '',
+  contactcategory4_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory4_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory4Link'
+--
+CREATE TABLE ContactCategory4Link (
+  contactcategory4link_category_id  int(8) NOT NULL default 0,
+  contactcategory4link_contact_id   int(8) NOT NULL default 0,
+  PRIMARY KEY (contactcategory4link_category_id,contactcategory4link_contact_id),
+  INDEX contcat4_idx_cont (contactcategory4link_contact_id)
 );
 
 
@@ -483,26 +537,26 @@ CREATE TABLE DealType (
 
 
 --
--- Table structure for table 'DealCategory'
+-- Table structure for table 'DealCategory1'
 --
-CREATE TABLE DealCategory (
-  dealcategory_id          int(8) auto_increment,
-  dealcategory_timeupdate  timestamp(14),
-  dealcategory_timecreate  timestamp(14),
-  dealcategory_userupdate  int(8) default 0,
-  dealcategory_usercreate  int(8) default 0,
-  dealcategory_code        varchar(10) default '',
-  dealcategory_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (dealcategory_id)
+CREATE TABLE DealCategory1 (
+  dealcategory1_id          int(8) auto_increment,
+  dealcategory1_timeupdate  timestamp(14),
+  dealcategory1_timecreate  timestamp(14),
+  dealcategory1_userupdate  int(8) default 0,
+  dealcategory1_usercreate  int(8) default 0,
+  dealcategory1_code        varchar(10) default '',
+  dealcategory1_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (dealcategory1_id)
 );
 
 
--- Table structure for table 'DealCategoryLink'
+-- Table structure for table 'DealCategory1Link'
 --
-CREATE TABLE DealCategoryLink (
-  dealcategorylink_category_id  int(8) NOT NULL default 0,
-  dealcategorylink_deal_id      int(8) NOT NULL default 0,
-  PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
+CREATE TABLE DealCategory1Link (
+  dealcategory1link_category_id  int(8) NOT NULL default 0,
+  dealcategory1link_deal_id      int(8) NOT NULL default 0,
+  PRIMARY KEY (dealcategory1link_category_id,dealcategory1link_deal_id)
 );
 
 
@@ -557,7 +611,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_owner	         int(8) default NULL, 
   calendarevent_title            varchar(255) default NULL,
   calendarevent_location         varchar(100) default NULL,
-  calendarevent_category_id      int(8) default NULL,
+  calendarevent_category1_id      int(8) default NULL,
   calendarevent_priority         int(2) default NULL,
   calendarevent_privacy          int(2) NOT NULL default 0,
   calendarevent_date             timestamp(14) NOT NULL,
@@ -603,16 +657,16 @@ CREATE TABLE CalendarException (
 
   
 --
--- Table structure for table 'CalendarCategory'
+-- Table structure for table 'CalendarCategory1'
 --
-CREATE TABLE CalendarCategory (
-  calendarcategory_id          int(8) auto_increment,
-  calendarcategory_timeupdate  timestamp(14),
-  calendarcategory_timecreate  timestamp(14),
-  calendarcategory_userupdate  int(8) default NULL,
-  calendarcategory_usercreate  int(8) default NULL,
-  calendarcategory_label       varchar(128) default NULL,
-  PRIMARY KEY (calendarcategory_id)
+CREATE TABLE CalendarCategory1 (
+  calendarcategory1_id          int(8) auto_increment,
+  calendarcategory1_timeupdate  timestamp(14),
+  calendarcategory1_timecreate  timestamp(14),
+  calendarcategory1_userupdate  int(8) default NULL,
+  calendarcategory1_usercreate  int(8) default NULL,
+  calendarcategory1_label       varchar(128) default NULL,
+  PRIMARY KEY (calendarcategory1_id)
 );
 
 --
@@ -1030,7 +1084,7 @@ CREATE TABLE Incident (
   incident_date             date default NULL,
   incident_priority_id      int(8) default NULL,
   incident_status_id        int(8) default NULL,
-  incident_cat1_id          int(8) default NULL,
+  incident_category1_id     int(8) default NULL,
   incident_logger           int(8) default NULL,
   incident_owner            int(8) default NULL,
   incident_duration         char(4) default '0',

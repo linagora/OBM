@@ -32,6 +32,8 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $ctry = $contact["country"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
+  $cat3 = $contact["category3"];
+  $cat4 = $contact["category4"];
   $archive = $contact["archive"];
   $lang = get_lang();
 
@@ -140,6 +142,16 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $join_cat2 = "LEFT JOIN ContactCategory2Link ON contact_id=contactcategory2link_contact_id";
     $where .= " AND contactcategory2link_category_id='$cat2'";
   }
+  // If a Category 3 has been set
+  if (($cat3 != $c_all) && ($cat3 != "")) {
+    $join_cat3 = "LEFT JOIN ContactCategory3Link ON contact_id=contactcategory3link_contact_id";
+    $where .= " AND contactcategory3link_category_id='$cat3'";
+  }
+  // If a Category 4 has been set
+  if (($cat4 != $c_all) && ($cat4 != "")) {
+    $join_cat4 = "LEFT JOIN ContactCategory4Link ON contact_id=contactcategory4link_contact_id";
+    $where .= " AND contactcategory4link_category_id='$cat4'";
+  }
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
@@ -163,6 +175,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       $order_next = ", company_country";
     }
   }
+
+  // Date
+  $date = sql_date_format($db_type, "contact_date", "contact_date");
 
   $orderq = " ORDER BY $order $p_order_dir $order_next";
 
@@ -196,6 +211,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_email,
       contact_archive,
       contact_privacy,
+      $date,
       $company_fields
       function_label as contact_function
       $if_country
@@ -209,12 +225,14 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
         $join_ctry2
         $join_cat1
         $join_cat2
+        $join_cat3
+        $join_cat4
     $whereq
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_cat1 $join_cat2 $whereq");
+    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_cat1 $join_cat2 $join_cat3 $join_cat4 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -241,6 +259,7 @@ function run_query_contact_detail($p_id) {
   $timeupdate = sql_date_format($db_type, "contact_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
   $lang = get_lang();
+  $date = sql_date_format($db_type, "contact_date", "contact_date");
 
   if ($cgp_show["module"]["company"]) {
     $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
@@ -275,6 +294,7 @@ function run_query_contact_detail($p_id) {
         function_label,
         C1.country_name,
         datasource_name,
+        $date,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
       FROM
@@ -365,7 +385,8 @@ function run_query_kind() {
 // Parameters:
 //   - $contact[]: Entry's values
 //     keys used : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
-//               : ctry, func, phone, hphone, mphone, fax, email, com, priv
+//               : ctry, func, phone, hphone, mphone, fax, email, priv
+//               : com, com2, com3 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
   global $auth, $cgp_show, $cdg_sql;
@@ -394,6 +415,8 @@ function run_query_contact_insert($contact) {
   $ad3 = $contact["ad3"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];  
+  $cat3 = $contact["category3"];  
+  $cat4 = $contact["category4"];  
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -407,12 +430,26 @@ function run_query_contact_insert($contact) {
   $email = $contact["email"];
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
+  $date = $contact["date"];
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
     $datecomment = $contact["datecomment"];
     $usercomment = $contact["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
+  $add_comment2 = $contact["add_comment"];
+  if ($add_comment2 != "") {
+    $datecomment2 = $contact["datecomment2"];
+    $usercomment2 = $contact["usercomment2"];
+    $comment2 .= "\n$datecomment2:$usercomment2:$add_comment2";
+  }
+  $add_comment3 = $contact["add_comment3"];
+  if ($add_comment3 != "") {
+    $datecomment3 = $contact["datecomment3"];
+    $usercomment3 = $contact["usercomment3"];
+    $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
+  }
+
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
   $priv = (isset($contact["priv"]) ? $contact["priv"] : '0');
 
@@ -446,8 +483,11 @@ function run_query_contact_insert($contact) {
     contact_mailing_ok,
     contact_archive,
     contact_privacy,
-    contact_comment)
-  VALUES (null,
+    contact_date,
+    contact_comment,
+    contact_comment2,
+    contact_comment3
+  ) VALUES (null,
     '$now',
     null,
     '$uid',
@@ -477,7 +517,11 @@ function run_query_contact_insert($contact) {
     '$mailok',
     '$arch',
     '$priv',
-    '$comment')";
+    '$date',
+    '$comment',
+    '$comment2',
+    '$comment3'
+  )";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -503,26 +547,22 @@ function run_query_contact_insert($contact) {
 
   if ($retour && is_array($cat1)) {
     foreach($cat1 as $categoryid) {
-      $query = "INSERT INTO ContactCategory1Link (
-	  contactcategory1link_contact_id,
-	  contactcategory1link_category_id)
-	VALUES (
-          '$id',
-          '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category1");
     }
   }
   if ($retour && is_array($cat2)) {
     foreach($cat2 as $categoryid) {
-      $query = "INSERT INTO ContactCategory2Link (
-	  contactcategory2link_contact_id,
-	  contactcategory2link_category_id)
-	VALUES (
-          '$id',
-          '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category2");
+    }
+  }
+  if ($retour && is_array($cat3)) {
+    foreach($cat3 as $categoryid) {
+      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category3");
+    }
+  }
+  if ($retour && is_array($cat4)) {
+    foreach($cat4 as $categoryid) {
+      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category4");
     }
   }
   
@@ -535,7 +575,8 @@ function run_query_contact_insert($contact) {
 // Parameters:
 //   - $contact[] : Entry's values
 //     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town
-//                : cdx, ctry, func, phone, hphone, mphone, fax, email, com
+//                : cdx, ctry, func, phone, hphone, mphone, fax, email
+//                : com, com2, com3
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_update($contact) {
   global $auth, $cgp_show, $cdg_sql;
@@ -575,6 +616,7 @@ function run_query_contact_update($contact) {
   $email = $contact["email"];
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
+  $date = $contact["date"];
   $comment = $contact["com"];
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
@@ -582,10 +624,27 @@ function run_query_contact_update($contact) {
     $usercomment = $contact["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
+  $comment2 = $contact["com2"];
+  $add_comment2 = $contact["add_comment2"];
+  if ($add_comment2 != "") {
+    $datecomment2 = $contact["datecomment2"];
+    $usercomment2 = $contact["usercomment2"];
+    $comment2 .= "\n$datecomment2:$usercomment2:$add_comment2";
+  }
+  $comment3 = $contact["com3"];
+  $add_comment3 = $contact["add_comment3"];
+  if ($add_comment3 != "") {
+    $datecomment3 = $contact["datecomment3"];
+    $usercomment3 = $contact["usercomment3"];
+    $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
+  }
+
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
   $priv = (isset($contact["priv"]) ? $contact["priv"] : '0');
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
+  $cat3 = $contact["category3"];
+  $cat4 = $contact["category4"];
   
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -616,7 +675,10 @@ function run_query_contact_update($contact) {
     contact_mailing_ok='$mailok',
     contact_archive='$arch',
     contact_privacy='$priv',
-    contact_comment='$comment'
+    contact_date='$date',
+    contact_comment='$comment',
+    contact_comment2='$comment2',
+    contact_comment3='$comment3'
   WHERE contact_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -624,41 +686,37 @@ function run_query_contact_update($contact) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $query = "DELETE
-      FROM ContactCategory1Link
-      WHERE contactcategory1link_contact_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
+    $retour = of_run_query_category_delete_link($id, "contact", "category1");
     if (is_array($cat1)) {
       foreach($cat1 as $categoryid) {
-	$query = "INSERT INTO ContactCategory1Link (
-	  contactcategory1link_contact_id,
-	  contactcategory1link_category_id)
-	VALUES (
-          '$id',
-          '$categoryid')";
-	display_debug_msg($query, $cdg_sql);
-	$obm_q->query($query);
+        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category1");
       }
     }
   }
 
   if ($retour) {
-    $query = "delete
-    from ContactCategory2Link
-    where contactcategory2link_contact_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);    
+    $retour = of_run_query_category_delete_link($id, "contact", "category2");
     if (is_array($cat2)) {
       foreach($cat2 as $categoryid) {
-	$query = "INSERT INTO ContactCategory2Link (
-	  contactcategory2link_contact_id,
-	  contactcategory2link_category_id)
-	VALUES (
-          '$id',
-          '$categoryid')";
-	display_debug_msg($query, $cdg_sql);
-	$obm_q->query($query);
+        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category2");
+      }
+    }
+  }
+
+  if ($retour) {
+    $retour = of_run_query_category_delete_link($id, "contact", "category3");
+    if (is_array($cat3)) {
+      foreach($cat3 as $categoryid) {
+        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category3");
+      }
+    }
+  }
+
+  if ($retour) {
+    $retour = of_run_query_category_delete_link($id, "contact", "category4");
+    if (is_array($cat4)) {
+      foreach($cat4 as $categoryid) {
+        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category4");
       }
     }
   }
@@ -673,7 +731,6 @@ function run_query_contact_update($contact) {
 
   return $retour;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the contact
@@ -701,55 +758,6 @@ function run_query_get_contactcategory1($c_id) {
 
   return $cats;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the contact
-// Parameters:
-//   - $c_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_contactcategory1_label($c_id) {
-    global $cdg_sql;
-
-  $query = "SELECT contactcategory1_label, contactcategory1_code
-    FROM ContactCategory1Link, ContactCategory1
-    WHERE contactcategory1link_category_id = contactcategory1_id
-      AND contactcategory1link_contact_id = '$c_id'
-    ORDER BY contactcategory1_id";     
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  if ($c_id != "") {
-    $obm_q->query($query);
-  }
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the contact
-// Parameters:
-//   - $c_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_contactcategory2_label($c_id) {
-  global $cdg_sql;
-
-  $query = "SELECT contactcategory2_label, contactcategory2_code
-    FROM ContactCategory2Link, ContactCategory2
-    WHERE contactcategory2link_category_id = contactcategory2_id
-      AND contactcategory2link_contact_id = '$c_id'
-    ORDER BY contactcategory2_id";     
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  if ($c_id != "") {
-    $obm_q->query($query);
-  }
-
-  return $obm_q;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the contact
@@ -965,6 +973,8 @@ function check_contact_data_form($cid, $contact) {
   $c_new_id = $contact["comp_new_id"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
+  $cat3 = $contact["category3"];
+  $cat4 = $contact["category4"];
   
   // MANDATORY: Contact name
   $lname = strtoupper($lname);
@@ -1385,261 +1395,6 @@ function get_kind_label($id) {
             $obm_q->f("kind_header");
   return $retour;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category1 insertion query construction and execution
-// Parameters:
-//   - $contact : contact hash info : keys used : kind_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_insert($contact) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat1 = $contact["cat1_label"];
-  $cat1_code = $contact["cat1_code"];
-
-  $query = "INSERT INTO ContactCategory1 (
-    contactcategory1_timecreate,
-    contactcategory1_usercreate,
-    contactcategory1_label,
-    contactcategory1_code)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat1',
-    '$cat1_code')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category2 insertion query construction and execution
-// Parameters:
-//   - $contact : contact hash info : keys used : kind_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_insert($contact) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat2 = $contact["cat2_label"];
-  $cat2_code = $contact["cat2_code"];
-  
-
-  $query = "INSERT INTO ContactCategory2 (
-    contactcategory2_timecreate,
-    contactcategory2_usercreate,
-    contactcategory2_label,
-    contactcategory2_code)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat2',
-    '$cat2_code')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 1  update query execution
-// Parameters:
-//   - $contact : contact hash info : keys used : act, act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_update($contact) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $contact["category2"];
-  $cat2 = $contact["cat2_label"];
-  $cat2_code = $contact["cat2_code"];
-
-  $query = "UPDATE ContactCategory2 SET
-      contactcategory2_label='$cat2',
-      contactcategory2_code='$cat2_code',
-      contactcategory2_timeupdate='$timeupdate',
-      contactcategory2_userupdate='$userupdate'
-    WHERE
-      contactcategory2_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 1 update query execution
-// Parameters:
-//   - $contact : contact hash info : keys used : act, act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_update($contact) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $contact["category1"];
-  $cat1 = $contact["cat1_label"];
-  $cat1_code = $contact["cat1_code"];
-  
-  $query = "UPDATE ContactCategory1 SET
-      contactcategory1_label='$cat1',
-      contactcategory1_code='$cat1_code',
-      contactcategory1_timeupdate='$timeupdate',
-      contactcategory1_userupdate='$userupdate'
-    WHERE
-      contactcategory1_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat1_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT contactcategory1_label
-    FROM ContactCategory1
-    WHERE contactcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("contactcategory1_label");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity - Contact links query execution
-// Parameters:
-//   - $p_id : activity id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT contact_title, contact_id, '$p_id' as contact_category1
-    FROM Contact,ContactCategory1Link
-    WHERE contact_id = contactcategory1link_contact_id
-      AND contactcategory1link_category_id = '$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat2_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT contactcategory2_label
-    FROM ContactCategory2
-    WHERE contactcategory2_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("contactcategory2_label");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category - Contact links query execution
-// Parameters:
-//   - $p_id : activity id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT contact_title, contact_id, '$p_id' as contact_category2
-    FROM Contact, ContactCategory2Link
-    WHERE contact_id = contactcategory2link_contact_id
-      AND contactcategory2link_category_id = '$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category1 deletion query execution
-// Parameters:
-//   - $id : Category1 id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_delete($id) {
-  global $cdg_sql;
-
-  if ($id != '') {
-    $query = "DELETE FROM ContactCategory1 WHERE contactcategory1_id='$id'";
-
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-  }
-  else 
-    $retour = 1;
-  
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category2 deletion query execution
-// Parameters:
-//   - $id : Category2 id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_delete($id) {
-  global $cdg_sql;
-
-  if ($id != '') {
-
-    $query = "DELETE FROM ContactCategory2 WHERE contactcategory2_id='$id'";
-
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-  } else { 
-    $retour = 1;
-  }
-
-  return $retour;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Count the number of subscription

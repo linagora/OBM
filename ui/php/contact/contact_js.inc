@@ -8,7 +8,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+require("$obminclude/javascript/category_js.inc");
 require("$obminclude/javascript/check_js.inc");
+require("$obminclude/lang/$set_lang/check_date_js.inc");
 
 $extra_js .= "
 function confirm_del() {
@@ -59,6 +61,13 @@ function check_contact(form) {
     return false;
   }
 
+  if (form.tf_date.value == \"\") {
+    return true;
+  } else if (check_date(form.tf_date, \"$l_j_check_date\") == false) {
+    return false;
+  } else
+    return true;
+
   return true;
 }
 
@@ -79,39 +88,6 @@ function check_func_checkdel(sel)
    }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category check or deletion is possible                       //
-///////////////////////////////////////////////////////////////////////////////
-function check_cat1_checkdel(form)
-{
-   if (form.sel_cat1.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_cat1_delete\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category check or deletion is possible                       //
-///////////////////////////////////////////////////////////////////////////////
-function check_cat2_checkdel(form)
-{
-   if (form.sel_cat2.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_cat2_delete\");
-      return false;
-   }
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -144,35 +120,6 @@ function check_func_new(form)
    }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category creation is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_cat1_new(form)
-{
-   if (form.tf_cat1.value != \"\")
-      return true;
-   else {
-      alert(\"$l_j_cat1_create\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category creation is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_cat2_new(form)
-{
-   if (form.tf_cat2.value != \"\")
-      return true;
-   else {
-      alert(\"$l_j_cat2_create\");
-      return false;
-   }
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,39 +132,6 @@ function check_kind_checkdel(sel)
     return false;
   }
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category update is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_cat1_upd(form,formd)
-{
-  cat1_pos = formd.sel_cat1.selectedIndex;
-  if ((cat1_pos >= 0) && (form.tf_cat1.value != \"\")) {
-    form.sel_cat1.value=formd.sel_cat1.options[cat1_pos].value;
-    return true;
-   } else {
-     alert(\"$l_j_cat1_update\");
-     return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category update is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_cat2_upd(form,formd)
-{
-  cat2_pos = formd.sel_cat2.selectedIndex;
-  if ((cat2_pos >= 0) && (form.tf_cat2.value != \"\")) {
-    form.sel_cat2.value=formd.sel_cat2.options[cat2_pos].value;
-    return true;
-   } else {
-     alert(\"$l_j_cat2_update\");
-     return false;
-   }
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind update is possible
@@ -234,7 +148,6 @@ function check_kind_upd(form, sel_del)
   }
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind creation is possible
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,7 +162,6 @@ function check_kind_new(form)
       return true;
    }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the Kind's mini label select.
@@ -300,6 +212,57 @@ function fill_select_header(source)
   destination.selectedIndex=0;
   
 }
+
+// Copy paste from mehdi's calendar.js
+
+var calendarWindow = null;
+var calendarColors = new Array();
+calendarColors['bgColor'] = '#BDC5D0';
+calendarColors['borderColor'] = '#333366';
+calendarColors['headerBgColor'] = '#143464';
+calendarColors['headerColor'] = '#FFFFFF';
+calendarColors['dateBgColor'] = '#8493A8';
+calendarColors['dateColor'] = '#004080';
+calendarColors['dateHoverBgColor'] = '#FFFFFF';
+calendarColors['dateHoverColor'] = '#8493A8';
+var calendarMonths = new Array('$l_monthsofyear[0]', '$l_monthsofyear[1]', '$l_monthsofyear[2]', '$l_monthsofyear[3]', '$l_monthsofyear[4]', '$l_monthsofyear[5]', '$l_monthsofyear[6]', '$l_monthsofyear[7]', '$l_monthsofyear[8]', '$l_monthsofyear[9]', '$l_monthsofyear[10]', '$l_monthsofyear[11]');
+var calendarWeekdays = new Array('$l_daysofweekfirst[0]', '$l_daysofweekfirst[1]', '$l_daysofweekfirst[2]', '$l_daysofweekfirst[3]', '$l_daysofweekfirst[4]', '$l_daysofweekfirst[5]', '$l_daysofweekfirst[6]', '$l_daysofweekfirst[0]');
+var calendarUseToday = true;
+var calendarFormat = 'y-m-d';
+var calendarStartMonday = true;
+
+function getCalendar(in_dateField,url)
+{
+    if (calendarWindow && !calendarWindow.closed) {
+        alert('Calendar window already open.  Attempting focus...');
+        try {
+            calendarWindow.focus();
+        }
+        catch(e) {}
+
+        return false;
+    }
+
+    var cal_width = 284;
+    var cal_height = 264;
+
+    if ((document.all) && (navigator.userAgent.indexOf(\"Konqueror\") == -1)) {
+        cal_width = 284;
+    }
+
+    calendarTarget = in_dateField;
+    calendarWindow = window.open(url, 'dateSelectorPopup','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=0,dependent=no,width='+cal_width+',height='+cal_height);
+
+    return false;
+}
+
+function killCalendar()
+{
+    if (calendarWindow && !calendarWindow.closed) {
+        calendarWindow.close();
+    }
+}
+
 ";
 
 if (isset($ext_target) && $ext_target!="") {
@@ -313,6 +276,7 @@ if (isset($ext_target) && $ext_target!="") {
   
 ";
 }
+
 $extra_js .= "
 function copy_clip(text)
 {
@@ -360,3 +324,4 @@ function copy_clip(text)
   return false;
 }
 ";
+</script>

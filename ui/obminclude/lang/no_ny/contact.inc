@@ -22,6 +22,9 @@ $l_mobilephone = "Mobile";
 $l_homephone = "Home"; 
 $l_address = "Adresse";
 $l_email = "E-post";
+$l_comment2 = "Kommentar 2";
+$l_comment3 = "Kommentar 3";
+
 
 $l_contact_select_company = "Velg firma for kontakten.";
 
@@ -39,6 +42,10 @@ $l_insert = "Legg til kontakt";
 $l_update = "Oppdater kontakten";
 $l_delete = "Slett kontakten";
 $l_select_company = "Velg firma";
+$l_add_comment2 = "Add a kommentar 2";
+$l_upd_comment2 = "Update the kommentar 2";
+$l_add_comment3 = "Add a Kommentar 3";
+$l_upd_comment3 = "Update the kommentar 3";
 
 // Messages
 $l_company_del_verif_error = " deal(s) are attached to this company : it can't be deleted";

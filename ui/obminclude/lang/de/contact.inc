@@ -25,6 +25,9 @@ $l_homephone = "Home";
 $l_address = "Adresse";
 
 $l_contact_select_company = "Firmenauswahl für den Kontakt";
+$l_comment2 = "Kommentar 2";
+$l_comment3 = "Kommentar 3";
+
 
 // Titles
 $l_contact = "Kontakt";
@@ -40,6 +43,10 @@ $l_insert = "anlegen Kontakt";
 $l_update = "ändern Kontakt";
 $l_delete = "löschen Kontakt";
 $l_select_company = "Firmenauswahl";
+$l_add_comment2 = "Add a kommentar 2";
+$l_upd_comment2 = "Update the kommentar 2";
+$l_add_comment3 = "Add a Kommentar 3";
+$l_upd_comment3 = "Update the kommentar 3";
 
 // Messages
 $l_contact_del_verif_error = " Verträge sind noch zugeordnet: Kontakt kann nicht gelöscht werden";

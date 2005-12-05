@@ -141,7 +141,12 @@ $profiles["editor"] = array (
 //$cgp_hide["contact"]["responsible"] = true;
 //$cgp_hide["contact"]["category1"] = true;
 //$cgp_hide["contact"]["category2"] = true;
+//$cgp_hide["contact"]["category3"] = true;
+//$cgp_hide["contact"]["category4"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
+//$cgp_hide["contact"]["comment2"] = true;
+//$cgp_hide["contact"]["comment3"] = true;
+//$cgp_hide["contact"]["contact_date"] = true;
 
 // Deal module
 //$cgp_hide["deal"]["category1"] = true;

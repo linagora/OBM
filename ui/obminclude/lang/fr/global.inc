@@ -69,7 +69,7 @@ $l_after = "Après";
 $l_before = "Avant";
 $l_fuzzy = "Avancée";
 $l_cat = "Catégorie";
-$l_visibility = "Accés";
+$l_visibility = "Accès";
 $l_private = "Privé";
 $l_public = "Public";
 $l_local = "Local";
@@ -305,3 +305,5 @@ $l_cr_date[$cr_date_tobegin] = "A débuter";
 $l_cr_date[$cr_date_current] = "En cours";
 $l_cr_date[$cr_date_torenew] = "A renouveler";
 $l_cr_date[$cr_date_ended] = "Expiré";
+
+

@@ -35,6 +35,7 @@ $fieldnames["contact_mobilephone"] = $l_mphone;
 $fieldnames["contact_fax"] = $l_fax;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["contact_archive"] = $l_archive_first;
+$fieldnames["contact_date"] = $l_date;
 // Calculated fields
 $fieldnames["company_name"] = $l_company;
 
@@ -298,6 +299,14 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == "contact_date") {
+    if ($cgp_show["module"]["contact_date"]) {
+      $date = $OD->data_set->f("contact_date");
+      $res["name"] = ($date) ? date_format($date) : " ";
+      $res["align"] = "center";
+    }
+  }
+
   return $res;
 }
 
@@ -319,7 +328,9 @@ function dis_contact_search_form($contact="") {
   $ctry_q = run_query_country_for_lang();
   $cats1 = of_category_get_ordered("contact", "category1");
   $cats2 = of_category_get_ordered("contact", "category2");
-  $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q, $cats1, $cats2);
+  $cats3 = of_category_get_ordered("contact", "category3");
+  $cats4 = of_category_get_ordered("contact", "category4");
+  $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q, $cats1, $cats2, $cats3, $cats4);
 
   return $block;
 }
@@ -335,8 +346,10 @@ function dis_contact_search_form($contact="") {
 //   - $ctry_q    : database object with country list
 //   - $cats1     : array with contact category 1 list
 //   - $cats2     : array with contact category 2 list
+//   - $cats3     : array with contact category 3 list
+//   - $cats4     : array with contact category 4 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $cats2) {
+function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $cats2, $cats3, $cats4) {
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
   global $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $l_function, $l_title, $l_market, $l_town, $l_postcode, $l_country;
@@ -355,15 +368,16 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $
   $mark = $contact["marketing_manager"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
+  $cat3 = $contact["category3"];
+  $cat4 = $contact["category4"];
   $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
 
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
-  $show_cat1 = (! $cgp_hide["contact"]["category1"]);
-  $show_cat2 = (! $cgp_hide["contact"]["category2"]);
-
+  // category1, category2, category3, category4   
+  
   // Function select
   if ($show_func) {
     $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
@@ -422,49 +436,11 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $
   }
   $sel_ctry .= "</select>";
 
-  // Category 1 select
-  if ($show_cat1) {
-    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">
-    <option value=\"$c_all\">$l_all</option>";
-    if (is_array($cats1)) {
-      foreach ($cats1 as $one_cat) {
-        $c1_id = $one_cat["id"];
-	$c1_code = str_pad($one_cat["code"] . " ", 10, ".");
-	$c1_label = htmlentities($one_cat["label"]);
-        $sel_cat1 .= "\n<option value=\"$c1_id\"";
-        if ($c1_id == $cat1) { $sel_cat1 .= " selected=\"selected\""; }
-        $sel_cat1 .= ">$c1_code $c1_label</option>";
-      }
-    }
-    $sel_cat1 .= "</select>";
-
-    $block_cat1 = "
-    <div class=\"searchLabel\">$l_category1<br />
-      $sel_cat1
-    </div>";
-  }
-
-  // Category 2 select
-  if ($show_cat2) {
-    $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2\">
-    <option value=\"$c_all\">$l_all</option>";
-    if (is_array($cats2)) {
-      foreach ($cats2 as $one_cat) {
-        $c1_id = $one_cat["id"];
-	$c1_code = str_pad($one_cat["code"] . " ", 10, ".");
-	$c1_label = htmlentities($one_cat["label"]);
-        $sel_cat2 .= "\n<option value=\"$c1_id\"";
-        if ($c1_id == $cat2) { $sel_cat2 .= " selected=\"selected\""; }
-        $sel_cat2 .= ">$c1_code $c1_label</option>";
-      }
-    }
-    $sel_cat2 .= "</select>";
-
-    $block_cat2 = "
-    <div class=\"searchLabel\">$l_category2<br />
-      $sel_cat2
-    </div>";
-  }
+  // Category 1, 2, 3, 4 select
+  $block_cat1 = of_dis_block_select_category($cats1, $cat1, "contact", "category1");
+  $block_cat2 = of_dis_block_select_category($cats2, $cat2, "contact", "category2");
+  $block_cat3 = of_dis_block_select_category($cats3, $cat3, "contact", "category3");
+  $block_cat4 = of_dis_block_select_category($cats4, $cat4, "contact", "category4");
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -515,6 +491,8 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $
     $block_title
     $block_cat1
     $block_cat2
+    $block_cat3
+    $block_cat4
     $block_resp
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
@@ -595,8 +573,10 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $mark = $contact["marketing_manager"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
+  $cat3 = $contact["category3"];
+  $cat4 = $contact["category4"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark&amp;sel_cat1=$cat1&amp;sel_cat2=$cat2$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -658,9 +638,11 @@ function dis_contact_consult($contact) {
     include("$path/$view/".$view."_query.inc");
     $block .= dis_subscription_external_list($contact);
   } else {
-    $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
-    $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
-    $block .= html_contact_view_main($con_q,$cat1_q,$cat2_q);
+    $cats1 = of_entitycategories_get($con_q->f("contact_id"), "contact", "category1");
+    $cats2 = of_entitycategories_get($con_q->f("contact_id"), "contact", "category2");
+    $cats3 = of_entitycategories_get($con_q->f("contact_id"), "contact", "category3");
+    $cats4 = of_entitycategories_get($con_q->f("contact_id"), "contact", "category4");
+    $block .= html_contact_view_main($con_q, $cats1, $cats2, $cats3, $cats4);
   }
 
   return $block;
@@ -674,7 +656,7 @@ function dis_contact_consult($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_header($co_q) {
   global $l_company,$l_lastname,$l_firstname,$l_kind, $l_function, $l_title;
-  global $l_contact, $l_market, $l_archive;
+  global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
   global $l_public, $l_private, $l_visibility;
   global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
   global $display, $path, $action, $auth;
@@ -694,11 +676,14 @@ function html_contact_header($co_q) {
   $fname = $co_q->f("contact_firstname");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
   $priv = $co_q->f("contact_privacy");
-  
+  $date = $co_q->f("contact_date");
+  $date = ($date != 0) ? date_format($date) : $l_no_date; 
+ 
  // Conditionnal fields
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
+  $show_date = (! $cgp_hide["contact"]["contact_date"]);
 
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
@@ -731,6 +716,14 @@ function html_contact_header($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_market</td>
       <td class=\"detailText\">$market</td>";
+  }
+
+  // Date field
+  if ($show_date) {
+    $block_date = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailText\">$date</td>";
   }
 
   if ($usercreate == $auth->auth["uid"]) {
@@ -767,6 +760,7 @@ function html_contact_header($co_q) {
     $block_func
     $block_title
     $block_resp
+    $block_date
     </tr>
     </table>"; 
 
@@ -779,10 +773,10 @@ function html_contact_header($co_q) {
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
+function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
-  global $l_comment, $l_email_other, $l_service, $l_coord, $ico_clipboard;
+  global $l_comment, $l_comment2, $l_comment3, $l_email_other, $l_service, $l_coord, $ico_clipboard;
   global $c_yes, $c_no, $set_theme, $ico_mail, $l_category1, $l_category2;
   global $display, $cgp_show, $cgp_hide;
 
@@ -838,14 +832,17 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
   $email = $co_q->f("contact_email");
   $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
-  $com = beautify_comment(nl2br($co_q->f("contact_comment")));
+  $com  = beautify_comment(nl2br($co_q->f("contact_comment")));
+  $com2 = beautify_comment(nl2br($co_q->f("contact_comment2")));
+  $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
 
   // Conditionnal fields
-  $show_cat1 = (! $cgp_hide["contact"]["category1"]);
-  $show_cat2 = (! $cgp_hide["contact"]["category2"]);
+  // category1, category2, category3, category4
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
+  $show_comment2 = (! $cgp_hide["contact"]["contact_comment2"]);
+  $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
   $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
   if ($title != "") {
@@ -921,64 +918,31 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
       </a>";
   }
   
-  // Category 1 field
-  if ($show_cat1) {
-    $nb_col_cat1 = 3;
-    $dis_cat1 = "<tr>";
-    for ($i=0; $i<$nb_col_cat1; $i++) {
-      $dis_cat1 .= "<td>&nbsp;</td>";
-    }
-    $dis_cat1 .= "</tr>";
-    $dis_cat1 = "";
+  // Category 1, 2, 3, 4 field
+  $block_cat1 = of_dis_block_consult_category($cats1, "contact", "category1");
+  $block_cat2 = of_dis_block_consult_category($cats2, "contact", "category2");
+  $block_cat3 = of_dis_block_consult_category($cats3, "contact", "category3");
+  $block_cat4 = of_dis_block_consult_category($cats4, "contact", "category4");
 
-    $i = 0;
-    while ($cat1_q->next_record()) {
-      if ($i==0) {
-	$dis_cat1 .= "<tr>";
-      }
-      $label = $cat1_q->f("contactcategory1_label");
-      $i++;
-      $dis_cat1 .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-      if ($i==$nb_col_cat1) {
-	$dis_cat1 .= "</tr>";
-	$i = 0;
-      }    
-    }
-    $block_cat1 = "
-    <div class=\"detailHead\">$l_category1</div>
+  if ($show_comment2) {
+    $block_comment2 = "
+    <div class=\"detailHead\">$l_comment2</div>
     <table class=\"detail\">
-    $dis_cat1
+      <tr>
+        <td class=\"detailText\" colspan=\"2\">$com2</td>
+      </tr>
+    </table>";
+  }
+  if ($show_comment3) {
+    $block_comment3 = "
+    <div class=\"detailHead\">$l_comment3</div>
+    <table class=\"detail\">
+      <tr>
+        <td class=\"detailText\" colspan=\"2\">$com3</td>
+      </tr>
     </table>";
   }
 
-  // Category 2 field
-  if ($show_cat2) {
-    $nb_col_cat2 = 3;
-    $dis_cat2 = "<tr>";
-    for ($i=0; $i<$nb_col_cat2; $i++) {
-      $dis_cat2 .= "<td>&nbsp;</td>";
-    }
-    $dis_cat2 .= "</tr>";
-    $dis_cat2 = "";
-    $i = 0;
-    while ($cat2_q->next_record()) {
-      if ($i==0) {
-	$dis_cat2 .= "<tr>";
-      }
-      $label = $cat2_q->f("contactcategory2_label");      
-      $i++;
-      $dis_cat2 .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-      if ($i==$nb_col_cat2) {
-	$dis_cat2 .= "</tr>";
-	$i = 0;
-      }    
-    }
-    $block_cat2 = "
-    <div class=\"detailHead\">$l_category2</div>
-    <table class=\"detail\">
-    $dis_cat2
-    </table>";
-  }
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1033,16 +997,18 @@ function html_contact_view_main($co_q, $cat1_q, $cat2_q) {
 
     $block_cat1
     $block_cat2
+    $block_cat3
+    $block_cat4
 
     <div class=\"detailHead\">$l_comment</div>
-
     <table class=\"detail\">
-    <tr>
-      <td class=\"detailText\" colspan=\"2\">
-      $com
-      </td>
-    </tr>
-    </table>";
+      <tr>
+        <td class=\"detailText\" colspan=\"2\">$com</td>
+      </tr>
+    </table>
+    $block_comment2 
+    $block_comment3 
+    ";
 
   return $block;
 }
@@ -1174,12 +1140,11 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $cid = $contact["id"];
   if ($cid > 0) {
-    if (! $cgp_hide["contact"]["category1"]) {
-      $cats1 = of_category_get_ordered("contact", "category1", $cid);
-    }
-    if (! $cgp_hide["contact"]["category2"]) {
-      $cats2 = of_category_get_ordered("contact", "category2", $cid);
-    }
+    $cats1=array();$cats2=array();$cats3=array();$cats4=array();
+    $cats1 = of_category_get_ordered("contact", "category1", $cid);
+    $cats2 = of_category_get_ordered("contact", "category2", $cid);
+    $cats3 = of_category_get_ordered("contact", "category3", $cid);
+    $cats4 = of_category_get_ordered("contact", "category4", $cid);
   }
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
@@ -1194,11 +1159,10 @@ function dis_contact_form($action, $co_q, $contact) {
     $usr_q = run_query_all_users_from_group("", array($uid));
   }
   $ctry_q = run_query_country_for_lang();
-  $block = html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
+  $block = html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Contact Form
@@ -1206,7 +1170,9 @@ function dis_contact_form($action, $co_q, $contact) {
 //   - $action    : action called
 //   - $co_q      : contact database result (company detail on new)
 //   - $cats1     : Contact category1 array
-//   - $cats2     : Contact category1 array
+//   - $cats2     : Contact category2 array
+//   - $cats3     : Contact category3 array
+//   - $cats4     : Contact category4 array
 //   - $dsrc_q    : datasource database result 
 //   - $func_q    : function database result 
 //   - $kind_q    : kind database result 
@@ -1216,22 +1182,27 @@ function dis_contact_form($action, $co_q, $contact) {
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
   global $cgp_mailing_default, $ccontact_private_default;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
-  global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok;
-  global $l_comment, $l_add_comment, $l_upd_comment;
+  global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok, $l_date, $l_no_date;
+  global $l_comment , $l_add_comment , $l_upd_comment ;
+  global $l_comment2, $l_add_comment2, $l_upd_comment2;
+  global $l_comment3, $l_add_comment3, $l_upd_comment3;
   global $l_service, $l_email_other;
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
+  global $ico_mini_cal;
   global $l_category1, $l_category2;
   global $display, $path, $auth, $cgp_show, $cgp_hide, $l_none;
 
   $cat1 = array();
   $cat2 = array();
+  $cat3 = array();
+  $cat4 = array();
   $uid = $auth->auth["uid"];
 
   // if update mode and first time values are taken from database
@@ -1243,6 +1214,8 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
     $dsrc = $co_q->f("contact_datasource_id");
     $kind = $co_q->f("contact_kind_id");
     $mark = $co_q->f("contact_marketingmanager_id");
+    $date = $co_q->f("contact_date");
+    $date = ($date != 0) ? date_format($date, 1) : "";
     $lname = $co_q->f("contact_lastname");
     $fname = $co_q->f("contact_firstname");
     $service = $co_q->f("contact_service");
@@ -1267,6 +1240,12 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
     $comment = $co_q->f("contact_comment");
     $usercomment = $uid;
     $datecomment = isodate_format();
+    $comment2 = $co_q->f("contact_comment2");
+    $usercomment2 = $uid;
+    $datecomment2 = isodate_format();
+    $comment3 = $co_q->f("contact_comment3");
+    $usercomment3 = $uid;
+    $datecomment3 = isodate_format();
     $cat2 = run_query_get_contactcategory2($id);
     $c_phone = $co_q->f("company_phone");
     $c_fax = $co_q->f("company_fax");
@@ -1283,8 +1262,13 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
   } elseif ($action == "new") {
     $dsrc = $set_dsrc;
     $mark = $auth->auth["uid"];
+    $date = date("Y-m-d");
     $usercomment = $uid;
     $datecomment = isodate_format();
+    $usercomment2 = $uid;
+    $datecomment2 = isodate_format();
+    $usercomment3 = $uid;
+    $datecomment3 = isodate_format();
     if ($ccontact_private_default) {
       $private_c = " checked";
     }
@@ -1320,6 +1304,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
   if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
   if (isset($contact["kind"])) { $kind = $contact["kind"]; }
   if (isset($contact["marketing_manager"])) { $mark = $contact["marketing_manager"]; }
+  if (isset($contact["date"])) { $mark = $contact["date"]; }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
   if (isset($contact["service"])) { $service = stripslashes($contact["service"]); }
@@ -1343,20 +1328,32 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
   if (isset($contact["add_comment"])) { $add_comment = stripslashes($contact["add_comment"]); }
   if (isset($contact["usercomment"])) { $usercomment = $contact["usercomment"]; }
   if (isset($contact["datecomment"])) { $datecomment = $contact["datecomment"]; }
+  if (isset($contact["comment2"])) { $comment2 = stripslashes($contact["com"]); }
+  if (isset($contact["add_comment2"])) { $add_comment2 = stripslashes($contact["add_comment2"]); }
+  if (isset($contact["usercomment2"])) { $usercomment2 = $contact["usercomment2"]; }
+  if (isset($contact["datecomment2"])) { $datecomment2 = $contact["datecomment2"]; }
+  if (isset($contact["comment3"])) { $comment3 = stripslashes($contact["com"]); }
+  if (isset($contact["add_comment3"])) { $add_comment3 = stripslashes($contact["add_comment3"]); }
+  if (isset($contact["usercomment3"])) { $usercomment3 = $contact["usercomment3"]; }
+  if (isset($contact["datecomment3"])) { $datecomment3 = $contact["datecomment3"]; }
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($contact["category2"])) { $cat2 = $contact["category2"]; }  
+  if (isset($contact["category2"])) { $cat3 = $contact["category3"]; }  
+  if (isset($contact["category2"])) { $cat4 = $contact["category4"]; }  
   if (isset($contact["priv"])) { $priv = stripslashes($contact["priv"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
   // Conditionnal fields
+  // category1,category2,category3,category4
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
-  $show_cat1 = (! $cgp_hide["contact"]["category1"]);
-  $show_cat2 = (! $cgp_hide["contact"]["category2"]);
+  $show_date = (! $cgp_hide["contact"]["contact_date"]);
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
+  $show_comment2 = (! $cgp_hide["contact"]["contact_comment2"]);
+  $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
   // some constants
   $csize_add = "48";
@@ -1412,6 +1409,20 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
     </tr>";
   }
 
+  // Date field
+  if ($show_date) {
+    $block_date = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailForm\">
+        <input type=\"text\" id=\"tf_date\" name=\"tf_date\" maxlength=\"10\" size=\"10\" value=\"$date\" />
+        <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_contact.tf_date,'../agenda/agenda_index.php?action=calendar&popup=1') ;\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
+        </a>
+      </td>
+    </tr>";
+  }
+
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
     <option value=\"0\">$l_none</option>";
@@ -1454,13 +1465,11 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
   $sel_kind_lang = "<select name=\"sel_lang\">";
   $sel_kind_label = "<select name=\"sel_label\">";
 
-  // Category 1 and 2 select field
-  if ($show_cat1) {
-    $block_cat1 = of_category_dis_entity_form($cats1, "1", "contact");
-  }
-  if ($show_cat2) {
-    $block_cat2 = of_category_dis_entity_form($cats2, "2", "contact");
-  }
+  // Category 1, 2, 3, 4 select field
+  $block_cat1 = of_category_dis_entity_form($cats1, "contact", "category1");
+  $block_cat2 = of_category_dis_entity_form($cats2, "contact", "category2");
+  $block_cat3 = of_category_dis_entity_form($cats3, "contact", "category3");
+  $block_cat4 = of_category_dis_entity_form($cats4, "contact", "category4");
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
@@ -1543,18 +1552,18 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
   if ($usr_q->nf()>0) {
     $usr_q->seek(0);
   }
-  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  $opt_usercomment = "";
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
-    $sel_usercomment .= "<option value=\"$cname\"";
+    $opt_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
       $sel_usercomment .= " selected = \"selected\"";
     }
-    $sel_usercomment .= ">$cname</option>\n";
+    $opt_usercomment .= ">$cname</option>\n";
   }
-  $sel_usercomment .= "</select>";
+  $sel_usercomment  = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
@@ -1564,6 +1573,54 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
       </tr><tr>
         <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
+    if ($show_comment2) {
+      $dis_comment2 = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment2</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com2\" rows=\"6\" cols=\"78\">$comment2</textarea></td>
+      ";
+    }
+    if ($show_comment3) {
+      $dis_comment3 = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment3</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com3\" rows=\"6\" cols=\"78\">$comment3</textarea></td>
+      ";
+    }
+  }
+
+  if ($show_comment2) {
+    $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
+    $block_comment2 = "
+    <div class=\"detailHead\">$l_comment2</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_add_comment2</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment2\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment2\" />$sel_usercomment2</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment2\" rows=\"6\" cols=\"78\">$add_comment2</textarea></td>
+      $dis_comment2
+    </tr>
+    </table>";
+  }
+
+  if ($show_comment3) {
+    $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";
+    $block_comment3 = "
+    <div class=\"detailHead\">$l_comment3</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_add_comment3</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment3\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment3\" />$sel_usercomment3</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment3\" rows=\"6\" cols=\"78\">$add_comment3</textarea></td>
+      $dis_comment3
+    </tr>
+    </table>";
   }
 
   // Company Display
@@ -1641,8 +1698,11 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
     $block_func
     $block_title
     $block_resp
+    $block_date
     $block_cat1
     $block_cat2
+    $block_cat3
+    $block_cat4
     </tr>
     </table>
 
@@ -1692,7 +1752,6 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
     </table>
 
     <div class=\"detailHead\">$l_comment</div>
-
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
@@ -1702,6 +1761,8 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $dsrc_q, $kind_q, $fu
       $dis_comment
     </tr>
     </table>
+    $block_comment2
+    $block_comment3
 
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
@@ -1882,7 +1943,7 @@ function dis_contact_admin_index() {
   if (! $cgp_hide["contact"]["category1"]) {
     $cats1 = of_category_get_ordered("contact", "category1");
     $block .= "<hr />";
-    $block .= html_contact_cat1_form($cats1);
+    $block .= of_html_admin_cat_form($cats1, "contact", "category1");
   }
 
   if (! $cgp_hide["contact"]["category2"]) {
@@ -1891,117 +1952,17 @@ function dis_contact_admin_index() {
     $block .= html_contact_cat2_form($cats2);
   }
 
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Contact Category1 section
-// Parameters:
-//   - $cats1 : Category1 array
-///////////////////////////////////////////////////////////////////////////////
-function html_contact_cat1_form($cats1) {
-  global $l_cat1_manage,$l_cat1_exist,$l_code,$l_label;
-  global $l_cat1_checkdelete,$l_cat1_update,$l_cat1_new,$l_cat1_insert;
-
-  $indent = 10;
-  $flabel = $indent + 1;
-  $sel_cat1 = "<select name=\"sel_cat1\" onchange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf(' ');
-    ext = mytext.substr(0, pos);
-    mytext = mytext.substr($flabel); 
-    forms.form_cat1_update.tf_cat1.value=mytext;
-    forms.form_cat1_update.tf_code1.value=ext;
-    \"
-    size=\"6\" >";
-  foreach ($cats1 as $one_cat) {
-    $c_id = $one_cat["id"];
-    $c_code = str_pad($one_cat["code"] . " ", $indent, ".");
-    $c_label = htmlentities($one_cat["label"]);
-    $sel_cat1 .= "\n<option value=\"$c_id\">$c_code $c_label</option>";
+  if (! $cgp_hide["contact"]["category3"]) {
+    $cats3 = of_category_get_ordered("contact", "category3");
+    $block .= "<hr />";  
+    $block .= of_html_admin_cat_form($cats3, "contact", "category3");
   }
-  $sel_cat1 .= "</select>";
 
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_cat1_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Category1 Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_cat1_delete\" method=\"post\"
-              action=\"" . url_prepare("contact_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_cat1_exist</td>
-              <td class=\"adminLabel\">$sel_cat1</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"cat1_checklink\" />
-              <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_checkdelete\" onclick=\"if (check_cat1_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Category1 Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_cat1_update\" method=\"get\"
-              action=\"" . url_prepare("contact_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_cat1\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"cat1_update\" />
-	    <input type=\"text\" size=\"10\" name=\"tf_code1\" />
-   	    <input type=\"text\" name=\"tf_cat1\" />
-            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_update\"
-              onclick=\"if (check_cat1_upd(this.form,document.form_cat1_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Category1 Section -->
-
-        <form name=\"form_cat1_new\" method=\"get\"
-          action=\"" . url_prepare("contact_index.php") . "\">
-        <table>
-	<tr>
-	<td class=\"adminLabel\" colspan=\"2\">$l_cat1_new</td>
-	</tr>
-        <tr>
-	  <td class=\"adminLabel\">$l_code :</td>
-          <td ><input type=\"text\" size=\"10\" name=\"tf_code1\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-          <td ><input type=\"text\" name=\"tf_cat1\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"action\" value=\"cat1_insert\" />
-            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_insert\"
-              onclick=\"if (check_cat1_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
-";
+  if (! $cgp_hide["contact"]["category4"]) {
+    $cats4 = of_category_get_ordered("contact", "category4");
+    $block .= "<hr />";  
+    $block .= of_html_admin_cat_form($cats4, "contact", "category4");
+  }
 
   return $block;
 }
@@ -2027,11 +1988,13 @@ function html_contact_cat2_form($cats2) {
     forms.form_cat2_update.tf_code2.value=ext;
     \"
     size=\"6\" >";
-  foreach ($cats2 as $one_cat) {
-    $c_id = $one_cat["id"];
-    $c_code = str_pad($one_cat["code"] . " ", $indent, ".");
-    $c_label = htmlentities($one_cat["label"]);
-    $sel_cat2 .= "\n<option value=\"$c_id\">$c_code $c_label</option>";
+  if (is_array($cats2)) {
+    foreach ($cats2 as $one_cat) {
+      $c_id = $one_cat["id"];
+      $c_code = str_pad($one_cat["code"] . " ", $indent, ".");
+      $c_label = htmlentities($one_cat["label"]);
+      $sel_cat2 .= "\n<option value=\"$c_id\">$c_code $c_label</option>";
+    }
   }
   $sel_cat2 .= "</select>";
 
@@ -2223,182 +2186,6 @@ function html_contact_function_form($func_q) {
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: the cat1 links
-// Parameters:
-//   - $contact : contact hash info : keys used : cat1
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat1_links($contact) {
-  global $l_cat1_link_contact, $l_cat1_link_contact_no;
-  global $l_cat1_delete, $l_cat1_can_delete, $l_cat1_cant_delete;
-  global $l_back,$display;
-
-  $id = $contact["category1"];
-  $label = get_cat1_label($id);
-  $obm_q = run_query_cat1_links($id);
-
-  $nb_cat = $obm_q->num_rows();
-  if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg($l_cat1_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat1_link_contact ($nb_cat)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_title");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_cat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-	  <form name=\"form_back\" method=\"get\"
-	    action=\"" .url_prepare("contact_index.php") . "\">
-	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
-	  <input type=\"submit\" value=\"$l_back\" />
-	  </form>
-	</p>
-      </div>";
-
-  } else {
-    $display["msg"] .= display_ok_msg($l_cat1_can_delete);
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat1_link_contact_no </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">    
-      <form name=\"form_act_delete\"
-	method=post action=\"" . url_prepare("contact_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"cat1_delete\">
-      <input type=\"hidden\" name=\"sel_cat1\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat1_delete\">
-      </form>
-      
-      <form name=\"form_back\" method=\"get\"
-	action=\"" .url_prepare("contact_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
-  }
-
-  return $dis_link;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: the cat2 links
-// Parameters:
-//   - $contact : contact hash info : keys used : cat2
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat2_links($contact) {
-  global $l_cat2_link_contact, $l_cat2_link_contact_no;
-  global $l_cat2_delete, $l_cat2_can_delete, $l_cat2_cant_delete;
-  global $l_back,$display;
-
-  $id = $contact["category2"];
-  $label = get_cat2_label($id);
-  $obm_q = run_query_cat2_links($id);
-
-  $nb_cat = $obm_q->num_rows();
-  if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg($l_cat2_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat2_link_contact ($nb_cat)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_title");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_cat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-	  <form name=\"form_back\" method=\"get\"
-	    action=\"" .url_prepare("contact_index.php") . "\">
-	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
-	  <input type=\"submit\" value=\"$l_back\" />
-	  </form>
-	</p>
-      </div>";
-
-  } else {
-    $display["msg"] .= display_ok_msg($l_cat2_can_delete);
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat2_link_contact_no </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">    
-      <form name=\"form_act_delete\"
-	method=post action=\"" . url_prepare("contact_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"cat2_delete\">
-      <input type=\"hidden\" name=\"sel_cat2\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat2_delete\">
-      </form>
-      
-      <form name=\"form_back\" method=\"get\"
-	action=\"" .url_prepare("contact_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
-  }
-
-  return $dis_link;
-}
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Displays the function links

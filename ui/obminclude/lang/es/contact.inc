@@ -33,6 +33,9 @@ $l_kind_manage = "Manejo del tipo de Contacto";
 $l_kind_exist = "Tipos Existentes";
 $l_kind_new = "Nuevo Tipo";
 $l_header = "Encabezado";
+$l_comment2 = "Comentario 2";
+$l_comment3 = "Comentario 3";
+
 
 // Actions
 $l_insert = "Ingresar el Contacto";
@@ -47,6 +50,10 @@ $l_kind_update = "Actualizar Tipo";
 $l_kind_checkdelete = "Seleccionar o Borrar  Tipo";
 $l_kind_delete = "Borrar Tipo";
 $l_kind_insert = "Ingresar Tipo";
+$l_add_comment2 = "Adicionar un comentario 2";
+$l_upd_comment2 = "Actualizar comentario 2";
+$l_add_comment3 = "Adicionar un comentario 3";
+$l_upd_comment3 = "Actualizar comentario 3";
 
 // Messages
 $l_check_samecontact = "Estos contactos lucen similares a la nueva entrada !";
