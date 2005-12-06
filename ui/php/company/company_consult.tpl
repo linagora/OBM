@@ -66,7 +66,7 @@
     </tr>
   </table>
 
-$block_cat
+$block_cat1
 
 <div class="detailHead">$l_comment</div>
   

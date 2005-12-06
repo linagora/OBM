@@ -25,7 +25,6 @@ function dis_menu_stats() {
   <div class=\"blockTitle\">:: $l_statistic </div>
   <ul class=\"blockItem\">";
 
-
   if (is_array($actions[$module])) {
     $module_right = $perm->get_module_rights($module); 
     foreach ($actions[$module] as $key => $value) {

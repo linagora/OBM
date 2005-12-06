@@ -30,10 +30,10 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $zip = sql_search_text_parse($contact["zip"]);
   $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];
-  $cat3 = $contact["category3"];
-  $cat4 = $contact["category4"];
+  $category1 = $contact["category1"];
+  $category2 = $contact["category2"];
+  $category3 = $contact["category3"];
+  $category4 = $contact["category4"];
   $archive = $contact["archive"];
   $lang = get_lang();
 
@@ -133,24 +133,24 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $where .= " AND contact_title $like '$title%'";
   }
   // If a Category 1 has been set
-  if (($cat1 != $c_all) && ($cat1 != "")) {
-    $join_cat1 = "LEFT JOIN ContactCategory1Link ON contact_id=contactcategory1link_contact_id";
-    $where .= " AND contactcategory1link_category_id='$cat1'";
+  if (($category1 != $c_all) && ($category1 != "")) {
+    $join_category1 = "LEFT JOIN ContactCategory1Link ON contact_id=contactcategory1link_contact_id";
+    $where .= " AND contactcategory1link_category_id='$category1'";
   }
   // If a Category 2 has been set
-  if (($cat2 != $c_all) && ($cat2 != "")) {
-    $join_cat2 = "LEFT JOIN ContactCategory2Link ON contact_id=contactcategory2link_contact_id";
-    $where .= " AND contactcategory2link_category_id='$cat2'";
+  if (($category2 != $c_all) && ($category2 != "")) {
+    $join_category2 = "LEFT JOIN ContactCategory2Link ON contact_id=contactcategory2link_contact_id";
+    $where .= " AND contactcategory2link_category_id='$category2'";
   }
   // If a Category 3 has been set
-  if (($cat3 != $c_all) && ($cat3 != "")) {
-    $join_cat3 = "LEFT JOIN ContactCategory3Link ON contact_id=contactcategory3link_contact_id";
-    $where .= " AND contactcategory3link_category_id='$cat3'";
+  if (($category3 != $c_all) && ($category3 != "")) {
+    $join_category3 = "LEFT JOIN ContactCategory3Link ON contact_id=contactcategory3link_contact_id";
+    $where .= " AND contactcategory3link_category_id='$category3'";
   }
   // If a Category 4 has been set
-  if (($cat4 != $c_all) && ($cat4 != "")) {
-    $join_cat4 = "LEFT JOIN ContactCategory4Link ON contact_id=contactcategory4link_contact_id";
-    $where .= " AND contactcategory4link_category_id='$cat4'";
+  if (($category4 != $c_all) && ($category4 != "")) {
+    $join_category4 = "LEFT JOIN ContactCategory4Link ON contact_id=contactcategory4link_contact_id";
+    $where .= " AND contactcategory4link_category_id='$category4'";
   }
   // Get only not archived by default
   if ($archive != "1") {
@@ -223,16 +223,16 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
                   contact_country_iso3166 = ctry1.country_iso3166
                   AND ctry1.country_lang='$lang'
         $join_ctry2
-        $join_cat1
-        $join_cat2
-        $join_cat3
-        $join_cat4
+        $join_category1
+        $join_category2
+        $join_category3
+        $join_category4
     $whereq
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_cat1 $join_cat2 $join_cat3 $join_cat4 $whereq");
+    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_category1 $join_category2 $join_category3 $join_category4 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -413,10 +413,10 @@ function run_query_contact_insert($contact) {
   $ad1 = $contact["ad1"];
   $ad2 = $contact["ad2"];
   $ad3 = $contact["ad3"];
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];  
-  $cat3 = $contact["category3"];  
-  $cat4 = $contact["category4"];  
+  $category1 = $contact["category1"];
+  $category2 = $contact["category2"];  
+  $category3 = $contact["category3"];  
+  $category4 = $contact["category4"];  
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -545,23 +545,23 @@ function run_query_contact_insert($contact) {
   $obm_q->next_record();
   $id = $obm_q->f("contact_id");
 
-  if ($retour && is_array($cat1)) {
-    foreach($cat1 as $categoryid) {
+  if ($retour && is_array($category1)) {
+    foreach($category1 as $categoryid) {
       $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category1");
     }
   }
-  if ($retour && is_array($cat2)) {
-    foreach($cat2 as $categoryid) {
+  if ($retour && is_array($category2)) {
+    foreach($category2 as $categoryid) {
       $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category2");
     }
   }
-  if ($retour && is_array($cat3)) {
-    foreach($cat3 as $categoryid) {
+  if ($retour && is_array($category3)) {
+    foreach($category3 as $categoryid) {
       $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category3");
     }
   }
-  if ($retour && is_array($cat4)) {
-    foreach($cat4 as $categoryid) {
+  if ($retour && is_array($category4)) {
+    foreach($category4 as $categoryid) {
       $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category4");
     }
   }
@@ -641,10 +641,10 @@ function run_query_contact_update($contact) {
 
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
   $priv = (isset($contact["priv"]) ? $contact["priv"] : '0');
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];
-  $cat3 = $contact["category3"];
-  $cat4 = $contact["category4"];
+  $category1 = $contact["category1"];
+  $category2 = $contact["category2"];
+  $category3 = $contact["category3"];
+  $category4 = $contact["category4"];
   
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -687,8 +687,8 @@ function run_query_contact_update($contact) {
 
   if ($retour) {
     $retour = of_run_query_category_delete_link($id, "contact", "category1");
-    if (is_array($cat1)) {
-      foreach($cat1 as $categoryid) {
+    if (is_array($category1)) {
+      foreach($category1 as $categoryid) {
         $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category1");
       }
     }
@@ -696,8 +696,8 @@ function run_query_contact_update($contact) {
 
   if ($retour) {
     $retour = of_run_query_category_delete_link($id, "contact", "category2");
-    if (is_array($cat2)) {
-      foreach($cat2 as $categoryid) {
+    if (is_array($category2)) {
+      foreach($category2 as $categoryid) {
         $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category2");
       }
     }
@@ -705,8 +705,8 @@ function run_query_contact_update($contact) {
 
   if ($retour) {
     $retour = of_run_query_category_delete_link($id, "contact", "category3");
-    if (is_array($cat3)) {
-      foreach($cat3 as $categoryid) {
+    if (is_array($category3)) {
+      foreach($category3 as $categoryid) {
         $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category3");
       }
     }
@@ -714,8 +714,8 @@ function run_query_contact_update($contact) {
 
   if ($retour) {
     $retour = of_run_query_category_delete_link($id, "contact", "category4");
-    if (is_array($cat4)) {
-      foreach($cat4 as $categoryid) {
+    if (is_array($category4)) {
+      foreach($category4 as $categoryid) {
         $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category4");
       }
     }
@@ -731,61 +731,6 @@ function run_query_contact_update($contact) {
 
   return $retour;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the contact
-// Parameters:
-//   - $c_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_contactcategory1($c_id) {
-  global $cdg_sql;
-
-  $cats = array();
-
-  $query = "SELECT contactcategory1_id
-    FROM ContactCategory1Link, ContactCategory1
-    WHERE contactcategory1link_category_id = contactcategory1_id
-      AND contactcategory1link_contact_id = '$c_id'
-    ORDER BY contactcategory1_id";     
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  while ($obm_q->next_record()) {
-    $id = $obm_q->f("contactcategory1_id");
-    $cats[] = $id;
-  }
-
-  return $cats;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the contact
-// Parameters:
-//   - $c_id : contact Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_contactcategory2($c_id) {
-  global $cdg_sql;
-
-  $cats = array();
-
-  $query = "select contactcategory2_id
-    from ContactCategory2Link, ContactCategory2
-    where contactcategory2link_category_id = contactcategory2_id
-      and contactcategory2link_contact_id = '$c_id'
-    order by contactcategory2_id";     
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  while($obm_q->next_record()) {
-    $id = $obm_q->f("contactcategory2_id");
-    $cats[] = $id;
-  }
-
-  return $cats;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the number of static lists where the contact is registered

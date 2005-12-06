@@ -270,6 +270,31 @@ $l_document_new = "New document";
 $l_document_add = "Link some documents";
 
 //---------------------------------------------------------------------------//
+// Category labels
+//---------------------------------------------------------------------------//
+$l_code = "Code";
+$l_c_manage = "Management: ";
+$l_c_new = "New";
+$l_c_checkdelete = "Check or delete";
+$l_c_delete =  "Delete";
+$l_c_update = "Update";
+$l_c_insert = "Insert";
+$l_c_can_delete = "deletion is possible";
+$l_c_cant_delete = " deletion is not possible";
+$l_c_link = "references found for ";
+$l_c_link_no = "no reference found for ";
+$l_c_delete_ok="deletion has been successful.";
+$l_c_delete_error="deletion has failed !";
+$l_c_insert_ok="insertion has been successful..";
+$l_c_insert_error="insertion has failed !";
+$l_c_update_ok = "update has been successful..";
+$l_c_update_error = "update has failed !";
+$l_c_j_create = "label is mandatory.";
+$l_c_j_update = "label is mandatory.";
+$l_c_j_delete = "selection is mandatory.";
+
+
+//---------------------------------------------------------------------------//
 // OF messages
 //---------------------------------------------------------------------------//
 $l_of_right_err_auth = "Insufficient rights to update rights !";

@@ -131,7 +131,7 @@ $profiles["editor"] = array (
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
 //$cgp_hide["company"]["companynafcode_code"] = true;
-//$cgp_hide["company"]["category"] = true;
+//$cgp_hide["company"]["category1"] = true;
 //$cgp_hide["company"]["company_address3"] = true;
 //$cgp_hide["company"]["company_expresspostal"] = true;
 

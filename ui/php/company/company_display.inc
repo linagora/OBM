@@ -169,7 +169,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 function dis_company_search_form($company="") {
 
   $type_q = run_query_companytype();
-  $cats = of_category_get_ordered("company", "category");
+  $cats = of_category_get_ordered("company", "category1");
   $act_q = run_query_companyactivity();
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
@@ -197,7 +197,7 @@ function dis_company_search_form($company="") {
 function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $l_company_name, $l_postcode, $l_town, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_after, $l_before, $l_nafcode; 
-  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_category, $l_cat_tree;
+  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_category1, $l_cat_tree;
   global $display, $c_all, $cgp_hide, $l_select_company;
 
   $popup = $company["popup"];
@@ -266,7 +266,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
     $sel_cat .= "</select>";
 
     $block_cat = "
-    <div class=\"searchLabel\">$l_category<br />
+    <div class=\"searchLabel\">$l_category1<br />
       $sel_cat
     </div>
     <div class=\"searchLabel\">$l_cat_tree<br />
@@ -668,10 +668,10 @@ function dis_company_consult($cid) {
 
   if ($cid > 0) {
     $comp_q = run_query_detail($cid);
-    $cats = of_category_get_ordered("company", "category", $cid);
+    $cats1 = of_category_get_ordered("company", "category1", $cid);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $block = html_company_consult($comp_q, $cats);
+      $block = html_company_consult($comp_q, $cats1);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -685,14 +685,14 @@ function dis_company_consult($cid) {
 // XHTML Display Company Consultation
 // Parameters:
 //   - $co_q : company database result 
-//   - $cats : array of compant categories
+//   - $cats1 : array of compant categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult($co_q, $cats) {
+function html_company_consult($co_q, $cats1) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode, $l_vat;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
-  global $l_insert,$l_update, $l_company, $l_coord,$l_category;
+  global $l_insert,$l_update, $l_company, $l_coord,$l_category1;
   global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard;
 
   $id = $co_q->f("company_id");
@@ -836,32 +836,9 @@ function html_company_consult($co_q, $cats) {
     $link_email = "&nbsp;";
   }
 
-  $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  if ( ($show_cat) && (count($cats) > 0) ) {
-    $i = 0;
-    foreach($cats as $cat_info) {
-      if ($i == 0) {
-	$cat_disp .= "<tr>";
-      }
-      $label = $cat_info["code"];
-      $label .= "-".$cat_info["label"];    
-      $i++;
-      $cat_disp .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-      if ($i==3) {
-	$cat_disp .= "</tr>";
-	$i = 0;
-      }    
-    }
-  }
-  // Category field
-  if ($show_cat) {
-    $block_cat = "
-<div class=\"detailHead\">$l_category</div>
-  
-  <table class=\"detail\">
-    $cat_disp
-  </table>";
-  }  
+  // Category1 field
+  $block_cat1 = of_dis_block_consult_category($cats1, "company", "category1"); 
+
   // Web link
   if ($web != "") {
     $link_web = "<a target=\"_blank\" href=\"";
@@ -903,15 +880,15 @@ function dis_company_form($action, $company) {
 
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
-  $show_cat = (! $cgp_hide["company"]["category"]);
+  $show_cat1 = (! $cgp_hide["company"]["category1"]);
 
   $c_id = $company["id"];
   if ($c_id > 0) {
     $comp_q = run_query_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      if ($show_cat) {
-	$cats = of_category_get_ordered("company", "category", $c_id);
+      if ($show_cat1) {
+	$cats1 = of_category_get_ordered("company", "category1", $c_id);
       }
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
@@ -936,7 +913,7 @@ function dis_company_form($action, $company) {
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();
 
-  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cats, $ctry_q, $company);
+  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cats1, $ctry_q, $company);
 
   return $block;
 }
@@ -952,15 +929,15 @@ function dis_company_form($action, $company) {
 //   - $act_q     : activity database result 
 //   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
-//   - $compcat   : array of category referenced by the company
+//   - $cats1     : array of category referenced by the company
 //   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cats, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cats1, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
-  global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
+  global $set_theme,$ico_web,$ico_mail,$l_category1,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
@@ -969,6 +946,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
   $uid = $auth->auth["uid"];
   $lang = get_lang();
+  $cat1 = array();
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -1033,15 +1011,15 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
   if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
   if (isset($company["datecomment"])) { $datecomment = $company["datecomment"]; }
-  if (isset($company["cat"])) { $compcat = $company["cat"]; }
+  if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
 
   // Conditionnal fields
+  // category1
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
-  $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
@@ -1095,9 +1073,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   }
 
   // Category select field
-  if ($show_cat) {
-    $block_cat = of_category_dis_entity_form($cats, "", "company");
-  }
+  $block_cat1 = of_category_dis_entity_form($cats1, "company", "category1");
 
   // Activity select field
   if ($show_act) {
@@ -1269,7 +1245,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     $block_kind
-    $block_cat
+    $block_cat1
     $block_act
     $block_naf
     </tr><tr>    
@@ -1505,8 +1481,8 @@ function dis_admin_index() {
   }
 
   if (! $cgp_hide["company"]["category"]) {
-    $cats = of_category_get_ordered("company", "category");
-    $block .= html_company_cat_form($cats);
+    $cats1 = of_category_get_ordered("company", "category1");
+    $block .= of_html_admin_cat_form($cats1, "company", "category1");
   }
 
   if (! $cgp_hide["company"]["companyactivity_label"]) {

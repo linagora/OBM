@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 require("$obminclude/javascript/check_js.inc");
+require("$obminclude/javascript/category_js.inc");
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
 if (($ext_widget != "") || ($ext_widget_text != "")) {

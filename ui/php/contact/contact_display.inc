@@ -1246,7 +1246,6 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $dsrc
     $comment3 = $co_q->f("contact_comment3");
     $usercomment3 = $uid;
     $datecomment3 = isodate_format();
-    $cat2 = run_query_get_contactcategory2($id);
     $c_phone = $co_q->f("company_phone");
     $c_fax = $co_q->f("company_fax");
     $c_ad1 = $co_q->f("company_address1");
@@ -1949,7 +1948,7 @@ function dis_contact_admin_index() {
   if (! $cgp_hide["contact"]["category2"]) {
     $cats2 = of_category_get_ordered("contact", "category2");
     $block .= "<hr />";  
-    $block .= html_contact_cat2_form($cats2);
+    $block .= of_html_admin_cat_form($cats2, "contact", "category2");
   }
 
   if (! $cgp_hide["contact"]["category3"]) {

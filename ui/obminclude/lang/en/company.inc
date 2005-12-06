@@ -11,7 +11,8 @@
 $l_aka = "Also known as";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
-$l_category = "Categories";
+$l_category1 = "Categories";
+$l_category1_s = "Categories";
 $l_activity = "Activity";
 $l_nafcode = "Code";
 $l_market = "Marketing manager";

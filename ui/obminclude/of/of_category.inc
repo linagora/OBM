@@ -641,7 +641,7 @@ function of_get_category_label($id, $entity, $cat) {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  $retour = $obm_q->f("contactcategory1_label");
+  $retour = $obm_q->f("$field_label");
 
   return $retour;
 }
@@ -670,7 +670,7 @@ function of_run_query_category_links($p_id, $entity, $cat) {
   $entityfield_prefix = $entity."_";
   $entitityfield_id = $entityfield_prefix."id";
 
-  $query = "SELECT $entitityfield_id, '$p_id' as contact_category1
+  $query = "SELECT $entitityfield_id, '$p_id'
     FROM $entitytable, $linktable
     WHERE $entitityfield_id = $linkfield_ent 
       AND $linkfield_cat = '$p_id'";
@@ -715,12 +715,11 @@ function of_category_compare($m, $n) {
 function of_html_admin_cat_form($cats, $entity, $cat) {
   global $obminclude;
   global $l_code,$l_label;
-  global $l_manage,$l_exist, $l_checkdelete, $l_update, $l_new, $l_insert;
+  global $l_c_manage, $l_c_checkdelete, $l_c_update, $l_c_new, $l_c_insert;
+  global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
 
   $l_cat = "l_${cat}"; $l_cat_s = "l_${cat}_s"; 
-  $l_cat_new = "l_${cat}_new";$l_cat_exist = "l_${cat}_exist";
   global $$l_cat,$$l_cat_s;
-  global $$l_cat_new,$$l_cat_exist;
 
 
   $indent = 14;
@@ -751,7 +750,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
     <table class=\"admin\">
     <tr>
       <td colspan=\"5\" class=\"adminHead\">
-        $l_manage ${$l_cat_s}
+        $l_c_manage ${$l_cat_s}
       </td>
     </tr><tr>
       <td>
@@ -762,14 +761,14 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
         <tr>
           <td colspan=\"3\">
             <form name=\"form_${cat}_delete\" method=\"post\"
-              action=\"" . url_prepare("contact_index.php") . "\">
+              action=\"" . url_prepare("${entity}_index.php") . "\">
             <table>
             <tr>
-              <td class=\"adminLabel\">".ucfirst(${$l_cat_s})." ${$l_cat_exist}</td>
+              <td class=\"adminLabel\">".ucfirst(${$l_cat_s})."</td>
               <td class=\"adminLabel\">$sel_cat</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
-              <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat})) return true; else return false;\" />
+              <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat},'".ucfirst(${$l_cat})."')) return true; else return false;\" />
               </td>
             </tr>
             </table>
@@ -782,13 +781,13 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
             <form name=\"form_${cat}_update\" method=\"get\"
-              action=\"" . url_prepare("contact_index.php") . "\">
+              action=\"" . url_prepare("${entity}_index.php") . "\">
             <input type=\"hidden\" name=\"sel_${cat}\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
             <input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" />
             <input type=\"text\" name=\"tf_${cat}_label\" />
-            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_update\"
-              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat})) return true; else return false;\" />
+            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_update\"
+              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat},'".ucfirst(${$l_cat})."')) return true; else return false;\" />
             </form>
           </td>
           <td>&nbsp;</td>
@@ -800,10 +799,10 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
 <!-- New Category Section -->
 
         <form name=\"form_${cat}_new\" method=\"get\"
-          action=\"" . url_prepare("contact_index.php") . "\">
+          action=\"" . url_prepare("${entity}_index.php") . "\">
         <table>
         <tr>
-        <td class=\"adminLabel\" colspan=\"2\">${$l_cat_new} ${$l_cat}</td>
+        <td class=\"adminLabel\" colspan=\"2\">$l_c_new</td>
         </tr>
         <tr>
           <td class=\"adminLabel\">$l_code :</td>
@@ -814,8 +813,8 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
         </tr><tr>
           <td class=\"adminLabel\" colspan=\"2\">
             <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
-            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_insert\"
-              onclick=\"if (check_category_new(this.form.tf_${cat}_label)) return true; else return false;\" />
+            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_insert\"
+              onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".ucfirst(${$l_cat})."')) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -829,19 +828,19 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the cat1 links
+// Display: the cat links
 // Parameters:
-//   - $contact : contact hash info : keys used : cat1
-// Display: Admin  Category section
-// Parameters:
-//   - $cats      : Category array
+//   - $param     : Entity parameters array
 //   - $entity    : target entity
 //   - $cat       : target category
 ///////////////////////////////////////////////////////////////////////////////
 function of_dis_category_links($param, $entity, $cat) {
-  global $l_cat1_link_contact, $l_cat1_link_contact_no;
-  global $l_cat1_delete, $l_cat1_can_delete, $l_cat1_cant_delete;
+  global $l_c_link, $l_c_link_no;
+  global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back,$display;
+
+  $l_entity = "l_${entity}";$l_cat = "l_${cat}"; 
+  global $$l_entity,$$l_cat;
 
   $id = $param["${cat}"];
   $label = of_get_category_label($id, $entity, $cat);
@@ -849,13 +848,13 @@ function of_dis_category_links($param, $entity, $cat) {
 
   $nb_cat = $obm_q->num_rows();
   if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg($l_cat1_cant_delete);
+    $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $l_c_cant_delete.");
     $url = url_prepare("${entity}_index.php?action=search&amp;sel_${cat}=$id");
 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_cat1_link_contact <a href=\"$url\">($nb_cat)</a></td>
+      <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity}s <a href=\"$url\">($nb_cat)</a>.</td>
     </tr>";
 
     $dis_link .="
@@ -863,7 +862,7 @@ function of_dis_category_links($param, $entity, $cat) {
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
           <form name=\"form_back\" method=\"get\"
-            action=\"" .url_prepare("contact_index.php") . "\">
+            action=\"" .url_prepare("${entity}_index.php") . "\">
           <input type=\"hidden\" name=\"action\" value=\"admin\" />
           <input type=\"submit\" value=\"$l_back\" />
           </form>
@@ -871,26 +870,26 @@ function of_dis_category_links($param, $entity, $cat) {
       </div>";
 
   } else {
-    $display["msg"] .= display_ok_msg($l_cat1_can_delete);
+    $display["msg"] .= display_ok_msg(ucfirst($cat).": $l_c_can_delete.");
 
     $dis_link = "
     <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat1_link_contact_no </td>
+        ".ucfirst(${$l_cat})."($label) : $l_c_link_no ${$l_entity}s. </td>
     </tr>
     </table>
   <div class=\"detailButton\">
     <p class=\"detailButtons\">
       <form name=\"form_act_delete\"
-        method=post action=\"" . url_prepare("contact_index.php") . "\">
+        method=post action=\"" . url_prepare("${entity}_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
       <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat1_delete\">
+      <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
       </form>
 
       <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("contact_index.php") . "\">
+        action=\"" .url_prepare("${entity}_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"admin\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>

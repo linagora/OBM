@@ -10,6 +10,7 @@
 
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
+require("$obminclude/javascript/category_js.inc");
 
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined

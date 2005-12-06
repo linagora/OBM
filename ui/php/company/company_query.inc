@@ -26,9 +26,9 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $town = sql_search_text_parse($company["town"]);
   $ctry = $company["country"];
   $kind = $company["kind"];
-  $cat = $company["cat"];
-  $cat_tree = $company["cat_tree"];
-  $cat_code = $company["cat_code"];
+  $category1 = $company["category1"];
+  $category1_tree = $company["category1_tree"];
+  $category1_code = $company["category1_code"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $market = $company["marketing_manager"];
@@ -58,13 +58,13 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $where .= " $and company_type_id='$kind'";
     $and = "and";
   }
-  if (($cat != $c_all) && ($cat != "")) {
-    $join_cat = "LEFT JOIN CompanyCategoryLink on company_id=companycategorylink_company_id";
-    if ($cat_tree) {
-      $join_cat .= " LEFT JOIN CompanyCategory on companycategorylink_category_id=companycategory_id";
-      $where_cat = " or companycategory_code like '$cat_code%'";
+  if (($category1 != $c_all) && ($category1 != "")) {
+    $join_category1 = "LEFT JOIN CompanyCategory1Link on company_id=companycategory1link_company_id";
+    if ($category1_tree) {
+      $join_category1 .= " LEFT JOIN CompanyCategory1 on companycategory1link_category_id=companycategory1_id";
+      $where_category1 = " or companycategory1_code like '$category1_code%'";
     }
-    $where .= " $and (companycategorylink_category_id='$cat'$where_cat)";
+    $where .= " $and (companycategory1link_category_id='$category1'$where_category1)";
     $and = "and";
   }
   if (($act != $c_all) && ($act != "")) { 
@@ -167,7 +167,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   $left_join = "
          LEFT JOIN CompanyType ON company_type_id=companytype_id
-         $join_cat
+         $join_category1
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
          LEFT JOIN Country ON company_country_iso3166=country_iso3166
@@ -255,7 +255,7 @@ function run_query_detail($p_id) {
 // Parameters:
 //   - $company[] : Entry's values
 //     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email, com
+//                : ctry, phone, fax, web, email, com, category1
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($company) {
   global $auth, $cdg_sql;
@@ -298,7 +298,7 @@ function run_query_insert($company) {
     $usercomment = $company["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
-  $compcat = $company["cat"];
+  $category1 = $company["category1"];
   
   $query = "INSERT INTO Company (company_timeupdate,
     company_timecreate,
@@ -385,16 +385,9 @@ function run_query_insert($company) {
   $obm_q->next_record();
   $id = $obm_q->f("id");
 
-  if ($retour && is_array($compcat)) {
-    foreach($compcat as $categoryid) {
-      $query = "INSERT INTO CompanyCategoryLink (
-	  companycategorylink_company_id,
-	  companycategorylink_category_id)
-	VALUES (
-          '$id',
-          '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+  if ($retour && is_array($category1)) {
+    foreach($category1 as $categoryid) {
+      $retour = of_run_query_category_insert_link($id, $categoryid, "company", "category1");
     }
   }
   
@@ -452,7 +445,7 @@ function run_query_update($cid, $company) {
     $usercomment = $company["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $compcat = $company["cat"];
+  $category1 = $company["category1"];
 
   $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -486,24 +479,14 @@ function run_query_update($cid, $company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $query = "DELETE
-    FROM CompanyCategoryLink
-    WHERE companycategorylink_company_id='$cid'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  if ($retour && is_array($compcat)) {
-    foreach($compcat as $categoryid) {
-      $query = "INSERT INTO CompanyCategoryLink (
-	companycategorylink_company_id,
-	companycategorylink_category_id)
-	VALUES
-	('$cid','$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+  if ($retour) {
+    $retour = of_run_query_category_delete_link($cid, "company", "category1");
+    if (is_array($category1)) {
+      foreach($category1 as $categoryid) {
+        $retour = of_run_query_category_insert_link($cid, $categoryid, "company", "category1");
+      }
     }
   }
-
 
   return $retour;
 }
@@ -525,8 +508,8 @@ function run_query_delete($p_id) {
 
   run_query_delete_document_links($p_id, "company");
 
-  $query = "DELETE FROM CompanyCategoryLink
-    WHERE companycategorylink_company_id='$p_id'";
+  $query = "DELETE FROM CompanyCategory1Link
+    WHERE companycategory1link_company_id='$p_id'";
   $obm_q->query($query);
 
   return $retour;
@@ -697,111 +680,6 @@ function run_query_kind_links($p_id) {
 
   return $obm_q;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Categorie insertion query construction and execution
-// Parameters:
-//   - $company : company hash info : keys used : cat_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_insert($company) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat = $company["cat_label"];
-  $code = $company["cat_code"];
-
-  $query = "INSERT INTO CompanyCategory (
-    companycategory_timecreate,
-    companycategory_usercreate,
-    companycategory_label,
-    companycategory_code)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat',
-    '$code')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Categorie update query execution
-// Parameters:
-//   - $company : company hash info : keys used : cat, cat_label,cat_code
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_update($company) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $company["cat"];
-  $cat = $company["cat_label"];
-  $code = $company["cat_code"];
-
-  $query = "UPDATE CompanyCategory SET
-    companycategory_label='$cat',
-    companycategory_code='$code',
-    companycategory_timeupdate='$timeupdate',
-    companycategory_userupdate='$userupdate'
-  WHERE
-    companycategory_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Categorie deletion query execution
-// Parameters:
-//   - $id : Categorie id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_delete($id) {
-  global $cdg_sql;
-
-  $query = "DELETE FROM CompanyCategory WHERE companycategory_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Categorie - Company links query execution
-// Parameters:
-//   - $p_id : cat id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT company_name,
-      company_id,
-      '$p_id' as company_category_id
-    FROM Company,
-      CompanyCategoryLink
-    WHERE company_id=companycategorylink_company_id
-      AND companycategorylink_category_id = '$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Activity company query execution
@@ -1065,29 +943,6 @@ function get_kind_label($id) {
   $retour = $obm_q->f("companytype_label");
   return $retour;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT companycategory_label
-    FROM CompanyCategory
-    WHERE companycategory_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  $retour = $obm_q->f("companycategory_label");
-  return $retour;
-}      
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Activity from its id
