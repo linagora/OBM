@@ -141,51 +141,57 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 // Parameters:
 //   - $cats     : category to display
 //   - $entity   : target entity
-//   - $category : target category 
+//   - $cat       : target category 
+//   - $cattype   : ([mono|multi]) 
 // Returns
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_entity_form($cats, $entity, $cat="") {
+function of_category_dis_entity_form($cats, $entity, $cat="", $cattype="multi") {
   global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width;
-
+  global $l_none;
+  
   $show_cat = (! $cgp_hide["$entity"]["${cat}"]);
 
   // Category select field
   if ($show_cat) {
-    if (is_array($cats)) {
-      foreach ($cats as $one_cat) {
-	$c_id = $one_cat["id"];
-	$c_code = $one_cat["code"];
-	$c_label = htmlentities($one_cat["label"]);
-	$sel_name = "sel_${cat}";
-	$div_id = "$sel_name-data-$c_id";
-	$sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','$sel_name');\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
-        </a>
-        $c_code $c_label
-        <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
-        </div>";
+
+    if ($cattype=="mono") {
+      $allcats=of_category_get_ordered("contact", "category5", 0, "mono");
+      $sel_cat=of_dis_html_select_category($allcats, $cats[0]["id"], $entity, $cat, "none");
+      $class="detailForm";
+    } else {
+      if (is_array($cats)) {
+        foreach ($cats as $one_cat) {
+	  $c_id = $one_cat["id"];
+          $c_code = $one_cat["code"];
+	  $c_label = htmlentities($one_cat["label"]);
+	  $sel_name = "sel_${cat}";
+	  $div_id = "$sel_name-data-$c_id";
+	  $sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','$sel_name');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
+          </a>
+          $c_code $c_label
+          <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
+          </div>";
+        }
       }
+      $url = "${entity}_index.php?action=ext_get_${cat}_ids&amp;popup=1&amp;ext_target=sel_${cat}&amp;ext_title=${$l_cat}";
+      $link="<a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>";
+      $class="detail";
     }
 
     $l_cat = "l_${cat}"; 
     global $$l_cat;
-    $url = "${entity}_index.php?action=ext_get_${cat}_ids&amp;popup=1&amp;ext_target=sel_${cat}&amp;ext_title=${$l_cat}";
 
     $block_cat = "
   <tr>
-    <td class=\"detailLabel\">
-      <a href=\"javascript: return false;\" style=\"float:right;\"
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
-      return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
-      </a>
-      ${$l_cat}
-    </td>    
-    <td class=\"detail\" id=\"sel_${cat}\">
-      $sel_cat
-    </td>
+    <td class=\"detailLabel\">$link ${$l_cat} </td>    
+    <td class=\"$class\" id=\"sel_${cat}\">$sel_cat</td>
   </tr>";
   }
 
@@ -343,10 +349,11 @@ function of_category_dis_tree_node($tree, $indent, $multi=false) {
 //   - $entity    : target entity
 //   - $cat       : target category
 //   - $entity_id : if not c_all, get only cat referenced by this entry
+//   - $cattype   : ([mono|multi]) 
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_get_ordered($entity, $cat, $entity_id=0) {
+function of_category_get_ordered($entity, $cat, $entity_id=0, $cattype="multi") {
   global $cdg_sql, $cgp_hide;
 
   $table = ucfirst($entity) . ucfirst($cat);
@@ -357,6 +364,10 @@ function of_category_get_ordered($entity, $cat, $entity_id=0) {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
+  $entitytable = ucfirst($entity);
+  $entityfield_prefix = $entity."_";
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
 
   $cats = array();
   $show_cat = (! $cgp_hide["$entity"]["$cat"]);
@@ -364,12 +375,19 @@ function of_category_get_ordered($entity, $cat, $entity_id=0) {
   if ($show_cat) {
     // If an entity id is given, restrict categories to those of this entry
     if ($entity_id > 0) {
-      $query = "SELECT
-          $table.*
-        FROM $linktable
-          LEFT JOIN $table ON $linkfield_cat = $field_id
-        WHERE $linkfield_ent = '$entity_id'
-        ORDER BY $field_code, $field_label";
+      if ($cattype=="mono") {
+        $query = "SELECT $table.*
+          FROM $entitytable
+            LEFT JOIN $table ON $entityfield_cat = $field_id
+          WHERE $entityfield_id = '$entity_id'
+          ORDER BY $field_code, $field_label";
+      } else {
+        $query = "SELECT $table.*
+          FROM $linktable
+            LEFT JOIN $table ON $linkfield_cat = $field_id
+          WHERE $linkfield_ent = '$entity_id'
+          ORDER BY $field_code, $field_label";
+      }
     } else {
       $query = "SELECT * FROM $table ORDER BY $field_code, $field_label";
     }
@@ -401,10 +419,11 @@ function of_category_get_ordered($entity, $cat, $entity_id=0) {
 //   - $entity_id : entity id 
 //   - $entity    : target entity
 //   - $cat       : target category
+//   - $cattype   : ([mono|multi]) 
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function of_entitycategories_get($entity_id, $entity, $cat) {
+function of_entitycategories_get($entity_id, $entity, $cat, $cattype="multi") {
   global $cdg_sql, $cgp_hide;
 
   $table = ucfirst($entity) . ucfirst($cat);
@@ -415,12 +434,24 @@ function of_entitycategories_get($entity_id, $entity, $cat) {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
+  $entitytable = ucfirst($entity);
+  $entityfield_prefix = $entity."_";
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
 
-  $query = "SELECT $field_id, $field_label, $field_code 
-    FROM $linktable, $table 
-    WHERE $linkfield_cat = $field_id 
-      AND $linkfield_ent = '$entity_id'
-    ORDER BY $field_id";
+  if ($cattype == "mono") {
+    $query = "SELECT $field_id, $field_label, $field_code 
+      FROM $entitytable, $table 
+      WHERE $entityfield_cat = $field_id
+        AND $entityfield_id = '$entity_id' 
+      ";
+  } else {
+    $query = "SELECT $field_id, $field_label, $field_code 
+      FROM $linktable, $table 
+      WHERE $linkfield_cat = $field_id 
+        AND $linkfield_ent = '$entity_id'
+      ORDER BY $field_id";
+  }
 
   display_debug_msg($query, $cdg_sql);
   $cat_q = new DB_OBM;
@@ -652,10 +683,11 @@ function of_get_category_label($id, $entity, $cat) {
 //   - $p_id      : activity(category) id
 //   - $entity    : target entity
 //   - $cat       : target category
+//   - $cattype   : ([mono|multi]) 
 // Return:
 //   - database handle
 ///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_links($p_id, $entity, $cat) {
+function of_run_query_category_links($p_id, $entity, $cat, $cattype="multi") {
   global $cdg_sql;
 
   $table = ucfirst($entity) . ucfirst($cat);
@@ -668,12 +700,19 @@ function of_run_query_category_links($p_id, $entity, $cat) {
   $linkfield_cat = $entity.$cat."link_category_id";
   $entitytable = ucfirst($entity);
   $entityfield_prefix = $entity."_";
-  $entitityfield_id = $entityfield_prefix."id";
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
 
-  $query = "SELECT $entitityfield_id, '$p_id'
-    FROM $entitytable, $linktable
-    WHERE $entitityfield_id = $linkfield_ent 
-      AND $linkfield_cat = '$p_id'";
+  if ($cattype == "mono") {
+    $query = "SELECT $entityfield_id, '$p_id'
+      FROM $entitytable
+      WHERE $entityfield_cat = '$p_id'";
+  } else {
+    $query = "SELECT $entityfield_id, '$p_id'
+      FROM $entitytable, $linktable
+      WHERE $entityfield_id = $linkfield_ent 
+        AND $linkfield_cat = '$p_id'";
+  }
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -833,8 +872,9 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
 //   - $param     : Entity parameters array
 //   - $entity    : target entity
 //   - $cat       : target category
+//   - $cattype   : ([mono|multi]) 
 ///////////////////////////////////////////////////////////////////////////////
-function of_dis_category_links($param, $entity, $cat) {
+function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back,$display;
@@ -844,7 +884,7 @@ function of_dis_category_links($param, $entity, $cat) {
 
   $id = $param["${cat}"];
   $label = of_get_category_label($id, $entity, $cat);
-  $obm_q = of_run_query_category_links($id, $entity, $cat);
+  $obm_q = of_run_query_category_links($id, $entity, $cat, $cattype);
 
   $nb_cat = $obm_q->num_rows();
   if ($nb_cat > 0) {
@@ -870,7 +910,7 @@ function of_dis_category_links($param, $entity, $cat) {
       </div>";
 
   } else {
-    $display["msg"] .= display_ok_msg(ucfirst($cat).": $l_c_can_delete.");
+    $display["msg"] .= display_ok_msg(ucfirst(${$l_cat}).": $l_c_can_delete.");
 
     $dis_link = "
     <table class=\"detail\">
@@ -901,25 +941,26 @@ function of_dis_category_links($param, $entity, $cat) {
   return $dis_link;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: category select block 
+// Display: category html select component
 // Parameters:
-//   - $cats         : Category array
-//   - $cat_selected : selected target category 
-//   - $entity       : target entity 
-//   - $cat          : target category
+//   - $cats          : Category array
+//   - $cat_selected  : selected target category
+//   - $entity        : target entity
+//   - $cat           : target category
+//   - $first_element : (["all"|"none"]) 
 ///////////////////////////////////////////////////////////////////////////////
-function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
-  global $c_all, $l_all;
-  $l_cat = "l_${cat}"; 
-  global $$l_cat;
+function of_dis_html_select_category($cats, $cat_selected, $entity, $cat, $first_element) {
+  $l_element = "l_${first_element}";$c_element = "c_${first_element}"; 
+  global $$l_element,$$c_element;
 
   $show_cat = (! $cgp_hide["$entity"]["$cat"]);
 
   if ($show_cat) {
     // Category select
     $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\">
-    <option value=\"$c_all\">$l_all</option>";
+    <option value=\"${$c_element}\">${$l_element}</option>";
     if (is_array($cats)) {
       foreach ($cats as $one_cat) {
         $c_id = $one_cat["id"];
@@ -931,6 +972,29 @@ function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
       }
     }
     $sel_cat .= "</select>";
+  }
+
+  return $sel_cat;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: category select block 
+// Parameters:
+//   - $cats         : Category array
+//   - $cat_selected : selected target category 
+//   - $entity       : target entity 
+//   - $cat          : target category
+///////////////////////////////////////////////////////////////////////////////
+function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
+  global $l_all;
+
+  $l_cat = "l_${cat}"; 
+  global $$l_cat;
+
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+
+  if ($show_cat) {
+    $sel_cat = of_dis_html_select_category($cats, $cat_selected, $entity, $cat, "all");
 
     $block_cat = "
     <div class=\"searchLabel\">${$l_cat}<br />
@@ -947,42 +1011,56 @@ function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
 //   - $cats         : Category array
 //   - $entity       : target entity 
 //   - $cat          : target category
+//   - $cattype   : ([mono|multi]) 
 ///////////////////////////////////////////////////////////////////////////////
-function of_dis_block_consult_category($cats, $entity, $cat) {
+function of_dis_block_consult_category($cats, $entity, $cat, $cattype="multi") {
   $l_cat = "l_${cat}"; 
   global $$l_cat;
 
   $show_cat = (! $cgp_hide["$entity"]["$cat"]);
 
   if ($show_cat) {
-    $nb_col_cat = 3;
-    $dis_cat = "<tr>";
-    for ($i=0; $i<$nb_col_cat; $i++) {
-      $dis_cat .= "<td>&nbsp;</td>";
-    }
-    $dis_cat .= "</tr>";
-    $dis_cat = "";
+  
+    if ($cattype == "mono") {
+      // Mono Link
+      $label = htmlentities($cats[0]["label"]); 
+      $block_cat = "
+        <tr>
+          <td class=\"detailLabel\">".ucfirst(${$l_cat})."</td>
+          <td class=\"detailText\">$label</td>
+         </tr>";
+    } else {
+      // Multi Link
+      $nb_col_cat = 3;
+      $dis_cat = "<tr>";
+      for ($i=0; $i<$nb_col_cat; $i++) {
+        $dis_cat .= "<td>&nbsp;</td>";
+      }
+      $dis_cat .= "</tr>";
+      $dis_cat = "";
 
-    $i = 0;
-    if (is_array($cats)) {
-      foreach ($cats as $one_cat) {
-        if ($i==0) {
-          $dis_cat .= "<tr>";
-        }
-        $label = htmlentities($one_cat["label"]);
-        $i++;
-        $dis_cat .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-        if ($i==$nb_col_cat) {
-          $dis_cat .= "</tr>";
-          $i = 0;
+      $i = 0;
+      if (is_array($cats)) {
+        foreach ($cats as $one_cat) {
+          if ($i==0) {
+            $dis_cat .= "<tr>";
+          }
+          $label = htmlentities($one_cat["label"]);
+          $i++;
+          $dis_cat .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
+          if ($i==$nb_col_cat) {
+            $dis_cat .= "</tr>";
+            $i = 0;
+          }
         }
       }
+      $block_cat = "
+      <div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
+      <table class=\"detail\">
+      $dis_cat
+      </table>";
     }
-    $block_cat = "
-    <div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
-    <table class=\"detail\">
-    $dis_cat
-    </table>";
+
   }
 
   return $block_cat;
