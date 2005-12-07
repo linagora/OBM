@@ -17,11 +17,12 @@ UPDATE ObmInfo set obminfo_value='1.0' where obminfo_name='db_version';
 ALTER TABLE Contact ADD COLUMN contact_comment2 text;
 ALTER TABLE Contact ADD COLUMN contact_comment3 text;
 ALTER TABLE Contact ADD COLUMN contact_date TIMESTAMP;
+ALTER TABLE Contact ADD COLUMN contact_category5_id integer DEFAULT 0;
+
 
 -------------------------------------------------------------------------------
 -- Tables needed for Contact Module
 -------------------------------------------------------------------------------
-
 
 --
 -- Table structure for table 'ContactCategory3'
@@ -73,6 +74,20 @@ CREATE TABLE ContactCategory4Link (
 );
 CREATE INDEX contcat4_idx_cont ON ContactCategory4Link (contactcategory4link_contact_id);
 
+
+--
+-- Table structure for table 'ContactCategory5'
+--
+CREATE TABLE ContactCategory5 (
+  contactcategory5_id          serial,
+  contactcategory5_timeupdate  timestamp,
+  contactcategory5_timecreate  timestamp,
+  contactcategory5_userupdate  integer default 0,
+  contactcategory5_usercreate  integer default 0,
+  contactcategory5_code        varchar(10) default '',
+  contactcategory5_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory5_id)
+);
 
 -------------------------------------------------------------------------------
 -- Create table structure for table 'CompanyCategory1'

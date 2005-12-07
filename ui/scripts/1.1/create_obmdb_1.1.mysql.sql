@@ -312,6 +312,7 @@ CREATE TABLE Contact (
   contact_comment              text,
   contact_comment2             text,
   contact_comment3             text,
+  contact_category5_id         int(8) DEFAULT 0,
   PRIMARY KEY (contact_id)
 );
 
@@ -447,6 +448,20 @@ CREATE TABLE ContactCategory4Link (
   contactcategory4link_contact_id   int(8) NOT NULL default 0,
   PRIMARY KEY (contactcategory4link_category_id,contactcategory4link_contact_id),
   INDEX contcat4_idx_cont (contactcategory4link_contact_id)
+);
+
+--
+-- Table structure for table 'ContactCategory5'
+--
+CREATE TABLE ContactCategory5 (
+  contactcategory5_id          int(8) auto_increment,
+  contactcategory5_timeupdate  timestamp(14),
+  contactcategory5_timecreate  timestamp(14),
+  contactcategory5_userupdate  int(8) default 0,
+  contactcategory5_usercreate  int(8) default 0,
+  contactcategory5_code        varchar(10) default '',
+  contactcategory5_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory5_id)
 );
 
 
