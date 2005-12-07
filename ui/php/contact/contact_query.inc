@@ -34,6 +34,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $category2 = $contact["category2"];
   $category3 = $contact["category3"];
   $category4 = $contact["category4"];
+  $category5 = $contact["category5"];
   $archive = $contact["archive"];
   $lang = get_lang();
 
@@ -152,6 +153,11 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $join_category4 = "LEFT JOIN ContactCategory4Link ON contact_id=contactcategory4link_contact_id";
     $where .= " AND contactcategory4link_category_id='$category4'";
   }
+  // If a Category 5 has been set
+  if (($category5 != $c_all) && ($category5 != "")) {
+    $join_category5 = "LEFT JOIN ContactCategory5 ON contact_category5_id=contactcategory5_id";
+    $where .= " AND contactcategory5_id='$category5'";
+  }
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
@@ -227,12 +233,13 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
         $join_category2
         $join_category3
         $join_category4
+        $join_category5
     $whereq
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_category1 $join_category2 $join_category3 $join_category4 $whereq");
+    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_category1 $join_category2 $join_category3 $join_category4 $join_category5 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -417,6 +424,7 @@ function run_query_contact_insert($contact) {
   $category2 = $contact["category2"];  
   $category3 = $contact["category3"];  
   $category4 = $contact["category4"];  
+  $category5 = $contact["category5"];  
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -486,7 +494,8 @@ function run_query_contact_insert($contact) {
     contact_date,
     contact_comment,
     contact_comment2,
-    contact_comment3
+    contact_comment3,
+    contact_category5_id
   ) VALUES (null,
     '$now',
     null,
@@ -520,7 +529,8 @@ function run_query_contact_insert($contact) {
     '$date',
     '$comment',
     '$comment2',
-    '$comment3'
+    '$comment3',
+    '$category5'
   )";
 
   display_debug_msg($query, $cdg_sql);
@@ -645,6 +655,7 @@ function run_query_contact_update($contact) {
   $category2 = $contact["category2"];
   $category3 = $contact["category3"];
   $category4 = $contact["category4"];
+  $category5 = $contact["category5"];
   
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -678,7 +689,8 @@ function run_query_contact_update($contact) {
     contact_date='$date',
     contact_comment='$comment',
     contact_comment2='$comment2',
-    contact_comment3='$comment3'
+    contact_comment3='$comment3',
+    contact_category5_id='$category5'
   WHERE contact_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

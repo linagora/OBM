@@ -48,6 +48,8 @@ $l_category3="catégorie 3";
 $l_category3_s="catégories 3";
 $l_category4="catégorie 4";
 $l_category4_s="catégories 4";
+$l_category5="catégorie 5";
+$l_category5_s="catégories 5";
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";

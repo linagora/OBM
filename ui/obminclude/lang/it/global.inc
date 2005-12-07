@@ -206,3 +206,6 @@ $l_header_day = "Giorno";
 $l_header_week = "Settimana";
 $l_header_month = "Mese";
 $l_header_new_event = "Nuovo Appuntamento";
+
+
+

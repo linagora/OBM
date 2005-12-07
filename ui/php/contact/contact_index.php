@@ -389,6 +389,42 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
+} elseif ($action == "category5_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_insert($contact, "contact", "category5");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category5)." : $l_c_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category5)." : $l_c_insert_error");
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category5_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_update($contact, "contact", "category5");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category5)." : $l_c_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category5)." : $l_c_update_error");
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
+
+} elseif ($action == "category5_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= of_dis_category_links($contact, "contact", "category5", "mono");
+
+} elseif ($action == "category5_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_delete($contact, "contact", "category5");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category5)." : $l_c_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category5)." : $l_c_delete_error");
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -531,6 +567,7 @@ function get_param_contact() {
   global $tf_category2_label, $tf_category2_code, $sel_category2; 
   global $tf_category3_label, $tf_category3_code, $sel_category3; 
   global $tf_category4_label, $tf_category4_code, $sel_category4; 
+  global $tf_category5_label, $tf_category5_code, $sel_category5; 
 
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($view)) $contact["view"] = $view;
@@ -546,6 +583,9 @@ function get_param_contact() {
   if (isset ($tf_category4_label)) $contact["category4_label"] = $tf_category4_label;
   if (isset ($tf_category4_code)) $contact["category4_code"] = $tf_category4_code;
   if (isset ($sel_category4)) $contact["category4"] = $sel_category4;
+  if (isset ($tf_category5_label)) $contact["category5_label"] = $tf_category5_label;
+  if (isset ($tf_category5_code)) $contact["category5_code"] = $tf_category5_code;
+  if (isset ($sel_category5)) $contact["category5"] = $sel_category5;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
   if (isset ($sel_dsrc)) $contact["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $contact["kind"] = $sel_kind;
@@ -911,6 +951,33 @@ function get_contact_action() {
 // Category Delete
   $actions["contact"]["category4_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=category4_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                               );
+// Category Insert
+  $actions["contact"]["category5_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category5_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                             );
+
+// Category Update
+  $actions["contact"]["category5_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category5_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                              );
+
+// Category Check Link
+  $actions["contact"]["category5_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category5_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                                );
+
+// Category Delete
+  $actions["contact"]["category5_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=category5_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                                );
