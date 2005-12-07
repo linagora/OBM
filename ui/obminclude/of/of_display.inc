@@ -592,6 +592,7 @@ class OBM_DISPLAY {
       <form style=\"display: inline;\" name=\"export_page\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
+      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
       <input type=\"hidden\" name=\"first_row\" value=\"$first_row\" />
       <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
       <input type=\"hidden\" name=\"query\" value=\"$query\" />
@@ -602,6 +603,7 @@ class OBM_DISPLAY {
       <form style=\"display: inline;\" name=\"export_page\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
+      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
       <input type=\"hidden\" name=\"first_row\" value=\"0\" />
       <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
       <input type=\"hidden\" name=\"query\" value=\"$query\" />

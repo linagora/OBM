@@ -186,7 +186,7 @@ class OBM_Challenge_Auth extends Auth {
       if ($password_encryption == "md5") {
 
         // Cas md5
-        $exspected_response = md5("$login:$pass:$challenge");
+        $expected_response = md5("$login:$pass:$challenge");
         // True when JS is disabled
         if ($response == "") {
           if ($password != $pass) {
@@ -198,7 +198,7 @@ class OBM_Challenge_Auth extends Auth {
         }
         
         // Response is set, JS is enabled
-        if ($exspected_response != $response) {
+        if ($expected_response != $response) {
           return false;
         } else {
           $this->auth["perm"] = $perm;

@@ -480,7 +480,7 @@ $datecomment:$usercomment:$add_comment";
   if (! is_array($users_array)) {
     $users_array = array();
   }
-  $recipient_array = array_diff($users_array, array($uid));
+  $recipient_array = $users_array;
   send_mail($subject, $message, $recipient_array,"");
 
   return true;

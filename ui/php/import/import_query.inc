@@ -1130,10 +1130,12 @@ function get_import_function_hash() {
 
   $func_q = run_query_function();
 
-  while ($func_q->next_record()) {
-    $id = $func_q->f("function_id");
-    $label = $func_q->f("function_label");
-    $functions[$label] = $id;
+  if (is_object($func_q)) {
+    while ($func_q->next_record()) {
+      $id = $func_q->f("function_id");
+      $label = $func_q->f("function_label");
+      $functions[$label] = $id;
+    }
   }
 
   return $functions;

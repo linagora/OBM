@@ -174,7 +174,7 @@ function run_query_insert($user) {
 
   $login = $user["login"];
   $passwd = $user["passwd"];
-  if ($passwd != ""){
+  if ($passwd != "") {
     if ($password_encryption == "crypt") {
       $passwd_crypt = crypt($passwd);
     } else if ($password_encryption == "md5") {
@@ -269,7 +269,7 @@ function run_query_update($p_id, $user) {
 
   $login = $user["login"];
   $passwd = $user["passwd"];
-  if ($passwd != ""){
+  if ($passwd != "") {
     if ($password_encryption == "crypt") {
       $passwd_crypt = crypt($passwd);
     } else if ($password_encryption == "md5") {

@@ -46,6 +46,10 @@ if (($action == "index") || ($action == "")) {
   } else {
     $emodule = "obm";
   }
+  $entity = $params["entity"];
+  if ($entity == "") {
+    $entity = $emodule;
+  }
   $first_row = $params["first_row"];
   $nb_rows = $params["nb_rows"];
   $query = stripslashes($params["query"]);
@@ -54,7 +58,7 @@ if (($action == "index") || ($action == "")) {
     $query = preg_replace("/(limit .*)$/i", "", $query);
   }
   
-  $prefs = get_display_pref($auth->auth["uid"], $emodule); // XXXX entity here?
+  $prefs = get_display_pref($auth->auth["uid"], $entity);
   
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -70,10 +74,10 @@ if (($action == "index") || ($action == "")) {
   }
 
   $export_d = new OBM_DISPLAY("DATA", $prefs, $emodule);
+  $export_d->display_entity = "$entity";
   $export_d->data_set = $obm_q;
-  //  $export_d->display_module = $module;
   header("Content-Type: text/comma-separated-values");
-  header("Content-Disposition: attachment; filename=\"$emodule.csv\"");
+  header("Content-Disposition: attachment; filename=\"$entity.csv\"");
   $export_d->dis_data_file($first_row, $nb_rows, $sep, $params["function"]);
 }
 
@@ -83,13 +87,14 @@ if (($action == "index") || ($action == "")) {
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_export() {
-  global $first_row, $nb_rows, $query, $call_module, $func_data;
+  global $first_row, $nb_rows, $query, $call_module, $entity, $func_data;
   global $cdg_param;
 
   if (isset ($first_row)) $params["first_row"] = $first_row;
   if (isset ($nb_rows)) $params["nb_rows"] = $nb_rows;
   if (isset ($query)) $params["query"] = $query;
   if (isset ($call_module)) $params["module"] = $call_module;
+  if (isset ($entity)) $params["entity"] = $entity;
   if (isset ($func_data)) $params["function"] = $func_data;
 
   display_debug_param($params);
