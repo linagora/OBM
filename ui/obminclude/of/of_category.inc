@@ -1067,4 +1067,137 @@ function of_dis_block_consult_category($cats, $entity, $cat, $cattype="multi") {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Entity coont query execution
+// Parameters:
+//   - $entity       : target entity
+///////////////////////////////////////////////////////////////////////////////
+function of_get_entity_count($entity) {
+  global $cdg_sql;
+
+  $entitytable = ucfirst($entity);
+
+  $query = "SELECT count(*) as count_entity FROM $entitytable";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q->f("count_entity");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Statistic Category Per Entity query execution
+// Parameters:
+//   - $entity       : target entity
+//   - $cat          : target category
+//   - $cattype   : ([mono|multi])
+///////////////////////////////////////////////////////////////////////////////
+function of_run_query_category_per_entity($entity, $cat, $cattype="multi") {
+  global $cdg_sql;
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_code = $field_prefix."code";
+  $field_label = $field_prefix."label";
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+  $linkfield_cat = $entity.$cat."link_category_id";
+  $entitytable = ucfirst($entity);
+  $entityfield_prefix = $entity."_";
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
+
+  if ($cattype == "mono") {
+    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
+      FROM $table
+      LEFT JOIN $entitytable ON $entityfield_cat = $field_id
+      GROUP BY $entityfield_cat, $field_id, $field_code, $field_label
+      ORDER BY $field_code, $field_label
+    ";
+  } else {
+    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
+      FROM $table
+      LEFT JOIN $linktable ON $linkfield_cat = $field_id
+      LEFT JOIN $entitytable ON $entityfield_id = $linkfield_ent
+      GROUP BY $linkfield_cat, $field_id, $field_code, $field_label
+      ORDER BY $field_code, $field_label
+    ";
+  }
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About the category for one entity 
+// Parameters:
+//   - $cat_q        : DB Object for category stats
+//   - $entity       : target entity
+//   - $cat          : target category
+// Returns:
+//   - $block        : html block
+///////////////////////////////////////////////////////////////////////////////
+function of_dis_category_entity_stats($cat_q, $entity, $cat, $cattype="multi") {
+  global $l_key, $l_totals;
+
+  $l_cat = "l_${cat}"; $l_entity = "l_${entity}";
+  global $$l_cat,$$l_entity;
+
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_code = $field_prefix."code";
+  $field_label = $field_prefix."label";
+  $entityfield_prefix = $entity."_";
+  $entityfield_id = $entityfield_prefix."id";
+
+  $count_entity=of_get_entity_count($entity);
+  $max = 1;
+  while($cat_q->next_record()) {
+    $stat[$cat_q->f("$field_id")]["$cat"] = $cat_q->f("count_entity");
+     $stat[$cat_q->f("$field_id")]["name"] = $cat_q->f("$field_code")." - ".$cat_q->f("$field_label");
+    if($cat_q->f("count_entity") > $max) {
+      $max = $cat_q->f("count_entity");
+    }
+  }
+
+
+  $block .= "<div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
+   <table class=\"detail\" >";
+  if (is_array($stat)) {
+    foreach($stat as $id => $value) {
+      $ents = round(($value["$cat"]/$max)*90);
+      $block .= "<tr>
+    <td class=\"detailLabel\">".$value["name"]."</td>
+    <td class=\"detailForm\">
+     <table style=\"width:100%;\">
+      <tr><td style=\"width:".$ents."%; background-color:#DE5B5B;align:left\"></td><td>".$value["$cat"]."</td></tr>
+     </table>
+    </td>
+   </tr>";
+    }
+  }
+
+  $block .= "
+  <tr>
+    <td class=\"detailLabel\" class=\"detailLabel\"><br/>$l_key</td>
+    <td class=\"detailForm\">
+     <br/>
+     <table>
+      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>${$l_entity} ($l_totals : $count_entity)</td></tr>
+     </table>
+    </td>
+   </tr>
+  </table>";
+
+  return $block;
+}
+
+
 ?>

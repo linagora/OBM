@@ -2603,4 +2603,34 @@ function export_vcard($co_q,$com_q) {
   echo iconv("ISO-8859-15","UTF-8",$vcard);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About Contact categories 
+// Parameters:
+//  - $cat1_q : DB Object for category1 stats
+//  - $cat2_q : DB Object for category2 stats
+//  - $cat3_q : DB Object for category3 stats
+//  - $cat4_q : DB Object for category4 stats
+//  - $cat5_q : DB Object for category5 stats
+// Returns:
+///////////////////////////////////////////////////////////////////////////////
+function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q) {
+
+  $block1=of_dis_category_entity_stats($cat1_q, "contact", "category1");
+  $block2=of_dis_category_entity_stats($cat2_q, "contact", "category2");
+  $block3=of_dis_category_entity_stats($cat3_q, "contact", "category3");
+  $block4=of_dis_category_entity_stats($cat4_q, "contact", "category4");
+  $block5=of_dis_category_entity_stats($cat5_q, "contact", "category5");
+
+  $block ="
+    $block1
+    $block2
+    $block3
+    $block4
+    $block5
+  ";
+
+  return $block;
+}
+
 </script>

@@ -25,6 +25,7 @@
 // - kind_update        -- form fields    -- update the kind
 // - kind_checklink     --                -- check if kind is used
 // - kind_delete     	-- $sel_kind      -- delete the kind
+// - statistics     	--                -- display contact statistics
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -235,6 +236,19 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_contact_consult($contact);
   }
+
+} elseif ($action == "statistics")  {
+///////////////////////////////////////////////////////////////////////////////
+  require_once("$obminclude/lang/$set_lang/statistic.inc");
+
+  $cat1_q = of_run_query_category_per_entity("contact", "category1", "multi");
+  $cat2_q = of_run_query_category_per_entity("contact", "category2", "multi");
+  $cat3_q = of_run_query_category_per_entity("contact", "category3", "multi");
+  $cat4_q = of_run_query_category_per_entity("contact", "category4", "multi");
+  $cat5_q = of_run_query_category_per_entity("contact", "category5", "mono");
+  $display["title"] = display_title($l_header_contact_stats);
+  $display["detail"] = dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q);
+//  $display["features"] = dis_menu_stats();
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -661,7 +675,7 @@ function get_param_contact() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_contact_action() {
   global $contact, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
   global $l_header_consult,$l_header_vcard, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -710,7 +724,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','index','search','new','detailconsult','update','check_delete','delete','admin','display') 
+    'Condition'=> array ('','index','search','new','detailconsult','update','statistics','check_delete','delete','admin','display') 
                                      );
 
 // Detail Consult
@@ -754,6 +768,13 @@ function get_contact_action() {
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
+// Statistics
+  $actions["contact"]["statistics"] = array (
+    'Name'     => $l_header_stats,
+    'Url'      => "$path/contact/contact_index.php?action=statistics",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
+                                        );
 					
 // Document Add
   $actions["contact"]["document_add"] = array (
@@ -997,7 +1018,7 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                       	        );
 
-// Dispilay Level
+// Display Level
   $actions["contact"]["dispref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
     'Right'    => $cright_read,
