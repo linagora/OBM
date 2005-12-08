@@ -48,6 +48,8 @@ $l_possible = "Libre";
 $l_occupied = "Non disponible";
 $l_meeting_legend = "Légende";
 $l_selection = "Sélection";
+$l_category1 = "catégorie";
+$l_category1_s = "catégorie";
 
 
 $l_accepted = "Accepté";
@@ -94,24 +96,10 @@ $l_insert_warning = "Attention des conflits ont été détectés";
 $l_update_error = "Des conflits ont été détectés, mise à jour annulée";
 $l_insert_error = "Des conflits ont été détectés, insertion annulée";
 $l_sendamail = "Forcer la notification par mail";
-$l_category_update = "Modifier la Catégorie";
-$l_category_checkdelete = "Vérifier ou Supprimer la Catégorie";
-$l_category_delete = "Supprimer la Catégorie";
-$l_category_insert = "Créer la Catégorie";
 $l_agenda_select_group = "Sélectionner les groupes.";
 $l_view_type = "Type de vue";
 
 // Messages
-$l_category_delete_ok = "La suppression de la catégorie a été correctement effectuée.";
-$l_category_delete_error = "La suppression de la catégorie a échoué !";
-$l_category_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
-$l_category_insert_error = "L'insertion de la catégorie a échoué !";
-$l_category_update_ok = "La modification de la catégorie a été correctement effectuée";
-$l_category_update_error = "La modification de la catégorie a échoué !";
-$l_category_link_company = "Certain événements sont de la catégorie";
-$l_category_link_company_no = "Pas d'événements de la catégorie";
-$l_category_cant_delete = "La catégorie ne peut être supprimée !";
-$l_category_can_delete = "La catégorie peut être supprimée.";
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
 $l_confirm_delete = "Cette opération va supprimer toutes les occurences de cet événement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
@@ -129,10 +117,7 @@ $l_err_days_repeat_not_weekly = "Vous ne pouvez préciser des jours de répétition
 $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'événement.";
 $l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
 
-$l_category_manage = "Gestion des Catégories d'événements";
-$l_category_exist = "Catégories existantes";
 $l_header_meeting = "Nouvelle réunion";
-$l_category_new = "Nouvelle Catégorie";
 $l_header_admin = "Administration";
 $l_authorize_list = "Personnes autorisées";
 $l_denie_list = "Personnes non-autorisées";
@@ -174,6 +159,3 @@ $mj_date_incompatibility = "La date de fin ne peut être antérieure a la date de 
 $mj_repeat_date_incompatibility = "La date de fin de répétition ne peut être antérieure a la date de début."; 
 $mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
 $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses répétitions ?"; 
-$l_j_category_create = "Vous devez donner un nom à la catégorie";
-$l_j_category_update = "Vous devez sélectionner une catégorie et lui donner un nom pour la mettre à jour";
-$l_j_category_delete = "Vous devez sélectionner une catégorie pour la supprimer";

@@ -7,21 +7,29 @@
 //  $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
-// - index (default) -- search fields  -- show the Incident search form
-// - search          -- search fields  -- show the result set of search
-// - new             -- $param_contract-- show the new Incident form
-// - detailconsult   -- $param_incident-- show the Incident detail
-// - detailupdate    -- $param_incident-- show the Incident detail form
-// - insert          -- form fields    -- insert the Incident 
-// - update          -- form fields    -- update the Incident
-// - delete          -- $param_incident-- delete the Incident
-// - cat1_insert     -- form fields    -- insert the category
-// - cat1_update     -- form fields    -- update the category
-// - cat1_checklin   --                -- check if category is used
-// - cat1_delete     -- $sel_cat1      -- delete the category
-// - display         --                -- display and set display parameters
-// - dispref_display --                -- update one field display value
-// - dispref_level   --                -- update one field display position 
+// - index (default)     -- search fields  -- show the Incident search form
+// - search              -- search fields  -- show the result set of search
+// - new                 -- $param_contract-- show the new Incident form
+// - detailconsult       -- $param_incident-- show the Incident detail
+// - detailupdate        -- $param_incident-- show the Incident detail form
+// - insert              -- form fields    -- insert the Incident 
+// - update              -- form fields    -- update the Incident
+// - delete              -- $param_incident-- delete the Incident
+// - priority_insert     -- form fields    -- insert the category
+// - priority_update     -- form fields    -- update the category
+// - priority_checklink  --                -- check if category is used
+// - priority_delete     -- $sel_cat1      -- delete the category
+// - status_insert       -- form fields    -- insert the category
+// - status_update       -- form fields    -- update the category
+// - status_checklink    --                -- check if category is used
+// - status_delete       -- $sel_cat1      -- delete the category
+// - category1_insert    -- form fields    -- insert the category
+// - category1_update    -- form fields    -- update the category
+// - category1_checklink --                -- check if category is used
+// - category1_delete    -- $sel_cat1      -- delete the category
+// - display             --                -- display and set display parameters
+// - dispref_display     --                -- update one field display value
+// - dispref_level       --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -33,6 +41,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("incident_query.inc");
 require("incident_display.inc");
+require_once("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -165,114 +174,114 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_priority_insert($incident);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_pri_insert_ok);
-    } else {
-      $display["msg"] .= display_err_msg($l_pri_insert_error);
-    }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_insert($incident, "incident", "priority");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_priority)." : $l_c_insert_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_priority_update($incident);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_pri_update_ok);
-    } else {
-        $display["msg"] .= display_err_msg($l_pri_update_error);
-      }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_update($incident, "incident", "priority");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_priority)." : $l_c_update_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "priority_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $display["detail"] = dis_priority_links($incident["priority"]);
+  $display["detail"] .= of_dis_category_links($incident, "incident", "priority", "mono");
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_priority_delete($incident["priority"]);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_pri_delete_ok);
-    } else {
-      $display["msg"] .= display_err_msg($l_pri_delete_error);
-    }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_delete($incident, "incident", "priority");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_priority)." : $l_c_delete_error");   
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_status_insert($incident);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_sta_insert_ok);
-    } else {
-        $display["msg"] .= display_err_msg($l_sta_insert_error);
-      }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_insert($incident, "incident", "status");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_status)." : $l_c_insert_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_status_update($incident);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_sta_update_ok);
-    } else {
-        $display["msg"] .= display_err_msg($l_sta_update_error);
-      }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_update($incident, "incident", "status");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_status)." : $l_c_update_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $display["detail"] = dis_status_links($incident["status"]);
+  $display["detail"] .= of_dis_category_links($incident, "incident", "status", "mono");
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_status_delete($incident["status"]);
-    if ($retour) {
-      $display["msg"] .= display_ok_msg($l_sta_delete_ok);
-    } else {
-        $display["msg"] .= display_err_msg($l_sta_delete_error);
-      }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_delete($incident, "incident", "status");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_status)." : $l_c_delete_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat1_insert")  {
+} elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_cat1_insert($incident);
-    if ($retour) {
-      display_ok_msg($l_cat1_insert_ok);
-    } else {
-      display_err_msg($l_cat1_insert_error);
-    }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_insert($incident, "incident", "category1");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat1_update")  {
+} elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_cat1_update($incident);
-    if ($retour) {
-      $display["msg"] = display_ok_msg($l_cat1_update_ok);
-    } else {
-        $display["msg"] = display_err_msg($l_cat1_update_error);
-      }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_update($incident, "incident", "category1");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat1_checklink")  {
+} elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $display["detail"] = dis_cat1_links($incident["cat1"]);
+  $display["detail"] .= of_dis_category_links($incident, "incident", "category1", "mono");
 
-} elseif ($action == "cat1_delete")  {
+} elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $retour = run_query_cat1_delete($incident["cat1"]);
-    if ($retour) {
-      $display["msg"] = display_ok_msg($l_cat1_delete_ok);
-    } else {
-      $display["msg"] = display_err_msg($l_cat1_delete_error);
-    }
-    require("incident_js.inc");
-    $display["detail"] = dis_admin_index();
+  $retour = of_run_query_category_delete($incident, "incident", "category1");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
+  }
+  require("incident_js.inc");
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -308,13 +317,17 @@ display_page($display);
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_incident() {
-  global $tf_lcontract, $tf_lincident, $tf_company, $sel_status, $sel_cat1, $sel_priority;
+  global $tf_lcontract, $tf_lincident, $tf_company;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
   global $tf_date, $ta_solu, $param_contract, $param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
-  global $tf_duration, $tf_pri, $tf_order, $tf_status,$tf_cat1, $tf_color;
+  global $tf_duration, $tf_pri, $tf_order, $tf_color;
   global $set_debug, $cdg_param,$res_duration;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
+  global $tf_priority_label, $tf_priority_code, $sel_priority;
+  global $tf_status_label, $tf_status_code, $sel_status;
+  global $tf_category1_label, $tf_category1_code, $sel_category1;
+
 
   if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $incident["date_before"] = $tf_datebefore;
@@ -322,9 +335,6 @@ function get_param_incident() {
   if (isset ($param_contract)) $incident["contract_id"] = $param_contract;
   if (isset ($tf_lcontract)) $incident["lcontract"] = $tf_lcontract;
   if (isset ($tf_lincident)) $incident["lincident"] = $tf_lincident;
-  if (isset ($sel_priority)) $incident["priority"] = $sel_priority;
-  if (isset ($sel_status)) $incident["status"] = $sel_status;
-  if (isset ($sel_cat1)) $incident["cat1"] = $sel_cat1;
   if (isset ($sel_owner)) $incident["owner"] = $sel_owner;
   if (isset ($sel_logger)) $incident["logger"] = $sel_logger;
   if (isset ($tf_date)) $incident["date"] = $tf_date;
@@ -338,23 +348,20 @@ function get_param_incident() {
   if (isset ($sel_usercomment)) $incident["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $incident["add_comment"] = trim($ta_add_comment);
   if (isset ($sel_dur)) $incident["add_duration"] = $sel_dur;
+  if (isset ($tf_priority_label)) $incident["priority_label"] = $tf_priority_label;
+  if (isset ($tf_priority_code)) $incident["priority_code"] = $tf_priority_code;
+  if (isset ($sel_priority)) $incident["priority"] = $sel_priority;
+  if (isset ($tf_status_label)) $incident["status_label"] = $tf_status_label;
+  if (isset ($tf_status_code)) $incident["status_code"] = $tf_status_code;
+  if (isset ($sel_status)) $incident["status"] = $sel_status;
+  if (isset ($tf_category1_label)) $incident["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $incident["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $incident["category1"] = $sel_category1;
 
   $incident["archive"] = ( ($cb_archive == '1') ? '1' : '0');
+
   // Admin - Priority fields
-  // $sel_priority -> "priority" is already set
-  if (isset ($tf_pri)) $incident["pri_label"] = $tf_pri;
-  $incident["pri_order"] = (isset($tf_order) ? $tf_order : "0");
   $incident["pri_color"] = (isset($tf_color) ? $tf_color : "");
-
-  // Admin - Status fields
-  // $sel_status -> "status" is already set
-  if (isset ($tf_status)) $incident["sta_label"] = $tf_status;
-  $incident["sta_order"] = (isset($tf_order) ? $tf_order : "0");
-
-  // Admin - Cat1 fields
-  // $sel_cat1 -> "cat1" is already set
-  if (isset ($tf_cat1)) $incident["cat1_label"] = $tf_cat1;
-  $incident["cat1_order"] = (isset($tf_order) ? $tf_order : "0");
 
   display_debug_param($incident);
 
@@ -504,30 +511,30 @@ function get_incident_action() {
     'Condition'=> array ('None') 
                                      		);
 
-//  Cat1 insert
-  $actions["incident"]["cat1_insert"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=cat1_insert",
+//  Category1 insert
+  $actions["incident"]["category1_insert"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-//  Cat1 update
-  $actions["incident"]["cat1_update"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=cat1_update",
+//  Category1 update
+  $actions["incident"]["category1_update"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-//  Cat1 Check Link
-  $actions["incident"]["cat1_checklink"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=cat1_checklink",
+//  Category1 Check Link
+  $actions["incident"]["category1_checklink"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-//  Cat1 delete
-  $actions["incident"]["cat1_delete"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=cat1_delete",
+//  Category1 delete
+  $actions["incident"]["category1_delete"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);

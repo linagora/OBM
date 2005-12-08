@@ -156,7 +156,7 @@ function of_category_dis_entity_form($cats, $entity, $cat="", $cattype="multi") 
   if ($show_cat) {
 
     if ($cattype=="mono") {
-      $allcats=of_category_get_ordered("contact", "category5", 0, "mono");
+      $allcats=of_category_get_ordered("$entity", "$cat", 0, "mono");
       $sel_cat=of_dis_html_select_category($allcats, $cats[0]["id"], $entity, $cat, "none");
       $class="detailForm";
     } else {
@@ -583,6 +583,7 @@ function of_run_query_category_update($param, $entity, $cat) {
     WHERE
       $field_id='$cat_id'";
 
+echo $query;
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -783,6 +784,12 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
   }
   $sel_cat .= "</select>";
 
+  if ($entity="calendar") {
+    $page="agenda_index.php";
+  } else {
+    $page="${entity}_index.php";
+  }
+  
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -800,7 +807,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
         <tr>
           <td colspan=\"3\">
             <form name=\"form_${cat}_delete\" method=\"post\"
-              action=\"" . url_prepare("${entity}_index.php") . "\">
+              action=\"" . url_prepare("$page") . "\">
             <table>
             <tr>
               <td class=\"adminLabel\">".ucfirst(${$l_cat_s})."</td>
@@ -820,7 +827,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
             <form name=\"form_${cat}_update\" method=\"get\"
-              action=\"" . url_prepare("${entity}_index.php") . "\">
+              action=\"" . url_prepare("$page") . "\">
             <input type=\"hidden\" name=\"sel_${cat}\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
             <input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" />
@@ -838,7 +845,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
 <!-- New Category Section -->
 
         <form name=\"form_${cat}_new\" method=\"get\"
-          action=\"" . url_prepare("${entity}_index.php") . "\">
+          action=\"" . url_prepare("$page") . "\">
         <table>
         <tr>
         <td class=\"adminLabel\" colspan=\"2\">$l_c_new</td>
@@ -886,10 +893,16 @@ function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
   $label = of_get_category_label($id, $entity, $cat);
   $obm_q = of_run_query_category_links($id, $entity, $cat, $cattype);
 
+  if ($entity="calendar") {
+    $page="agenda_index.php";
+  } else {
+    $page="${entity}_index.php";
+  }
+
   $nb_cat = $obm_q->num_rows();
   if ($nb_cat > 0) {
     $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $l_c_cant_delete.");
-    $url = url_prepare("${entity}_index.php?action=search&amp;sel_${cat}=$id");
+    $url = url_prepare("$page?action=search&amp;sel_${cat}=$id");
 
     $dis_link = "
     <table class=\"detail\">
@@ -902,7 +915,7 @@ function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
           <form name=\"form_back\" method=\"get\"
-            action=\"" .url_prepare("${entity}_index.php") . "\">
+            action=\"" .url_prepare("$page") . "\">
           <input type=\"hidden\" name=\"action\" value=\"admin\" />
           <input type=\"submit\" value=\"$l_back\" />
           </form>
@@ -922,14 +935,14 @@ function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
   <div class=\"detailButton\">
     <p class=\"detailButtons\">
       <form name=\"form_act_delete\"
-        method=post action=\"" . url_prepare("${entity}_index.php") . "\">
+        method=post action=\"" . url_prepare("$page") . "\">
       <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
       <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
       <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
       </form>
 
       <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("${entity}_index.php") . "\">
+        action=\"" .url_prepare("$page") . "\">
       <input type=\"hidden\" name=\"action\" value=\"admin\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>

@@ -76,10 +76,12 @@ function dis_incident_search_form($incident) {
 
   $owner_q = run_query_incident_owner($archive);
   $logger_q = run_query_incident_logger($archive);
-  $type_q = run_query_cat1();
-  $prio_q = run_query_priority();
-  $stat_q = run_query_status();
-  $block = html_incident_search_form($owner_q, $logger_q, $prio_q,$stat_q,$incident,$type_q);
+
+  $cats1 = of_category_get_ordered("incident", "category1", 0, "mono");
+  $pri = of_category_get_ordered("incident", "priority", 0, "mono");
+  $sta = of_category_get_ordered("incident", "status", 0, "mono");
+  $cats1 = of_category_get_ordered("incident", "category1", 0, "mono");
+  $block = html_incident_search_form($owner_q, $logger_q, $pri, $sta, $cats1, $incident);
 
   return $block;
 }
@@ -90,14 +92,14 @@ function dis_incident_search_form($incident) {
 // Parameters:
 //   - $owner_q    : DB result object (userobm list)
 //   - $logger_q   : DB result object (userobm list)
-//   - $pri_q      : DB result object (incident priority list)
-//   - $sta_q      : DB result object (incident status list)
-//   - $cat1_q     : DB result object (incident category1 list)
+//   - $pri        : array with incident category 1 list
+//   - $sta        : array with incident category 1 list 
+//   - $cats1      : array with incident category 1 list 
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_form ($owner_q,$logger_q, $pri_q, $sta_q, $incident, $cat1_q) {
-  global $c_all, $l_all, $l_label,$l_priority,$l_status,$l_find;
+function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $incident) {
+  global $c_all, $l_all, $l_label,$l_find;
   global $l_owner, $l_logger,$l_company,$l_contract;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_date_after,$l_date_before,$l_archive;
@@ -107,7 +109,7 @@ function html_incident_search_form ($owner_q,$logger_q, $pri_q, $sta_q, $inciden
   $priority = $incident["priority"];
   $company = $incident["company"];
   $status = $incident["status"];
-  $cat1 = $incident["cat1"];
+  $cat1 = $incident["category1"];
   $owner = $incident["owner"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
@@ -135,30 +137,10 @@ function html_incident_search_form ($owner_q,$logger_q, $pri_q, $sta_q, $inciden
   }
   $dis_sel_logger.="</select>";
 
-  $sel_pri = "<select name=\"sel_priority\">
-    <option value=\"$c_all\">$l_all</option>";
-  while ($pri_q->next_record()) {
-    $id = $pri_q->f("incidentpriority_id");
-    $label = $pri_q->f("incidentpriority_label");
-    $sel_pri .= "\n<option value=\"$id\"";
-    if ($id == $priority) 
-      $sel_pri .= " selected=\"selected \"";
-    $sel_pri .= ">$label</option>";
-  }
-  $sel_pri .= "</select>";
-
-  $sel_sta = "<select name=\"sel_status\">
-    <option value=\"$c_all\">$l_all</option>";
-  while ($sta_q->next_record()) {
-    $id = $sta_q->f("incidentstatus_id");
-    $label = $sta_q->f("incidentstatus_label");
-    $sel_sta .= "\n<option value=\"$id\"";
-    if ($id == $status) 
-      $sel_sta .= " selected=\"selected \"";
-    $sel_sta .= ">$label</option>";
-  }
-  $sel_sta .= "</select>";
-
+  // Categories priority, status, category1
+  $block_priority = of_dis_block_select_category($pri, $priority, "incident", "priority", "mono");
+  $block_status = of_dis_block_select_category($sta, $status, "incident", "status", "mono");
+  $block_category1 = of_dis_block_select_category($cats1, $cat1, "incident", "category1", "mono");
 
   // --- html template --------------------------------------------------------
 
@@ -182,12 +164,9 @@ function html_incident_search_form ($owner_q,$logger_q, $pri_q, $sta_q, $inciden
        <div class=\"searchLabel\">$l_date_before<br />
          <input name=\"tf_datebefore\" type=\"text\" size=\"10\" value=\"$datebefore\" />
        </div>
-       <div class=\"searchLabel\">$l_priority<br />
-         $sel_pri
-       </div>
-       <div class=\"searchLabel\">$l_status<br />
-         $sel_sta
-       </div>
+       $block_priority
+       $block_status
+       $block_category1
        <div class=\"searchLabel\">$l_logger<br />
          $dis_sel_logger
        </div>
@@ -252,7 +231,7 @@ function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
   $company = urlencode($incident["company"]);
   $priority = $incident["priority"];
   $status = $incident["status"];
-  $cat1 = $incident["cat1"];
+  $cat1 = $incident["category1"];
   $param_contract = $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
@@ -260,7 +239,7 @@ function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_cat1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
 
   $in_q->seek($first_row);
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
@@ -312,14 +291,13 @@ function html_incident_consult($inc_q) {
   global $l_incident, $l_contract, $l_company;
   global $l_label, $l_logger, $l_owner, $l_priority, $l_status, $l_archive;
   global $l_duration, $l_solution, $l_date;
-  global $l_client_manager, $l_cat1;
+  global $l_client_manager;
   global $l_comment;
 
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
   $label = $inc_q->f("incident_label");
   $priority = $inc_q->f("incidentpriority_label");
   $status = $inc_q->f("incidentstatus_label");
-  $cat1 = $inc_q->f("incidentcategory1_label");
   $date = datetime_format($inc_q->f("date"), 1);
   $inc_id = $inc_q->f("incident_id");
   $inc_dur = nl2br($inc_q->f("incident_duration"));
@@ -341,6 +319,9 @@ function html_incident_consult($inc_q) {
   $email_con1 = $inc_q->f("email_c1");
   $email_con2 = $inc_q->f("email_c2");
   $email_con = ($email_con1 != "" ? $email_con1 : $email_con2);
+  //Category 1
+  $cats1 = of_entitycategories_get($inc_q->f("incident_id"), "incident", "category1", "mono");
+  $block_category1 = of_dis_block_consult_category($cats1, "incident", "category1", "mono");
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
@@ -399,10 +380,9 @@ function html_incident_consult($inc_q) {
   </tr><tr>
     <td class=\"detailLabel\">$l_date</td>
     <td class=\"detailText\">$date</td>
-  </tr><tr>
-    <td class=\"detailLabel\">$l_cat1</td>
-    <td class=\"detailText\">$cat1</td>
-  </tr><tr>
+  </tr>
+  $block_category1
+  <tr>
     <td class=\"detailLabel\">$l_duration</td>
     <td class=\"detailText\">$inc_dur</td>
   </tr><tr>
@@ -460,11 +440,14 @@ function dis_incident_form($action,$incident) {
 
   $usr_q = run_query_userobm_active($users);
   $usrp_q = run_query_all_users_from_group($cg_prod,$users);
-  $prio_q = run_query_priority();
-  $stat_q = run_query_status();
-  $cat1_q = run_query_cat1();
 
-  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $prio_q, $stat_q, $cat1_q);
+  if ($id > 0) {
+    $pri = of_category_get_ordered("incident", "priority", $id, "mono");
+    $sta = of_category_get_ordered("incident", "status", $id, "mono");
+    $cats1 = of_category_get_ordered("incident", "category1", $id, "mono");
+  }
+
+  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1);
 
   return $block;
 }
@@ -478,8 +461,11 @@ function dis_incident_form($action,$incident) {
 //   - $inc_q     : incident database result 
 //   - $usr_q     : userobm database result 
 //   - $usrp_q    : userobm list from system group Production
+//   - $pri        : array with incident priority list
+//   - $sta        : array with incident status list
+//   - $cats1      : array with incident category 1 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q, $sta_q, $cat1_q) {
+function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1) {
   global $display, $path, $uid, $set_theme, $ico_contract;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status,$l_cat1, $l_find;
@@ -555,42 +541,9 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
   }
   $dis_sel_logger.="</select>";
 
-  // Priority select
-  $sel_pri = "<select name=\"sel_priority\">";
-  while ($pri_q->next_record()) {
-    $id = $pri_q->f("incidentpriority_id");
-    $label = $pri_q->f("incidentpriority_label");
-    $sel_pri .= "\n<option value=\"$id\"";
-    if ($id == $priority) 
-      $sel_pri .= " selected=\"selected \"";
-    $sel_pri .= ">$label</option>";
-  }
-  $sel_pri .= "</select>";
-
-  // Status select
-  $sel_sta = "<select name=\"sel_status\">";
-  while ($sta_q->next_record()) {
-    $id = $sta_q->f("incidentstatus_id");
-    $label = $sta_q->f("incidentstatus_label");
-    $sel_sta .= "\n<option value=\"$id\"";
-    if ($id == $status) 
-      $sel_sta .= " selected=\"selected \"";
-    $sel_sta .= ">$label</option>";
-  }
-  $sel_sta .= "</select>";
-
-  // Category1 select
-  $sel_cat1 = "<select name=\"sel_cat1\">";
-  while ($cat1_q->next_record()) {
-    $id = $cat1_q->f("incidentcategory1_id");
-    $label = $cat1_q->f("incidentcategory1_label");
-    $sel_cat1 .= "\n<option value=\"$id\"";
-    if ($id == $cat1) {
-      $sel_cat1 .= " selected=\"selected \"";
-    }
-    $sel_cat1 .= ">$label</option>";
-  }
-  $sel_cat1 .= "</select>";
+  $block_priority = of_category_dis_entity_form($pri, "incident", "priority", "mono");
+  $block_status = of_category_dis_entity_form($sta, "incident", "status", "mono");
+  $block_category1 = of_category_dis_entity_form($cats1, "incident", "category1", "mono");
 
   // Hour select
   $sel_hour = "<select name=\"sel_hour\">";
@@ -683,16 +636,11 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
               <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
               <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
             </td>
-          </tr><tr>
-            <td class=\"detailLabel\">$l_priority</td>
-            <td class=\"detailForm\">$sel_pri</td>
-          </tr><tr>
-            <td class=\"detailLabel\">$l_status</td>
-            <td class=\"detailForm\">$sel_sta</td>
-          </tr><tr>
-            <td class=\"detailLabel\">$l_cat1</td>
-            <td class=\"detailForm\"> $sel_cat1</td>
-          </tr><tr>
+          </tr>
+          $block_priority
+          $block_status
+          $block_category1
+          <tr>
             <td class=\"detailLabel\">$l_date</td>
             <td class=\"detailForm\">
               <input name=\"tf_date\" size=\"10\" maxlength=\"10\" value=\"$date\" />
@@ -732,7 +680,6 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
 
   return $block;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the incident delete validation screen
@@ -774,644 +721,24 @@ function dis_can_delete_incident($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
-  $pri_q = run_query_priority();
-  $sta_q = run_query_status();
-  $cat1_q = run_query_cat1();
-  return html_priority_form($pri_q) . "<hr />" . html_status_form($sta_q)."<hr />". html_cat1_form($cat1_q);
+  $block = "";
+
+  $pri = of_category_get_ordered("incident", "priority");
+  $block .= "<hr />";
+  $block .= of_html_admin_cat_form($pri, "incident", "priority");
+  $sta = of_category_get_ordered("incident", "status");
+  $block .= "<hr />";
+  $block .= of_html_admin_cat_form($sta, "incident", "status");
+  $cats1 = of_category_get_ordered("incident", "category1");
+  $block .= "<hr />";
+  $block .= of_html_admin_cat_form($cats1, "incident", "category1");
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Incident Priority section
-// Parameters:
-//   - $pri_q : Priority list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_priority_form($pri_q) {
-  global $l_pri_manage,$l_pri_exist, $l_label, $l_order, $l_color;
-  global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
-
-  // Priority select construction
-  $sel_pri = "<select name=\"sel_priority\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('(');
-    col = mytext.substr(pos+1);
-    pos2 = col.indexOf(')');
-    col = col.substr(0,pos2);
-    mytext = mytext.substr(0, pos);
-    pos = mytext.indexOf('-');
-    forms.form_pri_update.tf_pri.value=mytext.substr(pos+1);
-    forms.form_pri_update.tf_order.value=mytext.substr(0,pos);
-    forms.form_pri_update.tf_color.value=col;\"
-    size=\"4\" >";
-  while ($pri_q->next_record()) {
-    $id = $pri_q->f("incidentpriority_id");
-    $order = $pri_q->f("incidentpriority_order");
-    $color = $pri_q->f("incidentpriority_color");
-    $label = $pri_q->f("incidentpriority_label");
-    $sel_pri .= "\n<option value=\"$id\">$order-$label ($color)</option>";
-  }
-  $sel_pri .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $r = "
-    <table class=\"admin\">
-      <tr>
-        <td colspan=\"5\" class=\"adminHead\">
-          $l_pri_manage
-        </td>
-      </tr><tr>
-        <td>
-
-<!-- Priority Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_pri_delete\" method=\"post\"
-              action=\"" . url_prepare("incident_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_pri_exist</td>
-              <td class=\"adminLabel\">$sel_pri</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"priority_checklink\" />
-              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_priority_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Priority Update Section -->
-
-
-        <tr>
-          <td colspan=\"2\">
-            <form name=\"form_pri_update\" method=\"get\"
-              action=\"" . url_prepare("incident_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_priority\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"priority_update\" />
-          <table>
-          <tr>
-            <td class=\"adminLabel\">$l_label : </td>
-            <td><input type=\"text\" name=\"tf_pri\" /></td>
-            <td rowspan=\"3\">
-              <input type=\"submit\" name=\"8888\" value=\"$l_pri_update\"
-              onclick=\"if (check_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
-            </td>
-          </tr>
-          <tr>
-            <td class=\"adminLabel\">$l_order : </td>
-            <td>
-	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
-	    </td>
-          </tr>
-          <tr>
-            <td class=\"adminLabel\">$l_color : </td>
-            <td>
-	      <input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" />
-	    </td>
-          </tr>
-          </table>
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Priority Section -->
-
-        <form name=\"form_pri_new\" method=\"get\"
-          action=\"" . url_prepare("incident_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_pri_new : </td>
-          <td><input name=\"tf_pri\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_color : </td>
-          <td><input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" /></td>
-        </tr><tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
-            <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_insert\"
-              onclick=\"if (check_priority_new(this.form)) return true; else return false;\" />
-          </td>
-
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
-";
-
-  return $r;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Incident Status section
-// Parameters:
-//   - $sta_q : Status list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_status_form($sta_q) {
-  global $l_label, $l_order;
-  global $l_sta_manage,$l_sta_exist,$l_sta_new;
-  global $l_sta_checkdelete, $l_sta_update, $l_sta_insert;
-
-  // Status select construction
-  $sel_sta = "<select name=\"sel_status\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('-');
-    forms.form_status_update.tf_status.value=mytext.substr(pos+1);
-    forms.form_status_update.tf_order.value=mytext.substr(0,pos);\"
-   size=\"4\">";
-  while ($sta_q->next_record()) {
-    $id = $sta_q->f("incidentstatus_id");
-    $order = $sta_q->f("incidentstatus_order");
-    $label = $sta_q->f("incidentstatus_label");
-    $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
-  }
-  $sel_sta .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $r = "
-<!-- Status section -->
-
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_sta_manage</td>
-    </tr>
-    <tr>
-      <td>
-
-<!-- status delete section -->
-
-        <table>
-        <tr>
-         <td colspan=\"3\">
-          <form name=\"form_status_delete\"
-          method=\"post\" action=\"" . url_prepare("incident_index.php")."\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_sta_exist</td>
-        <td class=\"adminLabel\">$sel_sta</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"status_checklink\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_checkdelete\"
-          onclick=\"if (check_status_checkdel(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-         </form>
-        </td>
-      </tr>
-
-<!-- status update section -->
-
-      <tr>
-        <td colspan=\"2\">
-          <form name=\"form_status_update\" method=\"get\"
-            action=\"" . url_prepare("incident_index.php") . "\">
-          <input type=\"hidden\" name=\"sel_status\" value=\"\" />
-          <input type=\"hidden\" name=\"action\" value=\"status_update\" />
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_label : </td>
-          <td><input type=\"text\" name=\"tf_status\" /></td>
-          <td rowspan=\"2\">
-            <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_update\"
-            onclick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td>
-	    <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
-	  </td>
-        </tr>
-        </table>
-        </form>
-        </td>
-        <td>&nbsp;</td>
-      </tr>
-      </table>
-      </td>
-      <td>
-
-<!-- new status section -->
-
-      <form name=\"form_status_new\"
-        method=\"post\" action=\"" . url_prepare("incident_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_sta_new : </td>
-          <td><input type=\"text\" name=\"tf_status\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_insert\"
-            onclick=\"if (check_status_new(this.form)) return true; " .
-            "else return false;\" />
-        </td>
-      </tr>
-     </table>
-    </form>
-    </td>
-    </tr>
-    </table>
-";
-
-  return $r;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Incident Category1 section
-// Parameters:
-//   - $cat1_q : Category1 list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_cat1_form($cat1_q) {
-  global $l_label, $l_order;
-  global $l_cat1_manage,$l_cat1_exist,$l_cat1_new;
-  global $l_cat1_checkdelete, $l_cat1_update, $l_cat1_insert;
-
-  // Status select construction
-  $sel_cat1 = "<select name=\"sel_cat1\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('-');
-    forms.form_cat1_update.tf_cat1.value=mytext.substr(pos+1);
-    forms.form_cat1_update.tf_order.value=mytext.substr(0,pos);\"
-   size=\"4\">";
-  while ($cat1_q->next_record()) {
-    $id = $cat1_q->f("incidentcategory1_id");
-    $order = $cat1_q->f("incidentcategory1_order");
-    $label = $cat1_q->f("incidentcategory1_label");
-    $sel_cat1 .= "<option value=\"$id\">$order-$label</option>\n";
-  }
-  $sel_sta .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $r = "
-<!-- Category1 section -->
-
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_cat1_manage</td>
-    </tr>
-    <tr>
-      <td>
-
-<!-- Category1 delete section -->
-
-        <table>
-        <tr>
-         <td colspan=\"3\">
-          <form name=\"form_cat1_delete\"
-          method=\"post\" action=\"" . url_prepare("incident_index.php")."\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_cat1_exist</td>
-        <td class=\"adminLabel\">$sel_cat1</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"cat1_checklink\" />
-          <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_checkdelete\"
-          onclick=\"if (check_cat1_checkdel(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-         </form>
-        </td>
-      </tr>
-
-<!-- Category1 update section -->
-
-      <tr>
-        <td colspan=\"2\">
-          <form name=\"form_cat1_update\" method=\"get\"
-            action=\"" . url_prepare("incident_index.php") . "\">
-          <input type=\"hidden\" name=\"sel_cat1\" value=\"\" />
-          <input type=\"hidden\" name=\"action\" value=\"cat1_update\" />
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_label : </td>
-          <td><input type=\"text\" name=\"tf_cat1\" /></td>
-          <td rowspan=\"2\">
-            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_update\"
-            onclick=\"if (check_cat1_upd(this.form, document.form_cat1_delete)) return true; else return false;\" />
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td>
-	    <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
-	  </td>
-        </tr>
-        </table>
-        </form>
-        </td>
-        <td>&nbsp;</td>
-      </tr>
-      </table>
-      </td>
-      <td>
-
-<!-- new Category1 section -->
-
-      <form name=\"form_cat1_new\"
-        method=\"post\" action=\"" . url_prepare("incident_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_cat1_new : </td>
-          <td><input type=\"text\" name=\"tf_cat1\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"cat1_insert\" />
-          <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_insert\"
-            onclick=\"if (check_cat1_new(this.form)) return true; " .
-            "else return false;\" />
-        </td>
-      </tr>
-     </table>
-    </form>
-    </td>
-    </tr>
-    </table>
-";
-
-  return $r;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the priority links                                               //
-// Parameters:
-//   - $id : priority id
-///////////////////////////////////////////////////////////////////////////////
-function dis_priority_links($id) {
-  global $l_pri_link_incident, $l_pri_link_incident_no;
-  global $l_pri_delete, $l_pri_can_delete, $l_pri_cant_delete;
-  global $l_back,$display;
-
-  $label = get_priority_label($id);
-  $obm_q = run_query_priority_links($id);
-
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-        action=\"" .url_prepare("incident_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
-	
-  $nb_pri = $obm_q->num_rows();
-  if ($nb_pri > 0) {
-    $display["msg"] = display_warn_msg($l_pri_cant_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\"> $label : $l_pri_link_incident ($nb_pri)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("incident_id");
-      $cname = $obm_q->f("incident_label");
-      $dis_link .="
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_pri) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-
-  } else {
-      $display["msg"] = display_ok_msg($l_pri_can_delete);
-      $dis_link = "
-      <table class=\"detail\">
-      <tr>
-        <td colspan=\"2\" class=\"detailHead\">
-        $l_pri_link_incident_no $label</td>
-      </tr><tr>
-        <td>
-        </td>
-      </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-          <form name=\"form_pri_delete\" method=post action=\"" . url_prepare("incident_index.php") . "\">
-            <input type=\"hidden\" name=\"action\" value=\"priority_delete\">
-            <input type=\"hidden\" name=\"sel_priority\" value=\"$id\">
-            <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_delete\">
-          </form>
-          $dis_back
-        </p>
-      </div>";
-
-    }
-
-  return $dis_link;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the status links                                                //
-// Parameters:
-//   - $id : status id
-///////////////////////////////////////////////////////////////////////////////
-function dis_status_links($id) {
-  global $l_sta_link_incident,$l_sta_link_incident_no, $l_sta_can_delete, $l_sta_cant_delete;
-  global $l_sta_delete, $l_back,$display;
-
-  $label = get_status_label($id);
-  $obm_q = run_query_status_links($id);
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-        action=\"" .url_prepare("incident_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
-
-  $nb_stat = $obm_q->num_rows();
-  if ($nb_stat > 0) {
-    $display["msg"] = display_warn_msg($l_sta_cant_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_sta_link_incident ($nb_stat)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $iid = $obm_q->f("incident_id");
-      $ilabel = $obm_q->f("incident_label");
-      $dis_link.= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_stat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-
-  } else {
-    $display["msg"] = display_ok_msg($l_sta_can_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">$label : $l_sta_link_incident_no</td>
-    </tr>
-    </table>
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">
-        <form name=\"form_kind_delete\".
-          method=post action=\"" . url_prepare("incident_index.php") . "\">
-          <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
-          <input type=\"hidden\" name=\"sel_status\" value=\"$id\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_delete\" />
-        </form>
-        <form name=\"form_back\" method=\"post\"
-          action=\"" .url_prepare("incident_index.php") . "\">
-          <input type=\"hidden\" name=\"action\" value=\"admin\" />
-          <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </p>
-    </div>";
-
-  }
-
-  return $dis_link;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the Category1 links
-// Parameters:
-//   - $id : cat1 id
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat1_links($id) {
-  global $l_back,$display, $l_cat1_link_incident,$l_cat1_link_incident_no;
-  global $l_cat1_can_delete, $l_cat1_cant_delete, $l_cat1_delete;
-
-  $label = get_cat1_label($id);
-  $obm_q = run_query_cat1_links($id);
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-        action=\"" .url_prepare("incident_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
-
-  $nb_cat1 = $obm_q->num_rows();
-  if ($nb_cat1 > 0) {
-    $display["msg"] = display_warn_msg($l_cat1_cant_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat1_link_incident ($nb_cat1)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $iid = $obm_q->f("incident_id");
-      $ilabel = $obm_q->f("incident_label");
-      $dis_link.= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_cat1) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-
-  } else {
-    $display["msg"] = display_ok_msg($l_cat1_can_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">$label : $l_cat1_link_incident_no</td>
-    </tr>
-    </table>
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">
-        <form name=\"form_kind_delete\".
-          method=\"post\" action=\"" . url_prepare("incident_index.php") . "\">
-          <input type=\"hidden\" name=\"action\" value=\"cat1_delete\" />
-          <input type=\"hidden\" name=\"sel_cat1\" value=\"$id\" />
-          <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_delete\" />
-        </form>
-        <form name=\"form_back\" method=\"post\"
-          action=\"" .url_prepare("incident_index.php") . "\">
-          <input type=\"hidden\" name=\"action\" value=\"admin\" />
-          <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </p>
-    </div>";
-
-  }
-
-  return $dis_link;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the Incidnet Display preference screen
+// Display the Incident Display preference screen
 // Parameters:
 //   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////

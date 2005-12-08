@@ -214,7 +214,7 @@ FROM
   DealCategoryLink;
 
 -- DROP table DealCategory1Link
-DROP TABLE IF EXISTS DealCategory1Link;
+DROP TABLE IF EXISTS DealCategoryLink;
 
 -------------------------------------------------------------------------------
 -- Table structure for table 'CalendarCategory1'
@@ -273,4 +273,38 @@ ALTER TABLE DocumentCategory1 ADD COLUMN documentcategory1_code varchar(10) defa
 -- Update DocumentCategory2 table
 -------------------------------------------------------------------------------
 ALTER TABLE DocumentCategory2 ADD COLUMN documentcategory2_code varchar(10) default '' after documentcategory2_usercreate;
+
+-------------------------------------------------------------------------------
+-- Update IncidentCategory1 table
+-------------------------------------------------------------------------------
+ALTER TABLE IncidentCategory1 ADD COLUMN incidentcategory1_code varchar(10) default ''  after incidentcategory1_usercreate;
+
+-- Update table 'IncidentCategory1'
+UPDATE IncidentCategory1 set incidentcategory1_code = incidentcategory1_order;
+
+-- Update table 'IncidentCategory1'
+ALTER TABLE IncidentCategory1 DROP COLUMN incidentcategory1_order;
+
+-------------------------------------------------------------------------------
+-- Update IncidentStatus table
+-------------------------------------------------------------------------------
+ALTER TABLE IncidentStatus ADD COLUMN incidentstatus_code varchar(10) default '' after incidentstatus_usercreate;
+
+-- Update table 'IncidentStatus'
+UPDATE IncidentStatus set incidentstatus_code = incidentstatus_order;
+
+-- Update table 'IncidentStatus'
+ALTER TABLE IncidentStatus DROP COLUMN incidentstatus_order;
+
+-------------------------------------------------------------------------------
+-- Update IncidentPriority table
+-------------------------------------------------------------------------------
+ALTER TABLE IncidentPriority ADD COLUMN incidentpriority_code varchar(10) default '' after incidentpriority_usercreate;
+
+-- Update table 'IncidentPriority'
+UPDATE IncidentPriority set incidentpriority_code = incidentpriority_order;
+
+-- Update table 'IncidentPriority'
+ALTER TABLE IncidentPriority DROP COLUMN incidentpriority_order;
+
 

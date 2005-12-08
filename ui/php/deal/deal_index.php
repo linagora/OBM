@@ -31,10 +31,10 @@
 // - status_update   -- form fields    -- update the status
 // - status_checklink-- $sel_status    -- check if status is used
 // - status_delete   -- $sel_status    -- delete the status
-// - cat_insert      -- form fields    -- insert the category
-// - cat_update      -- form fields    -- update the category
-// - cat_checklin k  -- $sel_cat       -- check if category is used
-// - cat_delete      -- $sel_cat       -- delete the category
+// - category1_insert    -- form fields    -- insert the category
+// - category1_update    -- form fields    -- update the category
+// - category1_checklink -- $sel_cat       -- check if category is used
+// - category1_delete    -- $sel_cat       -- delete the category
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
@@ -59,6 +59,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("deal_query.inc");
 require("deal_display.inc");
+require_once("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -99,11 +100,10 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_cat_ids") {
+} elseif ($action == "ext_get_category1_ids") {
   $extra_css = "category.css";
   require("deal_js.inc");
-  $display["detail"] =  html_category_list($contact);
-
+  $display["detail"] = of_category_dis_tree($deal, $action, "deal", "category1");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -241,43 +241,43 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] = dis_deal_consult($deal);
 
-}  elseif ($action == "cat_insert")  {
+} elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-     $retour = run_query_cat_insert($deal);
-    if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat_insert_ok);
-    } else {
-    $display["msg"] .= display_err_msg($l_cat_insert_error);
-    }
-    require("deal_js.inc");
-    $display["detail"] .= html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
-
-
-}  elseif ($action == "cat_update")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat_update($deal);
+print_r($deal);
+  $retour = of_run_query_category_insert($deal, "deal", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
   }
   require("deal_js.inc");
   $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
 
-} elseif ($action == "cat_checklink")  {
+} elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-$display["detail"] .= dis_cat_links($deal);
- 
-} elseif ($action == "cat_delete")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat_delete($deal["category"]);
+  $retour = of_run_query_category_update($deal, "deal", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
   }
   require("deal_js.inc");
-  $display["detail"] .= html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
+
+} elseif ($action == "category1_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= of_dis_category_links($deal, "deal", "category1");
+
+} elseif ($action == "category1_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_run_query_category_delete($deal, "deal", "category1");
+  if ($retour) {
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
+  }
+  require("deal_js.inc");
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -498,7 +498,7 @@ function get_param_deal() {
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
-  global $sel_cat, $tf_code, $tf_cat;
+  global $tf_category1_label, $tf_category1_code, $sel_category1;
   global $param_deal, $param_contact, $hd_usercreate, $hd_timeupdate;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
@@ -536,9 +536,9 @@ function get_param_deal() {
   if (isset ($sel_status)) $deal["status"] = $sel_status;
   if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
   if (isset ($tf_dateexpected)) $deal["dateexpected"] = $tf_dateexpected;
-  if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
-  if (isset ($tf_code)) $deal["cat_code"] = $tf_code;
-  if (isset ($sel_cat)) $deal["category"] = $sel_cat;
+  if (isset ($tf_category1_label)) $deal["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $deal["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $deal["category1"] = $sel_category1;
   if (isset ($cb_archive)) {
     $deal["archive"] = $cb_archive;
   }
@@ -880,35 +880,35 @@ function get_deal_action() {
                                       );
 
   // Category Select 
-  $actions["deal"]["ext_get_cat_ids"]  = array (
+  $actions["deal"]["ext_get_category1_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
   // Category Check Link
-  $actions["deal"]["cat_checklink"] = array (
-    'Url'      => "$path/contact/deal_index.php?action=cat_checklink",
+  $actions["deal"]["category1_checklink"] = array (
+    'Url'      => "$path/contact/deal_index.php?action=category1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                     );                
 
 // Category Update
-  $actions["deal"]["cat_update"] = array (
-    'Url'      => "$path/contact/deal_index.php?action=cat_update",
+  $actions["deal"]["category1_update"] = array (
+    'Url'      => "$path/contact/deal_index.php?action=category1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Insert
-  $actions["deal"]["cat_insert"] = array (
-    'Url'      => "$path/contact/deal_index.php?action=cat_insert",
+  $actions["deal"]["category1_insert"] = array (
+    'Url'      => "$path/contact/deal_index.php?action=category1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Delete
-  $actions["deal"]["cat_delete"] = array (
-    'Url'      => "$path/contact/deal_index.php?action=cat_delete",
+  $actions["deal"]["category1_delete"] = array (
+    'Url'      => "$path/contact/deal_index.php?action=category1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );

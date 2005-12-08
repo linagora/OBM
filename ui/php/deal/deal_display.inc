@@ -122,10 +122,10 @@ function dis_deal_index($deal="") {
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
-  $cat_q = run_query_dealcategory();
+  $cats1 = of_category_get_ordered("deal", "category1");
   $status_q = run_query_dealstatus();
   $block .= html_parentdeal_search_form($deal, $usr_q);
-  $block .= html_deal_search_form($deal, $type_q, $tt_q, $cat_q, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $tt_q, $cats1, $status_q, $usr_q);
 
   return $block;
 }
@@ -144,9 +144,9 @@ function dis_deal_search_form($deal="") {
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
-  $cat_q = run_query_dealcategory();
+  $cats1 = of_category_get_ordered("deal", "category1");
   $status_q = run_query_dealstatus();
-  $block .= html_deal_search_form($deal, $type_q, $tt_q, $cat_q, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $tt_q, $cats1, $status_q, $usr_q);
 
   return $block;
 }
@@ -160,14 +160,14 @@ function dis_deal_search_form($deal="") {
 //                   manager, dateafter, datebefore
 //   - $kind_q     : DB result object (deal kind list)
 //   - $tt_q       : DB result object (deal task type list)
-//   - $cat_q      : DB result object (deal category list)
+//   - $cats1      : array with deal category 1 list 
 //   - $stat_q     : DB result object (deal status list)
 //   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_q) {
+function html_deal_search_form($deal, $kind_q, $tt_q, $cats1, $stat_q, $manager_q) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
-  global $l_all, $l_all_f, $l_find, $c_all, $l_category;
+  global $l_all, $l_all_f, $l_find, $c_all;
   global $display, $cgp_hide, $l_select_deal;
 
   // --- Var preparation ------------------------------------------------------
@@ -180,14 +180,14 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
-  $cat = $deal["category"];
+  $cat1 = $deal["category1"];
   $status = $deal["status"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
   $company_id = $deal["company"];
 
-  $show_cat = (! $cgp_hide["deal"]["category1"]);
+  // show : category1
 
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind\">
@@ -215,20 +215,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   $sel_tt .= "</select>";
 
   // Category select construction
-  if ($show_cat) {
-    $sel_cat = "<select name=\"sel_cat\">
-                <option value=\"$c_all\">$l_all</option>";
-    while ($cat_q->next_record()) {
-      //put menu titles
-      $id = $cat_q->f("dealcategory_id");
-      $cat_code = $cat_q->f("dealcategory_code");
-      $cat_label = $cat_q->f("dealcategory_label");
-      $sel_cat .= "\n<option value=\"$id\"";
-      if ($cat == $id) $sel_cat .= "selected =\"selected\"";
-      $sel_cat .= ">$cat_code - $cat_label</option>\n";
-    }
-    $sel_cat .= "</select>";
-  }
+  $block_category1 = of_dis_block_select_category($cats1, $cat1, "deal", "category1");
 
   // Status select construction
   $sel_status = "<select name=\"sel_status\">
@@ -309,9 +296,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
     <div class=\"searchLabel\">$l_tt<br />
       $sel_tt
     </div>
-    <div class=\"searchLabel\">$l_category<br />
-      $sel_cat
-    </div>
+    $block_category1 
     <div class=\"searchLabel\">$l_status<br />
       $sel_status
     </div>
@@ -443,7 +428,7 @@ function html_deal_search_list($deal_q, $prefs, $nb_deal, $deal) {
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
-  $cat = $deal["category"];
+  $cat1 = $deal["category1"];
   $status = $deal["status"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
@@ -460,7 +445,7 @@ function html_deal_search_list($deal_q, $prefs, $nb_deal, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_category1=$cat1&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
 
   $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   if ($popup) {
@@ -675,7 +660,7 @@ function html_deal_consult($deal_q) {
   global $l_tt,$l_marketing_manager,$l_technical_manager,$l_date_proposal;
   global $l_number, $l_amount,$l_hitrate,$l_date_expected;
   global $l_date_alarm,$l_status,$l_last_update,$l_archive,$l_comment,$l_at;
-  global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal,$l_category;
+  global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal;
   global $incl_arch, $param_deal;
   global $display, $path, $auth, $cgp_hide, $c_yes, $c_no;
 
@@ -717,43 +702,15 @@ function html_deal_consult($deal_q) {
   $con2 = $deal_q->f("deal_contact2_id");
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
+  $cats1 = of_entitycategories_get($deal_q->f("deal_id"), "deal", "category1");
 
   $display["link"] = html_deal_links($deal_q);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
    
-  $show_cat = (! $cgp_hide["deal"]["category1"]);
+  // show category1
 
   // Category 1 field
-  if ($show_cat) {
-    $cat2_q = run_query_get_dealcategory_info($id);
-    $nb_col_cat = 3;
-    $dis_cat = "<tr>";
-    for ($i=0; $i<$nb_col_cat; $i++) {
-      $dis_cat .= "<td>&nbsp;</td>";
-    }
-    $dis_cat .= "</tr>";
-    $dis_cat = "";
-
-    $i = 0;
-    while ($cat2_q->next_record()) {
-      if ($i == 0) {
-	$dis_cat .= "<tr>";
-      }
-      $cat_code = $cat2_q->f("dealcategory_code");
-      $cat_label = $cat2_q->f("dealcategory_label");
-      $i++;
-      $dis_cat .= "<td style=\"border: 1px solid\" class=\"detailText\">$cat_code - $cat_label</td>";
-      if ($i == $nb_col_cat) {
-	$dis_cat .= "</tr>";
-	$i = 0;
-      }    
-    }
-    $block_cat = "
-    <div class=\"detailHead\">$l_category</div>
-    <table class=\"detail\">
-    $dis_cat
-    </table>";
-  }
+  $block_category1 = of_dis_block_consult_category($cats1, "deal", "category1");
 
   $block = "
     <table width=\"100%\">
@@ -854,7 +811,7 @@ function html_deal_consult($deal_q) {
     </tr><tr>
    <td colspan=\"2\">
       
-      $block_cat
+      $block_category1
       
       <tr>
     <td colspan=\"2\">
@@ -873,49 +830,6 @@ function html_deal_consult($deal_q) {
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: category List
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function html_category_list($deal) {
-  global $l_close,$l_add_cats,$l_cat_no;
-
-  $popup = $deal["popup"];
-  $cat_q = run_query_dealcategory();
-  $ext_target = $deal["ext_target"];
-  $block.= "
-  <div class=\"categoryTree\">
-   <form onsubmit=\"fill_ext_form2(this);window.close(); return false;\">
-   ";
-
-  if ($cat_q->num_rows() > 0) {
-    $button_add = "<input type=\"submit\" value=\"$l_add_cats\" />";
-    while ($cat_q->next_record()) {
-      $label = $cat_q->f("dealcategory_label");
-      $id = $cat_q->f("dealcategory_id"); 
-      $block .= "
-    <div class=\"category\">
-      <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$label</span>
-    </div>";
-    }
-  } else {
-    $block .= display_info_msg($l_cat_no);
-  }
-
-  $block.= "
-  <br />
-  <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
-  <input name=\"popup\" type=\"hidden\" value=\"1\" />
-  $button_add  &nbsp;&nbsp;&nbsp;
-  <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
-  </form>
-  </div>";
-
-  return $block;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Deal form
@@ -947,13 +861,17 @@ function dis_deal_form($deal) {
 
   $type_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
-  $cat1_q = run_query_dealcategory();
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
   $sta_q = run_query_dealstatus();
   $con_q = run_query_contact_deal($deal["company"]);
+  
+  $did = $deal["id"];
+  if ($did) {
+    $cats1 = of_category_get_ordered("deal", "category1", $did);
+  }
 
-  $block = html_deal_form($action, $deal_q, $type_q, $tt_q, $cat1_q, $usrc_q, $usrp_q, $comp_q, $con_q, $sta_q, $deal);
+  $block = html_deal_form($action, $deal_q, $type_q, $tt_q, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $sta_q, $deal);
 
   return $block;
 }
@@ -966,7 +884,7 @@ function dis_deal_form($deal) {
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $kind_q    : DBO : deal kind list
 //   - $tt_q      : DBO : deal task type list
-//   - $cat1_q    : DBO : deal category list
+//   - $cats1     : array with deal category 1 list 
 //   - $usrc_q    : DBO : list of userobm from system group Commercial
 //   - $usrp_q    : DBO : list of userobm from system group Production
 //   - $comp_q    : DBO : deal company infos (name, ad1, zip, town when new)
@@ -976,14 +894,14 @@ function dis_deal_form($deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
+function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format, $l_update,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
   global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
   global $l_date_proposal,$l_amount,$l_hitrate,$l_date_expected;
   global $l_contact,$l_date_alarm,$l_status;
-  global $l_last_update, $l_archive, $l_at, $l_todo, $l_category;
+  global $l_last_update, $l_archive, $l_at, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
   global $path, $action, $auth, $cgp_hide, $c_all,$l_all,$popup;
@@ -1022,7 +940,6 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
     $ad1 = $deal_q->f("company_address1");
     $zip = $deal_q->f("company_zipcode");
     $town = $deal_q->f("company_town");
-    $cat_m = run_query_get_dealcategory($id);
   } elseif (($action == "new") || ($action == "insert")) {
     $comp = $comp_q->f("company_name");
     $ad1 = $comp_q->f("company_address1");
@@ -1034,9 +951,6 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
     // We pre-fill datebegin and datealarm with current date
     $datebegin = date($c_php_isodate_format); 
     $datealarm = $datebegin;
-    $cat_m = array();
-  } elseif ($action == "update") {
-    $cat_m = array();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -1049,7 +963,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   if (isset($deal["datebegin"])) { $datebegin = stripslashes($deal["datebegin"]); }
   if (isset($deal["kind"])) { $kind = $deal["kind"]; }
   if (isset($deal["tasktype"])) { $tt = $deal["tasktype"]; }
-  if (isset($deal["category"])) { $cat_m = $deal["category"]; }
+  if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
   if (isset($deal["tech"])) { $tech = $deal["tech"]; }
   if (isset($deal["dateprop"])) { $dateprop = stripslashes($deal["dateprop"]); }
@@ -1075,8 +989,8 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   if (isset($deal["ext_target"])) { $ext_target = $deal["ext_target"]; }
  
   // Conditionnal fields
-  $show_cat = (! $cgp_hide["deal"]["category1"]);
- 
+  // show category1
+
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind\">
     <option value=\"0\">$l_none</option>";
@@ -1163,33 +1077,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   $sel_con2 .= "</select>";
 
   // Category select field
-  if ($show_cat) {
-    $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat[]\"  multiple=\"multiple\" style=\"font-family:monospace;font1-weight:400;\">";
-    if (is_object($cat1_q)) {
-      while ($cat1_q->next_record()) {
-        $c_id = $cat1_q->f("dealcategory_id");
-        $sel_cat .= "\n<option value=\"$c_id\"";
-        if (in_array($c_id, $cat_m)) { $sel_cat .= " selected=\"selected\"";}
-        $sel_cat .= ">". $cat1_q->f("dealcategory_label") . "</option>\n";
-      }
-    }
-    $sel_cat .= "</select>";
-    $url = "deal_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=sel_cat";
-    $block_cat = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category</td>
-      <td class=\"detailForm\">
-       <table>
-	<tr><td>
-	  $sel_cat
-	</td><td>
-	  <a href=\"javascript: return false;\" style=\"float:right;\"
-	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" /></a>
-	</td></tr>
-       </table>      
-      </td>";
-  }
+  $block_category1 = of_category_dis_entity_form($cats1, "deal", "category1");
 
   // status select construction
   $sel_status = "<select name=\"sel_status\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
@@ -1373,9 +1261,7 @@ $js_status_loop
       <td class=\"detailLabel\">$l_date_expected</td>
       <td class=\"detailForm\"><input name=\"tf_dateexpected\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateexpected\" /></td>
     </tr><tr>
-     
-     $block_cat 
-      
+     $block_category1
     </table>    
    </table>
 
@@ -2115,223 +2001,14 @@ function html_deal_admin_form($kind_q, $status_q) {
   </table>";
 
   if (! $cgp_hide["deal"]["category1"]) {
-    $cat_q = run_query_dealcategory();
+    $cats1 = of_category_get_ordered("deal", "category1");
     $block .= "<hr />";
-    $block .= html_deal_cat_form($cat_q);
+    $block .= of_html_admin_cat_form($cats1, "deal", "category1");
   }
 
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Deal Category section
-// Parameters:
-//   - $cat1_q : DealCategory list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_deal_cat_form($cat_q) {
-  global $l_cat_manage,$l_cat_exist,$l_cat_no,$l_code,$l_label ;
-  global $l_cat_checkdelete,$l_cat_update,$l_cat_new,$l_cat_insert;
-
-  if ( (is_object($cat_q)) && ($cat_q->num_rows() > 0) ) {
-    $sel_cat = "<select name=\"sel_cat\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf(' ');
-    ext = mytext.substr(0, pos);
-    mytext = mytext.substr(pos+1); 
-    forms.form_cat_update.tf_cat.value=mytext;
-    forms.form_cat_update.tf_code.value=ext;
-    \"
-    size=\"4\" >";
-  
-    while ($cat_q->next_record()) {
-      $id = $cat_q->f("dealcategory_id");
-      $label = $cat_q->f("dealcategory_label");
-      $code = $cat_q->f("dealcategory_code");
-      $sel_cat .= "\n<option value=\"$id\">$code $label</option>";
-    }
-
-    $sel_cat .= "</select>";
-    $button_check = "<input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_checkdelete\" onclick=\"if (check_cat_checkdel(this.form)) return true; else return false;\" />";
-    $button_upd = "<input type=\"text\" size=\"2\" name=\"tf_code\" />
-   	    <input type=\"text\" name=\"tf_cat\" />
-            <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_update\"
-              onclick=\"if (check_cat_upd(this.form,document.form_cat_delete)) return true; else return false;\" />";
-
-  } else {
-    $no_cat = true;
-    $sel_cat = display_info_msg($l_cat_no);
-  }
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-      $l_cat_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Category Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_cat_delete\" method=\"post\"
-              action=\"" . url_prepare("deal_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_cat_exist</td>
-              <td class=\"adminLabel\">$sel_cat</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"cat_checklink\" />
-              $button_check
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Category Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_cat_update\" method=\"get\"
-              action=\"" . url_prepare("deal_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_cat\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"cat_update\" />
-            $button_upd
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Category Section -->
-
-        <form name=\"form_cat_new\" method=\"get\"
-          action=\"" . url_prepare("deal_index.php") . "\">
-        <table>
-	<tr>
-	<td class=\"adminLabel\" colspan=\"2\">$l_cat_new</td>
-	</tr>
-        <tr>
-	    <td class=\"adminLabel\">$l_code :</td>
-            <td >
-            <input type=\"text\" size=\"2\" name=\"tf_code\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-            <td >
-            <input type=\"text\" name=\"tf_cat\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"action\" value=\"cat_insert\" />
-            <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_insert\"
-              onclick=\"if (check_cat_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
-";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: the cat links
-// Parameters:
-//   - $deal : deal hash info : keys used : cat
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat_links($deal) {
-  global $l_cat_link_deal, $l_cat_link_deal_no;
-  global $l_cat_delete, $l_cat_can_delete, $l_cat_cant_delete;
-  global $l_back, $display;
-
-  $id = $deal["category"];
-  $label = get_cat_label($id);
-  $obm_q = run_query_cat_links($id);
-  $nb_cat = $obm_q->num_rows();
-  if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg($l_cat_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat_link_deal ($nb_cat)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $d_id = $obm_q->f("deal_id");
-      $d_label = $obm_q->f("deal_label");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$d_id") . "\">$d_label</a>
-      </td>
-    </tr>"; 
-    }
-
-    if ($cpt < $nb_cat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-    $dis_link .= "
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-	  <form name=\"form_back\" method=\"get\"
-	    action=\"" .url_prepare("deal_index.php") . "\">
-	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
-	  <input type=\"submit\" value=\"$l_back\" />
-	  </form>
-	</p>
-      </div>";
-
-  } else {
-    $display["msg"] .= display_ok_msg($l_cat_can_delete);
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat_link_deal_no </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">    
-      <form name=\"form_act_delete\"
-	method=post action=\"" . url_prepare("deal_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"cat_delete\">
-      <input type=\"hidden\" name=\"sel_cat\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat_delete\">
-      </form>
-      
-      <form name=\"form_back\" method=\"get\"
-	action=\"" .url_prepare("deal_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
-  }
-
-  return $dis_link;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Displays the kind links                                                   //

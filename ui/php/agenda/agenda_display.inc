@@ -2542,8 +2542,12 @@ function dis_free_interval($agenda, $entity_store) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
-  $category_q = run_query_get_eventcategories();
-  return html_agenda_category_form($category_q);
+  $cats1 = of_category_get_ordered("calendar", "category1");
+  $block = of_html_admin_cat_form($cats1, "calendar", "category1");;
+//  $block .= "<hr />";
+
+  return $block;
+
 }
 
 

@@ -37,6 +37,7 @@ $uid = $auth->auth["uid"];
 require("agenda_query.inc");
 require("agenda_display.inc");
 require("$obminclude/lib/right.inc");
+require_once("$obminclude/of/of_category.inc");
 
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();
@@ -306,42 +307,43 @@ if ($action == "index") {
   require("agenda_js.inc");
   $display["detail"] = dis_admin_index();
 
-} elseif ($action == "category_insert")  {
+} elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_category_insert($agenda);
+  $retour = of_run_query_category_insert($agenda, "calendar", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_category_insert_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_category_insert_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
   }
   require("agenda_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "category_update")  {
+} elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_category_update($agenda);
+  $retour = of_run_query_category_update($agenda, "calendar", "category1");
+  print_r($agenda);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_category_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_category_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
   }
   require("agenda_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "category_checklink")  {
+} elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_category_links($agenda);//$sel_category);
+  $display["detail"] .= of_dis_category_links($agenda, "calendar", "category1");
 
-} elseif ($action == "category_delete")  {
+} elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_category_delete($agenda);
+  $retour = of_run_query_category_delete($agenda, "calendar", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_category_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_category_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
   }
   require("agenda_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 }
 
 $sess->register("cal_entity_id");
@@ -360,7 +362,7 @@ display_page($display);
 function get_param_agenda() {
   global $action, $cagenda_first_hour, $cagenda_last_hour;
   global $param_date, $tf_title, $tf_location, $ta_event_description;
-  global $param_event, $sel_category_id, $sel_priority;
+  global $param_event, $sel_priority;
   global $tf_date_begin, $sel_time_begin, $sel_min_begin;
   global $tf_date_end, $sel_time_end, $sel_min_end;
   global $sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
@@ -370,16 +372,13 @@ function get_param_agenda() {
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
   global $sel_time_duration,$sel_min_duration;
-  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id;
+  global $sel_group_id;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
   global $ch_all_day;
+  global $tf_category1_label, $tf_category1_code, $sel_category1;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
   
   // Agenda fields
-  if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
-  if (isset($hd_category_label)) $agenda["category_label"] = $hd_category_label;
-  if (isset($tf_category_upd)) $agenda["category_label"] = $tf_category_upd;
-  if (isset($sel_category)) $agenda["category_id"] = $sel_category;
   if (isset ($param_date)) {
     $agenda["date"] = $param_date; 
   } else { 
@@ -389,9 +388,11 @@ function get_param_agenda() {
   if (isset($ch_all_day)) $agenda["allday"] = $ch_all_day;
   else  $agenda["allday"] = "0";
   if (isset($tf_title)) $agenda["title"] = $tf_title;
-  if (isset($sel_category_id)) $agenda["category"] = $sel_category_id;
   if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
   if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;
+  if (isset ($tf_category1_label)) $agenda["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $agenda["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $agenda["category1"] = $sel_category1;
   if (isset($tf_location)) $agenda["location"] = $tf_location;
   if (isset($cb_force)) $agenda["force"] = $cb_force;
   if (isset($cb_privacy)) $agenda["privacy"] = $cb_privacy;
@@ -716,28 +717,28 @@ function get_agenda_action() {
                                        );
 				       
 // Kind Insert
-  $actions["agenda"]["category_insert"] = array (
+  $actions["agenda"]["category1_insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
-  $actions["agenda"]["category_update"] = array (
+  $actions["agenda"]["category1_update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
-  $actions["agenda"]["category_checklink"] = array (
+  $actions["agenda"]["category1_checklink"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
-  $actions["agenda"]["category_delete"] = array (
+  $actions["agenda"]["category1_delete"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 

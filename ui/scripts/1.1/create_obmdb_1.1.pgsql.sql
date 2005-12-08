@@ -1129,9 +1129,9 @@ CREATE TABLE IncidentPriority (
   incidentpriority_timecreate  timestamp,
   incidentpriority_userupdate  integer DEFAULT NULL,
   incidentpriority_usercreate  integer DEFAULT NULL,
-  incidentpriority_order       integer,
-  incidentpriority_color       char(6),
+  incidentpriority_code        varchar(10) default '',
   incidentpriority_label       varchar(32) DEFAULT NULL,
+  incidentpriority_color       char(6),
   PRIMARY KEY (incidentpriority_id)
 );
 
@@ -1145,7 +1145,7 @@ CREATE TABLE IncidentStatus (
   incidentstatus_timecreate  timestamp,
   incidentstatus_userupdate  integer DEFAULT NULL,
   incidentstatus_usercreate  integer DEFAULT NULL,
-  incidentstatus_order       integer,
+  incidentstatus_code        varchar(10) default '',
   incidentstatus_label       varchar(32) DEFAULT NULL,
   PRIMARY KEY (incidentstatus_id)
 );
@@ -1160,7 +1160,7 @@ CREATE TABLE IncidentCategory1 (
   incidentcategory1_timecreate  timestamp,
   incidentcategory1_userupdate  integer DEFAULT NULL,
   incidentcategory1_usercreate  integer DEFAULT NULL,
-  incidentcategory1_order       integer,
+  incidentcategory1_code        varchar(10) default '',
   incidentcategory1_label       varchar(32) DEFAULT NULL,
   PRIMARY KEY (incidentcategory1_id)
 );

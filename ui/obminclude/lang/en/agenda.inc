@@ -15,6 +15,8 @@ $l_title = "Title";
 $l_location = "Location";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_back_mono = "Back to your own view";
+$l_category1 = "category";
+$l_category1_s = "categories";
 
 $l_go = "Go";
 $l_high = "High";
@@ -90,10 +92,6 @@ $l_change_state = "Your event participation";
 $l_force_insert = "Force insert";
 $l_refuse_insert = "Refuse event";
 $l_cancel_insert = "Wait...";
-$l_category_update = "Update Category";
-$l_category_checkdelete = "Check or Delete Category";
-$l_category_delete = "Delete Category";
-$l_category_insert = "Insert Category";
 $l_agenda_select_group = "Select the groups.";
 
 $l_force = "Force the event insertion";
@@ -129,22 +127,8 @@ $l_err_days_repeat_not_weekly = "You can give repeatition days only on weekly re
 $l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must at least be seven day after the end of the event.";
 $l_event_cant_delete = "You can only delete your own events !";
 
-$l_category_insert_ok = "The category has been inserted successfully.";
-$l_category_insert_error = "The insertion of the category has failed !";
-$l_category_delete_ok = "The category has been deleted successfully.";
-$l_category_delete_error = "The deletion of the category has failed !";
-$l_category_update_ok = "The category has been updated successfully.";
-$l_category_update_error = "The update of the category has failed !";
-$l_category_link_company = "These companies are referenced as";
-$l_category_link_company_no = "No company referenced as";
-$l_category_cant_delete = "The category can't be deleted !";
-$l_category_can_delete = "The category can be deleted.";
-
 $l_unknown="Inconnu";
 
-$l_category_manage = "Calendar Category Management";
-$l_category_exist = "Existing Categorys";
-$l_category_new = "New Category";
 $l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
 $l_header_export = "Export";
@@ -181,6 +165,3 @@ $mj_date_incompatibility = "La date de fin ne peut etre anterieure a la date de 
 $mj_repeat_date_incompatibility = "La date de fin de repetition ne peut etre anterieure a la date de debut."; 
 $mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
 $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?"; 
-$l_j_category_create = "Please specify a label for the new category";
-$l_j_category_update = "Please specify a new label, and select a category for the update";
-$l_j_category_delete = "Please select a category to delete it";

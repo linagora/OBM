@@ -1122,9 +1122,9 @@ CREATE TABLE IncidentPriority (
   incidentpriority_timecreate  timestamp(14),
   incidentpriority_userupdate  int(8) default NULL,
   incidentpriority_usercreate  int(8) default NULL,
-  incidentpriority_order       int(2),
-  incidentpriority_color       char(6),
+  incidentpriority_code        varchar(10) default '',
   incidentpriority_label       varchar(32) default NULL,
+  incidentpriority_color       char(6),
   PRIMARY KEY (incidentpriority_id)
 ) TYPE=MyISAM;
 
@@ -1138,7 +1138,7 @@ CREATE TABLE IncidentStatus (
   incidentstatus_timecreate  timestamp(14),
   incidentstatus_userupdate  int(8) default NULL,
   incidentstatus_usercreate  int(8) default NULL,
-  incidentstatus_order       int(2),
+  incidentstatus_code       varchar(10) default '',
   incidentstatus_label       varchar(32) default NULL,
   PRIMARY KEY (incidentstatus_id)
 ) TYPE=MyISAM;
@@ -1153,7 +1153,7 @@ CREATE TABLE IncidentCategory1 (
   incidentcategory1_timecreate  timestamp(14),
   incidentcategory1_userupdate  int(8) default NULL,
   incidentcategory1_usercreate  int(8) default NULL,
-  incidentcategory1_order       int(2),
+  incidentcategory1_code        varchar(10) default '',
   incidentcategory1_label       varchar(32) default NULL,
 PRIMARY KEY (incidentcategory1_id)
 );

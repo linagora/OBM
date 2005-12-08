@@ -237,7 +237,7 @@ function run_query_insert($deal) {
   $status = $deal["status"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
-  $cats = $deal["category"];
+  $category1 = $deal["category1"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
@@ -302,19 +302,11 @@ function run_query_insert($deal) {
 
   $d_id = run_query_deal_id($deal);
 
-  if ($retour && is_array($cats)) {
-    foreach ($cats as $categoryid) {
-      $query = "INSERT INTO DealCategoryLink (
-	  dealcategorylink_deal_id,
-	  dealcategorylink_category_id)
-	VALUES (
-          '$d_id',
-          '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+  if ($retour && is_array($category1)) {
+    foreach($category1 as $categoryid) {
+      $retour = of_run_query_category_insert_link($d_id, $categoryid, "deal", "category1");
     }
   }
-
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($d_id) && ($archive == '0')) {
@@ -367,7 +359,7 @@ function run_query_deal_update($deal) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $mail_comment = $deal["mail_comment"];
-  $cat_m = $deal["category"];
+  $category1 = $deal["category1"];
   
   $query = "UPDATE Deal SET
     deal_timeupdate='". date("Y-m-d H:i:s")."',
@@ -400,22 +392,13 @@ function run_query_deal_update($deal) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if (($retour) && (is_array($cat_m))) {
-    $query = "DELETE
-    FROM DealCategoryLink
-    WHERE dealcategorylink_deal_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
 
-    foreach ($cat_m as $categoryid) {
-      $query = "INSERT INTO DealCategoryLink (
-	  dealcategorylink_deal_id,
-	  dealcategorylink_category_id)
-	VALUES (
-          '$id',
-          '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+  if ($retour) {
+    $retour = of_run_query_category_delete_link($id, "deal", "category1");
+    if (is_array($category1)) {
+      foreach($category1 as $categoryid) {
+        $retour = of_run_query_category_insert_link($id, $categoryid, "deal", "category1");
+      }
     }
   }
 

@@ -1136,10 +1136,12 @@ function get_user_info($id="") {
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   $obm_q->next_record();
-  foreach ($obm_q->Record as $key => $user) {
-    $small_key = str_replace("userobm_", "", $key);
-    $u[$small_key] = $user;
-  }
+  if (is_array($obm_q->Record)) {
+    foreach ($obm_q->Record as $key => $user) {
+      $small_key = str_replace("userobm_", "", $key);
+      $u[$small_key] = $user;
+    }
+  }  
   $u["datebegin"] = array();
   $u["datebegin"]["iso"] = $obm_q->f("userobm_datebegin");
   $u["datebegin"]["unix_timestamp"] = $obm_q->f("datebegin");
