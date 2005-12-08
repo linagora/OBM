@@ -1,0 +1,152 @@
+<!--
+    À CUSTOMISER POUR AVOIR UNE PAGE DE LOGIN PERSONNALISÉE POUR UN CLIENT
+
+
+    * remplacer CLIENT par le nom du client
+    * éventuellement insérer un lien vers le site web du client à côté du "réalisé par Aliacom" en bas de page
+    * remplacer PATH_CSS par le chemin vers la css à utiliser pour cette page (typiquement, dans le répertoire themes choisi par défaut pour un client)
+    * remplacer PATH_LOGO par le chemin vers le logo à afficher au dessus du formulaire
+
+    * renommer ce fichier en crloginform.ihtml
+
+  -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title><?php echo "Login - CLIENT Version $obm_version"; ?></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+    <link rel="stylesheet" type="text/css" href="<?php echo C_IMAGE_PATH; ?>PATH_CSS" /> 
+
+    <?php
+       if ($auth_encryption) {
+       if ($password_encryption == "md5") {
+       include("$obminclude/auth/md5.js");
+       $function_crypt = "
+			  function doChallengeResponse() {
+			  str = document.login.login.value + \":\" +
+								  MD5(document.login.password.value) + \":\" +
+													    document.login.challenge.value;
+													    document.login.response.value = MD5(str);
+													    document.login.password.value = \"\";
+																		}
+																		";
+       } else {
+       // Crypt method : we do not handle javascript crypt encryption...
+       $function_crypt = "
+			  function doChallengeResponse() {
+			  document.login.submit();
+			  }
+			  ";
+       }
+
+       echo "
+	     <script type=\"text/javascript\">
+	       <!--
+		   $function_crypt
+		   // -->
+	     </script>";
+
+	     } else {
+	     // No encryption we passe the parameters as they are
+	     echo "
+	     <script type=\"text/javascript\">
+	       <!--
+		   function doChallengeResponse() {
+		   document.login.submit();
+		   }
+		   // -->
+	     </script>";
+
+	     }
+	     ?>
+
+  </head>
+
+  <body>
+    <center>
+      <p />
+      <img src="<?php echo C_IMAGE_PATH; ?>PATH_LOGO" alt="logo"/>
+    </center><br/>
+    <p align="center">
+      <font size="2" face="sans-serif, Verdana, Arial">
+	<em>Veuillez saisir votre nom d'utilisateur et votre mot de passe :</em>
+      </font>
+    </p>
+    <form name="login" method="post" action="<?php echo $login_action;?>">
+      <table align="center">
+	<tr>
+	  <td>
+	    <table border="0" align="center" cellpadding="0" cellspacing="5">
+	      <tr>
+		<td><div align="right"><font size="3" face="sans-serif, Verdana, Arial">
+		      <strong>Nom d'utilisateur :&nbsp;</strong></font> </div></td>
+		<td><input name="login" type="text" size="32" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>"></td>
+	      </tr>
+	      <tr>
+		<td><div align="right"><font size="3" face="sans-serif, Verdana, Arial">
+		      <strong>Mot de passe :&nbsp;</strong></font></div></td>
+		<td><input name="password" type="password" size="32"></td>
+	      </tr>
+	    </table>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    <p />
+	    <div align="center">
+	      <input type="submit" name="iloginButton" value="Valider" onclick="doChallengeResponse()">
+	    </div>
+	  </td>
+	</tr>
+      </table>
+
+      <?php global $login; if ( isset($login) ): ?>
+      <!-- failed login code -->
+
+      <p />
+
+      <table align="center">
+	<tr>
+	  <td colspan=2>
+	    <font color=red>
+	      <b>
+		Votre login/mot de passe est invalide
+		ou votre session a expiré<br/>
+		Merci de réessayer</b>
+	    </font>
+	  </td>
+	</tr>
+      </table>
+
+      <?php endif ?>
+
+      <p />
+      <p />
+
+      <div align="center">
+
+	<font size="1" face="sans-serif, Verdana, Arial">
+	  CLIENT
+	  <br /> 
+	  Réalisé par <a href="http://www.aliacom.fr" target="_blank">Aliacom</a>
+	</font> 
+      </div>
+
+      <!-- Set up the form with the challenge value and an empty reply value -->
+      <input type="hidden" name="challenge" value="<?php print $challenge ?>">
+      <input type="hidden" name="response"  value="">
+    </form>
+    <script type="text/javascript">
+      <!--
+	  // Activate the appropriate input form field.
+	  if (document.login.login.value == '') {
+	  document.login.login.focus();
+	  } else {
+	  document.login.password.focus();
+	  }
+	  // -->
+    </script>
+  </body>
+</html>
