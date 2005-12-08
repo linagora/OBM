@@ -409,12 +409,12 @@ function get_param_document() {
   if (isset ($ext_target)) $document["ext_target"] = $ext_target;
 
   
-  if (isset ($tf_category1_label)) $contact["category1_label"] = $tf_category1_label;
-  if (isset ($tf_category1_code)) $contact["category1_code"] = $tf_category1_code;
-  if (isset ($sel_category1)) $contact["category1"] = $sel_category1;
-  if (isset ($tf_category2_label)) $contact["category2_label"] = $tf_category2_label;
-  if (isset ($tf_category2_code)) $contact["category2_code"] = $tf_category2_code;
-  if (isset ($sel_category2)) $contact["category2"] = $sel_category2;
+  if (isset ($tf_category1_label)) $document["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $document["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $document["category1"] = $sel_category1;
+  if (isset ($tf_category2_label)) $document["category2_label"] = $tf_category2_label;
+  if (isset ($tf_category2_code)) $document["category2_code"] = $tf_category2_code;
+  if (isset ($sel_category2)) $document["category2"] = $sel_category2;
   
   if (isset ($tf_mime)) $document["mime_label"] = $tf_mime;
   if (isset ($tf_extension)) $document["extension"] = $tf_extension;

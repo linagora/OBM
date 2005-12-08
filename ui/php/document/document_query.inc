@@ -54,10 +54,12 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
     $where .= " and document_name $like '%$name%'";
   }
 
+  $join_category1 = "LEFT JOIN DocumentCategory1 ON document_category1_id=documentcategory1_id";
   if (($cat1 != $c_all) && ($cat1 != "")) { 
     $where .= " and document_category1_id = '$cat1'";
   }
   
+  $join_category2 = "LEFT JOIN DocumentCategory2 ON document_category2_id=documentcategory2_id";
   if (($cat2 != $c_all) && ($cat2 != "")) { 
     $where .= " and document_category2_id = '$cat2'";
   }
@@ -89,8 +91,8 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
       documentcategory2_label,
       documentmimetype_label
     FROM Document
-      LEFT JOIN DocumentCategory1 on document_category1_id=documentcategory1_id
-      LEFT JOIN DocumentCategory2 on document_category2_id=documentcategory2_id
+      $join_category1
+      $join_category2
       LEFT JOIN DocumentMimeType on document_mimetype_id = documentmimetype_id
       $join_ent
     $whereq
@@ -618,40 +620,6 @@ function get_dir_document_nb($dpath, $kind) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category 1 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_documentcategory1() {
-  global $cdg_sql;
-
-  $query = "SELECT * FROM DocumentCategory1 ORDER BY documentcategory1_label"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 2 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_documentcategory2() {
-  global $cdg_sql;
-
-  $query = "SELECT * FROM DocumentCategory2 ORDER BY documentcategory2_label"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Document Mime Types query execution
 // Return:
 //   Database Object
@@ -770,64 +738,6 @@ function check_document_data_form($cid, $document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category1 insertion query construction and execution
-// Parameters:
-//   - $document : document hash info : keys used : kind_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_insert($document) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat1 = $document["cat1_label"];
-
-  $query = "INSERT INTO DocumentCategory1 (
-    documentcategory1_timecreate,
-    documentcategory1_usercreate,
-    documentcategory1_label)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat1')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category2 insertion query construction and execution
-// Parameters:
-//   - $document : document hash info : keys used : cat2_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_insert($document) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat2 = $document["cat2_label"];
-
-  $query = "INSERT INTO DocumentCategory2 (
-    documentcategory2_timecreate,
-    documentcategory2_usercreate,
-    documentcategory2_label)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat2')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Mime Type insertion query construction and execution
 // Parameters:
 //   - $document : document hash info
@@ -864,62 +774,7 @@ function run_query_mime_insert($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category 1  update query execution
-// Parameters:
-//   - $document : document hash info : keys used : act, act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_update($document) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $document["category2"];
-  $cat2 = $document["cat2_label"];
-
-  $query = "UPDATE DocumentCategory2 SET
-      documentcategory2_label='$cat2',
-      documentcategory2_timeupdate='$timeupdate',
-      documentcategory2_userupdate='$userupdate'
-    WHERE
-      documentcategory2_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 1 update query execution
-// Parameters:
-//   - $document : document hash info : keys used : act, act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_update($document) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $document["category1"];
-  $cat1 = $document["cat1_label"];
-
-  $query = "UPDATE DocumentCategory1 SET
-      documentcategory1_label='$cat1',
-      documentcategory1_timeupdate='$timeupdate',
-      documentcategory1_userupdate='$userupdate'
-    WHERE
-      documentcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 2 update query execution
+// MimeType update query execution
 // Parameters:
 //   - $document : document hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -946,90 +801,6 @@ function run_query_mime_update($document) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat1_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT documentcategory1_label
-    FROM DocumentCategory1
-    WHERE documentcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("documentcategory1_label");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity - Document links query execution
-// Parameters:
-//   - $p_id : activity id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT document_title, document_id, document_category1_id
-    FROM Document
-    WHERE document_category1_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat2_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT documentcategory2_label
-    FROM DocumentCategory2
-    WHERE documentcategory2_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("documentcategory2_label");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 2 - Document links query execution
-// Parameters:
-//   - $p_id : activity id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT document_title, document_id, document_category2_id
-    FROM Document
-    WHERE document_category2_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
 }
 
 
@@ -1072,42 +843,6 @@ function run_query_mime_links($p_id) {
   $obm_q->query($query);
 
   return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category1 deletion query execution
-// Parameters:
-//   - $id : Category1 id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat1_delete($id) {
-  global $cdg_sql;
-
-  $query = "DELETE FROM DocumentCategory1 WHERE documentcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category2 deletion query execution
-// Parameters:
-//   - $id : Category2 id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat2_delete($id) {
-  global $cdg_sql;
-
-  $query = "DELETE FROM DocumentCategory2 WHERE documentcategory2_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
 }
 
 

@@ -42,7 +42,6 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
   return $res;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Document search form
 // Parameters:
@@ -50,11 +49,11 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_form($document="") {
 
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
+  $cats1 = of_category_get_ordered("document", "category1", 0, "mono");
+  $cats2 = of_category_get_ordered("document", "category2", 0, "mono");
   $mime_q = run_query_documentmime();
 
-  $block .= html_document_search_form($document, $cat1_q, $cat2_q, $mime_q);
+  $block .= html_document_search_form($document, $cats1, $cats2, $mime_q);
 
   return $block;
 }
@@ -63,13 +62,13 @@ function dis_document_search_form($document="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: XHTML Document search Form
 // Parameters:
-//   - $cat1_q    : database object with cat1 list
-//   - $cat2_q     : database object with cat2ivity list
+//   - $cats1      : array with document category 1 list
+//   - $cats2      : array with document category 2 list
 //   - $document[] : default form values
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_search_form ($document, $cat1_q, $cat2_q, $mime_q) {
-  global $display, $l_title, $l_category1, $l_mimetype, $l_name;
-  global $l_all, $l_find, $l_author, $l_category2, $l_document_add; 
+function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
+  global $display, $l_title, $l_mimetype, $l_name;
+  global $l_all, $l_find, $l_author, $l_document_add; 
   global $c_all;
 
   $title = stripslashes($document["title"]);
@@ -94,28 +93,8 @@ function html_document_search_form ($document, $cat1_q, $cat2_q, $mime_q) {
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
   
-  // category 1 select
-  $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">
-    <option value=\"$c_all\">$l_all</option>";
-  while($cat1_q->next_record()) {
-    $c1_id = $cat1_q->f("documentcategory1_id");
-    $sel_cat1 .= "\n<option value=\"$c1_id\"";
-    if ($c1_id == $cat1) { $sel_cat1 .= " selected=\"selected\""; }
-    $sel_cat1 .= ">". $cat1_q->f("documentcategory1_label") . "</option>\n";
-  }
-  $sel_cat1 .= "</select>";
-
-  // category 2 select
-  $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2\">
-    <option value=\"$c_all\">$l_all</option>";
-  while ($cat2_q->next_record()) {
-    $c2_id = $cat2_q->f("documentcategory2_id");
-    $sel_cat2 .= "\n<option value=\"$c2_id\"";
-    if ($c2_id == $cat2) { $sel_cat2 .= " selected=\"selected\""; }
-    $sel_cat2 .= ">". $cat2_q->f("documentcategory2_label") . "</option>\n";
-  }
-  $sel_cat2 .= "</select>";
-
+  $block_category1 = of_dis_block_select_category($cats1, $cat1, "document", "category1", "mono");
+  $block_category2 = of_dis_block_select_category($cats2, $cat2, "document", "category2", "mono");
 
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">
@@ -141,12 +120,8 @@ function html_document_search_form ($document, $cat1_q, $cat2_q, $mime_q) {
     <div class=\"searchLabel\">$l_name<br />
       <input type=\"text\" name=\"tf_filename\" id=\"tf_title\" size=\"16\" value=\"$name\" />
     </div>
-    <div class=\"searchLabel\">$l_category1<br />
-      $sel_cat1
-    </div>
-    <div class=\"searchLabel\">$l_category2<br />
-      $sel_cat2
-    </div>
+    $block_category1 
+    $block_category2
     <div class=\"searchLabel\">$l_author<br />
       <input type=\"text\" name=\"tf_author\" id=\"tf_author\" size=\"8\" value=\"$author\" />
     </div>
@@ -203,8 +178,8 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
 
   // we urlencode to avoid breakage for space char
   $title = stripslashes($document["title"]);
-  $cat1 = $document["category1"];
-  $cat2 = $document["category2"];
+  $category1 = $document["category1"];
+  $category2 = $document["category2"];
   $author = stripslashes($document["author"]);
   $mime = $document["mime"];
   $name = stripslashes($document["name"]);
@@ -219,7 +194,7 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
     $ext_target = $document["ext_target"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
   }  
-  $url = url_prepare("document_index.php?tf_title=$title&sel_cat1=$cat1&sel_cat2=$cat2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;param_entity=$entity_id&amp;action=search$url_ext");
+  $url = url_prepare("document_index.php?tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;param_entity=$entity_id&amp;action=search$url_ext");
 
 
   $doc_q->seek($first_row);
@@ -290,21 +265,25 @@ function dis_document_consult($document) {
 function html_document_consult($doc_q) {
   global $display, $set_theme;
   global $l_document, $l_size, $l_bytes, $l_title, $l_mimetype, $l_private;
-  global $l_author, $l_category1, $l_category2, $l_path, $l_name; 
+  global $l_author, $l_path, $l_name; 
   global $l_file, $l_consult, $l_insert, $l_update, $l_checkdelete;
   global $c_yes, $c_no;
 
   // if update mode and first display values are taken from database
   $id = $doc_q->f("document_id");
   $title = $doc_q->f("document_title");
-  $cat1 = $doc_q->f("documentcategory1_label");
-  $cat2 = $doc_q->f("documentcategory2_label");
+  $cats1 = of_entitycategories_get($doc_q->f("document_id"), "document", "category1", "mono");
+  $cats2 = of_entitycategories_get($doc_q->f("document_id"), "document", "category2", "mono");
   $author = $doc_q->f("document_author");
   $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
   $mimetype = $doc_q->f("documentmimetype_label");
   $path = $doc_q->f("document_path");
   $size = $doc_q->f("document_size");
   $name = $doc_q->f("document_name");
+
+  // Category 1 & 2 
+  $block_category1 = of_dis_block_consult_category($cats1, "document", "category1", "mono");
+  $block_category2 = of_dis_block_consult_category($cats2, "document", "category2", "mono");
 
   $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
   $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
@@ -331,13 +310,9 @@ function html_document_consult($doc_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_private</td>
       <td class=\"detailText\">$privacy</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailText\">$cat1</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailText\">$cat2</td>
     </tr>
+    $block_category1
+    $block_category2
     </table>
 
     <div class=\"detailHead\">$l_file</div>
@@ -375,11 +350,14 @@ function html_document_consult($doc_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_form($action, $document, $doc_q) {
 
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
+  $did=$document["id"];
+  if ($did > 0) {
+    $cats1 = of_category_get_ordered("document", "category1", $did, "mono");
+    $cats2 = of_category_get_ordered("document", "category2", $did, "mono");
+  }
   $mime_q = run_query_documentmime();
 
-  $block = html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_q);
+  $block = html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q);
 
   return $block;
 }
@@ -391,15 +369,15 @@ function dis_document_form($action, $document, $doc_q) {
 //   - $action     : action called
 //   - $document[] : Document hash values
 //   - $doc_q      : document database result 
-//   - $cat1_q     : category 1 database result 
-//   - $cat2_q     : category 2 database result 
+//   - $cats1      : Document category1 array
+//   - $cats2      : Document category2 array
 //   - $mime_q     : Mime types database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_q) {
+function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q) {
   global $display, $path, $default_path, $set_theme;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
-  global $l_name, $l_author, $l_category1, $l_category2, $l_path, $l_kind; 
+  global $l_name, $l_author, $l_path, $l_kind; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $popup_width, $popup_height;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
@@ -466,26 +444,8 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
 
   if ($fi_path =="") $fi_path = $default_path;
 
-  // category 1 select
-  $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">";
-  while($cat1_q->next_record()) {
-    $c1_id = $cat1_q->f("documentcategory1_id");
-    $sel_cat1 .= "\n<option value=\"$c1_id\"";
-    if ($c1_id == $cat1) { $sel_cat1 .= " selected=\"selected\""; }
-    $sel_cat1 .= ">". $cat1_q->f("documentcategory1_label") . "</option>\n";
-  }
-  $sel_cat1 .= "</select>";
-
-  // category 2 select
-  $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2\">";
-  while ($cat2_q->next_record()) {
-    $c2_id = $cat2_q->f("documentcategory2_id");
-    $sel_cat2 .= "\n<option value=\"$c2_id\"";
-    if ($c2_id == $cat2) { $sel_cat2 .= " selected=\"selected\""; }
-    $sel_cat2 .= ">". $cat2_q->f("documentcategory2_label") . "</option>\n";
-  }
-  $sel_cat2 .= "</select>";
-
+  $block_category1 = of_category_dis_entity_form($cats1, "document", "category1", "mono");
+  $block_category2 = of_category_dis_entity_form($cats2, "document", "category2", "mono");
 
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">";
@@ -568,13 +528,9 @@ function html_document_form($action, $document, $doc_q, $cat1_q, $cat2_q, $mime_
     </tr><tr>
       <td class=\"detailLabel\">$l_private</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> 
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailForm\">$sel_cat1</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailForm\">$sel_cat2</td>
     </tr>
+    $block_category1
+    $block_category2
     </table>
 
     <div class=\"detailHead\">$l_file</div>
@@ -750,203 +706,11 @@ function dis_admin_index() {
   $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_documentmime();
 
-  $block = of_html_admin_cat_form($cats1, "contact", "category1");;
+  $block = of_html_admin_cat_form($cats1, "document", "category1");;
   $block .= "<hr />";
-  $block .= of_html_admin_cat_form($cats1, "contact", "category1");;
+  $block .= of_html_admin_cat_form($cats2, "document", "category2");;
   $block .= "<hr />";
   $block .= html_document_mime_form($mime_q);
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Document Category1 section
-// Parameters:
-//   - $cat1_q : Category1 list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_document_cat1_form($cat1_q) {
-  global $l_cat1_manage,$l_cat1_exist;
-  global $l_cat1_checkdelete,$l_cat1_update,$l_cat1_new,$l_cat1_insert;
-
-  $sel_cat1 = "<select name=\"sel_cat1\" onChange=\"
-    forms.form_cat1_update.tf_cat1.value=this.options[this.selectedIndex].text;\"
-    size=\"4\" >";
-  while ($cat1_q->next_record()) {
-    $id = $cat1_q->f("documentcategory1_id");
-    $label = $cat1_q->f("documentcategory1_label");
-    $sel_cat1 .= "\n<option value=\"$id\">$label</option>";
-  }
-  $sel_cat1 .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_cat1_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Category1 Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_cat1_delete\" method=\"post\"
-              action=\"" . url_prepare("document_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_cat1_exist</td>
-              <td class=\"adminLabel\">$sel_cat1</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"cat1_checklink\" />
-              <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_checkdelete\" onclick=\"if (check_cat1_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Category1 Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_cat1_update\" method=\"get\"
-              action=\"" . url_prepare("document_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_cat1\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"cat1_update\" />
-            <input type=\"text\" name=\"tf_cat1\" />
-            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_update\"
-              onclick=\"if (check_cat1_upd(this.form,document.form_cat1_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Category1 Section -->
-
-        <form name=\"form_cat1_new\" method=\"get\"
-          action=\"" . url_prepare("document_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_cat1_new :
-            <input name=\"tf_cat1\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"cat1_insert\" />
-            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_insert\"
-              onclick=\"if (check_cat1_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
-";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Document Category2 section
-// Parameters:
-//   - $cat2_q : Category2 list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_document_cat2_form($cat2_q) {
-  global $l_cat2_manage,$l_cat2_exist;
-  global $l_cat2_checkdelete,$l_cat2_update,$l_cat2_new,$l_cat2_insert;
-
-  $sel_cat2 = "<select name=\"sel_cat2\" onChange=\"
-    forms.form_cat2_update.tf_cat2.value=this.options[this.selectedIndex].text;\"
-    size=\"4\" >";
-  while ($cat2_q->next_record()) {
-    $id = $cat2_q->f("documentcategory2_id");
-    $label = $cat2_q->f("documentcategory2_label");
-    $sel_cat2 .= "\n<option value=\"$id\">$label</option>";
-  }
-  $sel_cat2 .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_cat2_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Category2 Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_cat2_delete\" method=\"post\"
-              action=\"" . url_prepare("document_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_cat2_exist</td>
-              <td class=\"adminLabel\">$sel_cat2</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"cat2_checklink\" />
-              <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_checkdelete\" onclick=\"if (check_cat2_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Category2 Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_cat2_update\" method=\"get\"
-              action=\"" . url_prepare("document_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_cat2\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"cat2_update\" />
-            <input type=\"text\" name=\"tf_cat2\" />
-            <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_update\"
-              onclick=\"if (check_cat2_upd(this.form,document.form_cat2_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Category2 Section -->
-
-        <form name=\"form_cat2_new\" method=\"get\"
-          action=\"" . url_prepare("document_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_cat2_new :
-            <input name=\"tf_cat2\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"cat2_insert\" />
-            <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_insert\"
-              onclick=\"if (check_cat2_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
-";
 
   return $block;
 }
@@ -1077,181 +841,6 @@ function html_document_mime_form($mime_q) {
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: the cat1 links
-// Parameters:
-//   - $document : document hash info : keys used : cat1
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat1_links($document) {
-  global $l_cat1_link_document, $l_cat1_link_document_no;
-  global $l_cat1_delete, $l_cat1_can_delete, $l_cat1_cant_delete;
-  global $l_back,$display;
-
-  $id = $document["category1"];
-  $label = get_cat1_label($id);
-  $obm_q = run_query_cat1_links($id);
-
-  $nb_cat = $obm_q->num_rows();
-  if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg($l_cat1_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat1_link_document ($nb_cat)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("document_id");
-      $cname = $obm_q->f("document_title");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;param_document=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_cat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-	  <form name=\"form_back\" method=\"get\"
-	    action=\"" .url_prepare("document_index.php") . "\">
-	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
-	  <input type=\"submit\" value=\"$l_back\" />
-	  </form>
-	</p>
-      </div>";
-
-  } else {
-    $display["msg"] .= display_ok_msg($l_cat1_can_delete);
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat1_link_document_no </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">    
-      <form name=\"form_act_delete\"
-	method=post action=\"" . url_prepare("document_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"cat1_delete\">
-      <input type=\"hidden\" name=\"sel_cat1\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat1_delete\">
-      </form>
-      
-      <form name=\"form_back\" method=\"get\"
-	action=\"" .url_prepare("document_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
-  }
-
-  return $dis_link;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: the cat2 links
-// Parameters:
-//   - $document : document hash info : keys used : cat2
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat2_links($document) {
-  global $l_cat2_link_document, $l_cat2_link_document_no;
-  global $l_cat2_delete, $l_cat2_can_delete, $l_cat2_cant_delete;
-  global $l_back,$display;
-
-  $id = $document["category2"];
-  $label = get_cat2_label($id);
-  $obm_q = run_query_cat2_links($id);
-
-  $nb_cat = $obm_q->num_rows();
-  if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg($l_cat2_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat2_link_document ($nb_cat)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("document_id");
-      $cname = $obm_q->f("document_title");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;param_document=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_cat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-    $dis_link .="
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-	  <form name=\"form_back\" method=\"get\"
-	    action=\"" .url_prepare("document_index.php") . "\">
-	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
-	  <input type=\"submit\" value=\"$l_back\" />
-	  </form>
-	</p>
-      </div>";
-
-  } else {
-    $display["msg"] .= display_ok_msg($l_cat2_can_delete);
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat2_link_document_no </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">    
-      <form name=\"form_act_delete\"
-	method=post action=\"" . url_prepare("document_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"cat2_delete\">
-      <input type=\"hidden\" name=\"sel_cat2\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat2_delete\">
-      </form>
-      
-      <form name=\"form_back\" method=\"get\"
-	action=\"" .url_prepare("document_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
-  }
-
-  return $dis_link;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: the mime links
