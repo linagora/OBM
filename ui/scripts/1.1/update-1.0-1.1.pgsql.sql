@@ -275,4 +275,13 @@ UPDATE Incident SET temp_incident_category1_id = incident_cat1_id;
 ALTER TABLE Incident DROP COLUMN incident_category1_id;
 ALTER TABLE Incident RENAME COLUMN temp_incident_category1_id TO incident_category1_id;
 
+-------------------------------------------------------------------------------
+-- Update DocumentCategory1 table
+-------------------------------------------------------------------------------
+ALTER TABLE DocumentCategory1 ADD COLUMN   documentcategory1_code varchar(10) NOT NULL default ''; 
+
+-------------------------------------------------------------------------------
+-- Update DocumentCategory2 table
+-------------------------------------------------------------------------------
+ALTER TABLE DocumentCategory2 ADD COLUMN   documentcategory2_code varchar(10) NOT NULL default ''; 
 

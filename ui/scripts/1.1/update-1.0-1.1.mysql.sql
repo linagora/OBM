@@ -264,3 +264,13 @@ ALTER TABLE CalendarEvent CHANGE calendarevent_category_id calendarevent_categor
 -- correctness : _cat1_id -> _category1_id
 ALTER TABLE Incident CHANGE incident_cat1_id incident_category1_id int(8) default NULL;
 
+-------------------------------------------------------------------------------
+-- Update DocumentCategory1 table
+-------------------------------------------------------------------------------
+ALTER TABLE DocumentCategory1 ADD COLUMN documentcategory1_code varchar(10) default '' after documentcategory1_usercreate;
+
+-------------------------------------------------------------------------------
+-- Update DocumentCategory2 table
+-------------------------------------------------------------------------------
+ALTER TABLE DocumentCategory2 ADD COLUMN documentcategory2_code varchar(10) default '' after documentcategory2_usercreate;
+

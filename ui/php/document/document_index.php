@@ -25,6 +25,8 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("document_query.inc");
 require("document_display.inc");
+require_once("$obminclude/of/of_category.inc");
+
 
 if ($action == "") $action = "index";
 $document = get_param_document();
@@ -223,76 +225,77 @@ if ($document["id"] > 0) {
   require("document_js.inc");
   $display["detail"] = dis_admin_index();
 
-} elseif ($action == "cat1_insert")  {
+
+} elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat1_insert($document);
+  $retour = of_run_query_category_insert($document, "document", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat1_insert_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat1_insert_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
   }
   require("document_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat1_update")  {
+} elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat1_update($document);
+  $retour = of_run_query_category_update($document, "document", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat1_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat1_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
   }
   require("document_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat1_checklink")  {
+} elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_cat1_links($document);
+  $display["detail"] .= of_dis_category_links($document, "document", "category1");
 
-} elseif ($action == "cat1_delete")  {
+} elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat1_delete($document["category1"]);
+  $retour = of_run_query_category_delete($document, "document", "category1");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat1_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat1_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
   }
   require("document_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat2_insert")  {
+} elseif ($action == "category2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat2_insert($document);
+  $retour = of_run_query_category_insert($document, "document", "category2");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat2_insert_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat2_insert_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_insert_error");
   }
   require("document_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat2_update")  {
+} elseif ($action == "category2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat2_update($document);
+  $retour = of_run_query_category_update($document, "document", "category2");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat2_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat2_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_update_error");
   }
   require("document_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "cat2_checklink")  {
+} elseif ($action == "category2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_cat2_links($document);
+  $display["detail"] .= of_dis_category_links($document, "document", "category2", "mono");
 
-} elseif ($action == "cat2_delete")  {
+ } elseif ($action == "category2_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_cat2_delete($document["category2"]);
+  $retour = of_run_query_category_delete($document, "document", "category2");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_cat2_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_category2).": $l_c_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_cat2_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_delete_error");
   }
   require("document_js.inc");
   $display["detail"] .= dis_admin_index();
@@ -371,11 +374,13 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_document() {
   global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_dir_path;
-  global $tf_cat1, $tf_cat2, $tf_extension, $tf_mimetype, $tf_name;
+  global $tf_extension, $tf_mimetype, $tf_name;
   global $fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
-  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url;
+  global $sel_mime,$cb_privacy,$rd_kind,$tf_url;
   global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
   global $param_document, $popup, $param_entity, $entity,$rd_file_update; 
+  global $tf_category1_label, $tf_category1_code, $sel_category1;
+  global $tf_category2_label, $tf_category2_code, $sel_category2;
 
   if (isset ($param_document)) $document["id"] = $param_document;
   if (isset ($param_entity)) $document["entity_id"] = $param_entity;
@@ -404,14 +409,17 @@ function get_param_document() {
   if (isset ($ext_target)) $document["ext_target"] = $ext_target;
 
   
-  if (isset ($tf_cat1)) $document["cat1_label"] = $tf_cat1;
-  if (isset ($tf_cat2)) $document["cat2_label"] = $tf_cat2;
+  if (isset ($tf_category1_label)) $contact["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $contact["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $contact["category1"] = $sel_category1;
+  if (isset ($tf_category2_label)) $contact["category2_label"] = $tf_category2_label;
+  if (isset ($tf_category2_code)) $contact["category2_code"] = $tf_category2_code;
+  if (isset ($sel_category2)) $contact["category2"] = $sel_category2;
+  
   if (isset ($tf_mime)) $document["mime_label"] = $tf_mime;
   if (isset ($tf_extension)) $document["extension"] = $tf_extension;
   if (isset ($tf_mimetype)) $document["mimetype"] = $tf_mimetype;
 
-  if (isset ($sel_cat1)) $document["category1"] = $sel_cat1;
-  if (isset ($sel_cat2)) $document["category2"] = $sel_cat2;
   if (isset ($sel_mime)) $document["mime"] = $sel_mime;
 
   if (isset ($cb_privacy)) $document["privacy"] = $cb_privacy;
@@ -560,57 +568,57 @@ function get_document_action() {
    					);
 
 // Category Insert
-  $actions["document"]["cat1_insert"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat1_insert",
+  $actions["document"]["category1_insert"] = array (
+    'Url'      => "$path/document/document_index.php?action=category1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["document"]["cat1_update"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat1_update",
+  $actions["document"]["category1_update"] = array (
+    'Url'      => "$path/document/document_index.php?action=category1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["document"]["cat1_checklink"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat1_checklink",
+  $actions["document"]["category1_checklink"] = array (
+    'Url'      => "$path/document/document_index.php?action=category1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["document"]["cat1_delete"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat1_delete",
+  $actions["document"]["category1_delete"] = array (
+    'Url'      => "$path/document/document_index.php?action=category1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
-  $actions["document"]["cat2_insert"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat2_insert",
+  $actions["document"]["category2_insert"] = array (
+    'Url'      => "$path/document/document_index.php?action=category2_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["document"]["cat2_update"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat2_update",
+  $actions["document"]["category2_update"] = array (
+    'Url'      => "$path/document/document_index.php?action=category2_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["document"]["cat2_checklink"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat2_checklink",
+  $actions["document"]["category2_checklink"] = array (
+    'Url'      => "$path/document/document_index.php?action=category2_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["document"]["cat2_delete"] = array (
-    'Url'      => "$path/document/document_index.php?action=cat2_delete",
+  $actions["document"]["category2_delete"] = array (
+    'Url'      => "$path/document/document_index.php?action=category2_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );

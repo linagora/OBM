@@ -832,6 +832,7 @@ CREATE TABLE DocumentCategory1 (
   documentcategory1_timecreate  timestamp(14),
   documentcategory1_userupdate  int(8) default NULL,
   documentcategory1_usercreate  int(8) default NULL,
+  documentcategory1_code        varchar(10) default '',
   documentcategory1_label       varchar(255) default NULL,
   PRIMARY KEY (documentcategory1_id)
 );
@@ -846,6 +847,7 @@ CREATE TABLE DocumentCategory2 (
   documentcategory2_timecreate  timestamp(14),
   documentcategory2_userupdate  int(8) default NULL,
   documentcategory2_usercreate  int(8) default NULL,
+  documentcategory2_code        varchar(10) default '',
   documentcategory2_label       varchar(255) default NULL,
   PRIMARY KEY (documentcategory2_id)
 );

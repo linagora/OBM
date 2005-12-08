@@ -746,13 +746,13 @@ function dis_can_delete_dir($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
-  $cat1_q = run_query_documentcategory1();
-  $cat2_q = run_query_documentcategory2();
+  $cats1 = of_category_get_ordered("document", "category1");
+  $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_documentmime();
 
-  $block = html_document_cat1_form($cat1_q);
+  $block = of_html_admin_cat_form($cats1, "contact", "category1");;
   $block .= "<hr />";
-  $block .= html_document_cat2_form($cat2_q);
+  $block .= of_html_admin_cat_form($cats1, "contact", "category1");;
   $block .= "<hr />";
   $block .= html_document_mime_form($mime_q);
 
