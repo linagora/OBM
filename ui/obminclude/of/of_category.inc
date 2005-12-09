@@ -364,8 +364,13 @@ function of_category_get_ordered($entity, $cat, $entity_id=0, $cattype="multi") 
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
-  $entitytable = ucfirst($entity);
-  $entityfield_prefix = $entity."_";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
 
@@ -434,8 +439,13 @@ function of_entitycategories_get($entity_id, $entity, $cat, $cattype="multi") {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
-  $entitytable = ucfirst($entity);
-  $entityfield_prefix = $entity."_";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
 
@@ -699,8 +709,13 @@ function of_run_query_category_links($p_id, $entity, $cat, $cattype="multi") {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
-  $entitytable = ucfirst($entity);
-  $entityfield_prefix = $entity."_";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
 
@@ -1081,14 +1096,18 @@ function of_dis_block_consult_category($cats, $entity, $cat, $cattype="multi") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Entity coont query execution
+// Entity count query execution
 // Parameters:
 //   - $entity       : target entity
 ///////////////////////////////////////////////////////////////////////////////
 function of_get_entity_count($entity) {
   global $cdg_sql;
 
-  $entitytable = ucfirst($entity);
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+  } else {
+    $entitytable = ucfirst($entity);
+  }
 
   $query = "SELECT count(*) as count_entity FROM $entitytable";
 
@@ -1119,8 +1138,13 @@ function of_run_query_category_per_entity($entity, $cat, $cattype="multi") {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
-  $entitytable = ucfirst($entity);
-  $entityfield_prefix = $entity."_";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
 

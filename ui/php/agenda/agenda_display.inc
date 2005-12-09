@@ -798,12 +798,12 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties)
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category = $l_private;    
+    $category1 = $l_private;    
   } else {
     $title = $event["event"]->title;
     $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
     $description = $event["event"]->description;
-    $category = $event["event"]->category;
+    $category1 = $event["event"]->category1;
   }  
   if ($nb_ent == 1) {	      
     $event_head_display = date("H:i",$event["date"])."->".date("H:i",$event["date"] + $event["event"]->duration);
@@ -818,7 +818,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties)
   <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
    <div class=\"blockTitle\">:: $title</div>
    <ul class=\"blockItem\">
-    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$category1</li>
     <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
     <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
     <li class=\"blockItem\">$description</li>
@@ -1034,12 +1034,12 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) 
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category = $l_private;    
+    $category1 = $l_private;    
   }else {
     $title = $event["event"]->title;
     $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
     $description = $event["event"]->description;
-    $category = $event["event"]->category;
+    $category1 = $event["event"]->category1;
   }  
   if ($nb_ent == 1) {	      
     $event_head_display = "&#8226; $title";
@@ -1054,7 +1054,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) 
   <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\"> 
    <div class=\"blockTitle\">:: $title</div>
    <ul class=\"blockItem\">  
-    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$category1</li>
     <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
     <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>        
     <li class=\"blockItem\">$description</li>
@@ -1234,12 +1234,12 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category = $l_private;
+    $category1 = $l_private;
   } else {
     $title = $event["event"]->title;
     $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
     $description = $event["event"]->description;
-    $category = $event["event"]->category;
+    $category1 = $event["event"]->category1;
   }
   if ($nb_ent == 1) {
     $event_head_display = "&#8226;
@@ -1256,7 +1256,7 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
   <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;\">
    <div class=\"blockTitle\">:: $title</div>
    <ul class=\"blockItem\">
-    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$category1</li>
     <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
     <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
     <li class=\"blockItem\">$description</li>
@@ -1283,12 +1283,12 @@ function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category = $l_private;    
+    $category1 = $l_private;    
   }else {
     $title = $event->title;
     $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
     $description = $event->description;
-    $category = $event->category;
+    $category1 = $event->category1;
   }    
   $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
   $dis_calendar .=  "<a class=\"agendaLink\" 
@@ -1299,7 +1299,7 @@ function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
   <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\"> 
    <div class=\"blockTitle\">:: $title</div>
    <ul class=\"blockItem\">  
-    <li class=\"blockItem\">$category</li>
+    <li class=\"blockItem\">$category1</li>
     <li class=\"blockItem\">$description</li>
    </ul>
   </div>";
@@ -1462,8 +1462,11 @@ function dis_event_form($action, $agenda, $event_q, $entities) {
     }
   }
 
-  $cat_q = run_query_get_eventcategories();
-  $block = html_event_form($action, $agenda, $event_q, $users, $resources, $groups, $cat_q);
+  $id=$agenda["id"];
+  if ($id > 0) { 
+    $cats1 = of_category_get_ordered("calendar", "category1", $id, "mono");
+  }
+  $block = html_event_form($action, $agenda, $event_q, $users, $resources, $groups, $cats1);
 
   return $block;
 }
@@ -1478,9 +1481,9 @@ function dis_event_form($action, $agenda, $event_q, $entities) {
 //   - $users        : Array : Event users or selected users [ids] [entity]
 //   - $res          : Array : Event resources or selected res [ids] [entity]
 //   - $groups       : Array : selected groups [ids] [entity]
-//   - $cat_q        : DBO : Category list
+//   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat_q) {
+function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cats1) {
   global $path, $display, $set_theme;
   global $cagenda_resource, $cagenda_weekstart, $set_cal_interval;
   global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
@@ -1499,7 +1502,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   if ($action == "detailupdate") {
     $title = htmlspecialchars($event_q->f("calendarevent_title"));
     $location = htmlspecialchars($event_q->f("calendarevent_location"));
-    $category_id = $event_q->f("calendarevent_category_id");
+    $cat1 = $event_q->f("calendarevent_category1_id");
     $priority = $event_q->f("calendarevent_priority");
     $desc = $event_q->f("calendarevent_description");
     $datebegin = $event_q->f("calendarevent_date");
@@ -1524,7 +1527,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   if (isset($agenda["id"])) { $id = $agenda["id"]; }
   if (isset($agenda["title"])) { $title = $agenda["title"]; }
   if (isset($agenda["location"])) { $location = $agenda["location"]; }
-  if (isset($agenda["category"])) { $category_id = $agenda["category"]; }
+  if (isset($agenda["category1"])) { $cat1 = $agenda["category1"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
   if (isset($agenda["force"])) { $desc = $agenda["force"]; }
   if (isset($agenda["description"])) { $desc = $agenda["description"]; }
@@ -1595,17 +1598,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
     </select>";
 
   // eventcategory select
-  $sel_cat = "<select name=\"sel_category_id\">"; 
-  while ($cat_q->next_record()) {
-    $c_id = $cat_q->f("calendarcategory_id");
-    $c_label = $cat_q->f("calendarcategory_label");
-    $sel_cat .= "<option value=\"$c_id\"";
-    if ($c_id == $category_id) {
-      $sel_cat .= " selected=\"selected\"";
-    }
-    $sel_cat .= ">$c_label</option>";
-  }
-  $sel_cat .= "</select>";
+  $block_category1 = of_category_dis_entity_form($cats1, "calendar", "category1", "mono"); 
 
  // Repetition days
   $start_week_day = strtotime($cagenda_weekstart);
@@ -1814,10 +1807,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
     <td class=\"detailLabel\">$l_private</td>
     <td class=\"detailForm\">$dis_privacy</td>
   </tr> 
-  <tr>
-    <td class=\"detailLabel\">$l_cat</td>
-    <td class=\"detailForm\">$sel_cat</td>
-  </tr>    
+    $block_category1
   <tr>
     $block_user
   </tr>
@@ -1983,7 +1973,7 @@ function html_waiting_events($obm_wait) {
     <tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_location")."</td>
-     <td class=\"detailForm\">".$obm_wait->f("calendarcategory_label")."</td>
+     <td class=\"detailForm\">".$obm_wait->f("calendarcategory1_label")."</td>
      <td class=\"detailForm\">$priority</td>
      <td class=\"detailForm\">$user_create</td>
      <td class=\"detailForm\">$kind</td>
@@ -2056,7 +2046,7 @@ function html_calendar_consult($event_q, $entities) {
   
   $title = $event_q->f("calendarevent_title");
   $location = $event_q->f("calendarevent_location");
-  $category = $event_q->f("calendarcategory_label");
+  $cats1 = of_entitycategories_get($event_q->f("calendarevent_id"), "calendar", "category1", "mono");
   $priority = $event_q->f("calendarevent_priority"); 
   $description = $event_q->f("calendarevent_description");
   $all_day = $event_q->f("calendarevent_allday");
@@ -2076,6 +2066,8 @@ function html_calendar_consult($event_q, $entities) {
   }
   $id = $event_q->f("calendarevent_id");
 
+
+  $block_category1 = of_dis_block_consult_category($cats1, "calendar", "category1", "mono");
   switch ($priority ) {
     case 1 :
       $priority = $l_low;
@@ -2158,10 +2150,7 @@ function html_calendar_consult($event_q, $entities) {
     <td class=\"detailLabel\">$l_private</td>
     <td class=\"detailText\">$privacy</td>
   </tr> 
-  <tr>
-    <td class=\"detailLabel\">$l_cat</td>
-    <td class=\"detailText\">$category</td>
-  </tr>    
+  $block_category1
   <tr>
     <td class=\"detailLabel\">$l_users</td>
     <td class=\"detailText\">$dis_user_list</td>
@@ -2544,186 +2533,9 @@ function dis_admin_index() {
 
   $cats1 = of_category_get_ordered("calendar", "category1");
   $block = of_html_admin_cat_form($cats1, "calendar", "category1");;
-//  $block .= "<hr />";
 
   return $block;
 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Company Category section
-// Parameters:
-//   - $category_q : Category list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_agenda_category_form($category_q) {
-  global $l_category_manage,$l_category_exist;
-  global $l_category_checkdelete,$l_category_update,$l_category_new,$l_category_insert;
-
-  $sel_category = "<select name=\"sel_category\" size=\"4\" >";
-  while ($category_q->next_record()) {
-    $label = $category_q->f("calendarcategory_label");
-    $id = $category_q->f("calendarcategory_id");
-    $sel_category .= "\n<option value=\"$id\">$label</option>";
-  }
-  $sel_category .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_category_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Category Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_admin_category_delete\" method=\"post\"
-              action=\"" . url_prepare("agenda_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_category_exist</td>
-              <td class=\"adminLabel\">$sel_category</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"category_checklink\" />
-              <input type=\"submit\" name=\"sub_category\" value=\"$l_category_checkdelete\" onclick=\"if (check_category_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Category Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_admin_category_update\" method=\"get\"
-              action=\"" . url_prepare("agenda_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_category\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"category_update\" />
-            <input type=\"text\" name=\"tf_category_upd\" />
-            <input type=\"submit\" name=\"sub_category\" value=\"$l_category_update\"
-              onclick=\"if (check_category_upd(this.form,document.form_admin_category_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Category Section -->
-
-        <form name=\"form_admin_category_new\" method=\"get\"
-          action=\"" . url_prepare("agenda_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_category_new :
-            <input name=\"tf_category_new\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"category_insert\" />
-            <input type=\"submit\" name=\"sub_category\" value=\"$l_category_insert\"
-              onclick=\"if (check_category_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
-";
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return the category delete display form (button)
-// Parameters:
-//   - $label : category label
-// Retuns:
-//   $r : string with HTML code
-///////////////////////////////////////////////////////////////////////////////
-function dis_category_delete_form($agenda) {
-  global $l_category_delete;
-
-  $id = $agenda["category_id"];
-  $r = "<form name=\"form_category_delete\"
-          method=post action=\"" . url_prepare("agenda_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"category_delete\">
-        <input type=\"hidden\" name=\"sel_category\" value=\"$id\">
-        <input type=\"submit\" name=\"sub_category\" value=\"$l_category_delete\">
-        </form>";
-
-  return $r;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the category links
-// Parameters:
-//   - $label : category label
-///////////////////////////////////////////////////////////////////////////////
-function dis_category_links($agenda) {
-  global $l_category_link_agenda, $l_category_link_agenda_no;
-  global $l_category_can_delete, $l_category_cant_delete;
-  global $l_back,$l_link_events,$display;
-
-  $label = get_category_label($agenda["category_id"]);
-  $obm_q = run_query_category_links($agenda["category_id"]);
-  $del_form = dis_category_delete_form($agenda["category_id"]);
-  
-  $obm_q->next_record();
-  if ($obm_q->f("numlink") > 0) {
-    $display["msg"] = display_warn_msg($l_category_cant_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : ".$obm_q->f("numlink")." $l_link_events</td>
-    </tr>
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-        <form name=\"form_back\" method=\"post\"
-          action=\"" .url_prepare("agenda_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-	
-	</p>
-    </div>
-";
-  } else {
-    $display["msg"] = display_ok_msg($l_category_can_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $l_category_link_agenda_no '$label' 
-      </td>
-    </tr>
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-      $del_form
-        <form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("agenda_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-	</p>
-    </div>
-";
-
-  }
-  return "$dis_link";
 }
 
 
@@ -2757,7 +2569,7 @@ METHOD:PUBLISH";
     $title = wordwrap($title,74,"\n ",1);
     $location = $ev_q->f("calendarevent_location");
     $priority = $ev_q->f("calendarevent_priority");
-    $category = strtoupper($ev_q->f("calendarcategory_label")); 
+    $category1 = strtoupper($ev_q->f("calendarcategory1_label")); 
     $date_ts = $ev_q->f("calendarevent_timeupdate");
     $date_ts = gmdate("Ymd\THis\Z",$date_ts);
     if ($ev_q->f("calendarevent_description") != "") {
@@ -2805,7 +2617,7 @@ END:VEVENT";
     $title = $ev_q->f("calendarevent_title");
     $location = $ev_q->f("calendarevent_location");
     $priority = $ev_q->f("calendarevent_priority");
-    $category = strtoupper($ev_q->f("calendarcategory_label"));
+    $category = strtoupper($ev_q->f("calendarcategory1_label"));
     if ($ev_q->f("calendarevent_description") != "") {
       $description = "\nDESCRIPTION:".$ev_q->f("calendarevent_description");
     } else {

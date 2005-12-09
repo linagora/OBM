@@ -719,7 +719,7 @@ function dis_admin_index() {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Document Mime section
 // Parameters:
-//   - $mime_q : Category2 list database object
+//   - $mime_q : mimetype list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_mime_form($mime_q) {
   global $l_mime_manage,$l_mime_exist,$l_label,$l_extension,$l_mimetype;

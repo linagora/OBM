@@ -33,8 +33,8 @@ function run_query_detail($param_event) {
       calendarevent_title, 
       calendarevent_description,
       calendarevent_location, 
-      calendarevent_category_id,
-      calendarcategory_label,
+      calendarevent_category1_id,
+      calendarcategory1_label,
       calendarevent_privacy,
       calendarevent_priority,
       calendarevent_repeatkind,
@@ -46,7 +46,7 @@ function run_query_detail($param_event) {
     FROM  
       CalendarEvent
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-      LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
+      LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN UserObm AS c ON calendarevent_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON calendarevent_userupdate = u.userobm_id
     WHERE calendarevent_id = '$param_event'";
@@ -209,7 +209,7 @@ function run_query_waiting_events() {
       calendarevent_id,		  
       calendarevent_title, 
       calendarevent_location, 
-      calendarcategory_label,
+      calendarcategory1_label,
       calendarevent_privacy,
       calendarevent_priority,
       calendarevent_repeatkind,
@@ -218,7 +218,7 @@ function run_query_waiting_events() {
       $calendarevent_endrepeat,
       $calendarevent_date		   
     FROM CalendarEvent
-      LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
+      LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id  = evententity_event_id
       LEFT JOIN UserObm attendee ON evententity_entity_id = attendee.userobm_id
       LEFT JOIN UserObm u ON calendarevent_usercreate = u.userobm_id
@@ -345,7 +345,7 @@ function run_query_insert_event_data($agenda) {
 
   $now = date("Y-m-d H:i:s");
   $title = $agenda["title"];
-  $category_id = $agenda["category"];
+  $category1_id = $agenda["category1"];
   $priority = $agenda["priority"];
   $description = $agenda["description"];
   $location = $agenda["location"];
@@ -376,7 +376,7 @@ function run_query_insert_event_data($agenda) {
     calendarevent_date,     
     calendarevent_description,
     calendarevent_location, 
-    calendarevent_category_id,
+    calendarevent_category1_id,
     calendarevent_priority,
     calendarevent_privacy, 
     calendarevent_duration,
@@ -395,7 +395,7 @@ function run_query_insert_event_data($agenda) {
     '$datebegin',
     '$description',
     '$location',
-    '$category_id',
+    '$category1_id',
     '$priority',
     '$privacy',
     '$event_duration',		
@@ -478,7 +478,7 @@ METHOD:REQUEST";
     $title = wordwrap($title,74,"\n ",1);
     $location = $obm_event->f("calendarevent_location");
     $priority = $obm_event->f("calendarevent_priority");
-    $category = strtoupper($obm_event->f("calendarcategory_label")); 
+    $category1 = strtoupper($obm_event->f("calendarcategory1_label")); 
     $date_ts = $obm_event->f("calendarevent_timeupdate");
     $date_ts = gmdate("Ymd\THis\Z",$date_ts);
     if ($obm_event->f("calendarevent_description") != "") {
@@ -525,7 +525,7 @@ CLASS:$private
 ORGANIZER;CN=\"$organizer_cn\":MAILTO:$organizer_email
 $msg_attendee
 LOCATION:$location
-CATEGORIES:$category
+CATEGORIES:$category1
 STATUS:CONFIRMED$description
 DTSTART:$date_b
 DTEND:$date_e
@@ -537,7 +537,7 @@ END:VEVENT";
     $title = $obm_event->f("calendarevent_title");
     $location = $obm_event->f("calendarevent_location");
     $priority = $obm_event->f("calendarevent_priority"); 
-    $category = strtoupper($obm_event->f("calendarcategory_label")); 
+    $category1 = strtoupper($obm_event->f("calendarcategory1_label")); 
     if ($obm_event->f("calendarevent_description") != "") {
       $description = "\nDESCRIPTION:".$obm_event->f("calendarevent_description");
     } else {
@@ -602,7 +602,7 @@ UID:$id
 SUMMARY:$title
 CLASS:$private
 LOCATION:$location
-CATEGORIES:$category
+CATEGORIES:$category1
 STATUS:CONFIRMED$description
 DTSTART:$date_b
 DTEND:$date_e
@@ -656,22 +656,6 @@ function check_for_decision_conflict($agenda) {
   }
   return $c_q;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get all event categories
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_eventcategories() {
-  global $cdg_sql;
-
-  $query = "SELECT * FROM CalendarCategory ORDER BY calendarcategory_label";
-  display_debug_msg($query, $cdg_sql, "run_query_get_eventcategories()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Event Update Execution
@@ -794,7 +778,7 @@ function run_query_update_event_data($agenda) {
 
   $now = date("Y-m-d H:i:s");
   $title = $agenda["title"];
-  $category_id = $agenda["category"];
+  $category1_id = $agenda["category1"];
   $priority = $agenda["priority"];
   $description = $agenda["description"];
   $location = $agenda["location"];
@@ -815,7 +799,7 @@ function run_query_update_event_data($agenda) {
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',
     calendarevent_location = '$location',
-    calendarevent_category_id = '$category_id',
+    calendarevent_category1_id = '$category1_id',
     calendarevent_priority = '$priority',
     calendarevent_privacy = '$privacy', 
     calendarevent_duration = '$event_duration',
@@ -1134,114 +1118,24 @@ function run_query_group_writable() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// category insertion query construction and execution
-// Parameters:
-//   - $label : category label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_category_insert($agenda) {
-  global $auth, $cdg_sql;
-
-  $label = $agenda["category_label"];
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-
-  $query = "insert into CalendarCategory (
-    calendarcategory_timecreate,
-    calendarcategory_usercreate,
-    calendarcategory_label)
-  values (
-    '$timecreate',
-    '$usercreate',
-    '$label')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// category update query execution
-// Parameters:
-//   - $label     : label to set
-//   - $label_old : category label to update
-///////////////////////////////////////////////////////////////////////////////
-function run_query_category_update($agenda) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $label = $agenda["category_label"];
-  $category_id = $agenda["category_id"];
-  $query = "update CalendarCategory set
-    calendarcategory_label='$label',
-    calendarcategory_timeupdate='$timeupdate',
-    calendarcategory_userupdate='$userupdate'
-      where
-    calendarcategory_id ='$category_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// category deletion query execution
-// Parameters:
-//   - category_id     : category id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_category_delete($agenda) {
-  global $cdg_sql;
-
-  $category_id = $agenda["category_id"];
-  $query = "delete from CalendarCategory where calendarcategory_id = $category_id";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // category deletion query execution
 // Parameters:
 //   - $label     : category label to delete
 ///////////////////////////////////////////////////////////////////////////////
+/*
 function get_category_label($agenda) {
   global $cdg_sql;
 
-  $category_id = $agenda["category_id"];
-  $query = "Select * from CalendarCategory Where calendarcategory_id = $category_id";
+  $category1_id = $agenda["category1_id"];
+  $query = "Select * from CalendarCategory1 Where calendarcategory1_id = $category1_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  return $obm_q->f("calendarcategory_label");
+  return $obm_q->f("calendarcategory1_label");
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// category - Company links query execution
-// Parameters:
-//   - $p_id : category id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_category_links($p_id) {
-  global $cdg_sql;
-
-  $query = "select count(*) as numlink from CalendarEvent where calendarevent_category_id = $p_id";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed entities.
@@ -1706,12 +1600,12 @@ function run_query_conflict_events($start,$end,$sel_entity_id,$event_id) {
       evententity_entity_id,
       $select_user
       $select_resource
-      calendarcategory_label,
+      calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
       calendarevent_allday
     FROM CalendarEvent
-      LEFT JOIN CalendarCategory ON calendarcategory_id = calendarevent_category_id
+      LEFT JOIN CalendarCategory1 ON calendarcategory1_id = calendarevent_category1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
       $join_user
       $join_resource
@@ -1787,13 +1681,13 @@ function run_query_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_description,
       calendarevent_location,
       evententity_entity_id,
-      calendarcategory_label,
+      calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
       calendarevent_allday
     FROM CalendarEvent
-      LEFT JOIN CalendarCategory
-        ON calendarevent_category_id = calendarcategory_id
+      LEFT JOIN CalendarCategory1
+        ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
     WHERE evententity_state = 'A'
       AND calendarevent_repeatkind = 'none'
@@ -1866,7 +1760,7 @@ function run_query_repeat_events($start, $end, $calendar_entity) {
       calendarevent_privacy,
       calendarevent_description, 
       calendarevent_location, 
-      calendarcategory_label,
+      calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
       calendarevent_repeatkind,
@@ -1875,8 +1769,8 @@ function run_query_repeat_events($start, $end, $calendar_entity) {
       evententity_entity_id,
       calendarevent_repeatdays,
       calendarevent_allday
-    FROM CalendarEvent, CalendarCategory, EventEntity
-    WHERE calendarevent_category_id = calendarcategory_id
+    FROM CalendarEvent, CalendarCategory1, EventEntity
+    WHERE calendarevent_category1_id = calendarcategory1_id
       AND calendarevent_id = evententity_event_id
       AND evententity_state = 'A'
       AND calendarevent_repeatkind != 'none'
@@ -1910,12 +1804,12 @@ function events_model($start_time, $end_time, $calendar_entity) {
     $privacy = $nr_q->f("calendarevent_privacy");
     $description = $nr_q->f("calendarevent_description"); 
     $location = $nr_q->f("calendarevent_location"); 
-    $category = $nr_q->f("calendarcategory_label");
+    $category1 = $nr_q->f("calendarcategory1_label");
     $date = $nr_q->f("calendarevent_date");
     $duration = $nr_q->f("calendarevent_duration");
     $user_id = $nr_q->f("evententity_entity_id");
     $all_day = $nr_q->f("calendarevent_allday");    
-    $event = &new Event($id,$duration,$title,$category,$privacy,$description);
+    $event = &new Event($id,$duration,$title,$category1,$privacy,$description);
     store_event($date, $event, $day_events, $user_id, $all_day, $end_time);
   }
   
@@ -1926,7 +1820,7 @@ function events_model($start_time, $end_time, $calendar_entity) {
     $privacy = $r_q->f("calendarevent_privacy");
     $description = $r_q->f("calendarevent_description"); 
     $location = $r_q->f("calendarevent_location"); 
-    $category = $r_q->f("calendarcategory_label");
+    $category1 = $r_q->f("calendarcategory1_label");
     $date = $r_q->f("calendarevent_date");
     $duration = $r_q->f("calendarevent_duration");
     $repeatkind = $r_q->f("calendarevent_repeatkind");
@@ -1939,7 +1833,7 @@ function events_model($start_time, $end_time, $calendar_entity) {
     $repeatdays = $r_q->f("calendarevent_repeatdays");
     $user_id = $r_q->f("evententity_entity_id");    
     $all_day = $r_q->f("calendarevent_allday");       
-    $event = &new Event($id,$duration,$title,$category,$privacy,$description);
+    $event = &new Event($id,$duration,$title,$category1,$privacy,$description);
     $temp_date = $date;
     $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
     $end_date += $day_duration;
@@ -2194,15 +2088,15 @@ class Event {
   var $id;
   var $duration;
   var $title;
-  var $category;
+  var $category1;
   var $privacy;
   var $description;
 
-  function Event($id,$duration,$title,$category,$privacy,$description) {
+  function Event($id,$duration,$title,$category1,$privacy,$description) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
-    $this->category = $category;
+    $this->category1 = $category1;
     $this->privacy = $privacy;
     $this->description = $description;
   }
