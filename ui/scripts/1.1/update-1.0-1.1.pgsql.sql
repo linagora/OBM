@@ -88,6 +88,45 @@ CREATE TABLE ContactCategory5 (
   PRIMARY KEY (contactcategory5_id)
 );
 
+
+-------------------------------------------------------------------------------
+-- Create table structure for table 'ContactFunction'
+-------------------------------------------------------------------------------
+-- Table structure for table 'ContactFunction'
+CREATE TABLE ContactFunction (
+  contactfunction_id          serial,
+  contactfunction_timeupdate  TIMESTAMP,
+  contactfunction_timecreate  TIMESTAMP,
+  contactfunction_userupdate  integer,
+  contactfunction_usercreate  integer NOT NULL default 0,
+  contactfunction_code        varchar(10) NOT NULL default '',
+  contactfunction_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactfunction_id)
+);
+
+-- Update table 'ContactFunction'
+INSERT INTO ContactFunction (
+  contactfunction_id,
+  contactfunction_timeupdate,
+  contactfunction_timecreate,
+  contactfunction_userupdate,
+  contactfunction_usercreate,
+  contactfunction_label
+)
+SELECT
+  function_id,
+  function_timeupdate,
+  function_timecreate,
+  function_userupdate,
+  function_usercreate,
+  function_label
+FROM
+  Function;
+
+-- DROP table Function
+DROP TABLE Function;
+
+
 -------------------------------------------------------------------------------
 -- Create table structure for table 'CompanyCategory1'
 -------------------------------------------------------------------------------
@@ -152,6 +191,17 @@ FROM
 -- DROP table CompanyCategoryLink
 DROP TABLE CompanyCategoryLink;
 
+
+-------------------------------------------------------------------------------
+-- Update CompanyActivity table
+-------------------------------------------------------------------------------
+ALTER TABLE CompanyActivity ADD COLUMN companyactivity_code varchar(10) NOT NULL default ''; 
+
+
+-------------------------------------------------------------------------------
+-- Update CompanyType table
+-------------------------------------------------------------------------------
+ALTER TABLE CompanyType ADD COLUMN companytype_code varchar(10) NOT NULL default ''; 
 
 
 -------------------------------------------------------------------------------
@@ -328,4 +378,48 @@ UPDATE IncidentPriority set incidentpriority_code = incidentpriority_order;
 
 -- Update table 'IncidentPriority'
 ALTER TABLE IncidentPriority DROP COLUMN incidentpriority_order;
+
+
+-------------------------------------------------------------------------------
+-- Update PublicationType table
+-------------------------------------------------------------------------------
+ALTER TABLE PublicationType ADD COLUMN publicationtype_code varchar(10) NOT NULL default '';
+
+
+-------------------------------------------------------------------------------
+-- Update SubscriptionReception table
+-------------------------------------------------------------------------------
+ALTER TABLE SubscriptionReception ADD COLUMN subscriptionreception_code varchar(10) NOT NULL default '';
+
+
+-------------------------------------------------------------------------------
+-- Update ContractType table
+-------------------------------------------------------------------------------
+ALTER TABLE ContractType ADD COLUMN contracttype_code varchar(10) NOT NULL default '';
+
+
+-------------------------------------------------------------------------------
+-- Update ContractPriority table
+-------------------------------------------------------------------------------
+ALTER TABLE ContractPriority ADD COLUMN contractpriority_code varchar(10) NOT NULL default '';
+
+-- Update table 'ContractPriority'
+UPDATE ContractPriority set contractpriority_code = contractpriority_order;
+
+-- Update table 'ContractPriority'
+ALTER TABLE ContractPriority DROP COLUMN contactpriority_order;
+
+
+-------------------------------------------------------------------------------
+-- Update ContractStatus table
+-------------------------------------------------------------------------------
+ALTER TABLE ContractStatus ADD COLUMN contractstatus_code varchar(10) NOT NULL default '';
+
+-- Update table 'ContractStatus'
+UPDATE ContractStatus set contractstatus_code = contractstatus_order;
+
+-- Update table 'ContractStatus'
+ALTER TABLE ContractStatus DROP COLUMN contactstatus_order;
+
+
 

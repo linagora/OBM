@@ -170,6 +170,7 @@ CREATE TABLE CompanyType (
   companytype_timecreate  timestamp(14),
   companytype_userupdate  int(8),
   companytype_usercreate  int(8),
+  companytype_code        varchar(10) default '', 
   companytype_label       char(12),
   PRIMARY KEY (companytype_id)
 );
@@ -184,6 +185,7 @@ CREATE TABLE CompanyActivity (
   companyactivity_timecreate  timestamp(14),
   companyactivity_userupdate  int(8),
   companyactivity_usercreate  int(8),
+  companyactivity_code        varchar(10) default '', 
   companyactivity_label       varchar(64),
   PRIMARY KEY (companyactivity_id)
 );
@@ -335,16 +337,17 @@ CREATE TABLE Kind (
 
 
 --
--- Table structure for the table 'Function'
+-- Table structure for the table 'ContactFunction'
 --
-CREATE TABLE Function (
-  function_id          int(8) auto_increment,
-  function_timeupdate  timestamp(14),
-  function_timecreate  timestamp(14),
-  function_userupdate  int(8),
-  function_usercreate  int(8),
-  function_label       varchar(64),
-  PRIMARY KEY (function_id)
+CREATE TABLE ContactFunction (
+  contactfunction_id          int(8) auto_increment,
+  contactfunction_timeupdate  timestamp(14),
+  contactfunction_timecreate  timestamp(14),
+  contactfunction_userupdate  int(8),
+  contactfunction_usercreate  int(8),
+  contactfunction_code        varchar(10) default '',
+  contactfunction_label       varchar(64),
+  PRIMARY KEY (contactfunction_id)
 );
 
 
@@ -757,6 +760,7 @@ CREATE TABLE PublicationType (
   publicationtype_timecreate  timestamp(14),
   publicationtype_userupdate  int(8),
   publicationtype_usercreate  int(8),
+  publication_code            varchar(10) default '',
   publicationtype_label       varchar(64),
   PRIMARY KEY (publicationtype_id)
 );
@@ -791,6 +795,7 @@ CREATE TABLE SubscriptionReception (
   subscriptionreception_timecreate  timestamp(14),
   subscriptionreception_userupdate  int(8),
   subscriptionreception_usercreate  int(8),
+  subscriptionreception_code        varchar(10) default '',
   subscriptionreception_label       char(12),
   PRIMARY KEY (subscriptionreception_id)
 );	
@@ -1052,6 +1057,7 @@ CREATE TABLE ContractType (
   contracttype_timecreate  timestamp(14),
   contracttype_userupdate  int(8) default NULL,
   contracttype_usercreate  int(8) default NULL,
+  contracttype_code        varchar(10) default '',
   contracttype_label       varchar(64) default NULL,
   PRIMARY KEY (contracttype_id)
 ) TYPE=MyISAM;
@@ -1066,8 +1072,8 @@ CREATE TABLE ContractPriority (
   contractpriority_timecreate  timestamp(14),
   contractpriority_userupdate  int(8) default NULL,
   contractpriority_usercreate  int(8) default NULL,
+  contractpriority_code        varchar(10) default '',
   contractpriority_color       varchar(6) default NULL,
-  contractpriority_order       int(2) default NULL, 
   contractpriority_label       varchar(64) default NULL,
   PRIMARY KEY (contractpriority_id)
 );
@@ -1082,7 +1088,7 @@ CREATE TABLE ContractStatus (
   contractstatus_timecreate  	timestamp(14),
   contractstatus_userupdate  	int(8) default NULL,
   contractstatus_usercreate  	int(8) default NULL,
-  contractstatus_order  	int(2) default NULL,
+  contractstatus_code           varchar(10) default '',
   contractstatus_label  	varchar(64) default NULL,
 PRIMARY KEY (contractstatus_id)
 );
