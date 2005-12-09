@@ -12,7 +12,7 @@
 // Company search query execution
 // Parametes:
 //   - $company[]    : company search criteria
-//     keys used       archive, name, phone, kind, zip
+//     keys used       archive, name, phone, type, zip
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $phone = sql_search_text_parse($company["phone"]);
   $town = sql_search_text_parse($company["town"]);
   $ctry = $company["country"];
-  $kind = $company["kind"];
+  $type = $company["type"];
   $category1 = $company["category1"];
   $category1_tree = $company["category1_tree"];
   $category1_code = $company["category1_code"];
@@ -54,8 +54,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $where_name = " (company_name $like '$name%' or company_aka like '$name%')";
     $and = "and";
   }
-  if (($kind != $c_all) && ($kind != "")) { 
-    $where .= " $and company_type_id='$kind'";
+  if (($type != $c_all) && ($type != "")) { 
+    $where .= " $and company_type_id='$type'";
     $and = "and";
   }
   if (($category1 != $c_all) && ($category1 != "")) {
@@ -254,7 +254,7 @@ function run_query_detail($p_id) {
 // Insertion query execution
 // Parameters:
 //   - $company[] : Entry's values
-//     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
+//     keys used  : num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email, com, category1
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($company) {
@@ -277,7 +277,7 @@ function run_query_insert($company) {
   }
   $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
-  $kind = ($company["kind"] != "" ? $company["kind"] : "0");
+  $type = ($company["type"] != "" ? $company["type"] : "0");
   $act = ($company["activity"] != "" ? $company["activity"] : "0");
   $naf = ($company["nafcode"] != "" ? $company["nafcode"] : "0");
   $market = $company["marketing_manager"];
@@ -338,7 +338,7 @@ function run_query_insert($company) {
     '$name',
     '$aka',
     '$sound',
-    '$kind',
+    '$type',
     '$act',
     '$naf',
     '$market',
@@ -359,8 +359,8 @@ function run_query_insert($company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if ($kind != 0) {
-    $kind_sql = "AND company_type_id='$kind'";
+  if ($type != 0) {
+    $type_sql = "AND company_type_id='$type'";
   }
   if ($market != 0) {
     $marquet_sql = "AND company_marketingmanager_id='$market'";
@@ -374,7 +374,7 @@ function run_query_insert($company) {
     FROM Company
     WHERE company_name = '$name'
       AND company_timecreate='$now'
-      $kind_sql
+      $type_sql
       $marquet_sql
       $act_sql
       AND company_phone = '$phone'
@@ -400,7 +400,7 @@ function run_query_insert($company) {
 // Parameters:
 //   - $cid       : company id
 //   - $company[] : Entry's values
-//     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
+//     keys used  : num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($cid, $company) {
@@ -420,8 +420,8 @@ function run_query_update($cid, $company) {
   }
   $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
-  $kind = $company["kind"]; 
-  if ($kind != "") $upd_kind = "company_type_id='$kind',";
+  $type = $company["type"]; 
+  if ($type != "") $upd_type = "company_type_id='$type',";
   $act = $company["activity"];
   if ($act != "") $upd_act = "company_activity_id='$act',";
   $naf = $company["nafcode"];
@@ -457,7 +457,7 @@ function run_query_update($cid, $company) {
     company_name='$name',
     company_aka='$aka',
     company_sound='$sound',
-    $upd_kind
+    $upd_type
     $upd_act
     $upd_naf
     company_marketingmanager_id='$market',
@@ -559,239 +559,6 @@ function run_query_check_company($p_id, $name, $zip) {
               $where_id";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Kind company query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_companytype() {
-  global $cdg_sql, $cgp_hide;
-
-  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
-  if ($show_kind) {
-    $query = "SELECT * FROM CompanyType ORDER BY companytype_label"; 
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-  } else {
-    $obm_q = "";
-  }
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Kind insertion query construction and execution
-// Parameters:
-//   - $company : company hash info : keys used : kind_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_insert($company) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $kind = $company["kind_label"];
-
-  $query = "INSERT INTO CompanyType (
-    companytype_timecreate,
-    companytype_usercreate,
-    companytype_label)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$kind')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Kind update query execution
-// Parameters:
-//   - $company : company hash info : keys used : kind, kind_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_update($company) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $company["kind"];
-  $kind = $company["kind_label"];
-
-  $query = "UPDATE CompanyType SET
-    companytype_label='$kind',
-    companytype_timeupdate='$timeupdate',
-    companytype_userupdate='$userupdate'
-  WHERE
-    companytype_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Kind deletion query execution
-// Parameters:
-//   - $id : Kind id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_delete($id) {
-  global $cdg_sql;
-
-  $query = "DELETE FROM CompanyType WHERE companytype_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Kind - Company links query execution
-// Parameters:
-//   - $p_id : kind id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT company_name, company_id, company_type_id
-    FROM Company
-    WHERE company_type_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity company query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_companyactivity() {
-  global $cdg_sql, $cgp_hide;
-
-  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
-  if ($show_act) {
-    $query = "SELECT * FROM CompanyActivity ORDER BY companyactivity_label"; 
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
-  } else {
-    $obm_q = "";
-  }
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity insertion query construction and execution
-// Parameters:
-//   - $company : company hash info : keys used : act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_insert($company) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $act = $company["act_label"];
-
-  $query = "INSERT INTO CompanyActivity (
-      companyactivity_timecreate,
-      companyactivity_usercreate,
-      companyactivity_label)
-    VALUES (
-      '$timecreate',
-      '$usercreate',
-      '$act')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity update query execution
-// Parameters:
-//   - $company : company hash info : keys used : act, act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_update($company) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $company["activity"];
-  $activity = $company["act_label"];
-
-  $query = "UPDATE CompanyActivity SET
-      companyactivity_label='$activity',
-      companyactivity_timeupdate='$timeupdate',
-      companyactivity_userupdate='$userupdate'
-    WHERE
-      companyactivity_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity deletion query execution
-// Parameters:
-//   - $id : Activity id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_delete($id) {
-  global $cdg_sql;
-
-  $query = "DELETE FROM CompanyActivity WHERE companyactivity_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity - Company links query execution
-// Parameters:
-//   - $p_id : activity id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_links($p_id) {
-  global $cdg_sql;
-
-  $query = "SELECT company_name, company_id, company_activity_id
-    FROM Company
-    WHERE company_activity_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
@@ -920,49 +687,6 @@ function run_query_nafcode_links($p_id) {
   $obm_q->query($query);
 
   return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Kind from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_kind_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT companytype_label
-    FROM CompanyType
-    WHERE companytype_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("companytype_label");
-  return $retour;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Activity from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_activity_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT companyactivity_label
-    FROM CompanyActivity
-    WHERE companyactivity_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("companyactivity_label");
-  return $retour;
 }
 
 

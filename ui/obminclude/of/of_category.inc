@@ -799,7 +799,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
   }
   $sel_cat .= "</select>";
 
-  if ($entity="calendar") {
+  if ($entity=="calendar") {
     $page="agenda_index.php";
   } else {
     $page="${entity}_index.php";
@@ -908,7 +908,7 @@ function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
   $label = of_get_category_label($id, $entity, $cat);
   $obm_q = of_run_query_category_links($id, $entity, $cat, $cattype);
 
-  if ($entity="calendar") {
+  if ($entity=="calendar") {
     $page="agenda_index.php";
   } else {
     $page="${entity}_index.php";

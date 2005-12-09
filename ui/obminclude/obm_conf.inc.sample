@@ -131,18 +131,18 @@ $profiles["editor"] = array (
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
 //$cgp_hide["company"]["companynafcode_code"] = true;
-//$cgp_hide["company"]["category1"] = true;
+//$cgp_hide["company"]["companycategory1_label"] = true;
 //$cgp_hide["company"]["company_address3"] = true;
 //$cgp_hide["company"]["company_expresspostal"] = true;
 
 // Contact module
-//$cgp_hide["contact"]["contact_function"] = true;
+//$cgp_hide["contact"]["contactfunction_label"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["responsible"] = true;
-//$cgp_hide["contact"]["category1"] = true;
-//$cgp_hide["contact"]["category2"] = true;
-//$cgp_hide["contact"]["category3"] = true;
-//$cgp_hide["contact"]["category4"] = true;
+//$cgp_hide["contact"]["contactcategory1_label"] = true;
+//$cgp_hide["contact"]["contactcategory2_label"] = true;
+//$cgp_hide["contact"]["contactcategory3_label"] = true;
+//$cgp_hide["contact"]["contactcategory4_label"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
 //$cgp_hide["contact"]["comment2"] = true;
 //$cgp_hide["contact"]["comment3"] = true;

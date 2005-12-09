@@ -29,7 +29,7 @@ $fieldnames["company_fax"] = $l_fax;
 $fieldnames["company_email"] = $l_email;
 $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
-$fieldnames["companytype_label"] = $l_kind;
+$fieldnames["companytype_label"] = $l_type;
 $fieldnames["companyactivity_label"] = $l_activity;
 $fieldnames["companynafcode_code"] = $l_nafcode;
 $fieldnames["company_contact_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"C\" />";
@@ -168,14 +168,14 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_form($company="") {
 
-  $type_q = run_query_companytype();
-  $cats = of_category_get_ordered("company", "category1");
-  $act_q = run_query_companyactivity();
+  $types = of_category_get_ordered("company", "type", 0, "mono");
+  $cats1 = of_category_get_ordered("company", "category1");
+  $acts = of_category_get_ordered("company", "activity", 0, "mono");
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_country_for_lang();
   $dsrc_q = run_query_datasource();
-  $block .= html_company_search_form($type_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
+  $block .= html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
 }
@@ -184,9 +184,9 @@ function dis_company_search_form($company="") {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display Company search Form
 // Parameters:
-//   - $kind_q    : database object with kind list
-//   - $cats      : array of company categories
-//   - $act_q     : database object with activity list
+//   - $type      : array of company types
+//   - $cats1     : array of company categories
+//   - $acts      : array of company activities 
 //   - $naf_q     : database object with nafcode list
 //   - $usr_q     : database object with userobm list
 //   - $ctry_q    : database object with country list
@@ -194,10 +194,10 @@ function dis_company_search_form($company="") {
 //   - $company[] : default form values
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
-  global $l_company_name, $l_postcode, $l_town, $l_kind, $l_archive, $l_phone;
-  global $l_market, $l_activity, $l_country, $l_after, $l_before, $l_nafcode; 
-  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_category1, $l_cat_tree;
+function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
+  global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
+  global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
+  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_cat_tree;
   global $display, $c_all, $cgp_hide, $l_select_company;
 
   $popup = $company["popup"];
@@ -205,8 +205,8 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   $name = stripslashes($company["name"]);
   $phone = stripslashes($company["phone"]);
   $town = stripslashes($company["town"]);
-  $kind = $company["kind"];
-  $cat = $company["cat"];
+  $type = $company["type"];
+  $cat1 = $company["category1"];
   $cat_code = $company["cat_code"];
   $cat_tree = ($company["cat_tree"] == "1" ? "checked = \"checked\"" : "");
   $act = $company["activity"];
@@ -219,76 +219,20 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   $datebefore = stripslashes($company["datebefore"]);
   $fuzzy = ($company["fuzzy"] == "1" ? "checked = \"checked\"" : "");
 
-  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
-  $show_cat = (! $cgp_hide["company"]["category"]);
-  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  // of: activity, type
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_cat = (! $cgp_hide["company"]["companycategory1_label"]);
 
-  // Kind select
-  if ($show_kind) {
-    $sel_kind = "<select id=\"sel_kind\" name=\"sel_kind\">
-    <option value=\"$c_all\">$l_all</option>";
-    while ($kind_q->next_record()) {
-      $k_id = $kind_q->f("companytype_id");
-      $sel_kind .= "\n<option value=\"$k_id\"";
-      if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
-      $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
-    }
-    $sel_kind .= "</select>";
+  // Type, category1, activity select
+  $block_type = of_dis_block_select_category($types, $type, "company", "type", "mono");
+  $block_category1 = of_dis_block_select_category($cats1, $cat1, "company", "category1", "mono");
+  $block_activity = of_dis_block_select_category($acts, $act, "company", "activity", "mono");
 
-    $block_kind = "
-    <div class=\"searchLabel\">$l_kind<br />
-      $sel_kind
-    </div>";
-  }
-
-  // Category select
   if ($show_cat) {
-    $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\"
-      onchange=\"if (this.options[this.selectedIndex].value != '$c_all') {
-          mytext = this.options[this.selectedIndex].text;
-          pos = mytext.indexOf(' ');
-          code = mytext.substr(0, pos);
-          this.form.tf_cat_code.value = code + '.';
-        }
-      \">
-    <option value=\"$c_all\">$l_all</option>";
-    if (is_array($cats)) {
-      foreach ($cats as $one_cat) {
-	$c_id = $one_cat["id"];
-	$c_code = str_pad($one_cat["code"] . " ", 10, ".");
-	$c_label = htmlentities($one_cat["label"]);
-	$sel_cat .= "\n<option value=\"$c_id\"";
-	if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
-	$sel_cat .= ">$c_code $c_label</option>\n";
-      }
-    }
-    $sel_cat .= "</select>";
-
     $block_cat = "
-    <div class=\"searchLabel\">$l_category1<br />
-      $sel_cat
-    </div>
+    $block_category1
     <div class=\"searchLabel\">$l_cat_tree<br />
       <input type=\"checkbox\" name=\"cb_cat_tree\" value=\"1\" $cat_tree />
-    </div>";
-  }
-
-  // Activity select
-  if ($show_act) {
-    $sel_act = "<select id=\"sel_act\" name=\"sel_act\">
-    <option value=\"$c_all\">$l_all</option>";
-    while ($act_q->next_record()) {
-      $a_id = $act_q->f("companyactivity_id");
-      $sel_act .= "\n<option value=\"$a_id\"";
-      if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
-      $sel_act .= ">". $act_q->f("companyactivity_label") . "</option>\n";
-    }
-    $sel_act .= "</select>";
-
-    $block_act = "
-    <div class=\"searchLabel\">$l_activity<br />
-      $sel_act
     </div>";
   }
 
@@ -369,9 +313,9 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
       <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"10\"
       value=\"$phone\" />
     </div>
-    $block_kind
+    $block_type
     $block_cat
-    $block_act
+    $block_activity
     $block_naf
     <div class=\"searchLabel\">$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
@@ -423,7 +367,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
 // Display the Company search result
 // Parameters:
 //   - $company[] : company search criteria
-//     keys used  : name, kind, zip
+//     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
   global $display, $l_no_found;
@@ -450,7 +394,7 @@ function dis_company_search_list($company) {
 //   - $prefs      : Display preferences
 //   - $nb_company : nb companies returned by the search query
 //   - $company[]  : company search criteria
-//     keys used   : archive, name, kind, zip
+//     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) {
   global $display, $l_found,$l_close;
@@ -470,8 +414,8 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
   $phone = urlencode(stripslashes($company["phone"]));
   $town = stripslashes($company["town"]);
   $ctry = $company["country"];
-  $kind = $company["kind"];
-  $cat = $company["cat"];
+  $type = $company["type"];
+  $cat1 = $company["category1"];
   $cat_code = $company["cat_code"];
   $cat_tree = $company["cat_tree"];
   $act = $company["activity"];
@@ -482,7 +426,7 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;tf_cat_code=$cat_code&amp;cb_cat_tree=$cat_tree&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_cat_code=$cat_code&amp;cb_cat_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -689,10 +633,10 @@ function dis_company_consult($cid) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q, $cats1) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode, $l_vat;
+  global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
-  global $l_insert,$l_update, $l_company, $l_coord,$l_category1;
+  global $l_insert,$l_update, $l_company, $l_coord;
   global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard;
 
   $id = $co_q->f("company_id");
@@ -701,7 +645,7 @@ function html_company_consult($co_q, $cats1) {
   $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
   $name = $co_q->f("company_name");
   $aka = $co_q->f("company_aka");
-  $kind = $co_q->f("companytype_label");
+  $type = $co_q->f("companytype_label");
   $act = $co_q->f("companyactivity_label");
   $naf = $co_q->f("companynafcode_code")." - ".$co_q->f("companynafcode_label");
   $mark = $co_q->f("company_marketingmanager_id");
@@ -719,6 +663,11 @@ function html_company_consult($co_q, $cats1) {
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
   $com = beautify_comment(nl2br($co_q->f("company_comment")));
+
+  $types = of_entitycategories_get($co_q->f("company_id"), "company", "type", "mono");
+  $acts = of_entitycategories_get($co_q->f("company_id"), "company", "activity", "mono");
+  $cats1 = of_entitycategories_get($co_q->f("company_id"), "company", "category1");
+    
 
   if ($mark > 0)
     $lmarket = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
@@ -738,10 +687,9 @@ function html_company_consult($co_q, $cats1) {
   }
 
   // Conditionnal fields
+  // of: activity, type, category1
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
-  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
@@ -782,23 +730,9 @@ function html_company_consult($co_q, $cats1) {
     </tr>";
   }
 
-  // Kind field
-  if ($show_kind) {
-    $block_kind = "
-    <tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
-    </tr>";
-  }
-
-  // Activity field
-  if ($show_act) {
-    $block_act = "
-    <tr> 
-      <td class=\"detailLabel\">$l_activity</td>
-      <td class=\"detailText\">$act</td>
-    </tr>";
-  }
+  // Type, activity fields
+  $block_type = of_dis_block_consult_category($types, "company", "type", "mono");
+  $block_activity = of_dis_block_consult_category($acts, "company", "activity", "mono");
 
   // Naf code field
   if ($show_naf) {
@@ -878,27 +812,26 @@ function html_company_consult($co_q, $cats1) {
 function dis_company_form($action, $company) {
   global $display, $cg_com, $cgp_hide, $uid, $l_query_error;
 
-  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  // of: type, activity, category1
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
-  $show_cat1 = (! $cgp_hide["company"]["category1"]);
 
   $c_id = $company["id"];
   if ($c_id > 0) {
     $comp_q = run_query_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      if ($show_cat1) {
-	$cats1 = of_category_get_ordered("company", "category1", $c_id);
-      }
+      $cats1 = of_category_get_ordered("company", "category1", $c_id);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
   }
   $dsrc_q = run_query_datasource();
-  $type_q = run_query_companytype();
-  if ($show_act) {
-    $act_q = run_query_companyactivity();
+
+  if ($cid > 0) {
+    $types = of_category_get_ordered("company", "type", $cid, "mono");
+    $acts = of_category_get_ordered("company", "activity", $cid, "mono");
   }
+
   if ($show_naf) {
     $naf_q = run_query_companynafcode();
   }
@@ -913,7 +846,7 @@ function dis_company_form($action, $company) {
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();
 
-  $block = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $naf_q, $usr_q, $cats1, $ctry_q, $company);
+  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company);
 
   return $block;
 }
@@ -925,8 +858,8 @@ function dis_company_form($action, $company) {
 //   - $action    : action called
 //   - $co_q      : company database result 
 //   - $dsrc_q    : datasource database result 
-//   - $kind_q    : kind database result 
-//   - $act_q     : activity database result 
+//   - $types     : array of types referenced by the company 
+//   - $acts      : array of activities referenced by the company
 //   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
 //   - $cats1     : array of category referenced by the company
@@ -935,7 +868,7 @@ function dis_company_form($action, $company) {
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cats1, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category1,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
@@ -957,7 +890,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     $name = $co_q->f("company_name");
     $aka = $co_q->f("company_aka");
     $dsrc = $co_q->f("company_datasource_id");
-    $kind = $co_q->f("company_type_id");
+    $type = $co_q->f("company_type_id");
     $act = $co_q->f("company_activity_id");
     $naf = $co_q->f("company_nafcode_id");
     $mark = $co_q->f("company_marketingmanager_id");
@@ -992,7 +925,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (isset($company["name"])) { $name = stripslashes($company["name"]); }
   if (isset($company["aka"])) { $aka = stripslashes($company["aka"]); }
   if (isset($company["datasource"])) { $dsrc = $company["datasource"]; }
-  if (isset($company["kind"])) { $kind = $company["kind"]; }
+  if (isset($company["type"])) { $kind = $company["type"]; }
   if (isset($company["activity"])) { $act = $company["activity"]; }
   if (isset($company["nafcode"])) { $naf = $company["nafcode"]; }
   if (isset($company["marketing_manager"])) { $mark = $company["marketing_manager"]; }
@@ -1014,11 +947,9 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
 
   // Conditionnal fields
-  // category1
+  // category1, activity, type
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
-  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
@@ -1055,43 +986,10 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   }
   $sel_dsrc .= "</select>";
 
-  // Kind select field
-  if ($show_kind) {
-    $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">
-    <option value=\"0\">$l_none</option>";
-    while ($kind_q->next_record()) {
-      $k_id = $kind_q->f("companytype_id");
-      $sel_kind .= "\n<option value=\"$k_id\"";
-      if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
-      $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
-    }
-    $sel_kind .= "</select>";
-    $block_kind = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\">$sel_kind</td>";
-  }
-
+  $block_type = of_category_dis_entity_form($types, "company", "type", "mono");
+  $block_activity = of_category_dis_entity_form($acts, "company", "activity", "mono");
   // Category select field
   $block_cat1 = of_category_dis_entity_form($cats1, "company", "category1");
-
-  // Activity select field
-  if ($show_act) {
-    $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
-    <option value=\"0\">$l_none</option>";
-    while ($act_q->next_record()) {
-      $a_id = $act_q->f("companyactivity_id");
-      $sel_act .= "\n<option value=\"$a_id\"";
-      if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
-      $sel_act .= ">". $act_q->f("companyactivity_label") . "</option>\n";
-    }
-    $sel_act .= "</select>";
-
-    $block_act = "
-    </tr><tr>      
-      <td class=\"detailLabel\">$l_activity</td>
-      <td class=\"detailForm\">$sel_act</td>";
-  }
 
   // Naf code select field
   if ($show_naf) {
@@ -1244,9 +1142,9 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
-    $block_kind
+    $block_type
     $block_cat1
-    $block_act
+    $block_activity
     $block_naf
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
@@ -1475,19 +1373,19 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 function dis_admin_index() {
   global $cgp_hide;
 
-  if (! $cgp_hide["company"]["companytype_label"]) {
-    $kind_q = run_query_companytype();
-    $block .= html_company_kind_form($kind_q);
+  if (! $cgp_hide["company"]["type"]) {
+    $types = of_category_get_ordered("company", "type");
+    $block .= of_html_admin_cat_form($types, "company", "type");
   }
 
-  if (! $cgp_hide["company"]["category"]) {
+  if (! $cgp_hide["company"]["category1"]) {
     $cats1 = of_category_get_ordered("company", "category1");
     $block .= of_html_admin_cat_form($cats1, "company", "category1");
   }
 
-  if (! $cgp_hide["company"]["companyactivity_label"]) {
-    $act_q = run_query_companyactivity();
-    $block .= html_company_activity_form($act_q);
+  if (! $cgp_hide["company"]["activity"]) {
+    $acts = of_category_get_ordered("company", "activity");
+    $block .= of_html_admin_cat_form($acts, "company", "activity");
   }
 
   if (! $cgp_hide["company"]["companynafcode_code"]) {

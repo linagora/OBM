@@ -12,8 +12,8 @@
       <td class="detailLabel">$l_archive</td>
       <td class="detailText">$archive</td>
     </tr>
-    $block_kind
-    $block_act
+    $block_type
+    $block_activity
     $block_naf
     <tr>
       <td class="detailLabel">$l_market</td>

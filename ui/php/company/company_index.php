@@ -17,10 +17,10 @@
 // - check_delete          -- $param_company -- check links before delete
 // - delete                -- $param_company -- delete the company
 // - admin                 --                -- admin index (kind)
-// - kind_insert           -- form fields    -- insert the kind
-// - kind_update           -- form fields    -- update the kind
-// - kind_checklink        --                -- check if kind is used
-// - kind_delete           -- $sel_kind      -- delete the kind
+// - type_insert           -- form fields    -- insert the  type
+// - type_update           -- form fields    -- update the type 
+// - type_checklink        --                -- check if type is used
+// - type_delete           -- $sel_type      -- delete the type 
 // - activity_insert       -- form fields    -- insert the activity
 // - activity_update       -- form fields    -- update the activity
 // - activity_checklink    --                -- check if activity is used
@@ -211,76 +211,76 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] = dis_admin_index();
 
-} elseif ($action == "kind_insert")  {
+} elseif ($action == "type_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_insert($company);
+  $retour = of_run_query_category_insert($company, "company", "type");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_kind_insert_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_kind_insert_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_type)." : $l_c_insert_error");
   }
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_update") {
+} elseif ($action == "type_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_update($company);
+  $retour = of_run_query_category_update($company, "company", "type");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_kind_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_kind_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_type)." : $l_c_update_error");
   }
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_checklink") {
+} elseif ($action == "type_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_kind_links($company);
+  $display["detail"] .= of_dis_category_links($company, "company", "type", "mono");
 
-} elseif ($action == "kind_delete") {
+} elseif ($action == "type_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_delete($company["kind"]);
+  $retour = of_run_query_category_delete($company, "company", "type");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_kind_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_kind_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_type)." : $l_c_delete_error");
   }
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_insert($company);
+  $retour = of_run_query_category_insert($company, "company", "activity");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_act_insert_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_act_insert_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_activity)." : $l_c_insert_error");
   }
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_update($company);
+  $retour = of_run_query_category_update($company, "company", "activity");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_act_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_act_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_activity)." : $l_c_update_error");
   }
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_activity_links($company);
+  $display["detail"] .= of_dis_category_links($company, "company", "activity", "mono");
 
 } elseif ($action == "activity_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_delete($company["activity"]);
+  $retour = of_run_query_category_delete($company, "company", "activity");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_act_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_act_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_activity)." : $l_c_delete_error");
   }
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
@@ -410,12 +410,14 @@ display_page($display);
 function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
-  global $tf_email, $sel_act, $sel_naf, $sel_kind, $sel_cat, $sel_market;
+  global $tf_email, $sel_naf, $sel_market;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_dateafter, $tf_datebefore, $cb_category1_tree, $cb_fuzzy;
-  global $sel_dsrc, $tf_kind, $tf_act, $tf_category1_code, $tf_cat;
+  global $sel_dsrc, $tf_act, $tf_category1_code, $tf_cat;
   global $tf_naf_code, $tf_naf_label, $cb_naf_title, $tf_vat;
   global $tf_category1_label, $tf_category1_code, $sel_category1;
+  global $tf_type_label, $tf_type_code, $sel_type;
+  global $tf_activity_label, $tf_activity_code, $sel_activity;
   global $param_company;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text;
@@ -437,8 +439,6 @@ function get_param_company() {
   if (isset ($tf_name)) $company["name"] = get_format_company_name($tf_name);
   if (isset ($tf_aka)) $company["aka"] = $tf_aka;
   if (isset ($sel_dsrc)) $company["datasource"] = $sel_dsrc;
-  if (isset ($sel_kind)) $company["kind"] = $sel_kind;
-  if (isset ($sel_act)) $company["activity"] = $sel_act;
   if (isset ($sel_naf)) $company["nafcode"] = $sel_naf;
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
   if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
@@ -457,19 +457,23 @@ function get_param_company() {
   if (isset ($sel_usercomment)) $company["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $company["add_comment"] = trim($ta_add_comment);
   if (isset ($sel_category1)) $company["category1"] = $sel_category1;
+  if (isset ($sel_type)) $company["type"] = $sel_type;
+  if (isset ($sel_activity)) $company["activity"] = $sel_activity;
 
   // Search fields
   if (isset ($tf_dateafter)) $company["dateafter"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $company["datebefore"] = $tf_datebefore;
   if (isset ($cb_fuzzy)) $company["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
 
-  // Admin - Kind fields
-  // $sel_kind -> "kind" is already set
-  if (isset ($tf_kind)) $company["kind_label"] = $tf_kind;
+  // Admin - Type fields
+  // $sel_type -> "type" is already set
+  if (isset ($tf_type_code)) $company["type_code"] = $tf_type_code;
+  if (isset ($tf_type_label)) $company["type_label"] = $tf_type_label;
 
   // Admin - Activity fields
-  // $sel_act -> "act" is already set
-  if (isset ($tf_act)) $company["act_label"] = $tf_act;
+  // $sel_activity -> "activity" is already set
+  if (isset ($tf_activity_code)) $company["activity_code"] = $tf_activity_code;
+  if (isset ($tf_activity_label)) $company["activity_label"] = $tf_activity_label;
 
   // Admin - Nafcode fields
   // $sel_naf -> "naf" is already set
@@ -478,6 +482,7 @@ function get_param_company() {
   if (isset ($cb_naf_title)) $company["naf_title"] = $cb_naf_title;
 
   // Admin - Cat fields
+  // $sel_category1 -> "category1" is already set
   if (isset ($tf_category1_code)) $company["category1_code"] = $tf_category1_code;
   if (isset ($tf_category1_label)) $company["category1_label"] = $tf_category1_label;
   if (isset ($cb_category1_tree)) $company["category1_tree"] = ($cb_category1_tree == 1 ? 1 : 0);
@@ -575,30 +580,30 @@ function get_company_action() {
     'Condition'=> array ('all') 
                                        );
 
-// Kind Insert
-  $actions["company"]["kind_insert"] = array (
-    'Url'      => "$path/company/company_index.php?action=kind_insert",
+// Type Insert
+  $actions["company"]["type_insert"] = array (
+    'Url'      => "$path/company/company_index.php?action=type_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
-// Kind Update
-  $actions["company"]["kind_update"] = array (
-    'Url'      => "$path/company/company_index.php?action=kind_update",
+// Type Update
+  $actions["company"]["type_update"] = array (
+    'Url'      => "$path/company/company_index.php?action=type_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
-// Kind Check Link
-  $actions["company"]["kind_checklink"] = array (
-    'Url'      => "$path/company/company_index.php?action=kind_checklink",
+// Type Check Link
+  $actions["company"]["type_checklink"] = array (
+    'Url'      => "$path/company/company_index.php?action=type_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-// Kind Delete
-  $actions["company"]["kind_delete"] = array (
-    'Url'      => "$path/company/company_index.php?action=kind_delete",
+// Type Delete
+  $actions["company"]["type_delete"] = array (
+    'Url'      => "$path/company/company_index.php?action=type_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
