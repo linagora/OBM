@@ -133,7 +133,7 @@ class OBM_User_Sql extends CT_Sql {
 
 
 class OBM_Session extends Session {
-  var $cookie_name     	= "OBM_Session";
+  var $cookie_name     	= "AliaSuite";
 //  var $cookie_domain  	= "aliacom.local";
 }
 
