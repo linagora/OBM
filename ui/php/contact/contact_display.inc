@@ -324,14 +324,14 @@ function dis_contact_search_form($contact="") {
   } else {
     $usr_q = run_query_userobm_active();
   }
-  $func_q = run_query_function();
+  $funcs = of_category_get_ordered("contact", "function", 0, "mono");
   $ctry_q = run_query_country_for_lang();
   $cats1 = of_category_get_ordered("contact", "category1");
   $cats2 = of_category_get_ordered("contact", "category2");
   $cats3 = of_category_get_ordered("contact", "category3");
   $cats4 = of_category_get_ordered("contact", "category4");
   $cats5 = of_category_get_ordered("contact", "category5", 0, "mono");
-  $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5);
+  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5);
 
   return $block;
 }
@@ -343,7 +343,7 @@ function dis_contact_search_form($contact="") {
 //   - $contact[] : default form values
 //     keys used  : name, company
 //   - $usr_q     : database object with userobm list
-//   - $func_q    : database object with function list
+//   - $funcs     : array with contact function list
 //   - $ctry_q    : database object with country list
 //   - $cats1     : array with contact category 1 list
 //   - $cats2     : array with contact category 2 list
@@ -351,10 +351,10 @@ function dis_contact_search_form($contact="") {
 //   - $cats4     : array with contact category 4 list
 //   - $cats5     : array with contact category 5 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
+function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
   global $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
-  global $l_function, $l_title, $l_market, $l_town, $l_postcode, $l_country;
+  global $l_title, $l_market, $l_town, $l_postcode, $l_country;
   global $l_archive;
 
   $lname = stripslashes($contact["lname"]);
@@ -379,26 +379,10 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
-  // category1, category2, category3, category4, category5 
+  // category1, category2, category3, category4, category5, function
   
   // Function select
-  if ($show_func) {
-    $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
-    <option value=\"$c_all\">$l_all</option>";
-    while ($func_q->next_record()) {
-      $f_id = $func_q->f("function_id");
-      $f_label = $func_q->f("function_label");
-      $sel_func .= "\n<option value=\"$f_id\"";
-      if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
-      $sel_func .= ">$f_label</option>";
-    }
-    $sel_func .= "</select>";
-
-    $block_func = "
-    <div class=\"searchLabel\">$l_function<br />
-      $sel_func
-    </div>";
-  }
+  $block_function = of_dis_block_select_category($funcs, $func, "contact", "function", "mono");
 
   // Title Block
   if ($show_title) {
@@ -492,7 +476,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cats1, $
       $sel_ctry
     </div>
     $block_category5
-    $block_func
+    $block_function
     $block_title
     $block_category1
     $block_category2
@@ -582,7 +566,7 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_function=$func&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -638,7 +622,8 @@ function dis_contact_consult($contact) {
   $display["detailInfo"] = display_record_info($con_q);
   $display["link"] = html_contact_links($id);
   $cats5 = of_entitycategories_get($con_q->f("contact_id"), "contact", "category5", "mono");
-  $block .= html_contact_header($con_q, $cats5);
+  $funcs = of_entitycategories_get($con_q->f("contact_id"), "contact", "function", "mono");
+  $block .= html_contact_header($con_q, $funcs, $cats5);
 
   if ($view != "") {
     include("$path/$view/".$view."_display.inc");
@@ -660,9 +645,11 @@ function dis_contact_consult($contact) {
 // HTML Display Contact Consultation
 // Parameters:
 //   - $co_q : contact database result
+//   - $funcs     : array with contact function list
+//   - $cats5     : array with contact category 5 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_header($co_q, $cats5) {
-  global $l_company,$l_lastname,$l_firstname,$l_kind, $l_function, $l_title;
+function html_contact_header($co_q, $funcs, $cats5) {
+  global $l_company,$l_lastname,$l_firstname,$l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
   global $l_public, $l_private, $l_visibility;
   global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
@@ -686,8 +673,8 @@ function html_contact_header($co_q, $cats5) {
   $date = $co_q->f("contact_date");
   $date = ($date != 0) ? date_format($date) : $l_no_date; 
  
- // Conditionnal fields
-  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  // Conditionnal fields
+  // category, category, category, category, category, function
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
@@ -695,6 +682,7 @@ function html_contact_header($co_q, $cats5) {
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
   // Category 5
+  $block_function = of_dis_block_consult_category($funcs, "contact", "function", "mono");
   $block_category5 = of_dis_block_consult_category($cats5, "contact", "category5", "mono");
 
   // Company Display
@@ -702,14 +690,6 @@ function html_contact_header($co_q, $cats5) {
     $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
   } else {
     $dis_company = $c_name;
-  }
-
-  // Function field
-  if ($show_func) {
-    $block_func = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_function</td>
-      <td class=\"detailText\">$function</td>";
   }
 
   // Title field
@@ -768,7 +748,7 @@ function html_contact_header($co_q, $cats5) {
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">$dis_company</td>
     $block_category5
-    $block_func
+    $block_function
     $block_title
     $block_resp
     $block_date
@@ -848,7 +828,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
 
   // Conditionnal fields
-  // category1, category2, category3, category4, category5
+  // category1, category2, category3, category4, category5, function
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
@@ -1151,6 +1131,7 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $cid = $contact["id"];
   if ($cid > 0) {
+    $funcs = of_category_get_ordered("contact", "function", $cid, "mono");
     $cats1=array();$cats2=array();$cats3=array();$cats4=array();
     $cats1 = of_category_get_ordered("contact", "category1", $cid);
     $cats2 = of_category_get_ordered("contact", "category2", $cid);
@@ -1160,7 +1141,6 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
-  $func_q = run_query_function();
   if (! $cgp_hide["contact"]["responsible"]) {
     if ($contact["marketing_manager"]) {
       $users = array($contact["marketing_manager"]);
@@ -1171,7 +1151,7 @@ function dis_contact_form($action, $co_q, $contact) {
     $usr_q = run_query_all_users_from_group("", array($uid));
   }
   $ctry_q = run_query_country_for_lang();
-  $block = html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
+  $block = html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
@@ -1187,7 +1167,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //   - $cats4     : Contact category4 array
 //   - $cats5     : Contact category5 array
 //   - $dsrc_q    : datasource database result 
-//   - $func_q    : function database result 
+//   - $funcs     : Contact function array 
 //   - $kind_q    : kind database result 
 //   - $usr_q     : active userobm database result 
 //   - $ctry_q    : country database result 
@@ -1195,10 +1175,10 @@ function dis_contact_form($action, $co_q, $contact) {
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
   global $cgp_mailing_default, $ccontact_private_default;
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_letter;
+  global $l_lastname,$l_firstname,$l_kind,$l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok, $l_date, $l_no_date;
   global $l_comment , $l_add_comment , $l_upd_comment ;
@@ -1353,8 +1333,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
   // Conditionnal fields
-  // category1,category2,category3,category4,category5
-  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  // category1,category2,category3,category4,category5, function
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
@@ -1370,24 +1349,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $csize_phone = "24";
 
   // Function field
-  if ($show_func) {
-    // Function select
-    $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
-    <option value=\"0\">$l_none</option>";
-    while ($func_q->next_record()) {
-      $f_id = $func_q->f("function_id");
-      $f_label = $func_q->f("function_label");
-      $sel_func .= "\n<option value=\"$f_id\"";
-      if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
-      $sel_func .= ">$f_label</option>";
-    }
-    $sel_func .= "</select>";
-    $block_func = "
-    <tr>    
-      <td class=\"detailLabel\">$l_function</td> 
-      <td class=\"detailForm\">$sel_func</td>
-    </tr>";
-  }
+  $block_function = of_category_dis_entity_form($funcs, "contact", "function", "mono");
 
   // Title field
   if ($show_title) {
@@ -1706,7 +1668,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
       <td class=\"detailForm\">$dis_company</td>
     </tr>
     $block_category5
-    $block_func
+    $block_function
     $block_title
     $block_resp
     $block_date
@@ -1945,10 +1907,10 @@ function dis_contact_admin_index() {
   $kind_q = run_query_kind();
   $block .= html_contact_kind_form($kind_q);
 
-  if (! $cgp_hide["contact"]["contact_function"]) {
+  if (! $cgp_hide["contact"]["function"]) {
+    $funcs = of_category_get_ordered("contact", "function");
     $block .= "<hr />";
-    $func_q = run_query_function();
-    $block .= html_contact_function_form($func_q);
+    $block .= of_html_admin_cat_form($funcs, "contact", "function");
   }
 
   if (! $cgp_hide["contact"]["category1"]) {
@@ -1983,197 +1945,6 @@ function dis_contact_admin_index() {
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Contact Function section
-// Parameters:
-//   - $func_q : Function list database object
-///////////////////////////////////////////////////////////////////////////////
-function html_contact_function_form($func_q) {
-  global $l_func_manage, $l_func_exist, $l_func_no;
-  global $l_func_checkdelete, $l_func_update, $l_func_new, $l_func_insert;
-
-  if ($func_q->num_rows() > 0) {
-
-    // Function select construction
-    $sel_func = "<select name=\"sel_func\" onChange=\"
-      forms.form_func_update.tf_func.value=this.options[this.selectedIndex].text;\"
-      size=\"8\">";
-    while ($func_q->next_record()) {
-      $id = $func_q->f("function_id");
-      $label = $func_q->f("function_label");
-      $sel_func .= "\n<option value=\"$id\">$label</option>";
-    }
-    $sel_func .= "</select>";
-
-    $dis_update_delete = "
-<!-- Function Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_func_delete\" method=\"post\"
-              action=\"" . url_prepare("contact_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_func_exist</td>
-            </tr>
-            <tr>
-              <td class=\"adminLabel\">$sel_func</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"function_checklink\" />
-              <input type=\"submit\" name=\"sub_func\" value=\"$l_func_checkdelete\" onclick=\"if (check_func_checkdel(this.form.sel_func)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Function Update Section -->
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_func_update\" method=\"get\"
-              action=\"" . url_prepare("contact_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_func\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"function_update\" />
-            <input type=\"text\" name=\"tf_func\" />
-            <input type=\"submit\" name=\"sub_func\" value=\"$l_func_update\"
-              onclick=\"if (check_func_upd(this.form,document.form_func_delete.sel_func)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>";
-
-  } else {
-    $dis_update_delete = $l_func_no;
-  }
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_func_manage
-      </td>
-    </tr><tr>
-      <td>
-        $dis_update_delete
-      </td>
-      <td>
-
-<!-- New Function Section -->
-
-        <form name=\"form_func_new\" method=\"get\"
-          action=\"" . url_prepare("contact_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_func_new :
-            <input name=\"tf_func\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"function_insert\" />
-            <input type=\"submit\" name=\"sub_func\" value=\"$l_func_insert\"
-              onclick=\"if (check_func_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>";
-
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the function links
-// Parameters:
-//   - $contact : contact hash info : keys used : function
-///////////////////////////////////////////////////////////////////////////////
-function dis_function_links($contact) {
-  global $display, $l_back, $l_func_link_contact, $l_func_link_company_no;
-  global $l_func_delete, $l_func_can_delete, $l_func_cant_delete;
-
-  $delete_ok = true;
-  $id = $contact["function"];
-  $label = get_function_label($id);
-  $obm_q = run_query_function_links($id);
-
-  $nb_func = $obm_q->num_rows();
-  if ($nb_func > 0) {
-    $delete_ok = false;
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_func_link_contact ($nb_func)</td>
-    </tr>";
-
-    $cpt = 0;
-    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
-      $cpt++;
-      $cid = $obm_q->f("contact_id");
-      $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
-      $dis_link .="
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-    if ($cpt < $nb_func) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
-    }
-
-  } else {
-    $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_func_link_contact_no</td>
-    </tr>";
-  }
-
-  $block .= "<table class=\"detail\">
-    $dis_link
-    </table>";
-
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("contact_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_func_can_delete);
-    $dis_del = "<form name=\"form_func_delete\".
-          method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"function_delete\" />
-        <input type=\"hidden\" name=\"sel_func\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_func\" value=\"$l_func_delete\" />
-        </form>";
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_func_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
-  $block .= "<p>&nbsp;</p>";
-
-  return $block;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Kind section
@@ -2612,15 +2383,17 @@ function export_vcard($co_q,$com_q) {
 //  - $cat3_q : DB Object for category3 stats
 //  - $cat4_q : DB Object for category4 stats
 //  - $cat5_q : DB Object for category5 stats
+//  - $func_q : DB Object for function stats
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q) {
+function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q) {
 
   $block1=of_dis_category_entity_stats($cat1_q, "contact", "category1");
   $block2=of_dis_category_entity_stats($cat2_q, "contact", "category2");
   $block3=of_dis_category_entity_stats($cat3_q, "contact", "category3");
   $block4=of_dis_category_entity_stats($cat4_q, "contact", "category4");
   $block5=of_dis_category_entity_stats($cat5_q, "contact", "category5");
+  $block_function=of_dis_category_entity_stats($func_q, "contact", "function");
 
   $block ="
     $block1
@@ -2628,6 +2401,7 @@ function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q) {
     $block3
     $block4
     $block5
+    $block_function
   ";
 
   return $block;

@@ -352,6 +352,7 @@ function of_category_dis_tree_node($tree, $indent, $multi=false) {
 //   - $cattype   : ([mono|multi]) 
 // Return:
 //   Array with orderer categories
+//     if mono return a single value
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_get_ordered($entity, $cat, $entity_id=0, $cattype="multi") {
   global $cdg_sql, $cgp_hide;
@@ -829,7 +830,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
               <td class=\"adminLabel\">$sel_cat</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
-              <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat},'".ucfirst(${$l_cat})."')) return true; else return false;\" />
+              <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
               </td>
             </tr>
             </table>
@@ -848,7 +849,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
             <input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" />
             <input type=\"text\" name=\"tf_${cat}_label\" />
             <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_update\"
-              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat},'".ucfirst(${$l_cat})."')) return true; else return false;\" />
+              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
             </form>
           </td>
           <td>&nbsp;</td>
@@ -875,7 +876,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
           <td class=\"adminLabel\" colspan=\"2\">
             <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
             <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_insert\"
-              onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".ucfirst(${$l_cat})."')) return true; else return false;\" />
+              onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
           </td>
         </tr>
         </table>

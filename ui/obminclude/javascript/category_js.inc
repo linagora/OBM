@@ -41,15 +41,15 @@ function check_category_checkdel(sel,category) {
 // Check if the Category update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_category_upd(label,sel,sel_d,category) {
-  cat1_pos = sel_d.selectedIndex;
-  if ((cat1_pos >= 0) && (label.value != \"\")) {
-    sel.value=sel_d.options[cat1_pos].value;
-    return true;
-  } else {
+   cat1_pos = sel_d.selectedIndex;
+   if ((cat1_pos >= 0) && (label.value != \"\")) {
+     sel.value=sel_d.options[cat1_pos].value;
+     return true;
+   } else {
       msg = category+' : $l_c_j_update';
-     alert(msg);
-     return false;
-  }
+      alert(msg);
+      return false;
+   }
 }
 
 ";

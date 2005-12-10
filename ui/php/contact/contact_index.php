@@ -246,8 +246,9 @@ if ($action == "ext_get_ids") {
   $cat3_q = of_run_query_category_per_entity("contact", "category3", "multi");
   $cat4_q = of_run_query_category_per_entity("contact", "category4", "multi");
   $cat5_q = of_run_query_category_per_entity("contact", "category5", "mono");
+  $func_q = of_run_query_category_per_entity("contact", "function", "mono");
   $display["title"] = display_title($l_header_contact_stats);
-  $display["detail"] = dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q);
+  $display["detail"] = dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q);
 //  $display["features"] = dis_menu_stats();
 
 } elseif ($action == "admin")  {
@@ -442,37 +443,37 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_function_insert($contact);
+  $retour = of_run_query_category_insert($contact, "contact", "function");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_func_insert_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_function)." : $l_c_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_func_insert_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_function)." : $l_c_insert_error");
   }
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_function_update($contact);
+  $retour = of_run_query_category_update($contact, "contact", "function");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_func_update_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_function)." : $l_c_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_func_update_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_function)." : $l_c_update_error");
   }
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_function_links($contact);
+  $display["detail"] .= of_dis_category_links($contact, "contact", "function", "mono");
 
 } elseif ($action == "function_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_function_delete($contact["function"]);
+  $retour = of_run_query_category_delete($contact, "contact", "function");
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_func_delete_ok);
+    $display["msg"] .= display_ok_msg(ucfirst($l_function)." : $l_c_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_func_delete_error);
+    $display["msg"] .= display_err_msg(ucfirst($l_function)." : $l_c_delete_error");
   }
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
@@ -567,7 +568,7 @@ function get_param_contact() {
   global $action, $view;
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
-  global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
+  global $sel_function, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
   global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_priv, $ta_com, $ta_com2, $ta_com3, $tf_date;
   global $tf_datecomment , $sel_usercomment , $ta_add_comment ;
   global $tf_datecomment2, $sel_usercomment2, $ta_add_comment2;
@@ -575,7 +576,7 @@ function get_param_contact() {
   global $cb_archive;
   global $param_company, $param_contact, $hd_usercreate;
   global $company_name, $company_new_name, $company_new_id;
-  global $tf_func, $tf_label, $tf_lang, $tf_header, $cb_default;
+  global $tf_label, $tf_lang, $tf_header, $cb_default;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $tf_category1_label, $tf_category1_code, $sel_category1; 
   global $tf_category2_label, $tf_category2_code, $sel_category2; 
@@ -600,6 +601,9 @@ function get_param_contact() {
   if (isset ($tf_category5_label)) $contact["category5_label"] = $tf_category5_label;
   if (isset ($tf_category5_code)) $contact["category5_code"] = $tf_category5_code;
   if (isset ($sel_category5)) $contact["category5"] = $sel_category5;
+  if (isset ($tf_function_label)) $contact["function_label"] = $tf_function_label;
+  if (isset ($tf_function_code)) $contact["function_code"] = $tf_function_code;
+  if (isset ($sel_function)) $contact["function"] = $sel_function;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
   if (isset ($sel_dsrc)) $contact["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $contact["kind"] = $sel_kind;
@@ -620,7 +624,6 @@ function get_param_contact() {
   if (isset ($tf_town)) $contact["town"] = get_format_town($tf_town);
   if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;
   if (isset ($sel_ctry)) $contact["country"] = $sel_ctry;
-  if (isset ($sel_func)) $contact["function"] = $sel_func;
   if (isset ($tf_title)) $contact["title"] = $tf_title;
   if (isset ($tf_phone)) $contact["phone"] = trim($tf_phone);
   if (isset ($tf_hphone)) $contact["hphone"] = trim($tf_hphone);
@@ -643,10 +646,6 @@ function get_param_contact() {
   if (isset ($ta_add_comment)) $contact["add_comment"] = trim($ta_add_comment);
   if (isset ($ta_add_comment2)) $contact["add_comment2"] = trim($ta_add_comment2);
   if (isset ($ta_add_comment3)) $contact["add_comment3"] = trim($ta_add_comment3);
-
-  // Admin - Function fields
-  // $sel_func -> "function" is already set
-  if (isset ($tf_func)) $contact["func_label"] = $tf_func;
 
   // Admin - Kind fields
   if (isset ($tf_label)) $contact["kind_label"] = $tf_label;

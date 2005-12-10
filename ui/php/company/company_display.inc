@@ -349,7 +349,6 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
       <input type=\"checkbox\" name=\"cb_fuzzy\" value=\"1\" $fuzzy />
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"tf_cat_code\" type=\"hidden\" value=\"$cat_code\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -416,7 +415,6 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
   $ctry = $company["country"];
   $type = $company["type"];
   $cat1 = $company["category1"];
-  $cat_code = $company["cat_code"];
   $cat_tree = $company["cat_tree"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
@@ -426,7 +424,7 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_cat_code=$cat_code&amp;cb_cat_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;cb_cat_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -687,11 +685,10 @@ function html_company_consult($co_q, $cats1) {
   }
 
   // Conditionnal fields
-  // of: activity, type, category1
+  // of: activity, type, category1, activity
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
-  $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
@@ -817,6 +814,8 @@ function dis_company_form($action, $company) {
 
   $c_id = $company["id"];
   if ($c_id > 0) {
+    $types = of_category_get_ordered("company", "type", $c_id, "mono");
+    $acts = of_category_get_ordered("company", "activity", $c_id, "mono");
     $comp_q = run_query_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
@@ -826,11 +825,6 @@ function dis_company_form($action, $company) {
     }
   }
   $dsrc_q = run_query_datasource();
-
-  if ($cid > 0) {
-    $types = of_category_get_ordered("company", "type", $cid, "mono");
-    $acts = of_category_get_ordered("company", "activity", $cid, "mono");
-  }
 
   if ($show_naf) {
     $naf_q = run_query_companynafcode();
@@ -870,7 +864,7 @@ function dis_company_form($action, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
-  global $set_theme,$ico_web,$ico_mail,$l_category1,$popup_height,$popup_width;
+  global $set_theme,$ico_web,$ico_mail,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
@@ -879,7 +873,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   $uid = $auth->auth["uid"];
   $lang = get_lang();
-  $cat1 = array();
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
