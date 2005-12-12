@@ -19,6 +19,9 @@ ALTER TABLE Contact ADD COLUMN contact_comment3 text NULL after contact_comment2
 ALTER TABLE Contact ADD COLUMN contact_date timestamp(14) after contact_privacy;
 ALTER TABLE Contact ADD COLUMN contact_category5_id int(8) DEFAULT 0 after contact_comment3;
 
+ALTER TABLE Contact ADD COLUMN contact_aka varchar(255) DEFAULT NULL after contact_firstname;
+ALTER TABLE Contact ADD COLUMN contact_sound varchar(48) DEFAULT NULL after contact_aka;
+
 
 -------------------------------------------------------------------------------
 -- Tables needed for Contact module
@@ -188,7 +191,7 @@ SELECT
 FROM
   CompanyCategoryLink;
 
--- DROP table CompanyCategory1Link
+-- DROP table CompanyCategoryLink
 DROP TABLE IF EXISTS CompanyCategoryLink;
 
 
@@ -399,7 +402,3 @@ UPDATE ContractStatus set contractstatus_code = contractstatus_order;
 
 -- Update table 'ContractStatus'
 ALTER TABLE ContractStatus DROP COLUMN contractstatus_order;
-
-
-
-

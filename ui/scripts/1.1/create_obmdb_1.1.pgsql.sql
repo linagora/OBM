@@ -292,6 +292,8 @@ CREATE TABLE Contact (
   contact_marketingmanager_id  integer,
   contact_lastname             varchar(64) DEFAULT '' NOT NULL,
   contact_firstname            varchar(64),
+  contact_aka                  varchar(255),
+  contact_sound                varchar(48),
   contact_service              varchar(64),
   contact_address1             varchar(64),
   contact_address2             varchar(64),
@@ -315,7 +317,7 @@ CREATE TABLE Contact (
   contact_comment              text,
   contact_comment2             text,
   contact_comment3             text,
-  contact_category5_id          integer DEFAULT 0,
+  contact_category5_id         integer DEFAULT 0,
   PRIMARY KEY (contact_id)
 );
 

@@ -17,6 +17,8 @@ ALTER TABLE Contact ADD COLUMN contact_comment2 text;
 ALTER TABLE Contact ADD COLUMN contact_comment3 text;
 ALTER TABLE Contact ADD COLUMN contact_date TIMESTAMP;
 ALTER TABLE Contact ADD COLUMN contact_category5_id integer DEFAULT 0;
+ALTER TABLE Contact ADD COLUMN contact_aka varchar(255) DEFAULT NULL;
+ALTER TABLE Contact ADD COLUMN contact_sound varchar(48) DEFAULT NULL;
 
 
 -------------------------------------------------------------------------------

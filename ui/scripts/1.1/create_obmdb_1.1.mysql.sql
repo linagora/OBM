@@ -291,6 +291,8 @@ CREATE TABLE Contact (
   contact_marketingmanager_id  int(8),
   contact_lastname             varchar(64) DEFAULT '' NOT NULL,
   contact_firstname            varchar(64),
+  contact_aka                  varchar(255),
+  contact_sound                varchar(48),
   contact_service              varchar(64),
   contact_address1             varchar(64),
   contact_address2             varchar(64),
