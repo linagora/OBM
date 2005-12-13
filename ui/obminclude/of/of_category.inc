@@ -148,7 +148,7 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_dis_entity_form($cats, $entity, $cat="", $cattype="multi") {
   global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width;
-  global $l_none;
+  global $l_none, $cgp_hide;
   
   $show_cat = (! $cgp_hide["$entity"]["${cat}"]);
 
@@ -1058,6 +1058,8 @@ function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
 //   - $first_element : (["all"|"none"]) 
 ///////////////////////////////////////////////////////////////////////////////
 function of_dis_html_select_category($cats, $cat_selected, $entity, $cat, $first_element) {
+  global $cgp_hide;
+
   $l_element = "l_${first_element}";$c_element = "c_${first_element}"; 
   global $$l_element,$$c_element;
 
@@ -1092,7 +1094,7 @@ function of_dis_html_select_category($cats, $cat_selected, $entity, $cat, $first
 //   - $cat          : target category
 ///////////////////////////////////////////////////////////////////////////////
 function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
-  global $l_all;
+  global $l_all, $cgp_hide;
 
   $l_cat = "l_${cat}"; 
   global $$l_cat;
@@ -1120,6 +1122,8 @@ function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
 //   - $cattype   : ([mono|multi]) 
 ///////////////////////////////////////////////////////////////////////////////
 function of_dis_block_consult_category($cats, $entity, $cat, $cattype="multi") {
+  global $cgp_hide;
+
   $l_cat = "l_${cat}"; 
   global $$l_cat;
 
