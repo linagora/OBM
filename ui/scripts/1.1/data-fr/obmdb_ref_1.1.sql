@@ -72,42 +72,42 @@ INSERT INTO CalendarCategory1 (calendarcategory1_timeupdate, calendarcategory1_t
 --
 -- Dumping data for table 'ContractPriority'
 --
-INSERT INTO ContractPriority (contractpriority_color, contractpriority_order, contractpriority_label) VALUES ('FF0000', 1, 'Haute');
-INSERT INTO ContractPriority (contractpriority_color, contractpriority_order, contractpriority_label) VALUES ('FFA0A0', 2, 'Normale');
-INSERT INTO ContractPriority (contractpriority_color, contractpriority_order, contractpriority_label) VALUES ('FFF0F0', 3, 'Faible');
+INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FF0000', '1', 'Haute');
+INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FFA0A0', '2', 'Normale');
+INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FFF0F0', '3', 'Faible');
 
 
 --
 -- Dumping data for table 'ContractStatus'
 --
-INSERT INTO ContractStatus (contractstatus_order, contractstatus_label) VALUES (1, 'En cours');
-INSERT INTO ContractStatus (contractstatus_order, contractstatus_label) VALUES (2, 'Clos');
+INSERT INTO ContractStatus (contractstatus_code, contractstatus_label) VALUES ('1', 'En cours');
+INSERT INTO ContractStatus (contractstatus_code, contractstatus_label) VALUES ('2', 'Clos');
 
 
 --
 -- Dumping data for table 'IncidentPriority'
 --
-INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_order,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,1,'FF0000','Urgente');
-INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_order,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,2,'EE9D00','Forte');
-INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_order,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,3,'550000', 'Normale');
-INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_order,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,4,'000000','Basse');
+INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,'1','FF0000','Urgente');
+INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,'2','EE9D00','Forte');
+INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,'3','550000', 'Normale');
+INSERT INTO IncidentPriority (incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (null,null,null,1,'4','000000','Basse');
 
 
 --
 -- Dumping data for table 'IncidentStatus'
 --
-INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_order,incidentstatus_label) VALUES (null,null,null,1,1,'Ouvert');
-INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_order,incidentstatus_label) VALUES (null,null,null,1,2,'Appel');
-INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_order,incidentstatus_label) VALUES (null,null,null,1,3,'Attente Appel');
-INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_order,incidentstatus_label) VALUES (null,null,null,1,4,'En Pause');
-INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_order,incidentstatus_label) VALUES (null,null,null,1,5,'Cloturé');
+INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'1','Ouvert');
+INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'2','Appel');
+INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'3','Attente Appel');
+INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'4','En Pause');
+INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'5','Cloturé');
 
 
 --
 -- Dumping data for table 'IncidentCategory1'
 --
-INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (1, 'A distance');
-INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (2, 'Sur site');
+INSERT INTO IncidentCategory1 (incidentcategory1_code, incidentcategory1_label) VALUES ('1', 'A distance');
+INSERT INTO IncidentCategory1 (incidentcategory1_code, incidentcategory1_label) VALUES ('2', 'Sur site');
 
 
 --
