@@ -629,15 +629,6 @@ a.resultText:active  	{ color: #0ba589; background-color: transparent;}
 a.resultText:visited 	{ color: #0ba589; background-color: transparent;}
 
 
-
-/* ------------------------------------------------------------------------- */
-/* admin */
-/* ------------------------------------------------------------------------- */
-
-
-
-
-
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------- */
@@ -699,10 +690,31 @@ td.textLabelForm	{
 /* /////  Admin table style definition  ///// */
 /* ////////////////////////////////////////// */
 
+.admin {
+        clear: both;
+        font-size: 10px;
+        border: 1px solid #009EC6;
+        height: 100%;
+        width: 90%;
+/*      margin-top: 10px;*/
+        margin-bottom: 20px;
+        font-style: italic;
+        color: #ffffff;
+        background-color: #cccccc;
+}
+
+.adminTitle {
+        font-weight:            bold;
+        font-size:              13px;
+        background-color: #93919c;
+}
+
+
 table.admin		{
         margin-left:		auto;
 	margin-right:		auto;
-	border:			3px outset blue;
+/*	border:			3px outset blue;*/
+        border:                 0;
 	background-color:	#cccccc;
 }
 

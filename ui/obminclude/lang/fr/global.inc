@@ -285,6 +285,7 @@ $l_j_copy_privilege_alert = "Impossible d\'utiliser la fonctionnalité copier : \
 $l_code = "Code";
 $l_c_manage = "Gestion: ";
 $l_c_new = "Nouveau";
+$l_c_upd = "Modifier";
 $l_c_checkdelete = "Vérifier ou supprimer";
 $l_c_delete =  "Supprimer";
 $l_c_update = "Mettre à jour";

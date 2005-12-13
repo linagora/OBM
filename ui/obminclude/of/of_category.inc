@@ -594,7 +594,6 @@ function of_run_query_category_update($param, $entity, $cat) {
     WHERE
       $field_id='$cat_id'";
 
-echo $query;
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -771,7 +770,7 @@ function of_category_compare($m, $n) {
 function of_html_admin_cat_form($cats, $entity, $cat) {
   global $obminclude;
   global $l_code,$l_label;
-  global $l_c_manage, $l_c_checkdelete, $l_c_update, $l_c_new, $l_c_insert;
+  global $l_c_manage, $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
 
   $l_cat = "l_${cat}"; $l_cat_s = "l_${cat}_s"; 
@@ -802,6 +801,8 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
 
   if ($entity=="calendar") {
     $page="agenda_index.php";
+  } elseif ($entity=="subscription") {
+    $page="publication_index.php";
   } else {
     $page="${entity}_index.php";
   }
@@ -809,17 +810,90 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
+    <div class=\"admin\">
+    <div class=\"adminTitle\">:: $l_c_manage ${$l_cat_s}</div>
+    <table class=\"admin\" width=\"100%\">
     <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_c_manage ${$l_cat_s}
+      <td> </td>
+      <td class=\"adminLabel\">$l_c_upd</td>
+      <td class=\"adminLabel\">$l_c_new</td>
+    </tr>
+    <tr>
+      <td>
+<!-- Category Check Delete Section -->
+            <form name=\"form_${cat}_delete\" method=\"post\"
+              action=\"" . url_prepare("$page") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">".ucfirst(${$l_cat_s})."</td>
+            </tr>
+            <tr>
+              <td class=\"adminLabel\">$sel_cat</td>
+            </tr>
+            <tr>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
+              <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
+              </td>
+            </tr> 
+            </table>
+            </form>
       </td>
-    </tr><tr>
       <td>
 
-<!-- Category Check Delete Section -->
+<!-- Category Update Section -->
 
+          <form name=\"form_${cat}_update\" method=\"get\" action=\"" . url_prepare("$page") . "\">
+        <table heigth=\"100%\">
+        <tr>
+          <td class=\"adminLabel\">$l_code :</td>
+          <td><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">$l_label :</td>
+          <td><input type=\"text\" name=\"tf_${cat}_label\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\" colspan=\"2\">
+            <input type=\"hidden\" name=\"sel_${cat}\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
+            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_update\"
+              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+          </form>
+      </td>
+      <td>
+<!-- New Category Section -->
+        <form name=\"form_${cat}_new\" method=\"get\" action=\"" . url_prepare("$page") . "\">
         <table>
+        <tr>
+          <td class=\"adminLabel\">$l_code :</td>
+          <td ><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">$l_label :</td>
+          <td ><input type=\"text\" name=\"tf_${cat}_label\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\" colspan=\"2\">
+            <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
+            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_insert\"
+              onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+
+      </td>
+    </tr>
+    </table>
+
+
+<!--
+    <table class=\"admin\">
+    <tr>
+      <td>
+
+
+        <table border=1>
         <tr>
           <td colspan=\"3\">
             <form name=\"form_${cat}_delete\" method=\"post\"
@@ -838,7 +912,6 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
           </td>
         </tr>
 
-<!-- Category Update Section -->
 
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
@@ -858,7 +931,6 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
       </td>
       <td>
 
-<!-- New Category Section -->
 
         <form name=\"form_${cat}_new\" method=\"get\"
           action=\"" . url_prepare("$page") . "\">
@@ -884,6 +956,9 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
       </td>
     </tr>
     </table>
+-->
+
+    </div>
 ";
 
   return $block;
@@ -911,6 +986,8 @@ function of_dis_category_links($param, $entity, $cat, $cattype="multi") {
 
   if ($entity=="calendar") {
     $page="agenda_index.php";
+  } elseif ($entity=="subscription") {
+    $page="publication_index.php";
   } else {
     $page="${entity}_index.php";
   }

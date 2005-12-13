@@ -277,6 +277,7 @@ $l_document_add = "Link some documents";
 $l_code = "Code";
 $l_c_manage = "Management: ";
 $l_c_new = "New";
+$l_c_update = "Update";
 $l_c_checkdelete = "Check or delete";
 $l_c_delete =  "Delete";
 $l_c_update = "Update";
