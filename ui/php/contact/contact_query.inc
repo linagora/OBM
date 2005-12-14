@@ -286,7 +286,7 @@ function run_query_contact_detail($p_id) {
         company_country_iso3166,
         C2.country_name as company_country_name";
   } else {
-    $company_fields = "contact_company";
+    $company_fields = "contact_company as company_name";
   }
 
   $query = "SELECT Contact.*,
