@@ -158,7 +158,7 @@ function display_sections_theme($section) {
   foreach ($sections as $key => $value) {
     $section_name = $value["Name"];
     $section_right = $perm->get_section_rights($key); 
-    if (($section_right & $value["Right"]) == $value["Right"]) {
+    if ($section_right) {
       if ($key == $section) {
         $ret .= display_active_tab($value);
       }	else {

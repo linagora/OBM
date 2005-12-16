@@ -64,7 +64,7 @@ function doChallengeResponse() {
 
 <body>
 <div align="center"><font color="#0892B5" size="2" face="sans-serif, Verdana, Arial"><strong>OBM 
-<?php print $obm_version; ?> - DEMO</strong></font> </div>
+<?php print "$obm_version - $obmdb_dbtype"; ?> - DEMO</strong></font> </div>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>

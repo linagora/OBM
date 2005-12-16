@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_aka = "Also known as";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
 $l_category1 = "Categories";

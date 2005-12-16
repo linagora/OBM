@@ -44,6 +44,9 @@ function run_query_search($user, $p_new_order, $p_order_dir, $restriction="") {
 	$coma = ",";
       }
       $where_restriction .= "))";
+    } else {
+      // If no users have given $uid with read right, return empty set
+      $where_restriction = " AND userobm_id < 0";
     }
   }
 
@@ -99,8 +102,7 @@ function run_query_search($user, $p_new_order, $p_order_dir, $restriction="") {
       userobm_id as id,
       $datebegin,
       $lastaccess
-    FROM UserObm $join_grp
-    ";
+    FROM UserObm $join_grp";
 
 
   // ORDER construction

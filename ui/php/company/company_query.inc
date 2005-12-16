@@ -38,12 +38,6 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $datebefore = $company["datebefore"];
   $lang = get_lang();
 
-  // If a name has been given we search its sound too
-  if ($name != "") {
-    $auto_aka = format_name($name, 0, true, true);
-    $sound = phonetic_key($name);
-  }
-
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
@@ -132,6 +126,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $order = "company_address1";
     $order_next = ", company_address2, company_address3, company_zipcode, company_town";
   }
+  $orderq = " ORDER BY $order $p_order_dir $order_next";
+
 
   $select = "SELECT distinct
       company_id as id,
@@ -174,12 +170,14 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
                    AND country_lang='$lang'";
 
   if ((! $fuzzy) || ($name == "")) {
+    // If result limited, we get the global rows number
     if ($ctu_sql_limit) {
       $count = get_query_count("SELECT count(distinct company_id) FROM Company $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
+    // If any results (from limited) or result not limited, we get the data
     if (($count > 0) || (! $ctu_sql_limit)) {
-      $query = "$select $left_join $whereq ORDER BY $order $p_order_dir $order_next $limit";
+      $query = "$select $left_join $whereq $orderq $limit";
       display_debug_msg($query, $cdg_sql, "company_search(1)");
       $obm_q->query($query);
       if (! $ctu_sql_limit) {
@@ -190,6 +188,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   // if fuzzy or unsuccessful search (meaningful only if name has been entered)
   if ( ( ($fuzzy) || ($count == 0) ) && ($name != "") ) {
+    $auto_aka = format_name($name, 0, true, true);
+    $sound = phonetic_key($name);
     $where_name = " ($where_name OR company_aka $like '%$auto_aka%'
                  OR company_sound = '$sound')";
     $whereq = " WHERE $where_name $where";
@@ -197,8 +197,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       $count = get_query_count("SELECT count(distinct company_id) FROM Company $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
-    if (($count > 0)  || (! $ctu_sql_limit)) {
-      $query = "$select $left_join $whereq ORDER BY $order $p_order_dir $order_next $limit";
+    if (($count > 0) || (! $ctu_sql_limit)) {
+      $query = "$select $left_join $whereq $orderq $limit";
       display_debug_msg($query, $cdg_sql, "company_search(2)");
       $obm_q->query($query);
     }
@@ -257,7 +257,7 @@ function run_query_detail($p_id) {
 //     keys used  : num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email, com, category1
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($company) {
+function run_query_company_insert($company) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -403,7 +403,7 @@ function run_query_insert($company) {
 //     keys used  : num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($cid, $company) {
+function run_query_company_update($cid, $company) {
   global $auth, $cdg_sql, $cgp_hide;
 
   $num = $company["num"];

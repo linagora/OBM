@@ -611,7 +611,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"form_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
+    <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
       <div class=\"detailHead\">$l_incident</div>
         <table class=\"detail\">
           <tr>
@@ -632,7 +632,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
               <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_label</a>
               <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
               <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-              <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=form_incident.contract_new_id&amp;ext_widget_text=form_incident.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
+              <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
               <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
               <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
             </td>

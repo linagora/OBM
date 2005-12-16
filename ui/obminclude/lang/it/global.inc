@@ -72,6 +72,7 @@ $l_profile = "Profile";
 $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
 $l_version = "Versione";
+$l_aka = "Altri nome";
 
 // Entities
 $l_company = "Azienda";

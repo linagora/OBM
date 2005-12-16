@@ -362,7 +362,7 @@ function html_account_form($obm_q_account, $action) {
 ////////////////////////////////////////
 
   $block .= "
-   <form method=\"post\" action=\"account_index.php\"
+   <form method=\"post\" name=\"f_entity\" action=\"account_index.php\"
          onsubmit=\"if (check_cpte(this)) return true; else return false;\" >
     <table class=\"detail\">
      <tr>

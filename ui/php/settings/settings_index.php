@@ -100,10 +100,15 @@ if ($form_user_pref) {
   }
 
 }
-page_close();
 
 require("$obminclude/global_pref.inc");
 require("settings_display.inc");
+
+if ($action == "") $action = "index";
+get_settings_actions();
+$perm->check_permissions($module, $action);
+
+page_close();
 
 if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
@@ -128,10 +133,6 @@ if ($set_cal_interval == $ccal_1) $cal_1 = "checked";
 
 if ($set_csv_sep == $ccsvd_sc) $csvd_sc = "checked";
 if ($set_csv_sep == $ccsvd_tab) $csvd_tab = "checked";
-
-if ($action == "") $action = "index";
-get_settings_actions();
-$perm->check_permissions($module, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //

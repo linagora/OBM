@@ -46,7 +46,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   if ($owner != $c_all && ($owner != "")) {
      $where .=" AND (Incident.incident_owner = '$owner') ";
   }
-  if ($logger != $c_all && ($owner != "")) {
+  if ($logger != $c_all && ($logger != "")) {
      $where .=" AND (Incident.incident_logger = '$logger') ";
   }
   if ($dateafter !="") {
@@ -63,7 +63,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
      $join_contr = "LEFT JOIN Contract ON incident_contract_id=contract_id";
   }
   if ($company != "") {
-    $where .= " AND company_name $like '$company%'";
+    $where .= sql_company_name_advanced_search($company, $like);
     $join_contr = "LEFT JOIN Contract ON incident_contract_id=contract_id";
     $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }

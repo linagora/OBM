@@ -1032,7 +1032,7 @@ function html_project_form($action, $project_q, $project) {
   // --- HTML Template --------------------------------------------------------
   
   $block = "
-    <form method=\"post\" name=\"form_project_create\" 
+    <form method=\"post\" name=\"f_entity\" 
       onsubmit=\"if (check_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
 
@@ -1204,7 +1204,7 @@ function html_project_task_form($ptask_q, $project) {
 
   $block = "
    $js_script
-   <form method=\"post\" name=\"form_taskadd\"
+   <form method=\"post\" name=\"f_entity\"
      onsubmit=\"if (check_taskadd(this)) return true; else return false;\"
      action=\"". url_prepare("project_index.php") ."\">
  
@@ -1376,15 +1376,15 @@ function html_project_member_form($members_q, $project) {
       if ($m_manager)
 	$rd_manager = "
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked
-            onchange=\"change_status($m_id, 1, form_memberdel)\" />$l_manager
+            onchange=\"change_status($m_id, 1, f_entity)\" />$l_manager
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\"
-            onchange=\"change_status($m_id, 0, form_memberdel)\" />$l_member";
+            onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
       else
 	$rd_manager = "
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\"
-            onchange=\"change_status($m_id, 1, form_memberdel)\" />$l_manager
+            onchange=\"change_status($m_id, 1, f_entity)\" />$l_manager
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked
-            onchange=\"change_status($m_id, 0, form_memberdel)\" />$l_member";
+            onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
       
       $dis_member .= "
         <tr>
@@ -1421,7 +1421,7 @@ function html_project_member_form($members_q, $project) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-   <form name=\"form_memberdel\" method=\"post\"
+   <form name=\"f_entity\" method=\"post\"
          action=\"".url_prepare("project_index.php")."\">
 
     <div class=\"detailHead\">$l_members_info</div>
@@ -1435,7 +1435,7 @@ function html_project_member_form($members_q, $project) {
     </div>
 
    </form>
-   ";
+";
 
   return $block;
 }
@@ -1690,10 +1690,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form name=\"form_allocate\" method=\"post\">
-    <input type=\"hidden\" name=\"action\" value=\"advance_update\" />
-    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-
+  <form name=\"f_entity\" method=\"post\">
     <div class=\"detailHead\">$l_fill_advance_form</div>
 
     <table class=\"projectDetail\">
@@ -1701,6 +1698,8 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
       $dis_member
     </table>
 
+    <input type=\"hidden\" name=\"action\" value=\"advance_update\" />
+    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
   
     <div class=\"detailButton\">
      <p class=\"detailButtons\">$dis_button</p>

@@ -91,6 +91,7 @@ $l_profile = "Profil";
 $l_connection_end = "Fin de connexion";
 $l_reconnect = "Cliquer ici pour se reconnecter";
 $l_version = "Version";
+$l_aka = "Aussi connu comme";
 
 // Entities
 $l_company = "Société";

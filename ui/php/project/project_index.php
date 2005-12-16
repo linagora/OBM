@@ -57,11 +57,12 @@ $perms = $auth->auth["perm"];
 
 update_last_visit("project", $param_project, $action);
 
-page_close();
 if ($action == "") $action = "index";
 $project = get_param_project();
 get_project_action();
 $perm->check_permissions($module, $action);
+
+page_close();
 
 
 ///////////////////////////////////////////////////////////////////////////////

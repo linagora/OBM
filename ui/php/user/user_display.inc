@@ -361,7 +361,7 @@ function html_user_form($usr_q, $user) {
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-    <form method=\"post\" name=\"form_user\"
+    <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
@@ -369,14 +369,14 @@ function html_user_form($usr_q, $user) {
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_login</td>
       <td class=\"detailForm\"><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_password</td>
       <td class=\"detailForm\"><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_user_perms</td>
       <td class=\"detailForm\"><select name=\"sel_perms\">
@@ -601,7 +601,7 @@ function html_user_group_consult($usr_q) {
   }
 
   $block = "
-    <form method=\"post\" name=\"form_group\"
+    <form method=\"post\" name=\"f_entity\"
       action=\"" . url_prepare("user_index.php") . "\">
 
   <div class=\"detailHead\">$l_user $login ($lname $fname) $l_group_member</div>

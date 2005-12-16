@@ -63,8 +63,8 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
     $where .= " and invoice_company_id = '$comp_id'";
   }
   if ($company != "") {
-    $where .= " and company_name $like '$company%'";
-    $join_comp = "left join Company on invoice_company_id=company_id";
+    $where .= sql_company_name_advanced_search($company, $like);
+    $join_comp = "LEFT JOIN Company ON invoice_company_id=company_id";
   }
   if ($deal != "") {
     $where .= " and deal_label $like '$deal%'";

@@ -7,12 +7,11 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$module = "";
+// $module and $action defined for ActiveUser stats
+$module = "obm";
+if ($action == "") { $action = "home"; }
 $path = ".";
 $extra_css = "portal.css";
-///////////////////////////////////////////////////////////////////////////////
-// Session Management                                                        //
-///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");

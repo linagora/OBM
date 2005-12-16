@@ -58,6 +58,7 @@ $l_private = "Privat";
 $l_public = "Öffentlich";
 $l_local = "Local";
 $l_ext_id = "Id ext";
+$l_aka = "Also known as";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";

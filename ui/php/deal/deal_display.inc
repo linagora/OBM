@@ -1197,7 +1197,7 @@ $js_status_loop
 
   $block = "
     $js_status
-    <form method=\"post\" name=\"form_deal_update\" 
+    <form method=\"post\" name=\"f_entity\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
 
@@ -1448,7 +1448,7 @@ $js_status_loop
  
   $block = "
     $js_status
-    <form method=\"post\" name=\"form_deal_update\" 
+    <form method=\"post\" name=\"f_entity\" 
       onsubmit=\"if (check_quick_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
 
@@ -2292,7 +2292,7 @@ function dis_parentdeal_consult($deal) {
   $num_rows = $deal_q->num_rows();
   $kind_q = run_query_dealtype();
   $tt_q = run_query_tasktype($ctt_sales);
-  $cat_q = run_query_dealcategory();
+  $cat_q = run_query_dealcategory1();
   $status_q = run_query_dealstatus();
   $usr_q = run_query_deal_manager($archive);
 
@@ -2534,7 +2534,7 @@ function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
   }
 
   $block = "
-  <form method=\"post\" name=\"form_parentdeal_update\"
+  <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_parentdeal(this)) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
 

@@ -34,6 +34,8 @@ $todo = get_param_todo();
 get_todo_action();
 $perm->check_permissions($module, $action);
 
+page_close();
+
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////

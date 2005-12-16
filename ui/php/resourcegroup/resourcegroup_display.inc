@@ -136,7 +136,7 @@ function html_resourcegroup_search_form ($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Group search result                                           //
+// Display the Group search result
 // Parameters:
 //   - $group[]   : group search criteria
 //     keys used  : name, description
@@ -279,7 +279,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   }
 
   $block = "<center>
-  <form method=\"get\" name=\"f_group\" action=\"".url_prepare("resourcegroup_index.php")."\">
+  <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">
 
   <div class=\"detailHead\">$l_resourcegroup</div>
 
@@ -467,7 +467,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Group Display preference screen                               //
+// Display the Group Display preference screen
 // Parameters:
 //   - $pref_group_q : DBO : Group Field group to display
 //   - $pref_r_q     : DBO : Resource Field group to display

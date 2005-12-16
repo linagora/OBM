@@ -46,7 +46,7 @@ $cgp_sql_star = true;
 //$cmy_charset_collation = "latin1_general_ci";
 
 // is Mail enabled for OBM ? (eg: agenda)
-$cgp_mail_enabled = true;
+//$cgp_mail_enabled = true;
 
 // Session Cookie lifetime (in seconds, 0=session cookie)
 $cs_lifetime = 0;
@@ -72,6 +72,9 @@ $password_encryption = "md5";
 // Company : Auto format fields
 $caf_company_name = true;
 $caf_town = true;
+
+// Company + Contact : Advanced search enabled by default
+$cgp_advanced_search_default = false;
 
 // Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;
@@ -143,9 +146,10 @@ $profiles["editor"] = array (
 //$cgp_hide["contact"]["category2"] = true;
 //$cgp_hide["contact"]["category3"] = true;
 //$cgp_hide["contact"]["category4"] = true;
+//$cgp_hide["contact"]["category5"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
-//$cgp_hide["contact"]["comment2"] = true;
-//$cgp_hide["contact"]["comment3"] = true;
+//$cgp_hide["contact"]["contact_comment2"] = true;
+//$cgp_hide["contact"]["contact_comment3"] = true;
 //$cgp_hide["contact"]["contact_date"] = true;
 
 // Deal module

@@ -706,7 +706,7 @@ function dis_list_form($action, $list_q, $list) {
   global $l_insert, $l_update, $l_back;
 
   $url = url_prepare("list_index.php");
-  $block = "<form method=\"post\" name=\"f_new\" action=\"$url\"
+  $block = "<form method=\"post\" name=\"f_entity\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">";
 
   $block .= html_list_form($action, $list_q, $list);

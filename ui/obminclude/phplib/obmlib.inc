@@ -147,7 +147,7 @@ class OBM_Challenge_Auth extends Auth {
 
   function auth_loginform() {
     global $sess, $obminclude, $obm_version, $module, $path, $login_action;
-    global $challenge, $auth_encryption, $password_encryption;
+    global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));

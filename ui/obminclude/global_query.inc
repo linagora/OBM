@@ -910,4 +910,23 @@ function get_email_used($id="", $gid="", $lid="") {
   return $mails;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the SQL advanced search clause on Company name
+// Parameters:
+//   - $name : company name to search
+//   - $like : like clause (can be ilike for postgres)
+// Returns:
+//   - $sql : sql criteria
+///////////////////////////////////////////////////////////////////////////////
+function sql_company_name_advanced_search($name, $like="like") {
+
+  $sound = phonetic_key($name);
+  $sql = " AND (company_name $like '$name%'
+                  OR company_aka $like '%$name%'
+                  OR company_sound = '$sound')";
+
+  return $sql;
+}
+
 ?>

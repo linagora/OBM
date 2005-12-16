@@ -352,7 +352,7 @@ function get_param_contract() {
   global $hd_company_ad1, $hd_company_zip, $hd_company_town,$l_header_export;
   global $popup, $ext_title, $ext_target, $ext_widget, $ext_widget_text;
   global $cdg_param, $action,$sel_priority,$sel_status,$param_contract;
-  global $tf_pri,$tf_order, $tf_status, $tf_color, $tf_ticket_nb;
+  global $tf_pri,$tf_code, $tf_status, $tf_color, $tf_ticket_nb;
   global $tf_duration, $rd_format, $cb_vis;
 
   if (isset ($popup)) $contract["popup"] = $popup;
@@ -397,13 +397,13 @@ function get_param_contract() {
   // Admin - Priority fields
   // $sel_priority -> "priority" is already set
   if (isset ($tf_pri)) $contract["pri_label"] = $tf_pri;
-  $contract["pri_order"] = (isset($tf_order) ? $tf_order : "0");
+  $contract["pri_code"] = (isset($tf_code) ? $tf_code : "0");
   $contract["pri_color"] = (isset($tf_color) ? $tf_color : "");
 
   // Admin - Status fields
   // $sel_status -> "status" is already set
   if (isset ($tf_status)) $contract["sta_label"] = $tf_status;
-  $contract["sta_order"] = (isset($tf_order) ? $tf_order : "0");
+  $contract["sta_code"] = (isset($tf_code) ? $tf_code : "0");
 
   // Search fields
   if (isset ($tf_dateafter)) $contract["dateafter"] = $tf_dateafter;

@@ -113,7 +113,7 @@ function html_publication_search_form ($type_q,$publication) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_publication\" id=\"f_publication\" action=\"$url\">
+  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
   <div class=\"search\">
     $dis_title
     <div class=\"searchLabel\">$l_publication_type<br />
@@ -416,15 +416,13 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" /> 
-      ";
+      <input type=\"submit\" value=\"$l_update\" />";
 
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />
-      ";
-    $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\"> "; 
+      <input type=\"submit\" value=\"$l_insert\" />";
+    $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\">";
     while($cat1_q->next_record()) {
       $cat_id = $cat1_q->f("contactcategory1_id");
       $cat_label = $cat1_q->f("contactcategory1_label");
@@ -437,20 +435,20 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
     }
     $sel_contcat1 .= "</select>";
     $dis_auto_sub = "<div class=\"detailHead\">$l_auto_sub</div>
-   
+
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_contact_category1</td>
       <td class=\"detailForm\">
        $sel_contcat1
       </td>
-     </tr>   
+     </tr>
      <tr>
       <td class=\"detailLabel\"></td>
       <td class=\"detailForm\">
       $sel_recept
       </td>
-     </tr>       
+     </tr>
     </table>";      
   }
 
@@ -461,7 +459,7 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"post\" name=\"form_publication\"
+    <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
 
@@ -551,7 +549,7 @@ function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"post\" name=\"form_publication\"
+    <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
 

@@ -44,6 +44,8 @@ $agenda = get_param_agenda();
 get_agenda_action();
 $perm->check_permissions($module, $action);
 
+page_close();
+
 $max_display = 6;
 // If a group has just been selected, automatically select all its members
 if ( ($agenda["new_group"] == "1")

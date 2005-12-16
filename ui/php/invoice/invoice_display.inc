@@ -190,10 +190,6 @@ function html_invoice_search_form($sta_q, $invoice) {
     <form method=\"get\" name=\"f_search\"
         onSubmit=\"if (check_search_form(this) == false) return false;
         else return true;\" action=\"$url_form\">
-      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-      <input type=\"hidden\" name=\"param_project\" value=\"$proj_id\" />
-
     <div class=\"search\">
 
     <div class=\"searchLabel\">$l_label_start<br />
@@ -246,6 +242,9 @@ function html_invoice_search_form($sta_q, $invoice) {
     </div>
 
     <div class=\"searchLabel\">&nbsp;<br>
+      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+      <input type=\"hidden\" name=\"param_project\" value=\"$proj_id\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
     </div>
@@ -253,8 +252,7 @@ function html_invoice_search_form($sta_q, $invoice) {
     <div class=\"searchEnd\"></div>
 
     </div>
-    </form>
-   ";
+    </form>";
 
   return $block;
 }
@@ -763,7 +761,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
   $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
 
   $block = "
-  <form method=\"post\" name=\"f_invoice\" action=\"invoice_index.php\">
+  <form method=\"post\" name=\"f_entity\" action=\"invoice_index.php\">
 
   <div class=\"detailHead\">$title</div>
 
@@ -776,7 +774,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_invoice.company_new_id&amp;ext_widget_text=f_invoice.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -788,7 +786,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
       </a><input type=\"hidden\" name=\"param_deal\" value=\"$d_id\" />
       <input type=\"hidden\" name=\"deal_label\" value=\"$d_label\" />
       <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_invoice.deal_new_id&amp;ext_widget_text=f_invoice.deal_new_label','Deal','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_new_label','Deal','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"deal_new_label\" value=\"$d_new_label\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -800,7 +798,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
       </a><input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
       <input type=\"hidden\" name=\"project_name\" value=\"$p_name\" />
       <input type=\"hidden\" name=\"project_new_id\" value=\"$p_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_invoice.project_new_id&amp;ext_widget_text=f_invoice.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entit.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>

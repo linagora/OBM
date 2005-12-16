@@ -569,11 +569,12 @@ function get_param_contact() {
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $sel_function, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_priv, $ta_com, $ta_com2, $ta_com3, $tf_date;
+  global $sel_market, $tf_email, $tf_email2, $tf_date, $cb_mailok, $cb_priv;
+  global $ta_com, $ta_com2, $ta_com3, $tf_aka;
   global $tf_datecomment , $sel_usercomment , $ta_add_comment ;
   global $tf_datecomment2, $sel_usercomment2, $ta_add_comment2;
   global $tf_datecomment3, $sel_usercomment3, $ta_add_comment3;
-  global $cb_archive;
+  global $cb_archive, $cb_fuzzy;
   global $param_company, $param_contact, $hd_usercreate;
   global $company_name, $company_new_name, $company_new_id;
   global $tf_label, $tf_lang, $tf_header, $cb_default;
@@ -611,6 +612,7 @@ function get_param_contact() {
   if (isset ($tf_date)) $contact["date"] = $tf_date;
   if (isset ($tf_lname)) $contact["lname"] = trim($tf_lname);
   if (isset ($tf_fname)) $contact["fname"] = trim($tf_fname);
+  if (isset ($tf_aka)) $contact["aka"] = $tf_aka;
   if (isset ($param_company)) $contact["company_id"] = $param_company;
   if (isset ($tf_company)) $contact["company"] = $tf_company;
   if (isset ($company_name)) $contact["company_name"] = $company_name;
@@ -646,6 +648,7 @@ function get_param_contact() {
   if (isset ($ta_add_comment)) $contact["add_comment"] = trim($ta_add_comment);
   if (isset ($ta_add_comment2)) $contact["add_comment2"] = trim($ta_add_comment2);
   if (isset ($ta_add_comment3)) $contact["add_comment3"] = trim($ta_add_comment3);
+  if (isset ($cb_fuzzy)) $contact["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
 
   // Admin - Kind fields
   if (isset ($tf_label)) $contact["kind_label"] = $tf_label;

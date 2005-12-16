@@ -590,7 +590,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
           " - " . $contract_q->f("cphone2"); 
 
 
-  $dis_update = "<form method=\"get\" name=\"form_contract_update\"
+  $dis_update = "<form method=\"get\" name=\"f_entity\"
       action=\"".url_prepare("contract_index.php")."\">
     <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
     <input type=\"hidden\" name=\"param_contract\" value=\"$id\">
@@ -1124,7 +1124,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   // --- html template --------------------------------------------------------
 
   $block = "
-  <form method=\"post\" name=\"form_contract\"
+  <form method=\"post\" name=\"f_entity\"
     onsubmit=\"if (check_contract(this)) return true; else return false;\" 
     action=\"".url_prepare("contract_index.php")."\">
 
@@ -1152,7 +1152,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       </td>
       <td class=\"detailForm\">
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
-        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=form_contract.deal_new_id&amp;ext_widget_text=form_contract.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
@@ -1527,7 +1527,7 @@ function dis_can_delete_contract($p_id) {
 //   - $pri_q : Priority list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_priority_form($pri_q) {
-  global $l_pri_manage,$l_pri_exist, $l_label, $l_order, $l_color;
+  global $l_pri_manage,$l_pri_exist, $l_label, $l_code, $l_color;
   global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
 
   // Priority select construction
@@ -1540,15 +1540,15 @@ function html_priority_form($pri_q) {
     mytext = mytext.substr(0, pos);
     pos = mytext.indexOf('-');
     forms.form_pri_update.tf_pri.value=mytext.substr(pos+1);
-    forms.form_pri_update.tf_order.value=mytext.substr(0,pos);
+    forms.form_pri_update.tf_code.value=mytext.substr(0,pos);
     forms.form_pri_update.tf_color.value=col;\"
     size=\"4\" >";
   while ($pri_q->next_record()) {
     $id = $pri_q->f("contractpriority_id");
-    $order = $pri_q->f("contractpriority_order");
+    $code = $pri_q->f("contractpriority_code");
     $color = $pri_q->f("contractpriority_color");
     $label = $pri_q->f("contractpriority_label");
-    $sel_pri .= "\n<option value=\"$id\">$order-$label ($color)</option>";
+    $sel_pri .= "\n<option value=\"$id\">$code-$label ($color)</option>";
   }
   $sel_pri .= "</select>";
 
@@ -1603,9 +1603,9 @@ function html_priority_form($pri_q) {
             </td>
           </tr>
           <tr>
-            <td class=\"adminLabel\">$l_order : </td>
+            <td class=\"adminLabel\">$l_code : </td>
             <td>
-	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	      <input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" />
 	    </td>
           </tr>
           <tr>
@@ -1632,8 +1632,8 @@ function html_priority_form($pri_q) {
           <td class=\"adminLabel\">$l_pri_new : </td>
           <td><input name=\"tf_pri\" /></td>
         </tr><tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+          <td class=\"adminLabel\">$l_code : </td>
+          <td><input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">$l_color : </td>
           <td><input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" /></td>
@@ -1745,7 +1745,7 @@ function dis_priority_links($id) {
 //   - $sta_q : Status list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_status_form($sta_q) {
-  global $l_label, $l_order;
+  global $l_label, $l_code;
   global $l_sta_manage,$l_sta_exist,$l_sta_new;
   global $l_sta_checkdelete, $l_sta_update, $l_sta_insert;
 
@@ -1754,13 +1754,13 @@ function html_status_form($sta_q) {
     mytext = this.options[this.selectedIndex].text;
     pos = mytext.indexOf('-');
     forms.form_status_update.tf_status.value=mytext.substr(pos+1);
-    forms.form_status_update.tf_order.value=mytext.substr(0,pos);\"
+    forms.form_status_update.tf_code.value=mytext.substr(0,pos);\"
    size=\"4\">";
   while ($sta_q->next_record()) {
     $id = $sta_q->f("contractstatus_id");
-    $order = $sta_q->f("contractstatus_order");
+    $code = $sta_q->f("contractstatus_code");
     $label = $sta_q->f("contractstatus_label");
-    $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
+    $sel_sta .= "<option value=\"$id\">$code-$label</option>\n";
   }
   $sel_sta .= "</select>";
 
@@ -1816,9 +1816,9 @@ function html_status_form($sta_q) {
           </td>
         </tr>
         <tr>
-          <td class=\"adminLabel\">$l_order : </td>
+          <td class=\"adminLabel\">$l_code : </td>
           <td>
-	    <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	    <input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" />
 	  </td>
         </tr>
         </table>
@@ -1840,8 +1840,8 @@ function html_status_form($sta_q) {
           <td><input type=\"text\" name=\"tf_status\" /></td>
         </tr>
         <tr>
-          <td class=\"adminLabel\">$l_order : </td>
-          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+          <td class=\"adminLabel\">$l_code : </td>
+          <td><input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" /></td>
         </tr>
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
@@ -2187,7 +2187,7 @@ function html_select_contract($con_q, $title, $url="") {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"form_contr\"
+  <form method=\"get\" name=\"f_entity\"
     onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
 
   <table class=\"detail\">

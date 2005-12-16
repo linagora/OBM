@@ -335,7 +335,7 @@ function html_document_consult($doc_q) {
      $l_consult
     </a>
     </div>
-   ";
+";
 
   return $block;
 }
@@ -512,7 +512,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-    <form method=\"post\"  enctype=\"multipart/form-data\" name=\"f_mod_document\"
+    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\"
       onsubmit=\"if (check_document(this)){this.tf_url.value= this.preurl.value + this.tf_url.value; return true;} else return false;\"
       action=\"document_index.php\">
 

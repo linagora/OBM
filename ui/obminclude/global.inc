@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.1.0pre1";
+$obm_version = "1.1.0pre2";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -194,7 +194,6 @@ $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
 $cgp_show["section"]["compta"]["url"] = "$path/account/account_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
-$cgp_show["section"]["admin"]["right"] = "$cright_read_admin";
 //$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
 
 // modules

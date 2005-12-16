@@ -54,14 +54,14 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $where .= " AND deal_tasktype_id='$tt'";
   }
   if (($cat != $c_all) && ($cat != "")) {
-    $join_cat = "LEFT JOIN DealCategoryLink ON deal_id=dealcategorylink_deal_id";
-    $where .= " AND dealcategorylink_category_id='$cat'";
+    $join_cat = "LEFT JOIN DealCategory1Link ON deal_id=dealcategory1link_deal_id";
+    $where .= " AND dealcategory1link_category_id='$cat'";
   }
   if ($company_id != "") {
     $where .= " AND deal_company_id='$company_id'";
   }
   if ($name != "") {
-    $where .= " AND company_name $like '$name%'";
+    $where .= sql_company_name_advanced_search($name, $like);
     $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
   }
   if ($contact_id > 0) {
@@ -1124,16 +1124,16 @@ function get_deal_company_id($deal_id) {
 function get_cat_label($id) {
   global $cdg_sql;
 
-  $query = "SELECT dealcategory_label
-    FROM DealCategory
-    WHERE dealcategory_id='$id'";
+  $query = "SELECT dealcategory1_label
+    FROM DealCategory1
+    WHERE dealcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("dealcategory_label");
+  $retour = $obm_q->f("dealcategory1_label");
   return $retour;
 }
 
@@ -1143,11 +1143,11 @@ function get_cat_label($id) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_dealcategory() {
+function run_query_dealcategory1() {
   global $cdg_sql, $cgp_hide;
 
   if (! $cgp_hide["deal"]["category1"]) {
-    $query = "SELECT * FROM DealCategory ORDER BY dealcategory_code"; 
+    $query = "SELECT * FROM DealCategory1 ORDER BY dealcategory1_code"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
@@ -1164,21 +1164,21 @@ function run_query_dealcategory() {
 // Parameters:
 //   - $d_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dealcategory($d_id) {
+function run_query_get_dealcategory1($d_id) {
   global $cdg_sql;
 
-  $query = "SELECT dealcategory_id
-    FROM DealCategoryLink, DealCategory
-    WHERE dealcategorylink_category_id = dealcategory_id
-      AND dealcategorylink_deal_id = '$d_id'
-    ORDER by dealcategory_code";     
+  $query = "SELECT dealcategory1_id
+    FROM DealCategory1Link, DealCategory1
+    WHERE dealcategory1link_category_id = dealcategory1_id
+      AND dealcategory1link_deal_id = '$d_id'
+    ORDER by dealcategory1_code";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $categories = array();
   while ($obm_q->next_record()) {
-    $id = $obm_q->f("dealcategory_id");
+    $id = $obm_q->f("dealcategory1_id");
     $categories[] = $id;
   }
 
@@ -1191,14 +1191,14 @@ function run_query_get_dealcategory($d_id) {
 // Parameters:
 //   - $d_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dealcategory_info($d_id) {
+function run_query_get_dealcategory1_info($d_id) {
     global $cdg_sql;
 
-  $query = "SELECT dealcategory_label, dealcategory_code
-    FROM DealCategoryLink, DealCategory
-    WHERE dealcategorylink_category_id = dealcategory_id
-      AND dealcategorylink_deal_id = '$d_id'
-    ORDER by dealcategory_code";     
+  $query = "SELECT dealcategory1_label, dealcategory1_code
+    FROM DealCategory1Link, DealCategory1
+    WHERE dealcategory1link_category_id = dealcategory1_id
+      AND dealcategory1link_deal_id = '$d_id'
+    ORDER by dealcategory1_code";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1208,17 +1208,17 @@ function run_query_get_dealcategory_info($d_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// DealCategory - Deal links query execution
+// DealCategory1 - Deal links query execution
 // Parameters:
-//   - $c_id : dealcategory id
+//   - $c_id : dealcategory1 id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat_links($c_id) {
   global $cdg_sql;
 
   $query = "SELECT deal_label, deal_id
-    FROM Deal, DealCategoryLink
-    WHERE deal_id = dealcategorylink_deal_id
-      AND dealcategorylink_category_id = '$c_id'";
+    FROM Deal, DealCategory1Link
+    WHERE deal_id = dealcategory1link_deal_id
+      AND dealcategory1link_category_id = '$c_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1241,11 +1241,11 @@ function run_query_cat_insert($deal) {
   $cat_label = $deal["cat_label"];
   $cat_code = $deal["cat_code"];
 
-  $query = "INSERT INTO DealCategory (
-    dealcategory_timecreate,
-    dealcategory_usercreate,
-    dealcategory_label,
-    dealcategory_code)
+  $query = "INSERT INTO DealCategory1 (
+    dealcategory1_timecreate,
+    dealcategory1_usercreate,
+    dealcategory1_label,
+    dealcategory1_code)
   VALUES (
     '$timecreate',
     '$usercreate',
@@ -1274,13 +1274,13 @@ function run_query_cat_update($deal) {
   $cat_label = $deal["cat_label"];
   $cat_code = $deal["cat_code"];
   
-  $query = "UPDATE DealCategory SET
-      dealcategory_label='$cat_label',
-      dealcategory_code='$cat_code',
-      dealcategory_timeupdate='$timeupdate',
-      dealcategory_userupdate='$userupdate'
+  $query = "UPDATE DealCategory1 SET
+      dealcategory1_label='$cat_label',
+      dealcategory1_code='$cat_code',
+      dealcategory1_timeupdate='$timeupdate',
+      dealcategory1_userupdate='$userupdate'
     WHERE
-      dealcategory_id='$id'";
+      dealcategory1_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1298,7 +1298,7 @@ function run_query_cat_delete($id) {
   global $cdg_sql;
 
   if ($id != '') {
-    $query = "DELETE FROM DealCategory WHERE dealcategory_id='$id'";
+    $query = "DELETE FROM DealCategory1 WHERE dealcategory1_id='$id'";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;

@@ -125,7 +125,7 @@ function html_data_index($actions, $modules, $upd_modules) {
         <input type=\"hidden\" name=\"action\" value=\"sound_aka_update\" />
         <input type=\"submit\" value=\"$l_execute\" /></td>
     </tr><tr>
-      <td class=\"adminText\">Update aka and sound keys used for searches (Company)</td>
+      <td class=\"adminText\">Update aka and sound keys used for searches (Company, Contact)</td>
     </tr>
     </table>
     </form>";
@@ -716,13 +716,27 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update company sound key representation and aka
+// Update sound key representation and aka
 // In case of database update or sound function change
 // Parametres:
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_sound_aka_update($mode) {
-  global $debug, $c_all;
+
+  dis_sound_aka_update_company($mode);
+  dis_sound_aka_update_contact($mode);
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update company sound key representation and aka
+// In case of database update or sound function change
+// Parametres:
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_sound_aka_update_company($mode) {
+  global $debug, $c_all, $l_module_company;
 
   // Get the company list
   $c_q = get_company_list();
@@ -733,7 +747,7 @@ function dis_sound_aka_update($mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Sound Update : Company : $nb_comp to process
+*** Sound Update : $l_module_company : $nb_comp to process
 ------------------------------------------------------------------------------
 ";
   } else {
@@ -741,7 +755,7 @@ function dis_sound_aka_update($mode) {
     echo "
       <table class=\"admin\">
       <tr>
-        <td class=\"adminHead\">Company ($nb_comp)</td>
+        <td class=\"adminHead\">$l_module_company ($nb_comp)</td>
         <td class=\"adminHead\">Aka and Sound Update</td>
       </tr>";
   }
@@ -776,13 +790,94 @@ function dis_sound_aka_update($mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Sound update : Company $nb_comp processed
+*** Sound update : $l_module_company $nb_comp processed
 ------------------------------------------------------------------------------
 ";
   } else {
     echo "<tr>
         <td class=\"adminLabel\" colspan=\"2\">
-          Sound Update : Company : $nb_comp processed</td>
+          Sound Update : $l_module_company : $cpt_c processed</td>
+      </tr>
+      </table>";
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update contact sound key representation and aka
+// In case of database update or sound function change
+// Parametres:
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_sound_aka_update_contact($mode) {
+  global $debug, $c_all, $l_module_contact;
+
+  // Get the contact list
+  $c_q = get_contact_list();
+  $cpt_c = 0;
+  $cpt_cu = 0;
+  $nb = $c_q->num_rows();
+  
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Sound Update : Contact : $nb to process
+------------------------------------------------------------------------------
+";
+  } else {
+
+    echo "
+      <table class=\"admin\">
+      <tr>
+        <td class=\"adminHead\">$l_module_contact ($nb)</td>
+        <td class=\"adminHead\">Aka and Sound Update</td>
+      </tr>";
+  }
+
+  while ($c_q->next_record()) {
+    $cpt_c++;
+
+    $id = $c_q->f("contact_id");
+    $name = $c_q->f("contact_lastname");
+    $aka = $c_q->f("contact_aka");
+
+    // An empty name is not allowed, but in case
+    if ($name != "") {
+      // If reduced version of name not in aka (and not same as name) we add it
+      $auto_aka = format_name($name, 0, true, true);
+      if ($auto_aka == "") {
+	$auto_aka = " ";
+      }
+      if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
+	$aka .= " $auto_aka";
+      }
+      $sound = phonetic_key($name);
+      
+      $retour = update_sound_aka_one_contact($id, $aka, $sound);
+    }
+
+    if ($cpt_c % 100 == 0) {
+      if ($mode =="txt") {
+	echo ".";
+      } else {
+	echo "<tr>
+          <td class=\"adminLabel\" colspan=\"2\">$cpt_c</td>
+        </tr>";
+	flush();
+      }
+    }
+  }
+
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Sound update : $l_module_contact $cpt_c processed
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<tr>
+        <td class=\"adminLabel\" colspan=\"2\">
+          Sound Update : $l_module_contact : $nb processed</td>
       </tr>
       </table>";
   }

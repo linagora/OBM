@@ -148,16 +148,16 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_dis_entity_form($cats, $entity, $cat="", $cattype="multi") {
   global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width;
-  global $l_none, $cgp_hide;
+  global $cgp_hide, $l_none;
   
   $show_cat = (! $cgp_hide["$entity"]["${cat}"]);
 
   // Category select field
   if ($show_cat) {
 
-    if ($cattype=="mono") {
-      $allcats=of_category_get_ordered("$entity", "$cat", 0, "mono");
-      $sel_cat=of_dis_html_select_category($allcats, $cats[0]["id"], $entity, $cat, "none");
+    if ($cattype == "mono") {
+      $allcats = of_category_get_ordered("$entity", "$cat", 0, "mono");
+      $sel_cat = of_dis_html_select_category($allcats, $cats[0]["id"], $entity, $cat, "none");
       $class="detailForm";
     } else {
       if (is_array($cats)) {
@@ -182,7 +182,7 @@ function of_category_dis_entity_form($cats, $entity, $cat="", $cattype="multi") 
       return false;\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
       </a>";
-      $class="detail";
+      $class = "detail";
     }
 
     $l_cat = "l_${cat}"; 
@@ -343,6 +343,7 @@ function of_category_dis_tree_node($tree, $indent, $multi=false) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Category query execution
 // Parameters:
@@ -356,6 +357,12 @@ function of_category_dis_tree_node($tree, $indent, $multi=false) {
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_get_ordered($entity, $cat, $entity_id=0, $cattype="multi") {
   global $cdg_sql, $cgp_hide;
+
+  $cats = array();
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+  if (! $show_cat) {
+    return $cats;
+  }
 
   $table = ucfirst($entity) . ucfirst($cat);
   $field_prefix = $entity.$cat."_";
@@ -375,49 +382,45 @@ function of_category_get_ordered($entity, $cat, $entity_id=0, $cattype="multi") 
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
 
-  $cats = array();
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-
-  if ($show_cat) {
-    // If an entity id is given, restrict categories to those of this entry
-    if ($entity_id > 0) {
-      if ($cattype=="mono") {
-        $query = "SELECT $table.*
+  // If an entity id is given, restrict categories to those of this entry
+  if ($entity_id > 0) {
+    if ($cattype=="mono") {
+      $query = "SELECT $table.*
           FROM $entitytable
             LEFT JOIN $table ON $entityfield_cat = $field_id
           WHERE $entityfield_id = '$entity_id'
           ORDER BY $field_code, $field_label";
-      } else {
-        $query = "SELECT $table.*
+    } else {
+      $query = "SELECT $table.*
           FROM $linktable
             LEFT JOIN $table ON $linkfield_cat = $field_id
           WHERE $linkfield_ent = '$entity_id'
           ORDER BY $field_code, $field_label";
-      }
-    } else {
-      $query = "SELECT * FROM $table ORDER BY $field_code, $field_label";
     }
-    $cat_q = new DB_OBM;
-    display_debug_msg($query, $cdg_sql, "of_get_category_ordered()");
-    $cat_q->query($query);
+  } else {
+    $query = "SELECT * FROM $table ORDER BY $field_code, $field_label";
+  }
+  $cat_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "of_get_category_ordered()");
+  $cat_q->query($query);
+  
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f($field_id);
+    $code = $cat_q->f($field_code);
+    $label = $cat_q->f($field_label);
+    $cat_info = array("id" => $id,
+		      "label" => $label,
+		      "code" => $code);
+    $cats[] = $cat_info;
+  }
 
-    while ($cat_q->next_record()) {
-      $id = $cat_q->f($field_id);
-      $code = $cat_q->f($field_code);
-      $label = $cat_q->f($field_label);
-      $cat_info = array("id" => $id,
-			"label" => $label,
-			"code" => $code);
-      $cats[] = $cat_info;
-    }
-
-    if (count($cats) > 0) {
-      usort($cats, "of_category_compare");
-    }
+  if (count($cats) > 0) {
+    usort($cats, "of_category_compare");
   }
 
   return $cats;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the entity
@@ -431,6 +434,12 @@ function of_category_get_ordered($entity, $cat, $entity_id=0, $cattype="multi") 
 ///////////////////////////////////////////////////////////////////////////////
 function of_entitycategories_get($entity_id, $entity, $cat, $cattype="multi") {
   global $cdg_sql, $cgp_hide;
+
+  $cats = array();
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+  if (! $show_cat) {
+    return $cats;
+  }
 
   $table = ucfirst($entity) . ucfirst($cat);
   $field_prefix = $entity.$cat."_";
@@ -470,7 +479,6 @@ function of_entitycategories_get($entity_id, $entity, $cat, $cattype="multi") {
     $cat_q->query($query);
   }
 
-  $cats=array();
   while ($cat_q->next_record()) {
     $id = $cat_q->f($field_id);
     $code = $cat_q->f($field_code);
@@ -529,6 +537,7 @@ function of_run_query_category_insert($param, $entity, $cat) {
 
   return $ret;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Category link insertion query construction and execution
@@ -601,6 +610,7 @@ function of_run_query_category_update($param, $entity, $cat) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Category deletion query execution
 // Parameters:
@@ -630,6 +640,7 @@ function of_run_query_category_delete($param, $entity, $cat) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Category link deletion query construction and execution
 // Parameters:
@@ -655,6 +666,7 @@ function of_run_query_category_delete_link($entity_id, $entity, $cat) {
 
   return $retour;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of a Category from its id
@@ -687,6 +699,7 @@ function of_get_category_label($id, $entity, $cat) {
 
   return $retour;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Activity - Entity links query execution
@@ -737,6 +750,7 @@ function of_run_query_category_links($p_id, $entity, $cat, $cattype="multi") {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Compare 2 categories with their code. Order 1.15 ans 1.2 correctly
 // Parameters: 
@@ -760,6 +774,7 @@ function of_category_compare($m, $n) {
   return 0;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Admin  Category section
 // Parameters:
@@ -775,7 +790,6 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
 
   $l_cat = "l_${cat}"; $l_cat_s = "l_${cat}_s"; 
   global $$l_cat,$$l_cat_s;
-
 
   $indent = 14;
   $flabel = $indent;
@@ -964,6 +978,7 @@ function of_html_admin_cat_form($cats, $entity, $cat) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: the cat links
 // Parameters:
@@ -1094,7 +1109,7 @@ function of_dis_html_select_category($cats, $cat_selected, $entity, $cat, $first
 //   - $cat          : target category
 ///////////////////////////////////////////////////////////////////////////////
 function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
-  global $l_all, $cgp_hide;
+  global $cgp_hide, $l_all;
 
   $l_cat = "l_${cat}"; 
   global $$l_cat;
@@ -1112,6 +1127,7 @@ function of_dis_block_select_category($cats, $cat_selected, $entity, $cat) {
 
   return $block_cat;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category consult block

@@ -58,7 +58,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
     $where .= " AND (contract_priority_id = '$priority')";
 
   if ($comp != "") {
-    $where .= " AND (company_name $like '$comp%')";
+    $where .= sql_company_name_advanced_search($comp, $like);
     $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }
   if ($company_id != "") {
@@ -518,7 +518,7 @@ function run_query_priority() {
 
   $query = "SELECT * 
     FROM ContractPriority 
-    ORDER BY contractpriority_order";
+    ORDER BY contractpriority_code";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -535,7 +535,7 @@ function run_query_status() {
 
   $query = "SELECT * 
     FROM ContractStatus 
-    ORDER BY contractstatus_order";
+    ORDER BY contractstatus_code";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -547,12 +547,12 @@ function run_query_status() {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Priority insert
 // Parameters:
-//   - $contract[] : contract hash info : keys used : pri_label, pri_order
+//   - $contract[] : contract hash info : keys used : pri_label, pri_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority_insert($contract) {
   global $auth, $cdg_sql;
 	
-  $order = $contract["pri_order"];
+  $code = $contract["pri_code"];
   $color = $contract["pri_color"];
   $label = $contract["pri_label"];
 
@@ -560,13 +560,13 @@ function run_query_priority_insert($contract) {
     contractpriority_timeupdate,
     contractpriority_timecreate,
     contractpriority_usercreate,
-    contractpriority_order,
+    contractpriority_code,
     contractpriority_color,
     contractpriority_label)
 	values ('null',
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
-    '$order',
+    '$code',
     '$color',
     '$label')";
 
@@ -582,13 +582,13 @@ function run_query_priority_insert($contract) {
 // Query execution : Priority update
 // Parameters:
 //   - $contract[] : contract hash info :
-//     keys used : priority, pri_label, pri_order
+//     keys used : priority, pri_label, pri_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_priority_update($contract) {
   global $auth, $cdg_sql;
 
   $priority = $contract["priority"];
-  $order = $contract["pri_order"];
+  $code = $contract["pri_code"];
   $color = $contract["pri_color"];
   $label = $contract["pri_label"];
 
@@ -596,7 +596,7 @@ function run_query_priority_update($contract) {
     contractpriority_label='$label',
     contractpriority_timeupdate='".date("Y-m-d H:i:s")."',
     contractpriority_userupdate='".$auth->auth["uid"]."',
-    contractpriority_order='$order',
+    contractpriority_code='$code',
     contractpriority_color='$color'
   WHERE contractpriority_id='$priority' ";
 
@@ -651,7 +651,7 @@ function run_query_priority_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Status insert
 // Parameters:
-//   - $contract[] : contract hash info : keys used : sta_label, sta_order
+//   - $contract[] : contract hash info : keys used : sta_label, sta_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_insert($contract) {
   global $auth, $cdg_sql;
@@ -659,18 +659,18 @@ function run_query_status_insert($contract) {
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
   $label = $contract["sta_label"];
-  $order = $contract["sta_order"];
+  $code = $contract["sta_code"];
 
   $query = "INSERT INTO ContractStatus (
     contractstatus_timecreate,
     contractstatus_usercreate,
     contractstatus_label,
-    contractstatus_order)
+    contractstatus_code)
 	values (
     '$timecreate',
     '$usercreate',
     '$label',
-    '$order')";
+    '$code')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -684,7 +684,7 @@ function run_query_status_insert($contract) {
 // Query execution : Status update
 // Parameters:
 //   - $contract[] : contract hash info :
-//     keys used : status, sta_label, sta_order
+//     keys used : status, sta_label, sta_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_update($contract) {
   global $auth, $cdg_sql;
@@ -693,13 +693,13 @@ function run_query_status_update($contract) {
   $userupdate = $auth->auth["uid"];
   $status = $contract["status"];
   $label = $contract["sta_label"];
-  $order = $contract["sta_order"];
+  $code = $contract["sta_code"];
 
   $query = "UPDATE ContractStatus SET
     contractstatus_label='$label',
     contractstatus_timeupdate='$timeupdate',
     contractstatus_userupdate='$userupdate',
-    contractstatus_order='$order'
+    contractstatus_code='$code'
   WHERE contractstatus_id='$status'";
 
   display_debug_msg($query, $cdg_sql);

@@ -113,6 +113,8 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
 \hline
 \$caf\_town & & false & Indicateur de formattage automatique du nom de ville \\ 
 \hline
+\$cgp\_advanced\_search\_default & 1.1.0 & false & Indicateur de sélection de recherche avancée par défaut (société et contact)\\ 
+\hline
 \$cgp\_mailing\_default & & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
 \hline
 \$ccontact\_private\_default & & false & Indicateur contacts sont privés par défaut \\ 
@@ -190,10 +192,10 @@ Par défaut toutes les sections pointent vers le premier module de la section.
 \item Ses propres sections
 \item L'ordre d'affichage des sections
 \item Les urls pointées par les sections
-\item Les droits d'accès à chaque section
 \item Les labels affichés des sections
 \end{itemize}
-\vspace{0.3cm}
+
+\paragraph{Remarque} Le droit d'accès à cune section est défini dans les profils.\\
 
 Le tableau \textbf{\$cgp\_show[``section'']} définit les sections utilisées par OBM.
 
@@ -201,17 +203,15 @@ Le tableau \textbf{\$cgp\_show[``section'']} définit les sections utilisées par 
 
 Pour ne pas utiliser les sections génériques ou redéfinir l'ordre d'affichage des sections il est nécessaire de ``vider'' ce tableau avant d'y associer de nouvelles valeurs.
  
-\paragraph{Définition des urls et droits d'accès}
+\paragraph{Définition des urls}
 
-Pour chaque section il est possible de déclarer 2 paramètres, l'url et le droit d'accès; exemple pour la section ``com'' (définition de \$cgp\_show[``section''][``com'']) :\\
+Pour chaque section il est possible de déclarer 1 paramètre, l'url; exemple pour la section ``com'' (définition de \$cgp\_show[``section''][``com'']) :\\
 
 \begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5cm}|}
 \hline
 \textbf{Paramètre} & \textbf{Défaut} & \textbf{Description} \\
 \hline
 url & \$path/company/company\_index.php & url pointée par la section \\ 
-\hline
-right & \$cright\_read & Droits d'accès nécessaire pour l'affichage de la section \\ 
 \hline
 \end{tabular}
 
@@ -223,7 +223,6 @@ Il doit donc être défini dans les fichiers de langues spécifiques, pour les sect
 \begin{verbatim}
 $cgp_show["section"] = ""; // Needed if module order to change
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
-$cgp_show["section"]["admin"]["right"] = "$cright_read";
 \end{verbatim}
 
 
@@ -417,11 +416,16 @@ Liste des champs paramétrables (masquables) du module \contact :
 $cgp_hide["contact"]["contact_function"] = true;  // fonction
 $cgp_hide["contact"]["contact_title"] = true;     // titre
 $cgp_hide["contact"]["responsible"] = true;       // responsible
-$cgp_hide["contact"]["category1"] = true;         // catégorie 1
-$cgp_hide["contact"]["category2"] = true;         // catégorie 2
+$cgp_hide["contact"]["category1"] = true;	  // catégorie 1
+$cgp_hide["contact"]["category2"] = true;	  // catégorie 2
+$cgp_hide["contact"]["category3"] = true;	  // catégorie 3
+$cgp_hide["contact"]["category4"] = true;	  // catégorie 4
+$cgp_hide["contact"]["category5"] = true;	  // catégorie 5
 $cgp_hide["contact"]["contact_service"] = true;   // ligne service
 $cgp_hide["contact"]["contact_address3"] = [AUTO] // ligne adresse 3
-$cgp_hide["contact"]["contact_expresspostal"] = [AUTO];  // Cedex
+$cgp_hide["contact"]["contact_expresspostal"] = [AUTO]; // Cedex
+$cgp_hide["contact"]["contact_comment2"] = true   // commentaire 2
+$cgp_hide["contact"]["contact_comment3"] = true   // commentaire 3
 \end{verbatim}  
 
 

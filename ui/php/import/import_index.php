@@ -68,15 +68,18 @@ if ($cgp_site_include) {
 require("$obminclude/global_pref.inc");
 include("import_display.inc");
 include("import_query.inc");
+require("import_js.inc");
 
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $import = get_param_import();
 get_import_action();
 $perm->check_permissions($module, $action);
+
+page_close();
+
 $field_size = get_import_field_size();
 
-require("import_js.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //

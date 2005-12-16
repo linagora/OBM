@@ -9,7 +9,6 @@
 
 // Database fields
 $l_number = "Numéro";
-$l_aka = "Aussi connue comme";
 $l_company_name = "Nom Société";
 $l_type = "Type";
 $l_type_s = "Types";

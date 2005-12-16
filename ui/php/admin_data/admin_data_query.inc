@@ -309,6 +309,26 @@ function get_file_list($root, $with_dir=false) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution - contact list                                            //
+///////////////////////////////////////////////////////////////////////////////
+function get_contact_list() {
+  global $cdg_sql;
+
+  $query = "SELECT contact_id,
+      contact_lastname,
+      contact_aka,
+      contact_sound
+    FROM Contact";
+
+  display_debug_msg($query, $cdg_sql);
+
+  $c_q = new DB_OBM;
+  $c_q->query($query);
+  return $c_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution - Company Sound Update
 // Parametres:
 //   - $id    : company id
@@ -333,3 +353,26 @@ function update_sound_aka_one_company($id, $aka, $sound) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - Contact Sound Update
+// Parametres:
+//   - $id    : contact id
+//   - $aka   : aka to insert
+//   - $sound : sound key to insert
+///////////////////////////////////////////////////////////////////////////////
+function update_sound_aka_one_contact($id, $aka, $sound) {
+  global $cdg_sql;
+
+  $aka_s = addslashes($aka);
+
+  $query = "UPDATE Contact SET
+      contact_aka='$aka_s',
+      contact_sound='$sound'
+    WHERE contact_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $u_q = new DB_OBM;
+  $retour = $u_q->query($query);
+
+  return $retour;
+}

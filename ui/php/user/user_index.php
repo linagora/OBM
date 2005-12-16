@@ -44,6 +44,8 @@ $uid = $auth->auth["uid"];
 
 update_last_visit("user", $param_user, $action);
 
+page_close();
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -374,8 +376,8 @@ function get_user_action() {
   $actions["user"]["group_consult"] = array (
     'Name'     => $l_header_upd_group,
     'Url'      => "$path/user/user_index.php?action=group_consult&amp;param_user=".$obm_user["id"],
-    'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update') 
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update')
                                      );
 
 // Group Update

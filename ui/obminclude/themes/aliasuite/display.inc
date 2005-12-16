@@ -158,7 +158,7 @@ function display_sections_theme($section) {
       $value = $sections[$key];
       $section_name = $value["Name"];
       $section_right = $perm->get_section_rights($key); 
-      if (($section_right & $value["Right"]) == $value["Right"]) {
+      if ($section_right) {
         if ($key == $section) {
           $ret .= "<li>$section_name</li>\n";
         } else {

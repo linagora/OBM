@@ -102,7 +102,7 @@ function html_import_search_form ($import, $dsrc_q, $usr_q) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_import\"
+  <form method=\"get\" name=\"f_search\"
     action=\"".url_prepare("import_index.php")."\">
 
   <div class=\"search\">
@@ -926,7 +926,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   $display["title"] = "<div class=\"title\">$l_import : $name</div>";
 
   $block = "
-  <form method=\"post\" name=\"f_new action=\"$url\"
+  <form method=\"post\" name=\"f_entity\" action=\"$url\"
     onSubmit=\"if (check_import_form(this)) return true; else return false;\">
 
   <div class=\"detailHead\">$l_import</div>

@@ -841,7 +841,11 @@ function display_head($p_module) {
 </script>
 </head>
 
-<body onload=\"if (document.f_search) { document.f_search.submit.focus();} \">
+<body onload=\"if (document.f_search) {
+    document.f_search.elements[0].focus();
+  } else if (document.f_entity) {
+    document.f_entity.elements[0].focus();
+  } \">
 ";
 }
 
@@ -866,7 +870,7 @@ function display_sections($section) {
       $value = $sections[$key];
       $section_name = $value["Name"];
       $section_right = $perm->get_section_rights($key);
-      if (($section_right & $value["Right"]) == $value["Right"]) {
+      if ($section_right) {
         if ($key == $section) {
           $ret .= "<p class='actif'>$section_name</p>\n";
         } else {

@@ -348,7 +348,7 @@ function html_group_form($action, $group_q, $group) {
   }
 
   $block = "<center>
-  <form method=\"get\" name=\"f_group\" action=\"".url_prepare("group_index.php")."\">
+  <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
 
   <div class=\"detailHead\">$l_group</div>
 

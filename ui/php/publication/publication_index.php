@@ -44,11 +44,12 @@ require("publication_display.inc");
 
 update_last_visit("publication", $param_publication, $action);
 
-page_close();
 if ($action == "") $action = "index";
 $publication = get_param_publication();
 get_publication_action();
 $perm->check_permissions($module, $action);
+
+page_close();
 
 
 ///////////////////////////////////////////////////////////////////////////////

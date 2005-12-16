@@ -23,13 +23,12 @@ require("statistic_query.inc");
 
 $uid = $auth->auth["uid"];
 
-page_close();
-
 if ($action == "") $action = "index";
 $statistic = get_param_statistic();
 get_statistic_action();
 $perm->check_permissions($module, $action);
 
+page_close();
 
 if (! $statistic["popup"]) {
   $display["header"] = display_menu($module);

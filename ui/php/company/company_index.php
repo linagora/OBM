@@ -54,11 +54,12 @@ include("$obminclude/of/of_category.inc");
 $uid = $auth->auth["uid"];
 update_last_visit("company", $param_company, $action);
 
-page_close();
 if ($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
 $perm->check_permissions($module, $action);
+
+page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -127,7 +128,7 @@ if ($action == "ext_get_id") {
 
     // If the context (same companies) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $cid = run_query_insert($company);
+      $cid = run_query_comapny_insert($company);
       if ($cid > 0) {
         $company["id"] = $cid;
 	$display["detail"] = dis_company_consult($cid);
@@ -143,7 +144,7 @@ if ($action == "ext_get_id") {
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_company_warn_insert("", $obm_q, $company);
       } else {
-        $cid = run_query_insert($company);
+        $cid = run_query_company_insert($company);
         if ($cid > 0) {
           $company["id"] = $cid;
 	  $display["detail"] = dis_company_consult($cid);
@@ -165,7 +166,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($company["id"], $company)) {
-    $retour = run_query_update($company["id"], $company);
+    $retour = run_query_company_update($company["id"], $company);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {

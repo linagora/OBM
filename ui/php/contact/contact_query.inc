@@ -19,6 +19,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
 
   $company_id = $contact["company_id"];
+  $fuzzy = $contact["fuzzy"];
   $lname = sql_search_text_parse($contact["lname"]);
   $fname = sql_search_text_parse($contact["fname"]);
   $phone = sql_search_text_parse($contact["phone"]);
@@ -67,12 +68,11 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       ctry2.country_name as company_country,";
   } else {
     $company_fields = "contact_company as company_name,";
-    $company_fields = "contact_company as company_name,";
   }
 
   // If a lastname has been specified, get it 
   if ($lname != "") {
-    $where .= " AND contact_lastname $like '$lname%'";
+    $where_name .= "(contact_lastname $like '$lname%' or contact_aka like '$lname%')";
   }
   // If a firstname has been specified, get it 
   if ($fname != "") {
@@ -92,7 +92,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {
     if ($cgp_show["module"]["company"]) {
-      $where .= " AND company_name $like '$company%'";
+      $where .= sql_company_name_advanced_search($company, $like);
       $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
     } else {
       $where .= " AND contact_company $like '$company%'";
@@ -158,12 +158,18 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $join_category5 = "LEFT JOIN ContactCategory5 ON contact_category5_id=contactcategory5_id";
     $where .= " AND contactcategory5_id='$category5'";
   }
+  // Date
+  $date = sql_date_format($db_type, "contact_date", "contact_date");
+
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
   }
   
   $whereq = "WHERE $where";
+  if ($where_name != "") {
+    $whereq .= " AND $where_name";
+  }
 
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contact_lastname";
@@ -181,13 +187,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       $order_next = ", company_country";
     }
   }
-
-  // Date
-  $date = sql_date_format($db_type, "contact_date", "contact_date");
-
   $orderq = " ORDER BY $order $p_order_dir $order_next";
 
-  $query = "SELECT
+  $select = "SELECT
       contact_id as id,
       contact_id,
       contact_usercreate,
@@ -221,8 +223,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       $company_fields
       contactfunction_label as contact_function
       $if_country
-    FROM Contact
-        $join_comp
+    FROM Contact";
+
+  $left_join = "$join_comp
         LEFT JOIN Kind ON contact_kind_id = kind_id
         LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
         LEFT JOIN Country as ctry1 ON
@@ -233,21 +236,42 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
         $join_category2
         $join_category3
         $join_category4
-        $join_category5
-    $whereq
-    $orderq
-    $limit";
+        $join_category5";
 
-  if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Contact $join_comp_count $join_category1 $join_category2 $join_category3 $join_category4 $join_category5 $whereq");
-    $obm_q->set_num_rows_total($count);
+  if ((! $fuzzy) || ($lname == "")) {
+    if ($ctu_sql_limit) {
+      $count = get_query_count("SELECT count(*) FROM Contact $left_join $whereq");
+      $obm_q->set_num_rows_total($count);
+    }
+    // If any results (from limited) or result not limited, we get the data
+    if (($count > 0) || (! $ctu_sql_limit)) {
+      $query = "$select $left_join $whereq $orderq $limit";
+      display_debug_msg($query, $cdg_sql, "contact_search(1)");
+      $obm_q->query($query);
+      if (! $ctu_sql_limit) {
+	$count = $obm_q->num_rows();
+      }
+    }
   }
 
-  if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "contact_search()");
-    $obm_q->query($query);
+  // if fuzzy or unsuccessful search (meaningful only if name has been entered)
+  if ( ( ($fuzzy) || ($count == 0) ) && ($lname != "") ) {
+    $auto_aka = format_name($lname, 0, true, true);
+    $sound = phonetic_key($lname);
+    $where_name = " AND ($where_name OR contact_aka $like '%$auto_aka%'
+                 OR contact_sound = '$sound')";
+    $whereq = " WHERE $where $where_name";
+    if ($ctu_sql_limit) {
+      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $left_join $whereq");
+      $obm_q->set_num_rows_total($count);
+    }
+    if (($count > 0) || (! $ctu_sql_limit)) {
+      $query = "$select $left_join $whereq $orderq $limit";
+      display_debug_msg($query, $cdg_sql, "contact_search(2)");
+      $obm_q->query($query);
+    }
   }
-  
+
   return $obm_q;
 }
 
@@ -416,6 +440,15 @@ function run_query_contact_insert($contact) {
   $market = ($contact["marketing_manager"] ? $contact["marketing_manager"] : 0);
   $lname = $contact["lname"];
   $fname = $contact["fname"];
+  $aka = trim($contact["aka"]);
+  // If aka is empty we auto fill it
+  if ($aka == "") {
+    $auto_aka = format_name($lname, 0, true, true);
+    if ($auto_aka != $lname) {
+      $aka = $auto_aka;
+    }
+  }
+  $sound = phonetic_key($lname);
   $service = $contact["service"];
   $ad1 = $contact["ad1"];
   $ad2 = $contact["ad2"];
@@ -424,7 +457,7 @@ function run_query_contact_insert($contact) {
   $category2 = $contact["category2"];  
   $category3 = $contact["category3"];  
   $category4 = $contact["category4"];  
-  $category5 = $contact["category5"];  
+  $category5 = ($contact["category5"] > 0 ? $contact["category5"] : '0');  
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -472,6 +505,8 @@ function run_query_contact_insert($contact) {
     contact_marketingmanager_id,
     contact_lastname,
     contact_firstname,
+    contact_aka,
+    contact_sound,
     contact_service,
     contact_address1,
     contact_address2,
@@ -507,6 +542,8 @@ function run_query_contact_insert($contact) {
     '$market',
     '$lname',
     '$fname',
+    '$aka',
+    '$sound',
     '$service',
     '$ad1',
     '$ad2',
@@ -609,6 +646,15 @@ function run_query_contact_update($contact) {
   $market = ($contact["marketing_manager"] ? $contact["marketing_manager"] : 0);
   $lname = $contact["lname"];
   $fname = $contact["fname"];
+  $aka = trim($contact["aka"]);
+  // If aka is empty we auto fill it
+  if ($aka == "") {
+    $auto_aka = format_name($lname, 0, true, true);
+    if ($auto_aka != $lname) {
+      $aka = $auto_aka;
+    }
+  }
+  $sound = phonetic_key($lname);
   $service = $contact["service"];
   $ad1 = $contact["ad1"];
   $ad2 = $contact["ad2"];
@@ -655,7 +701,7 @@ function run_query_contact_update($contact) {
   $category2 = $contact["category2"];
   $category3 = $contact["category3"];
   $category4 = $contact["category4"];
-  $category5 = $contact["category5"];
+  $category5 = ($contact["category5"] > 0 ? $contact["category5"] : '0');  
   
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -667,6 +713,8 @@ function run_query_contact_update($contact) {
     contact_marketingmanager_id='$market',
     contact_lastname='$lname',
     contact_firstname='$fname',
+    contact_aka='$aka',
+    contact_sound='$sound',
     contact_service='$service',
     contact_address1='$ad1',
     contact_address2='$ad2',

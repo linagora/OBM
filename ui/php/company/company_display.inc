@@ -197,8 +197,9 @@ function dis_company_search_form($company="") {
 function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
   global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
-  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_cat_tree;
-  global $display, $c_all, $cgp_hide, $l_select_company;
+  global $l_all, $l_find, $l_datasource, $l_cat_tree, $l_select_company;
+  global $action, $display, $c_all, $cgp_hide;
+  global $cgp_advanced_search_default, $l_fuzzy;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -217,7 +218,12 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $zip = stripslashes($company["zip"]);
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
-  $fuzzy = ($company["fuzzy"] == "1" ? "checked = \"checked\"" : "");
+  if (($company["fuzzy"] == "1") ||
+      ($cgp_advanced_search_default && $action != "search") ) {
+    $fuzzy = "checked = \"checked\"";
+  } else {
+    $fuzzy = "";
+  }
 
   // of: activity, type
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
@@ -672,7 +678,6 @@ function html_company_consult($co_q, $cats1) {
   else
     $lmarket = "&nbsp;";
 
-
   // Display Aka only if non empty
   if ($aka != "") {
     $dis_aka = "
@@ -1115,7 +1120,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   $block = "
     $js_ctry
 
-    <form method=\"post\" name=\"form_company\"
+    <form method=\"post\" name=\"f_entity\"
     onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
     <div class=\"detailHead\">$l_company</div>

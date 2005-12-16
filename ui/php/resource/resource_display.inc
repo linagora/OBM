@@ -268,7 +268,7 @@ function html_resource_form($usr_q, $resource) {
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-    <form method=\"post\" name=\"form_resource\"
+    <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_resource(this)) return true; else return false;\"
       action=\"" . url_prepare("resource_index.php") . "\">
 

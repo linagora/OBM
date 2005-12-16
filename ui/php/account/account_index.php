@@ -19,8 +19,6 @@ require("account_query.inc");
 
 update_last_visit("account", $param_account, $action);
 
-page_close();
-
 // $account is a hash table containing, for each form field set 
 // in the calling page, a couple var_name, var_value...
 if ($action == "") $action = "index";
@@ -28,6 +26,7 @@ $account = get_param_account();
 get_account_action();
 $perm->check_permissions($module, $action);
 
+page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Programme principal                                                       //

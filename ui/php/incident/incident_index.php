@@ -27,9 +27,9 @@
 // - category1_update    -- form fields    -- update the category
 // - category1_checklink --                -- check if category is used
 // - category1_delete    -- $sel_cat1      -- delete the category
-// - display             --                -- display and set display parameters
+// - display             --                -- display, set display parameters
 // - dispref_display     --                -- update one field display value
-// - dispref_level       --                -- update one field display position 
+// - dispref_level       --                -- update one field display position
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -47,12 +47,12 @@ $uid = $auth->auth["uid"];
 
 update_last_visit("incident", $param_incident, $action);
 
-page_close();
-
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $incident = get_param_incident();
 get_incident_action();
 $perm->check_permissions($module, $action);
+
+page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program

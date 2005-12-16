@@ -7,7 +7,7 @@
 -------------------------------------------------------------------------------
 -- Global Information table
 -------------------------------------------------------------------------------
-UPDATE ObmInfo set obminfo_value='1.0' where obminfo_name='db_version';
+UPDATE ObmInfo set obminfo_value='1.1' where obminfo_name='db_version';
 
 -------------------------------------------------------------------------------
 -- Update Contact table
@@ -243,7 +243,7 @@ FROM
   DealCategory;
 
 -- DROP table DealCategory
-DROP TABLE IF EXISTS DealCategory;
+DROP TABLE DealCategory;
 
 -------------------------------------------------------------------------------
 -- Table structure for table 'DealCategory1Link'
@@ -268,7 +268,7 @@ FROM
   DealCategoryLink;
 
 -- DROP table DealCategoryLink
-DROP TABLE IF EXISTS DealCategoryLink;
+DROP TABLE DealCategoryLink;
 
 
 -------------------------------------------------------------------------------
@@ -305,7 +305,7 @@ FROM
   CalendarCategory;
 
 -- DROP table CalendarCategory
-DROP TABLE IF EXISTS CalendarCategory;
+DROP TABLE CalendarCategory;
 
 
 -------------------------------------------------------------------------------
@@ -314,7 +314,7 @@ DROP TABLE IF EXISTS CalendarCategory;
 -- correctness : _category_id -> _category1_id
 ALTER TABLE CalendarEvent ADD COLUMN temp_calendarevent_category1_id integer default NULL;
 UPDATE CalendarEvent SET temp_calendarevent_category1_id = calendarevent_category_id;
-ALTER TABLE CalendarEvent DROP COLUMN calendarevent_category1_id;
+ALTER TABLE CalendarEvent DROP COLUMN calendarevent_category_id;
 ALTER TABLE CalendarEvent RENAME COLUMN temp_calendarevent_category1_id TO calendarevent_category1_id;
 
 -------------------------------------------------------------------------------
@@ -323,18 +323,18 @@ ALTER TABLE CalendarEvent RENAME COLUMN temp_calendarevent_category1_id TO calen
 -- correctness : _cat1_id -> _category1_id
 ALTER TABLE Incident ADD COLUMN temp_incident_category1_id integer default NULL;
 UPDATE Incident SET temp_incident_category1_id = incident_cat1_id;
-ALTER TABLE Incident DROP COLUMN incident_category1_id;
+ALTER TABLE Incident DROP COLUMN incident_cat1_id;
 ALTER TABLE Incident RENAME COLUMN temp_incident_category1_id TO incident_category1_id;
 
 -------------------------------------------------------------------------------
 -- Update DocumentCategory1 table
 -------------------------------------------------------------------------------
-ALTER TABLE DocumentCategory1 ADD COLUMN   documentcategory1_code varchar(10) NOT NULL default ''; 
+ALTER TABLE DocumentCategory1 ADD COLUMN documentcategory1_code varchar(10) NOT NULL default ''; 
 
 -------------------------------------------------------------------------------
 -- Update DocumentCategory2 table
 -------------------------------------------------------------------------------
-ALTER TABLE DocumentCategory2 ADD COLUMN   documentcategory2_code varchar(10) NOT NULL default ''; 
+ALTER TABLE DocumentCategory2 ADD COLUMN documentcategory2_code varchar(10) NOT NULL default ''; 
 
 -------------------------------------------------------------------------------
 -- Update IncidentCategory1 table
@@ -347,17 +347,6 @@ UPDATE IncidentCategory1 set incidentcategory1_code = incidentcategory1_order;
 -- Update table 'IncidentCategory1'
 ALTER TABLE IncidentCategory1 DROP COLUMN incidentcategory1_order;
 
-
--------------------------------------------------------------------------------
--- Update IncidentCategory1 table
--------------------------------------------------------------------------------
-ALTER TABLE IncidentCategory1 ADD COLUMN incidentcategory1_code varchar(10) NOT NULL default '';
-
--- Update table 'IncidentCategory1'
-UPDATE IncidentCategory1 set incidentcategory1_code = incidentcategory1_order;
-
--- Update table 'IncidentCategory1'
-ALTER TABLE IncidentCategory1 DROP COLUMN incidentcategory1_order;
 
 -------------------------------------------------------------------------------
 -- Update IncidentStatus table
@@ -369,6 +358,7 @@ UPDATE IncidentStatus set incidentstatus_code = incidentstatus_order;
 
 -- Update table 'IncidentStatus'
 ALTER TABLE IncidentStatus DROP COLUMN incidentstatus_order;
+
 
 -------------------------------------------------------------------------------
 -- Update IncidentPriority table
@@ -409,7 +399,7 @@ ALTER TABLE ContractPriority ADD COLUMN contractpriority_code varchar(10) NOT NU
 UPDATE ContractPriority set contractpriority_code = contractpriority_order;
 
 -- Update table 'ContractPriority'
-ALTER TABLE ContractPriority DROP COLUMN contactpriority_order;
+ALTER TABLE ContractPriority DROP COLUMN contractpriority_order;
 
 
 -------------------------------------------------------------------------------
@@ -421,7 +411,7 @@ ALTER TABLE ContractStatus ADD COLUMN contractstatus_code varchar(10) NOT NULL d
 UPDATE ContractStatus set contractstatus_code = contractstatus_order;
 
 -- Update table 'ContractStatus'
-ALTER TABLE ContractStatus DROP COLUMN contactstatus_order;
+ALTER TABLE ContractStatus DROP COLUMN contractstatus_order;
 
 
 
