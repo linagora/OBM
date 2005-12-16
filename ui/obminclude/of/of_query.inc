@@ -1463,11 +1463,14 @@ function run_query_get_recipients($recipients, $force) {
   global $cdg_sql;
  
   if ($force != 1) {
-    $mail_filter = "AND userobm_id = userobmpref_user_id
-      AND userobmpref_option = 'set_mail'
-      AND userobmpref_value = 'yes'";
-    $join = ", UserObmPref";
-  }  
+    $mail_filter = "
+      AND (up1.userobmpref_value = 'yes' OR
+           (up2.userobmpref_value = 'yes' AND up1.userobmpref_value is null))";
+    $join = "LEFT JOIN UserObmPref as up1 ON up1.userobmpref_user_id=userobm_id
+               AND up1.userobmpref_option = 'set_mail'
+             LEFT JOIN UserObmPref as up2 on up2.userobmpref_user_id=0
+               AND up2.userobmpref_option = 'set_mail'";
+  }
   $coma = "";
   foreach($recipients as $recipient) {
     if ($recipient) {

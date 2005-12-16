@@ -788,8 +788,13 @@ function run_query_update_event_data($agenda) {
   $event_id = $agenda["id"]; 
   if ($agenda["privacy"] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $agenda["kind"];
-  $repeat_days = $agenda["repeat_days"]; 
-  $repeat_end = $agenda["repeat_end"]; 
+  $repeat_days = $agenda["repeat_days"];
+  $repeat_end = $agenda["repeat_end"];
+  if ($repeat_kind != 'none') {
+    $frequencey = "1";
+  } else {
+    $frequencey = "0";
+  }
    
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
@@ -803,13 +808,14 @@ function run_query_update_event_data($agenda) {
     calendarevent_priority = '$priority',
     calendarevent_privacy = '$privacy', 
     calendarevent_duration = '$event_duration',
-    calendarevent_repeatkind = '$repeat_kind',
-    calendarevent_repeatdays = '$repeat_days',
     calendarevent_allday = '$all_day', 
+    calendarevent_repeatkind = '$repeat_kind',
+    calendarevent_repeatfrequence = '$frequency',
+    calendarevent_repeatdays = '$repeat_days',
     calendarevent_endrepeat = '$repeat_end'
   WHERE
-    calendarevent_id = '$event_id'
-  ";
+    calendarevent_id = '$event_id'";
+
   display_debug_msg($query, $cdg_sql, "run_query_update_event_data()");
   $obm_q->query($query);
 }
