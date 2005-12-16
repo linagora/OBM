@@ -414,4 +414,10 @@ UPDATE ContractStatus set contractstatus_code = contractstatus_order;
 ALTER TABLE ContractStatus DROP COLUMN contractstatus_order;
 
 
+-------------------------------------------------------------------------------
+-- Update UserObm table
+-------------------------------------------------------------------------------
+-- set lastname and firstname to default '' instead of null (cause of concat)
+ALTER TABLE UserObm ALTER COLUMN userobm_lastname SET DEFAULT '';
+ALTER TABLE UserObm ALTER COLUMN userobm_firstname SET DEFAULT '';
 

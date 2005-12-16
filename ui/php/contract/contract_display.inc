@@ -1052,8 +1052,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   $dis_sel_con1.="</select>";
   
   if ($action == "detailupdate") {
-    $dis_con1 = "
+    if ($con1_id > 0) {
+      $dis_con1 = "
       <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+    }
   }
 
   if ($contact_q->nf()>0) {
@@ -1091,8 +1093,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   $sel_usercomment .= "</select>";
 
   if ($action == "detailupdate") {
-    $dis_con2 = "
-      <a href=\"".url_prepare("$path/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+    if ($con2_id > 0) {
+      $dis_con2 = "
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+    }
   }
 
   $dis_sub = "
