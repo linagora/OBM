@@ -1069,7 +1069,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 //   - $list[]    : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_add_criterion_form($list) {
-  global $l_list_display, $l_contact_display,$l_add_criterion;
+  global $cgp_show, $l_list_display, $l_contact_display,$l_add_criterion;
 
   $popup = $list["popup"];
   if (isset($list["row_index"])) {
@@ -1086,14 +1086,19 @@ function dis_add_criterion_form($list) {
   $cat2_q = run_query_contactcategory2();
   $fct_q = run_query_function();
   $cat_q = run_query_companycategory();
-  $rec_q = run_query_subscriptionreception();
   $lag_q = run_query_language();
-  $pub_q = run_query_publication();
     
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
+
   $block .= html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q);
   $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
-  $block .= html_publication_criterion($rec_q,$pub_q);
+
+  if ($cgp_show["module"]["publication"]) {
+    $rec_q = run_query_subscriptionreception();
+    $pub_q = run_query_publication();
+    $block .= html_publication_criterion($rec_q,$pub_q);
+  }
+
   $block .= "
   <div class=\"detailButton\">
   <p class=\"detailButtons\">

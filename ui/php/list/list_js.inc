@@ -89,8 +89,13 @@ function add_criterion(form,index) {
   cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option></select>';
   i=company_criterion(form,labels,values,4);
-  i=contact_criterion(form,labels,values,i);
+  i=contact_criterion(form,labels,values,i);";
+  if ($cgp_show["module"]["publication"]) {
+    $extra_js .= "
   i=publication_criterion(form,labels,values,i);
+";
+  }
+$extra_js .= "
 }
 
 

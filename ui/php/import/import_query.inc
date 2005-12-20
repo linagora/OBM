@@ -552,7 +552,7 @@ function get_similar_company($fields, $map) {
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $cats[]      : CompanyCategory hash
+//   - $cats[]      : CompanyCategory1 hash
 // Returns
 //   Id of the company inserted
 ///////////////////////////////////////////////////////////////////////////////
@@ -668,9 +668,9 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $cat = $cats[$fields["comp_cat"]];
   if ($cat != "") {
 
-    $query = "INSERT INTO CompanyCategoryLink (
-        companycategorylink_company_id,
-	companycategorylink_category_id)
+    $query = "INSERT INTO CompanyCategory1Link (
+        companycategory1link_company_id,
+	companycategory1link_category_id)
       VALUES (
         '$id',
         '$cat')";
@@ -689,7 +689,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $cats[]      : CompanyCategory hash
+//   - $cats[]      : CompanyCategory1 hash
 //   - $company_id  : Company id to update
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$cats, $company_id) {
@@ -762,15 +762,15 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   if ($cat != "") {
 
     $query = "DELETE
-      FROM CompanyCategoryLink
-      WHERE companycategorylink_company_id='$company_id'
-        AND companycategorylink_category_id='$cat'";
+      FROM CompanyCategory1Link
+      WHERE companycategory1link_company_id='$company_id'
+        AND companycategory1link_category_id='$cat'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
   
-    $query = "INSERT INTO CompanyCategoryLink (
-        companycategorylink_company_id,
-        companycategorylink_category_id)
+    $query = "INSERT INTO CompanyCategory1Link (
+        companycategory1link_company_id,
+        companycategory1link_category_id)
       VALUES (
           '$company_id',
           '$cat')";
@@ -1083,7 +1083,7 @@ function get_import_country_hash() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the companycategory hash : cats["code"] = id
+// Return the companycategory1 hash : cats["code"] = id
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_companycategory_hash() {
   global $cdg_sql;
@@ -1091,9 +1091,9 @@ function get_import_companycategory_hash() {
   $cat_q = run_query_companycategory();
 
   while ($cat_q->next_record()) {
-    $id = $cat_q->f("companycategory_id");
-    $code = $cat_q->f("companycategory_code");
-    $label = $cat_q->f("companycategory_label");
+    $id = $cat_q->f("companycategory1_id");
+    $code = $cat_q->f("companycategory1_code");
+    $label = $cat_q->f("companycategory1_label");
     $cats[$code] = $id;
     $cats[$label] = $id;
   }

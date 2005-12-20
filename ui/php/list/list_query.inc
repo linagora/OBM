@@ -1356,8 +1356,8 @@ function make_query_from_criteria($list) {
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "companycategory_code" => "
-       LEFT JOIN CompanyCategoryLink ccl%j ON company_id = ccl%j.companycategorylink_company_id 
-       LEFT JOIN CompanyCategory cc%j ON cc%j.companycategory_id = ccl%j.companycategorylink_category_id ",
+       LEFT JOIN CompanyCategory1Link ccl%j ON company_id = ccl%j.companycategory1link_company_id 
+       LEFT JOIN CompanyCategory1 cc%j ON cc%j.companycategory1_id = ccl%j.companycategory1link_category_id ",
     "contactcategory1link_category_id" => "
        LEFT JOIN ContactCategory1Link cc1l%j ON contact_id = cc1l%j.contactcategory1link_contact_id ",
     "contactcategory2link_category_id" => "
