@@ -45,69 +45,69 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   $and = "";
   if ($name != "") {
-    $where_name = " (company_name $like '$name%' or company_aka like '$name%')";
-    $and = "and";
+    $where_name = " (company_name $like '$name%' OR company_aka like '$name%')";
+    $and = "AND";
   }
   if (($type != $c_all) && ($type != "")) { 
     $where .= " $and company_type_id='$type'";
     $and = "and";
   }
   if (($category1 != $c_all) && ($category1 != "")) {
-    $join_category1 = "LEFT JOIN CompanyCategory1Link on company_id=companycategory1link_company_id";
+    $join_category1 = "LEFT JOIN CompanyCategory1Link ON company_id=companycategory1link_company_id";
     if ($category1_tree) {
-      $join_category1 .= " LEFT JOIN CompanyCategory1 on companycategory1link_category_id=companycategory1_id";
-      $where_category1 = " or companycategory1_code like '$category1_code%'";
+      $join_category1 .= " LEFT JOIN CompanyCategory1 ON companycategory1link_category_id=companycategory1_id";
+      $where_category1 = " OR companycategory1_code like '$category1_code%'";
     }
     $where .= " $and (companycategory1link_category_id='$category1'$where_category1)";
-    $and = "and";
+    $and = "AND";
   }
   if (($act != $c_all) && ($act != "")) { 
     $where .= " $and company_activity_id='$act'";
-    $and = "and";
+    $and = "AND";
   }
   if (($naf != $c_all) && ($naf != "")) { 
     $where .= " $and company_nafcode_id='$naf'";
-    $and = "and";
+    $and = "AND";
   }
   if (($market != $c_all) && ($market != "")) { 
     $where .= " $and company_marketingmanager_id='$market'";
-    $and = "and";
+    $and = "AND";
   }
   if (($dsrc != $c_all) && ($dsrc != "")) { 
     $where .= " $and company_datasource_id='$dsrc'";
-    $and = "and";
+    $and = "AND";
   }
   if ($phone != "") {
     $where .= " $and company_phone $like '$phone%'";
-    $and = "and";
+    $and = "AND";
   }
   if ($town != "") {
     $where .= " $and company_town $like '$town%'";
-    $and = "and";
+    $and = "AND";
   }
   if (($ctry != $c_all) && ($ctry != "")) { 
     $where .= " $and company_country_iso3166='$ctry'";
-    $and = "and";
+    $and = "AND";
   }
   if ($zip != "") {
     $where .= " $and company_zipcode $like '$zip%'";
-    $and = "and";
+    $and = "AND";
   }
   if ($dateafter != "") {
     $where .= " $and (company_timeupdate > '$dateafter'
-                     or company_timecreate > '$dateafter')";
-    $and = "and";
+                     OR company_timecreate > '$dateafter')";
+    $and = "AND";
   }
   if ($datebefore != "") {
     $where .= " $and (company_timeupdate < '$datebefore'
-                     and company_timecreate < '$datebefore')";
-    $and = "and";
+                     AND company_timecreate < '$datebefore')";
+    $and = "AND";
   }
 
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " $and company_archive=0";
-    $and = "and";
+    $and = "AND";
   }
 
   if (($where != "") || ($where_name != "")) {

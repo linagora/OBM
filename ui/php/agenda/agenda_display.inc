@@ -1462,10 +1462,7 @@ function dis_event_form($action, $agenda, $event_q, $entities) {
     }
   }
 
-  $id=$agenda["id"];
-  if ($id > 0) { 
-    $cats1 = of_category_get_ordered("calendar", "category1", $id, "mono");
-  }
+  $cats1 = of_category_get_ordered("calendar", "category1");
   $block = html_event_form($action, $agenda, $event_q, $users, $resources, $groups, $cats1);
 
   return $block;
@@ -1598,7 +1595,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
     </select>";
 
   // eventcategory select
-  $block_category1 = of_category_dis_entity_form($cats1, "calendar", "category1", "mono"); 
+  $block_category1 = of_category_dis_entity_form("calendar", "category1", $cats1, "mono", $cat1);
 
  // Repetition days
   $start_week_day = strtotime($cagenda_weekstart);

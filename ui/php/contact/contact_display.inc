@@ -324,13 +324,13 @@ function dis_contact_search_form($contact="") {
   } else {
     $usr_q = run_query_userobm_active();
   }
-  $funcs = of_category_get_ordered("contact", "function", 0, "mono");
+  $funcs = of_category_get_ordered("contact", "function");
   $ctry_q = run_query_country_for_lang();
   $cats1 = of_category_get_ordered("contact", "category1");
   $cats2 = of_category_get_ordered("contact", "category2");
   $cats3 = of_category_get_ordered("contact", "category3");
   $cats4 = of_category_get_ordered("contact", "category4");
-  $cats5 = of_category_get_ordered("contact", "category5", 0, "mono");
+  $cats5 = of_category_get_ordered("contact", "category5");
   $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5);
 
   return $block;
@@ -388,7 +388,7 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
   // category1, category2, category3, category4, category5, function
   
   // Function select
-  $block_function = of_dis_block_select_category($funcs, $func, "contact", "function", "mono");
+  $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
 
   // Title Block
   if ($show_title) {
@@ -430,11 +430,11 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
   $sel_ctry .= "</select>";
 
   // Category 1, 2, 3, 4, 5 select
-  $block_category1 = of_dis_block_select_category($cats1, $cat1, "contact", "category1");
-  $block_category2 = of_dis_block_select_category($cats2, $cat2, "contact", "category2");
-  $block_category3 = of_dis_block_select_category($cats3, $cat3, "contact", "category3");
-  $block_category4 = of_dis_block_select_category($cats4, $cat4, "contact", "category4");
-  $block_category5 = of_dis_block_select_category($cats5, $cat5, "contact", "category5", "mono");
+  $block_category1 = of_category_dis_search_select("contact", "category1", $cats1, $cat1);
+  $block_category2 = of_category_dis_search_select("contact", "category2", $cats2, $cat2);
+  $block_category3 = of_category_dis_search_select("contact", "category3", $cats3, $cat3);
+  $block_category4 = of_category_dis_search_select("contact", "category4", $cats4, $cat4);
+  $block_category5 = of_category_dis_search_select("contact", "category5", $cats5, $cat5);
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -1154,13 +1154,13 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $cid = $contact["id"];
   if ($cid > 0) {
-    $funcs = of_category_get_ordered("contact", "function", $cid, "mono");
+    $funcs = of_category_get_ordered("contact", "function");
     $cats1=array();$cats2=array();$cats3=array();$cats4=array();
-    $cats1 = of_category_get_ordered("contact", "category1", $cid);
-    $cats2 = of_category_get_ordered("contact", "category2", $cid);
-    $cats3 = of_category_get_ordered("contact", "category3", $cid);
-    $cats4 = of_category_get_ordered("contact", "category4", $cid);
-    $cats5 = of_category_get_ordered("contact", "category5", $cid, "mono");
+    $cats1 = of_category_get_ordered("contact", "category1", "multi", $cid);
+    $cats2 = of_category_get_ordered("contact", "category2", "multi", $cid);
+    $cats3 = of_category_get_ordered("contact", "category3", "multi", $cid);
+    $cats4 = of_category_get_ordered("contact", "category4", "multi", $cid);
+    $cats5 = of_category_get_ordered("contact", "category5");
   }
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
@@ -1374,7 +1374,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $csize_phone = "24";
 
   // Function field
-  $block_function = of_category_dis_entity_form($funcs, "contact", "function", "mono");
+  $block_function = of_category_dis_entity_form("contact", "function", $funcs, "mono", $func);
 
   // Title field
   if ($show_title) {
@@ -1462,11 +1462,11 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $sel_kind_label = "<select name=\"sel_label\">";
 
   // Category 1, 2, 3, 4, 5 select field
-  $block_category1 = of_category_dis_entity_form($cats1, "contact", "category1");
-  $block_category2 = of_category_dis_entity_form($cats2, "contact", "category2");
-  $block_category3 = of_category_dis_entity_form($cats3, "contact", "category3");
-  $block_category4 = of_category_dis_entity_form($cats4, "contact", "category4");
-  $block_category5 = of_category_dis_entity_form($cats5, "contact", "category5", "mono");
+  $block_category1 = of_category_dis_entity_form("contact", "category1", $cats1);
+  $block_category2 = of_category_dis_entity_form("contact", "category2", $cats2);
+  $block_category3 = of_category_dis_entity_form("contact", "category3", $cats3);
+  $block_category4 = of_category_dis_entity_form("contact", "category4", $cats4);
+  $block_category5 = of_category_dis_entity_form("contact", "category5", $cats5, "mono", $cat5);
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
@@ -1973,6 +1973,7 @@ function dis_contact_admin_index() {
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Kind section

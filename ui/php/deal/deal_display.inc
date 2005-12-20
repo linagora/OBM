@@ -215,7 +215,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cats1, $stat_q, $manager_
   $sel_tt .= "</select>";
 
   // Category select construction
-  $block_category1 = of_dis_block_select_category($cats1, $cat1, "deal", "category1");
+  $block_category1 = of_category_dis_search_select("deal", "category1", $cats1, $cat1);
 
   // Status select construction
   $sel_status = "<select name=\"sel_status\">
@@ -866,10 +866,7 @@ function dis_deal_form($deal) {
   $sta_q = run_query_dealstatus();
   $con_q = run_query_contact_deal($deal["company"]);
   
-  $did = $deal["id"];
-  if ($did) {
-    $cats1 = of_category_get_ordered("deal", "category1", $did);
-  }
+  $cats1 = of_category_get_ordered("deal", "category1", "multi", $did);
 
   $block = html_deal_form($action, $deal_q, $type_q, $tt_q, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $sta_q, $deal);
 
@@ -2010,8 +2007,9 @@ function html_deal_admin_form($kind_q, $status_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the kind links                                                   //
+// Displays the kind links
 // Parameters:
 //   - $id : kind id
 ///////////////////////////////////////////////////////////////////////////////

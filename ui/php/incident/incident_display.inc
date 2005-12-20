@@ -77,10 +77,9 @@ function dis_incident_search_form($incident) {
   $owner_q = run_query_incident_owner($archive);
   $logger_q = run_query_incident_logger($archive);
 
-  $cats1 = of_category_get_ordered("incident", "category1", 0, "mono");
-  $pri = of_category_get_ordered("incident", "priority", 0, "mono");
-  $sta = of_category_get_ordered("incident", "status", 0, "mono");
-  $cats1 = of_category_get_ordered("incident", "category1", 0, "mono");
+  $cats1 = of_category_get_ordered("incident", "category1");
+  $pri = of_category_get_ordered("incident", "priority");
+  $sta = of_category_get_ordered("incident", "status");
   $block = html_incident_search_form($owner_q, $logger_q, $pri, $sta, $cats1, $incident);
 
   return $block;
@@ -138,9 +137,9 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
   $dis_sel_logger.="</select>";
 
   // Categories priority, status, category1
-  $block_priority = of_dis_block_select_category($pri, $priority, "incident", "priority", "mono");
-  $block_status = of_dis_block_select_category($sta, $status, "incident", "status", "mono");
-  $block_category1 = of_dis_block_select_category($cats1, $cat1, "incident", "category1", "mono");
+  $block_priority = of_category_dis_search_select("incident", "priority", $pri, $priority);
+  $block_status = of_category_dis_search_select("incident", "status", $sta, $status);
+  $block_category1 = of_category_dis_search_select("incident", "category1", $cats1, $cat1);
 
   // --- html template --------------------------------------------------------
 
@@ -327,6 +326,7 @@ function html_incident_consult($inc_q) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
   }
   $display["title"] = "<div class=\"title\">$l_incident : $label</div>";
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -441,11 +441,9 @@ function dis_incident_form($action,$incident) {
   $usr_q = run_query_userobm_active($users);
   $usrp_q = run_query_all_users_from_group($cg_prod,$users);
 
-  if ($id > 0) {
-    $pri = of_category_get_ordered("incident", "priority", $id, "mono");
-    $sta = of_category_get_ordered("incident", "status", $id, "mono");
-    $cats1 = of_category_get_ordered("incident", "category1", $id, "mono");
-  }
+  $pri = of_category_get_ordered("incident", "priority");
+  $sta = of_category_get_ordered("incident", "status");
+  $cats1 = of_category_get_ordered("incident", "category1");
 
   $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1);
 
@@ -541,9 +539,9 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   }
   $dis_sel_logger.="</select>";
 
-  $block_priority = of_category_dis_entity_form($pri, "incident", "priority", "mono");
-  $block_status = of_category_dis_entity_form($sta, "incident", "status", "mono");
-  $block_category1 = of_category_dis_entity_form($cats1, "incident", "category1", "mono");
+  $block_priority = of_category_dis_entity_form("incident", "priority", $pri, "mono", $priority);
+  $block_status = of_category_dis_entity_form("incident", "status", $sta, "mono", $status);
+  $block_category1 = of_category_dis_entity_form("incident", "category1", $cats1, "mono", $cat1);
 
   // Hour select
   $sel_hour = "<select name=\"sel_hour\">";

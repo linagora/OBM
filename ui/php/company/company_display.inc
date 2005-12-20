@@ -168,9 +168,9 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_form($company="") {
 
-  $types = of_category_get_ordered("company", "type", 0, "mono");
+  $types = of_category_get_ordered("company", "type");
   $cats1 = of_category_get_ordered("company", "category1");
-  $acts = of_category_get_ordered("company", "activity", 0, "mono");
+  $acts = of_category_get_ordered("company", "activity");
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_country_for_lang();
@@ -195,11 +195,11 @@ function dis_company_search_form($company="") {
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
+  global $action, $display, $c_all, $cgp_hide;
+  global $cgp_advanced_search_default, $l_fuzzy;
   global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
   global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
   global $l_all, $l_find, $l_datasource, $l_cat_tree, $l_select_company;
-  global $action, $display, $c_all, $cgp_hide;
-  global $cgp_advanced_search_default, $l_fuzzy;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -208,8 +208,8 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $town = stripslashes($company["town"]);
   $type = $company["type"];
   $cat1 = $company["category1"];
-  $cat_code = $company["cat_code"];
-  $cat_tree = ($company["cat_tree"] == "1" ? "checked = \"checked\"" : "");
+  $cat_code = $company["category1_code"];
+  $cat_tree = ($company["category1_tree"] == "1" ? "checked = \"checked\"" : "");
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $ctry = $company["country"];
@@ -230,15 +230,24 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $show_cat = (! $cgp_hide["company"]["companycategory1_label"]);
 
   // Type, category1, activity select
-  $block_type = of_dis_block_select_category($types, $type, "company", "type", "mono");
-  $block_category1 = of_dis_block_select_category($cats1, $cat1, "company", "category1", "mono");
-  $block_activity = of_dis_block_select_category($acts, $act, "company", "activity", "mono");
+  $block_type = of_category_dis_search_select("company", "type", $types, $type);
+  $block_activity = of_category_dis_search_select("company", "activity", $acts, $act);
 
   if ($show_cat) {
+    $sel_append = "onchange=\"if (this.options[this.selectedIndex].value != '$c_all') {
+          mytext = this.options[this.selectedIndex].text;
+          pos = mytext.indexOf(' ');
+          code = mytext.substr(0, pos);
+          this.form.tf_category1_code.value = code + '.';
+       } \"";
+
+    $block_category1 = of_category_dis_search_select("company", "category1", $cats1, $cat1, $sel_append);
+
     $block_cat = "
     $block_category1
     <div class=\"searchLabel\">$l_cat_tree<br />
-      <input type=\"checkbox\" name=\"cb_cat_tree\" value=\"1\" $cat_tree />
+      <input type=\"checkbox\" name=\"cb_category1_tree\" value=\"1\" $cat_tree />
+      <input type=\"hidden\" name=\"tf_category1_code\" value=\"$cat_code\" />
     </div>";
   }
 
@@ -616,7 +625,7 @@ function dis_company_consult($cid) {
 
   if ($cid > 0) {
     $comp_q = run_query_detail($cid);
-    $cats1 = of_category_get_ordered("company", "category1", $cid);
+    $cats1 = of_category_get_ordered("company", "category1", "multi", $cid);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
       $block = html_company_consult($comp_q, $cats1);
@@ -819,12 +828,12 @@ function dis_company_form($action, $company) {
 
   $c_id = $company["id"];
   if ($c_id > 0) {
-    $types = of_category_get_ordered("company", "type", $c_id, "mono");
-    $acts = of_category_get_ordered("company", "activity", $c_id, "mono");
+    $types = of_category_get_ordered("company", "type");
+    $acts = of_category_get_ordered("company", "activity");
     $comp_q = run_query_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $cats1 = of_category_get_ordered("company", "category1", $c_id);
+      $cats1 = of_category_get_ordered("company", "category1", "multi", $c_id);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -984,10 +993,10 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   }
   $sel_dsrc .= "</select>";
 
-  $block_type = of_category_dis_entity_form($types, "company", "type", "mono");
-  $block_activity = of_category_dis_entity_form($acts, "company", "activity", "mono");
+  $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type);
+  $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act);
   // Category select field
-  $block_cat1 = of_category_dis_entity_form($cats1, "company", "category1");
+  $block_cat1 = of_category_dis_entity_form("company", "category1", $cats1);
 
   // Naf code select field
   if ($show_naf) {
@@ -1491,7 +1500,7 @@ function html_company_kind_form($kind_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the kind links                                                   //
+// Displays the kind links
 // Parameters:
 //   - $company : company hash info : keys used : kind
 ///////////////////////////////////////////////////////////////////////////////

@@ -33,9 +33,9 @@
 // - category1_update      -- form fields    -- update the category
 // - category1_checklink   --                -- check if category is used
 // - category1_delete      -- $sel_kind      -- delete the category
-// - display               --                -- display and set display parameters
+// - display               --                -- display, set display parameters
 // - dispref_display       --                -- update one field display value
-// - dispref_level         --                -- update one field display position 
+// - dispref_level         --                -- update 1 field display position
 // External API ---------------------------------------------------------------
 // - ext_get_id         -- $title         -- select a company (return id) 
 ///////////////////////////////////////////////////////////////////////////////

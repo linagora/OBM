@@ -49,8 +49,8 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_form($document="") {
 
-  $cats1 = of_category_get_ordered("document", "category1", 0, "mono");
-  $cats2 = of_category_get_ordered("document", "category2", 0, "mono");
+  $cats1 = of_category_get_ordered("document", "category1");
+  $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_documentmime();
 
   $block .= html_document_search_form($document, $cats1, $cats2, $mime_q);
@@ -93,8 +93,8 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
   
-  $block_category1 = of_dis_block_select_category($cats1, $cat1, "document", "category1", "mono");
-  $block_category2 = of_dis_block_select_category($cats2, $cat2, "document", "category2", "mono");
+  $block_category1 = of_category_dis_search_select("document", "category1", $cats1, $cat1);
+  $block_category2 = of_category_dis_search_select("document", "category2", $cats2, $cat2);
 
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">
@@ -350,11 +350,8 @@ function html_document_consult($doc_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_form($action, $document, $doc_q) {
 
-  $did=$document["id"];
-  if ($did > 0) {
-    $cats1 = of_category_get_ordered("document", "category1", $did, "mono");
-    $cats2 = of_category_get_ordered("document", "category2", $did, "mono");
-  }
+  $cats1 = of_category_get_ordered("document", "category1");
+  $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_documentmime();
 
   $block = html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q);
@@ -444,8 +441,8 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
 
   if ($fi_path =="") $fi_path = $default_path;
 
-  $block_category1 = of_category_dis_entity_form($cats1, "document", "category1", "mono");
-  $block_category2 = of_category_dis_entity_form($cats2, "document", "category2", "mono");
+  $block_category1 = of_category_dis_entity_form("document", "category1", $cats1, "mono", $cat1);
+  $block_category2 = of_category_dis_entity_form("document", "category2", $cats2, "mono", $cat2);
 
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">";
