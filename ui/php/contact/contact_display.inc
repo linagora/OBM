@@ -1208,11 +1208,11 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   global $l_comment2, $l_add_comment2, $l_upd_comment2;
   global $l_comment3, $l_add_comment3, $l_upd_comment3;
   global $l_service, $l_email_other;
-  global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
+  global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $ico_mini_cal;
-  global $display, $path, $auth, $cgp_show, $cgp_hide, $l_none;
+  global $display, $path, $auth, $cgp_show, $cgp_hide, $c_undef, $l_undef;
 
   $cat1 = array();$cat2 = array();$cat3 = array();$cat4 = array();$cat5 = array();
   $uid = $auth->auth["uid"];
@@ -1389,7 +1389,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if ($show_resp) {
     // Marketing manager select
     $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
-      <option value=\"0\">$l_none</option>";
+      <option value=\"$c_undef\">$l_undef</option>";
     while ($usr_q->next_record()) {
       $u_id = $usr_q->f("userobm_id");
       $sel_market .= "\n<option value=\"$u_id\"";
@@ -1421,7 +1421,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
 
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
     $sel_dsrc .= "\n<option value=\"$d_id\"";
@@ -1471,12 +1471,12 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
   onchange=\"fill_select_label(this)\">
-  <option value=\"0\">$l_none</option>";
+  <option value=\"$c_undef\">$l_undef</option>";
   $sel_kind_label = "<select name=\"sel_kind_label\" 
   onchange=\"fill_select_header(this)\">
-  <option value=\"0\">$l_none</option>";
+  <option value=\"$c_undef\">$l_undef</option>";
   $sel_kind_header = "<select name=\"sel_kind\">
-  <option value=\"0\">$l_none</option>";
+  <option value=\"$c_undef\">$l_undef</option>";
   foreach( $k_kind as $k_lang =>  $k_kind_label){
     $sel_kind_lang .= "\n<option value=\"$k_lang\"";
     if($k_lang == $kind_lang) {
@@ -1508,7 +1508,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
 
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
-    <option value=\"\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($ctry_q->next_record()) {
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";

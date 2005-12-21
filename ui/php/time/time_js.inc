@@ -118,7 +118,7 @@ function fill_projectall(sel_list) {
 
   proj_array.sort();
 
-  sel_list.options[0] = new Option('$l_none');
+  sel_list.options[0] = new Option('$l_undef');
   sel_list.options[0].value = 0; 
 
   for (i = 0; i < proj_array.length; i++) {
@@ -143,7 +143,7 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
       next_sel.options[i] = null; 
     }
 
-    next_sel.options[0] = new Option('$l_none');
+    next_sel.options[0] = new Option('$l_undef');
     next_sel.options[0].value = 0; 
 
   } else {
@@ -171,7 +171,7 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
     }
     // there are no projects with the selected tasktype
     else {
-      sel_list.options[0] = new Option(\"$l_none\");
+      sel_list.options[0] = new Option(\"$l_undef\");
       sel_list.options[0].value = 0; 
     }
 
@@ -219,7 +219,7 @@ function fill_projecttask(sel_list, deal_id) {
 
   // there are no projects with the selected tasktype
   else {
-    sel_list.options[0] = new Option(\"$l_none\");
+    sel_list.options[0] = new Option(\"$l_undef\");
     sel_list.options[0].value = 0; 
   }
 

@@ -150,7 +150,7 @@ $sel_todo = "<select name=\"param_todo\" id=\"param_todo\">
 // Data source select
 $dsrc_q = run_query_datasource();
 $sel_dsrc = "<select name=\"param_dsrc\" id=\"param_dsrc\">
-  <option value=\"0\">$l_none</option>";
+  <option value=\"$c_undef\">$l_undef</option>";
 while ($dsrc_q->next_record()) {
   $d_id = $dsrc_q->f("datasource_id");
   $sel_dsrc .= "\n<option value=\"$d_id\"";

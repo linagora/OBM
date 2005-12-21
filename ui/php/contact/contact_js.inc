@@ -179,8 +179,8 @@ function fill_select_label(source)
   for (i = kind.options.length-1; i >= 0; i--) {
     kind.options[i] = null; 
   }
-  kind.options[0]=new Option('$l_none');
-  destination.options[0]=new Option('$l_none');
+  kind.options[0]=new Option('$l_undef');
+  destination.options[0]=new Option('$l_undef');
   i=1;
   for (var destValue in lang_array[destIndex]) {
     destination.options[i]= new Option(destValue,destValue);
@@ -202,8 +202,8 @@ function fill_select_header(source)
   for (i = destination.options.length-1; i >= 0; i--) {
     destination.options[i] = null; 
   }  
-  lang.options[0]=new Option('$l_none');
-  destination.options[0]=new Option('$l_none');
+  lang.options[0]=new Option('$l_undef');
+  destination.options[0]=new Option('$l_undef');
   i=1;
   for (var destValue in lang_array[lang.options[lang.selectedIndex].value][destIndex]) {
     destination.options[i]= new Option(destValue,lang_array[lang.options[lang.selectedIndex].value][destIndex][destValue]);

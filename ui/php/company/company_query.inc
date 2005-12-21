@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($company, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql, $ctu_sql_limit;
+  global $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
 
   $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
@@ -52,13 +52,17 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $where .= " $and company_type_id='$type'";
     $and = "and";
   }
-  if (($category1 != $c_all) && ($category1 != "")) {
+  if (($category1 != $c_all) && ($category1 != $c_none) && ($category1 != "")) {
     $join_category1 = "LEFT JOIN CompanyCategory1Link ON company_id=companycategory1link_company_id";
     if ($category1_tree) {
       $join_category1 .= " LEFT JOIN CompanyCategory1 ON companycategory1link_category_id=companycategory1_id";
       $where_category1 = " OR companycategory1_code like '$category1_code%'";
     }
     $where .= " $and (companycategory1link_category_id='$category1'$where_category1)";
+    $and = "AND";
+  } else if ($category1 == $c_none) {
+    $join_category1 = "LEFT JOIN CompanyCategory1Link ON company_id=companycategory1link_company_id";
+    $where .= " $and companycategory1link_category_id IS NULL";
     $and = "AND";
   }
   if (($act != $c_all) && ($act != "")) { 

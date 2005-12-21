@@ -63,10 +63,10 @@ $l_link_contact = "These contacts are from this company";
 $l_link_contact_no = "The company hasn't any contacts";
 $l_link_deal = "The company is involved in these deals";
 $l_link_deal_no = "The company isn't involved in any deal";
-$l_link_contract = "The company is involved in these contracts";
-$l_link_contract_no = "The company isn't involved in any contract";
-$l_link_project = "The company is involved in these projects";
-$l_link_project_no = "The company isn't involved in any projects";
+$l_link_contract = "The company is involved in these Verträge";
+$l_link_contract_no = "The company isn't involved in any Verträge";
+$l_link_project = "The company is involved in these Projekte";
+$l_link_project_no = "The company isn't involved in any Projekte";
 $l_cant_delete = "The company can't be deleted !";
 $l_can_delete = "The company can be deleted.";
 

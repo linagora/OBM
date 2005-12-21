@@ -2037,7 +2037,7 @@ function html_calendar_consult($event_q, $entities) {
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_change_state,$l_groups,$l_all_day;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_daily, $l_weekly;
-  global $l_wait,$l_none;
+  global $l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   

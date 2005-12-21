@@ -13,10 +13,10 @@ $l_find = "Suche";
 $l_back = "Zurück";
 $l_cancel = "Abbruch";
 $l_close = "Schließen";
-$l_validate = "Prüfen";
+$l_validate = "übernehmen";
 $l_execute = "Ausführen";
 $l_confirm = "Bestätigung";
-$l_add = "Add";
+$l_add = "Hinzufügen";
 
 // Common messages
 $l_yes = "Ja";
@@ -24,6 +24,7 @@ $l_no = "Nein";
 $l_all = "Alle";
 $l_all_f = "Alle";
 $l_none = "---";
+$l_undef = "---";
 $l_comment = "Kommentar";
 $l_add_comment = "Add a Kommentar";
 $l_upd_comment = "Update Kommentar";
@@ -45,12 +46,12 @@ $l_color = "Farbe";
 $l_phone = "Telefon";
 $l_fax = "Telefax";
 $l_address = "Adresse";
-$l_postcode = "Postleitzahl";
+$l_postcode = "PLZ";
 $l_town = "Ort";
 $l_expresspostal = "Eilzustellung";
 $l_country = "Land";
 $l_desc = "Beschreibung";
-$l_priority = "Priority";
+$l_priority = "Priorität";
 $l_datasource = "Data source";
 $l_cat = "Kategorie";
 $l_visibility = "Zugriff";
@@ -59,6 +60,27 @@ $l_public = "Öffentlich";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_aka = "Also known as";
+
+// Entities
+$l_company = "Société";
+$l_contact = "Contact";
+$l_deal = "Affaire";
+$l_list = "Liste";
+$l_publication = "Publication";
+$l_todo = "A faire";
+$l_time = "Gestion du temps";
+$l_project = "Projet";
+$l_contract = "Contrat";
+$l_incident = "Incident";
+$l_document = "Document";
+$l_account = "Compte";
+$l_invoice = "Facture";
+$l_payment = "Paiement";
+$l_user = "Utilisateur";
+$l_resource = "Resource";
+$l_group = "Groupe";
+$l_resourcegroup = "Groupe de ressources";
+$l_settings = "Configuration";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";
@@ -126,6 +148,8 @@ $l_module_deal = "Verträge";
 $l_module_list = "Maillisten";
 $l_module_agenda = "Kalender";
 $l_module_todo    = "Aufgaben";
+$l_module_publication  = "Veröffentlichungen";
+$l_module_statistic    = "Statistiken";
 
 $l_module_time = "Zeiterfassung";
 $l_module_project = "Projekt";
@@ -151,7 +175,7 @@ $l_module_admin_ref = "Referential";
 $l_header_new_f = "Neu";
 $l_header_new = "Neu";
 $l_header_find = "Suche";
-$l_header_display = "Display";
+$l_header_display = "Ansicht";
 $l_header_global_export = "Export";
 $l_header_export = "Export";
 $l_header_consult = "?Consult";
@@ -189,7 +213,7 @@ $l_header_pref_update = "Reset users preferences";
 $l_header_reset = "?reset";
 $l_header_country = "Country";
 $l_header_datasource = "Data Source";
-$l_header_tasktype = "Task Type";
+$l_header_tasktype = "Aufgabe Type";
 
 $l_header_year = "Jahr";
 $l_header_day = "Tag";
@@ -201,8 +225,8 @@ $l_header_new_event = "Neues Ereignis";
 $l_header_stats = "Statistik";
 $l_header_statsmonth = "Monatsstatistik";
 $l_header_statsuser = "Benutzerstatistik";
-$l_header_weeklyview = "Wochensicht";
-$l_header_monthlyview = "Monatssicht";
+$l_header_weeklyview = "Wochenansicht";
+$l_header_monthlyview = "Monatsansicht";
 $l_header_globalview = "?globalview";
 
 //document headers

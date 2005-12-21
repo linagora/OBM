@@ -119,7 +119,7 @@ of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-of_category_dis_search_select($entity, $cat, $cats, $cat_id, $sel_append="") {
+of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_element="all,"$sel_append="") {
 \end{verbatim}
 \end{minipage}
 }
@@ -130,13 +130,15 @@ of_category_dis_search_select($entity, $cat, $cats, $cat_id, $sel_append="") {
 \hline
 \multicolumn{2}{|c|}{Fonction d'affichage du champ de recherche de la catégorie pour le formulaire de recherche}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact''\\
+\$entity & entité (ex: ``company'', ``contact'',..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',...\\
+\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
 \hline
 \$cats & tableau des catégories à afficher\\
 \hline
 \$cat\_id & entrée sélectionnée\\
+\hline
+\$first\_element & scalaire ou tableau (none|all) d'éléments à ajouter au <select>\\
 \hline
 \$sel\_append & chaine à insérer dans la définition du <select> (ex: code javascript)\\
 \hline
@@ -158,9 +160,9 @@ of_category_dis_entity_form($entity, $cat, $cats, $cat_num="", $entity) {
 \hline
 \multicolumn{2}{|c|}{Fonction d'affichage du champ catégorie pour le formulaire du module \$entity}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact''\\
+\$entity & entité (ex: ``company'', ``contact'',..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',...\\
+\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
 \hline
 \$cats & tableau des catégories à afficher\\
 \hline

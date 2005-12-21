@@ -241,7 +241,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
           this.form.tf_category1_code.value = code + '.';
        } \"";
 
-    $block_category1 = of_category_dis_search_select("company", "category1", $cats1, $cat1, $sel_append);
+    $block_category1 = of_category_dis_search_select("company", "category1", $cats1, $cat1, array("all", "none"), $sel_append);
 
     $block_cat = "
     $block_category1
@@ -877,7 +877,7 @@ function dis_company_form($action, $company) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company) {
-  global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
+  global $display, $auth, $cgp_hide, $set_dsrc, $c_undef, $l_undef, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
@@ -984,7 +984,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
     $sel_dsrc .= "\n<option value=\"$d_id\"";
@@ -1000,7 +1000,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   // Naf code select field
   if ($show_naf) {
-    $sel_naf = dis_select_companynafcode($naf_q, "<option value=\"0\">$l_none</option>", $naf);
+    $sel_naf = dis_select_companynafcode($naf_q, "<option value=\"$c_undef\">$l_undef</option>", $naf);
 
     $block_naf = "
     </tr><tr>      
@@ -1010,7 +1010,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
@@ -1041,7 +1041,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
         this.form.tf_phone.value = country_phone[this.options[this.selectedIndex].value];
       }
     \">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
 
   $js_ctry = "<script type=\"text/javascript\">
       var country_phone = new Array ();

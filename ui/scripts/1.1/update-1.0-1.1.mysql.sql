@@ -411,3 +411,27 @@ ALTER TABLE ContractStatus DROP COLUMN contractstatus_order;
 ALTER TABLE UserObm CHANGE userobm_lastname userobm_lastname varchar(32) DEFAULT '';
 ALTER TABLE UserObm CHANGE userobm_firstname userobm_firstname varchar(48) DEFAULT '';
 
+
+-------------------------------------------------------------------------------
+-- Update List table
+-------------------------------------------------------------------------------
+-- add column list type
+ALTER TABLE List ADD COLUMN list_type int(1) DEFAULT 0 AFTER list_email;
+
+
+-------------------------------------------------------------------------------
+-- Update Connector tables
+-------------------------------------------------------------------------------
+-- DROP table DeletedCalendarEvent
+DROP TABLE IF EXISTS DeletedCalendarEvent;
+--
+-- Table structure for the table 'DeletedCalendarEvent'
+--
+CREATE TABLE DeletedCalendarEvent (
+  deletedcalendarevent_id         int(8) auto_increment,
+  deletedcalendarevent_event_id   int(8),
+  deletedcalendarevent_user_id    int(8),
+  deletedcalendarevent_timestamp  timestamp(14),
+  INDEX idx_dce_event (deletedcalendarevent_event_id),
+  INDEX idx_dce_user (deletedcalendarevent_user_id)
+);

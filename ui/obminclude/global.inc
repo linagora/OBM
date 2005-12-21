@@ -300,7 +300,9 @@ if ($auth_kind == "CAS") {
 //---------------------------------------------------------------------------//
 
 // Global Constants
-$c_all = "_ALL_";		// Used in Form select
+$c_all = "_ALL_";           // Used in Form select
+$c_undef = "0";             // Used in Form select
+$c_none = "-1";             // Used in Form select
 $c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";

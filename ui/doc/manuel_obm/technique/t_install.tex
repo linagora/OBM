@@ -1,6 +1,6 @@
-\section{Installation pas à pas d'OBM 1.0.x}
+\section{Installation pas à pas d'OBM 1.1.x}
 
-Cette documentation est valide pour la version 1.0.0. Seules les
+Cette documentation est valide pour la version 1.1.0. Seules les
 manipulations spécifiques à OBM sont décrites. Pour l'installation de
 PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposés correspondant à la version Debian mais il est préférable de vous référer à la documentation de votre distribution.
 
@@ -27,10 +27,10 @@ racine de votre OBM).
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-wget http://obm.aliacom.fr/obm-archives/obm-1.0.0.tar.gz
-tar -C /var/www -xzvf obm-1.0.0.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-1.1.0.tar.gz
+tar -C /var/www -xzvf obm-1.1.0.tar.gz
 cd /var/www
-ln -s obm-1.0.0 obm
+ln -s obm-1.1.0 obm
 \end{verbatim}
   \end{minipage}
 }
@@ -53,7 +53,7 @@ chown -R apache:apache *  (sur Redhat)
 Fichier de configuration de PHP : 
 
 \begin{description}
-\item[sur debian] \fichier{/etc/php4/apache/php.ini}
+\item[sur Debian] \fichier{/etc/php4/apache/php.ini}
 \item[sur RedHat] \fichier{/etc/php.ini}
 \end{description}
 
@@ -306,7 +306,50 @@ NameVirtualHost 192.168.1.5
 }
 
 
-\subsection{Créer le dépôt de documents}
+\subsection{Configuration d'\obm}
+
+La configuration d'\obm se trouve dans le fichier \fichier{obminclude/obm\_conf.inc}.
+
+Pour le créer, copier le fichier \fichier{obminclude/obm\_conf.inc.sample} dans le nouveau fichier \fichier{obminclude/obm\_conf.inc}, et éditer ce dernier.
+
+
+\subsubsection{Configuration initiale pour la base de données OBM}
+
+Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+
+\begin{itemize}
+\item choisir la base de données à utiliser ; 
+\item la déclarer ;
+\item déclarer le nom d'utilisateur et le mot de passe à utiliser.
+\item déclarer l'url d'accès à OBM (\$cgp\_host).
+\item déclarer le dépôt de documents (voir \ref{install_doc}).
+\end{itemize}
+
+Il est également possible de modifier des préférences globales dans ce
+fichier, comme cgp\_mail\_enabled par exemple.
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+// Database infos
+$obmdb_host = "localhost";
+$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_db = "obm";
+$obmdb_user = "obm";
+$obmdb_password = "obm";
+
+$cgp_host = "http://obm/";
+...
+$cdocument_root = "/var/www/obmdocuments/";
+...
+// is Mail enabled ? (agenda)
+$gp_mail_enabled = false;
+\end{verbatim}
+  \end{minipage}
+}
+
+
+\subsubsection{Configurer le dépôt de documents}
 \label{install_doc}
 
 Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude}.
@@ -332,56 +375,18 @@ chown www-data:www-data /var/www/obmdocuments
 }
 
 
-\subsection{Création de la base de données OBM}
-
-\subsubsection{Configuration d'OBM}
-
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
-
-\begin{itemize}
-\item choisir la base de données à utiliser ; 
-\item la déclarer ;
-\item déclarer le nom d'utilisateur et le mot de passe à utiliser.
-\item déclarer l'url d'accès à OBM (\$cgp\_host).
-\item déclarer le dépôt de documents (voir \ref{install_doc}).
-\end{itemize}
-
-Il est également possible de modifier des préférences globales dans ce
-fichier, comme cgp\_mail\_enabled par exemple.
-
-\shadowbox{
-  \begin{minipage}{13cm}
-\begin{verbatim}
-// Database infos
-$obmdb_host = "localhost";
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
-$obmdb_db = "obm";
-$obmdb_user = "obm";
-$obmdb_password = "obm";
-
-$cgp\_host = "http://obm/";
-...
-$cdocument\_root = "/var/www/obmdocuments/";
-...
-// is Mail enabled ? (agenda)
-$gp_mail_enabled = false;
-\end{verbatim}
-  \end{minipage}
-}
-
-
 \subsubsection{Configuration et création de la base de données}
 
 Les scripts de création de la base de données se trouvent dans le
-répertoire \fichier{scripts/1.0}.
+répertoire \fichier{scripts/1.1}.
 
 \subsubsection*{Langue par défaut des données}
 
 Certaines valeurs de références sont insérées par défaut. Ces valeurs
 peuvent être en français (par défaut) ou en anglais. Pour passer de
 l'un à l'autre, il faut éditer le fichier
-\fichier{scripts/1.0/install\_obmdb\_1.0.mysql.sh} (ou
-\fichier{scripts/1.0/install\_obmdb\_1.0.pgsql.sh}) pour changer la
+\fichier{scripts/1.1/install\_obmdb\_1.1.mysql.sh} (ou
+\fichier{scripts/1.1/install\_obmdb\_1.1.pgsql.sh}) pour changer la
 valeur de DATA\_LANG à \texttt{en} : 
 
 \shadowbox{
@@ -396,7 +401,7 @@ DATA_LANG="en"
   \end{minipage}
 }
 
-\subsubsection*{MySQL}
+\subsubsection{MySQL}
 
 Pré-requis : disposer d'un login/mot de passe valide pour MySQL.
 
@@ -420,21 +425,21 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
   \end{minipage}
 }
 
-Le script \fichier{install\_obmdb\_1.0.mysql.sh} gère les différentes
+Le script \fichier{install\_obmdb\_1.1.mysql.sh} gère les différentes
 étapes de création de la base de données. Positionner les bonnes
 valeurs de login/mot de passe dans ce script et le lancer :
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-cd obm/scripts/1.0
-emacs install_obmdb_1.0.mysql.sh
-./install_obmdb_1.0.mysql.sh
+cd obm/scripts/1.1
+emacs install_obmdb_1.1.mysql.sh
+./install_obmdb_1.1.mysql.sh
 \end{verbatim}
   \end{minipage}
 }
 
-\subsubsection*{PostgreSQL}
+\subsubsection{PostgreSQL}
 
 OBM supporte PostgreSQL depuis la version 0.7.5.
 
@@ -449,11 +454,11 @@ create database obm with owner = obm;
   \end{minipage}
 }
 
-\subsubsection{Jeux de caractères}
+\subsubsection*{Jeux de caractères}
 
 Si votre server PostgreSQL n'est pas configuré pour le jeu de
-caractères latin1, éditez le fichier \fichier{scripts/1.0/postgres-pre.sql}
-et décommentez la ligne : 
+caractères latin1, éditez le fichier \fichier{scripts/1.1/postgres-pre.sql}
+et décommentez la ligne :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -463,9 +468,9 @@ et décommentez la ligne :
   \end{minipage}
 }
 
-\subsubsection{Pour toutes les versions d'OBM}
+\subsubsection*{Création de la base Postgres}
 
-Le script \fichier{install\_obmdb\_1.0.pgsql.sh} gère toutes les
+Le script \fichier{install\_obmdb\_1.1.pgsql.sh} gère toutes les
 étapes de création de la base de données.
 
 Ajoutez les informations login/mot de passe (et base de données) dans
@@ -474,9 +479,9 @@ ce script et lancez-le :
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-cd obm/scripts/1.0
-emacs install_obmdb_1.0_pgsql.sh
-./install_obmdb_1.0_pgsql.sh
+cd obm/scripts/1.1
+emacs install_obmdb_1.1_pgsql.sh
+./install_obmdb_1.1_pgsql.sh
 \end{verbatim}
   \end{minipage}
 }

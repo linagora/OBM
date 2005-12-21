@@ -795,7 +795,7 @@ function dis_contract_form($action,$contract,$param_company) {
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
   global $uid, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
-  global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
+  global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
   global $l_label,$l_begin,$l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel;
   global $l_technical_manager;
@@ -939,7 +939,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
 
   // Type select
   $dis_type="<select name=\"sel_type\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while($type_q->next_record()) {
     $dis_type.="\n<option value=\"".$type_q->f("contracttype_id")."\"";
     if ($type_id == $type_q->f("contracttype_id"))
@@ -950,7 +950,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
  
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($u_com_q->next_record()) {
    $sel_market .= "\n<option value=\"".$u_com_q->f("userobm_id")."\"";
     if ($u_com_q->f("userobm_id") == $market_id) 
@@ -961,7 +961,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
  
   // Technical manager select
   $sel_tech = "<select name=\"sel_tech\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($u_prod_q->next_record()) {
    $sel_tech .= "\n<option value=\"".$u_prod_q->f("userobm_id")."\"";
    if ($u_prod_q->f("userobm_id") == $tech) 
@@ -1039,7 +1039,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
    
   $dis_sel_con1 = "<select name=\"sel_con1\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($contact_q->next_record()) {
     $lc_id = $contact_q->f("contact_id");
     $lc_text = $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone");
@@ -1063,7 +1063,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
    
   $dis_sel_con2="<select name=\"sel_con2\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($contact_q->next_record()) {
     $lc_id = $contact_q->f("contact_id");
     $lc_text = $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone");

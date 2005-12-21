@@ -791,9 +791,9 @@ function run_query_update_event_data($agenda) {
   $repeat_days = $agenda["repeat_days"];
   $repeat_end = $agenda["repeat_end"];
   if ($repeat_kind != 'none') {
-    $frequencey = "1";
+    $frequency = "1";
   } else {
-    $frequencey = "0";
+    $frequency = "0";
   }
    
   $obm_q = new DB_OBM;

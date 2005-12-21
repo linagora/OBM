@@ -893,7 +893,7 @@ function dis_deal_form($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
-  global $c_php_isodate_format, $l_update,$l_insert, $l_none;
+  global $c_php_isodate_format, $l_update,$l_insert;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
   global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
   global $l_date_proposal,$l_amount,$l_hitrate,$l_date_expected;
@@ -901,7 +901,8 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$c
   global $l_last_update, $l_archive, $l_at, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $path, $action, $auth, $cgp_hide, $c_all,$l_all,$popup;
+  global $path, $action, $auth, $cgp_hide, $popup;
+  global $c_all, $l_all, $c_undef, $l_undef;
 
   $ext_target = $deal["ext_target"];
   $uid = $auth->auth["uid"];
@@ -990,7 +991,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$c
 
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($kind_q->next_record()) {
     $kid = $kind_q->f("dealtype_id");
     $klabel = $kind_q->f("dealtype_label");
@@ -1002,7 +1003,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$c
 
   // Task type select construction
   $sel_tt = "<select name=\"sel_tt\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($tt_q->next_record()) {
     $tt_id = $tt_q->f("tasktype_id");
     $tt_label = $tt_q->f("tasktype_label");
@@ -1014,7 +1015,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$c
  
   // Marketing manager select construction
   $sel_market = "<select name=\"sel_market\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($usrc_q->next_record()) {
     $cid = $usrc_q->f("userobm_id");
     $cname = $usrc_q->f("userobm_lastname") . " " .
@@ -1027,7 +1028,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$c
 
   // Technical manager select construction
   $sel_tech = "<select name=\"sel_tech\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($usrp_q->next_record()) {
     $cid = $usrp_q->f("userobm_id");
     $cname = $usrp_q->f("userobm_lastname") . " " .
@@ -1341,7 +1342,7 @@ function dis_deal_quick_form($deal) {
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
-  global $c_php_isodate_format, $l_update, $l_none;
+  global $c_php_isodate_format, $l_update;
   global $l_deal, $l_infos, $l_label, $l_last_update;
   global $l_date_expected, $l_date_alarm, $l_status, $l_hitrate, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;

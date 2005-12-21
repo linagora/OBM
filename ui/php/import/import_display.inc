@@ -69,7 +69,8 @@ function dis_import_search_form($import="") {
 //   - $usr_q    : database object with userobm list from Com group
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_search_form ($import, $dsrc_q, $usr_q) {
-  global $l_name, $l_datasource, $l_market, $l_find, $l_none, $c_all, $l_all;
+  global $l_name, $l_datasource, $l_market, $l_find;
+  global $c_all, $l_all;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -865,7 +866,7 @@ function display_import_log_line($log, $fields, $comps) {
 //   - $usr_q    : database object with userobm list
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
-  global $display, $l_none, $l_insert, $l_update, $l_back;
+  global $display, $c_undef, $l_undef, $l_insert, $l_update, $l_back;
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
@@ -899,7 +900,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
     $sel_dsrc .= "\n<option value=\"$d_id\"";
@@ -910,7 +911,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 
   // Marketing manager select
   $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_undef\">$l_undef</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";

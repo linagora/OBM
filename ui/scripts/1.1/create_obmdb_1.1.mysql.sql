@@ -596,6 +596,7 @@ CREATE TABLE List (
   list_name        	 varchar(64) NOT NULL,
   list_subject     	 varchar(128),
   list_email       	 varchar(128),
+  list_type       	 int(1) DEFAULT 0,
   list_mailing_ok  	 int(1) DEFAULT 0,
   list_contact_archive	 int(1) DEFAULT 0,
   list_info_publication  int(1) DEFAULT 0,
@@ -1397,6 +1398,7 @@ CREATE TABLE Import (
 -- Table structure for the table 'DeletedCalendarEvent'
 --
 CREATE TABLE DeletedCalendarEvent (
+  deletedcalendarevent_id         int(8) auto_increment,
   deletedcalendarevent_event_id   int(8),
   deletedcalendarevent_user_id    int(8),
   deletedcalendarevent_timestamp  timestamp(14),

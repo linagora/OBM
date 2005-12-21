@@ -16,9 +16,10 @@ UPDATE ObmInfo set obminfo_value='1.1' where obminfo_name='db_version';
 ALTER TABLE Contact ADD COLUMN contact_comment2 text;
 ALTER TABLE Contact ADD COLUMN contact_comment3 text;
 ALTER TABLE Contact ADD COLUMN contact_date TIMESTAMP;
-ALTER TABLE Contact ADD COLUMN contact_category5_id integer DEFAULT 0;
-ALTER TABLE Contact ADD COLUMN contact_aka varchar(255) DEFAULT NULL;
-ALTER TABLE Contact ADD COLUMN contact_sound varchar(48) DEFAULT NULL;
+ALTER TABLE Contact ADD COLUMN contact_category5_id integer;
+ALTER TABLE Contact ALTER COLUMN contact_category5_id SET DEFAULT 0;
+ALTER TABLE Contact ADD COLUMN contact_aka varchar(255);
+ALTER TABLE Contact ADD COLUMN contact_sound varchar(48);
 
 
 -------------------------------------------------------------------------------
@@ -197,13 +198,19 @@ DROP TABLE CompanyCategoryLink;
 -------------------------------------------------------------------------------
 -- Update CompanyActivity table
 -------------------------------------------------------------------------------
-ALTER TABLE CompanyActivity ADD COLUMN companyactivity_code varchar(10) NOT NULL default ''; 
+ALTER TABLE CompanyActivity ADD COLUMN companyactivity_code varchar(10);
+UPDATE CompanyActivity SET companyactivity_code = '' where companyactivity_code is null;
+ALTER TABLE CompanyActivity ALTER COLUMN companyactivity_code SET DEFAULT ''; 
+ALTER TABLE CompanyActivity ALTER COLUMN companyactivity_code SET NOT NULL; 
 
 
 -------------------------------------------------------------------------------
 -- Update CompanyType table
 -------------------------------------------------------------------------------
-ALTER TABLE CompanyType ADD COLUMN companytype_code varchar(10) NOT NULL default ''; 
+ALTER TABLE CompanyType ADD COLUMN companytype_code varchar(10); 
+UPDATE CompanyType SET companytype_code = '' where companytype_code is null;
+ALTER TABLE CompanyType ALTER COLUMN companytype_code SET DEFAULT ''; 
+ALTER TABLE CompanyType ALTER COLUMN companytype_code SET NOT NULL; 
 
 
 -------------------------------------------------------------------------------
@@ -312,7 +319,7 @@ DROP TABLE CalendarCategory;
 -- Update CalendarEvent table
 -------------------------------------------------------------------------------
 -- correctness : _category_id -> _category1_id
-ALTER TABLE CalendarEvent ADD COLUMN temp_calendarevent_category1_id integer default NULL;
+ALTER TABLE CalendarEvent ADD COLUMN temp_calendarevent_category1_id integer;
 UPDATE CalendarEvent SET temp_calendarevent_category1_id = calendarevent_category_id;
 ALTER TABLE CalendarEvent DROP COLUMN calendarevent_category_id;
 ALTER TABLE CalendarEvent RENAME COLUMN temp_calendarevent_category1_id TO calendarevent_category1_id;
@@ -321,7 +328,7 @@ ALTER TABLE CalendarEvent RENAME COLUMN temp_calendarevent_category1_id TO calen
 -- Update Incident table
 -------------------------------------------------------------------------------
 -- correctness : _cat1_id -> _category1_id
-ALTER TABLE Incident ADD COLUMN temp_incident_category1_id integer default NULL;
+ALTER TABLE Incident ADD COLUMN temp_incident_category1_id integer;
 UPDATE Incident SET temp_incident_category1_id = incident_cat1_id;
 ALTER TABLE Incident DROP COLUMN incident_cat1_id;
 ALTER TABLE Incident RENAME COLUMN temp_incident_category1_id TO incident_category1_id;
@@ -329,17 +336,26 @@ ALTER TABLE Incident RENAME COLUMN temp_incident_category1_id TO incident_catego
 -------------------------------------------------------------------------------
 -- Update DocumentCategory1 table
 -------------------------------------------------------------------------------
-ALTER TABLE DocumentCategory1 ADD COLUMN documentcategory1_code varchar(10) NOT NULL default ''; 
+ALTER TABLE DocumentCategory1 ADD COLUMN documentcategory1_code varchar(10); 
+UPDATE DocumentCategory1 SET documentcategory1_code = '' where documentcategory1_code is null;
+ALTER TABLE DocumentCategory1 ALTER COLUMN documentcategory1_code SET DEFAULT ''; 
+ALTER TABLE DocumentCategory1 ALTER COLUMN documentcategory1_code SET NOT NULL; 
 
 -------------------------------------------------------------------------------
 -- Update DocumentCategory2 table
 -------------------------------------------------------------------------------
-ALTER TABLE DocumentCategory2 ADD COLUMN documentcategory2_code varchar(10) NOT NULL default ''; 
+ALTER TABLE DocumentCategory2 ADD COLUMN documentcategory2_code varchar(10);
+UPDATE DocumentCategory2 SET documentcategory2_code = '' where documentcategory2_code is null;
+ALTER TABLE DocumentCategory2 ALTER COLUMN documentcategory2_code SET DEFAULT ''; 
+ALTER TABLE DocumentCategory2 ALTER COLUMN documentcategory2_code SET NOT NULL; 
 
 -------------------------------------------------------------------------------
 -- Update IncidentCategory1 table
 -------------------------------------------------------------------------------
-ALTER TABLE IncidentCategory1 ADD COLUMN incidentcategory1_code varchar(10) NOT NULL default '';
+ALTER TABLE IncidentCategory1 ADD COLUMN incidentcategory1_code varchar(10);
+UPDATE IncidentCategory1 SET incidentcategory1_code = '' where incidentcategory1_code is null;
+ALTER TABLE IncidentCategory1 ALTER COLUMN incidentcategory1_code SET default '';
+ALTER TABLE IncidentCategory1 ALTER COLUMN incidentcategory1_code SET NOT NULL;
 
 -- Update table 'IncidentCategory1'
 UPDATE IncidentCategory1 set incidentcategory1_code = incidentcategory1_order;
@@ -351,7 +367,10 @@ ALTER TABLE IncidentCategory1 DROP COLUMN incidentcategory1_order;
 -------------------------------------------------------------------------------
 -- Update IncidentStatus table
 -------------------------------------------------------------------------------
-ALTER TABLE IncidentStatus ADD COLUMN incidentstatus_code varchar(10) NOT NULL default '';
+ALTER TABLE IncidentStatus ADD COLUMN incidentstatus_code varchar(10);
+UPDATE IncidentStatus SET incidentstatus_code = '' where incidentstatus_code is null;
+ALTER TABLE IncidentStatus ALTER COLUMN incidentstatus_code SET DEFAULT '';
+ALTER TABLE IncidentStatus ALTER COLUMN incidentstatus_code SET NOT NULL;
 
 -- Update table 'IncidentStatus'
 UPDATE IncidentStatus set incidentstatus_code = incidentstatus_order;
@@ -363,7 +382,10 @@ ALTER TABLE IncidentStatus DROP COLUMN incidentstatus_order;
 -------------------------------------------------------------------------------
 -- Update IncidentPriority table
 -------------------------------------------------------------------------------
-ALTER TABLE IncidentPriority ADD COLUMN incidentpriority_code varchar(10) NOT NULL default '';
+ALTER TABLE IncidentPriority ADD COLUMN incidentpriority_code varchar(10);
+UPDATE IncidentPriority SET incidentpriority_code = '' where incidentpriority_code is null;
+ALTER TABLE IncidentPriority ALTER COLUMN incidentpriority_code SET DEFAULT '';
+ALTER TABLE IncidentPriority ALTER COLUMN incidentpriority_code SET NOT NULL;
 
 -- Update table 'IncidentPriority'
 UPDATE IncidentPriority set incidentpriority_code = incidentpriority_order;
@@ -375,25 +397,37 @@ ALTER TABLE IncidentPriority DROP COLUMN incidentpriority_order;
 -------------------------------------------------------------------------------
 -- Update PublicationType table
 -------------------------------------------------------------------------------
-ALTER TABLE PublicationType ADD COLUMN publicationtype_code varchar(10) NOT NULL default '';
+ALTER TABLE PublicationType ADD COLUMN publicationtype_code varchar(10);
+UPDATE PublicationType SET publicationtype_code = '' where publicationtype_code is null;
+ALTER TABLE PublicationType ALTER COLUMN publicationtype_code SET DEFAULT '';
+ALTER TABLE PublicationType ALTER COLUMN publicationtype_code SET NOT NULL;
 
 
 -------------------------------------------------------------------------------
 -- Update SubscriptionReception table
 -------------------------------------------------------------------------------
-ALTER TABLE SubscriptionReception ADD COLUMN subscriptionreception_code varchar(10) NOT NULL default '';
+ALTER TABLE SubscriptionReception ADD COLUMN subscriptionreception_code varchar(10);
+UPDATE SubscriptionReception SET subscriptionreception_code = '' where subscriptionreception_code is null;
+ALTER TABLE SubscriptionReception ALTER COLUMN subscriptionreception_code SET DEFAULT '';
+ALTER TABLE SubscriptionReception ALTER COLUMN subscriptionreception_code SET NOT NULL;
 
 
 -------------------------------------------------------------------------------
 -- Update ContractType table
 -------------------------------------------------------------------------------
-ALTER TABLE ContractType ADD COLUMN contracttype_code varchar(10) NOT NULL default '';
+ALTER TABLE ContractType ADD COLUMN contracttype_code varchar(10);
+UPDATE ContractType SET contracttype_code = '' where contracttype_code is null;
+ALTER TABLE ContractType ALTER COLUMN contracttype_code SET DEFAULT '';
+ALTER TABLE ContractType ALTER COLUMN contracttype_code SET NOT NULL;
 
 
 -------------------------------------------------------------------------------
 -- Update ContractPriority table
 -------------------------------------------------------------------------------
-ALTER TABLE ContractPriority ADD COLUMN contractpriority_code varchar(10) NOT NULL default '';
+ALTER TABLE ContractPriority ADD COLUMN contractpriority_code varchar(10);
+UPDATE ContractPriority SET contractpriority_code = '' where contractpriority_code is null;
+ALTER TABLE ContractPriority ALTER COLUMN contractpriority_code SET DEFAULT '';
+ALTER TABLE ContractPriority ALTER COLUMN contractpriority_code SET NOT NULL;
 
 -- Update table 'ContractPriority'
 UPDATE ContractPriority set contractpriority_code = contractpriority_order;
@@ -405,7 +439,10 @@ ALTER TABLE ContractPriority DROP COLUMN contractpriority_order;
 -------------------------------------------------------------------------------
 -- Update ContractStatus table
 -------------------------------------------------------------------------------
-ALTER TABLE ContractStatus ADD COLUMN contractstatus_code varchar(10) NOT NULL default '';
+ALTER TABLE ContractStatus ADD COLUMN contractstatus_code varchar(10);
+UPDATE ContractStatus SET contractstatus_code = '' where contractstatus_code is null;
+ALTER TABLE ContractStatus ALTER COLUMN contractstatus_code SET DEFAULT '';
+ALTER TABLE ContractStatus ALTER COLUMN contractstatus_code SET NOT NULL;
 
 -- Update table 'ContractStatus'
 UPDATE ContractStatus set contractstatus_code = contractstatus_order;
@@ -418,6 +455,32 @@ ALTER TABLE ContractStatus DROP COLUMN contractstatus_order;
 -- Update UserObm table
 -------------------------------------------------------------------------------
 -- set lastname and firstname to default '' instead of null (cause of concat)
+UPDATE UserObm SET userobm_lastname = '' where userobm_lastname is null;
 ALTER TABLE UserObm ALTER COLUMN userobm_lastname SET DEFAULT '';
+UPDATE UserObm SET userobm_firstname = '' where userobm_firstname is null;
 ALTER TABLE UserObm ALTER COLUMN userobm_firstname SET DEFAULT '';
 
+-------------------------------------------------------------------------------
+-- Update List table
+-------------------------------------------------------------------------------
+-- add column list type
+ALTER TABLE List ADD COLUMN list_type integer;
+ALTER TABLE List ALTER COLUMN list_type SET DEFAULT 0;
+
+
+-------------------------------------------------------------------------------
+-- Update Connector tables
+-------------------------------------------------------------------------------
+-- DROP table DeletedCalendarEvent
+DROP TABLE DeletedCalendarEvent;
+--
+-- Table structure for the table 'DeletedCalendarEvent'
+--
+CREATE TABLE DeletedCalendarEvent (
+  deletedcalendarevent_id         serial,
+  deletedcalendarevent_event_id   integer,
+  deletedcalendarevent_user_id    integer,
+  deletedcalendarevent_timestamp  timestamp
+);
+create INDEX idx_dce_event_id ON DeletedCalendarEvent (deletedcalendarevent_event_id);
+create INDEX idx_dce_user_id ON DeletedCalendarEvent (deletedcalendarevent_user_id);

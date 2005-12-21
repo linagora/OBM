@@ -144,13 +144,14 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category search block 
 // Parameters:
-//   - $entity     : target entity
-//   - $cat        : target category
-//   - $cats       : Category array
-//   - $cat_id     : selected target category id
-//   - $sel_append : string (eg javascript code) to append at select
+//   - $entity        : target entity
+//   - $cat           : target category
+//   - $cats          : Category array
+//   - $cat_id        : selected target category id
+//   - $first_element : scalar or array : (["all"|"none"])
+//   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $sel_append="") {
+function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_element="all", $sel_append="") {
   global $cgp_hide, $l_all;
 
   $l_cat = "l_${cat}"; 
@@ -159,7 +160,7 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $sel_appen
   $show_cat = (! $cgp_hide["$entity"]["$cat"]);
 
   if ($show_cat) {
-    $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, "all", $sel_append);
+    $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append);
 
     $block_cat = "
     <div class=\"searchLabel\">${$l_cat}<br />
@@ -1299,22 +1300,44 @@ function of_dis_category_entity_stats($cat_q, $entity, $cat) {
 //   - $cat_id        : selected target category
 //   - $entity        : target entity
 //   - $cat           : target category
-//   - $first_element : (["all"|"none"])
+//   - $first_element : scalar or array : (["all"|"none"])
 //   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////
 function _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="") {
   global $cgp_hide;
 
-  $l_element = "l_${first_element}";
-  $c_element = "c_${first_element}"; 
-  global $$l_element, $$c_element;
+  if (is_array($first_element)) {
+    foreach($first_element as $element) {
+      $l_element = "l_${element}";
+      $c_element = "c_${element}"; 
+      global $$l_element, $$c_element;
+      if ($$c_element == $cat_id) {
+	$first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+      } else {
+	$first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+      }
+    }
+  } else if ($first_element != "") {
+    $l_element = "l_${first_element}";
+    $c_element = "c_${first_element}"; 
+    global $$l_element, $$c_element;
+    if ($$c_element == $cat_id) {
+      $first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+    } else {
+      $first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+    }
+  }
 
   $show_cat = (! $cgp_hide["$entity"]["$cat"]);
 
   if ($show_cat) {
     // Category select
     $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\" $sel_append>
-    <option value=\"${$c_element}\">${$l_element}</option>";
+      $first_option";
     if (is_array($cats)) {
       foreach ($cats as $one_cat) {
         $c_id = $one_cat["id"];

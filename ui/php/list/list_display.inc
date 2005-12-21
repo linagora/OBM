@@ -1217,7 +1217,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
   global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
-  global $l_none,$l_yes,$l_no;
+  global $l_yes,$l_no;
   global $set_theme,$ico_mini_cal;  
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
@@ -1350,7 +1350,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_publication_criterion($rec_q,$pub_q){
-  global $path, $l_all, $l_none, $l_yes, $l_no, $set_theme, $ico_mini_cal;
+  global $path, $l_all, $l_undef, $l_yes, $l_no, $set_theme, $ico_mini_cal;
   global $l_publication, $l_title, $l_lang, $l_year;
   global $l_renew,$l_recept, $l_after, $l_before;
 
@@ -1399,7 +1399,7 @@ function html_publication_criterion($rec_q,$pub_q){
   <tr>
     <td class=\"detailForm\">
       <select name=\"tf_subscription_renewal\">
-       <option value=\"\">$l_none</option>
+       <option value=\"\">$l_undef</option>
        <option value=\"1\">$l_yes</option>
        <option value=\"0\">$l_no</option>
       </select>

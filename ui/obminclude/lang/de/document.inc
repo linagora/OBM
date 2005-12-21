@@ -11,6 +11,7 @@ $l_document = "Verwaltung Dokument";
 $l_document_new = "neues Dokument";
 $l_document_insert = "anlegen Dokument";
 $l_document_generate= "TeX-Dokument erzeugen";
+$l_category1 = "Kategorie 1";
 
 $l_namedocument = "Brief";
 $l_namesoc = "Firma";

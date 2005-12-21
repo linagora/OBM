@@ -23,6 +23,7 @@ $l_no = "No";
 $l_all = "Tutti";
 $l_all_f = "Tutti";
 $l_none = "Nessuno";
+$l_undef = "---";
 $l_comment = "Commento";
 $l_add_comment = "Nuovo commento";
 $l_upd_comment = "Modifica commento";

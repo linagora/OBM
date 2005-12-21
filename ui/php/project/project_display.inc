@@ -851,7 +851,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
-  global $l_datebegin, $l_dateend, $l_none;
+  global $l_datebegin, $l_dateend, $c_undef, $l_undef;
   global $l_comment,$l_add_comment,$l_upd_comment;
   global $uid, $cg_prod, $ctt_sales, $ctt_research, $c_php_isodate_format;
 
@@ -909,7 +909,7 @@ function html_project_form($action, $project_q, $project) {
     // member select
     $mb_q = run_query_all_users_from_group($cg_prod);
     $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
-      <option value=\"0\">$l_none</option>\n";
+      <option value=\"$c_undef\">$l_undef</option>\n";
     while ($mb_q->next_record()) {
 	$mb_id = $mb_q->f("userobm_id");
 	$mb_name = $mb_q->f("userobm_lastname")." ".$mb_q->f("userobm_firstname");
@@ -964,7 +964,7 @@ function html_project_form($action, $project_q, $project) {
   // task type select
   $sel_tt = "
         <select id=\"sel_tt\" name=\"sel_tt\">
-          <option value=\"0\">$l_none</option>";
+          <option value=\"$c_undef\">$l_undef</option>";
   while ($tt_q->next_record()) {
     $tt_id = $tt_q->f("tasktype_id");
     $tt_label = $tt_q->f("tasktype_label");
@@ -1130,8 +1130,8 @@ function dis_can_delete_project($p_id) {
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_task_form($ptask_q, $project) {
-  global $display;
-  global $l_none, $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
+  global $display, $c_undef, $l_undef;
+  global $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
   global $l_task_update, $l_task_upd, $l_task;
   
   $pid = $project["id"];
@@ -1145,7 +1145,7 @@ function html_project_task_form($ptask_q, $project) {
     // parent task select
     $sel_ptask = "
         <select id=\"sel_ptask\" name=\"sel_ptask\">
-          <option value=\"0\">$l_none</option>\n";
+          <option value=\"$c_undef\">$l_undef</option>\n";
     while ($ptask_q->next_record()) {
       $parent = $ptask_q->f("parent_id");
       if ($parent == 0) {

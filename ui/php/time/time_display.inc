@@ -539,7 +539,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
 //   - $validate_days : array of validated days (not to be shown)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_addtask($time, $validate_days) {
-  global $auth, $extra_js, $l_add, $l_update, $l_none, $l_close;
+  global $auth, $extra_js, $l_add, $l_update, $c_undef, $l_undef, $l_close;
   global $l_fill_addtask, $l_comment, $l_date, $l_cat, $l_project, $l_duration;
   global $l_task_fac, $l_task_div, $l_task_int, $l_intern;
   global $c_day_fraction, $c_working_days, $c_week_first_day;
@@ -694,7 +694,7 @@ function dis_form_addtask($time, $validate_days) {
   $sel_tt = "
     <select name=\"sel_tasktype\"
       onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,this.form.sel_projecttask, -1) \">
-      <option value=\"0\">$l_none</option>";
+      <option value=\"$c_undef\">$l_undef</option>";
   for ($i=0; $i<2; $i++) {
     $tt_q = $tasktype_q[$i];
     while($tt_q->next_record()) {
@@ -717,13 +717,13 @@ function dis_form_addtask($time, $validate_days) {
     <select name=\"sel_project\"
       onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
       fill_project(this.form.sel_project, this.form.sel_tasktype.value, this.form.sel_projecttask, this.form.sel_project.value);return true;\">
-    <option value=\"0\">$l_none</option>
+    <option value=\"$c_undef\">$l_undef</option>
     </select>";
 
   // ProjectTask select construction
   $sel_projtask = "
     <select name=\"sel_projecttask\">
-    <option value=\"0\">$l_none</option>
+    <option value=\"$c_undef\">$l_undef</option>
     </select>";
 
   // Project time length
