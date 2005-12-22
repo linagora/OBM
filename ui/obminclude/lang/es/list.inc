@@ -22,9 +22,6 @@ $l_list_contact = "Tiene un contacto";
 $l_list_display = "Opciones de despliegue para listas de Listas";
 $l_contact_display = "Opciones de despliegue para listas de Contactos";
 $l_list_set = "Configurar Lista";
-$l_export_format = "Formatos disponibles para exportar";
-$l_export_intro = "Se necesita seleccionar un formato de exportación";
-$l_select_list = "Seleccione la lista a exportar";
 
 // Contact
 $l_lastname = "Apellido";
@@ -70,19 +67,3 @@ $l_banned_word = "Palabra prohibida";
 
 $l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
 $l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
-
-//------------------------------------//
-// Export Format informations         //
-//------------------------------------//
-// Format 0 : HTML Stickers
-$c_export_format[0]["name"] = "HTML Stickers";
-$c_export_format[0]["info"] = "HTML Preview for stickers";
-// Format 1 :
-$c_export_format[1]["name"] = "HTML Table";
-$c_export_format[1]["info"] = "HTML Preview for table";
-// Format 2 : RTF Stickers
-$c_export_format[2]["name"] = "RTF Stickers";
-$c_export_format[2]["info"] = "RTF Sticker creation";
-// Format 3 : Excel data
-$c_export_format[3]["name"] = "Excel Table";
-$c_export_format[3]["info"] = "Excel table data";

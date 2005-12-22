@@ -22,10 +22,7 @@ $l_list_contact = "con contatto : ";
 $l_list_display = "Opzioni visualizzazione dell'elenco liste";
 $l_contact_display = "Opzioni visualizzazione dell'elenco contatti";
 $l_list_set = "Imposta Lista";
-$l_export_format = "Formati di esportazione";
 $l_desc = "Descrizione";
-$l_export_intro = "Seleziona il formato di esportazione";
-$l_select_list = "Seleziona le liste da esportare";
 
 // Contact
 $l_lastname = "Cognome";
@@ -75,19 +72,3 @@ $l_no_dyn_contact = "Non sono presenti contatti dinamici registrati";
 
 $l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
 $l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
-
-//------------------------------------//
-// Export Format informations         //
-//------------------------------------//
-// Format 0 : HTML Stickers
-$c_export_format[0]["name"] = "Etichette HTML";
-$c_export_format[0]["info"] = "Anteprima Etichette HTML";
-// Format 1 :
-$c_export_format[1]["name"] = "Tabella HTML";
-$c_export_format[1]["info"] = "Anteprima tabellla HTML";
-// Format 2 : RTF Stickers
-$c_export_format[2]["name"] = "Etichette RTF";
-$c_export_format[2]["info"] = "Creazione Etichette RTF";
-// Format 3 : Excel data
-$c_export_format[3]["name"] = "Tabella Excel";
-$c_export_format[3]["info"] = "Dati Tabella Excel";

@@ -22,9 +22,6 @@ $l_list_contact = "Ayant comme contact";
 $l_list_display = "Options d'affichage des listes de listes";
 $l_contact_display = "Options d'affichage des listes de contacts";
 $l_list_set = "Listes cibles";
-$l_export_format = "Formats d'export disponibles";
-$l_export_intro = "Sélectionner le format d'export souhaité";
-$l_select_list = "Sélectionner les listes cibles de l'export";
 $l_list_wizard = "Recherche globale";
 $l_criterion = "Critères de recherche";
 $l_timebefore = "Mis à jour avant";
@@ -102,19 +99,3 @@ $l_err_list_coh_pub = "$l_info_pub demandées alors qu'un critère de publication 
 $l_hungry_query = "La requête est trop consommatrice de ressource !";
 $l_warning_exp_to_nor = "Attention, Vous allez perdre votre requête actuelle. Continuer ?";
 $l_warning_nor_to_exp = "Attention, La requête générée sera gardée mais vous ne pourrez pas revenir en mode normal sans perdre les critères. Continuer ?";
-
-//------------------------------------//
-// Export Format informations         //
-//------------------------------------//
-// Format 0 : HTML Stickers
-$c_export_format[0]["name"] = "Etiquettes HTML";
-$c_export_format[0]["info"] = "Prévisualisation d'étiquettes en HTML";
-// Format 1 : HTML Table
-$c_export_format[1]["name"] = "Tableau HTML";
-$c_export_format[1]["info"] = "Prévisualisation tableau HTML";
-// Format 2 : RTF Stickers
-$c_export_format[2]["name"] = "Etiquettes RTF";
-$c_export_format[2]["info"] = "Génération d'étiquettes RTF";
-// Format 3 : Excel data
-$c_export_format[3]["name"] = "Tableau Excel";
-$c_export_format[3]["info"] = "Tableau Excel pour publipostage";

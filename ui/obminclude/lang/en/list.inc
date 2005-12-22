@@ -22,10 +22,7 @@ $l_list_contact = "Having as contact";
 $l_list_display = "Display options for Lists list";
 $l_contact_display = "Display options for Contacts list";
 $l_list_set = "List Set";
-$l_export_format = "Available export formats";
-$l_export_intro = "Select the export format needed";
 $l_criterion = "Search criteria";
-$l_select_list = "Select the lists to be exported";
 $l_timeafter = "Updated after";
 $l_timebefore = "Updated before";
 $l_market = "Responsible";
@@ -100,19 +97,3 @@ $l_err_list_coh_pub = "$l_info_pub selected while same publication criteria comb
 $l_hungry_query = "The query need too much resource !";
 $l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
 $l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
-
-//------------------------------------//
-// Export Format informations         //
-//------------------------------------//
-// Format 0 : HTML Stickers
-$c_export_format[0]["name"] = "HTML Stickers";
-$c_export_format[0]["info"] = "HTML Preview for stickers";
-// Format 1 :
-$c_export_format[1]["name"] = "HTML Table";
-$c_export_format[1]["info"] = "HTML Preview for table";
-// Format 2 : RTF Stickers
-$c_export_format[2]["name"] = "RTF Stickers";
-$c_export_format[2]["info"] = "RTF Sticker creation";
-// Format 3 : Excel data
-$c_export_format[3]["name"] = "Excel Table";
-$c_export_format[3]["info"] = "Excel table data";

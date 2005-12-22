@@ -20,7 +20,6 @@
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
-// - export_add      --                --
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple lists (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,14 +53,6 @@ if (! check_privacy($module, "List", $action, $list["id"], $uid)) {
   update_last_visit("list", $list["id"], $action);
 }
 
-// ses_list is the session array of lists id to export
-if (sizeof($ses_list) >= 1) {
-  $sess->register("ses_list");
-}
-if ($action != "export_add") {
-  $ses_list = "";
-  $sess->unregister("ses_list");
-}
 page_close();
 
 require("list_js.inc");
@@ -249,10 +240,6 @@ else if ($action == "new_criterion") {
   $prefs_con = get_display_pref($uid, "list_contact", 1);
   $display["detail"] = dis_list_display_pref($prefs, $prefs_con);
 
-} else if($action == "export_add") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_export_form($list);
-
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -420,7 +407,7 @@ function get_param_list() {
 function get_list_action() {
   global $list, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
+  global $l_list,$l_header_display;
   global $l_header_consult, $l_header_add_contact;
   global $l_select_list, $l_add_contact,$l_list_wizard;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -529,24 +516,6 @@ function get_list_action() {
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                           );
-
-// Export ADD
-  $actions["list"]["export_add"] = array (
-    'Name'     => $l_header_export,
-    'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult','contact_add','contact_del') 
-                                     	 );
-
-// Export
-  $actions["list"]["export"] = array (
-    'Name'     => $l_header_global_export,
-    'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
-    'Right'    => $cright_write,
-    'Popup'    => 1,
-    'Target'   => $l_list,
-    'Condition'=> array ('all') 
-                                     	 );
 
 // Display
   $actions["list"]["display"] = array (

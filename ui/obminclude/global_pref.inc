@@ -125,25 +125,6 @@ $display_include_file = "$obminclude/themes/$set_theme/display.inc";
 include("$display_include_file");
 
 
-// List Export Formats (use theme info so after theme inclusion)
-// Format 0 : HTML Stickers
-$c_export_format[0]["template"] = false;
-$c_export_format[0]["url"] = "addresses.php?fmt=htm&amp;form=label";
-$c_export_format[0]["icon"] = $ico_html;
-// Format 1 : HTML Table
-$c_export_format[1]["template"] = false;
-$c_export_format[1]["url"] = "addresses.php?fmt=htm&amp;form=table";
-$c_export_format[1]["icon"] = $ico_html;
-// Format 2 : RTF Stickers
-$c_export_format[2]["template"] = false;
-$c_export_format[2]["url"] = "addresses.php?fmt=rtf&amp;form=label";
-$c_export_format[2]["icon"] = $ico_rtf;
-// Format 3 : Excel data
-$c_export_format[3]["template"] = true;
-$c_export_format[3]["url"] = "addresses.php?fmt=xls&amp;form=table";
-$c_export_format[3]["icon"] = $ico_excel;
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Sections definitions
 ///////////////////////////////////////////////////////////////////////////////

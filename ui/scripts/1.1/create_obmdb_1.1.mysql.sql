@@ -1402,6 +1402,7 @@ CREATE TABLE DeletedCalendarEvent (
   deletedcalendarevent_event_id   int(8),
   deletedcalendarevent_user_id    int(8),
   deletedcalendarevent_timestamp  timestamp(14),
+  PRIMARY KEY (deletedcalendarevent_id),
   INDEX idx_dce_event (deletedcalendarevent_event_id),
   INDEX idx_dce_user (deletedcalendarevent_user_id)
 );
