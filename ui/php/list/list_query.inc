@@ -503,7 +503,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_country_iso3166,
          ctry1.country_name as contact_country,
          contact_function_id,
-         function_label,
+         contactfunction_label,
          contact_title,
          contact_phone,
          contact_homephone,
@@ -529,7 +529,7 @@ function run_query_contacts_list($list, $entity="") {
                               and ctry1.country_lang='$lang'
          LEFT JOIN Country as ctry2 ON Company.company_country_iso3166 = ctry2.country_iso3166
                               and ctry2.country_lang='$lang'
-         LEFT JOIN Function ON Contact.contact_function_id = function_id
+         LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
          LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       WHERE contactlist_list_id='$id'
       $orderq
@@ -997,7 +997,7 @@ function get_list_dynamic_company_nb($query) {
 
   if ($pos > 1) {
     // The query is has a sub-query
-    if (preg_match('/FROM .* (FROM (.*))(\) GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
+    if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
       $query_f = "SELECT count(distinct(company_id)) as nb ". $matches[1];
     } else {
       return 0;
@@ -1309,7 +1309,7 @@ function make_query_from_criteria($list) {
     "company_marketingmanager_id" => $common_equal,
     "company_town"  => $common_like,
     "company_datasource_id" => $common_equal,
-    "companycategory_code" => $category_equal,
+    "companycategory1_code" => $category_equal,
     "contact_firstname"  => $common_like,
     "contact_country_iso3166" => $contact_country,
     "contact_timeafter"  => $cont_time_sup,
@@ -1355,7 +1355,7 @@ function make_query_from_criteria($list) {
     "subscription_timebefore" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "companycategory_code" => "
+    "companycategory1_code" => "
        LEFT JOIN CompanyCategory1Link ccl%j ON company_id = ccl%j.companycategory1link_company_id 
        LEFT JOIN CompanyCategory1 cc%j ON cc%j.companycategory1_id = ccl%j.companycategory1link_category_id ",
     "contactcategory1link_category_id" => "
@@ -1372,7 +1372,7 @@ function make_query_from_criteria($list) {
         kind_minilabel,
         kind_header,
         kind_lang,
-        function_label,
+        contactfunction_label,
         contact_title,
         contact_service,
         contact_address1,
@@ -1405,7 +1405,7 @@ function make_query_from_criteria($list) {
                     LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166=ctry1.country_iso3166 and ctry1.country_lang='$lang'
                     LEFT JOIN Country as ctry2 ON Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
                     LEFT JOIN Kind ON contact_kind_id = kind_id
-                    LEFT JOIN Function ON contact_function_id = function_id";
+                    LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id";
 
 
   if (is_array($criteria)) {
@@ -1590,7 +1590,7 @@ function run_query_contacts_for_letter($list_ids) {
         contact_town as list_contact_town,
         contact_expresspostal as list_contact_expresspostal,
         c1.country_name as list_contact_country,
-        function_label as list_contact_function,
+        contactfunction_label as list_contact_function,
         contact_phone as list_contact_phone,
         contact_homephone as list_contact_homephone,
         contact_mobilephone as list_contact_mobilephone,

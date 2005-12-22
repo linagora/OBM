@@ -47,7 +47,7 @@ $cg_prod = 3;
 
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned
-$cql_max_cost = 100000;  // Maximum query cost (Postgres)
+$cql_max_cost = 200000;  // Maximum query cost (Postgres)
 
 // Allow * in search field
 $cgp_sql_star = true;

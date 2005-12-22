@@ -29,14 +29,14 @@ function get_obm_info($info) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// CompanyCategory query execution
+// CompanyCategory1 query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_companycategory() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM CompanyCategory ORDER BY companycategory_code"; 
+  $query = "SELECT * FROM CompanyCategory1 ORDER BY companycategory1_code"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
