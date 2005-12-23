@@ -47,25 +47,26 @@ $display["title"] = "
 <div class=\"title\">
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
 </div>";
-if ($cgp_show["module"]["agenda"]) { 
+
+if ($cgp_show["module"]["agenda"] && $perm->check_right("agenda", $cright_read)) { 
   require("$path/agenda/agenda_query.inc");
   $block .= dis_calendar_portal();
 }
 
-if ($cgp_show["module"]["time"]) { 
+if ($cgp_show["module"]["time"] && $perm->check_right("time", $cright_read)) { 
   $block .= dis_time_portal();
 }
 
-if ($cgp_show["module"]["deal"]) { 
+if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_read)) { 
   require("$path/deal/deal_query.inc");
   $block .= dis_deal_portal();
 }
 
-if ($cgp_show["module"]["incident"]) { 
+if ($cgp_show["module"]["incident"] && $perm->check_right("incident", $cright_read)) { 
   $block .= dis_incident_portal();
 }
 
-if ($cgp_show["module"]["contract"]) { 
+if ($cgp_show["module"]["contract"] && $perm->check_right("contract", $cright_read)) { 
   $block .= dis_contract_portal();
 }
 

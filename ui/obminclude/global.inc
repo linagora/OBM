@@ -70,6 +70,10 @@ $cs_lifetime = 7200;
 // Use Database sessions
 $cgp_sess_db = false;
 
+// Cookie name and domain
+$cgp_cookie_name = "OBM_Session";
+$cgp_cookie_domain = "aliacom.local";
+
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 // CAS specific parameters are in obm_conf.inc.
 $auth_kind = "standalone"; 

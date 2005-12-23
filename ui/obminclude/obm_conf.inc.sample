@@ -55,6 +55,10 @@ $cs_lifetime = 0;
 $cgp_sess_db = false;
 //$cgp_sess_db = true;
 
+// Cookie name and domain
+$cgp_cookie_name = "OBM_Session";
+$cgp_cookie_domain = "aliacom.local";
+
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 //$auth_kind="CAS";
 //$cas_server = "sso.aliacom.local";
