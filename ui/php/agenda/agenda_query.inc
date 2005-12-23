@@ -287,6 +287,9 @@ function run_query_add_event($agenda, $sel_entity_id, &$event_id) {
     $users_array = array_merge($users_array, $user_group_array);
     $users_array = array_unique($users_array);
   }
+  if (! is_array($users_array)) {
+    $users_array = array();
+  }
 
   $event_id = run_query_insert_event_data($agenda);   
 
@@ -684,6 +687,9 @@ function run_query_event_update($agenda, $sel_entity_id, &$event_id) {
     $users_array = array_merge($users_array,$user_group_array);
     $users_array = array_unique($users_array);
   }
+  if (! is_array($users_array)) {
+    $users_array = array();
+  }
 
   // Get the final resource list
   $resources_array = $sel_entity_id["resource"];
@@ -701,8 +707,13 @@ function run_query_event_update($agenda, $sel_entity_id, &$event_id) {
     $obm_q = new DB_OBM;
     $now = date("Y-m-d H:i:s");
     $old_users = get_event_users_info($event_id);
-    $removed_users = array_diff($old_users, $users_array);
-    $new_users = array_diff($users_array, $old_users);
+    if (is_array($old_users)) {
+      $removed_users = array_diff($old_users, $users_array);
+      $new_users = array_diff($users_array, $old_users);
+    } else {
+      $removed_users = array();
+      $new_users = $users_array;
+    }
 
     // If users have been removed, we note it in DeletedCalendarEvent
     if (count($removed_users) > 0) {

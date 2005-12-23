@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_js.inc                                                  //
 //     - Desc : List javascript functions File                               //
-// 200-16-02 Vincent MARGUERIT                                               //
+// 2000-02-16 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -221,15 +221,15 @@ function company_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_marketingmanager_id[]\" value=\"\" />';
   }
    
-  if (form.sel_companycategory_code.value != '') {  
+  if (form.sel_companycategory1_code.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_category'; 
     cell = values.insertCell(i);
-    field = form.sel_companycategory_code;
-    cell.innerHTML = '<select name=\"sel_companycategory_code[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    field = form.sel_companycategory1_code;
+    cell.innerHTML = '<select name=\"sel_companycategory1_code[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_companycategory_code[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_companycategory1_code[]\" value=\"\" />';
   }   
   
   if (form.sel_company_datasource_id.value != '') {  

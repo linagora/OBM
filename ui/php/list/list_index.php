@@ -281,7 +281,7 @@ function get_param_list() {
   global $tf_company_name, $tf_company_zipcode, $tf_company_town;
   global $tf_company_timeafter, $tf_company_timebefore;
   global $sel_company_country_iso3166, $sel_company_marketingmanager_id;
-  global $sel_company_datasource_id, $sel_companycategory_code;
+  global $sel_company_datasource_id, $sel_companycategory1_code;
 
   global $tf_contact_firstname, $tf_contact_lastname;
   global $tf_contact_zipcode, $tf_contact_town, $sel_kind_lang;
@@ -343,7 +343,7 @@ function get_param_list() {
   if (isset ($tf_company_timebefore)) $list["criteria"]["modules"]["company"]["company_timebefore"] = $tf_company_timebefore;
   if (isset ($tf_company_town)) $list["criteria"]["modules"]["company"]["company_town"] = $tf_company_town;
   if (isset ($sel_company_datasource_id)) $list["criteria"]["modules"]["company"]["company_datasource_id"] = $sel_company_datasource_id;
-  if (isset ($sel_companycategory_code)) $list["criteria"]["modules"]["company"]["companycategory_code"] = $sel_companycategory_code;
+  if (isset ($sel_companycategory1_code)) $list["criteria"]["modules"]["company"]["companycategory1_code"] = $sel_companycategory1_code;
   
   // Contact
   if (isset ($tf_contact_firstname)) $list["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;

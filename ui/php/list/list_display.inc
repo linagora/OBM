@@ -3,7 +3,6 @@
 // OBM - File : list_display.php                                             //
 //     - Desc : List Display File                                            //
 // 2000-01-20 Aliacom - Vincent MARGUERIT                                    //
-// 2001-08-23 jlb : add list_comment, add export for letter mailing
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -910,7 +909,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "company_timebefore" => "tf",
       "company_town" => "tf",
       "company_datasource_id" => "sel",
-      "companycategory_code" => "sel",
+      "companycategory1_code" => "sel",
       "contact_firstname" => "tf",
       "contact_country_iso3166" => "sel",
       "contact_timeafter" => "tf",
@@ -939,7 +938,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["company_timeafter"] = "$l_company: $l_timeafter"; 
   $fields_label["company_timebefore"] = "$l_company: $l_timebefore"; 
   $fields_label["company_marketingmanager_id"] = "$l_company: $l_market";
-  $fields_label["companycategory_code"] = "$l_company: $l_cat";   
+  $fields_label["companycategory1_code"] = "$l_company: $l_cat";   
   $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
   $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
   $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
@@ -969,7 +968,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     $usr_q = run_query_userobm_active();  
     $cat2_q = run_query_contactcategory2();
     $fct_q = run_query_function();
-    $cat_q = run_query_companycategory();       
+    $cat_q = run_query_companycategory1();       
     $rec_q = run_query_subscriptionreception();  
     $lag_q = run_query_language();
     $pub_q = run_query_publication();
@@ -978,7 +977,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "company_country_iso3166" => array($cty_q,"country_iso3166","country_name"),
       "company_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "company_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
-      "companycategory_code" => array($cat_q,"companycategory_code","companycategory_label"),
+      "companycategory1_code" => array($cat_q,"companycategory1_code","companycategory1_label"),
       "contact_country_iso3166" => array($cty_q,"country_iso3166","country_name"),
       "contact_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "contact_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
@@ -1085,7 +1084,7 @@ function dis_add_criterion_form($list) {
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();
   $fct_q = run_query_function();
-  $cat_q = run_query_companycategory();
+  $cat_q = run_query_companycategory1();
   $lag_q = run_query_language();
     
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
@@ -1149,8 +1148,8 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     $dsr_q->seek(0);
   $sel_cat .= "\n<option value=\"\">$l_all</option>";
   while($cat_q->next_record()) {
-    $cat_code = $cat_q->f("companycategory_code");
-    $cat_label = substr($cat_q->f("companycategory_label"),0,30);
+    $cat_code = $cat_q->f("companycategory1_code");
+    $cat_label = substr($cat_q->f("companycategory1_label"),0,30);
     $sel_cat .= "\n<option value=\"$cat_code\">$cat_code $cat_label</option>";
   }
   if($cat_q->nf()!=0) 
@@ -1196,8 +1195,8 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   <tr>    
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td> 
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-    <select  readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory_code\">$sel_cat</select>
-     <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_cat_code&amp;popup=1&amp;ext_target=f_new_criterion.sel_companycategory_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+    <select  readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory1_code\">$sel_cat</select>
+     <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_category1_code&amp;popup=1&amp;ext_target=f_new_criterion.sel_companycategory1_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />
 
     </td>     

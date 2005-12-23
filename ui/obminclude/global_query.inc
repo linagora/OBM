@@ -33,7 +33,7 @@ function get_obm_info($info) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_companycategory() {
+function run_query_companycategory1() {
   global $cdg_sql;
 
   $query = "SELECT * FROM CompanyCategory1 ORDER BY companycategory1_code"; 

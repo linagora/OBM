@@ -465,7 +465,7 @@ function html_import_file_import($import_q, $import) {
     $title = "$l_import_file : $file_name";
     // Get the country hash : countries["name"] = $id
     $countries = get_import_country_hash();
-    $cats = get_import_companycategory_hash();
+    $cats = get_import_companycategory1_hash();
     $kinds = get_import_kind_hash();
     $functions = get_import_function_hash();
   }

@@ -1085,10 +1085,10 @@ function get_import_country_hash() {
 ///////////////////////////////////////////////////////////////////////////////
 // Return the companycategory1 hash : cats["code"] = id
 ///////////////////////////////////////////////////////////////////////////////
-function get_import_companycategory_hash() {
+function get_import_companycategory1_hash() {
   global $cdg_sql;
 
-  $cat_q = run_query_companycategory();
+  $cat_q = run_query_companycategory1();
 
   while ($cat_q->next_record()) {
     $id = $cat_q->f("companycategory1_id");

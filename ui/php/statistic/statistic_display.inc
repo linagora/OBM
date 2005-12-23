@@ -139,10 +139,11 @@ function dis_list_select($list_q) {
   <input type=\"submit\" value=\"$l_generate_stats\" />
   </p>
   </div>
-  </form>
-  ";
+  </form>";
+
   return $block; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the companies 
@@ -156,14 +157,14 @@ function dis_cat_stats($comp_q,$tot) {
   global $l_null,$l_totals, $l_header_country,$l_compcat;
 
   while ($comp_q->next_record()) {
-    if ($comp_q->f("companycategory_id") == NULL) {
+    if ($comp_q->f("companycategory1_id") == NULL) {
       $cat_id = 0;
       $cat_c = $l_null;
     } else {
-      $code = $comp_q->f("companycategory_code");
-      $cat_id = $comp_q->f("companycategory_id");
+      $code = $comp_q->f("companycategory1_code");
+      $cat_id = $comp_q->f("companycategory1_id");
       $cat_c = $code; 
-      $cat_d = $comp_q->f("companycategory_label");
+      $cat_d = $comp_q->f("companycategory1_label");
       $cat_major_code = substr($code,0,strpos($code,'.'));
       // If code is a major code (not .)
       if ($cat_major_code == "") {
@@ -280,14 +281,14 @@ function export_cat_stats($comp_q,$tot) {
   global $set_csv_sep;
 
   while ($comp_q->next_record()) {
-    if ($comp_q->f("companycategory_id") == NULL) {
+    if ($comp_q->f("companycategory1_id") == NULL) {
       $cat_id = 0;
       $cat_c = $l_null;
     } else {
-      $code = $comp_q->f("companycategory_code");
-      $cat_id = $comp_q->f("companycategory_id");
+      $code = $comp_q->f("companycategory1_code");
+      $cat_id = $comp_q->f("companycategory1_id");
       $cat_c = $code; 
-      $cat_d = $comp_q->f("companycategory_label");
+      $cat_d = $comp_q->f("companycategory1_label");
       $cat_major_code = substr($code,0,strpos($code,'.'));
       // If code is a major code (not .)
       if ($cat_major_code == "") {
