@@ -464,8 +464,8 @@ ALTER TABLE UserObm ALTER COLUMN userobm_firstname SET DEFAULT '';
 -- Update List table
 -------------------------------------------------------------------------------
 -- add column list type
-ALTER TABLE List ADD COLUMN list_type integer;
-ALTER TABLE List ALTER COLUMN list_type SET DEFAULT 0;
+ALTER TABLE List ADD COLUMN list_mode integer;
+ALTER TABLE List ALTER COLUMN list_mode SET DEFAULT 0;
 
 
 -------------------------------------------------------------------------------

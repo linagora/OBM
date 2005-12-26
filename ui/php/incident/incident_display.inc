@@ -466,7 +466,7 @@ function dis_incident_form($action,$incident) {
 function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1) {
   global $display, $path, $uid, $set_theme, $ico_contract;
   global $c_php_isodate_format;
-  global $l_label,$l_contract,$l_status,$l_cat1, $l_find;
+  global $l_label,$l_contract,$l_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
   global $l_update, $l_insert;

@@ -53,13 +53,15 @@ $l_country = "Land";
 $l_desc = "Beschreibung";
 $l_priority = "Priorität";
 $l_datasource = "Data source";
-$l_cat = "Kategorie";
 $l_visibility = "Zugriff";
 $l_private = "Privat";
 $l_public = "Öffentlich";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_aka = "Also known as";
+$l_category1 = "Kategorie 1";
+$l_category2 = "Kategorie 2";
+$l_aduplicate = "Duplicate";
 
 // Entities
 $l_company = "Société";
@@ -179,6 +181,7 @@ $l_header_display = "Ansicht";
 $l_header_global_export = "Export";
 $l_header_export = "Export";
 $l_header_consult = "?Consult";
+$l_header_duplicate = "Duplicate";
 
 $l_header_update = "Ändern";
 $l_header_delete =  "Löschen";

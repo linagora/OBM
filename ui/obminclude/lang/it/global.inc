@@ -54,7 +54,6 @@ $l_country = "Nazione";
 $l_desc = "Descrizione";
 $l_priority = "Priorita";
 $l_datasource = "Data sorgente";
-$l_cat = "Categoria";
 $l_visibility = "Accesso";
 $l_private = "Privato";
 $l_public = "Pubblico";
@@ -74,6 +73,9 @@ $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
 $l_version = "Versione";
 $l_aka = "Altri nome";
+$l_category1 = "Categoria 1";
+$l_category2 = "Categoria 2";
+$l_aduplicate = "Copia";
 
 // Entities
 $l_company = "Azienda";
@@ -168,6 +170,7 @@ $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";
 $l_header_find = "Trova";
 $l_header_consult = "Consulta";
+$l_header_duplicate = "Duplicare";
 $l_header_vcard = "Vcard";
 $l_header_quickupdate = "Modifica Rapida";
 $l_header_update = "Modifica";

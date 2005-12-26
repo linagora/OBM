@@ -8,14 +8,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
+$l_number = "Number";
 $l_company_name = "Company Name";
-$l_kind = "Kind";
-$l_category1 = "Categories";
+$l_type = "Type";
+$l_type_s = "Types";
 $l_category1_s = "Categories";
 $l_activity = "Activity";
 $l_nafcode = "Code";
 $l_market = "Marketing manager";
-$l_company_kind = "Company Kind";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Details";

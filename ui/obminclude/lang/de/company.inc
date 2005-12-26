@@ -13,10 +13,10 @@
 // Labels and texts
 $l_number = "Nummer";
 $l_company_name = "Firma";
-$l_kind = "Firmenart";
+$l_type = "Firmenart";
+$l_type_s = "Firmenart";
 $l_activity = "Activity";
 $l_market = "Marketing manager";
-$l_company_kind = "Firmenart";
 $l_postcode = "Postleitzahl";
 $l_contact_first = "K";
 $l_newcontact_first = "NK";

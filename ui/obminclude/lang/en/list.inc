@@ -96,4 +96,4 @@ $l_incoherent_criteria = "Criteria are not coherent !";
 $l_err_list_coh_pub = "$l_info_pub selected while same publication criteria combined with AND !";
 $l_hungry_query = "The query need too much resource !";
 $l_warning_exp_to_nor = "Warning, You will lose your current query. Continue ?";
-$l_warning_nor_to_exp = "Warning, You will preserve the criteria in the query but lose these if you return to normal mode. Continue ?";
+$l_warning_nor_to_exp = "Warning, You will preserve the generated query and be able to edit it directly in SQL. But if you come back to normal mode, you will lose the changes you have manually made. Continue ?";

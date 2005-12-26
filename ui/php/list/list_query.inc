@@ -162,6 +162,7 @@ function run_query_insert($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
+  $mode = $list["mode"];
   $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
   $contact_arch = ($list["contact_arch"]==1)?1:0;
@@ -185,6 +186,7 @@ function run_query_insert($list) {
     list_mailing_ok,
     list_contact_archive,
     list_info_publication,
+    list_mode,
     list_query,
     list_structure)
   VALUES (null,
@@ -197,6 +199,7 @@ function run_query_insert($list) {
     '$email',
     '$mailing_ok',
     '$contact_arch',
+    '$mode',
     '$info_pub',
     '$list_query',
     '$list_critery')";
@@ -257,6 +260,7 @@ function run_query_update($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
+  $mode = $list["mode"];
   $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
   $contact_arch = ($list["contact_arch"]==1)?1:0;
@@ -277,6 +281,7 @@ function run_query_update($list) {
     list_email='$email',
     list_mailing_ok='$mailing_ok',
     list_contact_archive='$contact_arch',
+    list_mode='$mode',
     list_info_publication='$info_pub',
     list_query='$list_query',
     list_structure='$list_critery'
@@ -1046,27 +1051,6 @@ function get_list_static_company_nb($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the current mode of a given list according to parameters
-// Parameters:
-//   - $query    : list query
-//   - $criteria : list criteria (unserialized from structureà or parameter
-// Returns:
-//   $clist_mode_expert || $clist_mode_normal
-///////////////////////////////////////////////////////////////////////////////
-function check_list_mode($query, $criteria) {
-  global $clist_mode_expert, $clist_mode_normal;
-
-  if ($criteria == "" && $query != "") {
-    $mode = $clist_mode_expert;
-  } else {
-    $mode = $clist_mode_normal;
-  }
-
-  return $mode;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Evaluate if a query can be accepted based on resource consumption
 // Evaluation done specificaly for each database backend supported
 // Parameters:
@@ -1549,9 +1533,9 @@ function make_query_from_criteria($list) {
 function run_query_list_static_contact_id($id) {
   global $cdg_sql;
 
-  $query = "select contactlist_contact_id
-    from ContactList
-    where contactlist_list_id='$id'";
+  $query = "SELECT contactlist_contact_id
+    FROM ContactList
+    WHERE contactlist_list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;

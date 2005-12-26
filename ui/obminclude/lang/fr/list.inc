@@ -16,6 +16,7 @@ $l_date_creation = "Création";
 $l_updater = "Mise à jour par" ;
 $l_date_last_update = "Mise à jour" ;
 $l_static = "Statique";
+$l_mode = "Mode";
 
 // Labels et textes
 $l_list_contact = "Ayant comme contact";
@@ -98,4 +99,4 @@ $l_banned_word = "Mot interdit";
 $l_err_list_coh_pub = "$l_info_pub demandées alors qu'un critère de publication est combiné par un ET !";
 $l_hungry_query = "La requête est trop consommatrice de ressource !";
 $l_warning_exp_to_nor = "Attention, Vous allez perdre votre requête actuelle. Continuer ?";
-$l_warning_nor_to_exp = "Attention, La requête générée sera gardée mais vous ne pourrez pas revenir en mode normal sans perdre les critères. Continuer ?";
+$l_warning_nor_to_exp = "Attention, La requête générée deviendra éditable en SQL directement. Cependant si vous revenez en mode normal, vous perdrez les modifications manuelles sur la requête. Continuer ?";

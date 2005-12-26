@@ -353,10 +353,6 @@ function check_data_form($id, $import) {
 //        : $map[1]["field"] = comp_name
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_field_mapping($import_q) {
-  global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_expresspostal, $l_country, $l_phone, $l_fax, $l_web, $l_email;
-  global $l_contact, $l_lastname, $l_firstname, $l_function, $l_title;
-  global $l_hphone, $l_mphone, $l_comment, $l_lang;
 
   $desc = $import_q->f("import_desc");
   eval ($desc);
@@ -365,6 +361,7 @@ function get_import_field_mapping($import_q) {
   // $map[1][label] = "Company"
   // $map[1][field] = comp_name
   while (list($field, $el) = each($comp)) {
+    global ${$el["label"]};
     $label = ${$el["label"]};
     $value = $el["value"];
     $default = $el["default"];
@@ -379,6 +376,7 @@ function get_import_field_mapping($import_q) {
   }
 
   while (list($field, $el) = each($con)) {
+    global ${$el["label"]};
     $label = ${$el["label"]};
     $value = $el["value"];
     $default = $el["default"];
@@ -552,11 +550,11 @@ function get_similar_company($fields, $map) {
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $cats[]      : CompanyCategory1 hash
+//   - $cats1[]      : CompanyCategory1 hash
 // Returns
 //   Id of the company inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$cats) {
+function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$cats1) {
   global $auth, $cdg_sql, $field_size;
 
   $uid = $auth->auth["uid"];
@@ -665,15 +663,15 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $id = $obm_q->f("id");
 
   // Set the category if given
-  $cat = $cats[$fields["comp_cat"]];
-  if ($cat != "") {
+  $cat1 = $cats1[$fields["comp_cat1"]];
+  if ($cat1 != "") {
 
     $query = "INSERT INTO CompanyCategory1Link (
         companycategory1link_company_id,
 	companycategory1link_category_id)
       VALUES (
         '$id',
-        '$cat')";
+        '$cat1')";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
   }
@@ -689,10 +687,10 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $cats[]      : CompanyCategory1 hash
+//   - $cats1[]      : CompanyCategory1 hash
 //   - $company_id  : Company id to update
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$cats, $company_id) {
+function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$cats1, $company_id) {
   global $auth, $cdg_sql, $field_size;
 
   $uid = $auth->auth["uid"];
@@ -758,13 +756,13 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $retour = $obm_q->query($query);
 
   // Set the category if given
-  $cat = $cats[$fields["comp_cat"]];
-  if ($cat != "") {
+  $cat1 = $cats1[$fields["comp_cat1"]];
+  if ($cat1 != "") {
 
     $query = "DELETE
       FROM CompanyCategory1Link
       WHERE companycategory1link_company_id='$company_id'
-        AND companycategory1link_category_id='$cat'";
+        AND companycategory1link_category_id='$cat1'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
   
@@ -773,7 +771,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
         companycategory1link_category_id)
       VALUES (
           '$company_id',
-          '$cat')";
+          '$cat1')";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
   }
@@ -1128,12 +1126,12 @@ function get_import_kind_hash() {
 function get_import_function_hash() {
   global $cdg_sql;
 
-  $func_q = run_query_function();
+  $func_q = run_query_contactfunction();
 
   if (is_object($func_q)) {
     while ($func_q->next_record()) {
-      $id = $func_q->f("function_id");
-      $label = $func_q->f("function_label");
+      $id = $func_q->f("contactfunction_id");
+      $label = $func_q->f("contactfunction_label");
       $functions[$label] = $id;
     }
   }

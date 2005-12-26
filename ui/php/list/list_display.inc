@@ -23,7 +23,7 @@ $fieldnames["timeupdate"] = $l_date_last_update;
 $fieldnames["list_nb_contact"] = "$l_nb_contact : $l_static / $l_query";
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
-$fieldnames["function_label"] = $l_function;
+$fieldnames["contactfunction_label"] = $l_function;
 $fieldnames["contact_title"] = $l_title;
 $fieldnames["kind_minilabel"] = $l_status;
 $fieldnames["kind_header"] = $l_letter;
@@ -511,13 +511,15 @@ function dis_list_consult($list) {
 //   - $con_q     : contact database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $prefs_con, $con_q) {
-  global $l_list, $l_name, $l_subject, $l_email, $l_query, $l_static;
+  global $l_list, $l_name, $l_subject, $l_email, $l_static;
   global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
   global $display, $perm, $module, $cright_write, $ctu_sql_limit, $cdg_sql;
   global $l_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_company, $l_invalid_query;
   global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
   global $l_mailing, $l_contact_archive, $l_info_pub;
+  global $l_query, $l_expert_mode, $l_normal_mode;
+  global $clist_mode_normal, $clist_mode_expert;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");
@@ -531,6 +533,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
+  $mode = $list_q->f("list_mode");
   $static_nb = $list_q->f("list_static_nb");
   $structure = $list_q->f("list_structure");
 
@@ -540,9 +543,13 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     $criteria = "";
   }
 
-  if ($criteria != "") {
-    $query = make_query_from_db($list_q);
+  if ($mode == $clist_mode_normal) {
+    $lmode = $l_normal_mode;
+    if ($criteria != "") {
+      $query = make_query_from_db($list_q);
+    }
   } else {
+    $lmode = $l_expert_mode;
     $query = stripslashes($list_q->f("list_query"));
   }
 
@@ -570,8 +577,8 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
 
   $comp_static_nb = get_list_static_company_nb($id);
 
-  // If no search criteria, we display the query (empty or manual)
-  if ($criteria == "") {
+  // If expert mode, we display the query (empty or manual)
+  if ($mode == $clist_mode_expert) {
     $d_query = nl2br($query);
     $dis_query = "<tr>
       <td class=\"detailLabel\">$l_query</td>
@@ -605,6 +612,9 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_query</td>
+      <td class=\"detailText\">$lmode</td>
     </tr>
     <tr>
       <td class=\"detailLabel\"># $l_contact : $l_static / $l_query</td>
@@ -745,12 +755,13 @@ function html_list_form($action, $list_q, $list) {
   global $action, $display, $uid;
 
   // if update mode and first time, values are taken from db
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "detailduplicate")) {
     $id = $list_q->f("list_id");
     $usercreate = $list_q->f("list_usercreate");
     $name = $list_q->f("list_name");
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
+    $mode = $list_q->f("list_mode");
     $structure = $list_q->f("list_structure");
     $criteria = unserialize($structure);
     $query = stripslashes($list_q->f("list_query"));
@@ -766,15 +777,17 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
+  if (isset($list["mode"])) { $mode = $list["mode"]; }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["mailing_ok"])) { $mailing_ok = $list["mailing_ok"]; }
   if (isset($list["contact_arch"])) { $contact_arch = $list["contact_arch"]; }
   if (isset($list["info_pub"])) { $info_pub = $list["info_pub"]; }
   if (isset($list["criteria"])) { $criteria = $list["criteria"]; }
 	
-  if ( ($action == "new") || ($action == "insert") ||
-       ( (($action == "detailupdate") || ($action == "update")) && 
-         ($usercreate == $uid) ) ) {
+  if ( ($action == "new") || ($action == "insert")
+       || ($action == "detailduplicate")
+       || ( (($action == "detailupdate") || ($action == "update")) && 
+	    ($usercreate == $uid) ) ) {
     $dis_priv = "
       <td class=\"detailLabel\">$l_private</td>
       <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" ";
@@ -791,11 +804,11 @@ function html_list_form($action, $list_q, $list) {
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   // If criteria are set, we display the criteria form, else the query
-  if (check_list_mode($query, $criteria) == $clist_mode_expert) {
-    $query_checked = " checked=\"checked\" ";
+  if ($mode == $clist_mode_expert) {
+    $expert_checked = " checked=\"checked\" ";
     $style_query = "";
   } else {
-    $criterion_checked = " checked=\"checked\" ";
+    $normal_checked = " checked=\"checked\" ";
     $style_query = "style=\"display:none;\"";
   }
   $dis_query = html_list_graphical_form($action, $list_q, $list);
@@ -839,8 +852,8 @@ function html_list_form($action, $list_q, $list) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">
-       <input type=\"radio\" $query_checked name=\"js_query\" value=\"1\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
-       <input type=\"radio\" $criterion_checked name=\"js_query\" value=\"-1\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
+       <input type=\"radio\" $expert_checked name=\"rd_mode\" value=\"$clist_mode_expert\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
+       <input type=\"radio\" $normal_checked name=\"rd_mode\" value=\"$clist_mode_normal\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
       </td>
     </tr>
     <tr>
@@ -868,8 +881,8 @@ function html_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_graphical_form($action, $list_q, $list) {
-  global $l_add_criterion, $l_and, $l_or, $l_not, $l_empty;
-  global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
+  global $l_add_criterion, $l_criterion, $l_and, $l_or, $l_not, $l_empty;
+  global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
   global $l_contact_cat2,$l_function,$l_cat;
@@ -878,8 +891,9 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $clist_mode_expert, $clist_mode_normal;
   
   // if update mode and first time, values are taken from db
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "detailduplicate")) {
     $id = $list_q->f("list_id");
+    $mode = $list_q->f("list_mode");
     $query = stripslashes($list_q->f("list_query"));
     $criteria = unserialize($list_q->f("list_structure"));
     $bollean_criterion = $criteria["logical"]["NOT"];
@@ -889,6 +903,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
+  if (isset($list["mode"])) { $mode = $list["mode"]; }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["criteria"])) { 
     $criteria = $list["criteria"];
@@ -967,7 +982,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     $cat1_q = run_query_contactcategory1();
     $usr_q = run_query_userobm_active();  
     $cat2_q = run_query_contactcategory2();
-    $fct_q = run_query_function();
+    $fct_q = run_query_contactfunction();
     $cat_q = run_query_companycategory1();       
     $rec_q = run_query_subscriptionreception();  
     $lag_q = run_query_language();
@@ -983,7 +998,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contact_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
       "contactcategory1link_category_id" => array($cat1_q,"contactcategory1_id","contactcategory1_label"),
       "contactcategory2link_category_id" => array($cat2_q,"contactcategory2_id","contactcategory2_label"),
-      "contact_function_id" => array($fct_q,"function_id","function_label"),
+      "contact_function_id" => array($fct_q,"contactfunction_id","contactfunction_label"),
       "kind_lang" => array($lag_q,"kind_lang","kind_lang"),
       "subscription_publication_id" => array($pub_q,"publication_id","publication_title"),
       "subscription_reception_id" => array($rec_q,"subscriptionreception_id","subscriptionreception_label")
@@ -1033,7 +1048,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       $logical_criterion;      
       $dis_no_boolean = "<select name=\"sel_log_not[]\"><option value=\"\" $empty >$l_empty</option><option value=\"NOT\" $not>$l_not</option></select></td>";
       $dis_criteria .="<tr><td colspan=\"4\"> </td>".$labels[$key]."</tr>";
-      if($logical_criterion[$key] == "AND") {
+      if ($logical_criterion[$key] == "AND") {
 	$and = "selected =\"true\"";
 	$or = "";
       }
@@ -1046,7 +1061,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     }
   }
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-  if (check_list_mode($query, $criteria) == $clist_mode_expert) {
+  if ($mode == $clist_mode_expert) {
     $display = "style=\"display:none\"";
   }
   $block = "
@@ -1083,7 +1098,7 @@ function dis_add_criterion_form($list) {
   $dsr_q = run_query_datasource();
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();
-  $fct_q = run_query_function();
+  $fct_q = run_query_contactfunction();
   $cat_q = run_query_companycategory1();
   $lag_q = run_query_language();
     
@@ -1262,7 +1277,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   if ($fct_q != "") {
     $sel_fct .= "\n<option value=\"\">$l_all</option>";
     while ($fct_q->next_record()) {
-      $sel_fct .= "\n<option value=\"".$fct_q->f("function_id")."\">".$fct_q->f("function_label")."</option>";
+      $sel_fct .= "\n<option value=\"".$fct_q->f("contactfunction_id")."\">".$fct_q->f("contactfunction_label")."</option>";
     }
     if ($fct_q->nf() != 0) {
       $fct_q->seek(0);
@@ -1501,6 +1516,9 @@ function dis_list_warn_insert($list_q, $list) {
 
   $name = $list["name"];
   $subject = $list["subject"];
+  $mailing_ok = ($list["mailing_ok"] == "1" ? "1" : "0");
+  $contact_arch = ($list["contact_arch"] == "1" ? "1" : "0");
+  $info_pub = ($list["info_pub"] == "1" ? "1" : "0");
   $query = stripslashes($list["query"]);
   if (isset($list["criteria"])) {
     $criteria = urlencode(serialize($list["criteria"]));
@@ -1516,6 +1534,15 @@ function dis_list_warn_insert($list_q, $list) {
       </td></tr>";
   }
 
+  $hidden = "
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
+      <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
+      <input type=\"hidden\" name=\"cb_mailing_ok\" value=\"$mailing_ok\" />
+      <input type=\"hidden\" name=\"cb_contact_arch\" value=\"$contact_arch\" />
+      <input type=\"hidden\" name=\"cb_info_pub\" value=\"$info_pub\" />
+      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />";
+
   $block = "<p />
   <table class=\"detail\">
   $dis_same_list
@@ -1527,22 +1554,16 @@ function dis_list_warn_insert($list_q, $list) {
       action=\"" .url_prepare("list_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
-      <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" /
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
+      $hidden
     </form>
     </p>
     <p class=\"detailButtons\">
-    <form name=\"form_back method=\"post\"
+    <form name=\"form_back\" method=\"post\"
       action=\"" .url_prepare("list_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"new\" />
-      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
-      <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" /
       <input type=\"submit\" value=\"$l_back\" />
+      $hidden
     </form>
     </p>
   </div>";

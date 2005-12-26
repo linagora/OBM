@@ -8,9 +8,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels and texts
-$l_company_name = "Firmanamn";
-$l_company_kind = "Firmakategori";
 $l_number = "Organisasjonssnummer";
+$l_company_name = "Firmanamn";
+$l_type = "Firmakategori";
+$l_type_s = "Firmakategori";
 $l_postcode = "Postnummer";
 $l_market = "Person in charge";
 $l_aka = "Other names";

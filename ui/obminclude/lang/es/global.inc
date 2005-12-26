@@ -54,7 +54,6 @@ $l_expresspostal = "Dirección de correo";
 $l_country = "País";
 $l_desc = "Descripción";
 $l_datasource = "Fuente de Datos";
-$l_cat = "Categoría";
 $l_visibility = "Acceso";
 $l_private = "Privado";
 $l_public = "Publico";
@@ -76,6 +75,9 @@ $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
 $l_version = "Version";
 $l_aka = "Tambien Conocida como";
+$l_category1 = "Categoría 1";
+$l_category2 = "Categoría 2";
+$l_aduplicate = "Duplicate";
 
 // Entities
 $l_company = "Compañía";
@@ -184,6 +186,7 @@ $l_header_global_export = "Exportar";
 $l_header_export = "Exportar";
 $l_header_vcard = "Vcard";
 $l_header_consult = "Consultar";
+$l_header_duplicate = "Duplicate";
 $l_header_quickupdate = "Actualizar Rapido";
 $l_header_update = "Actualizar";
 $l_header_delete = "Borrar";

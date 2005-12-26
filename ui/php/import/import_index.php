@@ -233,8 +233,8 @@ function get_import_desc($import) {
   $desc .= '\$comp_name_d="'.$import["comp_name_d"] . '";';
   $desc .= '\$comp_num="'.$import["comp_num"] . '";';
   $desc .= '\$comp_num_d="'.$import["comp_num_d"] . '";';
-  $desc .= '\$comp_cat="'.$import["comp_cat"] . '";';
-  $desc .= '\$comp_cat_d="'.$import["comp_cat_d"] . '";';
+  $desc .= '\$comp_cat1="'.$import["comp_cat1"] . '";';
+  $desc .= '\$comp_cat1_d="'.$import["comp_cat1_d"] . '";';
   $desc .= '\$comp_ad1="'.$import["comp_ad1"] . '";';
   $desc .= '\$comp_ad1_d="'.$import["comp_ad1_d"] . '";';
   $desc .= '\$comp_ad2="'.$import["comp_ad2"] . '";';
@@ -304,9 +304,9 @@ function get_import_desc($import) {
   $desc .= '\$comp["comp_num"]["value"] ="'.$import["comp_num"] . '";';
   $desc .= '\$comp["comp_num"]["label"] ="l_number";';
   $desc .= '\$comp["comp_num"]["default"]="'.$import["comp_num_d"] . '";';
-  $desc .= '\$comp["comp_cat"]["value"] ="'.$import["comp_cat"] . '";';
-  $desc .= '\$comp["comp_cat"]["label"] ="l_cat";';
-  $desc .= '\$comp["comp_cat"]["default"]="'.$import["comp_cat_d"] . '";';
+  $desc .= '\$comp["comp_cat1"]["value"] ="'.$import["comp_cat1"] . '";';
+  $desc .= '\$comp["comp_cat1"]["label"] ="l_category1";';
+  $desc .= '\$comp["comp_cat1"]["default"]="'.$import["comp_cat1_d"] . '";';
   $desc .= '\$comp["comp_ad1"]["value"] ="'.$import["comp_ad1"] . '";';
   $desc .= '\$comp["comp_ad1"]["label"] ="l_address";';
   $desc .= '\$comp["comp_ad1"]["default"]="'.$import["comp_ad1_d"] . '";';
@@ -459,7 +459,7 @@ function get_param_import() {
   global $param_import, $cdg_param;
   global $tmp_path, $action, $new_order, $order_dir;
   global $tf_comp_name, $tf_comp_name_d, $tf_comp_num, $tf_comp_num_d;
-  global $tf_comp_cat, $tf_comp_cat_d;
+  global $tf_comp_cat1, $tf_comp_cat1_d;
   global $tf_comp_ad1, $tf_comp_ad1_d, $tf_comp_ad2, $tf_comp_ad2_d;
   global $tf_comp_ad3, $tf_comp_ad3_d, $tf_comp_zip, $tf_comp_zip_d;
   global $tf_comp_town, $tf_comp_town_d, $tf_comp_cdx, $tf_comp_cdx_d;
@@ -502,8 +502,8 @@ function get_param_import() {
   if (isset ($tf_comp_name_d)) $import["comp_name_d"] = trim($tf_comp_name_d);
   if (isset ($tf_comp_num)) $import["comp_num"] = trim($tf_comp_num);
   if (isset ($tf_comp_num_d)) $import["comp_num_d"] = trim($tf_comp_num_d);
-  if (isset ($tf_comp_cat)) $import["comp_cat"] = trim($tf_comp_cat);
-  if (isset ($tf_comp_cat_d)) $import["comp_cat_d"] = trim($tf_comp_cat_d);
+  if (isset ($tf_comp_cat1)) $import["comp_cat1"] = trim($tf_comp_cat1);
+  if (isset ($tf_comp_cat1_d)) $import["comp_cat1_d"] = trim($tf_comp_cat1_d);
   if (isset ($tf_comp_ad1)) $import["comp_ad1"] = trim($tf_comp_ad1);
   if (isset ($tf_comp_ad1_d)) $import["comp_ad1_d"] = trim($tf_comp_ad1_d);
   if (isset ($tf_comp_ad2)) $import["comp_ad2"] = trim($tf_comp_ad2);

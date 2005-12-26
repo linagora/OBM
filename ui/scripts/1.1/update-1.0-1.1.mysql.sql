@@ -416,7 +416,7 @@ ALTER TABLE UserObm CHANGE userobm_firstname userobm_firstname varchar(48) DEFAU
 -- Update List table
 -------------------------------------------------------------------------------
 -- add column list type
-ALTER TABLE List ADD COLUMN list_type int(1) DEFAULT 0 AFTER list_email;
+ALTER TABLE List ADD COLUMN list_mode int(1) DEFAULT 0 AFTER list_email;
 
 
 -------------------------------------------------------------------------------

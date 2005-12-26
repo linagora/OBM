@@ -5,6 +5,8 @@
 \clearpage
 \section{Le module \List}
 
+révision : \obm 1.1.0
+
 \subsection{Présentation du module \List}
 
 Ce module est une gestion de liste de contacts.
@@ -101,9 +103,9 @@ Lors du changement de mode, un message d'alerte est affiché détaillant ces consé
 \hline
 \textbf{Bascule} & \textbf{Description} \\
 \hline
-Normal -> Expert & Les critères saisis sont conservés et transformés en requête SQL qui est reprise.\\
+Normal -> Expert & Les critères saisis sont conservés et transformés en requête SQL qui est reprise comme base pour la requête manuelle. Les critères du mode normal sont sauvegardés dans la liste.\\
 \hline
-Expert -> Normal & La requête saisie est perdue, la détermination des critères est à effectuer graphiquement.\\
+Expert -> Normal & La requête saisie est perdue. Les critères sont récupérés de la dernière bascule Normal -> Expert, soit du dernier état en mode normal.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}

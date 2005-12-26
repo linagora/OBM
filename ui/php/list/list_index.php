@@ -27,8 +27,8 @@
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 
 //---------------------------------------------------------------------------//
-$clist_mode_normal = "normal";
-$clist_mode_expert = "expert";
+$clist_mode_normal = 0;
+$clist_mode_expert = 1;
 
 
 $path = "..";
@@ -102,6 +102,13 @@ else if ($action == "new_criterion") {
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_detail($list["id"]);
+  $display["detail"] = dis_list_form($action, $list_q, $list);
+
+} else if ($action == "detailduplicate") {
+///////////////////////////////////////////////////////////////////////////////
+  $list_q = run_query_detail($list["id"]);
+  $list["id"] = "";
+  $list["name"] = $list_q->f("list_name") . " - $l_aduplicate";
   $display["detail"] = dis_list_form($action, $list_q, $list);
 
 } else if ($action == "insert") {
@@ -273,7 +280,7 @@ exit(0);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
-  global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate;
+  global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $rd_mode;
   global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
   global $new_order, $order_dir, $popup, $row_index;
   global $param_contact, $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
@@ -305,6 +312,7 @@ function get_param_list() {
   if (isset ($tf_name)) $list["name"] = trim($tf_name);
   if (isset ($tf_subject)) $list["subject"] = trim($tf_subject);
   if (isset ($tf_email)) $list["email"] = $tf_email;
+  if (isset ($rd_mode)) $list["mode"] = $rd_mode;
   if (isset ($ta_query)) $list["query"] = trim($ta_query);
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
@@ -407,7 +415,7 @@ function get_param_list() {
 function get_list_action() {
   global $list, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_list,$l_header_display;
+  global $l_list,$l_header_display, $l_header_duplicate;
   global $l_header_consult, $l_header_add_contact;
   global $l_select_list, $l_add_contact,$l_list_wizard;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -448,7 +456,16 @@ function get_list_action() {
     'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailduplicate', 'detailupdate') 
+                                      );
+
+  // Detail Duplicate
+  $actions["list"]["detailduplicate"] = array (
+    'Name'     => $l_header_duplicate,
+    'Url'      => "$path/list/list_index.php?action=detailduplicate&amp;param_list=".$list["id"]."",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('detailconsult', 'detailupdate') 
                                       );
 
 // Detail Update
@@ -457,7 +474,7 @@ function get_list_action() {
     'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','contact_add','contact_del', 'update')
+    'Condition'=> array ('detailconsult', 'detailduplicate', 'contact_add','contact_del', 'update')
                                            );
 
 // Insert

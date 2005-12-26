@@ -44,10 +44,13 @@ $l_priority = "Priority";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_datasource = "Data source";
-$l_cat = "Kategori";
 $l_visibility = "Access";
 $l_private = "Private";
 $l_public = "Public";
+$l_category1 = "Kategori 1";
+$l_category2 = "Kategori 2";
+$l_aduplicate = "Duplicate";
+
 
 // OBM_DISPLAY
 $l_entries = "Entries";
@@ -118,7 +121,7 @@ $l_header_find_parent = "Find ParentDeal";
 $l_header_delete =  "Word to define";
 
 $l_header_reconcile =  "Word to define";
-$l_header_duplicate =  "Word to define";
+$l_header_duplicate = "Duplicate";
 $l_header_compute_balance =  "Word to define";
 
 $l_header_add_contact = "Word to define";

@@ -6,6 +6,8 @@
 \clearpage
 \section{List}
 
+révision : \obm 1.1.0
+
 Le module \List \obm.
 
 .\\
@@ -52,6 +54,8 @@ Table principale des informations d'une liste.\\
 \hline
 \_email & varchar 128 & Adresse E-mail de la liste & \\
 \hline
+\_mode & int 1 & Mode (Normal=0 ou Expert=1) & \\
+\hline
 \_mailing\_ok & int 1 & Indicateur de prise en compte d'activation pour mailing & \\
 \hline
 \_static\_nb & int 10 & Nombre de contacts statiques (directs) associés à la liste & \\
@@ -92,35 +96,10 @@ Table de liaison entre une liste et ses contacts statiques.\\
 
 \subsection{Détermination mode normal ou mode expert}
 
-Il n'y a pas de champ indicateur du mode de la liste.
-Celui- ci est déterminé en fonction du contenu des champs list\_query et list\_structure :\\
+Depuis \obm 1.1.0, le champ ``list\_mode'' détermine le mode de requête.
 
-\begin{tabular}{|p{1.5cm}|p{5.5cm}|p{5.5cm}|}
-\hline
-\textbf{Mode} & \textbf{Détermination} & \textbf{Précisions}\\
-\hline
-Expert & Critères vides et requête non vide & Critères vides ne signifie pas champ structure vide car ce champ est sérialisé. Unserialize(structure) vide \\
-\hline
-Normal & Si non expert & \\
-\hline
-\end{tabular}
-
-
-\subsubsection{API définie}
-
-Une api très simple (1 fonction définie dans list\_query.inc) est disponible :\\
-
-\shadowbox{
-\begin{minipage}{13cm}
-\begin{verbatim}
-function check_list_mode(&$query, &$criteria) {
-\end{verbatim}
-\end{minipage}
-}
-\begin{itemize}
- \item \textbf{\$query} : requête enregistrée de la liste (list\_query). \\
- \item \textbf{\$criteria} : critères de recherches. Attention ce n'est pas le champ structure mais la champ struture arès déserialisation.\\
-\end{itemize}
+A noter que les critères graphiques sont conservés lorsque la liste bascule en état expert.
+Ce qui permet de revenir en mode ``normal'' en retrouvant les critères du moment de la bascule.
 
 
 \subsection{Construction des requètes dynamiques}

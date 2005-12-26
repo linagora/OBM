@@ -134,14 +134,14 @@ function run_query_country() {
 // Returns:
 //   DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_function() {
+function run_query_contactfunction() {
   global $cdg_sql, $cgp_hide;
 
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   if ($show_func) {
-    $query = "SELECT function_id, function_label
-    FROM Function
-    ORDER by function_label";
+    $query = "SELECT contactfunction_id, contactfunction_label
+    FROM ContactFunction
+    ORDER by contactfunction_label";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;

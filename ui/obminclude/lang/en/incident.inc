@@ -8,8 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_cat1 = "Category";
-$l_cat1_s = "Categories";
+$l_category1_s = "Categories";
 $l_owner = "Owner";
 $l_logger = "Logger";
 $l_duration = "Total duration";

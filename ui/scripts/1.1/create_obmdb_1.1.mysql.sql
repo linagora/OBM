@@ -596,7 +596,7 @@ CREATE TABLE List (
   list_name        	 varchar(64) NOT NULL,
   list_subject     	 varchar(128),
   list_email       	 varchar(128),
-  list_type       	 int(1) DEFAULT 0,
+  list_mode       	 int(1) DEFAULT 0,
   list_mailing_ok  	 int(1) DEFAULT 0,
   list_contact_archive	 int(1) DEFAULT 0,
   list_info_publication  int(1) DEFAULT 0,

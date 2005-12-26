@@ -71,7 +71,6 @@ $l_datasource = "Source de données";
 $l_after = "Après";
 $l_before = "Avant";
 $l_fuzzy = "Avancée";
-$l_cat = "Catégorie";
 $l_visibility = "Accès";
 $l_private = "Privé";
 $l_public = "Public";
@@ -93,6 +92,9 @@ $l_connection_end = "Fin de connexion";
 $l_reconnect = "Cliquer ici pour se reconnecter";
 $l_version = "Version";
 $l_aka = "Aussi connu comme";
+$l_category1 = "Catégorie 1";
+$l_category2 = "Catégorie 2";
+$l_aduplicate = "Duplicata";
 
 // Entities
 $l_company = "Société";
@@ -215,6 +217,7 @@ $l_header_display = "Affichage";
 $l_header_vcard = "Vcard";
 $l_header_consult = "Consulter";
 $l_header_quickupdate = "Maj rapide";
+$l_header_duplicate = "Dupliquer";
 $l_header_update = "Modifier";
 $l_header_delete = "Supprimer";
 $l_header_add_contact = "Ajouter contact";

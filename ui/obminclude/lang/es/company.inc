@@ -9,11 +9,11 @@
 
 // Database fields
 $l_company_name = "Nombre de la Compañía";
-$l_kind = "Tipo";
-$l_category = "Categorías";
+$l_type = "Tipo";
+$l_type_s = "Tipo";
+$l_category1_s = "Categorías";
 $l_activity = "Actividad";
 $l_market = "Gerente de Mercadeo";
-$l_company_kind = "Tipo de Compañía";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Detalles";

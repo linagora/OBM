@@ -70,7 +70,6 @@ $l_datasource = "Data source";
 $l_after = "After";
 $l_before = "Before";
 $l_fuzzy = "Advanced";
-$l_cat = "Category";
 $l_visibility = "Access";
 $l_private = "Private";
 $l_public = "Public";
@@ -90,6 +89,9 @@ $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
 $l_version = "Version";
 $l_aka = "Also known as";
+$l_category1 = "Category 1";
+$l_category2 = "Category 2";
+$l_aduplicate = "Duplicate";
 
 // Entities
 $l_company = "Company";
@@ -212,6 +214,7 @@ $l_header_global_export = "Export";
 $l_header_export = "Export";
 $l_header_vcard = "Vcard";
 $l_header_consult = "Consult";
+$l_header_duplicate = "Duplicate";
 $l_header_quickupdate = "Quick Update";
 $l_header_update = "Update";
 $l_header_delete = "Delete";
