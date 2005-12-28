@@ -12,6 +12,7 @@
 // - new             --                -- show the new list form
 // - detailconsult   -- $param_list    -- show the list detail
 // - detailupdate    -- $param_list    -- show the list detail form
+// - detailduplicate -- $param_list    -- show the list detail form
 // - insert          -- form fields    -- insert the list
 // - update          -- form fields    -- update the list
 // - delete          -- $param_list    -- delete the list
@@ -114,7 +115,8 @@ else if ($action == "new_criterion") {
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
-    $list["query"] = make_query_from_criteria($list);
+    $dynlist = make_query_from_criteria($list);
+    $list["query"] = $dynlist["query"];
   } else {
     // To change : we do not know if expert mode (query should be stripslashed)
     // or no more graphical criteria (query should be set to empty)
@@ -156,7 +158,8 @@ else if ($action == "new_criterion") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
-    $list["query"] = make_query_from_criteria($list);
+    $dynlist = make_query_from_criteria($list);
+    $list["query"] = $dynlist["query"];
   } else {
     // To change : we do not know if expert mode (query should be stripslashed)
     // or no more graphical criteria (query should be set to empty)
@@ -465,7 +468,7 @@ function get_list_action() {
     'Url'      => "$path/list/list_index.php?action=detailduplicate&amp;param_list=".$list["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'contact_add','contact_del', 'update')
                                       );
 
 // Detail Update

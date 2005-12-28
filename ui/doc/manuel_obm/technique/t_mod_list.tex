@@ -12,8 +12,6 @@ Le module \List \obm.
 
 .\\
 Todo\\
-contacts statiques et dynamiques\\
-2 listes affichées\\
 tests des requetes (correction + limites ressources)\\
 génération de la requete : addslashes dans elements du tableau criteria\\
 
@@ -94,6 +92,23 @@ Table de liaison entre une liste et ses contacts statiques.\\
 \end{tabular}
 
 
+\subsection{Les contacts statiques et dynamiques}
+
+Une liste est constituée de 2 types de contacts :
+
+\begin{itemize}
+\item Les contacts statiques, sélectionnés individuellement par l'utilisateur
+\item Les contacts dynamiques, issus d'une requête (soit écrite manuellement : mode expert, soit générée en fonction des critères choisis : mode normal)
+\end{itemize}
+\vspace{0.3cm}
+
+L'écran de consultation d'une liste affiche les 2 listes de contacts de façon distincte. La liste des contacts statiques en premier, puis la liste des contacts dynamiques.
+
+\paragraph{A noter qu'en mode normal}, les contacts statiques sont automatiquement ajoutés aux critères (à la requête générée) et que par conséquence, les contacts dynamiques représentent l'ensemble des contacts de la liste. Ceci est utile pour les exports par exemple.
+
+Les contacts statiques sont ajoutés au plus au niveau de la clause WHERE de la requête ce qui permet leur présence même si ces contacts vérifiaient des critères d'exclusion.
+
+
 \subsection{Détermination mode normal ou mode expert}
 
 Depuis \obm 1.1.0, le champ ``list\_mode'' détermine le mode de requête.
@@ -123,7 +138,7 @@ Certains critères comme les catégories de société ou de contact et les publicati
 
 Ceci impose un traitement particulier des liens.
 La demande d'un de ces critères nécessite l'insertion d'une jointure (LEFT JOIN) dans la requète.
-La complexité vient de trois facteurs :\\
+La complexité vient de deux facteurs :\\
 \begin{itemize}
 \item Lorsqu'un de ces critères est combiné avec lui-même par un ET, cela implique de créer une jointure supplémentaire (Société de catégorie 1 ET de catégorie 2 va nécessiter 2 jointures vers les catégories de société).
 \item Dans le cas des informations de publication, tous les critères ajoutent la même jointure.
@@ -151,6 +166,25 @@ L'algorithme de gestion des critères et d'ajout des jointures pour la constructi
 \end{tabular}
 
 
+\subsubsection{Problématique ``AND NOT'' ou exclusions avec liaisons n-n}
+
+L'utilisateur qui sélectionne pour un critère (ou une ligne) les opérateurs AND NOT pense que ceci va exclure tous les contacts liés à ces critères.
+
+Ceci n'est plus vrai avec les critères des liaisons n-n, exemple :
+
+Un contact est doublement lié à la catégorie1, aux entrées ``A'' et ``B''.
+L'utilisateur saisi une clause : AND NOT catégorie1 = A.
+Il pense que le contact sera exclu du résultat, ce qui n'est pas certain car le contact peut faire partie du résultat par sa liaison avec l'entrée ``B''.\\
+
+Pour aboutir à un comportement fidèle à ce qu'attend un utilisateur, \obm traite les lignes de critères avec opérateurs ``AND NOT'' de façon spéciale.
+Ces lignes ne génèrent pas des lignes de critères classiques, mais des lignes d'exclusion en rajoutant dans la clause WHERE de la requête générée des sous-requêtes du type : ``AND contact\_id NOT IN (SELECT ... critères ...)''.
+
+Une ligne de critère est traitée comme exclusion lorsque :
+\begin{itemize}
+\item Les opérateurs de la ligne sont ``AND NOT''
+\item La ligne possède un critère avec liaison ``n-n'', repéré car ce critère possède obligatoirement une jointure dédiée à ajouter et donc une entrée dans \variable{\$add\_join}
+\end{itemize}
+
 \subsection{Actions et droits}
 
 Voici la liste des actions du module \List, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
@@ -171,6 +205,8 @@ Voici la liste des actions du module \List, avec le droit d'accès requis ainsi q
   detailconsult & read & Fiche détail d'une liste. \\
  \hline
   detailupdate & write & Formulaire de modification d'une liste. \\
+ \hline
+  detailduplicate & write & Formulaire de duplication d'une liste. \\
  \hline
   insert & write & Insertion d'une liste. \\
  \hline

@@ -15,6 +15,7 @@
 $fieldnames["list_name"] = $l_name;
 $fieldnames["list_subject"] = $l_subject;
 $fieldnames["list_email"] = $l_email;
+$fieldnames["list_info_publication"] = $l_info_pub;
 $fieldnames["usercreate"] = $l_creator;
 $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
@@ -86,6 +87,16 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "list_nb_contact") {
     $res["name"] = $OD->data_set->f("list_static_nb"). " / " .$OD->data_set->f("list_query_nb");
     $res["align"] = "center";
+  }
+
+  else if ($fieldname == "list_info_publication") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   // For contacts urls (link):
@@ -546,15 +557,17 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   if ($mode == $clist_mode_normal) {
     $lmode = $l_normal_mode;
     if ($criteria != "") {
-      $query = make_query_from_db($list_q);
+      $dynlist = make_query_from_db($list_q);
+      $query = $dynlist["query"];
     }
   } else {
     $lmode = $l_expert_mode;
     $query = stripslashes($list_q->f("list_query"));
+    $dynlist["query"] = $query;
   }
 
-  if ($query != "") {
-    $query_nb = get_list_query_num_rows($query, $list_q);
+  if ($dynlist["query"] != "") {
+    $query_nb = get_list_query_num_rows($dynlist, $list_q);
     if ($query_nb >= 0) {
       run_query_update_num_rows($id, $query_nb);
     } else {
@@ -562,11 +575,11 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     }
 
     // Company query nb
-    $comp_query_nb = get_list_dynamic_company_nb($query);
+    $comp_query_nb = get_list_dynamic_company_nb($dynlist);
 
     // Contact query nb (= query_nb if no supplement info needed as publi)
     if ($dis_info_pub == $l_yes) {
-      $con_query_nb = get_list_dynamic_contact_nb($query);
+      $con_query_nb = get_list_dynamic_contact_nb($dynlist);
     } else {
       $con_query_nb = $query_nb;
     }
@@ -896,7 +909,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     $mode = $list_q->f("list_mode");
     $query = stripslashes($list_q->f("list_query"));
     $criteria = unserialize($list_q->f("list_structure"));
-    $bollean_criterion = $criteria["logical"]["NOT"];
+    $boolean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"];
   }
@@ -910,7 +923,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     if (!is_array($criteria)) {
       $criteria = unserialize($criteria);
     }
-    $bollean_criterion = $criteria["logical"]["NOT"];
+    $boolean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"]; 
   }
@@ -1037,7 +1050,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
     if (is_array($structure))
     foreach($structure as $key=>$line) {
-      if ($bollean_criterion[$key] == "NOT") {
+      if ($boolean_criterion[$key] == "NOT") {
 	$not = "selected =\"true\"";
 	$empty = "";
       }
@@ -1060,7 +1073,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       $dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";      
     }
   }
-  $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
+  $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]";
   if ($mode == $clist_mode_expert) {
     $display = "style=\"display:none\"";
   }
@@ -1519,6 +1532,7 @@ function dis_list_warn_insert($list_q, $list) {
   $mailing_ok = ($list["mailing_ok"] == "1" ? "1" : "0");
   $contact_arch = ($list["contact_arch"] == "1" ? "1" : "0");
   $info_pub = ($list["info_pub"] == "1" ? "1" : "0");
+  $mode = ($list["mode"] == "1" ? "1" : "0");
   $query = stripslashes($list["query"]);
   if (isset($list["criteria"])) {
     $criteria = urlencode(serialize($list["criteria"]));
@@ -1541,6 +1555,7 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"cb_mailing_ok\" value=\"$mailing_ok\" />
       <input type=\"hidden\" name=\"cb_contact_arch\" value=\"$contact_arch\" />
       <input type=\"hidden\" name=\"cb_info_pub\" value=\"$info_pub\" />
+      <input type=\"hidden\" name=\"rd_mode\" value=\"$mode\" />
       <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />";
 
   $block = "<p />

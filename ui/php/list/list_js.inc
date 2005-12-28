@@ -525,4 +525,5 @@ function show_query_field(value_exp, value_nor, field) {
     document.all['ta_query'].style.display = value_exp;
     di.style.display = value_nor;
   }  
+}
 ";

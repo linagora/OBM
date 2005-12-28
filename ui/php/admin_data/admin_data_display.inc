@@ -477,13 +477,14 @@ function dis_data_list($action, $mode) {
     $criteria = unserialize($l_q->f("list_structure"));
 
     if ($criteria != "") {
-      $new_query = make_query_from_db($l_q);
+      $dynlist = make_query_from_db($l_q);
+      $new_query = $dynlist["query"];
     } else {
       $new_query = $l_q->f("list_query");
     }
 
     if ($new_query != "") {
-      $query_nb = get_list_query_num_rows($new_query);
+      $query_nb = get_list_query_num_rows($dynlist, $l_q);
       $query_txt = $query_nb;
     } else {
       $query_nb = "0";
