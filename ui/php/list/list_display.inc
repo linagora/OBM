@@ -894,8 +894,9 @@ function html_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_graphical_form($action, $list_q, $list) {
-  global $l_add_criterion, $l_criterion, $l_and, $l_or, $l_not, $l_empty;
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
+  global $l_add_criterion, $l_criterion;
+  global $l_and, $l_or, $l_not, $l_empty, $l_exclude;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
   global $l_contact_cat2,$l_function,$l_cat;
@@ -1052,14 +1053,23 @@ function html_list_graphical_form($action, $list_q, $list) {
     foreach($structure as $key=>$line) {
       if ($boolean_criterion[$key] == "NOT") {
 	$not = "selected =\"true\"";
+	$exclude = "";
 	$empty = "";
-      }
-      else {
+      } else if ($boolean_criterion[$key] == "Exclude") {
+	$exclude = "selected =\"true\"";
+	$not = "";
+	$empty = "";
+      } else {
 	$empty = "selected =\"true\"";
+	$exclude = "";
 	$not = "";
       }
       $logical_criterion;      
-      $dis_no_boolean = "<select name=\"sel_log_not[]\"><option value=\"\" $empty >$l_empty</option><option value=\"NOT\" $not>$l_not</option></select></td>";
+      $dis_no_boolean = "<select name=\"sel_log_not[]\">
+        <option value=\"\" $empty >$l_empty</option>
+        <option value=\"NOT\" $not>$l_not</option>
+        <option value=\"Exclude\" $exclude>$l_exclude</option>
+      </select></td>";
       $dis_criteria .="<tr><td colspan=\"4\"> </td>".$labels[$key]."</tr>";
       if ($logical_criterion[$key] == "AND") {
 	$and = "selected =\"true\"";

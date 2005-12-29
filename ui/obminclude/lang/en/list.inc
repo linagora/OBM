@@ -59,6 +59,7 @@ $l_or = "OR";
 $l_not = "NOT";
 $l_and = "AND";
 $l_empty = "&nbsp;";
+$l_exclude = "Exclude";
 
 // Messages
 $l_insert_ok = "The list has been inserted successfully.";

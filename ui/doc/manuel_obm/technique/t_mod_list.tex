@@ -166,7 +166,7 @@ L'algorithme de gestion des critères et d'ajout des jointures pour la constructi
 \end{tabular}
 
 
-\subsubsection{Problématique ``AND NOT'' ou exclusions avec liaisons n-n}
+\subsubsection{Problématique ``AND NOT'' avec liaisons n-n}
 
 L'utilisateur qui sélectionne pour un critère (ou une ligne) les opérateurs AND NOT pense que ceci va exclure tous les contacts liés à ces critères.
 
@@ -177,13 +177,23 @@ L'utilisateur saisi une clause : AND NOT catégorie1 = A.
 Il pense que le contact sera exclu du résultat, ce qui n'est pas certain car le contact peut faire partie du résultat par sa liaison avec l'entrée ``B''.\\
 
 Pour aboutir à un comportement fidèle à ce qu'attend un utilisateur, \obm traite les lignes de critères avec opérateurs ``AND NOT'' de façon spéciale.
-Ces lignes ne génèrent pas des lignes de critères classiques, mais des lignes d'exclusion en rajoutant dans la clause WHERE de la requête générée des sous-requêtes du type : ``AND contact\_id NOT IN (SELECT ... critères ...)''.
+Ces lignes ne génèrent pas des lignes de critères classiques, mais des sous-requêtes en rajoutant dans la clause WHERE de la requête générée des sous-requêtes du type : ``AND contact\_id NOT IN (SELECT ... critères ...)''.
 
-Une ligne de critère est traitée comme exclusion lorsque :
+Une ligne de critère est traitée comme cela lorsque :
 \begin{itemize}
 \item Les opérateurs de la ligne sont ``AND NOT''
 \item La ligne possède un critère avec liaison ``n-n'', repéré car ce critère possède obligatoirement une jointure dédiée à ajouter et donc une entrée dans \variable{\$add\_join}
 \end{itemize}
+
+
+\subsubsection{Gestion des exclusions}
+
+\obm ajoute une fonctionnalité à la génération des requêtes qui est la gestion des exclusions.\\
+
+Une exclusion est une ligne de critères positionnée avec l'opérateur ``Exclude''
+
+Ces lignes sont traitées de façon spéciale dans la clause WHERE, pour ne pas tenir compte de la chaine d'opérateurs logiques, en les combinant avec une AND a l'ensemble des criteres, afin que l'exclusion soit effective peu importe ou est placée la ligne de critères.
+
 
 \subsection{Actions et droits}
 

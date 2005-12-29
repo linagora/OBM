@@ -1432,6 +1432,8 @@ function make_query_from_criteria($list) {
                     LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id";
 
 
+  $max_line = 0;
+
   // handle "AND NOT to n-n (1-n too now) relation" as exlusions
   // To direct criteria (eg contact_name like...) nothing changed
   // To n-n : eg AND NOT companycat = 5.1, handle these in a subquery to
@@ -1448,9 +1450,12 @@ function make_query_from_criteria($list) {
 		if ( ($logical_criterion[$line] == "AND")
 		     && ($boolean_criterion[$line] == "NOT")
 		     && ($add_join[$field] != "") ) {
-		  $has_exclusion = true;
-		  $exclusions[$line] = true;
+		  $cond_andnotn[$line] = true;
 		}
+	      }
+
+	      if ($line > $max_line) {
+		$max_line = $line;
 	      }
 	    }
 	  }
@@ -1467,7 +1472,22 @@ function make_query_from_criteria($list) {
 	      
 	      if ($value != "") {
 
-		if ($exclusions[$line]) {
+		// case AND NOT to n-n criteria line
+		if ($cond_andnotn[$line]) {
+		  $cond_andnotn_join[$line] = str_replace('%j',"",$add_join[$field]);
+		  $operation = $operateurs[$field];
+		  $operation = str_replace('%j',"",$operation);
+		  $operation = str_replace('%f',$field,$operation);
+		  $operation = str_replace('%v',$value,$operation);
+		  if ($cond_andnotn_where[$line] != "") {
+		    $cond_andnotn_where[$line] .= " AND $operation";
+		  } else {
+		    $cond_andnotn_where[$line] = " $operation";
+		  }
+
+		  // Case Exclusion
+		} else if ($boolean_criterion[$line] == "Exclude") {
+		  $has_exclusion = true;
 		  $exclusion_join[$line] = str_replace('%j',"",$add_join[$field]);
 		  $operation = $operateurs[$field];
 		  $operation = str_replace('%j',"",$operation);
@@ -1479,6 +1499,7 @@ function make_query_from_criteria($list) {
 		    $exclusion_where[$line] = " $operation";
 		  }
 
+		  // Case Normal criteria line
 		} else {
 
 		  $select .= $add_select[$field];
@@ -1525,12 +1546,29 @@ function make_query_from_criteria($list) {
     }
 
     // Write each criteria
-    foreach ($condition as $line=>$value) {
-      if ($line == 0) {
-	$logical_criterion[$line] = "";
+    for ($line = 0; $line <= $max_line; $line++) {
+      $cond = $condition[$line];
+      $cond_andnotn = $cond_andnotn_where[$line];
+
+      // Case Normal criteria line
+      if ($cond != "") {
+	if ($line == 0) {
+	  $logical_criterion[$line] = "";
+	}
+	$where .= " " . $logical_criterion[$line]." ".$boolean_criterion[$line]." ($cond)";
+
+	// case AND NOT to n-n criteria line
+      } else if ($cond_andnotn != "") {
+	$where .= " AND contact_id NOT IN (
+          SELECT contact_id
+          FROM Contact
+            LEFT JOIN Company ON contact_company_id=company_id " .
+            $cond_andnotn_join[$line] . "
+          WHERE $cond_andnotn)";
       }
-      $where .= " " . $logical_criterion[$line]." ".$boolean_criterion[$line]." ($value)";
     }
+
+    // We handle exlusion appart from criteria to ensure exclusion
     if ($has_exclusion) {
       foreach($exclusion_where as $line=>$value) {
 	$exclusion .= " AND contact_id NOT IN (
@@ -1647,4 +1685,3 @@ function run_query_list_static_contact_id($id) {
 
 
 </script>
-

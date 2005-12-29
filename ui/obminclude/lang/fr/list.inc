@@ -56,6 +56,7 @@ $l_or = "OU";
 $l_not = "NON";
 $l_and = "ET";
 $l_empty = "&nbsp;";
+$l_exclude = "Exclure";
 
 // Actions
 $l_insert = "Enregistrer";
