@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : list.inc                                                 //
-// 2001-02-16 Aliacom - Vincent MARGUERIT                                    //
+// 2001-02-16 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,6 +16,7 @@ $l_date_creation = "Creation";
 $l_updater = "Last updater";
 $l_date_last_update = "Last update";
 $l_static = "Static";
+$l_mode = "Mode";
 
 // Labels and texts
 $l_list_contact = "Having as contact";
@@ -26,10 +27,11 @@ $l_criterion = "Search criteria";
 $l_timeafter = "Updated after";
 $l_timebefore = "Updated before";
 $l_market = "Responsible";
+$l_company_cat1 = "Category 1";
 $l_contact_cat1 = "Category 1";
 $l_contact_cat2 = "Category 2";
-$l_expert_mode = "Expert Mode";
-$l_normal_mode = "Normal Mode";
+$l_expert = "Expert";
+$l_normal = "Normal";
 $l_renew = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_mailing = "Mailing enabled only";

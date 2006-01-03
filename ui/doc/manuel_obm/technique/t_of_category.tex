@@ -48,7 +48,7 @@ Pour une catégorie ``multi'' d'un module, 2 tables doivent être créées :\\
 \end{itemize}
 \vspace{0.3cm}
 
-Table des informations d'une catégorie, ModuleCategory (ex: CompanyCategory) :\\
+Table des informations d'une catégorie, ModuleCategoryN (ex: CompanyCategory1) :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
 \hline
@@ -63,7 +63,7 @@ Table des informations d'une catégorie, ModuleCategory (ex: CompanyCategory) :\\
 \end{tabular}
 \vspace{0.3cm}
 
-Table des informations de liaison d'une catégorie avec un module, ModuleCategoryLink (ex: CompanyCategoryLink) :\\
+Table des informations de liaison d'une catégorie avec un module, ModuleCategoryNLink (ex: CompanyCategory1Link) :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|}
 \hline
@@ -78,48 +78,13 @@ Table des informations de liaison d'une catégorie avec un module, ModuleCategory
 
 \subsubsection{Implémentation : API fonctions publiques}
 
-\shadowbox{
-\begin{minipage}{13cm}
-\begin{verbatim}
-of_category_dis_tree($params, $action, $entity, $cat) {
-\end{verbatim}
-\end{minipage}
-}
-Affichage de l'arborescence de la catégorie ``\$cat'' pour l'entité (souvent module) \$entity.
-Si l'action demandée est du type ext\_get\_cat[1-9]?\_ids, l'affichage propose une sélection par checkbox, sinon une sélection directe unique par lien.\\
-
+\paragraph{Fonctions d'affichage} : \\
 
 \shadowbox{
-\begin{minipage}{13cm}
+\begin{minipage}{14cm}
 \begin{verbatim}
-of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
-\end{verbatim}
-\end{minipage}
-}
-
-\begin{tabular}{|p{3cm}|p{10cm}|}
-\hline
-\textbf{Paramètres} & \textbf{Description}\\
-\hline
-\multicolumn{2}{|c|}{Récupération de la liste des catégories ordonnées selon le code}\\
-\hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
-\hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
-\hline
-\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
-\hline
-\$entity\_id & pour mode ``multi''. Si donné, uniquement entrées liées à cette entité\\
-\hline
-\end{tabular}
-\vspace{0.3cm}
-
-
-
-\shadowbox{
-\begin{minipage}{13cm}
-\begin{verbatim}
-of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_element="all,"$sel_append="") {
+of_category_dis_search_select($entity, $cat, $cats, $cat_id,
+$first_element="all",$sel_append="") {
 \end{verbatim}
 \end{minipage}
 }
@@ -142,14 +107,19 @@ of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_element="all
 \hline
 \$sel\_append & chaine à insérer dans la définition du <select> (ex: code javascript)\\
 \hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Block de recherche <select> du champ catégorie pour l'entité\\
+\hline
 \end{tabular}
-\vspace{0.3cm}
+\vspace{0.4cm}
 
 
 \shadowbox{
-\begin{minipage}{13cm}
+\begin{minipage}{14cm}
 \begin{verbatim}
-of_category_dis_entity_form($entity, $cat, $cats, $cat_num="", $entity) {
+of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="") {
 \end{verbatim}
 \end{minipage}
 }
@@ -170,5 +140,108 @@ of_category_dis_entity_form($entity, $cat, $cats, $cat_num="", $entity) {
 \hline
 \$cat\_id & pour mode ``mono'' entrée catégorie sélectionnée\\
 \hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Ligne de tableau de formulaire : champ catégorie : select simple ou d'entité\\
+\hline
 \end{tabular}
-\vspace{0.3cm}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction d'affichage du champ catégorie en consultation du module \$entity}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\hline
+\$cats & tableau des catégories à afficher\\
+\hline
+\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Ligne de tableau (mono) ou block de consultation (multi) du champ catégorie\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_dis_tree($entity, $cat, $params, $action) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Affichage de l'arborescence de la catégorie ``\$cat'' pour l'entité (souvent module) \$entity.
+Si l'action demandée est du type ext\_get\_cat[1-9]?\_ids, l'affichage propose une sélection par checkbox, sinon une sélection directe unique par lien.}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\hline
+\$params & hachage des informations du module [popup], [ext\_title]\\
+\hline
+\$action & action du module : si de type "ext\_get\_category[1-9]?\_ids", affichage de sélection multiple (par checkbox), sinon sélection par lien simple\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Arborescence complète de la catégorie avec sélection\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\paragraph{Fonctions bases de données} : \\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Récupération de la liste des catégories ordonnées selon le code}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\hline
+\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
+\hline
+\$entity\_id & pour mode ``multi''. Si donné, uniquement entrées liées à cette entité\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+Array & Tableau de catégories ordonnées selon le code : [id], [code], [label]\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+

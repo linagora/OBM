@@ -706,11 +706,9 @@ function html_deal_consult($deal_q) {
 
   $display["link"] = html_deal_links($deal_q);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
-   
-  // show category1
 
   // Category 1 field
-  $block_category1 = of_dis_block_consult_category($cats1, "deal", "category1");
+  $block_category1 = of_category_dis_block_consult("deal", "category1", $cats1);
 
   $block = "
     <table width=\"100%\">

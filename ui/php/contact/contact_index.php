@@ -76,25 +76,25 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
-  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category1");
+  $display["detail"] = of_category_dis_tree("contact", "category1", $contact, $action);
 
 } elseif ($action == "ext_get_category2_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
-  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category2");
+  $display["detail"] = of_category_dis_tree("contact", "category2", $contact, $action);
 
 } elseif ($action == "ext_get_category3_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
-  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category3");
+  $display["detail"] = of_category_dis_tree("contact", "category3", $contact, $action);
 
 } elseif ($action == "ext_get_category4_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("contact_js.inc");
-  $display["detail"] = of_category_dis_tree($contact, $action, "contact", "category4");
+  $display["detail"] = of_category_dis_tree("contact", "category4", $contact, $action);
 
 } elseif ($action == "vcard") {
 ///////////////////////////////////////////////////////////////////////////////

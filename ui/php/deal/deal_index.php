@@ -103,7 +103,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "ext_get_category1_ids") {
   $extra_css = "category.css";
   require("deal_js.inc");
-  $display["detail"] = of_category_dis_tree($deal, $action, "deal", "category1");
+  $display["detail"] = of_category_dis_tree("deal", "category1", $deal, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls

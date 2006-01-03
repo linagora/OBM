@@ -25,13 +25,6 @@
 // - ext_get_ids     --                -- select multiple lists (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-//---------------------------------------------------------------------------//
-// OBM internal Constants : Do not change 
-//---------------------------------------------------------------------------//
-$clist_mode_normal = 0;
-$clist_mode_expert = 1;
-
-
 $path = "..";
 $module = "list";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -102,12 +95,12 @@ else if ($action == "new_criterion") {
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_detail($list["id"]);
+  $list_q = run_query_list_detail($list["id"]);
   $display["detail"] = dis_list_form($action, $list_q, $list);
 
 } else if ($action == "detailduplicate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_detail($list["id"]);
+  $list_q = run_query_list_detail($list["id"]);
   $list["id"] = "";
   $list["name"] = $list_q->f("list_name") . " - $l_aduplicate";
   $display["detail"] = dis_list_form($action, $list_q, $list);
@@ -122,10 +115,10 @@ else if ($action == "new_criterion") {
     // or no more graphical criteria (query should be set to empty)
     $list["query"] = stripslashes($list["query"]);
   }
-  if (check_data_form("", $list)) {
+  if (check_list_data("", $list)) {
     // If the context (same list) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $list["id"] = run_query_insert($list);
+      $list["id"] = run_query_list_insert($list);
       if ($list["id"] > 0) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
@@ -139,7 +132,7 @@ else if ($action == "new_criterion") {
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_list_warn_insert($obm_q, $list);
       } else {
-	$list["id"] = run_query_insert($list);
+	$list["id"] = run_query_list_insert($list);
         if ($list["id"] > 0) {
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
@@ -165,8 +158,8 @@ else if ($action == "new_criterion") {
     // or no more graphical criteria (query should be set to empty)
     $list["query"] = stripslashes($list["query"]);
   }
-  if (check_data_form($list["id"], $list)) {
-    $retour = run_query_update($list);
+  if (check_list_data($list["id"], $list)) {
+    $retour = run_query_list_update($list);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -175,7 +168,7 @@ else if ($action == "new_criterion") {
     $display["detail"] = dis_list_consult($list);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $list_q = run_query_detail($list["id"]);
+    $list_q = run_query_list_detail($list["id"]);
     $display["detail"] = dis_list_form($action, $list_q, $list);
   }
 
@@ -193,7 +186,7 @@ else if ($action == "new_criterion") {
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_list($list["id"])) {
-    $retour = run_query_delete($list["id"]);
+    $retour = run_query_list_delete($list["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -573,7 +566,7 @@ function get_list_action() {
 // List Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
 function update_list_action() {
-  global $list, $actions, $path;
+  global $list, $actions, $path, $l_add_contact, $l_list;
 
   $id = $list["id"];
   if ($id > 0) {
@@ -588,6 +581,10 @@ function update_list_action() {
     // Check Delete
     $actions["list"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=$id";
     $actions["list"]["check_delete"]['Condition'][] = 'insert';
+
+    // Contact selection
+    $actions["list"]["sel_list_contact"]['Url'] = "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=$id&amp;ext_target=$l_list";
+    $actions["list"]["sel_list_contact"]['Condition'][] = 'insert';
   }
 
 }

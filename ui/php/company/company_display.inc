@@ -742,8 +742,8 @@ function html_company_consult($co_q, $cats1) {
   }
 
   // Type, activity fields
-  $block_type = of_dis_block_consult_category($types, "company", "type", "mono");
-  $block_activity = of_dis_block_consult_category($acts, "company", "activity", "mono");
+  $block_type = of_category_dis_block_consult("company", "type", $types, "mono");
+  $block_activity = of_category_dis_block_consult("company", "activity", $acts, "mono");
 
   // Naf code field
   if ($show_naf) {
@@ -782,7 +782,7 @@ function html_company_consult($co_q, $cats1) {
   }
 
   // Category1 field
-  $block_cat1 = of_dis_block_consult_category($cats1, "company", "category1"); 
+  $block_cat1 = of_category_dis_block_consult("company", "category1", $cats1);
 
   // Web link
   if ($web != "") {

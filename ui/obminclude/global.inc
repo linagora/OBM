@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.1.0pre3";
+$obm_version = "1.1.0pre4";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -351,6 +351,10 @@ $ccal_1 = 1;  // 1 h
 $l_cal_4 = "1/4";  // 1/4 h
 $l_cal_2 = "1/2";  // 1/2 h
 $l_cal_1 = "1";    // 1 h
+
+// List modes
+$clist_mode_normal = 0;
+$clist_mode_expert = 1;
 
 // TaskType caterogies (used by Project and time management) (field : internal)
 $ctt_sales = '0';    // Sales Activity tasks

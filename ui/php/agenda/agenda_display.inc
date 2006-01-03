@@ -2064,7 +2064,7 @@ function html_calendar_consult($event_q, $entities) {
   $id = $event_q->f("calendarevent_id");
 
 
-  $block_category1 = of_dis_block_consult_category($cats1, "calendar", "category1", "mono");
+  $block_category1 = of_category_dis_block_consult("calendar", "category1", $cats1, "mono");
   switch ($priority ) {
     case 1 :
       $priority = $l_low;

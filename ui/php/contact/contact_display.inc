@@ -703,8 +703,8 @@ function html_contact_header($co_q, $funcs, $cats5) {
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
   // Category 5
-  $block_function = of_dis_block_consult_category($funcs, "contact", "function", "mono");
-  $block_category5 = of_dis_block_consult_category($cats5, "contact", "category5", "mono");
+  $block_function = of_category_dis_block_consult("contact", "function", $funcs, "mono");
+  $block_category5 = of_category_dis_block_consult("contact", "category5", $cats5, "mono");
 
   // Company Display
   if ($cgp_show["module"]["company"]) {
@@ -859,10 +859,10 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
   // Category 1, 2, 3, 4 field
-  $block_category1 = of_dis_block_consult_category($cats1, "contact", "category1");
-  $block_category2 = of_dis_block_consult_category($cats2, "contact", "category2");
-  $block_category3 = of_dis_block_consult_category($cats3, "contact", "category3");
-  $block_category4 = of_dis_block_consult_category($cats4, "contact", "category4");
+  $block_category1 = of_category_dis_block_consult("contact", "category1", $cats1);
+  $block_category2 = of_category_dis_block_consult("contact", "category2", $cats2);
+  $block_category3 = of_category_dis_block_consult("contact", "category3", $cats3);
+  $block_category4 = of_category_dis_block_consult("contact", "category4", $cats4);
 
   $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
   if ($title != "") {

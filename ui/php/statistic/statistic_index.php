@@ -56,39 +56,42 @@ if ($action == "index" || $action == "") {
   $display["detail"] = dis_list_select($list_q);
   $display["features"] = dis_menu_stats();
   $display["title"] = display_title($l_header_comp_stats);
+
 } elseif ($action == "company_statistic") {
-///////////////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////////////
   require("statistic_js.inc");
-  if($statistic["list"] == $c_all) {
+  require("$path/list/list_query.inc");
+  if ($statistic["list"] == $c_all) {
     $cat_q = run_query_company_per_country_per_cat();
     $nb_comp = run_query_nb_company();
     $display["title"] = display_title($l_header_comp_stats);
-  }
-  else {
+  } else {
     $obm_q = run_query_get_list($statistic["list"]);
     $query = stripslashes($obm_q->f("list_query"));
-    $com_q = run_query_get_selected_company($query,$statistic["list"]);
+    $com_q = ext_list_get_company_ids($statistic["list"]);
     $cat_q = run_query_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
     $display["title"] = display_title("$l_header_comp_stats : ".$obm_q->f("list_name"));
   }
   $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
+
 } elseif ($action == "company_statistic_export") {
-///////////////////////////////////////////////////////////////////////////////  
-  if($statistic["list"] == $c_all) {
+///////////////////////////////////////////////////////////////////////////////
+  require("$path/list/list_query.inc");
+  if ($statistic["list"] == $c_all) {
     $cat_q = run_query_company_per_country_per_cat();
     $nb_comp = run_query_nb_company();
-  }
-  else {
+  } else {
     $obm_q = run_query_get_list($statistic["list"]);
     $query = $obm_q->f("list_query");
-    $com_q = run_query_get_selected_company($query,$statistic["list"]);
+    $com_q = ext_list_get_company_ids($statistic["list"]);
     $cat_q = run_query_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
   }
   export_cat_stats($cat_q, $nb_comp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////

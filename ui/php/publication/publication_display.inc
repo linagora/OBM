@@ -146,7 +146,7 @@ function dis_publication_search_list($publication) {
   $popup = $publication["popup"];
 
   $prefs = get_display_pref($auth->auth["uid"], "publication");
-  $obm_q = run_query_search($publication, $new_order, $order_dir);
+  $obm_q = run_query_publication_search($publication, $new_order, $order_dir);
   $nb_pub = $obm_q->num_rows_total();
   if ($nb_pub == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -262,7 +262,7 @@ function dis_publication_consult($publication) {
   global $display, $l_query_error;
 
   if ($publication["id"] > 0) {
-    $pub_q = run_query_detail($publication["id"]);
+    $pub_q = run_query_publication_detail($publication["id"]);
     if ($pub_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($pub_q);
       $block = html_publication_consult($pub_q);
@@ -340,7 +340,7 @@ function dis_publication_form($action, $publication) {
   global $display, $l_query_error;
 
   if ($publication["id"] > 0) {
-    $pub_q = run_query_detail($publication["id"]);
+    $pub_q = run_query_publication_detail($publication["id"]);
     if ($pub_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($pub_q);
     } else {
@@ -349,16 +349,16 @@ function dis_publication_form($action, $publication) {
     $concat1_q = "";
   } else {
     $pub_q = "";
-    // We retrieve contact category 1 only on new
-    // (auto subscription to all contact from a category only on insert)
+    // We retrieve contact category 1 and list only on new
+    // auto subscription to all contact from a category or list only on insert
     $concat1_q = run_query_publication_contactcategory1();
+    $list_q = run_query_publication_list();
   }
 
   $type_q = run_query_publicationtype();
   $recept_q = run_query_subscriptionreception(); 
 
-
-  $block = html_publication_form($action, $pub_q, $type_q, $concat1_q, $recept_q, $publication);
+  $block = html_publication_form($action, $pub_q, $type_q, $recept_q, $publication, $concat1_q, $list_q);
 
   return $block;
 }
@@ -370,15 +370,16 @@ function dis_publication_form($action, $publication) {
 //   - $action    : action called
 //   - $pub_q     : publication database result 
 //   - $type_q    : type database result 
-//   - $cat1_q    : contact category
 //   - $recept_q  : reception modes database result 
 //   - $publication[] : default values
+//   - $cat1_q    : contact category
+//   - $list_q    : lists
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publication) {
+function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$cat1_q, $list_q) {
   global $display, $auth, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_desc;
-  global $l_insert,$l_update,$l_checkdelete, $l_publication;
+  global $l_insert,$l_update,$l_checkdelete, $l_publication, $l_list;
   global $l_contact_category1,$l_auto_sub;
 
   // if update mode and first display values are taken from database
@@ -390,7 +391,8 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
     $desc = $pub_q->f("publication_desc");
     $lang = $pub_q->f("publication_lang");    
   }
-  $auto_sub = array();
+  $concat1 = array();
+  $list_sub = array();
   // If parameters have been given, they supercede the default action value
   if (isset($publication["id"])) { $id = $publication["id"]; }
   if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
@@ -398,7 +400,8 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
   if (isset($publication["year"])) { $year = stripslashes($publication["year"]); }
   if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
   if (isset($publication["desc"])) { $desc = stripslashes($publication["desc"]); }
-  if (isset($publication["auto_sub"])) {  $auto_sub = $publication["auto_sub"]; }
+  if (isset($publication["concat1"])) { $concat1 = $publication["concat1"]; }
+  if (isset($publication["list_sub"])) { $list_sub = $publication["list_sub"]; }
  
 
   // type select
@@ -422,33 +425,53 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
+
     $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\">";
     while($cat1_q->next_record()) {
       $cat_id = $cat1_q->f("contactcategory1_id");
       $cat_label = $cat1_q->f("contactcategory1_label");
       $sel_contcat1 .= "<option value=\"".$cat_id ."\" ";
-      if ($cat_id = current($auto_sub)) {
+      if (in_array($cat_id,$concat1)) {
 	$sel_contcat1 .= "selected=\"selected\" ";
-	next($auto_sub);
       }
       $sel_contcat1 .= ">$cat_label</option>";
     }
     $sel_contcat1 .= "</select>";
+
+    $sel_list = "<select name=\"sel_list[]\" multiple=\"multiple\">";
+    while($list_q->next_record()) {
+      $l_id = $list_q->f("list_id");
+      $l_name = $list_q->f("list_name");
+      $l_login = $list_q->f("userobm_login");
+      $sel_list .= "<option value=\"$l_id\" ";
+      if (in_array($l_id, $list_sub)) {
+	$sel_list .= "selected=\"selected\" ";
+      }
+      $sel_list .= ">$l_login : $l_name</option>";
+    }
+    $sel_list .= "</select>";
+
     $dis_auto_sub = "<div class=\"detailHead\">$l_auto_sub</div>
 
     <table class=\"detail\">
-     <tr>
+    <tr>
       <td class=\"detailLabel\">$l_contact_category1</td>
       <td class=\"detailForm\">
        $sel_contcat1
       </td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_list</td>
+      <td class=\"detailForm\">
+       $sel_list
+      </td>
+    </tr>
+    <tr>
       <td class=\"detailLabel\"></td>
       <td class=\"detailForm\">
       $sel_recept
       </td>
-     </tr>
+    </tr>
     </table>";      
   }
 
@@ -501,7 +524,7 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Publication Form                                                      //
+// Display Publication subscription Form
 // Parameters:
 //   - $action    : action called
 //   - $pub_q      : publication database result 
@@ -516,14 +539,13 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
 function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
   global $display, $auth, $set_dsrc;
   global $set_theme,$l_category;
-  global $l_publication;
-  global $l_contact_category1,$l_auto_sub;
+  global $l_publication, $l_contact_category1, $l_auto_sub;
 
-  $auto_sub = array();
+  $concat1 = array();
   $title = $pub_q->f("publication_title");
   // If parameters have been given, they supercede the default action value
   if (isset($publication["id"])) { $id = $publication["id"]; }
-  if (isset($publication["auto_sub"])) {  $auto_sub = $publication["auto_sub"]; }
+  if (isset($publication["concat1"])) { $concat1 = $publication["concat1"]; }
  
 
   $dis_button = "
@@ -536,9 +558,9 @@ function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
     $cat_id = $cat1_q->f("contactcategory1_id");
     $cat_label = $cat1_q->f("contactcategory1_label");
     $sel_contcat1 .= "<option value=\"".$cat_id ."\" ";
-    if($cat_id = current($auto_sub)) {
+    if ($cat_id = current($concat1)) {
       $sel_contcat1 .= "selected=\"selected\" ";
-      next($auto_sub);
+      next($concat1);
     }
     $sel_contcat1 .= ">$cat_label</option>";
   }

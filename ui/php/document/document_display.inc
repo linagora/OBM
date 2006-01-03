@@ -282,8 +282,8 @@ function html_document_consult($doc_q) {
   $name = $doc_q->f("document_name");
 
   // Category 1 & 2 
-  $block_category1 = of_dis_block_consult_category($cats1, "document", "category1", "mono");
-  $block_category2 = of_dis_block_consult_category($cats2, "document", "category2", "mono");
+  $block_category1 = of_category_dis_block_consult("document", "category1", $cats1, "mono");
+  $block_category2 = of_category_dis_block_consult("document", "category2", $cats2, "mono");
 
   $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
   $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";

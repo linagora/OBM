@@ -192,7 +192,60 @@ Une ligne de critère est traitée comme cela lorsque :
 
 Une exclusion est une ligne de critères positionnée avec l'opérateur ``Exclude''
 
-Ces lignes sont traitées de façon spéciale dans la clause WHERE, pour ne pas tenir compte de la chaine d'opérateurs logiques, en les combinant avec une AND a l'ensemble des criteres, afin que l'exclusion soit effective peu importe ou est placée la ligne de critères.
+Ces lignes sont traitées de façon spéciale dans la clause WHERE, pour ne pas tenir compte de la chaine d'opérateurs logiques, en les combinant avec un AND à l'ensemble des critères, afin que l'exclusion soit effective peu importe ou est placée la ligne de critères.
+
+
+\subsection{Interface publique externe}
+
+Le module \List propose des fonctions utilisables par les autres modules pour exporter le contenu d'une liste.
+Le module statistiques peut calculer des statistiques sur les contacts ou sociétés d'une liste. Pour cela il a besoin de connaitres le contenu de la liste.\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+ext_list_get_contact_ids($id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction de récupération de la liste des ids des contacts de la liste}\\
+\hline
+\$id & Id de la liste\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+DBO & Dataset contenant la liste des ids (contact\_id)\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+ext_list_get_company_ids($id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction de récupération de la liste des ids des sociétés de la liste}\\
+\hline
+\$id & Id de la liste\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+DBO & Dataset contenant la liste des ids (company\_id)\\
+\hline
+\end{tabular}
 
 
 \subsection{Actions et droits}

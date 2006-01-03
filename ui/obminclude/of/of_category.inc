@@ -139,8 +139,6 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 // OF Category API
 //=============================================================================
 
-// A migrer encore : of_dis_block_consult_category
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category search block 
 // Parameters:
@@ -236,17 +234,85 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display: category consult block
+// Parameters:
+//   - $entity : target entity
+//   - $cat    : target category
+//   - $cats   : category to display
+//   - $mode   : ([mono|multi])
+// Returns : XHTML consult display block
+///////////////////////////////////////////////////////////////////////////////
+function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
+  global $cgp_hide;
+
+  $l_cat = "l_${cat}"; 
+  global $$l_cat;
+
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+
+  if ($show_cat) {
+  
+    // Mode mono
+    if ($mode == "mono") {
+      // Mono Link
+      $label = htmlentities($cats[0]["label"]); 
+      $block_cat = "
+        <tr>
+          <td class=\"detailLabel\">".ucfirst(${$l_cat})."</td>
+          <td class=\"detailText\">$label</td>
+         </tr>";
+
+    } else {
+      // Multi Link
+      $nb_col_cat = 3;
+      $dis_cat = "<tr>";
+      for ($i=0; $i<$nb_col_cat; $i++) {
+        $dis_cat .= "<td>&nbsp;</td>";
+      }
+      $dis_cat .= "</tr>";
+      $dis_cat = "";
+
+      $i = 0;
+      if (is_array($cats)) {
+        foreach ($cats as $one_cat) {
+          if ($i==0) {
+            $dis_cat .= "<tr>";
+          }
+          $label = htmlentities($one_cat["label"]);
+          $code = $one_cat["code"];
+          $i++;
+          $dis_cat .= "<td style=\"border: 1px solid\" class=\"detailText\">$code $label </td>";
+          if ($i==$nb_col_cat) {
+            $dis_cat .= "</tr>";
+            $i = 0;
+          }
+        }
+      }
+      $block_cat = "
+      <div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
+      <table class=\"detail\">
+      $dis_cat
+      </table>";
+    }
+
+  }
+
+  return $block_cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display a category Tree (category with code like 1.4.10) with input
 // Input type is checkbox for ext_get_cat_ids else link
 // Parameters:
-//   - $params : hash of module values
-//   - $action : action called
 //   - $entity : target entity
 //   - $cat    : target category
+//   - $params : hash of module values
+//   - $action : action called
 // Returns
 //   XHTML display of category tree with form if needed
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_tree($params, $action, $entity, $cat) {
+function of_category_dis_tree($entity, $cat, $params, $action) {
   global $display, $l_close, $l_add, $l_cat_no;
 
   $popup = $params["popup"];
@@ -284,7 +350,7 @@ function of_category_dis_tree($params, $action, $entity, $cat) {
 	  break;
       }
     }
-    $block .= of_category_dis_tree_node($tree, 0, $multi_select);
+    $block .= _of_category_dis_tree_node($tree, 0, $multi_select);
 
   } else {
     $block .= "$l_cat_no";
@@ -301,81 +367,6 @@ function of_category_dis_tree($params, $action, $entity, $cat) {
 
   $block .= "</div>";
 
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Document Tree
-// Parameters:
-//   - $tree   : array with categories
-//   - $indent : indent size
-//   - $multi  : tell if multi selection enabled
-///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_tree_node($tree, $indent, $multi=false) {
-  global $ico_directory_close, $ico_directory, $set_theme;
-
-  $code = $tree["code"];
-  $label = $tree["label"];
-  $id = $tree["id"]; 
-  if ($code != "") {
-    $node_to_display = true;
-    $indent_file = $indent + 15;
-  } else {
-    $node_to_display = false;
-  }
-
-  // Display the node children if it has any
-  foreach ($tree as $level => $info) {
-    if ("$level" != "code" && "$level" != "label" && "$level" != "id") {    
-      $content .= of_category_dis_tree_node($info, $indent_file, $multi);
-      $has_child = true;
-    }
-  }
-
-  // Display the node if it has values
-  if ($node_to_display) {
-
-    if ($multi) {
-      $dis_cat = "
-        <input type=\"checkbox\" name=\"$id\" />
-        <span id=\"data$id\">$code - $label</span>";
-    } else {
-      $dis_cat = "
-        <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code'); return false;\"><span id=\"data$id\">$code - $label</span></a>";
-    }
-
-    // If the node has children : link to open it, and icon is different
-    if ($has_child == true) {
-      $block = "
-      <table class=\"category\">
-      <tr>
-	<td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <a href=\"\" onclick=\"show_hide_dir('$code'); return false;\"> 
-	  <img id=\"img_$code\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
-	  </a>
-          $dis_cat
-	</td>
-      </tr>
-      </table>
-      <div id='div_$code' style=\"display:none;\" >
-      $content
-      </div>";
-    } else {
-      $block = "
-      <table class=\"category\">
-      <tr>
-        <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-          <img id=\"img_$code\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
-          $dis_cat
-        </td>
-      </tr>
-      </table>";
-    }
-  } else {
-    $block = $content;
-  }
-    
   return $block;
 }
 
@@ -433,11 +424,14 @@ function of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
   }
 
   if (count($cats) > 0) {
-    usort($cats, "of_category_compare");
+    usort($cats, "_of_category_compare");
   }
 
   return $cats;
 }
+
+
+// End of validated function ------------------------------------------------//
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -508,7 +502,7 @@ function of_entitycategories_get($entity_id, $entity, $cat, $mode="multi") {
   }
 
   if (count($cats) > 0) {
-    usort($cats, "of_category_compare");
+    usort($cats, "_of_category_compare");
   }
 
   return $cats;
@@ -652,8 +646,9 @@ function of_run_query_category_delete($param, $entity, $cat) {
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
-  } else 
+  } else {
     $retour = 1;
+  }
 
   return $retour;
 }
@@ -766,30 +761,6 @@ function of_run_query_category_links($p_id, $entity, $cat, $mode="multi") {
   $obm_q->query($query);
 
   return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Compare 2 categories with their code. Order 1.15 ans 1.2 correctly
-// Parameters: 
-//   - $m      : index of first category
-//   - $n      : index of second category
-///////////////////////////////////////////////////////////////////////////////
-function of_category_compare($m, $n) {
-
-  $code_1 = explode(".",$m["code"]);
-  $code_2 = explode(".",$n["code"]);
-  $i=0;
-  while (isset($code_1[$i]) || isset($code_2[$i])) {
-    if ($code_1[$i] > $code_2[$i]){
-      return 1;
-    } elseif ($code_1[$i] < $code_2[$i]) {
-      return -1;
-    }
-    $i++;
-  }
-
-  return 0;
 }
 
 
@@ -1082,70 +1053,6 @@ function of_dis_category_links($param, $entity, $cat, $mode="multi") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: category consult block
-// Parameters:
-//   - $cats         : Category array
-//   - $entity       : target entity 
-//   - $cat          : target category
-//   - $mode   : ([mono|multi]) 
-///////////////////////////////////////////////////////////////////////////////
-function of_dis_block_consult_category($cats, $entity, $cat, $mode="multi") {
-  global $cgp_hide;
-
-  $l_cat = "l_${cat}"; 
-  global $$l_cat;
-
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-
-  if ($show_cat) {
-  
-    if ($mode == "mono") {
-      // Mono Link
-      $label = htmlentities($cats[0]["label"]); 
-      $block_cat = "
-        <tr>
-          <td class=\"detailLabel\">".ucfirst(${$l_cat})."</td>
-          <td class=\"detailText\">$label</td>
-         </tr>";
-    } else {
-      // Multi Link
-      $nb_col_cat = 3;
-      $dis_cat = "<tr>";
-      for ($i=0; $i<$nb_col_cat; $i++) {
-        $dis_cat .= "<td>&nbsp;</td>";
-      }
-      $dis_cat .= "</tr>";
-      $dis_cat = "";
-
-      $i = 0;
-      if (is_array($cats)) {
-        foreach ($cats as $one_cat) {
-          if ($i==0) {
-            $dis_cat .= "<tr>";
-          }
-          $label = htmlentities($one_cat["label"]);
-          $i++;
-          $dis_cat .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-          if ($i==$nb_col_cat) {
-            $dis_cat .= "</tr>";
-            $i = 0;
-          }
-        }
-      }
-      $block_cat = "
-      <div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
-      <table class=\"detail\">
-      $dis_cat
-      </table>";
-    }
-
-  }
-
-  return $block_cat;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Entity count query execution
 // Parameters:
 //   - $entity       : target entity
@@ -1352,6 +1259,105 @@ function _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element,
   }
 
   return $sel_cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+//   - $tree   : array with categories
+//   - $indent : indent size
+//   - $multi  : tell if multi selection enabled
+///////////////////////////////////////////////////////////////////////////////
+function _of_category_dis_tree_node($tree, $indent, $multi=false) {
+  global $ico_directory_close, $ico_directory, $set_theme;
+
+  $code = $tree["code"];
+  $label = $tree["label"];
+  $id = $tree["id"]; 
+  if ($code != "") {
+    $node_to_display = true;
+    $indent_file = $indent + 15;
+  } else {
+    $node_to_display = false;
+  }
+
+  // Display the node children if it has any
+  foreach ($tree as $level => $info) {
+    if ("$level" != "code" && "$level" != "label" && "$level" != "id") {    
+      $content .= _of_category_dis_tree_node($info, $indent_file, $multi);
+      $has_child = true;
+    }
+  }
+
+  // Display the node if it has values
+  if ($node_to_display) {
+
+    if ($multi) {
+      $dis_cat = "
+        <input type=\"checkbox\" name=\"$id\" />
+        <span id=\"data$id\">$code - $label</span>";
+    } else {
+      $dis_cat = "
+        <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code'); return false;\"><span id=\"data$id\">$code - $label</span></a>";
+    }
+
+    // If the node has children : link to open it, and icon is different
+    if ($has_child == true) {
+      $block = "
+      <table class=\"category\">
+      <tr>
+	<td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
+	  <a href=\"\" onclick=\"show_hide_dir('$code'); return false;\"> 
+	  <img id=\"img_$code\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
+	  </a>
+          $dis_cat
+	</td>
+      </tr>
+      </table>
+      <div id='div_$code' style=\"display:none;\" >
+      $content
+      </div>";
+    } else {
+      $block = "
+      <table class=\"category\">
+      <tr>
+        <td class=\"categoryDir\" style=\"padding-left:".$indent."px;text-align:left;\">
+          <img id=\"img_$code\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
+          $dis_cat
+        </td>
+      </tr>
+      </table>";
+    }
+  } else {
+    $block = $content;
+  }
+    
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Compare 2 categories with their code. Order 1.15 ans 1.2 correctly
+// Parameters: 
+//   - $m : index of first category
+//   - $n : index of second category
+///////////////////////////////////////////////////////////////////////////////
+function _of_category_compare($m, $n) {
+
+  $code_1 = explode(".",$m["code"]);
+  $code_2 = explode(".",$n["code"]);
+  $i=0;
+  while (isset($code_1[$i]) || isset($code_2[$i])) {
+    if ($code_1[$i] > $code_2[$i]){
+      return 1;
+    } elseif ($code_1[$i] < $code_2[$i]) {
+      return -1;
+    }
+    $i++;
+  }
+
+  return 0;
 }
 
 

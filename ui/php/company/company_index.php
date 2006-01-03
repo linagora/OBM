@@ -81,13 +81,13 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] = of_category_dis_tree($company, $action, "company", "category1");
+  $display["detail"] = of_category_dis_tree("company", "category1", $company, $action);
 
 } elseif ($action == "ext_get_category1_code") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] = of_category_dis_tree($company, $action, "company", "category1");
+  $display["detail"] = of_category_dis_tree("company", "category1", $company, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls

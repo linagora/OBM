@@ -15,7 +15,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($list, $p_new_order, $p_order_dir) {
+function run_query_list_search($list, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
   
   $name = sql_search_text_parse($list["name"]);
@@ -92,7 +92,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 // Parameters:
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_list_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -111,7 +111,7 @@ function run_query_detail($id) {
        LEFT JOIN UserObm as u ON list_userupdate=u.userobm_id
   WHERE list_id = '$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_detail()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_detail()");
   $obm_q->query($query) ;
   $obm_q->next_record();
   return $obm_q;
@@ -155,7 +155,7 @@ function addslashes_array(&$item, $key) {
 // Parameters:
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($list) {
+function run_query_list_insert($list) {
   global $auth, $cdg_sql;
 
   $priv = ($list["priv"]==1) ? 1 : 0;
@@ -204,7 +204,7 @@ function run_query_insert($list) {
     '$list_query',
     '$list_critery')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_insert()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -252,7 +252,7 @@ function get_list_id($list) {
 // Parameters:
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($list) {
+function run_query_list_update($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
@@ -287,7 +287,7 @@ function run_query_update($list) {
     list_structure='$list_critery'
   WHERE list_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_update()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -305,7 +305,7 @@ function run_query_list_update_sql($id) {
 
   // Check that list has really a query (if not we do nothing)
   $query = "SELECT list_structure FROM List WHERE list_id='$id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_list_update_sql(1)");
   $list_q = new DB_OBM;
   $retour = $list_q->query($query);
   $list_q->next_record();
@@ -321,7 +321,7 @@ function run_query_list_update_sql($id) {
       list_query='$list_query'
     WHERE list_id='$id'";
 
-    display_debug_msg($query, $cdg_sql, "run_query_list_update_sql()");
+    display_debug_msg($query, $cdg_sql, "run_query_list_update_sql(2)");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   }
@@ -335,18 +335,18 @@ function run_query_list_update_sql($id) {
 // Parameters:
 //   - $p_id : list id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_list_delete($p_id) {
   global $cdg_sql;
 
   // Delete all contacts registration to this list
   $query = "DELETE FROM ContactList WHERE contactlist_list_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_delete(1)");
+  display_debug_msg($query, $cdg_sql, "run_query_list_delete(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Delete the List
   $query = "DELETE FROM List WHERE list_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_delete(2)");
+  display_debug_msg($query, $cdg_sql, "run_query_list_delete(2)");
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -532,9 +532,9 @@ function run_query_contacts_list($list, $entity="") {
          LEFT JOIN Contact ON contactlist_contact_id=contact_id
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
          LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166 = ctry1.country_iso3166
-                              and ctry1.country_lang='$lang'
+                              AND ctry1.country_lang='$lang'
          LEFT JOIN Country as ctry2 ON Company.company_country_iso3166 = ctry2.country_iso3166
-                              and ctry2.country_lang='$lang'
+                              AND ctry2.country_lang='$lang'
          LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
          LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       WHERE contactlist_list_id='$id'
@@ -772,7 +772,7 @@ function check_list_query_coherence($list) {
 //   - $list[]   : values checked
 //     keys used : name, subject, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($id, $list) {
+function check_list_data($id, $list) {
   global $php_regexp_email, $l_j_check_email, $l_list_exists, $l_fill_name;
   global $l_banned_word, $l_incoherent_criteria, $l_hungry_query;
   global $cdg_sql, $err_msg, $cql_max_row, $cql_max_cost, $l_invalid_query;
@@ -818,7 +818,7 @@ function check_data_form($id, $list) {
     }
 
     // Check if query is syntaxically correct
-    display_debug_msg("explain $query", $cdg_sql);
+    display_debug_msg("explain $query", $cdg_sql, "check_list_data()");
     $obm_q = new DB_OBM;
     // 1 indicate to PHPLIB not to report the error if any
     $ret = $obm_q->query("explain $query", 1);
@@ -968,7 +968,7 @@ function get_list_dynamic_contact_nb($dynquery="") {
   if (! isset($dynquery["from"])) {
     $query = $dynquery["query"];
 
-    // distinguinsh simple queries to queries with sub-query for optimization
+    // distinguish simple queries to queries with sub-query for optimization
     $pos = strpos(strtolower($query), 'select', 5);
  
     if ($pos > 1) {
@@ -1023,7 +1023,7 @@ function get_list_dynamic_company_nb($dynquery) {
   if (! isset($dynquery["from"])) {
     $query = $dynquery["query"];
 
-    // distinguinsh simple queries to queries with sub-query for optimization
+    // distinguish simple queries to queries with sub-query for optimization
     $pos = strpos(strtolower($query), 'select', 5);
 
     if ($pos > 1) {
@@ -1162,7 +1162,7 @@ function run_query_contactcategory1() {
   $query = "SELECT * FROM ContactCategory1 ORDER BY contactcategory1_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql,"run_query_contactcategory1()");
 
   return $obm_q;
 }
@@ -1179,7 +1179,7 @@ function run_query_contactcategory2() {
   $query = "SELECT * FROM ContactCategory2 ORDER BY contactcategory2_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contactcategory2()");
 
   return $obm_q;
 }
@@ -1196,7 +1196,7 @@ function run_query_language() {
   $query = "SELECT kind_lang FROM Kind
     GROUP BY kind_lang";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_language()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -1209,14 +1209,14 @@ function run_query_language() {
 // Returns:
 //   DB object result with all publication
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publication() {
+function run_query_list_publication() {
   global $cdg_sql;
 
   $query = "SELECT publication_title, publication_id
     FROM Publication
     ORDER by publication_year DESC, publication_type_id, publication_title";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_list_publication()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -1229,7 +1229,7 @@ function run_query_publication() {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_subscriptionreception() {
+function run_query_list_subscriptionreception() {
   global $cdg_sql;
 
   $query = "SELECT *
@@ -1237,7 +1237,7 @@ function run_query_subscriptionreception() {
     ORDER BY subscriptionreception_label DESC"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_list_subscriptionreception()");
 
   return $obm_q;
 }
@@ -1426,20 +1426,20 @@ function make_query_from_criteria($list) {
         ctry2.country_name as company_country";
 
   $from = " Contact LEFT JOIN Company ON contact_company_id=company_id
-                    LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166=ctry1.country_iso3166 and ctry1.country_lang='$lang'
-                    LEFT JOIN Country as ctry2 ON Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
+                    LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166=ctry1.country_iso3166 AND ctry1.country_lang='$lang'
+                    LEFT JOIN Country as ctry2 ON Company.company_country_iso3166=ctry2.country_iso3166 AND ctry2.country_lang='$lang'
                     LEFT JOIN Kind ON contact_kind_id = kind_id
                     LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id";
 
 
   $max_line = 0;
 
-  // handle "AND NOT to n-n (1-n too now) relation" as exlusions
+  // handle "n-n relation" as special case (for "AND NOT" or exclusions)
   // To direct criteria (eg contact_name like...) nothing changed
   // To n-n : eg AND NOT companycat = 5.1, handle these in a subquery to
   // exclude the corresponding contact (and not only the line) cause company
   // with 2 cats, will else match
-  // Determine which criteria lines are exclusions
+  // Determine which criteria lines are concerned (nn joins)
   if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
       if (is_array($module_criteria)) {
@@ -1447,10 +1447,12 @@ function make_query_from_criteria($list) {
           if (is_array($criterion)) {
             foreach($criterion as $line => $value) {
 	      if ($value != "") {
-		if ( ($logical_criterion[$line] == "AND")
-		     && ($boolean_criterion[$line] == "NOT")
-		     && ($add_join[$field] != "") ) {
-		  $cond_andnotn[$line] = true;
+		if ($add_join[$field] != "") {
+		  $has_join_nn[$line] = true;
+		  if ( ($logical_criterion[$line] == "AND")
+		       && ($boolean_criterion[$line] == "NOT") ) {
+		    $cond_andnotn[$line] = true;
+		  }
 		}
 	      }
 
@@ -1568,15 +1570,27 @@ function make_query_from_criteria($list) {
       }
     }
 
+    if ($where == "") {
+      $where = "true";
+    }
+
     // We handle exlusion appart from criteria to ensure exclusion
     if ($has_exclusion) {
       foreach($exclusion_where as $line=>$value) {
-	$exclusion .= " AND contact_id NOT IN (
+
+	// Exclusion on field with n-n relation
+	if ($has_join_nn[$line]) {
+	  $exclusion .= " AND contact_id NOT IN (
           SELECT contact_id
           FROM Contact
             LEFT JOIN Company ON contact_company_id=company_id " .
             $exclusion_join[$line] . "
           WHERE ". $exclusion_where[$line] . ")";
+
+	// Exclusion on field with no n-n relation
+	} else {
+	  $exclusion .= " AND NOT ". $exclusion_where[$line];
+	}
       }
 
       $where = "($where) $exclusion";
@@ -1654,9 +1668,9 @@ function make_query_from_criteria($list) {
 
   $query = trim("$over_select SELECT distinct $select FROM $from WHERE $where $over_end ORDER BY contact_lastname");
 
- $ret["query"] = $query;
- $ret["where"] = $where;
- $ret["from"] = $from;
+  $ret["query"] = $query;
+  $ret["where"] = $where;
+  $ret["from"] = $from;
 
   return $ret;
 }
@@ -1679,6 +1693,129 @@ function run_query_list_static_contact_id($id) {
   display_debug_msg($query, $cdg_sql, "run_query_list_static_contact_id()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// External use :
+// Return the DBO with distincts contact ids of the list
+// Parameters:
+//   - $id : list id
+///////////////////////////////////////////////////////////////////////////////
+function ext_list_get_contact_ids($id) {
+  global $cdg_sql, $clist_mode_normal, $clist_mode_expert;
+
+  if ($id > 0) {
+    $list_q = run_query_list_detail($id);
+  } else {
+    return false;
+  }
+
+  $query = $list_q->f("list_query");
+  $mode = $list_q->f("list_mode");
+
+  // If list has a dynamic part
+  if ($query != "") {
+
+    // Case expert query, we try to find the correct num_rows
+    if ($mode == $clist_mode_expert) {
+      $query_c = $query;
+ 
+      // Normal mode we optimize the query
+    } else {
+      $dynlist = make_query_from_db($list_q);
+      $from = $dynlist["from"];
+      $where = $dynlist["where"];
+      $query_c = "SELECT distinct contact_id FROM $from WHERE $where";
+    }
+
+    // List is static (has only static contacts)
+  } else {
+    $query_c = "SELECT
+        distinct contactlist_contact_id as contact_id
+      FROM ContactList
+      WHERE contactlist_list_id='$id'";
+  }
+
+  display_debug_msg($query_c, $cdg_sql, "ext_list_get_contact_ids()");
+  $obm_q = new DB_OBM;
+  $r = $obm_q->query($query_c, 1);
+  if (is_string($r)) {
+    return false;
+  }
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// External use :
+// Return the DBO with distincts company ids of the list
+// Parameters:
+//   - $id : list id
+///////////////////////////////////////////////////////////////////////////////
+function ext_list_get_company_ids($id) {
+  global $cdg_sql, $clist_mode_normal, $clist_mode_expert;
+
+  if ($id > 0) {
+    $list_q = run_query_list_detail($id);
+  } else {
+    return false;
+  }
+
+  $query = $list_q->f("list_query");
+  $mode = $list_q->f("list_mode");
+  $query_comp = "";
+
+  // If list has a dynamic part
+  if ($query != "") {
+
+    // Case expert query, we try to handle the query
+    if ($mode == $clist_mode_expert) {
+
+      // We remove the ORDER BY clause
+      $query = preg_replace('/order by .*$/i','',$query);
+
+      // We process only if we recognize the query
+      if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) {
+	$query_comp = "SELECT distinct(company_id) ". $matches[1];
+
+	// Add static contacts
+	$cl_q = run_query_list_static_contact_id($id);
+	if ($cl_q->num_rows() > 0) {
+	  while($cl_q->next_record()) {
+	    $c_id = $cl_q->f("contactlist_contact_id");
+	    $where_static .= " OR contact_id = '$c_id'";
+	  }
+	  $query_comp .= $where_static;
+	}
+      }
+
+      // Normal mode we optimize the query
+    } else {
+      $dynlist = make_query_from_db($list_q);
+      $from = $dynlist["from"];
+      $where = $dynlist["where"];
+      $query_comp = "SELECT distinct company_id FROM $from WHERE $where";
+    }
+  }
+
+  // List is static (has only static contacts) or expert query not processed
+  // We initialize the query with static contacts
+  if ($query_comp == "") {
+    $query_comp = "SELECT
+        distinct company_id
+      FROM ContactList
+        JOIN Contact ON contactlist_contact_id=contact_id
+        JOIN Company ON contact_company_id=company_id
+      WHERE contactlist_list_id='$id'";
+  }
+
+  display_debug_msg($query_comp, $cdg_sql, "ext_list_get_company_ids()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_comp);
 
   return $obm_q;
 }

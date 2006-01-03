@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_display.php                                             //
 //     - Desc : List Display File                                            //
-// 2000-01-20 Aliacom - Vincent MARGUERIT                                    //
+// 2000-01-20 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,6 +16,7 @@ $fieldnames["list_name"] = $l_name;
 $fieldnames["list_subject"] = $l_subject;
 $fieldnames["list_email"] = $l_email;
 $fieldnames["list_info_publication"] = $l_info_pub;
+$fieldnames["list_mode"] = $l_mode;
 $fieldnames["usercreate"] = $l_creator;
 $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
@@ -58,7 +59,8 @@ $fieldnames["publication_lang"] = $l_publication." ".$l_lang;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_list(&$OD, $fieldname, $link_ok) {
-  global $path, $list, $set_theme;
+  global $path, $list, $set_theme, $clist_mode_normal, $clist_mode_expert;
+  global $l_normal, $l_expert;
 
   $ext_url = $list["ext_url"];
   // We set an indicator to tell if the contact has an address
@@ -96,6 +98,15 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     } else {
       $res["name"] = "&nbsp;";
       $res["txt_name"] = " ";
+    }
+  }
+
+  else if ($fieldname == "list_mode") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname) == "$clist_mode_expert") {
+      $res["name"] = "$l_expert";
+    } else {
+      $res["name"] = "$l_normal";
     }
   }
 
@@ -407,7 +418,7 @@ function dis_list_search_list($list, $popup=false) {
   global $display, $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "list");
-  $obm_q = run_query_search($list, $new_order, $order_dir);
+  $obm_q = run_query_list_search($list, $new_order, $order_dir);
   $nb_list = $obm_q->num_rows_total();
   if ($nb_list == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -505,7 +516,7 @@ function dis_list_consult($list) {
 
   $id = $list["id"];
 
-  $list_q = run_query_detail($id);
+  $list_q = run_query_list_detail($id);
   $prefs_con = get_display_pref($uid, "list_contact");
   $con_q = run_query_contacts_list($list, "list_contact");
   $block = html_list_consult($list_q, $prefs_con, $con_q);
@@ -529,7 +540,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   global $l_no_dyn_contact, $l_dyn_con_found, $l_company, $l_invalid_query;
   global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
   global $l_mailing, $l_contact_archive, $l_info_pub;
-  global $l_query, $l_expert_mode, $l_normal_mode;
+  global $l_query, $l_expert, $l_normal;
   global $clist_mode_normal, $clist_mode_expert;
 
   $id = $list_q->f("list_id");
@@ -555,13 +566,13 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   }
 
   if ($mode == $clist_mode_normal) {
-    $lmode = $l_normal_mode;
+    $lmode = $l_normal;
     if ($criteria != "") {
       $dynlist = make_query_from_db($list_q);
       $query = $dynlist["query"];
     }
   } else {
-    $lmode = $l_expert_mode;
+    $lmode = $l_expert;
     $query = stripslashes($list_q->f("list_query"));
     $dynlist["query"] = $query;
   }
@@ -764,7 +775,7 @@ function dis_list_form($action, $list_q, $list) {
 function html_list_form($action, $list_q, $list) {
   global $l_name,$l_subject,$l_email,$l_mailing,$l_contact_archive,$l_info_pub;
   global $l_query, $l_list, $l_private;
-  global $clist_mode_normal, $clist_mode_expert, $l_expert_mode,$l_normal_mode;
+  global $clist_mode_normal, $clist_mode_expert, $l_expert, $l_normal;
   global $action, $display, $uid;
 
   // if update mode and first time, values are taken from db
@@ -865,8 +876,8 @@ function html_list_form($action, $list_q, $list) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">
-       <input type=\"radio\" $expert_checked name=\"rd_mode\" value=\"$clist_mode_expert\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
-       <input type=\"radio\" $normal_checked name=\"rd_mode\" value=\"$clist_mode_normal\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
+       <input type=\"radio\" $expert_checked name=\"rd_mode\" value=\"$clist_mode_expert\" onclick=\"return show_query_field('','none',this);\" />$l_expert
+       <input type=\"radio\" $normal_checked name=\"rd_mode\" value=\"$clist_mode_normal\" onclick=\"return show_query_field('none','',this);\" />$l_normal
       </td>
     </tr>
     <tr>
@@ -897,9 +908,10 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
   global $l_add_criterion, $l_criterion;
   global $l_and, $l_or, $l_not, $l_empty, $l_exclude;
-  global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
-  global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
-  global $l_contact_cat2,$l_function,$l_cat;
+  global $l_company, $l_country,$l_postcode,$l_town, $l_company_cat1;
+  global $l_contact,$l_lastname,$l_firstname;
+  global $l_timeafter,$l_timebefore,$l_market, $l_datasource,$l_contact_cat1;
+  global $l_contact_cat2,$l_function;
   global $l_publication,$l_title,$l_lang,$l_year, $l_after, $l_before;
   global $l_update,$l_delete,$l_recept,$l_renew;
   global $clist_mode_expert, $clist_mode_normal;
@@ -910,6 +922,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     $mode = $list_q->f("list_mode");
     $query = stripslashes($list_q->f("list_query"));
     $criteria = unserialize($list_q->f("list_structure"));
+    print_r($criteria);
     $boolean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"];
@@ -967,7 +980,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["company_timeafter"] = "$l_company: $l_timeafter"; 
   $fields_label["company_timebefore"] = "$l_company: $l_timebefore"; 
   $fields_label["company_marketingmanager_id"] = "$l_company: $l_market";
-  $fields_label["companycategory1_code"] = "$l_company: $l_cat";   
+  $fields_label["companycategory1_code"] = "$l_company: $l_company_cat1";   
   $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
   $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
   $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
@@ -998,9 +1011,9 @@ function html_list_graphical_form($action, $list_q, $list) {
     $cat2_q = run_query_contactcategory2();
     $fct_q = run_query_contactfunction();
     $cat_q = run_query_companycategory1();       
-    $rec_q = run_query_subscriptionreception();  
+    $rec_q = run_query_list_subscriptionreception();  
     $lag_q = run_query_language();
-    $pub_q = run_query_publication();
+    $pub_q = run_query_list_publication();
 
     $field_data = array(
       "company_country_iso3166" => array($cty_q,"country_iso3166","country_name"),
@@ -1016,7 +1029,8 @@ function html_list_graphical_form($action, $list_q, $list) {
       "kind_lang" => array($lag_q,"kind_lang","kind_lang"),
       "subscription_publication_id" => array($pub_q,"publication_id","publication_title"),
       "subscription_reception_id" => array($rec_q,"subscriptionreception_id","subscriptionreception_label")
-    );    
+    );
+
     foreach($criteria as $module)
     foreach($module as $field => $criterion) {
       foreach($criterion as $line => $value) {
@@ -1074,8 +1088,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       if ($logical_criterion[$key] == "AND") {
 	$and = "selected =\"true\"";
 	$or = "";
-      }
-      else {
+      } else {
 	$or = "selected =\"true\"";
 	$and = "";
       }	
@@ -1114,8 +1127,6 @@ function dis_add_criterion_form($list) {
   } else {
     $row_index =-1;
   }
-//  $ds_q =;
-//  $cat_q =;
   $cty_q = run_query_country_for_lang();
   $usr_q = run_query_userobm_active();
   $dsr_q = run_query_datasource();
@@ -1131,8 +1142,8 @@ function dis_add_criterion_form($list) {
   $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
 
   if ($cgp_show["module"]["publication"]) {
-    $rec_q = run_query_subscriptionreception();
-    $pub_q = run_query_publication();
+    $rec_q = run_query_list_subscriptionreception();
+    $pub_q = run_query_list_publication();
     $block .= html_publication_criterion($rec_q,$pub_q);
   }
 
@@ -1145,7 +1156,7 @@ function dis_add_criterion_form($list) {
 ";
   $block.="<input type=\"hidden\" name=\"ext_target\" value=\"$ext_target\" />";
   $block .= "</form>";
-  if($row_index != -1) {
+  if ($row_index != -1) {
     $block .= "
     <script type=\"text/javascript\">
       get_values(window.document.f_new_criterion);
@@ -1162,7 +1173,7 @@ function dis_add_criterion_form($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
-  global $l_all,$l_market,$l_datasource,$l_cat;
+  global $l_all,$l_market,$l_datasource,$l_company_cat1;
   global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
@@ -1227,7 +1238,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   </tr>
   <tr>   
     <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailLabel\">$l_cat</td>    
+    <td class=\"detailLabel\">$l_company_cat1</td>    
     <td class=\"detailLabel\">$l_datasource</td>
   </tr>
   <tr>    
@@ -1386,7 +1397,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
 // Display the Contact Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_criterion($rec_q,$pub_q){
+function html_publication_criterion($rec_q,$pub_q) {
   global $path, $l_all, $l_undef, $l_yes, $l_no, $set_theme, $ico_mini_cal;
   global $l_publication, $l_title, $l_lang, $l_year;
   global $l_renew,$l_recept, $l_after, $l_before;

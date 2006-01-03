@@ -25,7 +25,7 @@ function run_query_contact_per_resp() {
       userobm_id, userobm_lastname,userobm_firstname
    ";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_per_resp()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -49,7 +49,7 @@ function run_query_company_per_resp() {
     GROUP BY company_marketingmanager_id,userobm_id,userobm_firstname,
       userobm_lastname";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_per_resp()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -82,7 +82,7 @@ function run_query_company_per_country_per_cat() {
       companycategory1_id, companycategory1_code,companycategory1_label
     ORDER BY country_iso3166, companycategory1_id";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_per_country_per_cat()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -99,7 +99,7 @@ function run_query_nb_company() {
  
   $query = "SELECT count(*) as nb FROM Company";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_nb_company()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -117,7 +117,7 @@ function run_query_get_lists() {
  
   $query = "SELECT list_id, list_name FROM List ORDER BY list_name";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_lists()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -133,56 +133,10 @@ function run_query_get_list($id) {
  
   $query = "SELECT * FROM List WHERE list_id = '$id'";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_list()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Request a list of company Id with a list from list module
-// Parametes: The query to make the list of company
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_selected_company($query,$id) {
-  global $cdg_sql;
-
-  // We remove the ORDER BY clause
-  $query = preg_replace('/order by .*$/i','',$query);
-
-  if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
-    $query_f = "SELECT distinct(company_id) ". $matches[1];
-    $or = "OR";
-  }
-  else {
-    $query_f = "SELECT distinct(company_id)
-    FROM Contact 
-       LEFT JOIN Company ON Contact.contact_company_id=Company.company_id
-    WHERE";
-  }
-  $query_c = "SELECT distinct(contact_id) AS id
-    FROM ContactList
-      LEFT JOIN Contact ON contactlist_contact_id=contact_id
-      LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-    WHERE
-      contactlist_list_id='$id'";
-
-  display_debug_msg($query_c, $cdg_sql, "run_query_get_selected_company(1)");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query_c, 1);
-  if ($obm_q->nf() != 0) {
-    $query_f .= "$or contact_id IN (";
-    while($obm_q->next_record()) {
-      $query_f .= $coma .$obm_q->f("id");
-      $coma =",";
-    }
-    $query_f .= " )";
-  }
-  display_debug_msg($query_f, $cdg_sql, "run_query_get_selected_company(2)");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query_f, 1);
-  
   return $obm_q;
 }
 
@@ -195,9 +149,9 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
   global $cdg_sql;
 
   $lang = get_lang();
-  if($obm_q->nf()!= 0) { 
+  if ($obm_q->nf()!= 0) { 
     $where = " where company_id in(";
-    while($obm_q->next_record()) {
+    while ($obm_q->next_record()) {
       $where .= $coma.$obm_q->f("company_id");
       $coma = ",";
     }
@@ -220,7 +174,7 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
       companycategory1_id, companycategory1_code,companycategory1_label
     ORDER BY country_iso3166, companycategory1_id";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_selected_company_per_country_per_cat()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 

@@ -320,7 +320,7 @@ function html_incident_consult($inc_q) {
   $email_con = ($email_con1 != "" ? $email_con1 : $email_con2);
   //Category 1
   $cats1 = of_entitycategories_get($inc_q->f("incident_id"), "incident", "category1", "mono");
-  $block_category1 = of_dis_block_consult_category($cats1, "incident", "category1", "mono");
+  $block_category1 = of_category_dis_block_consult("incident", "category1", $cats1, "mono");
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
