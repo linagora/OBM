@@ -89,6 +89,9 @@ $c_use_connectors = true;
 
 // Modules specific parameters ----------------------------------------------//
 
+// Company and Contact : Copy address to clipboard
+$cclipboard_address = array ('address1' , 'address2', 'address3', 'zipcode', 'town', 'expresspostal', 'country', 'phone');
+
 // Company : Auto format fields
 $caf_company_name = false;
 $caf_town = false;

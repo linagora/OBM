@@ -703,9 +703,9 @@ function dis_admin_index() {
   $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_documentmime();
 
-  $block = of_html_admin_cat_form($cats1, "document", "category1");;
+  $block = of_category_dis_admin_form("document", "category1", $cats1);
   $block .= "<hr />";
-  $block .= of_html_admin_cat_form($cats2, "document", "category2");;
+  $block .= of_category_dis_admin_form("document", "category2", $cats2);
   $block .= "<hr />";
   $block .= html_document_mime_form($mime_q);
 

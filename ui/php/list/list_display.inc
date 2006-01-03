@@ -922,7 +922,6 @@ function html_list_graphical_form($action, $list_q, $list) {
     $mode = $list_q->f("list_mode");
     $query = stripslashes($list_q->f("list_query"));
     $criteria = unserialize($list_q->f("list_structure"));
-    print_r($criteria);
     $boolean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"];

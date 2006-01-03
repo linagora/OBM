@@ -292,22 +292,22 @@ $l_c_manage = "Gestion: ";
 $l_c_new = "Nouveau";
 $l_c_upd = "Modifier";
 $l_c_checkdelete = "Vérifier ou supprimer";
-$l_c_delete =  "Supprimer";
+$l_c_delete = "Supprimer";
 $l_c_update = "Mettre à jour";
 $l_c_insert = "Insérer";
 $l_c_can_delete = "suppression possible";
 $l_c_cant_delete = " suppression impossible";
 $l_c_link = " des références ont été trouvées pour les ";
 $l_c_link_no = " aucune référence n'a été trouvée dans les ";
-$l_c_delete_ok="la suppression a été correctement effectuée.";
-$l_c_delete_error="la suppression a été échoué !";
-$l_c_insert_ok="l'insertion a été correctement effectuée.";
-$l_c_insert_error="l'insertion a échoué !";
+$l_c_delete_ok = "la suppression a été correctement effectuée.";
+$l_c_delete_error = "la suppression a été échoué !";
+$l_c_insert_ok = "l'insertion a été correctement effectuée.";
+$l_c_insert_error = "l'insertion a échoué !";
 $l_c_update_ok = "la modification a été correctement effectuée.";
 $l_c_update_error = "la modification a échoué !";
-$l_c_j_create = "renseignement du label obligatoire.";
-$l_c_j_update = "renseignement du label obligatoire.";
-$l_c_j_delete = "sélection obligatoire.";
+$l_c_j_create = "Le label doit être renseigné.";
+$l_c_j_update = "Une entrée doit être sélectionée et le nouveau label doit être renseigné";
+$l_c_j_delete = "Une entrée doit être sélectionnée.";
 
 
 //---------------------------------------------------------------------------//

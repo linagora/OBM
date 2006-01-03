@@ -1999,7 +1999,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   if (! $cgp_hide["deal"]["category1"]) {
     $cats1 = of_category_get_ordered("deal", "category1");
     $block .= "<hr />";
-    $block .= of_html_admin_cat_form($cats1, "deal", "category1");
+    $block .= of_category_dis_admin_form("deal", "category1", $cats1);
   }
 
 

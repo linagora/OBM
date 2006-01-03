@@ -73,12 +73,15 @@ $password_encryption = "md5";
 
 // Modules specific parameters ----------------------------------------------//
 
+// Company and Contact : Copy address to clipboard
+$cclipboard_address["address"] = array ('address1' , 'address2', 'address3', 'zipcode', 'town', 'expresspostal', 'country', 'phone', 'fax');
+
 // Company : Auto format fields
 $caf_company_name = true;
 $caf_town = true;
 
 // Company + Contact : Advanced search enabled by default
-$cgp_advanced_search_default = false;
+$csearch_advanced_default = false;
 
 // Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;

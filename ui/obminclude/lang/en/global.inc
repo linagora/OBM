@@ -291,15 +291,15 @@ $l_c_can_delete = "deletion is possible";
 $l_c_cant_delete = " deletion is not possible";
 $l_c_link = "references found for ";
 $l_c_link_no = "no reference found for ";
-$l_c_delete_ok="deletion has been successful.";
-$l_c_delete_error="deletion has failed !";
-$l_c_insert_ok="insertion has been successful..";
-$l_c_insert_error="insertion has failed !";
-$l_c_update_ok = "update has been successful..";
+$l_c_delete_ok = "deletion has been successful.";
+$l_c_delete_error = "deletion has failed !";
+$l_c_insert_ok = "insertion has been successful.";
+$l_c_insert_error = "insertion has failed !";
+$l_c_update_ok = "update has been successful.";
 $l_c_update_error = "update has failed !";
-$l_c_j_create = "label is mandatory.";
-$l_c_j_update = "label is mandatory.";
-$l_c_j_delete = "selection is mandatory.";
+$l_c_j_create = "The label must be filled";
+$l_c_j_update = "An entry must be selected and a new label must be given";
+$l_c_j_delete = "An entry must be selected";
 
 
 //---------------------------------------------------------------------------//

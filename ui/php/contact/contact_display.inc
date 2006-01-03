@@ -353,7 +353,7 @@ function dis_contact_search_form($contact="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
-  global $cgp_advanced_search_default, $l_fuzzy;
+  global $csearch_advanced_default, $l_fuzzy;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
 
@@ -376,7 +376,7 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
   $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
   if (($contact["fuzzy"] == "1") ||
-      ($cgp_advanced_search_default && $action != "search") ) {
+      ($csearch_advanced_default && $action != "search") ) {
     $fuzzy = "checked = \"checked\"";
   } else {
     $fuzzy = "";
@@ -792,7 +792,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
   global $l_comment, $l_comment2, $l_comment3, $l_email_other, $l_service, $l_coord, $ico_clipboard;
   global $c_yes, $c_no, $set_theme, $ico_mail;
-  global $display, $cgp_show, $cgp_hide;
+  global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f("contact_id");
   $c_phone = $co_q->f("company_phone");
@@ -815,6 +815,8 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   $town = $co_q->f("contact_town");
   $cdx = $co_q->f("contact_expresspostal");
   $ctry_name = $co_q->f("country_name");
+
+  $newline = "\\r\\n";
   if (($ad1 == "") && ($ad2 == "") && ($ad3 == "") && ($zip == "")
       && ($town == "") && ($cdx == "") && ($ctry_name == "")) {
     $ad1 = ("$c_ad1" != "" ? "( $c_ad1 )" : "");
@@ -824,12 +826,32 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
     $town = ("$c_town" != "" ? "( $c_town )" : "");
     $cdx = ("$c_cdx" != "" ? "( $c_cdx )" : "");
     $ctry_name = $c_ctry_name;
-    $copy_addr_comp .= ($c_ad1 != "") ? addslashes($c_ad1) . $newline : "";
-    $copy_addr_comp .= ($c_ad2 != "") ? addslashes($c_ad2) . $newline : "";
-    $copy_addr_comp .= ($c_ad3 != "") ? addslashes($c_ad3) . $newline : "";
-    $copy_addr_comp .= ($c_zip . $c_town != "") ? addslashes("$c_zip $c_town") . $newline : "";
-    $copy_addr_comp .= ($c_cdx != "") ? addslashes($c_cdx) . $newline : "";
-    $copy_addr_comp .= ($c_ctry_name != "") ? addslashes($c_ctry_name) . $newline : "";
+    if (($c_ad1 != "") && (in_array("address1", $cclipboard_address))) {
+      $copy_addr_comp .= addslashes($c_ad1).$newline;
+    }
+    if (($c_ad2 != "") && (in_array("address2", $cclipboard_address))) {
+      $copy_addr_comp .= addslashes($c_ad2).$newline;
+    }
+    if (($c_ad3 != "") && (in_array("address3", $cclipboard_address))) {
+      $copy_addr_comp .= addslashes($c_ad3).$newline;
+    }
+    if (($c_zip != "") && (in_array("zipcode", $cclipboard_address))) {
+      $copy_addr_comp .= addslashes($c_zip);
+      $copy_zip = true;
+    }
+    if (($c_town != "") && (in_array("town", $cclipboard_address))) {
+      $copy_addr_comp .= ($copy_zip ? " " : "") . addslashes($c_town);
+      $copy_town = true;
+    }
+    if ($copy_zip || $copy_town) {
+      $copy_addr_comp .= $newline;
+    }
+    if (($c_cdx != "") && (in_array("expresspostal", $cclipboard_address))) {
+      $copy_addr_comp .= addslashes($c_cdx).$newline;
+    }
+    if (($c_ctry_name != "") && (in_array("country", $cclipboard_address))) {
+      $copy_addr_comp .= addslashes($c_ctry_name).$newline;
+    }
   }
   $phone = trim($co_q->f("contact_phone"));
   if ( (($phone == "") && ($c_phone != "")) ||
@@ -878,26 +900,37 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   if ($copy_addr_comp != "") {
     $copy .= $copy_addr_comp;
   } else {
-    if ($ad1 != "") {
-      $copy .= addslashes($ad1) . $newline;
+    if (($ad1 != "") && (in_array("address1", $cclipboard_address))) {
+      $copy .= addslashes($ad1).$newline;
     }
-    if ($ad2 != "") {
-      $copy .= addslashes($ad2) . $newline;
+    if (($ad2 != "") && (in_array("address2", $cclipboard_address))) {
+      $copy .= addslashes($ad2).$newline;
     }
-    if ($ad3 != "") {
-      $copy .= addslashes($ad3) . $newline;
+    if (($ad3 != "") && (in_array("address3", $cclipboard_address))) {
+      $copy .= addslashes($ad3).$newline;
     }
-    if ($zip != "" ) {
-      $copy .= addslashes($zip) . " ";
-    } else {
-      $copy .= " ";
+    $copy_zip = false;
+    $copy_town = false;
+    if (($zip != "") && (in_array("zipcode", $cclipboard_address))) {
+      $copy .= addslashes($zip);
+      $copy_zip = true;
     }
-    if ($town != "" ) {
-      $copy .= addslashes($town);
+    if (($town != "") && (in_array("town", $cclipboard_address))) {
+      $copy .= ($copy_zip ? " " : "") . addslashes($town);
+      $copy_town = true;
     }
-    if ($ctry_name != "" ) {
-      $copy .= $newline . addslashes($ctry_name);
+    if ($copy_zip || $copy_town) {
+      $copy .= $newline;
     }
+    if (($ctry_name != "") && (in_array("country", $cclipboard_address))) {
+      $copy .= addslashes($ctry_name).$newline;
+    }
+  }
+  if (($phone != "") && (in_array("phone", $cclipboard_address))) {
+    $copy .= "$l_phone : " . addslashes($phone).$newline;
+  }
+  if (($fax != "") && (in_array("fax", $cclipboard_address))) {
+    $copy .= "$l_fax : " . addslashes($fax).$newline;
   }
 
   // Service field
@@ -1938,37 +1971,37 @@ function dis_contact_admin_index() {
   if (! $cgp_hide["contact"]["function"]) {
     $funcs = of_category_get_ordered("contact", "function");
     $block .= "<hr />";
-    $block .= of_html_admin_cat_form($funcs, "contact", "function");
+    $block .= of_category_dis_admin_form("contact", "function", $funcs);
   }
 
   if (! $cgp_hide["contact"]["category1"]) {
     $cats1 = of_category_get_ordered("contact", "category1");
     $block .= "<hr />";
-    $block .= of_html_admin_cat_form($cats1, "contact", "category1");
+    $block .= of_category_dis_admin_form("contact", "category1", $cats1);
   }
 
   if (! $cgp_hide["contact"]["category2"]) {
     $cats2 = of_category_get_ordered("contact", "category2");
-    $block .= "<hr />";  
-    $block .= of_html_admin_cat_form($cats2, "contact", "category2");
+    $block .= "<hr />";
+    $block .= of_category_dis_admin_form("contact", "category2", $cats2);
   }
 
   if (! $cgp_hide["contact"]["category3"]) {
     $cats3 = of_category_get_ordered("contact", "category3");
-    $block .= "<hr />";  
-    $block .= of_html_admin_cat_form($cats3, "contact", "category3");
+    $block .= "<hr />";
+    $block .= of_category_dis_admin_form("contact", "category3", $cats3);
   }
 
   if (! $cgp_hide["contact"]["category4"]) {
     $cats4 = of_category_get_ordered("contact", "category4");
-    $block .= "<hr />";  
-    $block .= of_html_admin_cat_form($cats4, "contact", "category4");
+    $block .= "<hr />";
+    $block .= of_category_dis_admin_form("contact", "category4", $cats4);
   }
 
   if (! $cgp_hide["contact"]["category5"]) {
     $cats5 = of_category_get_ordered("contact", "category5");
     $block .= "<hr />";
-    $block .= of_html_admin_cat_form($cats5, "contact", "category5");
+    $block .= of_category_dis_admin_form("contact", "category5", $cats5);
   }
 
   return $block;

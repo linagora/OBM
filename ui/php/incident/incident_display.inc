@@ -723,13 +723,13 @@ function dis_admin_index() {
 
   $pri = of_category_get_ordered("incident", "priority");
   $block .= "<hr />";
-  $block .= of_html_admin_cat_form($pri, "incident", "priority");
+  $block .= of_category_dis_admin_form("incident", "priority", $pri);
   $sta = of_category_get_ordered("incident", "status");
   $block .= "<hr />";
-  $block .= of_html_admin_cat_form($sta, "incident", "status");
+  $block .= of_category_dis_admin_form("incident", "status", $sta);
   $cats1 = of_category_get_ordered("incident", "category1");
   $block .= "<hr />";
-  $block .= of_html_admin_cat_form($cats1, "incident", "category1");
+  $block .= of_category_dis_admin_form("incident", "category1", $cats1);
 
   return $block;
 }

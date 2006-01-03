@@ -2529,7 +2529,7 @@ function dis_free_interval($agenda, $entity_store) {
 function dis_admin_index() {
 
   $cats1 = of_category_get_ordered("calendar", "category1");
-  $block = of_html_admin_cat_form($cats1, "calendar", "category1");;
+  $block = of_category_dis_admin_form("calendar", "category1", $cats1);;
 
   return $block;
 

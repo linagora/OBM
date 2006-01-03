@@ -196,7 +196,7 @@ function dis_company_search_form($company="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $action, $display, $c_all, $cgp_hide;
-  global $cgp_advanced_search_default, $l_fuzzy;
+  global $csearch_advanced_default, $l_fuzzy;
   global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
   global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
   global $l_all, $l_find, $l_datasource, $l_cat_tree, $l_select_company;
@@ -219,7 +219,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
   if (($company["fuzzy"] == "1") ||
-      ($cgp_advanced_search_default && $action != "search") ) {
+      ($csearch_advanced_default && $action != "search") ) {
     $fuzzy = "checked = \"checked\"";
   } else {
     $fuzzy = "";
@@ -650,7 +650,7 @@ function html_company_consult($co_q, $cats1) {
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
   global $l_insert,$l_update, $l_company, $l_coord;
-  global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard;
+  global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
@@ -681,11 +681,11 @@ function html_company_consult($co_q, $cats1) {
   $acts = of_entitycategories_get($co_q->f("company_id"), "company", "activity", "mono");
   $cats1 = of_entitycategories_get($co_q->f("company_id"), "company", "category1");
     
-
-  if ($mark > 0)
+  if ($mark > 0) {
     $lmarket = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
-  else
+  } else {
     $lmarket = "&nbsp;";
+  }
 
   // Display Aka only if non empty
   if ($aka != "") {
@@ -708,18 +708,37 @@ function html_company_consult($co_q, $cats1) {
 
   $newline = "\\r\\n";
   $copy = addslashes($name).$newline;
-  if ($ad1 != "") {
+  if (($ad1 != "") && (in_array("address1", $cclipboard_address))) {
     $copy .= addslashes($ad1).$newline;
   }
-  if ($ad2 != "") {
+  if (($ad2 != "") && (in_array("address2", $cclipboard_address))) {
     $copy .= addslashes($ad2).$newline;
   }
-  if ($ad3 != "") {
+  if (($ad3 != "") && (in_array("address3", $cclipboard_address))) {
     $copy .= addslashes($ad3).$newline;
   }
-  $copy .= ($zip . $town != "") ? addslashes("$zip $town") . $newline : "";
-  if ($ctry_name != "" ) {
-    $copy .= addslashes($ctry_name);
+  if (($zip != "") && (in_array("zipcode", $cclipboard_address))) {
+    $copy .= addslashes($zip);
+    $copy_zip = true;
+  }
+  if (($town != "") && (in_array("town", $cclipboard_address))) {
+    $copy .= ($copy_zip ? " " : "") . addslashes($town);
+    $copy_town = true;
+  }
+  if ($copy_zip || $copy_town) {
+    $copy .= $newline;
+  }
+  if (($cdx != "") && (in_array("expresspostal", $cclipboard_address))) {
+    $copy .= addslashes($cdx).$newline;
+  }
+  if (($ctry_name != "") && (in_array("country", $cclipboard_address))) {
+    $copy .= addslashes($ctry_name).$newline;
+  }
+  if (($phone != "") && (in_array("phone", $cclipboard_address))) {
+    $copy .= "$l_phone : " . addslashes($phone).$newline;
+  }
+  if (($fax != "") && (in_array("fax", $cclipboard_address))) {
+    $copy .= "$l_fax : " . addslashes($fax).$newline;
   }
   $copy = "'$copy'"; 
 
@@ -1382,17 +1401,17 @@ function dis_admin_index() {
 
   if (! $cgp_hide["company"]["type"]) {
     $types = of_category_get_ordered("company", "type");
-    $block .= of_html_admin_cat_form($types, "company", "type");
+    $block .= of_category_dis_admin_form("company", "type", $types);
   }
 
   if (! $cgp_hide["company"]["category1"]) {
     $cats1 = of_category_get_ordered("company", "category1");
-    $block .= of_html_admin_cat_form($cats1, "company", "category1");
+    $block .= of_category_dis_admin_form("company", "category1", $cats1);
   }
 
   if (! $cgp_hide["company"]["activity"]) {
     $acts = of_category_get_ordered("company", "activity");
-    $block .= of_html_admin_cat_form($acts, "company", "activity");
+    $block .= of_category_dis_admin_form("company", "activity", $acts);
   }
 
   if (! $cgp_hide["company"]["companynafcode_code"]) {
