@@ -21,7 +21,6 @@ To do
 <UL>
 <LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> how to detect doublons ?
-<LI> Pour les listes : supprimer les listes dans export ? trier requete exports ?
 <li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
 <li> move all ereg to pcre (preg) Regexps (done but 1 in payment !)
@@ -47,14 +46,16 @@ To do
 <li> BUG#517 : Duplicate of #509 (fixed)
 <li> BUG#440 : List : Better handling of switching query mode (list_mode added)
 <li> BUG#284 : Contact sounding and aka added, used in search 
-<li> Advanced search can be configured to be default mode
+<li> New parameter : Advanced search can be configured to be default mode
 <li> Cursor automatically set in the first search or entity form field
 <li> Mail : Corrected recipients list (could be wrong due to prefs updates)
 <li> All deprecated "none" replaced by "undef" in all selects
 <li> Company : search by category now accept the criteria "none"
 <li> Calendar : fixed some warning when dealing with resources without users
+<li> Framework : of_category now handles mono or multi categories
 <li> Framework : Global work on of_category to handle all modules categories
-<li> Home page : Portlets only displayes if enabled and user has right
+<li> Framework : of_category provide category stats (bar charts)
+<li> Home page : Portlets only displays if enabled and user has right
 <li> New parameters : $cgp_cookie_name and $cgp_cookie_domain
 <li> List : list duplication added
 <li> List : Added Boolean "Exclude" in criteria to handle global exclusion

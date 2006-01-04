@@ -174,7 +174,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($incident, "incident", "priority");
+  $retour = of_category_query_insert("incident", "priority", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_insert_ok");
   } else {
@@ -185,7 +185,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($incident, "incident", "priority");
+  $retour = of_category_query_update("incident", "priority", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_update_ok");
   } else {
@@ -196,11 +196,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "priority_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($incident, "incident", "priority", "mono");
+  $display["detail"] .= of_category_dis_links("incident", "priority", $incident, "mono");
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($incident, "incident", "priority");
+  $retour = of_category_query_delete("incident", "priority", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_delete_ok");
   } else {
@@ -211,7 +211,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($incident, "incident", "status");
+  $retour = of_category_query_insert("incident", "status", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_insert_ok");
   } else {
@@ -222,7 +222,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($incident, "incident", "status");
+  $retour = of_category_query_update("incident", "status", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_update_ok");
   } else {
@@ -233,11 +233,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($incident, "incident", "status", "mono");
+  $display["detail"] .= of_category_dis_links("incident", "status", $incident, "mono");
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($incident, "incident", "status");
+  $retour = of_category_query_delete("incident", "status", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_delete_ok");
   } else {
@@ -248,7 +248,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($incident, "incident", "category1");
+  $retour = of_category_query_insert("incident", "category1", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -259,7 +259,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($incident, "incident", "category1");
+  $retour = of_category_query_update("incident", "category1", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -270,11 +270,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($incident, "incident", "category1", "mono");
+  $display["detail"] .= of_category_dis_links("incident", "category1", $incident, "mono");
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($incident, "incident", "category1");
+  $retour = of_category_query_delete("incident", "category1", $incident);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {

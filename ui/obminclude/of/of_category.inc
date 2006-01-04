@@ -139,6 +139,8 @@ function add_element(fieldName,fieldValue,fieldLabel) {
 // OF Category API
 //=============================================================================
 
+// Display functions ----------------------------------------------------------
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category search block 
 // Parameters:
@@ -399,9 +401,11 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
     \"
     size=\"6\" >";
   if (is_array($cats)) {
+    $has_code = false;
     foreach ($cats as $one_cat) {
       if ($one_cat["code"] != "") {
 	$has_code = true;
+	break;
       }
     }
     foreach ($cats as $one_cat) {
@@ -580,407 +584,14 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category query execution
-// Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
-//   - $entity_id : if not 0, get only cat referenced by this entry
-// Return:
-//   Array with orderer categories
-///////////////////////////////////////////////////////////////////////////////
-function of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
-  global $cdg_sql, $cgp_hide;
-
-  $cats = array();
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-  if (! $show_cat) {
-    return $cats;
-  }
-
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_code = $field_prefix."code";
-  $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
-
-  // If an entity id is given, restrict categories to those of this entry
-  if ( ($mode == "multi") && ($entity_id > 0)) {
-    $query = "SELECT $table.*
-      FROM $linktable
-        LEFT JOIN $table ON $linkfield_cat = $field_id
-      WHERE $linkfield_ent = '$entity_id'
-      ORDER BY $field_code, $field_label";
-  } else {
-    $query = "SELECT * FROM $table ORDER BY $field_code, $field_label";
-  }
-  $cat_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "of_get_category_ordered()");
-  $cat_q->query($query);
-  
-  while ($cat_q->next_record()) {
-    $id = $cat_q->f($field_id);
-    $code = $cat_q->f($field_code);
-    $label = $cat_q->f($field_label);
-    $cat_info = array("id" => $id,
-		      "label" => $label,
-		      "code" => $code);
-    $cats[] = $cat_info;
-  }
-
-  if (count($cats) > 0) {
-    usort($cats, "_of_category_compare");
-  }
-
-  return $cats;
-}
-
-
-// End of validated function ------------------------------------------------//
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the entity
-// Parameters:
-//   - $entity_id : entity id 
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $mode   : ([mono|multi]) 
-// Return:
-//   Array with orderer categories
-///////////////////////////////////////////////////////////////////////////////
-function of_entitycategories_get($entity_id, $entity, $cat, $mode="multi") {
-  global $cdg_sql, $cgp_hide;
-
-  $cats = array();
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-  if (! $show_cat) {
-    return $cats;
-  }
-
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_code = $field_prefix."code";
-  $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
-  if ($entity == "calendar") {
-    $entitytable = "CalendarEvent";
-    $entityfield_prefix = "calendarevent_";
-  } else {
-    $entitytable = ucfirst($entity);
-    $entityfield_prefix = $entity."_";
-  }
-  $entityfield_id = $entityfield_prefix."id";
-  $entityfield_cat = $entityfield_prefix.$cat."_id";
-
-  if ($mode == "mono") {
-    $query = "SELECT $field_id, $field_label, $field_code 
-      FROM $entitytable, $table 
-      WHERE $entityfield_cat = $field_id
-        AND $entityfield_id = '$entity_id' 
-      ";
-  } else {
-    $query = "SELECT $field_id, $field_label, $field_code 
-      FROM $linktable, $table 
-      WHERE $linkfield_cat = $field_id 
-        AND $linkfield_ent = '$entity_id'
-      ORDER BY $field_id";
-  }
-
-  display_debug_msg($query, $cdg_sql);
-  $cat_q = new DB_OBM;
-  if ($entity_id != "") {
-    $cat_q->query($query);
-  }
-
-  while ($cat_q->next_record()) {
-    $id = $cat_q->f($field_id);
-    $code = $cat_q->f($field_code);
-    $label = $cat_q->f($field_label);
-    $cat_info = array("id" => $id,
-                      "label" => $label,
-                      "code" => $code);
-    $cats[] = $cat_info;
-  }
-
-  if (count($cats) > 0) {
-    usort($cats, "_of_category_compare");
-  }
-
-  return $cats;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category insertion query construction and execution
-// Parameters:
-//   - $param     : parameters 
-//   - $entity    : target entity
-//   - $cat       : target category
-// Return:
-//   - execution code
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_insert($param, $entity, $cat) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat_label = $param["${cat}_label"];
-  $cat_code = $param["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_timecreate = $field_prefix."timecreate";
-  $field_usercreate = $field_prefix."usercreate";
-  $field_label = $field_prefix."label";
-  $field_code = $field_prefix."code";
-
-  $query = "INSERT INTO $table (
-    $field_timecreate,
-    $field_usercreate,
-    $field_label,
-    $field_code)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat_label',
-    '$cat_code')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $ret = $obm_q->query($query);
-
-  return $ret;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category link insertion query construction and execution
-// Parameters:
-//   - $entity_id : entity id 
-//   - $cat_id    : category id 
-//   - $entity    : target entity
-//   - $cat       : target category
-// Return:
-//   - execution code
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_insert_link($entity_id, $cat_id, $entity, $cat) {
-  global $cdg_sql;
-
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
-
-  $query = "INSERT INTO $linktable (
-       $linkfield_ent,
-       $linkfield_cat)
-     VALUES (
-       '$entity_id',
-       '$cat_id')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category update query execution
-// Parameters:
-//   - $param     : parameters 
-//   - $entity    : target entity
-//   - $cat       : target category
-// Return:
-//   - execution code
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_update($param, $entity, $cat) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $cat_id = $param["${cat}"];
-  $cat_label = $param["${cat}_label"];
-  $cat_code = $param["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_timeupdate = $field_prefix."timeupdate";
-  $field_userupdate = $field_prefix."userupdate";
-  $field_id = $field_prefix."id";
-  $field_label = $field_prefix."label";
-  $field_code = $field_prefix."code";
-
-  $query = "UPDATE $table SET
-    $field_timeupdate = '$timeupdate',
-    $field_userupdate = '$userupdate',
-    $field_label = '$cat_label',
-    $field_code = '$cat_code'
-    WHERE
-      $field_id='$cat_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category deletion query execution
-// Parameters:
-//   - $param     : parameters 
-//   - $entity    : target entity
-//   - $cat       : target category
-// Return:
-//   - execution code
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_delete($param, $entity, $cat) {
-  global $cdg_sql;
-
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $id = $param["${cat}"];
-
-  if ($id != '') {
-    $query = "DELETE FROM $table WHERE $field_id ='$id'";
-
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-  } else {
-    $retour = 1;
-  }
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category link deletion query construction and execution
-// Parameters:
-//   - $entity_id : entity id 
-//   - $entity    : target entity
-//   - $cat       : target category
-// Return:
-//   - execution code
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_delete_link($entity_id, $entity, $cat) {
-  global $cdg_sql;
-
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-
-  $query = "DELETE
-    FROM $linktable 
-    WHERE $linkfield_ent = '$entity_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category from its id
-// Category deletion query execution
-// Parameters:
-//   - $id        : category id 
-//   - $entity    : target entity
-//   - $cat       : target category
-// Return:
-//   - category label 
-///////////////////////////////////////////////////////////////////////////////
-function of_get_category_label($id, $entity, $cat) {
-  global $cdg_sql;
-
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_label = $field_prefix."label";
-
-  $query = "SELECT $field_label 
-    FROM $table 
-    WHERE $field_id = '$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  $retour = $obm_q->f("$field_label");
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity - Entity links query execution
-// Parameters:
-//   - $p_id      : activity(category) id
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $mode   : ([mono|multi]) 
-// Return:
-//   - database handle
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_links($p_id, $entity, $cat, $mode="multi") {
-  global $cdg_sql;
-
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_code = $field_prefix."code";
-  $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
-  if ($entity == "calendar") {
-    $entitytable = "CalendarEvent";
-    $entityfield_prefix = "calendarevent_";
-  } else {
-    $entitytable = ucfirst($entity);
-    $entityfield_prefix = $entity."_";
-  }
-  $entityfield_id = $entityfield_prefix."id";
-  $entityfield_cat = $entityfield_prefix.$cat."_id";
-
-  if ($mode == "mono") {
-    $query = "SELECT $entityfield_id, '$p_id'
-      FROM $entitytable
-      WHERE $entityfield_cat = '$p_id'";
-  } else {
-    $query = "SELECT $entityfield_id, '$p_id'
-      FROM $entitytable, $linktable
-      WHERE $entityfield_id = $linkfield_ent 
-        AND $linkfield_cat = '$p_id'";
-  }
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display: the cat links
 // Parameters:
-//   - $param     : Entity parameters array
 //   - $entity    : target entity
 //   - $cat       : target category
+//   - $param     : Entity parameters array
 //   - $mode   : ([mono|multi]) 
 ///////////////////////////////////////////////////////////////////////////////
-function of_dis_category_links($param, $entity, $cat, $mode="multi") {
+function of_category_dis_links($entity, $cat, $param, $mode="multi") {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back,$display;
@@ -989,8 +600,8 @@ function of_dis_category_links($param, $entity, $cat, $mode="multi") {
   global $$l_entity,$$l_cat;
 
   $id = $param["${cat}"];
-  $label = of_get_category_label($id, $entity, $cat);
-  $obm_q = of_run_query_category_links($id, $entity, $cat, $mode);
+  $label = of_category_get_label($entity, $cat, $id);
+  $obm_q = of_category_query_links($entity, $cat, $id, $mode);
 
   if ($entity=="calendar") {
     $page="agenda_index.php";
@@ -1057,93 +668,15 @@ function of_dis_category_links($param, $entity, $cat, $mode="multi") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Entity count query execution
-// Parameters:
-//   - $entity       : target entity
-///////////////////////////////////////////////////////////////////////////////
-function of_get_entity_count($entity) {
-  global $cdg_sql;
-
-  if ($entity == "calendar") {
-    $entitytable = "CalendarEvent";
-  } else {
-    $entitytable = ucfirst($entity);
-  }
-
-  $query = "SELECT count(*) as count_entity FROM $entitytable";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  return $obm_q->f("count_entity");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Statistic Category Per Entity query execution
-// Parameters:
-//   - $entity       : target entity
-//   - $cat          : target category
-//   - $mode   : ([mono|multi])
-///////////////////////////////////////////////////////////////////////////////
-function of_run_query_category_per_entity($entity, $cat, $mode="multi") {
-  global $cdg_sql;
-
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_code = $field_prefix."code";
-  $field_label = $field_prefix."label";
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
-  if ($entity == "calendar") {
-    $entitytable = "CalendarEvent";
-    $entityfield_prefix = "calendarevent_";
-  } else {
-    $entitytable = ucfirst($entity);
-    $entityfield_prefix = $entity."_";
-  }
-  $entityfield_id = $entityfield_prefix."id";
-  $entityfield_cat = $entityfield_prefix.$cat."_id";
-
-  if ($mode == "mono") {
-    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
-      FROM $table
-        LEFT JOIN $entitytable ON $entityfield_cat = $field_id
-      GROUP BY $entityfield_cat, $field_id, $field_code, $field_label
-      ORDER BY $field_code, $field_label
-    ";
-  } else {
-    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
-      FROM $table
-        LEFT JOIN $linktable ON $linkfield_cat = $field_id
-        LEFT JOIN $entitytable ON $entityfield_id = $linkfield_ent
-      GROUP BY $linkfield_cat, $field_id, $field_code, $field_label
-      ORDER BY $field_code, $field_label
-    ";
-  }
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the category for one entity 
 // Parameters:
-//   - $cat_q        : DB Object for category stats
 //   - $entity       : target entity
 //   - $cat          : target category
+//   - $cat_q        : DB Object for category stats
 // Returns:
 //   - $block        : html block
 ///////////////////////////////////////////////////////////////////////////////
-function of_dis_category_entity_stats($cat_q, $entity, $cat) {
+function of_category_dis_entity_stats($entity, $cat, $cat_q) {
   global $l_key, $l_totals;
 
   $l_cat = "l_${cat}"; $l_entity = "l_${entity}";
@@ -1156,12 +689,12 @@ function of_dis_category_entity_stats($cat_q, $entity, $cat) {
   $entityfield_prefix = $entity."_";
   $entityfield_id = $entityfield_prefix."id";
 
-  $count_entity=of_get_entity_count($entity);
+  $count_entity = _of_category_get_entity_count($entity);
   $max = 1;
   while($cat_q->next_record()) {
     $stat[$cat_q->f("$field_id")]["$cat"] = $cat_q->f("count_entity");
      $stat[$cat_q->f("$field_id")]["name"] = $cat_q->f("$field_code")." - ".$cat_q->f("$field_label");
-    if($cat_q->f("count_entity") > $max) {
+    if ($cat_q->f("count_entity") > $max) {
       $max = $cat_q->f("count_entity");
     }
   }
@@ -1199,6 +732,449 @@ function of_dis_category_entity_stats($cat_q, $entity, $cat) {
 }
 
 
+// Data functions -------------------------------------------------------------
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category query execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
+//   - $entity_id : if not 0, get only cat referenced by this entry
+// Return:
+//   Array with orderer categories
+///////////////////////////////////////////////////////////////////////////////
+function of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
+  global $cdg_sql, $cgp_hide;
+
+  $cats = array();
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+  if (! $show_cat) {
+    return $cats;
+  }
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_code = $field_prefix."code";
+  $field_label = $field_prefix."label";
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+  $linkfield_cat = $entity.$cat."link_category_id";
+
+  // If an entity id is given, restrict categories to those of this entry
+  if ( ($mode == "multi") && ($entity_id > 0)) {
+    $query = "SELECT $table.*
+      FROM $linktable
+        LEFT JOIN $table ON $linkfield_cat = $field_id
+      WHERE $linkfield_ent = '$entity_id'
+      ORDER BY $field_code, $field_label";
+  } else {
+    $query = "SELECT * FROM $table ORDER BY $field_code, $field_label";
+  }
+  $cat_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "of_category_get_ordered()");
+  $cat_q->query($query);
+  
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f($field_id);
+    $code = $cat_q->f($field_code);
+    $label = $cat_q->f($field_label);
+    $cat_info = array("id" => $id,
+		      "label" => $label,
+		      "code" => $code);
+    $cats[] = $cat_info;
+  }
+
+  if (count($cats) > 0) {
+    usort($cats, "_of_category_compare");
+  }
+
+  return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category insertion query construction and execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $param     : parameters 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_insert($entity, $cat, $param) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $cat_label = $param["${cat}_label"];
+  $cat_code = $param["${cat}_code"];
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_timecreate = $field_prefix."timecreate";
+  $field_usercreate = $field_prefix."usercreate";
+  $field_label = $field_prefix."label";
+  $field_code = $field_prefix."code";
+
+  $query = "INSERT INTO $table (
+    $field_timecreate,
+    $field_usercreate,
+    $field_label,
+    $field_code)
+  VALUES (
+    '$timecreate',
+    '$usercreate',
+    '$cat_label',
+    '$cat_code')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category link insertion query construction and execution
+// Parameters:
+//   - $entity_id : entity id 
+//   - $cat_id    : category id 
+//   - $entity    : target entity
+//   - $cat       : target category
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
+  global $cdg_sql;
+
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+  $linkfield_cat = $entity.$cat."link_category_id";
+
+  $query = "INSERT INTO $linktable (
+       $linkfield_ent,
+       $linkfield_cat)
+     VALUES (
+       '$entity_id',
+       '$cat_id')";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category update query execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $param     : parameters 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_update($entity, $cat, $param) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $cat_id = $param["${cat}"];
+  $cat_label = $param["${cat}_label"];
+  $cat_code = $param["${cat}_code"];
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_timeupdate = $field_prefix."timeupdate";
+  $field_userupdate = $field_prefix."userupdate";
+  $field_id = $field_prefix."id";
+  $field_label = $field_prefix."label";
+  $field_code = $field_prefix."code";
+
+  $query = "UPDATE $table SET
+    $field_timeupdate = '$timeupdate',
+    $field_userupdate = '$userupdate',
+    $field_label = '$cat_label',
+    $field_code = '$cat_code'
+    WHERE
+      $field_id='$cat_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category deletion query execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $param     : parameters 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_delete($entity, $cat, $param) {
+  global $cdg_sql;
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $id = $param["${cat}"];
+
+  if ($id != '') {
+    $query = "DELETE FROM $table WHERE $field_id ='$id'";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  } else {
+    $retour = 1;
+  }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category link deletion query construction and execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $entity_id : entity id 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_delete_link($entity, $cat, $entity_id) {
+  global $cdg_sql;
+
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+
+  $query = "DELETE
+    FROM $linktable 
+    WHERE $linkfield_ent = '$entity_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Activity - Entity links query execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $p_id      : activity(category) id
+//   - $mode   : ([mono|multi]) 
+// Return:
+//   - database handle
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_links($entity, $cat, $p_id, $mode="multi") {
+  global $cdg_sql;
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_code = $field_prefix."code";
+  $field_label = $field_prefix."label";
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+  $linkfield_cat = $entity.$cat."link_category_id";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
+
+  if ($mode == "mono") {
+    $query = "SELECT $entityfield_id, '$p_id'
+      FROM $entitytable
+      WHERE $entityfield_cat = '$p_id'";
+  } else {
+    $query = "SELECT $entityfield_id, '$p_id'
+      FROM $entitytable, $linktable
+      WHERE $entityfield_id = $linkfield_ent 
+        AND $linkfield_cat = '$p_id'";
+  }
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the categories attached to the entity
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $entity_id : entity id 
+//   - $mode   : ([mono|multi]) 
+// Return:
+//   Array with orderer categories
+///////////////////////////////////////////////////////////////////////////////
+function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="multi") {
+  global $cdg_sql, $cgp_hide;
+
+  $cats = array();
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+  if (! $show_cat) {
+    return $cats;
+  }
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_code = $field_prefix."code";
+  $field_label = $field_prefix."label";
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+  $linkfield_cat = $entity.$cat."link_category_id";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
+
+  if ($mode == "mono") {
+    $query = "SELECT $field_id, $field_label, $field_code 
+      FROM $entitytable, $table 
+      WHERE $entityfield_cat = $field_id
+        AND $entityfield_id = '$entity_id' 
+      ";
+  } else {
+    $query = "SELECT $field_id, $field_label, $field_code 
+      FROM $linktable, $table 
+      WHERE $linkfield_cat = $field_id 
+        AND $linkfield_ent = '$entity_id'
+      ORDER BY $field_id";
+  }
+
+  display_debug_msg($query, $cdg_sql);
+  $cat_q = new DB_OBM;
+  if ($entity_id != "") {
+    $cat_q->query($query);
+  }
+
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f($field_id);
+    $code = $cat_q->f($field_code);
+    $label = $cat_q->f($field_label);
+    $cat_info = array("id" => $id,
+                      "label" => $label,
+                      "code" => $code);
+    $cats[] = $cat_info;
+  }
+
+  if (count($cats) > 0) {
+    usort($cats, "_of_category_compare");
+  }
+
+  return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of a Category from its id
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $id        : category id 
+// Return:
+//   - category label 
+///////////////////////////////////////////////////////////////////////////////
+function of_category_get_label($entity, $cat, $id) {
+  global $cdg_sql;
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_label = $field_prefix."label";
+
+  $query = "SELECT $field_label 
+    FROM $table 
+    WHERE $field_id = '$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  $retour = $obm_q->f("$field_label");
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Statistic Category Per Entity query execution
+// Parameters:
+//   - $entity       : target entity
+//   - $cat          : target category
+//   - $mode   : ([mono|multi])
+///////////////////////////////////////////////////////////////////////////////
+function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
+  global $cdg_sql;
+
+  $table = ucfirst($entity) . ucfirst($cat);
+  $field_prefix = $entity.$cat."_";
+  $field_id = $field_prefix."id";
+  $field_code = $field_prefix."code";
+  $field_label = $field_prefix."label";
+  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+  $linkfield_ent = $entity.$cat."link_".$entity."_id";
+  $linkfield_cat = $entity.$cat."link_category_id";
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+    $entityfield_prefix = "calendarevent_";
+  } else {
+    $entitytable = ucfirst($entity);
+    $entityfield_prefix = $entity."_";
+  }
+  $entityfield_id = $entityfield_prefix."id";
+  $entityfield_cat = $entityfield_prefix.$cat."_id";
+
+  if ($mode == "mono") {
+    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
+      FROM $table
+        LEFT JOIN $entitytable ON $entityfield_cat = $field_id
+      GROUP BY $entityfield_cat, $field_id, $field_code, $field_label
+      ORDER BY $field_code, $field_label";
+  } else {
+    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
+      FROM $table
+        LEFT JOIN $linktable ON $linkfield_cat = $field_id
+        LEFT JOIN $entitytable ON $entityfield_id = $linkfield_ent
+      GROUP BY $linkfield_cat, $field_id, $field_code, $field_label
+      ORDER BY $field_code, $field_label";
+  }
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
 //=============================================================================
 // OF Category internal helper API
 //=============================================================================
@@ -1217,10 +1193,26 @@ function of_dis_category_entity_stats($cat_q, $entity, $cat) {
 function _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="") {
   global $cgp_hide;
 
-  if (is_array($first_element)) {
-    foreach($first_element as $element) {
-      $l_element = "l_${element}";
-      $c_element = "c_${element}"; 
+  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
+
+  if ($show_cat) {
+
+    if (is_array($first_element)) {
+      foreach($first_element as $element) {
+	$l_element = "l_${element}";
+	$c_element = "c_${element}"; 
+	global $$l_element, $$c_element;
+	if ($$c_element == $cat_id) {
+	  $first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+	} else {
+	  $first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+	}
+      }
+    } else if ($first_element != "") {
+      $l_element = "l_${first_element}";
+      $c_element = "c_${first_element}"; 
       global $$l_element, $$c_element;
       if ($$c_element == $cat_id) {
 	$first_option .= "
@@ -1230,29 +1222,23 @@ function _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element,
 	<option value=\"${$c_element}\">${$l_element}</option>";
       }
     }
-  } else if ($first_element != "") {
-    $l_element = "l_${first_element}";
-    $c_element = "c_${first_element}"; 
-    global $$l_element, $$c_element;
-    if ($$c_element == $cat_id) {
-      $first_option .= "
-	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
-    } else {
-      $first_option .= "
-	<option value=\"${$c_element}\">${$l_element}</option>";
-    }
-  }
 
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-
-  if ($show_cat) {
     // Category select
     $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\" $sel_append>
       $first_option";
     if (is_array($cats)) {
+      $has_code = false;
+      foreach ($cats as $one_cat) {
+        if ($one_cat["code"] != "") {
+	  $has_code = true;
+	  break;
+	}
+      }
       foreach ($cats as $one_cat) {
         $c_id = $one_cat["id"];
-        $c_code = str_pad($one_cat["code"] . " ", 10, ".");
+	if ($has_code) {
+	  $c_code = str_pad($one_cat["code"] . " ", 10, ".");
+	}
         $c_label = htmlentities($one_cat["label"]);
         $sel_cat .= "\n<option value=\"$c_id\"";
         if ($c_id == $cat_id) { $sel_cat .= " selected=\"selected\""; }
@@ -1362,6 +1348,31 @@ function _of_category_compare($m, $n) {
   }
 
   return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Entity count query execution
+// Parameters:
+//   - $entity       : target entity
+///////////////////////////////////////////////////////////////////////////////
+function _of_category_get_entity_count($entity) {
+  global $cdg_sql;
+
+  if ($entity == "calendar") {
+    $entitytable = "CalendarEvent";
+  } else {
+    $entitytable = ucfirst($entity);
+  }
+
+  $query = "SELECT count(*) as count_entity FROM $entitytable";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q->f("count_entity");
 }
 
 

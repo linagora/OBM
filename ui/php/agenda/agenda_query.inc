@@ -1135,26 +1135,6 @@ function run_query_group_writable() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// category deletion query execution
-// Parameters:
-//   - $label     : category label to delete
-///////////////////////////////////////////////////////////////////////////////
-/*
-function get_category_label($agenda) {
-  global $cdg_sql;
-
-  $category1_id = $agenda["category1_id"];
-  $query = "Select * from CalendarCategory1 Where calendarcategory1_id = $category1_id";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  return $obm_q->f("calendarcategory1_label");
-}
-*/
-
-///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed entities.
 // Parameters :
 //  - $entities_array : hashed array of userobm and resource DBO

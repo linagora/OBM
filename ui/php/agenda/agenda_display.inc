@@ -2040,10 +2040,11 @@ function html_calendar_consult($event_q, $entities) {
   global $l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
-  
+
+  $id = $event_q->f("calendarevent_id");
   $title = $event_q->f("calendarevent_title");
   $location = $event_q->f("calendarevent_location");
-  $cats1 = of_entitycategories_get($event_q->f("calendarevent_id"), "calendar", "category1", "mono");
+  $cats1 = of_category_get_entitycategories("calendar", "category1", $id, "mono");
   $priority = $event_q->f("calendarevent_priority"); 
   $description = $event_q->f("calendarevent_description");
   $all_day = $event_q->f("calendarevent_allday");
@@ -2061,7 +2062,6 @@ function html_calendar_consult($event_q, $entities) {
   if ($kind != "none") {
     $repeat_end = date_format($event_q->f("calendarevent_endrepeat"));
   }
-  $id = $event_q->f("calendarevent_id");
 
 
   $block_category1 = of_category_dis_block_consult("calendar", "category1", $cats1, "mono");

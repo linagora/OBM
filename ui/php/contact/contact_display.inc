@@ -630,8 +630,8 @@ function dis_contact_consult($contact) {
   }
   $display["detailInfo"] = display_record_info($con_q);
   $display["link"] = html_contact_links($id);
-  $cats5 = of_entitycategories_get($id, "contact", "category5", "mono");
-  $funcs = of_entitycategories_get($id, "contact", "function", "mono");
+  $cats5 = of_category_get_entitycategories("contact", "category5", $id, "mono");
+  $funcs = of_category_get_entitycategories("contact", "function", $id, "mono");
   $block .= html_contact_header($con_q, $funcs, $cats5);
 
   if ($view != "") {
@@ -639,10 +639,10 @@ function dis_contact_consult($contact) {
     include("$path/$view/".$view."_query.inc");
     $block .= dis_subscription_external_list($contact);
   } else {
-    $cats1 = of_entitycategories_get($id, "contact", "category1");
-    $cats2 = of_entitycategories_get($id, "contact", "category2");
-    $cats3 = of_entitycategories_get($id, "contact", "category3");
-    $cats4 = of_entitycategories_get($id, "contact", "category4");
+    $cats1 = of_category_get_entitycategories("contact", "category1", $id);
+    $cats2 = of_category_get_entitycategories("contact", "category2", $id);
+    $cats3 = of_category_get_entitycategories("contact", "category3", $id);
+    $cats4 = of_category_get_entitycategories("contact", "category4", $id);
     $block .= html_contact_view_main($con_q, $cats1, $cats2, $cats3, $cats4);
   }
 
@@ -2450,12 +2450,12 @@ function export_vcard($co_q,$com_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q) {
 
-  $block1=of_dis_category_entity_stats($cat1_q, "contact", "category1");
-  $block2=of_dis_category_entity_stats($cat2_q, "contact", "category2");
-  $block3=of_dis_category_entity_stats($cat3_q, "contact", "category3");
-  $block4=of_dis_category_entity_stats($cat4_q, "contact", "category4");
-  $block5=of_dis_category_entity_stats($cat5_q, "contact", "category5");
-  $block_function=of_dis_category_entity_stats($func_q, "contact", "function");
+  $block1 = of_category_dis_entity_stats("contact", "category1", $cat1_q);
+  $block2 = of_category_dis_entity_stats("contact", "category2", $cat2_q);
+  $block3 = of_category_dis_entity_stats("contact", "category3", $cat3_q);
+  $block4 = of_category_dis_entity_stats("contact", "category4", $cat4_q);
+  $block5 = of_category_dis_entity_stats("contact", "category5", $cat5_q);
+  $block_func = of_category_dis_entity_stats("contact", "function", $func_q);
 
   $block ="
     $block1
@@ -2463,7 +2463,7 @@ function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $fu
     $block3
     $block4
     $block5
-    $block_function
+    $block_func
   ";
 
   return $block;

@@ -311,7 +311,7 @@ if ($action == "index") {
 
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($agenda, "calendar", "category1");
+  $retour = of_category_query_insert("calendar", "category1", $agenda);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -322,7 +322,7 @@ if ($action == "index") {
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($agenda, "calendar", "category1");
+  $retour = of_category_query_update("calendar", "category1", $agenda);
   print_r($agenda);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
@@ -334,11 +334,11 @@ if ($action == "index") {
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($agenda, "calendar", "category1");
+  $display["detail"] .= of_category_dis_links("calendar", "category1", $agenda);
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($agenda, "calendar", "category1");
+  $retour = of_category_query_delete("calendar", "category1", $agenda);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {
@@ -352,7 +352,7 @@ $sess->register("cal_entity_id");
 //echo "<p>";
 //print_r($cal_entity_id);
 $display["head"] = display_head($l_agenda);
-$display["header"] = display_menu($module);      
+$display["header"] = display_menu($module);
 $display["end"] = display_end();
 display_page($display);
 

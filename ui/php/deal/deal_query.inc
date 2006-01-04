@@ -304,7 +304,7 @@ function run_query_insert($deal) {
 
   if ($retour && is_array($category1)) {
     foreach($category1 as $categoryid) {
-      $retour = of_run_query_category_insert_link($d_id, $categoryid, "deal", "category1");
+      $retour = of_category_query_insert_link("deal", "category1", $d_id, $categoryid);
     }
   }
 
@@ -394,10 +394,10 @@ function run_query_deal_update($deal) {
 
 
   if ($retour) {
-    $retour = of_run_query_category_delete_link($id, "deal", "category1");
+    $retour = of_category_query_delete_link("deal", "category1", $id);
     if (is_array($category1)) {
       foreach($category1 as $categoryid) {
-        $retour = of_run_query_category_insert_link($id, $categoryid, "deal", "category1");
+        $retour = of_category_query_insert_link("deal", "category1", $id, $categoryid);
       }
     }
   }
@@ -610,67 +610,6 @@ function run_query_deal_delete($id) {
   $retour = $obm_q->query($query);
 
   return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the contracts attached to the deal
-// Parameters:
-//   - $p_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_contract_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "SELECT distinct contract_id, contract_label 
-    FROM Contract
-    WHERE contract_deal_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the projects attached to the deal
-// Parameters:
-//   - $p_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_project_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "SELECT distinct project_id, project_name 
-    FROM Project
-    WHERE project_deal_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the invoices attached to the deal
-// Parameters:
-//   - $p_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_invoice_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "SELECT distinct invoice_id,
-      invoice_label 
-    FROM Invoice
-    WHERE invoice_deal_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
 }
 
 
@@ -1117,28 +1056,6 @@ function get_deal_company_id($deal_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id
-// Parameters:
-//   - $id : id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat_label($id) {
-  global $cdg_sql;
-
-  $query = "SELECT dealcategory1_label
-    FROM DealCategory1
-    WHERE dealcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("dealcategory1_label");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Category query execution
 // Return:
 //   Database Object
@@ -1204,110 +1121,6 @@ function run_query_get_dealcategory1_info($d_id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// DealCategory1 - Deal links query execution
-// Parameters:
-//   - $c_id : dealcategory1 id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_links($c_id) {
-  global $cdg_sql;
-
-  $query = "SELECT deal_label, deal_id
-    FROM Deal, DealCategory1Link
-    WHERE deal_id = dealcategory1link_deal_id
-      AND dealcategory1link_category_id = '$c_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category1 insertion query construction and execution
-// Parameters:
-//   - $contact : contact hash info : keys used : kind_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_insert($deal) {
-  global $auth, $cdg_sql;
-
-  $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $auth->auth["uid"];
-  $cat_label = $deal["cat_label"];
-  $cat_code = $deal["cat_code"];
-
-  $query = "INSERT INTO DealCategory1 (
-    dealcategory1_timecreate,
-    dealcategory1_usercreate,
-    dealcategory1_label,
-    dealcategory1_code)
-  VALUES (
-    '$timecreate',
-    '$usercreate',
-    '$cat_label',
-    '$cat_code')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 1 update query execution
-// Parameters:
-//   - $contact : contact hash info : keys used : act, act_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_update($deal) {
-  global $auth, $cdg_sql;
-
-  $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $auth->auth["uid"];
-  $id = $deal["category"];
-  $cat_label = $deal["cat_label"];
-  $cat_code = $deal["cat_code"];
-  
-  $query = "UPDATE DealCategory1 SET
-      dealcategory1_label='$cat_label',
-      dealcategory1_code='$cat_code',
-      dealcategory1_timeupdate='$timeupdate',
-      dealcategory1_userupdate='$userupdate'
-    WHERE
-      dealcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category1 deletion query execution
-// Parameters:
-//   - $id : Category1 id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_delete($id) {
-  global $cdg_sql;
-
-  if ($id != '') {
-    $query = "DELETE FROM DealCategory1 WHERE dealcategory1_id='$id'";
-
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-  } else { 
-    $retour = 1;
-  }
-
-  return $retour;
 }
 
 

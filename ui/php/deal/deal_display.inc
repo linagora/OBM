@@ -702,7 +702,7 @@ function html_deal_consult($deal_q) {
   $con2 = $deal_q->f("deal_contact2_id");
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
-  $cats1 = of_entitycategories_get($deal_q->f("deal_id"), "deal", "category1");
+  $cats1 = of_category_get_entitycategories("deal", "category1", $id);
 
   $display["link"] = html_deal_links($deal_q);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";

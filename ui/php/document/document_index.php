@@ -228,7 +228,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($document, "document", "category1");
+  $retour = of_category_query_insert("document", "category1", $document);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -239,7 +239,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($document, "document", "category1");
+  $retour = of_category_query_update("document", "category1", $document);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -250,11 +250,11 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($document, "document", "category1");
+  $display["detail"] .= of_category_dis_links("document", "category1", $document);
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($document, "document", "category1");
+  $retour = of_category_query_delete("document", "category1", $document);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {
@@ -265,7 +265,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($document, "document", "category2");
+  $retour = of_category_query_insert("document", "category2", $document);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_insert_ok");
   } else {
@@ -276,7 +276,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($document, "document", "category2");
+  $retour = of_category_query_update("document", "category2", $document);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_update_ok");
   } else {
@@ -287,11 +287,11 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($document, "document", "category2", "mono");
+  $display["detail"] .= of_category_dis_links("document", "category2", $document, "mono");
 
  } elseif ($action == "category2_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($document, "document", "category2");
+  $retour = of_category_query_delete("document", "category2", $document);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category2).": $l_c_delete_ok");
   } else {

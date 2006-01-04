@@ -153,37 +153,6 @@ function confirm_del() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the Category update is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_cat_upd(form,formd) {
-  cat_pos = formd.sel_cat.selectedIndex;
-  if ((cat_pos >= 0) && (form.tf_cat.value != \"\")) {
-    form.sel_cat.value=formd.sel_cat.options[cat_pos].value;
-    return true;
-   } else {
-     alert(\"$l_j_cat_update\");
-     return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category check or deletion is possible                       //
-///////////////////////////////////////////////////////////////////////////////
-function check_cat_checkdel(form) {
-   if (form.sel_cat.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_cat_delete\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Check if the obligatory fields are set while creating a new ParentDeal    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_parentdeal(f_parent) {

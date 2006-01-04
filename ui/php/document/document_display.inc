@@ -272,8 +272,8 @@ function html_document_consult($doc_q) {
   // if update mode and first display values are taken from database
   $id = $doc_q->f("document_id");
   $title = $doc_q->f("document_title");
-  $cats1 = of_entitycategories_get($doc_q->f("document_id"), "document", "category1", "mono");
-  $cats2 = of_entitycategories_get($doc_q->f("document_id"), "document", "category2", "mono");
+  $cats1 = of_category_get_entitycategories("document", "category1", $id, "mono");
+  $cats2 = of_category_get_entitycategories("document", "category2", $id, "mono");
   $author = $doc_q->f("document_author");
   $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
   $mimetype = $doc_q->f("documentmimetype_label");

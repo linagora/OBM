@@ -241,12 +241,12 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lang/$set_lang/statistic.inc");
 
-  $cat1_q = of_run_query_category_per_entity("contact", "category1", "multi");
-  $cat2_q = of_run_query_category_per_entity("contact", "category2", "multi");
-  $cat3_q = of_run_query_category_per_entity("contact", "category3", "multi");
-  $cat4_q = of_run_query_category_per_entity("contact", "category4", "multi");
-  $cat5_q = of_run_query_category_per_entity("contact", "category5", "mono");
-  $func_q = of_run_query_category_per_entity("contact", "function", "mono");
+  $cat1_q = of_category_query_category_per_entity("contact", "category1", "multi");
+  $cat2_q = of_category_query_category_per_entity("contact", "category2", "multi");
+  $cat3_q = of_category_query_category_per_entity("contact", "category3", "multi");
+  $cat4_q = of_category_query_category_per_entity("contact", "category4", "multi");
+  $cat5_q = of_category_query_category_per_entity("contact", "category5", "mono");
+  $func_q = of_category_query_category_per_entity("contact", "function", "mono");
   $display["title"] = display_title($l_header_contact_stats);
   $display["detail"] = dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q);
 //  $display["features"] = dis_menu_stats();
@@ -258,7 +258,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($contact, "contact", "category1");
+  $retour = of_category_query_insert("contact", "category1", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -269,7 +269,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($contact, "contact", "category1");
+  $retour = of_category_query_update("contact", "category1", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -280,11 +280,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($contact, "contact", "category1");
+  $display["detail"] .= of_category_dis_links("contact", "category1", $contact);
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($contact, "contact", "category1");
+  $retour = of_category_query_delete("contact", "category1", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {
@@ -295,7 +295,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($contact, "contact", "category2");
+  $retour = of_category_query_insert("contact", "category2", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_insert_ok");
   } else {
@@ -306,7 +306,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($contact, "contact", "category2");
+  $retour = of_category_query_update("contact", "category2", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_update_ok");
   } else {
@@ -317,11 +317,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($contact, "contact", "category2");
+  $display["detail"] .= of_category_dis_links("contact", "category2", $contact);
 
  } elseif ($action == "category2_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($contact, "contact", "category2");
+  $retour = of_category_query_delete("contact", "category2", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category2).": $l_c_delete_ok");
   } else {
@@ -332,7 +332,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category3_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($contact, "contact", "category3");
+  $retour = of_category_query_insert("contact", "category3", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category3)." : $l_c_insert_ok");
   } else {
@@ -343,7 +343,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category3_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($contact, "contact", "category3");
+  $retour = of_category_query_update("contact", "category3", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category3)." : $l_c_update_ok");
   } else {
@@ -354,11 +354,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category3_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($contact, "contact", "category3");
+  $display["detail"] .= of_category_dis_links("contact", "category3", $contact);
 
 } elseif ($action == "category3_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($contact, "contact", "category3");
+  $retour = of_category_query_delete("contact", "category3", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category3)." : $l_c_delete_ok");
   } else {
@@ -369,7 +369,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category4_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($contact, "contact", "category4");
+  $retour = of_category_query_insert("contact", "category4", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category4)." : $l_c_insert_ok");
   } else {
@@ -380,7 +380,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category4_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($contact, "contact", "category4");
+  $retour = of_category_query_update("contact", "category4", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category4)." : $l_c_update_ok");
   } else {
@@ -391,11 +391,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category4_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($contact, "contact", "category4");
+  $display["detail"] .= of_category_dis_links("contact", "category4", $contact);
 
 } elseif ($action == "category4_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($contact, "contact", "category4");
+  $retour = of_category_query_delete("contact", "category4", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category4)." : $l_c_delete_ok");
   } else {
@@ -406,7 +406,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category5_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($contact, "contact", "category5");
+  $retour = of_category_query_insert("contact", "category5", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category5)." : $l_c_insert_ok");
   } else {
@@ -417,7 +417,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category5_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($contact, "contact", "category5");
+  $retour = of_category_query_update("contact", "category5", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category5)." : $l_c_update_ok");
   } else {
@@ -428,11 +428,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category5_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($contact, "contact", "category5", "mono");
+  $display["detail"] .= of_category_dis_links("contact", "category5", $contact, "mono");
 
 } elseif ($action == "category5_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($contact, "contact", "category5");
+  $retour = of_category_query_delete("contact", "category5", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category5)." : $l_c_delete_ok");
   } else {
@@ -443,7 +443,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($contact, "contact", "function");
+  $retour = of_category_query_insert("contact", "function", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_function)." : $l_c_insert_ok");
   } else {
@@ -454,7 +454,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($contact, "contact", "function");
+  $retour = of_category_query_update("contact", "function", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_function)." : $l_c_update_ok");
   } else {
@@ -465,11 +465,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($contact, "contact", "function", "mono");
+  $display["detail"] .= of_category_dis_links("contact", "function", $contact, "mono");
 
 } elseif ($action == "function_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($contact, "contact", "function");
+  $retour = of_category_query_delete("contact", "function", $contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_function)." : $l_c_delete_ok");
   } else {

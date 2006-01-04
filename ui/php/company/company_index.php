@@ -214,7 +214,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($company, "company", "type");
+  $retour = of_category_query_insert("company", "type", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_insert_ok");
   } else {
@@ -225,7 +225,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($company, "company", "type");
+  $retour = of_category_query_update("company", "type", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_update_ok");
   } else {
@@ -236,11 +236,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($company, "company", "type", "mono");
+  $display["detail"] .= of_category_dis_links("company", "type", $company, "mono");
 
 } elseif ($action == "type_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($company, "company", "type");
+  $retour = of_category_query_delete("company", "type", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_delete_ok");
   } else {
@@ -251,7 +251,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "activity_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($company, "company", "activity");
+  $retour = of_category_query_insert("company", "activity", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_insert_ok");
   } else {
@@ -262,7 +262,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "activity_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($company, "company", "activity");
+  $retour = of_category_query_update("company", "activity", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_update_ok");
   } else {
@@ -273,11 +273,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "activity_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($company, "company", "activity", "mono");
+  $display["detail"] .= of_category_dis_links("company", "activity", $company, "mono");
 
 } elseif ($action == "activity_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($company, "company", "activity");
+  $retour = of_category_query_delete("company", "activity", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_delete_ok");
   } else {
@@ -325,7 +325,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_insert($company, "company", "category1");
+  $retour = of_category_query_insert("company", "category1", $company);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -336,7 +336,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($company, "company", "category1"); 
+  $retour = of_category_query_update("company", "category1", $company); 
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -347,11 +347,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($company, "company", "category1");
+  $display["detail"] .= of_category_dis_links("company", "category1", $company);
 
 } elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($company, "company", "category1"); 
+  $retour = of_category_query_delete("company", "category1", $company); 
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {

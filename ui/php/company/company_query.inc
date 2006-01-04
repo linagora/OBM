@@ -391,7 +391,7 @@ function run_query_company_insert($company) {
 
   if ($retour && is_array($category1)) {
     foreach($category1 as $categoryid) {
-      $retour = of_run_query_category_insert_link($id, $categoryid, "company", "category1");
+      $retour = of_category_query_insert_link("company", "category1", $id, $categoryid);
     }
   }
   
@@ -484,10 +484,10 @@ function run_query_company_update($cid, $company) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $retour = of_run_query_category_delete_link($cid, "company", "category1");
+    $retour = of_category_query_delete_link("company", "category1", $cid);
     if (is_array($category1)) {
       foreach($category1 as $categoryid) {
-        $retour = of_run_query_category_insert_link($cid, $categoryid, "company", "category1");
+        $retour = of_category_query_insert_link("company", "category1", $cid, $categoryid);
       }
     }
   }

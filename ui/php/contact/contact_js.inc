@@ -73,54 +73,6 @@ function check_contact(form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the function check or deletion is possible                       //
-///////////////////////////////////////////////////////////////////////////////
-function check_func_checkdel(sel)
-{
-   if (sel.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_func_delete\");
-      return false;
-   }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the function update is possible                                  //
-///////////////////////////////////////////////////////////////////////////////
-function check_func_upd(form, sel_del_func)
-{
-  func_pos = sel_del_func.selectedIndex;
-  if ((func_pos >= 0) && (form.tf_func.value != \"\")) {
-    form.sel_func.value=sel_del_func.options[func_pos].value;
-    return true;
-  } else {
-    alert(\"$l_j_func_update\");
-    return false;
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the function creation is possible                                //
-///////////////////////////////////////////////////////////////////////////////
-function check_func_new(form)
-{
-   if (form.tf_func.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_func_create\");
-      return false;
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_checkdel(sel)

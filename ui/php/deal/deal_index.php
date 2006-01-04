@@ -244,7 +244,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
 print_r($deal);
-  $retour = of_run_query_category_insert($deal, "deal", "category1");
+  $retour = of_category_query_insert("deal", "category1", $deal);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -255,7 +255,7 @@ print_r($deal);
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_update($deal, "deal", "category1");
+  $retour = of_category_query_update("deal", "category1", $deal);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -266,11 +266,11 @@ print_r($deal);
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_dis_category_links($deal, "deal", "category1");
+  $display["detail"] .= of_category_dis_links("deal", "category1", $deal);
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_run_query_category_delete($deal, "deal", "category1");
+  $retour = of_category_query_delete("deal", "category1", $deal);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {

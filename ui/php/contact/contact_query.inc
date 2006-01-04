@@ -594,22 +594,22 @@ function run_query_contact_insert($contact) {
 
   if ($retour && is_array($category1)) {
     foreach($category1 as $categoryid) {
-      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category1");
+      $retour = of_category_query_insert_link("contact", "category1", $id, $categoryid);
     }
   }
   if ($retour && is_array($category2)) {
     foreach($category2 as $categoryid) {
-      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category2");
+      $retour = of_category_query_insert_link("contact", "category2", $id, $categoryid);
     }
   }
   if ($retour && is_array($category3)) {
     foreach($category3 as $categoryid) {
-      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category3");
+      $retour = of_category_query_insert_link("contact", "category3", $id, $categoryid);
     }
   }
   if ($retour && is_array($category4)) {
     foreach($category4 as $categoryid) {
-      $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category4");
+      $retour = of_category_query_insert_link("contact", "category4", $id, $categoryid);
     }
   }
   
@@ -746,37 +746,37 @@ function run_query_contact_update($contact) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $retour = of_run_query_category_delete_link($id, "contact", "category1");
+    $retour = of_category_query_delete_link("contact", "category1", $id);
     if (is_array($category1)) {
       foreach($category1 as $categoryid) {
-        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category1");
+        $retour = of_category_query_insert_link("contact", "category1", $id, $categoryid);
       }
     }
   }
 
   if ($retour) {
-    $retour = of_run_query_category_delete_link($id, "contact", "category2");
+    $retour = of_category_query_delete_link("contact", "category2", $id);
     if (is_array($category2)) {
       foreach($category2 as $categoryid) {
-        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category2");
+        $retour = of_category_query_insert_link("contact", "category2", $id, $categoryid);
       }
     }
   }
 
   if ($retour) {
-    $retour = of_run_query_category_delete_link($id, "contact", "category3");
+    $retour = of_category_query_delete_link("contact", "category3", $id);
     if (is_array($category3)) {
       foreach($category3 as $categoryid) {
-        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category3");
+        $retour = of_category_query_insert_link("contact", "category3", $id, $categoryid);
       }
     }
   }
 
   if ($retour) {
-    $retour = of_run_query_category_delete_link($id, "contact", "category4");
+    $retour = of_category_query_delete_link("contact", "category4", $id);
     if (is_array($category4)) {
       foreach($category4 as $categoryid) {
-        $retour = of_run_query_category_insert_link($id, $categoryid, "contact", "category4");
+        $retour = of_category_query_insert_link("contact", "category4", $id, $categoryid);
       }
     }
   }
