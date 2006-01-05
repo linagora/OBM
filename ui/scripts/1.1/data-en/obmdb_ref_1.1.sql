@@ -72,7 +72,7 @@ INSERT INTO CalendarCategory1 (calendarcategory1_timeupdate, calendarcategory1_t
 --
 -- Dumping data for table 'ContractPriority'
 --
-INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FF0000', '1', 'High')
+INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FF0000', '1', 'High');
 INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FFA0A0', '2', 'Normal');
 INSERT INTO ContractPriority (contractpriority_color, contractpriority_code, contractpriority_label) VALUES ('FFF0F0', '3', 'Low');
 
@@ -101,7 +101,7 @@ INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate
 INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'3','Wait for Call');
 INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'4','Paused');
 INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (null,null,null,1,'5','Closed');
-code
+
 
 --
 -- Dumping data for table 'IncidentCategory1'
