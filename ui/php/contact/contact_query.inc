@@ -221,7 +221,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_privacy,
       $date,
       $company_fields
-      contactfunction_label as contact_function
+      contactfunction_label
       $if_country
     FROM Contact";
 

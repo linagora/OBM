@@ -184,7 +184,7 @@ function dis_company_search_form($company="") {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display Company search Form
 // Parameters:
-//   - $type      : array of company types
+//   - $types     : array of company types
 //   - $cats1     : array of company categories
 //   - $acts      : array of company activities 
 //   - $naf_q     : database object with nafcode list
@@ -226,8 +226,8 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   }
 
   // of: activity, type
-  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
-  $show_cat = (! $cgp_hide["company"]["companycategory1_label"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+  $show_cat = (! $cgp_hide["company"]["companycategory1"]);
 
   // Type, category1, activity select
   $block_type = of_category_dis_search_select("company", "type", $types, $type);
@@ -677,8 +677,8 @@ function html_company_consult($co_q, $cats1) {
   $deal_num = $co_q->f("company_deal_number");
   $com = beautify_comment(nl2br($co_q->f("company_comment")));
 
-  $types = of_category_get_entitycategories("company", "type", $id, "mono");
-  $acts = of_category_get_entitycategories("company", "activity", $id, "mono");
+  $types = array(array("label" => $type));
+  $acts = array(array("label" => $act));
   $cats1 = of_category_get_entitycategories("company", "category1", $id);
     
   if ($mark > 0) {
@@ -702,7 +702,7 @@ function html_company_consult($co_q, $cats1) {
   // of: activity, type, category1, activity
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
@@ -843,7 +843,7 @@ function dis_company_form($action, $company) {
   global $display, $cg_com, $cgp_hide, $uid, $l_query_error;
 
   // of: type, activity, category1
-  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
 
   $c_id = $company["id"];
   if ($c_id > 0) {
@@ -976,7 +976,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   // category1, activity, type
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
@@ -1399,22 +1399,22 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 function dis_admin_index() {
   global $cgp_hide;
 
-  if (! $cgp_hide["company"]["type"]) {
+  if (! $cgp_hide["company"]["companytype"]) {
     $types = of_category_get_ordered("company", "type");
     $block .= of_category_dis_admin_form("company", "type", $types);
   }
 
-  if (! $cgp_hide["company"]["category1"]) {
+  if (! $cgp_hide["company"]["companycategory1"]) {
     $cats1 = of_category_get_ordered("company", "category1");
     $block .= of_category_dis_admin_form("company", "category1", $cats1);
   }
 
-  if (! $cgp_hide["company"]["activity"]) {
+  if (! $cgp_hide["company"]["companyactivity"]) {
     $acts = of_category_get_ordered("company", "activity");
     $block .= of_category_dis_admin_form("company", "activity", $acts);
   }
 
-  if (! $cgp_hide["company"]["companynafcode_code"]) {
+  if (! $cgp_hide["company"]["companynafcode"]) {
     $naf_q = run_query_companynafcode();
     $block .= html_company_nafcode_form($naf_q);
   }
@@ -1667,7 +1667,7 @@ function dis_company_display_pref($prefs) {
 function dis_select_companynafcode($naf_q, $line1, $selected) {
   global $cgp_hide;
 
-  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
 
   if ($show_naf) {
     $sel_naf = "<select id=\"sel_naf\" name=\"sel_naf\">

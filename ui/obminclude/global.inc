@@ -283,7 +283,7 @@ if ($cgp_hide["company"]["company_expresspostal"]) {
   $cgp_hide["list_contact_2"]["expresspostal"] = true;
 }
 
-if ($cgp_hide["contact"]["contact_function"]) {
+if ($cgp_hide["contact"]["contactfunction"]) {
   $cgp_hide["list_contact"]["function_label"] = true;
   $cgp_hide["list_contact_2"]["function_label"] = true;
 }

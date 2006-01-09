@@ -11,8 +11,6 @@
 $l_number = "Number";
 $l_company_name = "Company Name";
 $l_type = "Type";
-$l_type_s = "Types";
-$l_category1_s = "Categories";
 $l_activity = "Activity";
 $l_nafcode = "Code";
 $l_market = "Marketing manager";

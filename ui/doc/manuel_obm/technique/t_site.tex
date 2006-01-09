@@ -33,7 +33,7 @@ Fichier de configuration spécifique & obminclude/obm\_conf.inc \\
 Liste des paramètres définis :\\
 
 
-\begin{longtable}{|p{3.5cm}|p{1.0cm}|p{2cm}|p{8cm}|}
+\begin{longtable}{|p{3.7cm}|p{0.8cm}|p{3cm}|p{7cm}|}
 \hline
 \textbf{Option} & \textbf{Depuis} & \textbf{Défaut} & \textbf{Description} \\
 \hline
@@ -89,7 +89,7 @@ Liste des paramètres définis :\\
 \hline
 \$cgp\_cookie\_name & 1.0.4 & OBM\_Session & Nom du cookie utilisé par \obm \\ 
 \hline
-\$cgp\_cookie\_domaine & 1.0.4 & aliacom.local & Domaine de validité du cookie (utilisation avec Aliamin) \\ 
+\$cgp\_cookie\_domain & 1.0.4 & aliacom.local & Domaine de validité du cookie (utilisation avec Aliamin) \\ 
 \hline
 \$auth\_kind\footnotemark[1] & & 'standalone' & "standalone" pour gérer les
 authentifications dans la base OBM, "CAS" pour passer par un serveur CAS \\ 
@@ -390,10 +390,37 @@ Pour ne pas afficher un champ il faut insérer dans le fichier de configuration l
 $cgp_hide[``company''][``company_number''] = true;
 \end{verbatim}  
 
-Lorsqu'un champ est caché, il n'est plus disponible dans les critères de recherche, dans les listes de résultats ni dans les fiches de détail.
+Lorsqu'un champ est caché, il n'est plus disponible dans les critères de recherche, dans les listes de résultats ni dans les fiches de détail.\\
 
-Les noms donnés aux champs du tableau \$cgp\_hide doivent être identiques aux noms des champs retournés par la requête des listes de résultat, car la classe OBM\_DISPLAY utilise ces noms pour déterminer si les champs doivent être affichés ou non.
-Si le champ n'est pas proposé dans un résultat de requête (catégories de société), il n'y a pas cette contrainte.
+Les noms donnés aux champs du tableau \$cgp\_hide doivent être :\\
+\begin{itemize}
+\item soit \textbf{identiques aux noms des champs} retournés par la requête des listes de résultat, car la classe OBM\_DISPLAY utilise ces noms pour déterminer si les champs doivent être affichés ou non.
+\item soit \textbf{identique au nom de la table liée} si le champ à masquer est un champ d'une table liée. Dans ce cas tous les champs de la table liée seront masqués (exemple : ``companyactivity'' pour masquer l'affichage de tous les champs, label, code,.. concernant les secteurs d'activités d'une société) 
+\end{itemize}
+
+
+\subsubsection{Utilisation des champs paramétrables dans \obm}
+
+Les tests concernant les champs paramétrables, référencés ci-dessous, sont effectués dans différentes parties de l'affichage ainsi que dans certaines requêtes afin d'éviter des traitements inutiles :\\
+
+\begin{itemize}
+\item Affichage du formulaire de recherche (permettre ou non la recherche selon le champ) : test direct ou via \variable{of\_category}
+\item Affichage d'un résultat de recherche (présence du champ ou de la famille de champ dans le résultat de recherche) : test via \variable{OBM\_DISPLAY}
+\item Affichage de la consultation d'une entité : test direct ou via \variable{of\_category}
+\item Affichage du formulaire d'une entité : idem consultation
+\item Requête de listes de catégories ou tables liées : test directs.
+\end{itemize}
+
+\paragraph{tests via \variable{of\_category} :}
+
+\variable{of\_category} reçoit en paramètres l'entité (ex: ``company'') et la catégorie (exemple: ``category1'').
+Le test est effectué sur ``\$category'' et ``\$entity\$category''.
+
+
+\paragraph{tests via \variable{obm\_display} :}
+
+\variable{obm\_display} affiche les résultats de recherche. Elle reçoit les champs issus des préférences d'affichage.
+Le test est effectué sur le nom du champ reçu, ainsi que sur la base du nom du champ avant le premier ``\_'' (ainsi \variable{\$cgp\_hide[``company''][``companyactivity] = true;} permet de désactiver ``companyactivity\_label'' et ``companyactivity\_code''.
 
 
 \subsubsection{Les champs paramétrables du module \company}
@@ -404,10 +431,10 @@ Liste des champs paramétrables (masquables) du module \company :
 // Company module
 $cgp_hide["company"]["company_number"] = true;         // numéro
 $cgp_hide["company"]["company_vat"] = true;            // numéro intracommunautaire
-$cgp_hide["company"]["companytype_label"] = true;      // type
-$cgp_hide["company"]["companyactivity_label"] = true;  // secteur d'activité
-$cgp_hide["company"]["companynafcode_code"] = true;    // code NAF
-$cgp_hide["company"]["category"] = true;               // catégorie
+$cgp_hide["company"]["companytype"] = true;            // type
+$cgp_hide["company"]["companyactivity"] = true;        // secteur d'activité
+$cgp_hide["company"]["companynafcode"] = true;         // code NAF
+$cgp_hide["company"]["companycategory1"] = true;       // catégorie
 $cgp_hide["company"]["company_address3"] = true;       // ligne adresse 3
 $cgp_hide["company"]["company_expresspostal"] = true;  // Cedex
 \end{verbatim}  
@@ -419,14 +446,14 @@ Liste des champs paramétrables (masquables) du module \contact :
 
 \begin{verbatim}
 // Contact module
-$cgp_hide["contact"]["contact_function"] = true;  // fonction
+$cgp_hide["contact"]["contactfunction"] = true;   // fonction
 $cgp_hide["contact"]["contact_title"] = true;     // titre
 $cgp_hide["contact"]["responsible"] = true;       // responsible
-$cgp_hide["contact"]["category1"] = true;	  // catégorie 1
-$cgp_hide["contact"]["category2"] = true;	  // catégorie 2
-$cgp_hide["contact"]["category3"] = true;	  // catégorie 3
-$cgp_hide["contact"]["category4"] = true;	  // catégorie 4
-$cgp_hide["contact"]["category5"] = true;	  // catégorie 5
+$cgp_hide["contact"]["contactcategory1"] = true;  // catégorie 1
+$cgp_hide["contact"]["contactcategory2"] = true;  // catégorie 2
+$cgp_hide["contact"]["contactcategory3"] = true;  // catégorie 3
+$cgp_hide["contact"]["contactcategory4"] = true;  // catégorie 4
+$cgp_hide["contact"]["contactcategory5"] = true;  // catégorie 5
 $cgp_hide["contact"]["contact_service"] = true;   // ligne service
 $cgp_hide["contact"]["contact_address3"] = [AUTO] // ligne adresse 3
 $cgp_hide["contact"]["contact_expresspostal"] = [AUTO]; // Cedex
@@ -441,13 +468,13 @@ Liste des champs paramétrables (masquables) du module \deal :
 
 \begin{verbatim}
 // Company module
-$cgp_hide["deal"]["category1"] = true;                 // catégorie
+$cgp_hide["deal"]["dealcategory1"] = true;                 // catégorie
 \end{verbatim}  
 
 
 \subsubsection{Les dépendances entre modules}
 
-Certains champs apparaissent dans différent modules.
+Certains champs apparaissent dans différents modules.
 Par exemple le champ \variable{contact\_function} apparait dans les modules \contact et \List, et ce champ, défini dans le module \contact peut être masqué.
 Pour les champs dépendants, \obm calcule donc automatiquement la visibilité en fonction des dépendances.
 Liste des champs dépendants :\\
@@ -468,7 +495,7 @@ Liste des champs dépendants :\\
 \cline{3-4}
 & & list\_contact\_2 & expresspostal \\ 
 \hline
-\multirow{2}{2cm}{contact} & \multirow{2}{2cm}{contact\_function} & list\_contact & function\_label \\ 
+\multirow{2}{2cm}{contact} & \multirow{2}{2cm}{contactfunction} & list\_contact & function\_label \\ 
 \cline{3-4}
 & & list\_contact\_2 & function\_label \\ 
 \hline

@@ -11,10 +11,7 @@
 $l_number = "Numéro";
 $l_company_name = "Nom Société";
 $l_type = "Type";
-$l_type_s = "Types";
-$l_category1_s = "Catégories";
 $l_activity = "Secteur d'activité";
-$l_activity_s = "Secteurs d'activité";
 $l_nafcode = "Code NAF";
 $l_market = "Responsable du compte";
 $l_web = "W";

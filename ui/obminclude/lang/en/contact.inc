@@ -25,14 +25,9 @@ $l_code = "Code";
 $l_letter = "Letter Head";
 $l_comment2 = "Comment 2";
 $l_comment3 = "Comment 3";
-$l_category1_s = "categories 1";
-$l_category2_s = "categories 2";
 $l_category3 = "category 3";
-$l_category3_s = "categories 3";
 $l_category4 = "category 4";
-$l_category4_s = "categories 4";
 $l_category5 = "category 5";
-$l_category5_s = "categories 5";
 
 // Labels and texts
 $l_contact_name = "Contact Name";

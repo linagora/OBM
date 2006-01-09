@@ -40,14 +40,9 @@ $l_date = "Date";
 $l_no_date = "Non spécifiée";
 $l_comment2 = "Commentaire 2";
 $l_comment3 = "Commentaire 3";
-$l_category1_s = "catégories 1";
-$l_category2_s = "catégories 2";
 $l_category3 = "catégorie 3";
-$l_category3_s = "catégories 3";
 $l_category4 = "catégorie 4";
-$l_category4_s = "catégories 4";
 $l_category5 = "catégorie 5";
-$l_category5_s = "catégories 5";
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";

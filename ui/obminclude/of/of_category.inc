@@ -157,9 +157,7 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_ele
   $l_cat = "l_${cat}"; 
   global $$l_cat;
 
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-
-  if ($show_cat) {
+  if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
     $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append);
 
     $block_cat = "
@@ -190,7 +188,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
   $show_cat = (! $cgp_hide["$entity"]["${cat}"]);
 
   // Category select field
-  if ($show_cat) {
+  if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
 
     if ($mode == "mono") {
       $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, "none");
@@ -225,10 +223,10 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
     global $$l_cat;
 
     $block_cat = "
-  <tr>
-    <td class=\"detailLabel\">$link ${$l_cat} </td>    
-    <td class=\"$class\" id=\"sel_${cat}\">$sel_cat</td>
-  </tr>";
+    <tr>
+      <td class=\"detailLabel\">$link ${$l_cat} </td>    
+      <td class=\"$class\" id=\"sel_${cat}\">$sel_cat</td>
+    </tr>";
   }
 
   return $block_cat;
@@ -250,9 +248,7 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
   $l_cat = "l_${cat}"; 
   global $$l_cat;
 
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-
-  if ($show_cat) {
+  if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
   
     // Mode mono
     if ($mode == "mono") {
@@ -385,10 +381,10 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
   global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
 
-  $l_cat = "l_${cat}"; $l_cat_s = "l_${cat}_s"; 
-  global $$l_cat,$$l_cat_s;
+  $l_cat = "l_${cat}"; 
+  global $$l_cat;
 
-  $indent = 14;
+  $indent = 10;
   $flabel = $indent;
   $sel_cat = "<select name=\"sel_${cat}\" onchange=\"
     mytext = this.options[this.selectedIndex].text;
@@ -399,7 +395,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
     forms.form_${cat}_update.tf_${cat}_label.value=mytext;
     forms.form_${cat}_update.tf_${cat}_code.value=ext;
     \"
-    size=\"6\" >";
+    size=\"8\" style=\"font-family:monospace;\">";
   if (is_array($cats)) {
     $has_code = false;
     foreach ($cats as $one_cat) {
@@ -431,10 +427,10 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
 
   $block = "
     <div class=\"admin\">
-    <div class=\"adminTitle\">:: $l_c_manage ${$l_cat_s}</div>
+    <div class=\"adminTitle\">:: $l_c_manage ${$l_cat}</div>
     <table class=\"admin\" width=\"100%\">
     <tr>
-      <td> </td>
+      <td>&nbsp;</td>
       <td class=\"adminLabel\">$l_c_upd</td>
       <td class=\"adminLabel\">$l_c_new</td>
     </tr>
@@ -445,10 +441,10 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
           action=\"" . url_prepare("$page") . "\">
         <table>
         <tr>
-          <td class=\"adminLabel\">".ucfirst(${$l_cat_s})."</td>
+          <td class=\"adminLabel\">".ucfirst(${$l_cat})."</td>
         </tr>
         <tr>
-          <td class=\"adminLabel\">$sel_cat</td>
+          <td class=\"adminText\">$sel_cat</td>
         </tr>
         <tr>
           <td>
@@ -518,7 +514,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
               action=\"" . url_prepare("$page") . "\">
             <table>
             <tr>
-              <td class=\"adminLabel\">".ucfirst(${$l_cat_s})."</td>
+              <td class=\"adminLabel\">".ucfirst(${$l_cat})."</td>
               <td class=\"adminLabel\">$sel_cat</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
@@ -749,8 +745,7 @@ function of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
   global $cdg_sql, $cgp_hide;
 
   $cats = array();
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-  if (! $show_cat) {
+  if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
     return $cats;
   }
 
@@ -1031,8 +1026,7 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
   global $cdg_sql, $cgp_hide;
 
   $cats = array();
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-  if (! $show_cat) {
+  if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
     return $cats;
   }
 
@@ -1193,9 +1187,7 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
 function _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="") {
   global $cgp_hide;
 
-  $show_cat = (! $cgp_hide["$entity"]["$cat"]);
-
-  if ($show_cat) {
+  if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
 
     if (is_array($first_element)) {
       foreach($first_element as $element) {

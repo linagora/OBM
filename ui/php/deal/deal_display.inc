@@ -168,7 +168,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cats1, $stat_q, $manager_
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
   global $l_all, $l_all_f, $l_find, $c_all;
-  global $display, $cgp_hide, $l_select_deal;
+  global $display, $l_select_deal;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -662,7 +662,7 @@ function html_deal_consult($deal_q) {
   global $l_date_alarm,$l_status,$l_last_update,$l_archive,$l_comment,$l_at;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal;
   global $incl_arch, $param_deal;
-  global $display, $path, $auth, $cgp_hide, $c_yes, $c_no;
+  global $display, $path, $auth, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -899,7 +899,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cats1, $usrc_q,$usrp_q,$c
   global $l_last_update, $l_archive, $l_at, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
-  global $path, $action, $auth, $cgp_hide, $popup;
+  global $path, $action, $auth, $popup;
   global $c_all, $l_all, $c_undef, $l_undef;
 
   $ext_target = $deal["ext_target"];
@@ -1996,7 +1996,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   </tr>
   </table>";
 
-  if (! $cgp_hide["deal"]["category1"]) {
+  if (! $cgp_hide["deal"]["dealcategory1"]) {
     $cats1 = of_category_get_ordered("deal", "category1");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("deal", "category1", $cats1);

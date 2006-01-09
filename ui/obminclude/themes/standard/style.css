@@ -675,17 +675,6 @@ td.logoVersion		{
 }
 
 
-/* //////////////////DIVERS////////////////// */
-/* ///// Divers table style definition ////// */
-/* ////////////////////////////////////////// */
-
-td.textLabelForm	{
-	font-family:		sans-serif;
-	font-size:		10px;
-	color:			#000000;
-	background-color:	transparent;
-}
-
 /* //////////////////ADMIN/////////////////// */
 /* /////  Admin table style definition  ///// */
 /* ////////////////////////////////////////// */
@@ -731,6 +720,7 @@ td.adminLabel		{
 	font-family:		sans-serif;
 	font-size:		12px;
 	font-weight:		bold;
+        font-style: 		normal;
 	color:			#59519e;
 	text-align:		center;
 	background-color:	transparent;
@@ -739,18 +729,11 @@ td.adminLabel		{
 td.adminText		{
 	font-family:		sans-serif;
 	font-size:		12px;
+        font-style: 		normal;
 	vertical-align:		top;
 	text-align:		center;
 	color:			#000000;
-	background-color:	transparent;
-}
-
-td.adminText		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	vertical-align:		top;
-	text-align:		center;
-	color:			#000000;
+        font-style: 		normal;
 	background-color:	transparent;
 }
 

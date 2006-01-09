@@ -150,7 +150,17 @@ class OBM_DISPLAY {
         $dis_default = "&nbsp;";
       }
 
-      if ($cgp_hide[$entity][$fieldname]) {
+      // Check if field (or field family has to be displayed)
+      // If type is hidden, hide all type_* fields
+      $pos_base = strpos($fieldname, "_");
+      if ($pos_base > 0) {
+	$fieldname_base = (substr($fieldname, 0, $pos_base));
+      } else {
+	$fieldname_base = $fieldname;
+      }
+
+      if ($cgp_hide[$entity][$fieldname]
+	  || $cgp_hide[$entity][$fieldname_base]) {
 	$td_class = "resultPrefHide";
       } else {
 	$td_class = "resultTextC";
@@ -373,10 +383,20 @@ class OBM_DISPLAY {
       // For each field in the data row we walk through the pref dbo ordered
       // and for each entry (field) we set special parameters and display it
       while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
-	// Default values
 
-	if (! $cgp_hide[$entity][$fieldname]) {
+	// Check if field (or field family has to be displayed)
+	// If type is hidden, hide all type_* fields
+	$pos_base = strpos($fieldname, "_");
+	if ($pos_base > 0) {
+	  $fieldname_base = (substr($fieldname, 0, $pos_base));
+	} else {
+	  $fieldname_base = $fieldname;
+	}
 
+	if (! ($cgp_hide[$entity][$fieldname]
+	       || $cgp_hide[$entity][$fieldname_base])) {
+
+	  // Default values
 	  $name = $this->data_set->f($fieldname);
 	  $url = "";
 	  $popup = false;
@@ -658,7 +678,17 @@ class OBM_DISPLAY {
     reset($this->display_pref);
     while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
 
-      if (! $cgp_hide[$entity][$fieldname]) {
+      // Check if field (or field family has to be displayed)
+      // If moduletype is hidden, hide all moduletype_* fields
+      $pos_base = strpos($fieldname, "_");
+      if ($pos_base > 0) {
+	$fieldname_base = (substr($fieldname, 0, $pos_base));
+      } else {
+	$fieldname_base = $fieldname;
+      }
+
+      if (! ($cgp_hide[$entity][$fieldname]
+	     || $cgp_hide[$entity][$fieldname_base])) {
 	$label = $fieldnames[$fieldname];
 	$order = ($order_dir == "DESC" ? "ASC" : "DESC");
 
@@ -703,7 +733,18 @@ class OBM_DISPLAY {
 
     reset($this->display_pref);
     while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
-      if (! $cgp_hide[$entity][$fieldname]) {
+
+      // Check if field (or field family has to be displayed)
+      // If type is hidden, hide all type_* fields
+      $pos_base = strpos($fieldname, "_");
+      if ($pos_base > 0) {
+	$fieldname_base = (substr($fieldname, 0, $pos_base));
+      } else {
+	$fieldname_base = $fieldname;
+      }
+
+      if (! ($cgp_hide[$entity][$fieldname]
+	  || $cgp_hide[$entity][$fieldname_base])) {
 	$label = $fieldnames[$fieldname];
 	// if label empty or is an image or a link, we display the column name
 	if ( ($label == "") || (preg_match("/.*<.*>.*/", $label) ) ) {
@@ -744,7 +785,17 @@ class OBM_DISPLAY {
       reset($this->display_pref);
       while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
 
-	if (! $cgp_hide[$entity][$fieldname]) {
+	// Check if field (or field family has to be displayed)
+	// If type is hidden, hide all type_* fields
+	$pos_base = strpos($fieldname, "_");
+	if ($pos_base > 0) {
+	  $fieldname_base = (substr($fieldname, 0, $pos_base));
+	} else {
+	  $fieldname_base = $fieldname;
+	}
+
+	if (! ($cgp_hide[$entity][$fieldname]
+	       || $cgp_hide[$entity][$fieldname_base])) {
 	  $txt_name = $this->data_set->f($fieldname);
 
 	  //--------------------------------------------------

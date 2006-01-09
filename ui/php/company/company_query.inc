@@ -577,7 +577,7 @@ function run_query_check_company($p_id, $name, $zip) {
 function run_query_companynafcode() {
   global $cdg_sql, $cgp_hide;
 
-  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
   if ($show_naf) {
     $query = "SELECT * FROM CompanyNafCode ORDER BY companynafcode_code"; 
     $obm_q = new DB_OBM;
