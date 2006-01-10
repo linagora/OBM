@@ -252,13 +252,20 @@ $display["detail"] .= " /></td>
     <td class=\"adminLabel\">$l_set_rows</td>
     <td class=\"adminText\">
       <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
-  </tr>
+  </tr>";
+
+if ($cgp_show["module"]["todo"]) {
+
+  $display["detail"] .= "
 
 <!-- Todo Order config ------------------------------------------------------->
   <tr>
     <td class=\"adminLabel\">$l_set_todo</td>
     <td class=\"adminText\">$sel_todo</td>
-  </tr>
+  </tr>";
+}
+
+$display["detail"] .= "
 
 <!-- Data Source config ------------------------------------------------------>
   <tr>
@@ -286,15 +293,24 @@ $display["detail"] .= " /></td>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
 if ($set_mail == "yes") $display["detail"] .= "checked";
+
 $display["detail"] .= " /></td>
-  </tr><tr>
+  </tr>";
+
+if ($cgp_show["module"]["agenda"]) {
+  $display["detail"] .= "
+  <tr>
     <td class=\"adminLabel\">$l_set_cal_interval</td>
     <td class=\"adminText\">
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
     </td>
-  </tr><tr>
+  </tr>";
+}
+
+$display["detail"] .= "
+  <tr>
     <td class=\"adminLabel\">$l_set_csv_sep</td>
     <td class=\"adminText\">
       <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
