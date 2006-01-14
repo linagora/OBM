@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_category1_s = "catégories";
 $l_date = "Date";
 $l_logger = "Récepteur";
 $l_owner = "Responsable Technique";

@@ -20,6 +20,18 @@ function confirm_del() {
     return false;
 }
 
+function check_search_form(form) {
+  if ((form.tf_dateafter.value != \"\") &&
+      (check_date(form.tf_dateafter, \"$l_date_after\") == false)) {
+    return false;
+  }
+  else if ((form.tf_datebefore.value != \"\") &&
+        (check_date(form.tf_datebefore, \"$l_date_before\") == false)) {
+    return false;
+  }
+  else return true;
+}
+
 function check_contact(form) {
   // MANDATORY : Check that Contact name is not empty
   if (trim(form.tf_lname.value) == \"\") {

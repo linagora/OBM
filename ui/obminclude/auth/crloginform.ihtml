@@ -112,9 +112,13 @@ function doChallengeResponse() {
   </tr>
  </table>
 
- <?php endif ?>
+<?php endif ?>
+
 
 <p align="center"> <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial"> 
+
+<?php global $cgp_demo_enabled; if ( isset($cgp_session_enabled) ): ?>
+
   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </font><font size="2" face="sans-serif, Verdana, Arial"><br>
   <em>Available login and pass for Demo :</em></font></p>
 <div align="center">
@@ -141,6 +145,8 @@ function doChallengeResponse() {
       <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">padmin</font></div></td>
     </tr>
   </table>
+
+<?php endif ?>
 
   <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial">- - - - - - 
   - - - - - - - - - - - - - - - - - - - - - - - - - - - -

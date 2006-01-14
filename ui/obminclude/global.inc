@@ -64,6 +64,9 @@ $ctu_sql_limit = false;
 // is Mail enabled (is a mail server configured for OBM)
 $cgp_mail_enabled = false;
 
+// is Demo enabled (login screen array with default account)
+$cgp_demo_enabled = false;
+
 // Session Cookie lifetime (in seconds, 0=session cookie)
 $cs_lifetime = 7200;
 

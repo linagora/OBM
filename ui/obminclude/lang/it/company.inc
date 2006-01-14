@@ -10,8 +10,6 @@
 // Database fields
 $l_company_name = "Nome Azienda";
 $l_type = "Tipo";
-$l_type_s = "Tipe";
-$l_category1_s = "Categories";
 $l_market = "Person in charge";
 $l_activity = "Attività";
 $l_web = "Web";

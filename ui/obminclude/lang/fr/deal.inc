@@ -24,7 +24,6 @@ $l_date_alarm = "Date Alarme";
 $l_date_comment = "Date Commentaire";
 $l_todo = "A faire";
 $l_category1 = "Catégorie";
-$l_category1_s = "Catégories";
 $l_code = "Code";
 
 // Labels et textes

@@ -14,7 +14,6 @@
 $l_number = "Nummer";
 $l_company_name = "Firma";
 $l_type = "Firmenart";
-$l_type_s = "Firmenart";
 $l_activity = "Activity";
 $l_market = "Marketing manager";
 $l_postcode = "Postleitzahl";

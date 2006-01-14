@@ -36,9 +36,9 @@ $fieldnames["contact_fax"] = $l_fax;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["contact_archive"] = $l_archive_first;
 $fieldnames["contact_date"] = $l_date;
+$fieldnames["contact_mailing_ok"] = $l_mailing_ok_first;
 // Calculated fields
 $fieldnames["company_name"] = $l_company;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contact specific dataset fields
@@ -51,6 +51,8 @@ $fieldnames["company_name"] = $l_company;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
   global $path, $cgp_show, $set_theme, $ico_mail;
+
+  $show_date = (! $cgp_hide["contact"]["contact_date"]);
 
   // We set an indicator to tell if the contact has an address
   if ( ($OD->data_set->f("contact_address1") != "")
@@ -78,6 +80,16 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "contact_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
+
+  else if ($fieldname == "contact_mailing_ok") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
       $res["name"] = "X";
@@ -288,7 +300,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "contact_date") {
-    if ($cgp_show["module"]["contact_date"]) {
+    if ($show_date) {
       $date = $OD->data_set->f("contact_date");
       $res["name"] = ($date) ? date_format($date) : " ";
       $res["align"] = "center";
@@ -343,6 +355,7 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $csearch_advanced_default, $l_fuzzy;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
+  global $l_after, $l_before, $l_mailing_ok_only;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
 
   $lname = stripslashes($contact["lname"]);
@@ -355,13 +368,15 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
   $ctry = $contact["country"];
   $func = $contact["function"];
   $title = $contact["title"];
-  $mark = $contact["marketing_manager"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
   $cat3 = $contact["category3"];
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
   $mark = $contact["marketing_manager"];
+  $dateafter = stripslashes($contact["dateafter"]);
+  $datebefore = stripslashes($contact["datebefore"]);
+  $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
   if (($contact["fuzzy"] == "1") ||
       ($csearch_advanced_default && $action != "search") ) {
@@ -440,7 +455,9 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("contact_index.php")."\">
+  <form method=\"get\" name=\"f_search\" 
+  onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
+  action=\"".url_prepare("contact_index.php")."\">
   <div class=\"search\">
 
     <div class=\"searchLabel\">$l_contact_name<br />
@@ -477,6 +494,17 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
     $block_category3
     $block_category4
     $block_resp
+    <div class=\"searchLabel\">$l_after<br />
+      <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
+        value=\"$dateafter\" />
+    </div>
+    <div class=\"searchLabel\">$l_before<br />
+      <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
+        value=\"$datebefore\" />
+    </div>
+    <div class=\"searchLabel\">$l_mailing_ok_only<br />
+      <input type=\"checkbox\" name=\"cb_mailing_ok_only\" value=\"1\" $mailing_ok_only />
+    </div>
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
     </div>
@@ -546,6 +574,7 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
 
   // we urlencode to avoid breakage for space char
   $archive = $contact["archive"];
+  $mailng_ok_only = $contact["mailng_ok_only"];
   $lname = urlencode(stripslashes($contact["lname"]));
   $fname = stripslashes($contact["fname"]);
   $phone = urlencode(stripslashes($contact["phone"]));
@@ -553,6 +582,8 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $zip = stripslashes($contact["zip"]);
   $town = stripslashes($contact["town"]);
   $ctry = $contact["country"];
+  $dateafter = stripslashes($contact["dateafter"]);
+  $datebefore = stripslashes($contact["datebefore"]);
   $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
   $func = $contact["function"];
@@ -563,7 +594,7 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_function=$func&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;cb_mailing_ok_only=$mailing_ok_only&amp;param_company=$company_id&amp;sel_function=$func&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -778,7 +809,7 @@ function html_contact_header($co_q, $funcs, $cats5) {
 function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
-  global $l_comment, $l_comment2, $l_comment3, $l_email_other, $l_service, $l_coord, $ico_clipboard;
+  global $l_comment1, $l_comment2, $l_comment3, $l_email_other, $l_service, $l_coord, $ico_clipboard;
   global $c_yes, $c_no, $set_theme, $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
@@ -1035,7 +1066,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
     $block_category3
     $block_category4
 
-    <div class=\"detailHead\">$l_comment</div>
+    <div class=\"detailHead\">$l_comment1</div>
     <table class=\"detail\">
       <tr>
         <td class=\"detailText\" colspan=\"2\">$com</td>
@@ -1225,7 +1256,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok, $l_date, $l_no_date;
-  global $l_comment, $l_add_comment, $l_upd_comment;
+  global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2;
   global $l_comment3, $l_add_comment3, $l_upd_comment3;
   global $l_service, $l_email_other;
@@ -1586,7 +1617,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
       </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td class=\"detailLabel\">$l_upd_comment1</td>
         <td>&nbsp;</td>
       </tr><tr>
         <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
@@ -1773,10 +1804,10 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     </tr>
     </table>
 
-    <div class=\"detailHead\">$l_comment</div>
+    <div class=\"detailHead\">$l_comment1</div>
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailLabel\">$l_add_comment1</td>
       <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>

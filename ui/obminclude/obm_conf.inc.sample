@@ -48,6 +48,9 @@ $cgp_sql_star = true;
 // is Mail enabled for OBM ? (eg: agenda)
 //$cgp_mail_enabled = true;
 
+// is Demo enabled (login screen array with default account)
+$cgp_demo_enabled = false;
+
 // Session Cookie lifetime (in seconds, 0=session cookie)
 $cs_lifetime = 0;
 

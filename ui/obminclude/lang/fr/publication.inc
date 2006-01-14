@@ -10,11 +10,9 @@
 // Database fields
 $l_publication_title = "Titre Publication";
 $l_type = "Type";
-$l_type_s = "Types";
 $l_renew = "Renouvellement automatique";
 $l_recept = "Mode de réception";
 $l_reception = "Mode de réception";
-$l_reception_s = "Modes de réception";
 $l_publication_type = "Type Publication";
 $l_year = "Année";
 $l_quantity = "Quantité";

@@ -49,7 +49,6 @@ $l_occupied = "Non disponible";
 $l_meeting_legend = "Légende";
 $l_selection = "Sélection";
 $l_category1 = "catégorie";
-$l_category1_s = "catégorie";
 
 
 $l_accepted = "Accepté";

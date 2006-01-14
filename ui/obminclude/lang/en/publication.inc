@@ -10,7 +10,6 @@
 // Database fields
 $l_publication_title = "Publication Title";
 $l_type = "Type";
-$l_type_s = "Types";
 $l_year= "Year";
 $l_market = "Marketing manager";
 $l_header_new_auto = "Renewal";
@@ -78,7 +77,6 @@ $l_auto_sub = "Automatic subscription";
 $l_contact_category1 = "Contact Category 1";
 $l_recept = "Reception mode";
 $l_reception = "Reception mode";
-$l_reception_s = "Reception modes";
 $l_quantity = "Quantity";
 
 $l_recept_manage = "Reception modes management";

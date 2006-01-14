@@ -65,6 +65,7 @@ page_close();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
+  require("contact_js.inc");
   $display["search"] = dis_contact_search_form($contact);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
@@ -107,6 +108,7 @@ if ($action == "ext_get_ids") {
 
 } else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
+  require("contact_js.inc");
   $display["search"] = dis_contact_search_form($contact);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
@@ -584,6 +586,7 @@ function get_param_contact() {
   global $tf_category3_label, $tf_category3_code, $sel_category3; 
   global $tf_category4_label, $tf_category4_code, $sel_category4; 
   global $tf_category5_label, $tf_category5_code, $sel_category5; 
+  global $tf_dateafter, $tf_datebefore, $cb_mailing_ok_only; 
 
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($view)) $contact["view"] = $view;
@@ -633,6 +636,9 @@ function get_param_contact() {
   if (isset ($tf_fax)) $contact["fax"] = trim($tf_fax);
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
   if (isset ($tf_email2)) $contact["email2"] = trim($tf_email2);
+  if (isset ($tf_dateafter)) $contact["dateafter"] = trim($tf_dateafter);
+  if (isset ($tf_datebefore)) $contact["datebefore"] = trim($tf_datebefore);
+  if (isset ($cb_mailing_ok_only)) $contact["mailing_ok_only"] = ($cb_mailing_ok_only == 1 ? 1 : 0);
   if (isset ($cb_archive)) $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
   if (isset ($cb_priv)) $contact["priv"] = ($cb_priv == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);

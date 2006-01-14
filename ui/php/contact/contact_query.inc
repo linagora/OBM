@@ -11,7 +11,8 @@
 // Contact search query execution
 // Parametes:
 //   - $contact[]    : contact search criteria
-//     keys used       company_id, name, phone, company
+//     keys used       company_id, name, phone, company, dateafter, datebefore, 
+//                     mailing_ok_only
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,6 +37,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $category3 = $contact["category3"];
   $category4 = $contact["category4"];
   $category5 = $contact["category5"];
+  $dateafter = $contact["dateafter"];
+  $datebefore = $contact["datebefore"];
+  $mailing_ok_only = $contact["mailing_ok_only"];
   $archive = $contact["archive"];
   $lang = get_lang();
 
@@ -161,6 +165,16 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // Date
   $date = sql_date_format($db_type, "contact_date", "contact_date");
 
+  if ($dateafter != "") {
+    $where .= " AND contact_date > '$dateafter'";
+  }
+  if ($datebefore != "") {
+    $where .= " AND contact_date < '$datebefore'";
+  }
+  // Get all by default 
+  if ($mailing_ok_only == "1") {
+    $where .= " AND contact_mailing_ok=1";
+  }
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
@@ -217,6 +231,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_mobilephone,
       contact_fax,
       contact_email,
+      contact_mailing_ok,
       contact_archive,
       contact_privacy,
       $date,
@@ -944,9 +959,7 @@ function check_contact_context($cid, $contact) {
 
   // return contacts with same lastname and firstname or
   // within the same company with same lname
-  if ($cgp_show["module"]["company"]) {
-    $co_q = run_query_check_contact($cid, $comp, $lname, $fname);
-  }
+  $co_q = run_query_check_contact($cid, $comp, $lname, $fname);
 
   return $co_q;
 }

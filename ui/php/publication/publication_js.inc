@@ -69,53 +69,6 @@ function check_subscription(form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the type check or deletion is possible                           //
-///////////////////////////////////////////////////////////////////////////////
-function check_type_checkdel(form)
-{
-   if (form.sel_type.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_type_delete\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the type update is possible                                    //
-///////////////////////////////////////////////////////////////////////////////
-function check_type_upd(form,formd)
-{
-  type_pos = formd.sel_type.selectedIndex;
-  if ((type_pos >= 0) && (form.tf_type.value != \"\")) {
-    form.sel_type.value=formd.sel_type.options[type_pos].value;
-    return true;
-  } else {
-    alert(\"$l_j_type_update\");
-    return false;
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the type creation is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_type_new(form)
-{
-   if (form.tf_type.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_type_create\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Check if the renew check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_renew_checkdel(form)
@@ -161,52 +114,6 @@ function check_renew_new(form)
    }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the recept check or deletion is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_recept_checkdel(form)
-{
-   if (form.sel_recept.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_recept_delete\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the recept update is possible                                    //
-///////////////////////////////////////////////////////////////////////////////
-function check_recept_upd(form,formd)
-{
-  recept_pos = formd.sel_recept.selectedIndex;
-  if ((recept_pos >= 0) && (form.tf_recept.value != \"\")) {
-    form.sel_recept.value=formd.sel_recept.options[recept_pos].value;
-    return true;
-  } else {
-    alert(\"$l_j_recept_update\");
-    return false;
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the cat creation is possible                                    //
-///////////////////////////////////////////////////////////////////////////////
-function check_recept_new(form)
-{
-   if (form.tf_recept.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_recept_create\");
-      return false;
-   }
-}
 
 
 ";

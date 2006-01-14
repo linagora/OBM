@@ -16,7 +16,6 @@ $l_location = "Location";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_back_mono = "Back to your own view";
 $l_category1 = "category";
-$l_category1_s = "categories";
 
 $l_go = "Go";
 $l_high = "High";
