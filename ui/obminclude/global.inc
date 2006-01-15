@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.1.0";
+$obm_version = "1.1.1pre2";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -66,6 +66,9 @@ $cgp_mail_enabled = false;
 
 // is Demo enabled (login screen array with default account)
 $cgp_demo_enabled = false;
+
+// submit button in the beginning of the form
+$cgp_submit_form_begin_enabled = false;
 
 // Session Cookie lifetime (in seconds, 0=session cookie)
 $cs_lifetime = 7200;

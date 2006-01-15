@@ -1252,7 +1252,7 @@ function dis_contact_form($action, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
-  global $cgp_mailing_default, $ccontact_private_default;
+  global $cgp_mailing_default, $cgp_submit_form_begin_enabled, $ccontact_private_default;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok, $l_date, $l_no_date;
@@ -1698,6 +1698,10 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
 
   // UPDATE 
   if (($action == "detailupdate") || ($action == "update")) {
+    if ($cgp_submit_form_begin_enabled) {
+      $dis_begin_button = "<input type=\"submit\" value=\"$l_update\" />";
+      $block_begin_button = "<div class=\"detailButton\"><p class=\"detailButtons\">$dis_begin_button</p></div><br><p></p>";
+    }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
@@ -1706,6 +1710,10 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
 
   // INSERT
   } elseif (($action=="new") || ($action=="insert")) {
+    if ($cgp_submit_form_begin_enabled){
+      $dis_begin_button = "<input type=\"submit\" value=\"$l_insert\" />";
+      $block_begin_button = "<div class=\"detailButton\"><p class=\"detailButtons\">$dis_begin_button</p></div><br><p></p>";
+    }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
@@ -1720,6 +1728,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
 
     <div class=\"detailHead\">$l_contact</div>
+    $block_begin_button
 
     <table class=\"detail\">
     <tr>
