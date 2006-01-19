@@ -96,6 +96,43 @@ function run_query_deal_status($user_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the number of project (by member status) for one user
+// Parameters:
+//   - $user_id : User id
+// Returns:
+//     array : array[memberstatus] = nb, array[total] = total
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_memberstatus($user_id) {
+  global $cdg_sql, $cdg_param;
+
+  $query = "SELECT
+      projectuser_manager,
+      count(*) as nb
+    FROM ProjectUser
+      LEFT JOIN Project ON projectuser_project_id=project_id
+    WHERE projectuser_projecttask_id is null
+      AND projectuser_user_id = '$user_id'
+      AND project_archive = '0'
+    GROUP BY projectuser_manager
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_project_memberstatus");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  $tot = 0;
+  while ($obm_q->next_record()) {
+    $nb = $obm_q->f("nb");
+    $res[$obm_q->f("projectuser_manager")] = $nb;
+    $tot += $nb;
+  }
+  $res["total"] = $tot;
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the number of active incident by status for one user
 // Parameters:
 //   - $user_id : User id
@@ -139,6 +176,67 @@ function run_query_incident_status($user_id) {
 //     array : array[range] = nb
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_range($user_id) {
+  global $cdg_sql, $cdg_param;
+  global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew, $cr_date_ended;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $ds = sql_date_format($db_type, "contract_datesignature", "datesignature");
+  $db = sql_date_format($db_type, "contract_datebegin", "datebegin");
+  $de = sql_date_format($db_type, "contract_dateexp", "dateexp");
+  $dr = sql_date_format($db_type, "contract_daterenew", "daterenew");
+
+  $query = "SELECT
+      $ds,
+      $db,
+      $de,
+      $dr
+    FROM Contract
+    WHERE contract_archive = '0'
+      AND (contract_marketmanager_id = '$user_id'
+        OR contract_techmanager_id = '$user_id')
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_contract_range");
+  $obm_q->query($query);
+  
+  $res[$cr_date_tosign] = 0;
+  $res[$cr_date_tobegin] = 0;
+  $res[$cr_date_current] = 0;
+  $res[$cr_date_torenew] = 0;
+  $res[$cr_date_ended] = 0;
+  $now = time();
+  while ($obm_q->next_record()) {
+    $ds = $obm_q->f("datesignature");
+    $db = $obm_q->f("datebegin");
+    $de = $obm_q->f("dateexp");
+    $dr = $obm_q->f("daterenew");
+
+    if (($ds != "") && ($now < $ds)) {
+      $res[$cr_date_tosign]++;
+    } else if (($db != "") && ($now < $db)) {
+      $res[$cr_date_tobegin]++;
+    } else if (($dr != "") && ($now < $dr)) {
+      $res[$cr_date_current]++;
+    } else if (($de != "") && ($now < $de)) {
+      $res[$cr_date_torenew]++;
+    } else if (($de != "") && ($now > $de)) {
+      $res[$cr_date_ended]++;
+    }
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the number of contracts by range of dates (expired,...)
+// Parameters:
+//   - $date_ranges : array [range1] : [date_start, date_end]
+// Returns:
+//     array : array[range] = nb
+///////////////////////////////////////////////////////////////////////////////
+function run_query_invoice_date_status($date_ranges) {
   global $cdg_sql, $cdg_param;
   global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew, $cr_date_ended;
 

@@ -74,6 +74,8 @@ $l_public = "Public";
 $l_local = "Local";
 $l_ext_id = "Ext Id";
 $l_manager = "Manager";
+$l_project_manager = "Manager";
+$l_member = "Member";
 $l_client = "Customer";
 $l_supplier = "Supplier";
 $l_total = "Total";
@@ -318,6 +320,9 @@ $l_my_deal = "My deals";
 $l_deal_total = "Total amount";
 $l_deal_balanced = "Balanced amount";
 
+$l_my_project = "My projects";
+$l_my_project_current = "My current projects";
+
 $l_my_incident = "My incidents";
 $l_my_incident_current = "My current incidents";
 
@@ -328,3 +333,6 @@ $l_cr_date[$cr_date_tobegin] = "To begin";
 $l_cr_date[$cr_date_current] = "Running";
 $l_cr_date[$cr_date_torenew] = "To renew";
 $l_cr_date[$cr_date_ended] = "Expired";
+
+$l_billed = "Billed";
+$l_bill_potential = "Bill potential";

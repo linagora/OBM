@@ -25,6 +25,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $deal = $project["deal"];
   $manager = $project["manager"];
   $member = $project["member"];
+  $user = $project["user"];
   $archive = $project["archive"];
   $date = $project["datebegin"];
 
@@ -70,13 +71,21 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   if (($member != "") && ($member != $c_all)) {
     $join_member = "LEFT JOIN ProjectUser as Member ON project_id=Member.projectuser_project_id";
     $where .= " AND Member.projectuser_user_id = '$member'
-                AND Member.projectuser_manager = 0";
+                AND Member.projectuser_manager = 0
+                AND Member.projectuser_projecttask_id is null";
   }
 
   if (($manager != "") && ($manager != $c_all)) {
     $join_manager = "LEFT JOIN ProjectUser as Manager ON project_id=Manager.projectuser_project_id";
     $where .= " AND Manager.projectuser_user_id = '$manager'
-                AND Manager.projectuser_manager = 1";
+                AND Manager.projectuser_manager = 1
+                AND Manager.projectuser_projecttask_id is null";
+  }
+
+  if ($user != "") {
+    $join_user = "LEFT JOIN ProjectUser ON project_id=projectuser_project_id";
+    $where .= " AND projectuser_user_id = '$user'
+                AND projectuser_projecttask_id is null";
   }
 
   $whereq = "WHERE $where";
@@ -102,6 +111,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
          LEFT JOIN TaskType on project_tasktype_id=tasktype_id
          $join_member
          $join_manager
+         $join_user
     $whereq
     $orderq
     $limit
@@ -1240,10 +1250,10 @@ function run_query_members($p_id = 0) {
       FROM ProjectUser
            LEFT JOIN UserObm ON projectuser_user_id = userobm_id
       WHERE projectuser_project_id = '$p_id'
-        and projectuser_projecttask_id is null
+        AND projectuser_projecttask_id is null
       GROUP BY member_id, member_firstname, member_lastname, member_manager
-      ORDER BY member_lastname
-      ";
+      ORDER BY member_lastname";
+
   } else { 
     $query = "
       SELECT
@@ -1254,8 +1264,8 @@ function run_query_members($p_id = 0) {
            LEFT JOIN UserObm ON projectuser_user_id = userobm_id
       WHERE projectuser_projecttask_id is null
       GROUP BY member_id, member_firstname, member_lastname
-      ORDER BY member_lastname
-      ";
+      ORDER BY member_lastname";
+
   }
   display_debug_msg($query, $cdg_sql, "run_query_members");
   $obm_q = new DB_OBM;

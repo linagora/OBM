@@ -95,9 +95,9 @@ function dis_project_search_form($project) {
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
-  global $l_name, $l_company, $l_tasktype, $l_manager, $l_member, $l_date;
+  global $l_name, $l_company, $l_tasktype, $l_project_manager, $l_member;
   global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_archive;
-  global $display, $c_all, $l_select_project;
+  global $display, $c_all, $l_select_project, $l_date;
 
   $popup = $project["popup"];
   $name = $project["name"];
@@ -190,7 +190,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       <div class=\"searchLabel\">$l_tasktype<br />
         $sel_tt
       </div>
-      <div class=\"searchLabel\">$l_manager<br />
+      <div class=\"searchLabel\">$l_project_manager<br />
         $sel_manager
       </div>
       <div class=\"searchLabel\">$l_member<br />
@@ -851,6 +851,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
+  global $l_task_fac, $l_task_int, $l_task_div;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef;
   global $l_comment,$l_add_comment,$l_upd_comment;
   global $uid, $cg_prod, $ctt_sales, $ctt_research, $c_php_isodate_format;
@@ -957,23 +958,31 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
 
   } else {
-    $tt_q = run_query_tasktype($ctt_research);
+    $tt_q = run_query_tasktype();
     $dis_comp = "";
   }
 
   // task type select
+  // TaskType select construction
+  $task_list = array($l_task_fac, $l_task_int, $l_task_div);
+  $type_prec = -1;
   $sel_tt = "
         <select id=\"sel_tt\" name=\"sel_tt\">
           <option value=\"$c_undef\">$l_undef</option>";
   while ($tt_q->next_record()) {
+    //put menu titles
+    if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
+      $sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
+      $type_prec = $task_i;
+    }
     $tt_id = $tt_q->f("tasktype_id");
     $tt_label = $tt_q->f("tasktype_label");
     $sel_tt .= "
           <option value=\"$tt_id\"";
     if ($tt_id == $tt) { $sel_tt .= " selected=\"selected\""; }
-    $sel_tt .= ">$tt_label</option>";
+    $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
   }
-  $sel_tt .= "</select>\n";
+  $sel_tt .= "</select>";
 
   // archive field
   if ($action == "detailupdate") {
@@ -1358,7 +1367,7 @@ function html_project_tasklist($tasks_q, $project) {
 function html_project_member_form($members_q, $project) {
   global $display;
   global $l_no_members, $l_members_info, $l_del_member_sel;
-  global $l_project, $l_manager, $l_member;
+  global $l_project, $l_project_manager, $l_member;
 
   $pid = $project["id"];
   $pname = $project["name"];
@@ -1373,19 +1382,20 @@ function html_project_member_form($members_q, $project) {
       $m_name = $members_q->f("member_lastname"). " " .$members_q->f("member_firstname");
       $m_manager = $members_q->f("member_manager");
 
-      if ($m_manager)
+      if ($m_manager) {
 	$rd_manager = "
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked
-            onchange=\"change_status($m_id, 1, f_entity)\" />$l_manager
+            onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\"
             onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
-      else
+      } else {
 	$rd_manager = "
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\"
-            onchange=\"change_status($m_id, 1, f_entity)\" />$l_manager
+            onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
           <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked
             onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
-      
+      }
+
       $dis_member .= "
         <tr>
          <td class=\"projectMember\"><input type=\"checkbox\" name=\"cb_u$m_id\"/></td>

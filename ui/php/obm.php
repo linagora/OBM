@@ -62,12 +62,20 @@ if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_read)) {
   $block .= dis_deal_portal();
 }
 
+if ($cgp_show["module"]["project"] && $perm->check_right("project", $cright_read)) { 
+  $block .= dis_project_portal();
+}
+
 if ($cgp_show["module"]["incident"] && $perm->check_right("incident", $cright_read)) { 
   $block .= dis_incident_portal();
 }
 
 if ($cgp_show["module"]["contract"] && $perm->check_right("contract", $cright_read)) { 
   $block .= dis_contract_portal();
+}
+
+if ($cgp_show["module"]["invoice"] && $perm->check_right("invoice", $cright_read)) { 
+  $block .= dis_invoice_portal();
 }
 
 $display["detail"] = "
@@ -284,6 +292,56 @@ function dis_deal_portal() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display The Project specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_portal() {
+  global $uid, $ico_project_portal, $set_theme;
+  global $l_total, $l_module_project, $l_project_manager, $l_member;
+  global $l_my_project, $l_my_project_current;
+
+  $proj = run_query_project_memberstatus($uid);
+  if (count($proj) > 0) {
+    $dis_project .= "
+      <tr>
+        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_manager=$uid")."\">$l_project_manager</a></td>
+        <td class=\"number\">$proj[1]</td>
+      </tr>
+      <tr>
+        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_member=$uid")."\">$l_member</a></td>
+        <td class=\"number\">$proj[0]</td>
+      </tr>";
+  }
+
+  $block = "
+  <div class=\"portalModule\"> 
+   <div class=\"portalModuleLeft\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project_portal\" alt=\"\" />
+   </div>
+   <div class=\"portalTitle\">$l_module_project</div>
+   <div class=\"portalContent\">
+    <div>
+    <table>
+    <tr>
+      <td>$l_my_project_current &nbsp;</td>
+      <td class=\"number\">$proj[total]</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td></td>
+    </tr>
+    $dis_project
+    </table>
+
+    </div>
+   </div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_user=$uid")."\">$l_my_project</a></div>
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display The Incident specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_portal() {
@@ -316,15 +374,18 @@ function dis_incident_portal() {
       <td>$l_my_incident_current &nbsp;</td>
       <td class=\"number\">$incs[0]</td>
     </tr>
-    <tr><td>&nbsp;</td><td></td></tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td></td>
+    </tr>
     $dis_status
     </table>
 
     </div>
    </div>
    <div class=\"portalLink\"><a href=\"".url_prepare("incident/incident_index.php?action=search&amp;sel_owner=$uid")."\">$l_my_incident</a></div>
-  </div>
-  ";
+  </div>";
+
   return $block;
 }
 
@@ -370,9 +431,60 @@ function dis_contract_portal() {
     </div>
    </div>
    <div class=\"portalLink\"><a href=\"".url_prepare("contract/contract_index.php?action=search&amp;sel_manager=$uid")."\">$l_my_contract</a></div>
-  </div>
-  ";
+  </div>";
+
   return $block;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The Invoice specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_invoice_portal() {
+  global $uid, $ico_invoice_portal, $set_theme;
+  global $l_total, $l_module_invoice, $l_billed, $l_bill_potential;
+  global $l_current_month, $l_next_month;
+
+  //  $proj = run_query_invoice_date_status($uid);
+  if (count($proj) > 0) {
+    $dis_project .= "
+      <tr>
+        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_manager=$uid")."\">$l_billed</a></td>
+        <td class=\"number\">$proj[1]</td>
+      </tr>
+      <tr>
+        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_member=$uid")."\">$l_bill_potential</a></td>
+        <td class=\"number\">$proj[0]</td>
+      </tr>";
+  }
+
+  $block = "
+  <div class=\"portalModule\">
+   <div class=\"portalModuleLeft\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice_portal\" alt=\"\" />
+   </div>
+   <div class=\"portalTitle\">$l_module_invoice</div>
+   <div class=\"portalContent\">
+    <div>
+    <table>
+    <tr>
+      <td>$l_my_project_current &nbsp;</td>
+      <td class=\"number\">$proj[total]</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td></td>
+    </tr>
+    $dis_project
+    </table>
+
+    </div>
+   </div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_user=$uid")."\">$l_my_project</a></div>
+  </div>";
+
+  return $block;
+}
+
 
 </script>

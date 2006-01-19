@@ -676,22 +676,33 @@ function run_query_delete_profile($param_user)  {
   $query = "DELETE FROM EventEntity
     WHERE evententity_entity = 'user'
       AND evententity_entity_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile()");
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(EventEntity)");
   $obm_q->query($query);
 
   // Remove all acl to the user and user's one
   $query = "DELETE FROM EntityRight
     WHERE entityright_entity = 'calendar'
       AND entityright_entity_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile()");
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(EntityRight)");
   $obm_q->query($query);
   $query = "DELETE FROM EntityRight
     WHERE entityright_consumer = 'user'
       AND entityright_consumer_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile()");
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(EntityRight)");
   $obm_q->query($query);
 
-  // XXXXXX what to do with : project allocation entries and timetask entries
+  // Remove all Project participation
+  $query = "DELETE FROM ProjectUser
+    WHERE projectuser_user_id = '$param_user'"; 
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(ProjectUser)");
+  $obm_q->query($query);
+
+  // Remove all User Time management data
+  // This is dangerous, but forbidden if user has timetask data (check_can..)
+  $query = "DELETE FROM TimeTask
+    WHERE timetask_user_id = '$param_user'"; 
+  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(TimeTask)");
+  $obm_q->query($query);
 }
 
 

@@ -27,8 +27,6 @@ $l_progeval = "Evaluation de l'avance/retard";
 
 // Labels et textes
 $l_parent = "Tâche parent";
-$l_manager = "Chef de projet";
-$l_member = "Participant";
 $l_soldtime = "Temps vendu";
 $l_projtime = "Temps prévu";
 $l_total = "Total";

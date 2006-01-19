@@ -27,7 +27,6 @@ $l_progeval = "Advance/Lateness evaluation";
 
 // Labels et textes
 $l_parent = "Parent task";
-$l_member = "Member";
 $l_soldtime = "Sold time";
 $l_projtime = "Projected time";
 $l_total = "Total";
