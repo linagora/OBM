@@ -541,7 +541,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
   global $l_mailing, $l_contact_archive, $l_info_pub;
   global $l_query, $l_expert, $l_normal;
-  global $clist_mode_normal, $clist_mode_expert;
+  global $cgp_show, $clist_mode_normal, $clist_mode_expert;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");
@@ -558,6 +558,14 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   $mode = $list_q->f("list_mode");
   $static_nb = $list_q->f("list_static_nb");
   $structure = $list_q->f("list_structure");
+
+  if ($cgp_show["module"]["publication"]) {
+    $dis_pub = "
+    <tr>
+      <td class=\"detailLabel\">$l_info_pub</td>
+      <td class=\"detailText\">$dis_info_pub</td>
+    </tr>";
+  }
 
   if ($structure != "") {
     $criteria = unserialize($structure);
@@ -609,6 +617,8 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
       <td class=\"detailText\">$d_query</td>
     </tr>";
   }
+
+
   $display["detailInfo"] = display_record_info($list_q);
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
@@ -627,10 +637,9 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_contact_archive</td>
       <td class=\"detailText\">$dis_con_arch</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_info_pub</td>
-      <td class=\"detailText\">$dis_info_pub</td>
-    </tr> <tr>
+    </tr>
+    $dis_pub
+    <tr>
       <td class=\"detailLabel\">$l_subject</td>
       <td class=\"detailText\">$subject</td>
     </tr><tr>
@@ -775,7 +784,7 @@ function dis_list_form($action, $list_q, $list) {
 function html_list_form($action, $list_q, $list) {
   global $l_name,$l_subject,$l_email,$l_mailing,$l_contact_archive,$l_info_pub;
   global $l_query, $l_list, $l_private;
-  global $clist_mode_normal, $clist_mode_expert, $l_expert, $l_normal;
+  global $cgp_show,$clist_mode_normal, $clist_mode_expert, $l_expert,$l_normal;
   global $action, $display, $uid;
 
   // if update mode and first time, values are taken from db
@@ -824,6 +833,15 @@ function html_list_form($action, $list_q, $list) {
   if ($contact_arch == 1) $dis_con_arch .= "checked = \"checked\""; 
   if ($info_pub == 1) $dis_info_pub .= "checked = \"checked\""; 
 
+  if ($cgp_show["module"]["publication"]) {
+    $dis_pub = "
+    <tr>
+      <td class=\"detailLabel\">$l_info_pub</td>
+      <td class=\"detailForm\"><input type=\"checkbox\" $dis_info_pub name=\"cb_info_pub\" value=\"1\" /></td>
+    </tr>";
+  }
+
+
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
@@ -866,11 +884,7 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailForm\">
       <input type=\"checkbox\" $dis_con_arch name=\"cb_contact_arch\" value=\"1\" /></td>
   </tr>  
-  <tr>
-    <td class=\"detailLabel\">$l_info_pub</td>
-    <td class=\"detailForm\">
-      <input type=\"checkbox\" $dis_info_pub name=\"cb_info_pub\" value=\"1\" /></td>
-  </tr>  
+  $dis_pub
   </table>
   <div class=\"detailHead\">$l_query</div>  
     <table class=\"detail\">

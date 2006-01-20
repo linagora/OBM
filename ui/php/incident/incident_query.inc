@@ -77,10 +77,10 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   }
   $join_category1 = "LEFT JOIN IncidentCategory1 ON incident_category1_id=incidentcategory1_id";
   if (($category1 != $c_all) && ($category1 != "")) {
-    $where .= " AND incidentcategory1link_category_id='$category1'";
+    $where .= " AND Incident.incident_category1_id = '$category1'";
   }
   if ($archive == "0") {
-     $where .= " AND Incident.incident_archive != '1'";
+    $where .= " AND Incident.incident_archive != '1'";
   }
   $whereq = "WHERE $where";
 
@@ -100,6 +100,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       incidentpriority_color,
       incident_status_id,
       incidentstatus_label as incident_status,
+      incidentcategory1_label as incident_category1,
       incident_logger,
       incident_owner,
       incident_archive,

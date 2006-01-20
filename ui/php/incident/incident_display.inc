@@ -17,6 +17,7 @@ $fieldnames["incident_label"] = $l_label;
 $fieldnames["incident_priority"] = $l_priority;
 $fieldnames["incident_date"] = $l_date;
 $fieldnames["incident_duration"] = $l_duration;
+$fieldnames["incident_category1"] = $l_category1;
 
 // Calculate fields
 $fieldnames["timeupdate"] = $l_lastupdate;

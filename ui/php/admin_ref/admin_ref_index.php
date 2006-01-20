@@ -243,7 +243,7 @@ function get_param_ref() {
 // ADMIN REF actions
 //////////////////////////////////////////////////////////////////////////////
 function get_admin_ref_action() {
-  global $actions, $path;
+  global $actions, $path, $cgp_show;
   global $l_header_datasource, $l_header_country, $l_header_tasktype;
   global $cright_read_admin, $cright_write_admin;
 
@@ -320,41 +320,47 @@ function get_admin_ref_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-  // Tasktype index
-  $actions["admin_ref"]["tasktype"] = array (
+  // Tasktype management only displayed if deal or project or time module
+  if (($cgp_show["module"]["deal"])
+      || ($cgp_show["module"]["project"])
+      || ($cgp_show["module"]["time"])) {
+
+    // Tasktype index
+    $actions["admin_ref"]["tasktype"] = array (
      'Name'     => $l_header_tasktype,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype&amp;mode=html",
      'Right'    => $cright_read_admin,
      'Condition'=> array ('all')
                                     	  );
 
-// Tasktype Insert
-  $actions["admin_ref"]["tasktype_insert"] = array (
+    // Tasktype Insert
+    $actions["admin_ref"]["tasktype_insert"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
-// Tasktype Update
-  $actions["admin_ref"]["tasktype_update"] = array (
+    // Tasktype Update
+    $actions["admin_ref"]["tasktype_update"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
-// Tasktype Check Link
-  $actions["admin_ref"]["tasktype_checklink"] = array (
+    // Tasktype Check Link
+    $actions["admin_ref"]["tasktype_checklink"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-// Tasktype Delete
-  $actions["admin_ref"]["tasktype_delete"] = array (
+    // Tasktype Delete
+    $actions["admin_ref"]["tasktype_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
+  }
 
 }
 

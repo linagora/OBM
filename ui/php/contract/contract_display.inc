@@ -414,13 +414,46 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
   
-  $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
-
   if ($last > 0) {
     $url_inc_last = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_contract=$id&amp;param_incident=$last");
     $dis_last = "<li>
     <a href=\"$url_inc_last\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc_last\">$l_last</a></li>";
+  }
+
+  // Deal
+  if ($cgp_show["module"]["deal"] && $deal_id > 0) {
+    $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
+    $block_deal = "
+    <div class=\"linkTitle\">:: $l_module_deal</div>
+    <ul class=\"linkList\">
+    <li>
+      <a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
+      <a href=\"$url_deal\">$l_deal</a>
+    </li>
+    </ul>";
+  }
+
+  // Document  
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contract");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contract");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contract/contract_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contract";
+
+    $nb_document = run_query_document_nb ($id,"Contract");
+    $block_doc = "
+  <div class=\"linkTitle\">:: $l_module_document</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+        <a href=\"$url_doc_new\">$l_document_new</a></li>
+	<li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>";
   }
 
   $block = "<div class=\"link\">
@@ -435,36 +468,9 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
     <a href=\"$url_inc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc_new\">$l_incident_new</a></li>
   </ul>
-
-  <div class=\"linkTitle\">:: $l_module_deal</div>
-  <ul class=\"linkList\">
-  <li>
-    <a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
-    <a href=\"$url_deal\">$l_deal</a>
-  </li>
-  </ul>";
-
-  // Document  
-  if ($cgp_show["module"]["document"]) {
-    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contract");
-    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contract");
-    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contract/contract_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contract";
-
-    $nb_document = run_query_document_nb ($id,"Contract");
-    $block .= "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
-        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
-        <a href=\"$url_doc_new\">$l_document_new</a></li>
-	<li><a href=\"\" 
-	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	 $l_document_add</a></li>
-  </ul> </div>";
-  }
+  $block_deal
+  $block_doc  
+  </div>";
 
   return $block;
 }
