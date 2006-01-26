@@ -38,6 +38,7 @@ require("agenda_query.inc");
 require("agenda_display.inc");
 require("$obminclude/lib/right.inc");
 require_once("$obminclude/of/of_category.inc");
+require("$obminclude/javascript/calendar.js.inc");
 
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();

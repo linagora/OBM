@@ -1827,20 +1827,14 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   <tr>
     <td class=\"detailLabel\">$l_datebegin $l_format </td>
     <td class=\"detailForm\">
-      <input onchange=\"changeDateEnd(this.form)\" type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_entity.tf_date_begin,'agenda_index.php?action=calendar&popup=1') ;\">
-        <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
+			<script>calendar('tf_date_begin','$datebegin')</script>
       <span id=\"hour_begin\" style=\"$style\" >$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_dateend $l_format</td>
+    <td class=\"detailLabel\">$l_dateend  $l_format</td>
     <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$dateend\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_entity.tf_date_end,'agenda_index.php?action=calendar&popup=1');\">
-        <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
+  		<script>calendar('tf_date_end','$dateend')</script>
       <span id=\"hour_end\" style=\"$style\" >$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>       
   </tr>
@@ -1859,10 +1853,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   <tr>    
     <td class=\"detailLabel\">$l_date_repeatend</td> 
     <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_repeat_end\" name=\"tf_repeat_end\" maxlength=\"10\" size=\"12\" value=\"$repeat_end\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_entity.tf_repeat_end,'agenda_index.php?action=calendar&popup=1');\">
-        <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>     
+			<script>calendar('tf_repeat_end','$repeat_end')</script>
     </td>
   </tr>
   <tr>  
@@ -2386,10 +2377,7 @@ function dis_meeting_form($agenda, $sel_entity_id) {
   <tr>
     <td class=\"detailLabel\">$l_datebegin $l_format</td>
     <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_entity.tf_date_begin,'agenda_index.php?action=calendar&popup=1');\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
+  		<script>calendar('tf_date_begin','$datebegin')</script>
     </td>
   </tr>
   <tr>    
