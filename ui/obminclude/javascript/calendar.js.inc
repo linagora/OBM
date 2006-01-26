@@ -307,10 +307,10 @@ function calendar(DateName,DispDate) {
 	writeln('<td class=\"calendarDateInput \" id=\"' + DateName + '_Previous_ID\" onClick=\"' + DateName + '_Object.previous.go()\"><img src=\"' + PrevURL + '\"></td>');
 
 	// Bouton mois en cours
-	writeln('<td class=\"calendarDateInput \" id=\"' + DateName + '_Current_ID\" class=\"calendarDateInput\" colspan=\"5\">' + eval(DateName + '_Object.displayed.fullName') + '</td>');
+	writeln('<td id=\"' + DateName + '_Current_ID\" class=\"calendarDateInput\" colspan=\"5\">' + eval(DateName + '_Object.displayed.fullName') + '</td>');
 
 	// Bouton suivant
-	writeln('<td class=\"calendarDateInput \" id=\"' + DateName + '_Next_ID\" class=\"calendarDateInput\" onClick=\"' + DateName + '_Object.next.go()\"><img src=\"' + NextURL + '\"></td></tr><tr>');
+	writeln('<td id=\"' + DateName + '_Next_ID\" class=\"calendarDateInput\" onClick=\"' + DateName + '_Object.next.go()\"><img src=\"' + NextURL + '\"></td></tr><tr>');
 
 	// Affiche la liste des jours
 	for (var w=0;w<7;w++) 
