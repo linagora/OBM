@@ -797,3 +797,73 @@ span.hiddenLegend {
   border: 1px solid black;
   moz-border-radius:
 }
+
+/* ------------------------------------------------------------------------- */
+/* Calendrier */
+/* ------------------------------------------------------------------------- */
+
+.calendarDateInputHover {
+	letter-spacing:normal;
+	line-height:normal;
+	font-family:	sans-serif;
+	font-size:12px;
+	height:14px;
+	cursor:default;
+}
+
+td.calendarDateInputHover:hover {
+	background:#7B9EAD;
+	font-weight:bold;
+	color:#FFF;
+}
+
+.calendarThisDay {
+	background:#EEE;
+	border:1px solid #7B9EAD;
+	font-weight:bold;
+	color: #7B9EAD;
+}
+
+td.calendarThisDay:hover {
+	background:#7B9EAD;
+	font-weight:bold;
+	color: #FFF;
+}
+
+.calendarDateInput {
+	letter-spacing:normal;
+	line-height:normal;
+	font-family:	sans-serif;
+	text-align:center;
+	font-size: 12px;
+	height:14px;
+	cursor:default;
+}
+
+.calendarDateInputDay {
+	letter-spacing:normal;
+	line-height:normal;
+	text-align:center;
+	font-family:	sans-serif;
+	font-size:12px;
+	height:14px;
+	width:30px;
+	cursor:default;
+	font-weight:bold;
+	border-top:1px solid #CCC;
+	border-bottom:1px solid #CCC;
+}
+		
+.calendarDateInputHead {
+	font-weight:bold;
+	background:#EEE;
+}
+
+.calendarButton {
+	vertical-align:bottom;
+}
+
+.calendarSpan {
+	background-color:#FFF;
+	border:1px solid #CCC;
+}
