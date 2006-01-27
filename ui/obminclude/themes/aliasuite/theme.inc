@@ -62,10 +62,13 @@ $ico_statistic      = "ico_stat.gif";
 //$ico_time           = "ico_time.gif";
 //$ico_project        = "ico_project.png";
 $ico_user           = "ico_user.gif";
+$ico_resource       = "../standard/ico_resource.gif";
 $ico_add_user       = "ico_user_new.gif";
 $ico_group          = "ico_group.gif";
 $ico_add_group      = "ico_group_new.gif";
 $ico_setting        = "ico_setting.gif";
+$ico_resourcegroup  = "../standard/ico_resourcegroup.gif";
+$ico_add_resourcegroup = "../standard/ico_resourcegroup_new.gif";
 
 // Admin icons
 $ico_admin          = "ico_admin.gif";
@@ -125,6 +128,18 @@ $ico_mini_larrow2   = "arrows_l_anim.gif";
 $ico_mini_rarrow    = "arrows_r_still.gif";
 $ico_mini_rarrow2   = "arrows_r_anim.gif";
 $ico_mini_cal       = "calendar.png";
+$ico_cal_user1      = "../standard/ico_cal_user1.gif";
+$ico_cal_user2      = "../standard/ico_cal_user2.gif";
+$ico_cal_user3      = "../standard/ico_cal_user3.gif";
+$ico_cal_user4      = "../standard/ico_cal_user4.gif";
+$ico_cal_user5      = "../standard/ico_cal_user5.gif";
+$ico_cal_user6      = "../standard/ico_cal_user6.gif";
+$ico_cal_resource1  = "../standard/ico_cal_res1.gif";
+$ico_cal_resource2  = "../standard/ico_cal_res2.gif";
+$ico_cal_resource3  = "../standard/ico_cal_res3.gif";
+$ico_cal_resource4  = "../standard/ico_cal_res4.gif";
+$ico_cal_resource5  = "../standard/ico_cal_res5.gif";
+$ico_cal_resource6  = "../standard/ico_cal_res6.gif";
 // Export icons
 $ico_html = "ico_netscape.png";
 $ico_excel = "ico_excel.png";
