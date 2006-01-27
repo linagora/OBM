@@ -221,22 +221,22 @@ td.agendaNoEvent	{
 }
 
 td.agendaAllDay1	{
-	background-image: 	url(bg_cell_allday.png);
+	background-image: 	url(../standard/bg_cell_allday.png);
 }
 td.agendaAllDay2	{
-	background-image: 	url(bg_cell_allday2.png);
+	background-image: 	url(../standard/bg_cell_allday2.png);
 }
 td.agendaAllDay3	{
-	background-image: 	url(bg_cell_allday3.png);
+	background-image: 	url(../standard/bg_cell_allday3.png);
 }
 td.agendaAllDay4	{
-	background-image: 	url(bg_cell_allday4.png);
+	background-image: 	url(../standard/bg_cell_allday4.png);
 }
 td.agendaAllDay5	{
-	background-image: 	url(bg_cell_allday5.png);
+	background-image: 	url(../standard/bg_cell_allday5.png);
 }
 td.agendaAllDay6	{
-	background-image: 	url(bg_cell_allday6.png);
+	background-image: 	url(../standard/bg_cell_allday6.png);
 }
 
 td.border {
