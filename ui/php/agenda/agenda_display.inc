@@ -2538,7 +2538,7 @@ function dis_export_handle($agenda) {
   $start_time = strtotime("-1 year", $ts_date);
   $end_time = strtotime("+1 year", $ts_date);
 
-  $calendar_user = array ($auth->auth["uid"] => "dummy");  
+  $calendar_user["user"] = array ($auth->auth["uid"] => "dummy");  
   $ev_q = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
 
   header("Content-Type: text/x-vCalendar");

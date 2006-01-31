@@ -811,7 +811,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   global $l_contract_kind,$l_format,$l_autorenewal;
   global $l_ticket_nb,$l_private,$uid,$l_duration; 
   global $cck_customer, $cck_supplier, $l_cck_customer,$l_cck_supplier;
-  global $ccf_period, $ccf_ticket, $ccf_duration;
+  global $ccf_period, $ccf_ticket, $ccf_duration, $cgp_show;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
 
   // if update mode and first time, values are taken from db
@@ -1132,6 +1132,20 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
 
   // --- html template --------------------------------------------------------
+  if ($cgp_show["module"]["deal"] && $deal_id > 0) {
+    $block_deal = "
+      </tr><tr>
+      <td class=\"detailLabel\">$l_deal
+        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
+      </td>
+      <td class=\"detailForm\">
+        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
+        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
+        <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+        </td>";
+  }
 
   $block = "
   <form method=\"post\" name=\"f_entity\"
@@ -1155,17 +1169,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_client_manager 2 $dis_con2</td>
       <td class=\"detailForm\">$dis_sel_con2</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_deal
-        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-        <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
-      </td>
-      <td class=\"detailForm\">
-        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
-        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
-        <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-      </td>
+      $block_deal
     </tr>
     </table>
   <div class=\"detailHead\">$l_contract</div>

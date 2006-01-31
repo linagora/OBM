@@ -394,7 +394,7 @@ function dis_incident_portal() {
 // Display The Contract specific portal layer
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_portal() {
-  global $uid, $ico_contrac_portal, $set_theme;
+  global $uid, $ico_contract_portal, $set_theme;
   global $l_total, $l_module_contract, $l_my_contract, $l_my_contract_current;
   global $l_cr_date;
   global $cr_date_tosign, $cr_date_tobegin, $cr_date_current, $cr_date_torenew, $cr_date_ended;
