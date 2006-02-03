@@ -800,6 +800,7 @@ function dis_contract_form($action,$contract,$param_company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract,$pri_q,$sta_q){
   // - Themes
+  global $cgp_show;
   global $uid, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
   global $l_label,$l_begin,$l_type, $l_marketing_manager, $l_archive;
@@ -918,6 +919,21 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     if ($vis == 1) $dis_vis .= "checked = \"checked\"";
       $dis_vis .= " /></td></tr>";
   }
+
+  if ($cgp_show["module"]["deal"] && $deal_id > 0) {
+    $block_deal = "
+    <tr>
+      <td class=\"detailLabel\">$l_deal
+        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
+      </td>
+      <td class=\"detailForm\">
+        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
+        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
+        <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+      </td>
+    </tr>";
 
   // Priority select
   $sel_pri = "<select name=\"sel_priority\">";
@@ -1055,7 +1071,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     }
     $dis_sel_con1 .= ">$lc_text</option>";
   }
-  $dis_sel_con1.="</select>";
+  $dis_sel_con1 .= "</select>";
   
   if ($action == "detailupdate") {
     if ($con1_id > 0) {
@@ -1068,7 +1084,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $contact_q->seek(0);
   }
    
-  $dis_sel_con2="<select name=\"sel_con2\">
+  $dis_sel_con2 = "<select name=\"sel_con2\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($contact_q->next_record()) {
     $lc_id = $contact_q->f("contact_id");
@@ -1134,7 +1150,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   // --- html template --------------------------------------------------------
   if ($cgp_show["module"]["deal"] && $deal_id > 0) {
     $block_deal = "
-      </tr><tr>
+    <tr>
       <td class=\"detailLabel\">$l_deal
         <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
@@ -1144,8 +1160,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-        </td>";
+      </td>
+    </tr>";
   }
+
 
   $block = "
   <form method=\"post\" name=\"f_entity\"
@@ -1169,8 +1187,8 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_client_manager 2 $dis_con2</td>
       <td class=\"detailForm\">$dis_sel_con2</td>
-      $block_deal
     </tr>
+    $block_deal
     </table>
   <div class=\"detailHead\">$l_contract</div>
     <table class=\"detail\">

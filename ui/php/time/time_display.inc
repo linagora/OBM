@@ -32,7 +32,7 @@ $fieldnames["timetask_id"] = "";
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Time specific dataset fields                                      //
+// Display Time specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display

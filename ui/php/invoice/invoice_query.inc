@@ -327,20 +327,36 @@ function run_query_update ($invoice) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// getting invoice status data
+// Get invoice status list with coditions
+// Parameters:
+//   - $target : "payment" : get status where invoice should have a payment
+// Returns:
+//   - $status : array of status [id][label]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoicestatus() {
+function get_invoicestatus($target="") {
   global $cdg_sql;
+
+  if ($target == "payment") {
+    $wtarget = "WHERE invoicestatus_payment = 1";
+  }
 
   $query = "SELECT invoicestatus_id,
       invoicestatus_label
     FROM InvoiceStatus
+    $wtarget
     ORDER BY invoicestatus_archive, invoicestatus_payment";
-  display_debug_msg($query, $cdg_sql, "run_query_invoicestatus()");
+
+  display_debug_msg($query, $cdg_sql, "get_invoicestatus()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  return $obm_q;
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("invoicestatus_id");
+    $label = $obm_q->f("invoicestatus_label");
+    $status[$id] = $label;
+  }
+
+  return $status;
 }
 
 
@@ -534,6 +550,90 @@ function get_invoicestatus_info($p_id) {
     $res["archive"] = $obm_q->f("invoicestatus_archive");
   } else {
     $res = "";
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get global invoices infos
+// Parameters:
+//   - $date_ranges : array [range1] : [date_start, date_end]
+// Returns:
+//     array : array[date]([billed]|[potential])([status]|[total])[$infos]
+///////////////////////////////////////////////////////////////////////////////
+function run_query_invoice_amounts($date_ranges) {
+  global $cdg_sql, $cdg_param;
+  global $l_total;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $da = sql_date_format($db_type, "invoice_date", "date");
+  $de = sql_date_format($db_type, "invoice_expiration_date", "expiration_date");
+
+  if (is_array($date_ranges)) {
+    $w_date = "AND ";
+    foreach ($date_ranges as $range) {
+      $d1 = $range[0];
+      $d2 = $range[1];
+      $w_date .= " $or (invoice_date > '$d1' AND invoice_date < '$d2')";
+      $or = "OR";
+    }
+  }
+
+  // Factured (invoicestatus_payment = 1) OR potential (status_created = 0)
+  $query = "SELECT
+      $da,
+      $de,
+      invoice_amount_ht,
+      invoice_amount_ttc,
+      invoice_inout,
+      invoice_status_id,
+      invoicestatus_label,
+      invoicestatus_payment
+    FROM Invoice
+      LEFT JOIN InvoiceStatus on invoice_status_id=invoicestatus_id
+    WHERE invoice_inout = '+' 
+      AND (invoicestatus_payment=1 OR invoicestatus_created=0)
+      $w_date 
+    ORDER BY invoice_status_id
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_invoice_amounts()");
+  $obm_q->query($query);
+  
+  while ($obm_q->next_record()) {
+    $ah = $obm_q->f("invoice_amount_ht");
+    $at = $obm_q->f("invoice_amount_ttc");
+    $inout = $obm_q->f("invoice_inout");
+    $date = $obm_q->f("date");
+    $month = substr($date, 0, 7);
+    $status = $obm_q->f("invoice_status_id");
+    $statuslabel = $obm_q->f("invoicestatus_label");
+    $payment = $obm_q->f("invoicestatus_payment");
+
+    // Invoice created
+    if ($payment == "1") {
+      $res[$month]["billed"]["$status"]["label"] = $statuslabel;
+      $res[$month]["billed"]["$status"]["amount_ht"] += $ah;
+      $res[$month]["billed"]["$status"]["amount_ttc"] += $at;
+      $res[$month]["billed"]["$status"]["nb"] ++;
+      $res[$month]["billed"]["total"]["label"] = $l_total;
+      $res[$month]["billed"]["total"]["amount_ht"] += $ah;
+      $res[$month]["billed"]["total"]["amount_ttc"] += $at;
+      $res[$month]["billed"]["total"]["nb"] ++;
+    } else {
+      // Invoice to create
+      $res[$month]["potential"]["$status"]["label"] = $statuslabel;
+      $res[$month]["potential"]["$status"]["amount_ht"] += $ah;
+      $res[$month]["potential"]["$status"]["amount_ttc"] += $at;
+      $res[$month]["potential"]["$status"]["nb"] ++;
+      $res[$month]["potential"]["total"]["label"] = $l_total;
+      $res[$month]["potential"]["total"]["amount_ht"] += $ah;
+      $res[$month]["potential"]["total"]["amount_ttc"] += $at;
+      $res[$month]["potential"]["total"]["nb"] ++;
+    }
   }
 
   return $res;

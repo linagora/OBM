@@ -128,8 +128,8 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_search_form($invoice="") {
 
-  $sta_q = run_query_invoicestatus();
-  $block .= html_invoice_search_form($sta_q, $invoice);
+  $sta = get_invoicestatus();
+  $block .= html_invoice_search_form($sta, $invoice);
 
   return $block;
 }
@@ -138,11 +138,11 @@ function dis_invoice_search_form($invoice="") {
 ///////////////////////////////////////////////////////////////////////////////
 // invoice search Form
 // Parameters :
-//  $sta_q   : DBO : status info
+//  $sta     : array of status
 //  $invoice : invoice hash parameters
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_search_form($sta_q, $invoice) {
-  global $c_all, $l_all_f;
+function html_invoice_search_form($sta, $invoice) {
+  global $c_all, $l_all;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
@@ -166,10 +166,8 @@ function html_invoice_search_form($sta_q, $invoice) {
   $url_form = url_prepare("invoice_index.php?action=search");
 
   $sel_status = "<select name=\"sel_status\">
-     <option value=\"$c_all\">$l_all_f</option>";
-  while ($sta_q->next_record()) {
-    $s_id = $sta_q->f("invoicestatus_id");
-    $s_label = $sta_q->f("invoicestatus_label");
+     <option value=\"$c_all\">$l_all</option>";
+  foreach ($sta as $s_id => $s_label) {
     $sel_status .= "<option value=\"$s_id\"";
     if ($status == $s_id) $sel_status .= " selected = \"selected\"";
     $sel_status .= ">$s_label</option>";
@@ -586,9 +584,9 @@ function dis_invoice_form($action, $invoice) {
   } else {
     $inv_q = "";
   }
-  $stat_q = run_query_invoicestatus();
+  $stat = get_invoicestatus();
   $usr_q = run_query_userobm_active();
-  $block = html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q);
+  $block = html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q);
 
   return $block;
 }
@@ -600,10 +598,10 @@ function dis_invoice_form($action, $invoice) {
 //   - $action    : action called
 //   - $invoice[] : invoice hash parameters
 //   - $inv_q     : if updating, contains the invoice current info
-//   - $stat_q    : Database result with status list
+//   - $stat      : Array of status list
 //   - $usr_q     : userobm database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
+function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   global $auth, $path, $display, $set_theme;
   global $ico_company, $ico_deal, $ico_project;
   global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
@@ -695,9 +693,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
 
   // Status select
   $sel_status = "<select name=\"sel_status\">"; 
-  while ($stat_q->next_record()) {
-    $s_id = $stat_q->f("invoicestatus_id");
-    $s_label = $stat_q->f("invoicestatus_label");
+  foreach ($stat as $s_id => $s_label) {
     $sel_status .= "<option value=\"$s_id\""; 
     if ($s_id == $status) {
       $sel_status .= " selected ";
@@ -915,6 +911,116 @@ function dis_can_delete_invoice($p_id) {
 
   return $block;
 }
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Display the invoice dashboard
+// Parameters:
+//   - $invoice : invoice hash infos
+//////////////////////////////////////////////////////////////////////////////
+function dis_invoice_dashboard($invoice) {
+  global $display, $set_theme, $path;
+  global $l_status, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
+
+  $year = date("Y");
+  $year = "2005";
+  $date_ranges = array(array("$year-01-01", "$year-12-31"));
+  $inv = run_query_invoice_amounts($date_ranges);
+  $url_prev = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_prev");
+  $url_next = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_next");
+
+  $status_pay = get_invoicestatus("payment");
+
+  // Table header
+  for ($month = 1; $month < 13; $month++) {
+    $table_head .= "
+      <td class=\"resultHead\">$month</td>";
+  }
+
+  // Loop through status (rows)
+  foreach ($status_pay as $s_id => $s_label) { 
+
+    $dis_row .= "<tr>
+      <td>$s_label</td>";
+
+    // Loop through each month (cols)
+    for ($month = 1; $month < 13; $month++) {
+
+      // left pad the month
+      if ($month > 9) {
+	$year_month = "$year-$month";
+      } else {
+	$year_month = "$year-0$month";
+      }
+      echo "$year_month";
+      print_r($inv["$year_month"]["billed"]);
+      // Invoice created
+      if (is_array($inv["$year_month"]["billed"]["$s_id"])) {
+	$status_info = $inv["$year_month"]["billed"]["$s_id"];
+	$amount_ht = $status_info["amount_ht"];
+	$nb = $status_info["nb"];
+        $dis_row .= "
+          <td>$amount_ht</td>";
+      }
+    }
+    $dis_row .= "</tr>";
+
+  }
+
+  $block = "
+    <div class=\"detailHead\">$title</div>
+
+      <table>
+      <tr>
+        <td>
+          <a href=\"$url_prev\">
+          <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" />
+          </a>
+        </td>
+        <td class=\"timePeriod\">
+          $year
+        </td>
+        <td>
+          <a href=\"$url_next\">
+           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" />
+          </a>
+        </td>
+      </tr>
+      </table>    
+
+
+    <table class=\"resultTable\">
+    <tr>
+      <td>$l_status</td>
+      $table_head
+    </tr>
+    $dis_row
+    <tr class=\"data2\">
+      <td>$l_total</td>
+      <td style=\"text-align: center;\">$m_nb_potential</td>
+      <td style=\"text-align: right;\">$m_amount</td>
+      <td style=\"text-align: right;\">$m_balanced</td>
+    </tr>
+    </table>
+    <p />
+    <table class=\"resultTable\">
+    <tr>
+      <td class=\"resultHead\">$l_technical_manager</td>
+      <td class=\"resultHead\"># $l_module_deal</td>
+      <td class=\"resultHead\">$l_deal_total</td>
+      <td class=\"resultHead\">$l_deal_balanced</td>
+    </tr>
+    $dis_tech_pot
+    <tr class=\"data2\">
+      <td>$l_total</td>
+      <td style=\"text-align: center;\">$t_nb_potential</td>
+      <td style=\"text-align: right;\">$t_amount</td>
+      <td style=\"text-align: right;\">$t_balanced</td>
+    </tr>
+    </table>";
+
+  return $block;
+} 
 
 
 ///////////////////////////////////////////////////////////////////////////////

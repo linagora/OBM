@@ -147,6 +147,10 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_invoice_consult($invoice);
   }
 
+} elseif ($action == "dashboard")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_invoice_dashboard($invoice);
+
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($invoice["doc_nb"] > 0) {
@@ -260,7 +264,7 @@ function get_invoice_action() {
   global $invoice, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display,$l_header_duplicate,$l_header_admin;
-  global $l_header_add_deal, $invoice_admin_write;
+  global $l_header_add_deal, $l_header_dashboard, $invoice_admin_write;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index 
@@ -338,6 +342,14 @@ function get_invoice_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      	);
+
+// Dashboard
+  $actions["invoice"]["dashboard"] = array (
+    'Name'     => $l_header_dashboard,
+    'Url'      => "$path/invoice/invoice_index.php?action=dashboard",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('all')
+                                        );
 
 // Display
   $actions["invoice"]["display"] = array (

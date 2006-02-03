@@ -389,7 +389,6 @@ function get_param_agenda() {
   }
   if (isset($param_event)) $agenda["id"] = $param_event;
   if (isset($ch_all_day)) $agenda["allday"] = $ch_all_day;
-  else  $agenda["allday"] = "0";
   if (isset($tf_title)) $agenda["title"] = $tf_title;
   if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
   if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;

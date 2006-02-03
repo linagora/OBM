@@ -352,7 +352,7 @@ function run_query_insert_event_data($agenda) {
   $priority = $agenda["priority"];
   $description = $agenda["description"];
   $location = $agenda["location"];
-  $all_day = $agenda["allday"]; 
+  $all_day = $agenda["allday"];
   $datebegin = $agenda["datebegin"];
   $dateend = $agenda["dateend"];
   $event_duration = $agenda["event_duration"];
@@ -1766,11 +1766,12 @@ function run_query_repeat_events($start, $end, $calendar_entity) {
       evententity_entity_id,
       calendarevent_repeatdays,
       calendarevent_allday
-    FROM CalendarEvent, CalendarCategory1, EventEntity
-    WHERE calendarevent_category1_id = calendarcategory1_id
-      AND calendarevent_id = evententity_event_id
-      AND evententity_state = 'A'
-      AND calendarevent_repeatkind != 'none'
+    FROM CalendarEvent
+      LEFT JOIN CalendarCategory1
+        ON calendarevent_category1_id = calendarcategory1_id
+      LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
+                               AND evententity_state = 'A'
+    WHERE calendarevent_repeatkind != 'none'
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
            OR $calendarevent_endrepeat = '0')
@@ -1805,8 +1806,8 @@ function events_model($start_time, $end_time, $calendar_entity) {
     $date = $nr_q->f("calendarevent_date");
     $duration = $nr_q->f("calendarevent_duration");
     $user_id = $nr_q->f("evententity_entity_id");
-    $all_day = $nr_q->f("calendarevent_allday");    
-    $event = &new Event($id,$duration,$title,$category1,$privacy,$description);
+    $all_day = $nr_q->f("calendarevent_allday");
+    $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
     store_event($date, $event, $day_events, $user_id, $all_day, $end_time);
   }
   
@@ -1830,7 +1831,7 @@ function events_model($start_time, $end_time, $calendar_entity) {
     $repeatdays = $r_q->f("calendarevent_repeatdays");
     $user_id = $r_q->f("evententity_entity_id");    
     $all_day = $r_q->f("calendarevent_allday");       
-    $event = &new Event($id,$duration,$title,$category1,$privacy,$description);
+    $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
     $temp_date = $date;
     $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
     $end_date += $day_duration;
@@ -2085,14 +2086,16 @@ class Event {
   var $id;
   var $duration;
   var $title;
+  var $location;
   var $category1;
   var $privacy;
   var $description;
 
-  function Event($id,$duration,$title,$category1,$privacy,$description) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
+    $this->location = $location;
     $this->category1 = $category1;
     $this->privacy = $privacy;
     $this->description = $description;

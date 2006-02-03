@@ -445,18 +445,53 @@ function dis_invoice_portal() {
   global $l_total, $l_module_invoice, $l_billed, $l_bill_potential;
   global $l_current_month, $l_next_month;
 
-  //  $proj = run_query_invoice_date_status($uid);
-  if (count($proj) > 0) {
-    $dis_project .= "
+  $year_month = date("Y-m");
+  $date_ranges = array(array("$year_month-01", "$year_month-31"));
+
+  $inv = run_query_invoice_amounts($date_ranges);
+
+  // Invoice created
+  if (is_array($inv["billed"])) {
+    foreach ($inv["billed"] as $status => $status_info) {
+      if ($status != "total") {
+	$label = $status_info["label"];
+	$amount_ht = $status_info["amount_ht"];
+	$nb = $status_info["nb"];
+	$dis_created .= "
+      <tr>
+        <td>$label</td>
+        <td class=\"number\">$amount_ht / </td>
+        <td class=\"number\">$nb</td>
+      </tr>";
+      }
+    }
+  }
+
+  // Invoice potential
+  if (is_array($inv["potential"])) {
+    foreach ($inv["potential"] as $status => $status_info) {
+      if ($status != "total") {
+	$label = $status_info["label"];
+	$amount_ht = $status_info["amount_ht"];
+	$nb = $status_info["nb"];
+	$dis_potential .= "
+      <tr>
+        <td>$label</td>
+        <td class=\"number\">$amount_ht / </td>
+        <td class=\"number\"> / $nb</td>
+      </tr>";
+      }
+    }
+  }
+
+  if (is_array($inv)) {
+    $dis_inv .= "
       <tr>
         <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_manager=$uid")."\">$l_billed</a></td>
         <td class=\"number\">$proj[1]</td>
-      </tr>
-      <tr>
-        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_member=$uid")."\">$l_bill_potential</a></td>
-        <td class=\"number\">$proj[0]</td>
       </tr>";
   }
+
 
   $block = "
   <div class=\"portalModule\">
@@ -468,19 +503,26 @@ function dis_invoice_portal() {
     <div>
     <table>
     <tr>
-      <td>$l_my_project_current &nbsp;</td>
-      <td class=\"number\">$proj[total]</td>
+      <td>$l_billed &nbsp;</td>
+      <td class=\"number\">".$inv["billed"]["total"]["amount_ht"]. " / </td>
+      <td class=\"number\">".$inv["billed"]["total"]["nb"]."</td>
     </tr>
+    $dis_created
     <tr>
       <td>&nbsp;</td>
       <td></td>
     </tr>
-    $dis_project
+    <tr>
+      <td>$l_bill_potential &nbsp;</td>
+      <td class=\"number\">".$inv["potential"]["total"]["amount_ht"]. " / </td>
+      <td class=\"number\">".$inv["potential"]["total"]["nb"]."</td>
+    </tr>
+    $dis_potential
     </table>
 
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_user=$uid")."\">$l_my_project</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("invoice/invoice_index.php?action=search&amp;sel_user=$uid")."\">$l_my_project</a></div>
   </div>";
 
   return $block;

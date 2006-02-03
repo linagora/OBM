@@ -465,9 +465,6 @@ function dis_year_planning($agenda, $calendar_entity) {
    
   $display_date = localizeDate("month", $ts_date);  
   
-  $td_heigth = 8;
-  $td_width = 8;
-  
   $events = events_model($start_time,$end_time, $calendar_entity);
   
   for ($i=0; $i<7; $i++) {
@@ -697,7 +694,7 @@ function dis_month_planning($agenda, $calendar_entity) {
       </a>";
 
     if (isset($events[$iso_day])) {      
-      $dis_month_cal .= "<table style=\"heigth:100%;width:100%;\"><tr>";
+      $dis_month_cal .= "<table style=\"height:100%;width:100%;\"><tr>";
       $day = $events[$iso_day];
       $days_events = $day->day_events;
 
@@ -705,12 +702,12 @@ function dis_month_planning($agenda, $calendar_entity) {
       foreach ($calendar_entity as $entity) {
 	foreach ($entity as $id => $properties) {
 	  $dis_month_cal .= "
-            <td><table style=\"heigth:100%;width:$td_width;\">";
+            <td><table style=\"height:10%;width:$td_width;\">";
 	  $list_events = $days_events[$id];
 	  if ($list_events != null) {
 	    $dis_month_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	    foreach ($list_events as $event) {
-	      $dis_month_cal .= allday_event_display(&$hidden_div,$event,$nb_ent,$properties);
+	      dis_event_allday_planning(&$dis_month_cal, &$hidden_div,$event,$nb_ent,$properties);
 	    }
 	    $dis_month_cal .= "</td>";
 	  }
@@ -719,7 +716,7 @@ function dis_month_planning($agenda, $calendar_entity) {
 	    $list_events = $events_data["events"];
 	    foreach ($events_data as $event) {
 	      $dis_month_cal .= "<tr><td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
-	      month_event_display(&$dis_month_cal,&$hidden_div,$event,$nb_ent,$properties);	   
+	      dis_event_planning("month", &$dis_month_cal,&$hidden_div,$event,$nb_ent,$properties);	   
 	      $dis_month_cal .= "</td></tr>";
 	    }
 	    
@@ -781,53 +778,6 @@ function dis_month_planning($agenda, $calendar_entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Make the event display 
-// Parameters:
-//    - $agenda         : agenda parameters
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array   : array of selected groups 
-//   - $nb_ent : number of entities to display
-///////////////////////////////////////////////////////////////////////////////
-function month_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
-  global $path, $l_private, $l_private_description, $set_theme,$ico_event;
-  global $auth,$l_begin,$l_end;
-
-  $id = $event["event"]->id;
-  $usr_id = $properties["id"];
-  if ($event["event"]->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
-    $title = $l_private;
-    $description = $l_private_description;
-    $link = "javascript:return false;";
-    $category1 = $l_private;    
-  } else {
-    $title = $event["event"]->title;
-    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
-    $description = $event["event"]->description;
-    $category1 = $event["event"]->category1;
-  }  
-  if ($nb_ent == 1) {	      
-    $event_head_display = date("H:i",$event["date"])."->".date("H:i",$event["date"] + $event["event"]->duration);
-  } else {
-    $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
-  }  
-  $week_cal .= "<a class=\"agendaLink\"
-    onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
-    onMouseOut=\"hide('$id-$usr_id'); return true;\"
-    href=\"$link\">$event_head_display</a><br />";
-  $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
-   <div class=\"blockTitle\">:: $title</div>
-   <ul class=\"blockItem\">
-    <li class=\"blockItem\">$category1</li>
-    <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
-    <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
-    <li class=\"blockItem\">$description</li>
-   </ul>
-  </div>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the week beginning at the specified date
 // Parameters:
 //    - $agenda          : agenda parameters
@@ -880,12 +830,12 @@ function dis_week_planning($agenda, $calendar_entity) {
     $daylink_end = urlencode(isodate_format(strtotime("+$cagenda_last_hour hours",$ts),"",1));
     $daylink_end = urlencode(isodate_format($ts + $dis_day_second,"",1));
     $week_day_list .= "
-    <td class=\"agendaCell\" colspan=\"$nb_ent\" style=\"width:$cell_widthpx\">
+    <td class=\"agendaCell\" colspan=\"$nb_ent\" style=\"width:${cell_width}px\">
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$iso_date")."\">$this_date_l</a>
       <br />
-      <a href=\"agenda_index.php?action=new&amp;tf_date_begin=$daylink_begin&amp;tf_date_end=$daylink_end\" > 
+      <a href=\"agenda_index.php?action=new&amp;tf_date_begin=$daylink_begin&amp;tf_date_end=$daylink_end\" >
        <img align=\"middle\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
-      </a>	
+      </a>
      </td>";
 
     $day = $events[$iso_date];
@@ -903,7 +853,7 @@ function dis_week_planning($agenda, $calendar_entity) {
 	  $all_days[$iso_date][$type][$id] = true;
 	  $days_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	  foreach($list_events as $event) {
-	    $days_cal .= allday_event_display(&$hidden_div,$event,$nb_ent,$properties);
+	    dis_event_allday_planning(&$days_cal, &$hidden_div, $event, $nb_ent, $properties);
 	  }
 	  $days_cal .= "</td>";
 	} else {
@@ -953,7 +903,7 @@ function dis_week_planning($agenda, $calendar_entity) {
 
 		  $week_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;text-align:left;\" rowspan=\"".ceil($duration/($time_unit_sec))."\">";
 		  foreach($list_events as $event) {
-		    week_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties);	
+		    dis_event_planning("week", &$week_cal,&$hidden_div,$event,$nb_ent,$properties);	
 		  }
 		  $week_cal .= "</td>";
 		}
@@ -1017,53 +967,6 @@ function dis_week_planning($agenda, $calendar_entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Make the event display 
-// Parameters:
-//    - $agenda         : agenda parameters
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array   : array of selected groups 
-//   - $nb_ent : number of entities to display
-///////////////////////////////////////////////////////////////////////////////
-function week_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
-  global $path, $l_private, $l_private_description, $set_theme,$ico_event;
-  global $auth,$l_begin,$l_end;
-
-  $id = $event["event"]->id;
-  $usr_id = $properties["id"];
-  if($event["event"]->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
-    $title = $l_private;
-    $description = $l_private_description;
-    $link = "javascript:return false;";
-    $category1 = $l_private;    
-  }else {
-    $title = $event["event"]->title;
-    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
-    $description = $event["event"]->description;
-    $category1 = $event["event"]->category1;
-  }  
-  if ($nb_ent == 1) {	      
-    $event_head_display = "&#8226; $title";
-  }else {
-    $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
-  } 
-  $week_cal .=  "<a class=\"agendaLink\" 
-  onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
-  onMouseOut=\"hide('$id-$usr_id'); return true;\"		
-  href=\"$link\">$event_head_display</a><br />";
-  $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\"> 
-   <div class=\"blockTitle\">:: $title</div>
-   <ul class=\"blockItem\">  
-    <li class=\"blockItem\">$category1</li>
-    <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
-    <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>        
-    <li class=\"blockItem\">$description</li>
-   </ul>
-  </div>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the day
 // Parameters:
 //   - $agenda         : agenda parameters
@@ -1117,7 +1020,7 @@ function dis_day_planning($agenda, $calendar_entity) {
 	$all_days[$iso_date][$type][$id] = true;
 	$hour_day_list .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	foreach ($list_events as $event) {
-	  $hour_day_list .= allday_event_display(&$hidden_div,$event,$nb_ent,$properties);	
+	  dis_event_allday_planning(&$hour_day_list, &$hidden_div,$event,$nb_ent,$properties);	
 	}
 	$hour_day_list .= "</td>";
       } else {
@@ -1155,7 +1058,7 @@ function dis_day_planning($agenda, $calendar_entity) {
 		$list_events = $events_data["events"];
 		$hour_day_list .= "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\" rowspan=\"".ceil($duration/($time_unit_sec))."\" >";
 		foreach ($list_events as $event) {
-		  day_event_display(&$hour_day_list,&$hidden_div,$event,$nb_ent,$properties);	
+		  dis_event_planning("day", &$hour_day_list,&$hidden_div,$event,$nb_ent,$properties);	
 		}
 		$hour_day_list .= "</td>";
 	      }
@@ -1211,22 +1114,69 @@ function dis_day_planning($agenda, $calendar_entity) {
 $hidden_div
 ";
 
-return $block;
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Make the event display 
+// Display an individual allday event (with popup) 
 // Parameters:
-//    - $agenda         : agenda parameters
-//    - $event_qs   : list of event's records 
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array   : array of selected groups 
-//   - $nb_ent : number of entities to display
+//   - $dis_cal    : [return] agenda parameters
+//   - $hidden_div : [return] popup hidden div to add
+//   - $event      : event object 
+//   - $nb_ent     : number of entities to display
+//   - $properties :
 ///////////////////////////////////////////////////////////////////////////////
-function day_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
-  global $path, $l_private, $set_theme;
-  global $auth,$l_begin,$l_end;
+function dis_event_allday_planning(&$dis_cal, &$hidden_div,$event,$nb_user,$properties) {
+  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1;
+  global $l_location, $l_private, $l_private_description, $l_begin,$l_end;
+
+  $id = $event->id;
+  $usr_id = $properties["id"];
+  if ($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
+    $title = $l_private;
+    $description = $l_private_description;
+    $link = "javascript:return false;";
+    $category1 = $l_private;    
+  } else {
+    $title = $event->title;
+    $location = $event->location;
+    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
+    $description = $event->description;
+    $category1 = $event->category1;
+  }    
+  $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
+
+  $dis_cal .= "<a class=\"agendaLink\"
+  onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
+  onMouseOut=\"hide('$id-$usr_id'); return true;\"
+  href=\"$link\">$event_head_display</a>";
+
+  $hidden_div .= "
+  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
+   <div class=\"blockTitle\">:: $title</div>
+   <ul class=\"blockItem\">
+    <li class=\"blockItem\">$l_location : $location</li>
+    <li class=\"blockItem\">$l_category1 : $category1</li>
+    <li class=\"blockItem\">$description</li>
+   </ul>
+  </div>";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display an individual event (with popup) 
+// Parameters:
+//   - $view       : "allday", "week", "month", "day"
+//   - $dis_cal    : [return] agenda parameters
+//   - $hidden_div : [return] popup hidden div to add
+//   - $event      : event array
+//   - $nb_ent     : number of entities to display
+//   - $properties :
+///////////////////////////////////////////////////////////////////////////////
+function dis_event_planning($view, &$dis_cal, &$hidden_div, $event,$nb_ent,$properties) {
+  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1;
+  global $l_location, $l_private, $l_private_description, $l_begin,$l_end;
 
   $id = $event["event"]->id;
   $usr_id = $properties["id"];
@@ -1234,77 +1184,54 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_ent,$properties) {
     $title = $l_private;
     $description = $l_private_description;
     $link = "javascript:return false;";
-    $category1 = $l_private;
+    $category1 = $l_private;    
   } else {
     $title = $event["event"]->title;
+    $location = $event["event"]->location;
     $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
     $description = $event["event"]->description;
     $category1 = $event["event"]->category1;
   }
-  if ($nb_ent == 1) {
-    $event_head_display = "&#8226;
+  if ($view == "week") {
+    if ($nb_ent == 1) {	      
+      $event_head_display = "&#8226; $title";
+    } else {
+      $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
+    }
+  } else if ($view == "month") {
+    if ($nb_ent == 1) {	      
+      $event_head_display = date("H:i",$event["date"])."->".date("H:i",$event["date"] + $event["event"]->duration);
+    } else {
+      $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
+    }
+  } else if ($view == "day") {
+    if ($nb_ent == 1) {
+      $event_head_display = "&#8226;
     ".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."
     ".$title;
-  }else {
-    $event_head_display = "&#8226;$title";
-  }  
-  $week_cal .=  "<a class=\"agendaLink\"
-  onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
-  onMouseOut=\"hide('$id-$usr_id'); return true;\"
-  href=\"$link\">$event_head_display</a><br />";
+    } else {
+      $event_head_display = "&#8226;$title";
+    }
+  } else if ($view == "allday") {
+    $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
+  }
+
+  $dis_cal .= "<a class=\"agendaLink\"
+    onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
+    onMouseOut=\"hide('$id-$usr_id'); return true;\"
+    href=\"$link\">$event_head_display</a><br />";
+
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;\">
+  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
    <div class=\"blockTitle\">:: $title</div>
    <ul class=\"blockItem\">
-    <li class=\"blockItem\">$category1</li>
+    <li class=\"blockItem\">$l_location : $location</li>
+    <li class=\"blockItem\">$l_category1 : $category1</li>
     <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
     <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
     <li class=\"blockItem\">$description</li>
    </ul>
   </div>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Make the event display 
-// Parameters:
-//    - $agenda         : agenda parameters
-//    - $event_q   : list of event's records 
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array   : array of selected groups 
-///////////////////////////////////////////////////////////////////////////////
-function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
-  global $path, $l_private, $set_theme,$ico_calendar_day;
-  global $auth,$l_begin,$l_end;
-
-  $id = $event->id;
-  $usr_id = $properties["id"];
-  if($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
-    $title = $l_private;
-    $description = $l_private_description;
-    $link = "javascript:return false;";
-    $category1 = $l_private;    
-  }else {
-    $title = $event->title;
-    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
-    $description = $event->description;
-    $category1 = $event->category1;
-  }    
-  $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
-  $dis_calendar .=  "<a class=\"agendaLink\" 
-  onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
-  onMouseOut=\"hide('$id-$usr_id'); return true;\"		
-  href=\"$link\">$event_head_display</a>";
-  $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\"> 
-   <div class=\"blockTitle\">:: $title</div>
-   <ul class=\"blockItem\">  
-    <li class=\"blockItem\">$category1</li>
-    <li class=\"blockItem\">$description</li>
-   </ul>
-  </div>";
-
-  return $dis_calendar;
 }
 
 
@@ -1486,7 +1413,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
   global $cagenda_first_hour, $cagenda_last_hour;
   // -- Labels
-  global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_cat, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
   global $l_repeatkind,$l_repeatdays, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort;
@@ -1522,13 +1449,13 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
 
   // If parameters have been given, they supercede the default action value
   if (isset($agenda["id"])) { $id = $agenda["id"]; }
-  if (isset($agenda["title"])) { $title = $agenda["title"]; }
-  if (isset($agenda["location"])) { $location = $agenda["location"]; }
+  if (isset($agenda["title"])) { $title = stripslashes($agenda["title"]); }
+  if (isset($agenda["location"])) { $location = stripslashes($agenda["location"]); }
   if (isset($agenda["category1"])) { $cat1 = $agenda["category1"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
-  if (isset($agenda["force"])) { $desc = $agenda["force"]; }
-  if (isset($agenda["description"])) { $desc = $agenda["description"]; }
+  if (isset($agenda["description"])) { $desc = stripslashes($agenda["description"]); }
   if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
+
   if (isset($agenda["datebegin"])) {
     $ts = isodate_to_timestamp($agenda["datebegin"]);
     $datebegin = isodate_format($ts);
@@ -1885,7 +1812,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
-  global $l_users, $l_title, $l_location, $l_priority, $l_cat,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_location, $l_priority, $l_category1,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$cagenda_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
@@ -1913,7 +1840,7 @@ function html_waiting_events($obm_wait) {
 	 <tr>
 	  <td class=\"detailText\">$l_title</td>
 	  <td class=\"detailText\">$l_location</td>
-	  <td class=\"detailText\">$l_cat</td>
+	  <td class=\"detailText\">$l_category1</td>
 	  <td class=\"detailText\">$l_priority</td>
 	  <td class=\"detailText\">$l_from</td>
 	  <td class=\"detailText\">$dis_kind</td>
@@ -1998,7 +1925,7 @@ function html_waiting_events($obm_wait) {
    <tr>
     <td class=\"detailText\">$l_title</td>
     <td class=\"detailText\">$l_location</td>
-    <td class=\"detailText\">$l_cat</td>
+    <td class=\"detailText\">$l_category1</td>
     <td class=\"detailText\">$l_priority</td>
     <td class=\"detailText\">$l_from</td>
     <td class=\"detailText\">$dis_kind</td>
@@ -2023,7 +1950,7 @@ function html_waiting_events($obm_wait) {
 function html_calendar_consult($event_q, $entities) {
   global $auth, $display, $set_theme, $cagenda_weekstart, $cagenda_resource;
   // -- Labels
-  global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
+  global $l_users, $l_resources, $l_title, $l_location, $l_priority, $l_private, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_change_state,$l_groups,$l_all_day;
