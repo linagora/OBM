@@ -330,6 +330,7 @@ function run_query_update ($invoice) {
 // Get invoice status list with coditions
 // Parameters:
 //   - $target : "payment" : get status where invoice should have a payment
+//             : "tocreate" : get status where invoice ahs not been cretated
 // Returns:
 //   - $status : array of status [id][label]
 ///////////////////////////////////////////////////////////////////////////////
@@ -338,6 +339,8 @@ function get_invoicestatus($target="") {
 
   if ($target == "payment") {
     $wtarget = "WHERE invoicestatus_payment = 1";
+  } else if ($target == "tocreate") {
+    $wtarget = "WHERE invoicestatus_created = 0";
   }
 
   $query = "SELECT invoicestatus_id,
@@ -607,7 +610,7 @@ function run_query_invoice_amounts($date_ranges) {
     $ah = $obm_q->f("invoice_amount_ht");
     $at = $obm_q->f("invoice_amount_ttc");
     $inout = $obm_q->f("invoice_inout");
-    $date = $obm_q->f("date");
+    $date = isodate_format($obm_q->f("date"));
     $month = substr($date, 0, 7);
     $status = $obm_q->f("invoice_status_id");
     $statuslabel = $obm_q->f("invoicestatus_label");

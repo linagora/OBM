@@ -582,7 +582,6 @@ border-top:1px solid #009ec6;*/
 tr.data0			{
 	font-family:		sans-serif;
 	font-size:		10px;
-	text-align:		left;
 	color:			#000000;
 	background-color:	#FFFFFF;
 }
@@ -590,7 +589,6 @@ tr.data0			{
 tr.data1			{
 	font-family:		sans-serif;
 	font-size:		10px;
-	text-align:		left;
 	color:			#000000;
 	background-color:	#ebf0f1;
 }
@@ -598,7 +596,6 @@ tr.data1			{
 tr.data2			{
 	font-family:		sans-serif;
 	font-size:		10px;
-	text-align:		left;
 	color:			#000000;
 	background-color:	#fbf7db;
 }

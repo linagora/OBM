@@ -149,6 +149,8 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "dashboard")  {
 ///////////////////////////////////////////////////////////////////////////////
+  include_once("$obminclude/Artichow/BarPlot.class.php");
+  //  include("$obminclude/libchart/libchart/libchart.php");
   $display["detail"] = dis_invoice_dashboard($invoice);
 
 } elseif ($action == "document_add")  {
@@ -195,7 +197,7 @@ display_page($display);
 // returns : $invoice hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_invoice() {
-  global $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
+  global $year, $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
   global $ta_comment, $sel_status, $param_invoice, $tf_date, $tf_payment_date;
   global $tf_expiration_date, $tf_date_after, $tf_date_before;
   global $tf_deal, $tf_company, $cb_archive, $rd_inout, $hd_inout;
@@ -228,6 +230,7 @@ function get_param_invoice() {
   if (isset ($ta_add_comment)) $invoice["add_comment"] = trim($ta_add_comment);
   if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
+  if (isset ($year)) $invoice["year"] = $year;
 
   // Company params
   if (isset ($param_company)) $invoice["company_id"] = $param_company;

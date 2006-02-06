@@ -1,0 +1,1 @@
+<img src='image/ScatterPlot-1.test.php' border=2 bordercolor=black/>

@@ -343,5 +343,4 @@ $l_cr_date[$cr_date_torenew] = "A renouveler";
 $l_cr_date[$cr_date_ended] = "Expiré";
 
 $l_billed = "Facturé";
-$l_bill_potential = "Facturable";
-
+$l_order_no_bill = "Commandé";

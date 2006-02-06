@@ -31,7 +31,6 @@ $fieldnames["payment_expect_date"] = $l_expected_date;
 $fieldnames["payment_date"] = $l_date;
 $fieldnames["payment_amount"] = $l_amount;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Invoice specific dataset fields
 // Parameters:
@@ -920,28 +919,39 @@ function dis_can_delete_invoice($p_id) {
 //////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard($invoice) {
   global $display, $set_theme, $path;
-  global $l_status, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
+  global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
+  global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
 
-  $year = date("Y");
-  $year = "2005";
+  if (isset($invoice["year"])) {
+    $year = $invoice["year"];
+  } else {
+    $year = date("Y");
+  }
+  $year_prev = $year - 1;
+  $year_next = $year + 1;
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
   $inv = run_query_invoice_amounts($date_ranges);
-  $url_prev = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_prev");
-  $url_next = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_next");
-
-  $status_pay = get_invoicestatus("payment");
+  $url_prev = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_prev");
+  $url_next = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_next");
 
   // Table header
   for ($month = 1; $month < 13; $month++) {
-    $table_head .= "
-      <td class=\"resultHead\">$month</td>";
+    $label = $l_monthsofyear[$month - 1];
+    $dis_row_head .= "
+      <td class=\"resultHead\">$label</td>";
   }
+
+  // Billed Chart
+  $status_pay = get_invoicestatus("payment");
 
   // Loop through status (rows)
   foreach ($status_pay as $s_id => $s_label) { 
+    $total_amount_ht = 0;
+    $cpt++;
+    $data = "data" . ($cpt % 2);
 
-    $dis_row .= "<tr>
-      <td>$s_label</td>";
+    $dis_bil_row .= "<tr class=\"$data\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$s_label</td>";
 
     // Loop through each month (cols)
     for ($month = 1; $month < 13; $month++) {
@@ -952,24 +962,114 @@ function dis_invoice_dashboard($invoice) {
       } else {
 	$year_month = "$year-0$month";
       }
-      echo "$year_month";
-      print_r($inv["$year_month"]["billed"]);
       // Invoice created
       if (is_array($inv["$year_month"]["billed"]["$s_id"])) {
 	$status_info = $inv["$year_month"]["billed"]["$s_id"];
 	$amount_ht = $status_info["amount_ht"];
 	$nb = $status_info["nb"];
-        $dis_row .= "
-          <td>$amount_ht</td>";
+	$total_amount_ht += $amount_ht;
+	$dis_amount_ht = number_format($amount_ht, 2, ",", " ");
+        $dis_bil_row .= "
+          <td class=\"$data\">&nbsp;$dis_amount_ht</td>";
+      } else {
+        $dis_bil_row .= "
+          <td class=\"$data\"> </td>";
       }
     }
-    $dis_row .= "</tr>";
-
+    $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
+    $dis_bil_row .= "<td class=\"data2\">&nbsp;$f_total_amount_ht</td>
+        </tr>";
   }
 
-  $block = "
-    <div class=\"detailHead\">$title</div>
+  // Total row
+  $total_amount_ht = 0;
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $status_info = $inv["$year_month"]["billed"]["total"];
+    $amount_ht = $status_info["amount_ht"];
+    $total_amount_ht += $amount_ht;
+    $dis_amount_ht = number_format($amount_ht, 2, ",", " ");
+    $dis_bil_row_total .= "
+      <td>&nbsp;$dis_amount_ht</td>";
+  }
+  $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
+  $dis_bil_row_total .= "
+      <td>&nbsp;$f_total_amount_ht</td>";
 
+  // Artichow Chart
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $status_info = $inv["$year_month"]["billed"]["total"];
+    $amount_ht = $status_info["amount_ht"];
+    $values[$month-1] = $amount_ht;
+    $labels[$month-1] = number_format($amount_ht, 0, ",", " ");
+    $xlabels[$month-1] = $l_monthsofyear[$month-1];
+    $values_pot[$month-1] = $amount_ht + $inv["$year_month"]["potential"]["total"]["amount_ht"];
+    $labels_pot[$month-1] = number_format($values_pot[$month-1], 0, ",", " ");
+  }
+  $title = "$l_billed $year";
+
+  $chart_bil_params .= "&amp;title=".urlencode($title)."&amp;values=".urlencode(serialize($values)) . "&amp;chart_labels=".urlencode(serialize($labels)). "&amp;chart_xlabels=".urlencode(serialize($xlabels));
+
+  // Potential Chart
+  $status_toc = get_invoicestatus("tocreate");
+
+  // Loop through status (rows)
+  foreach ($status_toc as $s_id => $s_label) { 
+    $total_amount_ht = 0;
+    $cpt++;
+    $data = "data" . ($cpt % 2);
+
+    $dis_pot_row .= "<tr class=\"$data\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$s_label</td>";
+
+    // Loop through each month (cols)
+    for ($month = 1; $month < 13; $month++) {
+
+      // left pad the month
+      if ($month > 9) {
+	$year_month = "$year-$month";
+      } else {
+	$year_month = "$year-0$month";
+      }
+      // Invoice not created
+      if (is_array($inv["$year_month"]["potential"]["$s_id"])) {
+	$status_info = $inv["$year_month"]["potential"]["$s_id"];
+	$amount_ht = $status_info["amount_ht"];
+	$nb = $status_info["nb"];
+	$total_amount_ht += $amount_ht;
+	$f_amount_ht = number_format($amount_ht, 2, ",", " ");
+        $dis_pot_row .= "
+          <td class=\"$data\">&nbsp;$f_amount_ht</td>";
+      } else {
+        $dis_pot_row .= "
+          <td class=\"$data\"> </td>";
+      }
+      $labels[$month-1] = number_format($amount_ht, 0, ",", " ");
+    }
+    $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
+    $dis_pot_row .= "<td class=\"data2\">&nbsp;$f_total_amount_ht</td>
+        </tr>";
+  }
+  $plots["new_bar"] = array(1, 0);
+  $plots["legends"] = array($l_order_no_bill, $l_billed);
+  //  $legends = array($l_order_no_bill, $l_billed);
+  $title = "$l_potential $year";
+
+  $chart_pot_params .= "&amp;title=".urlencode($title)."&amp;values=".urlencode(serialize(array($values_pot, $values)))."&amp;chart_plots=".urlencode(serialize($plots))."&amp;chart_labels=".urlencode(serialize($labels_pot)). "&amp;chart_xlabels=".urlencode(serialize($xlabels));
+
+  $block = "
+    <div class=\"detailHead\">
       <table>
       <tr>
         <td>
@@ -978,7 +1078,7 @@ function dis_invoice_dashboard($invoice) {
           </a>
         </td>
         <td class=\"timePeriod\">
-          $year
+          $l_invoice $year
         </td>
         <td>
           <a href=\"$url_next\">
@@ -986,38 +1086,43 @@ function dis_invoice_dashboard($invoice) {
           </a>
         </td>
       </tr>
-      </table>    
+      </table>
+    </div>
 
+    <div class=\"detailHead\">$l_billed</div>
 
     <table class=\"resultTable\">
-    <tr>
-      <td>$l_status</td>
-      $table_head
+    <tr style=\"text-align: right;\">
+      <td class=\"resultHead\" style=\"text-align: left;\">$l_status</td>
+      $dis_row_head
+      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
     </tr>
-    $dis_row
-    <tr class=\"data2\">
-      <td>$l_total</td>
-      <td style=\"text-align: center;\">$m_nb_potential</td>
-      <td style=\"text-align: right;\">$m_amount</td>
-      <td style=\"text-align: right;\">$m_balanced</td>
+    $dis_bil_row
+    <tr class=\"data2\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$l_total</td>
+      $dis_bil_row_total
     </tr>
     </table>
     <p />
+
+    <div class=\"detailHead\">$l_order_no_bill</div>
+
     <table class=\"resultTable\">
-    <tr>
-      <td class=\"resultHead\">$l_technical_manager</td>
-      <td class=\"resultHead\"># $l_module_deal</td>
-      <td class=\"resultHead\">$l_deal_total</td>
-      <td class=\"resultHead\">$l_deal_balanced</td>
+    <tr style=\"text-align: right;\">
+      <td class=\"resultHead\" style=\"text-align: left;\">$l_status</td>
+      $dis_row_head
+      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
     </tr>
-    $dis_tech_pot
-    <tr class=\"data2\">
-      <td>$l_total</td>
-      <td style=\"text-align: center;\">$t_nb_potential</td>
-      <td style=\"text-align: right;\">$t_amount</td>
-      <td style=\"text-align: right;\">$t_balanced</td>
-    </tr>
-    </table>";
+    $dis_pot_row
+    </table>
+    <p />
+
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
+    <br />
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
+
+";
+
 
   return $block;
 } 

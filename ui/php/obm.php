@@ -442,7 +442,7 @@ function dis_contract_portal() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_portal() {
   global $uid, $ico_invoice_portal, $set_theme;
-  global $l_total, $l_module_invoice, $l_billed, $l_bill_potential;
+  global $l_total, $l_module_invoice, $l_billed, $l_order_no_bill;
   global $l_current_month, $l_next_month;
 
   $year_month = date("Y-m");
@@ -513,7 +513,7 @@ function dis_invoice_portal() {
       <td></td>
     </tr>
     <tr>
-      <td>$l_bill_potential &nbsp;</td>
+      <td>$l_order_no_bill &nbsp;</td>
       <td class=\"number\">".$inv["potential"]["total"]["amount_ht"]. " / </td>
       <td class=\"number\">".$inv["potential"]["total"]["nb"]."</td>
     </tr>

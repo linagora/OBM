@@ -335,4 +335,4 @@ $l_cr_date[$cr_date_torenew] = "To renew";
 $l_cr_date[$cr_date_ended] = "Expired";
 
 $l_billed = "Billed";
-$l_bill_potential = "Bill potential";
+$l_order_no_bill = "Ordered";

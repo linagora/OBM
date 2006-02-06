@@ -1,0 +1,113 @@
+Artichow 1.0.6
+
+- Add method Plot::setYAxisZero()
+- Add auto-scaling for axis
+- Add constant ARTICHOW_CACHE to enable/disable the cache
+- Improve prefix for classes
+
+Artichow 1.0.5
+
+- Add constant ARTICHOW_PREFIX to prefix Artichow's classes (bug #000002)
+- Add methods Shadow::hide() and Shadow::show()
+- Add method Plot::reduce()
+- It is now possible to save its charts in a file
+- Fix a bug in PlotGroup (setYMin() / setYMax() did not work)
+- Fix an incoherent behaviour if some values in $datay are not numeric (LinePlot, BarPlot, ScatterPlot)
+- Fix an inclusion bug in Pattern
+- Fix a bug for PHP 5.1.0
+
+Artichow 1.0.4
+
+- Add support for GIF images
+- Add patterns (Pattern.class.php)
+- Add titles on axis
+- Rename Artichow.class.php to Graph.class.php (break backward compatibility)
+- Add a README file
+- Add support for ScatterPlot
+- Merge setBackgroundColor() and setBackgroundGradient() into setFill() in class Mark (break backward compatibility)
+- Add an optional argument $size to Mark::setType()
+- Grid background in now default to white in class Plot
+- Change class Polygon to accept NULL values
+- Add a new legend type (Legend::MARKONLY)
+- Add method Legend::show()
+- Add methods Mark::move(), Mark::hide() and Mark::show()
+- Add new marks (star, book, ...)
+- Add methods Label::setBackground() and Legend::setBackground()
+- Add methods Plot::setXMax(), Plot::setXMin(), PlotGroup::setXMax() and PlotGroup::setXMin()
+- Add new colors to default theme in Pie
+- Remove methods Drawer::setBackground*()
+- Tests have been removed from the archive
+- Move methods Component::addLabel() and Component::addAbsLabel() to class Graph
+- Modes LinePlot::MIDDLE and LinePlot::BAR have been merged into LinePlot::MIDDLE (break backward compatibility)
+- Fix a bug in Artichow.cfg.php (unable to use some ttf fonts)
+- Fix a bug in Legend (position of marks was sometimes broken)
+- Fix a bug in Pie (pies can now take only a single value)
+- Fix some bugs in Plot / LinePlot
+- Fix a bug in Font::draw() (call to undefined function trigger__error)
+
+Artichow 1.0.3 (beta)
+
+- Add EXPERIMENTAL support for PHP 4
+- Change class BarPlot so it now uses class Border instead of setBorderThickness() and setBorderColor()
+- Change class Legend so it now uses class Border instead of setBorderSize() and setBorderColor()
+- Change class Mark so it now uses class Border instead of setBorderSize() and setBorderColor()
+- Change class Text so it now uses class Border instead of setBorderColor()
+- Change class Label so it now uses class Border instead of setBorderColor()
+- Drawer::drawRectangle() and Drawer::drawFilledRectangle() now take a line as second argument
+- Add styles to rectangles and polygons
+- BarPlot::setBarPadding() takes now values in per-cent instead of pixels
+- Merge drawFilledRectangleColor() and drawFilledRectangleGradient() into drawFilledRectangle() in class Drawer
+- Merge drawFilledPolygonColor() and drawFilledPolygonGradient() into drawFilledPolygon() in class Drawer
+- Merge drawFilledEllipseColor() and drawFilledEllipseGradient() into drawFilledEllipse() in class Drawer
+- Add method BarPlot::setBarWidth()
+- Add an optional border to the class Image
+- Add a new class Border
+- Add support for MathPlot
+- LinePlot::STEP has been removed
+- Merge classes Paragraph and Label (no changes in the API)
+- Method Plot::setLabelCenter() is obsolete and has been removed
+- Rewrite Axis (add a new class Tick) (break backward compatibility)
+- Remove draw*Triangle* from class Drawer (use polygons instead)
+- Remove prefix draw in each method of class Drawer
+- Rename LinePlot::setLineType() into LinePlot::setStyle()
+- Rename LinePlot::setLineThickness() into LinePlot::setThickness()
+- Rename LinePlot::setLineColor() into LinePlot::setColor()
+- Rename LinePlot::setLineBackgroundColor() to LinePlot::setFillColor()
+- Rename LinePlot::setLineBackgroundGradient() to LinePlot::setFillGradient()
+- Rename Line::setType() to Line::setStyle()
+- Add methods Label::get(), Label::setFormat() and change method Label::setFont()
+- Add a parameter $smooth in Shadow::setSize();
+- Add filled areas in LinePlot
+- Add lots of new features in Math.class.php
+- Fix a bug in Math::isVertical() and Math::isHorizontal()
+- Fix a bug in Legend (shadow is now well-positioned is there is no border on the legend)
+- Lots of minor changes
+
+Artichow 1.0.2 (beta)
+
+- Add support for pies (2D & 3D)
+- Move shadow from class Component to class Image
+- X Axis are now centered on 0 by default on bar and line plots
+- Add title to Graphs
+- Add 4 named fonts
+- Add 50 named colors
+- Add shadow to legends
+- Add method Image::setBackgroundGradient()
+- Add methods Label::setCallbackFunction() and Label::hide()
+- Add method Legend::hide()
+- Add methods Drawer::copyResizeImage(), Drawer::drawArc() and Drawer::drawFilledArcColor()
+- Rename Positionable::setHorizontalAlign() and Positionable::setVerticalAlign() to Positionable::setAlign()
+- API for ellipses has changed
+- Title is now a property instead of a method in Component
+- Remove old code, that fixes a bug in the grid
+- Fix a bug that affects position of bars in some cases
+- Fix wrong size of shadow
+- Fix a bug in Plot::setYMin() and Plot::setYMax()
+
+Artichow 1.0.1 (alpha)
+
+- Add anti-spam images
+
+Artichow 1.0.0 (alpha)
+
+- Initial release

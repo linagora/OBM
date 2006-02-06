@@ -10,7 +10,6 @@
 // Labels et textes
 // invoice only 
 $l_label_start = "Début de Label";
-$l_number = "Numéro";
 $l_amount = "Montant";
 $l_amount_ht = "Montant HT";
 $l_amount_ttc = "Montant TTC";
@@ -25,6 +24,7 @@ $l_both = "Tous";
 $l_tax_rate = "Taux TVA";
 $l_compute_tax = "Calculer le montant TTC";
 $l_include_archive = "Inclure les archives";
+$l_potential = "Potentiel";
 
 //payment
 $l_no_payment = "Aucun paiement connecté à cette facture";

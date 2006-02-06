@@ -22,6 +22,8 @@ $l_no_deal = "no deals related to this invoice";
 $l_no_payment = "no payments related to this invoice";
 $l_list_payment = "payments related to this invoice";
 $l_expected_date = "Expected Date";
+$l_potential = "Potential";
+
 $l_inout = "Kind";
 $l_both = "Both"; 
 $l_no_deals_related_error = "You cannot add payments to this invoice because it has no deals connected";
