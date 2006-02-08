@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.1.1pre5";
+$obm_version = "1.1.1pre6";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -202,7 +202,7 @@ $profiles["admin"] = array (
 // Default Displayed Infos //
 //-------------------------//
 // sections -- Urls
-$cgp_show["section"]["com"]["url"] = "$path/contact/contact_index.php";
+$cgp_show["section"]["com"]["url"] = "$path/company/company_index.php";
 $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
 $cgp_show["section"]["compta"]["url"] = "$path/account/account_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";

@@ -128,7 +128,7 @@ if ($action == "ext_get_id") {
 
     // If the context (same companies) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $cid = run_query_comapny_insert($company);
+      $cid = run_query_company_insert($company);
       if ($cid > 0) {
         $company["id"] = $cid;
 	$display["detail"] = dis_company_consult($cid);

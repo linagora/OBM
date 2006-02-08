@@ -338,7 +338,7 @@ function dis_contract_search_list($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_list($contract_q, $prefs, $nb_con, $contract, $popup) {
   global $display, $l_found, $l_close;
-
+  
   if ($popup) {
     $ext_action = $contract["ext_action"];
     $ext_url = $contract["ext_url"];
@@ -410,7 +410,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
   global $path, $auth, $cgp_show;
-
+  
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
   
@@ -741,7 +741,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   </table>
 ";
 
-   return $block;
+  return $block;
 }
 
 
@@ -934,6 +934,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
     </tr>";
+  }
 
   // Priority select
   $sel_pri = "<select name=\"sel_priority\">";
