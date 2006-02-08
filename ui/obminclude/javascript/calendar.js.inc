@@ -1,5 +1,4 @@
 <?php
-$path_image = "/images/$set_theme";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // On récupère un tableau PHP
@@ -28,10 +27,10 @@ $extra_js .= "
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var Delimiter = '-'; // Delimiteur
 var Timeout = 1; // Nb de secondes du timeout
-var ImageURL = '$path_image/$ico_mini_cal';
+var ImageURL = '".C_IMAGE_PATH."/$set_theme/$ico_mini_cal';
 var CellWidth = 30; // Largeur d'une cellule
-var NextURL = '$path_image/ico_next.gif';
-var PrevURL = '$path_image/ico_previous.gif';
+var NextURL = '".C_IMAGE_PATH."/$set_theme/ico_next.gif';
+var PrevURL = '".C_IMAGE_PATH."/$set_theme/ico_previous.gif';
 var ZCounter = 100;
 var Today = new Date();
 var YearPart = Today.getFullYear();
