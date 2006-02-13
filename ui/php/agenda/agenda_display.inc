@@ -1445,6 +1445,8 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
       $repeat_end = isodate_format($event_q->f("calendarevent_endrepeat"));
     }
     $id = $event_q->f("calendarevent_id");
+  } elseif ($action == "new") {
+    $repeat_end = isodate_format(strtotime("+1 year"));
   }
 
   // If parameters have been given, they supercede the default action value
@@ -1473,8 +1475,6 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   if (isset($agenda["repeat_days"]) && $agenda["repeat_days"] != "000000") { $repeat_days = $agenda["repeat_days"];}
   if (isset($agenda["repeat_end"])) {
     $repeat_end = $agenda["repeat_end"];
-  } else {
-    $repeat_end = isodate_format(strtotime("+1 year"));
   }
   if (isset($agenda["force"])) { $force = $agenda["force"]; }
   if ($repeat_kind != "weekly") {
@@ -1780,7 +1780,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   <tr>    
     <td class=\"detailLabel\">$l_date_repeatend</td> 
     <td class=\"detailForm\">
-			<script>calendar('tf_repeat_end','$repeat_end')</script>
+      <script>calendar('tf_repeat_end','$repeat_end')</script>
     </td>
   </tr>
   <tr>  
