@@ -616,7 +616,6 @@ END:VEVENT";
   $msg .= "
 END:VCALENDAR";
 
-  $msg = iconv("ISO-8859-1","UTF-8",$msg);
 
   // we don't forget the last line :
   fputs($fd_dest, $msg);
