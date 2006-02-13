@@ -11,8 +11,6 @@
 // Contact search query execution
 // Parametes:
 //   - $contact[]    : contact search criteria
-//     keys used       company_id, name, phone, company, dateafter, datebefore, 
-//                     mailing_ok_only
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
@@ -486,7 +484,7 @@ function run_query_contact_insert($contact) {
   $email = $contact["email"];
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
-  $date = $contact["date"];
+  $date = ($contact["date"] ? "'".$contact["date"]."'" : "null");
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
     $datecomment = $contact["datecomment"];
@@ -578,7 +576,7 @@ function run_query_contact_insert($contact) {
     '$mailok',
     '$arch',
     '$priv',
-    '$date',
+    $date,
     '$comment',
     '$comment2',
     '$comment3',
@@ -687,7 +685,7 @@ function run_query_contact_update($contact) {
   $email = $contact["email"];
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
-  $date = $contact["date"];
+  $date = ($contact["date"] ? "'".$contact["date"]."'" : "null");
   $comment = $contact["com"];
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
@@ -749,7 +747,7 @@ function run_query_contact_update($contact) {
     contact_mailing_ok='$mailok',
     contact_archive='$arch',
     contact_privacy='$priv',
-    contact_date='$date',
+    contact_date=$date,
     contact_comment='$comment',
     contact_comment2='$comment2',
     contact_comment3='$comment3',

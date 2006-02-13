@@ -210,6 +210,21 @@ function run_query_list_insert($list) {
 
   if ($retour) {
     $id = get_list_id($list);
+    $id_dup = $list["id_duplicated"];
+    if ($id_dup > 0) {
+      $query = "SELECT * FROM ContactList WHERE contactlist_list_id='$id_dup'";
+      $retour = $obm_q->query($query);
+      while ($obm_q->next_record()) {
+	$c_id = $obm_q->f("contactlist_contact_id");
+	$query_i = "INSERT INTO ContactList
+          (contactlist_list_id, contactlist_contact_id)
+        VALUES
+          ('$id', '$c_id')";
+	display_debug_msg($query_i, $cdg_sql, "run_query_list_insert(dup)");
+	$obm_qi = new DB_OBM;
+	$retour = $obm_qi->query($query_i);
+      }
+    }
   }
 
   return $id;

@@ -491,3 +491,9 @@ CREATE TABLE DeletedCalendarEvent (
 );
 create INDEX idx_dce_event_id ON DeletedCalendarEvent (deletedcalendarevent_event_id);
 create INDEX idx_dce_user_id ON DeletedCalendarEvent (deletedcalendarevent_user_id);
+
+
+-------------------------------------------------------------------------------
+-- Clean ProjectUser table
+-------------------------------------------------------------------------------
+UPDATE ProjectUser SET projectuser_manager=0 WHERE projectuser_manager is null;

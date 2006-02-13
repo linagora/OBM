@@ -88,7 +88,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc");
   if (check_invoice_data_form("", $invoice)) {
-    $retour = run_query_insert($invoice);
+    $retour = run_query_invoice_insert($invoice);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
@@ -104,7 +104,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc"); 
   if (check_invoice_data_form($invoice["id"], $invoice)) {
-    $retour = run_query_update($invoice); 
+    $retour = run_query_invoice_update($invoice); 
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok); 
     } else {

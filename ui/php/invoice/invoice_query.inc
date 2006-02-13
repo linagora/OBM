@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Invoice search query :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search ($invoice, $p_new_order, $p_order_dir) {
+function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql, $c_all, $ctu_sql_limit;
 
   $label = sql_search_text_parse($invoice["label"]);
@@ -36,53 +36,53 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 
   $where = "1=1";
   if ($label != ""){
-    $where .= " and invoice_label $like '%$label%'";
+    $where .= " AND invoice_label $like '%$label%'";
   }
   if ($number != ""){
-    $where .= " and invoice_number $like '%$number%'";
+    $where .= " AND invoice_number $like '%$number%'";
   }
   if ($ht != ""){
-    $where .= " and invoice_amount_ht = '$ht'";
+    $where .= " AND invoice_amount_ht = '$ht'";
   }
   if ($ttc != ""){
-    $where .= " and invoice_amount_ttc = '$ttc'";
+    $where .= " AND invoice_amount_ttc = '$ttc'";
   }
   if (($status != '') && ($status != "$c_all")){
-    $where .= " and invoice_status_id = '$status'";
+    $where .= " AND invoice_status_id = '$status'";
   }
   if ($date_after != ""){
-    $where .= " and invoice_date >= '$date_after'";
+    $where .= " AND invoice_date >= '$date_after'";
   }
   if ($date_before != ""){
-    $where .= " and invoice_date <= '$date_before'";
+    $where .= " AND invoice_date <= '$date_before'";
   }
   if (($inout != "") && ($inout != "$c_all")){
-    $where .= " and invoice_inout = '$inout'";
+    $where .= " AND invoice_inout = '$inout'";
   }
   if ($comp_id != "") {
-    $where .= " and invoice_company_id = '$comp_id'";
+    $where .= " AND invoice_company_id = '$comp_id'";
   }
   if ($company != "") {
     $where .= sql_company_name_advanced_search($company, $like);
     $join_comp = "LEFT JOIN Company ON invoice_company_id=company_id";
   }
   if ($deal != "") {
-    $where .= " and deal_label $like '$deal%'";
-    $join_deal = "left join Deal on invoice_deal_id=deal_id";
+    $where .= " AND deal_label $like '$deal%'";
+    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($deal_id != "") {
-    $where .= " and invoice_deal_id = '$deal_id'";
+    $where .= " AND invoice_deal_id = '$deal_id'";
   }
   if ($proj_id != "") {
-    $where .= " and invoice_project_id = '$proj_id'";
+    $where .= " AND invoice_project_id = '$proj_id'";
   }
   if ($archive != "1") {
-    $where .= " and invoice_archive = '0'";
+    $where .= " AND invoice_archive = '0'";
   }
-  $whereq = "where $where";
+  $whereq = "WHERE $where";
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
-  $orderq .= "order by $order $order_dir";
+  $orderq .= "ORDER BY $order $order_dir";
 
   // XXXXXX ???? Display archive
   $query = "select Invoice.*,
@@ -92,23 +92,23 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
       deal_id, deal_label as invoice_deal,
       project_id, project_name as invoice_project,
       invoicestatus_id, invoicestatus_label as invoice_status
-    from Invoice
-      left outer join Company on invoice_company_id = company_id
-      left outer join Deal on invoice_deal_id = deal_id
-      left outer join Project on invoice_project_id = project_id
-      left join InvoiceStatus on invoice_status_id = invoicestatus_id
+    FROM Invoice
+      LEFT OUTER JOIN Company ON invoice_company_id = company_id
+      LEFT OUTER JOIN Deal ON invoice_deal_id = deal_id
+      LEFT OUTER JOIN Project ON invoice_project_id = project_id
+      LEFT JOIN InvoiceStatus ON invoice_status_id = invoicestatus_id
     $whereq
     $orderq
     $limit
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Invoice $join_comp $join_deal $whereq");
+    $count = get_query_count("SELECT count(*) FROM Invoice $join_comp $join_deal $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg ($query, $cdg_sql, "run_query_search()"); 
+    display_debug_msg ($query, $cdg_sql, "run_query_invoice_search()"); 
     $obm_q->query($query);
   }
 
@@ -119,7 +119,7 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 ///////////////////////////////////////////////////////////////////////////////
 // Invoice: Select query construction
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_invoice_id) {
+function run_query_invoice_detail($p_invoice_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -148,13 +148,13 @@ function run_query_detail($p_invoice_id) {
       invoicestatus_label,
       sum(paymentinvoice_amount) as invoice_paid
     FROM Invoice
-      LEFT JOIN Company on invoice_company_id=company_id
-      LEFT JOIN Deal on invoice_deal_id=deal_id
-      LEFT JOIN Project on invoice_project_id=project_id
-      LEFT JOIN InvoiceStatus on invoice_status_id=invoicestatus_id
-      LEFT OUTER join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
-      LEFT JOIN UserObm as c on invoice_usercreate=c.userobm_id
-      LEFT JOIN UserObm as u on invoice_userupdate=u.userobm_id
+      LEFT JOIN Company ON invoice_company_id=company_id
+      LEFT JOIN Deal ON invoice_deal_id=deal_id
+      LEFT JOIN Project ON invoice_project_id=project_id
+      LEFT JOIN InvoiceStatus ON invoice_status_id=invoicestatus_id
+      LEFT OUTER join PaymentInvoice ON invoice_id=paymentinvoice_invoice_id
+      LEFT JOIN UserObm as c ON invoice_usercreate=c.userobm_id
+      LEFT JOIN UserObm as u ON invoice_userupdate=u.userobm_id
     WHERE invoice_id='$p_invoice_id'
     GROUP BY Invoice.invoice_id, invoice_timeupdate, invoice_timecreate,
       invoice_userupdate, invoice_usercreate, invoice_company_id,
@@ -165,7 +165,7 @@ function run_query_detail($p_invoice_id) {
       invoicestatus_label,
       c.userobm_login, u.userobm_login, company_name, deal_label, project_name";
 
-  display_debug_msg ($query, $cdg_sql, "run_query_detail()"); 
+  display_debug_msg ($query, $cdg_sql, "run_query_invoice_detail()"); 
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -176,7 +176,7 @@ function run_query_detail($p_invoice_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($invoice) {
+function run_query_invoice_insert($invoice) {
   global $auth, $cdg_sql, $new_order, $order_dir;
 
   $now = date("Y-m-d H:i:s");
@@ -251,7 +251,7 @@ function run_query_insert($invoice) {
      '$inout',
      '$arch')"; 
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_invoice_insert()");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
@@ -262,7 +262,7 @@ function run_query_insert($invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 // invoice update 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update ($invoice) {
+function run_query_invoice_update($invoice) {
   global $auth, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
@@ -318,7 +318,7 @@ function run_query_update ($invoice) {
       invoice_archive='$arch'
     WHERE invoice_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_update()");
+  display_debug_msg($query, $cdg_sql, "run_query_invoice_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -580,7 +580,7 @@ function run_query_invoice_amounts($date_ranges) {
     foreach ($date_ranges as $range) {
       $d1 = $range[0];
       $d2 = $range[1];
-      $w_date .= " $or (invoice_date > '$d1' AND invoice_date < '$d2')";
+      $w_date .= " $or (invoice_date >= '$d1' AND invoice_date <= '$d2')";
       $or = "OR";
     }
   }

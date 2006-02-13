@@ -28,6 +28,8 @@ if (isset($publication["ext_target"]) && $publication["ext_target"]!="") {
 
 ";
 }
+
+
 $extra_js .= "
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))

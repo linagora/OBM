@@ -210,11 +210,11 @@ function html_invoice_search_form($sta, $invoice) {
     </div>
 
     <div class=\"searchLabel\">$l_date_apres<br />
-      <input type=\"text\" name=\"tf_date_after\" size=\"12\" value=\"$date_after\" />
+      <input type=\"text\" name=\"tf_date_after\" maxlength=\"10\" size=\"10\" value=\"$date_after\" />
     </div>
 
     <div class=\"searchLabel\">$l_date_avant<br />
-      <input type=\"text\" name=\"tf_date_before\" size=\"12\" value=\"$date_before\" />
+      <input type=\"text\" name=\"tf_date_before\" maxlength=\"10\" size=\"10\" value=\"$date_before\" />
     </div>
 
     <div class=\"searchLabel\">$l_include_archive<br />
@@ -265,7 +265,7 @@ function dis_invoice_search_list($invoice) {
   global $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "invoice");
-  $inv_q = run_query_search($invoice, $new_order, $order_dir);
+  $inv_q = run_query_invoice_search($invoice, $new_order, $order_dir);
   $nb_inv = $inv_q->num_rows_total();
   if ($nb_inv == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -343,7 +343,7 @@ function dis_invoice_consult($invoice) {
   $id = $invoice["id"];
   $uid = $auth->auth["uid"];
 
-  $inv_q = run_query_detail($id);
+  $inv_q = run_query_invoice_detail($id);
   if ($inv_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
   }
@@ -578,7 +578,7 @@ function dis_invoice_form($action, $invoice) {
 
   $id = $invoice["id"];
   if ($id > 0) {
-    $inv_q = run_query_detail($id);
+    $inv_q = run_query_invoice_detail($id);
     $display["detailInfo"] = display_record_info($inv_q);
   } else {
     $inv_q = "";
@@ -969,8 +969,10 @@ function dis_invoice_dashboard($invoice) {
 	$nb = $status_info["nb"];
 	$total_amount_ht += $amount_ht;
 	$dis_amount_ht = number_format($amount_ht, 2, ",", " ");
+	$month_start = "$year_month-01";
+	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_bil_row .= "
-          <td class=\"$data\">&nbsp;$dis_amount_ht</td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end\">$dis_amount_ht</a></td>";
       } else {
         $dis_bil_row .= "
           <td class=\"$data\"> </td>";
@@ -994,8 +996,15 @@ function dis_invoice_dashboard($invoice) {
     $amount_ht = $status_info["amount_ht"];
     $total_amount_ht += $amount_ht;
     $dis_amount_ht = number_format($amount_ht, 2, ",", " ");
-    $dis_bil_row_total .= "
-      <td>&nbsp;$dis_amount_ht</td>";
+    if ($amount_ht > 0) {
+      $month_start = "$year_month-01";
+      $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+      $dis_bil_row_total .= "
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cb_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end\">$dis_amount_ht</a></td>";
+    } else {
+      $dis_bil_row_total .= "
+          <td>&nbsp;$dis_amount_ht</td>";
+    }
   }
   $f_total_amount_ht = number_format($total_amount_ht, 2, ",", " ");
   $dis_bil_row_total .= "

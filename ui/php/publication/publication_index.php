@@ -21,10 +21,6 @@
 // - type_update        -- form fields    -- update the type
 // - type_checklink     --                -- check if type is used
 // - type_delete        -- $sel_type      -- delete the type
-// - activity_insert    -- form fields    -- insert the type
-// - activity_update    -- form fields    -- update the type
-// - activity_checklink --                -- check if type is used
-// - activity_delete    -- $sel_type      -- delete the type
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -95,7 +91,7 @@ if ($action == "ext_get_id") {
   $recept_q = run_query_subscriptionreception();
   $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
   require("publication_js.inc");
-  $display["detail"] =html_subscription_form($action,$sub_q, $recept_q, $publication);
+  $display["detail"] = html_subscription_form($action,$sub_q, $recept_q, $publication);
 
 } elseif ($action == "new_auto") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,15 +160,15 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_subscription_form("", $publication)) {
     $retour = run_query_insert_subscription($publication);
-    $quit = "
+    $display["detail"] = "
     <br />
     <a href=\"javascript: void(0);\" onclick=\"window.opener.location.href='".$publication["ext_url"]."';window.close();\" >
     $l_close
     </a>";
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_insert_ok.$quit);
+      $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error.$quit);
+      $display["msg"] .= display_err_msg($l_insert_error);
     }
   // Form data are not valid
   } else {

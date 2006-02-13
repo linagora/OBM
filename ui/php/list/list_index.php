@@ -101,6 +101,7 @@ else if ($action == "new_criterion") {
 } else if ($action == "detailduplicate") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_list_detail($list["id"]);
+  $list["id_duplicated"] = $list["id"];
   $list["id"] = "";
   $list["name"] = $list_q->f("list_name") . " - $l_aduplicate";
   $display["detail"] = dis_list_form($action, $list_q, $list);
@@ -278,7 +279,7 @@ function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $rd_mode;
   global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
-  global $new_order, $order_dir, $popup, $row_index;
+  global $id_duplicated, $new_order, $order_dir, $popup, $row_index;
   global $param_contact, $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
 
   global $tf_company_name, $tf_company_zipcode, $tf_company_town;
@@ -304,6 +305,7 @@ function get_param_list() {
   // List fields
   if (isset ($param_ext)) $list["id"] = $param_ext;
   if (isset ($param_list)) $list["id"] = $param_list;
+  if (isset ($id_duplicated)) $list["id_duplicated"] = $id_duplicated;
   if (isset ($param_contact)) $list["contact_id"] = $param_contact;
   if (isset ($tf_name)) $list["name"] = trim($tf_name);
   if (isset ($tf_subject)) $list["subject"] = trim($tf_subject);

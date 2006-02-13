@@ -759,7 +759,11 @@ function dis_list_form($action, $list_q, $list) {
       <input type=\"submit\" value=\"$l_update\" />";
 
    } else {
-    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+     $id_dup = $list["id_duplicated"];
+     if ($id_dup > 0) {
+       $dis_but .= "<input type=\"hidden\" name=\"id_duplicated\" value=\"$id_dup\" />";
+     }
+     $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 

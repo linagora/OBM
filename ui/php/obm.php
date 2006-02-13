@@ -58,7 +58,7 @@ if ($cgp_show["module"]["time"] && $perm->check_right("time", $cright_read)) {
 }
 
 if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_read)) { 
-  require("$path/deal/deal_query.inc");
+  require_once("$path/deal/deal_query.inc");
   $block .= dis_deal_portal();
 }
 
@@ -75,6 +75,7 @@ if ($cgp_show["module"]["contract"] && $perm->check_right("contract", $cright_re
 }
 
 if ($cgp_show["module"]["invoice"] && $perm->check_right("invoice", $cright_read)) { 
+  require_once("$path/invoice/invoice_query.inc");
   $block .= dis_invoice_portal();
 }
 
@@ -443,16 +444,19 @@ function dis_contract_portal() {
 function dis_invoice_portal() {
   global $uid, $ico_invoice_portal, $set_theme;
   global $l_total, $l_module_invoice, $l_billed, $l_order_no_bill;
-  global $l_current_month, $l_next_month;
+  global $l_header_dashboard;
 
-  $year_month = date("Y-m");
-  $date_ranges = array(array("$year_month-01", "$year_month-31"));
+  $year = date("Y");
+  $month = date("m");
+  $year_month = "$year-$month";
+  $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+  $date_ranges = array(array("$year-$month-01", "$month_end"));
 
   $inv = run_query_invoice_amounts($date_ranges);
 
   // Invoice created
-  if (is_array($inv["billed"])) {
-    foreach ($inv["billed"] as $status => $status_info) {
+  if (is_array($inv["$year_month"]["billed"])) {
+    foreach ($inv["$year_month"]["billed"] as $status => $status_info) {
       if ($status != "total") {
 	$label = $status_info["label"];
 	$amount_ht = $status_info["amount_ht"];
@@ -468,8 +472,8 @@ function dis_invoice_portal() {
   }
 
   // Invoice potential
-  if (is_array($inv["potential"])) {
-    foreach ($inv["potential"] as $status => $status_info) {
+  if (is_array($inv["$year_month"]["potential"])) {
+    foreach ($inv["$year_month"]["potential"] as $status => $status_info) {
       if ($status != "total") {
 	$label = $status_info["label"];
 	$amount_ht = $status_info["amount_ht"];
@@ -478,20 +482,11 @@ function dis_invoice_portal() {
       <tr>
         <td>$label</td>
         <td class=\"number\">$amount_ht / </td>
-        <td class=\"number\"> / $nb</td>
+        <td class=\"number\">$nb</td>
       </tr>";
       }
     }
   }
-
-  if (is_array($inv)) {
-    $dis_inv .= "
-      <tr>
-        <td><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_manager=$uid")."\">$l_billed</a></td>
-        <td class=\"number\">$proj[1]</td>
-      </tr>";
-  }
-
 
   $block = "
   <div class=\"portalModule\">
@@ -504,8 +499,8 @@ function dis_invoice_portal() {
     <table>
     <tr>
       <td>$l_billed &nbsp;</td>
-      <td class=\"number\">".$inv["billed"]["total"]["amount_ht"]. " / </td>
-      <td class=\"number\">".$inv["billed"]["total"]["nb"]."</td>
+      <td class=\"number\">".$inv["$year_month"]["billed"]["total"]["amount_ht"]. " / </td>
+      <td class=\"number\">".$inv["$year_month"]["billed"]["total"]["nb"]."</td>
     </tr>
     $dis_created
     <tr>
@@ -514,15 +509,15 @@ function dis_invoice_portal() {
     </tr>
     <tr>
       <td>$l_order_no_bill &nbsp;</td>
-      <td class=\"number\">".$inv["potential"]["total"]["amount_ht"]. " / </td>
-      <td class=\"number\">".$inv["potential"]["total"]["nb"]."</td>
+      <td class=\"number\">".$inv["$year_month"]["potential"]["total"]["amount_ht"]. " / </td>
+      <td class=\"number\">".$inv["$year_month"]["potential"]["total"]["nb"]."</td>
     </tr>
     $dis_potential
     </table>
 
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("invoice/invoice_index.php?action=search&amp;sel_user=$uid")."\">$l_my_project</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("invoice/invoice_index.php?action=dashboard")."\">$l_header_dashboard</a></div>
   </div>";
 
   return $block;
