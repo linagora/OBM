@@ -1567,6 +1567,7 @@ function dis_list_warn_insert($list_q, $list) {
 
   $name = $list["name"];
   $subject = $list["subject"];
+  $id_duplicated = $list["id_duplicated"];
   $mailing_ok = ($list["mailing_ok"] == "1" ? "1" : "0");
   $contact_arch = ($list["contact_arch"] == "1" ? "1" : "0");
   $info_pub = ($list["info_pub"] == "1" ? "1" : "0");
@@ -1594,7 +1595,8 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"cb_contact_arch\" value=\"$contact_arch\" />
       <input type=\"hidden\" name=\"cb_info_pub\" value=\"$info_pub\" />
       <input type=\"hidden\" name=\"rd_mode\" value=\"$mode\" />
-      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />";
+      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />
+      <input type=\"hidden\" name=\"id_duplicated\" value=\"$id_duplicated\" />";
 
   $block = "<p />
   <table class=\"detail\">

@@ -1216,20 +1216,22 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
-  if (! $cgp_hide["contact"]["responsible"]) {
-    if ($contact["marketing_manager"]) {
-      $users = array($contact["marketing_manager"]);
-    }
-    $usr_q = run_query_all_users_from_group($cg_com, $users);
-  } else {
-    // We only get the connected user for comment user select
-    $usr_q = run_query_all_users_from_group("", array($uid));
+
+  $users = array($uid);
+
+  if ($contact["marketing_manager"] > 0) {
+    $users[] = $contact["marketing_manager"];
   }
+  if ($contact["id"] > 0) {
+    $users[] = $co_q->f("contact_marketingmanager_id");
+  }
+  $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();
   $block = html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Contact Form
@@ -1608,11 +1610,12 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     $opt_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
-      $sel_usercomment .= " selected = \"selected\"";
+      $opt_usercomment .= " selected = \"selected\"";
     }
     $opt_usercomment .= ">$cname</option>\n";
   }
-  $sel_usercomment  = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
+
+  $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "

@@ -208,6 +208,7 @@ function run_query_list_insert($list) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  // Handle list duplication
   if ($retour) {
     $id = get_list_id($list);
     $id_dup = $list["id_duplicated"];
@@ -225,6 +226,7 @@ function run_query_list_insert($list) {
 	$retour = $obm_qi->query($query_i);
       }
     }
+    run_query_list_update_static_nb($id);
   }
 
   return $id;

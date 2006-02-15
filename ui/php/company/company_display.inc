@@ -294,7 +294,6 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   }
   $sel_dsrc .= "</select>";
 
-
   $url = url_prepare("company_index.php");
 
   if ($popup) {
