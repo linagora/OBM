@@ -243,6 +243,13 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "statistics")  {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lang/$set_lang/statistic.inc");
+  // Specific site statistics lang file
+  if ($cgp_site_include) {
+    $lang_file = "$obminclude/site/lang/$set_lang/statistic.inc";
+    if (file_exists("$path/../".$lang_file)) {
+      include("$lang_file");
+    }
+  }
 
   $cat1_q = of_category_query_category_per_entity("contact", "category1", "multi");
   $cat2_q = of_category_query_category_per_entity("contact", "category2", "multi");
