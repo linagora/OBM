@@ -1206,16 +1206,16 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $cid = $contact["id"];
   if ($cid > 0) {
-    $funcs = of_category_get_ordered("contact", "function");
     $cats1=array();$cats2=array();$cats3=array();$cats4=array();
     $cats1 = of_category_get_ordered("contact", "category1", "multi", $cid);
     $cats2 = of_category_get_ordered("contact", "category2", "multi", $cid);
     $cats3 = of_category_get_ordered("contact", "category3", "multi", $cid);
     $cats4 = of_category_get_ordered("contact", "category4", "multi", $cid);
-    $cats5 = of_category_get_ordered("contact", "category5");
   }
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
+  $funcs = of_category_get_ordered("contact", "function");
+  $cats5 = of_category_get_ordered("contact", "category5");
 
   $users = array($uid);
 
