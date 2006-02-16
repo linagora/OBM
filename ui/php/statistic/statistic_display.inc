@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics differents actions
 // Parameters:
@@ -355,4 +354,45 @@ function export_cat_stats($comp_q,$tot) {
   echo $block;
   exit();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics about Contact number evolution by date
+// Parameters:
+// - stats : contact total number evolution by date 
+// Returns:
+// - image inline
+///////////////////////////////////////////////////////////////////////////////
+function dis_contact_date_evolution_graph($stats) {
+  global $obminclude;
+
+  require_once "$obminclude/Artichow/LinePlot.class.php";
+
+  if (count($stats["data"]) > 0) {
+    $graph = new Graph(600, 400);
+    $graph->setAntiAliasing(TRUE);
+    $blue = new Color(0, 0, 200);
+    $red = new Color(200, 0, 0);
+    $green = new Color(0, 200, 0);
+
+    $group = new PlotGroup;
+    $group->setBackgroundColor( new Color(240, 240, 240));
+    $group->setPadding(40, 40);
+
+    $values = $stats["data"];
+    $plot = new LinePlot($values);
+    $plot->setColor($blue);
+    $group->add($plot);
+
+    $group->axis->bottom->setLabelText($stats["legend"]);
+    $group->axis->bottom->setNumberByTick('minor', 'major', 12);
+    $group->axis->bottom->setTickInterval(12);
+
+    $graph->add($group);
+    $graph->draw();
+  } else { 
+    false;
+  }
+
+}
+
 </script>

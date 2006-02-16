@@ -7,7 +7,8 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
-// - index (default)    -- search fields  -- show the statistic search form
+// - index (default)                -- search fields  -- show the statistic search form
+// - contact_date_evolution_graph   --                -- show contact date evolution stats 
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -37,7 +38,6 @@ if (! $statistic["popup"]) {
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["features"] = dis_menu_stats(); 
@@ -90,6 +90,15 @@ if ($action == "index" || $action == "") {
     $nb_comp = $com_q->nf();
   }
   export_cat_stats($cat_q, $nb_comp);
+
+} elseif ($action == "contact_date_evolution_graph") {
+///////////////////////////////////////////////////////////////////////////////
+  $stats = get_stats_contact_date_total();
+//  $tot = get_stats_contact_date_categories($stats);
+//  dis_contact_date_evolution_graph($tot);
+  dis_contact_date_evolution_graph($stats);
+  flush();
+  exit();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,6 +132,7 @@ function get_statistic_action() {
   global $path,$actions,$statistic;
   global $ico_contact,$ico_company;
   global $l_header_resp_stats,$l_header_comp_stats,$l_header_index,$l_header_export;
+  global $l_header_contact_date_evolution_stats;
 
 // Index
   $actions["statistic"]["index"] = array (
@@ -148,7 +158,6 @@ function get_statistic_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('content') 
                                         );
-
 // 
   $actions["statistic"]["company_statistic"] = array (
     'Url'      => "$path/statistic/statistic_index.php?action=company_statistic",
@@ -165,5 +174,20 @@ function get_statistic_action() {
     'Condition'=> array ('company_statistic') 
                                         );					
 					
+  $actions["statistic"]["contact_date_evolution"] = array (
+    'Name'     => $l_header_contact_date_evolution_stats,
+    'Url'      => "$path/statistic/statistic_index.php?action=contact_date_evolution",
+    'Ico'      => $ico_contact,
+    'Right'    => $cright_read,
+    'Condition'=> array ('content')
+                                        );
+
+  $actions["statistic"]["contact_date_evolution_graph"] = array (
+    'Url'      => "$path/statistic/statistic_index.php?action=contact_date_evolution_graph",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
+                                        );
+
+
 }
 </script>

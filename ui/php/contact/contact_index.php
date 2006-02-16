@@ -17,6 +17,7 @@
 // - check_delete       -- $param_contact -- check links before delete
 // - delete             -- $param_contact -- delete the contact
 // - admin              --                -- admin index (kind)
+// - statistics         --                -- statistics index 
 // - function_insert    -- form fields    -- insert the function
 // - function_update    -- form fields    -- update the function
 // - function_checklink --                -- check if function is used
@@ -547,7 +548,6 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_contact_consult($contact);
   }    
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display

@@ -92,7 +92,7 @@ function run_query_company_per_country_per_cat() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // return Company number
-// Parametes:
+// Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_nb_company() {
   global $cdg_sql;
@@ -110,7 +110,7 @@ function run_query_nb_company() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // return all the lists
-// Parametes:
+// Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_lists() {
   global $cdg_sql;
@@ -126,7 +126,7 @@ function run_query_get_lists() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // return the list query
-// Parametes:
+// Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_list($id) {
   global $cdg_sql;
@@ -143,7 +143,7 @@ function run_query_get_list($id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // statistic about category and country
-// Parametes: the list of the company to select
+// Parameters: the list of the company to select
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_selected_company_per_country_per_cat($obm_q) {
   global $cdg_sql;
@@ -181,5 +181,62 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// return the contact date 
+// Parameters:
+////////////////////////////////////////////////////////////////////////////////
+function get_stats_contact_date_total() {
+  global $obmdb_dbtype, $db_type_mysql, $db_type_pgsql, $cdg_sql;
+
+  $legend = array("Total");
+
+  if ($obmdb_dbtype == $db_type_mysql) {
+    $query = "select count(*) as nb, YEAR(contact_date) as year, MONTH(contact_date) as month from Contact where contact_date !='0' group by YEAR(contact_date), MONTH(contact_date) order by YEAR(contact_date) , MONTH(contact_date)";
+  } elseif ($obmdb_dbtype == $db_type_pgsql) {
+    $query = "select count(*) as nb, extract (year from  contact_date) as year, extract(month from contact_date) as month from Contact where contact_date is not null group by  extract (year from contact_date), extract(month from contact_date)";
+  }
+  display_debug_msg($query, $cdg_sql, "get_stats_contact_date_total()");
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  $data=array(); $i=0; $sum=0;
+  $month=0;$year=0; 
+  while ($obm_q->next_record()) {
+    // Months without data
+    if (($obm_q->f("month") != (($month % 12) + 1))) {
+      while ($obm_q->f("month") != (($month % 12) + 1)) {
+        $month = ($month % 12) + 1;
+
+	if ($year == 0) {
+           $year = $obm_q->f("year");
+        } elseif ($month == 1) {
+           $year += 1;
+        } 
+	if ($month == 1)
+          $legend[$i] = $year;
+        else
+          $legend[$i] = "";
+        $data[$i] = $sum;
+        $i++;
+      }
+    }
+
+    $sum +=  $obm_q->f("nb");
+	if ($obm_q->f("month") == 1)
+          $legend[$i] = $obm_q->f("year");
+        else
+          $legend[$i] = "";
+    $data[$i] = $sum;
+
+    $month = $obm_q->f("month");
+    $year = $obm_q->f("year");
+    $i++;
+  }
+
+  return array (
+     "data" => $data,
+     "legend" => $legend,
+  );
+}
 
 </script>

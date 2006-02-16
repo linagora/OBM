@@ -2467,6 +2467,25 @@ function export_vcard($co_q,$com_q) {
   echo iconv("ISO-8859-15","UTF-8",$vcard);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About Contact number evolution by date
+// Parameters:
+// Returns:
+///////////////////////////////////////////////////////////////////////////////
+function dis_html_contact_date_graph_stats($entity) {
+  global $l_contact_date_evolution_graph;
+
+  $url = url_prepare("$path/statistic/statistic_index.php?action=contact_date_evolution_graph");
+
+  $block = "<div class=\"detailHead\">".ucfirst($l_contact_date_evolution_graph)."</div>
+   <table class=\"detail\" >
+     <tr>
+       <td class=\"detailLabel\" class=\"detailForm\"> <img src=\"$url\" /></td>
+     </tr>
+   </table>";
+ 
+  return $block; 
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About Contact categories 
@@ -2487,6 +2506,7 @@ function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $fu
   $block4 = of_category_dis_entity_stats("contact", "category4", $cat4_q);
   $block5 = of_category_dis_entity_stats("contact", "category5", $cat5_q);
   $block_func = of_category_dis_entity_stats("contact", "function", $func_q);
+  $block_date = dis_html_contact_date_graph_stats("contact"); 
 
   $block ="
     $block1
@@ -2495,6 +2515,7 @@ function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $fu
     $block4
     $block5
     $block_func
+    $block_date
   ";
 
   return $block;

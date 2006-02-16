@@ -158,8 +158,6 @@ function dis_chart_bar_multiple($chart) {
   $graph->draw();
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Chart parameters transmitted in $chart hash
 // returns : $chart hash with parameters set
@@ -177,6 +175,5 @@ function get_param_chart() {
 
   return $chart;
 }
-
 
 </script>

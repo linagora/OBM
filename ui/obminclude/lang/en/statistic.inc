@@ -19,3 +19,6 @@ $l_null = "None";
 $l_compcat = "Company's categories";
 $l_select_list = "Select a list of companies from List module";
 $l_generate_stats = "Generate statistics";
+
+$l_contact_date_evolution_graph = "Contacts number evolution (monthly)";
+
