@@ -20,6 +20,8 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
+  $dateexp_after = $invoice["dateexp_after"];
+  $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
   $company = sql_search_text_parse($invoice["company"]);
   $deal = sql_search_text_parse($invoice["deal"]);
@@ -33,28 +35,35 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $date = sql_date_format($db_type, "invoice_date", "date");
+  $dateexp = sql_date_format($db_type, "invoice_expiration_date", "expiration_date");
 
   $where = "1=1";
-  if ($label != ""){
+  if ($label != "") {
     $where .= " AND invoice_label $like '%$label%'";
   }
-  if ($number != ""){
+  if ($number != "") {
     $where .= " AND invoice_number $like '%$number%'";
   }
-  if ($ht != ""){
+  if ($ht != "") {
     $where .= " AND invoice_amount_ht = '$ht'";
   }
-  if ($ttc != ""){
+  if ($ttc != "") {
     $where .= " AND invoice_amount_ttc = '$ttc'";
   }
   if (($status != '') && ($status != "$c_all")){
     $where .= " AND invoice_status_id = '$status'";
   }
-  if ($date_after != ""){
+  if ($date_after != "") {
     $where .= " AND invoice_date >= '$date_after'";
   }
-  if ($date_before != ""){
+  if ($date_before != "") {
     $where .= " AND invoice_date <= '$date_before'";
+  }
+  if ($dateexp_after != "") {
+    $where .= " AND invoice_expiration_date >= '$dateexp_after'";
+  }
+  if ($dateexp_before != "") {
+    $where .= " AND invoice_expiration_date <= '$dateexp_before'";
   }
   if (($inout != "") && ($inout != "$c_all")){
     $where .= " AND invoice_inout = '$inout'";
@@ -71,7 +80,9 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
     $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($deal_id != "") {
-    $where .= " AND invoice_deal_id = '$deal_id'";
+    $where .= " AND (invoice_deal_id = '$deal_id'
+                     OR project_deal_id = '$deal_id')";
+    $join_deal = "LEFT JOIN Project on invoice_project_id=project_id";
   }
   if ($proj_id != "") {
     $where .= " AND invoice_project_id = '$proj_id'";
@@ -85,9 +96,10 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   $orderq .= "ORDER BY $order $order_dir";
 
   // XXXXXX ???? Display archive
-  $query = "select Invoice.*,
+  $query = "SELECT Invoice.*,
       invoice_id as id,
       $date,
+      $dateexp,
       company_id, company_name as invoice_company,
       deal_id, deal_label as invoice_deal,
       project_id, project_name as invoice_project,
@@ -332,7 +344,7 @@ function run_query_invoice_update($invoice) {
 //   - $target : "payment" : get status where invoice should have a payment
 //             : "tocreate" : get status where invoice ahs not been cretated
 // Returns:
-//   - $status : array of status [id][label]
+//   - $status : array of status [id] [[label][created][payment][archive]]
 ///////////////////////////////////////////////////////////////////////////////
 function get_invoicestatus($target="") {
   global $cdg_sql;
@@ -344,7 +356,10 @@ function get_invoicestatus($target="") {
   }
 
   $query = "SELECT invoicestatus_id,
-      invoicestatus_label
+      invoicestatus_label,
+      invoicestatus_payment,
+      invoicestatus_created,
+      invoicestatus_archive
     FROM InvoiceStatus
     $wtarget
     ORDER BY invoicestatus_archive, invoicestatus_payment";
@@ -356,7 +371,13 @@ function get_invoicestatus($target="") {
   while ($obm_q->next_record()) {
     $id = $obm_q->f("invoicestatus_id");
     $label = $obm_q->f("invoicestatus_label");
-    $status[$id] = $label;
+    $payment = $obm_q->f("invoicestatus_payment");
+    $created = $obm_q->f("invoicestatus_created");
+    $archive = $obm_q->f("invoicestatus_archive");
+    $status[$id] = array ("label" => $label,
+			  "payment" => $payment,
+			  "created" => $created,
+			  "archive" => $archive);
   }
 
   return $status;
@@ -387,13 +408,13 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
       $exp_date,
       payment_amount
     FROM PaymentInvoice
-         LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
+      LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
     WHERE paymentinvoice_invoice_id = '$p_invoice'";
 
   if ($not_paid == 1) {
-    $query .= " and paymentinvoice_amount = 0.0 ";
+    $query .= " AND paymentinvoice_amount = 0.0 ";
   } elseif ($not_paid == -1) {
-    $query .= " and paymentinvoice_amount <> 0.0 ";
+    $query .= " AND paymentinvoice_amount <> 0.0 ";
   }
   
   display_debug_msg($query, $cdg_sql, "run_query_invoice_payment");
@@ -470,7 +491,7 @@ function run_query_linked_invoice_payment($p_id) {
 
   $query = "SELECT distinct payment_id, payment_label, payment_amount 
     FROM Payment
-         LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id
+      LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id
     WHERE paymentinvoice_invoice_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -563,10 +584,11 @@ function get_invoicestatus_info($p_id) {
 // Get global invoices infos
 // Parameters:
 //   - $date_ranges : array [range1] : [date_start, date_end]
+//   - $target_date : invoice_date, invoice_expiration_date
 // Returns:
 //     array : array[date]([billed]|[potential])([status]|[total])[$infos]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_amounts($date_ranges) {
+function run_query_invoice_amounts($date_ranges, $target_date="invoice_date") {
   global $cdg_sql, $cdg_param;
   global $l_total;
 
@@ -580,7 +602,7 @@ function run_query_invoice_amounts($date_ranges) {
     foreach ($date_ranges as $range) {
       $d1 = $range[0];
       $d2 = $range[1];
-      $w_date .= " $or (invoice_date >= '$d1' AND invoice_date <= '$d2')";
+      $w_date .= " $or ($target_date >= '$d1' AND $target_date <= '$d2')";
       $or = "OR";
     }
   }
@@ -594,7 +616,8 @@ function run_query_invoice_amounts($date_ranges) {
       invoice_inout,
       invoice_status_id,
       invoicestatus_label,
-      invoicestatus_payment
+      invoicestatus_payment,
+      invoicestatus_archive
     FROM Invoice
       LEFT JOIN InvoiceStatus on invoice_status_id=invoicestatus_id
     WHERE invoice_inout = '+' 
@@ -611,10 +634,16 @@ function run_query_invoice_amounts($date_ranges) {
     $at = $obm_q->f("invoice_amount_ttc");
     $inout = $obm_q->f("invoice_inout");
     $date = isodate_format($obm_q->f("date"));
-    $month = substr($date, 0, 7);
+    $exp_date = isodate_format($obm_q->f("expiration_date"));
+    if ($target_date == "invoice_expiration_date") {
+      $month = substr($exp_date, 0, 7);
+    } else {
+      $month = substr($date, 0, 7);
+    }
     $status = $obm_q->f("invoice_status_id");
     $statuslabel = $obm_q->f("invoicestatus_label");
     $payment = $obm_q->f("invoicestatus_payment");
+    $archivable = $obm_q->f("invoicestatus_archive");
 
     // Invoice created
     if ($payment == "1") {
@@ -626,6 +655,12 @@ function run_query_invoice_amounts($date_ranges) {
       $res[$month]["billed"]["total"]["amount_ht"] += $ah;
       $res[$month]["billed"]["total"]["amount_ttc"] += $at;
       $res[$month]["billed"]["total"]["nb"] ++;
+      // Il the invoice that need a payment can be archived, it has been paid
+      if ($archivable == "1") {
+	$res[$month]["paid"]["total"]["amount_ht"] += $ah;
+	$res[$month]["paid"]["total"]["amount_ttc"] += $at;
+	$res[$month]["paid"]["total"]["nb"] ++;
+      }	
     } else {
       // Invoice to create
       $res[$month]["potential"]["$status"]["label"] = $statuslabel;

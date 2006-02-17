@@ -143,7 +143,7 @@ function dis_invoice_search_form($invoice="") {
 function html_invoice_search_form($sta, $invoice) {
   global $c_all, $l_all;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
-  global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
+  global $l_status, $l_date, $l_after, $l_before, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
   global $l_find, $l_both, $l_client, $l_supplier;
 
@@ -154,6 +154,8 @@ function html_invoice_search_form($sta, $invoice) {
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
+  $dateexp_after = $invoice["dateexp_after"];
+  $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
   $deal = $invoice["deal"];
   $deal_id = $invoice["deal_id"];
@@ -166,7 +168,8 @@ function html_invoice_search_form($sta, $invoice) {
 
   $sel_status = "<select name=\"sel_status\">
      <option value=\"$c_all\">$l_all</option>";
-  foreach ($sta as $s_id => $s_label) {
+  foreach ($sta as $s_id => $s_status) {
+    $s_label = $s_status["label"];
     $sel_status .= "<option value=\"$s_id\"";
     if ($status == $s_id) $sel_status .= " selected = \"selected\"";
     $sel_status .= ">$s_label</option>";
@@ -209,11 +212,11 @@ function html_invoice_search_form($sta, $invoice) {
       $sel_status
     </div>
 
-    <div class=\"searchLabel\">$l_date_apres<br />
+    <div class=\"searchLabel\">$l_date $l_after<br />
       <input type=\"text\" name=\"tf_date_after\" maxlength=\"10\" size=\"10\" value=\"$date_after\" />
     </div>
 
-    <div class=\"searchLabel\">$l_date_avant<br />
+    <div class=\"searchLabel\">$l_date $l_before<br />
       <input type=\"text\" name=\"tf_date_before\" maxlength=\"10\" size=\"10\" value=\"$date_before\" />
     </div>
 
@@ -297,6 +300,8 @@ function html_invoice_search_list ($inv_q, $prefs, $nb_invoice, $invoice) {
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
+  $dateexp_after = $invoice["dateexp_after"];
+  $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
   $deal = urlencode($invoice["deal"]);
   $company = urlencode($invoice["company"]);
@@ -313,6 +318,8 @@ function html_invoice_search_list ($inv_q, $prefs, $nb_invoice, $invoice) {
 		    "&amp;sel_status=$status".
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;tf_date_before=$date_before".
+		    "&amp;tf_date_exp_after=$dateexp_after".
+		    "&amp;tf_date_exp_before=$dateexp_before".
 		    "&amp;tf_deal=$deal".
 		    "&amp;rd_inout=$inout".
 		    "&amp;param_company=$comp_id".
@@ -692,7 +699,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
 
   // Status select
   $sel_status = "<select name=\"sel_status\">"; 
-  foreach ($stat as $s_id => $s_label) {
+  foreach ($stat as $s_id => $s_status) {
+    $s_label = $s_status["label"];
     $sel_status .= "<option value=\"$s_id\""; 
     if ($s_id == $status) {
       $sel_status .= " selected ";
@@ -793,7 +801,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       </a><input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
       <input type=\"hidden\" name=\"project_name\" value=\"$p_name\" />
       <input type=\"hidden\" name=\"project_new_id\" value=\"$p_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entit.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -912,15 +920,16 @@ function dis_can_delete_invoice($p_id) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Display the invoice dashboard
 // Parameters:
 //   - $invoice : invoice hash infos
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard($invoice) {
   global $display, $set_theme, $path;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
+  global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
 
   if (isset($invoice["year"])) {
     $year = $invoice["year"];
@@ -941,11 +950,13 @@ function dis_invoice_dashboard($invoice) {
       <td class=\"resultHead\">$label</td>";
   }
 
-  // Billed Chart
+  // Billed infos -------------------------------------------------------------
+
   $status_pay = get_invoicestatus("payment");
 
   // Loop through status (rows)
-  foreach ($status_pay as $s_id => $s_label) { 
+  foreach ($status_pay as $s_id => $s_status) { 
+    $s_label = $s_status["label"];
     $total_amount_ht = 0;
     $cpt++;
     $data = "data" . ($cpt % 2);
@@ -1030,11 +1041,13 @@ function dis_invoice_dashboard($invoice) {
 
   $chart_bil_params .= "&amp;title=".urlencode($title)."&amp;values=".urlencode(serialize($values)) . "&amp;chart_labels=".urlencode(serialize($labels)). "&amp;chart_xlabels=".urlencode(serialize($xlabels));
 
-  // Potential Chart
+  // Potential chart ----------------------------------------------------------
+
   $status_toc = get_invoicestatus("tocreate");
 
   // Loop through status (rows)
-  foreach ($status_toc as $s_id => $s_label) { 
+  foreach ($status_toc as $s_id => $s_status) { 
+    $s_label = $s_status["label"];
     $total_amount_ht = 0;
     $cpt++;
     $data = "data" . ($cpt % 2);
@@ -1058,8 +1071,10 @@ function dis_invoice_dashboard($invoice) {
 	$nb = $status_info["nb"];
 	$total_amount_ht += $amount_ht;
 	$f_amount_ht = number_format($amount_ht, 2, ",", " ");
+	$month_start = "$year_month-01";
+	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
-          <td class=\"$data\">&nbsp;$f_amount_ht</td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end\">$f_amount_ht</a></td>";
       } else {
         $dis_pot_row .= "
           <td class=\"$data\"> </td>";
@@ -1072,10 +1087,105 @@ function dis_invoice_dashboard($invoice) {
   }
   $plots["new_bar"] = array(1, 0);
   $plots["legends"] = array($l_order_no_bill, $l_billed);
-  //  $legends = array($l_order_no_bill, $l_billed);
   $title = "$l_potential $year";
 
   $chart_pot_params .= "&amp;title=".urlencode($title)."&amp;values=".urlencode(serialize(array($values_pot, $values)))."&amp;chart_plots=".urlencode(serialize($plots))."&amp;chart_labels=".urlencode(serialize($labels_pot)). "&amp;chart_xlabels=".urlencode(serialize($xlabels));
+
+  // Payment infos ------------------------------------------------------------
+
+  $date_ranges = array(array("$year-01-01", "$year-12-31"));
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date");
+
+  $status_pay = get_invoicestatus("payment");
+
+  // Loop through status (rows)
+  foreach ($status_pay as $s_id => $s_status) { 
+    $s_label = $s_status["label"];
+    //    // If the status tell invoice can be archived, invoice has been paid 
+    //    $status_paid = $s_status["archive"] == 1 ? true : false;
+    $total_amount_ttc = 0;
+    $cpt++;
+    $data = "data" . ($cpt % 2);
+
+    $dis_pay_row .= "<tr class=\"$data\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$s_label</td>";
+
+    // Loop through each month (cols)
+    for ($month = 1; $month < 13; $month++) {
+
+      // left pad the month
+      if ($month > 9) {
+	$year_month = "$year-$month";
+      } else {
+	$year_month = "$year-0$month";
+      }
+      // Invoice created
+      if (is_array($inv["$year_month"]["billed"]["$s_id"])) {
+	$status_info = $inv["$year_month"]["billed"]["$s_id"];
+	$amount_ttc = $status_info["amount_ttc"];
+	$nb = $status_info["nb"];
+	$total_amount_ttc += $amount_ttc;
+	$dis_amount_ttc = number_format($amount_ttc, 2, ",", " ");
+	$month_start = "$year_month-01";
+	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
+        $dis_pay_row .= "
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=0&amp;tf_date_exp_after=$month_start&amp;tf_date_exp_before=$month_end\">$dis_amount_ttc</a></td>";
+      } else {
+        $dis_pay_row .= "
+          <td class=\"$data\"> </td>";
+      }
+    }
+    $f_total_amount_ttc = number_format($total_amount_ttc, 2, ",", " ");
+    $dis_pay_row .= "<td class=\"data2\">&nbsp;$f_total_amount_ttc</td>
+        </tr>";
+  }
+
+  // Total row
+  $total_amount_ttc = 0;
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $status_info = $inv["$year_month"]["billed"]["total"];
+    $amount_ttc = $status_info["amount_ttc"];
+    $total_amount_ttc += $amount_ttc;
+    $dis_amount_ttc = number_format($amount_ttc, 2, ",", " ");
+    if ($amount_ttc > 0) {
+      $month_start = "$year_month-01";
+      $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+      $dis_pay_row_total .= "
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cb_archive=1&amp;tf_date_exp_after=$month_start&amp;tf_date_exp_before=$month_end\">$dis_amount_ttc</a></td>";
+    } else {
+      $dis_pay_row_total .= "
+          <td>&nbsp;$dis_amount_ttc</td>";
+    }
+  }
+  $f_total_amount_ttc = number_format($total_amount_ttc, 2, ",", " ");
+  $dis_pay_row_total .= "
+      <td>&nbsp;$f_total_amount_ttc</td>";
+
+  // Artichow Chart
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $xlabels[$month-1] = $l_monthsofyear[$month-1];
+    $values[$month-1] = $inv["$year_month"]["paid"]["total"]["amount_ttc"];
+    $values_pay[$month-1] = $inv["$year_month"]["billed"]["total"]["amount_ttc"];
+    $labels[$month-1] = number_format($values_pay[$month-1], 0, ",", " ");
+  }
+  $plots["new_bar"] = array(1, 0);
+  $plots["legends"] = array($l_waiting, $l_paid);
+  $title = "$l_payment $year ($l_amount_ttc)";
+
+  $chart_pay_params .= "&amp;title=".urlencode($title)."&amp;values=".urlencode(serialize(array($values_pay, $values)))."&amp;chart_plots=".urlencode(serialize($plots))."&amp;chart_labels=".urlencode(serialize($labels)). "&amp;chart_xlabels=".urlencode(serialize($xlabels));
+
 
   $block = "
     <div class=\"detailHead\">
@@ -1098,7 +1208,7 @@ function dis_invoice_dashboard($invoice) {
       </table>
     </div>
 
-    <div class=\"detailHead\">$l_billed</div>
+    <div class=\"detailHead\">$l_billed ($l_amount_ht)</div>
 
     <table class=\"resultTable\">
     <tr style=\"text-align: right;\">
@@ -1114,7 +1224,7 @@ function dis_invoice_dashboard($invoice) {
     </table>
     <p />
 
-    <div class=\"detailHead\">$l_order_no_bill</div>
+    <div class=\"detailHead\">$l_order_no_bill ($l_amount_ht)</div>
 
     <table class=\"resultTable\">
     <tr style=\"text-align: right;\">
@@ -1126,9 +1236,27 @@ function dis_invoice_dashboard($invoice) {
     </table>
     <p />
 
+    <div class=\"detailHead\">$l_payment ($l_amount_ttc)</div>
+
+    <table class=\"resultTable\">
+    <tr style=\"text-align: right;\">
+      <td class=\"resultHead\" style=\"text-align: left;\">$l_status</td>
+      $dis_row_head
+      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
+    </tr>
+    $dis_pay_row
+    <tr class=\"data2\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$l_total</td>
+      $dis_pay_row_total
+    </tr>
+    </table>
+    <p />
+
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
     <br />
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
+    <br />
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pay_params\" alt=\"\" />
 
 ";
 

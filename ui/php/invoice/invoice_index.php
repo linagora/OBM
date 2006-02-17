@@ -200,6 +200,7 @@ function get_param_invoice() {
   global $year, $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
   global $ta_comment, $sel_status, $param_invoice, $tf_date, $tf_payment_date;
   global $tf_expiration_date, $tf_date_after, $tf_date_before;
+  global $tf_date_exp_after, $tf_date_exp_before;
   global $tf_deal, $tf_company, $cb_archive, $rd_inout, $hd_inout;
   global $ta_comment, $sel_usercomment, $tf_datecomment, $ta_add_comment;
   global $param_company, $company_name, $company_new_name, $company_new_id;
@@ -220,6 +221,8 @@ function get_param_invoice() {
   if (isset ($tf_expiration_date)) $invoice["edate"] = $tf_expiration_date;
   if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after;
   if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before;
+  if (isset ($tf_date_exp_after)) $invoice["dateexp_after"] = $tf_date_exp_after;
+  if (isset ($tf_date_exp_before)) $invoice["dateexp_before"] = $tf_date_exp_before;
   if (isset ($rd_inout)) $invoice["inout"] = $rd_inout;
   if (isset ($hd_inout)) $invoice["inout"] = $hd_inout;
   if (isset ($tf_balance)) $invoice["balance"] = $tf_balance;

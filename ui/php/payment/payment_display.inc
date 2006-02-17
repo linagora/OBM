@@ -99,8 +99,8 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payment) {
   global $l_all, $c_all;
-  global $l_label_start, $l_number, $l_amount, $l_date_apres;
-  global $l_date_avant, $l_inout, $l_kind, $l_account;
+  global $l_label_start, $l_number, $l_amount, $l_date, $l_after, $l_before;
+  global $l_inout, $l_kind, $l_account;
   global $l_deal, $l_company, $l_include_checked;
   global $l_find, $l_all, $l_both, $l_client, $l_supplier;
   global $l_status, $l_paid, $l_unpaid;
@@ -185,11 +185,11 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
        <input type=text name=tf_amount size=12 value=\"$amount\">
       </div>
 
-      <div class=\"searchLabel\">$l_date_apres<br />
+      <div class=\"searchLabel\">$l_date $l_after<br />
        <input type=text name=tf_date_after size=12 value=\"$date_after\">
       </div>
 
-      <div class=\"searchLabel\">$l_date_avant<br />
+      <div class=\"searchLabel\">$l_date $l_before<br />
        <input type=text name=tf_date_before size=12 value=\"$date_before\">
       </div>
 
@@ -229,141 +229,10 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
       <div class=\"searchEnd\"></div>
      </div>
     </form>
-    ";
-
-  // bcontins : ancienne version à Nico
-  /////////////////////////////////////////////////////////////////
-  //   $block = "
-  //     <form method=\"get\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".url_prepare("payment_index.php?action=search")."\">
-  //      <table border=$border cellspacing=$cellspacing>
-  //       <tr><td>
-  //       <table border=$border cellspacing=$cellspacing width=\"100%\">
-  //        <tr><td>
-  // 	<table border=$border cellspacing=$cellspacing width=\"100%\">
-  //          <tr>
-  //           <td>
-  //            <font size=-2>$l_label_start</font><br>
-  //            <input type=text name=tf_label size=20 value=\"$label\">
-  //           </td>
-  //           <td>
-  //            <font size=-2>$l_number</font><br>
-  //            <input type=text name=tf_number size=12 value=\"$number\">
-  //           </td>
-  //           <td>
-  //            <font size=-2>$l_amount</font><br>
-  //            <input type=text name=tf_amount size=12 value=\"$amount\">
-  //           </td>
-  //          </tr>
-  //         </table>
-  //        </td></tr>
-  //        <tr><td>
-  //         <table cellspacing=$cellspacing border=$border width=\"100%\">
-  //          <tr>
-  //          <td>
-  //           <font size=-2>$l_date_apres</font><br>
-  //          </td>
-  //          <td>
-  //           <font size=-2>$l_date_avant</font><br>
-  //          </td>
-  //         <td>
-  //           <font size=-2>$l_inout</font><br>
-  //           <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\"";
-  //   if (($inout == "$c_all")||($inout=="")){
-  //     $block .= "checked";
-  //   }
-  //   $block .= ">$l_both &nbsp;
-  //     <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
-  //   if ($inout == "+"){
-  //     $block .= "checked";
-  //   }
-  //   $block .= ">$l_client &nbsp;
-  //           <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
-  //   if ($inout == "-"){
-  //     $block .= "checked";
-  //   }
-  //   $block .= ">$l_supplier &nbsp;
-  //         </td></tr>";
-  //   // Paid or unpaid payments ?
-  //   $block .= "
-  //         <tr><td>
-  //           <font size=-2>$l_status</font>
-  //           <br>
-  //           <input type=\"radio\" name=\"rd_paid\" value=\"$c_all\"";
-  //   if (($paid == "$c_all")||($paid=="")){
-  //     $block .= "checked"; 
-  //   }
-  //   $block .= ">$l_both &nbsp;
-  //           <input type=\"radio\" name=\"rd_paid\" value=\"y\"";
-  //   if ($paid == "y"){
-  //     $block .= "checked";
-  //   }
-  //   $block .= ">$l_paid &nbsp;
-  //           <input type=\"radio\" name=\"rd_paid\" value=\"n\"";
-  //   if ($paid == "n"){
-  //    $block .= "checked";
-  //   }
-  //   $block .=">$l_unpaid &nbsp;";
-  //   // deal :
-  //   $block .="
-  //         </td><td>
-  //          <font size=\"-2\">$l_deal</font><br>
-  //          <input type=\"text\" name=\"tf_deal\" value=\"$deal\">
-  // 	 </td>
-  // 	 <td>
-  //          <font size=\"-2\">$l_company</font><br>
-  //          <input type=\"text\" name=\"tf_company\" value=\"$company\">
-  //         </td></tr>
-  //        </table>
-  //         </td></tr>
-  //         <tr><td>
-  //          <table width=\"100%\" border=$border cellspacing=$cellspacing>
-  //           <tr><td>
-  //            <font size=-2>$l_account</font><br>
-  //            <select name=\"sel_account\">
-  //            <option value=\"-1\">$l_all";
-  //   while ($q_account->next_record()) {
-  //    $block .= "\n\t<option value=\"".$q_account->f("account_id")."\"";
-  //     if ($q_account->f("account_id") == $account) {
-  //       $block .= " selected ";
-  //     }
-  //     $block .=">".$q_account->f("account_label");
-  //   }
-  //  $block .= "
-  //            </select>";
-  //   // kind of the payment (paymentkind db table)
-  //     $block .="
-  //           </td><td>
-  //            <font size=-2>$l_kind</font><br>
-  //            <select name=\"sel_kind\">
-  //             <option value=-1>$l_all";
-  //   while ($q_paymentkind->next_record()) {
-  //     $block .="
-  //             <option value=\"".$q_paymentkind->f("paymentkind_id")."\"";
-  //     if ($q_paymentkind->f("paymentkind_id") == $kind) {
-  //       $block .=" selected ";
-  //     }
-  //     $block .=">".$q_paymentkind->f("paymentkind_longlabel");
-  //   }
-  //   $block .=" 
-  //            </select> 
-  // 	   </td>
-  // 	   <td>
-  //            <font size=\"-2\">".$l_include_checked."</font><br>
-  //            <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $checked>
-  //           </td></tr>
-  //          </table>  
-  //         </td></tr>
-  //        </table>
-  //       </td><td valign=center>
-  //         <input type=hidden name=action value=\"search\">
-  //         <input type=submit value=".$l_find.">
-  //       </td></tr>
-  //      </table>
-  //     </form><hr>
-  //    </center>";
+";
 
    return $block;
-}// html_payment_search_form
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

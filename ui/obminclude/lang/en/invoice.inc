@@ -14,15 +14,20 @@ $l_amount_ht = "HT amount";
 $l_amount_ttc = "TTC Amount";
 $l_expiration_date = "Expiration date";
 $l_payment_date = "Payment date";
-$l_date_apres = "After";
-$l_date_avant = "Before";
-$l_paid = "Paid TTC Amount";
+$l_expected_date = "Expected Date";
+$l_paid = "Paid";
+$l_waiting = "Waiting";
 $l_pick_deal = "Choose a deal";
-$l_no_deal = "no deals related to this invoice";
+$l_inout = "Type";
+$l_both = "All";
+$l_tax_rate = "Tax rate";
+$l_compute_tax = "Calculate the taxed amount";
+$l_potential = "Potential";
+$l_include_archive = "Include archives";
+
+// payment
 $l_no_payment = "no payments related to this invoice";
 $l_list_payment = "payments related to this invoice";
-$l_expected_date = "Expected Date";
-$l_potential = "Potential";
 
 $l_inout = "Kind";
 $l_both = "Both"; 

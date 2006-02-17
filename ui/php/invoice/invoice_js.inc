@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : invoice_js.inc                                               //
-//     - Desc : invoice javascript functions File                            //
+// OBM - File : invoice_js.inc
+//     - Desc : invoice javascript functions File
 // 2001-08-03 Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -18,13 +18,13 @@ function check_search_form(f_inv){
   j_ttc=f_inv.tf_amount_ttc.value;
 
   if (trim(f_inv.tf_date_after.value) != \"\") {
-    if (check_date(f_inv.tf_date_after,\"".$l_date_apres."\")==false) {
+    if (check_date(f_inv.tf_date_after,\"$l_date $l_after\")==false) {
       alert(\"$l_invalid_date\");
       return false;
     }
   }
   if (trim(f_inv.tf_date_before.value) != \"\") {
-    if (check_date(f_inv.tf_date_before,\"".$l_date_avant."\")==false) {
+    if (check_date(f_inv.tf_date_before,\"$l_date $l_before\")==false) {
      alert(\"$l_invalid_date\");
      return false;
     }

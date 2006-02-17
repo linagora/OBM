@@ -12,8 +12,6 @@
 $l_label_start = "Début du Label";
 $l_amount = "Montant"; 
 $l_expected_date = "Date Prévisionnelle";
-$l_date_apres = "Ayant la date après";
-$l_date_avant = "Ayant la date avant";
 $l_type = "Type du Paiement";
 $l_inout = "Type";
 $l_both = "Both"; 

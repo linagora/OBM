@@ -29,10 +29,10 @@ function check_search_form (f_pay){
    return false;
   }
   // date after, date before :
-  if((f_pay.tf_date_after.value!='')&&(check_date(f_pay.tf_date_after,\"".$l_date_apres."\")==false)) {
+  if((f_pay.tf_date_after.value!='')&&(check_date(f_pay.tf_date_after,\"$l_date $l_after\")==false)) {
    return false;
   }
-  if((f_pay.tf_date_before.value!='')&&(check_date(f_pay.tf_date_before,\"".$l_date_avant."\")==false)) {
+  if((f_pay.tf_date_before.value!='')&&(check_date(f_pay.tf_date_before,\"$l_date $l_before\")==false)) {
    return false;
   }
  return true;

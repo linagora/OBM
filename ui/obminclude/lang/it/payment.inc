@@ -11,8 +11,6 @@
 $l_label_start = "Etichetta inizio";
 $l_amount = "Importo";
 $l_expected_date = "Scadenza";
-$l_date_apres = "Data Prima";
-$l_date_avant = "Data Dopo";
 $l_account = "Account";
 $l_type = "Tipo";
 $l_inout = "Tipo";

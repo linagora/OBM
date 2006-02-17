@@ -204,7 +204,7 @@ $profiles["admin"] = array (
 // sections -- Urls
 $cgp_show["section"]["com"]["url"] = "$path/company/company_index.php";
 $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
-$cgp_show["section"]["compta"]["url"] = "$path/account/account_index.php";
+$cgp_show["section"]["compta"]["url"] = "$path/invoice/invoice_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
 //$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
@@ -223,9 +223,9 @@ $cgp_show["module"]["project"] = "prod";
 $cgp_show["module"]["contract"] = "prod";
 $cgp_show["module"]["incident"] = "prod";
 $cgp_show["module"]["document"] = "prod";
-$cgp_show["module"]["account"] = "compta";
 $cgp_show["module"]["invoice"] = "compta";
 $cgp_show["module"]["payment"] = "compta";
+$cgp_show["module"]["account"] = "compta";
 $cgp_show["module"]["settings"] = "user";
 $cgp_show["module"]["user"] = "user";
 $cgp_show["module"]["group"] = "user";

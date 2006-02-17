@@ -12,8 +12,6 @@
 $l_label_start = "Inicio de Referencia";
 $l_amount = "Cantidad"; 
 $l_expected_date = "Fecha Esperada";
-$l_date_apres = "Fecha Posterior";
-$l_date_avant = "Fecha Anterior";
 $l_type = "Tipo";
 $l_inout = "Tipo";
 $l_both = "Ambos"; 

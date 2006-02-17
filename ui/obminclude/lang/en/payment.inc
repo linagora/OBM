@@ -11,8 +11,6 @@
 $l_label_start = "Label start";
 $l_amount = "Amount"; 
 $l_expected_date = "Expected Date";
-$l_date_apres = "Date After";
-$l_date_avant = "Date Before";
 $l_type = "Kind";
 $l_inout = "Kind";
 $l_both = "Both"; 

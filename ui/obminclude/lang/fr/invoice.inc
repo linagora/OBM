@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Labels et textes
 // invoice only 
 $l_label_start = "Début de Label";
 $l_amount = "Montant";
@@ -15,21 +14,20 @@ $l_amount_ht = "Montant HT";
 $l_amount_ttc = "Montant TTC";
 $l_expiration_date = "Date d'échéance";
 $l_payment_date = "Date de paiment";
-$l_date_apres = "Ayant la date après";
-$l_date_avant = "Ayant la date avant";
-$l_paid = "Montant TTC payé";
+$l_expected_date = "Date Prévisionnelle";
+$l_paid = "Payé";
+$l_waiting = "En attente";
 $l_pick_deal = "Choisissez une affaire";
 $l_inout = "Type";
 $l_both = "Tous";
 $l_tax_rate = "Taux TVA";
 $l_compute_tax = "Calculer le montant TTC";
-$l_include_archive = "Inclure les archives";
 $l_potential = "Potentiel";
+$l_include_archive = "Inclure les archives";
 
-//payment
+// payment
 $l_no_payment = "Aucun paiement connecté à cette facture";
 $l_list_payment = " Paiements connectés à cette facture";
-$l_expected_date = "Date Prévisionnelle";
 
 // Titres
 $l_invoice_infos = "Informations à propos de la Facture";
