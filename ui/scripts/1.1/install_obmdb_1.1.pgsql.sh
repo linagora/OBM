@@ -27,6 +27,8 @@ if [ $? != 0 ]; then
 fi
 echo $PHP : PHP interpreter found
 
+# Create the Artichow library link
+ln -s ../../obminclude/Artichow-1.06-php4+5/ ../../obminclude/Artichow
 
 echo "*** Document repository creation"
 $PHP install_document_1.1.php || (echo $?; exit $?)

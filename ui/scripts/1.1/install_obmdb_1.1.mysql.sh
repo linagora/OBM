@@ -27,6 +27,8 @@ if [ $? != 0 ]; then
 fi
 echo $PHP : PHP interpreter found
 
+# Create the Artichow library link
+ln -s ../../obminclude/Artichow-1.06-php4+5/ ../../obminclude/Artichow
 
 echo "*** Document repository creation"
 $PHP install_document_1.1.php || (echo $?; exit $?)
@@ -72,6 +74,6 @@ cd ../../php/admin_data
 echo "  Update calculated values"
 $PHP admin_data_index.php -a data_update
 
-# Update phonetics ans approximative searches
+# Update phonetics and approximative searches
 echo "  Update phonetics and approximative searches"
 $PHP admin_data_index.php -a sound_aka_update
