@@ -1372,11 +1372,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   }
 
   // Headers
-  $charset="iso-8859-1";
-  $charset="utf-8";
-  $ctencoding="8bit";
-  $ctencoding="quoted-printable";
-  $boundary='--' . md5( uniqid("myboundary") );
+  $boundary = '--' . md5( uniqid("myboundary") );
 
   $headers .= "From: ";
   // If AliaSuite, construct sender address.
@@ -1385,13 +1381,16 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   } else {
     $headers .= $send_q->f("userobm_email")."\n";
   }
-  if ($h_file !="") {
-    $headers.="Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
-  } else {
-    $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
-  } 
-  $headers.="Content-Transfer-Encoding: $ctencoding\nX-Mailer: Php/OBM $obm_version\n";
 
+  // If attachements are provided
+  if ($h_file != "") {
+    $headers .= "Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
+  } else {
+    // Commented as this breaks mail encoding
+    //    $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
+  } 
+  $headers .= "X-Mailer: OBM $obm_version\n";
+  
   // Message 
   $type = array(
     'gif'  => 'image/gif',
@@ -1409,19 +1408,21 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
     'r'  => '"application/x-unknown-content-type"'
   );
   $priorities = array( '1 (Highest)', '2 (High)', '3 (Normal)', '4 (Low)', '5 (Lowest)' );
-  $priority=$priorities[3];
-  $body=$message;
-  $sep= chr(13) . chr(10);
-  $disposition="inline";
+  $priority = $priorities[3];
+  $body = $message;
+  $sep = chr(13) . chr(10);
 
   // message
   $msg="";
   if ($h_file !="") {
-    $body=iconv("ISO-8859-1","UTF-8",$body);
+    $charset = "iso-8859-1";
+    $ctencoding = "quoted-printable";
+    //  $disposition="inline";  // Not used for now
+    //    $body=iconv("ISO-8859-1","UTF-8",$body);
     $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
     $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
     $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
-    for($i=0;$i<count($h_file);$i++){
+    for ($i=0;$i<count($h_file);$i++){
       $filename=$h_file[$i]["filename"];
       $name=$h_file[$i]["name"];
       $ctype=$type[$h_file[$i]["type"]];
@@ -1433,20 +1434,21 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
       $msg .= "Content-type: $ctype;charset=$charset;name=\"$name\"\n";
       $msg .= "Content-Transfer-Encoding: 8bit\n";
       $msg .= "filename=\"$name\"\n";
-      $linesz= filesize($filename)+1;
-      $fp= fopen($filename, 'r');
+      $linesz = filesize($filename)+1;
+      $fp = fopen($filename, 'r');
 //      $content = chunk_split(base64_encode(fread($fp,$linesz)));
       $content = fread($fp,$linesz);
       fclose($fp);
-      $msg .=    $sep.$content;
+      $msg .= $sep.$content;
     }
   } else {
-      $msg = "$message";
+    $msg = "$message";
   }
 
   if ($reci_list != "") {
-    $subject=encode($subject,"ISO-8859-1");
-    mail ($reci_list, $subject, $msg, $headers);      
+    // as we don't have a mean to encode the subject, we drop its accents
+    $subject = format_name($subject, 0, true);
+    mail ($reci_list, $subject, $msg, $headers);         
   }
 }
 
