@@ -101,7 +101,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($incident)) {
-    $incident["id"] = run_query_insert($incident);
+    $incident["id"] = run_query_incident_insert($incident);
     if ($incident["id"] > 0) {
       $display["msg"] = display_ok_msg($l_insert_ok);
       $display["detail"] = dis_incident_consult($incident);
@@ -119,7 +119,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($incident)) {
-    $ret = run_query_update($incident);
+    $ret = run_query_incident_update($incident);
     if ($ret) {
       $display["msg"] = display_ok_msg($l_update_ok);
       $display["detail"] = dis_incident_consult($incident);
@@ -148,7 +148,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_incident($incident["id"])) {
-    $retour = run_query_delete($incident["id"]);
+    $retour = run_query_incident_delete($incident["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {

@@ -164,8 +164,8 @@ function run_query_list_insert($list) {
   $email = $list["email"];
   $mode = $list["mode"];
   $list_query = addslashes($list["query"]);
-  $mailing_ok = ($list["mailing_ok"]==1)?1:0;
-  $contact_arch = ($list["contact_arch"]==1)?1:0;
+  $mailing_ok = ($list["mailing_ok"] == 1) ? 1 : 0;
+  $contact_arch = ($list["contact_arch"] == 1 ) ? 1 : 0;
   $info_pub = ($list["info_pub"]==1)?1:0;
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
@@ -184,9 +184,9 @@ function run_query_list_insert($list) {
     list_subject,
     list_email,
     list_mailing_ok,
+    list_mode,
     list_contact_archive,
     list_info_publication,
-    list_mode,
     list_query,
     list_structure)
   VALUES (null,
@@ -198,8 +198,8 @@ function run_query_list_insert($list) {
     '$subject',
     '$email',
     '$mailing_ok',
-    '$contact_arch',
     '$mode',
+    '$contact_arch',
     '$info_pub',
     '$list_query',
     '$list_critery')";
@@ -921,9 +921,9 @@ function get_list_query_num_rows($dynquery="", $list_q) {
   // If no extra info needed (as publication) take unique contact id
   $info_pub = ($list_q->f("list_info_publication") == 0 ? 0 : 1);
   if ($info_pub) {
-    $distinct = "";
+    $distinct_id = "distinct subscription_id";
   } else {
-    $distinct = "distinct";
+    $distinct_id = "distinct contact_id";
   }
 
   // Case expert query, we try to find the correct num_rows
@@ -935,7 +935,7 @@ function get_list_query_num_rows($dynquery="", $list_q) {
     if ($pos > 1) {
       // The query has a sub-query
       if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
-	$query_c = "SELECT count($distinct contact_id) as nb " . $matches[1];
+	$query_c = "SELECT count($distinct_id) as nb " . $matches[1];
       } else {
 	return 0;
       }
@@ -946,7 +946,7 @@ function get_list_query_num_rows($dynquery="", $list_q) {
       // IF 'Group by' present, take between From and group by (ungreedy)
       // else get between From and the end
       if (preg_match('/(FROM (.*))(ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) {
-	$query_c = "SELECT count($distinct contact_id) as nb " . $matches[1];
+	$query_c = "SELECT count($distinct_id) as nb " . $matches[1];
       } else {
 	return 0;
       }
@@ -956,7 +956,7 @@ function get_list_query_num_rows($dynquery="", $list_q) {
   } else {
     $from = $dynquery["from"];
     $where = $dynquery["where"];
-    $query_c = "SELECT count($distinct contact_id) as nb FROM $from WHERE $where";
+    $query_c = "SELECT count($distinct_id) as nb FROM $from WHERE $where";
   }
 
   display_debug_msg($query_c, $cdg_sql, "get_list_query_num_rows()");
@@ -1376,26 +1376,26 @@ function make_query_from_criteria($list) {
   // hash field criteria -> join asociated needed
   $add_join = array (
     "subscription_publication_id" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "publication_lang" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "publication_year" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_renewal" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_reception_id" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_timeafter" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_timebefore" => "
-       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "companycategory1_code" => "
        LEFT JOIN CompanyCategory1Link ccl%j ON company_id = ccl%j.companycategory1link_company_id 
        LEFT JOIN CompanyCategory1 cc%j ON cc%j.companycategory1_id = ccl%j.companycategory1link_category_id ",

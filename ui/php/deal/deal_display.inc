@@ -2568,4 +2568,133 @@ function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the Subscription search result in an external module
+// Parameters:
+//   - $publication[] : publication search criteria
+//     keys used  : name, type, zip
+///////////////////////////////////////////////////////////////////////////////
+function ext_dis_deal_list($params, $entity, $id) {
+  global $path;
+
+  $params["$entity"] = $id;
+  $block = dis_deal_search_list($params);
+
+  global $display, $auth, $l_no_found;
+
+  $new_order = $params["new_order"];
+  $order_dir = $params["order_dir"];
+
+  $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
+  $nb_deal = $deal_q->num_rows_total();
+  if ($nb_deal == 0) {
+    $display["msg"] .= display_warn_msg($l_no_found);
+    return;
+  }
+
+  $prefs = get_display_pref($auth->auth["uid"], "deal", 0);
+  
+  $url = url_prepare("$path/$entity/${entity}_index.php?action=detailconsult&amp;view=deal&amp;param_$entity=$id");
+
+  $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
+  $deal_d->data_set = $deal_q;
+  $deal_d->data_url = $url;
+  $deal_d->data_header = "both";
+  $display["msg"] .= display_info_msg("$nb_deal $l_found");
+  $block = $deal_d->display("dis_data_deal");
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Time Task  result
+// Parameters : 
+//   - $sub_q   : subscription list
+//   - $nb_sub  : nb subscriptions
+///////////////////////////////////////////////////////////////////////////////
+function html_subscription_list_result($sub_q,$nb_subscription) {
+  global $set_theme, $ico_update, $ico_delete, $ico_crow;
+  global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
+  global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
+  global $path, $auth, $popup_height, $popup_width;
+  global $cright_write, $module, $perm;
+
+  if ($perm->check_right($module, $cright_write)) {  
+    $has_write_right = true;
+    $display_write .= "<td class=\"resultHead\"></td>
+    <td class=\"resultHead\"></td>";
+  }
+  
+  $block = " 
+  <div class=\"result\"><table class=\"resultTable\">
+   <tr>
+    <td class=\"resultHead\">$l_publication_title</td>
+    <td class=\"resultHead\">$l_year</td>
+    <td class=\"resultHead\">$l_lang</td>
+    <td class=\"resultHead\">$l_renewal</td>
+    <td class=\"resultHead\">$l_recept</td>
+    <td class=\"resultHead\">$l_quantity</td>
+    <td class=\"resultHead\">$l_timecreate</td>    
+    <td class=\"resultHead\">$l_timeupdate</td>
+    $display_write
+   </tr>
+   ";
+  while($sub_q->next_record()) {
+    $c_id = $sub_q->f("subscription_contact_id");
+    $p_id = $sub_q->f("subscription_publication_id");
+    $s_id = $sub_q->f("subscription_id");
+    $title = $sub_q->f("publication_title");
+    $year = $sub_q->f("publication_year");
+    $lang = $sub_q->f("publication_lang");
+    $rec_label = $sub_q->f("subscriptionreception_label");
+    $quantity = $sub_q->f("subscription_quantity");
+    $timecreate = datetime_format($sub_q->f("timecreate"));
+    if ($sub_q->f("timeupdate") != "") {
+      $timeupdate = datetime_format($sub_q->f("timeupdate"));
+    } else {
+      $timeupdate = "&nbsp;";
+    }
+    $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
+    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$c_id&amp;view=publication"));
+
+    if ($has_write_right) {
+      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1&amp;ext_url=$ext_url");
+      $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
+
+      $display_write = "
+    <td class=\"resultText\">
+      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_update\" />
+      </a>
+    </td>    
+    <td class=\"resultText\">
+      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" />
+      </a>
+      </td>";
+    }
+
+    if ($sub_q->f("subscription_renewal") == "1") {
+      $dis_renew = $l_yes;
+    } else {
+      $dis_renew = $l_no;
+    }
+    $block .= "
+    <tr>
+    <td class=\"resultText\"><a href=\"$url_publication_consult\">$title</a></td>
+    <td class=\"resultText\">$year</td>
+    <td class=\"resultText\">$lang</td>
+    <td class=\"resultText\">$dis_renew</td>
+    <td class=\"resultText\">$rec_label</td>
+    <td class=\"resultText\">$quantity</td>
+    <td class=\"resultText\">$timecreate</td>
+    <td class=\"resultText\">$timeupdate</td>    
+    $display_write
+    </tr>";
+  }
+  return $block;
+}
+
+
 </script>

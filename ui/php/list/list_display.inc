@@ -723,7 +723,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list");
     $dis_infos->data_set = $conq_q;
     $dis_infos->data_url = $url;
-    $dis_infos->display_entity = "list_contact_2";
+    $dis_infos->display_entity = "list_contact";
     $dis_infos->data_order = false;
     $dis_infos->data_header = "both";
     $block .= $dis_infos->display("dis_data_list");

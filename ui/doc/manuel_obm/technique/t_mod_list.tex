@@ -124,10 +124,12 @@ La construction de la requète selon les critères demandés est effectuée par la f
 
 \subsubsection{Informations de publication}
 
-La série de critère "\publication" permet de rechercher des contacts selon leurs abonnements aux publications.
+La série de critère "\publication" permet de rechercher des contacts selon leurs abonnements aux publications.\\
 
 La sélection de la case à cocher "Information des publications" permet d'afficher dans les listes de résultat les informations de publication associées aux contacts.
 Une conséquence importante est que ceci modifie en profondeur le résultat de la liste, qui devient une liste d'associations contact - publication (un contact pourra apparaître plusieurs fois selon ses abonnements).
+
+La clé d'une ligne devient le champ \variable{subscription\_id}. Seules les lignes avec un abonnement apparaissent. Même un contact ajouté statiquement n'apparaitra pas s'il n'a pas d'abonnement.
 
 Lorsque les informations de publication sont demandées, il devient impossible de cumuler un même critère de publication par un ET. (Exemple : publication dont le titre est "TITRE1" et dont le titre est "TITRE2"), car une ligne de résultat ne contient qu'une publication et ne correspondra donc jamais.
 

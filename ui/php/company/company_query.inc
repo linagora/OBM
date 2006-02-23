@@ -16,7 +16,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($company, $p_new_order, $p_order_dir) {
+function run_query_company_search($company, $p_new_order, $p_order_dir) {
   global $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
 
   $fuzzy = $company["fuzzy"];
@@ -217,7 +217,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 // Parameters :
 //   - $p_id  : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_id) {
+function run_query_company_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -501,7 +501,7 @@ function run_query_company_update($cid, $company) {
 // Parameters:
 //   - $p_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_company_delete($p_id) {
   global $cdg_sql;
 
   $query = "DELETE FROM Company WHERE company_id='$p_id'";

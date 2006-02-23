@@ -388,7 +388,7 @@ function dis_company_search_list($company) {
 
   $popup = $company["popup"];
   $prefs = get_display_pref($auth->auth["uid"], "company");
-  $obm_q = run_query_search($company, $new_order, $order_dir);
+  $obm_q = run_query_company_search($company, $new_order, $order_dir);
   $nb_company = $obm_q->num_rows_total();
   if ($nb_company == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -617,17 +617,32 @@ function html_company_links($co_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company Detail
 // Parameters:
-//   - $cid : company id
+//   - $params[] : company criteria
 ///////////////////////////////////////////////////////////////////////////////
-function dis_company_consult($cid) {
-  global $display, $l_query_error;
+function dis_company_consult($params) {
+  global $path, $display, $obminclude, $set_lang, $l_query_error;
+
+  $cid = $params["id"];
 
   if ($cid > 0) {
-    $comp_q = run_query_detail($cid);
-    $cats1 = of_category_get_ordered("company", "category1", "multi", $cid);
+    $comp_q = run_query_company_detail($cid);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $block = html_company_consult($comp_q, $cats1);
+      $block .= html_company_consult($comp_q);
+      $view = $params["view"];
+
+      if ($view != "") {
+	global $fieldnames;
+	include("$obminclude/lang/$set_lang/global.inc");
+	include("$obminclude/lang/$set_lang/$view.inc");
+	include("$path/$view/".$view."_display.inc");
+	include("$path/$view/".$view."_query.inc");
+	$ext_func = "ext_dis_${view}_list";
+	$block .= $ext_func($params, "company", $cid);
+      } else {
+	$cats1 = of_category_get_ordered("company", "category1", "multi", $cid);
+	$block .= html_company_consult_address($comp_q, $cats1);
+      }
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -641,15 +656,12 @@ function dis_company_consult($cid) {
 // XHTML Display Company Consultation
 // Parameters:
 //   - $co_q : company database result 
-//   - $cats1 : array of compant categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult($co_q, $cats1) {
+function html_company_consult($co_q) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat;
-  global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
-  global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
-  global $l_insert,$l_update, $l_company, $l_coord;
-  global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
+  global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat, $l_market, $l_archive;
+  global $l_company;
+  global $display, $l_yes, $l_no, $cgp_hide;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
@@ -661,24 +673,9 @@ function html_company_consult($co_q, $cats1) {
   $act = $co_q->f("companyactivity_label");
   $naf = $co_q->f("companynafcode_code")." - ".$co_q->f("companynafcode_label");
   $mark = $co_q->f("company_marketingmanager_id");
-  $ad1 = $co_q->f("company_address1");
-  $ad2 = $co_q->f("company_address2");
-  $ad3 = $co_q->f("company_address3");
-  $zip = $co_q->f("company_zipcode");
-  $town = $co_q->f("company_town");
-  $cdx = $co_q->f("company_expresspostal");
-  $ctry_name = $co_q->f("country_name");
-  $phone = $co_q->f("company_phone");
-  $fax = $co_q->f("company_fax");
-  $web = $co_q->f("company_web");
-  $email = $co_q->f("company_email");
-  $con_num = $co_q->f("company_contact_number");
-  $deal_num = $co_q->f("company_deal_number");
-  $com = beautify_comment(nl2br($co_q->f("company_comment")));
 
   $types = array(array("label" => $type));
   $acts = array(array("label" => $act));
-  $cats1 = of_category_get_entitycategories("company", "category1", $id);
     
   if ($mark > 0) {
     $lmarket = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
@@ -702,6 +699,104 @@ function html_company_consult($co_q, $cats1) {
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+
+  // Number field
+  if ($show_number) {
+    $block_num = "
+    <tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$num</td>
+    </tr>";
+  }
+
+  // VAT field
+  if ($show_vat) {
+    $block_vat = "
+    <tr>
+      <td class=\"detailLabel\">$l_vat</td>
+      <td class=\"detailText\">$vat</td>
+    </tr>";
+  }
+
+  // Type, activity fields
+  $block_type = of_category_dis_block_consult("company", "type", $types, "mono");
+  $block_activity = of_category_dis_block_consult("company", "activity", $acts, "mono");
+
+  // Naf code field
+  if ($show_naf) {
+    $block_naf = "
+    <tr> 
+      <td class=\"detailLabel\">$l_nafcode</td>
+      <td class=\"detailText\">$naf</td>
+    </tr>";
+  }
+  
+  $display["link"] = html_company_links($co_q);
+  $display["title"] = "<div class=\"title\">$l_company : $name</div>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+<div class=\"detailHead\">$l_company</div>
+
+  <table class=\"detail\">
+    <tr> 
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+    </tr>
+    $dis_aka
+    $block_num
+    $block_vat
+    <tr> 
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
+    </tr>
+    $block_type
+    $block_activity
+    $block_naf
+    <tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailText\">$lmarket</td>
+    </tr>
+  </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Company Consultation : Address sub view
+// Parameters:
+//   - $co_q : company database result 
+//   - $cats1 : array of compant categories1
+///////////////////////////////////////////////////////////////////////////////
+function html_company_consult_address($co_q, $cats1) {
+  global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
+  global $l_name;
+  global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
+  global $l_town,$l_country,$l_email,$l_web,$l_comment;
+  global $l_company, $l_coord;
+  global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
+
+  $id = $co_q->f("company_id");
+  $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
+  $name = $co_q->f("company_name");
+  $ad1 = $co_q->f("company_address1");
+  $ad2 = $co_q->f("company_address2");
+  $ad3 = $co_q->f("company_address3");
+  $zip = $co_q->f("company_zipcode");
+  $town = $co_q->f("company_town");
+  $cdx = $co_q->f("company_expresspostal");
+  $ctry_name = $co_q->f("country_name");
+  $phone = $co_q->f("company_phone");
+  $fax = $co_q->f("company_fax");
+  $web = $co_q->f("company_web");
+  $email = $co_q->f("company_email");
+  $com = beautify_comment(nl2br($co_q->f("company_comment")));
+
+  $cats1 = of_category_get_entitycategories("company", "category1", $id);
+    
+  // Conditionnal fields
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
@@ -741,37 +836,6 @@ function html_company_consult($co_q, $cats1) {
   }
   $copy = "'$copy'"; 
 
-  // Number field
-  if ($show_number) {
-    $block_num = "
-    <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$num</td>
-    </tr>";
-  }
-
-  // VAT field
-  if ($show_vat) {
-    $block_vat = "
-    <tr>
-      <td class=\"detailLabel\">$l_vat</td>
-      <td class=\"detailText\">$vat</td>
-    </tr>";
-  }
-
-  // Type, activity fields
-  $block_type = of_category_dis_block_consult("company", "type", $types, "mono");
-  $block_activity = of_category_dis_block_consult("company", "activity", $acts, "mono");
-
-  // Naf code field
-  if ($show_naf) {
-    $block_naf = "
-    <tr> 
-      <td class=\"detailLabel\">$l_nafcode</td>
-      <td class=\"detailText\">$naf</td>
-    </tr>";
-  }
-  
   // Address3 field
   if ($show_ad3) {
     $block_ad3 = "
@@ -818,10 +882,6 @@ function html_company_consult($co_q, $cats1) {
     $link_web = "&nbsp;";
   }
 
-  $display["link"] = html_company_links($co_q);
-  $display["title"] = "<div class=\"title\">$l_company : $name</div>";
-
-
   // --- HTML Template --------------------------------------------------------
 
   $template = get_template("company_consult.tpl");
@@ -848,7 +908,7 @@ function dis_company_form($action, $company) {
   if ($c_id > 0) {
     $types = of_category_get_ordered("company", "type");
     $acts = of_category_get_ordered("company", "activity");
-    $comp_q = run_query_detail($c_id);
+    $comp_q = run_query_company_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
       $cats1 = of_category_get_ordered("company", "category1", "multi", $c_id);

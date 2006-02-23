@@ -52,12 +52,12 @@ require("company_display.inc");
 include("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
-update_last_visit("company", $param_company, $action);
 
 if ($action == "") $action = "index";
-$company = get_param_company();
+$params = get_param_company();
 get_company_action();
 $perm->check_permissions($module, $action);
+update_last_visit("company", $params["id"], $action);
 
 page_close();
 
@@ -70,9 +70,9 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   require("company_js.inc");
-  $display["search"] = dis_company_search_form($company);
+  $display["search"] = dis_company_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_company_search_list($company);
+    $display["result"] = dis_company_search_list($params);
   } else {
     $display["msg"] = display_info_msg($l_no_display);
   }
@@ -81,22 +81,22 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] = of_category_dis_tree("company", "category1", $company, $action);
+  $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
 
 } elseif ($action == "ext_get_category1_code") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] = of_category_dis_tree("company", "category1", $company, $action);
+  $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_company_search_form($company);
+  $display["search"] = dis_company_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_company_search_list($company);
+    $display["result"] = dis_company_search_list($params);
   } else {
     $display["msg"] = display_info_msg($l_no_display);
   }
@@ -104,55 +104,55 @@ if ($action == "ext_get_id") {
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  $display["search"] = dis_company_search_form($company);
-  $display["result"] = dis_company_search_list($company);
+  $display["search"] = dis_company_search_form($params);
+  $display["result"] = dis_company_search_list($params);
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  $display["detail"] = dis_company_form($action, $company);
+  $display["detail"] = dis_company_form($action, $params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  $display["detail"] = dis_company_consult($company["id"]);
+  $display["detail"] = dis_company_consult($params);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  $display["detail"] = dis_company_form($action, $company);
+  $display["detail"] = dis_company_form($action, $params);
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $company)) {
+  if (check_data_form("", $params)) {
 
     // If the context (same companies) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
-      $cid = run_query_company_insert($company);
+    if ($params["confirm"] == $c_yes) {
+      $cid = run_query_company_insert($params);
       if ($cid > 0) {
-        $company["id"] = $cid;
-	$display["detail"] = dis_company_consult($cid);
+        $params["id"] = $cid;
+	$display["detail"] = dis_company_consult($params);
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
 	require("company_js.inc");
-	$display["detail"] = dis_company_form($action, $company);
+	$display["detail"] = dis_company_form($action, $params);
       }
     // If it is the first try, we warn the user if some companies seem similar
     } else {
-      $obm_q = check_company_context("", $company);
+      $obm_q = check_company_context("", $params);
       if ($obm_q->num_rows() > 0) {
-        $display["detail"] = dis_company_warn_insert("", $obm_q, $company);
+        $display["detail"] = dis_company_warn_insert("", $obm_q, $params);
       } else {
-        $cid = run_query_company_insert($company);
+        $cid = run_query_company_insert($params);
         if ($cid > 0) {
-          $company["id"] = $cid;
-	  $display["detail"] = dis_company_consult($cid);
+          $params["id"] = $cid;
+	  $display["detail"] = dis_company_consult($params);
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
 	  require("company_js.inc");
-	  $display["detail"] = dis_company_form($action, $company);
+	  $display["detail"] = dis_company_form($action, $params);
         }
       }
     }
@@ -160,51 +160,51 @@ if ($action == "ext_get_id") {
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_company_form($action, $company);
+    $display["detail"] = dis_company_form($action, $params);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($company["id"], $company)) {
-    $retour = run_query_company_update($company["id"], $company);
+  if (check_data_form($params["id"], $params)) {
+    $retour = run_query_company_update($params["id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
     require("company_js.inc");
-    $display["detail"] = dis_company_consult($company["id"]);
+    $display["detail"] = dis_company_consult($params);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_company_form($action, $company);
+    $display["detail"] = dis_company_form($action, $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_company($company["id"])) {
+  if (check_can_delete_company($params["id"])) {
     require("company_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_company($company["id"]);
+    $display["detail"] = dis_can_delete_company($params["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_company_consult($company["id"]);
+    $display["detail"] = dis_company_consult($params);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_company($company["id"])) {
-    $retour = run_query_delete($company["id"]);
+  if (check_can_delete_company($params["id"])) {
+    $retour = run_query_company_delete($params["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
       $display["msg"] .= display_err_msg($l_delete_error);
     }
-    $display["search"] = dis_company_search_form($company);
+    $display["search"] = dis_company_search_form($params);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_company_consult($company["id"]);
+    $display["detail"] = dis_company_consult($params);
   }
 
 } elseif ($action == "admin") {
@@ -214,7 +214,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("company", "type", $company);
+  $retour = of_category_query_insert("company", "type", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_insert_ok");
   } else {
@@ -225,7 +225,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("company", "type", $company);
+  $retour = of_category_query_update("company", "type", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_update_ok");
   } else {
@@ -236,11 +236,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("company", "type", $company, "mono");
+  $display["detail"] .= of_category_dis_links("company", "type", $params, "mono");
 
 } elseif ($action == "type_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("company", "type", $company);
+  $retour = of_category_query_delete("company", "type", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_type)." : $l_c_delete_ok");
   } else {
@@ -251,7 +251,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "activity_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("company", "activity", $company);
+  $retour = of_category_query_insert("company", "activity", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_insert_ok");
   } else {
@@ -262,7 +262,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "activity_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("company", "activity", $company);
+  $retour = of_category_query_update("company", "activity", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_update_ok");
   } else {
@@ -273,11 +273,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "activity_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("company", "activity", $company, "mono");
+  $display["detail"] .= of_category_dis_links("company", "activity", $params, "mono");
 
 } elseif ($action == "activity_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("company", "activity", $company);
+  $retour = of_category_query_delete("company", "activity", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_activity)." : $l_c_delete_ok");
   } else {
@@ -288,7 +288,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "nafcode_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_nafcode_insert($company);
+  $retour = run_query_nafcode_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_naf_insert_ok);
   } else {
@@ -299,7 +299,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "nafcode_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_nafcode_update($company);
+  $retour = run_query_nafcode_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_naf_update_ok);
   } else {
@@ -310,11 +310,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "nafcode_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_nafcode_links($company);
+  $display["detail"] .= dis_nafcode_links($params);
 
 } elseif ($action == "nafcode_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_nafcode_delete($company["nafcode"]);
+  $retour = run_query_nafcode_delete($params["nafcode"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_naf_delete_ok);
   } else {
@@ -325,7 +325,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("company", "category1", $company);
+  $retour = of_category_query_insert("company", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
   } else {
@@ -336,7 +336,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("company", "category1", $company); 
+  $retour = of_category_query_update("company", "category1", $params); 
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -347,11 +347,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("company", "category1", $company);
+  $display["detail"] .= of_category_dis_links("company", "category1", $params);
 
 } elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("company", "category1", $company); 
+  $retour = of_category_query_delete("company", "category1", $params); 
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
   } else {
@@ -379,14 +379,14 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($company["doc_nb"] > 0) {
-    $nb = run_query_insert_documents($company, "company");
+  if ($params["doc_nb"] > 0) {
+    $nb = run_query_insert_documents($params, "company");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
   require("company_js.inc");
-  $display["detail"] = dis_company_consult($company["id"]);
+  $display["detail"] = dis_company_consult($params);
 }
 
 
@@ -396,7 +396,7 @@ if ($action == "ext_get_id") {
 $display["head"] = display_head($l_company);
 $display["end"] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
-if (! $company["popup"]) {
+if (! $params["popup"]) {
   update_company_action();
   $display["header"] = display_menu($module);
 }
@@ -405,8 +405,8 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Company parameters transmited in $company hash
-// returns : $company hash with parameters set
+// Stores Company parameters transmited in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
@@ -419,80 +419,83 @@ function get_param_company() {
   global $tf_category1_label, $tf_category1_code, $sel_category1;
   global $tf_type_label, $tf_type_code, $sel_type;
   global $tf_activity_label, $tf_activity_code, $sel_activity;
-  global $param_company;
+  global $param_company, $hd_confirm;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text;
+  global $view;
 
-  if (isset ($popup)) $company["popup"] = $popup;
-  if (isset ($ext_action)) $company["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $company["ext_url"] = urldecode($ext_url);
-  if (isset ($ext_id)) $company["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $company["id"] = $ext_id;
-  if (isset ($ext_title)) $company["ext_title"] = stripslashes(urldecode($ext_title));
-  if (isset ($ext_target)) $company["ext_target"] = $ext_target;
-  if (isset ($ext_widget)) $company["ext_widget"] = $ext_widget;
-  if (isset ($ext_widget_text)) $company["ext_widget_text"] = $ext_widget_text;
+  if (isset ($popup)) $params["popup"] = $popup;
+  if (isset ($ext_action)) $params["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $params["ext_url"] = urldecode($ext_url);
+  if (isset ($ext_id)) $params["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $params["id"] = $ext_id;
+  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
+  if (isset ($ext_target)) $params["ext_target"] = $ext_target;
+  if (isset ($ext_widget)) $params["ext_widget"] = $ext_widget;
+  if (isset ($ext_widget_text)) $params["ext_widget_text"] = $ext_widget_text;
 
-  if (isset ($param_company)) $company["id"] = $param_company;
-  if (isset ($tf_num)) $company["num"] = $tf_num;
-  if (isset ($tf_vat)) $company["vat"] = $tf_vat;
-  if (isset ($cb_archive)) $company["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($tf_name)) $company["name"] = get_format_company_name($tf_name);
-  if (isset ($tf_aka)) $company["aka"] = $tf_aka;
-  if (isset ($sel_dsrc)) $company["datasource"] = $sel_dsrc;
-  if (isset ($sel_naf)) $company["nafcode"] = $sel_naf;
-  if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
-  if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
-  if (isset ($tf_ad2)) $company["ad2"] = $tf_ad2;
-  if (isset ($tf_ad3)) $company["ad3"] = $tf_ad3;
-  if (isset ($tf_zip)) $company["zip"] = $tf_zip;
-  if (isset ($tf_town)) $company["town"] = get_format_town($tf_town);
-  if (isset ($tf_cdx)) $company["cdx"] = $tf_cdx;
-  if (isset ($sel_ctry)) $company["country"] = $sel_ctry;
-  if (isset ($tf_phone)) $company["phone"] = $tf_phone;
-  if (isset ($tf_fax)) $company["fax"] = $tf_fax;
-  if (isset ($tf_web)) $company["web"] = $tf_web;
-  if (isset ($tf_email)) $company["email"] = $tf_email;
-  if (isset ($ta_com)) $company["comment"] = $ta_com;
-  if (isset ($tf_datecomment)) $company["datecomment"] = $tf_datecomment;
-  if (isset ($sel_usercomment)) $company["usercomment"] = $sel_usercomment;
-  if (isset ($ta_add_comment)) $company["add_comment"] = trim($ta_add_comment);
-  if (isset ($sel_category1)) $company["category1"] = $sel_category1;
-  if (isset ($sel_type)) $company["type"] = $sel_type;
-  if (isset ($sel_activity)) $company["activity"] = $sel_activity;
+  if (isset ($param_company)) $params["id"] = $param_company;
+  if (isset ($view)) $params["view"] = $view;
+  if (isset ($hd_confirm)) $params["confirm"] = $hd_confirm;
+  if (isset ($tf_num)) $params["num"] = $tf_num;
+  if (isset ($tf_vat)) $params["vat"] = $tf_vat;
+  if (isset ($cb_archive)) $params["archive"] = ($cb_archive == 1 ? 1 : 0);
+  if (isset ($tf_name)) $params["name"] = get_format_company_name($tf_name);
+  if (isset ($tf_aka)) $params["aka"] = $tf_aka;
+  if (isset ($sel_dsrc)) $params["datasource"] = $sel_dsrc;
+  if (isset ($sel_naf)) $params["nafcode"] = $sel_naf;
+  if (isset ($sel_market)) $params["marketing_manager"] = $sel_market;
+  if (isset ($tf_ad1)) $params["ad1"] = $tf_ad1;
+  if (isset ($tf_ad2)) $params["ad2"] = $tf_ad2;
+  if (isset ($tf_ad3)) $params["ad3"] = $tf_ad3;
+  if (isset ($tf_zip)) $params["zip"] = $tf_zip;
+  if (isset ($tf_town)) $params["town"] = get_format_town($tf_town);
+  if (isset ($tf_cdx)) $params["cdx"] = $tf_cdx;
+  if (isset ($sel_ctry)) $params["country"] = $sel_ctry;
+  if (isset ($tf_phone)) $params["phone"] = $tf_phone;
+  if (isset ($tf_fax)) $params["fax"] = $tf_fax;
+  if (isset ($tf_web)) $params["web"] = $tf_web;
+  if (isset ($tf_email)) $params["email"] = $tf_email;
+  if (isset ($ta_com)) $params["comment"] = $ta_com;
+  if (isset ($tf_datecomment)) $params["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $params["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $params["add_comment"] = trim($ta_add_comment);
+  if (isset ($sel_category1)) $params["category1"] = $sel_category1;
+  if (isset ($sel_type)) $params["type"] = $sel_type;
+  if (isset ($sel_activity)) $params["activity"] = $sel_activity;
 
   // Search fields
-  if (isset ($tf_dateafter)) $company["dateafter"] = $tf_dateafter;
-  if (isset ($tf_datebefore)) $company["datebefore"] = $tf_datebefore;
-  if (isset ($cb_fuzzy)) $company["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
+  if (isset ($tf_dateafter)) $params["dateafter"] = $tf_dateafter;
+  if (isset ($tf_datebefore)) $params["datebefore"] = $tf_datebefore;
+  if (isset ($cb_fuzzy)) $params["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
 
   // Admin - Type fields
   // $sel_type -> "type" is already set
-  if (isset ($tf_type_code)) $company["type_code"] = $tf_type_code;
-  if (isset ($tf_type_label)) $company["type_label"] = $tf_type_label;
+  if (isset ($tf_type_code)) $params["type_code"] = $tf_type_code;
+  if (isset ($tf_type_label)) $params["type_label"] = $tf_type_label;
 
   // Admin - Activity fields
   // $sel_activity -> "activity" is already set
-  if (isset ($tf_activity_code)) $company["activity_code"] = $tf_activity_code;
-  if (isset ($tf_activity_label)) $company["activity_label"] = $tf_activity_label;
+  if (isset ($tf_activity_code)) $params["activity_code"] = $tf_activity_code;
+  if (isset ($tf_activity_label)) $params["activity_label"] = $tf_activity_label;
 
   // Admin - Nafcode fields
   // $sel_naf -> "naf" is already set
-  if (isset ($tf_naf_code)) $company["naf_code"] = $tf_naf_code;
-  if (isset ($tf_naf_label)) $company["naf_label"] = $tf_naf_label;
-  if (isset ($cb_naf_title)) $company["naf_title"] = $cb_naf_title;
+  if (isset ($tf_naf_code)) $params["naf_code"] = $tf_naf_code;
+  if (isset ($tf_naf_label)) $params["naf_label"] = $tf_naf_label;
+  if (isset ($cb_naf_title)) $params["naf_title"] = $cb_naf_title;
 
   // Admin - Cat fields
   // $sel_category1 -> "category1" is already set
-  if (isset ($tf_category1_code)) $company["category1_code"] = $tf_category1_code;
-  if (isset ($tf_category1_label)) $company["category1_label"] = $tf_category1_label;
-  if (isset ($cb_category1_tree)) $company["category1_tree"] = ($cb_category1_tree == 1 ? 1 : 0);
+  if (isset ($tf_category1_code)) $params["category1_code"] = $tf_category1_code;
+  if (isset ($tf_category1_label)) $params["category1_label"] = $tf_category1_label;
+  if (isset ($cb_category1_tree)) $params["category1_tree"] = ($cb_category1_tree == 1 ? 1 : 0);
 
-  get_global_param_document($company);
+  get_global_param_document($params);
 
-  display_debug_param($company);
+  display_debug_param($params);
 
-  return $company;
+  return $params;
 }
 
 
@@ -500,7 +503,7 @@ function get_param_company() {
 // Company Actions 
 ///////////////////////////////////////////////////////////////////////////////
 function get_company_action() {
-  global $company, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display,$l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -531,7 +534,7 @@ function get_company_action() {
 // Detail Consult
   $actions["company"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"]."",
+    'Url'      => "$path/company/company_index.php?action=detailconsult&amp;param_company=".$params["id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate')
                                      		 );
@@ -539,7 +542,7 @@ function get_company_action() {
 // Detail Update
   $actions["company"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
+    'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$params["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update')
                                      	      );
@@ -561,7 +564,7 @@ function get_company_action() {
 // Check Delete
   $actions["company"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
+    'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$params["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
@@ -746,9 +749,9 @@ function get_company_action() {
 // Company Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_company_action() {
-  global $company, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $company["id"];
+  $id = $params["id"];
   if ($id > 0) {
     // Detail Consult
     $actions["company"]["detailconsult"]["Url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=$id";

@@ -201,7 +201,7 @@ function dis_incident_search_list($incident) {
   global $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "incident");
-  $obm_q = run_query_search($incident, $new_order, $order_dir);
+  $obm_q = run_query_incident_search($incident, $new_order, $order_dir);
   $nb_incident = $obm_q->num_rows_total();
   if ($nb_incident == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -267,7 +267,7 @@ function dis_incident_consult($incident) {
   $id = $incident["id"];
 
   if ($id > 0) {
-    $inc_q = run_query_detail($id);
+    $inc_q = run_query_incident_detail($id);
     if ($inc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($inc_q);
       $block = html_incident_consult($inc_q);
@@ -428,7 +428,7 @@ function dis_incident_form($action,$incident) {
   }
   if ($action == "detailupdate") {
     if ($id > 0) {
-      $inc_q = run_query_detail($id);
+      $inc_q = run_query_incident_detail($id);
       $users = array($inc_q->f("incident_owner"),$inc_q->f("incident_logger"));
       $display["detailInfo"] = display_record_info($inc_q);
     }

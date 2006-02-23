@@ -16,7 +16,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($incident, $p_new_order, $p_order_dir) {
+function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $lincident = sql_search_text_parse($incident["lincident"]);
@@ -142,7 +142,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 // Parameters:
 //   - $id : incident id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_incident_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -205,7 +205,7 @@ function run_query_detail($id) {
 //     keys used   : lincident, logger, owner, description, solution, priority
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($incident) {
+function run_query_incident_insert($incident) {
   global $auth, $cdg_sql, $cgp_host;
   global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
 
@@ -353,7 +353,7 @@ function run_query_incident_id($incident) {
 //     keys used   : lincident, logger, owner,  solution, priority
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($incident) {
+function run_query_incident_update($incident) {
   global $auth, $cdg_sql;
 
   $contract_id = $incident["cont_new_id"];
@@ -412,7 +412,7 @@ function run_query_update($incident) {
 // Parameters:
 //   - $i_id : incident id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($i_id) {
+function run_query_incident_delete($i_id) {
   global $auth, $cdg_sql;
  
   $query = "DELETE FROM Incident WHERE incident_id='$i_id'";

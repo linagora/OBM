@@ -635,7 +635,7 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact search result
 // Parameters:
-//   - $contact[] : contact search criteria
+//   - $contact[] : contact criteria
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
@@ -2467,6 +2467,7 @@ function export_vcard($co_q,$com_q) {
   echo iconv("ISO-8859-15","UTF-8",$vcard);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About Contact number evolution by date
 // Parameters:
@@ -2486,6 +2487,7 @@ function dis_html_contact_date_graph_stats($entity) {
  
   return $block; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About Contact categories 

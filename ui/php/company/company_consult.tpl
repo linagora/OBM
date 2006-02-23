@@ -1,26 +1,3 @@
-<div class="detailHead">$l_company</div>
-
-<table class="detail">
-  <tr> 
-      <td class="detailLabel">$l_name</td>
-      <td class="detailText">$name</td>
-    </tr>
-    $dis_aka
-    $block_num
-    $block_vat
-    <tr> 
-      <td class="detailLabel">$l_archive</td>
-      <td class="detailText">$archive</td>
-    </tr>
-    $block_type
-    $block_activity
-    $block_naf
-    <tr>
-      <td class="detailLabel">$l_market</td>
-      <td class="detailText">$lmarket</td>
-    </tr>
-  </table>
-
 <div class="detailHead">$l_coord</div>
   
   <table class="detail">

@@ -1649,7 +1649,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" name=\"cb_force\" />";
   }
   
-  if ($privacy == 1){
+  if ($privacy == 1) {
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" checked=\"checked\" name=\"cb_privacy\" />";
   } else {
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" name=\"cb_privacy\" />";

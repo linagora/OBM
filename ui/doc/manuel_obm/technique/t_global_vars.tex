@@ -1,0 +1,63 @@
+% Documentation technique d'OBM : Variables globales
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\subsection{Les variables globales définies par \obm}
+\label{global_vars}
+
+\obm met à la disposition du développeur certaines variables, définies de façon globale et donc utilisables partout avec un scope global.
+
+
+\subsubsection{Variables globales générées pas programme}
+
+\begin{tabular}{|p{2cm}|p{5cm}|p{6cm}|}
+\hline
+\textbf{Nom} & \textbf{Valeur} & \textbf{description}  \\
+\hline
+\$path & chemin relatif vers la racine du répertoire des modules (php/) & défini en tête des modules, utilisé pour construire des urls \\ 
+\hline
+\$module & module effectuant le traitement courant (company, contact,..) & défini en tête des modules \\ 
+\hline
+\$obminclude & nom du répertoire ``obminclude'' & défini en tête des modules \\ 
+\hline
+\$auth & informations d'authentification
+\begin{itemize}
+\item[->auth[uid]] : id de l'utilisateur
+\item[->auth[perm]] : profil de l'utilisateur
+\end{itemize}
+ & hérité de phplib. A faire évoluer \\ 
+\hline
+\$sess & information sur la session & hérité de phplib. A faire évoluer \\ 
+
+\hline
+\$extra\_js & code Javascript à inclure & Permet d'ajouter du code Javascript qui sera placé en en-tête de page <head> \\ 
+\hline
+\$extra\_css & nom de fichier d'une css à inclure (ex: calendar.css)& Permet d'ajouter une CSS spécifique à un module \\ 
+\hline
+\$display & zones graphiques définies & voir \ref{display} \\ 
+\hline
+\end{tabular}
+
+
+\subsubsection{Variables globales passées par paramètre}
+
+\begin{tabular}{|p{2cm}|p{5cm}|p{6cm}|}
+\hline
+\textbf{Nom} & \textbf{Valeur} & \textbf{description}  \\
+\hline
+\$action & traitement à effectuer (ex: new, insert,...) & défini par programme \\ 
+\hline
+\$view & vue spécifique à afficher (action detailconsult) & Permet d'afficher différentes sous-vues d'une entité \\ 
+\hline
+\$new\_order & colonne de tri d'une vue of\_display & A modifier en of\_display\_order \\ 
+\hline
+\$order\_dir & ordre de tri d'une vue of\_display & A modifier en of\_display\_order\_dir \\ 
+\hline
+\end{tabular}
+
+\subsubsection{Gestion des paramètres}
+
+Aucun paramètre ne doit être utilisé directement !
+
+Afin de permettre la vérification de tous les paramètres (et la désactivation de la directive PHP register\_globals) tous les paramètres doivent être récupérés par la fonction \fonction{get\_params()} qui retourne le haschage \$params à utiliser.
