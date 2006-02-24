@@ -123,6 +123,8 @@ $l_help_up = "Sposta sopra";
 
 // Javascript common messages
 $l_fill_label = "Scrivi prima nome.";
+$l_fill_status = "Scrivi stato.";
+$l_fill_priority = "Scrivi priorita.";
 $l_fill_date = "Scrivi prima Data.";
 $l_invalid_date = "Formato data non valido (GG/MM/AAAA ou AAAA-MM-GG).";
 

@@ -47,9 +47,9 @@ $fieldnames["company_deal_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ic
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_company(&$OD, $fieldname, $link_ok) {
-  global $path, $company, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path, $params, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
 
-  $ext_url = $company["ext_url"];
+  $ext_url = $params["ext_url"];
 
   if ($fieldname == "company_name") {
     if ($OD->display_ext == "get_id") {
@@ -633,7 +633,7 @@ function dis_company_consult($params) {
 
       if ($view != "") {
 	global $fieldnames;
-	include("$obminclude/lang/$set_lang/global.inc");
+       	include("$obminclude/lang/$set_lang/global.inc");
 	include("$obminclude/lang/$set_lang/$view.inc");
 	include("$path/$view/".$view."_display.inc");
 	include("$path/$view/".$view."_query.inc");
@@ -906,8 +906,6 @@ function dis_company_form($action, $company) {
 
   $c_id = $company["id"];
   if ($c_id > 0) {
-    $types = of_category_get_ordered("company", "type");
-    $acts = of_category_get_ordered("company", "activity");
     $comp_q = run_query_company_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
@@ -917,6 +915,8 @@ function dis_company_form($action, $company) {
     }
   }
   $dsrc_q = run_query_datasource();
+  $types = of_category_get_ordered("company", "type");
+  $acts = of_category_get_ordered("company", "activity");
 
   if ($show_naf) {
     $naf_q = run_query_companynafcode();
@@ -1071,8 +1071,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   }
   $sel_dsrc .= "</select>";
 
-  $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type);
-  $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act);
+  $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type, "none");
+  $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act, "none");
   // Category select field
   $block_cat1 = of_category_dis_entity_form("company", "category1", $cats1);
 

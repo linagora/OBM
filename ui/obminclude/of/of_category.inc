@@ -177,11 +177,12 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_ele
 //   - $cat    : target category
 //   - $cats   : category to display
 //   - $mode   : ([mono|multi])
-//   - $cat_id : category selected (on mode mono) 
+//   - $cat_id : (mono mode) category selected
+//   - $first  : (mono mode) first element, scalar or array : (["all"|"none"])
 // Returns
 //   XHTML display of category form part
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="") {
+function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
   global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width;
   global $cgp_hide, $l_none;
   
@@ -191,7 +192,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
   if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
 
     if ($mode == "mono") {
-      $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, "none");
+      $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, $first);
       $class = "detailForm";
     } else {
       if (is_array($cats)) {

@@ -116,18 +116,23 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
   if (check_contract_form("", $contract)) {
+    echo "111111";
     // If the context (same contracts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $contract["id"] = run_query_insert($contract);
+      echo "2222222";
+      $contract["id"] = run_query_contract_insert($contract);
       $display["detail"] = dis_contract_consult($contract);
       // If first try, we warn the user if some contracts seem similar
     } else {
+    echo "33333";
       $obm_q = check_contract_context("", $contract);
       if ($obm_q->num_rows() > 0) {
 	$display["detail"] = dis_contract_warn_insert("", $obm_q, $contract);
       } else {
-	$contract["id"] = run_query_insert($contract);
+	echo "555555";
+	$contract["id"] = run_query_contract_insert($contract);
 	if ($contract["id"]) {
+	  echo "6666666";
 	  $display["msg"] .= display_ok_msg($l_insert_ok);
 	  $display["detail"] = dis_contract_consult($contract);
 	} else {
@@ -143,7 +148,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contract_form("", $contract)) {  
-    $ret = run_query_update($contract);         
+    $ret = run_query_contract_update($contract);         
     if ($ret) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -171,7 +176,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_contract($contract["id"])) {
-    $ret = run_query_delete($contract["id"]);
+    $ret = run_query_contract_delete($contract["id"]);
     if ($ret) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -191,7 +196,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_priority_insert($contract);
+  $retour = run_query_contract_priority_insert($contract);
   if ($retour) {
     $display["msg"] = display_ok_msg($l_pri_insert_ok);
   } else {
@@ -206,7 +211,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_priority_update($contract);
+  $retour = run_query_contract_priority_update($contract);
   if ($retour) {
     $display["msg"] = display_ok_msg($l_pri_update_ok);
   } else {
@@ -217,7 +222,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_priority_delete($contract["priority"]);
+  $retour = run_query_contract_priority_delete($contract["priority"]);
   if ($retour) {
     $display["msg"] = display_ok_msg($l_pri_delete_ok);
   } else {
@@ -228,7 +233,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_status_insert($contract);
+  $retour = run_query_contract_status_insert($contract);
   if ($retour) {
     display_ok_msg($l_sta_insert_ok);
   } else {
@@ -239,7 +244,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_status_update($contract);
+  $retour = run_query_contract_status_update($contract);
   if ($retour) {
     $display["msg"] = display_ok_msg($l_sta_update_ok);
   } else {
@@ -254,7 +259,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_status_delete($contract["status"]);
+  $retour = run_query_contract_status_delete($contract["status"]);
   if ($retour) {
     $display["msg"] = display_ok_msg($l_sta_delete_ok);
   } else {
@@ -287,7 +292,7 @@ if ($action == "ext_get_id") {
  
 } elseif ($action == "type_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_type_insert($contract);
+  $retour = run_query_contract_type_insert($contract);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_type_insert_ok);
   } else {
@@ -298,7 +303,7 @@ if ($action == "ext_get_id") {
     
 } elseif ($action == "type_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_type_update($contract);
+  $retour = run_query_contract_type_update($contract);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_type_update_ok);
   } else {
@@ -314,7 +319,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "type_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_type_delete($contract["type"]);
+  $retour = run_query_contract_type_delete($contract["type"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_type_delete_ok);
   } else {

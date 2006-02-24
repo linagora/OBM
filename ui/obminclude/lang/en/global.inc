@@ -144,6 +144,8 @@ $l_no_document_added = "No documents added";
 
 // Javascript common messages
 $l_fill_label = "You have to fill the label";
+$l_fill_status = "You have to fill the status";
+$l_fill_priority = "You have to fill the priority";
 $l_fill_date = "The date must be filled";
 $l_invalid_date = "Invalid date format (MM/JJ/AAAA ou AAAA-MM-JJ)";
 

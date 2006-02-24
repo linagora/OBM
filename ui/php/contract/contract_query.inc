@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_query.inc                                           //
 //     - Desc : Contract Support query File                                  //
-// 2002-02-02 : Aliacom - Cedric Bellegarde
+// 2002-02-02 : Aliacom                                                      //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 //   - $p_new_order : if it's set, replaces the default "order by" value
 //   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($contract, $p_new_order, $p_order_dir) {
+function run_query_contract_search($contract, $p_new_order, $p_order_dir) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
 
   $label = sql_search_text_parse($contract["label"]);
@@ -123,7 +123,6 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       contract_marketmanager_id,
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
       u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
-      contract_archive,
       $datebegin,
       $dateexp
     FROM Contract
@@ -155,7 +154,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 ///////////////////////////////////////////////////////////////////////////////
 // Contract detail query execution
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_contract_detail($id) {
   global $cdg_sql;  
 
   $obm_q = new DB_OBM;
@@ -221,7 +220,7 @@ function run_query_detail($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($contract) {
+function run_query_contract_insert($contract) {
   global $display, $cdg_sql, $auth, $cgp_show;
 
   $vis = ($contract["privacy"]==1)?1:0;
@@ -337,7 +336,7 @@ function run_query_insert($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 // Update query construction
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($contract) {
+function run_query_contract_update($contract) {
   global $auth, $cdg_sql, $ccf_ticket, $ccf_duration;
 
   $vis = ($contract["privacy"]==1)?1:0;
@@ -431,7 +430,7 @@ function run_query_update($contract) {
 // Parameters:
 //   - $p_id : contract id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_contract_delete($p_id) {
   global $cdg_sql;
   
   $query = "DELETE FROM Contract WHERE contract_id='$p_id'";
@@ -513,7 +512,7 @@ function run_query_contract_incident($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Contract Priority list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_priority() {
+function run_query_contract_priority() {
   global $cdg_sql;
 
   $query = "SELECT * 
@@ -530,7 +529,7 @@ function run_query_priority() {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Incident Status list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status() {
+function run_query_contract_status() {
   global $cdg_sql;
 
   $query = "SELECT * 
@@ -549,7 +548,7 @@ function run_query_status() {
 // Parameters:
 //   - $contract[] : contract hash info : keys used : pri_label, pri_code
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_priority_insert($contract) {
+function run_query_contract_priority_insert($contract) {
   global $auth, $cdg_sql;
 	
   $code = $contract["pri_code"];
@@ -584,7 +583,7 @@ function run_query_priority_insert($contract) {
 //   - $contract[] : contract hash info :
 //     keys used : priority, pri_label, pri_code
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_priority_update($contract) {
+function run_query_contract_priority_update($contract) {
   global $auth, $cdg_sql;
 
   $priority = $contract["priority"];
@@ -613,7 +612,7 @@ function run_query_priority_update($contract) {
 // Parameters:
 //   - $id : Priority id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_priority_delete($id) {
+function run_query_contract_priority_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM ContractPriority WHERE contractpriority_id='$id'";
@@ -631,7 +630,7 @@ function run_query_priority_delete($id) {
 // Parameters:
 //   - $s_id : priority id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_priority_links($p_id) {
+function run_query_contract_priority_links($p_id) {
   global $cdg_sql;
 
   $query = "SELECT
@@ -653,7 +652,7 @@ function run_query_priority_links($p_id) {
 // Parameters:
 //   - $contract[] : contract hash info : keys used : sta_label, sta_code
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_insert($contract) {
+function run_query_contract_status_insert($contract) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -686,7 +685,7 @@ function run_query_status_insert($contract) {
 //   - $contract[] : contract hash info :
 //     keys used : status, sta_label, sta_code
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_update($contract) {
+function run_query_contract_status_update($contract) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -715,7 +714,7 @@ function run_query_status_update($contract) {
 // Parameters:
 //   - $id : Status id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_delete($id) {
+function run_query_contract_status_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM ContractStatus WHERE contractstatus_id='$id'";
@@ -733,7 +732,7 @@ function run_query_status_delete($id) {
 // Parameters:
 //   - $s_id : status id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_links($s_id) {
+function run_query_contract_status_links($s_id) {
   global $cdg_sql;
 
   $query = "SELECT
@@ -799,7 +798,7 @@ function get_status_label($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query : get contracttype entries                                          //
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contracttype() {
+function run_query_contract_type() {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -890,7 +889,7 @@ function run_query_contract($archive=false) {
 // Parameters:
 //   - $contract[] : contract hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_insert($contract) {
+function run_query_contract_type_insert($contract) {
   global $auth, $cdg_sql;
 	
   $label = $contract["type_label"];
@@ -918,7 +917,7 @@ function run_query_type_insert($contract) {
 // Parameters:
 //   - $contract[] : contract hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_update($contract) {
+function run_query_contract_type_update($contract) {
   global $auth, $cdg_sql;
 
   $type = $contract["type"];
@@ -943,7 +942,7 @@ function run_query_type_update($contract) {
 // Parameters:
 //   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_delete($id) {
+function run_query_contract_type_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM ContractType WHERE contracttype_id='$id'";
@@ -961,7 +960,7 @@ function run_query_type_delete($id) {
 // Parameters:
 //   - $t_id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_links($t_id) {
+function run_query_contract_type_links($t_id) {
   global $cdg_sql;
 
   $query = "SELECT
@@ -1035,7 +1034,7 @@ function get_contract_info($id) {
 //   contract Id if found else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_id($contract) {
-  global $cdg_sql,$c_id;
+  global $cdg_sql;
 
   $label = $contract["label"];
   $comp_id = $contract["company_id"];

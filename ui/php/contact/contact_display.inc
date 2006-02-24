@@ -1428,7 +1428,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $csize_phone = "24";
 
   // Function field
-  $block_function = of_category_dis_entity_form("contact", "function", $funcs, "mono", $func);
+  $block_function = of_category_dis_entity_form("contact", "function", $funcs, "mono", $func, "none");
 
   // Title field
   if ($show_title) {
@@ -1520,7 +1520,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $block_category2 = of_category_dis_entity_form("contact", "category2", $cats2);
   $block_category3 = of_category_dis_entity_form("contact", "category3", $cats3);
   $block_category4 = of_category_dis_entity_form("contact", "category4", $cats4);
-  $block_category5 = of_category_dis_entity_form("contact", "category5", $cats5, "mono", $cat5);
+  $block_category5 = of_category_dis_entity_form("contact", "category5", $cats5, "mono", $cat5, "none");
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"

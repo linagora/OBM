@@ -126,9 +126,9 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 function dis_contract_search_form($contract) {
 
   $usr_q = run_query_contract_manager();
-  $type_q = run_query_contracttype();
-  $prio_q = run_query_priority();
-  $stat_q = run_query_status();
+  $type_q = run_query_contract_type();
+  $prio_q = run_query_contract_priority();
+  $stat_q = run_query_contract_status();
 
   $block .= html_contract_search_form($contract, $usr_q, $type_q, $prio_q, $stat_q);
 
@@ -314,7 +314,7 @@ function dis_contract_search_list($contract) {
   
   $popup = $contract["popup"];
   $prefs = get_display_pref($auth->auth["uid"], "contract");
-  $obm_q = run_query_search($contract, $new_order, $order_dir);
+  $obm_q = run_query_contract_search($contract, $new_order, $order_dir);
   $nb_contract = $obm_q->num_rows_total();
   if ($nb_contract == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -361,8 +361,9 @@ function html_contract_search_list($contract_q, $prefs, $nb_con, $contract, $pop
   $status = $contract["status"];
   $kind = $contract["kind"];
   $format = $contract["format"];
+  $archive = ($contract["archive"] == "1" ? "1" : "0"); 
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_tech=$tech&amp;sel_market=$market&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_tech=$tech&amp;sel_market=$market&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_archive=$archive$url_ext");
   
   $contract_q->seek($first_row);
   $contract_d = new OBM_DISPLAY("DATA", $prefs, "contract");
@@ -486,7 +487,7 @@ function dis_contract_consult($contract) {
 
   $id = $contract["id"];
   if ($id > 0) {
-    $contract_q = run_query_detail($id);
+    $contract_q = run_query_contract_detail($id);
     $display["detailInfo"] = display_record_info($contract_q);
     $inc_q = run_query_contract_incident($id);
     $inc_nb = $inc_q->num_rows();
@@ -755,7 +756,7 @@ function dis_contract_form($action,$contract,$param_company) {
   global $display, $cg_com, $cg_prod;
 
   if ($action == "detailupdate") {
-    $contract_q = run_query_detail($contract["id"]);
+    $contract_q = run_query_contract_detail($contract["id"]);
     $comp_id = $contract_q->f("contract_company_id"); 
     $users = array($contract_q->f("contract_marketmanager_id"), $contract_q->f("contract_techmanager_id"));
     $display["detailInfo"] = display_record_info($contract_q);
@@ -773,11 +774,11 @@ function dis_contract_form($action,$contract,$param_company) {
   }
 
   $contact_q = run_query_contact_contract($comp_id);
-  $prio_q = run_query_priority();
-  $status_q = run_query_status();
+  $prio_q = run_query_contract_priority();
+  $status_q = run_query_contract_status();
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-  $type_q = run_query_contracttype();
+  $type_q = run_query_contract_type();
  
   $block = html_contract_form($action,$contract_q,$type_q, $usrc_q, $usrp_q, $company_q, $contact_q, $contract, $prio_q, $status_q);
 
@@ -803,7 +804,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   global $cgp_show;
   global $uid, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
-  global $l_label,$l_begin,$l_type, $l_marketing_manager, $l_archive;
+  global $l_label, $l_begin, $l_type, $l_marketing_manager, $l_archive;
   global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel;
   global $l_technical_manager;
   global $popup_height,$popup_width,$l_number,$l_clause,$l_priority, $l_status;
@@ -1195,10 +1196,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
+      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" maxlength=\"40\" value=\"$label\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"40\" value=\"$number\" /></td>
+      <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_signature</td>
       <td class=\"detailForm\"><input name=\"tf_datesignature\" type=\"text\" size=\"10\" value=\"$datesignature\" /></td>
@@ -1285,7 +1286,7 @@ function dis_contract_export($param_contract) {
   global $display, $path, $l_query_error;
   global $auth;
 
-  $con_q = run_query_detail($param_contract);
+  $con_q = run_query_contract_detail($param_contract);
   $company_id = $con_q->f("company_id");
 
   if ($con_q->num_rows() != 1) {
@@ -1700,7 +1701,7 @@ function dis_priority_links($id) {
   global $l_back,$display;
 
   $label = get_priority_label($id);
-  $obm_q = run_query_priority_links($id);
+  $obm_q = run_query_contract_priority_links($id);
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
         action=\"" .url_prepare("contract_index.php") . "\">
@@ -1905,7 +1906,7 @@ function dis_status_links($id) {
   global $l_sta_delete, $l_back,$display;
 
   $label = get_status_label($id);
-  $obm_q = run_query_status_links($id);
+  $obm_q = run_query_contract_status_links($id);
   $dis_back = "<form name=\"form_back\" method=\"post\"
         action=\"" .url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
@@ -1977,14 +1978,14 @@ function dis_status_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contract admin index                                          //
+// Display the Contract admin index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
-  $pri_q = run_query_priority();
-  $sta_q = run_query_status();
+  $pri_q = run_query_contract_priority();
+  $sta_q = run_query_contract_status();
   
-  return html_priority_form($pri_q) . "<hr />" .html_status_form($sta_q)."<hr />" .html_contract_admin_form(run_query_contracttype());
+  return html_priority_form($pri_q) . "<hr />" .html_status_form($sta_q)."<hr />" .html_contract_admin_form(run_query_contract_type());
 }
 
 
@@ -2098,7 +2099,7 @@ function dis_type_links($id) {
   global $display;
 
   $label = get_type_label($id);
-  $obm_q = run_query_type_links($id);
+  $obm_q = run_query_contract_type_links($id);
 
   $nb_type = $obm_q->num_rows();
   if ($nb_type > 0) {

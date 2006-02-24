@@ -535,6 +535,7 @@ function get_incident_info($id) {
 function check_incident_form($incident) {
   global $cdg_sql;
   global $php_regexp_isodate, $l_fill_label, $l_fill_contract,$l_incident_date;
+  global $l_fill_status, $l_fill_priority;
   global $err_msg,$l_length_label,$l_invalid_date;
 
   $c_id = $incident["contract_id"];
@@ -543,6 +544,18 @@ function check_incident_form($incident) {
   // Check the label is filled
   if (trim($incident["lincident"]) == "") {
     $err_msg = $l_fill_label;
+    return false;
+  }
+
+  // Check the status is filled
+  if ($incident["status"] < 1) {
+    $err_msg = $l_fill_status;
+    return false;
+  }
+
+  // Check the priority is filled
+  if ($incident["priority"] < 1) {
+    $err_msg = $l_fill_priority;
     return false;
   }
 

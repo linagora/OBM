@@ -540,8 +540,8 @@ function dis_time_list_result($task_q,$prefs,$time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_addtask($time, $validate_days) {
   global $auth, $extra_js, $l_add, $l_update, $c_undef, $l_undef, $l_close;
-  global $l_fill_addtask, $l_comment, $l_date, $l_cat, $l_project, $l_duration;
-  global $l_task_fac, $l_task_div, $l_task_int, $l_intern;
+  global $l_fill_addtask, $l_comment, $l_date, $l_project, $l_duration;
+  global $l_header_tasktype, $l_task_fac, $l_task_div, $l_task_int, $l_intern;
   global $c_day_fraction, $c_working_days, $c_week_first_day;
 
   $action = $time["action"];
@@ -796,7 +796,7 @@ function dis_form_addtask($time, $validate_days) {
       <td class=\"timeForm\">$sel_time</td>
     </tr>
     <tr>
-      <td class=\"timeForm\">$l_cat :</td>
+      <td class=\"timeForm\">$l_header_tasktype :</td>
       <td class=\"timeForm\" colspan=\"4\">$sel_tt</td>
     </tr>
     <tr>

@@ -125,6 +125,8 @@ $l_help_up = "Mover el campo arriba";
 
 // Javascript common messages
 $l_fill_label = "Tiene que proveer una referencia";
+$l_fill_status = "Tiene que proveer un status";
+$l_fill_priority = "Tiene que proveer una priorita";
 $l_fill_date = "Debe ingresar la fecha";
 $l_invalid_date = "Formato de fecha inválido (JJ/MM/AAAA ou AAAA-MM-JJ)";
 
