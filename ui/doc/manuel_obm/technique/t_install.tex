@@ -486,6 +486,49 @@ emacs install_obmdb_1.1_pgsql.sh
   \end{minipage}
 }
 
+\subsection{Support du système d'authentification CAS (Central Authentication Service)}
+
+\subsubsection{Pré-requis}
+
+Le support CAS s'appuie sur la librairie cliente PHP, phpCAS (http://esup-phpcas.sourceforge.net/index.html).
+
+Les librairies Curl doivent être installées sur votre système et compilées avec le support de SSL.
+Sous Debian, il faut installer les packages : curl, libcurl3, libcurl3-gnutls.  
+
+La version de PHP doit être supérieure à la 4.2.2.
+PHP doit être installé avec le support curl, openssl, domxml et zlib.
+Sous Debian, il faut installer les packages php4-curl et php4-domxml.
+
+Il est nécessaire d'installer PEAR. Les libariries PEAR::DB et PEAR:Log sont utilisées.
+Sous Debian, il faut installer le packages php4-pear.
+
+\subsubsection{Configuration d'OBM}
+
+Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+
+\begin{itemize}
+\item spécifier le mode d'authentification "CAS"; 
+\item déclarer les paramètres de connection au serveur CAS.
+\end{itemize}
+
+Les variables suivantes du fichier de configuration doivent être rennseignées:
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+
+...
+// authentification : 'CAS' (SSO) or 'standalone' (default)
+$auth_kind="CAS";
+$cas_server = "sso.aliacom.local";
+$cas_server_port = "8443";
+$cas_server_uri = "/cas";
+...
+
+\end{verbatim}
+  \end{minipage}
+}
+
 \subsection{Lancer OBM (accéder à obm.php depuis un navigateur)}
 
 D'abord, redémarrer le serveur web apache : 
