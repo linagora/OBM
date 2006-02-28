@@ -391,8 +391,10 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
     mytext = this.options[this.selectedIndex].text;
     mytext = mytext.substr(0, mytext.length);
     pos = mytext.indexOf('...');
-    ext = trim(mytext.substr(0, pos));
-    mytext = mytext.substr($flabel);
+    if (pos != -1) {
+      ext = trim(mytext.substr(0, pos));
+      mytext = mytext.substr($flabel);
+    }
     forms.form_${cat}_update.tf_${cat}_label.value=mytext;
     forms.form_${cat}_update.tf_${cat}_code.value=ext;
     \"
@@ -1178,10 +1180,10 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category html select component
 // Parameters:
-//   - $cats          : Category array
-//   - $cat_id        : selected target category
 //   - $entity        : target entity
+//   - $cats          : Category array
 //   - $cat           : target category
+//   - $cat_id        : selected target category
 //   - $first_element : scalar or array : (["all"|"none"])
 //   - $sel_append    : string (eg javascript code) to append at select
 ///////////////////////////////////////////////////////////////////////////////

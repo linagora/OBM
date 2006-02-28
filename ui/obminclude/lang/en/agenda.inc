@@ -130,6 +130,7 @@ $l_unknown="Inconnu";
 
 $l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
+$l_header_waiting_events = "waiting events";
 $l_header_export = "Export";
 $l_authorize_list = "Authorized people";
 $l_denie_list = "Unauthorized people";

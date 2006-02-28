@@ -92,7 +92,9 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   }
   // For User member lists
   elseif (($fieldname == "group_user_lastname")  && $link_ok) {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("group_user_id");
+    if ($cgp_show["module"]["user"]) { 
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("group_user_id");
+    }
   }
 
   else if ($fieldname == "group_email") {
@@ -315,6 +317,7 @@ function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
 function html_group_form($action, $group_q, $group) {
   global $cgroup_private_default, $l_group, $l_name, $l_desc, $l_email;
   global $l_private, $l_insert, $l_update, $l_back;
+  global $auth;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -344,8 +347,12 @@ function html_group_form($action, $group_q, $group) {
     if ($priv == '1') {
       $private_c = " checked";
     }
-    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />";
-  }
+    $display_private = "
+  <tr>
+    <td class=\"detailLabel\">$l_private</td>
+    <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />
+  </tr>";
+  } 
 
   $block = "<center>
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
@@ -366,10 +373,7 @@ function html_group_form($action, $group_q, $group) {
     <td class=\"detailForm\">
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
-  </tr><tr>
-    <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c /></td>
-  </tr>
+  $display_private
   </table>";
 
 

@@ -117,6 +117,7 @@ $l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
 
 $l_header_meeting = "Nouvelle réunion";
 $l_header_admin = "Administration";
+$l_header_waiting_events = "Evts en attente";
 $l_authorize_list = "Personnes autorisées";
 $l_denie_list = "Personnes non-autorisées";
 $l_read_permission = "Gestion des permissions de lecture de l'agenda";

@@ -134,6 +134,19 @@ if ($action == "index") {
     $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
   }
 
+} elseif ($action == "waiting_events") {
+///////////////////////////////////////////////////////////////////////////////
+  $obm_wait = run_query_waiting_events();
+  if ($obm_wait->nf() != 0) {
+    $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
+    $display["detail"] = html_waiting_events($obm_wait);
+  } else {
+    $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
+    require("agenda_js.inc");
+    $display["detail"] = dis_calendar_view($agenda, $cal_entity_id);
+  }
+
+
 } elseif ($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
   if (!$agenda["force"] && $conflicts = check_for_decision_conflict($agenda)) {
@@ -324,7 +337,6 @@ if ($action == "index") {
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("calendar", "category1", $agenda);
-  print_r($agenda);
   if ($retour) {
     $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
   } else {
@@ -335,7 +347,7 @@ if ($action == "index") {
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("calendar", "category1", $agenda);
+  $display["detail"] .= of_category_dis_links("calendar", "category1", $agenda, "mono");
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -561,6 +573,7 @@ function get_agenda_action() {
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
   global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  global $l_header_waiting_events;
 
   $id = $agenda["id"];
   $date = $agenda["date"];
@@ -593,7 +606,7 @@ function get_agenda_action() {
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
        'update_decision','decision','update','delete', 'new_meeting',
        'view_month','view_week','view_day','view_year',
-		  'rights_admin','rights_update')
+		  'rights_admin','rights_update', 'waiting_events')
 		);
 
   // Detail Update
@@ -678,6 +691,14 @@ function get_agenda_action() {
     'Url'      => "$path/agenda/agenda_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
+                                         );
+
+//Waiting events.
+  $actions["agenda"]["waiting_events"] = array (
+    'Name'     => $l_header_waiting_events,
+    'Url'      => "$path/agenda/agenda_index.php?action=waiting_events",
+    'Right'    => $cright_write,
+    'Condition'=> array ('all')
                                          );
 					 
   // New meeting

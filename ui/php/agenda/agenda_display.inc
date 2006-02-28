@@ -193,9 +193,7 @@ function html_select_calendar_entity($new_action, $agenda, $calendar_entity, $en
       $data_id = "data-$type-$id";
       $div_id = "sel_ent-$data_id";
       $sel_ent .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_ent');\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico\">
-        </a>
+        <a href=\"javascript: remove_element('$div_id','sel_ent');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico\"></a>
         $name
         <input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />
         </div>";
@@ -595,17 +593,13 @@ function dis_year_planning($agenda, $calendar_entity) {
   <table class=\"agendaCalYear\">
   <tr>
     <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=".$prev_year)."\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"Previous Month\" />
-      </a>
+      <a href=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=".$prev_year)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"Previous Month\" /></a>
     </td>
     <td class=\"agendaHead\" colspan=\"3\">
       $this_year
     </td>
     <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=".$next_year)."\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"Next Month\" />
-       </a>
+      <a href=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=".$next_year)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"Next Month\" /></a>
     </td>
   </tr> 
   <tr>
@@ -745,17 +739,13 @@ function dis_month_planning($agenda, $calendar_entity) {
    <table class=\"agendaCalMonth agendaMonth\">
     <tr>
      <td colspan=\"2\" class=\"agendaHead\">  	 
-      <a href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$prev_month)."\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Month]\" />
-      </a>
+      <a href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$prev_month)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Month]\" /></a>
      </td>
      <td colspan=\"5\" class=\"agendaHead\">
       $display_date
      </td>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$next_month)."\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Month]\" />
-      </a>
+      <a href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$next_month)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Month]\" /></a>
      </td>
     </tr>
     <tr>
@@ -941,17 +931,13 @@ function dis_week_planning($agenda, $calendar_entity) {
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$prev_week")."\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
-      </a>     
+      <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$prev_week")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" /></a>     
      </td>
      <td colspan=\"$col_span\" class=\"agendaHead\">
       $display_date
      </td>  
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$next_week")."\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
-      </a>     
+      <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$next_week")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" /></a>     
      </td>
     </tr>
     <tr>
@@ -1087,12 +1073,8 @@ function dis_day_planning($agenda, $calendar_entity) {
   <table class=\"agendaCalDay\">
   <tr>
     <td colspan=\"".($nb_ent +1)."\" class=\"agendaHead\">
-      <a style=\"float:left;\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$yesterdays_date")."\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" />
-      </a>     
-      <a style=\"float:right;\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$tomorrows_date")."\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" />
-      </a>      
+      <a style=\"float:left;\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$yesterdays_date")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" /></a>     
+      <a style=\"float:right;\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$tomorrows_date")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" /></a>      
       $display_date
     </td>
   </tr>
@@ -1147,10 +1129,7 @@ function dis_event_allday_planning(&$dis_cal, &$hidden_div,$event,$nb_user,$prop
   }    
   $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
 
-  $dis_cal .= "<a class=\"agendaLink\"
-  onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
-  onMouseOut=\"hide('$id-$usr_id'); return true;\"
-  href=\"$link\">$event_head_display</a>";
+  $dis_cal .= "<a class=\"agendaLink\" onMouseOver=\"show(event,'$id-$usr_id'); return true;\" onMouseOut=\"hide('$id-$usr_id'); return true;\" href=\"$link\">$event_head_display</a>";
 
   $hidden_div .= "
   <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
@@ -2412,17 +2391,13 @@ function dis_free_interval($agenda, $entity_store) {
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;param_duration=$param_duration")."\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
-      </a>
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;param_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" /></a>
      </td>
      <td colspan=\"$col_span\" class=\"agendaHead\">
       $display_date
      </td>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;param_duration=$param_duration")."\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
-      </a>     
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;param_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" /></a>     
      </td>
     </tr>
     <tr>

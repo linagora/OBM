@@ -249,11 +249,12 @@ class CAS_Auth extends Auth {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
 
     include_once("obmCAS.inc");
+    obmCAS::setDebug('/tmp/dd');
     if (!$lock) {
-      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri,true);
       $lock = true;
     }
-    obmCAS::authenticateIfNeeded();
+    obmCAS::forceAuthentication();
   }
 
   function is_authenticated() {
@@ -296,17 +297,19 @@ class CAS_Auth extends Auth {
       $lock = "true";
     }
     //valider le login CAS
-    if (!obmCAS::isAuthenticated()) {
+    if (!obmCAS::checkAuthentication()) {
       return false;
     }
     $login = obmCAS::getUser();
+    // NTLM authentication hack - prerequisite: login do not contain \
+    if(ereg("[\\]", $login)){$tmp = split("[\\]", $login);$login = $tmp[1];}
+
     $this->db->query(sprintf("select userobm_id,
         userobm_perms
       from %s
       where userobm_login = '%s'",
 			     $this->database_table,
 			     addslashes($login)));
-
     while ($this->db->next_record()) {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
@@ -314,6 +317,7 @@ class CAS_Auth extends Auth {
 
     $this->auth["perm"] = $perm;
     $this->auth["uname"] = $login;
+
     return $uid;
   }
    
@@ -360,7 +364,7 @@ class CAS_Auth extends Auth {
     #  3) Login in progress (if $$cl, revert to state 1)
     // seule modif par rapport à Auth::start()
     if ($uid = $this->is_authenticated()) {
-      
+
       switch ($uid) {
         case "form":
           # Login in progress
