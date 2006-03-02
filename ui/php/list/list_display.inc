@@ -673,10 +673,9 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
 
     $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list");
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list", "list_contact", "sta");
     $dis_infos->data_set = $con_q;
     $dis_infos->data_url = $url;
-    $dis_infos->display_entity = "list_contact";
     $dis_infos->data_header = "both";
 
     if ($perm->check_right($module, $cright_write)) {
@@ -720,10 +719,9 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     $query_limit = "$query $limit";
     display_debug_msg($query_limit, $cdg_sql, "dynamic list()");
     $conq_q->query("$query_limit");
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list");
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list", "list_contact", "dyn");
     $dis_infos->data_set = $conq_q;
     $dis_infos->data_url = $url;
-    $dis_infos->display_entity = "list_contact";
     $dis_infos->data_order = false;
     $dis_infos->data_header = "both";
     $block .= $dis_infos->display("dis_data_list");
@@ -1494,8 +1492,7 @@ function html_publication_criterion($rec_q,$pub_q) {
 function dis_list_display_pref($prefs, $prefs_con) {
   global $l_list_display, $l_contact_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "list"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "list");
   $dis_pref->pref_title = $l_list_display;
   $dis_pref->pref_dis_help = 0;
 
@@ -1503,7 +1500,6 @@ function dis_list_display_pref($prefs, $prefs_con) {
   $block .= $dis_pref->display();
 
   $dis_pref->display_pref = $prefs_con;
-  $dis_pref->display_module = "list";
   $dis_pref->display_entity = "list_contact";
   $dis_pref->pref_title = $l_contact_display;
 

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : document.inc                                             //
-// 2004-02-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,8 +17,6 @@ $l_cat2_manage = "Categoría 2 manejo";
 $l_cat2_exist = "Categoría 2 Existente";
 $l_cat2_new = "Nueva categoría 2"; 
 $l_cat2_delete =  "Borrar";
-$l_category1 = "Categoría 1";
-$l_category2 = "Categoría 2";
 $l_createtime = "Crear tiempo";
 $l_extension = "Extensión";
 $l_file = "Archivo";
@@ -28,7 +26,7 @@ $l_mime_exist = "Mimes type Existentes";
 $l_mime_new = "Nuevo Mime type"; 
 $l_mimetype = "Mime-Type";
 $l_mime_delete =  "Borrar";
-$l_path = "Path";
+$l_path = "Camino";
 $l_title = "Título";
 $l_updatetime = "Actualizar tiempo";
 $l_document_display = "Opciones de despliegue de listas de documentos";
@@ -93,25 +91,33 @@ $l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener
 $l_query_error = "Problema crítico en la ejecución de la búsqueda.";
 $l_update_ok = "El documento ha sido actualizado exitosamente.";
 $l_update_error = "La actualización del documento ha fallado !";
-$l_new_file = "Archivo a enviar";
-$l_link = "HTTP Link";
-$l_links = "HTTPS Link";
-$l_kind = "Tipo de documento";
 $l_invalid_link_file = "No puede crear un alias sobre un vínculo";
+$l_have_link = "Este documento esta vinculado a otros elementos en OBM";
+$l_have_no_link = "Este documento NO esta vinculado y puede ser borrado";
+$l_kind = "Clase de documento";
+
 $l_invalid_url = "URL Incorrecto";
-$l_noupdate_file = "NO actualice archivo";
+$l_noupdate_file = "No actualice archivo";
 $l_update_file = "Actualizar archivo";
 $l_create_file_error = "Error en la creación de Archivo";
 $l_delete_file_error = "Error en la eliminación de Archivo";
+$l_can_delete = "El documento puede ser borrado.";
+$l_cant_delete = "El documento NO puede ser borrado !";
+$l_err_system_path = "La raiz y el directorio por omisión NO pueden ser borrados !"; 
+$l_err_dir_no_empty = "El directorio no esta vacio !"; 
+$l_dir_can_delete = "El directorio puede ser borrado.";
+$l_dir_cant_delete = "El directorio NO puede ser borrado !";
 
-$l_have_link = "Este documento esta vinculado a otros elementos en OBM";
-$l_have_no_link = "Este documento NO esta vinculado y puede ser borrado";
+$l_have_link = "Este documento esta relacionado a varios elementos de obm";
+$l_have_no_link = "Este documento NO esta relacionado a ningun elemento de obm";
 $l_no_document = "Documentos no encontrados";
+
 // Actions
 $l_checkdelete = "Revisar o Borrar el Documento";
 $l_delete = "Borrar el Documento";
 $l_insert = "Insert el Documento";
 $l_update = "Actualizar el Documento";
+$l_dir_delete = "Borrar el Directorio";
 
 // JavaScript Messages
 $l_fill_title = "Debe proveer el Título antes de enviar.";
@@ -124,11 +130,17 @@ $l_j_cat1_update = "Debe ingresar referencia antes de enviar.";
 $l_j_cat2_update = "Debe ingresar referencia antes de enviar.";
 $l_j_mime_update = "Debe llenar todos los campos antes de enviar.";
 $l_j_mime_delete = "Deve escoger un mime-type";
-$l_j_cat1_delete = "Debe escoger una category1";
-$l_j_cat2_delete = "Deve escoger una category2";
+$l_j_cat1_delete = "Debe escoger una categoría1";
+$l_j_cat2_delete = "Deve escoger una categoría2";
 $l_fill_dir_name = "Debe proveer el nombre del directorio";
 $l_invalid_dir_path = "Camino al directorio incorrecto";
 $l_invalid_file = "Archivo Incorrecto";
 $l_invalid_existing_file = "El camino no es un archivo válido";
 
-$l_existing_file = "Archivo ya ha sido enviado";
+// Others Skina
+
+$l_new_file = "Archivo a enviar";
+$l_link = "Vínculo HTTP";
+$l_links = "Vínculo HTTPS";
+$l_existing_file = "Archivo YA enviado";
+

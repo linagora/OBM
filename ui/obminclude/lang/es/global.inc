@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : global.inc                                               //
-// 2004-02-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,10 +12,17 @@ $l_find = "Buscar";
 $l_back = "Atrás";
 $l_cancel = "Cancelar";
 $l_close = "Cerrar la ventana";
+$l_update = "Validar las modificaciones";
 $l_validate = "Validar";
 $l_execute = "Ejecutar Acción";
 $l_confirm = "Confirmar";
 $l_add = "Adicionar";
+$l_home = "Casa";
+$l_entity_right = "Administrar permisos para";
+$l_read_permission = "Administración de permiso de lectura";
+$l_write_permission = "Administración de permiso de escritura";
+$l_right_validate = "Validar estos permisos";
+$l_right_update_ok = "Nuevos permisos han sido validados";
 
 // Common messages
 $l_yes = "Si";
@@ -24,13 +31,14 @@ $l_all = "Todo";
 $l_all_f = "Todo";
 $l_none = "---";
 $l_undef = "---";
+$l_id = "Id";
 $l_comment = "Comentario";
 $l_add_comment = "Adicionar un comentario";
 $l_upd_comment = "Actualizar comentario";
 $l_mail_comment = "Mail";
 $l_members = "Miembros";
-$l_default = "Default";
 $l_lang = "Idioma";
+$l_default = "Por Omisión";
 $l_status = "Estado";
 $l_archive = "Archivo";
 $l_archive_first = "Arch";
@@ -38,14 +46,18 @@ $l_date = "Fecha";
 $l_datebegin = "Fecha de Inicio";
 $l_dateend = "Fecha final";
 $l_name = "Nombre";
-$l_label = "Referencia";
+$l_label = "Etiqueta";
 $l_number = "Número";
 $l_invalid_data = "Datos Inválidos";
 $l_error_permission = "Ud. NO tiene permitido ejecutar esta acción";
 $l_error_visibility = "Ud. NO puede tiene acceso a esta información, es privada.";
-$l_query_error = "Error mientras se ejecuta la búsqueda";
+$l_err_reference = "Referencia equivocada. Esta entidad no existe.";
+$l_err_fill = "El campo debe ser llenado";
+$l_query_error = "Problemas ejecutando la búsqueda.";
 $l_color = "Color";
 $l_phone = "Teléfono";
+$l_hphone = "Teléfono Casa";
+$l_mphone = "Teléfono Celular";
 $l_fax = "Fax";
 $l_address = "Dirección";
 $l_postcode = "Código Postal";
@@ -53,42 +65,46 @@ $l_town = "Ciudad";
 $l_expresspostal = "Dirección de correo";
 $l_country = "País";
 $l_desc = "Descripción";
+$l_priority = "Prioridad";
 $l_datasource = "Fuente de Datos";
 $l_after = "Despues";
 $l_before = "Antes";
+$l_fuzzy = "Avanzado";
 $l_visibility = "Acceso";
 $l_private = "Privado";
 $l_public = "Publico";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_manager = "Gerente";
+$l_project_manager = "Administrador";
+$l_member = "Miembro";
 $l_client = "Cliente";
 $l_supplier = "Proveedor";
 $l_total = "Todos";
-$l_active = "Active";
+$l_active = "Activo";
 $l_new = "Nuevo";
-$l_last = "Last";
 $l_document_added = " documentos adicionados";
 $l_no_document_added = "No hay documentos adicionados";
-$l_login = "Login";
-$l_logout = "Logout";
-$l_profile = "Profile";
-$l_connection_end = "Connection end";
-$l_reconnect = "Click here to reconnect";
-$l_version = "Version";
+$l_last = "Último";
+$l_login = "Ingresar";
+$l_logout = "Salir";
+$l_profile = "Perfil";
+$l_connection_end = "Conexión Finalizada";
+$l_reconnect = "Presione aqui para conectar nuevamente";
+$l_version = "Versión";
 $l_aka = "Tambien Conocida como";
 $l_category1 = "Categoría 1";
 $l_category2 = "Categoría 2";
-$l_aduplicate = "Duplicate";
+$l_aduplicate = "Duplicar";
 
 // Entities
 $l_company = "Compañía";
 $l_contact = "Contacto";
 $l_deal = "Negocio";
 $l_list = "Lista";
-$l_todo = "Tareaa";
-$l_publication = "Publication";
-$l_time = "Time management";
+$l_publication = "Publicación";
+$l_todo = "Tarea";
+$l_time = "Control de tiempo";
 $l_project = "Proyecto";
 $l_contract = "Contrato";
 $l_incident = "Incidente";
@@ -97,7 +113,9 @@ $l_account = "Cuenta";
 $l_invoice = "Factura";
 $l_payment = "Pago";
 $l_user = "Usuario";
+$l_resource = "Recurso";
 $l_group = "Grupo";
+$l_resourcegroup = "Grupo de Recursos";
 $l_settings = "Opciones";
 
 // OBM_DISPLAY
@@ -115,6 +133,9 @@ $l_display_yes = "Despliegue de este campo";
 $l_down = "Mover el campo una fila abajo";
 $l_up = "Mover el campo una fila arriba";
 
+// Global display
+$l_last_visit = "Bookmarks";
+
 // OBM_DISPLAY help screen
 $l_help = "Ayuda";
 $l_help_display_yes = "El campo esta desplegado. Presione este boton si desea no desplegar el campo";
@@ -124,17 +145,14 @@ $l_help_down  = "Mover el campo abajo";
 $l_help_up = "Mover el campo arriba";
 
 // Javascript common messages
-$l_fill_label = "Tiene que proveer una referencia";
-$l_fill_status = "Tiene que proveer un status";
-$l_fill_priority = "Tiene que proveer una priorita";
+$l_fill_label = "Tiene que proveer una etiqueta";
 $l_fill_date = "Debe ingresar la fecha";
-$l_invalid_date = "Formato de fecha inválido (JJ/MM/AAAA ou AAAA-MM-JJ)";
+$l_invalid_date = "Formato de fecha inválido (DD/MM/AAAA ou AAAA-MM-DD)";
 
-//used by many modules
-//tasktype groups
+// tasktype groups
 $l_task_fac = "Tareas Facturadas";
 $l_task_int = "Internal Proyecto";
-$l_task_div = "Tareas NO Facturadas";
+$l_task_div = "No hay Tareas Facturadas";
 
 // Days and months
 $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
@@ -144,7 +162,7 @@ $l_daysofweekshort = array ('Dom','Lun','Mar','Mie','Jue','Vie','Sab');
 $l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 
 //---------------------------------------------------------------------------//
-// Theme Header lang files
+// Theme headers lang files
 //---------------------------------------------------------------------------//
 
 $l_section_com    = "COMMERCIAL";
@@ -152,6 +170,9 @@ $l_section_prod   = "PRODUCCIÓN";
 $l_section_compta = "CONTABILIDAD";
 $l_section_user   = "USUARIOS";
 $l_section_admin  = "ADMINISTRACIÓN";
+$l_section_aliamin = "ALIAMIN";
+$l_section_settings = "PREFERENCIAS";
+
 
 $l_module_company = "Compañías";
 $l_module_contact = "Contactos";
@@ -159,6 +180,8 @@ $l_module_deal = "Negocios";
 $l_module_list = "Listas";
 $l_module_agenda = "Calendario";
 $l_module_todo    = "Tareas";
+$l_module_publication = "Publicaciones";
+$l_module_statistic = "Estadísticas";
 
 $l_module_time = "Manejo de tiempo";
 $l_module_project = "Proyectos";
@@ -172,31 +195,37 @@ $l_module_payment = "Pagos";
 
 $l_module_settings = "Opciones";
 $l_module_user = "Usuarios";
+$l_module_resource = "Recursos";
 $l_module_group = "Grupos";
+$l_module_resourcegroup = "Grupo de Recursos";
 
 $l_module_admin = "Administración";
 $l_module_admin_lang = "Idioma";
 $l_module_admin_data = "Datos";
-$l_module_admin_pref = "Pref";
+$l_module_admin_pref = "Preferencias";
 $l_module_admin_code = "Código";
-$l_module_admin_ref = "Referential";
+$l_module_admin_ref = "Referencial";
+$l_module_import = "Importar";
+$l_module_backup = "Respaldo";
 
 $l_header_admin = "Administración";
 $l_header_new_f = "Nuevo";
 $l_header_new = "Nuevo";
 $l_header_find = "Buscar";
-$l_header_display = "Desplegar";
 $l_header_global_export = "Exportar";
 $l_header_export = "Exportar";
+$l_header_display = "Desplegar";
 $l_header_vcard = "Vcard";
 $l_header_consult = "Consultar";
-$l_header_duplicate = "Duplicate";
 $l_header_quickupdate = "Actualizar Rapido";
+$l_header_duplicate = "Duplicado";
 $l_header_update = "Actualizar";
 $l_header_delete = "Borrar";
 $l_header_add_contact = "Nuevo contacto";
 $l_header_add_user = "Nuevo usuario";
+$l_header_add_resource = "Adicionar recurso";
 $l_header_add_group = "Nuevo grupo";
+$l_header_upd_group = "Actualizar grupos";
 $l_header_add_deal = "Nuevo Negocio";
 $l_header_list = "Lista";
 
@@ -204,19 +233,21 @@ $l_header_new_child = "Nuevo Negocio vinculado";
 $l_header_new_parent = "Nuevo Negocio Original (Padre)";
 
 $l_header_reconcile = "Reconciliar";
+$l_header_duplicate = "Duplicar";
 $l_header_compute_balance = "Computo de balance";
-$l_header_duplicate = "Duplicado";
 
 $l_header_add_contact = "Nuevo contacto";
 
+// Project Agenda
 $l_header_right = "Manejo de permisos";
 
 // Project headers
 $l_header_man_task = "Tareas";
 $l_header_man_member = "Miembros";
 $l_header_advance = "Progreso";
-$l_header_man_affect = "Allocation";
+$l_header_man_affect = "Asignación";
 $l_header_add_member = "Nuevo miembro";
+$l_header_dashboard = "Tablero";
 
 // Admin headers
 $l_header_index = "Principal";
@@ -228,11 +259,12 @@ $l_header_pref_update = "Reiniciar preferencias de usuarios";
 $l_header_reset = "Preferencias por omisión";
 $l_header_country = "Pais";
 $l_header_datasource = "Fuente de Datos";
+$l_header_tasktype = "Tipo de Tarea";
 
-$l_header_year = "Año";
 $l_header_day = "Día";
 $l_header_week = "Semana";
 $l_header_month = "Mes";
+$l_header_year = "Año";
 $l_header_new_event = "Nueva cita";
 
 //time headers
@@ -246,3 +278,70 @@ $l_header_globalview = "Validación";
 //document headers
 $l_document_new = "Nuevo documento";
 $l_document_add = "Adicionar documentos";
+
+////////////////////////////////////////////////////////
+// Javascript error ////////////////////////////////////
+////////////////////////////////////////////////////////
+$l_j_copy_privilege_alert = "Imposible utilizar la funcionalidad de copiar: \\nlos derechos son insuficientes para realizar la acción. \\nSi usted utiliza mozilla/firefox haga lo siguiente:  \\n - Agregar en el archivo prefs.js su mozilla en la linea :user_pref(\"signed.applets.codebase_principal_support \", true);  \\n - Escriba la siguiente dirección en su navegador about:config, entonces cambiar la llave signed.applets.codebase_principal_support a true.";
+
+
+//---------------------------------------------------------------------------//
+// Category labels
+//---------------------------------------------------------------------------//
+$l_code = "Código";
+$l_c_manage = "Control: ";
+$l_c_new = "Nuevo";
+$l_c_upd = "Actualizar";
+$l_c_checkdelete = "Revisar o borrar";
+$l_c_delete =  "Borrar";
+$l_c_update = "Actualizar";
+$l_c_insert = "Insertar";
+$l_c_can_delete = "borrar es posible";
+$l_c_cant_delete = " borrar NO es posible";
+$l_c_link = "referencias encontradas para ";
+$l_c_link_no = "referencias NO encontradas para ";
+$l_c_delete_ok = "eliminación ha sido exitoso.";
+$l_c_delete_error = "eliminación ha fallado !";
+$l_c_insert_ok = "ingreso ha sido exitoso.";
+$l_c_insert_error = "ingreso ha fallado !";
+$l_c_update_ok = "actualización ha sido exitosa.";
+$l_c_update_error = "actualización ha fallado !";
+$l_c_j_create = "Debe ingresar un título";
+$l_c_j_update = "Una entrada debe ser seleccionada y un nuevo título debe ser proveido";
+$l_c_j_delete = "Una entrada debe ser seleccionada";
+
+
+//---------------------------------------------------------------------------//
+// OF messages
+//---------------------------------------------------------------------------//
+$l_of_right_err_auth = "Permisos insuficientes para actualizar permisos !";
+
+//---------------------------------------------------------------------------//
+// Home page portlets
+//---------------------------------------------------------------------------//
+$l_waiting_events = "Esperando evento(s)";
+$l_unfilled = "Dia(s) no llenado";
+$l_my_agenda = "Mi calendario";
+$l_my_time = "Mi control de tiempo";
+
+$l_my_deal_current = "Mis negocios actuales";
+$l_my_deal = "Mis negocios";
+$l_deal_total = "Cantidad Total";
+$l_deal_balanced = "Cantidad Balanceada";
+
+$l_my_project = "Mis proyectos";
+$l_my_project_current = "Mis projectos actuales";
+
+$l_my_incident = "Mis incidentes";
+$l_my_incident_current = "Mis incidentes actuales";
+
+$l_my_contract = "Mis contratos";
+$l_my_contract_current = "Mis contratos actuales";
+$l_cr_date[$cr_date_tosign] = "Por firmar";
+$l_cr_date[$cr_date_tobegin] = "Por empezar";
+$l_cr_date[$cr_date_current] = "Corriendo";
+$l_cr_date[$cr_date_torenew] = "Por renovar";
+$l_cr_date[$cr_date_ended] = "Expirado";
+
+$l_billed = "Cobrado";
+$l_order_no_bill = "Ordenado";

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : admin_data.inc                                           //
-// 2004-02-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ $l_ctry_no = "No hay país definido";
 $l_ctry_update = "Actualizacion de País";
 $l_ctry_checkdelete = "Seleccionar o Borrar País";
 $l_ctry_delete = "Borrar País";
-$l_ctry_insert = "Insert País";
+$l_ctry_insert = "Agregar País";
 
 $l_ctry_delete_ok = "El País ha sido borrado exitosamente.";
 $l_ctry_delete_error = "La eliminación del País ha fallado !";
@@ -64,3 +64,37 @@ $l_j_ctry_update = "Debe escoger un país e ingresar un nuevo nombre para actuali
 $l_j_ctry_create = "Debe ingresar el nombre del nuevo país para crearlo !";
 
 $l_iso_3166 = "Iso Code 3166";
+
+// Task Type
+$l_tt_manage = "Administración de Paises";
+$l_tt_exist = "Paises Existentes";
+$l_tt_new = "Nuevo Tipo de Tarea";
+$l_tt_no = "No ha definido un Tipo de Tarea";
+$l_tt_update = "Actualizar Tipo de Tarea";
+$l_tt_checkdelete = "Revisar o Borrar  Tipo de Tarea";
+$l_tt_delete = "Borrar Tipo de Tarea";
+$l_tt_insert = "Insertar Tipo de Tarea";
+
+$l_tt_delete_ok = "El Tipo de Tarea se ha borrado exitosamente.";
+$l_tt_delete_error = "La eliminación del Tipo de Tarea ha fallado !";
+$l_tt_insert_ok = "El Tipo de Tarea ha sido insertado exitosamente.";
+$l_tt_insert_error = "El ingreso de Tipo de Tarea ha fallado !";
+$l_tt_update_ok = "El Tipo de Tarea ha sido actualizado exitosamente.";
+$l_tt_update_error = "La actualización del Tipo de Tarea ha fallado !";
+
+$l_tt_link_deal = "Estos negocios referencian este Tipo de Tarea";
+$l_tt_link_deal_no = "No hay negocios que referencien este Tipo de Tarea";
+$l_tt_link_project = "Estos proyectos referencian este Tipo de Tarea";
+$l_tt_link_project_no = "No hay proyectos que referencien este Tipo de Tarea";
+$l_tt_link_time = "El Tipo de Tarea es usado en Control de Tiempo";
+$l_tt_link_time_no = "El Tipo de Tarea no es usado en Control de Tiempo";
+$l_tt_cant_delete = "El Tipo de Tarea NO puede ser borrado !";
+$l_tt_can_delete = "El Tipo de Tarea puede ser borrado !";
+
+$l_j_tt_delete = "Debe escoger el Tipo de Tarea para seleccionar o borrarlo !";
+$l_j_tt_update = "Debe escoger a Tipo de Tarea  e ingresar un nuevo nombre para actualizarlo !";
+$l_j_tt_create = "Debe ingresar el nombre del Tipo de Tarea para crearlo !";
+
+$l_tt_sales = "Tarea de Cliente";
+$l_tt_research = "Proyecto Interno";
+$l_tt_others = "Otra tarea";

@@ -809,11 +809,13 @@ function html_contact_header($co_q, $funcs, $cats5) {
 function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
-  global $l_comment1, $l_comment2, $l_comment3, $l_email_other, $l_service, $l_coord, $ico_clipboard;
+  global $l_comment1, $l_comment2, $l_comment3, $l_email_other;
+  global $l_service, $l_coord, $ico_clipboard;
   global $c_yes, $c_no, $set_theme, $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f("contact_id");
+  $c_name = $co_q->f("company_name");
   $c_phone = $co_q->f("company_phone");
   $c_fax = $co_q->f("company_fax");
   $c_ad1 = $co_q->f("company_address1");
@@ -834,6 +836,16 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   $town = $co_q->f("contact_town");
   $cdx = $co_q->f("contact_expresspostal");
   $ctry_name = $co_q->f("country_name");
+  $phone = trim($co_q->f("contact_phone"));
+  $hphone = $co_q->f("contact_homephone");
+  $mphone = $co_q->f("contact_mobilephone");
+  $fax = $co_q->f("contact_fax");
+  $email = $co_q->f("contact_email");
+  $email2 = $co_q->f("contact_email2");
+  $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
+  $com  = beautify_comment(nl2br($co_q->f("contact_comment")));
+  $com2 = beautify_comment(nl2br($co_q->f("contact_comment2")));
+  $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
 
   $newline = "\\r\\n";
   if (($ad1 == "") && ($ad2 == "") && ($ad3 == "") && ($zip == "")
@@ -872,24 +884,14 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
       $copy_addr_comp .= addslashes($c_ctry_name).$newline;
     }
   }
-  $phone = trim($co_q->f("contact_phone"));
   if ( (($phone == "") && ($c_phone != "")) ||
        (($phone != "") && ($phone == $c_phone)) ) {
     $phone = "( $c_phone )";
   }
-  $hphone = $co_q->f("contact_homephone");
-  $mphone = $co_q->f("contact_mobilephone");
-  $fax = $co_q->f("contact_fax");
   if ( (($fax == "") && ($c_fax != "")) ||
        (($fax != "") && ($fax == $c_fax)) ) {
     $fax = "( $c_fax )";
   }
-  $email = $co_q->f("contact_email");
-  $email2 = $co_q->f("contact_email2");
-  $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
-  $com  = beautify_comment(nl2br($co_q->f("contact_comment")));
-  $com2 = beautify_comment(nl2br($co_q->f("contact_comment2")));
-  $com3 = beautify_comment(nl2br($co_q->f("contact_comment3")));
 
   // Conditionnal fields
   // category1, category2, category3, category4, function
@@ -909,11 +911,11 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   if ($title != "") {
     $copy .= addslashes($title) . $newline;
   }
-  if ($service != "") {
-    $copy .= addslashes($service) . $newline;
-  }
   if ($c_name != "") {
     $copy .= addslashes($c_name) . $newline;
+  }
+  if ($service != "") {
+    $copy .= addslashes($service) . $newline;
   }
   // If contact address is empty, get the company one
   if ($copy_addr_comp != "") {
@@ -950,6 +952,12 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   }
   if (($fax != "") && (in_array("fax", $cclipboard_address))) {
     $copy .= "$l_fax : " . addslashes($fax).$newline;
+  }
+  if (($mphone != "") && (in_array("mobile", $cclipboard_address))) {
+    $copy .= "$l_mphone : " . addslashes($mphone).$newline;
+  }
+  if (($email != "") && (in_array("email", $cclipboard_address))) {
+    $copy .= "$l_email : " . addslashes($email).$newline;
   }
 
   // Service field
@@ -2317,8 +2325,7 @@ function dis_kind_links($ref) {
 function dis_contact_display_pref($prefs) {
   global $l_contact_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "contact";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "contact");
   $dis_pref->pref_title = $l_contact_display;
   $dis_pref->pref_dis_help = 1;
 

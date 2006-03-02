@@ -184,11 +184,12 @@ function sql_if($db_type, $expr, $iftrue, $iffalse) {
 //   - $db_type  : DB type
 //   - $number   : number of rows to return (set_rows by default)
 //   - $p_offset : #rows to skip (start at offset + 1) (default from page)
+//   - $name     : of_display name
 // Returns:
 //   - limit clause
 ///////////////////////////////////////////////////////////////////////////////
-function sql_limit($db_type, $number="", $p_offset="") {
-  global $db_type_mysql, $db_type_pgsql, $ctu_sql_limit;
+function sql_limit($db_type, $number="", $p_offset="", $name="") {
+  global $db_type_mysql, $db_type_pgsql, $ctu_sql_limit, $of_display_name;
   global $set_rows, $set_rows_default, $page;
 
   // If limit should not be used, return empty clause
@@ -202,9 +203,10 @@ function sql_limit($db_type, $number="", $p_offset="") {
     $num = $set_rows_default;
   }
 
+  // Handle cursor only if rigth dataset
   if ($p_offset != "") {
     $off = $p_offset;
-  } else if ($page > 0) {
+  } else if (($page > 0) && ($name == $of_display_name)) {
     $off = ($page - 1) * $num;
   } else {
     $off = "0";

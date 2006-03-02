@@ -934,8 +934,7 @@ function dis_mime_links($document) {
 function dis_document_display_pref($prefs) {
   global $l_document_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "document"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "document");
   $dis_pref->pref_title = $l_document_display;
   $dis_pref->pref_dis_help = 1;
 

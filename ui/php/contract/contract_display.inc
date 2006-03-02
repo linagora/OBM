@@ -2176,8 +2176,7 @@ function dis_type_links($id) {
 function dis_contract_display_pref($prefs) {
   global $l_contract_display;
   
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "contract"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "contract");
   $dis_pref->pref_title = $l_contract_display;
   $dis_pref->pref_dis_help = 1;
 

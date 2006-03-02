@@ -261,7 +261,7 @@ function html_group_search_group($obm_q, $prefs, $nb_group, $group) {
 
   $url = url_prepare("group_index.php?action=search&amp;tf_name=$namet&amp;tf_user=$user$url_ext");
   
-  $dis_group = new OBM_DISPLAY("DATA", $prefs);
+  $dis_group = new OBM_DISPLAY("DATA", $prefs, "group");
   if ($popup) {
     $dis_group->display_link = false;
     $dis_group->data_cb_text = "X";
@@ -518,9 +518,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_g);
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_g, "group", "group_group");
     $dis_infos->data_set = $g_q;
-    $dis_infos->display_entity = "group_group";
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "top";
 
@@ -560,9 +559,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   if ($nb_u != 0) {
 
     $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_u);
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_u, "group", "group_user");
     $dis_infos->data_set = $u_q;
-    $dis_infos->display_entity = "group_user";
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";
 
@@ -694,8 +692,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
 function dis_group_display_pref($prefs_g, $prefs_u) {
   global $l_group_display, $l_user_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g);
-  $dis_pref->display_entity = "group"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_g, "group");
   $dis_pref->pref_title = $l_group_display;
   $dis_pref->pref_dis_help = 0;
 
@@ -705,7 +702,6 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
       <td>" . $dis_pref->display() . "</td>";
 
   $dis_pref->display_pref = $prefs_u;
-  $dis_pref->display_module = "group";
   $dis_pref->display_entity = "group_user";
   $dis_pref->pref_title = $l_user_display;
 

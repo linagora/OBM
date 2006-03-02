@@ -11,6 +11,7 @@ class OBM_DISPLAY {
   var $display_type;      // determines the type of display. possible values
     // - PREFERENCES  : to set the display preference
     // - DATA         : to display all elements, for exemple all contacts
+  var $display_name;      // Display Name (to differentiate same displays)
   var $display_module;    // module where to find the entity in use
   var $display_entity;    // entity used (deal, contact, parentdeal,...)
   var $display_pref;      // User preferences : Array[fieldname] order,status
@@ -45,8 +46,10 @@ class OBM_DISPLAY {
   //   - $type   : display type
   //   - $pref   : display pref : DBO
   //   - $module : calling module
+  //   - $entity : entity to display
+  //   - $name   : dataset name
   /////////////////////////////////////////////////////////////////////////////
-  function OBM_DISPLAY($type, $pref, $module="") {
+  function OBM_DISPLAY($type, $pref, $module, $entity="", $name="") {
     if ( ($type != "PREFERENCES") && 
 	($type != "DATA") ) {
       die("ERROR: the type MUST be PREFERENCES or DATA");
@@ -58,6 +61,14 @@ class OBM_DISPLAY {
     }
     if (isset($module)) {
       $this->display_module = $module;
+    }
+    if (isset($entity) && ($entity != "")) {
+      $this->display_entity = $entity;
+    } else {
+      $this->display_entity = $this->display_module;
+    }
+    if (isset($name)) {
+      $this->display_name = $name;
     }
   }
   
@@ -139,7 +150,6 @@ class OBM_DISPLAY {
     $i = 0;
     $nb_field_hidden = 0;
     while ( list($fieldname, $fieldinfo) = each($this->display_pref) ) {
-      $entity = $this->display_entity;
       $fieldstatus = $fieldinfo["status"];
       $fieldorder = $fieldinfo["order"];
       $fielddefault = (! $fieldinfo["notdefault"]);
@@ -314,12 +324,10 @@ class OBM_DISPLAY {
     global $path, $cgp_hide, $cdg_id, $set_debug, $set_theme, $set_rows;
 
     $link_ok = $this->display_link;
-    $module = $this->display_module;
     $entity = $this->display_entity;
-    if ($entity == "") {
-      $entity = $module;
-    }
     $block .= "<div class=\"result\">";
+
+    $module = $this->display_module;
 
     // We display page management only if enabled and a search url is given
     if (($this->data_page) && ($this->data_url != "")) {
@@ -518,7 +526,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $page, $new_order, $order_dir, $entity, $ctu_sql_limit;
+    global $path, $page, $new_order, $order_dir, $entity, $of_display_name, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
@@ -526,6 +534,7 @@ class OBM_DISPLAY {
 
     $nb_page_dis = 10;
     $this_entity = $this->display_entity;
+    $this_name = $this->display_name;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
@@ -534,7 +543,7 @@ class OBM_DISPLAY {
 
     // Page display management
     // If page not set or page not for this display (this entity)
-    if ((!isset($page)) || ($page == "") || ($entity != $this_entity)) {
+    if ((!isset($page)) || ($page == "") || ($of_display_name != $this_name)) {
       $lpage = 1;
     } else {
       $lpage = $page;
@@ -559,26 +568,26 @@ class OBM_DISPLAY {
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
     if ($start_page > 1) {
       $i = $start_page - $nb_page_dis;
-      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
     }
 
     // Previous page
     if ($lpage > 1) {
       $tmppage = $lpage - 1;
-      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     $i = $start_page;
     // Pages display
     while ($i <= $end_page) {
       if ($i != $lpage) {
-	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">$i</a> | \n";
+	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">$i</a> | \n";
       } else {
 	$content .= "$i | \n";
       }
@@ -588,19 +597,19 @@ class OBM_DISPLAY {
     // Next page
     if ($lpage < $nb_page) {
       $tmppage = $lpage + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
     }
 
     // Go to next $nb_page_dis pages
     if ($end_page < $nb_page) {
       $i = $end_page + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">+$nb_page_dis</a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">+$nb_page_dis</a>";
     }
 
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export - Uses forms to allow big queries to be transmitted
@@ -612,6 +621,7 @@ class OBM_DISPLAY {
       <form style=\"display: inline;\" name=\"export_page\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
+      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
       <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
       <input type=\"hidden\" name=\"first_row\" value=\"$first_row\" />
       <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
@@ -623,6 +633,7 @@ class OBM_DISPLAY {
       <form style=\"display: inline;\" name=\"export_page\" method=\"post\" action=\"$export_url\">
       <input type=\"hidden\" name=\"action\" value=\"export_page\" />
       <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
+      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
       <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
       <input type=\"hidden\" name=\"first_row\" value=\"0\" />
       <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
@@ -648,25 +659,22 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $page, $new_order, $order_dir;
-    global $fieldnames, $cgp_hide, $cdg_id, $set_debug;
+    global $of_display_name, $page, $new_order, $order_dir;
+    global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
       $url .= "&amp;popup=1";
     }
 
-    $module = $this->display_module;
     $entity = $this->display_entity;
-    if ($entity == "") {
-      $entity = $module;
-    }
+    $this_name = $this->display_name;
     $block = "
     <tr>";
     
     // If debug level Id is set, display the entity id
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
-      $block .= "<td class=\"resultHead\">Id</td>";
+      $block .= "<td class=\"resultHead\">$l_id</td>";
     }
 
     // Display the checkbox title if needed (exists and left side)
@@ -695,9 +703,16 @@ class OBM_DISPLAY {
 	$block .= "
         <td class=\"resultHead\">";
 	if ($this->data_order) {
-	  $block .= "<a class=\"resultHead\" href=\"".$url.
-	    (($url != "") ? "&amp;page=$page" : "" ) .
-	    "&amp;new_order=$fieldname&amp;order_dir=$order&amp;entity=$entity\">";
+	  $block .= "<a class=\"resultHead\" href=\"".$url;
+	  if ($url != "") {
+	    // If action on this dataset
+	    if ($this_name == $of_display_name) {
+	      $block .= "&amp;page=$page&amp;new_order=$fieldname&amp;order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	    } else {
+	      $block .= "&amp;page=1&amp;new_order=$fieldname&amp;order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	    }
+	  }
+	  $block .= "\">";
 	}
 	$block .= $label;
 	if ($this->data_order) {
@@ -725,11 +740,7 @@ class OBM_DISPLAY {
   function dis_data_header_file($sep) {
     global $cgp_hide, $fieldnames, $cdg_id, $set_debug;
 
-    $module = $this->display_module;
     $entity = $this->display_entity;
-    if ($entity == "") {
-      $entity = $module;
-    }
 
     reset($this->display_pref);
     while ( list($fieldname, $fieldinfo) = each ($this->display_pref) ) {
@@ -764,11 +775,7 @@ class OBM_DISPLAY {
   function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
     global $cgp_hide, $cdg_id, $set_debug, $ctu_sql_limit;
 
-    $module = $this->display_module;
     $entity = $this->display_entity;
-    if ($entity == "") {
-      $entity = $module;
-    }
     $this->dis_data_header_file($sep);
 
     // If limit is not used, we seek to the first row to display

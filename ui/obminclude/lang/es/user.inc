@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : user.inc                                                 //
-// 2004-02-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,17 +13,27 @@ $l_firstname = "Nombre";
 $l_user_perms = "Nivel";
 $l_password = "Contraseña";
 $l_lastaccess = "Último acceso";
-$l_email = "Correo Electrónico";
+$l_phone2 = "$l_phone 2";
+$l_fax2 = "$l_fax 2";
+$l_email = "@M";
+$l_datebegin = "Fecha Ingreso";
 $l_perms_user = "Usuario";
 $l_perms_editor = "Editor";
 $l_perms_admin = "Administrador";
+$l_infos = "Informaciones";
 $l_check_usercreate = " entradas que pertenecen a este usuario.";
-$l_check_userupdate = " últimas entradas actualizadas por este usuario. ";
-$l_no_user = "No hay campos de usuarios en esta tabla";
+$l_check_userupdate = " últimas entradas actualizadas por este usuario.";
+$l_no_user = "No campos de usuarios en esta tabla";
+$l_group = "Grupo";
+
+// Titres
+$l_user = "Usuario";
+$l_group_member = "Miembro de grupos";
 
 // Actions
 $l_insert = "Ingresar Usuario";
 $l_update = "Actualizar Usuario";
+$l_update_group = "Actualizar Grupos de Usuarios";
 $l_checkdelete = "Revisar o Borrar Usuario";
 $l_reset = "Re-iniciar Preferencias de Usuario";
 $l_delete = "Borrar Usuario";
@@ -40,13 +50,17 @@ $l_insert_error = "El ingreso del usuario ha fallado !";
 $l_update_ok = "El usuario ha sido actualizado exitosamente.";
 $l_update_error = "La actualización del usuario ha fallado !";
 $l_reset_ok = "Se ha colocado los valores por omision en las Preferencias de Usuario";
+$l_can_delete = "El usuario puede ser borrado.";
+$l_cant_delete = "El usuario NO puede ser borrado.";
+$l_link_timetask = "El usuario esta referenciado en el control de tiempo de un proyecto";
+$l_link_timetask_no = "El usuario NO esta referenciado en el control de tiempo de un proyecto";
 $l_query_error = "Error mientras ejecutaba la búsqueda";
 $l_login_error = "Login Inválido !";
 $l_password_error = "Contraseña Inválida !";
 $l_email_error = "Correo Electrónico Inválido";
-$l_lname_error = "Nombre Inválido !";
-$l_exist_error = "Ya existe";
 $l_check_sameuser = "Estos usuarios lucen similar a la nueva entrada !";
+$l_exist_error = "Ya existe";
+$l_lname_error = "Nombre Inválido !";
 
 $l_add_users = "Adicionar Usuarios";
 
@@ -57,3 +71,7 @@ $l_delete_confirm = "Realmente desea borrar el usuario?";
 $l_j_check_email = "Dirección de correo electrónico no válida.";
 
 $l_user_display = "Opciones de despliegue de las listas de usuarios"; 
+
+// Other Skina
+$l_email = "Correo Electrónico";
+$l_perms_user = "Usuario";

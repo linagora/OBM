@@ -1129,7 +1129,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=0&amp;tf_date_exp_after=$month_start&amp;tf_date_exp_before=$month_end\">$dis_amount_ttc</a></td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_date_exp_after=$month_start&amp;tf_date_exp_before=$month_end\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= "
           <td class=\"$data\"> </td>";
@@ -1273,8 +1273,7 @@ function dis_invoice_dashboard($invoice) {
 function dis_invoice_display_pref($prefs) {
   global $l_invoice_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "invoice";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "invoice");
   $dis_pref->pref_title = $l_invoice_display;
   $dis_pref->pref_dis_help = 1;
 

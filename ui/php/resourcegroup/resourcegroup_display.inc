@@ -197,7 +197,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $gr
 
   $url = url_prepare("resourcegroup_index.php?action=search&amp;tf_name=$namet&amp;tf_resource=$resource$url_ext");
   
-  $dis_group = new OBM_DISPLAY("DATA", $pref_q);
+  $dis_group = new OBM_DISPLAY("DATA", $pref_q, "resourcegroup");
   if ($popup) {
     $dis_group->display_link = false;
     $dis_group->data_cb_text = "X";
@@ -433,9 +433,8 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
 
   if ($nb_r != 0) {
     $url = url_prepare("resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=$id");
-    $dis_infos = new OBM_DISPLAY("DATA", $prefs_r);
+    $dis_infos = new OBM_DISPLAY("DATA", $prefs_r, "resourcegroup", "resourcegroup_resource");
     $dis_infos->data_set = $r_q;
-    $dis_infos->display_entity = "resourcegroup_resource";
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";
 
@@ -475,8 +474,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
 function dis_resourcegroup_display_pref($pref_group_q, $pref_r_q) {
   global $l_resourcegroup_display, $l_resource_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_group_q);
-  $dis_pref->display_entity = "resourcegroup"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_group_q, "resourcegroup"); 
   $dis_pref->pref_title = $l_resourcegroup_display;
   $dis_pref->pref_dis_help = 0;
 
@@ -486,7 +484,6 @@ function dis_resourcegroup_display_pref($pref_group_q, $pref_r_q) {
       <td>" . $dis_pref->display() . "</td>";
 
   $dis_pref->display_pref = $pref_r_q;
-  $dis_pref->display_module = "resourcegroup";
   $dis_pref->display_entity = "resourcegroup_resource";
   $dis_pref->pref_title = $l_resource_display;
 

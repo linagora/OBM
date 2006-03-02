@@ -2057,8 +2057,7 @@ function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
 function dis_project_display_pref($prefs) {
   global $l_project_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "project"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "project");
   $dis_pref->pref_title = $l_project_display;
 
   $block .= "<td>";

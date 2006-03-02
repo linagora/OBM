@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : time.inc                                                 //
-// 2004-02-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,6 +34,7 @@ $l_fill= "Llenar";
 $l_intern = "Interno";
 
 $l_task = "Tarea";
+$l_label = "Etiqueta";
 $l_duration = "Duración";
 
 $l_searchtime_display = "Opciones de despligue de lista de tareas";

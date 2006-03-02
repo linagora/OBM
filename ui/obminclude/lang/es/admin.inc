@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : admin.inc                                                //
-// 2003-11-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,10 +12,10 @@ $l_check = "Revisando";
 $l_database_server = "Motor de Bases de datos";
 $l_database = "Base de datos";
 $l_host = "Servidor";
-$l_session_stats = "Estadísticas de sesiones";
+$l_session_stats = "Estadísticas de sesión";
 $l_date = "Fecha";
 $l_lifetime = "Duración de la sesión de usuario (segundos)";
-$l_user_session = " Existencias en ActiveUserObm";
+$l_user_session = " Registros en ActiveUserObm";
 $l_active_user = "Usuarios Activos";
 $l_login_date = "Fecha de Ingreso";
 $l_last_acces = "Último acceso";
@@ -26,7 +26,7 @@ $l_user_ip = "IP";
 
 // Titles
 $l_admin = "Administración";
-$l_admin_lang = "Lenguaje de Administración";
+$l_admin_lang = "Administración de Idioma ";
 
 // Actions
 $l_help = "Ayuda";

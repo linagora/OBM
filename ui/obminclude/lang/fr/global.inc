@@ -31,6 +31,7 @@ $l_all = "Tout";
 $l_all_f = "Toutes";
 $l_none = "Aucun";
 $l_undef = "---";
+$l_id = "Id";
 $l_comment = "Commentaire";
 $l_add_comment = "Ajouter un commentaire";
 $l_upd_comment = "Modifier le commentaire";

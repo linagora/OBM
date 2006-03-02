@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : project.inc                                              //
-// 2004-02-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,6 @@ $l_progeval = "Evaluacion de Avance/Retraso";
 
 // Labels et textes
 $l_parent = "Tarea Padre";
-$l_member = "Miembro";
 $l_soldtime = "Tiempo vendido";
 $l_projtime = "Tiempo proyectado";
 $l_total = "Total";
@@ -38,7 +37,9 @@ $l_tasks = "Tareas";
 $l_members_info = "Miembros del Proyecto";
 $l_progressinfos = "Evaluación de progreso: las siguientes datos son<br>(tiempo usado / tiempo perdido / tiempo total proyectoado)";
 $l_memberstimeinfos = "Llene la duración proyectada del trabajo (en días) para cada persona asignada a una tarea";
+$l_fill_advance_form = "Ingrese el tiempo de trabajo : planeado / restante";
 $l_task_new = "Nueva tarea";
+$l_task_update = "Actualice tarea";
 $l_task_list = "Tareas definidas";
 $l_progress_info = "Llene la duración perdida del trabajo (en dias) para cada persona para completar una tarea";
 $l_select_project = "Seleccionar proyecto";
@@ -47,9 +48,10 @@ $l_select_project = "Seleccionar proyecto";
 $l_insert = "Crear proyecto";
 $l_update = "Actualizar proyecto";
 $l_delete = "Borrar proyecto";
-$l_progress_update = "Actualizar proyecto en progreso";
 $l_task_add = "Adicionar tarea";
+$l_task_upd = "Actualice tarea";
 $l_task_del = "Borrar tarea seleccionada";
+$l_progress_update = "Actualizar proyecto en progreso";
 
 // Messages
 $l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener los proyectos.";
@@ -64,28 +66,34 @@ $l_update_ok = "El proyecto ha sido actualizado exitosamente.";
 $l_update_error = "La actualización of proyecto ha fallado !";
 $l_delete_ok = "El proyecto ha sido borrado exitosamente.";
 $l_delete_error = "La eliminación of proyecto ha fallado";
+$l_link_timetask = "El proyecto es usado en el control de tiempos";
+$l_link_timetask_no = "El proyecto NO es usado en el control de tiempos";
+$l_cant_delete = "El proyecto NO puede ser borrado !";
+$l_can_delete = "El proyecto puede ser borrado.";
 $l_task_insert_ok = "Tarea adicionada exitosamente";
 $l_task_insert_error = "El ingreso de la tarea ha fallado ! La tarea padre esta ya asignada a usuarios";
-$l_task_delete_ok = "La tarea ha sido borrado exitosamente.";
+$l_task_update_ok = "La tarea ha sido actualizada exitosamente.";
+$l_task_update_error = "La actualización de la tarea ha fallado !";
+$l_task_delete_ok = "La tarea ha sido borrada exitosamente.";
 $l_task_delete_error = "La eliminación de la tarea ha fallado !  Alguien tiene asignada a la tarea (o sus hijos)";
+$l_no_task_del = "No hay tareas para remover";
+$l_ptask_same_task = "Una tarea padre no puede ser igual a la tarea !";
+$l_ptask_and_parent = "Una tare padre o puede tener un padre !";
+$l_ptask_has_parent = "La tarea asignada como padre ya tiene un padre !";
+$l_ptask_has_user = "La tarea asignada como padre esta vinculad con un usuario !";
+
 $l_member_delete_error = "La eliminación del miembro ha fallado ! Debe tener asignada alguna tarea o ha gastado algun tiempo en el proyecto"; 
 $l_allocate_update_ok = "La actualizacion de la reservas del proyecto ha sido actualizado exitosamente.";
 $l_allocate_update_error = "La actualización de la reservas del proyecto ha fallado !";
 $l_progress_update_ok = "El progreso del proyecto ha sido actualizado exitosamente.";
 $l_progress_update_error = "La actualización del progreso del proyecto ha fallado !";
-$l_query_error = "Problemas ejecutando la búsqueda...";
-$l_no_task_del = "No hay tareas para remover";
-$l_del_member_sel = "remueva estos miembros";
+$l_del_member_sel = "eliminar estos miembros";
 $l_member_added = "miembros(s) adicionados";
 $l_member_removed = "miembros(s) removidos";
 $l_no_member_add = "No se adicionó el miembro";
 $l_no_member_del = "No se borro el miembro";
 $l_add_member = "Adicione miembros al proyecto";
-
-$l_link_timetask = "El proyecto es usado en el control de tiempos";
-$l_link_timetask_no = "El proyecto NO es usado en el control de tiempos";
-$l_cant_delete = "El proyecto no puede ser borrado !";
-$l_can_delete = "El proyecto puede ser borrado.";
+$l_board_no_data = "Tablero no puede ser mostrado si la definición de tareas o miembros no existen !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Debe ingresar el nombre antes de enviar.";
@@ -102,3 +110,6 @@ $l_delete_confirm = "Confirme la eliminación del proyecto ?";
 
 // For the display preferences modification screen 
 $l_project_display = "Opciones de despliegue de listas de proyectos";
+
+// Other Skina
+$l_query_error = "Problemas ejecutando la búsqueda...";

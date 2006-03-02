@@ -21,6 +21,7 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
 
   $lincident = sql_search_text_parse($incident["lincident"]);
   $lcontract = sql_search_text_parse($incident["lcontract"]);
+  $i_id = $incident["id"];
   $company = sql_search_text_parse($incident["company"]);
   $priority = $incident["priority"];
   $status = $incident["status"];
@@ -42,6 +43,9 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
   $where = "1=1";
   if ($lincident != "") {
      $where .= " AND Incident.incident_label $like '$lincident%'";
+  }
+  if ($i_id != "") {
+     $where .= " AND Incident.incident_id $like '$i_id%'";
   }
   if ($owner != $c_all && ($owner != "")) {
      $where .=" AND (Incident.incident_owner = '$owner') ";

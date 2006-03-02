@@ -807,8 +807,7 @@ function dis_can_delete_user($p_id) {
 function dis_user_display_pref($prefs) {
   global $l_user_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "user"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "user");
   $dis_pref->pref_title = $l_user_display;
   $dis_pref->pref_dis_help = 1;
 

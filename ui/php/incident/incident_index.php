@@ -317,7 +317,7 @@ display_page($display);
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_incident() {
-  global $tf_lcontract, $tf_lincident, $tf_company;
+  global $tf_lcontract, $tf_lincident, $tf_company, $tf_id;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
   global $tf_date, $ta_solu, $param_contract, $param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
@@ -331,6 +331,7 @@ function get_param_incident() {
 
   if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $incident["date_before"] = $tf_datebefore;
+  if (isset ($tf_id)) $incident["id"] = $tf_id;
   if (isset ($param_incident)) $incident["id"] = $param_incident;
   if (isset ($param_contract)) $incident["contract_id"] = $param_contract;
   if (isset ($tf_lcontract)) $incident["lcontract"] = $tf_lcontract;

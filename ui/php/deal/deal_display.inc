@@ -1736,7 +1736,6 @@ function dis_deal_stats($deal) {
   $dis_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
   $dis_deal->data_set = $deal_q;
   $dis_deal->data_url = $url;
-  $dis_deal->display_entity = "deal";
   $dis_deal->data_order = true;
   $dis_deal->data_header = "both";
   $block .= $dis_deal->display("dis_data_deal");
@@ -2181,8 +2180,7 @@ function dis_status_links($id) {
 function dis_deal_display_pref($prefs, $prefs_parent) {
   global $l_deal_display, $l_parentdeal_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "deal";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "deal");
   $dis_pref->pref_title = $l_deal_display;
 
   $block = "
@@ -2194,7 +2192,6 @@ function dis_deal_display_pref($prefs, $prefs_parent) {
     </td><td>";
 
   $dis_pref->display_pref = $prefs_parent;
-  $dis_pref->display_module = "deal";
   $dis_pref->display_entity = "parentdeal";
   $dis_pref->pref_title = $l_parentdeal_display;
 
@@ -2258,7 +2255,7 @@ function html_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal) {
 
   $url = url_prepare("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
 
-  $parentdeal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
+  $parentdeal_d = new OBM_DISPLAY("DATA", $prefs, "deal", "parentdeal");
   $parentdeal_d->data_set = $obm_q;
   $parentdeal_d->data_url = $url;
   $parentdeal_d->data_header = "both";

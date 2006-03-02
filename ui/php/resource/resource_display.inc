@@ -396,8 +396,7 @@ function dis_can_delete_resource($p_id) {
 function dis_resource_display_pref($prefs) {
   global $l_resource_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "resource"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "resource");
   $dis_pref->pref_title = $l_resource_display;
   $dis_pref->pref_dis_help = 1;
 

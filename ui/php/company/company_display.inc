@@ -437,8 +437,9 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
   $dsrc = $company["datasource"];
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
+  $fuzzy = $company["fuzzy"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;cb_cat_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;cb_cat_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_fuzzy=$fuzzy$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -833,6 +834,12 @@ function html_company_consult_address($co_q, $cats1) {
   }
   if (($fax != "") && (in_array("fax", $cclipboard_address))) {
     $copy .= "$l_fax : " . addslashes($fax).$newline;
+  }
+  if (($email != "") && (in_array("email", $cclipboard_address))) {
+    $copy .= "$l_email : " . addslashes($email).$newline;
+  }
+  if (($web != "") && (in_array("web", $cclipboard_address))) {
+    $copy .= "$l_web : " . addslashes($web).$newline;
   }
   $copy = "'$copy'"; 
 
@@ -1707,8 +1714,7 @@ function dis_nafcode_links($company) {
 function dis_company_display_pref($prefs) {
   global $l_company_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "company"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "company");
   $dis_pref->pref_title = $l_company_display;
   $dis_pref->pref_dis_help = 1;
 

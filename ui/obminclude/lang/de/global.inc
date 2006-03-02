@@ -3,7 +3,7 @@
 // OBM - Language : English for global                                       //
 //     - File     : global.inc                                               //
 // 2001-12-27 Pierre Baudracco                                               //
-// 2003-10-29 / Fink / merged (merge.awk) english with german; fixed translations
+// 2003-10-29 / Fink / merged (merge.awk) english with german
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,6 +25,7 @@ $l_all = "Alle";
 $l_all_f = "Alle";
 $l_none = "---";
 $l_undef = "---";
+$l_id = "Id";
 $l_comment = "Kommentar";
 $l_add_comment = "Add a Kommentar";
 $l_upd_comment = "Update Kommentar";

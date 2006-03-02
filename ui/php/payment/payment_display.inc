@@ -1206,17 +1206,15 @@ function dis_payment_display_pref ($prefs, $prefs_i, $prefs_t) {
   <table><tr valign=\"top\">";
  
   $block .= "<td>";
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs) ;
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "payment");
   $dis_pref->pref_title = $l_payment_options;
-  $dis_pref->display_entity = "payment" ;
   $dis_pref->pref_dis_help = 0 ; // help is displayed after et options
 
-  $block .= $dis_pref->display() ;
+  $block .= $dis_pref->display();
 
-  $block .=  "</td><td>" ;
+  $block .=  "</td><td>";
 
-  $invoice_prefs = new OBM_DISPLAY("PREFERENCES", $prefs_i) ;
-  $invoice_prefs->display_entity = "payment"; 
+  $invoice_prefs = new OBM_DISPLAY("PREFERENCES", $prefs_i, "payment");
   $invoice_prefs->pref_title = $l_invoice_options;
   $invoice_prefs->pref_dis_help = 0 ;
 
@@ -1224,8 +1222,7 @@ function dis_payment_display_pref ($prefs, $prefs_i, $prefs_t) {
  
   $block .=  "</td><td>" ;
 
-  $et_prefs = new OBM_DISPLAY("PREFERENCES", $prefs_t) ;
-  $et_prefs->display_entity = "payment"; 
+  $et_prefs = new OBM_DISPLAY("PREFERENCES", $prefs_t, "payment");
   $et_prefs->pref_title = $l_et_options;
   $et_prefs->pref_dis_help =  0;
 

@@ -1,0 +1,111 @@
+% Documentation technique d'OBM : Gestion des affichages "dataset"
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\subsection{Gestion des affichages des listes de données ou dataset}
+
+Les listes de données ou dataset sont les objets représentant les ensembles de données comme par exemple les résultats d'une recherche.
+Ils permettent d'afficher tout résultat de recherche ou requète en proposant les fonctionnalités suivantes :\\
+
+\begin{itemize}
+\item Gestion de la pagination
+\item Personnalisation par utilisateur des colonnes affichées (voir \ref{display_prefs})
+\item Gestion des tris selon toutes les colonnes
+\item Export CSV de la page courante ou de l'ensemble du résultat
+\item Gestion de case à cocher pour sélection
+\end{itemize}
+\vspace{0.3cm}
+Ces dataset sont gérés par la classe \variable{OBM\_DISPLAY} fournie par le fichier \fichier{of/of\_display.inc}
+
+
+\subsubsection{Classe of\_display}
+
+\begin{longtable}{|p{3cm}|c|p{8cm}|}
+\hline
+\textbf{Attributs} & \textbf{Type, valeur} & \textbf{Description} \\
+\hline
+display\_type & DATA | PREFERENCES & Type de représentation
+\begin{itemize}
+\item DATA pour les ensembles de données
+\item PREFERENCES pour les écrans de préférences
+\end{itemize}\\
+\hline
+display\_name & string & Nom du dataset (nécessaire si plusieurs dataset identiques dans le même écran)\\
+\hline
+display\_module & string & Module gérant l'entité (ex: deal pour entité parendeal) \\
+\hline
+display\_entity & string & Entité à afficher (company, contact, list\_contact,..)\\
+\hline
+display\_pref & prefs array & hash retourné par la fonction \fonction{get\_display\_pref()}\\
+\hline
+display\_link & \textbf{true} | false & Indique si les liens doivent être affichés (ex: non dans une fenêtre popup)\\
+\hline
+display\_ext & string & Indique l'action externe appelée dans le contexte d'action externe (ex: get\_id, get\_id\_url) qui permet un affichage spécial des liens par exemple\\
+\hline
+data\_set & DB\_OBM & Ensemble de données à afficher\\
+\hline
+data\_header & \textbf{top} | both & Affichage de la line de titre des colonnes\\
+\hline
+data\_page & \textbf{true} | false & Activation de la gestion de la pagination\\
+\hline
+data\_url & string & Base de url de recherche (critères, pagination et ordre)
+ex: contact\_index.php?action=search\&tf\_lname=baud\\
+\hline
+data\_order & \textbf{true} | false & Activation des tris par colonne\\
+\hline
+data\_cb\_text & string & Label de la colonne contenant les checkbox\\
+\hline
+data\_cb\_show & \textbf{1} | string & Indicateur des lignes pour affichage des checkbox
+\begin{itemize}
+\item 1 : sur chaque ligne
+\item string : nom de colonne définissant si la checkbox doit être affichée (colonne à vrai, checkbox affichée sinon non
+\end{itemize}
+\\
+\hline
+data\_cb\_side & \textbf{left} | right & Position de la colonne des checkbox\\
+\hline
+data\_cb\_name & string & Préfixe du nom des checkbox. Est complété par l'id de la ligne\\
+\hline
+data\_cb\_field & string & Nom du champ servant à pré-remplir les checkbox. Si le champ est évalué à vrai alors checkbox cochée\\
+\hline
+data\_idfield & string & Nom du champ servant d'index pour la ligne\\
+\hline
+\end{longtable}
+
+
+\begin{longtable}{|p{7cm}|p{8cm}|}
+\hline
+\textbf{Méthodes publiques} & \textbf{Description} \\
+\hline
+OBM\_DISPLAY(\$type, \$pref, \$module='''', \$entity='''', \$name=''''
+&
+Constructeur
+\begin{itemize}
+\item \$type (display\_type)
+\item \$pref (display\_pref)
+\item \$module (display\_module)
+\item \$entity (display\_type) [optionnel] si non positionné mis par défaut à \$module
+\item \$name (display\_name) [optionnel] permet de différencier 2 dataset de la même entité sur le même écran (ex: liste de contact statique et dynamique d'une liste)
+\end{itemize}\\
+\hline
+display(\$module\_function) & Affiche l'ensemble de données
+\begin{itemize}
+\item \$module\_function : nom de la fonction d'affichage spécifique au module
+\end{itemize}\\
+\hline
+dis\_pref\_help() & Affichage de l'aide de l'écran de préférences \\
+\hline
+dis\_data\_file(\$first\_row, \$nb\_rows, \$sep, \$dis\_data\_entity) & Affiche les données au format CSV
+\begin{itemize}
+\item \$first\_row : première ligne à afficher dans l'ensemble des données
+\item \$nb\_rows : nombre de lignes à afficher
+\item \$sep séparateur de colonnes utilisé
+\item \$dis\_data\_entity : fonction gérant l'affichage spécifique de certaines colonnes
+\end{itemize}
+\\
+\hline
+\end{longtable}
+
+
+
+\subsubsection{Implémentation : API fonctions publiques}

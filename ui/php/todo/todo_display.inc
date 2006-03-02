@@ -116,7 +116,7 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
   $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
 
 
-  $todo_d = new OBM_DISPLAY("DATA", $prefs);
+  $todo_d = new OBM_DISPLAY("DATA", $prefs, "todo");
   $todo_d->data_set = $todo_q;
   $todo_d->data_url = $url;
   $todo_d->data_idfield = "todo_id";
@@ -366,8 +366,7 @@ function dis_todo_form($todo, $todo_q = 0) {
 function dis_todo_display_pref($prefs) {
   global $l_todo_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "todo";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "todo");
   $dis_pref->pref_title = $l_todo_display;
 
   $block .= "<td>";

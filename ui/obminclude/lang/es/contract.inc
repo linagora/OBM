@@ -2,37 +2,76 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : contract.inc                                             //
-// 2003-11-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
+// 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
+$l_archive = "Archivo";
 $l_contract_contracttype = "Tipo de contrato";
-$l_after = "Antes de Fecha de vencimiento";
-$l_before = "Posterior a  Fecha de vencimiento";
-$l_incident_list = "Lista de  incidentes";
-$l_incident_new = "Adicione un nuevo incidente";
-
-$l_contract_select_deal = "Seleccionar el Negocio.";
-$l_label_libelle = "Palabra clave de la Referencia";
-$l_kind = "Tipo";
-$l_marketing_manager = "Gerente de Mercadeo";
-$l_technical_manager = "Gerente Técnico";
-$l_client_manager = "Gerente Comercial";
-$l_clause = "Clausulas";
+$l_after = "Vencimiento antes de";
+$l_before = "Vencimiento despues de";
+$l_incident_list = "Incidentes";
+$l_incident_new = "Nuevo";
+$l_format = "Formato";
+$l_ccf_period = "Periodo";
+$l_ccf_ticket = "Tiquetes";
+$l_ccf_duration = "Duración";
 $l_date = "Fechas";
-$l_dateexp = "Expiración";
-$l_last_update = "Última actualización";
-$l_at = "a las";
+$l_signature = "Firma";
+$l_begin = "Inicio";
+$l_exp = "Expiración";
+$l_renew = "Renovación";
+$l_date_cancel = "Cancelación";
+$l_autorenewal =" Renovación Automática";
+$l_priority = "Prioridad";
+$l_type = "Tipo";
+$l_pri_manage = "Administración de Prioridad de Contratos";
+$l_pri_exist = "Prioridades Existentes";
+$l_pri_new = "Nueva Prioridad";
+$l_sta_manage = "Administración de Estado de Contrato";
+$l_sta_exist = "Estado Existente";
+$l_sta_new = "Nuevo Estado";
+
+$l_ticket_nb = "# Tiquetes";
+$l_total_ticket ="Tiquetes usados";
+$l_disp_ticket = "Tiquetes disponibles";
+$l_ticket_final = "Último"; 
+$l_duration_used ="Duración usada (h)";
+$l_duration = "Duración Soporte (h)";
+$l_cck_customer = "Cliente";
+$l_cck_supplier = "Proveedor";
+$l_contract_kind = "Tipo de Contrato";
+$l_contract_select_deal = "Seleccione el Negocio.";
+$l_label_libelle = "Palabra clave de la etiqueta";
+$l_renewalkind = "Tipo de Renovación";
+$l_marketing_manager = "Gerente Mercadeo";
+$l_technical_manager = "Gerente Técnico";
+$l_client_manager = "Gerente de Cuenta";
+$l_clause = "Cláusula";
+$l_company_town = "ciudad";
+$l_company_zipcode = "código de área";
+$l_company_expresspostalcode = "código postal express";
+$l_company_phonenumber = "número telefónico";
+$l_company_fax = "número fax";
+$l_company_web = "dirección web";
+$l_company_email = "correo electrónico";
 
 // Actions
-$l_insert = "Ingresar el contrato";
-$l_update = "Actualizar el contrato";
-$l_delete = "Borrar el contrato";
-$l_select_company = "Seleccione la compañía";
-
-$l_select_contract = "Seleccione el contrato";
+$l_pri_update = "Actualizar Prioridad";
+$l_pri_checkdelete = "Revisar o Borrar Prioridad";
+$l_pri_delete = "Borrar Prioridad";
+$l_pri_insert = "Ingresar Prioridad";
+$l_sta_update = "Actualizar Estado";
+$l_sta_checkdelete = "Revisar o Borrar Estado";
+$l_sta_delete = "Borrar estado";
+$l_sta_insert = "Ingresar estado";
+$l_insert = "Ingresar contrato";
+$l_update = "Actualizar contrato";
+$l_delete = "Borrar contrato";
+$l_select_company = "Seleccione compañía";
+$l_select_contract = "Seleccione el Contrato.";
 
 // Messages
 $l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener los contratos";
@@ -44,12 +83,30 @@ $l_insert_ok = "El contrato ha sido ingresado exitosamente.";
 $l_insert_error = "El ingreso del contrato ha fallado !";
 $l_update_ok = "El contrato ha sido actualizado exitosamente.";
 $l_update_error = "La actualización of el contrato ha fallado !";
-
+$l_pri_insert_ok = "La prioridad ha sido ingresada exitosamente.";
+$l_pri_insert_error = "El ingreso de la prioridad ha fallado !";
+$l_pri_update_ok = "La prioridad ha sido actualizada exitosamente.";
+$l_pri_update_error = "La prioridad of the deal ha fallado !";
+$l_pri_delete_ok = "La prioridad ha sido borrado exitosamente.";
+$l_pri_delete_error = "La eliminación de la prioridad ha fallado !";
+$l_pri_can_delete = "La Prioridad puede ser borrada";
+$l_pri_cant_delete = "La Prioridad NO puede ser borrada";
+$l_pri_link_contract = "La Prioridad esta referenciado por estos incidentes";
+$l_pri_link_contract_no = "La Prioridad NO esta referenciado";
+$l_sta_insert_ok = "El estado ha sido ingresado exitosamente.";
+$l_sta_insert_error = "El ingreso del estado ha fallado !";
+$l_sta_update_ok = "El estado ha sido actualizado exitosamente.";
+$l_sta_update_error = "La actualización del estado ha fallado !";
+$l_sta_delete_ok = "El estado ha sido borrado exitosamente.";
+$l_sta_delete_error = "La eliminación del estado ha fallado !";
+$l_sta_can_delete = "El Estado puede ser borrada";
+$l_sta_cant_delete = "El Estado NO puede ser borrada";
+$l_sta_link_incident = "El Estado esta referenciado por estos incidentes";
+$l_sta_link_incident_no = "El Estado NO esta referenciado";
 $l_link_incident = "El contrato tiene estos incidentes";
 $l_link_incident_no = "El contrato no tiene incidentes";
 $l_cant_delete = "El contrato no puede ser borrado !";
 $l_can_delete = "El contrato puede ser borrado.";
-
 $l_type_manage = "Manejo de tipo de contrato de soporte";
 $l_type_exist = "Tipos existentes";
 $l_type_new = "Nuevo tipo";
@@ -63,11 +120,17 @@ $l_type_update_ok = "El Tipo ha sido actualizado exitosamente";
 $l_type_update_error = "La actualización del Tipo ha fallado !";
 $l_type_delete_error = "La eliminación de Tipo ha fallado !";
 $l_type_delete_ok = "El Tipo ha sido borrado exitosamente.";
-$l_type_cant_delete = "El Tipo NO puede ser borrado !";
 $l_type_can_delete = "EL tipo puede ser borrado.";
+$l_type_cant_delete = "El Tipo NO puede ser borrado !";
 $l_type_link_contract = "El tipo esta involucrado en estos contratos";
-
 $l_err_label_empty = "Tiene que llenar el nombre !";
+$l_err_duration_empty = "Ud. debe llenar la duración del Soporte !";
+$l_err_ticket_empty = "Ud. debe llenar el número del Tiquete!";
+$l_check_samecontract = "Estos contratos lucen similares a esta nueva entrada !";
+$l_err_daterenew = "Fecha de renovación no es válida !";
+$l_err_datecancel = "Fecha de cancelación no es válida !";
+$l_err_date = "Fecha inicial es posterior a la fecha de expiración !";
+
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_select_contract = "Debe generar un contrato !";
@@ -78,3 +141,17 @@ $l_delete_confirm = "Realmente desea borrar el Contrato ?";
 
 // For the display preferences modification screen 
 $l_contract_display = "Opciones de despliegue de Contratos de Soporte";
+$l_j_pri_create = "Debe ingresar una prioridad para crearla !";
+$l_j_pri_update = "Debe seleccionar una prioridad e ingrese un nuevo nombre para crearla !";
+$l_j_pri_delete = "Debe seleccionar una prioridad para borrarla !";
+$l_j_sta_create = "Debe ingresar un estado para crearlo !";
+$l_j_sta_update = "Debe seleccionar un estado e ingrese un nuevo nombre para crearlo !";
+$l_j_sta_delete = "Debe seleccionar un estado para borrarlo !";
+
+// Others Skina
+
+$l_ticket_final_coupon = "tiquetes";
+$l_ticket = "Tipo de Contracto";
+$l_yes = "Si";
+$l_no = "No";
+

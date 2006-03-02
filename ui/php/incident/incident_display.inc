@@ -99,12 +99,13 @@ function dis_incident_search_form($incident) {
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $incident) {
-  global $c_all, $l_all, $l_label,$l_find;
+  global $c_all, $l_all, $l_label, $l_id, $l_find;
   global $l_owner, $l_logger,$l_company,$l_contract;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_date_after,$l_date_before,$l_archive;
 
   $lincident = stripslashes($incident["lincident"]);
+  $i_id = $incident["id"];
   $lcontract = stripslashes($incident["lcontract"]);
   $priority = $incident["priority"];
   $company = $incident["company"];
@@ -151,6 +152,9 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
     <div class=\"search\">
        <div class=\"searchLabel\">$l_label<br />
          <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
+       </div>
+       <div class=\"searchLabel\">$l_id<br />
+         <input type=\"text\" name=\"tf_id\" size=\"10\" value=\"$i_id\" />
        </div>
        <div class=\"searchLabel\">$l_company<br />
          <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
@@ -294,6 +298,7 @@ function html_incident_consult($inc_q) {
   global $l_client_manager;
   global $l_comment;
 
+  $id = $inc_q->f("incident_id");
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
   $label = $inc_q->f("incident_label");
   $priority = $inc_q->f("incidentpriority_label");
@@ -361,7 +366,7 @@ function html_incident_consult($inc_q) {
   </tr>
   </table>
 
-  <div class=\"detailHead\">$l_incident</div>
+  <div class=\"detailHead\">$l_incident (# $id)</div>
   <table class=\"detail\"> 
   <tr>
     <td class=\"detailLabel\">$l_label</td>
@@ -418,7 +423,7 @@ function html_incident_consult($inc_q) {
 //   - $action    : action called
 //   - $incident[] : default values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_incident_form($action,$incident) {
+function dis_incident_form($action, $incident) {
   global $display, $cg_com, $cg_prod;
 
   $id = $incident ["id"];
@@ -744,8 +749,7 @@ function dis_admin_index() {
 function dis_incident_display_pref($prefs) {
   global $l_incident_display;
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "incident";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "incident");
   $dis_pref->pref_title = $l_incident_display;
   $dis_pref->pref_dis_help = 1;
  

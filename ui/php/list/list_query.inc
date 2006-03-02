@@ -464,11 +464,10 @@ function run_query_contacts_list($list, $entity="") {
   $order_dir = $list["order_dir"];
   $lang = get_lang();
 
-  $obm_q = new DB_OBM; 
+  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $limit = sql_limit($db_type);
+  $limit = sql_limit($db_type, "", "", "sta");
   $if_country = sql_if($db_type, "(ctry1.country_name != '')", "ctry1.country_name", "ctry2.country_name");
-
 
   // Order exceptions (order on calculated rows)
   // Addresses are taken from contact or from company (if empty for contact)
@@ -548,10 +547,12 @@ function run_query_contacts_list($list, $entity="") {
       FROM ContactList
          LEFT JOIN Contact ON contactlist_contact_id=contact_id
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-         LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166 = ctry1.country_iso3166
-                              AND ctry1.country_lang='$lang'
-         LEFT JOIN Country as ctry2 ON Company.company_country_iso3166 = ctry2.country_iso3166
-                              AND ctry2.country_lang='$lang'
+         LEFT JOIN Country as ctry1
+           ON Contact.contact_country_iso3166 = ctry1.country_iso3166
+              AND ctry1.country_lang='$lang'
+         LEFT JOIN Country as ctry2
+            ON Company.company_country_iso3166 = ctry2.country_iso3166
+               AND ctry2.country_lang='$lang'
          LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
          LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       WHERE contactlist_list_id='$id'
@@ -559,6 +560,7 @@ function run_query_contacts_list($list, $entity="") {
       $limit";
 
   if ($ctu_sql_limit) {
+    display_debug_msg($query, $cdg_sql, "run_query_contacts_list()");
     $count = get_query_count("SELECT count(*) FROM ContactList WHERE contactlist_list_id='$id'");
     $obm_q->set_num_rows_total($count);
   }
@@ -702,6 +704,7 @@ function run_query_update_num_rows($id, $nb) {
   if ($nb == "") {
     $nb = "0";
   }
+
   $query = "UPDATE List SET list_query_nb='$nb' WHERE list_id='$id'";
   display_debug_msg($query, $cdg_sql, "run_query_update_num_rows()");
   $obm_q = new DB_OBM;

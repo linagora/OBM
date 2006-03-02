@@ -497,7 +497,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
      <form method=\"post\" name=\"f_task_del\" action=\"$url\"
        onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
-  $dis_task_list = new OBM_DISPLAY("DATA",$prefs);
+  $dis_task_list = new OBM_DISPLAY("DATA", $prefs, "time");
   $dis_task_list->data_set = $task_q;
   $dis_task_list->data_header = "top";
   $dis_task_list->data_page = false;
@@ -907,8 +907,7 @@ function html_time_month_users_total($time, $array_res) {
        <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
       </td>
       <td>$dis_validlink</td>
-     </tr>
-     ";
+     </tr>";
   }
 
   $block = "
@@ -918,8 +917,7 @@ function html_time_month_users_total($time, $array_res) {
     <table class=\"timeValid\">
       $dis_months
     </table>
-   <div>
-   ";
+   <div>";
 
   return $block;
 }
@@ -931,7 +929,7 @@ function html_time_month_users_total($time, $array_res) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Stats TimeManager result page                                 //
+// Display the Stats TimeManager result page
 // Parameters:
 //   - $time[] : time search criteria
 //     keys used  : 
@@ -944,7 +942,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   if ($statproj_q->num_rows() != 0) {
     $prefs_p = get_display_pref($auth->auth["uid"], "time_proj");
 
-    $dis_projuser_list = new OBM_DISPLAY("DATA",$prefs_p);
+    $dis_projuser_list = new OBM_DISPLAY("DATA", $prefs_p, "time", "time_proj");
     $dis_projuser_list->data_set = $statproj_q;
     $dis_projuser_list->data_order = false;
     $dis_projuser_list->data_page = false;
@@ -959,7 +957,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   if ($stattt_q->num_rows() != 0) {
     $prefs_t = get_display_pref($auth->auth["uid"], "time_tt");
 
-    $dis_ttuser_list = new OBM_DISPLAY("DATA",$prefs_t);
+    $dis_ttuser_list = new OBM_DISPLAY("DATA", $prefs_t, "time", "time_tt");
     $dis_ttuser_list->data_set = $stattt_q;
     $dis_ttuser_list->data_order = false;
     $dis_ttuser_list->data_page = false;
@@ -983,8 +981,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
 function dis_time_display_pref($prefs) {
   global $l_searchtime_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "time";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "time");
   $dis_pref->pref_title = $l_searchtime_display;
 
   $block .= "<td>";

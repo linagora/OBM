@@ -28,7 +28,7 @@ $fieldnames["payment_amount"] = $l_amount;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Account specific dataset fields                                   //
+// Display Account specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -412,16 +412,14 @@ function dis_account_display_pref ($prefs, $prefs_p) {
  $block .= "<table><tr valign=\"top\">";
    $block .= "<td>";
  
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "account"; // not used but must be set
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "account");
   $dis_pref->pref_title = $l_account_options;
   $dis_pref->pref_dis_help = 0;
   $dis_pref->display();
 
   $block .= "</td><td>";
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_p);
-  $dis_pref->display_entity = "payment";
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs_p, "account", "payment");
   $dis_pref->pref_title = $l_payment_options;
   $dis_pref->pref_dis_help = 0;
   $block .= $dis_pref->display ();

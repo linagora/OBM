@@ -32,7 +32,7 @@ function dis_data_publication(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
   
   if ($fieldname == "publication_title") {
-    if($OD->display_ext == "ext_get_id") {
+    if($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".addslashes($OD->data_set->f("publication_title"))."');";
     }
     else {    
@@ -189,7 +189,7 @@ function html_publication_search_list($pub_q, $prefs, $nb_pub,$publication,$popu
   $pub_d = new OBM_DISPLAY("DATA", $prefs, "publication");
   if ($popup) {
     $pub_d->display_link = false;
-    $pub_d->display_ext = "ext_get_id";
+    $pub_d->display_ext = "get_id";
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -235,7 +235,7 @@ function html_subscription_search_list($pub_q, $prefs, $nb_pub,$publication,$pop
 
   $pub_d = new OBM_DISPLAY("DATA", $prefs, "publication");
   if ($popup) {
-    $pub_d->display_ext = "ext_get_id";
+    $pub_d->display_ext = "get_id";
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -655,7 +655,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
     $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
   }
   $sel_recept .= "</select>";
-  
+
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang"; 
   if (($action == "detailupdate_subscription") || ($action == "update_subscription")) {
     $dis_button = "
@@ -1312,8 +1312,7 @@ function dis_recept_links($publication) {
 function dis_publication_display_pref($prefs) {
   global $l_publication_display;
 
-  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs);
-  $dis_pref->display_entity = "publication"; 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "publication");
   $dis_pref->pref_title = $l_publication_display;
   $dis_pref->pref_dis_help = 1;
 
