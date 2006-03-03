@@ -1733,7 +1733,7 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
   <tr>
     <td class=\"detailLabel\">$l_datebegin $l_format </td>
     <td class=\"detailForm\">
-			<script>calendar('tf_date_begin','$datebegin')</script>
+			<script>calendar('tf_date_begin','$datebegin', 'tf_date_end')</script>
       <span id=\"hour_begin\" style=\"$style\" >$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
@@ -1767,7 +1767,6 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
     <td class=\"detailForm\">$dis_repeat_day</td>
   </tr>
   </table>
-
   <div class=\"detailHead\">$l_desc</div>
   <table class=\"detail\">     
   <tr>    

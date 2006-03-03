@@ -64,6 +64,13 @@ function PickDisplayDay(ClickedDay) {
 
   // Affiche la date selectionnée
   eval('window.document.forms[0].'+this.inputDisplay+'.value = DisplayDate');
+
+  // Test si la date affiché est < à la date à comparer
+  eval('DisplayChkDate = window.document.forms[0].'+this.checkDate+'.value');
+  if(DisplayChkDate < DisplayDate) {
+    eval('window.document.forms[0].'+this.checkDate+'.value = DisplayDate');
+  }
+
 }
 
 
@@ -251,7 +258,7 @@ function SetPickedMonth(PickedYear, PickedMonth, PickedDay) {
 ////////////////////////////////////////////////////////////////////////////////
 // Objet Calendrier
 ////////////////////////////////////////////////////////////////////////////////
-function calendarObject(DateName, IsoDate) {
+function calendarObject(DateName, IsoDate, ChkDate) {
 
   /* Proprietés */
   this.hiddenFieldName = DateName;
@@ -261,9 +268,10 @@ function calendarObject(DateName, IsoDate) {
   this.timerID = this.calendarID + '_Timer';
   this.objName = DateName + '_Object';
   this.inputDisplay = DateName;
+  this.checkDate = ChkDate;
   this.formNumber = -1;
   this.picked = null;
-  //this.displayed = null;
+  this.displayed = null;
   this.previous = null;
   this.next = null;
 
@@ -306,10 +314,10 @@ function calendarObject(DateName, IsoDate) {
 ////////////////////////////////////////////////////////////////////////////////
 // Fonction principale: Créer le formulaire
 ////////////////////////////////////////////////////////////////////////////////
-function calendar(DateName, IsoDate) {
+function calendar(DateName, IsoDate, ChkDate) {
 
   // Creates the calendar object!
-  eval(DateName + '_Object=new calendarObject(\'' + DateName + '\',\'' + IsoDate + '\')');
+  eval(DateName + '_Object=new calendarObject(\'' + DateName + '\',\'' + IsoDate + '\',\'' + ChkDate + '\')');
   var InitialDate = eval(DateName + '_Object.picked.formatted');
 
   // ************************************************
