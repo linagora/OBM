@@ -186,11 +186,11 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
       </div>
 
       <div class=\"searchLabel\">$l_date $l_after<br />
-       <input type=text name=tf_date_after size=12 value=\"$date_after\">
+        <script>calendar('tf_date_after','$date_after')</script>
       </div>
 
       <div class=\"searchLabel\">$l_date $l_before<br />
-       <input type=text name=tf_date_before size=12 value=\"$date_before\">
+        <script>calendar('tf_date_before','$date_before')</script>
       </div>
 
       <div class=\"searchLabel\">$l_inout<br />
@@ -367,12 +367,12 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
      </tr><tr>
       <td class=\"detailLabel\">$l_expected_date</td>
       <td class=\"detailForm\">
-       <input type=\"text\" name=\"tf_expected_date\" size=10 value=\"$expected_date\">
+        <script>calendar('tf_expected_date','$expected_date')</script>
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailForm\">
-       <input type=\"text\" name=\"tf_date\" size=10 value=\"$date\" $readonly>
+        <script>calendar('tf_date','$date')</script>
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_type</td>
@@ -583,13 +583,13 @@ function html_payment_search_list ($payment_q, $prefs, $nb_payment, $payment){
   return $block;
 }
 
-// bcontins !! faudra refaire la requete qui renvoit les details pour récuperer
+// bcontins !! faudra refaire la requete qui renvoit les details pour rï¿½cuperer
 // bcontins !! les label des types de paiement et autre parce que c'est crade
 // bcontins !!
 // bcontins !! while ($q_paymentkind->next_record()) {
 // bcontins !!   if ($q_paymentkind->f("paymentkind_id") == $q_payment->f("payment_paymentkind_id")) {
 // bcontins !!	   $block .= $q_paymentkind->f("paymentkind_longlabel");
-// bcontins !!	   break; // dès qu'on a le bon, on sort
+// bcontins !!	   break; // dï¿½s qu'on a le bon, on sort
 // bcontins !! } }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -632,7 +632,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
     while ($q_paymentkind->next_record()) {
       if ($q_paymentkind->f("paymentkind_id") == $q_payment->f("payment_paymentkind_id")) {
 	$kind = $q_paymentkind->f("paymentkind_longlabel");
-	break; // dès qu'on a le bon, on sort
+	break; // dï¿½s qu'on a le bon, on sort
       }
     }
   }
@@ -644,7 +644,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
     while ($q_account->next_record()) {
       if ($q_account->f("account_id") == $q_payment->f("payment_account_id")) {
 	$account =  $q_account->f("account_label");
-	break; // dès qu'on a le bon, on sort
+	break; // dï¿½s qu'on a le bon, on sort
       }
     }
   }  
@@ -726,7 +726,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   //     while ($q_paymentkind->next_record()) {
   //       if ($q_paymentkind->f("paymentkind_id") == $q_payment->f("payment_paymentkind_id")) {
   // 	$block .= $q_paymentkind->f("paymentkind_longlabel");
-  // 	break; // dès qu'on a le bon, on sort
+  // 	break; // dï¿½s qu'on a le bon, on sort
   //       }
   //     }
   //   }
@@ -741,7 +741,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   //     while ($q_account->next_record()) {
   //       if ($q_account->f("account_id") == $q_payment->f("payment_account_id")) {
   // 	$block .=  $q_account->f("account_label");
-  // 	break; // dès qu'on a le bon, on sort
+  // 	break; // dï¿½s qu'on a le bon, on sort
   //       }
   //     }
   //   }  
@@ -910,7 +910,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
 </center>";
  // we display invoice data only if search has been done
  if ((!is_object ($q_invoice)) || ($q_invoice->num_rows() == 0)) {
-   // pas de résultats :
+   // pas de rï¿½sultats :
    $display["msg"] .= display_ok_msg ($l_no_invoices);
  } else {
 
@@ -985,8 +985,8 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
   $q_payment = run_query_detail ($payment["id"]);
   html_payment_form ("add_invoices", $q_payment,
 		     run_query_paymentkind(), run_query_account());
-  // ATTENTION : peut-être un problème de formulaire dans html_payment_form()
-  // réglé à priori..
+  // ATTENTION : peut-ï¿½tre un problï¿½me de formulaire dans html_payment_form()
+  // rï¿½glï¿½ ï¿½ priori..
   
   // repartition part of the form :
   // for each invoice, we give a textfield in which the user can
@@ -1279,7 +1279,7 @@ function html_reconcile_import ($q_entrytemp, $prefs_t) {
 
   // il faut displayer les entrytemp, puis un form de confirm..
   $block .=  "<center><font color=\"#FF00FF\">";
-  $block .=  $q_entrytemp->nf(). " opérations temporaires";
+  $block .=  $q_entrytemp->nf(). " opï¿½rations temporaires";
   $block .=  "</FONT><BR></CENTER>";
 
   $url_dm = url_prepare("payment_index.php?action=reconcile_import".
@@ -1391,7 +1391,7 @@ function html_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t) {
   $url_over = url_prepare("payment_index.php?action=do_reconcile");
 
   $block .= "
-  <input type=\"button\" value=\"Valider les lignes cochées\" ".
+  <input type=\"button\" value=\"Valider les lignes cochï¿½es\" ".
     " onClick=\"this.form.action='$url_go_on' ; this.form.submit ();\">";
   $block .= "
   <input type=\"button\" value=\"Finir le Rapprochement\" ";
@@ -1421,4 +1421,4 @@ function html_reconcile_error_page ($error_msg) {
   return $block;
 } // html_reconcile_error_page ()
 
-</script>
+?>

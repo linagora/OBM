@@ -408,7 +408,7 @@ function html_user_form($usr_q, $user) {
       <td class=\"detailForm\"><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_datebegin</td>
-      <td class=\"detailForm\"><input name=\"tf_datebegin\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_desc</td>
       <td class=\"detailForm\"><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>

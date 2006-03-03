@@ -32,6 +32,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -372,7 +373,7 @@ function get_invoice_action() {
     'Condition'=> array ('None')
                                         );
 
-// Display Préférences
+// Display Prï¿½fï¿½rences
   $actions["invoice"]["dispref_level"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=dispref_level",
     'Right'    => $cright_read,

@@ -34,6 +34,7 @@ require("user_display.inc");
 require("user_query.inc");
 require("user_js.inc");
 require("$obminclude/lib/right.inc"); // needed by call from calendar
+require_once("$obminclude/javascript/calendar_js.inc");
 
 //There is no page_close(). yes, at the end
 if ($action == "") $action = "index";

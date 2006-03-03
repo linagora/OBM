@@ -17,6 +17,7 @@ require("$obminclude/global_pref.inc");
 require("payment_display.inc");
 require("payment_query.inc");
 require("payment_js.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "")  $action = "index";
 $payment = get_param_payment();
@@ -161,7 +162,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   $display["msg"] = display_debug_msg("FIXME : permissions", $cdg_param);
   // options d'affichage pour les invoices
   $prefs_i = get_display_pref($auth->auth["uid"],"invoice");
-  // recherche des invoices selon label si la recherche a déjà été lancée,
+  // recherche des invoices selon label si la recherche a dï¿½jï¿½ ï¿½tï¿½ lancï¿½e,
   $inv_q = run_query_search_connectable_invoices($payment);
   // get invoices already connected to that payment :
   $q_invoices_connected = run_query_search_connected_invoices($payment["id"]);
@@ -374,7 +375,7 @@ elseif ($action =="reconcile_import") {
 // we don't need to do it again...
   if ($import_file != "no") {
     if (!is_uploaded_file ($fichier_csv)) {
-      $display["msg"] = display_err_msg( "$fichier_csv n'est pas un fichier uploadé !<br>");
+      $display["msg"] = display_err_msg( "$fichier_csv n'est pas un fichier uploadï¿½ !<br>");
        $display["detail"] = html_choose_csv_file ();
     }else { 
       // the dest file must be readable by everybody if you want mysql import

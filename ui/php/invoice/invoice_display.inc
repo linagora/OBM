@@ -213,11 +213,11 @@ function html_invoice_search_form($sta, $invoice) {
     </div>
 
     <div class=\"searchLabel\">$l_date $l_after<br />
-      <input type=\"text\" name=\"tf_date_after\" maxlength=\"10\" size=\"10\" value=\"$date_after\" />
+      <script>calendar('tf_date_after','$date_after')</script>
     </div>
 
     <div class=\"searchLabel\">$l_date $l_before<br />
-      <input type=\"text\" name=\"tf_date_before\" maxlength=\"10\" size=\"10\" value=\"$date_before\" />
+      <script>calendar('tf_date_before','$date_before')</script>
     </div>
 
     <div class=\"searchLabel\">$l_include_archive<br />
@@ -827,17 +827,17 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   </tr><tr>
     <td class=\"detailLabel\">$l_date</td>
     <td class=\"detailForm\">
-      <input name=\"tf_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$date\" />
+      <script>calendar('tf_date','$date')</script>
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_expiration_date</td>
     <td class=\"detailForm\">
-      <input name=\"tf_expiration_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$edate\" />
+      <script>calendar('tf_expiration_date','$edate')</script>
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_payment_date</td>
     <td class=\"detailForm\">
-      <input name=\"tf_payment_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$pdate\" />
+      <script>calendar('tf_payment_date','$pdate')</script>
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_status</td>
@@ -867,7 +867,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
       $dis_comment
