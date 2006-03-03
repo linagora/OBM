@@ -342,11 +342,11 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
     <div class=\"searchLabel\">$l_country<br />
       $sel_ctry
     </div>
-    <div class=\"searchLabel\">$l_market<br />
-      $sel_market
-    </div>
     <div class=\"searchLabel\">$l_datasource<br />
       $sel_dsrc
+    </div>
+    <div class=\"searchLabel\">$l_market<br />
+      $sel_market
     </div>
     <div class=\"searchLabel\">$l_after<br />
       <script>calendar('tf_dateafter','$dateafter')</script>

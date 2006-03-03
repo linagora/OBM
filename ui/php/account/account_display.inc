@@ -634,4 +634,4 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
 
 }
 
-</script>
+?>
