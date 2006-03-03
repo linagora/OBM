@@ -50,6 +50,7 @@ include("$obminclude/global_pref.inc");
 require("company_query.inc");
 require("company_display.inc");
 include("$obminclude/of/of_category.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -704,7 +705,7 @@ function get_company_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-// Display Préférences
+// Display Prï¿½fï¿½rences
   $actions["company"]["dispref_display"] = array (
     'Url'      => "$path/company/company_index.php?action=dispref_display",
     'Right'    => $cright_read,

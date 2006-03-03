@@ -349,12 +349,10 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
       $sel_dsrc
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
-        value=\"$dateafter\" />
+      <script>calendar('tf_dateafter','$dateafter')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
-        value=\"$datebefore\" />
+      <script>calendar('tf_datebefore','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
@@ -1284,7 +1282,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\">
+      <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
       $dis_comment
