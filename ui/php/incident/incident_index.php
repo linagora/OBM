@@ -42,6 +42,7 @@ include("$obminclude/global_pref.inc");
 require("incident_query.inc");
 require("incident_display.inc");
 require_once("$obminclude/of/of_category.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -548,7 +549,7 @@ function get_incident_action() {
      'Condition'=> array ('all') 
                                       	   );
 
-//  Display Préférence
+//  Display Prï¿½fï¿½rence
   $actions["incident"]["dispref_display"] = array (
      'Url'      => "$path/incident/incident_index.php?action=dispref_display",
      'Right'    => $cright_read,

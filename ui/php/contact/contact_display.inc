@@ -495,12 +495,10 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
     $block_category4
     $block_resp
     <div class=\"searchLabel\">$l_after<br />
-      <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
-        value=\"$dateafter\" />
+      <script>calendar('tf_dateafter','$dateafter')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
-        value=\"$datebefore\" />
+      <script>calendar('tf_datebefore','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cb_mailing_ok_only\" value=\"1\" $mailing_ok_only />
@@ -1473,10 +1471,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     </tr><tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailForm\">
-        <input type=\"text\" id=\"tf_date\" name=\"tf_date\" maxlength=\"10\" size=\"10\" value=\"$date\" />
-        <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_entity.tf_date,'../agenda/agenda_index.php?action=calendar&popup=1') ;\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-        </a>
+        <script>calendar('tf_date','$date')</script>
       </td>
     </tr>";
   }
@@ -1660,7 +1655,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment2</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment2\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment2\" />$sel_usercomment2</td>
+      <td class=\"detailForm\"><script>calendar('tf_datecomment2','$datecomment2')</script>$sel_usercomment2</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment2\" rows=\"6\" cols=\"78\">$add_comment2</textarea></td>
       $dis_comment2
@@ -1675,7 +1670,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment3</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment3\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment3\" />$sel_usercomment3</td>
+      <td class=\"detailForm\"><script>calendar('tf_datecomment3','$datecomment3')</script>$sel_usercomment3</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment3\" rows=\"6\" cols=\"78\">$add_comment3</textarea></td>
       $dis_comment3
@@ -1828,7 +1823,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment1</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
       $dis_comment

@@ -197,8 +197,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
         $sel_member
       </div>
       <div class=\"searchLabel\">$l_date<br />
-        <input name=\"tf_datebegin\" size=\"10\" maxlength=\"10\"
-          value=\"$date\" />
+        <script>calendar('tf_datebegin','$date')</script>
       </div>
       <div class=\"searchLabel\">$l_archive<br />
         $cb_archive
@@ -1064,10 +1063,10 @@ function html_project_form($action, $project_q, $project) {
     $dis_member
     </tr><tr>
       <td class=\"detailLabel\">$l_datebegin</td>
-      <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_dateend</td>
-      <td class=\"detailForm\"><input name=\"tf_dateend\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateend\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_dateend','$dateend')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" $arc_val /></td>
@@ -1079,7 +1078,7 @@ function html_project_form($action, $project_q, $project) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
       $dis_comment

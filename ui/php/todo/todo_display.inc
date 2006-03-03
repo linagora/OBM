@@ -332,10 +332,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   </tr><tr>
     <td class=\"detailLabel\">$l_deadline</td>
     <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" value=\"$deadline\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_entity.tf_deadline,'../agenda/agenda_index.php?action=calendar&popup=1') ;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
+      <script>calendar('tf_deadline','$deadline')</script>
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_content</td>

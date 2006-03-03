@@ -163,10 +163,10 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
          <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
        </div>
        <div class=\"searchLabel\">$l_date_after<br />
-         <input name=\"tf_dateafter\" type=\"text\" size=\"10\" value=\"$dateafter\" />
+        <script>calendar('tf_dateafter','$dateafter')</script>
        </div>
        <div class=\"searchLabel\">$l_date_before<br />
-         <input name=\"tf_datebefore\" type=\"text\" size=\"10\" value=\"$datebefore\" />
+        <script>calendar('tf_datebefore','$datebefore')</script>
        </div>
        $block_priority
        $block_status
@@ -647,7 +647,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           <tr>
             <td class=\"detailLabel\">$l_date</td>
             <td class=\"detailForm\">
-              <input name=\"tf_date\" size=\"10\" maxlength=\"10\" value=\"$date\" />
+            <script>calendar('tf_date','$date')</script>
                 H $sel_hour
             </td>
           </tr><tr>
@@ -666,7 +666,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           <tr>
             <td class=\"detailLabel\">$l_add_comment</td>
             <td class=\"detailForm\">
-              <input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment
+              <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment
             </td> 
           </tr><tr>
             <td class=\"detailLabel\">$l_res_duration</td>

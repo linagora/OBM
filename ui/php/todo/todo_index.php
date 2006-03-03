@@ -23,6 +23,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("todo_query.inc");
 require("todo_display.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 if (!(($action == "detailupdate") && ($popup)))
   require("todo_js.inc");
@@ -269,7 +270,7 @@ function get_todo_action() {
      'Condition'=> array ('all') 
                                        	 );
 
-// Display Préférences
+// Display Prï¿½fï¿½rences
    $actions["todo"]["dispref_display"] = array (
     'Url'      => "$path/todo/todo_index.php?action=dispref_display",
     'Right'    => $cright_read,

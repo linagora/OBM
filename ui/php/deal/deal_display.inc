@@ -283,12 +283,10 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cats1, $stat_q, $manager_
       <input name=\"tf_zip\" size=\"14\" value=\"$zip\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
-        value=\"$dateafter\" />
+      <script>calendar('tf_dateafter','$dateafter')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
-        value=\"$datebefore\" />
+      <script>calendar('tf_datebefore','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_kind<br />
       $sel_kind
@@ -1231,7 +1229,7 @@ $js_status_loop
         <td class=\"detailForm\"><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_date_init</td>
-        <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+        <td class=\"detailForm\"> <script>calendar('tf_datebegin','$datebegin')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\">$sel_kind</td>
@@ -1246,7 +1244,7 @@ $js_status_loop
       <td class=\"detailForm\">$sel_tech</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_date_proposal</td>
-      <td class=\"detailForm\"><input name=\"tf_dateprop\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateprop\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_dateprop','$dateprop')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_amount</td>
       <td class=\"detailForm\"><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
@@ -1255,7 +1253,7 @@ $js_status_loop
       <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_date_expected</td>
-      <td class=\"detailForm\"><input name=\"tf_dateexpected\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateexpected\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_dateexpected','$dateexpected')</script></td>
     </tr><tr>
      $block_category1
     </table>    
@@ -1266,7 +1264,7 @@ $js_status_loop
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_date_alarm</td>
-      <td class=\"detailForm\"><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datealarm','$datealarm')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_status</td>
       <td class=\"detailForm\">$sel_status</td>
@@ -1284,7 +1282,8 @@ $js_status_loop
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\">
+        <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_mail_comment</td>
       <td class=\"detailForm\">
@@ -1453,7 +1452,7 @@ $js_status_loop
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_date_alarm</td>
-      <td class=\"detailForm\"><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datealarm','$datealarm')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_status</td>
       <td class=\"detailForm\">$sel_status</td>
@@ -1466,7 +1465,7 @@ $js_status_loop
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_date_expected</td>
-      <td class=\"detailForm\"><input name=\"tf_dateexpected\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateexp\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_dateexpected','$dateexp')</script></td>
     </tr>
     </table>
 
@@ -1475,7 +1474,8 @@ $js_status_loop
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\">
+      <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_mail_comment</td>
       <td class=\"detailForm\">

@@ -35,7 +35,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-
+require_once("$obminclude/javascript/calendar_js.inc");
 require("contract_query.inc");
 require("contract_display.inc");
 
@@ -640,7 +640,7 @@ function get_contract_action() {
     'Condition'=> array ('all') 
                                       	  );
 
-// Display Préférence
+// Display Prï¿½fï¿½rence
   $actions["contract"]["dispref_display"] = array (
     'Url'      => "$path/contract/contract_index.php?action=dispref_display",
     'Right'    => $cright_read,

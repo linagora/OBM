@@ -261,10 +261,10 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
       <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <input name=\"tf_dateafter\" size=\"10\" value=\"$dateafter\" />
+      <script>calendar('tf_dateafter','$dateafter')</script>
    </div>
     <div class=\"searchLabel\">$l_before<br />
-      <input type=\"text\" name=\"tf_datebefore\" size=\"10\" value=\"$datebefore\" />
+      <script>calendar('tf_datebefore','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_label_libelle<br />
       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
@@ -1202,19 +1202,19 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_signature</td>
-      <td class=\"detailForm\"><input name=\"tf_datesignature\" type=\"text\" size=\"10\" value=\"$datesignature\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datesignature','$datesignature')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_begin</td>
-      <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" value=\"$datebegin\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_exp</td>
-      <td class=\"detailForm\"><input name=\"tf_dateexp\" type=\"text\" size=\"10\" value=\"$dateexp\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_dateexp','$dateexp')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_renew</td>
-      <td class=\"detailForm\"><input name=\"tf_daterenew\" type=\"text\" size=\"10\" value=\"$daterenew\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_daterenew','$daterenew')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_date_cancel</td>
-      <td class=\"detailForm\"><input name=\"tf_datecancel\" type=\"text\" size=\"10\" value=\"$datecancel\" /></td>
+      <td class=\"detailForm\"><script>calendar('tf_datecancel','$datecancel')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_type</td>
       <td class=\"detailForm\">$dis_type</td>
@@ -1259,7 +1259,7 @@ $dis_format_detail
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
     </tr><tr>
       <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
       $dis_comment

@@ -46,6 +46,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 require("project_query.inc");
 require("project_display.inc");
@@ -714,7 +715,7 @@ function get_project_action() {
      'Condition'=> array ('all')
                                        	 );
 
-// Display Préférences
+// Display Prï¿½fï¿½rences
   $actions["project"]["dispref_display"] = array (
     'Url'      => "$path/project/project_index.php?action=dispref_display",
     'Right'    => $cright_read,
