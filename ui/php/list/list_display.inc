@@ -69,7 +69,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
          || ($OD->data_set->f("contact_address3") != "")
          || ($OD->data_set->f("contact_zipcode") != "")
          || ($OD->data_set->f("contact_town") != "")
-         || (trim($OD->data_set->f("contact_country_iso3166")) != "")
+         || (trim($OD->data_set->f("contact_country_iso3166")) != "0")
          || ($OD->data_set->f("contact_expresspostal") != "") ) {
     $contact_has_address = true;
   } else {
