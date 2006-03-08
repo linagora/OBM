@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 require("$obminclude/javascript/check_js.inc");
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 
 $extra_js .= "
 function confirm_del() {
@@ -25,7 +24,8 @@ function check_addtodoform(form) {
     return false;
   } 
 
-  if (check_date(form.tf_deadline, \"$l_j_fill_deadline\") == false) {
+  if (form.tf_deadline.value == \"\") {
+    alert(\"$l_deadline\" + \" : $l_fill_date\");
     return false;
   } else
     return true;

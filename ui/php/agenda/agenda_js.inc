@@ -8,27 +8,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 require("$obminclude/javascript/check_js.inc");
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/category_js.inc");
 
 $extra_js .= "
 
 function check_calendar(form) {
-
   if (trim(form.tf_title.value) == \"\") {
     alert (\"$l_fill_title\");
     return false;
   }
-  else if (check_date(form.tf_date_begin, \"$l_datebegin\") == false) {
+  else if (form.tf_date_begin.value == \"\") {
+    alert(\"$l_datebegin\" + \" : $l_fill_date\");
     return false;
   }
-  else if (check_date(form.tf_date_end, \"$l_dateend\") == false) {
+  else if (form.tf_date_end.value == \"\") {
+    alert(\"$l_dateend\" + \" : $l_fill_date\");
     return false;
   }
-  else if ((trim(form.tf_repeat_end.value) != \"\") && (trim(form.sel_repeat_kind.value) != \"none\") && (check_date(form.tf_repeat_end, \"$l_date_repeatend\") == false) ) {
+  else if ((form.tf_repeat_end.value == \"\") && (trim(form.sel_repeat_kind.value) != \"none\") ) {
+    alert(\"$l_date_repeatend\" + \" : $l_fill_date\");
     return false;
   }
-
   return true;
 }
 
@@ -146,7 +146,8 @@ function check_meeting(form) {
     alert (\"$l_interval_null\");
     return false;
   }
-  else if (check_date(form.tf_date_begin, \"$l_datebegin\") == false) {
+  else if (form.tf_date_begin.value == \"\") {
+    alert(\"$l_datebegin\" + \" : $l_fill_date\");
     return false;
   }
 

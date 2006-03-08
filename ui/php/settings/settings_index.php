@@ -72,7 +72,13 @@ if ($form_user_pref) {
     $sess->register("set_date");
     update_user_pref($uid, "set_date", $set_date);
   }
-
+  
+  if ($param_date_upd != "") {
+    $set_date_upd = $param_date_upd;
+    $sess->register("$set_date_upd");
+    update_user_pref($uid, "set_date_upd", $set_date_upd);
+  }
+  
   if ($param_commentorder != "") {
     $set_commentorder = $param_commentorder;
     $sess->register("set_commentorder");
@@ -123,6 +129,9 @@ if ($set_date == $cda_iso) $da_iso = "checked";
 if ($set_date == $cda_en) $da_en = "checked";
 if ($set_date == $cda_fr) $da_fr = "checked";
 if ($set_date == $cda_txt) $da_txt = "checked";
+
+if($set_date_upd == $cda_upd_dmy) $da_dmy = "checked";
+if($set_date_upd == $cda_upd_mdy) $da_mdy = "checked";
 
 if ($set_commentorder == $cco_chro) $co_chro = "checked";
 if ($set_commentorder == $cco_rev) $co_rev = "checked";
@@ -274,6 +283,13 @@ $display["detail"] .= "
   </tr>
 
 <!-- Date Format config ------------------------------------------------------>
+  <tr>
+      <td class=\"adminLabel\">$l_set_date_upd</td>
+          <td class=\"adminText\">
+          <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_dmy\" $da_dmy />$l_da_dmy
+          <input type=\"radio\" name=\"param_date_upd\" value=\"$cda_upd_mdy\" $da_mdy />$l_da_mdy
+        </td>
+  </tr>
   <tr>
     <td class=\"adminLabel\">$l_set_date</td>
     <td class=\"adminText\">

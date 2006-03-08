@@ -7,8 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
@@ -42,33 +40,17 @@ function check_get_id_url(p_url, valeur) {
   }
 }
 
-function check_search_form(f_con) {
-  if ((f_con.tf_dateafter.value != \"\") &&
-      (check_date(f_con.tf_dateafter, \"$l_date_alarm_after\") == false)) {
-    return false;
-  }
-  else if ((f_con.tf_datebefore.value != \"\") &&
-       (check_date(f_con.tf_datebefore, \"$l_date_alarm_before\") == false)) {
-    return false;
-  } 
-  else
-    return true;
-}
-
-
 function check_contract(f_con) {
   if (trim(f_con.tf_label.value) == \"\") {
     alert (\"$l_fill_label\");
     return false;
-  }
-  else if (check_date(f_con.tf_datebegin, \"$l_begin\") == false) {
+  } else if (f_con.tf_datebegin.value == \"\") {
+    alert(\"$l_begin\" + \" : $l_fill_date\");
     return false;
-  }
-  else if (check_date(f_con.tf_dateexp, \"$l_exp\") == false) {
+  } else if (f_con.tf_dateexp.value == \"\") {
+    alert(\"$l_exp\" + \" : $l_fill_date\");
     return false;
-  }
-
-  else
+  } else
     return true;
 }
 

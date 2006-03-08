@@ -456,7 +456,6 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_search\" 
-  onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
   action=\"".url_prepare("contact_index.php")."\">
   <div class=\"search\">
 

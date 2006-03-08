@@ -149,6 +149,9 @@ $l_fill_status = "You have to fill the status";
 $l_fill_priority = "You have to fill the priority";
 $l_fill_date = "The date must be filled";
 $l_invalid_date = "Invalid date format (MM/JJ/AAAA ou AAAA-MM-JJ)";
+$l_invalid_date_day = "Invalide day";
+$l_invalid_date_month = "Invalid month";
+$l_invalid_date_year = "Invalid year";
 
 // Tasktype groups
 $l_tt = "Task Type";

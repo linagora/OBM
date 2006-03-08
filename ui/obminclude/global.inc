@@ -336,6 +336,9 @@ $cda_en = "m/d/Y";  // us format
 $cda_fr = "d/m/Y";  // fr format
 $cda_txt = "d M Y"; // txt format
 
+$cda_upd_dmy = "dmy";  // day month year format
+$cda_upd_mdy = "mdy"; // month day year format
+
 // Menu display options constants
 $cme_txt = "text";  // text
 $cme_ico = "icon";  // icon

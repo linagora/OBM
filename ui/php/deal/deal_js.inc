@@ -7,8 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/javascript/category_js.inc");
 
@@ -44,20 +42,6 @@ function check_get_id_url(p_url, valeur) {
   }
 }
 
-
-function check_search_form(f_aff) {
-  if ((f_aff.tf_dateafter.value != \"\") &&
-      (check_date(f_aff.tf_dateafter, \"$l_date_alarm_after\") == false)) {
-    return false;
-  }
-  else if ((f_aff.tf_datebefore.value != \"\") &&
-        (check_date(f_aff.tf_datebefore, \"$l_date_alarm_before\") == false)) {
-    return false;
-  }
-  else return true;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the deal form values are correct                                 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,22 +51,13 @@ function check_form(f_aff) {
     return false;
   }
 
-  if (trim(f_aff.tf_datebegin.value) == \"\") {
+  if (f_aff.tf_datebegin.value == \"\") {
     alert (\"$l_fill_datebegin\");
-    return false;
-  } else if (check_date(f_aff.tf_datebegin, \"$l_date_init\") == false) {
-    return false;
-  }
-  
-  if ((f_aff.tf_dateprop.value != \"\") &&
-          (check_date(f_aff.tf_dateprop, \"$l_proposition\") == false)) {
     return false;
   }
 
   if (trim(f_aff.tf_datealarm.value) == \"\") {
     alert (\"$l_fill_datealarm\");
-    return false;
-  } else if (check_date(f_aff.tf_datealarm, \"$l_date_alarm\") == false) {
     return false;
   } else {
     // Check if date alarm is in the past
@@ -116,8 +91,6 @@ function check_quick_form(fdeal) {
 
   if (trim(fdeal.tf_datealarm.value) == \"\") {
     alert (\"$l_fill_datealarm\");
-    return false;
-  } else if (check_date(fdeal.tf_datealarm, \"$l_date_alarm\") == false) {
     return false;
   } else {
     // Check if date alarm is in the past

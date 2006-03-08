@@ -7,8 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
@@ -85,19 +83,6 @@ function check_project(form) {
     alert (\"$l_fill_soldnumber\");
     return false;
   }
-
-  // If datebegin filled, check it is correct 
-  if ( (form.tf_datebegin.value != \"\")
-       && (check_date(form.tf_datebegin, \"$l_datebegin\") == false)) {
-    return false;
-  }
-
-  // If dateend filled, check it is correct 
-  if ( (form.tf_dateend.value != \"\")
-       && (check_date(form.tf_dateend, \"$l_dateend\") == false)) {
-    return false;
-  }
-
   return true;
 } 
 

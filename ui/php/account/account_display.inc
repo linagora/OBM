@@ -501,7 +501,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   onsubmit=\"return check_balance_form (this);\">
    <tr><td>
     <font size=-2 color=\"#$col_label\">$l_choose_balance_date</font><br>
-    <input type=text name=\"tf_balance_date\" value=\"".$p_date."\">
+      <script>calendar('tf_balance_date','$p_date')</script>
    </td><td>
     <input type=submit value=\"".$l_compute_balance."\">
    </td></tr>

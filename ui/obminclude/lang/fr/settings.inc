@@ -17,7 +17,8 @@ $l_set_theme = "Choisissez votre theme";
 $l_set_menu = "Affichage des menus";
 $l_set_rows = "# lignes affichées par page";
 $l_set_todo = "Ordre d'affichage des tâches";
-$l_set_date = "Format de date";
+$l_set_date_upd = "Format de saisie de date";
+$l_set_date = "Format d'affichage de date";
 $l_set_commentorder = "Affichage des commentaires";
 $l_set_cal_interval = "Intervalle du calendrier";
 $l_set_csv_sep = "Séparateur pour export CSV";
@@ -31,6 +32,9 @@ $l_da_iso = "yyyy-mm-dd";
 $l_da_en = "mm/dd/yyyy";
 $l_da_fr = "dd/mm/yyyy";
 $l_da_txt = "dd mois yyyy";
+
+$l_da_dmy = "dmy";
+$l_da_mdy = "mdy";
 
 $l_deadline = "date limite";
 

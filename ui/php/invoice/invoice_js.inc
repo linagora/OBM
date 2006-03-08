@@ -7,9 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 require("$obminclude/javascript/check_js.inc");
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 
 $extra_js .= "
 // user input check in  html_invoice_search_form :
@@ -17,18 +15,6 @@ function check_search_form(f_inv){
   j_ht=f_inv.tf_amount_ht.value;
   j_ttc=f_inv.tf_amount_ttc.value;
 
-  if (trim(f_inv.tf_date_after.value) != \"\") {
-    if (check_date(f_inv.tf_date_after,\"$l_date $l_after\")==false) {
-      alert(\"$l_invalid_date\");
-      return false;
-    }
-  }
-  if (trim(f_inv.tf_date_before.value) != \"\") {
-    if (check_date(f_inv.tf_date_before,\"$l_date $l_before\")==false) {
-     alert(\"$l_invalid_date\");
-     return false;
-    }
-  }
   if ((j_ht != \"\") && check_money(j_ht)==null){
     alert(\"$l_check_money_ht\");
     return false;
@@ -59,7 +45,8 @@ function check_invoice(f_inv) {
    return false;
   }
   
-  if (check_date(f_inv.tf_date, \"$l_date\") == false) {
+  if (f_inv.tf_date.value == \"\") {
+    alert(\"$l_fill_date\");
     return false;
   }
 

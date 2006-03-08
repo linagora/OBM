@@ -16,6 +16,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("account_display.inc");
 require("account_query.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 update_last_visit("account", $param_account, $action);
 

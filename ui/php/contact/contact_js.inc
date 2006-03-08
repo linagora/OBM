@@ -10,7 +10,6 @@
 
 require("$obminclude/javascript/category_js.inc");
 require("$obminclude/javascript/check_js.inc");
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 
 $extra_js .= "
 function confirm_del() {
@@ -18,18 +17,6 @@ function confirm_del() {
     return true;
   else
     return false;
-}
-
-function check_search_form(form) {
-  if ((form.tf_dateafter.value != \"\") &&
-      (check_date(form.tf_dateafter, \"$l_date_after\") == false)) {
-    return false;
-  }
-  else if ((form.tf_datebefore.value != \"\") &&
-        (check_date(form.tf_datebefore, \"$l_date_before\") == false)) {
-    return false;
-  }
-  else return true;
 }
 
 function check_contact(form) {
@@ -72,13 +59,6 @@ function check_contact(form) {
     alert (\"$l_j_check_email\");
     return false;
   }
-
-  if (form.tf_date.value == \"\") {
-    return true;
-  } else if (check_date(form.tf_date, \"$l_j_check_date\") == false) {
-    return false;
-  } else
-    return true;
 
   return true;
 }

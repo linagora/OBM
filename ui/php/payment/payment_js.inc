@@ -28,13 +28,6 @@ function check_search_form (f_pay){
    alert ('$l_check_amount');
    return false;
   }
-  // date after, date before :
-  if((f_pay.tf_date_after.value!='')&&(check_date(f_pay.tf_date_after,\"$l_date $l_after\")==false)) {
-   return false;
-  }
-  if((f_pay.tf_date_before.value!='')&&(check_date(f_pay.tf_date_before,\"$l_date $l_before\")==false)) {
-   return false;
-  }
  return true;
 }
 

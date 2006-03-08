@@ -250,8 +250,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
 
   $block = "
   <form method=\"get\" name=\"f_search\" 
-  onsubmit=\"if (check_search_form(this) == false) return false;
-  else return true;\" action=\"".url_prepare("contract_index.php")."\">
+  action=\"".url_prepare("contract_index.php")."\">
 
   <div class=\"search\">
     <div class=\"searchLabel\">$l_number<br />

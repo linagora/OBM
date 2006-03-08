@@ -147,7 +147,7 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
 
   $block = "
     <form method=\"get\" name=\"f_search\" action=\"" .
-    url_prepare("incident_index.php") . " \" onsubmit=\"if (check_search_inc(this)) return true; else return false;\">
+    url_prepare("incident_index.php") . " \">
 
     <div class=\"search\">
        <div class=\"searchLabel\">$l_label<br />

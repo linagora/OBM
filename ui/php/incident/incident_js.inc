@@ -9,7 +9,6 @@
 
 
 require("$obminclude/javascript/check_js.inc");
-require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/category_js.inc");
 
 $extra_js .= "
@@ -19,18 +18,6 @@ function confirm_del() {
   else
     return false;
 }
-
-
-function check_search_inc(f_inc) {
-  if (f_inc.tf_dateafter.value != '' && check_date(f_inc.tf_dateafter, '".addslashes($l_date_after_js)."') == false) {
-    return false;
-  }
-  if (f_inc.tf_datebefore.value != '' && check_date(f_inc.tf_datebefore,'".addslashes($l_date_before)."') == false) {
-    return false;
-  }
-  return true;
-}
-
 
 function check_incident(form) {
   // MANDATORY : Check that Contact name is not empty
@@ -42,7 +29,8 @@ function check_incident(form) {
     alert (\"$l_length_label\");
     return false;
   }
-  if (check_date(form.tf_date,'".addslashes($l_incident_date)."') == false) { 
+  if (form.tf_date.value == \"\") { 
+      alert(\"$l_date\" + \" : $l_fill_date\");
       return false;
     }
  return true;

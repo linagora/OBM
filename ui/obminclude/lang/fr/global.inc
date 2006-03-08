@@ -149,7 +149,10 @@ $l_fill_label = "Vous devez renseigner le Label.";
 $l_fill_status = "Vous devez renseigner l'état.";
 $l_fill_priority = "Vous devez renseigner la priorité.";
 $l_fill_date = "La date doit être renseignée.";
-$l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
+$l_invalid_date = "Format de date invalide.";
+$l_invalid_date_day = "Jour invalide !";
+$l_invalid_date_month = "Mois invalide !";
+$l_invalid_date_year = "Année invalide !";
 
 // tasktype groups
 $l_tt = "Type de tâche";

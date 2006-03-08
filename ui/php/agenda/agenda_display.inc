@@ -1731,14 +1731,14 @@ function html_event_form($action, $agenda, $event_q, $users, $res, $groups, $cat
     </td>
   </tr>   
   <tr>
-    <td class=\"detailLabel\">$l_datebegin $l_format </td>
+    <td class=\"detailLabel\">$l_datebegin</td>
     <td class=\"detailForm\">
 			<script>calendar('tf_date_begin','$datebegin', 'tf_date_end')</script>
       <span id=\"hour_begin\" style=\"$style\" >$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_dateend  $l_format</td>
+    <td class=\"detailLabel\">$l_dateend</td>
     <td class=\"detailForm\">
   		<script>calendar('tf_date_end','$dateend')</script>
       <span id=\"hour_end\" style=\"$style\" >$l_hour : $dis_hour_e : $dis_min_e</span>
