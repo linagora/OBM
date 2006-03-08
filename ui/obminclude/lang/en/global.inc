@@ -151,9 +151,10 @@ $l_fill_date = "The date must be filled";
 $l_invalid_date = "Invalid date format (MM/JJ/AAAA ou AAAA-MM-JJ)";
 
 // Tasktype groups
-$l_task_fac = "Factured Tasks";
-$l_task_int = "Internal Projects";
-$l_task_div = "Not Factured Tasks";
+$l_tt = "Task Type";
+$l_tt_sales = "Factured Tasks";
+$l_tt_research = "Internal Projects";
+$l_tt_others = "Not Factured Tasks";
 
 // Days and months
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');

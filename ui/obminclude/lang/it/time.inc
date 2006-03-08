@@ -7,21 +7,16 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// for list
-$l_task_fac = "Operazione Factured";
-$l_task_int = "Operazione Interna";
-
 // Database fields
 $l_taskdate="Data Operazione";
 $l_tasktype = "Tipo Operazione";
 $l_project = "Progetto:";
-$l_task_del="Elimina?";
 $l_delete = "Elimina  Operazioni";
-$l_length="Durata";
-$l_total_length="Durata totale";
-$l_task_del="Elimina.";
-$l_week="Settimana";
-$l_user="Utente";
+$l_length = "Durata";
+$l_total_length = "Durata totale";
+$l_task_del = "Elimina.";
+$l_week = "Settimana";
+$l_user = "Utente";
 $l_see = "Vedi";
 $l_valid = "Conferma";
 $l_add = "Aggiungi";

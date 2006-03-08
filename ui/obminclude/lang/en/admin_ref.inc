@@ -94,7 +94,3 @@ $l_tt_can_delete = "The Task Type can be deleted.";
 $l_j_tt_delete = "You have to select a task type to check or delete it !";
 $l_j_tt_update = "You have to select a task type and enter a new name to update it !";
 $l_j_tt_create = "You have to enter a new task type name to create it !";
-
-$l_tt_sales = "Client Task";
-$l_tt_research = "Internal Project";
-$l_tt_others = "Other task";

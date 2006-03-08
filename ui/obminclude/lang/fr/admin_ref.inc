@@ -94,7 +94,3 @@ $l_tt_can_delete = "Le type de tâche peut être supprimé.";
 $l_j_tt_delete = "Sélectionnez un type de tâche pour le vérifier ou supprimer !";
 $l_j_tt_update = "Vous devez sélectionner un type de tâche et entrer une modification avant de valider !";
 $l_j_tt_create = "Vous devez saisir un nom de type de tâche pour le créer !";
-
-$l_tt_sales = "Tâche facturée";
-$l_tt_research = "Projet interne";
-$l_tt_others = "Tâche non facturée";

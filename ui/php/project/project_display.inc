@@ -76,11 +76,11 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_form($project) {
 
-  $tt_q = run_query_tasktype("project");
+  $tts = get_tasktype("project");
   $manager_q = run_query_managers();
   $member_q = run_query_members();
 
-  $block = html_project_search_form ($tt_q, $manager_q, $member_q, $project);
+  $block = html_project_search_form ($tts, $manager_q, $member_q, $project);
   return $block;
 }
 
@@ -88,16 +88,18 @@ function dis_project_search_form($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Html Project search Form
 // Parameters:
-//   - $tt_q      : database object with tasktype list
+//   - $tts       : tasktype array
 //   - $manager_q : database object with project manager list
 //   - $member_q  : database object with project member list
 //   - $project[] : default form values
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
+function html_project_search_form ($tts, $manager_q, $member_q, $project) {
   global $l_name, $l_company, $l_tasktype, $l_project_manager, $l_member;
-  global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_archive;
+  global $l_all, $l_find, $l_archive;
   global $display, $c_all, $l_select_project, $l_date;
+  global $ctt_sales, $ctt_research, $ctt_others;
+  global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $popup = $project["popup"];
   $name = $project["name"];
@@ -110,25 +112,29 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $company_id = $project["company"];
   $deal_id = $project["deal"];
 
-  $task_list = array($l_task_fac, $l_task_int, $l_task_div);
+  $task_list = array($ctt_sales => $l_tt_sales,
+		     $ctt_research => $l_tt_research,
+		     $ctt_others => $l_tt_others);
 
   // TaskType select construction
   $type_prec = -1;
-  $sel_tt = "<select name=\"sel_tt\">";
-  $sel_tt .= "<option value=\"$c_all\">$l_all</option>";
-  while ($tt_q->next_record()) {
-    //put menu titles
-    if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
-      $sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
-      $type_prec = $task_i;
+  $sel_tt = "<select name=\"sel_tt\">
+    <option value=\"$c_all\">$l_all</option>";
+  if (is_array($tts)) {
+    foreach ($tts as $id=>$one_tt) {
+      $tt_label = $one_tt["label"];
+      $internal = $one_tt["internal"];
+      // put menu titles
+      if ($internal != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$internal]." </option>";
+	$type_prec = $internal;
+      }
+      $sel_tt .= "\n<option value=\"$id\"";
+      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
-    $tt_id = $tt_q->f("tasktype_id");
-    $tt_label = $tt_q->f("tasktype_label");
-    $sel_tt .= "\n<option value=\"$tt_id\"";
-    if ($tt == $tt_id) $sel_tt .= " selected"; 
-    $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+    $sel_tt .= "</select>";
   }
-  $sel_tt .= "</select>";
 
   // manager select
   $sel_manager = "<select id=\"sel_manager\" name=\"sel_manager\">
@@ -850,10 +856,11 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
-  global $l_task_fac, $l_task_int, $l_task_div;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef;
-  global $l_comment,$l_add_comment,$l_upd_comment;
-  global $uid, $cg_prod, $ctt_sales, $ctt_research, $c_php_isodate_format;
+  global $l_comment, $l_add_comment, $l_upd_comment;
+  global $uid, $cg_prod, $c_php_isodate_format;
+  global $ctt_sales, $ctt_research, $ctt_others;
+  global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $usr_q = run_query_all_users_from_group($cg_prod, array($uid));
 
@@ -934,7 +941,7 @@ function html_project_form($action, $project_q, $project) {
 
   // We select the task list depending on task category (or if company filled)
   if ($company > 0) {
-    $tt_q = run_query_tasktype($ctt_sales);
+    $tts = get_tasktype($ctt_sales);
     if ($deal > 0) {
       $dis_deal = "
     </tr><tr>
@@ -957,31 +964,33 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
 
   } else {
-    $tt_q = run_query_tasktype();
+    $tts = get_tasktype();
     $dis_comp = "";
   }
 
-  // task type select
   // TaskType select construction
-  $task_list = array($l_task_fac, $l_task_int, $l_task_div);
+  $task_list = array($ctt_sales=>$l_tt_sales,
+		     $ctt_research=>$l_tt_research,
+		     $ctt_others=>$l_tt_others);
   $type_prec = -1;
   $sel_tt = "
         <select id=\"sel_tt\" name=\"sel_tt\">
           <option value=\"$c_undef\">$l_undef</option>";
-  while ($tt_q->next_record()) {
-    //put menu titles
-    if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
-      $sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
-      $type_prec = $task_i;
+  if (is_array($tts)) {
+    foreach ($tts as $id=>$one_tt) {
+      $tt_label = $one_tt["label"];
+      $internal = $one_tt["internal"];
+      // put menu titles
+      if ($internal != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$internal]." </option>";
+	$type_prec = $internal;
+      }
+      $sel_tt .= "\n<option value=\"$id\"";
+      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
-    $tt_id = $tt_q->f("tasktype_id");
-    $tt_label = $tt_q->f("tasktype_label");
-    $sel_tt .= "
-          <option value=\"$tt_id\"";
-    if ($tt_id == $tt) { $sel_tt .= " selected=\"selected\""; }
-    $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+    $sel_tt .= "</select>";
   }
-  $sel_tt .= "</select>";
 
   // archive field
   if ($action == "detailupdate") {

@@ -126,9 +126,11 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 //   - $invoice[] : hash with invoice values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_search_form($invoice="") {
+  global $ctt_sales;
 
   $sta = get_invoicestatus();
-  $block .= html_invoice_search_form($sta, $invoice);
+  $tts = get_tasktype($ctt_sales);
+  $block .= html_invoice_search_form($invoice, $sta, $tts);
 
   return $block;
 }
@@ -137,13 +139,14 @@ function dis_invoice_search_form($invoice="") {
 ///////////////////////////////////////////////////////////////////////////////
 // invoice search Form
 // Parameters :
-//  $sta     : array of status
-//  $invoice : invoice hash parameters
-///////////////////////////////////////////////////////////////////////////////
-function html_invoice_search_form($sta, $invoice) {
+//   - $invoice : invoice hash parameters/
+//   - $sta     : Status array
+//   - $tts     : Task Type aray
+//////////////////////////////////////////////////////////////////////////////
+function html_invoice_search_form($invoice, $sta, $tts) {
   global $c_all, $l_all;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
-  global $l_status, $l_date, $l_after, $l_before, $l_inout;
+  global $l_status, $l_tt, $l_date, $l_after, $l_before, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
   global $l_find, $l_both, $l_client, $l_supplier;
 
@@ -157,6 +160,7 @@ function html_invoice_search_form($sta, $invoice) {
   $dateexp_after = $invoice["dateexp_after"];
   $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
+  $tt = $invoice["tt"];
   $deal = $invoice["deal"];
   $deal_id = $invoice["deal_id"];
   $company = $invoice["company"];
@@ -184,6 +188,20 @@ function html_invoice_search_form($sta, $invoice) {
   }
   if ($inout == "-") {
     $rb_four = " checked ";
+  }
+
+  // TaskType select construction
+  $sel_tt = "<select name=\"sel_tt\">
+              <option value=\"$c_all\">$l_all</option>";
+  if (is_array($tts)) {
+    foreach ($tts as $id=>$one_tt) {
+      $tt_label = $one_tt["label"];
+      $internal = $one_tt["internal"];
+      $sel_tt .= "\n<option value=\"$id\"";
+      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= ">$tt_label</option>\n";
+    }
+    $sel_tt .= "</select>";
   }
 
   $block = "
@@ -231,6 +249,10 @@ function html_invoice_search_form($sta, $invoice) {
       $l_client &nbsp;
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
       $l_supplier &nbsp;
+    </div>
+
+    <div class=\"searchLabel\">$l_tt<br />
+      $sel_tt
     </div>
 
     <div class=\"searchLabel\">$l_deal<br />

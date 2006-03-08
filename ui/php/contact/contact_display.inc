@@ -2008,31 +2008,31 @@ function dis_contact_admin_index() {
     $block .= of_category_dis_admin_form("contact", "function", $funcs);
   }
 
-  if (! $cgp_hide["contact"]["contactcategory1"]) {
+  if (! $cgp_hide["contact"]["category1"]) {
     $cats1 = of_category_get_ordered("contact", "category1");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("contact", "category1", $cats1);
   }
 
-  if (! $cgp_hide["contact"]["contactcategory2"]) {
+  if (! $cgp_hide["contact"]["category2"]) {
     $cats2 = of_category_get_ordered("contact", "category2");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("contact", "category2", $cats2);
   }
 
-  if (! $cgp_hide["contact"]["contactcategory3"]) {
+  if (! $cgp_hide["contact"]["category3"]) {
     $cats3 = of_category_get_ordered("contact", "category3");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("contact", "category3", $cats3);
   }
 
-  if (! $cgp_hide["contact"]["contactcategory4"]) {
+  if (! $cgp_hide["contact"]["category4"]) {
     $cats4 = of_category_get_ordered("contact", "category4");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("contact", "category4", $cats4);
   }
 
-  if (! $cgp_hide["contact"]["contactcategory5"]) {
+  if (! $cgp_hide["contact"]["category5"]) {
     $cats5 = of_category_get_ordered("contact", "category5");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("contact", "category5", $cats5);

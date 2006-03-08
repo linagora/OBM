@@ -9,9 +9,8 @@
 
 // Database fields
 $l_date_init = "Init Date";
-$l_parentdeal="Parent Deal";
+$l_parentdeal = "Parent Deal";
 $l_kind = "Kind";
-$l_tt = "Task Type";
 $l_marketing_manager = "Marketing manager";
 $l_technical_manager = "Technical manager";
 $l_date_proposal = "Proposal Date";

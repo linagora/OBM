@@ -684,7 +684,7 @@ global $cdg_sql, $cdg_param;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: TaskType select query execution                              //
+// Timemanager: TaskType select query execution
 // Returns : DB object result with all type of task
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_used_tasktype($uid = 0) {
@@ -692,23 +692,23 @@ function run_query_used_tasktype($uid = 0) {
 
   if ($uid) {
     $query = "
-      select distinct TaskType.*
-      from TaskType, Project, ProjectUser
-      where tasktype_id = project_tasktype_id
-        and project_id = projectuser_project_id
-        and project_archive = '0'
-        and projectuser_user_id = '$uid'
-      order by tasktype_internal, tasktype_label";
+      SELECT DISTINCT TaskType.*
+      FROM TaskType, Project, ProjectUser
+      WHERE tasktype_id = project_tasktype_id
+        AND project_id = projectuser_project_id
+        AND project_archive = '0'
+        AND projectuser_user_id = '$uid'
+      ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
     $obm1_q= new DB_OBM;
     $obm1_q->query($query);
 
     $query = "
-      select TaskType.*
-      from TaskType
-      where tasktype_internal='$ctt_others'
-      order by tasktype_internal, tasktype_label";
+      SELECT TaskType.*
+      FROM TaskType
+      WHERE tasktype_internal='$ctt_others'
+      ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
     $obm2_q= new DB_OBM;
@@ -718,9 +718,9 @@ function run_query_used_tasktype($uid = 0) {
 
   } else {
     $query = "
-      select *
-      from TaskType
-      order by tasktype_internal, tasktype_label";
+      SELECT *
+      FROM TaskType
+      ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
     $obm_q= new DB_OBM;

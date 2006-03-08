@@ -115,11 +115,11 @@ $l_fill_label = "Label muﬂ eingetragen sein";
 $l_fill_date = "Datum muﬂ eingetragen sein";
 $l_invalid_date = "Falsches Datumsformat (ISO/DIN JJJJ-MM-TT oder lokale Einstellung)";
 
-//used by many modules
-//tasktype groups
-$l_task_fac = "abrechenbare Aufgaben";
-$l_task_int = "interne Aufgaben";
-$l_task_div = "nicht abrechenbare Aufgaben";
+// Tasktype groups
+$l_tt = "Task Type";
+$l_tt_sales = "abrechenbare Aufgaben";
+$l_tt_research = "interne Aufgaben";
+$l_tt_others = "nicht abrechenbare Aufgaben";
 
 // days and months
 $l_monthsofyear = array (	'January','February',

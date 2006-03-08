@@ -205,7 +205,7 @@ function get_param_ref() {
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   // Admin - generic fields
-  if (isset ($tf_name)) $ref["name"] = $tf_name;
+  if (isset ($tf_name)) $ref["name"] = trim($tf_name);
 
   // Admin - Data Source fields
   if (isset ($sel_dsrc)) $ref["datasource"] = $sel_dsrc;
@@ -224,7 +224,7 @@ function get_param_ref() {
 
   // Admin - Task Type fields
   if (isset ($sel_tt)) $ref["tasktype"] = $sel_tt;
-  if (isset ($tf_label)) $ref["label"] = $tf_label;
+  if (isset ($tf_label)) $ref["label"] = trim($tf_label);
   if (isset ($rd_tt_internal)) $ref["internal"] = $rd_tt_internal;
 
   if (debug_level_isset($cdg_param)) {

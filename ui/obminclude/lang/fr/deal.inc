@@ -13,7 +13,6 @@ $l_label = "Label";
 $l_date_init = "Date Debut";
 $l_parentdeal = "SurAffaire";
 $l_kind = "Type";
-$l_tt = "Type de tâche";
 $l_marketing_manager = "Resp Commercial";
 $l_technical_manager = "Resp Technique";
 $l_date_proposal = "Date de proposition";

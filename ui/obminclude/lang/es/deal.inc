@@ -13,7 +13,6 @@ $l_label = "Etiqueta";
 $l_date_init = "Fecha de inicio";
 $l_parentdeal="Negocio original (Padre)";
 $l_kind = "Tipo";
-$l_tt = "Tipo de Tarea";
 $l_marketing_manager = "Gerente de Mercadeo";
 $l_technical_manager = "Gerente Técnico";
 $l_date_proposal = "Fecha de Propuesta";

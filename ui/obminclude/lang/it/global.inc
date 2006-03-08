@@ -129,6 +129,12 @@ $l_fill_priority = "Scrivi priorita.";
 $l_fill_date = "Scrivi prima Data.";
 $l_invalid_date = "Formato data non valido (GG/MM/AAAA ou AAAA-MM-GG).";
 
+// Tasktype groups
+$l_tt = "Tipo di Operazione";
+$l_tt_sales = "Operazione Factured";
+$l_tt_research = "Operazione di richerca";
+$l_tt_others = "Operazione Interna";
+
 // Days and months
 $l_monthsofyear = array ('Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug','Agosto', 'Settembre','Ottobre','Novembre', 'Dicembre');
 $l_monthsofyearshort = array ('Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic');

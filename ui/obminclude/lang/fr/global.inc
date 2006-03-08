@@ -152,9 +152,10 @@ $l_fill_date = "La date doit être renseignée.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 
 // tasktype groups
-$l_task_fac = "Taches Facturées";
-$l_task_int = "Projets Internes";
-$l_task_div = "Tâches Non Facturées";
+$l_tt = "Type de tâche";
+$l_tt_sales = "Taches Facturées";
+$l_tt_research = "Projets Internes";
+$l_tt_others = "Tâches Non Facturées";
 
 // Days and months
 $l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août', 'Septembre','Octobre','Novembre', 'Décembre');

@@ -94,7 +94,3 @@ $l_tt_can_delete = "El Tipo de Tarea puede ser borrado !";
 $l_j_tt_delete = "Debe escoger el Tipo de Tarea para seleccionar o borrarlo !";
 $l_j_tt_update = "Debe escoger a Tipo de Tarea  e ingresar un nuevo nombre para actualizarlo !";
 $l_j_tt_create = "Debe ingresar el nombre del Tipo de Tarea para crearlo !";
-
-$l_tt_sales = "Tarea de Cliente";
-$l_tt_research = "Proyecto Interno";
-$l_tt_others = "Otra tarea";

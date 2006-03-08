@@ -7,10 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-//for list
-$l_task_fac = "Impegni comuni";
-$l_task_int = "Impegni interni";
-
 // Database fields
 $l_date_init = "Data inizio";
 $l_parentdeal="Impegno";

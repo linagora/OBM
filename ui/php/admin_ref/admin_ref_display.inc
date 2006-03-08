@@ -530,8 +530,8 @@ function dis_datasource_links($ref) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_tasktype_index() {
 
-  $tt_q = run_query_tasktype();
-  $block = html_tasktype_form($tt_q);
+  $tts = get_tasktype();
+  $block = html_tasktype_form($tts);
 
   return $block;
 }
@@ -540,28 +540,33 @@ function dis_tasktype_index() {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Task Type section
 // Parameters:
-//   - $tt_q : Task Type list database object
+//   - $tts : Task Type array
 ///////////////////////////////////////////////////////////////////////////////
-function html_tasktype_form($tt_q) {
+function html_tasktype_form($tts) {
   global $l_tt_manage, $l_tt_exist, $l_tt_no;
   global $l_tt_checkdelete, $l_tt_update, $l_tt_new, $l_tt_insert;
+  global $ctt_sales, $ctt_research, $ctt_others;
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
-  $tt_list = array($l_tt_sales, $l_tt_research, $l_tt_others);
+  $tt_list = array($ctt_sales => $l_tt_sales,
+		     $ctt_research => $l_tt_research,
+		     $ctt_others => $l_tt_others);
 
-  if ($tt_q->num_rows() > 0) {
-    $sel_tt = "<select name=\"sel_tt\" onChange=\"
+  $type_prec = -1;
+  $sel_tt = "<select name=\"sel_tt\" onChange=\"
       forms.form_tt_update.tf_label.value=this.options[this.selectedIndex].text;\" size=\"16\">";
-    while ($tt_q->next_record()) {
-      $id = $tt_q->f("tasktype_id");
-      $label = $tt_q->f("tasktype_label");
-      $int = $tt_q->f("tasktype_internal");
-      //put menu titles
-      if ($int != $cur_type) {
-	$sel_tt .= "<option disabled=\"disabled\">".$tt_list[$int]."</option>";
-	$cur_type = $int;
+  if (is_array($tts)) {
+    foreach ($tts as $id=>$one_tt) {
+      $tt_label = $one_tt["label"];
+      $internal = $one_tt["internal"];
+      // put menu titles
+      if ($internal != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$tt_list[$internal]."</option>";
+	$type_prec = $internal;
       }
-      $sel_tt .= "\n<option value=\"$id\">&nbsp;&nbsp;$label</option>";
+      $sel_tt .= "\n<option value=\"$id\"";
+      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= ">&nbsp;&nbsp;$tt_label</option>\n";
     }
     $sel_tt .= "</select>";
 

@@ -41,6 +41,13 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
+// If home page has a redirection
+if ($c_home_redirect != "") {
+  header("Status: 301 OK");
+  header("Location: $c_home_redirect");
+  exit();
+ }
+
 $display["head"] = display_head("OBM Version $obm_version");
 $display["header"] = display_menu("");
 $display["title"] = "

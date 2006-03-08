@@ -541,8 +541,10 @@ function dis_time_list_result($task_q,$prefs,$time) {
 function dis_form_addtask($time, $validate_days) {
   global $auth, $extra_js, $l_add, $l_update, $c_undef, $l_undef, $l_close;
   global $l_fill_addtask, $l_comment, $l_date, $l_project, $l_duration;
-  global $l_header_tasktype, $l_task_fac, $l_task_div, $l_task_int, $l_intern;
+  global $l_header_tasktype, $l_intern;
   global $c_day_fraction, $c_working_days, $c_week_first_day;
+  global $ctt_sales, $ctt_research, $ctt_others;
+  global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $action = $time["action"];
   $project_q = run_query_project($time);
@@ -552,7 +554,6 @@ function dis_form_addtask($time, $validate_days) {
   $d_start_week = first_day_week($time["date"]);  
   $work_day_dates = get_week_working_days_dates($d_start_week);
 
-  $task_list  = array($l_task_fac, $l_task_int, $l_task_div);
   $cpt_end = $c_week_first_day + 7;
   
   // get different attribute for task to be modify
@@ -688,8 +689,11 @@ function dis_form_addtask($time, $validate_days) {
   )
 ";
 
-
   // TaskType select construction
+  $task_list = array($ctt_sales=>$l_tt_sales,
+		     $ctt_research=>$l_tt_research,
+		     $ctt_others=>$l_tt_others);
+
   $type_prec = -1;
   $sel_tt = "
     <select name=\"sel_tasktype\"
@@ -698,13 +702,14 @@ function dis_form_addtask($time, $validate_days) {
   for ($i=0; $i<2; $i++) {
     $tt_q = $tasktype_q[$i];
     while($tt_q->next_record()) {
-      //put menu titles
-      if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
-	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
-	$type_prec = $task_i;
-      }
       $tt_id = $tt_q->f("tasktype_id");
       $tt_label = $tt_q->f("tasktype_label");
+      $tt_internal = $tt_q->f("tasktype_internal");
+      //put menu titles
+      if ($tt_internal != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+	$type_prec = $tt_internal;
+      }
       $sel_tt .= "\n<option value=\"$tt_id\"";
       if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
       $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";

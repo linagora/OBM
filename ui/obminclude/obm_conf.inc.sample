@@ -22,6 +22,9 @@ $obmdb_password = "obm";
 $cgp_host = "http://obm/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
+// Home page redirection
+//$c_home_redirect = "$cgp_host" . "agenda/agenda_index.php";
+
 // Use specific site includes
 //$cgp_site_include = true;
 

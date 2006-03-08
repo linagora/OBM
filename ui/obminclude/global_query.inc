@@ -161,8 +161,9 @@ function run_query_contactfunction() {
 //               "all" or ""  return all tasktype
 //               "project" "  return tasktype from $ctt_sales and $ctt_research
 //               one category return the category
+// Returns : tasktype array [id] => [label],[internal]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype($tt_cat="") {
+function get_tasktype($tt_cat="") {
   global $cdg_sql, $ctt_sales, $ctt_research;
 
   $query = "
@@ -186,7 +187,16 @@ function run_query_tasktype($tt_cat="") {
   display_debug_msg($query, $cdg_sql, "run_query_tasktype");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  return $obm_q;
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("tasktype_id");
+    $label = $obm_q->f("tasktype_label");
+    $internal = $obm_q->f("tasktype_internal");
+    $tt[$id] = array ("label" => $label,
+		      "internal" => $internal);
+  }
+
+  return $tt;
 }
 
 

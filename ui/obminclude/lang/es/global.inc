@@ -150,9 +150,10 @@ $l_fill_date = "Debe ingresar la fecha";
 $l_invalid_date = "Formato de fecha inválido (DD/MM/AAAA ou AAAA-MM-DD)";
 
 // tasktype groups
-$l_task_fac = "Tareas Facturadas";
-$l_task_int = "Internal Proyecto";
-$l_task_div = "No hay Tareas Facturadas";
+$l_tt = "Tipo de Tarea";
+$l_tt_sales = "Tareas Facturadas";
+$l_tt_research = "Proyecto Interno";
+$l_tt_others = "Otra tarea";
 
 // Days and months
 $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');

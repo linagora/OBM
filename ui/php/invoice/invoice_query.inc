@@ -18,6 +18,7 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   $ht = $invoice["ht"];
   $ttc = $invoice["ttc"];
   $status = $invoice["status"];
+  $tt = $invoice["tt"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
   $dateexp_after = $invoice["dateexp_after"];
@@ -65,8 +66,13 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   if ($dateexp_before != "") {
     $where .= " AND invoice_expiration_date <= '$dateexp_before'";
   }
-  if (($inout != "") && ($inout != "$c_all")){
+  if (($inout != "") && ($inout != "$c_all")) {
     $where .= " AND invoice_inout = '$inout'";
+  }
+  if (($tt != '') && ($tt != "$c_all")){
+    $where .= " AND project_tasktype_id = '$tt'";
+    $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
+    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($comp_id != "") {
     $where .= " AND invoice_company_id = '$comp_id'";
@@ -82,7 +88,7 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   if ($deal_id != "") {
     $where .= " AND (invoice_deal_id = '$deal_id'
                      OR project_deal_id = '$deal_id')";
-    $join_deal = "LEFT JOIN Project on invoice_project_id=project_id";
+    $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
   }
   if ($proj_id != "") {
     $where .= " AND invoice_project_id = '$proj_id'";
@@ -105,17 +111,17 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
       project_id, project_name as invoice_project,
       invoicestatus_id, invoicestatus_label as invoice_status
     FROM Invoice
+      LEFT JOIN InvoiceStatus ON invoice_status_id = invoicestatus_id
       LEFT OUTER JOIN Company ON invoice_company_id = company_id
       LEFT OUTER JOIN Deal ON invoice_deal_id = deal_id
-      LEFT OUTER JOIN Project ON invoice_project_id = project_id
-      LEFT JOIN InvoiceStatus ON invoice_status_id = invoicestatus_id
+      LEFT JOIN Project on invoice_project_id=project_id
     $whereq
     $orderq
     $limit
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Invoice $join_comp $join_deal $whereq");
+    $count = get_query_count("SELECT count(*) FROM Invoice $join_comp $join_deal $join_project $whereq");
     $obm_q->set_num_rows_total($count);
   }
 

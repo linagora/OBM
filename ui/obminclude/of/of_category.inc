@@ -349,8 +349,9 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
 	  break;
       }
     }
-    $block .= _of_category_dis_tree_node($tree, 0, $multi_select);
-
+    if (is_array($tree)) {
+      $block .= _of_category_dis_tree_node($tree, 0, $multi_select);
+    }
   } else {
     $block .= "$l_cat_no";
   }
@@ -1268,10 +1269,12 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
   }
 
   // Display the node children if it has any
-  foreach ($tree as $level => $info) {
-    if ("$level" != "code" && "$level" != "label" && "$level" != "id") {    
-      $content .= _of_category_dis_tree_node($info, $indent_file, $multi);
-      $has_child = true;
+  if (is_array($tree)) {
+    foreach ($tree as $level => $info) {
+      if ("$level" != "code" && "$level" != "label" && "$level" != "id") {
+	$content .= _of_category_dis_tree_node($info, $indent_file, $multi);
+	$has_child = true;
+      }
     }
   }
 
