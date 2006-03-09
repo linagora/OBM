@@ -431,7 +431,7 @@ function calendar(DateName, IsoDate, ChkDate) {
     writeln('<span id=\"' + DateName + '_DayTable_ID\">' + eval(DateName + '_Object.buildCalendar()') + '</span>');
     
     // Today link
-    writeln('<span id=\"' + DateName + '_TODAY\"><table width=\"' + (CellWidth * 7) + '\" cellspacing=\"0\" cellpadding=\"1\"><tr class=\"calendarDateInputHead\"><td align=\"center\"  class=\"calendarDateInput\" onClick=\"' + DateName + '_Object.displayed.goCurrent()\">Aujourd\'hui</td></tr></table></span>');
+    writeln('<span id=\"' + DateName + '_TODAY\"><table width=\"' + (CellWidth * 7) + '\" cellspacing=\"0\" cellpadding=\"1\"><tr class=\"calendarDateInputHead\"><td align=\"center\"  class=\"calendarDateInput\" onClick=\"' + DateName + '_Object.displayed.goCurrent()\">$l_today</td></tr></table></span>');
     
     writeln('</span>');
 
@@ -471,7 +471,7 @@ function live_check_date(date_field, datecompare) {
     M = isosplit[1];
     D = isosplit[2];
   } else {
-    date = dateinput.replace(/(-|\.|\/)/g, \"\");
+    date = trim(dateinput.replace(/(-|\.|\/)/g, \"\"));
     datelength = date.length;
     if(!isNaN(date)) {
       // Case 1 : DMY

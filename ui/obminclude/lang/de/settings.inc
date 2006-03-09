@@ -37,6 +37,9 @@ $l_da_en = "mm/dd/yyyy";
 $l_da_fr = "dd/mm/yyyy";
 $l_da_txt = "dd month yyyy";
 
+$l_da_dmy = "dmy";
+$l_da_mdy = "mdy";
+
 $l_me_txt = "text";
 $l_me_ico = "icon";
 $l_me_both = "text+icon";
@@ -44,3 +47,6 @@ $l_me_both = "text+icon";
 // Comment order
 $l_co_chro = "Chronologisch";
 $l_co_rev = "Invers";
+
+$l_csvd_sc = ";";
+$l_csvd_tab = "tab";

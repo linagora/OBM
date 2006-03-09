@@ -148,7 +148,7 @@ $l_fill_label = "You have to fill the label";
 $l_fill_status = "You have to fill the status";
 $l_fill_priority = "You have to fill the priority";
 $l_fill_date = "The date must be filled";
-$l_invalid_date = "Invalid date format (MM/JJ/AAAA ou AAAA-MM-JJ)";
+$l_invalid_date = "Invalid date format";
 $l_invalid_date_day = "Invalide day";
 $l_invalid_date_month = "Invalid month";
 $l_invalid_date_year = "Invalid year";
@@ -160,6 +160,7 @@ $l_tt_research = "Internal Projects";
 $l_tt_others = "Not Factured Tasks";
 
 // Days and months
+$l_today = "Today";
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
 $l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
 $l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');

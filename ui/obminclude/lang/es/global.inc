@@ -147,7 +147,7 @@ $l_help_up = "Mover el campo arriba";
 // Javascript common messages
 $l_fill_label = "Tiene que proveer una etiqueta";
 $l_fill_date = "Debe ingresar la fecha";
-$l_invalid_date = "Formato de fecha inválido (DD/MM/AAAA ou AAAA-MM-DD)";
+$l_invalid_date = "Formato de fecha inválido";
 
 // tasktype groups
 $l_tt = "Tipo de Tarea";
@@ -156,6 +156,7 @@ $l_tt_research = "Proyecto Interno";
 $l_tt_others = "Otra tarea";
 
 // Days and months
+$l_today = "Hoy";
 $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
 $l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic');
 $l_daysofweek = array ('Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sábado');

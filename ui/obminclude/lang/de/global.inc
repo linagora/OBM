@@ -113,7 +113,7 @@ $l_no_document_added = "keine Dokumente hinzugefügt";
 // Javascript common messages
 $l_fill_label = "Label muß eingetragen sein";
 $l_fill_date = "Datum muß eingetragen sein";
-$l_invalid_date = "Falsches Datumsformat (ISO/DIN JJJJ-MM-TT oder lokale Einstellung)";
+$l_invalid_date = "Falsches Datumsformat";
 
 // Tasktype groups
 $l_tt = "Task Type";
@@ -122,16 +122,17 @@ $l_tt_research = "interne Aufgaben";
 $l_tt_others = "nicht abrechenbare Aufgaben";
 
 // days and months
-$l_monthsofyear = array (	'January','February',
-				'March','April','May',
-				'June','July','August',
-				'September','October','November',
-				'December');
-$l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun',
-			      'jul','aug','sep','oct','nov','dec');
-$l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
-$l_daysofweekshort = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
-$l_daysofweekfirst = array ('S','M','T','W','T','F','S');
+$l_today = "Heute";
+$l_monthsofyear = array (	'Januar','Februar',
+				'März','April','Mai',
+				'Juni','Juli','August',
+				'September','Oktober','November',
+				'Dezember');
+$l_monthsofyearshort = array ('jan','feb','mar','apr','mai','jun',
+			      'jul','aug','sep','okt','nov','dez');
+$l_daysofweek = array('Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag');
+$l_daysofweekshort = array('So','Mo','Di','Mi','Do','Fr','Sa');
+$l_daysofweekfirst = array ('S','M','D','M','D','F','S');
 
 $l_invalid_perm = "keine Berechtigung";
 

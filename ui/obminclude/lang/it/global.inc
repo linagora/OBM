@@ -127,7 +127,7 @@ $l_fill_label = "Scrivi prima nome.";
 $l_fill_status = "Scrivi stato.";
 $l_fill_priority = "Scrivi priorita.";
 $l_fill_date = "Scrivi prima Data.";
-$l_invalid_date = "Formato data non valido (GG/MM/AAAA ou AAAA-MM-GG).";
+$l_invalid_date = "Formato data non valido.";
 
 // Tasktype groups
 $l_tt = "Tipo di Operazione";
@@ -136,6 +136,7 @@ $l_tt_research = "Operazione di richerca";
 $l_tt_others = "Operazione Interna";
 
 // Days and months
+$l_today = "Oggi";
 $l_monthsofyear = array ('Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug','Agosto', 'Settembre','Ottobre','Novembre', 'Dicembre');
 $l_monthsofyearshort = array ('Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic');
 $l_daysofweek = array ('Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato');

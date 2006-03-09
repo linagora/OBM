@@ -81,6 +81,7 @@ $l_tt_resaerch = "Internal Projects";
 $l_tt_others = "Not Factured Tasks";
 
 // Days and months
+$l_today = "Today";
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
 $l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
 $l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');

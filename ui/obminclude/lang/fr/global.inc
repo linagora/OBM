@@ -161,6 +161,7 @@ $l_tt_research = "Projets Internes";
 $l_tt_others = "Tâches Non Facturées";
 
 // Days and months
+$l_today = "Aujourd\'hui";
 $l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août', 'Septembre','Octobre','Novembre', 'Décembre');
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc');
 $l_daysofweek = array ('Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi');
