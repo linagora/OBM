@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.1.3pre2";
+$obm_version = "1.2.0pre1";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -696,9 +696,9 @@ function get_month($timestamp="") {
 function get_day($timestamp="") {
 
   if ($timestamp != "")
-    $date = date("m", $timestamp);
+    $date = date("d", $timestamp);
   else
-    $date = date("m");
+    $date = date("d");
 
   return $date;
 }
