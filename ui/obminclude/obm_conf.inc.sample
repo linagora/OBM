@@ -83,7 +83,7 @@ $password_encryption = "md5";
 // Modules specific parameters ----------------------------------------------//
 
 // Company and Contact : Copy address to clipboard
-$cclipboard_address = array ('address1' , 'address2', 'address3', 'zipcode', 'town', 'expresspostal', 'country', 'phone', 'fax', 'mobile', 'email', 'web');
+$cclipboard_address = array ('title', 'address1' , 'address2', 'address3', 'zipcode', 'town', 'expresspostal', 'country', 'phone', 'fax', 'mobile', 'email', 'web');
 
 // Company : Auto format fields
 $caf_company_name = true;

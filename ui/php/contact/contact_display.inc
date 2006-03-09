@@ -812,6 +812,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
 
   $id = $co_q->f("contact_id");
+  $title = $co_q->f("contact_title");
   $c_name = $co_q->f("company_name");
   $c_phone = $co_q->f("company_phone");
   $c_fax = $co_q->f("company_fax");
@@ -905,7 +906,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   $block_category4 = of_category_dis_block_consult("contact", "category4", $cats4);
 
   $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
-  if ($title != "") {
+  if (($title != "")  && (in_array("title", $cclipboard_address))) {
     $copy .= addslashes($title) . $newline;
   }
   if ($c_name != "") {
