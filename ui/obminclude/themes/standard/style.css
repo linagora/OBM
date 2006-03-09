@@ -833,6 +833,26 @@ td.calendarThisDay:hover {
 	color: #FFF;
 }
 
+.calendarOldDay {
+	text-decoration : line-through;
+	color : #DDD;
+	cursor:default;
+}
+
+.calendarTodayLink {
+	letter-spacing:normal;
+	line-height:normal;
+	text-align:center;
+	font-family:	sans-serif;
+	font-size:12px;
+	height:14px;
+	width:30px;
+	cursor:default;
+	font-weight:bold;
+	border-top:1px solid #CCC;
+	cursor : pointer;
+}
+
 .calendarDateInput {
 	letter-spacing:normal;
 	line-height:normal;
@@ -840,7 +860,7 @@ td.calendarThisDay:hover {
 	text-align:center;
 	font-size: 12px;
 	height:14px;
-	cursor:default;
+	cursor:pointer;
 }
 
 .calendarDateInputDay {
@@ -870,4 +890,3 @@ td.calendarThisDay:hover {
 	background-color:#FFF;
 	border:1px solid #CCC;
 }
-

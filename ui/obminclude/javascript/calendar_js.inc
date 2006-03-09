@@ -43,6 +43,7 @@ var DayPart = Today.getDate();
 var MonthNames = eval($MonthNames);
 var MonthDays = new Array(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 var WeekDays = eval($WeekDays);
+var NbDays = WeekDays.length;
 var MaxLength = 10; // Input maxlength
 var InputSize = 10; // Input size
 
@@ -140,16 +141,22 @@ function BuildCalendarDays() {
               && (this.displayed.firstDay == 0)) {
     Rows = 4;
   }
-  var HTML = '<table width=\"' + (CellWidth * 7) + '\" cellspacing=\"0\" cellpadding=\"1\">';
+  var Style='';
+  var HTML = '<table width=\"' + (CellWidth * NbDays) + '\" cellspacing=\"0\" cellpadding=\"1\">';
   for (var j=0;j<Rows;j++) {
     HTML += '<tr>';
-    for (var i=1;i<=7;i++) {
-      Day = (j * 7) + (i - this.displayed.firstDay);
+    for (var i=1;i<=NbDays;i++) {
+      Day = (j * NbDays) + (i - this.displayed.firstDay);
       if ((Day >= 1) && (Day <= this.displayed.dayCount)) {
         if ((this.displayed.yearValue == YearPart)
             && (this.displayed.monthIndex == MonthPart)
             && (Day == DayPart)) {
           Class =  'calendarThisDay';
+        } else if ((this.displayed.yearValue < YearPart)
+            || ((this.displayed.monthIndex == MonthPart)
+            && (Day < DayPart) && (this.displayed.yearValue == YearPart)) 
+            || (this.displayed.yearValue == YearPart) && (this.displayed.monthIndex < MonthPart)) {
+            Class = 'calendarOldDay';
         } else {
           Class =  'calendarDateInputHover';
         }
@@ -398,7 +405,6 @@ function calendar(DateName, IsoDate, ChkDate) {
     // Display date field
     // ************************************************
     writeln('<input  type=\"text\" name=\"'+DateName+'\" id=\"'+DateName+'\" value=\"' + IsoDate + '\" size=\"'+InputSize+'\" maxlength=\"'+MaxLength+'\" onchange=\"live_check_date('+DateName+', '+ChkDate+');\">');
-    // writeln('<input  type=\"text\" name=\"'+DateName+'\" id=\"'+DateName+'\" value=\"' + IsoDate + '\" size=\"'+InputSize+'\" maxlength=\"'+MaxLength+'\">');
 
     // ************************************************
     // Open calendar image link
@@ -408,9 +414,9 @@ function calendar(DateName, IsoDate, ChkDate) {
     // ************************************************
     // Calendar
     // ************************************************
-    writeln('<span id=\"' + DateName + '_ID\" style=\"position:absolute;visibility:hidden;width:' + (CellWidth * 7) + 'px;\" class=\"calendarSpan\" onMouseOver=\"' + DateName + '_Object.handleTimer(true)\" onMouseOut=\"' + DateName + '_Object.handleTimer(false)\">');
+    writeln('<span id=\"' + DateName + '_ID\" style=\"position:absolute;visibility:hidden;width:' + (CellWidth * NbDays) + 'px;\" class=\"calendarSpan\" onMouseOver=\"' + DateName + '_Object.handleTimer(true)\" onMouseOut=\"' + DateName + '_Object.handleTimer(false)\">');
     
-    writeln('<table width=\"' + (CellWidth * 7) + '\" cellspacing=\"0\" cellpadding=\"1\"><tr class=\"calendarDateInputHead\">');
+    writeln('<table width=\"' + (CellWidth * NbDays) + '\" cellspacing=\"0\" cellpadding=\"1\"><tr class=\"calendarDateInputHead\">');
 
     // Previous button
     writeln('<td class=\"calendarDateInput \" id=\"' + DateName + '_Previous_ID\" onClick=\"' + DateName + '_Object.previous.go()\"><img src=\"' + PrevURL + '\"></td>');
@@ -422,7 +428,7 @@ function calendar(DateName, IsoDate, ChkDate) {
     writeln('<td id=\"' + DateName + '_Next_ID\" class=\"calendarDateInput\" onClick=\"' + DateName + '_Object.next.go()\"><img src=\"' + NextURL + '\"></td></tr><tr>');
 
     // Display days label
-    for (var w=0;w<7;w++) { 
+    for (var w=0;w<NbDays;w++) { 
       writeln('<td class=\"calendarDateInputDay\">' + WeekDays[w] + '</td>');
     }
     writeln('</tr></table>');
@@ -431,10 +437,14 @@ function calendar(DateName, IsoDate, ChkDate) {
     writeln('<span id=\"' + DateName + '_DayTable_ID\">' + eval(DateName + '_Object.buildCalendar()') + '</span>');
     
     // Today link
-    writeln('<span id=\"' + DateName + '_TODAY\"><table width=\"' + (CellWidth * 7) + '\" cellspacing=\"0\" cellpadding=\"1\"><tr class=\"calendarDateInputHead\"><td align=\"center\"  class=\"calendarDateInput\" onClick=\"' + DateName + '_Object.displayed.goCurrent()\">$l_today</td></tr></table></span>');
+    writeln('<span id=\"' + DateName + '_TODAY\">');
+    writeln('<table width=\"' + (CellWidth * NbDays) + '\" cellspacing=\"0\" cellpadding=\"1\">');
+    writeln('<tr class=\"calendarDateInputHead\">');
+    writeln('<td align=\"center\" class=\"calendarTodayLink\" onClick=\"' + DateName + '_Object.displayed.goCurrent()\">$l_today');
+    writeln('</td></tr></table></span>');
     
+    // Close calendar span tag    
     writeln('</span>');
-
   }
 }
 
@@ -539,7 +549,7 @@ function live_check_date(date_field, datecompare) {
     // write iso date in date_compare field
     if(datecompare) {
       if(datecompare.value < date_field.value ) {
-        datecompare.value = Y + Delimiter + M + Delimiter +D;
+        datecompare.value = date_field.value;
       }
     }
     return true;
