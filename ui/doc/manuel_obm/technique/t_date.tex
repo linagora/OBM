@@ -34,7 +34,13 @@ Voir :
 \obm reçoit les dates à insérer en BD au format ISO ``\textbf{AAAA-MM-JJ HH:MM:SS}''
 &
 La BD doit accepter en entrée des dates au format ISO.
-A noter que la fonction javascript globale \fonction{check\_date()} permet aussi de saisir les dates au format du pays (JJ/MM/AAAA ou MM/JJ/AAAA). Cette fonction est définie dans le fichier de langue \fichier{check\_date.js}\\
+La fonction \fonction{calendar()} permet de générer les champs de saisie de date. Un champ de date est divisé en deux parties:
+\begin{itemize}
+\item Un champ de saisie
+\item Un popup calendrier
+\end{itemize}
+La fonction javascript \fonction{live\_check\_date()} permet de convertir la date saisie au format ISO. Ces fonctions sont définies dans le fichier \fichier{calendar\_js.inc}
+\\
 \hline
 OBM acceptant en simultané des langues différentes pour les utilisateurs, propose des labels pour le nom des mois, et jours de semaine.
 &
