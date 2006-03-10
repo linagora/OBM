@@ -3,7 +3,7 @@
   <table class="detail">
     <tr>
       <td class="detailLabel">$l_address 1
-        <a href="javascript: return false;" onclick="copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="/images/$set_theme/$ico_clipboard" /></a>
+        <a href="javascript: return false;" onclick="company_copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="/images/$set_theme/$ico_clipboard" /></a>
       </td>
       <td class="detailText">$ad1</td>
     </tr>

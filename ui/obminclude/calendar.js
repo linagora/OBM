@@ -2,7 +2,7 @@
 $extra_js .= "
 var calendarWindow = null;
 var calendarColors = new Array();
-calendarColors['bgColor'] = '#BDC5D0';
+calendarColors['bgColor'] = '#000';
 calendarColors['borderColor'] = '#333366';
 calendarColors['headerBgColor'] = '#143464';
 calendarColors['headerColor'] = '#FFFFFF';

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_display.php                                          //
 //     - Desc : Contact Display File                                         //
@@ -1038,7 +1038,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
     </tr><tr>
       <td class=\"detailLabel\">
       $l_address 1
-      <a href=\"javascript: return false;\" onclick=\"copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
+      <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
       </td>
       <td class=\"detailText\">$ad1</td>
     </tr><tr>
@@ -1169,7 +1169,7 @@ function html_contact_links($id) {
 
   // Publication  
   if ($cgp_show["module"]["publication"]) {
-    $nb_subscription = run_query_subscription_nb($id);
+    $nb_subscription = run_query_contact_subscription_nb($id);
     $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;param_contact=$id");
     $url = urlencode($url_subscription);
     $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1&amp;ext_url=$url");
@@ -1219,7 +1219,7 @@ function dis_contact_form($action, $co_q, $contact) {
     $cats4 = of_category_get_ordered("contact", "category4", "multi", $cid);
   }
   $dsrc_q = run_query_global_datasource();
-  $kind_q = run_query_kind();
+  $kind_q = run_query_contact_kind();
   $funcs = of_category_get_ordered("contact", "function");
   $cats5 = of_category_get_ordered("contact", "category5");
 
@@ -1527,10 +1527,10 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
-  onchange=\"fill_select_label(this)\">
+  onchange=\"fill_contact_select_label(this)\">
   <option value=\"$c_undef\">$l_undef</option>";
   $sel_kind_label = "<select name=\"sel_kind_label\" 
-  onchange=\"fill_select_header(this)\">
+  onchange=\"fill_contact_select_header(this)\">
   <option value=\"$c_undef\">$l_undef</option>";
   $sel_kind_header = "<select name=\"sel_kind\">
   <option value=\"$c_undef\">$l_undef</option>";
@@ -1978,7 +1978,7 @@ function dis_can_delete_contact($p_id) {
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    onclick=\"if (confirm_contact_del(this.form)) return true; else return false;\" />
     </form>";
 
   $display["msg"] .= display_ok_msg($l_can_delete);
@@ -1999,7 +1999,7 @@ function dis_can_delete_contact($p_id) {
 function dis_contact_admin_index() {
   global $cgp_hide;
 
-  $kind_q = run_query_kind();
+  $kind_q = run_query_contact_kind();
   $block .= html_contact_kind_form($kind_q);
 
   if (! $cgp_hide["contact"]["contactfunction"]) {
@@ -2112,7 +2112,7 @@ function html_contact_kind_form($kind_q) {
         <td>
           <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
           <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
-            onclick=\"if (check_kind_checkdel(this.form.sel_kind)) return true;
+            onclick=\"if (check_contact_kind_checkdel(this.form.sel_kind)) return true;
             else return false;\" />
         </td>
       </tr>
@@ -2136,7 +2136,7 @@ function html_contact_kind_form($kind_q) {
           <td><input type=\"text\" name=\"tf_lang\" size=\"2\" maxlength=\"2\"/></td>
           <td rowspan=\"3\">
           <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
-            onclick=\"if (check_kind_upd(this.form,document.form_kind_delete.sel_kind)) return true; else return false;\" />
+            onclick=\"if (check_contact_kind_upd(this.form,document.form_kind_delete.sel_kind)) return true; else return false;\" />
           </td>
         </tr>
         <tr>
@@ -2213,7 +2213,7 @@ function html_contact_kind_form($kind_q) {
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
             <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
-              onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_contact_kind_new(this.form)) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -2231,17 +2231,17 @@ function html_contact_kind_form($kind_q) {
 // Parameters:
 //   - $ref : kind hash info : keys used : id, name
 ///////////////////////////////////////////////////////////////////////////////
-function dis_kind_links($ref) {
+function dis_contact_kind_links($ref) {
   global $display, $l_back, $l_kind_link_company, $l_kind_link_company_no;
   global $l_kind_link_contact, $l_kind_link_contact_no;
   global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
 
   $delete_ok = true;
   $id = $ref["kind"];
-  $name = get_kind_label($id);
+  $name = get_contact_kind_label($id);
 
   // Contacts Links
-  $obm_q = run_query_kind_links($id);
+  $obm_q = run_query_contact_kind_links($id);
   $nb_kind = $obm_q->num_rows();
   if ($nb_kind > 0) {
     $delete_ok = false;
@@ -2338,7 +2338,7 @@ function dis_contact_display_pref($prefs) {
 //   - $contact[] : contact id
 //     keys used  : contact_id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_vcard_export($contact) {
+function dis_contact_vcard_export($contact) {
   global $display, $path, $l_query_error;
   global $auth;
 
@@ -2348,7 +2348,7 @@ function dis_vcard_export($contact) {
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
-  export_vcard($con_q,$com_q);
+  export_contact_vcard($con_q,$com_q);
 }
 
 
@@ -2357,7 +2357,7 @@ function dis_vcard_export($contact) {
 // Parameters:
 //   - $con_q : : DBO : information about the contact
 ///////////////////////////////////////////////////////////////////////////////
-function export_vcard($co_q,$com_q) {
+function export_contact_vcard($co_q,$com_q) {
 
   $id = $co_q->f("contact_id");
   $kind_header = $co_q->f("kind_header");
@@ -2525,4 +2525,4 @@ function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $fu
   return $block;
 }
 
-</script>
+?>

@@ -79,7 +79,7 @@ function run_query_company_contact_number_update($comp_id) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource() {
+function run_query_global_datasource() {
   global $cdg_sql;
 
   $query = "SELECT * FROM DataSource ORDER BY datasource_name"; 
@@ -96,7 +96,7 @@ function run_query_datasource() {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_for_lang() {
+function run_query_global_country_for_lang() {
   global $cdg_sql;
 
   $lang = get_lang();
@@ -116,7 +116,7 @@ function run_query_country_for_lang() {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country() {
+function run_query_global_country() {
   global $cdg_sql;
 
   $query = "SELECT * FROM Country
@@ -163,7 +163,7 @@ function run_query_contactfunction() {
 //               one category return the category
 // Returns : tasktype array [id] => [label],[internal]
 ///////////////////////////////////////////////////////////////////////////////
-function get_tasktype($tt_cat="") {
+function get_global_tasktype($tt_cat="") {
   global $cdg_sql, $ctt_sales, $ctt_research;
 
   $query = "

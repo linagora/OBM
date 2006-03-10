@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : backup_query.inc                                             //
 //     - Desc : Backup query File                                            //
@@ -45,7 +45,7 @@ function get_backup_list($backup) {
 ///////////////////////////////////////////////////////////////////////////////
 // Backup Creation
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_create() {
+function run_query_backup_create() {
   global $err_msg, $l_create_backup_error, $l_err_unknown_db;
   global $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
   global $db_type_mysql, $db_type_pgsql;
@@ -82,7 +82,7 @@ function run_query_create() {
 ///////////////////////////////////////////////////////////////////////////////
 // Backup Restore
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_restore($filename) {
+function run_query_backup_restore($filename) {
   global $err_msg, $l_err_backup_file, $l_err_unknown_db;
   global $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
   global $db_type_mysql, $db_type_pgsql;
@@ -159,11 +159,11 @@ function run_query_restore($filename) {
 // Parameters:
 //   - $filename : backup filename
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($filename) {
+function run_query_backup_delete($filename) {
   global $err_msg;
 
   // Delete the backup file
-  $retour = run_query_delete_backup_file($filename);
+  $retour = run_query_backup_delete_backup_file($filename);
 
   if (! $retour) {
     $err_msg = $l_delete_file_error;
@@ -178,7 +178,7 @@ function run_query_delete($filename) {
 // Parameters:
 //   - $id : id of file to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_backup_file($filename) {
+function run_query_backup_delete_backup_file($filename) {
 
   $disk_path = get_backup_disk_path();
   $disk_fullname = $disk_path . $filename; 
@@ -210,7 +210,7 @@ function get_backup_disk_path() {
 // Returns:
 //   true if backup can be deleted (for now always), else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_backup($filename) {
+function check_backup_can_delete($filename) {
   global $err_msg, $php_regexp_backup, $l_err_backup_name;
 
   $delete_ok = true;
@@ -223,3 +223,5 @@ function check_can_delete_backup($filename) {
 
   return $delete_ok;
 }
+
+?>

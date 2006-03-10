@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : backup_display.inc                                           //
 //     - Desc : Backup Display File                                          //
@@ -214,7 +214,7 @@ function dis_can_delete_backup($filename) {
 ///////////////////////////////////////////////////////////////////////////////
 // Consult File
 ///////////////////////////////////////////////////////////////////////////////
-function dis_file($doc_q) {
+function dis_backup_file($doc_q) {
   global $cdoc_kind_link;
 
   $name = $doc_q->f("document_name");  
@@ -242,3 +242,5 @@ function dis_file($doc_q) {
   }
 
 }
+
+?>

@@ -31,7 +31,7 @@ echo $PHP : PHP interpreter found
 ln -s ../../obminclude/Artichow-1.06-php4+5/ ../../obminclude/Artichow
 
 echo "*** Document repository creation"
-$PHP install_document_1.1.php || (echo $?; exit $?)
+$PHP install_document_1.2.php || (echo $?; exit $?)
 
 
 echo "*** Database creation"

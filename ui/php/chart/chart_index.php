@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : chart_index.inc
 //     - Desc : chart Main file
@@ -176,4 +176,4 @@ function get_param_chart() {
   return $chart;
 }
 
-</script>
+?>

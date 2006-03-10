@@ -484,7 +484,7 @@ function sendDate(month, day, year)
     selectedDate = selectedDate.replace(/y/, year);
     targetDateField.value = selectedDate;
     if(targetDateField.name == 'tf_date_begin'&& targetDateField.form.tf_date_end) 
-    window.opener.changeDateEnd(targetDateField.form);
+    window.opener.agenda_changeDateEnd(targetDateField.form);
     parent.window.close();
     
 }

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_index.php                                            //
 //     - Desc : Contact Index File                                           //
@@ -101,7 +101,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "vcard") {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_vcard_export($contact);
+  dis_contact_vcard_export($contact);
   exit();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -491,7 +491,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_insert($contact);
+  $retour = run_query_contact_kind_insert($contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_kind_insert_ok);
   } else {
@@ -502,7 +502,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_update($contact);
+  $retour = run_query_contact_kind_update($contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_kind_update_ok);
   } else {
@@ -513,11 +513,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_kind_links($contact);
+  $display["detail"] .= dis_contact_kind_links($contact);
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_delete($contact["kind"]);
+  $retour = run_query_contact_kind_delete($contact["kind"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_kind_delete_ok);
   } else {
@@ -1065,4 +1065,5 @@ function update_contact_action() {
   }
 }
 
-</script>
+
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : company_js.inc                                              //
 //     - Desc  : Company javascript functions File                           //
@@ -14,7 +14,7 @@ require("$obminclude/javascript/category_js.inc");
 if (($ext_widget != "") || ($ext_widget_text != "")) {
   $extra_js .= "
 
-function check_get_id(valeur,text) {
+function check_company_get_id(valeur,text) {
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;
@@ -30,7 +30,7 @@ function check_get_id(valeur,text) {
 
 $extra_js .= "
 
-function check_get_id_url(p_url, valeur) {
+function check_company_get_id_url(p_url, valeur) {
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;
@@ -43,7 +43,7 @@ function check_get_id_url(p_url, valeur) {
 }
 
 
-function confirm_del() {
+function confirm_company_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
   else
@@ -101,7 +101,7 @@ function check_company(form) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Naf code check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_naf_checkdel(form) {
+function check_company_naf_checkdel(form) {
 
   if (form.sel_naf.selectedIndex >= 0) {
     return true;
@@ -115,7 +115,7 @@ function check_naf_checkdel(form) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the nafcode update is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_naf_upd(form,formd)
+function check_company_naf_upd(form,formd)
 {
   naf_pos = formd.sel_naf.selectedIndex;
   if ((naf_pos >= 0) && (form.tf_naf_code.value != \"\")) {
@@ -131,7 +131,7 @@ function check_naf_upd(form,formd)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the naf code creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_naf_new(form)
+function check_company_naf_new(form)
 {
    if (form.tf_naf_code.value != \"\")
       return true;
@@ -148,7 +148,7 @@ function check_naf_new(form)
 if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
   
-function fill_ext_code_form(value) {
+function fill_company_ext_code_form(value) {
    ext_field = window.opener.document.$ext_target;
    ext_size = ext_field.length;
    ext_field = window.opener.document.$ext_target;
@@ -166,7 +166,7 @@ function fill_ext_code_form(value) {
 }
 
 $extra_js .= "
-function copy_clip(text)
+function company_copy_clip(text)
 {
 
   if (window.clipboardData) 
@@ -214,3 +214,4 @@ function copy_clip(text)
 
 ";
 
+?>

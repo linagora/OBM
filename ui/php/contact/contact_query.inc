@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_query.inc                                            //
 //     - Desc : contact query File                                           //
@@ -417,7 +417,7 @@ function run_query_contact_company($c_id) {
 // Contact: Kind select query execution
 // Returns : DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind() {
+function run_query_contact_kind() {
   global $cdg_sql;
 
   $query = "SELECT kind_id,
@@ -872,7 +872,7 @@ function run_query_contact_delete($p_id) {
   $c = get_contact_info($p_id);
   $comp_id = $c["company_id"];
   run_query_delete_document_links($p_id, "contact");    
-  run_query_delete_contact_subscription($p_id);    
+  run_query_contact_delete_subscription($p_id);    
 
   $query = "DELETE FROM Contact WHERE contact_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
@@ -901,7 +901,7 @@ function run_query_contact_delete($p_id) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_contact_subscription($p_id) {
+function run_query_contact_delete_subscription($p_id) {
   global $cdg_sql;
 
   $query = "delete from Subscription where subscription_contact_id='$p_id'";
@@ -923,7 +923,7 @@ function run_query_delete_contact_subscription($p_id) {
 //   - $lname   : lastname
 //   - $fname   : firstname
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_contact($cid, $comp_id, $lname, $fname) {
+function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   global $cdg_sql;
 
   $where_id = "";
@@ -969,7 +969,7 @@ function check_contact_context($cid, $contact) {
 
   // return contacts with same lastname and firstname or
   // within the same company with same lname
-  $co_q = run_query_check_contact($cid, $comp, $lname, $fname);
+  $co_q = run_query_contact_check($cid, $comp, $lname, $fname);
 
   return $co_q;
 }
@@ -1143,7 +1143,7 @@ function get_contact_info($con_id) {
 //   - $contact : contact hash info
 //                keys used : kind_label, kind_lang, kind_header
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_insert($contact) {
+function run_query_contact_kind_insert($contact) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -1155,7 +1155,7 @@ function run_query_kind_insert($contact) {
 
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
-    run_query_kind_clear_default($lang);
+    run_query_contact_kind_clear_default($lang);
   }
 
   $query = "INSERT INTO Kind (
@@ -1186,7 +1186,7 @@ function run_query_kind_insert($contact) {
 // Parameters:
 //   - $lang : lang to clear default kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_clear_default($lang) {
+function run_query_contact_kind_clear_default($lang) {
   global $cdg_sql;
 
   $query = "UPDATE Kind
@@ -1207,7 +1207,7 @@ function run_query_kind_clear_default($lang) {
 //   - $contact : contact hash info
 //                keys used : kind_label, kind_lang, kind_header
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_update($contact) {
+function run_query_contact_kind_update($contact) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -1220,7 +1220,7 @@ function run_query_kind_update($contact) {
 
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
-    run_query_kind_clear_default($lang);
+    run_query_contact_kind_clear_default($lang);
   }
 
   $query = "UPDATE Kind SET
@@ -1246,7 +1246,7 @@ function run_query_kind_update($contact) {
 // Parameters:
 //   - $id : Kind id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_delete($id) {
+function run_query_contact_kind_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM Kind WHERE kind_id='$id'";
@@ -1264,7 +1264,7 @@ function run_query_kind_delete($id) {
 // Parameters:
 //   - $id : kind id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_links($id) {
+function run_query_contact_kind_links($id) {
   global $cdg_sql;
 
   $query = "SELECT contact_lastname,
@@ -1287,7 +1287,7 @@ function run_query_kind_links($id) {
 // Parameters:
 //   - $id : kind id
 ///////////////////////////////////////////////////////////////////////////////
-function get_kind_label($id) {
+function get_contact_kind_label($id) {
   global $cdg_sql;
 
   $query = "SELECT kind_lang, kind_minilabel, kind_header
@@ -1309,7 +1309,7 @@ function get_kind_label($id) {
 // Parameters:
 //   - $id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_subscription_nb($id) {
+function run_query_contact_subscription_nb($id) {
   global $cdg_sql;
 
   if ($id != '') {
@@ -1329,5 +1329,4 @@ function run_query_subscription_nb($id) {
   return $retour;
 }
 
-
-</script>
+?>

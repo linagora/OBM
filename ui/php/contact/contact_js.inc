@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : contact_js.inc                                              //
 //     - Desc  : Contact javascript functions File                           //
@@ -12,7 +12,7 @@ require("$obminclude/javascript/category_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
-function confirm_del() {
+function confirm_contact_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
   else
@@ -67,7 +67,7 @@ function check_contact(form) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_checkdel(sel)
+function check_contact_kind_checkdel(sel)
 {
   if (sel.selectedIndex >= 0) {
     return true;
@@ -80,7 +80,7 @@ function check_kind_checkdel(sel)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind update is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_upd(form, sel_del)
+function check_contact_kind_upd(form, sel_del)
 {
   kind_pos = sel_del.selectedIndex;
   if ((kind_pos >= 0) && (form.tf_label.value != \"\")) {
@@ -95,7 +95,7 @@ function check_kind_upd(form, sel_del)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_new(form)
+function check_contact_kind_new(form)
 {
    if ( (trim(form.tf_lang.value) == \"\")
         || (trim(form.tf_label.value) == \"\")
@@ -112,7 +112,7 @@ function check_kind_new(form)
 ///////////////////////////////////////////////////////////////////////////////
 var lang_array;
 
-function fill_select_label(source) 
+function fill_contact_select_label(source) 
 {
   destination = source.form.sel_kind_label;
   kind = source.form.sel_kind;
@@ -138,7 +138,7 @@ function fill_select_label(source)
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the Kind's header select.
 ///////////////////////////////////////////////////////////////////////////////
-function fill_select_header(source) 
+function fill_contact_select_header(source) 
 {
   destination = source.form.sel_kind;
   lang = source.form.sel_kind_lang;
@@ -222,7 +222,7 @@ if (isset($ext_target) && $ext_target!="") {
 }
 
 $extra_js .= "
-function copy_clip(text)
+function contact_copy_clip(text)
 {
 
   if (window.clipboardData) 
@@ -268,4 +268,5 @@ function copy_clip(text)
   return false;
 }
 ";
-</script>
+
+?>

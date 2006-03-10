@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_query.inc                                            //
 //     - Desc : company query File                                           //
@@ -596,7 +596,7 @@ function run_query_companynafcode() {
 // Parameters:
 //   - $company : company hash info : keys used : naf_code, naf_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_nafcode_insert($company) {
+function run_query_company_nafcode_insert($company) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -631,7 +631,7 @@ function run_query_nafcode_insert($company) {
 // Parameters:
 //   - $company : company hash info : keys used : naf_code, naf_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_nafcode_update($company) {
+function run_query_company_nafcode_update($company) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -661,7 +661,7 @@ function run_query_nafcode_update($company) {
 // Parameters:
 //   - $id : Naf code id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_nafcode_delete($id) {
+function run_query_company_nafcode_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM CompanyNafCode WHERE companynafcode_id='$id'";
@@ -679,7 +679,7 @@ function run_query_nafcode_delete($id) {
 // Parameters:
 //   - $p_id : naf code id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_nafcode_links($p_id) {
+function run_query_company_nafcode_links($p_id) {
   global $cdg_sql;
 
   $query = "SELECT company_name, company_id, company_nafcode_id
@@ -699,7 +699,7 @@ function run_query_nafcode_links($p_id) {
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_nafcode_label($id) {
+function get_company_nafcode_label($id) {
   global $cdg_sql;
 
   $query = "SELECT companynafcode_code,
@@ -746,7 +746,7 @@ function check_company_context($cid, $company) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($cid, $company) {
+function check_company_data_form($cid, $company) {
   global $l_fill_name, $l_j_check_phone, $l_j_check_zip, $l_j_check_fax;
   global $l_j_check_email, $l_j_check_web, $l_err_act_empty;
   global $err_msg;
@@ -871,4 +871,4 @@ function check_can_delete_company($p_id) {
 }
 
 
-</script>
+?>

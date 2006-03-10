@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //
@@ -125,7 +125,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $params)) {
+  if (check_company_data_form("", $params)) {
 
     // If the context (same companies) was confirmed ok, we proceed
     if ($params["confirm"] == $c_yes) {
@@ -166,7 +166,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($params["id"], $params)) {
+  if (check_company_data_form($params["id"], $params)) {
     $retour = run_query_company_update($params["id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
@@ -211,7 +211,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_company_admin_index();
 
 } elseif ($action == "type_insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -222,7 +222,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_type)." : $l_c_insert_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "type_update") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_type)." : $l_c_update_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "type_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_type)." : $l_c_delete_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "activity_insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -259,7 +259,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_activity)." : $l_c_insert_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "activity_update") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -270,7 +270,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_activity)." : $l_c_update_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "activity_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -285,44 +285,44 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_activity)." : $l_c_delete_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "nafcode_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_nafcode_insert($params);
+  $retour = run_query_company_nafcode_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_naf_insert_ok);
   } else {
     $display["msg"] .= display_err_msg($l_naf_insert_error);
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "nafcode_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_nafcode_update($params);
+  $retour = run_query_company_nafcode_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_naf_update_ok);
   } else {
     $display["msg"] .= display_err_msg($l_naf_update_error);
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "nafcode_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_nafcode_links($params);
+  $display["detail"] .= dis_company_nafcode_links($params);
 
 } elseif ($action == "nafcode_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_nafcode_delete($params["nafcode"]);
+  $retour = run_query_company_nafcode_delete($params["nafcode"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_naf_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_naf_delete_error);
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -344,7 +344,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -359,7 +359,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
   }
   require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_company_admin_index();
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -768,4 +768,4 @@ function update_company_action() {
   }
 }
 
-</script>
+?>

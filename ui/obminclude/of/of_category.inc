@@ -1287,7 +1287,7 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
         <span id=\"data$id\">$code - $label</span>";
     } else {
       $dis_cat = "
-        <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code'); return false;\"><span id=\"data$id\">$code - $label</span></a>";
+        <a href=\"javascript: void(0);\" onclick=\"fill_company_ext_code_form('$code'); return false;\"><span id=\"data$id\">$code - $label</span></a>";
     }
 
     // If the node has children : link to open it, and icon is different

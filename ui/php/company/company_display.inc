@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_display.inc                                          //
 //     - Desc : Company Display File                                         //
@@ -53,9 +53,9 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "company_name") {
     if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".addslashes($OD->data_set->f("company_name"))."');";
+      $res["url"] = "javascript:check_company_get_id(".$OD->data_set->f("company_id").",'".addslashes($OD->data_set->f("company_name"))."');";
     } else if ($OD->display_ext == "get_id_url") {
-      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
+      $res["url"] = "javascript:check_company_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
     } else {
       $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
     }
@@ -253,7 +253,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
 
   // Naf Code select
   if ($show_naf) {
-    $sel_naf = dis_select_companynafcode($naf_q, "<option value=\"$c_all\">$l_all</option>", $naf);
+    $sel_naf = dis_select_company_nafcode($naf_q, "<option value=\"$c_all\">$l_all</option>", $naf);
 
     $block_naf = "
     <div class=\"searchLabel\">$l_nafcode<br />
@@ -1083,7 +1083,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   // Naf code select field
   if ($show_naf) {
-    $sel_naf = dis_select_companynafcode($naf_q, "<option value=\"$c_undef\">$l_undef</option>", $naf);
+    $sel_naf = dis_select_company_nafcode($naf_q, "<option value=\"$c_undef\">$l_undef</option>", $naf);
 
     $block_naf = "
     </tr><tr>      
@@ -1320,7 +1320,7 @@ function dis_can_delete_company($p_id) {
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    onclick=\"if (confirm_company_del(this.form)) return true; else return false;\" />
     </form>";
 
   $display["msg"] .= display_ok_msg($l_can_delete);
@@ -1461,7 +1461,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the company administration index
 ///////////////////////////////////////////////////////////////////////////////
-function dis_admin_index() {
+function dis_company_admin_index() {
   global $cgp_hide;
 
   if (! $cgp_hide["company"]["companytype"]) {
@@ -1555,7 +1555,7 @@ function html_company_nafcode_form($naf_q) {
               <td class=\"adminLabel\">$sel_naf</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"nafcode_checklink\" />
-              <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_checkdelete\" onclick=\"if (check_naf_checkdel(this.form)) return true; else return false;\" />
+              <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_checkdelete\" onclick=\"if (check_company_naf_checkdel(this.form)) return true; else return false;\" />
               </td>
             </tr>
             </table>
@@ -1575,7 +1575,7 @@ function html_company_nafcode_form($naf_q) {
  	    <input type=\"text\" size=\"4\" maxlength=\"4\" name=\"tf_naf_code\" />
             <input type=\"text\" name=\"tf_naf_label\" />
             <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_update\"
-              onclick=\"if (check_naf_upd(this.form,document.form_naf_delete)) return true; else return false;\" />
+              onclick=\"if (check_company_naf_upd(this.form,document.form_naf_delete)) return true; else return false;\" />
             </form>
           </td>
           <td>&nbsp;</td>
@@ -1608,7 +1608,7 @@ function html_company_nafcode_form($naf_q) {
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"nafcode_insert\" />
             <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_insert\"
-              onclick=\"if (check_naf_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_company_naf_new(this.form)) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -1627,14 +1627,14 @@ function html_company_nafcode_form($naf_q) {
 // Parameters:
 //   - $company : company hash info : keys used : nafcode
 ///////////////////////////////////////////////////////////////////////////////
-function dis_nafcode_links($company) {
+function dis_company_nafcode_links($company) {
   global $display, $l_back, $l_naf_link_company, $l_naf_link_company_no;
   global $l_naf_delete, $l_naf_can_delete, $l_naf_cant_delete;
 
   $delete_ok = true;
   $id = $company["nafcode"];
-  $label = get_nafcode_label($id);
-  $obm_q = run_query_nafcode_links($id);
+  $label = get_company_nafcode_label($id);
+  $obm_q = run_query_company_nafcode_links($id);
 
   $nb_naf = $obm_q->num_rows();
   if ($nb_naf > 0) {
@@ -1728,7 +1728,7 @@ function dis_company_display_pref($prefs) {
 // Parameters:
 //   - $naf_q     : database object with nafcode list
 ///////////////////////////////////////////////////////////////////////////////
-function dis_select_companynafcode($naf_q, $line1, $selected) {
+function dis_select_company_nafcode($naf_q, $line1, $selected) {
   global $cgp_hide;
 
   $show_naf = (! $cgp_hide["company"]["companynafcode"]);
@@ -1757,4 +1757,4 @@ function dis_select_companynafcode($naf_q, $line1, $selected) {
 }
 
 
-</script>
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : backup_index.php                                             //
 //     - Desc : Backup Index File                                            //
@@ -57,7 +57,7 @@ if ($action == "index") {
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $ret = run_query_create();
+  $ret = run_query_backup_create();
   if ($ret) {
     $display["msg"] .= display_ok_msg($l_insert_ok);
   } else {
@@ -67,7 +67,7 @@ if ($action == "index") {
 
 } elseif ($action == "restore")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $ret = run_query_restore($backup["filename"]);
+  $ret = run_query_backup_restore($backup["filename"]);
   if ($ret) {
     $display["msg"] .= display_ok_msg($l_restore_ok);
   } else {
@@ -77,7 +77,7 @@ if ($action == "index") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_backup($backup["filename"])) {
+  if (check_backup_can_delete($backup["filename"])) {
     $display["msg"] .= display_info_msg($err_msg);
     $display["detail"] = dis_can_delete_backup($backup["filename"]);
   } else {
@@ -87,8 +87,8 @@ if ($action == "index") {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_backup($backup["filename"])) {
-    $retour = run_query_delete($backup["filename"]);
+  if (check_backup_can_delete($backup["filename"])) {
+    $retour = run_query_backup_delete($backup["filename"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -193,3 +193,5 @@ function get_backup_action() {
                                      	 );  
 
 }
+
+?>
