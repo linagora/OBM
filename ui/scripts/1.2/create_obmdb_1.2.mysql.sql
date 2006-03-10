@@ -1,6 +1,6 @@
 --/////////////////////////////////////////////////////////////////////////////
---// OBM - File : create_obmdb_1.0.mysql.sql                                 //
---//     - Desc : MySQL Database 1.0 creation script                         //
+--// OBM - File : create_obmdb_1.2.mysql.sql                                 //
+--//     - Desc : MySQL Database 1.2 creation script                         //
 --// 2005-06-08 ALIACOM                                                      //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$

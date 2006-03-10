@@ -1,6 +1,6 @@
 --/////////////////////////////////////////////////////////////////////////////
---// OBM - File : create_obmdb_1.0.pgsql.sql                                 //
---//     - Desc : PostGreSQL Database 1.0 creation script                    //
+--// OBM - File : create_obmdb_1.2.pgsql.sql                                 //
+--//     - Desc : PostGreSQL Database 1.2 creation script                    //
 --// 2005-06-08 Pierre Baudracco                                             //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$

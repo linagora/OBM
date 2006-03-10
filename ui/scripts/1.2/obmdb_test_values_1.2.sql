@@ -1,5 +1,5 @@
 --/////////////////////////////////////////////////////////////////////////////
--- OBM - File : obmdb_test_values_1.0.sql                                    //
+-- OBM - File : obmdb_test_values_1.2.sql                                    //
 --     - Desc : Insertion of Test values (database independant)              //
 -- 2005-06-08 Pierre Baudracco                                               //
 --/////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 --/////////////////////////////////////////////////////////////////////////////
--- OBM - File : obm_default_values_1.0.sql                                   //
+-- OBM - File : obm_default_values_1.2.sql                                   //
 --     - Desc : Insertion of Default values (database independant)           //
 -- 2005-06-08 Pierre Baudracco                                               //
 --/////////////////////////////////////////////////////////////////////////////
