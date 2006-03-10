@@ -325,7 +325,7 @@ function dis_contact_search_form($contact="") {
     $usr_q = run_query_userobm_active();
   }
   $funcs = of_category_get_ordered("contact", "function");
-  $ctry_q = run_query_country_for_lang();
+  $ctry_q = run_query_global_country_for_lang();
   $cats1 = of_category_get_ordered("contact", "category1");
   $cats2 = of_category_get_ordered("contact", "category2");
   $cats3 = of_category_get_ordered("contact", "category3");
@@ -1218,7 +1218,7 @@ function dis_contact_form($action, $co_q, $contact) {
     $cats3 = of_category_get_ordered("contact", "category3", "multi", $cid);
     $cats4 = of_category_get_ordered("contact", "category4", "multi", $cid);
   }
-  $dsrc_q = run_query_datasource();
+  $dsrc_q = run_query_global_datasource();
   $kind_q = run_query_kind();
   $funcs = of_category_get_ordered("contact", "function");
   $cats5 = of_category_get_ordered("contact", "category5");
@@ -1232,7 +1232,7 @@ function dis_contact_form($action, $co_q, $contact) {
     $users[] = $co_q->f("contact_marketingmanager_id");
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
-  $ctry_q = run_query_country_for_lang();
+  $ctry_q = run_query_global_country_for_lang();
   $block = html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
 
   return $block;

@@ -105,7 +105,7 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $dsrc_q = run_query_datasource();
+  $dsrc_q = run_query_global_datasource();
   $usr_q = run_query_all_users_from_group($cg_com);
   $display["detail"] = html_import_form($action, $import, "", $dsrc_q, $usr_q);
 
@@ -117,7 +117,7 @@ if (($action == "index") || ($action == "")) {
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($import["id"]);
-  $dsrc_q = run_query_datasource();
+  $dsrc_q = run_query_global_datasource();
   $usr_q = run_query_all_users_from_group($cg_com);
   $display["detail"] = html_import_form($action, $import, $obm_q, $dsrc_q, $usr_q);
 
@@ -154,7 +154,7 @@ if (($action == "index") || ($action == "")) {
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $dsrc_q = run_query_datasource();
+    $dsrc_q = run_query_global_datasource();
     $usr_q = run_query_all_users_from_group($cg_com);
     $display["detail"] = html_import_form($action, $import, "", $dsrc_q, $usr_q);
   }
@@ -173,7 +173,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
     $import_q = run_query_detail($import["id"]);
-    $dsrc_q = run_query_datasource();
+    $dsrc_q = run_query_global_datasource();
     $usr_q = run_query_all_users_from_group($cg_com);
     $display["detail"] = html_import_form($action, $import, $import_q, $dsrc_q, $usr_q);
   }

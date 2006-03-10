@@ -121,7 +121,7 @@ function dis_deal_index($deal="") {
 
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_dealtype();
-  $tts = get_tasktype($ctt_sales);
+  $tts = get_global_tasktype($ctt_sales);
   $cats1 = of_category_get_ordered("deal", "category1");
   $status_q = run_query_dealstatus();
   $block .= html_parentdeal_search_form($deal, $usr_q);
@@ -143,7 +143,7 @@ function dis_deal_search_form($deal="") {
 
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_dealtype();
-  $tts = get_tasktype($ctt_sales);
+  $tts = get_global_tasktype($ctt_sales);
   $cats1 = of_category_get_ordered("deal", "category1");
   $status_q = run_query_dealstatus();
   $block .= html_deal_search_form($deal, $type_q, $tts, $cats1, $status_q, $usr_q);
@@ -854,7 +854,7 @@ function dis_deal_form($deal) {
   }
 
   $type_q = run_query_dealtype();
-  $tts = get_tasktype($ctt_sales);
+  $tts = get_global_tasktype($ctt_sales);
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
   $sta_q = run_query_dealstatus();
@@ -2282,7 +2282,7 @@ function dis_parentdeal_consult($deal) {
   $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
   $kind_q = run_query_dealtype();
-  $tts = get_tasktype($ctt_sales);
+  $tts = get_global_tasktype($ctt_sales);
   $cat_q = run_query_dealcategory1();
   $status_q = run_query_dealstatus();
   $usr_q = run_query_deal_manager($archive);

@@ -1068,7 +1068,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
 function get_import_country_hash() {
   global $cdg_sql;
 
-  $ctry_q = run_query_country();
+  $ctry_q = run_query_global_country();
 
   while ($ctry_q->next_record()) {
     $name = $ctry_q->f("country_name");

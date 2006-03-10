@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : agenda_js.inc                                               //
 //     - Desc  : Agenda javascript functions File                            //
@@ -12,7 +12,7 @@ require("$obminclude/javascript/category_js.inc");
 
 $extra_js .= "
 
-function check_calendar(form) {
+function check_agenda_calendar(form) {
   if (trim(form.tf_title.value) == \"\") {
     alert (\"$l_fill_title\");
     return false;
@@ -33,7 +33,7 @@ function check_calendar(form) {
 }
 
 
-function show_hide_dates(field) {
+function show_hide_agenda_dates(field) {
   target = window.document;
   begin = target.getElementById('hour_begin');   
   end = target.getElementById('hour_end');
@@ -50,7 +50,7 @@ function show_hide_dates(field) {
 NS4 = (document.layers) ? 1 : 0;
 IE4 = (document.all) ? 1 : 0;
 W3C = (document.getElementById) ? 1 : 0;	
-function show ( evt, name ) {
+function agenda_show ( evt, name ) {
   if (IE4) {
     evt = window.event;  
   }
@@ -121,7 +121,7 @@ function show ( evt, name ) {
   }
 }
 
-function hide ( name ) {
+function agenda_hide ( name ) {
   if (W3C) {
     document.getElementById(name).style.display = \"none\";
   } else if (NS4) {
@@ -131,7 +131,7 @@ function hide ( name ) {
   }
 }
 
-function changeDateEnd ( form ) {
+function agenda_changeDateEnd ( form ) {
   form.tf_date_end.value = form.tf_date_begin.value; 
 
 }
@@ -139,7 +139,7 @@ function changeDateEnd ( form ) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the meeting perform is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_meeting(form) {
+function agenda_check_meeting(form) {
   
   if (trim(form.sel_min_duration.options[form.sel_min_duration.selectedIndex].value) == \"00\" 
        && trim(form.sel_time_duration.options[form.sel_time_duration.selectedIndex].value) == \"00\") {
@@ -155,3 +155,5 @@ function check_meeting(form) {
 } 
 
 ";
+
+?>

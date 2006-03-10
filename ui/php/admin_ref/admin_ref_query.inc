@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref_query.inc                                          //
 //     - Desc : Referential Data Query File                                  //
@@ -13,7 +13,7 @@
 // Parameters:
 //   - $ctry : data source hash info : keys used : name
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_insert($ctry) {
+function run_query_admin_ref_country_insert($ctry) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -51,7 +51,7 @@ function run_query_country_insert($ctry) {
 // Parameters:
 //   - $ctry : data source hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_update($ctry) {
+function run_query_admin_ref_country_update($ctry) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -87,7 +87,7 @@ function run_query_country_update($ctry) {
 // Parameters:
 //   - $ctry : data source hash info : keys used : old_iso, old_lang
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_delete($ctry) {
+function run_query_admin_ref_country_delete($ctry) {
   global $cdg_sql;
 
   $iso = $ctry["iso"];
@@ -110,7 +110,7 @@ function run_query_country_delete($ctry) {
 // Parameters:
 //   - $iso : country_iso3166
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_company_links($iso) {
+function run_query_admin_ref_country_company_links($iso) {
   global $cdg_sql;
 
   $query = "select company_id,
@@ -132,7 +132,7 @@ function run_query_country_company_links($iso) {
 // Parameters:
 //   - $iso : country_iso3166
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_contact_links($iso) {
+function run_query_admin_ref_country_contact_links($iso) {
   global $cdg_sql;
 
   $query = "select contact_id,
@@ -155,7 +155,7 @@ function run_query_country_contact_links($iso) {
 //   - $iso  : country_iso3166
 //   - $lang : country_lang
 ///////////////////////////////////////////////////////////////////////////////
-function get_country_name($iso, $lang) {
+function get_admin_ref_country_name($iso, $lang) {
   global $cdg_sql;
 
   $query = "select country_name
@@ -178,7 +178,7 @@ function get_country_name($iso, $lang) {
 // Parameters:
 //   - $dsrc : data source hash info : keys used : name
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource_insert($dsrc) {
+function run_query_admin_ref_datasource_insert($dsrc) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -207,7 +207,7 @@ function run_query_datasource_insert($dsrc) {
 // Parameters:
 //   - $dsrc : data source hash info : keys used : act, name
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource_update($dsrc) {
+function run_query_admin_ref_datasource_update($dsrc) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -235,7 +235,7 @@ function run_query_datasource_update($dsrc) {
 // Parameters:
 //   - $dsrc : data source hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource_delete($dsrc) {
+function run_query_admin_ref_datasource_delete($dsrc) {
   global $cdg_sql;
 
   $id = $dsrc["datasource"];
@@ -255,7 +255,7 @@ function run_query_datasource_delete($dsrc) {
 // Parameters:
 //   - $dsrc : data source hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource_company_links($dsrc) {
+function run_query_admin_ref_datasource_company_links($dsrc) {
   global $cdg_sql;
 
   $id = $dsrc["datasource"];
@@ -279,7 +279,7 @@ function run_query_datasource_company_links($dsrc) {
 // Parameters:
 //   - $dsrc : data source hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource_contact_links($dsrc) {
+function run_query_admin_ref_datasource_contact_links($dsrc) {
   global $cdg_sql;
 
   $id = $dsrc["datasource"];
@@ -304,7 +304,7 @@ function run_query_datasource_contact_links($dsrc) {
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_datasource_name($id) {
+function get_admin_ref_datasource_name($id) {
   global $cdg_sql;
 
   $query = "select datasource_name
@@ -326,7 +326,7 @@ function get_datasource_name($id) {
 // Parameters:
 //   - $tt : task type hash info : keys used : label, internal
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype_insert($tt) {
+function run_query_admin_ref_tasktype_insert($tt) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -358,7 +358,7 @@ function run_query_tasktype_insert($tt) {
 // Parameters:
 //   - $tt : task type hash info : keys used : tasktype, label, int
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype_update($tt) {
+function run_query_admin_ref_tasktype_update($tt) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -387,7 +387,7 @@ function run_query_tasktype_update($tt) {
 // Parameters:
 //   - $tt : task type hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype_delete($tt) {
+function run_query_admin_ref_tasktype_delete($tt) {
   global $cdg_sql;
 
   $id = $tt["tasktype"];
@@ -407,7 +407,7 @@ function run_query_tasktype_delete($tt) {
 // Parameters:
 //   - $tt : task type hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype_deal_links($tt) {
+function run_query_admin_ref_tasktype_deal_links($tt) {
   global $cdg_sql;
 
   $id = $tt["tasktype"];
@@ -431,7 +431,7 @@ function run_query_tasktype_deal_links($tt) {
 // Parameters:
 //   - $tt : task type hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype_project_links($tt) {
+function run_query_admin_ref_tasktype_project_links($tt) {
   global $cdg_sql;
 
   $id = $tt["tasktype"];
@@ -454,7 +454,7 @@ function run_query_tasktype_project_links($tt) {
 // Parameters:
 //   - $tt : task type hash info : keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype_timetask_links($tt) {
+function run_query_admin_ref_tasktype_timetask_links($tt) {
   global $cdg_sql;
 
   $id = $tt["tasktype"];
@@ -485,7 +485,7 @@ function run_query_tasktype_timetask_links($tt) {
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_tasktype_label($id) {
+function get_admin_ref_tasktype_label($id) {
   global $cdg_sql;
 
   $query = "select tasktype_label
@@ -500,3 +500,5 @@ function get_tasktype_label($id) {
   $retour = $obm_q->f("tasktype_label");
   return $retour;
 }
+
+?>

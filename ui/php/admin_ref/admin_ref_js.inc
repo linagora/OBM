@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref_js.inc                                             //
 //     - Desc : Referential Data javascript functions File                   //
@@ -15,7 +15,7 @@ $extra_js .= "
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the datasource check or deletion is possible                     //
 ///////////////////////////////////////////////////////////////////////////////
-function check_dsrc_checkdel(sel)
+function check_admin_ref_dsrc_checkdel(sel)
 {
    if (sel.selectedIndex >= 0)
    {
@@ -32,7 +32,7 @@ function check_dsrc_checkdel(sel)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the data source update is possible                               //
 ///////////////////////////////////////////////////////////////////////////////
-function check_dsrc_upd(form, sel_del_dsrc)
+function check_admin_ref_dsrc_upd(form, sel_del_dsrc)
 {
   dsrc_pos = sel_del_dsrc.selectedIndex;
   if ((dsrc_pos >= 0) && (form.tf_name.value != \"\")) {
@@ -48,7 +48,7 @@ function check_dsrc_upd(form, sel_del_dsrc)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the data source creation is possible                             //
 ///////////////////////////////////////////////////////////////////////////////
-function check_dsrc_new(form)
+function check_admin_ref_dsrc_new(form)
 {
    if (form.tf_name.value != \"\")
       return true;
@@ -63,7 +63,7 @@ function check_dsrc_new(form)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the country check or deletion is possible                        //
 ///////////////////////////////////////////////////////////////////////////////
-function check_ctry_checkdel(sel)
+function check_admin_ref_ctry_checkdel(sel)
 {
    if (sel.selectedIndex >= 0)
    {
@@ -80,7 +80,7 @@ function check_ctry_checkdel(sel)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the country update is possible                                   //
 ///////////////////////////////////////////////////////////////////////////////
-function check_ctry_upd(form, sel_del_ctry)
+function check_admin_ref_ctry_upd(form, sel_del_ctry)
 {
   ctry_pos = sel_del_ctry.selectedIndex;
   if ((ctry_pos >= 0) && (form.tf_name.value != \"\")) {
@@ -96,7 +96,7 @@ function check_ctry_upd(form, sel_del_ctry)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the country creation is possible                                 //
 ///////////////////////////////////////////////////////////////////////////////
-function check_ctry_new(form)
+function check_admin_ref_ctry_new(form)
 {
    if (form.tf_name.value != \"\")
       return true;
@@ -111,7 +111,7 @@ function check_ctry_new(form)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the task type check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_tt_checkdel(sel)
+function check_admin_ref_tt_checkdel(sel)
 {
    if (sel.selectedIndex >= 0)
    {
@@ -128,7 +128,7 @@ function check_tt_checkdel(sel)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the task type update is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_tt_upd(form, sel_del_tt)
+function check_admin_ref_tt_upd(form, sel_del_tt)
 {
   tt_pos = sel_del_tt.selectedIndex;
   if ((tt_pos >= 0) && (form.tf_label.value != \"\")) {
@@ -144,7 +144,7 @@ function check_tt_upd(form, sel_del_tt)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the tasktype creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_tt_new(form)
+function check_admin_ref_tt_new(form)
 {
    if (form.tf_label.value != \"\")
       return true;
@@ -156,3 +156,5 @@ function check_tt_new(form)
 }
 
 ";
+
+?>

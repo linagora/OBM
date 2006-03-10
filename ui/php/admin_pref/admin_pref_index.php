@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_pref_index.php                                         //
 //     - Desc : Update User Preferences (Display,...)                        //
@@ -34,16 +34,16 @@ if ($mode == "") $mode = "txt";
 switch ($mode) {
  case "txt":
    include("$obminclude/global_pref.inc"); 
-   $retour = parse_arg($argv);
+   $retour = parse_admin_pref_arg($argv);
    if (! $retour) { end; }
-   $pref = get_param_pref();
+   $pref = get_admin_pref_param_pref();
    break;
  case "html":
-   $pref = get_param_pref();
+   $pref = get_admin_pref_param_pref();
    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
-   get_admin_pref_action();
+   get_admin_pref_admin_pref_action();
    $perm->check_permissions($module, $action);
    $display["head"] = display_head("Admin_Pref");
    $display["header"] = display_menu($module);
@@ -56,19 +56,19 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_help($mode);
+    dis_admin_pref_help($mode);
     break;
   case "index":
-    dis_pref_index($mode);
+    dis_admin_pref_index($mode);
     break;
   case "user_pref_reset":
-    dis_user_pref_reset($mode);
+    dis_admin_pref_user_pref_reset($mode);
     break;
   case "user_pref_update_one":
     $option = $pref["up_option"];
     $value = $pref["up_value"];
-    if (! $value) $value = get_userpref_value($option); 
-    dis_user_pref_update_one($mode, $option, $value);
+    if (! $value) $value = get_admin_pref_userpref_value($option); 
+    dis_admin_pref_user_pref_update_one($mode, $option, $value);
     break;
   default:
     $msg = "$action : Action not implemented !";
@@ -93,7 +93,7 @@ switch ($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_command_use($msg="") {
+function dis_admin_pref_command_use($msg="") {
   global $actions;
 
   while (list($nb, $val) = each ($actions)) {
@@ -118,7 +118,7 @@ Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function parse_arg($argv) {
+function parse_admin_pref_arg($argv) {
   global $cdg_param, $actions, $action;
   global $sel_userpref, $tf_pref_value;
 
@@ -140,7 +140,7 @@ function parse_arg($argv) {
 	}
       }
       else {
-	dis_command_use("Invalid action ($val2)");
+	dis_admin_pref_command_use("Invalid action ($val2)");
 	return false;
       }
       break;
@@ -171,7 +171,7 @@ function parse_arg($argv) {
 // Stores Admin preferences parameters transmited in $pref hash
 // returns : $pref hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_pref() {
+function get_admin_pref_param_pref() {
   global $cdg_param, $sel_userpref, $tf_pref_value;
 
   if (isset ($sel_userpref)) $pref["up_option"] = $sel_userpref;
@@ -192,7 +192,7 @@ function get_param_pref() {
 //////////////////////////////////////////////////////////////////////////////
 // ADMIN PREF actions
 //////////////////////////////////////////////////////////////////////////////
-function get_admin_pref_action() {
+function get_admin_pref_admin_pref_action() {
   global $actions, $path;
   global $l_header_index,$l_header_pref_update,$l_header_help;
   global $cright_read_admin, $cright_write_admin;
@@ -228,4 +228,4 @@ function get_admin_pref_action() {
 
 }
 
-</script>
+?>

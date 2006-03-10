@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_pref_display.inc                                       //
 //     - Desc : Pref admin display File                                      //
@@ -13,7 +13,7 @@
 // Parameters:
 //   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_help($mode) {
+function dis_admin_pref_help($mode) {
 
   if ($mode == "html")
     echo "<table class=\"detail\">
@@ -35,14 +35,14 @@ function dis_help($mode) {
 // Parameters:
 //   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_pref_index($mode) {
+function dis_admin_pref_index($mode) {
 
   switch ($mode) {
   case "txt":
     echo "\ntry -h for help\n";
     break;
   case "html":
-    html_pref_index();
+    html_admin_pref_index();
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -54,11 +54,11 @@ function dis_pref_index($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the HTML index screen for the pref admin module
 ///////////////////////////////////////////////////////////////////////////////
-function html_pref_index() {
+function html_admin_pref_index() {
   global $l_validate, $l_execute, $l_help, $l_user_pref;
   global $l_user_pref_reset, $l_user_pref_update_one;
 
-  $userpref_q = get_default_user_pref();
+  $userpref_q = get_admin_pref_default_user_pref();
   // User preferences SELECT
   $sel_userpref = "<select name=\"sel_userpref\">";
   while ($userpref_q->next_record()) {
@@ -119,7 +119,7 @@ function html_pref_index() {
 // Parameters:
 //   - $mode   : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_pref_reset($mode) {
+function dis_admin_pref_user_pref_reset($mode) {
   global $l_reset_ok;
   
   //-- Reset default values (drop all specific users values)
@@ -146,7 +146,7 @@ function dis_user_pref_reset($mode) {
 //   - $pref : name or option of the pref
 //   - $val  : optional : value to set for all users
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_pref_update_one($mode, $pref, $val="") {
+function dis_admin_pref_user_pref_update_one($mode, $pref, $val="") {
   global $cdg_sql;
 
   //-- Drop specific user preference if same as new value
@@ -172,3 +172,5 @@ function dis_user_pref_update_one($mode, $pref, $val="") {
   }
 
 }
+
+?>

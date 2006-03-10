@@ -129,7 +129,7 @@ function dis_invoice_search_form($invoice="") {
   global $ctt_sales;
 
   $sta = get_invoicestatus();
-  $tts = get_tasktype($ctt_sales);
+  $tts = get_global_tasktype($ctt_sales);
   $block .= html_invoice_search_form($invoice, $sta, $tts);
 
   return $block;

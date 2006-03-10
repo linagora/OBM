@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref_display.inc                                        //
 //     - Desc : Referential data display file                                //
@@ -11,10 +11,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Country index screen
 ///////////////////////////////////////////////////////////////////////////////
-function dis_country_index() {
+function dis_admin_ref_country_index() {
 
-  $ctry_q = run_query_country();
-  $block = html_country_form($ctry_q);
+  $ctry_q = run_query_global_country();
+  $block = html_admin_ref_country_form($ctry_q);
 
   return $block;
 }
@@ -25,7 +25,7 @@ function dis_country_index() {
 // Parameters:
 //   - $ctry_q : Country list database object
 ///////////////////////////////////////////////////////////////////////////////
-function html_country_form($ctry_q) {
+function html_admin_ref_country_form($ctry_q) {
   global $l_ctry_manage, $l_ctry_exist, $l_ctry_no;
   global $l_ctry_checkdelete, $l_ctry_update, $l_ctry_new, $l_ctry_insert;
   global $l_name, $l_lang, $l_iso_3166, $l_phone;
@@ -86,7 +86,7 @@ function html_country_form($ctry_q) {
         <td>
           <input type=\"hidden\" name=\"action\" value=\"country_checklink\" />
           <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_checkdelete\"
-            onclick=\"if (check_ctry_checkdel(this.form.sel_ctry)) return true;
+            onclick=\"if (check_admin_ref_ctry_checkdel(this.form.sel_ctry)) return true;
             else return false;\" />
         </td>
       </tr>
@@ -111,7 +111,7 @@ function html_country_form($ctry_q) {
           <td><input type=\"text\" name=\"tf_name\" /></td>
           <td rowspan=\"4\">
           <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_update\"
-            onclick=\"if (check_ctry_upd(this.form,document.form_ctry_delete.sel_ctry)) return true; else return false;\" />
+            onclick=\"if (check_admin_ref_ctry_upd(this.form,document.form_ctry_delete.sel_ctry)) return true; else return false;\" />
           </td>
         </tr>
         <tr>
@@ -183,7 +183,7 @@ function html_country_form($ctry_q) {
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"country_insert\" />
             <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_insert\"
-              onclick=\"if (check_ctry_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_admin_ref_ctry_new(this.form)) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -201,7 +201,7 @@ function html_country_form($ctry_q) {
 // Parameters:
 //   - $ref : country hash info : keys used : name, iso, lang
 ///////////////////////////////////////////////////////////////////////////////
-function dis_country_links($ref) {
+function dis_admin_ref_country_links($ref) {
   global $display, $l_back, $l_ctry_link_company, $l_ctry_link_company_no;
   global $l_ctry_link_contact, $l_ctry_link_contact_no;
   global $l_ctry_delete, $l_ctry_can_delete, $l_ctry_cant_delete;
@@ -209,10 +209,10 @@ function dis_country_links($ref) {
   $delete_ok = true;
   $iso = $ref["iso"];
   $lang = $ref["lang"];
-  $name = get_country_name($iso, $lang);
+  $name = get_admin_ref_country_name($iso, $lang);
 
   // Company Links
-  $obm_q = run_query_country_company_links($iso);
+  $obm_q = run_query_admin_ref_country_company_links($iso);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
     $dis_link_comp = "
@@ -239,7 +239,7 @@ function dis_country_links($ref) {
   }
 
   // Contacts Links
-  $obm_q = run_query_country_contact_links($iso);
+  $obm_q = run_query_admin_ref_country_contact_links($iso);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
     $dis_link_cont = "
@@ -305,10 +305,10 @@ function dis_country_links($ref) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Data Source index screen
 ///////////////////////////////////////////////////////////////////////////////
-function dis_datasource_index() {
+function dis_admin_ref_datasource_index() {
 
-  $dsrc_q = run_query_datasource();
-  $block = html_datasource_form($dsrc_q);
+  $dsrc_q = run_query_global_datasource();
+  $block = html_admin_ref_datasource_form($dsrc_q);
 
   return $block;
 }
@@ -319,7 +319,7 @@ function dis_datasource_index() {
 // Parameters:
 //   - $dsrc_q : Data Source list database object
 ///////////////////////////////////////////////////////////////////////////////
-function html_datasource_form($dsrc_q) {
+function html_admin_ref_datasource_form($dsrc_q) {
   global $l_dsrc_manage, $l_dsrc_exist, $l_dsrc_no;
   global $l_dsrc_checkdelete, $l_dsrc_update, $l_dsrc_new, $l_dsrc_insert;
 
@@ -348,7 +348,7 @@ function html_datasource_form($dsrc_q) {
         <td>
           <input type=\"hidden\" name=\"action\" value=\"datasource_checklink\" />
           <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_checkdelete\"
-            onclick=\"if (check_dsrc_checkdel(this.form.sel_dsrc)) return true;
+            onclick=\"if (check_admin_ref_dsrc_checkdel(this.form.sel_dsrc)) return true;
             else return false;\" />
         </td>
       </tr>
@@ -367,7 +367,7 @@ function html_datasource_form($dsrc_q) {
         <input type=\"hidden\" name=\"action\" value=\"datasource_update\" />
         <input type=\"text\" name=\"tf_name\" />
         <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_update\"
-          onclick=\"if (check_dsrc_upd(this.form,document.form_dsrc_delete.sel_dsrc)) return true; else return false;\" />
+          onclick=\"if (check_admin_ref_dsrc_upd(this.form,document.form_dsrc_delete.sel_dsrc)) return true; else return false;\" />
         </form>
       </td>
       <td>&nbsp;</td>
@@ -405,7 +405,7 @@ function html_datasource_form($dsrc_q) {
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"datasource_insert\" />
             <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_insert\"
-              onclick=\"if (check_dsrc_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_admin_ref_dsrc_new(this.form)) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -423,7 +423,7 @@ function html_datasource_form($dsrc_q) {
 // Parameters:
 //   - $ref : datasource hash info : keys used : id, name
 ///////////////////////////////////////////////////////////////////////////////
-function dis_datasource_links($ref) {
+function dis_admin_ref_datasource_links($ref) {
   global $path, $display, $l_back;
   global $l_dsrc_link_company, $l_dsrc_link_company_no;
   global $l_dsrc_link_contact, $l_dsrc_link_contact_no;
@@ -431,10 +431,10 @@ function dis_datasource_links($ref) {
 
   $delete_ok = true;
   $id = $ref["datasource"];
-  $name = get_datasource_name($id);
+  $name = get_admin_ref_datasource_name($id);
 
   // Company Links
-  $obm_q = run_query_datasource_company_links($ref);
+  $obm_q = run_query_admin_ref_datasource_company_links($ref);
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
     $delete_ok = false;
@@ -462,7 +462,7 @@ function dis_datasource_links($ref) {
   }
 
   // Contacts Links
-  $obm_q = run_query_datasource_contact_links($ref);
+  $obm_q = run_query_admin_ref_datasource_contact_links($ref);
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
     $delete_ok = false;
@@ -528,10 +528,10 @@ function dis_datasource_links($ref) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Task Type index screen
 ///////////////////////////////////////////////////////////////////////////////
-function dis_tasktype_index() {
+function dis_admin_ref_tasktype_index() {
 
-  $tts = get_tasktype();
-  $block = html_tasktype_form($tts);
+  $tts = get_global_tasktype();
+  $block = html_admin_ref_tasktype_form($tts);
 
   return $block;
 }
@@ -542,7 +542,7 @@ function dis_tasktype_index() {
 // Parameters:
 //   - $tts : Task Type array
 ///////////////////////////////////////////////////////////////////////////////
-function html_tasktype_form($tts) {
+function html_admin_ref_tasktype_form($tts) {
   global $l_tt_manage, $l_tt_exist, $l_tt_no;
   global $l_tt_checkdelete, $l_tt_update, $l_tt_new, $l_tt_insert;
   global $ctt_sales, $ctt_research, $ctt_others;
@@ -585,7 +585,7 @@ function html_tasktype_form($tts) {
         <td>
           <input type=\"hidden\" name=\"action\" value=\"tasktype_checklink\" />
           <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_checkdelete\"
-            onclick=\"if (check_tt_checkdel(this.form.sel_tt)) return true;
+            onclick=\"if (check_admin_ref_tt_checkdel(this.form.sel_tt)) return true;
             else return false;\" />
         </td>
       </tr>
@@ -604,7 +604,7 @@ function html_tasktype_form($tts) {
         <input type=\"hidden\" name=\"action\" value=\"tasktype_update\" />
         <input type=\"text\" name=\"tf_label\" />
         <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_update\"
-          onclick=\"if (check_tt_upd(this.form,document.form_tt_delete.sel_tt)) return true; else return false;\" />
+          onclick=\"if (check_admin_ref_tt_upd(this.form,document.form_tt_delete.sel_tt)) return true; else return false;\" />
         </form>
       </td>
       <td>&nbsp;</td>
@@ -650,7 +650,7 @@ function html_tasktype_form($tts) {
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
             <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\"
-              onclick=\"if (check_tt_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_admin_ref_tt_new(this.form)) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -668,17 +668,17 @@ function html_tasktype_form($tts) {
 // Parameters:
 //   - $ref : tasktype hash info : keys used : id, name
 ///////////////////////////////////////////////////////////////////////////////
-function dis_tasktype_links($ref) {
+function dis_admin_ref_tasktype_links($ref) {
   global $path, $display, $l_back, $l_tt_link_deal, $l_tt_link_deal_no;
   global $l_tt_link_project, $l_tt_link_project_no, $l_tt_link_time, $l_tt_link_time_no;
   global $l_tt_delete, $l_tt_can_delete, $l_tt_cant_delete;
 
   $delete_ok = true;
   $id = $ref["tasktype"];
-  $label = get_tasktype_label($id);
+  $label = get_admin_ref_tasktype_label($id);
 
   // Deal Links
-  $obm_q = run_query_tasktype_deal_links($ref);
+  $obm_q = run_query_admin_ref_tasktype_deal_links($ref);
   $nb_deal = $obm_q->num_rows();
   if ($nb_deal > 0) {
     $delete_ok = false;
@@ -714,7 +714,7 @@ function dis_tasktype_links($ref) {
   }
 
   // Projects Links
-  $obm_q = run_query_tasktype_project_links($ref);
+  $obm_q = run_query_admin_ref_tasktype_project_links($ref);
   $nb_proj = $obm_q->num_rows();
   if ($nb_proj > 0) {
     $delete_ok = false;
@@ -750,7 +750,7 @@ function dis_tasktype_links($ref) {
   }
 
   // Time Task Links
-  $obm_q = run_query_tasktype_timetask_links($ref);
+  $obm_q = run_query_admin_ref_tasktype_timetask_links($ref);
   $nb_time = $obm_q->num_rows();
   if ($nb_time > 0) {
     $delete_ok = false;
@@ -823,5 +823,5 @@ function dis_tasktype_links($ref) {
 }
 
 
-
+?>
 

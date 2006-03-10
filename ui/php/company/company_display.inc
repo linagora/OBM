@@ -173,8 +173,8 @@ function dis_company_search_form($company="") {
   $acts = of_category_get_ordered("company", "activity");
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
-  $ctry_q = run_query_country_for_lang();
-  $dsrc_q = run_query_datasource();
+  $ctry_q = run_query_global_country_for_lang();
+  $dsrc_q = run_query_global_datasource();
   $block .= html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
@@ -919,7 +919,7 @@ function dis_company_form($action, $company) {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
   }
-  $dsrc_q = run_query_datasource();
+  $dsrc_q = run_query_global_datasource();
   $types = of_category_get_ordered("company", "type");
   $acts = of_category_get_ordered("company", "activity");
 
@@ -935,7 +935,7 @@ function dis_company_form($action, $company) {
     $users[] = $comp_q->f("company_marketingmanager_id");
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
-  $ctry_q = run_query_country_for_lang();
+  $ctry_q = run_query_global_country_for_lang();
 
   $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company);
 

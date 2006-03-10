@@ -157,7 +157,7 @@ $sel_todo = "<select name=\"param_todo\" id=\"param_todo\">
 </select>";
 
 // Data source select
-$dsrc_q = run_query_datasource();
+$dsrc_q = run_query_global_datasource();
 $sel_dsrc = "<select name=\"param_dsrc\" id=\"param_dsrc\">
   <option value=\"$c_undef\">$l_undef</option>";
 while ($dsrc_q->next_record()) {

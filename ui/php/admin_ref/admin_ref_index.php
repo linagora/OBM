@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref_index.php                                          //
 //     - Desc : Referential data index file                                  //
@@ -37,7 +37,7 @@ require("admin_ref_display.inc");
 require("admin_ref_query.inc");
 
 if ( ($action == "") || ($action == "index")) $action = "country";
-$ref = get_param_ref();
+$ref = get_admin_ref_param();
 get_admin_ref_action();
 $perm->check_permissions($module, $action);
 
@@ -50,137 +50,137 @@ page_close();
 if ($action == "index")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
-  $display["detail"] = dis_ref_index();
+  //$display["detail"] = dis_ref_index();
 
 } elseif ($action == "country")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
-  $display["detail"] = dis_country_index();
+  $display["detail"] = dis_admin_ref_country_index();
 
 } elseif ($action == "country_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_country_insert($ref);
+  $retour = run_query_admin_ref_country_insert($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_country_insert_ok);
   } else {
     $display["msg"] .= display_err_msg($l_country_insert_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_country_index();
+  $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "country_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_country_update($ref);
+  $retour = run_query_admin_ref_country_update($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_country_update_ok);
   } else {
     $display["msg"] .= display_err_msg($l_country_update_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_country_index();
+  $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "country_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_country_links($ref);
+  $display["detail"] .= dis_admin_ref_country_links($ref);
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_country_index();
+  $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "country_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_country_delete($ref);
+  $retour = run_query_admin_ref_country_delete($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_country_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_country_delete_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_country_index();
+  $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "datasource")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
-  $display["detail"] = dis_datasource_index();
+  $display["detail"] = dis_admin_ref_datasource_index();
 
 } elseif ($action == "datasource_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_datasource_insert($ref);
+  $retour = run_query_admin_ref_datasource_insert($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_dsrc_insert_ok);
   } else {
     $display["msg"] .= display_err_msg($l_dsrc_insert_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_datasource_index();
+  $display["detail"] .= dis_admin_ref_datasource_index();
 
 } elseif ($action == "datasource_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_datasource_update($ref);
+  $retour = run_query_admin_ref_datasource_update($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_dsrc_update_ok);
   } else {
     $display["msg"] .= display_err_msg($l_dsrc_update_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_datasource_index();
+  $display["detail"] .= dis_admin_ref_datasource_index();
 
 } elseif ($action == "datasource_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_datasource_links($ref);
+  $display["detail"] .= dis_admin_ref_datasource_links($ref);
 
 } elseif ($action == "datasource_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_datasource_delete($ref);
+  $retour = run_query_admin_ref_datasource_delete($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_dsrc_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_dsrc_delete_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_datasource_index();
+  $display["detail"] .= dis_admin_ref_datasource_index();
 
 } elseif ($action == "tasktype")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
-  $display["detail"] = dis_tasktype_index();
+  $display["detail"] = dis_admin_ref_tasktype_index();
 
 } elseif ($action == "tasktype_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_tasktype_insert($ref);
+  $retour = run_query_admin_ref_tasktype_insert($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_tt_insert_ok);
   } else {
     $display["msg"] .= display_err_msg($l_tt_insert_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_tasktype_index();
+  $display["detail"] .= dis_admin_ref_tasktype_index();
 
 } elseif ($action == "tasktype_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_tasktype_update($ref);
+  $retour = run_query_admin_ref_tasktype_update($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_tt_update_ok);
   } else {
     $display["msg"] .= display_err_msg($l_tt_update_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_tasktype_index();
+  $display["detail"] .= dis_admin_ref_tasktype_index();
 
 } elseif ($action == "tasktype_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_tasktype_links($ref);
+  $display["detail"] .= dis_admin_ref_tasktype_links($ref);
 
 } elseif ($action == "tasktype_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_tasktype_delete($ref);
+  $retour = run_query_admin_ref_tasktype_delete($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_tt_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_tt_delete_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_tasktype_index();
+  $display["detail"] .= dis_admin_ref_tasktype_index();
 }
 
 
@@ -198,7 +198,7 @@ display_page($display);
 // Stores Admin Ref parameters transmited in $ref hash
 // returns : $ref hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_ref() {
+function get_admin_ref_param() {
   global $tf_name, $sel_dsrc, $sel_ctry, $tf_iso, $tf_lang, $tf_phone;
   global $sel_tt, $tf_label, $rd_tt_internal, $hd_old_iso, $hd_old_lang;
   global $cdg_param;
@@ -364,4 +364,4 @@ function get_admin_ref_action() {
 
 }
 
-</script>
+?>

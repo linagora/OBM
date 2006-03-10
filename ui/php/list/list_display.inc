@@ -1019,8 +1019,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["subscription_timebefore"] = "$l_publication: $l_before";
 
   if (is_array($criteria)) {
-    $cty_q = run_query_country_for_lang();
-    $dsr_q = run_query_datasource();
+    $cty_q = run_query_global_country_for_lang();
+    $dsr_q = run_query_global_datasource();
     $cat1_q = run_query_contactcategory1();
     $usr_q = run_query_userobm_active();  
     $cat2_q = run_query_contactcategory2();
@@ -1142,9 +1142,9 @@ function dis_add_criterion_form($list) {
   } else {
     $row_index =-1;
   }
-  $cty_q = run_query_country_for_lang();
+  $cty_q = run_query_global_country_for_lang();
   $usr_q = run_query_userobm_active();
-  $dsr_q = run_query_datasource();
+  $dsr_q = run_query_global_datasource();
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();
   $fct_q = run_query_contactfunction();

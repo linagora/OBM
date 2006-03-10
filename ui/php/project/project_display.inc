@@ -76,7 +76,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_form($project) {
 
-  $tts = get_tasktype("project");
+  $tts = get_global_tasktype("project");
   $manager_q = run_query_managers();
   $member_q = run_query_members();
 
@@ -941,7 +941,7 @@ function html_project_form($action, $project_q, $project) {
 
   // We select the task list depending on task category (or if company filled)
   if ($company > 0) {
-    $tts = get_tasktype($ctt_sales);
+    $tts = get_global_tasktype($ctt_sales);
     if ($deal > 0) {
       $dis_deal = "
     </tr><tr>
@@ -964,7 +964,7 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
 
   } else {
-    $tts = get_tasktype();
+    $tts = get_global_tasktype();
     $dis_comp = "";
   }
 

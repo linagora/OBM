@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_pref_query.inc                                         //
 //     - Desc : Pref admin Query File                                        //
@@ -13,7 +13,7 @@
 // Returns:
 //   - $obm_q : DB object of default User Preferences 
 ///////////////////////////////////////////////////////////////////////////////
-function get_default_user_pref() {
+function get_admin_pref_default_user_pref() {
   global $cdg_sql;
 
   $query = "SELECT *
@@ -36,7 +36,7 @@ function get_default_user_pref() {
 // Returns:
 //   - $value : of the preference
 ///////////////////////////////////////////////////////////////////////////////
-function get_userpref_value($option) {
+function get_admin_pref_userpref_value($option) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -61,10 +61,12 @@ function get_userpref_value($option) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($pref) {
+function check_admin_pref_data_form($pref) {
   global $err_msg;
 
   // Future use to check if user parameter valid ? XXXXX
 
   return true; 
 }
+
+?>
