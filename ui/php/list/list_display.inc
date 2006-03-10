@@ -1231,9 +1231,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_company_timeafter\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
+      <script>calendar('tf_company_timeafter','$company_timeafter')</script>
     </td>    
   </tr>
   <tr>
@@ -1245,10 +1243,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_company_timebefore\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-     </a>
+      <script>calendar('tf_company_timebefore','$company_timebefore')</script>
     </td> 
   </tr>
   <tr>   
@@ -1352,9 +1347,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_contact_timeafter\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
+      <script>calendar('tf_contact_timeafter','$contact_timeafter')</script>
     </td>    
   <tr>  
     <td class=\"detailLabel\">$l_firstname</td>
@@ -1365,10 +1358,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_contact_timebefore\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
-     </a>
+      <script>calendar('tf_contact_timebefore','$contact_timebefore')</script>
     </td>     
   </tr>
   <tr>  
@@ -1447,10 +1437,7 @@ function html_publication_criterion($rec_q,$pub_q) {
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_publication_lang\" value=\"\" /></td>
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_publication_year\" value=\"\" /></td>  
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_subscription_timeafter\" value=\"\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_subscription_timeafter,'$path/agenda/agenda_index.php?action=calendar&popup=1');\">
-      <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
+      <script>calendar('tf_subscription_timeafter','$subscription_timeafter')</script>
     </td>     
   </tr>
   <tr>
@@ -1470,10 +1457,7 @@ function html_publication_criterion($rec_q,$pub_q) {
     <td class=\"detailForm\"><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
     <td class=\"detailForm\">&nbsp;</td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-      <input readonly=\"true\" type=\"text\" size=\"10\" name=\"tf_subscription_timebefore\" value=\"\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_subscription_timebefore,'$path/agenda/agenda_index.php?action=calendar&popup=1');\">
-      <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
+      <script>calendar('tf_subscription_timebefore','$subscription_timebefore')</script>
     </td>
   </tr>
   
