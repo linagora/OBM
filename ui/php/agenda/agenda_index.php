@@ -149,8 +149,7 @@ if ($action == "index") {
 
 } elseif ($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (!$agenda["force"] && $conflicts = check_agenda_decision_conflict($agenda)) {
-    require("$obminclude/calendar.js");
+  if ($agenda["force"] && $conflicts = check_agenda_decision_conflict($agenda)) {
     require("agenda_js.inc");
     $display["search"] = html_agenda_dis_conflict($agenda, $conflicts) ;
     $display["detail"] = html_agenda_conflict_form($agenda);
@@ -191,7 +190,6 @@ if ($action == "index") {
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  require("$obminclude/calendar.js");
   $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
 
 } elseif ($action == "insert") {
@@ -200,7 +198,6 @@ if ($action == "index") {
   if (check_agenda_data_form($agenda)) {
     if ( (!$agenda["force"])
 	 && ($conflicts = check_agenda_conflict($agenda, $cal_entity_id)) ) {
-      require("$obminclude/calendar.js");
       $display["search"] = html_agenda_dis_conflict($agenda,$conflicts) ;
       $display["msg"] .= display_err_msg($l_insert_error);
       $display["detail"] = dis_agenda_event_form($action, $agenda, "",$cal_entity_id);
@@ -211,7 +208,6 @@ if ($action == "index") {
       $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
     }
   } else {
-    require("$obminclude/calendar.js");
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
   }
@@ -223,7 +219,6 @@ if ($action == "index") {
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($agenda["id"] > 0) {  
-    require("$obminclude/calendar.js");
     require("agenda_js.inc");
     $eve_q = run_query_agenda_detail($agenda["id"]);
     $entities = get_agenda_event_entity($agenda["id"]);
@@ -236,7 +231,6 @@ if ($action == "index") {
   if (check_agenda_data_form($agenda)) {
     if ( (!$agenda["force"])
 	 && ($conflicts = check_agenda_conflict($agenda, $cal_entity_id)) ) {
-      require("$obminclude/calendar.js");
       require("agenda_js.inc");
       $display["search"] = html_agenda_dis_conflict($agenda,$conflicts) ;
       $display["msg"] .= display_err_msg($l_insert_error);
@@ -250,7 +244,6 @@ if ($action == "index") {
     }
   } else {
     require("agenda_js.inc");
-    require("$obminclude/calendar.js");    
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
   }
@@ -306,7 +299,6 @@ if ($action == "index") {
 } elseif ($action == "new_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  require("$obminclude/calendar.js");
   $display["detail"] = dis_agenda_meeting_form($agenda, $cal_entity_id);
 
 } elseif ($action == "perform_meeting")  {

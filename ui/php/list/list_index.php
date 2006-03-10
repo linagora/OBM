@@ -70,7 +70,6 @@ if ($action == "ext_get_id") {
 
 }
 else if ($action == "new_criterion") {
-  require("$obminclude/calendar.js");  
   $display["detail"] = dis_add_criterion_form($list);
 
 } elseif (($action == "index") || ($action == "")) {
