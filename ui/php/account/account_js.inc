@@ -12,7 +12,7 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 // user input checking in html_account_search_form()
-function check_form(f_acc){
+function check_account_form(f_acc){
   j_number=f_acc.tf_number.value;
   if ((j_number != \"\") && check_number(j_number)==null){
     alert (\"$l_check_number\"); 
@@ -21,7 +21,7 @@ function check_form(f_acc){
   return true;
 }
 
-function check_cpte(f_acc){
+function check_account_cpte(f_acc){
  // moving spaces away
  f_acc.tf_number.value=f_acc.tf_number.value.replace(/ /g,\"\");
 
@@ -57,7 +57,7 @@ function valider_suppression() {
 
 
 // balance compute date checking
-function check_balance_form (f_acc) {
+function check_account_balance_form (f_acc) {
  if (f_acc.tf_balance_date.value = \"\") {
   alert(\"$l_choose_balance_date\" + \" : $l_fill_date\");
   return false;

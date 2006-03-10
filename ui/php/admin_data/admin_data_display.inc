@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : admin_data_display.inc                                      //
 //     - Desc  : Data admin display File                                     //
@@ -13,7 +13,7 @@
 // Parameters:
 //   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_help($mode) {
+function dis_admin_data_help($mode) {
 
   if ($mode == "html")
     echo "<table class=\"detail\">
@@ -38,7 +38,7 @@ function dis_help($mode) {
 //   - $modules     : target modules to show action
 //   - $upd_modules : target modules to update action
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_index($mode, $actions, $modules, $upd_modules) {
+function dis_admin_data_index($mode, $actions, $modules, $upd_modules) {
 
   switch ($mode) {
   case "txt":
@@ -139,20 +139,20 @@ function html_data_index($actions, $modules, $upd_modules) {
 //   - $mode   : "txt" or "html"
 //   - $module : module name
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data($action, $mode, $module) {
+function dis_admin_data($action, $mode, $module) {
   global $debug, $c_all;
 
   if ($module == '$c_all') {
-    dis_data_company($action, $mode);
+    dis_admin_data_company($action, $mode);
 
   } else if ($module == "company") {
-    dis_data_company($action, $mode);
+    dis_admin_data_company($action, $mode);
   } else if ($module == "deal") {
-    dis_data_deal($action, $mode);
+    dis_admin_data_deal($action, $mode);
   } else if ($module == "list") {
-    dis_data_list($action, $mode);
+    dis_admin_data_list($action, $mode);
   } else if ($module == "document") {
-    dis_data_document($action, $mode);
+    dis_admin_data_document($action, $mode);
   } else {
     echo "No data inconsistency to check here... bye.";
   }
@@ -166,11 +166,11 @@ function dis_data($action, $mode, $module) {
 //   - $action : data_show || data_update (proceed the update)
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_company($action, $mode) {
+function dis_admin_data_company($action, $mode) {
   global $debug, $c_all;
 
   // Get the company list
-  $c_q = get_company_list();
+  $c_q = get_admin_data_company_list();
   $cpt_c = 0;
   $cpt_cu = 0;
   $nb_comp = $c_q->num_rows();
@@ -215,9 +215,9 @@ function dis_data_company($action, $mode) {
     $deal_num = $c_q->f("company_deal_number");
     $deal_total = $c_q->f("company_deal_total");
 
-    $new_con_num = get_company_contact_number($id);
-    $new_deal_num = get_company_active_deal_number($id);
-    $new_deal_total = get_company_total_deal_number($id);
+    $new_con_num = get_admin_data_company_contact_number($id);
+    $new_deal_num = get_admin_data_company_active_deal_number($id);
+    $new_deal_total = get_admin_data_company_total_deal_number($id);
     //$new_deal_num = "0";
     //$new_deal_total = "0";
 
@@ -238,7 +238,7 @@ function dis_data_company($action, $mode) {
       }
 
       if ($action == "data_update") {
-	$retour = update_one_company($id, $new_con_num, $new_deal_num, $new_deal_total);
+	$retour = update_admin_data_one_company($id, $new_con_num, $new_deal_num, $new_deal_total);
 	if ($retour) {
 	  if ($mode == "txt") {
 	    echo "OK";
@@ -294,11 +294,11 @@ function dis_data_company($action, $mode) {
 //   - $action : data_show || data_update (proceed the update)
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_deal($action, $mode) {
+function dis_admin_data_deal($action, $mode) {
   global $path, $debug, $c_all, $php_regexp_number;
 
   // Get the deal list
-  $d_q = get_deal_list();
+  $d_q = get_admin_data_deal_list();
   $cpt_d = 0;
   $cpt_du = 0;
   $nb_deal = $d_q->num_rows();
@@ -363,7 +363,7 @@ function dis_data_deal($action, $mode) {
       if ($action == "data_update") {
 	$retour = false;
 	if ( ($new_hitrate != "") && ($new_hitrate != $hitrate) ) {
-	  $retour = update_one_deal($id, $new_hitrate);
+	  $retour = update_admin_data_one_deal($id, $new_hitrate);
 	}
 	if ($retour) {
 	  if ($mode == "txt") {
@@ -421,14 +421,14 @@ function dis_data_deal($action, $mode) {
 //   - $action : data_show || data_update (proceed the update)
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_list($action, $mode) {
+function dis_admin_data_list($action, $mode) {
   global $debug, $path, $c_all;
 
   // To include specic list queries (make_query_from_criteria,...)
   require_once("$path/list/list_query.inc");
 
   // Get the list list
-  $l_q = get_list_list();
+  $l_q = get_admin_data_list_list();
   $cpt_l = 0;
   $cpt_lu = 0;
   $nb_l = $l_q->num_rows();
@@ -484,14 +484,14 @@ function dis_data_list($action, $mode) {
     }
 
     if ($new_query != "") {
-      $query_nb = get_list_query_num_rows($dynlist, $l_q);
+      $query_nb = get_admin_data_list_query_num_rows($dynlist, $l_q);
       $query_txt = $query_nb;
     } else {
       $query_nb = "0";
       $query_txt = "No";
     }
 
-    $new_sta_nb = get_list_static_contact_nb($id);
+    $new_sta_nb = get_admin_data_list_static_contact_nb($id);
     $new_dyn_nb = $query_nb;
 
     if (($sta_nb != $new_sta_nb) || ($query != $new_query)) {
@@ -519,7 +519,7 @@ function dis_data_list($action, $mode) {
 
       if ($action == "data_update") {
 	$up_query = addslashes($new_query);
-	$retour = update_one_list($id, $new_sta_nb, $new_dyn_nb, $up_query);
+	$retour = update_admin_data_one_list($id, $new_sta_nb, $new_dyn_nb, $up_query);
 	if ($retour) {
 	  if ($mode == "txt") {
 	    echo "OK";
@@ -576,13 +576,13 @@ function dis_data_list($action, $mode) {
 //   - $action : data_show || data_update (proceed the update)
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_document($action, $mode) {
+function dis_admin_data_document($action, $mode) {
   global $debug, $c_all, $php_regexp_number, $cdocument_root;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   // Get the document list
-  $d_q = get_document_list();
-  $disk_array = get_file_list("$cdocument_root/");
+  $d_q = get_admin_data_document_list();
+  $disk_array = get_admin_data_file_list("$cdocument_root/");
   $nb_files = count ($disk_array);
   $cpt_err = 0;
   $nb_document = $d_q->num_rows();
@@ -631,9 +631,9 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
     } elseif ($kind == $cdoc_kind_link) {
       $type = "Link";
     }
-    $disk_path = get_document_disk_path($id);
+    $disk_path = get_admin_data_document_disk_path($id);
     $disk_fn = $disk_path . $id;
-    $disk_rel = get_document_disk_relative_path($id);
+    $disk_rel = get_admin_data_document_disk_relative_path($id);
     
     // If document is a file, check if present in filesystem
     if ($kind == $cdoc_kind_file) {
@@ -722,10 +722,10 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
 // Parametres:
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_sound_aka_update($mode) {
+function dis_admin_data_sound_aka_update($mode) {
 
-  dis_sound_aka_update_company($mode);
-  dis_sound_aka_update_contact($mode);
+  dis_admin_data_sound_aka_update_company($mode);
+  dis_admin_data_sound_aka_update_contact($mode);
 
 }
 
@@ -736,11 +736,11 @@ function dis_sound_aka_update($mode) {
 // Parametres:
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_sound_aka_update_company($mode) {
+function dis_admin_data_sound_aka_update_company($mode) {
   global $debug, $c_all, $l_module_company;
 
   // Get the company list
-  $c_q = get_company_list();
+  $c_q = get_admin_data_company_list();
   $cpt_c = 0;
   $cpt_cu = 0;
   $nb_comp = $c_q->num_rows();
@@ -774,7 +774,7 @@ function dis_sound_aka_update_company($mode) {
     }
     $sound = phonetic_key($name);
 
-    $retour = update_sound_aka_one_company($id, $aka, $sound);
+    $retour = update_admin_data_sound_aka_one_company($id, $aka, $sound);
 
     if ($cpt_c % 100 == 0) {
       if ($mode =="txt") {
@@ -810,11 +810,11 @@ function dis_sound_aka_update_company($mode) {
 // Parametres:
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_sound_aka_update_contact($mode) {
+function dis_admin_data_sound_aka_update_contact($mode) {
   global $debug, $c_all, $l_module_contact;
 
   // Get the contact list
-  $c_q = get_contact_list();
+  $c_q = get_admin_data_contact_list();
   $cpt_c = 0;
   $cpt_cu = 0;
   $nb = $c_q->num_rows();
@@ -854,7 +854,7 @@ function dis_sound_aka_update_contact($mode) {
       }
       $sound = phonetic_key($name);
       
-      $retour = update_sound_aka_one_contact($id, $aka, $sound);
+      $retour = update_admin_data_sound_aka_one_contact($id, $aka, $sound);
     }
 
     if ($cpt_c % 100 == 0) {
@@ -883,3 +883,5 @@ function dis_sound_aka_update_contact($mode) {
       </table>";
   }
 }
+
+?>

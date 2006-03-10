@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_data_index.php                                         //
 //     - Desc : Update static database data (company contact number,...)     //
@@ -39,7 +39,7 @@ if ($mode == "") $mode = "txt";
 switch ($mode) {
  case "txt":
    include("$obminclude/global_pref.inc"); 
-   $retour = parse_arg($argv);
+   $retour = parse_admin_data_arg($argv);
    if (! $retour) { end; }
    break;
  case "html":
@@ -58,19 +58,19 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_help($mode);
+    dis_admin_data_help($mode);
     break;
   case "index":
-    dis_data_index($mode, $acts, $target_modules, $target_upd_modules);
+    dis_admin_data_index($mode, $acts, $target_modules, $target_upd_modules);
     break;
   case "data_show":
-    dis_data($action, $mode, $target_module);
+    dis_admin_data($action, $mode, $target_module);
     break;
   case "data_update":
-    dis_data($action, $mode, $target_module);
+    dis_admin_data($action, $mode, $target_module);
     break;
   case "sound_aka_update":
-    dis_sound_aka_update($mode);
+    dis_admin_data_sound_aka_update($mode);
     break;
   default:
     echo "No action specified !";
@@ -93,7 +93,7 @@ switch ($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_command_use($msg="") {
+function dis_admin_data_command_use($msg="") {
   global $acts, $target_modules;
 
   while (list($nb, $val) = each ($acts)) {
@@ -120,7 +120,7 @@ Ex: php4 admin_data_index.php -a data_show -m company
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function parse_arg($argv) {
+function parse_admin_data_arg($argv) {
   global $debug, $acts, $target_modules;
   global $action, $target_module;
 
@@ -140,7 +140,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }
       else {
-        dis_command_use("Invalid target_module ($val2)");
+        dis_admin_data_command_use("Invalid target_module ($val2)");
 	return false;
       }
       break;
@@ -151,7 +151,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid action ($val2)");
+	dis_admin_data_command_use("Invalid action ($val2)");
 	return false;
       }
       break;
@@ -206,4 +206,4 @@ function get_admin_data_action() {
 
 }
 
-</script>
+?>

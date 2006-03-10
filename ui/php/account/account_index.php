@@ -60,7 +60,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_insert($account);
+  run_query_account_insert($account);
   $display["msg"] = display_ok_msg($l_insert_ok);
   require("account_js.inc");
   $display["search"] = html_account_search_form($action, $account);
@@ -69,14 +69,14 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   if ($account["id"] > 0) {
-    $ac_q = run_query_detail($account["id"]);
+    $ac_q = run_query_account_detail($account["id"]);
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($account["id"] > 0) {
-    $ac_q = run_query_detail($account["id"]);
+    $ac_q = run_query_account_detail($account["id"]);
     require("account_js.inc");
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_form($ac_q, $action);
@@ -85,10 +85,10 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  run_query_update($account);
+  run_query_account_update($account);
 
   if ($account["id"] > 0) {
-    $ac_q = run_query_detail($account["id"]);
+    $ac_q = run_query_account_detail($account["id"]);
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
@@ -99,12 +99,12 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   // checking that no payment is linked to this account
-  $q_related_payments = run_query_search_payments ($account["id"]);
+  $q_related_payments = run_query_account_search_payments ($account["id"]);
   if ($q_related_payments->nf() != 0){
-    $display["detail"] = html_impossible_deletion ($account["id"], $q_related_payments);
+    $display["detail"] = html_account_impossible_deletion ($account["id"], $q_related_payments);
     // maybe a confirmation from the user would be enough...
   } else {
-    run_query_delete($account["id"]);
+    run_query_account_delete($account["id"]);
     $display["msg"] = display_ok_msg($l_delete_ok);
     require("account_js.inc");
     $display["search"] = html_account_search_form($action,'');
@@ -115,14 +115,14 @@ if ($action == "index" || $action == "") {
   /*  if (true){
     display_ok_msg ("FIXME PERMISSIONS");
     require ("account_js.inc");
-    $q_account = run_query_detail ($account["id"]);
+    $q_account = run_query_account_detail ($account["id"]);
     // used to compute today balance :
-    $q_payments = run_query_search_payments($account["id"], date ("Y-m-d"));
+    $q_payments = run_query_account_search_payments($account["id"], date ("Y-m-d"));
     // used to compute balance on $tf_balance_date :
-    $q_expected_payments = run_query_search_expected_payments ($account["id"], $tf_balance_date);
+    $q_expected_payments = run_query_account_search_expected_payments ($account["id"], $tf_balance_date);
     $payments_options = run_query_display_options ($auth->auth["uid"], "payment");
     $expected_payments_options = run_query_display_options ($auth->auth["uid"], "payment");
-    html_compute_balance ($q_account, $q_payments, $q_expected_payments, $payments_options, $expected_payments_options, $tf_balance_date);
+    html_account_compute_balance ($q_account, $q_payments, $q_expected_payments, $payments_options, $expected_payments_options, $tf_balance_date);
   } else{
     display_err_msg($l_error_permission);
   }
@@ -131,17 +131,17 @@ if ($action == "index" || $action == "") {
     // account_js.inc needed to check date input by user...
     require ("account_js.inc");
     $display["msg"] = display_ok_msg ("FIXME PERMISSIONS");
-    //$q_account = run_query_detail ($account["id"]);
+    //$q_account = run_query_account_detail ($account["id"]);
     //    $payments_options = run_query_display_options ($auth->auth["uid"],"payment");
     $payments_prefs = get_display_pref ($auth->auth["uid"], "payment");
 
-    $display["detail"] = html_compute_balance ($account["id"], $payments_prefs, $tf_balance_date);
+    $display["detail"] = html_account_compute_balance ($account["id"], $payments_prefs, $tf_balance_date);
 
   } else {
     $display["msg"] = display_err_msg($l_error_permission);
   } 
   /*  
-$q_account = run_query_detail ($account["id"]);
+$q_account = run_query_account_detail ($account["id"]);
   $today = account_compute_balance ($q_account); 
   $other = account_compute_balance ($q_account, $tf_balance_date);  
   echo "<br>calcul du solde pour aujourd'hui : <br>"; 

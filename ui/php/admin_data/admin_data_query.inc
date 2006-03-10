@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_data_query.inc                                         //
 //     - Desc : Data admin Query File                                        //
@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - company list                                            //
 ///////////////////////////////////////////////////////////////////////////////
-function get_company_list() {
+function get_admin_data_company_list() {
   global $cdg_sql;
 
   $query = "SELECT company_id,
@@ -36,7 +36,7 @@ function get_company_list() {
 // Parameters:
 //   - $id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function get_company_contact_number($id) {
+function get_admin_data_company_contact_number($id) {
   global $cdg_sql;
 
   $query = "SELECT count(contact_id) as nb
@@ -58,7 +58,7 @@ function get_company_contact_number($id) {
 // Parameters:
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_company_active_deal_number($id) {
+function get_admin_data_company_active_deal_number($id) {
   global $cdg_sql;
 
   $query = "SELECT count(deal_id) as nb
@@ -80,7 +80,7 @@ function get_company_active_deal_number($id) {
 // Parameters:
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_company_total_deal_number($id) {
+function get_admin_data_company_total_deal_number($id) {
   global $cdg_sql;
 
   $query = "SELECT count(deal_id) as nb
@@ -105,7 +105,7 @@ function get_company_total_deal_number($id) {
 //   - $deal_num   : active deal number
 //   - $deal_total : total deal number
 ///////////////////////////////////////////////////////////////////////////////
-function update_one_company($id, $con_num, $deal_num, $deal_total) {
+function update_admin_data_one_company($id, $con_num, $deal_num, $deal_total) {
   global $cdg_sql;
 
   $query = "UPDATE Company SET
@@ -124,7 +124,7 @@ function update_one_company($id, $con_num, $deal_num, $deal_total) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - Deal list
 ///////////////////////////////////////////////////////////////////////////////
-function get_deal_list() {
+function get_admin_data_deal_list() {
   global $cdg_sql;
 
   $query = "SELECT deal_id,
@@ -150,7 +150,7 @@ function get_deal_list() {
 //   - $id      : deal id
 //   - $hitrate : deal new hitrate
 ///////////////////////////////////////////////////////////////////////////////
-function update_one_deal($id, $hitrate) {
+function update_admin_data_one_deal($id, $hitrate) {
   global $cdg_sql;
 
   $query = "UPDATE Deal SET
@@ -167,7 +167,7 @@ function update_one_deal($id, $hitrate) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - List list
 ///////////////////////////////////////////////////////////////////////////////
-function get_list_list() {
+function get_admin_data_list_list() {
   global $cdg_sql;
 
   $query = "SELECT list_id,
@@ -198,7 +198,7 @@ function get_list_list() {
 //   - $dyn_nb    : dynamic contact number
 //   - $new_query : query
 ///////////////////////////////////////////////////////////////////////////////
-function update_one_list($id, $sta_nb, $dyn_nb, $new_query) {
+function update_admin_data_one_list($id, $sta_nb, $dyn_nb, $new_query) {
   global $cdg_sql;
 
   $query = "UPDATE List SET
@@ -217,7 +217,7 @@ function update_one_list($id, $sta_nb, $dyn_nb, $new_query) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - document list
 ///////////////////////////////////////////////////////////////////////////////
-function get_document_list() {
+function get_admin_data_document_list() {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -251,7 +251,7 @@ function get_document_list() {
 // Returns:
 //   real disk path
 ///////////////////////////////////////////////////////////////////////////////
-function get_document_disk_relative_path($id) {
+function get_admin_data_document_disk_relative_path($id) {
 
   // The document disk path set in the subdirectory named "last id number"
   // Get the last number from Id
@@ -271,7 +271,7 @@ function get_document_disk_relative_path($id) {
 // Returns:
 // Array( [$fullname] => array([0]=>$path [1]=>$name), ..)
 ///////////////////////////////////////////////////////////////////////////////
-function get_file_list($root, $with_dir=false) {
+function get_admin_data_file_list($root, $with_dir=false) {
   global $cdocument_root;
 
   $tree = array();
@@ -297,7 +297,7 @@ function get_file_list($root, $with_dir=false) {
 	  unset($tree[$relative_path.$file]);
 	}
 	// We recurse into it
-	$result =  get_file_list("$path/");
+	$result =  get_admin_data_file_list("$path/");
 	if ($result) {
 	  $tree = array_merge($tree,$result);
 	}
@@ -311,7 +311,7 @@ function get_file_list($root, $with_dir=false) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - contact list                                            //
 ///////////////////////////////////////////////////////////////////////////////
-function get_contact_list() {
+function get_admin_data_contact_list() {
   global $cdg_sql;
 
   $query = "SELECT contact_id,
@@ -335,7 +335,7 @@ function get_contact_list() {
 //   - $aka   : aka to insert
 //   - $sound : sound key to insert
 ///////////////////////////////////////////////////////////////////////////////
-function update_sound_aka_one_company($id, $aka, $sound) {
+function update_admin_data_sound_aka_one_company($id, $aka, $sound) {
   global $cdg_sql;
 
   $aka_s = addslashes($aka);
@@ -360,7 +360,7 @@ function update_sound_aka_one_company($id, $aka, $sound) {
 //   - $aka   : aka to insert
 //   - $sound : sound key to insert
 ///////////////////////////////////////////////////////////////////////////////
-function update_sound_aka_one_contact($id, $aka, $sound) {
+function update_admin_data_sound_aka_one_contact($id, $aka, $sound) {
   global $cdg_sql;
 
   $aka_s = addslashes($aka);
@@ -376,3 +376,5 @@ function update_sound_aka_one_contact($id, $aka, $sound) {
 
   return $retour;
 }
+
+?>

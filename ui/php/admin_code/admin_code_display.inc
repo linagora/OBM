@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_code_display.inc                                       //
 //     - Desc : code admin display File                                      //
@@ -13,7 +13,7 @@
 // Parameters:
 //   - $mode   : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_help($mode) {
+function dis_admin_code_help($mode) {
 
   if ($mode == "html")
     echo "<table class=\"detail\">
@@ -36,14 +36,14 @@ function dis_help($mode) {
 //   - $mode  : "txt" ou "html"
 //   - $words : list of excluded words
 ///////////////////////////////////////////////////////////////////////////////
-function dis_code_index($mode, $actions, $words) {
+function dis_admin_code_code_index($mode, $actions, $words) {
 
   switch ($mode) {
   case "txt":
     echo "try --help to get info on available actions. ";
     break;
   case "html":
-    html_code_index($actions, $words);
+    html_admin_code_index($actions, $words);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -55,7 +55,7 @@ function dis_code_index($mode, $actions, $words) {
 // Display the HTML search form for code module
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_code_index($actions, $words) {
+function html_admin_code_index($actions, $words) {
   global $modules, $l_execute;
 
   // modules SELECT
@@ -132,7 +132,7 @@ function html_code_index($actions, $words) {
 // Parameters:
 //   - $mode  : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_amp($mode) {
+function dis_admin_code_amp($mode) {
   global $obm_root, $cpt_line;
 
   if ($mode == "txt") {
@@ -142,7 +142,7 @@ function dis_amp($mode) {
   } else {
     echo "<table class=\"admin\">";
   }
-  dis_amp_directory($mode, $obm_root);
+  dis_admin_code_amp_directory($mode, $obm_root);
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ $cpt_line lines parsed
 //   - $mode  : "txt" or "html"
 //   - $dir   : directory to process
 ///////////////////////////////////////////////////////////////////////////////
-function dis_amp_directory($mode, $dir) {
+function dis_admin_code_amp_directory($mode, $dir) {
   global $exclude;
 
   $obm_dir = dir($dir);
@@ -175,13 +175,13 @@ function dis_amp_directory($mode, $dir) {
 
     if (! in_array ($entry, $exclude)) {
       if (is_dir($long_entry)) {
-	dis_amp_directory($mode, $long_entry);
+	dis_admin_code_amp_directory($mode, $long_entry);
       } else {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
 	$ext = $temp[1];
 	if (($ext == "php") || ($ext == "inc")) {
-	  dis_amp_file($mode, $long_entry);
+	  dis_admin_code_amp_file($mode, $long_entry);
 	}
       }
     }
@@ -198,7 +198,7 @@ function dis_amp_directory($mode, $dir) {
 //   - $mode : "txt" or "html"
 //   - $file : file name (complete with path)
 ///////////////////////////////////////////////////////////////////////////////
-function dis_amp_file($mode, $file) {
+function dis_admin_code_amp_file($mode, $file) {
   global $regexp, $cpt_line;
 
   $first = true;  // first line matching in this file
@@ -253,14 +253,14 @@ function dis_amp_file($mode, $file) {
 //   - $mode   : "txt" or "html"
 //   - $module : module to process (or All)
 ///////////////////////////////////////////////////////////////////////////////
-function dis_unused_functions($mode, $module="") {
+function dis_admin_code_unused_functions($mode, $module="") {
   global $path, $c_all, $def_func, $used_func;
 
   if (($module != $c_all) && ($module != "")) $root = "$path/$module";
   else $root = "$path/..";
 
-  $def_func = get_def_func_directory($root);
-  $used_func = get_used_functions($root);
+  $def_func = get_admin_code_def_func_directory($root);
+  $used_func = get_admin_code_used_functions($root);
   
   if ($mode == "txt") {
     echo "
@@ -276,7 +276,7 @@ File   --   Line   --   Function   --   Used
       <td class=\"adminHead\"> # used</td>
     </tr>";
   }
-  dis_unused_func_content($mode, $def_func, $used_func);
+  dis_admin_code_unused_func_content($mode, $def_func, $used_func);
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ File   --   Line   --   Function   --   Used
 //   - $def  : defined functions array
 //   - $used : used functions array
 ///////////////////////////////////////////////////////////////////////////////
-function dis_unused_func_content($mode, $def, $used) {
+function dis_admin_code_unused_func_content($mode, $def, $used) {
 
   foreach ($def as $func => $fa) {
     $def_file = $fa["file"];
@@ -334,7 +334,7 @@ function dis_unused_func_content($mode, $def, $used) {
 //   - $mode : "txt" or "html"
 //   - $func : function to display
 ///////////////////////////////////////////////////////////////////////////////
-function dis_function_uses($mode, $func) {
+function dis_admin_code_function_uses($mode, $func) {
   global $obm_root, $def_func, $used_func;
 
   if ($mode == "txt") {
@@ -354,7 +354,7 @@ Line   --   File   --   #Use
       <td class=\"adminHead\"> # used</td>
     </tr>";
   }
-  dis_function_uses_content($mode, $func, $obm_root);
+  dis_admin_code_function_uses_content($mode, $func, $obm_root);
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
@@ -374,7 +374,7 @@ Line   --   File   --   #Use
 //   - $function : function to search
 //   - $dir      : directory to process
 ///////////////////////////////////////////////////////////////////////////////
-function dis_function_uses_content($mode, $function, $dir) {
+function dis_admin_code_function_uses_content($mode, $function, $dir) {
   global $exclude;
 
   $obm_dir = dir($dir);
@@ -384,13 +384,13 @@ function dis_function_uses_content($mode, $function, $dir) {
 
     if (! in_array ($entry, $exclude)) {
       if (is_dir($long_entry)) {
-	dis_function_uses_content($mode, $function, $long_entry);
+	dis_admin_code_function_uses_content($mode, $function, $long_entry);
       } else {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
 	$ext = $temp[1];
 	if (($ext == "php") || ($ext == "inc")) {
-	  dis_function_uses_content_file($mode, $function, $long_entry);
+	  dis_admin_code_function_uses_content_file($mode, $function, $long_entry);
 	}
       }
     }
@@ -408,7 +408,7 @@ function dis_function_uses_content($mode, $function, $dir) {
 //   - $function : function to search
 //   - $file     : file to process
 ///////////////////////////////////////////////////////////////////////////////
-function dis_function_uses_content_file($mode, $function, $file) {
+function dis_admin_code_function_uses_content_file($mode, $function, $file) {
   global $regexp_used_func, $regexp_used_func_not, $used_table;
 
   $contents = array();
@@ -449,3 +449,5 @@ function dis_function_uses_content_file($mode, $function, $file) {
     }
   }
 }
+
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_code_index.php                                         //
 //     - Desc : code admin index File                                        //
@@ -33,7 +33,7 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
-   $retour = parse_arg($argv);
+   $retour = parse_admin_code_arg($argv);
    if (! $retour) { end; }
    break;
  case "html":
@@ -52,19 +52,19 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_help($mode);
+    dis_admin_code_help($mode);
     break;
   case "index":
-    dis_code_index($mode, $acts, $words);
+    dis_admin_code_code_index($mode, $acts, $words);
     break;
   case "show_amp":
-    dis_amp($mode, $words);
+    dis_admin_code_amp($mode, $words);
     break;
   case "func_unused":
-    dis_unused_functions($mode, $param_module);
+    dis_admin_code_unused_functions($mode, $param_module);
     break;
   case "function_uses":
-    dis_function_uses($mode, $function);
+    dis_admin_code_function_uses($mode, $function);
     break;
   default:
     echo "No action specified !";
@@ -87,7 +87,7 @@ switch ($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_command_use($msg="") {
+function dis_admin_code_command_use($msg="") {
   global $acts, $target_modules, $langs, $themes;
 
   while (list($nb, $val) = each ($acts)) {
@@ -113,7 +113,7 @@ Ex: php4 admin_code_index.php -a show_amp
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function parse_arg($argv) {
+function parse_admin_code_arg($argv) {
   global $debug, $acts, $target_modules;
   global $action, $param_module;
 
@@ -133,7 +133,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-m -> \$param_module=$val2\n"; }
       }
       else {
-        dis_command_use("Invalid module ($val2)");
+        dis_admin_code_command_use("Invalid module ($val2)");
 	return false;
       }
       break;
@@ -144,7 +144,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid action ($val2)");
+	dis_admin_code_command_use("Invalid action ($val2)");
 	return false;
       }
       break;
@@ -155,7 +155,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-f -> \$function=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid action ($val2)");
+	dis_admin_code_command_use("Invalid action ($val2)");
 	return false;
       }
       break;
@@ -215,3 +215,4 @@ function get_admin_code_action() {
 
 }
 
+?>

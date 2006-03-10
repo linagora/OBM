@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_display.inc                                            //
 //     - Desc : Admin Display File                                           //
@@ -12,7 +12,7 @@
 // Parameters:
 //   - $mode   : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_help($mode) {
+function dis_admin_help($mode) {
 
   if ($mode == "html")
     echo "<table class=\"details\">
@@ -35,15 +35,15 @@ function dis_help($mode) {
 //   - $mode     : "txt" ou "html"
 //   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
-function dis_index($mode, $lifetime) {
+function dis_admin_index($mode, $lifetime) {
 
   switch ($mode) {
   case "txt":
     echo "try -h to help\n";
     break;
   case "html":
-    $nb_user_ses = get_usersession_number();
-    $obm_u = run_query_active_user($lifetime);
+    $nb_user_ses = get_admin_usersession_number();
+    $obm_u = run_query_admin_active_user($lifetime);
     html_admin_status($lifetime, $nb_user_ses, $obm_u);
     break;
   default:
@@ -66,7 +66,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
 
   $date = datetime_format();
   if ($lifetime > 0) {
-    $nb_sess_to_clear = run_query_count_passive_sess($lifetime);
+    $nb_sess_to_clear = run_query_admin_count_passive_sess($lifetime);
     $d_lifetime = $lifetime;
   } else {
     $nb_sess_to_clear = 0;
@@ -164,22 +164,23 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
 //   - $mode     : "txt" or "html"                                           //
 //   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
-function dis_clear_sess($mode, $lifetime) {
+function dis_admin_clear_sess($mode, $lifetime) {
   global $cdg_sql;
 
   if ($lifetime > 0) {
     $date_limit = date("Y-m-d H:i:s",time() - $lifetime);
-    $obm_q = run_query_passive_user($lifetime);
+    $obm_q = run_query_admin_passive_user($lifetime);
 
     while($obm_q->next_record()) {
-      run_query_log_session($obm_q);
-      run_query_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
+      run_query_admin_log_session($obm_q);
+      run_query_admin_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
     }
   } else {
     echo "Sessions are unlimited (lifetime = 0) !";
   }
 
   if ($mode == "html")
-    dis_index($mode, $lifetime);
+    dis_admin_index($mode, $lifetime);
 
 }
+?>

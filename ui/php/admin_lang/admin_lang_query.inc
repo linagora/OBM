@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_lang_query.inc                                         //
 //     - Desc : lang admin Query File                                        //
@@ -9,15 +9,15 @@
 
 $actions = array ('help', 'index', 'show_src', 'show_lang', 'comp_lang', 'comp_header_lang');
 $target_modules = get_modules_array();
-$langs = get_langs_array();
-$themes = get_themes_array();
+$langs = get_admin_lang_langs_array();
+$themes = get_admin_lang_themes_array();
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the lang list
 // Return : $langs : array of langs
 ///////////////////////////////////////////////////////////////////////////////
-function get_langs_array() {
+function get_admin_lang_langs_array() {
   global $obminclude, $path;
 
   // Lang dirs to exclude
@@ -40,7 +40,7 @@ function get_langs_array() {
 // Get the theme list
 // Return : $themes : array of themes
 ///////////////////////////////////////////////////////////////////////////////
-function get_themes_array() {
+function get_admin_lang_themes_array() {
   global $obminclude, $path;
 
   // Themes dirs to exclude
@@ -66,7 +66,7 @@ function get_themes_array() {
 // Returns:
 //   - $resultat : array of var present in the module sources
 ///////////////////////////////////////////////////////////////////////////////
-function get_src_vars($module) {
+function get_admin_lang_src_vars($module) {
   global $debug, $path;
 
   if ($debug > 0) {
@@ -122,7 +122,7 @@ function get_src_vars($module) {
 // Returns:
 //   - $resultat : array of var present and used in the module sources
 ///////////////////////////////////////////////////////////////////////////////
-function get_src_used_vars($module) {
+function get_admin_lang_src_used_vars($module) {
   global $debug, $path;
 
   if ($debug > 0) {
@@ -196,7 +196,7 @@ function get_src_used_vars($module) {
 // Returns:
 //   - $resultat : array of var present and used in the file source
 ///////////////////////////////////////////////////////////////////////////////
-function get_src_used_vars_file($myfile) {
+function get_admin_lang_src_used_vars_file($myfile) {
   global $debug, $path;
 
   if ($debug > 0) {
@@ -252,7 +252,7 @@ function get_src_used_vars_file($myfile) {
 ///////////////////////////////////////////////////////////////////////////////
 // Returns the list of all vars used in OBM modules                          //
 ///////////////////////////////////////////////////////////////////////////////
-function get_all_src_used_vars() {
+function get_admin_lang_all_src_used_vars() {
   global $debug, $obminclude, $path, $target_modules;
 
   $all_vars = array();
@@ -263,19 +263,19 @@ function get_all_src_used_vars() {
       echo "All Source used vars : module : $mod";
     }
 
-    $vars = get_src_used_vars($mod);
+    $vars = get_admin_lang_src_used_vars($mod);
     $all_vars = array_merge($all_vars, $vars);
   }
 
-  $vars = get_src_used_vars_file("$path/../$obminclude/global.inc");
+  $vars = get_admin_lang_src_used_vars_file("$path/../$obminclude/global.inc");
   $all_vars = array_merge($all_vars, $vars);
-  $vars = get_src_used_vars_file("$path/../$obminclude/global_display.inc");
+  $vars = get_admin_lang_src_used_vars_file("$path/../$obminclude/global_display.inc");
   $all_vars = array_merge($all_vars, $vars);
-  $vars = get_src_used_vars_file("$path/../$obminclude/global_pref.inc");
+  $vars = get_admin_lang_src_used_vars_file("$path/../$obminclude/global_pref.inc");
   $all_vars = array_merge($all_vars, $vars);
-  $vars = get_src_used_vars_file("$path/../$obminclude/lang/fr/check_date_js.inc");
+  $vars = get_admin_lang_src_used_vars_file("$path/../$obminclude/lang/fr/check_date_js.inc");
   $all_vars = array_merge($all_vars, $vars);
-  $vars = get_src_used_vars_file("$path/../$obminclude/phplib/obmlib.inc");
+  $vars = get_admin_lang_src_used_vars_file("$path/../$obminclude/phplib/obmlib.inc");
   $all_vars = array_merge($all_vars, $vars);
 
   $resultat = array_unique($all_vars);
@@ -292,7 +292,7 @@ function get_all_src_used_vars() {
 // Returns: 
 //   - $tableau : array of lang module vars : $tableau[var]=value
 ///////////////////////////////////////////////////////////////////////////////
-function get_lang_vars($module, $lang) {
+function get_admin_lang_vars($module, $lang) {
   global $debug, $obminclude, $path;
 
   $tableau = array();
@@ -334,7 +334,7 @@ function get_lang_vars($module, $lang) {
 // Returns: 
 //   - $tableau : array of global lang vars : $tableau[var]=value
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_lang_vars($lang) {
+function get_admin_lang_global_lang_vars($lang) {
   global $debug, $obminclude, $path;
 
   $tableau = array();
@@ -367,3 +367,4 @@ function get_global_lang_vars($lang) {
 
   return $tableau;
 }
+?>

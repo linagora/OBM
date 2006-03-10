@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_index.php                                              //
 //     - Desc : Administration (Language, themes,...) management index file  //
@@ -29,7 +29,7 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
-   $retour = parse_arg($argv);
+   $retour = parse_admin_arg($argv);
    include("$obminclude/global_pref.inc");
    if (! $retour) { end; }
    break;
@@ -48,13 +48,13 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_help($mode);
+    dis_admin_help($mode);
     break;
   case "index":
-    dis_index($mode, $cs_lifetime);
+    dis_admin_index($mode, $cs_lifetime);
     break;
   case "clear_sess":
-    dis_clear_sess($mode, $cs_lifetime);
+    dis_admin_clear_sess($mode, $cs_lifetime);
     break;
   default:
     echo "No action specified !";
@@ -78,7 +78,7 @@ switch ($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display command use                                                       //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_command_use($msg="") {
+function dis_admin_command_use($msg="") {
   global $acts, $target_modules, $langs, $themes;
 
   while (list($nb, $val) = each ($acts)) {
@@ -100,7 +100,7 @@ Ex: php4 admin_index.php -a clear_sess
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function parse_arg($argv) {
+function parse_admin_arg($argv) {
   global $debug, $acts, $target_modules;
   global $action, $module;
 
@@ -120,7 +120,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid action ($val2)");
+	dis_admin_command_use("Invalid action ($val2)");
 	return false;
       }
       break;
@@ -174,4 +174,4 @@ function get_admin_action() {
                                     );
 }
 
-</script>
+?>

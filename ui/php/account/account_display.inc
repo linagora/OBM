@@ -93,7 +93,7 @@ function html_account_search_form ($p_action, $account) {
 
   $block .= "
   <form method=\"get\" name=\"f_search\"
-    onsubmit=\"if (check_form(this) == false) return false; else return true;\"
+    onsubmit=\"if (check_account_form(this) == false) return false; else return true;\"
     action=\"$url\">
   <div class=\"search\">
    <div class=\"searchLabel\">$l_label_start<br />
@@ -131,7 +131,7 @@ function dis_account_search_list($account) {
   global $auth, $new_order, $order_dir,$display;
 
   $prefs = get_display_pref($auth->auth["uid"], "account");
-  $obm_q = run_query_search($account, $new_order, $order_dir);
+  $obm_q = run_query_account_search($account, $new_order, $order_dir);
   $nb_account = $obm_q->num_rows_total();
   if ($nb_account == 0) {
     $display["msg"] = display_info_msg($l_no_found);
@@ -292,7 +292,7 @@ function html_account_form($obm_q_account, $action) {
     $comment = nl2br($obm_q_account->f("account_comment"));
     // when we update, this field is only available if the account
     // is not connected to any payments
-    $q_payments = run_query_search_payments ($id);
+    $q_payments = run_query_account_search_payments ($id);
     if ($q_payments->nf() != 0) {
       $bal_state = " disabled ";
     }
@@ -355,7 +355,7 @@ function html_account_form($obm_q_account, $action) {
 //     $url_insert = url_prepare("account_index.php?action=insert");
 //     $block .= "
 //           <input type=\"button\" value=\"$l_insert\" ".
-//       " onClick=\"if (check_cpte (this.form)) {".
+//       " onClick=\"if (check_account_cpte (this.form)) {".
 //       "this.form.action='$url_insert';this.form.submit();".
 //       "}\">";
 //   }  
@@ -363,7 +363,7 @@ function html_account_form($obm_q_account, $action) {
 
   $block .= "
    <form method=\"post\" name=\"f_entity\" action=\"account_index.php\"
-         onsubmit=\"if (check_cpte(this)) return true; else return false;\" >
+         onsubmit=\"if (check_account_cpte(this)) return true; else return false;\" >
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_label</td>
@@ -437,7 +437,7 @@ function dis_account_display_pref ($prefs, $prefs_p) {
 // displays an error message when 
 // an account connected to payments is being deleted 
 ///////////////////////////////////////////////////////////////////////////////
-function html_impossible_deletion ($p_account_id, $q_related_payments) {
+function html_account_impossible_deletion ($p_account_id, $q_related_payments) {
   global $l_impossible_deletion, $l_cancel;
 
   $block .= "
@@ -465,7 +465,7 @@ function html_impossible_deletion ($p_account_id, $q_related_payments) {
 // $payments_options : display options for the list of payments used 
 // $p_date date of the compute. if none, we assume today
 //////////////////////////////////////////////////////////////////////////////
-function html_compute_balance ($p_account, $payments_options, $p_date) {
+function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   global $border, $cellspacing;
   global $col_label, $col_balance_neg, $col_balance_pos;
   global $l_old_balance, $l_in_total, $l_out_total, $l_total;
@@ -488,7 +488,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["id"]);
 
   // we display all account data :
-  $q_account = run_query_detail ($p_account["id"]);
+  $q_account = run_query_account_detail ($p_account["id"]);
   html_account_consult ($q_account, "compute_balance");
 
   // the form allowing a date input :
@@ -498,7 +498,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
   <form method=\"post\" action=\"$url\"
-  onsubmit=\"return check_balance_form (this);\">
+  onsubmit=\"return check_account_balance_form (this);\">
    <tr><td>
     <font size=-2 color=\"#$col_label\">$l_choose_balance_date</font><br>
       <script>calendar('tf_balance_date','$p_date')</script>

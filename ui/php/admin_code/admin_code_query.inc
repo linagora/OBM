@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_code_query.inc                                         //
 //     - Desc : Code admin Query File                                        //
@@ -23,7 +23,7 @@ $exclude = array('.', '..', 'CVS', 'doc', 'scripts', 'contrib', 'www');
 // Parameters:
 //   - $dir : directory to process
 ///////////////////////////////////////////////////////////////////////////////
-function get_def_func_directory($dir) {
+function get_admin_code_def_func_directory($dir) {
   global $exclude;
 
   $table = array();
@@ -36,13 +36,13 @@ function get_def_func_directory($dir) {
 
     if (! in_array ($entry, $exclude)) {
       if (is_dir($long_entry)) {
-	$table2 = get_def_func_directory($long_entry);
+	$table2 = get_admin_code_def_func_directory($long_entry);
       } else {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
 	$ext = $temp[1];
 	if (($ext == "php") || ($ext == "inc")) {
-	  $table2 = get_def_functions($long_entry);
+	  $table2 = get_admin_code_def_functions($long_entry);
 	}
       }
     }
@@ -62,7 +62,7 @@ function get_def_func_directory($dir) {
 // Returns:
 //   - $resultat : array of defined functions
 ///////////////////////////////////////////////////////////////////////////////
-function get_def_functions($file) {
+function get_admin_code_def_functions($file) {
   global $debug, $path, $regexp_def_func;
 
   if ($debug > 0) {
@@ -98,7 +98,7 @@ function get_def_functions($file) {
 // Parameters:
 //   - $dir : root directory to process
 ///////////////////////////////////////////////////////////////////////////////
-function get_used_functions($dir) {
+function get_admin_code_used_functions($dir) {
   global $exclude, $used_table;
 
   $used_table = array();
@@ -110,13 +110,13 @@ function get_used_functions($dir) {
 
     if (! in_array ($entry, $exclude)) {
       if (is_dir($long_entry)) {
-	get_used_func_directory($long_entry);
+	get_admin_code_used_func_directory($long_entry);
       } else {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
 	$ext = $temp[1];
 	if (($ext == "php") || ($ext == "inc")) {
-	  get_used_func_file($long_entry);
+	  get_admin_code_used_func_file($long_entry);
 	}
       }
     }
@@ -132,7 +132,7 @@ function get_used_functions($dir) {
 // Parameters:
 //   - $dir : directory to process
 ///////////////////////////////////////////////////////////////////////////////
-function get_used_func_directory($dir) {
+function get_admin_code_used_func_directory($dir) {
   global $exclude;
 
   $obm_dir = dir($dir);
@@ -142,13 +142,13 @@ function get_used_func_directory($dir) {
 
     if (! in_array ($entry, $exclude)) {
       if (is_dir($long_entry)) {
-	get_used_func_directory($long_entry);
+	get_admin_code_used_func_directory($long_entry);
       } else {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
 	$ext = $temp[1];
 	if (($ext == "php") || ($ext == "inc")) {
-	  get_used_func_file($long_entry);
+	  get_admin_code_used_func_file($long_entry);
 	}
       }
     }
@@ -166,7 +166,7 @@ function get_used_func_directory($dir) {
 // Returns:
 //   - $resultat : array of functions (defined or used)
 ///////////////////////////////////////////////////////////////////////////////
-function get_used_func_file($file) {
+function get_admin_code_used_func_file($file) {
   global $debug, $path, $regexp_used_func, $regexp_used_func_not, $used_table;
 
   $contents = array();
@@ -194,3 +194,5 @@ function get_used_func_file($file) {
     }
   }
 }
+
+?>

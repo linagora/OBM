@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_lang_index.php                                         //
 //     - Desc : lang admin index File                                        //
@@ -24,7 +24,7 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
-   $retour = parse_arg($argv);
+   $retour = parse_admin_lang_arg($argv);
    if (! $retour) { end; }
    break;
  case "html":
@@ -43,22 +43,22 @@ switch ($mode) {
 
 switch ($action) {
   case "help":
-    dis_help($mode);
+    dis_admin_lang_help($mode);
     break;
   case "index":
-    dis_lang_index($mode, $actions, $target_modules, $langs, $themes);
+    dis_admin_lang_index($mode, $actions, $target_modules, $langs, $themes);
     break;
   case "show_src":
-    dis_src_vars($mode, $target_module);
+    dis_admin_lang_src_vars($mode, $target_module);
     break;
   case "show_lang":
-    dis_lang_vars($mode, $target_module, $lang);
+    dis_admin_lang_vars($mode, $target_module, $lang);
     break;
   case "comp_lang":
-    dis_comp_lang_vars($mode, $target_module, $lang, $lang2);
+    dis_admin_lang_comp_lang_vars($mode, $target_module, $lang, $lang2);
     break;
   case "comp_global_lang":
-    dis_comp_global_lang_vars($mode, $lang, $lang2);
+    dis_admin_lang_comp_global_lang_vars($mode, $lang, $lang2);
     break;
   default:
     echo "No action specified !";
@@ -81,7 +81,7 @@ switch ($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_command_use($msg="") {
+function dis_admin_lang_command_use($msg="") {
   global $argv, $actions, $target_modules, $langs, $themes;
 
   while (list($nb, $val) = each ($actions)) {
@@ -118,7 +118,7 @@ Ex: php4 admin_lang.php -a show_lang -m deal -l fr
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function parse_arg($argv) {
+function parse_admin_lang_arg($argv) {
   global $debug, $actions, $target_modules, $langs, $themes;
   global $action, $target_module, $lang, $theme;
 
@@ -138,7 +138,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-m -> \$target_module=$val2\n"; }
       }
       else {
-        dis_command_use("Invalid module ($val2)");
+        dis_admin_lang_command_use("Invalid module ($val2)");
 	return false;
       }
       break;
@@ -149,7 +149,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-l -> \$lang=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid language ($val2)");
+	dis_admin_lang_command_use("Invalid language ($val2)");
 	return false;
       }
       break;
@@ -160,7 +160,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid action ($val2)");
+	dis_admin_lang_command_use("Invalid action ($val2)");
 	return false;
       }
       break;
@@ -171,7 +171,7 @@ function parse_arg($argv) {
         if ($debug > 0) { echo "-t -> \$theme=$val2\n"; }
       }
       else {
-	dis_command_use("Invalid theme ($val2)");
+	dis_admin_lang_command_use("Invalid theme ($val2)");
 	return false;
       }
       break;
@@ -233,3 +233,5 @@ function get_admin_lang_action() {
                                     	);
 
 }
+
+?>

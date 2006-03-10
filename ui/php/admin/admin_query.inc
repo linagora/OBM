@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_query.inc                                              //
 //     - Desc : Admin Query File                                             //
@@ -18,7 +18,7 @@
 // Returns:
 //   - number of passive session
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_count_passive_sess($delay) {
+function run_query_admin_count_passive_sess($delay) {
   global $cdg_sql;
 
   $time_pass = date("Y-m-d H:i:s",time() - $delay);
@@ -38,7 +38,7 @@ function run_query_count_passive_sess($delay) {
 // Returns:
 //   - number of user session
 ///////////////////////////////////////////////////////////////////////////////
-function get_usersession_number() {
+function get_admin_usersession_number() {
   global $cdg_sql;
 
   $query = "select count(*) as num from ActiveUserObm";
@@ -59,7 +59,7 @@ function get_usersession_number() {
 // Returns:
 //   - DBO : list of active user session
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_active_user($delay) {
+function run_query_admin_active_user($delay) {
   global $cdg_sql;
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
@@ -97,7 +97,7 @@ function run_query_active_user($delay) {
 // Returns:
 //   - DBO : list of passive user session
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_passive_user($delay) {
+function run_query_admin_passive_user($delay) {
   global $cdg_sql;
 
   $date_limit = date("Y-m-d H:i:s",time() - $delay);
@@ -120,7 +120,7 @@ function run_query_passive_user($delay) {
 // Returns:
 //   - DBO : list of passive user session
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_activeuserobm_delete($sid) {
+function run_query_admin_activeuserobm_delete($sid) {
   global $cdg_sql;
 
   $query = "delete from ActiveUserObm where activeuserobm_sid = '$sid'";
@@ -129,3 +129,5 @@ function run_query_activeuserobm_delete($sid) {
   $obm_q->query($query);
 
 }
+
+?>

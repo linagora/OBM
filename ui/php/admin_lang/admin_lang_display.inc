@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_lang_display.inc                                       //
 //     - Desc : lang admin display File                                      //
@@ -13,7 +13,7 @@
 // Parameters:
 //   - $mode   : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_help($mode) {
+function dis_admin_lang_help($mode) {
 
   if ($mode == "html")
     echo "<table class=\"detail\">
@@ -36,14 +36,14 @@ function dis_help($mode) {
 // Parameters:
 //   - $mode   : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_lang_index($mode, $actions, $modules, $langs, $themes) {
+function dis_admin_lang_index($mode, $actions, $modules, $langs, $themes) {
 
   switch ($mode) {
   case "txt":
     txt_lang_index($actions, $modules, $langs, $themes);
     break;
   case "html":
-    html_lang_index($actions, $modules, $langs, $themes);
+    html_admin_lang_index($actions, $modules, $langs, $themes);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -56,7 +56,7 @@ function dis_lang_index($mode, $actions, $modules, $langs, $themes) {
 // Display the HTML search form for lang module
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_lang_index($actions, $modules, $langs, $themes) {
+function html_admin_lang_index($actions, $modules, $langs, $themes) {
   global $l_execute, $l_help;
 
   // modules SELECT
@@ -167,18 +167,18 @@ function html_lang_index($actions, $modules, $langs, $themes) {
 //   - $mode   : "txt" or "html"
 //   - $module : module name
 ///////////////////////////////////////////////////////////////////////////////
-function dis_src_vars($mode, $module) {
+function dis_admin_lang_src_vars($mode, $module) {
 
-  $ref_vars = get_src_vars($module);
-  $used_vars = get_src_used_vars($module);
+  $ref_vars = get_admin_lang_src_vars($module);
+  $used_vars = get_admin_lang_src_used_vars($module);
   $unused_vars = array_diff ($ref_vars, $used_vars);
 
   switch ($mode) {
   case "txt":
-    txt_src_vars($module, $ref_vars, $used_vars, $unused_vars);
+    txt_admin_lang_src_vars($module, $ref_vars, $used_vars, $unused_vars);
     break;
   case "html":
-    html_src_vars($module, $ref_vars, $used_vars, $unused_vars);
+    html_admin_lang_src_vars($module, $ref_vars, $used_vars, $unused_vars);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -194,7 +194,7 @@ function dis_src_vars($mode, $module) {
 //   - $used_vars   : used vars
 //   - $unused_vars : unused vars (defined in global but not used)
 ///////////////////////////////////////////////////////////////////////////////
-function txt_src_vars($module, $ref_vars, $used_vars, $unused_vars) {
+function txt_admin_lang_src_vars($module, $ref_vars, $used_vars, $unused_vars) {
 
   $nb_used_vars = count($used_vars);
   $nb_unused_vars = count($unused_vars);
@@ -226,7 +226,7 @@ function txt_src_vars($module, $ref_vars, $used_vars, $unused_vars) {
 //   - $used_vars   : used vars
 //   - $unused_vars : unused vars (defined in global but not used)
 ///////////////////////////////////////////////////////////////////////////////
-function html_src_vars($module, $ref_vars, $used_vars, $unused_vars) {
+function html_admin_lang_src_vars($module, $ref_vars, $used_vars, $unused_vars) {
 
   $nb_used_vars = count($used_vars);
   $nb_unused_vars = count($unused_vars);
@@ -267,30 +267,30 @@ function html_src_vars($module, $ref_vars, $used_vars, $unused_vars) {
 //   - $module : module name
 //   - $lang   : language to display
 ///////////////////////////////////////////////////////////////////////////////
-function dis_lang_vars($mode, $module, $lang) {
+function dis_admin_lang_vars($mode, $module, $lang) {
 
-  $lang_v = get_lang_vars($module, $lang);
+  $lang_v = get_admin_lang_vars($module, $lang);
   if (! $lang_v) {
     echo "File $lang/$module.inc is missing ! Create it";
     return false;
   }
 
-  $glang_v = get_global_lang_vars($lang);
+  $glang_v = get_admin_lang_global_lang_vars($lang);
   if (! $glang_v) {
     echo "File $lang/global.inc is missing ! Create it";
     return false;
   }
 
-  $ref_v = get_src_vars($module);
-  $used_v = get_src_used_vars($module);
+  $ref_v = get_admin_lang_src_vars($module);
+  $used_v = get_admin_lang_src_used_vars($module);
   $unused_v = array_diff ($ref_v, $used_v);
 
   switch ($mode) {
   case "txt":
-    txt_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v);
+    txt_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v);
     break;
   case "html":
-    html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v);
+    html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -309,7 +309,7 @@ function dis_lang_vars($mode, $module, $lang) {
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function txt_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v) {
+function txt_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v) {
 
   $text = "";
   $nb_ref = count($ref_v);
@@ -456,7 +456,7 @@ $text
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v) {
+function html_admin_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unused_v) {
 
   $nb_ref = count($ref_v);
   $nb_used = count($used_v);
@@ -633,40 +633,40 @@ function html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unu
 //   - $lang   : language src to display
 //   - $lang2  : language dest to compare
 ///////////////////////////////////////////////////////////////////////////////
-function dis_comp_lang_vars($mode, $module, $lang, $lang2) {
+function dis_admin_lang_comp_lang_vars($mode, $module, $lang, $lang2) {
 
-  $lang_v = get_lang_vars($module, $lang);
+  $lang_v = get_admin_lang_vars($module, $lang);
   if (! $lang_v) {
     echo "File $lang/$module.inc is missing ! Create it";
     return false;
   }
-  $lang2_v = get_lang_vars($module, $lang2);
+  $lang2_v = get_admin_lang_vars($module, $lang2);
   if (! $lang2_v) {
     echo "File $lang2/$module.inc is missing ! Create it";
     return false;
   }
 
-  $glang_v = get_global_lang_vars($lang);
+  $glang_v = get_admin_lang_global_lang_vars($lang);
   if (! $glang_v) {
     echo "File $lang/global.inc is missing ! Create it";
     return false;
   }
-  $glang2_v = get_global_lang_vars($lang2);
+  $glang2_v = get_admin_lang_global_lang_vars($lang2);
   if (! $glang2_v) {
     echo "File $lang2/global.inc is missing ! Create it";
     return false;
   }
 
-  $ref_v = get_src_vars($module);
-  $used_v = get_src_used_vars($module);
+  $ref_v = get_admin_lang_src_vars($module);
+  $used_v = get_admin_lang_src_used_vars($module);
   $unused_v = array_diff ($ref_v, $used_v);
 
   switch ($mode) {
   case "txt":
-    txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v);
+    txt_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v);
     break;
   case "html":
-    html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v);
+    html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -688,7 +688,7 @@ function dis_comp_lang_vars($mode, $module, $lang, $lang2) {
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v) {
+function txt_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v) {
 
   echo "txt mode Not implemented: Run this action in HTML mode.\n";
 }
@@ -708,7 +708,7 @@ function txt_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v,
 //   - $used_v   : lang vars used in source files
 //   - $unused_v : lang vars referenced in source but not used
 ///////////////////////////////////////////////////////////////////////////////
-function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v) {
+function html_admin_lang_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v, $glang2_v, $ref_v, $used_v, $unused_v) {
 
   $nb_ref = count($ref_v);
   $nb_used = count($used_v);
@@ -899,27 +899,27 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v
 //   - $lang  : language src to display
 //   - $lang2 : language dest to compare
 ///////////////////////////////////////////////////////////////////////////////
-function dis_comp_global_lang_vars($mode, $lang, $lang2) {
+function dis_admin_lang_comp_global_lang_vars($mode, $lang, $lang2) {
 
-  $lang_v = get_global_lang_vars($lang);
+  $lang_v = get_admin_lang_global_lang_vars($lang);
   if (! $lang_v) {
     echo "File $lang/global.inc is missing ! Create it";
     return false;
   }
-  $lang2_v = get_global_lang_vars($lang2);
+  $lang2_v = get_admin_lang_global_lang_vars($lang2);
   if (! $lang2_v) {
     echo "File $lang2/global.inc is missing ! Create it";
     return false;
   }
 
-  $ref_v = get_all_src_used_vars();
+  $ref_v = get_admin_lang_all_src_used_vars();
 
   switch ($mode) {
   case "txt":
-    txt_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v);
+    txt_admin_lang_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v);
     break;
   case "html":
-    html_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v);
+    html_admin_lang_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -936,7 +936,7 @@ function dis_comp_global_lang_vars($mode, $lang, $lang2) {
 //   - $lang2_v : lang vars defined
 //   - $ref_v   : lang vars referenced in source files
 ///////////////////////////////////////////////////////////////////////////////
-function txt_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v) {
+function txt_admin_lang_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v) {
   echo "txt mode Not implemented: Run this action in HTML mode.\n";
 }
 
@@ -950,7 +950,7 @@ function txt_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v) {
 //   - $lang2_v : lang vars defined
 //   - $ref_v   : lang vars referenced in source files
 ///////////////////////////////////////////////////////////////////////////////
-function html_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v) {
+function html_admin_lang_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v) {
 
   $nb_ref = count($ref_v);
   $nb_lang = count($lang_v);
@@ -1009,3 +1009,5 @@ function html_comp_global_lang_vars($lang, $lang2, $lang_v, $lang2_v, $ref_v) {
       $text_def_unref
     </table>";
 }
+
+?>
