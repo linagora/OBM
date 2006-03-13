@@ -296,6 +296,15 @@ td.agendaHead2		{
 	font-weight: 		800;
 	}
 	
+td.agendaHead3          {
+        background-image:       url(time_bg.gif);
+        text-align:             center;
+        vertical-align:         middle;
+        font-family:            sans-serif;
+        font-size:              12px;
+        font-weight:            800;
+        }
+
 td.agendaEventHead	{ 
     background-color:       	#ffffff;
     text-align:			center;	

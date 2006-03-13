@@ -673,7 +673,7 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
       $week_num = get_agenda_week_num($current_time); 
       $dis_month_cal .= "
       <tr>
-        <td class=\"agendaHead\">
+        <td class=\"agendaHead3\">
         <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$iso_day")."\" >$week_num</a>
         </td>";
     }
@@ -1079,7 +1079,7 @@ function dis_agenda_day_planning($agenda, $calendar_entity) {
     </td>
   </tr>
   <tr>
-    <td class=\"agendaHead\">
+    <td class=\"agendaHead3\">
       <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$iso_date")."\" class=\"agendaLink\">
       $week_num
       </a>
