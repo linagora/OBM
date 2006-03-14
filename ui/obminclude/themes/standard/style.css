@@ -257,6 +257,11 @@ a.action:visited { color: #ffffff; background-color: transparent;}
 	list-style-type: none;
 }
 
+.block form {
+        padding:                0;
+        margin:                 2px 0;
+}
+
 .blockTitle {
 	font-weight:		bold;
 	font-size:		13px;

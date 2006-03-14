@@ -19,6 +19,11 @@ function display_page(&$display) {
   // If print activated, display only the detail
   if ($output_target == "print") {
     echo $display["head"] . "
+      <!-- left panel -->
+      <div class=\"leftpanel\">
+" .
+      $display["features"] ."
+      </div>
       <div class=\"detailpanelalone\">
 " .
       $display["title"] .

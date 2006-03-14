@@ -101,6 +101,9 @@ $ccontact_private_default = true;
 // Calendar : show public groups
 $cagenda_public_groups = true;
 
+// Calendar: generic E-mail resource admin for agenda module
+//$cagenda_resource_admin = "resource@mydomain";
+
 // Calendar first ay of week, first and last hour display
 //$cagenda_weekstart = "monday";
 $cagenda_first_hour = 8;

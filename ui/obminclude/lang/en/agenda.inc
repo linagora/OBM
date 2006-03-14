@@ -41,6 +41,7 @@ $l_calendar_visible = "Select calendars";
 $l_calendar_displayed = "Calendars displayed";
 $l_resource_visible = "Select Resources";
 $l_resource_displayed = "Resources displayed";
+$l_resource_allocated = "Resources allocated";
 $l_repeatdays2 = "Repeatition days";
 $l_group_members = "Members of group";
 $l_everybody = "Everybody";

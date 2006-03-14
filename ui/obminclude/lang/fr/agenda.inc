@@ -145,6 +145,7 @@ $l_calendar_visible = "Agendas Visibles";
 $l_calendar_displayed = "Agendas affichés";
 $l_resource_visible = "Ressources";
 $l_resource_displayed = "Ressources choisies";
+$l_resource_allocated = "Ressources allouées";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "La durée ne peux pas être nulle";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";

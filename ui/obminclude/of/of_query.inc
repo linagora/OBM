@@ -1331,7 +1331,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
     return 0;
   }
 
-  if (count ($recipients) < 1) {
+  if (count($recipients) < 1 && count($r_addr) < 1) {
     return 0;
   }
 
@@ -1389,7 +1389,8 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
     $headers .= "Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
   } else {
     // Commented as this breaks mail encoding
-    //    $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
+    // $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
+    $headers .= "Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
   } 
   $headers .= "X-Mailer: OBM $obm_version\n";
   
@@ -1416,11 +1417,12 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
 
   // message
   $msg="";
+  //$charset = "iso-8859-1";
+  $charset = mb_internal_encoding();
   if ($h_file !="") {
-    $charset = "iso-8859-1";
     $ctencoding = "quoted-printable";
-    //  $disposition="inline";  // Not used for now
-    //    $body=iconv("ISO-8859-1","UTF-8",$body);
+    // $disposition="inline";  // Not used for now
+    // $body=iconv("ISO-8859-1","UTF-8",$body);
     $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
     $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
     $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
@@ -1434,8 +1436,8 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
         $msg .= "content-class: urn:content-classes:calendarmessage\n"; 
       }
       $msg .= "Content-type: $ctype;charset=$charset;name=\"$name\"\n";
-      $msg .= "Content-Transfer-Encoding: 8bit\n";
-      $msg .= "filename=\"$name\"\n";
+      $msg .= "Content-Encoding: $charset\n";
+      $msg .= "Content-Transfer-Encoding: 8bit;filename=\"$name\"\n";
       $linesz = filesize($filename)+1;
       $fp = fopen($filename, 'r');
 //      $content = chunk_split(base64_encode(fread($fp,$linesz)));
@@ -1444,7 +1446,12 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
       $msg .= $sep.$content;
     }
   } else {
-    $msg = "$message";
+    $ctencoding = "quoted-printable";
+    // $disposition="inline";  // Not used for now
+    // $body=iconv("ISO-8859-1","UTF-8",$body);
+    $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
+    $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
+    $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
   }
 
   if ($reci_list != "") {
@@ -1493,6 +1500,40 @@ function run_query_get_recipients($recipients, $force) {
     WHERE $user_in
       userobm_email != ''
       $mail_filter";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get resources info 
+// Parameters:
+//  - $resources : Id Resources array
+// Returns: DB with resources info 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_resources_info($resources) {
+  global $cdg_sql;
+
+  $coma = "";
+  foreach($resources as $resource) {
+    if ($resource) {
+      $res_list .= $coma.$resource;
+      $coma = ",";
+    }
+  }
+  if ($res_list != "") {
+    $res_in = "resource_id IN ($res_list)";
+  } else {
+    return false;
+  }
+
+  $query = "SELECT resource_name, resource_description
+    FROM Resource 
+    WHERE $res_in
+  ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

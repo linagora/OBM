@@ -54,6 +54,7 @@ function dis_agenda_calendar_view($agenda, &$sel_entity_id, $p_view="week") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_agenda_planning_bar($agenda, $calendar_entity, $entity_readable) {
   global $action;
+  global $output_target;
 
   // If come from view (eg: month), keep view for links else set to week
   if ( ($action == "view_day") || ($action == "view_week")
@@ -64,7 +65,7 @@ function html_agenda_planning_bar($agenda, $calendar_entity, $entity_readable) {
   }
 
   $block = html_agenda_bar_legend($calendar_entity);
-  if ($action != "perform_meeting") {
+  if ($action != "perform_meeting"  && $output_target != "print") {
     $block .= html_agenda_select_calendar_entity($new_action, $agenda, $calendar_entity, $entity_readable);
     $block .= html_agenda_bar_date_selector($agenda);
   }
@@ -421,6 +422,10 @@ function html_agenda_bar_date_selector($agenda) {
       <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
       </form>
     </td>
+  </tr>
+  <tr>
+    <td>
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
   </tr>
   <tr>
     <td >
@@ -963,6 +968,8 @@ function dis_agenda_day_planning($agenda, $calendar_entity) {
   global $ico_agenda;
   global $ico_cal_user1, $ico_cal_user2, $ico_cal_user3, $ico_cal_user4;
   global $ico_cal_user5, $ico_cal_user6;
+  global $ico_cal_resource1, $ico_cal_resource2, $ico_cal_resource3;
+  global $ico_cal_resource4, $ico_cal_resource5, $ico_cal_resource6;
   global $cagenda_first_hour, $cagenda_last_hour,$set_cal_interval;
   global $l_private, $l_all_day;
 

@@ -259,6 +259,11 @@ a.action:hover { font-weight : bold;color: #000; background-color: transparent;t
 	border:			1px solid #009ec6; 
 }
 
+.block form {
+        padding:                0;
+        margin:                 2px 0;
+}
+
 .blockTitle {
 	font-weight:		bold;
 	font-size:		13px;

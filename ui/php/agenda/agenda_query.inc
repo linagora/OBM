@@ -270,6 +270,7 @@ function run_query_agenda_delete_event_entity($agenda) {
 function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
   global $uid, $l_from, $l_to, $l_date;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
+  global $cagenda_resource_admin, $l_resource_allocated;
 
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
   $mail  = $agenda["mail"];
@@ -301,6 +302,8 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
     }
   }
 
+  $resources_writable=array(); // Writable Resources  
+  $resources_address =array(); // Resource Admin notification
   // Get the final resource list and insert resource links
   $resources_array = $sel_entity_id["resource"];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
@@ -309,21 +312,31 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res["ids"])) {
 	run_query_agenda_insert_entity_event("resource", $res_id, $event_id, 'A');
+        array_push($resources_writable, $res_id);
       }
     }
   }    
+  if ((count($resources_writable) > 0) && ($cagenda_resource_admin != "")) {
+    $resources_address = array($cagenda_resource_admin);
+    $message_resource = "\r\n\r\n$l_resource_allocated:";
+    $resource_q = run_query_get_resources_info($resources_writable);
+    while ($resource_q->next_record()) {
+      $message_resource .=  "\n  ".$resource_q->f("resource_name");
+    }
+  }
+
 
   $subject = "$l_add_event_mail_subject" . $mail_title;
-  $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend";
+  $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend $message_resource";
   if (is_array($users_array)) {
     $recipient_array = array_diff($users_array, array($uid));
   } else {
     $recipient_array = array();
   }
   
-  if (count($recipient_array) > 0) {
+  if (count($recipient_array) > 0 || count($r_address) > 0) {
     $tmp_filename = secure_tmpname(".ics","ics_");
-    create_agenda_ics_meeting_file($agenda, $event_id, $recipient_array, $tmp_filename);
+    create_agenda_ics_meeting_file($agenda, $event_id, $recipient_array, $resources_writable, $tmp_filename);
     $h_file = array(
 		    array (
 			   "filename" => "$tmp_filename",
@@ -331,7 +344,7 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
 			   "type" => "ics"
 			   )
 		    );
-    send_mail($subject, $message, $recipient_array, "",$mail, $h_file);
+    send_mail($subject, $message, $recipient_array, $resources_address, $mail, $h_file);
     unlink($tmp_filename);
   }
 }
@@ -451,9 +464,10 @@ function run_query_agenda_insert_entity_event($entity, $entity_id,$event_id, $st
 // Parameters:
 //   - $agenda : agenda hash values
 ///////////////////////////////////////////////////////////////////////////////
-function create_agenda_ics_meeting_file($agenda, $event_id, $attendees, $filename) {
+function create_agenda_ics_meeting_file($agenda, $event_id, $attendees, $resources, $filename) {
   global $obm_version,$cagenda_weekstart,$auth;
   global $l_file_error, $l_write_error, $l_read_error;
+  global $l_resource_allocated;
 
   $fd_dest = fopen ($filename,"w");
   if ($fd_dest == false) {
@@ -487,10 +501,18 @@ METHOD:REQUEST";
     if ($obm_event->f("calendarevent_description") != "") {
       $description = preg_replace("/\\r?\\n/","\\n",$obm_event->f("calendarevent_description"));
       $description = "DESCRIPTION:" . $description;
-      $description = "\n" . wordwrap($description,74,"\n ",1);
     } else {
       $description = "";
     }
+    if (count($resources) > 0) {
+      if ($description == "") $description = "DESCRIPTION:";
+      $description .= "$l_resource_allocated:";
+      $resource_q = run_query_get_resources_info($resources);
+      while ($resource_q->next_record()) {
+        $description .=  "\\n  ".$resource_q->f("resource_name");
+      }
+    }
+    $description = "\n" . wordwrap($description,74,"\n ",1);
     $date_b = $obm_event->f("calendarevent_date");
     $date_b = gmdate("Ymd\THis\Z",$date_b);
     $date_e = $obm_event->f("calendarevent_date") + $obm_event->f("calendarevent_duration") ;
@@ -514,11 +536,13 @@ METHOD:REQUEST";
     $organizer_email=$organizer_q->f("userobm_email");
     $attendee_q = run_query_get_recipients($attendees, 1);
     $msg_attendee = "";
-    while ($attendee_q->next_record()) {
-      $msg_attendee .= "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=\"'";
-      $msg_attendee .= $attendee_q->f("userobm_lastname")." ".$attendee_q->f("userobm_firstname");
-      $msg_attendee .= "'\":MAILTO:";
-      $msg_attendee .= $attendee_q->f("userobm_email");
+    if (is_array($attendee_q)) {
+      while ($attendee_q->next_record()) {
+        $msg_attendee .= "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=\"'";
+        $msg_attendee .= $attendee_q->f("userobm_lastname")." ".$attendee_q->f("userobm_firstname");
+        $msg_attendee .= "'\":MAILTO:";
+        $msg_attendee .= $attendee_q->f("userobm_email");
+      }
     }
     $msg .= "
 BEGIN:VEVENT
@@ -545,6 +569,14 @@ END:VEVENT";
       $description = "\nDESCRIPTION:".$obm_event->f("calendarevent_description");
     } else {
       $description = "";
+    }
+    if (count($resources) > 0) {
+      if ($description == "") $description = "DESCRIPTION:";
+      $description .= "$l_resource_allocated:";
+      $resource_q = run_query_get_resources_info($resources);
+      while ($resource_q->next_record()) {
+        $description .=  "\\n  ".$resource_q->f("resource_name");
+      }
     }
     $date_b = $obm_event->f("calendarevent_date");
     $date_b = date("Ymd",$date_b)."T".date("His",$date_b);
@@ -668,6 +700,7 @@ function check_agenda_decision_conflict($agenda) {
 function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
   global $c_use_connectors, $uid, $l_date;
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
+  global $cagenda_resource_admin, $l_resource_allocated;
 
   $datebegin = $agenda["datebegin"];
   $dateend = $agenda["dateend"];
@@ -757,11 +790,22 @@ function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
   }
 
   // Resource insertion
+  $resources_writable=array(); // Writable Resources
+  $resources_address =array(); // Resource Admin notification
   if (is_array($resources_array)) {
     foreach ($resources_array as $res_id) {
       if (in_array($res_id, $writable_res["ids"])) {
 	run_query_agenda_insert_entity_event("resource", $res_id, $event_id, 'A');
+	array_push($resources_writable, $res_id);
       }
+    }
+  }
+  if ((count($resources_writable) > 0) && ($cagenda_resource_admin != "")) {
+    $resources_address = array($cagenda_resource_admin);
+    $message_resource = "\r\n\r\n$l_resource_allocated:";
+    $resource_q = run_query_get_resources_info($resources_writable);
+    while ($resource_q->next_record()) {
+      $message_resource .=  "\n  ".$resource_q->f("resource_name");
     }
   }
 
@@ -772,9 +816,10 @@ $l_date : $l_from $datebegin $l_to $dateend";
     $message .= "
 $l_update_event_mail_body $l_from $old_begin $l_to $old_end";
   }
+  $message .= $message_resource; 
 
   $recipient_array = array_diff($users_array, array($uid));
-  send_mail($subject, $message, $recipient_array, "",$mail);
+  send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
 
@@ -855,6 +900,7 @@ function check_agenda_can_delete($id) {
 function run_query_agenda_delete($agenda) {
   global $cdg_sql, $c_use_connectors, $l_to, $l_from;
   global $l_delete_event_mail_head,$l_delete_event_mail_subject,$l_delete_event_mail_body;
+  global $cagenda_resource_admin, $l_resource_allocated;
 
   $obm_q = new DB_OBM;
   $event_id = $agenda["id"];
@@ -869,6 +915,23 @@ function run_query_agenda_delete($agenda) {
   $obm_q->query($query);
   $obm_q->next_record();
   $title = $obm_q->f("calendarevent_title");
+
+  // Resources display
+  $query = "SELECT evententity_entity_id FROM EventEntity WHERE evententity_event_id = '$event_id' AND evententity_entity = 'resource'";
+  $obm_q->query($query);
+  $resources = array();
+  while ($obm_q->next_record()) {
+     array_push($resources, $obm_q->f("evententity_entity_id"));
+  }
+  $resources_address = array();
+  if (count($resources) > 0 && ($cagenda_resource_admin != "")) {
+    $resources_address = array($cagenda_resource_admin);
+    $message_resource = "\r\n\r\n$l_resource_allocated:";
+    $resource_q = run_query_get_resources_info($resources);
+    while ($resource_q->next_record()) {
+      $message_resource .=  "\n  ".$resource_q->f("resource_name");
+    }
+  }
 
   $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, "run_query_agenda_delete(2)");
@@ -903,10 +966,10 @@ function run_query_agenda_delete($agenda) {
     $retour = $obm_q->query($query);
   }
 
-  $message = $l_delete_event_mail_head.$title;   
+  $message = $l_delete_event_mail_head.$title.$message_resource;   
   $subject = "$l_delete_event_mail_subject" . $title;
   $recipient_array = array_diff($users_array, array($uid));
-  send_mail($subject, $message, $recipient_array, "", $mail);
+  send_mail($subject, $message, $recipient_array, $resources_address, $mail);
 }
 
 
