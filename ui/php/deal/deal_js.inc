@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : deal_js.inc                                                 //
 //     - Desc  : Deal javascript functions File                              //
@@ -248,3 +248,5 @@ function check_status_new(form)
 }
 
 ";
+
+?>

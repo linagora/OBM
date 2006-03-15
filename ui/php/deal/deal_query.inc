@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : deal_query.inc                                               //
 //     - Desc : Deal query File                                              //
@@ -17,7 +17,7 @@
 //   - $p_new_order  : if it's set, it replaces the default "order by" value
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
+function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $parent = $deal["parent"];
@@ -213,7 +213,7 @@ function run_query_deal_detail($id) {
 // Parameters:
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($deal) {
+function run_query_deal_insert($deal) {
   global $auth, $cdg_sql,$obm_q;
 
   $id = $deal["id"];
@@ -310,12 +310,12 @@ function run_query_insert($deal) {
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($d_id) && ($archive == '0')) {
-    run_query_company_active_deal_inc($comp);
+    run_query_deal_company_active_deal_inc($comp);
   }
 
   // we increment the company total deal number
   if ($d_id) {
-    run_query_company_total_deal_inc($comp);
+    run_query_deal_company_total_deal_inc($comp);
   }
 
   return $d_id;
@@ -405,9 +405,9 @@ function run_query_deal_update($deal) {
   // If deal archive status has changed, update the company deal number
   if (($retour) && ($archive != $archive_old)) {
     if ($archive == '1') {
-      run_query_company_active_deal_dec($comp);
+      run_query_deal_company_active_deal_dec($comp);
     } else {
-      run_query_company_active_deal_inc($comp);
+      run_query_deal_company_active_deal_inc($comp);
     }
   }
 
@@ -475,7 +475,7 @@ $datecomment:$usercomment:$add_comment";
 // Parameters:
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_quick_update($deal) {
+function run_query_deal_quick_update($deal) {
   global $auth, $cdg_sql, $l_no;
 
   $id = $deal["id"];
@@ -597,11 +597,11 @@ function run_query_deal_delete($id) {
 
   // If deal archive status is off (0), update the company deal number
   if ($archive == '0') {
-    run_query_company_active_deal_dec($comp_id);
+    run_query_deal_company_active_deal_dec($comp_id);
   }
 
   // update the company total deal number
-  run_query_company_total_deal_dec($comp_id);
+  run_query_deal_company_total_deal_dec($comp_id);
   run_query_delete_document_links($id, "deal");
   $query = "DELETE FROM Deal WHERE deal_id='$id'";
 
@@ -618,7 +618,7 @@ function run_query_deal_delete($id) {
 // Parameters:
 //   - $id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_info($id) {
+function run_query_deal_company_info($id) {
   global $cdg_sql;
 
   $query = "SELECT company_name,
@@ -884,7 +884,7 @@ function run_query_deal_manager($archive = false) {
 // Parameters:
 //   - $p_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_deal($p_id) {
+function run_query_deal_contact($p_id) {
   global $cdg_sql;
 
   $query = "SELECT contact_id,
@@ -907,7 +907,7 @@ function run_query_contact_deal($p_id) {
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_active_deal_inc($comp_id) {
+function run_query_deal_company_active_deal_inc($comp_id) {
   global $cdg_sql;
 
   $query = "UPDATE Company SET
@@ -926,7 +926,7 @@ function run_query_company_active_deal_inc($comp_id) {
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_active_deal_dec($comp_id) {
+function run_query_deal_company_active_deal_dec($comp_id) {
   global $cdg_sql;
 
   $query = "UPDATE Company SET
@@ -945,7 +945,7 @@ function run_query_company_active_deal_dec($comp_id) {
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_total_deal_inc($comp_id) {
+function run_query_deal_company_total_deal_inc($comp_id) {
   global $cdg_sql;
 
   $query = "UPDATE Company SET
@@ -964,7 +964,7 @@ function run_query_company_total_deal_inc($comp_id) {
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_total_deal_dec($comp_id) {
+function run_query_deal_company_total_deal_dec($comp_id) {
   global $cdg_sql;
 
   $query = "UPDATE Company SET
@@ -1060,7 +1060,7 @@ function get_deal_company_id($deal_id) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_dealcategory1() {
+function run_query_deal_category1() {
   global $cdg_sql, $cgp_hide;
 
   if (! $cgp_hide["deal"]["category1"]) {
@@ -1081,7 +1081,7 @@ function run_query_dealcategory1() {
 // Parameters:
 //   - $d_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dealcategory1($d_id) {
+function run_query_deal_get_dealcategory1($d_id) {
   global $cdg_sql;
 
   $query = "SELECT dealcategory1_id
@@ -1108,7 +1108,7 @@ function run_query_get_dealcategory1($d_id) {
 // Parameters:
 //   - $d_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dealcategory1_info($d_id) {
+function run_query_deal_get_dealcategory1_info($d_id) {
     global $cdg_sql;
 
   $query = "SELECT dealcategory1_label, dealcategory1_code
@@ -1127,7 +1127,7 @@ function run_query_get_dealcategory1_info($d_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Deal Kind list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_dealtype() {
+function run_query_deal_type() {
   global $cdg_sql;
 
   $query = "SELECT * FROM DealType";
@@ -1144,7 +1144,7 @@ function run_query_dealtype() {
 // Parameters:
 //   - $deal[] : deal hash info : keys used : kind_label, kind_inout
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_insert($deal) {
+function run_query_deal_kind_insert($deal) {
   global $auth, $cdg_sql;
 	
   $label = $deal["kind_label"];
@@ -1174,7 +1174,7 @@ function run_query_kind_insert($deal) {
 // Parameters:
 //   - $deal[] : deal hash info : keys used : kind, kind_label, kind_inout
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_update($deal) {
+function run_query_deal_kind_update($deal) {
   global $auth, $cdg_sql;  
 
   $label = $deal["kind_label"];
@@ -1201,7 +1201,7 @@ function run_query_kind_update($deal) {
 // Parameters:
 //   - $id : kind id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_delete($id) {
+function run_query_deal_kind_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM DealType WHERE dealtype_id='$id'";
@@ -1219,7 +1219,7 @@ function run_query_kind_delete($id) {
 // Parameters:
 //   - $k_id : kind id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_links($k_id) {
+function run_query_deal_kind_links($k_id) {
   global $cdg_sql;
 
   $query = "SELECT deal_id, deal_label FROM Deal WHERE deal_type_id='$k_id'";
@@ -1235,7 +1235,7 @@ function run_query_kind_links($k_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Deal Status list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_dealstatus() {
+function run_query_deal_status_list() {
   global $cdg_sql;
 
   $query = "SELECT * FROM DealStatus ORDER BY dealstatus_order ASC";
@@ -1252,7 +1252,7 @@ function run_query_dealstatus() {
 // Parameters:
 //   - $deal[] : deal hash info, keys used : status_label, status_order hitrate
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_insert($deal) {
+function run_query_deal_status_insert($deal) {
   global $auth, $cdg_sql;
 	
   $label = $deal["status_label"];
@@ -1285,7 +1285,7 @@ function run_query_status_insert($deal) {
 // Parameters:
 //   - $deal[] : deal hash info, keys used : status_label, status_order hitrate
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_update($deal) {
+function run_query_deal_status_update($deal) {
   global $auth, $cdg_sql;
 
   $status = $deal["status"];
@@ -1314,7 +1314,7 @@ function run_query_status_update($deal) {
 // Parameters:
 //   - $id : Status id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_delete($id) {
+function run_query_deal_status_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM DealStatus WHERE dealstatus_id='$id'";
@@ -1332,7 +1332,7 @@ function run_query_status_delete($id) {
 // Parameters:
 //   - $s_id : status id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_status_links($s_id) {
+function run_query_deal_status_links($s_id) {
   global $cdg_sql;
 
   $query = "SELECT deal_id, deal_label FROM Deal WHERE deal_status_id='$s_id'";
@@ -1525,7 +1525,7 @@ function check_can_delete_deal($p_id) {
 //   - $deal[] : values to check : plabel
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_parent_form($pid, $deal) {
+function check_deal_parent_form($pid, $deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_date_init;
   global $err_msg, $l_err_label_empty;
 
@@ -1546,7 +1546,7 @@ function check_parent_form($pid, $deal) {
 // Returns:
 //   true if the deal can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_parentdeal($p_id) {
+function check_deal_can_delete_parentdeal($p_id) {
   global $cdg_sql, $err_msg, $ok_msg;
   global $l_link_deal;
 
@@ -1589,7 +1589,7 @@ function check_can_delete_parentdeal($p_id) {
 //   - $p_new_order  : if it's set, it replaces the default "order by" value
 //   - $p_order_dir  : direction for order clause (asc, desc)
 //////////////////////////////////////////////////////////////////////////////
-function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
+function run_query_deal_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $plabel = sql_search_text_parse($deal["plabel"]);
@@ -1656,7 +1656,7 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
 // Parameters:
 //   - $deal[] : deal hash info : keys used : plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_parentdeal($deal) {
+function run_query_deal_insert_parentdeal($deal) {
   global $auth, $cdg_sql;
 
   $plabel = $deal["plabel"];
@@ -1764,7 +1764,7 @@ function run_query_deal_parentdeal_update($deal) {
 //   - $id     : deal id
 //   - $deal[] : deal hash info : keys used : sel_parent
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_affect_deal_parentdeal($id, $deal) {
+function run_query_deal_affect_deal_parentdeal($id, $deal) {
   global $auth, $cdg_sql;
     
   $pid = $deal["sel_parent"];
@@ -1803,7 +1803,7 @@ function run_query_deal_parentdeal_delete($p_id) {
 // Parameters:
 //   - $p_id : parent_deal id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_updatearchive_parentdeal($p_id) {
+function run_query_deal_updatearchive_parentdeal($p_id) {
   global $cdg_sql;
   
   $query = "UPDATE ParentDeal SET
@@ -1821,7 +1821,7 @@ function run_query_updatearchive_parentdeal($p_id) {
 // Parameters:
 //   - $id : kind id
 ///////////////////////////////////////////////////////////////////////////////
-function get_kind_label($id) {
+function get_deal_kind_label($id) {
   global $cdg_sql;
 
   $query = "SELECT dealtype_label FROM DealType WHERE dealtype_id='$id'";
@@ -1841,7 +1841,7 @@ function get_kind_label($id) {
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
-function get_status_label($id) {
+function get_deal_status_label($id) {
   global $cdg_sql;
 
   $query = "SELECT dealstatus_label FROM DealStatus WHERE dealstatus_id='$id'";
@@ -1861,7 +1861,7 @@ function get_status_label($id) {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_label($p_id) {
+function get_deal_parent_label($p_id) {
   global $cdg_sql;
 
   // We group by, to only have one row result
@@ -1884,7 +1884,7 @@ function get_parent_label($p_id) {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_status($p_id) {
+function get_deal_parent_status($p_id) {
   global $cdg_sql;
 
   // We order by dealstatus_id to get the min
@@ -1909,7 +1909,7 @@ function get_parent_status($p_id) {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_dateproposal($p_id)  {
+function get_deal_parent_dateproposal($p_id)  {
   global $cdg_sql;
 
   $query = "SELECT deal_dateproposal
@@ -1934,7 +1934,7 @@ function get_parent_dateproposal($p_id)  {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_datealarm($p_id)  {
+function get_deal_parent_datealarm($p_id)  {
   global $cdg_sql;
 
   $query = "SELECT deal_datealarm
@@ -1957,7 +1957,7 @@ function get_parent_datealarm($p_id)  {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_expense($p_id)  {
+function get_deal_parent_expense($p_id)  {
   global $cdg_sql;
 
   $query = "SELECT sum(deal_amount) as res
@@ -1983,7 +1983,7 @@ function get_parent_expense($p_id)  {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_income($p_id)  {
+function get_deal_parent_income($p_id)  {
   global $cdg_sql;
 
   $query = "SELECT sum(deal_amount) as res
@@ -2009,7 +2009,7 @@ function get_parent_income($p_id)  {
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
-function get_parent_potential($p_id)  {
+function get_deal_parent_potential($p_id)  {
   global $cdg_sql;
 
   $query = "SELECT sum(deal_amount * deal_hitrate / 100) as res_balanced,
@@ -2029,5 +2029,4 @@ function get_parent_potential($p_id)  {
   return number_format($obm_q->f("res_balanced")) . " / " .$obm_q->f("res");
 }
 
-
-</script>
+?>

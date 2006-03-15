@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : deal_display.php                                             //
 //     - Desc : Deal Display File                                            //
@@ -120,11 +120,11 @@ function dis_deal_index($deal="") {
   $archive = $deal["archive"];
 
   $usr_q = run_query_deal_manager($archive);
-  $type_q = run_query_dealtype();
+  $type_q = run_query_deal_type();
   $tts = get_global_tasktype($ctt_sales);
   $cats1 = of_category_get_ordered("deal", "category1");
-  $status_q = run_query_dealstatus();
-  $block .= html_parentdeal_search_form($deal, $usr_q);
+  $status_q = run_query_deal_status_list();
+  $block .= html_deal_parentdeal_search_form($deal, $usr_q);
   $block .= html_deal_search_form($deal, $type_q, $tts, $cats1, $status_q, $usr_q);
 
   return $block;
@@ -142,10 +142,10 @@ function dis_deal_search_form($deal="") {
   $archive = $deal["archive"];
 
   $usr_q = run_query_deal_manager($archive);
-  $type_q = run_query_dealtype();
+  $type_q = run_query_deal_type();
   $tts = get_global_tasktype($ctt_sales);
   $cats1 = of_category_get_ordered("deal", "category1");
-  $status_q = run_query_dealstatus();
+  $status_q = run_query_deal_status_list();
   $block .= html_deal_search_form($deal, $type_q, $tts, $cats1, $status_q, $usr_q);
 
   return $block;
@@ -325,7 +325,7 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
 //     keys used    plabel, parchive, pmanager
 //   - $pmanager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_search_form($deal, $pmanager_q) {
+function html_deal_parentdeal_search_form($deal, $pmanager_q) {
   global $l_parentdeal, $l_label_start, $l_all, $l_all_f, $l_manager;
   global $l_find,$l_show_archive; 
 
@@ -390,7 +390,7 @@ function dis_deal_search_list($deal) {
   $new_order = $deal["new_order"];
   $order_dir = $deal["order_dir"];
 
-  $obm_q = run_query_search($deal, 0, $new_order, $order_dir);
+  $obm_q = run_query_deal_search($deal, 0, $new_order, $order_dir);
   $nb_deal = $obm_q->num_rows_total();
   if ($nb_deal == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -501,7 +501,7 @@ function html_deal_links($deal_q) {
 
   // parent deal
   if ($pid > 0) {
-    $plabel = get_parent_label($pid);
+    $plabel = get_deal_parent_label($pid);
     $url_pdeal = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$pid");
     $dis_pdeal = "
     <li><a href=\"$url_pdeal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_pdeal\" alt=\"\" /></a>
@@ -848,17 +848,17 @@ function dis_deal_form($deal) {
   }
   
   if (($action == "new") || ($action == "insert")) {
-    $comp_q = run_query_company_info($deal["company"]);
+    $comp_q = run_query_deal_company_info($deal["company"]);
   } else {
     $comp_q = "";
   }
 
-  $type_q = run_query_dealtype();
+  $type_q = run_query_deal_type();
   $tts = get_global_tasktype($ctt_sales);
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-  $sta_q = run_query_dealstatus();
-  $con_q = run_query_contact_deal($deal["company"]);
+  $sta_q = run_query_deal_status_list();
+  $con_q = run_query_deal_contact($deal["company"]);
   
   $cats1 = of_category_get_ordered("deal", "category1", "multi", $did);
 
@@ -1317,7 +1317,7 @@ function dis_deal_quick_form($deal) {
     $deal_q = run_query_deal_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $usrc_q = run_query_all_users_from_group($cg_com, array($uid));
-    $sta_q = run_query_dealstatus();
+    $sta_q = run_query_deal_status_list();
     $block = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
   }
 
@@ -1509,7 +1509,7 @@ $js_status_loop
 // Parameters:
 //   - $p_id : deal id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_deal($p_id) {
+function dis_deal_can_delete_deal($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
@@ -2008,13 +2008,13 @@ function html_deal_admin_form($kind_q, $status_q) {
 // Parameters:
 //   - $id : kind id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_kind_links($id) {
+function dis_deal_kind_links($id) {
   global $display, $l_kind_link_deal, $l_kind_link_deal_no, $l_back;
   global $l_kind_can_delete, $l_kind_cant_delete, $l_kind_delete;
 
   $delete_ok = true;
-  $label = get_kind_label($id);
-  $obm_q = run_query_kind_links($id);
+  $label = get_deal_kind_label($id);
+  $obm_q = run_query_deal_kind_links($id);
 
   $nb_kind = $obm_q->num_rows();
   if ($nb_kind > 0) {
@@ -2090,13 +2090,13 @@ function dis_kind_links($id) {
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_status_links($id) {
+function dis_deal_status_links($id) {
   global $display, $l_status_link_deal, $l_status_link_deal_no, $l_back;
   global $l_status_can_delete, $l_status_cant_delete, $l_status_delete;
 
   $delete_ok = true;
-  $label = get_status_label($id);
-  $obm_q = run_query_status_links($id);
+  $label = get_deal_status_label($id);
+  $obm_q = run_query_deal_status_links($id);
 
   $nb_stat = $obm_q->num_rows();
   if ($nb_stat > 0) {
@@ -2212,21 +2212,21 @@ function dis_deal_display_pref($prefs, $prefs_parent) {
 //   - $deal[]    : deal search criteria
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
-function dis_parentdeal_search_list($deal) {
+function dis_deal_parentdeal_search_list($deal) {
   global $l_no_found_parent;
   global $display, $auth;
 
   $new_order = $deal["new_order"];
   $order_dir = $deal["order_dir"];
 
-  $obm_q = run_query_search_parentdeal($deal, $new_order, $order_dir);
+  $obm_q = run_query_deal_search_parentdeal($deal, $new_order, $order_dir);
   
   $nb_parent = $obm_q->num_rows_total();
   if ($nb_parent == 0) {
     $display["msg"] .= display_warn_msg($l_no_found_parent);
   } else {
     $prefs = get_display_pref($auth->auth["uid"], "parentdeal");
-    $block = html_parentdeal_search_list($obm_q, $prefs, $nb_parent, $deal);
+    $block = html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parent, $deal);
   }
   return $block;
 }
@@ -2242,7 +2242,7 @@ function dis_parentdeal_search_list($deal) {
 //     keys used     : plabel, pmanager, parchive
 // Display the results of the parentdeal search
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal) {
+function html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal) {
   global $display, $l_found_parent; 
 
   $plabel = urlencode(stripslashes($deal["plabel"]));
@@ -2270,7 +2270,7 @@ function html_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal) {
 //   - deal[]    : default or transmitted values
 //     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
-function dis_parentdeal_consult($deal) {
+function dis_deal_parentdeal_consult($deal) {
   global $ctt_sales, $uid;
 
   $new_order = $deal["new_order"];
@@ -2279,15 +2279,15 @@ function dis_parentdeal_consult($deal) {
 
   $obm_q = run_query_deal_parentdeal_detail($deal["parent"]);
   $prefs = get_display_pref ($uid, "deal");
-  $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
+  $deal_q = run_query_deal_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
-  $kind_q = run_query_dealtype();
+  $kind_q = run_query_deal_type();
   $tts = get_global_tasktype($ctt_sales);
-  $cat_q = run_query_dealcategory1();
-  $status_q = run_query_dealstatus();
+  $cat_q = run_query_deal_category1();
+  $status_q = run_query_deal_status_list();
   $usr_q = run_query_deal_manager($archive);
 
-  $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tts, $cat_q, $status_q, $usr_q);
+  $block = html_deal_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tts, $cat_q, $status_q, $usr_q);
 
   return $block;
 }
@@ -2308,7 +2308,7 @@ function dis_parentdeal_consult($deal) {
 //   - $status_q : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$cat_q,$status_q,$usr_q) {
+function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$cat_q,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_status;
@@ -2323,12 +2323,12 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_
 
   $pmarket_name = $parent_q->f("lname1") . " " . $parent_q->f("fname1");
   $ptech_name = $parent_q->f("lname2") . " " . $parent_q->f("fname2");
-  $p_status = get_parent_status($parent);
-  $p_dateproposal = get_parent_dateproposal($parent);
-  $p_datealarm = get_parent_datealarm($parent);
-  $p_expense = get_parent_expense($parent);
-  $p_income = get_parent_income($parent);
-  $p_potential = get_parent_potential($parent);
+  $p_status = get_deal_parent_status($parent);
+  $p_dateproposal = get_deal_parent_dateproposal($parent);
+  $p_datealarm = get_deal_parent_datealarm($parent);
+  $p_expense = get_deal_parent_expense($parent);
+  $p_income = get_deal_parent_income($parent);
+  $p_potential = get_deal_parent_potential($parent);
 
   $block = "
     <table width=\"100%\">
@@ -2438,7 +2438,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_
 //   - $deal[]   : default or transmitted values
 //     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
-function dis_parentdeal_form($action, $deal) {
+function dis_deal_parentdeal_form($action, $deal) {
   global $display, $ctt_sales, $cg_com, $cg_prod, $uid, $l_no_found;
 
   $new_order = $deal["new_order"];
@@ -2458,7 +2458,7 @@ function dis_parentdeal_form($action, $deal) {
 
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-  $block = html_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
+  $block = html_deal_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
 
   return $block;
 }
@@ -2474,7 +2474,7 @@ function dis_parentdeal_form($action, $deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : parent_id, plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
+function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
   global $l_update_parent,$l_insert_parent,$l_label,$l_marketing_manager;
   global $l_parentdeal,$l_technical_manager,$l_comment;
 
@@ -2579,7 +2579,7 @@ function ext_dis_deal_list($params, $entity, $id) {
   $new_order = $params["new_order"];
   $order_dir = $params["order_dir"];
 
-  $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
+  $deal_q = run_query_deal_search($deal, 0, $new_order, $order_dir);
   $nb_deal = $deal_q->num_rows_total();
   if ($nb_deal == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -2607,7 +2607,7 @@ function ext_dis_deal_list($params, $entity, $id) {
 //   - $sub_q   : subscription list
 //   - $nb_sub  : nb subscriptions
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_list_result($sub_q,$nb_subscription) {
+function html_deal_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme, $ico_update, $ico_delete, $ico_crow;
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
@@ -2691,4 +2691,4 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
 }
 
 
-</script>
+?>

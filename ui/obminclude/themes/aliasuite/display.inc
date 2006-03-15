@@ -17,7 +17,6 @@ function display_page(&$display) {
   // If header is null, display only the detail (Popup windows)
   if ($display["header"] == "") {
     echo $display["head"] . "
-    echo $display["head"] . "
       <!-- left panel -->
       <div class=\"leftpanel\">
 " .

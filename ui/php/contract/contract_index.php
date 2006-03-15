@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_index.php                                           //
 //     - Desc : Contract Support Index File                                  //
@@ -203,11 +203,11 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_err_msg($l_pri_insert_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "priority_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_priority_links($contract["priority"]);
+  $display["detail"] = dis_contract_priority_links($contract["priority"]);
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,7 +218,7 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_err_msg($l_pri_update_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_err_msg($l_pri_delete_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ if ($action == "ext_get_id") {
     display_err_msg($l_sta_insert_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -251,11 +251,11 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_err_msg($l_sta_update_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_status_links($contract["status"]);
+  $display["detail"] = dis_contract_status_links($contract["status"]);
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_err_msg($l_sta_delete_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,7 +288,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "admin")  {
 //////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();  
+  $display["detail"] = dis_contract_admin_index();  
  
 } elseif ($action == "type_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg($l_type_insert_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();  
+  $display["detail"] = dis_contract_admin_index();  
     
 } elseif ($action == "type_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -310,11 +310,11 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg($l_type_update_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();  
+  $display["detail"] = dis_contract_admin_index();  
 
 } elseif ($action == "type_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_type_links($contract["type"]);
+  $display["detail"] = dis_contract_type_links($contract["type"]);
   require("contract_js.inc");
   
 } elseif ($action == "type_delete")  {
@@ -326,7 +326,7 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg($l_type_delete_error);
   }
   require("contract_js.inc");
-  $display["detail"] = dis_admin_index();  
+  $display["detail"] = dis_contract_admin_index();  
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -679,5 +679,4 @@ function update_contract_action() {
   }
 }
 
-
-</script>
+?>

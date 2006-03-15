@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_query.inc                                           //
 //     - Desc : Contract Support query File                                  //
@@ -754,7 +754,7 @@ function run_query_contract_status_links($s_id) {
 // Parameters:
 //   - $id : priority id
 ///////////////////////////////////////////////////////////////////////////////
-function get_priority_label($id) {
+function get_contract_priority_label($id) {
   global $cdg_sql;
 
   $query = "SELECT
@@ -777,7 +777,7 @@ function get_priority_label($id) {
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
-function get_status_label($id) {
+function get_contract_status_label($id) {
   global $cdg_sql;
 
   $query = "SELECT
@@ -982,7 +982,7 @@ function run_query_contract_type_links($t_id) {
 // Parameters:
 //   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function get_type_label($id) {
+function get_contract_type_label($id) {
   global $cdg_sql;
 
   $query = "SELECT
@@ -1266,4 +1266,4 @@ function check_can_delete_contract($p_id) {
 }
 
 
-</script>
+?>

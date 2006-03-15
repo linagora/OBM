@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_display.php                                         //
 //     - Desc : Contract Support Display File                                //
@@ -45,9 +45,9 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "contract_label") {
     if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("contract_id").",'".addslashes($OD->data_set->f("contract_label"))."');";
+      $res["url"] = "javascript:check_contract_get_id(".$OD->data_set->f("contract_id").",'".addslashes($OD->data_set->f("contract_label"))."');";
     } else if ($OD->display_ext == "get_id_url") {
-      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("contract_id").");";
+      $res["url"] = "javascript:check_contract_get_id_url('$ext_url',".$OD->data_set->f("contract_id").");";
     } else {
       $res["url"] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$OD->data_set->f("contract_id");
     }
@@ -1539,7 +1539,7 @@ function dis_can_delete_contract($p_id) {
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    onclick=\"if (confirm_contract_del(this.form)) return true; else return false;\" />
     </form>";
 
   $display["msg"] .= display_ok_msg($l_can_delete);
@@ -1559,7 +1559,7 @@ function dis_can_delete_contract($p_id) {
 // Parameters:
 //   - $pri_q : Priority list database object
 ///////////////////////////////////////////////////////////////////////////////
-function html_priority_form($pri_q) {
+function html_contract_priority_form($pri_q) {
   global $l_pri_manage,$l_pri_exist, $l_label, $l_code, $l_color;
   global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
 
@@ -1609,7 +1609,7 @@ function html_priority_form($pri_q) {
               <td class=\"adminLabel\">$sel_pri</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"priority_checklink\" />
-              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_priority_checkdel(this.form)) return true; else return false;\" />
+              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_contract_priority_checkdel(this.form)) return true; else return false;\" />
               </td>
             </tr>
             </table>
@@ -1632,7 +1632,7 @@ function html_priority_form($pri_q) {
             <td><input type=\"text\" name=\"tf_pri\" /></td>
             <td rowspan=\"3\">
               <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_update\"
-              onclick=\"if (check_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
+              onclick=\"if (check_contract_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
             </td>
           </tr>
           <tr>
@@ -1674,7 +1674,7 @@ function html_priority_form($pri_q) {
           <td colspan=\"2\" class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
             <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_insert\"
-              onclick=\"if (check_priority_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_contract_priority_new(this.form)) return true; else return false;\" />
           </td>
 
         </tr>
@@ -1694,12 +1694,12 @@ function html_priority_form($pri_q) {
 // Parameters:
 //   - $id : priority id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_priority_links($id) {
+function dis_contract_priority_links($id) {
   global $l_pri_link_contract, $l_pri_link_contract_no;
   global $l_pri_delete, $l_pri_can_delete, $l_pri_cant_delete;
   global $l_back,$display;
 
-  $label = get_priority_label($id);
+  $label = get_contract_priority_label($id);
   $obm_q = run_query_contract_priority_links($id);
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
@@ -1777,7 +1777,7 @@ function dis_priority_links($id) {
 // Parameters:
 //   - $sta_q : Status list database object
 ///////////////////////////////////////////////////////////////////////////////
-function html_status_form($sta_q) {
+function html_contract_status_form($sta_q) {
   global $l_label, $l_code;
   global $l_sta_manage,$l_sta_exist,$l_sta_new;
   global $l_sta_checkdelete, $l_sta_update, $l_sta_insert;
@@ -1823,7 +1823,7 @@ function html_status_form($sta_q) {
         <td>
           <input type=\"hidden\" name=\"action\" value=\"status_checklink\" />
           <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_checkdelete\"
-          onclick=\"if (check_status_checkdel(this.form)) return true; else return false;\" />
+          onclick=\"if (check_contract_status_checkdel(this.form)) return true; else return false;\" />
           </td>
         </tr>
         </table>
@@ -1845,7 +1845,7 @@ function html_status_form($sta_q) {
           <td><input type=\"text\" name=\"tf_status\" /></td>
           <td rowspan=\"2\">
             <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_update\"
-            onclick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
+            onclick=\"if (check_contract_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
           </td>
         </tr>
         <tr>
@@ -1880,7 +1880,7 @@ function html_status_form($sta_q) {
           <td colspan=\"2\" class=\"adminLabel\">
           <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
           <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_insert\"
-            onclick=\"if (check_status_new(this.form)) return true; " .
+            onclick=\"if (check_contract_status_new(this.form)) return true; " .
             "else return false;\" />
         </td>
       </tr>
@@ -1900,11 +1900,11 @@ function html_status_form($sta_q) {
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_status_links($id) {
+function dis_contract_status_links($id) {
   global $l_sta_link_incident,$l_sta_link_incident_no, $l_sta_can_delete, $l_sta_cant_delete;
   global $l_sta_delete, $l_back,$display;
 
-  $label = get_status_label($id);
+  $label = get_contract_status_label($id);
   $obm_q = run_query_contract_status_links($id);
   $dis_back = "<form name=\"form_back\" method=\"post\"
         action=\"" .url_prepare("contract_index.php") . "\">
@@ -1914,7 +1914,7 @@ function dis_status_links($id) {
 
   $nb_stat = $obm_q->num_rows();
   if ($nb_stat > 0) {
-    $display["msg"] = display_warn_msg($l_sta_cant_delete); 
+    $display["msg"] = display_warn_msg($l_sta_cant_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
@@ -1979,12 +1979,12 @@ function dis_status_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Contract admin index
 ///////////////////////////////////////////////////////////////////////////////
-function dis_admin_index() {
+function dis_contract_admin_index() {
 
   $pri_q = run_query_contract_priority();
   $sta_q = run_query_contract_status();
   
-  return html_priority_form($pri_q) . "<hr />" .html_status_form($sta_q)."<hr />" .html_contract_admin_form(run_query_contract_type());
+  return html_contract_priority_form($pri_q) . "<hr />" .html_contract_status_form($sta_q)."<hr />" .html_contract_admin_form(run_query_contract_type());
 }
 
 
@@ -2030,7 +2030,7 @@ function html_contract_admin_form($type_q) {
           <td>
             <input type=\"hidden\" name=\"action\" value=\"type_checklink\" />
             <input type=\"submit\" name=\"sub_type\" value=\"$l_type_checkdelete\"
-              onclick=\"if (check_type_del(this.form)) return true;
+              onclick=\"if (check_contract_type_del(this.form)) return true;
               else return false;\" />
           </td>
          </tr>
@@ -2051,7 +2051,7 @@ function html_contract_admin_form($type_q) {
 	  </td>
 	  <td rowspan=\"2\">
 	    <input type=\"submit\" name=\"sub_type\" value=\"$l_type_update\"
-	    onclick=\"if (check_type_upd(this.form,document.form_type_delete)) return true; else return false;\" />
+	    onclick=\"if (check_contract_type_upd(this.form,document.form_type_delete)) return true; else return false;\" />
 	  </td>
 	</tr>
        </table>
@@ -2073,7 +2073,7 @@ function html_contract_admin_form($type_q) {
        <td class=\"adminLabel\">
          <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
          <input type=\"submit\" name=\"sub_type\" value=\"$l_type_insert\"
-         onclick=\"if (check_type_new(this.form)) return true;else return false;\" />
+         onclick=\"if (check_contract_type_new(this.form)) return true;else return false;\" />
        </td>
       </tr>
      </table>
@@ -2092,12 +2092,12 @@ function html_contract_admin_form($type_q) {
 // Parameters:
 //   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_type_links($id) {
+function dis_contract_type_links($id) {
   global $l_type_link_contract, $l_type_can_delete, $l_type_cant_delete;
   global $l_type_delete, $l_back;
   global $display;
 
-  $label = get_type_label($id);
+  $label = get_contract_type_label($id);
   $obm_q = run_query_contract_type_links($id);
 
   $nb_type = $obm_q->num_rows();
@@ -2198,9 +2198,9 @@ function html_select_contract($con_q, $title, $url="") {
   global $l_select_contract, $l_close, $display;
 
   if ($url != "") {
-    $jsfunc = "check_get_id_url(this, '$url')";
+    $jsfunc = "check_contract_get_id_url(this, '$url')";
   } else {
-    $jsfunc = "check_get_id(this)";
+    $jsfunc = "check_contract_get_id(this)";
   }
 
   $display_cont = "
@@ -2244,4 +2244,4 @@ function html_select_contract($con_q, $title, $url="") {
   return $block;
 }
  
-</script>
+?>
