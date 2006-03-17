@@ -23,6 +23,8 @@
 // - tasktype_update      -- form fields    -- update the Tasktype
 // - tasktype_checklink   --                -- check if Tasktype is used
 // - tasktype_delete      --                -- delete the Tasktype
+// External API ---------------------------------------------------------------
+// - tt_ext_get_ids       --                -- select multiple tt (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -35,6 +37,7 @@ include("$obminclude/global_pref.inc");
 
 require("admin_ref_display.inc");
 require("admin_ref_query.inc");
+require_once("admin_ref_js.inc");
 
 if ( ($action == "") || ($action == "index")) $action = "country";
 $ref = get_admin_ref_param();
@@ -44,17 +47,17 @@ $perm->check_permissions($module, $action);
 page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
-// Main Program                                                              //
+// External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
+if ($action == "tt_ext_get_ids") {
+  $display["detail"] = html_admin_ref_tasktype_select_list($ref);
 
-if ($action == "index")  {
+} elseif ($action == "index")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("admin_ref_js.inc");
   //$display["detail"] = dis_ref_index();
 
 } elseif ($action == "country")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("admin_ref_js.inc");
   $display["detail"] = dis_admin_ref_country_index();
 
 } elseif ($action == "country_insert")  {
@@ -65,7 +68,6 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_country_insert_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "country_update")  {
@@ -76,13 +78,11 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_country_update_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "country_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_admin_ref_country_links($ref);
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "country_delete")  {
@@ -93,12 +93,10 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_country_delete_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_country_index();
 
 } elseif ($action == "datasource")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("admin_ref_js.inc");
   $display["detail"] = dis_admin_ref_datasource_index();
 
 } elseif ($action == "datasource_insert")  {
@@ -109,7 +107,6 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_dsrc_insert_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_datasource_index();
 
 } elseif ($action == "datasource_update")  {
@@ -120,12 +117,10 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_dsrc_update_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_datasource_index();
 
 } elseif ($action == "datasource_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_datasource_links($ref);
 
 } elseif ($action == "datasource_delete")  {
@@ -136,12 +131,10 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_dsrc_delete_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_datasource_index();
 
 } elseif ($action == "tasktype")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("admin_ref_js.inc");
   $display["detail"] = dis_admin_ref_tasktype_index();
 
 } elseif ($action == "tasktype_insert")  {
@@ -152,7 +145,6 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_tt_insert_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_tasktype_index();
 
 } elseif ($action == "tasktype_update")  {
@@ -163,12 +155,10 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_tt_update_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_tasktype_index();
 
 } elseif ($action == "tasktype_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_tasktype_links($ref);
 
 } elseif ($action == "tasktype_delete")  {
@@ -179,7 +169,6 @@ if ($action == "index")  {
   } else {
     $display["msg"] .= display_err_msg($l_tt_delete_error);
   }
-  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_ref_tasktype_index();
 }
 
@@ -188,7 +177,9 @@ if ($action == "index")  {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_header_admin_ref);
-$display["header"] = display_menu($module);
+if (! $ref["popup"]) {
+  $display["header"] = display_menu($module);
+ }
 $display["end"] = display_end();
 
 display_page($display);
@@ -201,7 +192,8 @@ display_page($display);
 function get_admin_ref_param() {
   global $tf_name, $sel_dsrc, $sel_ctry, $tf_iso, $tf_lang, $tf_phone;
   global $sel_tt, $tf_label, $rd_tt_internal, $hd_old_iso, $hd_old_lang;
-  global $cdg_param;
+  global $tt_target, $cdg_param, $ext_element;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   // Admin - generic fields
@@ -227,6 +219,17 @@ function get_admin_ref_param() {
   if (isset ($tf_label)) $ref["label"] = trim($tf_label);
   if (isset ($rd_tt_internal)) $ref["internal"] = $rd_tt_internal;
 
+  // External param
+  if (isset ($popup)) $ref["popup"] = $popup;
+  if (isset ($ext_action)) $ref["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $ref["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $ref["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $ref["id"] = $ext_id;
+  if (isset ($ext_target)) $ref["ext_target"] = $ext_target;
+  if (isset ($ext_title)) $ref["ext_title"] = $ext_title;
+  if (isset ($ext_element)) $ref["ext_element"] = $ext_element;
+  if (isset ($tt_target)) $ref["tt_target"] = $tt_target;
+
   if (debug_level_isset($cdg_param)) {
     if ( $ref ) {
       while ( list( $key, $val ) = each( $ref ) ) {
@@ -245,7 +248,7 @@ function get_admin_ref_param() {
 function get_admin_ref_action() {
   global $actions, $path, $cgp_show;
   global $l_header_datasource, $l_header_country, $l_header_tasktype;
-  global $cright_read_admin, $cright_write_admin;
+  global $cright_read, $cright_read_admin, $cright_write_admin;
 
 
   // Country index
@@ -324,6 +327,14 @@ function get_admin_ref_action() {
   if (($cgp_show["module"]["deal"])
       || ($cgp_show["module"]["project"])
       || ($cgp_show["module"]["time"])) {
+
+    // External : Get Ids
+    $actions["admin_ref"]["tt_ext_get_ids"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none'),
+    'popup' => 1
+                                    );
 
     // Tasktype index
     $actions["admin_ref"]["tasktype"] = array (

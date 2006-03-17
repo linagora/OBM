@@ -9,6 +9,9 @@
 
 
 require("$obminclude/javascript/check_js.inc");
+if ($ext_element != "") {
+  require_once("$obminclude/of/of_extmod.inc");
+}
 
 $extra_js .= "
 

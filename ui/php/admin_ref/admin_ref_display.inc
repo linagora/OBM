@@ -823,5 +823,82 @@ function dis_admin_ref_tasktype_links($ref) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the Task Type select list for external call
+///////////////////////////////////////////////////////////////////////////////
+function html_admin_ref_tasktype_select_list($ref) {
+  global $l_close, $l_add;
+  global $l_tt_no, $ctt_sales, $ctt_research, $ctt_others;
+  global $l_tt_sales, $l_tt_research, $l_tt_others;
+
+  $tt_list = array($ctt_sales => $l_tt_sales,
+		     $ctt_research => $l_tt_research,
+		     $ctt_others => $l_tt_others);
+
+  $type_prec = -1;
+
+  $tts = get_global_tasktype($ref["tt_target"]);
+
+  if (is_array($tts)) {
+
+    $ext_action = $ref["ext_action"];
+    $ext_url = $ref["ext_url"];
+    $ext_id = $ref["ext_id"];
+    $ext_target = $ref["ext_target"];
+    $ext_widget = $ref["ext_widget"];
+    $ext_element = $ref["ext_element"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
+
+    if ($ext_element != "") {
+      $form_head = "
+      <form onsubmit=\"of_extmod_fill_ext_element(this, 'tt'); window.close(); return false;\">";
+    } elseif ($ext_widget != "") {
+      $form_head = "
+      <form onsubmit=\"fill_ext_form(this); return false;\">";
+    } else {
+      $form_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
+
+    $table_tt = "<table>";
+    foreach ($tts as $id=>$one_tt) {
+      $tt_label = $one_tt["label"];
+      $internal = $one_tt["internal"];
+      // put menu titles
+      if ($internal != $type_prec) {
+	$table_tt .= "\n<tr><td class=\"detailLabel\">".$tt_list[$internal]."</td></tr>";
+	$type_prec = $internal;
+      } else {
+	$table_tt .= "\n<tr><td class=\"detailText\"><input type=\"checkbox\" name=\"$id\"><span id=\"data-tt-$id\" style=\"display:none;\">$tt_label</span>&nbsp;&nbsp;$tt_label</td></tr>";
+      }
+    }
+    $table_tt .= "</table>";
+
+    $block = "
+<!-- Task Type Select list -->
+$form_head
+$table_tt
+
+      <p class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </p>
+      </p>
+      </form>
+
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>
+";
+    
+  } else {
+    $block = $l_tt_no;
+  }
+
+  return $block;
+}
+
 ?>
 

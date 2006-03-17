@@ -32,6 +32,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
+require_once("invoice_js.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
@@ -51,7 +52,6 @@ page_close();
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
   $display["search"] = dis_invoice_search_form($invoice); 
   if ($set_display == "yes") { 
     $display["result"] = dis_invoice_search_list($invoice);
@@ -61,13 +61,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "search")  { 
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
   $display["search"] = dis_invoice_search_form($invoice); 
   $display["result"] = dis_invoice_search_list($invoice);
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc"); 
   $display["detail"] = dis_invoice_form($action, $invoice);
 
 } elseif ($action == "detailconsult")  {
@@ -76,18 +74,15 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailupdate")  { 
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
   $display["detail"] = dis_invoice_form($action, $invoice);
 
 } elseif ($action == "duplicate") {
 ///////////////////////////////////////////////////////////////////////////////
   // we give the user the traditionnal form to modify this invoice :
-  require("invoice_js.inc"); 
   $display["detail"] = dis_invoice_form($action, $invoice);
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
   if (check_invoice_data_form("", $invoice)) {
     $retour = run_query_invoice_insert($invoice);
     if ($retour) {
@@ -103,7 +98,6 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc"); 
   if (check_invoice_data_form($invoice["id"], $invoice)) {
     $retour = run_query_invoice_update($invoice); 
     if ($retour) {
@@ -120,7 +114,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_invoice($invoice["id"])) {
-    require("invoice_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_invoice($invoice["id"]);
   } else {
@@ -136,7 +129,6 @@ if ($action == "index" || $action == "") {
     $retour = run_query_invoice_delete($invoice["id"]); 
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
-      require ("invoice_js.inc");
       $display["search"] = dis_invoice_search_form($invoice);
     } else {
       $display["msg"] .= display_err_msg ($l_delete_error);
@@ -217,7 +209,6 @@ function get_param_invoice() {
   if (isset ($tf_amount_ht)) $invoice["ht"] = $tf_amount_ht;
   if (isset ($tf_amount_ttc)) $invoice["ttc"] = $tf_amount_ttc;
   if (isset ($sel_status)) $invoice["status"] = $sel_status;
-  if (isset ($sel_tt)) $invoice["tt"] = $sel_tt;
   if (isset ($tf_date)) $invoice["date"] = $tf_date;
   if (isset ($tf_payment_date)) $invoice["pdate"] = $tf_payment_date;
   if (isset ($tf_expiration_date)) $invoice["edate"] = $tf_expiration_date;
@@ -255,6 +246,18 @@ function get_param_invoice() {
   if (isset ($project_name)) $invoice["project_name"] = $project_name;
   if (isset ($project_new_name)) $invoice["proj_new_name"] = $project_new_name;
   if (isset ($project_new_id)) $invoice["proj_new_id"] = $project_new_id;
+
+  // sel_tt
+  if (is_array($sel_tt)) {
+    while ( list( $key, $value ) = each( $sel_tt ) ) {
+      // sel_tt contains select infos (data-tt-$id)
+      if (strcmp(substr($value, 0, 8),"data-tt-") == 0) {
+	$data = explode("-", $value);
+	$id = $data[2];
+	$invoice["sel_tt"][] = $id;
+      }
+    }
+  }
 
   // External parameters
   if (isset ($ext_id)) $invoice["id"] = $ext_id;

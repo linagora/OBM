@@ -128,8 +128,14 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 function dis_invoice_search_form($invoice="") {
   global $ctt_sales;
 
+  // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
+  $tt_ids = $invoice["sel_tt"];
+  if (! is_array($tt_ids) && ($tt_ids == "")) {
+    $tt_ids = "0";
+  }
+
   $sta = get_invoicestatus();
-  $tts = get_global_tasktype($ctt_sales);
+  $tts = get_global_tasktype($ctt_sales, $tt_ids);
   $block .= html_invoice_search_form($invoice, $sta, $tts);
 
   return $block;
@@ -144,7 +150,7 @@ function dis_invoice_search_form($invoice="") {
 //   - $tts     : Task Type aray
 //////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_form($invoice, $sta, $tts) {
-  global $c_all, $l_all;
+  global $set_theme, $ico_crow, $ico_add, $c_all, $l_all, $ctt_sales;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_tt, $l_date, $l_after, $l_before, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
@@ -168,17 +174,20 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $proj_id = $invoice["project_id"];
   $archive = ($invoice["archive"]) ? "checked" : "" ;
 
-  $url_form = url_prepare("invoice_index.php?action=search");
+  $url_form = url_prepare("invoice_index.php");
 
-  $sel_status = "<select name=\"sel_status\">
-     <option value=\"$c_all\">$l_all</option>";
-  foreach ($sta as $s_id => $s_status) {
-    $s_label = $s_status["label"];
-    $sel_status .= "<option value=\"$s_id\"";
-    if ($status == $s_id) $sel_status .= " selected = \"selected\"";
-    $sel_status .= ">$s_label</option>";
-  }
-  $sel_status .= "</select>";
+   $sel_status = "<select name=\"sel_status\">
+      <option value=\"$c_all\">$l_all</option>";
+   foreach ($sta as $s_id => $s_status) {
+     $s_label = $s_status["label"];
+     $sel_status .= "<option value=\"$s_id\"";
+     if ($status == $s_id) $sel_status .= " selected = \"selected\"";
+     $sel_status .= ">$s_label</option>";
+   }
+   $sel_status .= "</select>";
+
+
+   //  $block_status = of_extmod_dis_search_select($sta, "status", $url_tt);
 
   if (($inout == "$c_all") || ($inout == "")) {
     $rb_both = "checked";
@@ -190,22 +199,12 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     $rb_four = " checked ";
   }
 
-  // TaskType select construction
-  $sel_tt = "<select name=\"sel_tt\">
-              <option value=\"$c_all\">$l_all</option>";
-  if (is_array($tts)) {
-    foreach ($tts as $id=>$one_tt) {
-      $tt_label = $one_tt["label"];
-      $internal = $one_tt["internal"];
-      $sel_tt .= "\n<option value=\"$id\"";
-      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
-      $sel_tt .= ">$tt_label</option>\n";
-    }
-    $sel_tt .= "</select>";
-  }
+  $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
+
+  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
 
   $block = "
-    <form method=\"get\" name=\"f_search\"
+    <form method=\"post\" name=\"f_search\"
         onSubmit=\"if (check_search_form(this) == false) return false;
         else return true;\" action=\"$url_form\">
     <div class=\"search\">
@@ -251,9 +250,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
       $l_supplier &nbsp;
     </div>
 
-    <div class=\"searchLabel\">$l_tt<br />
-      $sel_tt
-    </div>
+    $block_tt
 
     <div class=\"searchLabel\">$l_deal<br />
       <input type=\"text\" name=\"tf_deal\" value=\"$deal\" />
@@ -948,10 +945,11 @@ function dis_can_delete_invoice($p_id) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard($invoice) {
-  global $display, $set_theme, $path;
+  global $display, $set_theme, $path, $ctt_sales;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
+  global $l_execute;
 
   if (isset($invoice["year"])) {
     $year = $invoice["year"];
@@ -961,9 +959,20 @@ function dis_invoice_dashboard($invoice) {
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges);
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["sel_tt"]);
   $url_prev = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_prev");
   $url_next = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_next");
+
+  // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
+  $tt_ids = $invoice["sel_tt"];
+  if (! is_array($tt_ids) && ($tt_ids == "")) {
+    $tt_ids = "0";
+  }
+
+  $tts = get_global_tasktype($ctt_sales, $tt_ids);
+
+  $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
+  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
 
   // Table header
   for ($month = 1; $month < 13; $month++) {
@@ -1116,7 +1125,7 @@ function dis_invoice_dashboard($invoice) {
   // Payment infos ------------------------------------------------------------
 
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date");
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date", $invoice["sel_tt"]);
 
   $status_pay = get_invoicestatus("payment");
 
@@ -1210,7 +1219,10 @@ function dis_invoice_dashboard($invoice) {
 
 
   $block = "
+    <form method=\"post\" name=\"f_search\" action=\"$url_form\">
+
     <div class=\"detailHead\">
+
       <table>
       <tr>
         <td>
@@ -1228,6 +1240,20 @@ function dis_invoice_dashboard($invoice) {
         </td>
       </tr>
       </table>
+    </div>
+
+    <div class=\"search\">
+      <div class=\"detailText\">$block_tt</div>
+      <div class=\"searchLabel\">&nbsp;<br>
+        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+        <input type=\"hidden\" name=\"param_project\" value=\"$proj_id\" />
+        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
+        <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
+      </div>
+
+      <div class=\"searchEnd\"></div>
+
     </div>
 
     <div class=\"detailHead\">$l_billed ($l_amount_ht)</div>

@@ -75,9 +75,21 @@ function get_elem(doc, name) {
 function remove_element(elemId,parentId) {
   target = window.document;
   content = target.getElementById(elemId);
-  container = target.getElementById(parentId)
-  container.removeChild(content); 
-} 
+  container = target.getElementById(parentId);
+  container.removeChild(content);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Remove an element line from the list form
+///////////////////////////////////////////////////////////////////////////////
+function remove_all_element(parentId) {
+  target = window.document;
+  container = target.getElementById(parentId);
+  content = container.getChild();
+alert(content);
+  container.innerHTML = '';
+}
 
 ";
 </script>

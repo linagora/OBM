@@ -379,7 +379,6 @@ function get_param_agenda() {
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
   global $sel_time_duration,$sel_min_duration;
-  global $sel_group_id;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
   global $ch_all_day;
   global $tf_category1_label, $tf_category1_code, $sel_category1;

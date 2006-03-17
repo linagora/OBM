@@ -148,7 +148,7 @@ function dis_calendar_portal() {
 
   $current_time = $start_time; 
   $calendar_entity["user"] = array($auth->auth["uid"] => array("dummy"));
-  $events_list = events_agenda_model($start_time,$end_time, $calendar_entity);
+  $events_list = agenda_events_model($start_time,$end_time, $calendar_entity);
   $whole_month = TRUE;
   $num_of_events = 0;
   $i = 0;

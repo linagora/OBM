@@ -430,6 +430,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 }
 
 .detailText {
+	font-size: 12px;
 	text-align: left;
 	font-weight: bold;
 	color: #666666;
@@ -467,11 +468,19 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 
 .elementRow {
 	font-size:         10px;
+	color:             #666666;
         background-color:  #FFFFFF;  
         overflow:          hidden;
         width:             150px;
         float:             left; 
         white-space:       nowrap;
+}
+.elementRowEmpty {
+	font-size:         1px;
+        background-color:  #FFFFFF;  
+        overflow:          hidden;
+        width:             150px;
+        float:             left; 
 }
 /* ------------------------------------------------------------------------- */
 /* link */

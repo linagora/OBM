@@ -161,9 +161,10 @@ function run_query_contactfunction() {
 //               "all" or ""  return all tasktype
 //               "project" "  return tasktype from $ctt_sales and $ctt_research
 //               one category return the category
+//   - $tt_ids : tasktype ids to select
 // Returns : tasktype array [id] => [label],[internal]
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_tasktype($tt_cat="") {
+function get_global_tasktype($tt_cat="", $tt_ids="") {
   global $cdg_sql, $ctt_sales, $ctt_research;
 
   $query = "
@@ -176,15 +177,33 @@ function get_global_tasktype($tt_cat="") {
   if (($tt_cat == "") || ($tt_cat == "all")) {
     $query .= "";
   } elseif ($tt_cat == "project") {
-    $query .= "WHERE (tasktype_internal = '$ctt_sales'
+    $where .= "(tasktype_internal = '$ctt_sales'
                       or tasktype_internal = '$ctt_research')";
   } else {
-    $query .= "WHERE tasktype_internal = '$tt_cat'";
+    $where .= "tasktype_internal = '$tt_cat'";
   }
 
-  $query .= " ORDER BY tasktype_internal, tasktype_label";
+  if (is_array($tt_ids)) {
+    if ($where != "") {
+      $where .= " AND ";
+    }
+    $where .= "(";
+    foreach($tt_ids as $id) {
+      $where .= "$or tasktype_id = '$id'";
+      $or = " OR";
+    }
+    $where .= ")";
+  } else if ($tt_ids != "") {
+    if ($where != "") {
+      $where .= " AND ";
+    }
+    $where .= " tasktype_id = '$tt_ids'";
+  }
 
-  display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+  $query .= " WHERE $where
+              ORDER BY tasktype_internal, tasktype_label";
+
+  display_debug_msg($query, $cdg_sql, "get_global_tasktype()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -601,10 +620,10 @@ function get_last_deal_text($id) {
   if ($id > 0) {
     $query = "SELECT deal_label FROM Deal WHERE deal_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("deal_label");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("deal_label");
   }
 
   return;
@@ -645,10 +664,10 @@ function get_last_list_text($id) {
   if ($id > 0) {
     $query = "SELECT list_name FROM List WHERE list_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("list_name");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("list_name");
   }
 
   return;

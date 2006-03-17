@@ -1853,7 +1853,7 @@ function run_query_agenda_repeat_events($start, $end, $calendar_entity) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function events_agenda_model($start_time, $end_time, $calendar_entity) {
+function agenda_events_model($start_time, $end_time, $calendar_entity) {
   global $day_duration;
 
   $day_duration = 86400;

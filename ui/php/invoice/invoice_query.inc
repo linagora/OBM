@@ -18,7 +18,7 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   $ht = $invoice["ht"];
   $ttc = $invoice["ttc"];
   $status = $invoice["status"];
-  $tt = $invoice["tt"];
+  $sel_tt = $invoice["sel_tt"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
   $dateexp_after = $invoice["dateexp_after"];
@@ -51,7 +51,7 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   if ($ttc != "") {
     $where .= " AND invoice_amount_ttc = '$ttc'";
   }
-  if (($status != '') && ($status != "$c_all")){
+  if (($status != '') && ($status != "$c_all")) {
     $where .= " AND invoice_status_id = '$status'";
   }
   if ($date_after != "") {
@@ -68,11 +68,6 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   }
   if (($inout != "") && ($inout != "$c_all")) {
     $where .= " AND invoice_inout = '$inout'";
-  }
-  if (($tt != '') && ($tt != "$c_all")){
-    $where .= " AND project_tasktype_id = '$tt'";
-    $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
-    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($comp_id != "") {
     $where .= " AND invoice_company_id = '$comp_id'";
@@ -92,6 +87,17 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   }
   if ($proj_id != "") {
     $where .= " AND invoice_project_id = '$proj_id'";
+  }
+  if (is_array($sel_tt)) {
+    $where .= " AND (";
+    $or = "";
+    foreach ($sel_tt as $tt_id) {
+      $where .= "$or project_tasktype_id='$tt_id' OR deal_tasktype_id='$tt_id'";
+      $or = " OR";
+    }
+    $where .= ")";
+    $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
+    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($archive != "1") {
     $where .= " AND invoice_archive = '0'";
@@ -591,10 +597,11 @@ function get_invoicestatus_info($p_id) {
 // Parameters:
 //   - $date_ranges : array [range1] : [date_start, date_end]
 //   - $target_date : invoice_date, invoice_expiration_date
+//   - $sel_tt      : [optionnal] tasktype array
 // Returns:
 //     array : array[date]([billed]|[potential])([status]|[total])[$infos]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_amounts($date_ranges, $target_date="invoice_date") {
+function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $sel_tt="") {
   global $cdg_sql, $cdg_param;
   global $l_total;
 
@@ -613,6 +620,19 @@ function run_query_invoice_amounts($date_ranges, $target_date="invoice_date") {
     }
   }
 
+  // Tasktype filter
+  if (is_array($sel_tt)) {
+    $w_tt .= " AND (";
+    $or = "";
+    foreach ($sel_tt as $tt_id) {
+      $w_tt .= "$or project_tasktype_id='$tt_id' OR deal_tasktype_id='$tt_id'";
+      $or = " OR";
+    }
+    $w_tt .= ")";
+    $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
+    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
+  }
+  echo "$w_tt";
   // Factured (invoicestatus_payment = 1) OR potential (status_created = 0)
   $query = "SELECT
       $da,
@@ -626,9 +646,12 @@ function run_query_invoice_amounts($date_ranges, $target_date="invoice_date") {
       invoicestatus_archive
     FROM Invoice
       LEFT JOIN InvoiceStatus on invoice_status_id=invoicestatus_id
+      $join_project
+      $join_deal
     WHERE invoice_inout = '+' 
       AND (invoicestatus_payment=1 OR invoicestatus_created=0)
-      $w_date 
+      $w_date
+      $w_tt 
     ORDER BY invoice_status_id
 ";
   

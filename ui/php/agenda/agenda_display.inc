@@ -468,7 +468,7 @@ function dis_agenda_year_planning($agenda, $calendar_entity) {
    
   $display_date = agenda_localizeDate("month", $ts_date);  
   
-  $events = events_agenda_model($start_time,$end_time, $calendar_entity);
+  $events = agenda_events_model($start_time,$end_time, $calendar_entity);
   
   for ($i=0; $i<7; $i++) {
     $day_num = date("w","$start_day");
@@ -650,7 +650,7 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
   $nb_ent = $nb_user + $nb_res;
   $td_width = floor(100 / $nb_ent)."px";
    
-  $events = events_agenda_model($start_time,$end_time, $calendar_entity);
+  $events = agenda_events_model($start_time,$end_time, $calendar_entity);
 
   // Display the day of a week
   for ($i=0; $i<7; $i++) {
@@ -808,7 +808,7 @@ function dis_agenda_week_planning($agenda, $calendar_entity) {
   $end_week = agenda_localizeDate("week", $end_week_time);
   
   $display_date = "$start_week - $end_week"; 
-  $events = events_agenda_model($start_week_day,$end_week_time,$calendar_entity);
+  $events = agenda_events_model($start_week_day,$end_week_time,$calendar_entity);
 
   $nb_user = count($calendar_entity["user"]);
   $nb_res = count($calendar_entity["resource"]);
@@ -988,7 +988,7 @@ function dis_agenda_day_planning($agenda, $calendar_entity) {
 
   $display_date = agenda_localizeDate("day", $ts_date);
 
-  $events = events_agenda_model($start_time,$end_time, $calendar_entity);
+  $events = agenda_events_model($start_time,$end_time, $calendar_entity);
   $nb_user = count($calendar_entity["user"]);
   $nb_res = count($calendar_entity["resource"]);
   $nb_ent = $nb_user + $nb_res;
@@ -1556,7 +1556,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
       return false;\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
-     </td>    
+     </td>
      <td class=\"detailForm\" id=\"sel_user_id\">
        $dis_sel_user
      </td>";
@@ -1740,14 +1740,14 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   <tr>
     <td class=\"detailLabel\">$l_datebegin</td>
     <td class=\"detailForm\">
-			<script>calendar('tf_date_begin','$datebegin', 'tf_date_end')</script>
+      <script>calendar('tf_date_begin','$datebegin', 'tf_date_end')</script>
       <span id=\"hour_begin\" style=\"$style\" >$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_dateend</td>
     <td class=\"detailForm\">
-  		<script>calendar('tf_date_end','$dateend')</script>
+      <script>calendar('tf_date_end','$dateend')</script>
       <span id=\"hour_end\" style=\"$style\" >$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>       
   </tr>
@@ -2338,7 +2338,7 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   $start_week = agenda_localizeDate("week", $start_week_time);
   $end_week = agenda_localizeDate("week", $end_week_time);
   $display_date = "$start_week - $end_week"; 
-  $events = events_agenda_model($start_week_day,$end_week_time,$entity_store);
+  $events = agenda_events_model($start_week_day,$end_week_time,$entity_store);
   $day_duration = 86400; 
 
   /* Week Days headers */

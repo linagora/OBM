@@ -224,7 +224,7 @@ class OBM_DISPLAY {
           <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
       }
       
-      // If first field we doesn't display the up arrow
+      // If first field we don't display the up arrow
       if ($i == 0) {
 	$block .= "
         <td >&nbsp;</td>";
