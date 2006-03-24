@@ -129,7 +129,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   if (($ctry != $c_all) && ($ctry != "")) {
     if ($cgp_show["module"]["company"]) {
       $where .= " AND (contact_country_iso3166='$ctry' OR
-       contact_country_iso3166='' AND company_country_iso3166='$ctry')";
+       contact_country_iso3166=0 AND company_country_iso3166='$ctry')";
       $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
     } else {
       $where .= " AND contact_country_iso3166='$ctry'";

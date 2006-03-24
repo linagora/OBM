@@ -584,6 +584,7 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
   $func = $contact["function"];
+  $title = urlencode(stripslashes($contact["title"]));
   $mark = $contact["marketing_manager"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
@@ -591,7 +592,7 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;cb_mailing_ok_only=$mailing_ok_only&amp;param_company=$company_id&amp;sel_function=$func&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;cb_mailing_ok_only=$mailing_ok_only&amp;param_company=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
