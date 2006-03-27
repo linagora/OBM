@@ -36,7 +36,7 @@ if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
     $display["msg"] = display_debug_msg("FIXME PERMISSIONS", $cdg_param);
-    $display["detail"] = html_payment_form($action,"",run_query_paymentkind(), run_query_account());
+    $display["detail"] = html_payment_form($action,"",run_query_payment_kind(), run_query_payment_account());
   } else {
    $display["msg"] =  display_err_msg($l_error_permission);
   }
@@ -44,23 +44,23 @@ if ($action == "new") {
 } elseif ($action == "new_with_invoices") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
-    run_query_insert ($payment);
+    run_query_payment_insert ($payment);
     $display["msg"] = display_ok_msg($l_insert_ok);
 
     // we re-load all values :
-    $pay_q = run_query_search ($payment);
+    $pay_q = run_query_payment_search ($payment);
     $pay_q->next_record();
     $payment["id"] = $pay_q->f("payment_id");
 
-    $pay_q = run_query_detail ($payment["id"]);
-    $inv_q = run_query_search_connectable_invoices ($payment);
+    $pay_q = run_query_payment_detail ($payment["id"]);
+    $inv_q = run_query_payment_search_connectable_invoices ($payment);
     $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
 
     // we display all data concerning our freshly created payment
-    $display["detail"] = html_payment_consult ($action, $pay_q, run_query_paymentkind (), run_query_account (), $inv_q, $prefs_i);
+    $display["detail"] = html_payment_consult ($action, $pay_q, run_query_payment_kind (), run_query_payment_account (), $inv_q, $prefs_i);
 
     // and we give the user a form to find invoices :
-    $display["detail"] = html_chose_invoices_form ($action, $payment, $prefs_i, $inv_q);
+    $display["detail"] = html_payment_chose_invoices_form ($action, $payment, $prefs_i, $inv_q);
   }
   else {
     $display["msg"] = display_err_msg($l_error_permission);
@@ -76,18 +76,18 @@ if ($action == "new") {
 
   while (list($key) = each ($HTTP_POST_VARS)) {
     if (strcmp(substr($key,0,4),"use_") == 0) {
-      run_query_link_payment_to_invoice($payment, substr($key, 4));
+      run_query_payment_link_payment_to_invoice($payment, substr($key, 4));
     }
   }
   $display["msg"] = display_ok_msg($l_insert_paymentinvoice_ok);
   // then back to the search screen :
-  $display["detail"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account(), $payment);
+  $display["detail"] = html_payment_search_form($action,run_query_payment_kind(), run_query_payment_account(), $payment);
 
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_payment_search_form($p_action, run_query_paymentkind(), run_query_account(), $payment);
+  $display["search"] = html_payment_search_form($p_action, run_query_payment_kind(), run_query_payment_account(), $payment);
   if ($set_display == "yes") {
-    $pay_q = run_query_search($payment);
+    $pay_q = run_query_payment_search($payment);
     $nb_payments = $pay_q->num_rows();
     if ($nb_payments == 0){
       $display["msg"] = display_warn_msg($l_no_found);
@@ -102,8 +102,8 @@ if ($action == "new") {
 } elseif ($action == "search")  { 
 //////////////////////////////////////////////////////////////////////////////
   require("payment_js.inc");
-  $display["search"] = html_payment_search_form($p_action, run_query_paymentkind(), run_query_account(), $payment);
-  $pay_q = run_query_search($payment);
+  $display["search"] = html_payment_search_form($p_action, run_query_payment_kind(), run_query_payment_account(), $payment);
+  $pay_q = run_query_payment_search($payment);
   $nb_payments = $pay_q->num_rows();
   if ($nb_payments == 0){
     $display["msg"] = display_warn_msg($l_no_found);
@@ -115,11 +115,11 @@ if ($action == "new") {
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($payment["id"] > 0) {
-    $pay_q = run_query_detail($payment["id"]);
-    $inv_q = run_query_search_connected_invoices($payment["id"]);
+    $pay_q = run_query_payment_detail($payment["id"]);
+    $inv_q = run_query_payment_search_connected_invoices($payment["id"]);
     $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
     $display["detailInfo"] = display_record_info($pay_q);
-    $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $prefs_i);
+    $display["detail"] = html_payment_consult($action, $pay_q, run_query_payment_kind(), run_query_payment_account(), $inv_q, $prefs_i);
   }
 
 } elseif ($action == "detailupdate") {
@@ -127,9 +127,9 @@ if ($action == "new") {
   // nothing to do with invoice or account stuff
 ///////////////////////////////////////////////////////////////////////////////
   if ($payment["id"] > 0) {
-    $pay_q = run_query_detail($payment["id"]);
+    $pay_q = run_query_payment_detail($payment["id"]);
     $display["detailInfo"] = display_record_info($pay_q);
-    $display["detail"] = html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
+    $display["detail"] = html_payment_form ($action, $pay_q, run_query_payment_kind(), run_query_payment_account());
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,9 +143,9 @@ if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
    if ($payment["id"] > 0) {
      display_ok_msg (" action == bank");
-     $pay_q = run_query_detail ($payment["id"]);
+     $pay_q = run_query_payment_detail ($payment["id"]);
      $display["detailInfo"] = display_record_info ($pay_q);
-     html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
+     html_payment_form ($action, $pay_q, run_query_payment_kind(), run_query_payment_account());
   } 
 ///////////////////////////////////////////////////////////////////////////////
 }
@@ -163,17 +163,17 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   // options d'affichage pour les invoices
   $prefs_i = get_display_pref($auth->auth["uid"],"invoice");
   // recherche des invoices selon label si la recherche a d�j� �t� lanc�e,
-  $inv_q = run_query_search_connectable_invoices($payment);
+  $inv_q = run_query_payment_search_connectable_invoices($payment);
   // get invoices already connected to that payment :
-  $q_invoices_connected = run_query_search_connected_invoices($payment["id"]);
+  $q_invoices_connected = run_query_payment_search_connected_invoices($payment["id"]);
   //  $q_invoices_connected->next_record ();
   // first, we display payment info :
-  $pay_q = run_query_detail($payment["id"]);
-  $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $q_invoices_connected, $prefs_i);
+  $pay_q = run_query_payment_detail($payment["id"]);
+  $display["detail"] = html_payment_consult($action, $pay_q, run_query_payment_kind(), run_query_payment_account(), $q_invoices_connected, $prefs_i);
   
   // then the invoices search form
   $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
-  $display["detail"] .= html_chose_invoices_form($action, $payment, $prefs_i, $inv_q);
+  $display["detail"] .= html_payment_chose_invoices_form($action, $payment, $prefs_i, $inv_q);
 
 } elseif ($action == "add_invoices") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
 
   // then we need to get from base invoices already connected to 
   // that payment, but not paid yet...
-  $invoices_connected = run_query_search_connected_invoices ($payment["id"], 1);
+  $invoices_connected = run_query_payment_search_connected_invoices ($payment["id"], 1);
   while ($invoices_connected->next_record()) {
     $invoices_selected[] = $invoices_connected->f("invoice_id");
   }
@@ -204,75 +204,75 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   // we need to consider payments not connected to invoices,
   // like salaries or account/bank stuff...
   // we retrieve invoices data and put everything in an array :
-  $all_invoices = get_invoices_data ($payment["nb_invoices"]);
+  $all_invoices = get_payment_invoices_data ($payment["nb_invoices"]);
 
   if (! isset ($check_done)){
     // now, let's check what the user typed in...
-    $error = check_banking_data ($payment, $all_invoices);
+    $error = check_payment_banking_data ($payment, $all_invoices);
   } else {
     $error = 0;
   }
     
   if ($error) {
-   $display["detail"] = html_banking_problem ($error, $payment, $all_invoices);
+   $display["detail"] = html_payment_banking_problem ($error, $payment, $all_invoices);
   } else { 
     // everything is OK :
-    run_query_do_banking ($payment, $all_invoices);
-    $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment);
+    run_query_payment_do_banking ($payment, $all_invoices);
+    $display["search"] = html_payment_search_form($action,run_query_payment_kind(), run_query_payment_account (), $payment);
   }
 
 } elseif ($action == "duplicate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $pay_q = run_query_detail($payment["id"]);
+  $pay_q = run_query_payment_detail($payment["id"]);
   // we give the user the traditionnal form to modify his payment :
-  $display["detail"] = html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
+  $display["detail"] = html_payment_form ($action, $pay_q, run_query_payment_kind(), run_query_payment_account());
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_insert ($payment);
+  run_query_payment_insert ($payment);
   $display["msg"] = display_ok_msg ($l_insert_ok);
-  $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment); 
+  $display["search"] = html_payment_search_form($action,run_query_payment_kind(), run_query_payment_account (), $payment); 
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_update ($payment); 
+  run_query_payment_update ($payment); 
   $display["msg"] = display_ok_msg ($l_update_ok);
 
-  $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account(), $payment); 
+  $display["search"] = html_payment_search_form($action,run_query_payment_kind(), run_query_payment_account(), $payment); 
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_payment($payment["id"])) {
+  if (check_payment_can_delete($payment["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_payment($payment["id"]);
+    $display["detail"] = dis_payment_can_delete($payment["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $pay_q = run_query_detail($payment["id"]);
-    $inv_q = run_query_search_connected_invoices($payment["id"]);
+    $pay_q = run_query_payment_detail($payment["id"]);
+    $inv_q = run_query_payment_search_connected_invoices($payment["id"]);
     $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
     $display["detailInfo"] = display_record_info($pay_q);
-    $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $prefs_i);
+    $display["detail"] = html_payment_consult($action, $pay_q, run_query_payment_kind(), run_query_payment_account(), $inv_q, $prefs_i);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_payment($payment["id"])) {
-    $success = run_query_delete ($payment["id"]);
+  if (check_payment_can_delete($payment["id"])) {
+    $success = run_query_payment_delete ($payment["id"]);
     if ($success) {
       $display["msg"] = display_ok_msg ($l_delete_ok);
     } else {
       $display["msg"] = display_err_msg ($l_delete_error);
     }
-    $display["search"] = html_payment_search_form ($action,run_query_paymentkind(),run_query_account(),'','','');
+    $display["search"] = html_payment_search_form ($action,run_query_payment_kind(),run_query_payment_account(),'','','');
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $pay_q = run_query_detail($payment["id"]);
-    $inv_q = run_query_search_connected_invoices($payment["id"]);
+    $pay_q = run_query_payment_detail($payment["id"]);
+    $inv_q = run_query_payment_search_connected_invoices($payment["id"]);
     $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
     $display["detailInfo"] = display_record_info($pay_q);
-    $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $prefs_i);
+    $display["detail"] = html_payment_consult($action, $pay_q, run_query_payment_kind(), run_query_payment_account(), $inv_q, $prefs_i);
   }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -282,14 +282,14 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
     $display["msg"] = display_err_msg($l_error_permission);
   } else {
     // first, we get payment details :
-    $pay_q = run_query_detail($payment["id"]);
+    $pay_q = run_query_payment_detail($payment["id"]);
     // then invoices connected to that payment
-    $inv_q = run_query_search_connected_invoices ($payment["id"]);
+    $inv_q = run_query_payment_search_connected_invoices ($payment["id"]);
     //$q_connected_invoices->next_record ();
     // display stuff :
     $prefs_i = get_display_pref($auth->auth["uid"], "invoice");
     // at last, we can work for real :
-   $display["detail"] = html_breaking_associations ($action, $pay_q, $inv_q, $prefs_i);
+   $display["detail"] = html_payment_breaking_associations ($action, $pay_q, $inv_q, $prefs_i);
   }
 
 } elseif ($action == "do_break_asso") {
@@ -309,7 +309,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
     // same work to do :
     $display["msg"] = display_debug_msg("situation = $situation", $cdg_param);
     // we get the list of connected invoices (only one if situation is soft)
-    $invoices = run_query_search_connected_invoices ($payment["id"]);
+    $invoices = run_query_payment_search_connected_invoices ($payment["id"]);
     while ($invoices->next_record ()) {
       // unpay the invoice
       payment_unpay_invoice ($invoices->f("invoice_id"));
@@ -332,7 +332,7 @@ elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   }
 
   // once it's done, we go back to payment search page...
-  $display["search"] = html_payment_search_form($p_action, run_query_paymentkind(), run_query_account(), $payment);
+  $display["search"] = html_payment_search_form($p_action, run_query_payment_kind(), run_query_payment_account(), $payment);
   $display["msg"] = display_ok_msg($l_no_display);
   }
   
@@ -362,7 +362,7 @@ elseif ($action =="reconcile") {
 ///////////////////////////////////////////////////////////////////////////////
   // display a form to choose the file containing
   // data from the bank in the csv format.
-   $display["detail"] = html_choose_csv_file ();
+   $display["detail"] = html_payment_choose_csv_file ();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -376,7 +376,7 @@ elseif ($action =="reconcile_import") {
   if ($import_file != "no") {
     if (!is_uploaded_file ($fichier_csv)) {
       $display["msg"] = display_err_msg( "$fichier_csv n'est pas un fichier upload� !<br>");
-       $display["detail"] = html_choose_csv_file ();
+       $display["detail"] = html_payment_choose_csv_file ();
     }else { 
       // the dest file must be readable by everybody if you want mysql import
       $mon_fichier = tempnam ("/tmp/","csv_");
@@ -388,19 +388,19 @@ elseif ($action =="reconcile_import") {
       // some lines to remove
       // Aliacom specific function ! 
       // edit to fit your needs...
-      get_csv_ready ($fichier_csv, $mon_fichier);
-      run_query_import_csv ($mon_fichier);
-      $q_entrytemp = run_query_get_entrytemp ();
+      get_payment_csv_ready ($fichier_csv, $mon_fichier);
+      run_query_payment_import_csv ($mon_fichier);
+      $q_entrytemp = run_query_payment_get_entrytemp ();
       $prefs_t = get_display_pref($auth->auth['uid'], "entrytemp");
     
-       $display["detail"] = html_reconcile_import ($q_entrytemp, $prefs_t);
+       $display["detail"] = html_payment_reconcile_import ($q_entrytemp, $prefs_t);
     }
   } else {
     // we only display 
-    $q_entrytemp = run_query_get_entrytemp();
+    $q_entrytemp = run_query_payment_get_entrytemp();
     $prefs_t = get_display_pref($auth->auth['uid'], "entrytemp");
     
-    $display["detail"] = html_reconcile_import ($q_entrytemp, $prefs_t);
+    $display["detail"] = html_payment_reconcile_import ($q_entrytemp, $prefs_t);
   }
 }
 
@@ -425,28 +425,28 @@ elseif ($action == "select_reconcile") {
       // we had this id to our list : 
       $et_array[] = substr($key,9);
       // we have an entryTemp to update
-      // run_query_check_entrytemp (substr($key,9));
+      // run_query_payment_check_entrytemp (substr($key,9));
     } elseif (strcmp(substr($key,0,10),"check_pay_")==0) {
       // we had this id to our list : 
       $pay_array[] = substr($key,10);
       // we have a payment to check
-      // run_query_check_payment (substr($key,10));
+      // run_query_payment_check_payment (substr($key,10));
     }
   }
   // if we have any elements in any of our 2 arrays, we have to
   // check what the user selected...
   if (count($et_array) != 0 || count($pay_array) != 0) {
-    if (!check_reconcile ($pay_array, $et_array)) {
+    if (!check_payment_reconcile ($pay_array, $et_array)) {
       $display["msg"] = display_err_msg ($l_reconcile_errors);
     }
   }
 
   // get all payments not checked yet :
-  $q_payments = run_query_get_payments_to_reconcile ();
+  $q_payments = run_query_payment_get_payments_to_reconcile ();
   $prefs = get_display_pref ($auth->auth["uid"], "payment");
 
   // then we get all EntryTemp not checked yet : 
-  $q_et = run_query_get_entrytemp ();
+  $q_et = run_query_payment_get_entrytemp ();
   $prefs_t = get_display_pref ($auth->auth["uid"], "entrytemp");
   
   // for the moment, we suppose that when all entrytemps of the table
@@ -454,7 +454,7 @@ elseif ($action == "select_reconcile") {
   // so the button 'finished' is disabled until that moment
 
   // and we display the form to check them...
-   $display["detail"] = html_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t);
+   $display["detail"] = html_payment_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t);
 }
 
 
@@ -468,8 +468,8 @@ elseif ($action == "do_reconcile") {
   // we check that no unchecked ET remains in the EntryTemp table.
   // if yes, we display an error page including a link to 
   // the select_reconcile action
-  if (remains_entrytemps_in_table ()) {
-     $display["detail"] = html_reconcile_error_page ($l_remains_entrytemps);
+  if (remains_payment_entrytemps_in_table ()) {
+     $display["detail"] = html_payment_reconcile_error_page ($l_remains_entrytemps);
   } else {
     // we have checked that all payments and entrytemps were valid
     // time by time, so we don't check the sum of them now...
@@ -477,13 +477,13 @@ elseif ($action == "do_reconcile") {
     // to update the db, all we have to do is get the list of all payments ids
     // that are checked in the PaymentTemp table and check them in the payment 
     // official table...
-    $pay_id_list = run_query_get_checked_payments();
+    $pay_id_list = run_query_payment_get_checked_payments();
     $display["msg"] = display_debug_msg ("liste des ids : [$pay_id_list]", $cdg_param);
 
     // then we check all that payments :
-    run_query_check_payments ($pay_id_list);
+    run_query_payment_check_payments ($pay_id_list);
     // and we look for invoices that become checked to check them =)
-    run_query_update_invoice_status ();
+    run_query_payment_update_invoice_status ();
     // we can, at last, dele te the csv file :
     //    $sess->thaw ();
     if ($sess->is_registered("mon_fichier")) {
@@ -590,7 +590,7 @@ function get_param_payment() {
 // each corresponding to an invoice...
 // $nb is the total number of invoices
 ///////////////////////////////////////////////////////////////////////////////
-function get_invoices_data ($nb) {
+function get_payment_invoices_data ($nb) {
   global $HTTP_POST_VARS;
   global $set_debug, $cdg_param;
 

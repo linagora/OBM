@@ -48,7 +48,7 @@ $fieldnames["entrytemp_comment"] = $l_entrytemp_comment;
 // Returns:
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_payment(&$OD, $fieldname, $link_ok) {
+function dis_payment_data(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $col_frs, $col_client;
 
   if ($fieldname == "payment_label") {
@@ -579,7 +579,7 @@ function html_payment_search_list ($payment_q, $prefs, $nb_payment, $payment){
   $dis_payment->data_url = $url;
 
   $display["msg"] .= display_info_msg("$nb_payment $l_found");
-  $block = $dis_payment->display ("dis_data_payment");
+  $block = $dis_payment->display ("dis_payment_data");
   return $block;
 }
 
@@ -834,7 +834,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
 // Parameters:
 //   - $p_id : payment id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_payment($p_id) {
+function dis_payment_can_delete($p_id) {
   global $display, $l_delete, $l_can_delete, $l_back;
 
   $url = url_prepare("payment_index.php");
@@ -870,7 +870,7 @@ function dis_can_delete_payment($p_id) {
 //   - $dis_options_invoice : display options (invoice only)
 //   - $q_invoice : invoices found in db using label as a search criteria
 ///////////////////////////////////////////////////////////////////////////
-function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q_invoice) {
+function html_payment_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q_invoice) {
   global $col_label, $l_invoice_label, $l_search_invoice;
   global $cellspacing, $border;
   // display stuff 
@@ -982,9 +982,9 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
 
   // first form : the user can update the payment
   // (type in number, amount kind, account...)
-  $q_payment = run_query_detail ($payment["id"]);
+  $q_payment = run_query_payment_detail ($payment["id"]);
   html_payment_form ("add_invoices", $q_payment,
-		     run_query_paymentkind(), run_query_account());
+		     run_query_payment_kind(), run_query_payment_account());
   // ATTENTION : peut-�tre un probl�me de formulaire dans html_payment_form()
   // r�gl� � priori..
   
@@ -1005,7 +1005,7 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
   $i = 0;
   // we need to compute for each invoice the amount remainig to pay
   foreach ($tab_invoices_selected as $invoice_id) {
-    $q_invoice = run_query_invoice_detail ($invoice_id);
+    $q_invoice = run_query_payment_invoice_detail ($invoice_id);
     $q_invoice->next_record ();
     // we put all that things in the form :
     $block .=  "\n<tr>\n".
@@ -1057,7 +1057,7 @@ return $block;
 // $p_payment : payment banked
 // $p_invoices : invoices involved in the banking
 //////////////////////////////////////////////////////////////////////////
-function html_banking_problem ($p_error, $p_payment, $p_invoices) {
+function html_payment_banking_problem ($p_error, $p_payment, $p_invoices) {
   global $l_too_much, $l_not_enough, $l_trouble_invoice;
   global $l_bank_again, $l_bank_anyway;
   global $display;
@@ -1126,14 +1126,14 @@ function html_banking_problem ($p_error, $p_payment, $p_invoices) {
 //////////////////////////////////////////////////////////////////////////
 // checking associations between a payment and invoices connected
 //////////////////////////////////////////////////////////////////////////
-function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices, $invoices_display) {
+function html_payment_breaking_associations ($p_action,$q_payment, $q_connected_invoices, $invoices_display) {
   global $l_break_asso_strong_confirm, $l_break_asso_go;
   global $l_break_asso_soft_confirm, $l_break_asso_easy_confirm;
   global $l_payment_break_asso;
   global $display;
   // we display payment infos :
-  html_payment_consult ($p_action, $q_payment, run_query_paymentkind(),
-  run_query_account(), $q_connected_invoices, $invoices_display);
+  html_payment_consult ($p_action, $q_payment, run_query_payment_kind(),
+  run_query_payment_account(), $q_connected_invoices, $invoices_display);
 
   // 3 checks to make :
   // - payment is paid and connected to more than 1 invoice
@@ -1188,7 +1188,7 @@ function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices
 </form>";
   return $block;
 
-} //   html_breaking_associations ()
+} //   html_payment_breaking_associations ()
 
 ///////////////////////////////////////////////////////////////////////////////
 // display stuff below
@@ -1246,7 +1246,7 @@ function dis_payment_display_pref ($prefs, $prefs_i, $prefs_t) {
 ///////////////////////////////////////////////////////////////////////////////
 // displays a form to choose the file containing cvs data from the bank
 ///////////////////////////////////////////////////////////////////////////////
-function html_choose_csv_file () {
+function html_payment_choose_csv_file () {
   global $border, $cellspacing;
   global $l_choose_csv;
 
@@ -1274,7 +1274,7 @@ return $block;
 // display all $q_entrytemp and asks the user if everything is ok
 // $q_et_prefs display prefs for EntryTemp
 ///////////////////////////////////////////////////////////////////////////////
-function html_reconcile_import ($q_entrytemp, $prefs_t) {
+function html_payment_reconcile_import ($q_entrytemp, $prefs_t) {
   global $l_import_ok, $l_restart_import;
 
   // il faut displayer les entrytemp, puis un form de confirm..
@@ -1312,12 +1312,12 @@ function html_reconcile_import ($q_entrytemp, $prefs_t) {
  </form>
 </center>";  
 return $block;
-} // html_reconcile_import ()
+} // html_payment_reconcile_import ()
 
 ///////////////////////////////////////////////////////////////////////////////
 // page to check payments
 ///////////////////////////////////////////////////////////////////////////////
-function html_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t) {
+function html_payment_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t) {
   global $border, $cellspacing;
   global $set_rows;
   global $l_reconcile, $l_nb_payments_to_reconcile;
@@ -1404,13 +1404,13 @@ function html_select_reconcile ($q_payments, $q_et, $prefs, $prefs_t) {
  </form>
 </center>";
  return $block;
-} // html_select_reconcile () 
+} // html_payment_select_reconcile () 
 
 ///////////////////////////////////////////////////////////////////////////////
 // displays an error message and gives the user a link to click on
 // to restart the reconcile procedure...
 ///////////////////////////////////////////////////////////////////////////////
-function html_reconcile_error_page ($error_msg) {
+function html_payment_reconcile_error_page ($error_msg) {
   global $l_restart_reconcile;
   global $display;
 
@@ -1419,6 +1419,6 @@ function html_reconcile_error_page ($error_msg) {
     $l_restart_reconcile.
     "</a><br>";
   return $block;
-} // html_reconcile_error_page ()
+} // html_payment_reconcile_error_page ()
 
 ?>

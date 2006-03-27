@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // search for the specified payment in the database
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($p_payment, $p_new_order="") {
+function run_query_payment_search($p_payment, $p_new_order="") {
   global $auth, $cdg_sql, $c_all;
 
   $label = sql_search_text_parse($p_payment["label"]);
@@ -111,7 +111,7 @@ function run_query_search($p_payment, $p_new_order="") {
 
   $query .= " order by ".$order;
 
-  display_debug_msg ("<b>run_query_search() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_search() : </b>$query", $cdg_sql);
   $obm_q->query($query);
 
   return ($obm_q);
@@ -122,7 +122,7 @@ function run_query_search($p_payment, $p_new_order="") {
 ///////////////////////////////////////////////////////////////////////////////
 // récupération de tous les champs du payment
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_payment_id) {
+function run_query_payment_detail($p_payment_id) {
   global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -155,7 +155,7 @@ function run_query_detail($p_payment_id) {
 
   $query .= " group by paymentinvoice_invoice_id ";
 
-  display_debug_msg ("<b>run_query_detail() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_detail() : </b>$query", $cdg_sql);
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -168,7 +168,7 @@ function run_query_detail($p_payment_id) {
 // the new payment has payment_amount_used = 0 et is not connected to
 // any invoice
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert ($p_payment) {
+function run_query_payment_insert ($p_payment) {
   global $auth, $cdg_sql;
 
   $label = $p_payment["label"];
@@ -201,7 +201,7 @@ function run_query_insert ($p_payment) {
      "'".$comment."','".$inout."',".$account.",".
      "'0')";
   
-  display_debug_msg ("<b>run_query_insert() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_insert() :</b>$query", $cdg_sql);
   
   $db = new DB_OBM;
   $db->query($query);  
@@ -211,12 +211,12 @@ function run_query_insert ($p_payment) {
 ///////////////////////////////////////////////////////////////////////////////
 // retourne tous les types de payments :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_paymentkind () {
+function run_query_payment_kind () {
   global $cdg_sql;
 
   $query = "select * from PaymentKind order by paymentkind_longlabel";
 
-  display_debug_msg ("<b>run_query_paymentkind() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_kind() :</b>$query", $cdg_sql);
   $db = new DB_OBM;
   $db->query($query);
   return $db;
@@ -226,12 +226,12 @@ function run_query_paymentkind () {
 ///////////////////////////////////////////////////////////////////////////////
 // retourne tous les comptes :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_account () {
+function run_query_payment_account () {
   global $cdg_sql;
 
   $query = "select * from Account order by account_label";
 
-  display_debug_msg ("<b>run_query_account() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_account() : </b>$query", $cdg_sql);
   $db = new DB_OBM;
   $db->query($query);
 
@@ -242,7 +242,7 @@ function run_query_account () {
 // mise à jour de payments 
 // if $banking == 1, we are banking and we set payment_paid to 1.
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update ($payment, $banking=0) {
+function run_query_payment_update ($payment, $banking=0) {
   global $auth, $cdg_sql;
 
   $label = $payment["label"];
@@ -279,7 +279,7 @@ function run_query_update ($payment, $banking=0) {
   
   $query .= " WHERE payment_id = '$id'";
   
-  display_debug_msg ("<b>run_query_update() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_update() : </b>$query", $cdg_sql);
   
   $pay_q->query($query);
 }
@@ -292,7 +292,7 @@ function run_query_update ($payment, $banking=0) {
 // Returns:
 //   true if the payment can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_payment($id) {
+function check_payment_can_delete($id) {
   global $err_msg, $ok_msg;
 
   $delete_ok = true;
@@ -305,7 +305,7 @@ function check_can_delete_payment($id) {
 // suppression du payment p_payment_id (et toutes les lignes le concernant
 // dans la table PaymentInvoice
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete ($p_id){
+function run_query_payment_delete ($p_id){
   global $cdg_sql;
 
   $pay_q = new DB_OBM;
@@ -318,7 +318,7 @@ function run_query_delete ($p_id){
     WHERE payment_id = '$p_id'";
   $pay_q->query($query);
 
-  display_debug_msg ("<b>run_query_delete() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_delete() : </b>$query", $cdg_sql);
 
   return $pay_q;
 }
@@ -331,7 +331,7 @@ function run_query_delete ($p_id){
 // if $payment["invoice_label"] is set, we use it as a search criteria
 // if $payment["invoice_company"] is set, it is also used
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_connectable_invoices ($payment) {
+function run_query_payment_search_connectable_invoices ($payment) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -344,7 +344,7 @@ function run_query_search_connectable_invoices ($payment) {
      "from PaymentInvoice ".
      "where paymentinvoice_payment_id ='".$payment["id"]."'".
      " and paymentinvoice_amount = '0.0'";
-  display_debug_msg ("<b>run_query_search_connectable_invoices() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_search_connectable_invoices() : </b>$query", $cdg_sql);
   $obm_q->query($query);
 
   if ($obm_q->nf() > 0) {
@@ -394,7 +394,7 @@ function run_query_search_connectable_invoices ($payment) {
   
   $query .= " group by invoice_id ";
 
-  display_debug_msg ("<b>run_query_search_connectable_invoices () : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_search_connectable_invoices () : </b>$query", $cdg_sql);
 
   $obm_q->query($query);
 
@@ -406,7 +406,7 @@ function run_query_search_connectable_invoices ($payment) {
 // returns all invoices connected to the $payment.
 // if not_paid = 1, we return only not paid invoices
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
+function run_query_payment_search_connected_invoices ($p_payment_id, $not_paid=0) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -439,7 +439,7 @@ function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
   }
   $query.=" group by paymentinvoice_invoice_id ";
 
-  display_debug_msg ("<b>run_query_search_connected_invoices() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_search_connected_invoices() : </b>$query", $cdg_sql);
 
   $go->query($query);
   return $go;
@@ -450,7 +450,7 @@ function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
 //  return all interesting data concerning a particular invoice
 // including amount not paid yet
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_detail ($p_invoice_id) {
+function run_query_payment_invoice_detail ($p_invoice_id) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -465,7 +465,7 @@ function run_query_invoice_detail ($p_invoice_id) {
      " and invoice_id = $p_invoice_id".
      " group by paymentinvoice_invoice_id ";
 
-  display_debug_msg ("<b>run_query_invoice_detail() : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_invoice_detail() : </b>$query", $cdg_sql);
   $go->query($query);
   
   return $go;
@@ -478,7 +478,7 @@ function run_query_invoice_detail ($p_invoice_id) {
 // $p_invoices : invoices involved in the banking
 // return $error, error msg identifying the error
 ///////////////////////////////////////////////////////////////////////////////
-function check_banking_data ($p_payment, $p_invoices) {
+function check_payment_banking_data ($p_payment, $p_invoices) {
   global $l_too_much, $l_not_enough, $l_trouble_invoice;
 
   $error = "";
@@ -511,11 +511,11 @@ function check_banking_data ($p_payment, $p_invoices) {
 
 
 //////////////////////////////////////////////////////////////////////////
-// run_query_do_banking :
+// run_query_payment_do_banking :
 // updates the dbase with data concerning the bnaking of $p_payment
 // using all $p_invoices
 //////////////////////////////////////////////////////////////////////////
-function run_query_do_banking ($p_payment, $p_invoices) {
+function run_query_payment_do_banking ($p_payment, $p_invoices) {
 
   // if no invoices connected to $p_payment,
   // we use the whole amount...
@@ -526,17 +526,17 @@ function run_query_do_banking ($p_payment, $p_invoices) {
     foreach ($p_invoices as $invoice) {
       // first, we change Invoice data :
       // status and time/user update
-      run_query_bank_invoice ($invoice);
+      run_query_payment_bank_invoice ($invoice);
       
       // then we add a line in PaymentInvoice
-      run_query_bank_paymentinvoice ($p_payment, $invoice);
+      run_query_payment_bank_paymentinvoice ($p_payment, $invoice);
     }
   }
 
   // to update the payment, we use that :
-  run_query_update ($p_payment,1);
+  run_query_payment_update ($p_payment,1);
   // now we update the balance of the connected account :
-  run_query_bank_account ($p_payment);
+  run_query_payment_bank_account ($p_payment);
   
 }
 
@@ -545,7 +545,7 @@ function run_query_do_banking ($p_payment, $p_invoices) {
 // update the invoice in the db after a payment banking...
 // $invoice = data concerning the banking
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_bank_invoice($p_invoice) {
+function run_query_payment_bank_invoice($p_invoice) {
   global $auth, $cdg_sql;
 
   $go = new DB_OBM;
@@ -564,7 +564,7 @@ function run_query_bank_invoice($p_invoice) {
      " invoice_timeupdate = '".date("Y-m-d H:i:s")."' ".
      " where invoice_id = '".$p_invoice["invoice_id"]."'";
 
-  display_debug_msg ("<b>run_query_bank_invoice() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_bank_invoice() :</b>$query", $cdg_sql);
   $go->query($query);
 
 }
@@ -574,7 +574,7 @@ function run_query_bank_invoice($p_invoice) {
 // add a line in PaymentInvoice concerning 
 // $p_payment and $p_invoice
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_bank_paymentinvoice ($p_payment, $p_invoice) {
+function run_query_payment_bank_paymentinvoice ($p_payment, $p_invoice) {
   // in fact, 2 possibilities :
   // payment and invoice are not connected yet => we insert
   // payment and invoice are already connected => we update
@@ -605,7 +605,7 @@ function run_query_bank_paymentinvoice ($p_payment, $p_invoice) {
        ");";
   }
 
-  display_debug_msg ("<b>run_query_bank_paymentinvoice() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_bank_paymentinvoice() :</b>$query", $cdg_sql);
   $go->query($query);
 
 }
@@ -614,7 +614,7 @@ function run_query_bank_paymentinvoice ($p_payment, $p_invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 // update the account connected to the payment banked
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_bank_account ($p_payment) {
+function run_query_payment_bank_account ($p_payment) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -628,17 +628,17 @@ function run_query_bank_account ($p_payment) {
      " set account_today = account_today ".$operation.
      " where account_id = '".$p_payment["account"]."'";
 
-  display_debug_msg ("<b>run_query_bank_account : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_bank_account : </b>$query", $cdg_sql);
   $go->query($query);
 
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// run_query_link_payment_to_invoice ()
+// run_query_payment_link_payment_to_invoice ()
 // connects payment to invoice, without any amount...
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_link_payment_to_invoice ($payment, $p_invoice_id) {
+function run_query_payment_link_payment_to_invoice ($payment, $p_invoice_id) {
   global $auth, $cdg_sql;
 
   $go = new DB_OBM;
@@ -660,7 +660,7 @@ $query = "insert into PaymentInvoice ".
    "'".$auth->auth['uid']."',".
    "'')";
 
-  display_debug_msg ("<b>run_query_link_payment_to_invoice() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_link_payment_to_invoice() :</b>$query", $cdg_sql);
   $go->query($query);
 }
 
@@ -779,7 +779,7 @@ function payment_unpay ($p_payment_id) {
 // NON : en fait, on compte les champs et on vire les lignes qui n'en
 // contiennent pas le nombre exact (ici, 5 chps, soit 5 ';')
 ///////////////////////////////////////////////////////////////////////////////
-function get_csv_ready ($orig, $dest) {
+function get_payment_csv_ready ($orig, $dest) {
   global $l_file_error, $l_write_error, $l_read_error;
   // size of the input buffer 
   $MAX_SIZE = 8192;
@@ -833,14 +833,14 @@ function get_csv_ready ($orig, $dest) {
   
   fclose ($fd_orig);
   fclose ($fd_dest);
-} // get_csv_ready ()
+} // get_payment_csv_ready ()
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // import the bank data from the file named $file into the db table EntryTemp
 // drops the temporary table used to store payments later....
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_csv ($file) {
+function run_query_payment_import_csv ($file) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -858,7 +858,7 @@ function run_query_import_csv ($file) {
      " entrytemp_realdate, entrytemp_label, entrytemp_comment)";
 
 
-  display_debug_msg ("<b>run_query_import_csv () : </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_import_csv () : </b>$query", $cdg_sql);
   $go->query($query);
  
   // we also retrieve all payments concerned
@@ -866,7 +866,7 @@ function run_query_import_csv ($file) {
   $query_cp = " insert into PaymentTemp ".
      " select * from Payment ".
      " where payment_paid = '1' and payment_checked = '0'";
-  display_debug_msg ("<b>run_query_import_csv() :</b>$query_cp", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_import_csv() :</b>$query_cp", $cdg_sql);
   $another_go->query ($query_cp);
 }
 
@@ -874,14 +874,14 @@ function run_query_import_csv ($file) {
 ///////////////////////////////////////////////////////////////////////////////
 // returns all entrytemp lines
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_entrytemp() {
+function run_query_payment_get_entrytemp() {
   global $cdg_sql;
 
   $go = new DB_OBM;
 
   $query = "select * from EntryTemp where entrytemp_checked = '0' ".
      " order by entrytemp_date ";
-  display_debug_msg ("<b>run_query_get_entrytemp() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_get_entrytemp() :</b>$query", $cdg_sql);
 
   $go->query($query);
   return $go;
@@ -891,14 +891,14 @@ function run_query_get_entrytemp() {
 ///////////////////////////////////////////////////////////////////////////////
 // returns all payments from the newly created table, needed ??
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_payments_to_reconcile() {
+function run_query_payment_get_payments_to_reconcile() {
   global $cdg_sql;
 
   $go = new DB_OBM;
 
   $query = "select * from PaymentTemp where payment_checked = '0' ".
      " order by payment_date ";
-  display_debug_msg ("<b>run_query_get_payments_to_reconcile() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_get_payments_to_reconcile() :</b>$query", $cdg_sql);
   $go->query ($query);
 
   return $go;
@@ -908,24 +908,24 @@ function run_query_get_payments_to_reconcile() {
 ///////////////////////////////////////////////////////////////////////////////
 // the 2 next functions check an entrytemp (resp. a payment) given its id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_entrytemp ($et_id) {
+function run_query_payment_check_entrytemp ($et_id) {
   global $cdg_sql;
 
   $go = new DB_OBM;
   $query = " update EntryTemp set entrytemp_checked = '1' ".
      " where entrytemp_id = '".$et_id."'";
-  display_debug_msg("<b>run_query_check_entrytemp():</b>$query", $cdg_sql);
+  display_debug_msg("<b>run_query_payment_check_entrytemp():</b>$query", $cdg_sql);
   $go->query($query);
 }
 
 
-function run_query_check_payment ($pay_id) {
+function run_query_payment_check_payment ($pay_id) {
   global $cdg_sql;
 
   $go = new DB_OBM;
   $query = " update PaymentTemp set payment_checked = '1' 
              where payment_id='$pay_id'";
-  display_debug_msg("<b>run_query_check_payment() : </b>$query", $cdg_sql);
+  display_debug_msg("<b>run_query_payment_check_payment() : </b>$query", $cdg_sql);
   $go->query($query);
 }
 
@@ -938,7 +938,7 @@ function run_query_check_payment ($pay_id) {
 // $et_ids = array containing entrytemp_id of selected ones
 // $pay_ids = same thing but for payments
 ///////////////////////////////////////////////////////////////////////////////
-function check_reconcile ($pay_ids, $et_ids) {
+function check_payment_reconcile ($pay_ids, $et_ids) {
   //string implode (string glue, array pieces)
   // first we turn the 2 arrays en 2 strings we'll be able to use
   // in a DB query :
@@ -948,8 +948,8 @@ function check_reconcile ($pay_ids, $et_ids) {
   $et_id_list = implode (",", $et_ids);
 
   // than we retrieve data from the .... database ?
-  $q_et = run_query_detail_et ($et_id_list);
-  $q_pay = run_query_detail_payments ($pay_id_list);
+  $q_et = run_query_payment_detail_et ($et_id_list);
+  $q_pay = run_query_payment_detail_payments ($pay_id_list);
 
   display_debug_msg ("pay_id_list=$pay_id_list<br>et_id_list=$et_id_list", $cdg_param);
 
@@ -982,10 +982,10 @@ function check_reconcile ($pay_ids, $et_ids) {
   
   // we can update the db... 
   foreach ($pay_ids as $current_id) {
-    run_query_check_payment ($current_id);
+    run_query_payment_check_payment ($current_id);
   }
   foreach ($et_ids as $current_id) {
-    run_query_check_entrytemp ($current_id);
+    run_query_payment_check_entrytemp ($current_id);
   }
   
   return true;
@@ -996,7 +996,7 @@ function check_reconcile ($pay_ids, $et_ids) {
 // the next 2 functions return all data concerning the list of
 // payments (resp. entrytemp) given as argument :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail_payments ($pay_id_list) {
+function run_query_payment_detail_payments ($pay_id_list) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -1005,14 +1005,14 @@ function run_query_detail_payments ($pay_id_list) {
   if ($pay_id_list != "") {
     $query .= " where payment_id in ($pay_id_list)";
   }
-  display_debug_msg ("<b>run_query_detail_payments() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_detail_payments() :</b>$query", $cdg_sql);
   $go->query($query);
 
   return $go;
 }
 
 
-function run_query_detail_et ($et_id_list) {
+function run_query_payment_detail_et ($et_id_list) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -1021,7 +1021,7 @@ function run_query_detail_et ($et_id_list) {
   if ($et_id_list != "") {
      $query .= " where entrytemp_id in ($et_id_list)";
   }
-  display_debug_msg ("<b>run_query_detail_et() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_detail_et() :</b>$query", $cdg_sql);
   $go->query($query);
 
   return $go;
@@ -1032,13 +1032,13 @@ function run_query_detail_et ($et_id_list) {
 // returns true if there are some Entrytemps not checked in the table,
 // else false
 ///////////////////////////////////////////////////////////////////////////////
-function remains_entrytemps_in_table () {
+function remains_payment_entrytemps_in_table () {
   global $cdg_sql;
 
   $go = new DB_OBM;
   
   $query = "select * from EntryTemp where entrytemp_checked = '0'";
-  display_debug_msg ("<b>remains_entrytemps_in_table() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>remains_payment_entrytemps_in_table() :</b>$query", $cdg_sql);
   $go->query($query);
 
   if ($go->nf() == 0) {
@@ -1051,14 +1051,14 @@ function remains_entrytemps_in_table () {
 ///////////////////////////////////////////////////////////////////////////////
 // returns the lists of checked payments id as a string 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_checked_payments () {
+function run_query_payment_get_checked_payments () {
   global $cdg_sql;
 
   $go = new DB_OBM;
 
   $query = "select payment_id from PaymentTemp ".
      " where payment_checked = '1'";
-  display_debug_msg ("<b>run_query_get_checked_payments() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_get_checked_payments() :</b>$query", $cdg_sql);
   $go->query ($query);
 
   $tab = array ();
@@ -1073,7 +1073,7 @@ function run_query_get_checked_payments () {
 ///////////////////////////////////////////////////////////////////////////////
 // checks all payments corresponding to id given as parameter
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_payments ($id_list) {
+function run_query_payment_check_payments ($id_list) {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -1081,7 +1081,7 @@ function run_query_check_payments ($id_list) {
   $query = "update Payment ".
      " set payment_checked = '1' ".
      " where payment_id in (".$id_list.")";
-  display_debug_msg ("<b>run_query_check_payments() :</b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_check_payments() :</b>$query", $cdg_sql);
   $go->query($query);
 }
 
@@ -1091,7 +1091,7 @@ function run_query_check_payments ($id_list) {
 // if some exist, we update their status to checked IF IT WAS NOT TROUBLE
 // if status was TROUBLE, we don't even select them at the first stage...
 ///////////////////////////////////////////////////////////////////////////////
-function  run_query_update_invoice_status () {
+function  run_query_payment_update_invoice_status () {
   global $cdg_sql;
 
   $go = new DB_OBM;
@@ -1102,7 +1102,7 @@ function  run_query_update_invoice_status () {
      " and payment_checked = '1'".
      " group by invoice_id ";
 
-  display_debug_msg ("<b>run_query_update_invoice_status(): </b>$query", $cdg_sql);
+  display_debug_msg ("<b>run_query_payment_update_invoice_status(): </b>$query", $cdg_sql);
   $go->query($query);
 
   if ($go->nf() > 0) {
@@ -1116,7 +1116,7 @@ function  run_query_update_invoice_status () {
     $query = " update Invoice ".
        " set invoice_status_id = '3' ".// 3 == checked =)
        " where invoice_id in (".$my_invoices.")";
-    display_debug_msg ("<b>run_query_update_invoice_status(): </b>$query", $cdg_sql);
+    display_debug_msg ("<b>run_query_payment_update_invoice_status(): </b>$query", $cdg_sql);
     $go->query($query);
   }
 }
