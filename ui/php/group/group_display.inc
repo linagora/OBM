@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : group_display.php                                            //
 //     - Desc : Group Display File                                           //
@@ -213,9 +213,9 @@ function dis_group_search_group($group) {
 
   $prefs = get_display_pref($auth->auth["uid"], "group");
   if ($child_res) {
-    $obm_q = run_query_search_possible_children($group);
+    $obm_q = run_query_group_search_possible_children($group);
   }  else {
-    $obm_q = run_query_search($group);
+    $obm_q = run_query_group_search($group);
   }
 
   $nb_group = $obm_q->num_rows_total();
@@ -410,10 +410,10 @@ function dis_group_consult($group, $uid) {
 
   $g_id = $group["id"];
 
-  $group_q = run_query_detail($g_id);
+  $group_q = run_query_group_detail($g_id);
 
   $prefs_u = get_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($group);
+  $u_q = run_query_group_user_group($group);
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id=$g_id");
     $u_q->set_num_rows_total($count);
@@ -596,7 +596,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 // Parameters:
 //   - $p_id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_group($p_id) {
+function dis_group_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
@@ -716,4 +716,4 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
 }
 
 
-</script>
+?>

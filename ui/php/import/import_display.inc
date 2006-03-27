@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : import_display.php                                           //
 //     - Desc : Import Display File                                          //
@@ -141,7 +141,7 @@ function dis_import_search_list($import, $popup=false) {
   global $display, $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "import");
-  $obm_q = run_query_search($import, $new_order, $order_dir);
+  $obm_q = run_query_import_search($import, $new_order, $order_dir);
   $nb = $obm_q->num_rows_total();
   if ($nb == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -509,7 +509,7 @@ function html_import_file_import($import_q, $import) {
       $nb_comp_ins++;
 
       // If contact, insert
-      if (row_has_contact($fields)) {
+      if (import_row_has_contact($fields)) {
 	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
 	$nb_con_ins++;
       }
@@ -524,11 +524,11 @@ function html_import_file_import($import_q, $import) {
       }
 
       // test for contact
-      if ( (row_has_contact($fields)) &&
+      if ( (import_row_has_contact($fields)) &&
 	   ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
 	
 	// Test if similar contact exist --------------------------------------
-	$conts = get_similar_contact($fields, $company_id);
+	$conts = get_import_similar_contact($fields, $company_id);
 	if (is_array($conts)) {
 	  $log["display"] = true;
 	  $log["res"] = $l_similar_contact;
@@ -583,14 +583,14 @@ function html_import_file_import($import_q, $import) {
     $fields = get_import_row_mapping($row, $map);
 
     // Test if company is valid
-    if (is_row_valid($fields, $map)) {
+    if (import_is_row_valid($fields, $map)) {
 
       if ($fields["comp_name"] == "") {
 	$log["res"] = $l_company_defaultname;
       }
 
       // Test if similar companies exist --------------------------------------
-      $comps = get_similar_company($fields, $map);
+      $comps = get_import_similar_company($fields, $map);
       if (is_array($comps)) {
 	$nb_line_conf++;
 	$log["display"] = true;
@@ -622,7 +622,7 @@ function html_import_file_import($import_q, $import) {
 	  $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats1);
 	  $nb_comp_ins++;
 	  // If row has a contact
-	  if (row_has_contact($fields)) {
+	  if (import_row_has_contact($fields)) {
 	    // We insert If lastname filled, or if lastname empty but default
 	    if ($fields["con_ln"] != "") {
 	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds, $functions);
@@ -1245,7 +1245,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 // Parameters:
 //   - $id : import id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($id) {
+function dis_import_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back;
 
   $display["msg"] .= display_warn_msg("$l_warn_delete");
@@ -1331,4 +1331,4 @@ function dis_import_warn_insert($import_q, $import) {
 }
 
 
-</script>
+?>

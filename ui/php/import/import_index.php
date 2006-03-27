@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : import_index.php                                             //
 //     - Desc : Import Index File                                            //
@@ -111,23 +111,23 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_detail($import["id"]);
+  $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult($import_q);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($import["id"]);
+  $obm_q = run_query_import_detail($import["id"]);
   $dsrc_q = run_query_global_datasource();
   $usr_q = run_query_all_users_from_group($cg_com);
   $display["detail"] = html_import_form($action, $import, $obm_q, $dsrc_q, $usr_q);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $import)) {
+  if (check_import_data_form("", $import)) {
 
     // If the context (same import) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_insert($import);
+      $retour = run_query_import_insert($import);
       if ($retour) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
@@ -141,7 +141,7 @@ if (($action == "index") || ($action == "")) {
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_import_warn_insert($obm_q, $import);
       } else {
-        $retour = run_query_insert($import);
+        $retour = run_query_import_insert($import);
         if ($retour) {
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
@@ -161,18 +161,18 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($import["id"], $import)) {
-    $retour = run_query_update($import);
+  if (check_import_data_form($import["id"], $import)) {
+    $retour = run_query_import_update($import);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $import_q = run_query_detail($import["id"]);
+    $import_q = run_query_import_detail($import["id"]);
     $display["detail"] = html_import_consult($import_q);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $import_q = run_query_detail($import["id"]);
+    $import_q = run_query_import_detail($import["id"]);
     $dsrc_q = run_query_global_datasource();
     $usr_q = run_query_all_users_from_group($cg_com);
     $display["detail"] = html_import_form($action, $import, $import_q, $dsrc_q, $usr_q);
@@ -180,11 +180,11 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_warn_delete($import["id"]);
+  $display["detail"] = dis_import_warn_delete($import["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($import["id"]);
+  $retour = run_query_import_delete($import["id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
@@ -194,19 +194,19 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "file_sample")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_detail($import["id"]);
+  $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_sample($import_q, $import, 5);
 
 } elseif ($action == "file_test")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_detail($import["id"]);
+  $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_import($import_q, $import);
 
 } elseif ($action == "file_import")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_detail($import["id"]);
+  $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_import($import_q, $import);
 
@@ -707,4 +707,4 @@ function get_import_action() {
 
 }
 
-</script>
+?>

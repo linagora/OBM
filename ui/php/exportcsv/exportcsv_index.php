@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : exportcsv_index.php                                          //
 //     - Desc : OBM CSV export Index File (used by OBM_DISPLAY)              //
@@ -102,4 +102,4 @@ function get_param_export() {
   return $params;
 }
 
-</script>
+?>

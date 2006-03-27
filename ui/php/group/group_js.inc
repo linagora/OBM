@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : group_js.inc                                                 //
 //     - Desc : Group javascript functions File                              //
@@ -36,3 +36,5 @@ function fill_ext_form(int_form) {
 if ($ext_element != "") {
   require_once("$obminclude/of/of_extmod.inc");
 }
+
+?>

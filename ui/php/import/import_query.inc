@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : import_query.inc                                             //
 //     - Desc : Import query File                                            //
@@ -16,7 +16,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($import, $p_new_order, $p_order_dir) {
+function run_query_import_search($import, $p_new_order, $p_order_dir) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
   
   $name = sql_search_text_parse($import["name"]);
@@ -89,7 +89,7 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
 // Parameters:
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_import_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -126,7 +126,7 @@ function run_query_detail($id) {
 // Parameters:
 //   - $import[] : import hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($import) {
+function run_query_import_insert($import) {
   global $auth, $cdg_sql;
 
   $id = $import["id"];
@@ -171,7 +171,7 @@ function run_query_insert($import) {
 // Parameters:
 //   - $import[] : import hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($import) {
+function run_query_import_update($import) {
   global $auth, $cdg_sql;
 
   $id = $import["id"];
@@ -205,7 +205,7 @@ function run_query_update($import) {
 // Parameters:
 //   - $p_id : import id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_import_delete($p_id) {
   global $cdg_sql;
 
   // Delete the Import
@@ -256,7 +256,7 @@ function get_import_name_exists($name, $id="") {
 // Parameters:
 //   - $import[] : import hash info : keys used : id, name, datasource
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_import($import) {
+function run_query_import_check($import) {
   global $cdg_sql;
 
   $id = $import["id"];
@@ -307,7 +307,7 @@ function check_import_context($id, $import) {
   global $cdg_sql;
 
   // return the imports with similar name and same datasource
-  $import_q = run_query_check_import($import);
+  $import_q = run_query_import_check($import);
 
   return $import_q;
 }
@@ -320,7 +320,7 @@ function check_import_context($id, $import) {
 //   - $import[] : values checked
 //     keys used : name, datasource
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($id, $import) {
+function check_import_data_form($id, $import) {
   global $l_import_exists, $l_fill_name;
   global $err_msg;
 
@@ -406,7 +406,7 @@ function get_import_field_mapping($import_q) {
 // Returns:
 //   hash : $row[1] = value
 ///////////////////////////////////////////////////////////////////////////////
-function get_file_row_fields($row, $sep, $enclosed) {
+function get_import_file_row_fields($row, $sep, $enclosed) {
 
   if ($sep == "tab") {
     $sep = "\t";
@@ -472,7 +472,7 @@ function get_import_row_mapping($row, $map) {
 // Returns:
 //   true if valid
 ///////////////////////////////////////////////////////////////////////////////
-function is_row_valid($fields, $map) {
+function import_is_row_valid($fields, $map) {
 
   if ( ($fields["comp_name"] == "") && ($map["default"]["comp_name"] == "") ) {
     return false;
@@ -489,7 +489,7 @@ function is_row_valid($fields, $map) {
 // Returns:
 //   true if valid
 ///////////////////////////////////////////////////////////////////////////////
-function row_has_contact($fields) {
+function import_row_has_contact($fields) {
 
   // we consider the row has a contact if lastname, firstname or job title
   if ( ( (isset($fields["con_ln"])) && ($fields["con_ln"] != "") )
@@ -509,7 +509,7 @@ function row_has_contact($fields) {
 //   - $fields : company Id not to return
 //   - $map    : import mapping fields (to get default entries)
 ///////////////////////////////////////////////////////////////////////////////
-function get_similar_company($fields, $map) {
+function get_import_similar_company($fields, $map) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -786,7 +786,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
 //   - $fields : contact Id not to return
 //   - $cid    : contact company id
 ///////////////////////////////////////////////////////////////////////////////
-function get_similar_contact($fields, $cid) {
+function get_import_similar_contact($fields, $cid) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -1161,4 +1161,4 @@ function run_query_import_kind() {
 }
 
 
-</script>
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : import_js.inc                                                //
 //     - Desc : Import javascript functions File                             //
@@ -33,3 +33,5 @@ function check_import_form(form) {
 }
 
 ";
+
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : group_query.inc                                              //
 //     - Desc : group query File                                             //
@@ -14,7 +14,7 @@
 //   - $group[]      : list search criteria
 //     keys used     : name, user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($group) {
+function run_query_group_search($group) {
   global $cdg_sql, $ctu_sql_limit;
   global $c_public, $c_private;
   
@@ -89,7 +89,7 @@ function run_query_search($group) {
 //   - $group[]      : list search criteria
 //     keys used     : name, user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_possible_children($group) {
+function run_query_group_search_possible_children($group) {
   global $cdg_sql;
   
   $id = $group["ext_id"];
@@ -152,7 +152,7 @@ function run_query_search_possible_children($group) {
 // Parameters:
 //   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_group_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -183,7 +183,7 @@ function run_query_detail($id) {
 // Parameters:
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($group) {
+function run_query_group_insert($group) {
   global $uid, $cdg_sql;
 
   $id = $group["id"];
@@ -268,7 +268,7 @@ function run_query_group_id($group) {
 // Parameters:
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($group) {
+function run_query_group_update($group) {
   global $uid, $cdg_sql;
 
   $id = $group["id"];
@@ -300,7 +300,7 @@ function run_query_update($group) {
 // Parameters:
 //   - $p_id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_group_delete($p_id) {
   global $cdg_sql;
 
   // Delete all users registrations to this group
@@ -332,7 +332,7 @@ function run_query_delete($p_id) {
 //   - $group[] : group hash info : keys used : id, user_nb, userX
 // Return: number of users inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_usergroup_insert($group) {
+function run_query_group_usergroup_insert($group) {
   global $auth, $cdg_sql;
 
   $id = $group["id"];
@@ -373,7 +373,7 @@ function run_query_usergroup_insert($group) {
 //   - $group[] : group hash info : keys used : id, user_nb, userX
 // Return: number of users deleted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_usergroup_delete($group) {
+function run_query_group_usergroup_delete($group) {
   global $auth, $cdg_sql;
 
   $id = $group["id"];
@@ -404,7 +404,7 @@ function run_query_usergroup_delete($group) {
 //   - $group[] : group hash info : keys used : id, group_nb, group_X
 // Return: number of groups inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_groupgroup_insert($group) {
+function run_query_group_group_insert($group) {
   global $auth, $cdg_sql;
 
   $id = $group["id"];
@@ -451,7 +451,7 @@ function run_query_groupgroup_insert($group) {
 //   - $group[] : group hash info : keys used : id, group_nb, group_X
 // Return: number of groups deleted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_groupgroup_delete($group) {
+function run_query_group_group_delete($group) {
   global $auth, $cdg_sql;
 
   $id = $group["id"];
@@ -482,7 +482,7 @@ function run_query_groupgroup_delete($group) {
 // Parameters:
 //   - $group[] : Group parameters
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_group($group) {
+function run_query_group_user_group($group) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM; 
@@ -655,7 +655,7 @@ function get_group_name_exists($name, $id="") {
 //   - $name : group name
 //   - $desc : group desc
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_group($id, $name, $desc) {
+function run_query_group_check($id, $name, $desc) {
   global $cdg_sql, $uid;
 
   $obm_q = new DB_OBM;
@@ -713,7 +713,7 @@ function check_group_context($id, $group) {
   $desc = $group["desc"];
 
   // return the groups with same name or desc
-  $g_q = run_query_check_group($id, $name, $desc);
+  $g_q = run_query_group_check($id, $name, $desc);
 
   return $g_q;
 }
@@ -725,7 +725,7 @@ function check_group_context($id, $group) {
 //   - $group[]  : values checked
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($group) {
+function check_group_data_form($group) {
   global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
   global $l_group_exists, $l_email_exist;
   global $uid, $err_msg, $l_j_check_email, $l_system_no_priv, $l_only_owner_priv;
@@ -794,7 +794,7 @@ function check_data_form($group) {
 // Returns:
 //   true if the group can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_group($p_id) {
+function check_group_can_delete($p_id) {
   global $uid, $err_msg, $ok_msg;
   global $l_warn_delete, $l_cant_delete_system, $l_cant_delete_public;
 
@@ -846,4 +846,4 @@ function get_group_parents($id) {
 }
 
 
-</script>
+?>
