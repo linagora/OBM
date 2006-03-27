@@ -997,7 +997,7 @@ function update_last_visit($entity, $id, $action) {
   } else if ( ($id > 0 ) && ($last_v[$entity]["id"] != $id) ) {
     $last_v[$entity]["id"] = $id;
     update_user_pref($auth->auth["uid"], "last_$entity", $id);
-    $function_get_last_text = "get_last_${entity}_text";
+    $function_get_last_text = "get_global_last_${entity}_text";
     $last_v[$entity]["text"] = $function_get_last_text($id);
   }
   
