@@ -363,7 +363,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($project["doc_nb"] > 0) {
-    $nb = run_query_insert_documents($project, "project");
+    $nb = run_query_global_insert_documents($project, "project");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);

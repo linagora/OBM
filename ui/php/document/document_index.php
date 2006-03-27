@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : document_index.php                                           //
 //     - Desc : Document Index File                                          //
@@ -45,12 +45,12 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
   require("document_js.inc");
-  $display["detail"] = html_documents_tree($document, $ext_disp_file);
+  $display["detail"] = html_document_tree($document, $ext_disp_file);
 } elseif ($action == "accessfile") {
   if ($document["id"] > 0) {
-    $doc_q = run_query_detail($document["id"]);
+    $doc_q = run_query_document_detail($document["id"]);
     if ($doc_q->num_rows() == 1) {
-      dis_file($doc_q);
+      dis_document_file($doc_q);
       exit();
     }
   } else {
@@ -89,12 +89,12 @@ if ($action == "ext_get_path") {
 } elseif ($action == "new_dir")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = html_dir_form($action, $document);
+  $display["detail"] = html_document_dir_form($action, $document);
   
 } elseif ($action == "tree")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = html_documents_tree($document,"true");
+  $display["detail"] = html_document_tree($document,"true");
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ if ($action == "ext_get_path") {
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
 if ($document["id"] > 0) {
-    $doc_q = run_query_detail($document["id"]);
+    $doc_q = run_query_document_detail($document["id"]);
     if ($doc_q->num_rows() == 1) {
       require("document_js.inc");
       $display["detailInfo"] = display_record_info($doc_q);
@@ -116,7 +116,7 @@ if ($document["id"] > 0) {
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form("", $document)) {
-    $document["id"] = run_query_insert($document);
+    $document["id"] = run_query_document_insert($document);
     if ($document["id"]) {
       update_last_visit("document", $document["id"], $action);
       $display["msg"] .= display_ok_msg($l_insert_ok);
@@ -134,32 +134,32 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "insert_dir")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_dir_data_form($document)) {
-    $retour = run_query_insert_dir($document);
+  if (check_document_dir_data_form($document)) {
+    $retour = run_query_document_insert_dir($document);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error);
     }
     require("document_js.inc");    
-    $display["detail"] = html_documents_tree($document,true);
+    $display["detail"] = html_document_tree($document,true);
   // Form data are not valid
   } else {
     require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = html_dir_form($action, $document);
+    $display["detail"] = html_document_dir_form($action, $document);
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form($document["id"], $document)) {
-    $retour = run_query_update($document["id"], $document);
+    $retour = run_query_document_update($document["id"], $document);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error."  ".$err_msg);
     }
-    $doc_q = run_query_detail($document["id"]);
+    $doc_q = run_query_document_detail($document["id"]);
     $display["detailInfo"] .= display_record_info($doc_q);
     $display["detail"] = html_document_consult($doc_q);
   } else {
@@ -171,9 +171,9 @@ if ($document["id"] > 0) {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  if (check_can_delete_document($document["id"])) {
+  if (check_document_can_delete($document["id"])) {
     $display["msg"] .= display_info_msg($err_msg);
-    $display["detail"] = dis_can_delete_document($document["id"]);
+    $display["detail"] = dis_document_can_delete($document["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
     $display["detail"] = dis_document_consult($document);
@@ -181,8 +181,8 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_document($document["id"])) {
-    $retour = run_query_delete($document["id"]);
+  if (check_document_can_delete($document["id"])) {
+    $retour = run_query_document_delete($document["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -198,17 +198,17 @@ if ($document["id"] > 0) {
 } elseif ($action == "dir_check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  if (check_can_delete_dir($document["id"])) {
-    $display["detail"] = dis_can_delete_dir($document["id"]);
+  if (check_document_can_delete_dir($document["id"])) {
+    $display["detail"] = dis_document_can_delete_dir($document["id"]);
   } else {
     $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
-    $display["detail"] = html_documents_tree($document,"true");
+    $display["detail"] = html_document_tree($document,"true");
   }
 
 } elseif ($action == "dir_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_dir($document["id"])) {
-    $retour = run_query_delete($document["id"]);
+  if (check_document_can_delete_dir($document["id"])) {
+    $retour = run_query_document_delete($document["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -218,12 +218,12 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
   }
   require("document_js.inc");
-  $display["detail"] = html_documents_tree($document,"true");
+  $display["detail"] = html_document_tree($document,"true");
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_document_admin_index();
 
 
 } elseif ($action == "category1_insert")  {
@@ -235,7 +235,7 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,7 +246,7 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,7 +261,7 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "category2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_insert_error");
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "category2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -283,7 +283,7 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_update_error");
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "category2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -298,44 +298,44 @@ if ($document["id"] > 0) {
     $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_delete_error");
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "mime_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_mime_insert($document);
+  $retour = run_query_document_mime_insert($document);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_mime_insert_ok);
   } else {
     $display["msg"] .= display_err_msg($l_mime_insert_error);
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "mime_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_mime_update($document);
+  $retour = run_query_document_mime_update($document);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_mime_update_ok);
   } else {
     $display["msg"] .= display_err_msg($l_mime_update_error);
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 } elseif ($action == "mime_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_mime_links($document);
+  $display["detail"] .= dis_document_mime_links($document);
 
 } elseif ($action == "mime_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_mime_delete($document["mime"]);
+  $retour = run_query_document_mime_delete($document["mime"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_mime_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_mime_delete_error);
   }
   require("document_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_document_admin_index();
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -711,4 +711,4 @@ function update_document_action() {
 }
 
 
-</script>
+?>

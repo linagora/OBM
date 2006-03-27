@@ -510,7 +510,7 @@ function run_query_company_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  run_query_delete_document_links($p_id, "company");
+  run_query_global_delete_document_links($p_id, "company");
 
   $query = "DELETE FROM CompanyCategory1Link
     WHERE companycategory1link_company_id='$p_id'";
@@ -823,7 +823,7 @@ function check_can_delete_company($p_id) {
   $delete_ok = true;
 
   // Links from Contact
-  $nb = get_linked_contact_nb($p_id, "company", true);
+  $nb = get_global_linked_contact_nb($p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "$l_link_contact";
@@ -832,7 +832,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from deals
-  $nb = get_linked_deal_nb($p_id, "company", true);
+  $nb = get_global_linked_deal_nb($p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_deal";
@@ -841,7 +841,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from Contracts
-  $nb = get_linked_contract_nb($p_id, "company", true);
+  $nb = get_global_linked_contract_nb($p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_contract";
@@ -850,7 +850,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from Project
-  $nb = get_linked_project_nb($p_id, "company", true);
+  $nb = get_global_linked_project_nb($p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_project";
@@ -859,7 +859,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from Invoice
-  $nb = get_linked_invoice_nb($p_id, "company", true);
+  $nb = get_global_linked_invoice_nb($p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_invoice";

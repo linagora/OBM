@@ -33,7 +33,7 @@ function get_obm_info($info) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_companycategory1() {
+function run_query_global_companycategory1() {
   global $cdg_sql;
 
   $query = "SELECT * FROM CompanyCategory1 ORDER BY companycategory1_code"; 
@@ -50,7 +50,7 @@ function run_query_companycategory1() {
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_contact_number_update($comp_id) {
+function run_query_global_company_contact_number_update($comp_id) {
   global $cdg_sql;
 
   $query = "SELECT count(*) as nb
@@ -134,7 +134,7 @@ function run_query_global_country() {
 // Returns:
 //   DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contactfunction() {
+function run_query_global_contactfunction() {
   global $cdg_sql, $cgp_hide;
 
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
@@ -228,7 +228,7 @@ function get_global_tasktype($tt_cat="", $tt_ids="") {
 // Return:
 //   - $nb     : number of Contact
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_contact_nb ($id, $entity, $arch="") {
+function get_global_linked_contact_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
   $query = "SELECT count(contact_id) as nb
@@ -258,7 +258,7 @@ function get_linked_contact_nb ($id, $entity, $arch="") {
 // Return:
 //   - $nb      : number of Deal
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_deal_nb ($id, $entity, $arch="", $entity2="") {
+function get_global_linked_deal_nb ($id, $entity, $arch="", $entity2="") {
   global $cdg_sql;
 
   if ($entity2 != "") {
@@ -293,7 +293,7 @@ function get_linked_deal_nb ($id, $entity, $arch="", $entity2="") {
 // Return:
 //   - $nb     : number of Project
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_project_nb ($id, $entity, $arch="") {
+function get_global_linked_project_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
   $query = "SELECT count(project_id) as nb
@@ -323,7 +323,7 @@ function get_linked_project_nb ($id, $entity, $arch="") {
 // Return:
 //   - $nb      : number of contract
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_contract_nb ($id, $entity, $arch="", $entity2="") {
+function get_global_linked_contract_nb ($id, $entity, $arch="", $entity2="") {
   global $cdg_sql;
 
   if ($entity2 != "") {
@@ -358,7 +358,7 @@ function get_linked_contract_nb ($id, $entity, $arch="", $entity2="") {
 // Return:
 //   - $nb     : # Incident
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_incident_nb ($id, $entity, $arch="") {
+function get_global_linked_incident_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
   $query = "SELECT count(incident_id) as nb
@@ -387,7 +387,7 @@ function get_linked_incident_nb ($id, $entity, $arch="") {
 // Return:
 //   - $nb     : number of invoice
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_invoice_nb ($id, $entity, $arch="") {
+function get_global_linked_invoice_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
   if ($entity == "deal") {
@@ -422,7 +422,7 @@ function get_linked_invoice_nb ($id, $entity, $arch="") {
 // Return:
 //   - $nb : document number
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_document_nb ($id,$entity) {
+function run_query_global_document_nb ($id,$entity) {
   global $cdg_sql;
 
   $query = "SELECT count(*) as nb
@@ -446,7 +446,7 @@ function run_query_document_nb ($id,$entity) {
 //   - $entity : Type of entity (deal, company..)
 //   - $doc_id : [optionnal] document Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_document_links($ent_id, $entity, $doc_id="") {
+function run_query_global_delete_document_links($ent_id, $entity, $doc_id="") {
   global $cdg_sql;
 
   $where = "1=1";
@@ -477,7 +477,7 @@ function run_query_delete_document_links($ent_id, $entity, $doc_id="") {
 // Return:
 //   - $cpt_ins : # documents inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_documents($ids, $entity) {
+function run_query_global_insert_documents($ids, $entity) {
   global $cdg_sql;
 
   $id = $ids["id"];
@@ -523,7 +523,7 @@ function run_query_insert_documents($ids, $entity) {
 // Get and register the user's todo into session
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
-function session_load_user_todos($set_todo="todo_priority") {
+function global_session_load_user_todos($set_todo="todo_priority") {
   global $cdg_sql, $cgp_todo_nb, $todos, $sess, $auth;
 
   $uid = $auth->auth["uid"];
@@ -572,7 +572,7 @@ function session_load_user_todos($set_todo="todo_priority") {
 // Parameters:
 //   - $id : company id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_company_text($id) {
+function get_global_last_company_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -593,7 +593,7 @@ function get_last_company_text($id) {
 // Parameters:
 //   - $id : contact id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_contact_text($id) {
+function get_global_last_contact_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -614,7 +614,7 @@ function get_last_contact_text($id) {
 // Parameters:
 //   - $id : deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_deal_text($id) {
+function get_global_last_deal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -635,7 +635,7 @@ function get_last_deal_text($id) {
 // Parameters:
 //   - $id : parent deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_parentdeal_text($id) {
+function get_global_last_parentdeal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -658,7 +658,7 @@ function get_last_parentdeal_text($id) {
 // Parameters:
 //   - $id : list id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_list_text($id) {
+function get_global_last_list_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -679,7 +679,7 @@ function get_last_list_text($id) {
 // Parameters:
 //   - $id : publication id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_publication_text($id) {
+function get_global_last_publication_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -701,7 +701,7 @@ function get_last_publication_text($id) {
 // Parameters:
 //   - $id : project id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_project_text($id) {
+function get_global_last_project_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -721,7 +721,7 @@ function get_last_project_text($id) {
 // Parameters:
 //   - $id : contract id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_contract_text($id) {
+function get_global_last_contract_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -741,7 +741,7 @@ function get_last_contract_text($id) {
 // Parameters:
 //   - $id : incident id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_incident_text($id) {
+function get_global_last_incident_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -761,7 +761,7 @@ function get_last_incident_text($id) {
 // Parameters:
 //   - $id : document id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_document_text($id) {
+function get_global_last_document_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -782,7 +782,7 @@ function get_last_document_text($id) {
 // Parameters:
 //   - $id : account id
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_account_text($id) {
+function get_global_last_account_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -802,7 +802,7 @@ function get_last_account_text($id) {
 // Parameters:
 //   - $id : invoice id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_invoice_text($id) {
+function get_global_last_invoice_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -821,7 +821,7 @@ function get_last_invoice_text($id) {
 // Parameters:
 //   - $id : resource id
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_resource_text($id) {
+function get_global_last_resource_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -840,7 +840,7 @@ function get_last_resource_text($id) {
 // Parameters:
 //   - $id : resourcegroup id
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_resourcegroup_text($id) {
+function get_global_last_resourcegroup_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -860,7 +860,7 @@ function get_last_resourcegroup_text($id) {
 // Parameters:
 //   - $id : payment id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_payment_text($id) {
+function get_global_last_payment_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -884,7 +884,7 @@ function get_last_payment_text($id) {
 // Returns:
 //   - $mails : array of used emails
 ///////////////////////////////////////////////////////////////////////////////
-function get_email_used($id="", $gid="", $lid="") {
+function get_global_email_used($id="", $gid="", $lid="") {
   global $cdg_sql, $php_regexp_email_name;
 
   $mails = array();
@@ -955,7 +955,7 @@ function get_email_used($id="", $gid="", $lid="") {
 // Returns:
 //   - $sql : sql criteria
 ///////////////////////////////////////////////////////////////////////////////
-function sql_company_name_advanced_search($name, $like="like") {
+function sql_global_company_name_advanced_search($name, $like="like") {
 
   $sound = phonetic_key($name);
   $sql = " AND (company_name $like '$name%'

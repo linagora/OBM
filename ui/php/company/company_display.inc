@@ -527,7 +527,7 @@ function html_company_links($co_q) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=company");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=company");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
-    $nb_document = run_query_document_nb ($id, "company");
+    $nb_document = run_query_global_document_nb ($id, "company");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
@@ -547,8 +547,8 @@ function html_company_links($co_q) {
   if ($cgp_show["module"]["project"]) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
     $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
-    $nb_pro = get_linked_project_nb($id, "company");
-    $nb_pro_total = get_linked_project_nb ($id, "company", 1);
+    $nb_pro = get_global_linked_project_nb($id, "company");
+    $nb_pro_total = get_global_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_project = "
   <div class=\"linkTitle\">:: $l_module_project</div>
@@ -563,8 +563,8 @@ function html_company_links($co_q) {
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $nb_ctra = get_linked_contract_nb($id, "company");
-    $nb_ctra_total = get_linked_contract_nb($id, "company", 1);
+    $nb_ctra = get_global_linked_contract_nb($id, "company");
+    $nb_ctra_total = get_global_linked_contract_nb($id, "company", 1);
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id");
     $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
@@ -585,8 +585,8 @@ function html_company_links($co_q) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_company=$id&amp;company_name=$uname");
-    $nb_inv_tot = get_linked_invoice_nb($id, "company", 1);
-    $nb_inv = get_linked_invoice_nb($id, "company");
+    $nb_inv_tot = get_global_linked_invoice_nb($id, "company", 1);
+    $nb_inv = get_global_linked_invoice_nb($id, "company");
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">

@@ -141,7 +141,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 // If the todo list was updated, we reload the todo in session
 if (in_array($action, array("insert", "detailupdate", "delete", "delete_unique")))
-  session_load_user_todos();
+  global_session_load_user_todos();
 
 
 ///////////////////////////////////////////////////////////////////////////////

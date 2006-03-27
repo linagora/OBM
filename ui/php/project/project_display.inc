@@ -335,7 +335,7 @@ function html_project_links($p_q) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=project");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=project");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=$id&amp;ext_target=$l_project";
-    $nb_document = run_query_document_nb ($id, "project");
+    $nb_document = run_query_global_document_nb ($id, "project");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
@@ -356,8 +356,8 @@ function html_project_links($p_q) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id&amp;cb_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_project=$id&amp;project_name=$uname&amp;param_company=$cid&amp;company_name=$ucname&amp;param_deal=$did&amp;deal_label=$udlabel");
-    $nb_inv_tot = get_linked_invoice_nb($id, "project", 1);
-    $nb_inv = get_linked_invoice_nb($id, "project");
+    $nb_inv_tot = get_global_linked_invoice_nb($id, "project", 1);
+    $nb_inv = get_global_linked_invoice_nb($id, "project");
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">

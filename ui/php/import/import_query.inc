@@ -949,7 +949,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 
   
   if ($retour) {
-    run_query_company_contact_number_update($comp_id);
+    run_query_global_company_contact_number_update($comp_id);
   }
 
   return $retour;
@@ -1086,7 +1086,7 @@ function get_import_country_hash() {
 function get_import_companycategory1_hash() {
   global $cdg_sql;
 
-  $cat_q = run_query_companycategory1();
+  $cat_q = run_query_global_companycategory1();
 
   while ($cat_q->next_record()) {
     $id = $cat_q->f("companycategory1_id");
@@ -1126,7 +1126,7 @@ function get_import_kind_hash() {
 function get_import_function_hash() {
   global $cdg_sql;
 
-  $func_q = run_query_contactfunction();
+  $func_q = run_query_global_contactfunction();
 
   if (is_object($func_q)) {
     while ($func_q->next_record()) {

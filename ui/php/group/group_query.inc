@@ -760,7 +760,7 @@ function check_data_form($group) {
 
   // If email not empty, must not already exists
   if ($email != "") {
-    $mails = get_email_used("", $id);
+    $mails = get_global_email_used("", $id);
 
     // Email address not already used
     if (array_key_exists($email, $mails)) {

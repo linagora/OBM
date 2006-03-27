@@ -546,7 +546,7 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($contact["doc_nb"] > 0) {
-    $nb = run_query_insert_documents($contact, "contact");
+    $nb = run_query_global_insert_documents($contact, "contact");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);

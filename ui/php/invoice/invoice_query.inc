@@ -73,7 +73,7 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
     $where .= " AND invoice_company_id = '$comp_id'";
   }
   if ($company != "") {
-    $where .= sql_company_name_advanced_search($company, $like);
+    $where .= sql_global_company_name_advanced_search($company, $like);
     $join_comp = "LEFT JOIN Company ON invoice_company_id=company_id";
   }
   if ($deal != "") {
@@ -486,7 +486,7 @@ function run_query_invoice_delete($p_id) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    run_query_delete_document_links($p_id, "invoice");    
+    run_query_global_delete_document_links($p_id, "invoice");    
   }
 
   return $retour;

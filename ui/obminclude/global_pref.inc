@@ -17,7 +17,7 @@ if (($set_lang == "")  && ($mode != "txt")) {
   // We Load and make session variables from User preferences
   session_load_user_prefs();
   if ($cgp_show["module"]["todo"]) 
-    session_load_user_todos($set_todo); 
+    global_session_load_user_todos($set_todo); 
 
   // We update the last login date for the user
   run_query_userobm_update_lastaccess($auth->auth["uid"]);

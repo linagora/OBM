@@ -47,7 +47,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   }
 
   if ($company_name != "") {
-    $where .= sql_company_name_advanced_search($company_name, $like);
+    $where .= sql_global_company_name_advanced_search($company_name, $like);
     $join_comp = "LEFT JOIN Company on project_company_id=company_id";
   }
 
@@ -531,7 +531,7 @@ function run_query_delete($p_id) {
   $obm_q = new DB_OBM;
 
   // Delete all links to documents
-  run_query_delete_document_links($p_id, "project");
+  run_query_global_delete_document_links($p_id, "project");
 
   // Delete all users associations to the project
   $query = "DELETE FROM ProjectUser WHERE projectuser_project_id='$p_id'";

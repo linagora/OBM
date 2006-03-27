@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : document_display.inc                                         //
 //     - Desc : Document Display File                                        //
@@ -51,7 +51,7 @@ function dis_document_search_form($document="") {
 
   $cats1 = of_category_get_ordered("document", "category1");
   $cats2 = of_category_get_ordered("document", "category2");
-  $mime_q = run_query_documentmime();
+  $mime_q = run_query_document_mime();
 
   $block .= html_document_search_form($document, $cats1, $cats2, $mime_q);
 
@@ -152,7 +152,7 @@ function dis_document_search_list($document) {
   global $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "document");
-  $obm_q = run_query_search($document, $new_order, $order_dir);
+  $obm_q = run_query_document_search($document, $new_order, $order_dir);
   $nb_document = $obm_q->num_rows_total();
   if ($nb_document == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -244,7 +244,7 @@ function dis_document_consult($document) {
   global $display, $l_no_document;
 
   if ($document["id"] > 0) {
-    $doc_q = run_query_detail($document["id"]);
+    $doc_q = run_query_document_detail($document["id"]);
     if ($doc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($doc_q);
       $block = html_document_consult($doc_q);
@@ -352,7 +352,7 @@ function dis_document_form($action, $document, $doc_q) {
 
   $cats1 = of_category_get_ordered("document", "category1");
   $cats2 = of_category_get_ordered("document", "category2");
-  $mime_q = run_query_documentmime();
+  $mime_q = run_query_document_mime();
 
   $block = html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q);
 
@@ -584,7 +584,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
 //   - $document[] : default values
 //     keys used  : uri, name
 ///////////////////////////////////////////////////////////////////////////////
-function html_dir_form($action, $document) {
+function html_document_dir_form($action, $document) {
   global $display,$popup_height,$popup_width;
   global $set_theme,$l_document;
   global $l_path, $l_name,$path,$ico_browse;
@@ -633,7 +633,7 @@ function html_dir_form($action, $document) {
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_document($p_id) {
+function dis_document_can_delete($p_id) {
   global $display, $l_delete, $l_can_delete, $l_back;
 
   $url = url_prepare("document_index.php");
@@ -666,7 +666,7 @@ function dis_can_delete_document($p_id) {
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_dir($p_id) {
+function dis_document_can_delete_dir($p_id) {
   global $display, $l_dir_can_delete, $l_dir_delete, $l_back;
 
   $url = url_prepare("document_index.php");
@@ -697,11 +697,11 @@ function dis_can_delete_dir($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the document administration index
 ///////////////////////////////////////////////////////////////////////////////
-function dis_admin_index() {
+function dis_document_admin_index() {
 
   $cats1 = of_category_get_ordered("document", "category1");
   $cats2 = of_category_get_ordered("document", "category2");
-  $mime_q = run_query_documentmime();
+  $mime_q = run_query_document_mime();
 
   $block = of_category_dis_admin_form("document", "category1", $cats1);
   $block .= "<hr />";
@@ -844,14 +844,14 @@ function html_document_mime_form($mime_q) {
 // Parameters:
 //   - $document : document hash info : keys used : mime
 ///////////////////////////////////////////////////////////////////////////////
-function dis_mime_links($document) {
+function dis_document_mime_links($document) {
   global $l_mime_link_document, $l_mime_link_document_no;
   global $l_mime_delete, $l_mime_can_delete, $l_mime_cant_delete;
   global $l_back,$display;
 
   $id = $document["mime"];
-  $label = get_mime_label($id);
-  $obm_q = run_query_mime_links($id);
+  $label = get_document_mime_label($id);
+  $obm_q = run_query_document_mime_links($id);
 
   $nb_mime = $obm_q->num_rows();
   if ($nb_mime > 0) {
@@ -948,12 +948,12 @@ function dis_document_display_pref($prefs) {
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_documents_tree($document,$display_file) {
+function html_document_tree($document,$display_file) {
   global $l_close;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   
   $popup = $document["popup"];
-  $obm_d = run_query_get_tree($display_file);
+  $obm_d = run_query_document_get_tree($display_file);
   if ($popup) {
     $link = "<a class=\"documentDir\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
@@ -993,9 +993,9 @@ function html_documents_tree($document,$display_file) {
     }
   }
   if ($display_file == "true") {
-    $block .= @display_tree($tree,'/','/',0,0);
+    $block .= @display_document_tree($tree,'/','/',0,0);
   } else {
-    $block .= @display_popup_tree($tree,'/','/',0);
+    $block .= @display_document_popup_tree($tree,'/','/',0);
   }
 $block.= "
   </div>
@@ -1009,7 +1009,7 @@ $block.= "
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function display_tree($tree,$current_directory,$name,$indent,$d_id) {
+function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $ico_del_directory,$popup;
 
@@ -1017,7 +1017,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
   $files = $tree[$current_directory][1];
   $indent_file = $indent + 15;
   foreach($directories as $id => $info) {
-    $content.= display_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file,$id);
+    $content.= display_document_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file,$id);
     $bool = true;
   }
   $current_dir_id = str_replace("'","_",$current_directory);
@@ -1085,13 +1085,13 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function display_popup_tree($tree,$current_directory,$name,$indent) {
+function display_document_popup_tree($tree,$current_directory,$name,$indent) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $popup;
   $indent_file = $indent + 15;
   $directories = $tree[$current_directory];
   foreach($directories as $id => $info) {
-    $content.= display_popup_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file);
+    $content.= display_document_popup_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file);
     $bool = true;
   }
   $current_dir_id = str_replace("'","_",$current_directory);
@@ -1138,7 +1138,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
 ///////////////////////////////////////////////////////////////////////////////
 // Consult File
 ///////////////////////////////////////////////////////////////////////////////
-function dis_file($doc_q) {
+function dis_document_file($doc_q) {
   global $cdoc_kind_link;
 
   $name = $doc_q->f("document_name");  
@@ -1166,3 +1166,5 @@ function dis_file($doc_q) {
   }
 
 }
+
+?>

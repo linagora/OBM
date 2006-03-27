@@ -107,7 +107,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {
     if ($cgp_show["module"]["company"]) {
-      $where .= sql_company_name_advanced_search($company, $like);
+      $where .= sql_global_company_name_advanced_search($company, $like);
       $join_comp_count = "LEFT JOIN Company ON contact_company_id=company_id";
     } else {
       $where .= " AND contact_company $like '$company%'";
@@ -600,7 +600,7 @@ function run_query_contact_insert($contact) {
   $retour = $obm_q->query($query);
 
   if (($cgp_show["module"]["company"]) && ($retour)) {
-    run_query_company_contact_number_update($comp_id);
+    run_query_global_company_contact_number_update($comp_id);
   }
 
   $query = "SELECT contact_id
@@ -809,8 +809,8 @@ function run_query_contact_update($contact) {
   if ($cgp_show["module"]["company"]) {
     // If company has changed, update the companies contact number
     if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
-      run_query_company_contact_number_update($comp_new_id);
-      run_query_company_contact_number_update($comp_old_id);
+      run_query_global_company_contact_number_update($comp_new_id);
+      run_query_global_company_contact_number_update($comp_old_id);
     }
   }
 
@@ -890,7 +890,7 @@ function run_query_contact_delete($p_id) {
   }
 
   // After contact deletion to get correct number
-  run_query_company_contact_number_update($comp_id);
+  run_query_global_company_contact_number_update($comp_id);
 
   return $retour;
 }
@@ -1074,7 +1074,7 @@ function check_can_delete_contact($p_id) {
   $delete_ok = true;
 
   // Links from deals
-  $nb = get_linked_deal_nb($p_id, "contact1", true, "contact2");
+  $nb = get_global_linked_deal_nb($p_id, "contact1", true, "contact2");
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "$l_link_deal";
@@ -1092,7 +1092,7 @@ function check_can_delete_contact($p_id) {
   }
 
   // Links from Contract
-  $nb = get_linked_contract_nb($p_id, "contact1", true, "contact2");
+  $nb = get_global_linked_contract_nb($p_id, "contact1", true, "contact2");
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_contract";

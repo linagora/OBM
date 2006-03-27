@@ -58,7 +58,7 @@ function run_query_contract_search($contract, $p_new_order, $p_order_dir) {
     $where .= " AND (contract_priority_id = '$priority')";
 
   if ($comp != "") {
-    $where .= sql_company_name_advanced_search($comp, $like);
+    $where .= sql_global_company_name_advanced_search($comp, $like);
     $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }
   if ($company_id != "") {
@@ -1254,7 +1254,7 @@ function check_can_delete_contract($p_id) {
   $delete_ok = true;
 
   // Links from Incident
-  $nb = get_linked_incident_nb($p_id, "contract", true);
+  $nb = get_global_linked_incident_nb($p_id, "contract", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "$l_link_incident";

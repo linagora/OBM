@@ -58,7 +58,7 @@ if ($form_user_pref) {
     $set_todo = $param_todo;
     $sess->register("set_todo");
     update_user_pref($uid, "set_todo", $set_todo);
-    session_load_user_todos($set_todo);
+    global_session_load_user_todos($set_todo);
   }
 
   if ($param_dsrc != "") {

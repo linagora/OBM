@@ -67,7 +67,7 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
      $join_contr = "LEFT JOIN Contract ON incident_contract_id=contract_id";
   }
   if ($company != "") {
-    $where .= sql_company_name_advanced_search($company, $like);
+    $where .= sql_global_company_name_advanced_search($company, $like);
     $join_contr = "LEFT JOIN Contract ON incident_contract_id=contract_id";
     $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }

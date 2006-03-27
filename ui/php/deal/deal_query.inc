@@ -61,7 +61,7 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $where .= " AND deal_company_id='$company_id'";
   }
   if ($name != "") {
-    $where .= sql_company_name_advanced_search($name, $like);
+    $where .= sql_global_company_name_advanced_search($name, $like);
     $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
   }
   if ($contact_id > 0) {
@@ -602,7 +602,7 @@ function run_query_deal_delete($id) {
 
   // update the company total deal number
   run_query_deal_company_total_deal_dec($comp_id);
-  run_query_delete_document_links($id, "deal");
+  run_query_global_delete_document_links($id, "deal");
   $query = "DELETE FROM Deal WHERE deal_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -1488,7 +1488,7 @@ function check_can_delete_deal($p_id) {
   $delete_ok = true;
 
   // Links from Contract
-  $nb = get_linked_contract_nb($p_id, "deal", true);
+  $nb = get_global_linked_contract_nb($p_id, "deal", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "$l_link_contract";
@@ -1497,7 +1497,7 @@ function check_can_delete_deal($p_id) {
   }
 
   // Links from Project
-  $nb = get_linked_project_nb($p_id, "deal", true);
+  $nb = get_global_linked_project_nb($p_id, "deal", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_project";
@@ -1506,7 +1506,7 @@ function check_can_delete_deal($p_id) {
   }
 
   // Links from Invoice
-  $nb = get_linked_invoice_nb($p_id, "deal", true);
+  $nb = get_global_linked_invoice_nb($p_id, "deal", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_invoice";

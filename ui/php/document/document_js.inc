@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : document_js.inc                                              //
 //     - Desc : Document javascript functions File                           //
@@ -296,3 +296,5 @@ if (isset($ext_target)) {
   }
   ";
 }
+
+?>

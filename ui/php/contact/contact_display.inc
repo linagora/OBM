@@ -1107,8 +1107,8 @@ function html_contact_links($id) {
   if ($cgp_show["module"]["deal"]) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_contact=$id");
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_contact=$id&amp;cb_archive=1");
-    $deal_active = get_linked_deal_nb($id, "contact1", false, "contact2");
-    $deal_total = get_linked_deal_nb($id, "contact1", true, "contact2");
+    $deal_active = get_global_linked_deal_nb($id, "contact1", false, "contact2");
+    $deal_total = get_global_linked_deal_nb($id, "contact1", true, "contact2");
     $block_deal = "
   <div class=\"linkTitle\">:: $l_module_deal</div>
   <ul class=\"linkList\">
@@ -1133,8 +1133,8 @@ function html_contact_links($id) {
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $contract_active = get_linked_contract_nb($id,"contact1",false,"contact2");
-    $contract_total = get_linked_contract_nb($id,"contact1",true,"contact2");
+    $contract_active = get_global_linked_contract_nb($id,"contact1",false,"contact2");
+    $contract_total = get_global_linked_contract_nb($id,"contact1",true,"contact2");
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_contact=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_contact=$id&amp;cb_archive=1");
     $block_contract = "

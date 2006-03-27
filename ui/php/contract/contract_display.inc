@@ -440,7 +440,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contract");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contract/contract_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contract";
 
-    $nb_document = run_query_document_nb ($id,"Contract");
+    $nb_document = run_query_global_document_nb ($id,"Contract");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">

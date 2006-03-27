@@ -511,8 +511,8 @@ function html_deal_links($deal_q) {
 
   // Project
   if ($cgp_show["module"]["project"]) {
-    $nb_pro = get_linked_project_nb ($id, "deal");
-    $nb_pro_arch = get_linked_project_nb ($id, "deal", 1);
+    $nb_pro = get_global_linked_project_nb ($id, "deal");
+    $nb_pro_arch = get_global_linked_project_nb ($id, "deal", 1);
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
     $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $dis_ico_project = "
@@ -536,8 +536,8 @@ function html_deal_links($deal_q) {
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $contract_active = get_linked_contract_nb($id, "deal");
-    $contract_total = get_linked_contract_nb($id, "deal", 1);
+    $contract_active = get_global_linked_contract_nb($id, "deal");
+    $contract_total = get_global_linked_contract_nb($id, "deal", 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $dis_contract = "
@@ -564,8 +564,8 @@ function html_deal_links($deal_q) {
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
-    $nb_inv_tot = get_linked_invoice_nb($id, "deal", 1);
-    $nb_inv = get_linked_invoice_nb($id, "deal");
+    $nb_inv_tot = get_global_linked_invoice_nb($id, "deal", 1);
+    $nb_inv = get_global_linked_invoice_nb($id, "deal");
     $dis_invoice = "
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
@@ -590,7 +590,7 @@ function html_deal_links($deal_q) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=deal");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=deal");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
-    $nb_document = run_query_document_nb($id, "deal");
+    $nb_document = run_query_global_document_nb($id, "deal");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">

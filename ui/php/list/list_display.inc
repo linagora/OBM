@@ -1024,8 +1024,8 @@ function html_list_graphical_form($action, $list_q, $list) {
     $cat1_q = run_query_contactcategory1();
     $usr_q = run_query_userobm_active();  
     $cat2_q = run_query_contactcategory2();
-    $fct_q = run_query_contactfunction();
-    $cat_q = run_query_companycategory1();       
+    $fct_q = run_query_global_contactfunction();
+    $cat_q = run_query_global_companycategory1();       
     $rec_q = run_query_list_subscriptionreception();  
     $lag_q = run_query_language();
     $pub_q = run_query_list_publication();
@@ -1147,8 +1147,8 @@ function dis_add_criterion_form($list) {
   $dsr_q = run_query_global_datasource();
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();
-  $fct_q = run_query_contactfunction();
-  $cat_q = run_query_companycategory1();
+  $fct_q = run_query_global_contactfunction();
+  $cat_q = run_query_global_companycategory1();
   $lag_q = run_query_language();
     
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";

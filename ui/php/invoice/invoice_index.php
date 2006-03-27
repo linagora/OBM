@@ -149,7 +149,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($invoice["doc_nb"] > 0) {
-    $nb = run_query_insert_documents($invoice, "invoice");
+    $nb = run_query_global_insert_documents($invoice, "invoice");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
