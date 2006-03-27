@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resourcegroup_js.inc                                         //
 //     - Desc : ResourceGroup javascript functions File                      //
@@ -30,3 +30,4 @@ function fill_ext_form(int_form) {
    }
 }";
 }
+?>

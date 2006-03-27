@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_index.php                                               //
 //     - Desc : User Index File                                              //
@@ -83,7 +83,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($obm_user["id"]);
+  $obm_q = run_query_user_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_user_form($obm_q, $obm_user);
@@ -93,11 +93,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $obm_user)) {
+  if (check_user_data_form("", $obm_user)) {
 
     // If the context (same user) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $cid = run_query_insert($obm_user);
+      $cid = run_query_user_insert($obm_user);
       if ($cid > 0) {
 	$obm_user["id"] = $cid;
         $display["msg"] .= display_ok_msg($l_insert_ok);
@@ -113,7 +113,7 @@ if ($action == "ext_get_ids") {
       if ($obm_q->num_rows() > 0) {
         $display["detail"] = dis_user_warn_insert("", $obm_q, $obm_user);
       } else {
-        $cid = run_query_insert($obm_user);
+        $cid = run_query_user_insert($obm_user);
         if ($cid > 0) {
 	  $obm_user["id"] = $cid;
           $display["msg"] .= display_ok_msg($l_insert_ok);
@@ -140,8 +140,8 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($obm_user["id"], $obm_user)) {
-    $retour = run_query_update($obm_user["id"], $obm_user);
+  if (check_user_data_form($obm_user["id"], $obm_user)) {
+    $retour = run_query_user_update($obm_user["id"], $obm_user);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -155,9 +155,9 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_user($obm_user["id"])) {
+  if (check_user_can_delete($obm_user["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_user($obm_user["id"]);
+    $display["detail"] = dis_user_can_delete($obm_user["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
@@ -166,14 +166,14 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_user($obm_user["id"])) {
-    $retour = run_query_delete($obm_user["id"]);
+  if (check_user_can_delete($obm_user["id"])) {
+    $retour = run_query_user_delete($obm_user["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
       $display["msg"] .= display_err_msg($l_delete_error);
     }
-    run_query_delete_profile($obm_user["id"]);
+    run_query_user_delete_profile($obm_user["id"]);
     $display["search"] = html_user_search_form($obm_user);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
@@ -183,7 +183,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "group_consult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($obm_user["id"]);
+  $obm_q = run_query_user_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detail"] = html_user_group_consult($obm_q);
   } else {
@@ -192,7 +192,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "group_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_update_user_group($obm_user);
+  $retour = run_query_user_update_user_group($obm_user);
   if ($retour >= 0) {
     $display["msg"] .= display_ok_msg($l_update_ok);
   } else {
@@ -470,4 +470,4 @@ function update_user_action() {
 }
 
 
-</script>
+?>

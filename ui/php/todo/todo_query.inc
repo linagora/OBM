@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : todo_query.inc                                               //
 //     - Desc : todo query File                                              //
@@ -16,7 +16,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_todolist($todo, $p_new_order, $p_order_dir) {
+function run_query_todo_todolist($todo, $p_new_order, $p_order_dir) {
   global $cdg_sql, $ctu_sql_limit;
 
   $uid = $todo["uid"];
@@ -72,7 +72,7 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
 //   - $todo[]       : company search criteria
 //     keys used       id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($todo) {
+function run_query_todo_detail($todo) {
   global $cdg_sql;
 
   $t_id = $todo["id"];
@@ -119,7 +119,7 @@ function run_query_detail($todo) {
 //   - $todo[]       : company search criteria
 //     keys used       uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($todo) {
+function run_query_todo_insert($todo) {
   global $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
@@ -179,7 +179,7 @@ function run_query_insert($todo) {
 //   - $todo[]       : company search criteria
 //     keys used       id, uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($todo) {
+function run_query_todo_update($todo) {
   global $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
@@ -221,7 +221,7 @@ function run_query_update($todo) {
 // Parameters:
 //   - $parms : correponding to page parameters
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($parms) {
+function run_query_todo_delete($parms) {
   global $cdg_sql, $c_use_connectors;
 
   foreach($parms as $key => $val) {
@@ -232,7 +232,7 @@ function run_query_delete($parms) {
     
       if ($val == "on") {
         $query = "DELETE FROM Todo WHERE todo_id = '$id_todo'";
-	display_debug_msg($query, $cdg_sql, "run_query_delete");
+	display_debug_msg($query, $cdg_sql, "run_query_todo_delete");
         $obm_q = new DB_OBM;
         $obm_q->query($query);
 
@@ -256,12 +256,12 @@ function run_query_delete($parms) {
 // Parameters:
 //   - $t_id = todo id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_unique($t_id) {
+function run_query_todo_delete_unique($t_id) {
   global $cdg_sql, $c_use_connectors;
 
   $query = "DELETE FROM Todo WHERE todo_id = '$t_id'";
   
-  display_debug_msg($query, $cdg_sql, "run_query_delete_unique");
+  display_debug_msg($query, $cdg_sql, "run_query_todo_delete_unique");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
@@ -322,10 +322,12 @@ function check_todo_data_form($todo) {
 // Returns:
 //   true if the todo can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_todo($p_id) {
+function check_todo_can_delete($p_id) {
   global $err_msg, $ok_msg;
 
   $delete_ok = true;
 
   return $delete_ok;
 }
+
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_js.inc                                                  //
 //     - Desc : List javascript functions File                               //
@@ -527,3 +527,5 @@ function show_query_field(value_exp, value_nor, field) {
   }  
 }
 ";
+
+?>

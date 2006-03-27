@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_display.inc
 //     - Desc : Invoice Display file
@@ -670,7 +670,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $number = date ($default_invoice_numbering);
     // when creating from a deal, default to use same "inout" as the dealtype
     if ($d_id >= 1) {
-      $inout = run_query_deal_get_inout ($d_id);
+      $inout = run_query_invoice_deal_get_inout ($d_id);
     }
     $usercomment = $uid;
     $datecomment = isodate_format();
@@ -1333,4 +1333,4 @@ function dis_invoice_display_pref($prefs) {
 }
 
 
-</script>
+?>

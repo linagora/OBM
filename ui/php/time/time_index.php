@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_index.php                                               //
 //     - Desc : Time management Index File                                   //
@@ -61,7 +61,7 @@ require("time_js.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
-$project_managers = run_query_managers();
+$project_managers = run_query_time_managers();
 $stats_users = $project_managers;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,25 +77,25 @@ if ($action == "index") {
   $time["interval"] = "month";
   $display["result"] = dis_time_nav_date($time);
   $display["result"] .= dis_time_planning($time);
-  $display["features"] .= dis_user_select($time, run_query_get_obmusers());
+  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
  
 } elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "week";
-  run_query_insert($time);
-  run_query_validate($time["user_id"]);
+  run_query_time_insert($time);
+  run_query_time_validate($time["user_id"]);
   dis_time_index($time);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $d_start_week = first_day_week($time["date"]);
-  $val_days = run_query_valid_search($time);
-  $display["result"] .= dis_form_addtask($time, $val_days);
+  $d_start_week = time_first_day_week($time["date"]);
+  $val_days = run_query_time_valid_search($time);
+  $display["result"] .= dis_time_form_addtask($time, $val_days);
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_update($time);
-  run_query_validate($time["user_id"]);
+  run_query_time_update($time);
+  run_query_time_validate($time["user_id"]);
   // close the popup
   $display["result"] .= "
     <script language=\"javascript\">
@@ -108,8 +108,8 @@ if ($action == "index") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time["interval"] = "week";
-  run_query_delete($HTTP_POST_VARS);
-  run_query_validate($time["user_id"]);
+  run_query_time_delete($HTTP_POST_VARS);
+  run_query_time_validate($time["user_id"]);
   dis_time_index($time);
   
 } if ($action == "globalview") {
@@ -121,14 +121,14 @@ if ($action == "index") {
 } elseif ($action == "validate") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
-  run_query_adminvalidate($time);
+  run_query_time_adminvalidate($time);
   $display["result"] = dis_time_nav_date($time);
   $display["result"] .= dis_time_month_users_total($time);
 
 } elseif ($action == "unvalidate") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
-  run_query_adminunvalidate($time);
+  run_query_time_adminunvalidate($time);
   $display["result"] = dis_time_nav_date($time);
   $display["result"] .= dis_time_month_users_total($time);
 
@@ -136,10 +136,10 @@ if ($action == "index") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time["interval"] = "month";
-  $statproj_q = run_query_stat_project($time);
-  $stattt_q = run_query_stat_tasktype($time);
+  $statproj_q = run_query_time_stat_project($time);
+  $stattt_q = run_query_time_stat_tasktype($time);
   $display["result"] = dis_time_nav_date($time);
-  $display["features"] .= dis_user_select($time, run_query_get_obmusers(), 1);
+  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers(), 1);
   $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
 
 } elseif ($action == "display") {
@@ -340,4 +340,4 @@ function get_time_actions() {
                                      		 );
 }
 
-</script>
+?>

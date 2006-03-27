@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_display.inc                                             //
 //     - Desc : User Display functions File                                  //
@@ -143,7 +143,7 @@ function dis_resource_search_list($resource) {
   $restriction = $resource["restriction"];
 
   $prefs = get_display_pref($auth->auth["uid"], "resource");
-  $obm_q = run_query_search($resource, $new_order, $order_dir, $restriction);
+  $obm_q = run_query_resource_search($resource, $new_order, $order_dir, $restriction);
   $nb_resource = $obm_q->num_rows_total();
   if ($nb_resource == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -306,7 +306,7 @@ function dis_resource_consult($resource) {
 
   $id = $resource["id"];
 
-  $obm_q = run_query_detail($id);
+  $obm_q = run_query_resource_detail($id);
   if ($obm_q->num_rows() == 1) {
     $block = html_resource_consult($obm_q);
   } else {
@@ -360,7 +360,7 @@ function html_resource_consult($obm_q) {
 // Parameters:
 //   - $p_id : resource id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_resource($p_id) {
+function dis_resource_can_delete($p_id) {
   global $display, $l_delete, $l_can_delete, $l_back;
 
   $url = url_prepare("resource_index.php");
@@ -406,4 +406,4 @@ function dis_resource_display_pref($prefs) {
 }
 
 
-</script>
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : statistic_query.inc                                          //
 //     - Desc : statistic query File                                         //
@@ -12,7 +12,7 @@
 // statistic Contact Per responsible query execution
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_per_resp() {
+function run_query_statistic_contact_per_resp() {
   global $cdg_sql;
 
   $query = "SELECT userobm_id,
@@ -25,7 +25,7 @@ function run_query_contact_per_resp() {
       userobm_id, userobm_lastname,userobm_firstname
    ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_per_resp()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_contact_per_resp()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -37,7 +37,7 @@ function run_query_contact_per_resp() {
 // statistic Company Per responsible query execution
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_per_resp() {
+function run_query_statistic_company_per_resp() {
   global $cdg_sql;
 
   $query = "SELECT userobm_id,
@@ -49,7 +49,7 @@ function run_query_company_per_resp() {
     GROUP BY company_marketingmanager_id,userobm_id,userobm_firstname,
       userobm_lastname";
 
-  display_debug_msg($query, $cdg_sql, "run_query_company_per_resp()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_company_per_resp()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -61,7 +61,7 @@ function run_query_company_per_resp() {
 // statistic about category and country
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_per_country_per_cat() {
+function run_query_statistic_company_per_country_per_cat() {
   global $cdg_sql;
 
   $lang = get_lang();
@@ -82,7 +82,7 @@ function run_query_company_per_country_per_cat() {
       companycategory1_id, companycategory1_code,companycategory1_label
     ORDER BY country_iso3166, companycategory1_id";
   
-  display_debug_msg($query, $cdg_sql, "run_query_company_per_country_per_cat()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_company_per_country_per_cat()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -94,12 +94,12 @@ function run_query_company_per_country_per_cat() {
 // return Company number
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_nb_company() {
+function run_query_statistic_nb_company() {
   global $cdg_sql;
  
   $query = "SELECT count(*) as nb FROM Company";
   
-  display_debug_msg($query, $cdg_sql, "run_query_nb_company()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_nb_company()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -112,12 +112,12 @@ function run_query_nb_company() {
 // return all the lists
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_lists() {
+function run_query_statistic_get_lists() {
   global $cdg_sql;
  
   $query = "SELECT list_id, list_name FROM List ORDER BY list_name";
   
-  display_debug_msg($query, $cdg_sql, "run_query_get_lists()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_get_lists()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -128,12 +128,12 @@ function run_query_get_lists() {
 // return the list query
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_list($id) {
+function run_query_statistic_get_list($id) {
   global $cdg_sql;
  
   $query = "SELECT * FROM List WHERE list_id = '$id'";
   
-  display_debug_msg($query, $cdg_sql, "run_query_get_list()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_get_list()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -145,7 +145,7 @@ function run_query_get_list($id) {
 // statistic about category and country
 // Parameters: the list of the company to select
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_selected_company_per_country_per_cat($obm_q) {
+function run_query_statistic_selected_company_per_country_per_cat($obm_q) {
   global $cdg_sql;
 
   $lang = get_lang();
@@ -174,7 +174,7 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
       companycategory1_id, companycategory1_code,companycategory1_label
     ORDER BY country_iso3166, companycategory1_id";
   
-  display_debug_msg($query, $cdg_sql, "run_query_selected_company_per_country_per_cat()");
+  display_debug_msg($query, $cdg_sql, "run_query_statistic_selected_company_per_country_per_cat()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -185,7 +185,7 @@ function run_query_selected_company_per_country_per_cat($obm_q) {
 // return the contact date 
 // Parameters:
 ////////////////////////////////////////////////////////////////////////////////
-function get_stats_contact_date_total() {
+function get_statistic_contact_date_total() {
   global $obmdb_dbtype, $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $legend = array("Total");
@@ -195,7 +195,7 @@ function get_stats_contact_date_total() {
   } elseif ($obmdb_dbtype == $db_type_pgsql) {
     $query = "select count(*) as nb, extract (year from  contact_date) as year, extract(month from contact_date) as month from Contact where contact_date is not null group by  extract (year from contact_date), extract(month from contact_date)";
   }
-  display_debug_msg($query, $cdg_sql, "get_stats_contact_date_total()");
+  display_debug_msg($query, $cdg_sql, "get_statistic_contact_date_total()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -239,4 +239,4 @@ function get_stats_contact_date_total() {
   );
 }
 
-</script>
+?>

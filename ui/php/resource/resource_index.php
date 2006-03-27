@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resource_index.php                                           //
 //     - Desc :  Resource Index File                                         //
@@ -89,7 +89,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($resource["id"]);
+  $obm_q = run_query_resource_detail($resource["id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_resource_form($obm_q, $resource);
@@ -99,9 +99,9 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $resource)) {
+  if (check_resource_data_form("", $resource)) {
     // If the context (same resource) was confirmed ok, we proceed
-    $rid = run_query_insert($resource);
+    $rid = run_query_resource_insert($resource);
     if ($rid > 0) {
       $resource["id"] = $rid;
       $display["msg"] .= display_ok_msg($l_insert_ok);
@@ -118,8 +118,8 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($resource["id"], $resource)) {
-    $retour = run_query_update($resource["id"], $resource);
+  if (check_resource_data_form($resource["id"], $resource)) {
+    $retour = run_query_resource_update($resource["id"], $resource);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -133,9 +133,9 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_resource($resource["id"])) {
+  if (check_resource_can_delete($resource["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_resource($resource["id"]);
+    $display["detail"] = dis_resource_can_delete($resource["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
@@ -144,8 +144,8 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_resource($resource["id"])) {
-    $retour = run_query_delete($resource["id"]);
+  if (check_resource_can_delete($resource["id"])) {
+    $retour = run_query_resource_delete($resource["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
@@ -408,4 +408,4 @@ function update_resource_action() {
 
 }
 
-</script>
+?>

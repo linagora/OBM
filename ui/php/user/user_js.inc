@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : user_js.inc                                                 //
 //     - Desc  : User javascript functions File                              //
@@ -65,3 +65,4 @@ function check_user(form) {
 
 ";
 
+?>

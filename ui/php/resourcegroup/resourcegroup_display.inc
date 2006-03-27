@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resourcegroup_display.php                                    //
 //     - Desc : Resource Group Display File                                  //
@@ -149,9 +149,9 @@ function dis_resourcegroup_search_resourcegroup($group) {
 
   $prefs = get_display_pref($auth->auth["uid"], "resourcegroup");
   if ($child_res) {
-    $obm_q = run_query_search_possible_children($group);
+    $obm_q = run_query_resourcegroup_search_possible_children($group);
   }  else {
-    $obm_q = run_query_search($group);
+    $obm_q = run_query_resourcegroup_search($group);
   }
 
   $nb_group = $obm_q->num_rows_total();
@@ -339,7 +339,7 @@ function dis_resourcegroup_consult($group, $uid) {
 
   $g_id = $group["id"];
 
-  $group_q = run_query_detail($g_id);
+  $group_q = run_query_resourcegroup_detail($g_id);
 
   $prefs_r = get_display_pref($uid, "resourcegroup_resource");
   $r_q = run_query_resource_resourcegroup($group);
@@ -504,7 +504,7 @@ function dis_resourcegroup_display_pref($pref_group_q, $pref_r_q) {
 // Parameters:
 //   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($id) {
+function dis_resourcegroup_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back, $l_cant_delete_system;
   global $uid, $l_cant_delete_public;
 
@@ -604,4 +604,4 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
 }
 
 
-</script>
+?>

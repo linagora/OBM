@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : contact_js.inc                                              //
 //     - Desc  : Contact javascript functions File                           //
@@ -85,3 +85,4 @@ function check_cat1_new(form)
 }
 
 ";
+?>

@@ -477,7 +477,7 @@ function dis_admin_data_list($action, $mode) {
     $criteria = unserialize($l_q->f("list_structure"));
 
     if ($criteria != "") {
-      $dynlist = make_query_from_db($l_q);
+      $dynlist = make_list_query_from_db($l_q);
       $new_query = $dynlist["query"];
     } else {
       $new_query = $l_q->f("list_query");

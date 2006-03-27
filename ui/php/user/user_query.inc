@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_query.inc                                               //
 //     - Desc : User query & db File                                         //
@@ -16,7 +16,7 @@
 //   - $p_order_dir : direction for order clause (asc, desc)
 //   - $restriction : if and which restriction to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($user, $p_new_order, $p_order_dir, $restriction="") {
+function run_query_user_search($user, $p_new_order, $p_order_dir, $restriction="") {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $login = sql_search_text_parse($user["login"]);
@@ -133,7 +133,7 @@ function run_query_search($user, $p_new_order, $p_order_dir, $restriction="") {
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_id) {
+function run_query_user_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -171,7 +171,7 @@ function run_query_detail($p_id) {
 // Returns:
 //   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($user) {
+function run_query_user_insert($user) {
   global $auth, $cdg_sql, $password_encryption;
 
   $login = $user["login"];
@@ -266,7 +266,7 @@ function run_query_insert($user) {
 //   - $user[]   : entry values
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($p_id, $user) {
+function run_query_user_update($p_id, $user) {
   global $auth, $cdg_sql, $password_encryption;
 
   $login = $user["login"];
@@ -317,7 +317,7 @@ function run_query_update($p_id, $user) {
 
   // If the user is archived, we unsubscribe it from all Groups
   if ($archive == "1") {
-    $retour = run_query_unsubscribe_all_groups($p_id);    
+    $retour = run_query_user_unsubscribe_all_groups($p_id);    
   }
 
   return $retour;
@@ -329,7 +329,7 @@ function run_query_update($p_id, $user) {
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_user_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
   $query = "DELETE FROM UserObm WHERE userobm_id='$p_id'";
@@ -356,7 +356,7 @@ function run_query_delete($p_id) {
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_group($p_id) {
+function run_query_user_user_group($p_id) {
   global $cdg_sql, $uid;
 
   $query = "SELECT *
@@ -378,7 +378,7 @@ function run_query_user_group($p_id) {
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_unsubscribe_all_groups($p_id) {
+function run_query_user_unsubscribe_all_groups($p_id) {
   global $cdg_sql;
 
   $query = "DELETE
@@ -396,7 +396,7 @@ function run_query_unsubscribe_all_groups($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Groups query execution
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group() {
+function run_query_user_group() {
   global $cdg_sql, $uid;
 
   $query = "SELECT *
@@ -417,7 +417,7 @@ function run_query_group() {
 //   - $user[] : user hash info : keys used : id, group_nb, group_X
 // Return: number of usergroup inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update_user_group($user) {
+function run_query_user_update_user_group($user) {
   global $cdg_sql;
 
   $uid = $user["id"];
@@ -472,7 +472,7 @@ function check_user_context($p_id, $user) {
   $email = $user["email"];
 
   // if a user with same name exists, return false
-  $co_q = run_query_check_user($p_id, $login);
+  $co_q = run_query_user_check_user($p_id, $login);
   return $co_q;
 }
 
@@ -483,7 +483,7 @@ function check_user_context($p_id, $user) {
 //   - $p_id  : user id
 //   - $login : login
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_user($p_id, $login) {
+function run_query_user_check_user($p_id, $login) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -513,7 +513,7 @@ function run_query_check_user($p_id, $login) {
 //   - $user[]   : values checked
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($p_id, $user) {
+function check_user_data_form($p_id, $user) {
   global $l_exist_error, $l_login_error, $l_password_error, $l_email_error;
   global $l_lname_error, $php_regexp_email;
   global $err_msg, $action, $cdg_sql;
@@ -599,7 +599,7 @@ function get_linked_user_timetask_nb($p_id) {
 // Returns:
 //   true if the user can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_user($p_id) {
+function check_user_can_delete($p_id) {
   global $err_msg, $ok_msg;
   global $l_link_timetask, $l_link_timetask_no;
 
@@ -625,7 +625,7 @@ function check_can_delete_user($p_id) {
 // Parameters:
 //   - $param_user : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_profile($param_user)  {
+function run_query_user_delete_profile($param_user)  {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -676,34 +676,34 @@ function run_query_delete_profile($param_user)  {
   $query = "DELETE FROM EventEntity
     WHERE evententity_entity = 'user'
       AND evententity_entity_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(EventEntity)");
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventEntity)");
   $obm_q->query($query);
 
   // Remove all acl to the user and user's one
   $query = "DELETE FROM EntityRight
     WHERE entityright_entity = 'calendar'
       AND entityright_entity_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(EntityRight)");
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EntityRight)");
   $obm_q->query($query);
   $query = "DELETE FROM EntityRight
     WHERE entityright_consumer = 'user'
       AND entityright_consumer_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(EntityRight)");
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EntityRight)");
   $obm_q->query($query);
 
   // Remove all Project participation
   $query = "DELETE FROM ProjectUser
     WHERE projectuser_user_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(ProjectUser)");
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(ProjectUser)");
   $obm_q->query($query);
 
   // Remove all User Time management data
   // This is dangerous, but forbidden if user has timetask data (check_can..)
   $query = "DELETE FROM TimeTask
     WHERE timetask_user_id = '$param_user'"; 
-  display_debug_msg($query, $cdg_sql, "run_query_delete_profile(TimeTask)");
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(TimeTask)");
   $obm_q->query($query);
 }
 
 
-</script>
+?>

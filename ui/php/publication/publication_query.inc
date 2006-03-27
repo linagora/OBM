@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : publication_query.inc                                        //
 //     - Desc : publication query File                                       //
@@ -380,7 +380,7 @@ function run_query_publication_auto_subscription($publication, $p_id){
 //   - $publication[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_subscription($publication) {
+function run_query_publication_insert_subscription($publication) {
   global $auth, $cdg_sql;
 
   $c_id = $publication["contact_id"];
@@ -432,7 +432,7 @@ function run_query_insert_subscription($publication) {
 //   - $publication[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update_subscription($publication) {
+function run_query_publication_update_subscription($publication) {
   global $auth, $cdg_sql;
 
   $s_id = $publication["subscription_id"];
@@ -511,11 +511,11 @@ function run_query_publication_delete($p_id) {
 //   - $p_id : publication id
 //   - $c_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_subscription($s_id) {
+function run_query_publication_delete_subscription($s_id) {
   global $cdg_sql;
 
   $query = "delete from Subscription where subscription_id='$s_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_delete_subscription()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_delete_subscription()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   
@@ -549,7 +549,7 @@ function run_query_publication_contact_links($p_id) {
 //   - $title : title
 //   - $zip  : zip
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_publication($p_id, $title, $lang) {
+function run_query_publication_check($p_id, $title, $lang) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -566,7 +566,7 @@ function run_query_check_publication($p_id, $title, $lang) {
       AND publication_lang $like '$lang%'
       $where_id";
 
-  display_debug_msg($query, $cdg_sql, "run_query_check_publication()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_check()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -578,13 +578,13 @@ function run_query_check_publication($p_id, $title, $lang) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publicationtype() {
+function run_query_publication_type() {
   global $cdg_sql;
 
   $query = "SELECT * FROM PublicationType ORDER BY publicationtype_label"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_publicationtype()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_type()");
 
   return $obm_q;
 }
@@ -595,7 +595,7 @@ function run_query_publicationtype() {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_subscriptionreception() {
+function run_query_publication_subscription_reception() {
   global $cdg_sql, $c_focsys;
 
   $query = "SELECT *
@@ -604,7 +604,7 @@ function run_query_subscriptionreception() {
     ORDER BY subscriptionreception_label DESC "; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_subscriptionreception()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_reception()");
 
   return $obm_q;
 }
@@ -615,7 +615,7 @@ function run_query_subscriptionreception() {
 // Parameters:
 //   - $publication : publication hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_insert($publication) {
+function run_query_publication_type_insert($publication) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -631,7 +631,7 @@ function run_query_type_insert($publication) {
     '$usercreate',
     '$type')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_type_insert()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_type_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -644,7 +644,7 @@ function run_query_type_insert($publication) {
 // Parameters:
 //   - $publication : publication hash info : keys used : recept_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_recept_insert($publication) {
+function run_query_publication_recept_insert($publication) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
@@ -660,7 +660,7 @@ function run_query_recept_insert($publication) {
     '$usercreate',
     '$recept')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_recept_insert()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -673,7 +673,7 @@ function run_query_recept_insert($publication) {
 // Parameters:
 //   - $publication : publication hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_update($publication) {
+function run_query_publication_type_update($publication) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -688,7 +688,7 @@ function run_query_type_update($publication) {
     WHERE
       publicationtype_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_type_update()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_type_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -700,7 +700,7 @@ function run_query_type_update($publication) {
 // Parameters:
 //   - $publication : publication hash info : keys used : recept, recept_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_recept_update($publication) {
+function run_query_publication_recept_update($publication) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
@@ -715,7 +715,7 @@ function run_query_recept_update($publication) {
     WHERE
       subscriptionreception_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_recept_update()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -728,12 +728,12 @@ function run_query_recept_update($publication) {
 // Parameters:
 //   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_delete($id) {
+function run_query_publication_type_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE FROM PublicationType WHERE publicationtype_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_type_delete()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_type_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -746,14 +746,14 @@ function run_query_type_delete($id) {
 // Parameters:
 //   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_recept_delete($id) {
+function run_query_publication_recept_delete($id) {
   global $cdg_sql;
 
   $query = "DELETE
     FROM SubscriptionReception
     WHERE subscriptionreception_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_recept_delete()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -766,14 +766,14 @@ function run_query_recept_delete($id) {
 // Parameters:
 //   - $p_id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_type_links($p_id) {
+function run_query_publication_type_links($p_id) {
   global $cdg_sql;
 
   $query = "SELECT publication_title, publication_id, publication_type_id
     FROM Publication
     WHERE publication_type_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_type_links()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_type_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -786,7 +786,7 @@ function run_query_type_links($p_id) {
 // Parameters:
 //   - $p_id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_recept_links($p_id) {
+function run_query_publication_recept_links($p_id) {
   global $cdg_sql;
 
   $query = "SELECT publication_title,
@@ -799,7 +799,7 @@ function run_query_recept_links($p_id) {
       LEFT JOIN Contact ON contact_id = subscription_contact_id
     WHERE subscription_reception_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_recept_links()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_recept_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -812,14 +812,14 @@ function run_query_recept_links($p_id) {
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_type_label($id) {
+function get_publication_type_label($id) {
   global $cdg_sql;
 
   $query = "SELECT publicationtype_label
     FROM PublicationType
     WHERE publicationtype_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "get_type_label()");
+  display_debug_msg($query, $cdg_sql, "get_publication_type_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -834,14 +834,14 @@ function get_type_label($id) {
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_recept_label($id) {
+function get_publication_recept_label($id) {
   global $cdg_sql;
 
   $query = "SELECT subscriptionreception_label
     FROM SubscriptionReception 
     WHERE subscriptionreception_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "get_recept_label()");
+  display_debug_msg($query, $cdg_sql, "get_publication_recept_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -865,7 +865,7 @@ function check_publication_context($cid, $publication) {
   $lang = $publication["lang"];
 
   // if a publication with same title and zip exists, return false
-  $co_q = run_query_check_publication($cid, $title, $lang);
+  $co_q = run_query_publication_check($cid, $title, $lang);
   return $co_q;
 }
 
@@ -920,7 +920,7 @@ function check_publication_data($cid, $publication) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_subscription_form($cid, $publication) {
+function check_publication_data_subscription_form($cid, $publication) {
   global $l_j_check_quantity,$l_j_select_publication ;
   global $err_msg;
 
@@ -946,7 +946,7 @@ function check_data_subscription_form($cid, $publication) {
 // Returns:
 //   true if the publication can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_publication($p_id) {
+function check_publication_can_delete($p_id) {
   global $err_msg, $ok_msg, $block;
   global $path;
   global $l_contact, $l_link_contact, $l_link_contact_no;
@@ -993,7 +993,7 @@ function check_can_delete_publication($p_id) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_contact_lang($p_id) {
+function run_query_publication_get_contact_lang($p_id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -1001,7 +1001,7 @@ function run_query_get_contact_lang($p_id) {
       FROM Contact LEFT JOIN Kind ON contact_kind_id = kind_id
       WHERE contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_get_contact_lang()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_get_contact_lang()");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -1014,7 +1014,7 @@ function run_query_get_contact_lang($p_id) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_subscription_external_search($hash_table) {
+function run_query_publication_subscription_external_search($hash_table) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $contact = $hash_table["id"];
@@ -1041,7 +1041,7 @@ function run_query_subscription_external_search($hash_table) {
     WHERE subscription_contact_id='$contact'
     ORDER BY subscription_timecreate desc";
 
-  display_debug_msg($query, $cdg_sql, "run_query_subscription_external_search()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_external_search()");
   $obm_q->query($query);
   return $obm_q;
 }
@@ -1052,7 +1052,7 @@ function run_query_subscription_external_search($hash_table) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_subscription_detail($s_id){
+function run_query_publication_subscription_detail($s_id){
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -1068,10 +1068,10 @@ function run_query_subscription_detail($s_id){
 	LEFT JOIN Publication ON publication_id = subscription_publication_id
     WHERE subscription_id='$s_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_subscription_detail()");
+  display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
   return $obm_q;
 }
 
-</script>
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : settings_index.php                                           //
 //     - Desc : Settings (Language, themes,...) management index file        //
@@ -405,4 +405,4 @@ function get_settings_actions() {
                                     	);
 }
 
-</script>
+?>

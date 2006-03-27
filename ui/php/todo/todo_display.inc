@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : todo_display.inc                                             //
 //     - Desc : Todo Display File                                            //
@@ -84,7 +84,7 @@ function dis_todo_search_list($todo) {
   $new_order = $todo["new_order"];
   $order_dir = $todo["order_dir"];
 
-  $todo_q = run_query_todolist($todo, $new_order, $order_dir);
+  $todo_q = run_query_todo_todolist($todo, $new_order, $order_dir);
   $nb_todo = $todo_q->num_rows_total();
   if ($nb_todo == 0) {
     $display["msg"] .= display_info_msg($l_no_found);
@@ -374,4 +374,4 @@ function dis_todo_display_pref($prefs) {
   return $block;
 }
 
-</script>
+?>

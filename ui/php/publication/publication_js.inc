@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : publication_js.inc                                          //
 //     - Desc  : Company javascript functions File                           //
@@ -120,3 +120,4 @@ function check_renew_new(form)
 
 ";
 
+?>

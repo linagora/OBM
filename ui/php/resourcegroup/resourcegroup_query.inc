@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resourcegroup_query.inc                                      //
 //     - Desc : Resource group query File                                    //
@@ -14,7 +14,7 @@
 //   - $resourcegroup[]     : list search criteria
 //     keys used     : name, user
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($group) {
+function run_query_resourcegroup_search($group) {
   global $cdg_sql, $ctu_sql_limit, $ctype_resource;
   
   $name = sql_search_text_parse($group["name"]);
@@ -78,7 +78,7 @@ function run_query_search($group) {
 //   - $group[]      : list search criteria
 //     keys used     : name, resource 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_possible_children($group) {
+function run_query_resourcegroup_search_possible_children($group) {
   global $cdg_sql, $ctype_resource;
   
   $id = $group["ext_id"];
@@ -137,7 +137,7 @@ function run_query_search_possible_children($group) {
 // Parameters:
 //   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($id) {
+function run_query_resourcegroup_detail($id) {
   global $cdg_sql, $ctype_resource;
 
   $obm_q = new DB_OBM;
@@ -168,7 +168,7 @@ function run_query_detail($id) {
 // Parameters:
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($group) {
+function run_query_resourcegroup_insert($group) {
   global $uid, $cdg_sql, $ctype_resource;
 
   $id = $group["id"];
@@ -246,7 +246,7 @@ function run_query_resourcegroup_id($group) {
 // Parameters:
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($group) {
+function run_query_resourcegroup_update($group) {
   global $uid, $cdg_sql, $ctype_resource;
 
   $id = $group["id"];
@@ -276,7 +276,7 @@ function run_query_update($group) {
 // Parameters:
 //   - $p_id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_resourcegroup_delete($p_id) {
   global $cdg_sql;
 
   // Delete all resources registrations to this group
@@ -310,7 +310,7 @@ function run_query_delete($p_id) {
 //   - $group[] : group hash info : keys used : id, resource_nb, resourceX
 // Return: number of users inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_resourceresourcegroup_insert($group) {
+function run_query_resourcegroup_resourcegroup_insert($group) {
   global $auth, $cdg_sql;
 
   $id = $group["id"];
@@ -349,7 +349,7 @@ function run_query_resourceresourcegroup_insert($group) {
 //   - $group[] : group hash info : keys used : id, resource_nb, resourceX
 // Return: number of resources deleted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_resourceresourcegroup_delete($group) {
+function run_query_resourcegroup_resourcegroup_delete($group) {
   global $auth, $cdg_sql;
 
   $id = $group["id"];
@@ -623,7 +623,7 @@ function get_resourcegroup_name_exists($name, $id="") {
 //   - $name : group name
 //   - $desc : group desc
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_resourcegroup($id, $name, $desc) {
+function run_query_resourcegroup_check($id, $name, $desc) {
   global $cdg_sql, $uid, $ctype_resource;
 
   $obm_q = new DB_OBM;
@@ -681,7 +681,7 @@ function check_resourcegroup_context($id, $group) {
   $desc = $group["desc"];
 
   // return the groups with same name or desc
-  $g_q = run_query_check_resourcegroup($id, $name, $desc);
+  $g_q = run_query_resourcegroup_check($id, $name, $desc);
 
   return $g_q;
 }
@@ -693,7 +693,7 @@ function check_resourcegroup_context($id, $group) {
 //   - $group[]  : values checked
 //     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($group) {
+function check_resourcegroup_data_form($group) {
   global $l_fill_name;
   global $l_group_exists;
   global $uid, $err_msg, $l_system_no_priv, $l_only_owner_priv;
@@ -749,4 +749,4 @@ function get_resourcegroup_parents($id) {
 }
 
 
-</script>
+?>

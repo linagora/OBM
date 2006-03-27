@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : publication_index.php                                        //
 //     - Desc : Company Index File                                           //
@@ -57,7 +57,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   require("publication_js.inc");  
-  $type_q = run_query_publicationtype();
+  $type_q = run_query_publication_type();
   $display["search"] = html_publication_search_form($type_q, $publication);
   $display["result"] = dis_publication_search_list($publication);  
 
@@ -66,7 +66,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $type_q = run_query_publicationtype();
+  $type_q = run_query_publication_type();
   $display["search"] = html_publication_search_form($type_q, $publication);
   if ($set_display == "yes") {
     $display["result"] = dis_publication_search_list($publication);
@@ -77,7 +77,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   require("publication_js.inc");  
-  $type_q = run_query_publicationtype();
+  $type_q = run_query_publication_type();
   $display["search"] = html_publication_search_form($type_q, $publication);
   $display["result"] = dis_publication_search_list($publication);
 
@@ -88,18 +88,18 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "new_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
-  $recept_q = run_query_subscriptionreception();
-  $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
+  $recept_q = run_query_publication_subscription_reception();
+  $publication["lang"] = run_query_publication_get_contact_lang($publication["contact_id"]);
   require("publication_js.inc");
-  $display["detail"] = html_subscription_form($action,$sub_q, $recept_q, $publication);
+  $display["detail"] = html_publication_subscription_form($action,$sub_q, $recept_q, $publication);
 
 } elseif ($action == "new_auto") {
 ///////////////////////////////////////////////////////////////////////////////
-  $recept_q = run_query_subscriptionreception();
+  $recept_q = run_query_publication_subscription_reception();
   $pub_q = run_query_publication_detail($publication["id"]);
   if ($pub_q->nf() == 1) {
     require("publication_js.inc");
-    $display["detail"] = html_auto_subscription_form($action,$pub_q, $recept_q, $publication);
+    $display["detail"] = html_publication_auto_subscription_form($action,$pub_q, $recept_q, $publication);
   }
 
 } elseif ($action == "detailconsult") {
@@ -113,11 +113,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "detailupdate_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
-  $recept_q = run_query_subscriptionreception();
-  $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
-  $sub_q = run_query_subscription_detail($param_subscription);
+  $recept_q = run_query_publication_subscription_reception();
+  $publication["lang"] = run_query_publication_get_contact_lang($publication["contact_id"]);
+  $sub_q = run_query_publication_subscription_detail($param_subscription);
   require("publication_js.inc");
-  $display["detail"] = html_subscription_form($action,$sub_q,  $recept_q, $publication);
+  $display["detail"] = html_publication_subscription_form($action,$sub_q,  $recept_q, $publication);
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,8 +158,8 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "insert_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_subscription_form("", $publication)) {
-    $retour = run_query_insert_subscription($publication);
+  if (check_publication_data_subscription_form("", $publication)) {
+    $retour = run_query_publication_insert_subscription($publication);
     $display["detail"] = "
     <br />
     <a href=\"javascript: void(0);\" onclick=\"window.opener.location.href='".$publication["ext_url"]."';window.close();\" >
@@ -173,17 +173,17 @@ if ($action == "ext_get_id") {
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $recept_q = run_query_subscriptionreception();
-    $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
+    $recept_q = run_query_publication_subscription_reception();
+    $publication["lang"] = run_query_publication_get_contact_lang($publication["contact_id"]);
     require("publication_js.inc");
-    $display["detail"] = html_subscription_form($action,$cont_q, $recept_q, $publication);
+    $display["detail"] = html_publication_subscription_form($action,$cont_q, $recept_q, $publication);
   }
 
 } elseif ($action == "new_group_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
   $pub_q = run_query_publication_detail($publication["id"]);
   $concat1_q = run_query_publication_contactcategory1();
-  $display["detail"] = html_group_subscription_form($action,$pub_q, $concat1_q,$publication);
+  $display["detail"] = html_publication_group_subscription_form($action,$pub_q, $concat1_q,$publication);
 
 } elseif ($action == "insert_group_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -229,8 +229,8 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "update_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_subscription_form("", $publication)) {
-    $retour = run_query_update_subscription($publication);
+  if (check_publication_data_subscription_form("", $publication)) {
+    $retour = run_query_publication_update_subscription($publication);
     $quit = "
     <br />
     <a href=\"javascript: void(0);\" onclick=\"window.opener.location.href='".$publication["ext_url"]."';window.close();\" >
@@ -244,18 +244,18 @@ if ($action == "ext_get_id") {
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $recept_q = run_query_subscriptionreception();
-    $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
+    $recept_q = run_query_publication_subscription_reception();
+    $publication["lang"] = run_query_publication_get_contact_lang($publication["contact_id"]);
     require("publication_js.inc");
-    $display["detail"] = html_subscription_form($action,$cont_q, $recept_q, $publication);
+    $display["detail"] = html_publication_subscription_form($action,$cont_q, $recept_q, $publication);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_publication($publication["id"])) {
+  if (check_publication_can_delete($publication["id"])) {
     require("publication_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_publication($publication["id"]);
+    $display["detail"] = dis_publication_can_delete($publication["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
@@ -265,7 +265,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_publication($publication["id"])) {
+  if (check_publication_can_delete($publication["id"])) {
     $retour = run_query_publication_delete($publication["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
@@ -273,7 +273,7 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_err_msg($l_delete_error);
     }
     require("publication_js.inc");  
-    $type_q = run_query_publicationtype();
+    $type_q = run_query_publication_type();
     $display["search"] = html_publication_search_form($type_q, $publication);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
@@ -283,7 +283,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "delete_subscription") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete_subscription($param_subscription);
+  $retour = run_query_publication_delete_subscription($param_subscription);
   $display["detail"] = "
   <br />
   <a href=\"javascript: void(0);\" onclick=\"window.opener.location.reload();window.close();\" >
@@ -302,7 +302,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_type_insert($publication);
+  $retour = run_query_publication_type_insert($publication);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_type_insert_ok);
   } else {
@@ -313,7 +313,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_type_update($publication);
+  $retour = run_query_publication_type_update($publication);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_type_update_ok);
   } else {
@@ -324,11 +324,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_type_links($publication);
+  $display["detail"] .= dis_publication_type_links($publication);
 
 } elseif ($action == "type_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_type_delete($publication["type"]);
+  $retour = run_query_publication_type_delete($publication["type"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_type_delete_ok);
   } else {
@@ -339,7 +339,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "recept_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_recept_insert($publication);
+  $retour = run_query_publication_recept_insert($publication);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_recept_insert_ok);
   } else {
@@ -350,7 +350,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "recept_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_recept_update($publication);
+  $retour = run_query_publication_recept_update($publication);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_recept_update_ok);
   } else {
@@ -361,11 +361,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "recept_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_recept_links($publication);
+  $display["detail"] .= dis_publication_recept_links($publication);
 
 } elseif ($action == "recept_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_recept_delete($publication["recept"]);
+  $retour = run_query_publication_recept_delete($publication["recept"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_recept_delete_ok);
   } else {
@@ -704,4 +704,4 @@ function update_publication_action() {
   }
 }
 
-</script>
+?>

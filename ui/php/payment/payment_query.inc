@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : payment_query.inc 
 //     - Desc : payment query File
@@ -1121,4 +1121,4 @@ function  run_query_update_invoice_status () {
   }
 }
 
-</script>
+?>

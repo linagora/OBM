@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : project_display.inc                                          //
 //     - Desc : Project Display File                                         //
@@ -77,8 +77,8 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 function dis_project_search_form($project) {
 
   $tts = get_global_tasktype("project");
-  $manager_q = run_query_managers();
-  $member_q = run_query_members();
+  $manager_q = run_query_project_managers();
+  $member_q = run_query_project_members();
 
   $block = html_project_search_form ($tts, $manager_q, $member_q, $project);
   return $block;
@@ -238,7 +238,7 @@ function dis_project_search_list($project) {
   $order_dir = $project["order_dir"];
 
   $prefs = get_display_pref($auth->auth["uid"], "project", 0);
-  $obm_q = run_query_search($project, $new_order, $order_dir);
+  $obm_q = run_query_project_search($project, $new_order, $order_dir);
   $nb_project = $obm_q->num_rows_total();
 
   if ($nb_project == 0) {
@@ -388,10 +388,10 @@ function html_project_links($p_q) {
 function dis_project_consult($pid) {
   global $display, $l_query_error;
 
-  $project_q = run_query_detail($pid);
-  $tasks_q = run_query_tasks($pid);
-  $members_q = run_query_members($pid);
-  $times = run_query_allocation_and_time($pid);
+  $project_q = run_query_project_detail($pid);
+  $tasks_q = run_query_project_tasks($pid);
+  $members_q = run_query_project_members($pid);
+  $times = run_query_project_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error);
@@ -1739,10 +1739,10 @@ function dis_project_dashboard($project) {
   global $display;
 
   $pid = $project["id"];
-  $project_q = run_query_detail($pid);
-  $tasks_q = run_query_tasks($pid);
-  $members_q = run_query_members($pid);
-  $times = run_query_allocation_and_time($pid);
+  $project_q = run_query_project_detail($pid);
+  $tasks_q = run_query_project_tasks($pid);
+  $members_q = run_query_project_members($pid);
+  $times = run_query_project_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error);
@@ -2076,4 +2076,4 @@ function dis_project_display_pref($prefs) {
   return $block;
 }
 
-</script>
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_js.inc                                                  //
 //     - Desc : Time javascript functions File                               //
@@ -31,3 +31,5 @@ function check_addtodoform(form) {
     return true;
 }
 ";
+
+?>

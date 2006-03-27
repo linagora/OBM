@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_query.inc                                               //
 //     - Desc : list query File                                              //
@@ -124,10 +124,10 @@ function run_query_list_detail($id) {
 //   - $item : array or value
 //   - $key  : element key
 ///////////////////////////////////////////////////////////////////////////////
-function stripslashes_array(&$item, $key) {
+function list_strip_slashes_array(&$item, $key) {
 
   if (is_array($item)) {
-    array_walk($item, 'stripslashes_array');
+    array_walk($item, 'list_strip_slashes_array');
   } else if ($item != "") {
     $item = stripslashes($item);
   }
@@ -140,10 +140,10 @@ function stripslashes_array(&$item, $key) {
 //   - $item : array or value
 //   - $key  : element key
 ///////////////////////////////////////////////////////////////////////////////
-function addslashes_array(&$item, $key) {
+function list_add_slashes_array(&$item, $key) {
 
   if (is_array($item)) {
-    array_walk($item, 'addslashes_array');
+    array_walk($item, 'list_add_slashes_array');
   } else if ($item != "") {
     $item = addslashes($item);
   }
@@ -170,7 +170,7 @@ function run_query_list_insert($list) {
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
     if (is_array($ss_criteria)) {
-      array_walk($ss_criteria, 'stripslashes_array');
+      array_walk($ss_criteria, 'list_strip_slashes_array');
     }
     $list_critery = addslashes(serialize($ss_criteria));
   }
@@ -285,7 +285,7 @@ function run_query_list_update($list) {
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
     if (is_array($ss_criteria)) {
-      array_walk($ss_criteria, 'stripslashes_array');
+      array_walk($ss_criteria, 'list_strip_slashes_array');
     }
     $list_critery = addslashes(serialize($ss_criteria));
   }
@@ -327,7 +327,7 @@ function run_query_list_update_sql($id) {
   $retour = $list_q->query($query);
   $list_q->next_record();
 
-  $dynlist = make_query_from_db($list_q);
+  $dynlist = make_list_query_from_db($list_q);
   $list_query = addslashes($dynlist["query"]);
 
   if ($list_query != "") {
@@ -376,14 +376,14 @@ function run_query_list_delete($p_id) {
 //   - $list[] : list hash info : keys used : id, con_nb, conX
 // Return: number of contact inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contactlist_insert($list) {
+function run_query_list_contactlist_insert($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
 
   // We check the list still exist (in case popup windows here for long...)
   $query = "SELECT list_id FROM List WHERE list_id = '$id'";
-  display_debug_msg($query, $cdg_sql,"run_query_contactlist_insert()");
+  display_debug_msg($query, $cdg_sql,"run_query_list_contactlist_insert()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() != 1) {
@@ -399,7 +399,7 @@ function run_query_contactlist_insert($list) {
     $query = "SELECT * FROM ContactList
       WHERE contactlist_list_id='$id'
         AND contactlist_contact_id='$con_id'";
-    display_debug_msg($query, $cdg_sql,"run_query_contactlist_insert(2)");
+    display_debug_msg($query, $cdg_sql,"run_query_list_contactlist_insert(2)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
@@ -408,7 +408,7 @@ function run_query_contactlist_insert($list) {
       $query = "INSERT INTO ContactList (contactlist_list_id,
         contactlist_contact_id) VALUES ($id, $con_id)";
 
-      display_debug_msg($query, $cdg_sql,"run_query_contactlist_insert(3)");
+      display_debug_msg($query, $cdg_sql,"run_query_list_contactlist_insert(3)");
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
 
@@ -425,7 +425,7 @@ function run_query_contactlist_insert($list) {
 // Parameters:
 //   - $list[] : list hash info : keys used : id, con_nb, conX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contactlist_delete($list) {
+function run_query_list_contactlist_delete($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
@@ -437,7 +437,7 @@ function run_query_contactlist_delete($list) {
 
     $query = "DELETE FROM ContactList
       WHERE contactlist_list_id='$id' AND contactlist_contact_id='$con_id'";
-    display_debug_msg($query, $cdg_sql, "run_query_contactlist_delete()");
+    display_debug_msg($query, $cdg_sql, "run_query_list_contactlist_delete()");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
     if ($retour) {
@@ -456,7 +456,7 @@ function run_query_contactlist_delete($list) {
 // -- Optionnals
 //   - $entity : dataset entity to order (to handle multiple Display in 1 p)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contacts_list($list, $entity="") {
+function run_query_list_contacts_list($list, $entity="") {
   global $cdg_sql, $ctu_sql_limit;
 
   $id = $list["id"];
@@ -560,13 +560,13 @@ function run_query_contacts_list($list, $entity="") {
       $limit";
 
   if ($ctu_sql_limit) {
-    display_debug_msg($query, $cdg_sql, "run_query_contacts_list()");
+    display_debug_msg($query, $cdg_sql, "run_query_list_contacts_list()");
     $count = get_query_count("SELECT count(*) FROM ContactList WHERE contactlist_list_id='$id'");
     $obm_q->set_num_rows_total($count);
   }
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_contacts_list()");
+    display_debug_msg($query, $cdg_sql, "run_query_list_contacts_list()");
     $obm_q->query($query);
   }
 
@@ -656,7 +656,7 @@ function get_list_name_exists($name, $id="") {
 //   - $name    : list name
 //   - $subject : list subject
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_list($id, $name, $subject) {
+function run_query_list_check_list($id, $name, $subject) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -682,7 +682,7 @@ function run_query_check_list($id, $name, $subject) {
      WHERE $where_id
        ($wname or $wsubject)";
 
-  display_debug_msg($query, $cdg_sql, "run_query_check_list()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_check_list()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -695,7 +695,7 @@ function run_query_check_list($id, $name, $subject) {
 //   - $id : list_id
 //   - $nb : new rows number
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update_num_rows($id, $nb) {
+function run_query_list_update_num_rows($id, $nb) {
   global $cdg_sql;
 
   if ($id == "") {
@@ -706,7 +706,7 @@ function run_query_update_num_rows($id, $nb) {
   }
 
   $query = "UPDATE List SET list_query_nb='$nb' WHERE list_id='$id'";
-  display_debug_msg($query, $cdg_sql, "run_query_update_num_rows()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_update_num_rows()");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
@@ -730,7 +730,7 @@ function check_list_context($id, $list) {
   $subject = $list["subject"];
 
   // return the lists with same name or subject
-  $list_q = run_query_check_list($id, $name, $subject);
+  $list_q = run_query_list_check_list($id, $name, $subject);
 
   return $list_q;
 }
@@ -846,7 +846,7 @@ function check_list_data($id, $list) {
       $err_msg = "$l_invalid_query : " . substr($ret,4);
       return false;
     } else {
-      $ret = sql_query_resource_high($query);
+      $ret = sql_list_query_resource_high($query);
       if ($ret["ret"]) {
 	$rows = $ret["rows"];
 	$cost = $ret["cost"];
@@ -866,7 +866,7 @@ function check_list_data($id, $list) {
 // Returns:
 //   true if the list can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_list($p_id) {
+function check_list_can_delete($p_id) {
   global $err_msg, $ok_msg;
   global $l_has_contact;
 
@@ -1113,7 +1113,7 @@ function get_list_static_company_nb($id) {
 // Returns:
 //   - true if resource consumption is high for this query, else false
 ///////////////////////////////////////////////////////////////////////////////
-function sql_query_resource_high($query) {
+function sql_list_query_resource_high($query) {
   global $cdg_sql, $db_type_mysql, $db_type_pgsql;
   global $cql_max_row, $cql_max_cost;
 
@@ -1122,7 +1122,7 @@ function sql_query_resource_high($query) {
 
   if ($db_type == $db_type_mysql) {
     $q = "explain $query";
-    display_debug_msg($q, $cdg_sql, "sql_query_resource_high()");
+    display_debug_msg($q, $cdg_sql, "sql_list_query_resource_high()");
     $obm_q->query($q);
     $cpt = 1;
     while ($obm_q->next_record()) {
@@ -1141,7 +1141,7 @@ function sql_query_resource_high($query) {
     // Postgres Estimate
   } elseif ($db_type == $db_type_pgsql) {
     $q = "explain $query";
-    display_debug_msg($q, $cdg_sql, "sql_query_resource_high()");
+    display_debug_msg($q, $cdg_sql, "sql_list_query_resource_high()");
     $obm_q->query($q, 1);
     // We read the first row of explain command
     $obm_q->next_record();
@@ -1176,13 +1176,13 @@ function sql_query_resource_high($query) {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contactcategory1() {
+function run_query_list_contactcategory1() {
   global $cdg_sql;
 
   $query = "SELECT * FROM ContactCategory1 ORDER BY contactcategory1_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql,"run_query_contactcategory1()");
+  display_debug_msg($query, $cdg_sql,"run_query_list_contactcategory1()");
 
   return $obm_q;
 }
@@ -1193,13 +1193,13 @@ function run_query_contactcategory1() {
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contactcategory2() {
+function run_query_list_contactcategory2() {
   global $cdg_sql;
 
   $query = "SELECT * FROM ContactCategory2 ORDER BY contactcategory2_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "run_query_contactcategory2()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_contactcategory2()");
 
   return $obm_q;
 }
@@ -1210,13 +1210,13 @@ function run_query_contactcategory2() {
 // Returns:
 //   DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_language() {
+function run_query_list_language() {
   global $cdg_sql;
 
   $query = "SELECT kind_lang FROM Kind
     GROUP BY kind_lang";
 
-  display_debug_msg($query, $cdg_sql, "run_query_language()");
+  display_debug_msg($query, $cdg_sql, "run_query_list_language()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -1270,7 +1270,7 @@ function run_query_list_subscriptionreception() {
 // Returns:
 // $ret array [query] full query, [where] where clause, [from] from clause
 ///////////////////////////////////////////////////////////////////////////////
-function make_query_from_db(&$list_q) {
+function make_list_query_from_db(&$list_q) {
   global $auth, $cdg_sql;
 
   if (is_object($list_q)) {
@@ -1290,14 +1290,14 @@ function make_query_from_db(&$list_q) {
       // Addslashes to all criteria elements
       $as_criteria = $criteria;
       if (is_array($as_criteria)) {
-	array_walk($as_criteria, 'addslashes_array');
+	array_walk($as_criteria, 'list_add_slashes_array');
       }
       $list_info["criteria"] = $as_criteria;
       $list_info["id"] = $id;
       $list_info["mailing_ok"] = $mail_ok;
       $list_info["contact_arch"] = $contact_arch;
       $list_info["info_pub"] = $info_pub;
-      $dynlist = make_query_from_criteria($list_info);
+      $dynlist = make_list_query_from_criteria($list_info);
     }
   }
 
@@ -1313,7 +1313,7 @@ function make_query_from_db(&$list_q) {
 // Returns:
 // $ret array [query] full query, [where] where clause, [from] from clause
 ///////////////////////////////////////////////////////////////////////////////
-function make_query_from_criteria($list) {
+function make_list_query_from_criteria($list) {
   global $cdg_sql;
 
   $id = $list["id"];
@@ -1745,7 +1745,7 @@ function ext_list_get_contact_ids($id) {
  
       // Normal mode we optimize the query
     } else {
-      $dynlist = make_query_from_db($list_q);
+      $dynlist = make_list_query_from_db($list_q);
       $from = $dynlist["from"];
       $where = $dynlist["where"];
       $query_c = "SELECT distinct contact_id FROM $from WHERE $where";
@@ -1815,7 +1815,7 @@ function ext_list_get_company_ids($id) {
 
       // Normal mode we optimize the query
     } else {
-      $dynlist = make_query_from_db($list_q);
+      $dynlist = make_list_query_from_db($list_q);
       $from = $dynlist["from"];
       $where = $dynlist["where"];
       $query_comp = "SELECT distinct company_id FROM $from WHERE $where";
@@ -1841,4 +1841,4 @@ function ext_list_get_company_ids($id) {
 }
 
 
-</script>
+?>

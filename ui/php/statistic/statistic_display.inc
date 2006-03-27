@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : statistic_display.php                                        //
 //     - Desc : Statistic Display File                                       //
@@ -12,7 +12,7 @@
 // Parameters:
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_menu_stats() {
+function dis_statistic_menu_stats() {
   global $path, $set_theme;
   global $set_theme, $action;
   global $actions, $module, $perm;
@@ -53,7 +53,7 @@ function dis_menu_stats() {
 //  - $comp_q : DB Object for companies stats
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_resp_stats($cont_q,$comp_q) {
+function dis_statistic_resp_stats($cont_q,$comp_q) {
   global $path, $set_theme;
   global $set_theme, $l_module_company, $l_module_contact, $l_key;
 
@@ -123,7 +123,7 @@ function dis_resp_stats($cont_q,$comp_q) {
 //  - $lisy_q : DB Object with all list
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_list_select($list_q) {
+function dis_statistic_list_select($list_q) {
   global $l_select_list, $c_all, $l_all,$l_generate_stats;
   global $path,$popup_height,$popup_width; 
   $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_list)."&amp;ext_action=company&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=company_statistic&amp;sel_list=")."&amp;ext_target=$l_statistc";
@@ -151,7 +151,7 @@ function dis_list_select($list_q) {
 // - tot : Total of companies... unused for now
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_cat_stats($comp_q,$tot) {
+function dis_statistic_cat_stats($comp_q,$tot) {
   global $path, $set_theme;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
 
@@ -274,7 +274,7 @@ function dis_cat_stats($comp_q,$tot) {
 // - tot : Total of companies... unused for now
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function export_cat_stats($comp_q,$tot) {
+function export_statistic_cat_stats($comp_q,$tot) {
   global $path, $set_theme;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
   global $set_csv_sep;
@@ -362,7 +362,7 @@ function export_cat_stats($comp_q,$tot) {
 // Returns:
 // - image inline
 ///////////////////////////////////////////////////////////////////////////////
-function dis_contact_date_evolution_graph($stats) {
+function dis_statistic_contact_date_evolution_graph($stats) {
   global $obminclude;
 
   require_once "$obminclude/Artichow/LinePlot.class.php";
@@ -395,4 +395,4 @@ function dis_contact_date_evolution_graph($stats) {
 
 }
 
-</script>
+?>

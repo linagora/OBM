@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : contact_js.inc                                              //
 //     - Desc  : Contact javascript functions File                           //
@@ -94,3 +94,5 @@ function hide ( name ) {
 }
 
 ";
+
+?>

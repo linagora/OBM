@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : incident_display.php                                         //
 //     - Desc : Incident File                                                //
@@ -723,7 +723,7 @@ function dis_can_delete_incident($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Incident administration index                                 //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_admin_index() {
+function dis_incident_admin_index() {
 
   $block = "";
 
@@ -757,3 +757,5 @@ function dis_incident_display_pref($prefs) {
 
   return $dis_pref->display();
 }
+
+?>

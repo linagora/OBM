@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //
@@ -45,14 +45,14 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $todo_q = run_query_detail($todo);
+  $todo_q = run_query_todo_detail($todo);
   $display["detailInfo"] = display_record_info($todo_q);
   $display["detail"] .= dis_todo_detail($todo, $todo_q);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_todo_data_form($todo)) {
-    $retour = run_query_insert($todo);
+    $retour = run_query_todo_insert($todo);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
@@ -68,14 +68,14 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($HTTP_POST_VARS);
+  $retour = run_query_todo_delete($HTTP_POST_VARS);
   $display["result"] = dis_todo_form($todo);
   $display["result"] .= dis_todo_search_list($todo);
 
 } else if ($action == "delete_unique") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_todo($todo["id"])) {
-    $retour = run_query_delete_unique($todo["id"]);
+  if (check_todo_can_delete($todo["id"])) {
+    $retour = run_query_todo_delete_unique($todo["id"]);
     if ($retour) {
       $display["msg"] = display_ok_msg($l_delete_ok);
     } else {
@@ -86,19 +86,19 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $todo_q = run_query_detail($todo);
+    $todo_q = run_query_todo_detail($todo);
     $display["detail"] .= dis_todo_detail($todo, $todo_q);
   }
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $todo_q = run_query_detail($todo);
+  $todo_q = run_query_todo_detail($todo);
   $display["result"] = dis_todo_form($todo, $todo_q);
 
 } else if ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_todo_data_form($todo)) {
-    $retour = run_query_update($todo);
+    $retour = run_query_todo_update($todo);
 
     if ($popup) {
       $display["result"] .= "
@@ -287,4 +287,4 @@ function get_todo_action() {
 }
 
 
-</script>
+?>

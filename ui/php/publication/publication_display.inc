@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : publication_display.inc                                      //
 //     - Desc : Publication Display File                                     //
@@ -216,7 +216,7 @@ function html_publication_search_list($pub_q, $prefs, $nb_pub,$publication,$popu
 //   - $publication[]  : publication search criteria
 //     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_search_list($pub_q, $prefs, $nb_pub,$publication,$popup) {
+function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publication,$popup) {
   global $display, $l_found,$l_close;
 
   // we urlencode to avoid breakage for space char
@@ -355,8 +355,8 @@ function dis_publication_form($action, $publication) {
     $list_q = run_query_publication_list();
   }
 
-  $type_q = run_query_publicationtype();
-  $recept_q = run_query_subscriptionreception(); 
+  $type_q = run_query_publication_type();
+  $recept_q = run_query_publication_subscription_reception(); 
 
   $block = html_publication_form($action, $pub_q, $type_q, $recept_q, $publication, $concat1_q, $list_q);
 
@@ -536,7 +536,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
 //     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
+function html_publication_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
   global $display, $auth, $set_dsrc;
   global $set_theme,$l_category;
   global $l_publication, $l_contact_category1, $l_auto_sub;
@@ -616,7 +616,7 @@ function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
 //     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_form($action,$sub_q, $recept_q, $publication) {
+function html_publication_subscription_form($action,$sub_q, $recept_q, $publication) {
   global $display, $authd;
   global $set_theme,$ico_publication_new,$popup_height,$popup_width;
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
@@ -749,7 +749,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
 //     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
+function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
   global $display,$ico_publication_new;
   global $set_theme,$popup_height,$popup_width,$l_insert;
   global $l_publication,$l_quantity, $l_renew, $l_recept,$l_year;
@@ -833,7 +833,7 @@ function html_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
 // Parameters:
 //   - $p_id : publication id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_publication($p_id) {
+function dis_publication_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
@@ -937,11 +937,11 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_admin_index() {
 
-  $type_q = run_query_publicationtype();
+  $type_q = run_query_publication_type();
   $block = html_publication_type_form($type_q);
   $block .= "<hr />";
-  $recept_q = run_query_subscriptionreception();
-  $block .= html_subscription_reception_form($recept_q);  
+  $recept_q = run_query_publication_subscription_reception();
+  $block .= html_publication_subscription_reception_form($recept_q);  
   return $block;
 }
 
@@ -1046,14 +1046,14 @@ function html_publication_type_form($type_q) {
 // Parameters:
 //   - $publication : publication hash info : keys used : type
 ///////////////////////////////////////////////////////////////////////////////
-function dis_type_links($publication) {
+function dis_publication_type_links($publication) {
   global $display, $l_back, $l_type_link_publication, $l_type_link_publication_no;
   global $l_type_delete, $l_type_can_delete, $l_type_cant_delete;
 
   $delete_ok = true;
   $id = $publication["type"];
-  $label = get_type_label($id);
-  $obm_q = run_query_type_links($id);
+  $label = get_publication_type_label($id);
+  $obm_q = run_query_publication_type_links($id);
 
   $nb_type = $obm_q->num_rows();
   if ($nb_type > 0) {
@@ -1130,7 +1130,7 @@ function dis_type_links($publication) {
 // Parameters:
 //   - $recept_q : Renewal list database object
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_reception_form($recept_q) {
+function html_publication_subscription_reception_form($recept_q) {
   global $l_recept_manage,$l_recept_exist;
   global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
 
@@ -1225,14 +1225,14 @@ function html_subscription_reception_form($recept_q) {
 // Parameters:
 //   - $publication : publication hash info : keys used : recept
 ///////////////////////////////////////////////////////////////////////////////
-function dis_recept_links($publication) {
+function dis_publication_recept_links($publication) {
   global $display, $l_back, $l_recept_link_publication, $l_recept_link_publication_no;
   global $l_recept_delete, $l_recept_can_delete, $l_recept_cant_delete;
 
   $delete_ok = true;
   $id = $publication["recept"];
-  $label = get_recept_label($id);
-  $obm_q = run_query_recept_links($id);
+  $label = get_publication_recept_label($id);
+  $obm_q = run_query_publication_recept_links($id);
 
   $nb_recept = $obm_q->num_rows();
   if ($nb_recept > 0) {
@@ -1328,17 +1328,17 @@ function dis_publication_display_pref($prefs) {
 //   - $publication[] : publication search criteria
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function dis_subscription_external_list($hash_table) {
+function dis_publication_subscription_external_list($hash_table) {
   global $display,$l_subscription, $l_no_found_subscription;
   global $auth, $new_order, $order_dir;
   
-  $obm_q = run_query_subscription_external_search($hash_table);
+  $obm_q = run_query_publication_subscription_external_search($hash_table);
   $nb_subscription = $obm_q->num_rows();
   if ($nb_subscription == 0) {
     $display["msg"] = display_warn_msg($l_no_found_subscription);
   } else {
     $block .= "<div class=\"detailHead\">$l_subscription</div>";
-    $block .= html_subscription_list_result($obm_q,$nb_subscription);
+    $block .= html_publication_subscription_list_result($obm_q,$nb_subscription);
   }
 
   
@@ -1352,7 +1352,7 @@ function dis_subscription_external_list($hash_table) {
 //   - $sub_q   : subscription list
 //   - $nb_sub  : nb subscriptions
 ///////////////////////////////////////////////////////////////////////////////
-function html_subscription_list_result($sub_q,$nb_subscription) {
+function html_publication_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme, $ico_update, $ico_delete, $ico_crow;
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
@@ -1436,4 +1436,4 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
 }
 
 
-</script>
+?>

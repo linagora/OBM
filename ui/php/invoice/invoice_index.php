@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_index.inc
 //     - Desc : Invoice Main file
@@ -419,4 +419,4 @@ function update_invoice_action() {
   }
 }
 
-</script>
+?>

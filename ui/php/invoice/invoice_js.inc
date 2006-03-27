@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_js.inc
 //     - Desc : invoice javascript functions File
@@ -111,3 +111,5 @@ function compute_tax (form, auto) {
 }
 
 ";
+
+?>

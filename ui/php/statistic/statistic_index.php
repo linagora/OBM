@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : statistic_index.php                                          //
 //     - Desc : Statistic Index File                                         //
@@ -40,21 +40,21 @@ if (! $statistic["popup"]) {
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["features"] = dis_menu_stats(); 
+  $display["features"] = dis_statistic_menu_stats(); 
 
 } elseif ($action == "responsible") {
 ///////////////////////////////////////////////////////////////////////////////
-  $cont_q = run_query_contact_per_resp();
-  $comp_q = run_query_company_per_resp();
+  $cont_q = run_query_statistic_contact_per_resp();
+  $comp_q = run_query_statistic_company_per_resp();
   $display["title"] = display_title($l_header_resp_stats);
-  $display["detail"] = dis_resp_stats($cont_q,$comp_q);
-  $display["features"] = dis_menu_stats(); 
+  $display["detail"] = dis_statistic_resp_stats($cont_q,$comp_q);
+  $display["features"] = dis_statistic_menu_stats(); 
 
 } elseif ($action == "company") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_get_lists();
-  $display["detail"] = dis_list_select($list_q);
-  $display["features"] = dis_menu_stats();
+  $list_q = run_query_statistic_get_lists();
+  $display["detail"] = dis_statistic_list_select($list_q);
+  $display["features"] = dis_statistic_menu_stats();
   $display["title"] = display_title($l_header_comp_stats);
 
 } elseif ($action == "company_statistic") {
@@ -62,41 +62,41 @@ if ($action == "index" || $action == "") {
   require("statistic_js.inc");
   require("$path/list/list_query.inc");
   if ($statistic["list"] == $c_all) {
-    $cat_q = run_query_company_per_country_per_cat();
-    $nb_comp = run_query_nb_company();
+    $cat_q = run_query_statistic_company_per_country_per_cat();
+    $nb_comp = run_query_statistic_nb_company();
     $display["title"] = display_title($l_header_comp_stats);
   } else {
-    $obm_q = run_query_get_list($statistic["list"]);
+    $obm_q = run_query_statistic_get_list($statistic["list"]);
     $query = stripslashes($obm_q->f("list_query"));
     $com_q = ext_list_get_company_ids($statistic["list"]);
-    $cat_q = run_query_selected_company_per_country_per_cat($com_q);
+    $cat_q = run_query_statistic_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
     $display["title"] = display_title("$l_header_comp_stats : ".$obm_q->f("list_name"));
   }
-  $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
-  $display["features"] = dis_menu_stats(); 
+  $display["detail"] = dis_statistic_cat_stats($cat_q, $nb_comp);
+  $display["features"] = dis_statistic_menu_stats(); 
 
 } elseif ($action == "company_statistic_export") {
 ///////////////////////////////////////////////////////////////////////////////
   require("$path/list/list_query.inc");
   if ($statistic["list"] == $c_all) {
-    $cat_q = run_query_company_per_country_per_cat();
-    $nb_comp = run_query_nb_company();
+    $cat_q = run_query_statistic_company_per_country_per_cat();
+    $nb_comp = run_query_statistic_nb_company();
   } else {
-    $obm_q = run_query_get_list($statistic["list"]);
+    $obm_q = run_query_statistic_get_list($statistic["list"]);
     $query = $obm_q->f("list_query");
     $com_q = ext_list_get_company_ids($statistic["list"]);
-    $cat_q = run_query_selected_company_per_country_per_cat($com_q);
+    $cat_q = run_query_statistic_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
   }
-  export_cat_stats($cat_q, $nb_comp);
+  export_statistic_cat_stats($cat_q, $nb_comp);
 
 } elseif ($action == "contact_date_evolution_graph") {
 ///////////////////////////////////////////////////////////////////////////////
-  $stats = get_stats_contact_date_total();
+  $stats = get_statistic_contact_date_total();
 //  $tot = get_stats_contact_date_categories($stats);
-//  dis_contact_date_evolution_graph($tot);
-  dis_contact_date_evolution_graph($stats);
+//  dis_statistic_contact_date_evolution_graph($tot);
+  dis_statistic_contact_date_evolution_graph($stats);
   flush();
   exit();
 }
@@ -190,4 +190,5 @@ function get_statistic_action() {
 
 
 }
-</script>
+
+?>

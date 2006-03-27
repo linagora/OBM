@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : incident_query.inc                                           //
 //     - Desc : Incident query File                                          //
@@ -600,3 +600,5 @@ function check_can_delete_incident($p_id) {
 
   return $delete_ok;
 }
+
+?>

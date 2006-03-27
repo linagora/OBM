@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_display.php                                             //
 //     - Desc : List Display File                                            //
@@ -518,7 +518,7 @@ function dis_list_consult($list) {
 
   $list_q = run_query_list_detail($id);
   $prefs_con = get_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($list, "list_contact");
+  $con_q = run_query_list_contacts_list($list, "list_contact");
   $block = html_list_consult($list_q, $prefs_con, $con_q);
 
   return $block;
@@ -576,7 +576,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   if ($mode == $clist_mode_normal) {
     $lmode = $l_normal;
     if ($criteria != "") {
-      $dynlist = make_query_from_db($list_q);
+      $dynlist = make_list_query_from_db($list_q);
       $query = $dynlist["query"];
     }
   } else {
@@ -588,7 +588,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   if ($dynlist["query"] != "") {
     $query_nb = get_list_query_num_rows($dynlist, $list_q);
     if ($query_nb >= 0) {
-      run_query_update_num_rows($id, $query_nb);
+      run_query_list_update_num_rows($id, $query_nb);
     } else {
       $query_nb = $l_invalid_query;
     }
@@ -1021,13 +1021,13 @@ function html_list_graphical_form($action, $list_q, $list) {
   if (is_array($criteria)) {
     $cty_q = run_query_global_country_for_lang();
     $dsr_q = run_query_global_datasource();
-    $cat1_q = run_query_contactcategory1();
+    $cat1_q = run_query_list_contactcategory1();
     $usr_q = run_query_userobm_active();  
-    $cat2_q = run_query_contactcategory2();
+    $cat2_q = run_query_list_contactcategory2();
     $fct_q = run_query_global_contactfunction();
     $cat_q = run_query_global_companycategory1();       
     $rec_q = run_query_list_subscriptionreception();  
-    $lag_q = run_query_language();
+    $lag_q = run_query_list_language();
     $pub_q = run_query_list_publication();
 
     $field_data = array(
@@ -1133,7 +1133,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 // Parameters:
 //   - $list[]    : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_add_criterion_form($list) {
+function dis_list_add_criterion_form($list) {
   global $cgp_show, $l_list_display, $l_contact_display,$l_add_criterion;
 
   $popup = $list["popup"];
@@ -1145,21 +1145,21 @@ function dis_add_criterion_form($list) {
   $cty_q = run_query_global_country_for_lang();
   $usr_q = run_query_userobm_active();
   $dsr_q = run_query_global_datasource();
-  $cat1_q = run_query_contactcategory1();
-  $cat2_q = run_query_contactcategory2();
+  $cat1_q = run_query_list_contactcategory1();
+  $cat2_q = run_query_list_contactcategory2();
   $fct_q = run_query_global_contactfunction();
   $cat_q = run_query_global_companycategory1();
-  $lag_q = run_query_language();
+  $lag_q = run_query_list_language();
     
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
 
-  $block .= html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q);
-  $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
+  $block .= html_list_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q);
+  $block .= html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
 
   if ($cgp_show["module"]["publication"]) {
     $rec_q = run_query_list_subscriptionreception();
     $pub_q = run_query_list_publication();
-    $block .= html_publication_criterion($rec_q,$pub_q);
+    $block .= html_list_publication_criterion($rec_q,$pub_q);
   }
 
   $block .= "
@@ -1186,7 +1186,7 @@ function dis_add_criterion_form($list) {
 // Display the Company Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
+function html_list_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
   global $l_all,$l_market,$l_datasource,$l_company_cat1;
   global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
@@ -1271,7 +1271,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 // Display the Contact Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q) {
+function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q) {
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
   global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
@@ -1402,7 +1402,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
 // Display the Contact Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_criterion($rec_q,$pub_q) {
+function html_list_publication_criterion($rec_q,$pub_q) {
   global $path, $l_all, $l_undef, $l_yes, $l_no, $set_theme, $ico_mini_cal;
   global $l_publication, $l_title, $l_lang, $l_year;
   global $l_renew,$l_recept, $l_after, $l_before;
@@ -1503,7 +1503,7 @@ function dis_list_display_pref($prefs, $prefs_con) {
 // Parameters:
 //   - $p_id : list id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_list($p_id) {
+function dis_list_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $display;
 
@@ -1607,4 +1607,4 @@ function dis_list_warn_insert($list_q, $list) {
 }
 
 
-</script>
+?>

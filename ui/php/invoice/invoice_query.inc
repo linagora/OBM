@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_query.inc
 //     - Desc : invoice query File
@@ -517,7 +517,7 @@ function run_query_linked_invoice_payment($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // returns the value of the inout attribute of the given deal
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_get_inout ($p_deal_id) {
+function run_query_invoice_deal_get_inout ($p_deal_id) {
   global $cdg_sql;
 
   $query = "SELECT dealtype_inout
@@ -567,7 +567,7 @@ function get_invoice_nb_having_number ($number, $id="") {
 //   - $p_id : invoicestatus_id
 // Returns: array of invoicestatus infos
 ///////////////////////////////////////////////////////////////////////////////
-function get_invoicestatus_info($p_id) {
+function get_invoice_status_info($p_id) {
   global $cdg_sql;
 
   if ($p_id > 0) {
@@ -732,7 +732,7 @@ function check_invoice_data_form($id, $invoice) {
   $c_id = $invoice["company_id"];
   $c_new_id = $invoice["comp_new_id"];
   $status = $invoice["status"];
-  $istatus = get_invoicestatus_info($status);
+  $istatus = get_invoice_status_info($status);
   $status_created = $istatus["created"];
 
   // MANDATORY: Invoice label
@@ -840,4 +840,4 @@ function check_can_delete_invoice($p_id) {
 }
 
 
-</script>
+?>

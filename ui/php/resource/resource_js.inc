@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : resource_js.inc                                             //
 //     - Desc  : Resource javascript functions File                          //
@@ -80,3 +80,4 @@ function check_resource(form) {
 
 ";
 
+?>

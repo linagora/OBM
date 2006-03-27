@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : invoice_js.inc                                              //
 //     - Desc  : invoice javascript functions File                           //
@@ -165,3 +165,4 @@ function update_values (share, old_share, not_paid_before, still_not_paid, insta
 }
 
 ";
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_display.inc                                             //
 //     - Desc : User Display functions File                                  //
@@ -38,7 +38,7 @@ $fieldnames["userobm_description"] = $l_desc;
 // Returns:
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_user(&$OD, $fieldname, $link_ok) {
+function dis_user_data(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail,$ext_element;
 
   if (($fieldname == "userobm_login") && $link_ok) {
@@ -200,7 +200,7 @@ function dis_user_search_list($user) {
 
   $popup = $user["popup"];
   $restriction = $user["restriction_calendar"];
-  $obm_q = run_query_search($user, $new_order, $order_dir, $restriction);
+  $obm_q = run_query_user_search($user, $new_order, $order_dir, $restriction);
 
   $prefs = get_display_pref($auth->auth["uid"], "user");
   $nb_user = $obm_q->num_rows_total();
@@ -286,7 +286,7 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
 
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_info_msg("$nb_user $l_found");
-  $block .= $user_d->display("dis_data_user");
+  $block .= $user_d->display("dis_user_data");
   $block .= $display_popup_end;
 
   return $block;
@@ -434,7 +434,7 @@ function dis_user_consult($user) {
 
   $id = $user["id"];
 
-  $obm_q = run_query_detail($id);
+  $obm_q = run_query_user_detail($id);
   if ($obm_q->num_rows() == 1) {
     $block = html_user_consult($obm_q);
   } else {
@@ -480,7 +480,7 @@ function html_user_consult($obm_q) {
   if ($perms == $perms_admin) $l_perms = $l_perms_admin;
 
   // Liste des groupes de l'utilisateur
-  $g_q = run_query_user_group($id);
+  $g_q = run_query_user_user_group($id);
   if ($g_q->num_rows() > 0) {
     $dis_group = "
     <div class=\"detailHead\">$l_group_member</div>
@@ -579,10 +579,10 @@ function html_user_group_consult($usr_q) {
   if ($perms == $perms_admin) $lperms = $l_perms_admin;
 
   // Liste des groupes
-  $g_q = run_query_group($id);
+  $g_q = run_query_user_group($id);
 
   // Liste des groupes de l'utilisateur : on remplit le tableau $groups
-  $gu_q = run_query_user_group($id);
+  $gu_q = run_query_user_user_group($id);
   $groups = array();
   while ($gu_q->next_record()) {
     $g_id = $gu_q->f("userobmgroup_group_id");
@@ -700,7 +700,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_can_delete_user($p_id) {
+function dis_user_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
   global $l_no_user, $l_check_usercreate, $l_check_userupdate;
   global $display, $l_user, $l_infos;
@@ -817,4 +817,4 @@ function dis_user_display_pref($prefs) {
 }
 
 
-</script>
+?>

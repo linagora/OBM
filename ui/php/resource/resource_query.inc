@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resource_query.inc                                           //
 //     - Desc : resource query & db File                                     //
@@ -16,7 +16,7 @@
 //   - $p_order_dir : direction for order clause (asc, desc)
 //   - $restriction : if and which restriction to set (eg user (who can read))
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($resource, $p_new_order, $p_order_dir, $restriction="") {
+function run_query_resource_search($resource, $p_new_order, $p_order_dir, $restriction="") {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = sql_search_text_parse($resource["name"]);
@@ -87,7 +87,7 @@ function run_query_search($resource, $p_new_order, $p_order_dir, $restriction=""
 // Parameters:
 //   - $p_id : resource id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_id) {
+function run_query_resource_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -120,7 +120,7 @@ function run_query_detail($p_id) {
 //   - $resource[]   : entry values
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($resource) {
+function run_query_resource_insert($resource) {
   global $auth, $cdg_sql;
 
   $name = $resource["name"];
@@ -154,7 +154,7 @@ function run_query_insert($resource) {
 
   if ($retour) {
     $id = get_resource_id($name);
-    run_query_right_init($id);
+    run_query_resource_right_init($id);
   }
 
   return $id;
@@ -166,7 +166,7 @@ function run_query_insert($resource) {
 // Parameters:
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_right_init($resource_id) {
+function run_query_resource_right_init($resource_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -213,7 +213,7 @@ function run_query_right_init($resource_id) {
 //   - $resource[]   : entry values
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($p_id, $resource) {
+function run_query_resource_update($p_id, $resource) {
   global $auth, $cdg_sql;
 
   $name = $resource["name"];
@@ -241,7 +241,7 @@ function run_query_update($p_id, $resource) {
 // Parameters:
 //   - $p_id : resource id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_resource_delete($p_id) {
   global $cdg_sql;
 
   $query = "DELETE FROM Resource WHERE resource_id='$p_id'";
@@ -303,7 +303,7 @@ function check_resource_context($p_id, $resource) {
 //   - $resource[]   : values checked
 //     keys used : name, resource 
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($p_id, $resource) {
+function check_resource_data_form($p_id, $resource) {
   global $l_exist_error, $l_name_error, $l_desc_error;
   global $l_lname_error;
   global $err_msg, $action, $cdg_sql;
@@ -325,7 +325,7 @@ function check_data_form($p_id, $resource) {
   if ($p_id > 0) {
     $query .= " AND resource_id!='$p_id'";
   }
-  display_debug_msg($query, $cdg_sql, "check_data_form()");
+  display_debug_msg($query, $cdg_sql, "check_resource_data_form()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
@@ -344,7 +344,7 @@ function check_data_form($p_id, $resource) {
 // Returns:
 //   true if the resource can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_resource($id) {
+function check_resource_can_delete($id) {
   global $err_msg, $ok_msg;
 
   $delete_ok = true;
@@ -386,7 +386,7 @@ function get_resource_id($name) {
 function set_resource_calendar_rights($id) {
   global $cdg_sql;
 
-  $user_q = get_all_users();
+  $user_q = get_resource_all_users();
   while ($user_q->next_record()) {
     $u_id = $user_q->f("userobm_id");
     $query = "INSERT INTO EntityRight (
@@ -416,7 +416,7 @@ function set_resource_calendar_rights($id) {
 // Returns:
 //   - users Id
 ///////////////////////////////////////////////////////////////////////////////
-function get_all_users() {
+function get_resource_all_users() {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -425,4 +425,4 @@ function get_all_users() {
   $retour = $obm_q->query($query) ;
 }
 
-</script>
+?>

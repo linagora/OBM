@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : project_query.inc                                            //
 //     - Desc : project query File                                           //
@@ -15,7 +15,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($project, $p_new_order="", $p_order_dir) {
+function run_query_project_search($project, $p_new_order="", $p_order_dir) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = sql_search_text_parse($project["name"]);
@@ -122,7 +122,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_search");
+    display_debug_msg($query, $cdg_sql, "run_query_project_search");
     $obm_q->query($query);
   }
 
@@ -135,7 +135,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
 // Parameters :
 //   - $p_id  : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_id) {
+function run_query_project_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -174,7 +174,7 @@ function run_query_detail($p_id) {
     WHERE project_id='$p_id'
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_detail");
+  display_debug_msg($query, $cdg_sql, "run_query_project_detail");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -184,13 +184,13 @@ function run_query_detail($p_id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Project tasks user allocation and time spend (in time management)
-// Different from run_query_allocation as a project member who has already
+// Different from run_query_project_allocation as a project member who has already
 // spent some time on the project (filled in the time management) but is not
 // anymore assigned to some tasks, must appear in the detailed progress table 
 // Parameters:
 //   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_allocation_and_time($p_id) {
+function run_query_project_allocation_and_time($p_id) {
   global $cdg_sql, $c_day_fraction;
 
   $frac = $c_day_fraction;
@@ -219,7 +219,7 @@ function run_query_allocation_and_time($p_id) {
     GROUP BY userobm_id, projecttask_id, projected_time, missing_time
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time");
+  display_debug_msg($query, $cdg_sql, "run_query_project_allocation_and_time");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -255,7 +255,7 @@ function run_query_allocation_and_time($p_id) {
       AND projectuser_missingtime is null
     GROUP BY userobm_id, projecttask_id, projecttask_project_id";
 
-  display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time (2)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_allocation_and_time (2)");
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
@@ -277,7 +277,7 @@ function run_query_allocation_and_time($p_id) {
 //   - $project[] : Entry's values
 //     keys used  : name, soldtime, tt
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($project) {
+function run_query_project_insert($project) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -331,7 +331,7 @@ function run_query_insert($project) {
     '0',
     '$comment')";
 
-  display_debug_msg($query, $cdg_sql, "run_query_insert");
+  display_debug_msg($query, $cdg_sql, "run_query_project_insert");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -343,7 +343,7 @@ function run_query_insert($project) {
               AND project_tasktype_id = '$tt'
               AND project_timecreate = '$date_now'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_insert (get Id)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_insert (get Id)");
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -372,7 +372,7 @@ function run_query_insert($project) {
       '0',
       '1')";
 
-    display_debug_msg($query, $cdg_sql, "run_query_insert (create task)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_insert (create task)");
     $retour = $obm_q->query($query);
   }
 
@@ -397,7 +397,7 @@ function run_query_insert($project) {
         '$uid',
         '1')";
 
-    display_debug_msg($query, $cdg_sql, "run_query_insert (add member)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_insert (add member)");
     $retour = $obm_q->query($query);
 
     // We get the projecttask_id if a project task has been filled
@@ -434,7 +434,7 @@ function run_query_insert($project) {
         $estimated,
         '$date_now')";
 
-      display_debug_msg($query, $cdg_sql, "run_query_insert (add member)");
+      display_debug_msg($query, $cdg_sql, "run_query_project_insert (add member)");
       $retour = $obm_q->query($query);
     }
   }
@@ -450,7 +450,7 @@ function run_query_insert($project) {
 //   - $project[] : Entry's values
 //     keys used  : name, soldtime, tt
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($pid, $project) {
+function run_query_project_update($pid, $project) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -487,7 +487,7 @@ function run_query_update($pid, $project) {
       project_comment='$comment'
     WHERE project_id='$pid'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_update");
+  display_debug_msg($query, $cdg_sql, "run_query_project_update");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -500,7 +500,7 @@ function run_query_update($pid, $project) {
 // Parameters:
 //   - $p_id : project Id
 ///////////////////////////////////////////////////////////////////////////////
-function get_linked_project_timetask_nb($p_id) {
+function get_project_linked_project_timetask_nb($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -511,7 +511,7 @@ function get_linked_project_timetask_nb($p_id) {
       AND timetask_projecttask_id = projecttask_id
   ";
 
-  display_debug_msg($query, $cdg_sql, "get_linked_project_timetask_nb($p_id)");
+  display_debug_msg($query, $cdg_sql, "get_project_linked_project_timetask_nb($p_id)");
   $obm_q->query($query);
   $obm_q->next_record();
   $nb = $obm_q->f("nb");
@@ -525,7 +525,7 @@ function get_linked_project_timetask_nb($p_id) {
 // Parameters:
 //   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_project_delete($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -558,7 +558,7 @@ function run_query_delete($p_id) {
 //   - $project[] : Entry's values
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_projectname($pid) {
+function run_query_project_name($pid) {
   global $cdg_sql;
 
   $query = "
@@ -566,7 +566,7 @@ function run_query_projectname($pid) {
     FROM Project
     WHERE project_id = '$pid'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_projectname");
+  display_debug_msg($query, $cdg_sql, "run_query_project_name");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -587,7 +587,7 @@ function run_query_projectname($pid) {
 //   - $project[] : Entry's values
 //     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_insert($project) {
+function run_query_project_task_insert($project) {
   global $auth, $cdg_sql;
 
   $pid = $project["id"];
@@ -607,7 +607,7 @@ function run_query_task_insert($project) {
       WHERE projectuser_projecttask_id = '$ptask'
       ";
 
-    display_debug_msg($query, $cdg_sql, "run_query_task_insert(1)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_task_insert(1)");
     $search_q->query($query);
   }
 
@@ -628,7 +628,7 @@ function run_query_task_insert($project) {
         '$ptask',
         '1')";
 
-    display_debug_msg($query, $cdg_sql, "run_query_task_insert(2)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_task_insert(2)");
     $obm_q = new DB_OBM;
     $obm_q->query($query);
   
@@ -645,7 +645,7 @@ function run_query_task_insert($project) {
 //   - $project[] : Entry's values
 //     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_update($project) {
+function run_query_project_task_update($project) {
   global $auth, $cdg_sql;
 
   $task = $project["task"];
@@ -662,7 +662,7 @@ function run_query_task_update($project) {
       WHERE
         projecttask_id='$task'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_task_update(2)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_task_update(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   
@@ -675,7 +675,7 @@ function run_query_task_update($project) {
 // Parameters:
 //   - $project[] : hash info : keys used : id, task_nb, tskX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_delete($project) {
+function run_query_project_task_delete($project) {
   global $auth, $cdg_sql;
 
   $id = $project["id"];
@@ -695,7 +695,7 @@ function run_query_task_delete($project) {
       WHERE projectuser_projecttask_id = projecttask_id
         AND (projecttask_id='$tsk_id' OR projecttask_parenttask_id='$tsk_id')";
     
-    display_debug_msg($query, $cdg_sql, "run_query_task_delete(1)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_task_delete(1)");
     $search_q = new DB_OBM;
     $search_q->query($query);
 
@@ -712,7 +712,7 @@ function run_query_task_delete($project) {
         WHERE timetask_projecttask_id = projecttask_id
           AND (projecttask_id='$tsk_id' or projecttask_parenttask_id='$tsk_id')";
     
-      display_debug_msg($query, $cdg_sql, "run_query_task_delete(2)");
+      display_debug_msg($query, $cdg_sql, "run_query_project_task_delete(2)");
       $search_q = new DB_OBM;
       $search_q->query($query);
 
@@ -729,7 +729,7 @@ function run_query_task_delete($project) {
         WHERE projecttask_id = '$tsk_id'
           OR  projecttask_parenttask_id = '$tsk_id'";
 
-      display_debug_msg($query, $cdg_sql, "run_query_task_delete(3)");
+      display_debug_msg($query, $cdg_sql, "run_query_project_task_delete(3)");
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
       if ($retour)
@@ -747,7 +747,7 @@ function run_query_task_delete($project) {
 //   - $project[] : hash info : keys used : id, mem_nb, memX
 // Return: number of users inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_memberlist_insert($project) {
+function run_query_project_memberlist_insert($project) {
   global $auth, $cdg_sql;
 
   $id = $project["id"];
@@ -764,7 +764,7 @@ function run_query_memberlist_insert($project) {
       WHERE projectuser_project_id = '$id'
         AND projectuser_user_id = '$mem_id'";
 
-    display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(2)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_memberlist_insert(2)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
@@ -789,7 +789,7 @@ function run_query_memberlist_insert($project) {
           0,
           0)";
 
-      display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(3)");
+      display_debug_msg($query, $cdg_sql, "run_query_project_memberlist_insert(3)");
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
       $cpt_ins++;
@@ -805,7 +805,7 @@ function run_query_memberlist_insert($project) {
 // Parameters:
 //   - $project[] : hash info : keys used : id, mem_nb, memX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_memberlist_delete($project) {
+function run_query_project_memberlist_delete($project) {
   global $auth, $cdg_sql;
 
   $id = $project["id"];
@@ -827,7 +827,7 @@ function run_query_memberlist_delete($project) {
           AND timetask_projecttask_id = projecttask_id
           AND projecttask_project_id = '$id'";
     
-    display_debug_msg($query, $cdg_sql, "run_query_member_delete(2b)");
+    display_debug_msg($query, $cdg_sql, "run_query_project_member_delete(2b)");
     $search_q->query($query);
     
     if ($search_q->nf() == 0) {
@@ -837,7 +837,7 @@ function run_query_memberlist_delete($project) {
         WHERE projectuser_project_id = '$id'
           AND projectuser_user_id = '$mem_id'";
       
-      display_debug_msg($query, $cdg_sql, "run_query_memberlist_delete(3b)");
+      display_debug_msg($query, $cdg_sql, "run_query_project_memberlist_delete(3b)");
       $retour = $obm_q->query($query);
       
       if ($retour)
@@ -854,7 +854,7 @@ function run_query_memberlist_delete($project) {
 // Parameters:
 //   - $project[] : hash info : user_id, user_status
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_memberstatus_change($project) {
+function run_query_project_memberstatus_change($project) {
   global $cdg_sql;
 
   $p_id = $project["id"];
@@ -869,7 +869,7 @@ function run_query_memberstatus_change($project) {
       AND projectuser_projecttask_id is null";
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_memberstatus_change");
+  display_debug_msg($query, $cdg_sql, "run_query_project_memberstatus_change");
   $obm_q->query($query);
 
   return $obm_q;
@@ -881,7 +881,7 @@ function run_query_memberstatus_change($project) {
 // Parameters:
 //   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_allocation($p_id) {
+function run_query_project_allocation($p_id) {
   global $cdg_sql, $c_day_fraction;
 
   $frac = $c_day_fraction;
@@ -902,7 +902,7 @@ function run_query_allocation($p_id) {
     GROUP BY userobm_id, projectuser_projecttask_id, projected_time, missing_time
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_allocation");
+  display_debug_msg($query, $cdg_sql, "run_query_project_allocation");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -915,7 +915,7 @@ function run_query_allocation($p_id) {
 // Parameters:
 //   - $project[] : hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_allocate_update($project) {
+function run_query_project_allocate_update($project) {
   global $auth, $cdg_sql;
 
   $p_id = $project["id"];
@@ -934,7 +934,7 @@ function run_query_allocate_update($project) {
     ORDER by mt_user, mt_task";
 
   $old_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_allocate_update(old)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(old)");
   $old_q->query($query);
 
   while ($old_q->next_record()) {
@@ -962,7 +962,7 @@ function run_query_allocate_update($project) {
         WHERE projectuser_user_id = '$m_id'
           AND projectuser_projecttask_id = '$t_id'";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(2)");
+ 	display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(2)");
 	$obm_q->query($query);
 
       // if an allocation existed, and a new has been given
@@ -985,7 +985,7 @@ function run_query_allocate_update($project) {
          WHERE projectuser_user_id = '$m_id'
            AND projectuser_projecttask_id = '$t_id'";
 
-	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(3)");
+	display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(3)");
 	$obm_q->query($query);
 
       // if a new allocation has been given
@@ -1011,7 +1011,7 @@ function run_query_allocate_update($project) {
            '$proj'
           )";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(4)");
+ 	display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(4)");
 	$obm_q->query($query);
       }
     }
@@ -1026,7 +1026,7 @@ function run_query_allocate_update($project) {
 // Parameters:
 //   - $project[] : hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_advance_update($project) {
+function run_query_project_advance_update($project) {
   global $auth, $cdg_sql;
 
   $p_id = $project["id"];
@@ -1046,7 +1046,7 @@ function run_query_advance_update($project) {
     ORDER by mt_user, mt_task";
 
   $old_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_allocate_update(old)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(old)");
   $old_q->query($query);
 
   while ($old_q->next_record()) {
@@ -1076,7 +1076,7 @@ function run_query_advance_update($project) {
         WHERE projectuser_user_id = '$m_id'
           AND projectuser_projecttask_id = '$t_id'";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(2)");
+ 	display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(2)");
 	$obm_q->query($query);
 
       // if an entry existed, and a new has been given, we update
@@ -1098,7 +1098,7 @@ function run_query_advance_update($project) {
          WHERE projectuser_user_id = '$m_id'
            AND projectuser_projecttask_id = '$t_id'";
 
-	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(3)");
+	display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(3)");
 	$obm_q->query($query);
 
       // if a new entry has been given, we insert it
@@ -1130,7 +1130,7 @@ function run_query_advance_update($project) {
            '$set_miss_time'
           )";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(4)");
+ 	display_debug_msg($query, $cdg_sql, "run_query_project_allocate_update(4)");
 	$obm_q->query($query);
       }
     }
@@ -1145,7 +1145,7 @@ function run_query_advance_update($project) {
 // Parameters:
 //   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_statlog($p_id) {
+function run_query_project_statlog($p_id) {
   global $auth, $cdg_sql, $c_day_fraction;
 
   $uid = $auth->auth["uid"];
@@ -1158,7 +1158,7 @@ function run_query_statlog($p_id) {
       AND projecttask_project_id = '$p_id'
     GROUP BY projecttask_project_id";
 
-  display_debug_msg($query, $cdg_sql, "run_query_statlog(1)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_statlog(1)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1171,7 +1171,7 @@ function run_query_statlog($p_id) {
             WHERE projectuser_project_id = '$p_id'
             GROUP BY projectuser_project_id";
 
-  display_debug_msg($query, $cdg_sql, "run_query_statlog(2)");
+  display_debug_msg($query, $cdg_sql, "run_query_project_statlog(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1193,7 +1193,7 @@ function run_query_statlog($p_id) {
       '$time_left'
     )";
 
-   display_debug_msg($query, $cdg_sql, "run_query_statlog(4)");
+   display_debug_msg($query, $cdg_sql, "run_query_project_statlog(4)");
    $obm_q = new DB_OBM;
    $retour = $obm_q->query($query);
 
@@ -1206,7 +1206,7 @@ function run_query_statlog($p_id) {
 // Parameters :
 //   - $pid : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasks($pid) {
+function run_query_project_tasks($pid) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -1224,7 +1224,7 @@ function run_query_tasks($pid) {
     ORDER BY parent_group, parent_id, projecttask_rank
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_tasks");
+  display_debug_msg($query, $cdg_sql, "run_query_project_tasks");
   $obm_q->query($query);
 
   return $obm_q;
@@ -1237,7 +1237,7 @@ function run_query_tasks($pid) {
 // Parameters :
 //   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_members($p_id = 0) {
+function run_query_project_members($p_id = 0) {
   global $cdg_sql;
   
   if ($p_id) {
@@ -1267,7 +1267,7 @@ function run_query_members($p_id = 0) {
       ORDER BY member_lastname";
 
   }
-  display_debug_msg($query, $cdg_sql, "run_query_members");
+  display_debug_msg($query, $cdg_sql, "run_query_project_members");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -1324,7 +1324,7 @@ function get_project_participants($p_id = 0) {
 // Parameters :
 //   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_managers($p_id = 0) {
+function run_query_project_managers($p_id = 0) {
   global $cdg_sql;
 
   $query = "SELECT userobm_id as manager_id,
@@ -1340,7 +1340,7 @@ function run_query_managers($p_id = 0) {
   $query .= "GROUP BY manager_id, manager_firstname, manager_lastname
              ORDER BY manager_lastname";
 
-  display_debug_msg($query, $cdg_sql, "run_query_managers");
+  display_debug_msg($query, $cdg_sql, "run_query_project_managers");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -1356,7 +1356,7 @@ function run_query_managers($p_id = 0) {
 // Returns:
 //   - (true | false) : true if user have write rights for this project 
 ///////////////////////////////////////////////////////////////////////////////
-function manager_rights($uid, $project, $project_q) {
+function project_manager_rights($uid, $project, $project_q) {
   global $cdg_sql, $perms;
 
   if ($perms == "admin") {
@@ -1371,16 +1371,16 @@ function manager_rights($uid, $project, $project_q) {
     WHERE projectuser_project_id = '$pid'
       AND projectuser_manager != '0'";
 
-  display_debug_msg($query, $cdg_sql, "manager_rights(managers)");
+  display_debug_msg($query, $cdg_sql, "project_manager_rights(managers)");
   $managers_q = new DB_OBM;
   $managers_q->query($query);
 
-  $manager_rights = 
+  $project_manager_rights = 
     ( ( (is_object($project_q)) && ( ($project_q->f("usercreate") == $uid) ) )
     or ($project_q->f("userupdate") == $uid) 
     or ($managers_q->nf() != 0) ) ? true : false;
 
-  return $manager_rights;
+  return $project_manager_rights;
 }
 
 
@@ -1445,14 +1445,14 @@ function check_project_form($pid, $project) {
 // Returns:
 //   true if the project can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_can_delete_project($p_id) {
+function check_project_can_delete($p_id) {
   global $err_msg, $ok_msg;
   global $l_link_timetask, $l_link_timetask_no;
 
   $delete_ok = true;
 
   // Links from Time management
-  $nb = get_linked_project_timetask_nb($p_id);
+  $nb = get_project_linked_project_timetask_nb($p_id);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "$l_link_timetask";
@@ -1473,7 +1473,7 @@ function check_can_delete_project($p_id) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_task_form($pid, $project) {
+function check_project_task_form($pid, $project) {
   global $err_msg, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
   global $l_ptask_has_parent, $l_ptask_and_parent;
 
@@ -1496,13 +1496,13 @@ function check_task_form($pid, $project) {
 
   // If parent task is given, it should not have parents
   // Can happen if update from another window simultaneously
-  if (task_has_parent($ptask)) {
+  if (project_task_has_parent($ptask)) {
     $err_msg = $l_ptask_has_parent;
     return false;
   }
 
   // If parent task and task is already parent
-  if (is_task_parent($task)) {
+  if (project_is_task_parent($task)) {
     $task_is_parent = true;
   } else {
     $task_is_parent = false;
@@ -1515,7 +1515,7 @@ function check_task_form($pid, $project) {
 
   // If a parent task has been given, check that there are no links from
   // User to the parent task (a parent task can't be assigned to users)
-  if (task_has_user($ptask)) {
+  if (project_task_has_user($ptask)) {
     $pt_has_user = true;
   } else {
     $pt_has_user = false;
@@ -1537,7 +1537,7 @@ function check_task_form($pid, $project) {
 // Returns:
 //   - (true | false) : true if task is parent, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function is_task_parent($tid) {
+function project_is_task_parent($tid) {
   global $cdg_sql;
 
   if ($tid == "") {
@@ -1548,7 +1548,7 @@ function is_task_parent($tid) {
     FROM ProjectTask
     WHERE projecttask_parenttask_id = '$tid'";
 
-  display_debug_msg($query, $cdg_sql, "is_task_parent");
+  display_debug_msg($query, $cdg_sql, "project_is_task_parent");
   $t_q = new DB_OBM;
   $t_q->query($query);
   
@@ -1567,14 +1567,14 @@ function is_task_parent($tid) {
 // Returns:
 //   - (true | false) : true if task has a parent, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function task_has_parent($tid) {
+function project_task_has_parent($tid) {
   global $cdg_sql;
 
   $query = "SELECT projecttask_parenttask_id
     FROM ProjectTask
     WHERE projecttask_id = '$tid'";
 
-  display_debug_msg($query, $cdg_sql, "task_has_parent");
+  display_debug_msg($query, $cdg_sql, "project_task_has_parent");
   $t_q = new DB_OBM;
   $t_q->query($query);
   $t_q->next_record();
@@ -1594,14 +1594,14 @@ function task_has_parent($tid) {
 // Returns:
 //   - (true | false) : true if task is assigned to user, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function task_has_user($tid) {
+function project_task_has_user($tid) {
   global $cdg_sql;
 
   $query = "SELECT projectuser_id
     FROM ProjectUser
     WHERE projectuser_projecttask_id = '$tid'";
 
-  display_debug_msg($query, $cdg_sql, "task_has_user");
+  display_debug_msg($query, $cdg_sql, "project_task_has_user");
   $t_q = new DB_OBM;
   $t_q->query($query);
 
@@ -1622,7 +1622,7 @@ function task_has_user($tid) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_progress_form($project) {
+function check_project_progress_form($project) {
 
   $error = 0;
 
@@ -1640,4 +1640,4 @@ function check_progress_form($project) {
     return true;
 }
 
-</script>
+?>

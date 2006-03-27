@@ -146,7 +146,7 @@ if (($action == "index") || ($action == "")) {
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
     $display["detail"] = dis_group_consult($group, $uid);
   }
-  //  $display["detail"] = dis_warn_delete($group["id"]);
+  //  $display["detail"] = dis_group_warn_delete($group["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////

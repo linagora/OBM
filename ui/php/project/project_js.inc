@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : project_js.inc                                              //
 //     - Desc  : Project javascript functions File                           //
@@ -298,3 +298,5 @@ function fill_parenttask(sel_pt, sel_t, tf_tname) {
 }
 
 ";
+
+?>

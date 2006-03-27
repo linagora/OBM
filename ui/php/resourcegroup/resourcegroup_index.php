@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resourcegroup_index.php                                      //
 //     - Desc : Resource Group Index File                                    //
@@ -79,16 +79,16 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($resourcegroup["id"]);
+  $obm_q = run_query_resourcegroup_detail($resourcegroup["id"]);
   $display["detail"] = html_resourcegroup_form($action, $obm_q, $resourcegroup);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($resourcegroup)) {
+  if (check_resourcegroup_data_form($resourcegroup)) {
 
     // If the context (same group) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $resourcegroup["id"] = run_query_insert($resourcegroup);
+      $resourcegroup["id"] = run_query_resourcegroup_insert($resourcegroup);
       if ($resourcegroup["id"]) {
 	$display["msg"] .= display_ok_msg($l_insert_ok);
 	$display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
@@ -103,7 +103,7 @@ if (($action == "index") || ($action == "")) {
       if ($obm_q->num_rows() > 0) {
 	$display["detail"] = dis_resourcegroup_warn_insert("", $obm_q, $resourcegroup);
       } else {
-	$resourcegroup["id"] = run_query_insert($resourcegroup);
+	$resourcegroup["id"] = run_query_resourcegroup_insert($resourcegroup);
 	if ($resourcegroup["id"] > 0) {
 	  $display["msg"] .= display_ok_msg($l_insert_ok);
 	  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
@@ -122,8 +122,8 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($resourcegroup)) {
-    $retour = run_query_update($resourcegroup);
+  if (check_resourcegroup_data_form($resourcegroup)) {
+    $retour = run_query_resourcegroup_update($resourcegroup);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
@@ -132,17 +132,17 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $resourcegroup_q = run_query_detail($resourcegroup["id"]);
+    $resourcegroup_q = run_query_resourcegroup_detail($resourcegroup["id"]);
     $display["detail"] = html_resourcegroup_form($action, $resourcegroup_q, $resourcegroup);
   }
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_warn_delete($resourcegroup["id"]);
+  $display["detail"] = dis_resourcegroup_warn_delete($resourcegroup["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($hd_resourcegroup_id);
+  $retour = run_query_resourcegroup_delete($hd_resourcegroup_id);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
@@ -153,7 +153,7 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "resource_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($resourcegroup["resource_nb"] > 0) {
-    $nb = run_query_resourceresourcegroup_insert($resourcegroup);
+    $nb = run_query_resourcegroup_resourcegroup_insert($resourcegroup);
     $display["msg"] .= display_ok_msg("$nb $l_resource_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_resource_added);
@@ -163,7 +163,7 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "resource_del")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($resourcegroup["resource_nb"] > 0) {
-    $nb = run_query_resourceresourcegroup_delete($resourcegroup);
+    $nb = run_query_resourcegroup_resourcegroup_delete($resourcegroup);
     $display["msg"] .= display_ok_msg("$nb $l_resource_removed");
   } else {
     $display["msg"] .= display_err_msg($l_no_resource_deleted);
@@ -496,4 +496,4 @@ function update_resourcegroup_action() {
   }
 }
 
-</script>
+?>

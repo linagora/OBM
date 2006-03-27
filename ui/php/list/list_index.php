@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_index.php                                               //
 //     - Desc : List Index File                                              //
@@ -70,7 +70,7 @@ if ($action == "ext_get_id") {
 
 }
 else if ($action == "new_criterion") {
-  $display["detail"] = dis_add_criterion_form($list);
+  $display["detail"] = dis_list_add_criterion_form($list);
 
 } elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ else if ($action == "new_criterion") {
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
-    $dynlist = make_query_from_criteria($list);
+    $dynlist = make_list_query_from_criteria($list);
     $list["query"] = $dynlist["query"];
   } else {
     // To change : we do not know if expert mode (query should be stripslashed)
@@ -153,7 +153,7 @@ else if ($action == "new_criterion") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
-    $dynlist = make_query_from_criteria($list);
+    $dynlist = make_list_query_from_criteria($list);
     $list["query"] = $dynlist["query"];
   } else {
     // To change : we do not know if expert mode (query should be stripslashed)
@@ -176,9 +176,9 @@ else if ($action == "new_criterion") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_list($list["id"])) {
+  if (check_list_can_delete($list["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_list($list["id"]);
+    $display["detail"] = dis_list_can_delete($list["id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
@@ -187,7 +187,7 @@ else if ($action == "new_criterion") {
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_list($list["id"])) {
+  if (check_list_can_delete($list["id"])) {
     $retour = run_query_list_delete($list["id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_delete_ok);
@@ -204,7 +204,7 @@ else if ($action == "new_criterion") {
 } elseif ($action == "contact_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["con_nb"] > 0) {
-    $nb = run_query_contactlist_insert($list);
+    $nb = run_query_list_contactlist_insert($list);
     run_query_list_update_sql($list["id"]);
     run_query_list_update_static_nb($list["id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_added");
@@ -216,7 +216,7 @@ else if ($action == "new_criterion") {
 } elseif ($action == "contact_del")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["con_nb"] > 0) {
-    $nb = run_query_contactlist_delete($list);
+    $nb = run_query_list_contactlist_delete($list);
     run_query_list_update_sql($list["id"]);
     run_query_list_update_static_nb($list["id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
@@ -592,4 +592,4 @@ function update_list_action() {
 
 }
 
-</script>
+?>

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_query.inc                                               //
 //     - Desc : time manager query File                                      //
@@ -15,14 +15,14 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_list($time) {
+function run_query_time_task_list($time) {
   global $c_day_fraction, $cdg_sql;
 
   $date = $time["date"];
   $user_id = $time["user_id"];
 
   if ($time["interval"] == "week") {
-    $array_date = get_week_point($date);
+    $array_date = get_time_week_point($date);
   }
 
   $obm_q = new DB_OBM;
@@ -81,7 +81,7 @@ function run_query_task_list($time) {
 // Returns:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_stat_project($time) {
+function run_query_time_stat_project($time) {
   global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
@@ -121,7 +121,7 @@ function run_query_stat_project($time) {
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
+  display_debug_msg($query, $cdg_sql, "run_query_time_stat_project_by_month");
 
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -137,7 +137,7 @@ function run_query_stat_project($time) {
 // Returns:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_stat_tasktype($time) {
+function run_query_time_stat_tasktype($time) {
   global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
@@ -174,7 +174,7 @@ function run_query_stat_tasktype($time) {
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
+  display_debug_msg($query, $cdg_sql, "run_query_time_stat_project_by_month");
 
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -190,10 +190,10 @@ function run_query_stat_tasktype($time) {
 //  array of days corresponding to validated date, and task_status : 
 //   ("20010911" => 2, "20010912" => 1, "20010913" => 1)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_valid_search($time) {
+function run_query_time_valid_search($time) {
   global $cdg_sql;
 
-  $week_span = get_week_point($time["date"]);
+  $week_span = get_time_week_point($time["date"]);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -211,14 +211,14 @@ function run_query_valid_search($time) {
   if (sizeof($time["user_ids"]) == 1) {
     $query .= " AND timetask_user_id = '". $time["user_id"] . "'";
   } else {
-    $users_list = array_to_list($time["user_ids"]);
+    $users_list = time_array_to_list($time["user_ids"]);
     $query .= " AND timetask_user_id in $users_list";
   }
 
   // Group
   $query .= " GROUP BY timetask_date, timetask_status ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_valid_search");
+  display_debug_msg($query, $cdg_sql, "run_query_time_valid_search");
   $obm_q->query($query);
   
   while ($obm_q->next_record()) {
@@ -235,7 +235,7 @@ function run_query_valid_search($time) {
 // Parametes:
 //   - $id : id for task
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_task($id) {
+function run_query_time_get_task($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -251,7 +251,7 @@ function run_query_get_task($id) {
       LEFT JOIN ProjectTask ON timetask_projecttask_id = projecttask_id
     WHERE timetask_id = '$id'";
   
-  display_debug_msg($query, $cdg_sql, "run_query_get_task");
+  display_debug_msg($query, $cdg_sql, "run_query_time_get_task");
   $obm_q->query($query);
   $obm_q->next_record();
   return $obm_q;
@@ -264,10 +264,10 @@ function run_query_get_task($id) {
 //   - $task[] : Entry's values
 //     keys used  : tasktype, project, time, label, date
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($task) {
+function run_query_time_insert($task) {
   global $uid, $cdg_sql;
 
-  $valid_date = run_query_valid_search($task);
+  $valid_date = run_query_time_valid_search($task);
   $date = $task["sel_date"];
   $ttype = $task["tasktype"];
   $projecttask = ($task["projecttask"] == 0) ? 'null' : $task["projecttask"];
@@ -305,7 +305,7 @@ function run_query_insert($task) {
          '$label',
          0)";
 
-	display_debug_msg($query, $cdg_sql, "run_query_insert");
+	display_debug_msg($query, $cdg_sql, "run_query_time_insert");
 	$obm_q = new DB_OBM;
 	$obm_q->query($query);  
       }
@@ -336,7 +336,7 @@ function run_query_insert($task) {
          '$label',
          0)";
 
-       display_debug_msg($query, $cdg_sql, "run_query_insert");
+       display_debug_msg($query, $cdg_sql, "run_query_time_insert");
        $obm_q = new DB_OBM;
        $obm_q->query($query);  
     }
@@ -350,7 +350,7 @@ function run_query_insert($task) {
 //   - $task[] : Entry's values
 //     keys used  : tasktype, project, time, label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($task) {
+function run_query_time_update($task) {
   global $cdg_sql;
 
   $id = $task["task_id"];
@@ -369,7 +369,7 @@ function run_query_update($task) {
     timetask_projecttask_id='$projecttask'
   WHERE timetask_id='$id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_update");
+  display_debug_msg($query, $cdg_sql, "run_query_time_update");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 }
@@ -380,7 +380,7 @@ function run_query_update($task) {
 // Parameters:
 //   - $parms : parameters hash
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($parms) {
+function run_query_time_delete($parms) {
   global $cdg_sql;
 
   foreach($parms as $key => $val) {
@@ -390,7 +390,7 @@ function run_query_delete($parms) {
     
       if ($val == "on") { 
         $query = "DELETE FROM TimeTask WHERE timetask_id = '$id_task'";
-	display_debug_msg($query, $cdg_sql, "run_query_delete");
+	display_debug_msg($query, $cdg_sql, "run_query_time_delete");
         $obm_q = new DB_OBM;
         $obm_q->query($query);
       }    
@@ -405,7 +405,7 @@ function run_query_delete($parms) {
 //   - $time[]    :    time search criteria
 //     keys used
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_validate($who) {
+function run_query_time_validate($who) {
   global $cdg_sql, $c_day_fraction;
 
   // to see if a day is full
@@ -421,7 +421,7 @@ function run_query_validate($who) {
             group by timetask_date
             having sum(timetask_length) = '$cdf'";
   
-  display_debug_msg($query, $cdg_sql, "run_query_validate(1)");
+  display_debug_msg($query, $cdg_sql, "run_query_time_validate(1)");
   $search_valid_query = new DB_OBM;
   $search_valid_query->query($query);
 
@@ -444,7 +444,7 @@ function run_query_validate($who) {
               where timetask_user_id=$who
               and timetask_date in $date_list";
     
-    display_debug_msg($query, $cdg_sql, "run_query_validate(2)");
+    display_debug_msg($query, $cdg_sql, "run_query_time_validate(2)");
     $valid_query = new DB_OBM;
     $valid_query->query($query);
   }
@@ -458,7 +458,7 @@ function run_query_validate($who) {
             group by timetask_date
             having sum(timetask_length) != '$cdf'";
   
-  display_debug_msg($query, $cdg_sql, "run_query_validate(3)");
+  display_debug_msg($query, $cdg_sql, "run_query_time_validate(3)");
   $search_unvalid_query = new DB_OBM;
   $search_unvalid_query->query($query);
 
@@ -481,7 +481,7 @@ function run_query_validate($who) {
               where timetask_user_id = '$who'
               and timetask_date in $date_list";
     
-    display_debug_msg($query, $cdg_sql, "run_query_validate(4)");
+    display_debug_msg($query, $cdg_sql, "run_query_time_validate(4)");
     $unvalid_query = new DB_OBM;
     $unvalid_query->query($query);
   }
@@ -495,7 +495,7 @@ function run_query_validate($who) {
 //   - $time[]    :    time search criteria
 //     keys used       date, user_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_adminvalidate($time) {
+function run_query_time_adminvalidate($time) {
   global $cdg_sql, $cdg_param;
 
   $year=substr($time["date"],0,4);
@@ -516,7 +516,7 @@ function run_query_adminvalidate($time) {
       and timetask_date <= '$month_end' 
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_adminvalidate");
+  display_debug_msg($query, $cdg_sql, "run_query_time_adminvalidate");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
@@ -529,7 +529,7 @@ function run_query_adminvalidate($time) {
 //   - $time[]    :    time search criteria
 //     keys used       date, user_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_adminunvalidate($time) {
+function run_query_time_adminunvalidate($time) {
   global $cdg_sql, $cdg_param;
 
   $year=substr($time["date"],0,4);
@@ -550,7 +550,7 @@ function run_query_adminunvalidate($time) {
       and timetask_date <= '$month_end' 
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_adminvalidate");
+  display_debug_msg($query, $cdg_sql, "run_query_time_adminvalidate");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
@@ -563,7 +563,7 @@ function run_query_adminunvalidate($time) {
 //     keys used       date, user_id
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_short_month($time) {
+function run_query_time_short_month($time) {
   global $cdg_sql, $cdg_param;
 
   $year = substr($time["date"],0,4);
@@ -591,7 +591,7 @@ function run_query_short_month($time) {
     order by userobm_lastname, userobm_firstname
     ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_short_month");
+  display_debug_msg($query, $cdg_sql, "run_query_time_short_month");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
@@ -605,7 +605,7 @@ function run_query_short_month($time) {
 //   - $time[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_one_month($time) {
+function run_query_time_task_one_month($time) {
   global $cdg_sql, $cdg_param;
 
   $year=substr($time["date"],0,4);
@@ -637,7 +637,7 @@ function run_query_task_one_month($time) {
     ORDER by date
     ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
+  display_debug_msg($query, $cdg_sql, "run_query_time_task_one_month");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
@@ -651,10 +651,10 @@ function run_query_task_one_month($time) {
 //   - $time[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_one_week($time) {
+function run_query_time_task_one_week($time) {
 global $cdg_sql, $cdg_param;
 
-  $week = get_week_point($time["date"]);
+  $week = get_time_week_point($time["date"]);
 
   $user_id = $time["user_id"];
 
@@ -674,7 +674,7 @@ global $cdg_sql, $cdg_param;
     GROUP by date
     ORDER by date";
 
-  display_debug_msg($query, $cdg_sql, "run_query_task_one_week");
+  display_debug_msg($query, $cdg_sql, "run_query_time_task_one_week");
   $obm_q->query($query);
   
   return $obm_q; 
@@ -687,7 +687,7 @@ global $cdg_sql, $cdg_param;
 // Timemanager: TaskType select query execution
 // Returns : DB object result with all type of task
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_used_tasktype($uid = 0) {
+function run_query_time_used_tasktype($uid = 0) {
   global $cdg_sql, $ctt_sales, $ctt_research, $ctt_others;
 
   if ($uid) {
@@ -700,7 +700,7 @@ function run_query_used_tasktype($uid = 0) {
         AND projectuser_user_id = '$uid'
       ORDER BY tasktype_internal, tasktype_label";
 
-    display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
+    display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
     $obm1_q= new DB_OBM;
     $obm1_q->query($query);
 
@@ -710,7 +710,7 @@ function run_query_used_tasktype($uid = 0) {
       WHERE tasktype_internal='$ctt_others'
       ORDER BY tasktype_internal, tasktype_label";
 
-    display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
+    display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
     $obm2_q= new DB_OBM;
     $obm2_q->query($query);
 
@@ -722,7 +722,7 @@ function run_query_used_tasktype($uid = 0) {
       FROM TaskType
       ORDER BY tasktype_internal, tasktype_label";
 
-    display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
+    display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
     $obm_q= new DB_OBM;
     $obm_q->query($query);
   }
@@ -746,7 +746,7 @@ function run_query_used_tasktype($uid = 0) {
 // Timemanager: Project select query execution                              //
 // Returns : DB object result with project satisfying criteria
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project($time) {
+function run_query_time_project($time) {
   global $cdg_sql;
 
   $uid = $time["user_id"];
@@ -768,7 +768,7 @@ function run_query_project($time) {
       and projectuser_projectedtime != '0'
       order by project_tasktype_id, company_name, project_name";
 
-  display_debug_msg($query, $cdg_sql, "run_query_project");
+  display_debug_msg($query, $cdg_sql, "run_query_time_project");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -783,7 +783,7 @@ function run_query_project($time) {
 //   exists, it returns "parenttask_label --- task_label".                   //
 //  Used for update and insert task form                                     //
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_projecttask($time) {
+function run_query_time_projecttask($time) {
   global $cdg_sql;
 
   $uid = $time["user_id"];
@@ -795,7 +795,7 @@ function run_query_projecttask($time) {
   $a_concat[]=array("type"=>"string", "value"=>" --- ");
   $a_concat[]=array("type"=>"field", "value"=>"a.projecttask_label");
   $concat = sql_string_concat($db_type, $a_concat);
-  display_debug_msg($concat, $cdg_sql, "run_query_projecttask : $db_type concat : ");
+  display_debug_msg($concat, $cdg_sql, "run_query_time_projecttask : $db_type concat : ");
   $sql_if = sql_if($db_type, "a.projecttask_parenttask_id = 0", "a.projecttask_label", $concat);
 
   $query = "
@@ -811,7 +811,7 @@ function run_query_projecttask($time) {
       and projectuser_projectedtime != 0
       order by a.projecttask_project_id, a.projecttask_label";
 
-  display_debug_msg($query, $cdg_sql, "run_query_projecttask");
+  display_debug_msg($query, $cdg_sql, "run_query_time_projecttask");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -823,19 +823,19 @@ function run_query_projecttask($time) {
 // Return th Id of people that will see the globalview
 //  -- THIS SHOULD CHANGE TO USE THE User TABLE --
 //////////////////////////////////////////////////////////////////////////
-function run_query_managers() {
+function run_query_time_managers() {
   global $cdg_sql;
  
   // should use union (mysql 4.0.0 and further)
 
   $manager=new DB_OBM;
   $query="select projectuser_user_id as manager_id from ProjectUser where projectuser_manager = 1";
-  display_debug_msg($query, $cdg_sql, "run_query_managers(manager)");
+  display_debug_msg($query, $cdg_sql, "run_query_time_managers(manager)");
   $manager->query($query);
 
   $admin=new DB_OBM;
   $query="select userobm_id as manager_id from UserObm where userobm_perms = 'admin'";
-  display_debug_msg($query, $cdg_sql, "run_query_managers(admin)");
+  display_debug_msg($query, $cdg_sql, "run_query_time_managers(admin)");
   $admin->query($query);
 
   $m_array = array();
@@ -858,13 +858,13 @@ function run_query_managers() {
 // Get all the contacts of the companyusing obm
 //  -- THIS SHOULD CHANGE TO USE THE User TABLE --
 //////////////////////////////////////////////////////////////////////////
-function run_query_get_obmusers() {
+function run_query_time_get_obmusers() {
   global $cdg_sql;
  
   $obm_db=new DB_OBM;
   $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm 
           where userobm_archive!=1 order by userobm_lastname";
-  display_debug_msg($query, $cdg_sql, "run_query_get_obmusers");
+  display_debug_msg($query, $cdg_sql, "run_query_time_get_obmusers");
 
   $obm_db->query($query);
   return $obm_db;
@@ -878,12 +878,12 @@ function run_query_get_obmusers() {
 // Returns:
 //  array with for each days of the week : 0->"Mon 23 Apr" 1->20040413
 ///////////////////////////////////////////////////////////////////////////////
-function get_week_working_days_dates($date) {
+function get_time_week_working_days_dates($date) {
   global $c_week_first_day, $l_daysofweekshort, $l_monthsofyearshort;
   
   $cpt_end = $c_week_first_day + 7;
   for ($i=$c_week_first_day; $i < $cpt_end; $i++) {
-    if (is_working_day($date)) {
+    if (time_is_working_day($date)) {
       $date_link = date("Ymd", $date);
       $month = date("m", $date);
       $day = date("d", $date);
@@ -904,7 +904,7 @@ function get_week_working_days_dates($date) {
 // Parameters:
 //   - $date : date with YYYYMMDD format
 ///////////////////////////////////////////////////////////////////////////////
-function get_week_point($date) {
+function get_time_week_point($date) {
 
   if (is_null($date)) {
     $p_date = date("Ymd");
@@ -912,7 +912,7 @@ function get_week_point($date) {
     $p_date = $date;
   }
 
-  $week_first_day = first_day_week($p_date);
+  $week_first_day = time_first_day_week($p_date);
   // beginning and end of week (Ymd format)
   $weekstart = date("Ymd", $week_first_day);
   $weekend = date("Ymd", $week_first_day + 6 * 86400);
@@ -926,7 +926,7 @@ function get_week_point($date) {
 // Parameters :
 // - $date : with YYYYMMDD format
 ///////////////////////////////////////////////////////////////////////////////
-function first_day_week($date) {
+function time_first_day_week($date) {
   global $c_week_first_day;
 
   $date_int = strtotime($date);
@@ -946,7 +946,7 @@ function first_day_week($date) {
 //Parameters :
 // - $array = any array 
 ///////////////////////////////////////////////////////////////////////////
-function array_to_list($array) {
+function time_array_to_list($array) {
   global $cdg_param;
 
   $i = 0;
@@ -974,7 +974,7 @@ function array_to_list($array) {
 // Return :
 //  true or false
 ///////////////////////////////////////////////////////////////////////////////
-function is_working_day($date) {
+function time_is_working_day($date) {
   global $c_working_days;
 
   $wday = date("w", $date);
@@ -991,7 +991,7 @@ function is_working_day($date) {
 // Parameters :
 //   - $date = a date in the month in the AAAAMMDD format 
 ///////////////////////////////////////////////////////////////////////////////
-function get_nb_working_days($date) {
+function get_time_nb_working_days($date) {
 
   $date_int = strtotime(substr($date,0,6)."01");
   $date_int += 43200;  // We add 12h
@@ -1001,7 +1001,7 @@ function get_nb_working_days($date) {
 
   $workingdays = 0;
   while ($date_int < $first_next_month) {
-    if (is_working_day($date_int)) {
+    if (time_is_working_day($date_int)) {
       $workingdays++;
     }
     $date_int += 86400;
@@ -1011,4 +1011,4 @@ function get_nb_working_days($date) {
 }
 
 
-</script>
+?>

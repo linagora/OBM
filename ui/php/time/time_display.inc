@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_display.php                                             //
 //     - Desc : Time Display File                                            //
@@ -40,7 +40,7 @@ $fieldnames["timetask_id"] = "";
 // Returns:
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_data_time(&$OD, $fieldname, $link_ok) {
+function dis_time_data(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $time;
 
   $res["style"] = "";
@@ -90,11 +90,11 @@ function dis_time_index($time) {
   $display["result"] = dis_time_nav_date($time);
   $display["result"] .= dis_time_planning($time);
 
-  $val_days = run_query_valid_search($time);
-  $display["result"] .= dis_form_addtask($time, $val_days); 
+  $val_days = run_query_time_valid_search($time);
+  $display["result"] .= dis_time_form_addtask($time, $val_days); 
 
   $display["result"] .= dis_time_task_list($time);
-  $display["features"] .= dis_user_select($time, run_query_get_obmusers());
+  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
 }
 
 
@@ -128,10 +128,10 @@ function dis_time_nav_date($time) {
     $tot_width = 500;
 
     // get the current start and end of week
-    $d_start_week = first_day_week($time["date"]);
+    $d_start_week = time_first_day_week($time["date"]);
     $d_end_week = $d_start_week+6*86400;
-    $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
-    $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
+    $hum_date_start = dis_time_human_date(date("Ymd", $d_start_week));
+    $hum_date_end = dis_time_human_date(date("Ymd", $d_end_week));
     $title = "$user $hum_date_start - $hum_date_end";
 
     // get the previous and next beginning of week
@@ -189,11 +189,11 @@ function dis_time_planning($time) {
   global $auth, $cdg_param;
 
   if ($time["interval"] == "week") {
-    $task_q = run_query_task_one_week($time, '');
+    $task_q = run_query_time_task_one_week($time, '');
     $block = dis_time_planning_week($task_q, $time);
 
   } else if ($time["interval"] == "month") {
-    $task_q = run_query_task_one_month($time);
+    $task_q = run_query_time_task_one_month($time);
     $block = dis_time_planning_month($task_q, $time);
   }
 
@@ -220,7 +220,7 @@ function dis_time_planning_week($obm_q, $time) {
   $tot_width = 500;
   $col_width = $tot_width / $nb_worked_days;
 
-  $first_day = first_day_week($time["date"]);
+  $first_day = time_first_day_week($time["date"]);
   $curr_day = $first_day + $c_dst_err;
   $last_day = $first_day + 7*86400;
 
@@ -347,7 +347,7 @@ function dis_time_planning_month($obm_q, $time) {
 
     // last day of the week 
     if (($val["obm_dow"] == 6) or ($day == $month_length)) {
-      $week = get_week_point($year.$month.$day);
+      $week = get_time_week_point($year.$month.$day);
       $url = url_prepare("time_index.php?action=index&amp;wbegin=".$week[0]);
       
       if ($time_length != $time_worked) {
@@ -468,7 +468,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
 function dis_time_task_list($time) {
   global $uid, $display;
 
-  $task_q = run_query_task_list($time);
+  $task_q = run_query_time_task_list($time);
   $nb_task = $task_q->num_rows();
 
   if ($nb_task != 0) {
@@ -509,7 +509,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
   $dis_task_list->data_cb_show = "test_status";
 
   $block .= "<div class=\"detailHead\">$l_task_list</div>\n";
-  $block .= $dis_task_list->display("dis_data_time");
+  $block .= $dis_task_list->display("dis_time_data");
 
   $dis_button = "
     <input type=\"hidden\" name=\"sel_user_id\" value=\"".$time["user_id"]."\" />
@@ -538,7 +538,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
 //   - $time[] : time hash values
 //   - $validate_days : array of validated days (not to be shown)
 ///////////////////////////////////////////////////////////////////////////////
-function dis_form_addtask($time, $validate_days) {
+function dis_time_form_addtask($time, $validate_days) {
   global $auth, $extra_js, $l_add, $l_update, $c_undef, $l_undef, $l_close;
   global $l_fill_addtask, $l_comment, $l_date, $l_project, $l_duration;
   global $l_header_tasktype, $l_intern;
@@ -547,12 +547,12 @@ function dis_form_addtask($time, $validate_days) {
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $action = $time["action"];
-  $project_q = run_query_project($time);
-  $projecttask_q = run_query_projecttask($time);
-  $tasktype_q = run_query_used_tasktype($time["user_id"]);
+  $project_q = run_query_time_project($time);
+  $projecttask_q = run_query_time_projecttask($time);
+  $tasktype_q = run_query_time_used_tasktype($time["user_id"]);
   $nb_worked_days = array_sum($c_working_days);
-  $d_start_week = first_day_week($time["date"]);  
-  $work_day_dates = get_week_working_days_dates($d_start_week);
+  $d_start_week = time_first_day_week($time["date"]);  
+  $work_day_dates = get_time_week_working_days_dates($d_start_week);
 
   $cpt_end = $c_week_first_day + 7;
   
@@ -560,7 +560,7 @@ function dis_form_addtask($time, $validate_days) {
   if ($action == "detailupdate") {
     $obm_action = "update";
     $task_id = $time["task_id"];
-    $task_q = run_query_get_task($task_id);
+    $task_q = run_query_time_get_task($task_id);
     //    $is_day = substr($task_q->f("timetask_date"),0,8);
     $is_day = date("Ymd", $task_q->f("date_task"));
     $is_tt = $task_q->f("timetask_tasktype_id");
@@ -834,7 +834,7 @@ function dis_form_addtask($time, $validate_days) {
 function dis_time_month_users_total($time) {
   global $display, $l_admin_empty;
 
-  $month_q = run_query_short_month($time);
+  $month_q = run_query_time_short_month($time);
 
   if ($month_q->nf()==0) {
     $block .= display_warn_msg($l_admin_empty);
@@ -868,7 +868,7 @@ function html_time_month_users_total($time, $array_res) {
   global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
 
   $date = $time["date"];
-  $tot_workingdays = get_nb_working_days($date);
+  $tot_workingdays = get_time_nb_working_days($date);
 
   while (list($key) = each($array_res)) {	
     $uid = $array_res[$key]["id"];
@@ -954,7 +954,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $dis_projuser_list->data_header = "top";
 
     $block .= "<div class=\"detailHead\">$l_proj_stats</div>";
-    $block .= $dis_projuser_list->display("dis_data_time");
+    $block .= $dis_projuser_list->display("dis_time_data");
   } else {
     $block .= display_warn_msg($l_no_proj_stats);
   }
@@ -969,7 +969,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $dis_projuser_list->data_header = "top";
 
     $block .= "<div class=\"detailHead\">$l_tt_stats</div>";
-    $block .= $dis_ttuser_list->display("dis_data_time");
+    $block .= $dis_ttuser_list->display("dis_time_data");
   } else {
     $block .= display_warn_msg($l_no_tt_stats);
   }
@@ -1002,7 +1002,7 @@ function dis_time_display_pref($prefs) {
 // Show a date in human format
 //  params : $p_date : date in yyyymmdd format
 //////////////////////////////////////////////////////////////////////////
-function dis_human_date($p_date) {
+function dis_time_human_date($p_date) {
   global $cdg_sql, $l_monthsofyear;
     
   $p_year=substr($p_date,0,4);
@@ -1016,4 +1016,4 @@ function dis_human_date($p_date) {
 }
 
 
-</script>
+?>

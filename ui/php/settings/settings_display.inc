@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : settings_display.php                                         //
 //     - Desc : Settings Display File                                        //
@@ -13,3 +13,5 @@
 function html_settings_form() {
 
 }
+
+?>

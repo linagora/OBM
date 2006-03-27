@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : payment_index.php 
 //     - Desc : payment Index File
@@ -856,4 +856,4 @@ function update_payment_action() {
   }
 }
 
-</script>
+?>

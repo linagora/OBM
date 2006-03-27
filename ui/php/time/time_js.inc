@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_js.inc                                                  //
 //     - Desc : Time javascript functions File                               //
@@ -238,3 +238,5 @@ function select_default(sel_list, def_value) {
   }
 }
 ";
+
+?>
