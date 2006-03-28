@@ -1009,7 +1009,7 @@ function update_last_visit($entity, $id, $action) {
 // Parameters:
 //   - $id : user id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_user_text($id) {
+function get_global_last_user_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -1029,7 +1029,7 @@ function get_last_user_text($id) {
 // Parameters:
 //   - $id : group id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_last_group_text($id) {
+function get_global_last_group_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {

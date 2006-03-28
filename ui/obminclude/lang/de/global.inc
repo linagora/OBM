@@ -238,3 +238,8 @@ $l_header_globalview = "?globalview";
 $l_document_new = "Neues Dokument";
 $l_document_add = "Dokument hinzufügen";
 
+// Debug
+$l_dg_id = "Id";
+$l_dg_param = "Parameters";
+$l_dg_sess = "Session";
+$l_dg_sql = "SQL";

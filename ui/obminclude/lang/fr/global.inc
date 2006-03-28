@@ -352,3 +352,10 @@ $l_cr_date[$cr_date_ended] = "Expiré";
 
 $l_billed = "Facturé";
 $l_order_no_bill = "Commandé";
+
+// Debug levels
+$l_dg_id = "Id";
+$l_dg_param = "Paramètres";
+$l_dg_sess = "Session";
+$l_dg_sql = "SQL";
+

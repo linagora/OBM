@@ -224,5 +224,9 @@ $l_header_week = "Settimana";
 $l_header_month = "Mese";
 $l_header_new_event = "Nuovo Appuntamento";
 
-
+// Debug
+$l_dg_id = "Id";
+$l_dg_param = "Parametri";
+$l_dg_sess = "Sessione";
+$l_dg_sql = "SQL";
 

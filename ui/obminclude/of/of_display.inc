@@ -1152,10 +1152,45 @@ function display_todos($path="..") {
 // Display : end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
 function display_end() { 
+  global $l_dg_sql, $l_dg_param, $l_dg_sess;
+  global $global_dis_debug_msg, $global_dis_debug_param, $dis_session;
+  global $cdg_param, $cdg_sql, $cdg_sess;
+
+  $dis_debug_sql = "";
+  $dis_debug_param = "";
+  $dis_session_content = "";
+  
+  if (debug_level_isset($cdg_sql)) {
+  $dis_debug_sql = "
+    <div class=\"debug\">
+      <div class=\"debugHead\">$l_dg_sql</div>
+      $global_dis_debug_msg
+    </div>";
+  }
+  
+  if (debug_level_isset($cdg_param)) {
+    $dis_debug_param = "
+      <div class=\"debug\">
+        <div class=\"debugHead\">$l_dg_param</div>
+        $global_dis_debug_param
+      </div>";
+  }
+  
+  if (debug_level_isset($cdg_sess)) {
+    $dis_session_content = "
+      <div class=\"debug\">
+        <div class=\"debugHead\">$l_dg_sess</div>
+        $dis_session
+      </div>";
+  }
+    
   return "
+    $dis_session_content
+    $dis_debug_sql
+    $dis_debug_param
     </body>
     </html>
-";
+  ";
 }
 
 

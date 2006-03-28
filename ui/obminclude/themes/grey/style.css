@@ -162,6 +162,30 @@
 	border-left: 		2px solid #394D5A;
 }
 
+.debug {
+	position : relative; 
+	width : auto;
+	margin : 0px 0px 20px 196px;
+	z-index : 3; 
+	background-color : #FFF;
+	font-size: 12px;
+}
+
+.debug hr {
+	border : 1px dashed #CCC; 
+}
+
+.debugHead {
+	position : relative; 
+	width : auto;
+	z-index : 3; 
+	background-color : #009ec6;
+	font-size: 16px;
+	color :  #FFF;
+	font-weight:		bold;
+	text-align: center;
+}
+
 .blockTitle {
 	font-size: 		13px;
 	color: 			#FFFFFF;

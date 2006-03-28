@@ -257,6 +257,30 @@ a.action:visited { color: #ffffff; background-color: transparent;}
 	list-style-type: none;
 }
 
+.debug {
+	position : relative; 
+	width : auto;
+	margin : 0px 0px 20px 196px;
+	z-index : 3; 
+	background-color : #FFF;
+	font-size: 12px;
+}
+
+.debug hr {
+	border : 1px dashed #CCC; 
+}
+
+.debugHead {
+	position : relative; 
+	width : auto;
+	z-index : 3; 
+	background-color : #009ec6;
+	font-size: 16px;
+	color :  #FFF;
+	font-weight:		bold;
+	text-align: center;
+}
+
 .block form {
         padding:                0;
         margin:                 2px 0;

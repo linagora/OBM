@@ -116,28 +116,23 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
   if (check_contract_form("", $contract)) {
-    echo "111111";
     // If the context (same contracts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      echo "2222222";
       $contract["id"] = run_query_contract_insert($contract);
       $display["detail"] = dis_contract_consult($contract);
       // If first try, we warn the user if some contracts seem similar
     } else {
-    echo "33333";
       $obm_q = check_contract_context("", $contract);
       if ($obm_q->num_rows() > 0) {
-	$display["detail"] = dis_contract_warn_insert("", $obm_q, $contract);
+	     $display["detail"] = dis_contract_warn_insert("", $obm_q, $contract);
       } else {
-	echo "555555";
-	$contract["id"] = run_query_contract_insert($contract);
-	if ($contract["id"]) {
-	  echo "6666666";
-	  $display["msg"] .= display_ok_msg($l_insert_ok);
-	  $display["detail"] = dis_contract_consult($contract);
-	} else {
-	  $display["msg"] .= display_err_msg($l_insert_error);
-	}
+      	$contract["id"] = run_query_contract_insert($contract);
+      	if ($contract["id"]) {
+      	  $display["msg"] .= display_ok_msg($l_insert_ok);
+      	  $display["detail"] = dis_contract_consult($contract);
+      	} else {
+      	  $display["msg"] .= display_err_msg($l_insert_error);
+      	}
       }
     }
   } else {
@@ -472,7 +467,7 @@ function get_contract_action() {
     'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
-    'Condition'=> array ('','search','index','detailconsult','admin','type_insert','type_update','type_delete','display')
+    'Condition'=> array ('','search','index','detailconsult','admin','type_insert','type_update','type_delete','display','delete')
                                       );
 
 // Insert

@@ -344,3 +344,9 @@ $l_cr_date[$cr_date_ended] = "Expired";
 
 $l_billed = "Billed";
 $l_order_no_bill = "Ordered";
+
+// Debug
+$l_dg_id = "Id";
+$l_dg_param = "Parameters";
+$l_dg_sess = "Session";
+$l_dg_sql = "SQL";

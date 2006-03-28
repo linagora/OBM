@@ -401,7 +401,7 @@ function get_incident_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/incident/incident_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','index','detailconsult', 'insert', 'update','display') 
+    'Condition'=> array ('','search','index','detailconsult', 'insert', 'update','display','delete') 
                     		       );
 
 //  Detail Consult

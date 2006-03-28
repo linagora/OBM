@@ -51,13 +51,6 @@ $l_co_rev = "Inverso";
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
 
-// Debug levels
-$l_dg_id = "Id";
-$l_dg_param = "Parámetros";
-$l_dg_sess = "Sesión";
-$l_dg_sql = "SQL";
-
-
 // Other Skina
 
 $l_submit = "Validar";

@@ -427,6 +427,8 @@ $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
 $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}.dump$/";
 
+$global_dis_debug_msg = "";
+$global_dis_debug_param = "";
 
 // Path to the OBM php root (if not set)
 if ($path == "") {
@@ -446,11 +448,12 @@ if ($path == "") {
 //   - $debug (opt) : debug flag required
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_msg($msg, $debug=0, $function_name="") {
-  global $set_debug;
+  global $set_debug, $global_dis_debug_msg;
 
   if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    echo "<b>$function_name</b> : $msg<hr>";
+    $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr>";
   }
+  return $global_dis_debug_msg;
 }  
 
 
@@ -466,23 +469,23 @@ require_once("$obminclude/global_query.inc");
 //   - $param : parameters hash
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_param($param) {
-  global $cdg_param, $action;
+  global $cdg_param, $action, $global_dis_debug_param;
 
   if (debug_level_isset($cdg_param)) {
-    $block = "<br />action=$action";
+    $global_dis_debug_param .= "action=$action";
     if ( $param ) {
       while ( list( $key, $val ) = each( $param ) ) {
 	if (is_array($val)) {
-          $block .= "<br />param[$key]=";
-	  $block .= print_r($val, true);
+          $global_dis_debug_param .= "<br />param[$key]=";
+	  $global_dis_debug_param .= print_r($val, true);
 	} else {
-          $block .= "<br />param[$key]=$val";
+          $global_dis_debug_param .= "<br />param[$key]=$val";
 	}
       }
     }
   }
 
-  echo $block;
+  return $global_dis_debug_param;
 }  
 
 

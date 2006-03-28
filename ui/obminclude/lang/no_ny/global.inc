@@ -147,3 +147,10 @@ $l_header_new_event = "Nouveau rdv";
 $l_header_right = "Right management";
 
 $l_header_admin_ref = "Referential";
+
+// Debug
+$l_dg_id = "Id";
+$l_dg_param = "Parameters";
+$l_dg_sess = "Session";
+$l_dg_sql = "SQL";
+

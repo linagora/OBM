@@ -50,10 +50,3 @@ $l_co_rev = "Inverse";
 // CSV Separators
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
-
-// Debug levels
-$l_dg_id = "Id";
-$l_dg_param = "Paramètres";
-$l_dg_sess = "Session";
-$l_dg_sql = "SQL";
-

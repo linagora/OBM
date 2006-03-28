@@ -26,11 +26,6 @@ $l_send_mail = "Accetta e-mail";
 
 $l_update_ok = "Modifica eseguita";
 
-$l_dg_id = "Id";
-$l_dg_param = "Parametri";
-$l_dg_sess = "Sessione";
-$l_dg_sql = "SQL";
-
 $l_da_iso = "yyyy-mm-dd";
 $l_da_en = "mm/dd/yyyy";
 $l_da_fr = "dd/mm/yyyy";

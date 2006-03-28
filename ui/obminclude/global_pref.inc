@@ -25,17 +25,12 @@ if (($set_lang == "")  && ($mode != "txt")) {
 
 // Display session content if debug level is set
 if (($set_debug & $cdg_sess) == $cdg_sess) {
-  $dis_session = "<table border=\"1\">
-    <tr><th>Session content</th></tr>
-    <tr><td>";
   while (list($key, $val) = each ($_SESSION)) {
     if (is_array($val)) {
       $val = var_export($val, true);
     }
     $dis_session .= "$key = $val<br />\n";
   }
-  $dis_session .= "</td></tr></table>";
-  echo $dis_session;
 }
 
 // Default settings
