@@ -996,11 +996,11 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
   $sel_tt = "<select name=\"sel_tt\">
     <option value=\"$c_undef\">$l_undef</option>";
   if (is_array($tts)) {
-    foreach ($tts as $id=>$one_tt) {
+    foreach ($tts as $id_tts=>$one_tt) {
       $tt_label = $one_tt["label"];
       $internal = $one_tt["internal"];
-      $sel_tt .= "\n<option value=\"$id\"";
-      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= "\n<option value=\"$id_tts\"";
+      if ($tt == $id_tts) $sel_tt .= "selected =\"selected\"";
       $sel_tt .= ">$tt_label</option>\n";
     }
     $sel_tt .= "</select>";
