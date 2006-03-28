@@ -199,9 +199,11 @@ function get_global_tasktype($tt_cat="", $tt_ids="") {
     }
     $where .= " tasktype_id = '$tt_ids'";
   }
-
-  $query .= " WHERE $where
-              ORDER BY tasktype_internal, tasktype_label";
+  if($where != "") {
+     $query .= " WHERE $where ";
+  }
+  
+  $query .= "ORDER BY tasktype_internal, tasktype_label";
 
   display_debug_msg($query, $cdg_sql, "get_global_tasktype()");
   $obm_q = new DB_OBM;
