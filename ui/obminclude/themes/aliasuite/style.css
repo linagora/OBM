@@ -46,9 +46,8 @@ p			{
 .leftpanel {
 	position:absolute;
 	width:180px;
-	top: 60px;
+	margin-top: -30px;
 	left: 0;
-	margin-top: 10px;
 }
 
 .rightpanel {
@@ -107,8 +106,8 @@ ul.header {
 
 #logo {
        position: absolute;
-       top: 4px;
-       left: 4px;
+       margin-top: 4px;
+       margin-left: 4px;
 }
 
 
@@ -279,9 +278,11 @@ a.action:hover { font-weight : bold;color: #000; background-color: transparent;t
 }
 
 .debug {
+  height: 200px;
+  overflow: scroll;
 	position : relative; 
 	width : auto;
-	margin : 0px 2px 20px 196px;
+  margin : 2px;
 	z-index : 2; 
 	background-color : #FFF;
 	border:			1px solid #009ec6; 

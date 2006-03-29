@@ -258,12 +258,14 @@ a.action:visited { color: #ffffff; background-color: transparent;}
 }
 
 .debug {
+  height: 200px;
+  overflow: scroll;
 	position : relative; 
 	width : auto;
-	margin : 0px 2px 20px 196px;
+  margin : 2px;
 	z-index : 2; 
 	background-color : #FFF;
-	border:1px solid #666666; 
+	border:			1px solid #009ec6; 
 	font-size: 12px;
 }
 
@@ -274,12 +276,13 @@ a.action:visited { color: #ffffff; background-color: transparent;}
 .debugHead {
 	width : auto;
 	z-index : 2; 
-	background-color : #666666;
+	background-color : #009ec6;
 	font-size: 14px;
 	color :  #FFF;
 	font-weight:		bold;
 	text-align: center;
 }
+
 .block form {
         padding:                0;
         margin:                 2px 0;

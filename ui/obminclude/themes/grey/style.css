@@ -163,12 +163,14 @@
 }
 
 .debug {
+  height: 200px;
+  overflow: scroll;
 	position : relative; 
 	width : auto;
-	margin : 0px 2px 20px 196px;
+  margin : 2px;
 	z-index : 2; 
 	background-color : #FFF;
-	border: 1px solid #394D5A; 
+	border:			1px solid #009ec6; 
 	font-size: 12px;
 }
 
@@ -179,7 +181,7 @@
 .debugHead {
 	width : auto;
 	z-index : 2; 
-	background-color : #394D5A;
+	background-color : #009ec6;
 	font-size: 14px;
 	color :  #FFF;
 	font-weight:		bold;

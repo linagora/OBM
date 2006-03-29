@@ -574,7 +574,7 @@ function global_session_load_user_todos($set_todo="todo_priority") {
 // Parameters:
 //   - $id : company id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_company_text($id) {
+function get_last_company_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -595,7 +595,7 @@ function get_global_last_company_text($id) {
 // Parameters:
 //   - $id : contact id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_contact_text($id) {
+function get_last_contact_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -616,7 +616,7 @@ function get_global_last_contact_text($id) {
 // Parameters:
 //   - $id : deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_deal_text($id) {
+function get_last_deal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -637,7 +637,7 @@ function get_global_last_deal_text($id) {
 // Parameters:
 //   - $id : parent deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_parentdeal_text($id) {
+function get_last_parentdeal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -660,7 +660,7 @@ function get_global_last_parentdeal_text($id) {
 // Parameters:
 //   - $id : list id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_list_text($id) {
+function get_last_list_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -681,7 +681,7 @@ function get_global_last_list_text($id) {
 // Parameters:
 //   - $id : publication id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_publication_text($id) {
+function get_last_publication_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -703,7 +703,7 @@ function get_global_last_publication_text($id) {
 // Parameters:
 //   - $id : project id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_project_text($id) {
+function get_last_project_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -723,7 +723,7 @@ function get_global_last_project_text($id) {
 // Parameters:
 //   - $id : contract id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_contract_text($id) {
+function get_last_contract_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -743,7 +743,7 @@ function get_global_last_contract_text($id) {
 // Parameters:
 //   - $id : incident id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_incident_text($id) {
+function get_last_incident_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -763,7 +763,7 @@ function get_global_last_incident_text($id) {
 // Parameters:
 //   - $id : document id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_document_text($id) {
+function get_last_document_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -784,7 +784,7 @@ function get_global_last_document_text($id) {
 // Parameters:
 //   - $id : account id
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_account_text($id) {
+function get_last_account_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -804,7 +804,7 @@ function get_global_last_account_text($id) {
 // Parameters:
 //   - $id : invoice id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_invoice_text($id) {
+function get_last_invoice_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
@@ -823,7 +823,7 @@ function get_global_last_invoice_text($id) {
 // Parameters:
 //   - $id : resource id
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_resource_text($id) {
+function get_last_resource_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -842,7 +842,7 @@ function get_global_last_resource_text($id) {
 // Parameters:
 //   - $id : resourcegroup id
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_resourcegroup_text($id) {
+function get_last_resourcegroup_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
@@ -862,7 +862,7 @@ function get_global_last_resourcegroup_text($id) {
 // Parameters:
 //   - $id : payment id 
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_last_payment_text($id) {
+function get_last_payment_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
