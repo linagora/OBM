@@ -101,7 +101,7 @@ function html_resource_search_form($resource) {
     </div>
     <div class=\"searchLabel\">$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
-      value=\"$email\" />
+      value=\"$ldesc\" />
     </div>
     <div class=\"searchLabel\">&nbsp;&nbsp;<br />
     </div>

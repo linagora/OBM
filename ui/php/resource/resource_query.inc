@@ -20,7 +20,7 @@ function run_query_resource_search($resource, $p_new_order, $p_order_dir, $restr
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = sql_search_text_parse($resource["name"]);
-  $desc = sql_search_text_parse($resource["description"]);
+  $desc = sql_search_text_parse($resource["desc"]);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
