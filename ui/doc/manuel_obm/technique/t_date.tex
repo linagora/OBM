@@ -98,3 +98,27 @@ function sql_date_format($db_type, $field, $as="") {
 \end{verbatim}
 \end{minipage}
 }
+
+\subsubsection{Utilisation du fichier calendar\_js.inc}
+Le fichier calendar\_js.inc, disponible dans /obminclude/javascript permet la gestion des champs de saisie date ainsi que de la
+popup de saisie de date.
+
+\paragraph{Utilisation} :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+	Syntaxe:
+	<script>calendar(nom_du_champ,variable_php [,champ_à_comparer])</script>
+	
+	Exemple:
+	<script>calendar('tf_date_begin','$datebegin', 'tf_date_end')</script>
+\end{verbatim}
+\end{minipage}
+}
+
+Dans cette exemple, le nom du champ de saisie sera tf\_date\_begin et sera affecté à la variable \$datebegin. \\
+Le troisième paramètre, optionel, est le champ à laquel la date saisie sera comparé. Si la date de saisie est supérieur à la date comparé, cette dernière prendra la valeur de la date saisie. \\
+
+Lors de la saisie d'une date, la fonction \fonction{live\_check\_date()} transforme la date au format ISO si son format est valide (en fonction des préférences utilisateur) et si la date est valide. \\
+Dans le cas de non validité, l'application retourne un message d'erreur à l'utilisateur.
