@@ -159,28 +159,31 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Clear the Sessions and file it       				     //
-// Parameters:								     //
-//   - $mode     : "txt" or "html"                                           //
+// Clear the Sessions and file it
+// Parameters:
+//   - $mode     : "txt" or "html"
 //   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_clear_sess($mode, $lifetime) {
   global $cdg_sql;
 
+  // If session lifetime not set, clear all sessions older than 1 day
   if ($lifetime > 0) {
-    $date_limit = date("Y-m-d H:i:s",time() - $lifetime);
-    $obm_q = run_query_admin_passive_user($lifetime);
-
-    while($obm_q->next_record()) {
-      run_query_admin_log_session($obm_q);
-      run_query_admin_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
-    }
+    $ltime = $lifetime;
   } else {
-    echo "Sessions are unlimited (lifetime = 0) !";
+    $ltime = 86400;
   }
 
-  if ($mode == "html")
-    dis_admin_index($mode, $lifetime);
+  $date_limit = date("Y-m-d H:i:s",time() - $ltime);
+  $obm_q = run_query_admin_passive_user($ltime);
 
+  while($obm_q->next_record()) {
+    run_query_log_session($obm_q);
+    run_query_admin_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
+  }
+
+  if ($mode == "html") {
+    dis_admin_index($mode, $ltime);
+  }
 }
 ?>

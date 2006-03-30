@@ -191,10 +191,10 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
   $sel_kind = "<select name=\"sel_kind\">
      <option value=\"$c_all\">$l_all</option>";  
   while ($kind_q->next_record()) {
-    $id = $kind_q->f("dealtype_id");
+    $k_id = $kind_q->f("dealtype_id");
     $klabel = $kind_q->f("dealtype_label");
-    $sel_kind .= "<option value=\"$id\"";
-    if ($kind == $id) $sel_kind .= " selected = \"selected\"";
+    $sel_kind .= "<option value=\"$k_id\"";
+    if ($kind == $k_id) $sel_kind .= " selected = \"selected\"";
     $sel_kind .= ">$klabel</option>";
   }
   $sel_kind .= "</select>";
@@ -203,11 +203,11 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
   $sel_tt = "<select name=\"sel_tt\">
               <option value=\"$c_all\">$l_all</option>";
   if (is_array($tts)) {
-    foreach ($tts as $id=>$one_tt) {
+    foreach ($tts as $tt_id=>$one_tt) {
       $tt_label = $one_tt["label"];
       $internal = $one_tt["internal"];
-      $sel_tt .= "\n<option value=\"$id\"";
-      if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= "\n<option value=\"$tt_id\"";
+      if ($tt == $tt_id) $sel_tt .= "selected =\"selected\"";
       $sel_tt .= ">$tt_label</option>\n";
     }
     $sel_tt .= "</select>";
@@ -220,10 +220,10 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
   $sel_status = "<select name=\"sel_status\">
      <option value=\"$c_all\">$l_all</option>";
   while ($stat_q->next_record()) {
-    $id = $stat_q->f("dealstatus_id");
+    $s_id = $stat_q->f("dealstatus_id");
     $slabel = $stat_q->f("dealstatus_label");
-    $sel_status .= "<option value=\"$id\"";
-    if ($status == $id) $sel_status .= "selected =\" selected\"";
+    $sel_status .= "<option value=\"$s_id\"";
+    if ($status == $s_id) $sel_status .= "selected =\" selected\"";
     $sel_status .= ">$slabel</option>";
   }
   $sel_status .= "</select>";
@@ -235,10 +235,10 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
   $sel_manager = "<select name=\"sel_manager\">
      <option value=\"$c_all\">$l_all</option>";
   while ($manager_q->next_record()) {
-    $id = $manager_q->f("userobm_id");
+    $m_id = $manager_q->f("userobm_id");
     $lname = $manager_q->f("userobm_lastname");
-    $sel_manager .= "<option value=\"$id\"";
-    if ($manager == $id) $sel_manager .= "selected =\"selected\"";
+    $sel_manager .= "<option value=\"$m_id\"";
+    if ($manager == $m_id) $sel_manager .= "selected =\"selected\"";
     $sel_manager .= ">$lname</option>";
   }
   $sel_manager .= "</select>";
@@ -342,10 +342,10 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
   $sel_pmanager = "<select name=\"sel_pmanager\">
      <option value=\"$c_all\">$l_all</option>";
   while($pmanager_q->next_record()) {
-    $id = $pmanager_q->f("userobm_id");
+    $m_id = $pmanager_q->f("userobm_id");
     $lname = $pmanager_q->f("userobm_lastname");
-    $sel_pmanager .= "<option value=\"$id\"";
-    if ($pmanager == $id) $sel_pmanager .= "selected = \"selected\"";
+    $sel_pmanager .= "<option value=\"$m_id\"";
+    if ($pmanager == $m_id) $sel_pmanager .= "selected = \"selected\"";
     $sel_pmanager .= ">$lname</option>";
   }
   $sel_pmanager .= "</select>";
@@ -996,11 +996,11 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
   $sel_tt = "<select name=\"sel_tt\">
     <option value=\"$c_undef\">$l_undef</option>";
   if (is_array($tts)) {
-    foreach ($tts as $id_tts=>$one_tt) {
+    foreach ($tts as $tt_id=>$one_tt) {
       $tt_label = $one_tt["label"];
       $internal = $one_tt["internal"];
-      $sel_tt .= "\n<option value=\"$id_tts\"";
-      if ($tt == $id_tts) $sel_tt .= "selected =\"selected\"";
+      $sel_tt .= "\n<option value=\"$tt_id\"";
+      if ($tt == $tt_id) $sel_tt .= "selected =\"selected\"";
       $sel_tt .= ">$tt_label</option>\n";
     }
     $sel_tt .= "</select>";
@@ -1768,10 +1768,10 @@ function html_deal_admin_form($kind_q, $status_q) {
     forms.form_kind_update.rd_kind_inout[pos].checked=true;\"
     size=\"4\">";
   while ($kind_q->next_record()) {
-    $id = $kind_q->f("dealtype_id");
+    $k_id = $kind_q->f("dealtype_id");
     $inout = $kind_q->f("dealtype_inout");
     $label = $kind_q->f("dealtype_label");
-    $sel_kind .= "<option value=\"$id\">$inout $label</option>\n";
+    $sel_kind .= "<option value=\"$k_id\">$inout $label</option>\n";
   }
   $sel_kind .= "</select>";
 
@@ -1789,11 +1789,11 @@ function html_deal_admin_form($kind_q, $status_q) {
     forms.form_status_update.tf_hitrate.value=hit;\"
     size=\"4\">";
   while ($status_q->next_record()) {
-    $id = $status_q->f("dealstatus_id");
+    $s_id = $status_q->f("dealstatus_id");
     $order = $status_q->f("dealstatus_order");
     $label = $status_q->f("dealstatus_label");
     $hitrate = $status_q->f("dealstatus_hitrate");
-    $sel_sta .= "<option value=\"$id\">$order-$label ($hitrate)</option>\n";
+    $sel_sta .= "<option value=\"$s_id\">$order-$label ($hitrate)</option>\n";
   }
   $sel_sta .= "</select>";
 
