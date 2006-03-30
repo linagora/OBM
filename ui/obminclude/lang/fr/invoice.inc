@@ -34,6 +34,8 @@ $l_invoice_infos = "Informations à propos de la Facture";
 $l_remaining_amount = "Montant non utilisé";
 $l_to_use_amount = "Montant à affecter à cette Facture";
 $l_affect = "Affecter";
+$l_year_detail = "Détail année";
+$l_year_to_year = "Comparaison années";
 
 // Actions 
 $l_insert = "Insérer la Facture";

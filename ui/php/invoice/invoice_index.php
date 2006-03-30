@@ -143,8 +143,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "dashboard")  {
 ///////////////////////////////////////////////////////////////////////////////
   include_once("$obminclude/Artichow/BarPlot.class.php");
-  //  include("$obminclude/libchart/libchart/libchart.php");
-  $display["detail"] = dis_invoice_dashboard($invoice);
+  $display["detail"] = dis_invoice_dashboard_index($invoice);
 
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -199,7 +198,7 @@ function get_param_invoice() {
   global $param_company, $company_name, $company_new_name, $company_new_id;
   global $param_deal, $deal_label, $deal_new_label, $deal_new_id;
   global $param_project, $project_name, $project_new_name, $project_new_id;
-  global $ext_id;
+  global $ext_id, $dash_view;
 
   get_global_param_document($invoice);
 
@@ -227,6 +226,7 @@ function get_param_invoice() {
   if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
   if (isset ($year)) $invoice["year"] = $year;
+  if (isset ($dash_view)) $invoice["dash_view"] = $dash_view;
 
   // Company params
   if (isset ($param_company)) $invoice["company_id"] = $param_company;

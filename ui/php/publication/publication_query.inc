@@ -220,9 +220,8 @@ function run_query_publication_insert($publication) {
 // Auto Subscription Insertion query execution                                 
 // Parameters:
 //   - $publication[] : List of contact_type to subscribe
-//   -p_id :  Id of the subscription
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_auto_insert($publication){
+function run_query_publication_auto_insert($publication) {
   global $auth, $cdg_sql;
   
   $id = $publication["id"];
@@ -275,13 +274,13 @@ function run_query_publication_auto_subscription($publication, $p_id){
   $list_sub = $publication["list_sub"];
   $recept = $c_focsys;
   $lang = $publication["lang"];
+  $lang_array = split("-", $lang);
 
   // Subscription according to contact category 1
   if (is_array($concat1) && (count($concat1)>0)) {
     $obm_q = new DB_OBM;
-    $type = $obm_q->type;  
-    $like = sql_casei_like($type);     
-    $lang_array = split("-",$lang);
+    $type = $obm_q->type;
+    $like = sql_casei_like($type);
     $query = "INSERT INTO Subscription (
       subscription_timeupdate,
       subscription_timecreate,
@@ -310,14 +309,14 @@ function run_query_publication_auto_subscription($publication, $p_id){
 
     foreach($concat1 as $category_id) {
       $query .= "$coma '$category_id'";
-      $coma =',';
+      $coma = ',';
     }
     $query .= ") 
   AND (";
     $coma = "";
     foreach($lang_array as $lang_id) {
       $query .= "$coma kind_lang $like '$lang_id' ";
-      $coma ='OR';
+      $coma = 'OR';
     }
     $query .= ") 
   group by contact_id";
@@ -336,35 +335,39 @@ function run_query_publication_auto_subscription($publication, $p_id){
     foreach ($list_sub as $list_id) {
       $c_q = ext_list_get_contact_ids($list_id);
 
-      // Process eacg list contact (if not already done)
+      // Process each list contact (if not already done)
       while ($c_q->next_record()) {
 	$c_id = $c_q->f("contact_id");
 
 	// If subscription not already set for this contact
 	if (! in_array($c_id, $contacts)) {
-	  $contacts[] = $c_id;
-	  $query = "INSERT INTO Subscription (
-          subscription_timeupdate,
-          subscription_timecreate,
-          subscription_userupdate,
-          subscription_usercreate,
-          subscription_contact_id,
-          subscription_publication_id,
-          subscription_renewal,
-          subscription_reception_id,
-          subscription_quantity)
-        VALUES ( 
-          null,
-          '" . date("Y-m-d H:i:s") . "',
-          null,
-          '" . $auth->auth["uid"] . "',
-          '$c_id',
-          '$p_id',
-          '1',
-          '$recept',
-          '1')";
-	  display_debug_msg($query, $cdg_sql, "run_query_publication_auto_subscription(from list : contact : $c_id)");
-	  $retour = $obm_q->query($query);
+	  $c_lang = run_query_get_contact_lang($c_id);
+	  if ((in_array($c_lang, $lang_array))
+	      || (in_array(strtoupper($c_lang), $lang_array))) {
+	    $contacts[] = $c_id;
+	    $query = "INSERT INTO Subscription (
+            subscription_timeupdate,
+            subscription_timecreate,
+            subscription_userupdate,
+            subscription_usercreate,
+            subscription_contact_id,
+            subscription_publication_id,
+            subscription_renewal,
+            subscription_reception_id,
+            subscription_quantity)
+          VALUES ( 
+            null,
+            '" . date("Y-m-d H:i:s") . "',
+            null,
+            '" . $auth->auth["uid"] . "',
+            '$c_id',
+            '$p_id',
+            '1',
+            '$recept',
+            '1')";
+	    display_debug_msg($query, $cdg_sql, "run_query_publication_auto_subscription(from list : contact : $c_id)");
+	    $retour = $obm_q->query($query);
+	  }
 	}
       }
     }

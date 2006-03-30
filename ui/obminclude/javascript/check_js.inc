@@ -86,9 +86,9 @@ function remove_element(elemId,parentId) {
 function remove_all_element(parentId) {
   target = window.document;
   container = target.getElementById(parentId);
-  content = container.getChild();
-alert(content);
-  container.innerHTML = '';
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
 }
 
 ";

@@ -51,7 +51,15 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   if ($ttc != "") {
     $where .= " AND invoice_amount_ttc = '$ttc'";
   }
-  if (($status != '') && ($status != "$c_all")) {
+  if (is_array($status) && (count($status) > 0)) {
+    $where .= " AND (";
+    $or = "";
+    foreach ($status as $s_id) {
+      $where .= "$or invoice_status_id='$s_id'";
+      $or = " OR";
+    }
+    $where .= ")";
+  } else if (($status != '') && ($status != "$c_all")) {
     $where .= " AND invoice_status_id = '$status'";
   }
   if ($date_after != "") {
@@ -596,10 +604,11 @@ function get_invoice_status_info($p_id) {
 // Get global invoices infos
 // Parameters:
 //   - $date_ranges : array [range1] : [date_start, date_end]
-//   - $target_date : invoice_date, invoice_expiration_date
-//   - $sel_tt      : [optionnal] tasktype array
+//   - $target_date : invoice_date, invoice_expiration_date : date to sort
+//   - $sel_tt      : [optionnal] tasktype array filter
 // Returns:
-//     array : array[date]([billed]|[potential])([status]|[total])[$infos]
+//     $res : array[date]([billed]|[potential])([status]|[total])[$infos]
+//            $infos = label, amount_ht, amount_ttc, nb
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $sel_tt="") {
   global $cdg_sql, $cdg_param;
@@ -632,7 +641,7 @@ function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $s
     $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
     $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
-  echo "$w_tt";
+
   // Factured (invoicestatus_payment = 1) OR potential (status_created = 0)
   $query = "SELECT
       $da,

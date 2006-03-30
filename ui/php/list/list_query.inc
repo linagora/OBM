@@ -536,6 +536,8 @@ function run_query_list_contacts_list($list, $entity="") {
          contact_privacy,
          company_id,
          company_name,
+         company_phone,
+         company_fax,
          company_address1,
          company_address2,
          company_address3,

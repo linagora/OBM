@@ -100,9 +100,8 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
-  global $l_email, $l_desc, $l_group, $perms_user, $perms_admin, $perms_editor;
-  global $l_add_users;
-  global $display, $c_all, $l_perms_user, $l_perms_admin, $l_perms_editor;
+  global $l_email, $l_desc, $l_group, $l_add_users;
+  global $display, $c_all, $profiles;
 
   $login = $user["login"];
   $perms = $user["perms"];
@@ -137,6 +136,11 @@ function html_user_search_form($user) {
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
 
+  foreach ($profiles as $profile => $one_profile) {
+    $block_pro .= "
+      <option value=\"$profile\" /> $profile";
+  }
+
   $block = "
   <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare("user_index.php")."\">
@@ -153,9 +157,7 @@ function html_user_search_form($user) {
     <div class=\"searchLabel\">$l_user_perms<br />
       <select type=\"text\" name=\"sel_perms\">
         <option value=\"$c_all\" /> $l_all
-        <option value=\"$perms_user\" /> $l_perms_user
-        <option value=\"$perms_editor\" /> $l_perms_editor
-        <option value=\"$perms_admin\" /> $l_perms_admin
+        $block_pro
       </select>
     </div>
     <div class=\"searchLabel\">$l_email<br />
@@ -303,10 +305,8 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
 function html_user_form($usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_user, $l_email, $l_archive, $l_insert, $l_update;
-  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc;
-  global $l_datebegin;
-  global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
-  global $action;
+  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc, $l_datebegin;
+  global $action, $profiles;
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -343,10 +343,15 @@ function html_user_form($usr_q, $user) {
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
 
-  // perms selectconstruction
-  if ($perms == $perms_user) $perms_user_s = " selected";
-  if ($perms == $perms_editor) $perms_editor_s = " selected";
-  if ($perms == $perms_admin) $perms_admin_s = " selected";
+  foreach ($profiles as $profile => $one_profile) {
+    if ($perms == $profile) {
+      $selected = " selected";
+    } else {
+      $selected = "";
+    }
+    $block_pro .= "
+      <option value=\"$profile\"$selected /> $profile";
+  }
 
   // Buttons
   if (($action == "new") || ($action == "insert")) {
@@ -380,9 +385,7 @@ function html_user_form($usr_q, $user) {
     </tr><tr>
       <td class=\"detailLabel\">$l_user_perms</td>
       <td class=\"detailForm\"><select name=\"sel_perms\">
-        <option value=\"$perms_user\" $perms_user_s>$l_perms_user
-        <option value=\"$perms_editor\" $perms_editor_s>$l_perms_editor
-        <option value=\"$perms_admin\" $perms_admin_s>$l_perms_admin
+        $block_pro
         </select>
       </td>
     </tr><tr>
@@ -455,7 +458,6 @@ function html_user_consult($obm_q) {
   global $l_user, $l_lastaccess, $l_archive, $l_datebegin;
   global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_email, $l_desc;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
-  global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
@@ -474,10 +476,6 @@ function html_user_consult($obm_q) {
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
-
-  if ($perms == $perms_user) $l_perms = $l_perms_user;
-  if ($perms == $perms_editor) $l_perms = $l_perms_editor;
-  if ($perms == $perms_admin) $l_perms = $l_perms_admin;
 
   // Liste des groupes de l'utilisateur
   $g_q = run_query_user_user_group($id);
@@ -520,7 +518,7 @@ function html_user_consult($obm_q) {
       <td class=\"detailText\">$ext_id</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_user_perms</td>
-      <td class=\"detailText\">$l_perms</td>
+      <td class=\"detailText\">$perms</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_lastname</td>
       <td class=\"detailText\">$lname</td>
@@ -573,10 +571,6 @@ function html_user_group_consult($usr_q) {
   $login = $usr_q->f("userobm_login");
   $lname = $usr_q->f("userobm_lastname");
   $fname = $usr_q->f("userobm_firstname");
-
-  if ($perms == $perms_user) $lperms = $l_perms_user;
-  if ($perms == $perms_editor) $lperms = $l_perms_editor;
-  if ($perms == $perms_admin) $lperms = $l_perms_admin;
 
   // Liste des groupes
   $g_q = run_query_user_group($id);

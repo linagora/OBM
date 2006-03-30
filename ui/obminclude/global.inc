@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre2";
+$obm_version = "1.2.0pre3";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -1008,6 +1008,8 @@ function format_name($name, $up, $accent, $dot=false) {
     $res = preg_replace("/[€‹Ÿ]/i", "U", $res);
     $res = preg_replace("/[Á]/i", "c", $res);
     $res = preg_replace("/[«]/i", "C", $res);
+    $res = preg_replace("/[®]/i", "s", $res);
+    $res = preg_replace("/[¶]/i", "S", $res);
   }
 
   if ($dot) {

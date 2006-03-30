@@ -106,30 +106,26 @@ function of_extmod_add_element(element_name, sel_id, fieldLabel) {
 //   - $url        : url to access external select data
 ///////////////////////////////////////////////////////////////////////////////
 function of_extmod_dis_search_select($data_array, $data_name, $url) {
-  global $set_theme, $ico_add, $l_all;
+  global $set_theme, $ico_add, $ico_delete;
 
   $l_name = "l_${data_name}"; 
   global $$l_name;
 
   $sel = _of_extmod_select($data_array, $data_name);
-  $cb_name = "cb_${data_name}_all";
 
   $block = "
     <div class=\"searchLabel\">${$l_name}
       <a href=\"javascript: return false;\"
       onclick=\"window.open('$url','','height=360,width=240,scrollbars=yes');
       return false;\">
-       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
-      </a>
-      <input type=\"checkbox\" name=\"$cb_name\"
-        onclick=\"if (this.form.$cb_name.checked==true) {
-                    remove_all_element('sel_${data_name}');
-                  }\"> $l_all</input>
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" /></a>
+      &nbsp;
+      <a href=\"javascript: return false;\"
+        onclick=\"remove_all_element('sel_${data_name}');
+        return false;\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\" alt=\"[Clear]\" /></a>
       <br />
-      <div class=\"elementRow\" id=\"sel_$data_name\">
-        <div class=\"elementRowEmpty\">a</div>
-        $sel
-      </div>
+      <div class=\"elementRow\" id=\"sel_$data_name\"><div class=\"elementRowEmpty\">a</div>$sel</div>
     </div>";
 
   return $block;
@@ -148,7 +144,7 @@ function of_extmod_dis_search_select($data_array, $data_name, $url) {
 //   - $data_name  : data name to construct the fields
 ///////////////////////////////////////////////////////////////////////////////
 function _of_extmod_select($data_array, $data_name) {
-  global $set_theme, $ico_crow;
+  global $set_theme, $ico_delete;
 
   if (is_array($data_array)) {
     foreach ($data_array as $id => $one_data) {
@@ -156,7 +152,7 @@ function _of_extmod_select($data_array, $data_name) {
       $data_id = "data-$data_name-$id";
       $div_id = "sel_$data_name-$data_id";
       $sel_data .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_$data_name');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\"></a>
+        <a href=\"javascript: remove_element('$div_id','sel_$data_name');\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\"></a>
         $data_label
         <input value=\"$data_id\" name=\"sel_${data_name}[]\" type=\"hidden\" />
         </div>";
@@ -165,7 +161,6 @@ function _of_extmod_select($data_array, $data_name) {
 
   return $sel_data;
 }
-
 
 
 ?>

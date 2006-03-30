@@ -11,8 +11,8 @@
 <a href="javascript:back();">back</A>
     
 <center>
-<h1>O.B.M. 1.1 ChangeLog</h1>
-version 1.1.3 - 2006-03-31
+<h1>O.B.M. 1.2 ChangeLog</h1>
+version 1.2.0 - 2006-03-31
 <p>
 </center>
 
@@ -29,13 +29,19 @@ To do
 - admin code : verifier si des actions non utilisees
 
 
-2006-03-31 : version 1.1.3<br>
+2006-03-31 : version 1.2.0<br>
 
 <ul>
+<li> BUG#538 : User profile select no more hardcoded !
+<li> BUG#535 : A mini calendar popup help fill all dates fields
 <li> Home page can redirect on a given url
 <li> TaskType handling code improvements
 <li> Contact : Added title on clipboard address copy
 <li> Contact : title search parameter now kept in result list navigation
+<li> List : some page navigation fixed when ctu_sql_limit is on
+<li> Invoice : Dashboard link from Billed invoice total corrected
+<li> List : Tel and fax inherited from Company if empty for static contacts
+<li> Publication : Automatic List subscription now handle lontact lang
 </ul>
 
 2006-03-02 : version 1.1.2<br>
@@ -57,85 +63,6 @@ To do
 <li> Invoice : Fixes invoices links in payments dashboard table
 <li> List : Fixed multiple dataset display on same screen with same entity
 <li> Spanish translation updated (thank you Jaime !)
-</ul>
-
-2006-02-17 : version 1.1.1<br>
-
-<ul>
-<li> BUG#546 : Calendar : fixed a bug affecting repeated events display
-<li> BUG#545 : Calendar : all fields can now accept quotes ' without error
-<li> BUG#544 : Calendar : allday infos now kept in event update form
-<li> BUG#541 : Calendar : all text fields now handle quote correctly
-<li> BUG#540 : Settings : some parameters now hidden according to module status
-<li> BUG#539 : Calendar : fixed an uneeded call to iconv()
-<li> BUG#536 : Deal : invalid bug (deal links menu are there)
-<li> BUG#533 : List : All publication infos removed from List if disabled
-<li> BUG#526 : Calendar : end repeat date now ok on update form
-<li> BUG#74 : unwanted feature now with CSS and themes
-<li> Corrected hidden fields definition for link table fields
-<li> Allow all tasktype categories for a project (even not factured tasks)
-<li> Home page : Project portlet added
-<li> Home page : Invoice portlet added
-<li> Contract : Deal infos not displayed if no deal referenced or deal disabled
-<li> Incident : search by category corrected with category in result list
-<li> Install : default country list added for French and English languages 
-<li> List : duplicate now duplicate static contacts too
-<li> Contact : a contact can now have 3 separated comment fields
-<li> Calendar : added event location in event popup, better event display
-<li> Invoice : added dashboard with invoice stats charts
-<li> Artichow chart library integration
-<li> Deal : linked invoices can be retrieved from projects of the deal
-</ul>
-
-2006-01-04 : version 1.1.0<br>
-
-<ul>
-<li> BUG#533 : List : publication info not displayed when publication disabled
-<li> BUG#532 : List : old deprecated export actions removed
-<li> BUG#531 : Removed some warnings when updating events without any users
-<li> BUG#530 : Usernames now displayed in right management if firstname is null
-<li> BUG#529 : Contract: 2nd contact link corrected
-<li> BUG#528 : Contact: Company name not displayed when company module disabled
-<li> BUG#525 : Portlet Incident link fixed ("my incidents")
-<li> BUG#524 : Invalid bug !
-<li> BUG#523 : Calendar : repeat frequency correctly updated
-<li> BUG#522 : Admin : Last page, action now consistent for every module
-<li> BUG#520 : User : "user" profile now can't see update group form
-<li> BUG#519 : User : User list from calendar selection empty if no rights set
-<li> BUG#518 : Company aka and sound search in every company search criteria
-<li> BUG#517 : Duplicate of #509 (fixed)
-<li> BUG#440 : List : Better handling of switching query mode (list_mode added)
-<li> BUG#284 : Contact sounding and aka added, used in search 
-<li> New parameter : Advanced search can be configured to be default mode
-<li> Cursor automatically set in the first search or entity form field
-<li> Mail : Corrected recipients list (could be wrong due to prefs updates)
-<li> All deprecated "none" replaced by "undef" in all selects
-<li> Company : search by category now accept the criteria "none"
-<li> Calendar : fixed some warning when dealing with resources without users
-<li> Framework : of_category now handles mono or multi categories
-<li> Framework : Global work on of_category to handle all modules categories
-<li> Framework : of_category provide category stats (bar charts)
-<li> Home page : Portlets only displayed if enabled and user has right
-<li> New parameters : $cgp_cookie_name and $cgp_cookie_domain
-<li> List : list duplication added
-<li> List : Added Boolean "Exclude" in criteria to handle global exclusion
-<li> List : Enhance query generation to handle n-n relations (AND NOT, exlcude)
-<li> Publication : added Automatic subscription to a contact list on creation
-<li> List : External interface for modules to get contact, company from a list
-<li> Clipboard : New parameter to select fields to copy in address copy
-</ul>
-
-2005-11-28 : version 1.0.2<br>
-
-<ul>
-<li> BUG#511 : Incident : result set sorting fixed
-<li> BUG#510 : Calendar : allow to diplay print view for all weeks, monthes,..
-<li> BUG#509 : Incident : syntax typo in incident_index.php (when inserting)
-<li> BUG#442 : Project : archived users shown in project summary (was in 1.0)
-<li> BUG#297 : Themes : Generic display functions now in framework
-<li> Home page : direct view for current active deals for the owner
-<li> Home page : corrected the days remaining for user added this year
-<li> Incident : Add icon to send the report directly by mail
 </ul>
 
 <p/>

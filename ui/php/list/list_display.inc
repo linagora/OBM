@@ -710,7 +710,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     
     $conq_q = new DB_OBM;
     $db_type = $obm_q->type;
-    $limit = sql_limit($db_type);
+    $limit = sql_limit($db_type, "", "", "dyn");
 
     if ($ctu_sql_limit) {
       $conq_q->set_num_rows_total($query_nb);

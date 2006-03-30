@@ -48,7 +48,7 @@ var MaxLength = 10; // Input maxlength
 var InputSize = 10; // Input size
 
 
-/////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Hide select-list if they are behind the calendar, specific for IE ...
 ////////////////////////////////////////////////////////////////////////////////
 // Gets the absolute pixel position of the supplied element
@@ -83,7 +83,7 @@ function FixSelectLists(Over) {
           if (FoundCalInput) {
             if (document.forms[j].elements[i].type == 'select-one') {
               selectlist = document.forms[j].elements[i];
-              // Get abusolute pixel position of target list
+              // Get absolute pixel position of target list
               ListLeftX = GetTagPixels(selectlist, 'LEFT');
               ListTopY = GetTagPixels(selectlist, 'TOP');
               ListRightX = ListLeftX + selectlist.offsetWidth;
@@ -151,7 +151,7 @@ function BuildCalendarDays() {
         if ((this.displayed.yearValue == YearPart)
             && (this.displayed.monthIndex == MonthPart)
             && (Day == DayPart)) {
-          Class =  'calendarThisDay';
+          Class = 'calendarThisDay';
         } else if ((this.displayed.yearValue < YearPart)
             || ((this.displayed.monthIndex == MonthPart)
             && (Day < DayPart) && (this.displayed.yearValue == YearPart)) 
