@@ -871,7 +871,7 @@ function run_query_contact_delete($p_id) {
 
   $c = get_contact_info($p_id);
   $comp_id = $c["company_id"];
-  run_query_delete_document_links($p_id, "contact");    
+  run_query_global_delete_document_links($p_id, "contact");    
   run_query_contact_delete_subscription($p_id);    
 
   $query = "DELETE FROM Contact WHERE contact_id='$p_id'";
