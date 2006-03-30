@@ -42,12 +42,10 @@ p			{
 	margin-right:		auto;
 }	
 
-	
 .leftpanel {
-	position:absolute;
-	width:180px;
-	margin-top: -30px;
-	left: 0;
+  position : absolute;
+	width:			180px;
+	padding:		0px 4px;
 }
 
 .rightpanel {
