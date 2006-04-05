@@ -365,7 +365,7 @@ function run_query_agenda_insert_event_data($agenda) {
   $priority = $agenda["priority"];
   $description = $agenda["description"];
   $location = $agenda["location"];
-  $all_day = $agenda["allday"];
+  ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = $agenda["datebegin"];
   $dateend = $agenda["dateend"];
   $event_duration = $agenda["event_duration"];
@@ -375,15 +375,7 @@ function run_query_agenda_insert_event_data($agenda) {
   $repeat_end = $agenda["repeat_end"]; 
   
   $obm_q = new DB_OBM;
-  // XXXXXXXXXXXXXXxx revenir comme d'hab. insere, apres on recupere id
-  $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
-  display_debug_msg($query, $cdg_sql, "run_query_agenda_insert_event_data()");
-  $obm_q->query($query);
-  $obm_q->next_record(); 
-  $max_id = $obm_q->f("max_id")+1;
-
   $query = "INSERT INTO CalendarEvent (
-    calendarevent_id,
     calendarevent_timeupdate,                         
     calendarevent_timecreate,                         
     calendarevent_usercreate,
@@ -402,7 +394,6 @@ function run_query_agenda_insert_event_data($agenda) {
     calendarevent_allday,
     calendarevent_endrepeat)
   VALUES (
-    '$max_id',
     '$now',
     '$now',
     '$uid',
@@ -423,6 +414,13 @@ function run_query_agenda_insert_event_data($agenda) {
 
   display_debug_msg($query, $cdg_sql, "run_query_agenda_insert_event_data()");
   $obm_q->query($query);
+  
+  $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
+  display_debug_msg($query, $cdg_sql, "run_query_agenda_insert_event_data()");
+  $obm_q->query($query);
+  $obm_q->next_record(); 
+  $max_id = $obm_q->f("max_id");
+
 
   return $max_id;
 }
@@ -839,7 +837,7 @@ function run_query_agenda_update_event_data($agenda) {
   $location = $agenda["location"];
   $datebegin = $agenda["datebegin"];
   $event_duration = $agenda["event_duration"];
-  $all_day = $agenda["allday"];
+  ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
   $event_id = $agenda["id"]; 
   if ($agenda["privacy"] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $agenda["kind"];
