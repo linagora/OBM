@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 1.2 ChangeLog</h1>
-version 1.2.0 - 2006-03-31
+version 1.2.0 - 2006-04-30
 <p>
 </center>
 
@@ -27,9 +27,10 @@ To do
 </UL>
 
 - admin code : verifier si des actions non utilisees
+- cgp_submit... : soit partout, soit virer
+- param global pour recherche prefixees ou non par %
 
-
-2006-03-31 : version 1.2.0<br>
+2006-04-30 : version 1.2.0<br>
 
 <ul>
 <li> BUG#538 : User profile select no more hardcoded !
@@ -44,6 +45,11 @@ To do
 <li> Publication : Automatic List subscription now handle lontact lang
 <li> Admin : Clear Session now clear even if session lifetime illimited (0)
 <li> Backup : backup deletion fixed (filename problem)
+<li> Backup : Enable backup search by date and DB version
+<li> Invoice : Dashboard year to year comparison
+<li> Invoice : Dashboard scope can be limited to some task types
+<li> List : Fixed an SQL error on special case with AND NOT operator
+<li> Agenda : fixed a Postgres SQL error on event insertion
 </ul>
 
 2006-03-02 : version 1.1.2<br>

@@ -148,7 +148,7 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
 //   - $document[] : document search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_list($document) {
-  global $display, $l_no_found;
+  global $display, $l_found, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "document");
@@ -157,7 +157,8 @@ function dis_document_search_list($document) {
   if ($nb_document == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_document_search_list($obm_q,$prefs,$nb_document,$document);
+    $display["msg"] .= display_info_msg("$nb_document $l_found");
+    $block = html_document_search_list($obm_q, $prefs, $document);
   }
 
   return $block;
@@ -169,12 +170,11 @@ function dis_document_search_list($document) {
 // Parameters : 
 //   - $doc_q     : list of documents
 //   - $prefs     : the fields which have to be displayed
-//   - $nb_document : nb documents returned by the search query
 //   - $document[]  : document search criteria
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
-  global $display, $l_found, $l_add,$l_close;
+function html_document_search_list($doc_q, $prefs, $document) {
+  global $l_add, $l_close;
 
   // we urlencode to avoid breakage for space char
   $title = stripslashes($document["title"]);
@@ -195,9 +195,6 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
   }  
   $url = url_prepare("document_index.php?tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;param_entity=$entity_id&amp;action=search$url_ext");
-
-
-  $doc_q->seek($first_row);
 
   $doc_d = new OBM_DISPLAY("DATA", $prefs, "document");
 
@@ -226,9 +223,9 @@ function html_document_search_list($doc_q, $prefs, $nb_document,$document) {
   $doc_d->data_set = $doc_q;
   $doc_d->data_url = $url;
   $doc_d->data_header = "both";
-  $display["msg"] .= display_info_msg("$nb_document $l_found");
   $block .= $doc_d->display("dis_data_document");
   $block .= $display_popup_end;
+
   return $block;
 }
 

@@ -142,7 +142,7 @@ function html_resourcegroup_search_form ($group) {
 //     keys used  : name, description
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resourcegroup_search_resourcegroup($group) {
-  global $l_no_found, $display, $auth;
+  global $display, $l_found, $l_no_found, $auth;
 
   $child_res = $group["children_restriction"];
   $widget = $group["ext_widget"];
@@ -158,7 +158,8 @@ function dis_resourcegroup_search_resourcegroup($group) {
   if ($nb_group == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_resourcegroup_search_resourcegroup($obm_q, $prefs, $nb_group, $group);
+    $display["msg"] .= display_info_msg("$nb_group $l_found");
+    $block = html_resourcegroup_search_resourcegroup($obm_q, $prefs, $group);
   }
 
   return $block;
@@ -170,12 +171,11 @@ function dis_resourcegroup_search_resourcegroup($group) {
 // Parameters : 
 //   - $obm_q     : list of the groups to display 
 //   - $pref_q    : the fields which have to be displayed
-//   - $nb_group  : nb groups returned by the search query 
 //   - $group[]   : group search criteria
 //     keys used  : name, resource, popup
 ///////////////////////////////////////////////////////////////////////////////
-function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $group) {
-  global $display, $l_found, $l_add, $l_close;
+function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
+  global $l_add, $l_close;
 
   $child_res = $group["children_restriction"];
   $popup = $group["popup"];
@@ -233,7 +233,6 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $nb_group, $gr
   $dis_group->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_info_msg("$nb_group $l_found");
   $block .= $dis_group->display("dis_data_resourcegroup");
   $block .= $display_popup_end;
 

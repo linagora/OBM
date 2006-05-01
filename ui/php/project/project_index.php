@@ -427,7 +427,7 @@ function get_param_project() {
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if (isset ($param_project)) $project["id"] = $param_project;
   if (isset ($param_user)) $project["user_id"] = $param_user;

@@ -118,12 +118,12 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
   
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_contact_search_form($contact);
   $display["result"] = dis_contact_search_list($contact);
-  
-} elseif ($action == "new")  {
+
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if (isset($contact["company_id"])) {
     $comp_q = run_query_contact_company($contact["company_id"]);
@@ -131,14 +131,14 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] = dis_contact_form($action, $comp_q, $contact);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($contact["id"] > 0) {
     require("contact_js.inc");
     $display["detail"] = dis_contact_consult($contact);
   }
   
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($contact["id"] > 0) {
     $con_q = run_query_contact_detail($contact["id"]);
@@ -151,7 +151,7 @@ if ($action == "ext_get_ids") {
     }
   }
 
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contact_data_form("", $contact)) {
 
@@ -194,7 +194,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_contact_form($action, "", $contact);
   }
   
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_contact_data_form("", $contact)) {
     $retour = run_query_contact_update($contact);
@@ -213,7 +213,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_contact_form($action, "", $contact);
   }
   
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_contact($contact["id"])) {
     require("contact_js.inc");
@@ -225,7 +225,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_contact_consult($contact);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_contact($contact["id"])) {
     $retour = run_query_contact_delete($contact["id"]);
@@ -241,7 +241,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_contact_consult($contact);
   }
 
-} elseif ($action == "statistics")  {
+} elseif ($action == "statistics") {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lang/$set_lang/statistic.inc");
   // Specific site statistics lang file
@@ -262,12 +262,12 @@ if ($action == "ext_get_ids") {
   $display["detail"] = dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q);
 //  $display["features"] = dis_menu_stats();
 
-} elseif ($action == "admin")  {
+} elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("contact_js.inc");
   $display["detail"] = dis_contact_admin_index();
 
-} elseif ($action == "category1_insert")  {
+} elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("contact", "category1", $contact);
   if ($retour) {
@@ -278,7 +278,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category1_update")  {
+} elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("contact", "category1", $contact);
   if ($retour) {
@@ -289,11 +289,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category1_checklink")  {
+} elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("contact", "category1", $contact);
 
-} elseif ($action == "category1_delete")  {
+} elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("contact", "category1", $contact);
   if ($retour) {
@@ -304,7 +304,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category2_insert")  {
+} elseif ($action == "category2_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("contact", "category2", $contact);
   if ($retour) {
@@ -315,7 +315,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category2_update")  {
+} elseif ($action == "category2_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("contact", "category2", $contact);
   if ($retour) {
@@ -326,11 +326,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category2_checklink")  {
+} elseif ($action == "category2_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("contact", "category2", $contact);
 
- } elseif ($action == "category2_delete")  {
+ } elseif ($action == "category2_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("contact", "category2", $contact);
   if ($retour) {
@@ -341,7 +341,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category3_insert")  {
+} elseif ($action == "category3_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("contact", "category3", $contact);
   if ($retour) {
@@ -352,7 +352,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category3_update")  {
+} elseif ($action == "category3_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("contact", "category3", $contact);
   if ($retour) {
@@ -363,11 +363,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category3_checklink")  {
+} elseif ($action == "category3_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("contact", "category3", $contact);
 
-} elseif ($action == "category3_delete")  {
+} elseif ($action == "category3_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("contact", "category3", $contact);
   if ($retour) {
@@ -378,7 +378,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category4_insert")  {
+} elseif ($action == "category4_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("contact", "category4", $contact);
   if ($retour) {
@@ -389,7 +389,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category4_update")  {
+} elseif ($action == "category4_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("contact", "category4", $contact);
   if ($retour) {
@@ -400,11 +400,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category4_checklink")  {
+} elseif ($action == "category4_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("contact", "category4", $contact);
 
-} elseif ($action == "category4_delete")  {
+} elseif ($action == "category4_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("contact", "category4", $contact);
   if ($retour) {
@@ -415,7 +415,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category5_insert")  {
+} elseif ($action == "category5_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("contact", "category5", $contact);
   if ($retour) {
@@ -426,7 +426,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category5_update")  {
+} elseif ($action == "category5_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("contact", "category5", $contact);
   if ($retour) {
@@ -437,11 +437,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "category5_checklink")  {
+} elseif ($action == "category5_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("contact", "category5", $contact, "mono");
 
-} elseif ($action == "category5_delete")  {
+} elseif ($action == "category5_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("contact", "category5", $contact);
   if ($retour) {
@@ -452,7 +452,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "function_insert")  {
+} elseif ($action == "function_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("contact", "function", $contact);
   if ($retour) {
@@ -463,7 +463,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "function_update")  {
+} elseif ($action == "function_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("contact", "function", $contact);
   if ($retour) {
@@ -474,11 +474,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "function_checklink")  {
+} elseif ($action == "function_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("contact", "function", $contact, "mono");
 
-} elseif ($action == "function_delete")  {
+} elseif ($action == "function_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("contact", "function", $contact);
   if ($retour) {
@@ -489,7 +489,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "kind_insert")  {
+} elseif ($action == "kind_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contact_kind_insert($contact);
   if ($retour) {
@@ -500,7 +500,7 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "kind_update")  {
+} elseif ($action == "kind_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contact_kind_update($contact);
   if ($retour) {
@@ -511,11 +511,11 @@ if ($action == "ext_get_ids") {
   require("contact_js.inc");
   $display["detail"] .= dis_contact_admin_index();
 
-} elseif ($action == "kind_checklink")  {
+} elseif ($action == "kind_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_contact_kind_links($contact);
 
-} elseif ($action == "kind_delete")  {
+} elseif ($action == "kind_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contact_kind_delete($contact["kind"]);
   if ($retour) {

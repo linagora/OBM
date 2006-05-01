@@ -25,7 +25,6 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   $dateexp_before = $invoice["dateexp_before"];
   $inout = $invoice["inout"];
   $company = sql_search_text_parse($invoice["company"]);
-  $deal = sql_search_text_parse($invoice["deal"]);
   $archive = $invoice["archive"];
   $comp_id = $invoice["company_id"];
   $deal_id = $invoice["deal_id"];
@@ -84,10 +83,6 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
     $where .= sql_global_company_name_advanced_search($company, $like);
     $join_comp = "LEFT JOIN Company ON invoice_company_id=company_id";
   }
-  if ($deal != "") {
-    $where .= " AND deal_label $like '$deal%'";
-    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
-  }
   if ($deal_id != "") {
     $where .= " AND (invoice_deal_id = '$deal_id'
                      OR project_deal_id = '$deal_id')";
@@ -120,10 +115,14 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
       invoice_id as id,
       $date,
       $dateexp,
-      company_id, company_name as invoice_company,
-      deal_id, deal_label as invoice_deal,
-      project_id, project_name as invoice_project,
-      invoicestatus_id, invoicestatus_label as invoice_status
+      company_id,
+      company_name as invoice_company,
+      deal_id,
+      deal_label as invoice_deal,
+      project_id,
+      project_name as invoice_project,
+      invoicestatus_id,
+      invoicestatus_label as invoice_status
     FROM Invoice
       LEFT JOIN InvoiceStatus ON invoice_status_id = invoicestatus_id
       LEFT OUTER JOIN Company ON invoice_company_id = company_id
@@ -417,15 +416,12 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, "payment_date", "payment_date");
-  $exp_date = sql_date_format($db_type, "payment_expected_date", "payment_expect_date");
 
   $query = "SELECT
       paymentinvoice_amount,
       payment_id,
-      payment_label,
       payment_number,
       $date,
-      $exp_date,
       payment_amount
     FROM PaymentInvoice
       LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
@@ -607,7 +603,7 @@ function get_invoice_status_info($p_id) {
 //   - $target_date : invoice_date, invoice_expiration_date : date to sort
 //   - $sel_tt      : [optionnal] tasktype array filter
 // Returns:
-//     $res : array[date]([billed]|[potential])([status]|[total])[$infos]
+//     $res : array[date]([billed]|[paid]|[potential])([status]|[total])[$infos]
 //            $infos = label, amount_ht, amount_ttc, nb
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $sel_tt="") {
@@ -783,12 +779,6 @@ function check_invoice_data_form($id, $invoice) {
   // Payment Date check
   if (($pdate != "") && (preg_match($php_regexp_isodate, $pdate) == 0)) {
     $err_msg = "$l_payment_date : $pdate : $l_invalid_date"; 
-    return false;
-  }
-
-  // MANDATORY: Invoice inout type must be set
-  if (($inout != "+") && ($inout != "-")) {
-    $err_msg = $l_fill_inout;
     return false;
   }
 

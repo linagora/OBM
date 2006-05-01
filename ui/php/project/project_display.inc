@@ -232,7 +232,7 @@ function html_project_search_form ($tts, $manager_q, $member_q, $project) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_list($project) {
-  global $display, $auth, $l_no_found;
+  global $display, $auth, $l_found, $l_no_found;
 
   $new_order = $project["new_order"];
   $order_dir = $project["order_dir"];
@@ -244,7 +244,8 @@ function dis_project_search_list($project) {
   if ($nb_project == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_project_search_list($obm_q, $prefs, $nb_project, $project);
+    $display["msg"] .= display_info_msg($nb_project." ".$l_found);
+    $block = html_project_search_list($obm_q, $prefs, $project);
   }
 
   return $block;
@@ -256,12 +257,11 @@ function dis_project_search_list($project) {
 // Parameters:
 //   - $proj_q    : list of projects
 //   - $prefs     : fields to display in the list of projects 
-//   - $nb_deal   : nb projects found
 //   - $project[] : project search criteria
 //     keys used  : name, company_name, tt, manager, member
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_search_list($proj_q, $prefs, $nb_project, $project) {
-  global $display, $l_found;
+function html_project_search_list($proj_q, $prefs, $project) {
+  global $l_close;
 
   $popup = $project["popup"];
   $name = $project["name"];
@@ -299,7 +299,6 @@ function html_project_search_list($proj_q, $prefs, $nb_project, $project) {
   $proj_d->data_set = $proj_q;
   $proj_d->data_url = $url;
   $proj_d->data_header = "both";
-  $display["msg"] .= display_info_msg($nb_project." ".$l_found);
   $block = $proj_d->display("dis_data_project");
   $block .= $display_popup_end;
 

@@ -40,3 +40,47 @@ UPDATE Contact SET contact_zipcode='' WHERE contact_zipcode is null;
 UPDATE Contact SET contact_town='' WHERE contact_town is null;
 UPDATE Contact SET contact_expresspostal='' WHERE contact_expresspostal is null;
 UPDATE Company SET company_zipcode='' WHERE company_zipcode is null;
+
+
+-------------------------------------------------------------------------------
+-- Clean UserObm table
+-------------------------------------------------------------------------------
+-- set lastname and firstname to default '' instead of null (cause of concat)
+UPDATE UserObm SET userobm_lastname = '' where userobm_lastname is null;
+ALTER TABLE UserObm ALTER COLUMN userobm_lastname SET DEFAULT '';
+UPDATE UserObm SET userobm_firstname = '' where userobm_firstname is null;
+ALTER TABLE UserObm ALTER COLUMN userobm_firstname SET DEFAULT '';
+
+
+-------------------------------------------------------------------------------
+-- Re-create Payment table
+-------------------------------------------------------------------------------
+DROP TABLE Payment;
+
+CREATE TABLE Payment (
+  payment_id              serial,
+  payment_timeupdate      timestamp,
+  payment_timecreate      timestamp,
+  payment_userupdate      integer,
+  payment_usercreate      integer,
+  payment_company_id      integer NOT NULL,
+  payment_account_id      integer,
+  payment_paymentkind_id  integer NOT NULL,
+  payment_amount          decimal(10,2) DEFAULT '0.0' NOT NULL,
+  payment_date            date,
+  payment_inout           char(1) NOT NULL DEFAULT '+',
+  payment_number          varchar(24) NOT NULL DEFAULT '',
+  payment_checked         char(1) NOT NULL DEFAULT '0',
+  payment_comment         text,
+  PRIMARY KEY (payment_id)
+);
+
+
+-------------------------------------------------------------------------------
+-- Update PaymentKind table
+-------------------------------------------------------------------------------
+ALTER TABLE PaymentKind ADD COLUMN paymentkind_label varchar(40);
+ALTER TABLE PaymentKind ALTER COLUMN paymentkind_label SET DEFAULT '';
+ALTER TABLE PaymentKind ALTER COLUMN paymentkind_label SET NOT NULL;
+UPDATE PaymentKind SET paymentkind_label = paymentkind_longlabel;
+ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;

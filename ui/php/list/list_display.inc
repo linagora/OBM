@@ -62,7 +62,6 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   global $path, $list, $set_theme, $clist_mode_normal, $clist_mode_expert;
   global $l_normal, $l_expert;
 
-  $ext_url = $list["ext_url"];
   // We set an indicator to tell if the contact has an address
   if ( ($OD->data_set->f("contact_address1") != "")
          || ($OD->data_set->f("contact_address2") != "")
@@ -80,6 +79,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("list_id").",'".addslashes($OD->data_set->f("list_name"))."');";
     } else if ($OD->display_ext == "get_id_url") {
+      $ext_url = $list["ext_url"];
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("list_id").");";
     } elseif($link_ok) {
       $res["url"] = "list_index.php?action=detailconsult&amp;param_list=".$OD->data_set->f("list_id");
@@ -414,7 +414,7 @@ function html_list_search_form ($list, $usr_q) {
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_search_list($list, $popup=false) {
-  global $l_no_found;
+  global $l_found, $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "list");
@@ -423,7 +423,8 @@ function dis_list_search_list($list, $popup=false) {
   if ($nb_list == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup);
+    $display["msg"] .= display_info_msg("$nb_list $l_found");
+    $block = html_list_search_list($obm_q, $prefs, $list, $popup);
   }
 
   return $block;
@@ -435,13 +436,12 @@ function dis_list_search_list($list, $popup=false) {
 // Parameters : 
 //   - $obm_q    : list of the lists to display 
 //   - $prefs    : fields that have to be displayed
-//   - $nb_list  : nb lists returned by the search query 
 //   - $list[]   : list search criteria
 //     keys used : name, contact, ext_id, ext_url, ext_action
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup) {
-  global $display, $l_found, $l_add, $l_close;
+function html_list_search_list($obm_q, $prefs, $list, $popup) {
+  global $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $list["ext_action"];
@@ -456,19 +456,9 @@ function html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup) {
   $contact = urlencode(stripslashes($list["contact"]));
   $mark = $list["marketing_manager"];
 
-  $display["msg"] .= display_info_msg("$nb_list $l_found");
-
   $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;sel_market=$mark$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA", $prefs, "list");
-/*  if ($popup) {
-    $dis_list->display_link = false;
-    $dis_list->data_cb_text = "X";
-    $dis_list->data_idfield = "list_id";
-    $dis_list->data_cb_name = "cb_list";
-    $block .= "<form target=\"$ext_target\" method=\"get\" action=\"$ext_url\">";
-  }
-  */
   if ($popup) {
     $dis_list->display_link = false;
     if ($ext_url != "") {
@@ -487,20 +477,6 @@ function html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup) {
   $dis_list->data_url = $url;
   $block .= $dis_list->display("dis_data_list");
   $block .= $display_popup_end;  
-/*
-  if ($popup) {
-    $block .= "
-    <p class=\"detailButton\">
-    <p class=\"detailButtons\">
-      <input type=\"submit\" value=\"$l_add\" /> 
-      <input type=\"hidden\" name=\"param_list\" value=\"$ext_id\" /> 
-      <input type=\"hidden\" name=\"action\" value=\"$ext_action\" /> 
-    </p>
-    </p>
-    </form>
-    <p align=\"right\">
-    <a href=\"\" onclick='window.close();'>$l_close</a></p>";
-  }*/
 
   return $block;
 }
@@ -512,7 +488,7 @@ function html_list_search_list($obm_q, $prefs, $nb_list, $list, $popup) {
 //   - $list[] : list parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_consult($list) {
-  global $display, $uid;
+  global $uid;
 
   $id = $list["id"];
 

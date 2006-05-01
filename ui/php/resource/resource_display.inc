@@ -136,7 +136,7 @@ function html_resource_search_form($resource) {
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resource_search_list($resource) {
-  global $l_no_found;
+  global $l_found, $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
   $popup = $resource["popup"];
@@ -148,7 +148,8 @@ function dis_resource_search_list($resource) {
   if ($nb_resource == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $popup);
+    $display["msg"] .= display_info_msg("$nb_resource $l_found");
+    $block = html_resource_search_list($obm_q, $prefs, $resource, $popup);
   }
 
   return $block;
@@ -160,13 +161,12 @@ function dis_resource_search_list($resource) {
 // Parameters:
 //   - $obm_q    : database result (resource list)
 //   - $prefs   : the fields which have to be displayed
-//   - $nb_resource  : nb resources returned by the search query
 //   - $resource[]   : resource search criteria
 //     keys used : name, desc 
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $popup) {
-  global $display, $l_found, $l_close, $l_add;
+function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
+  global $l_close, $l_add;
 
   $lname = urlencode($resource["name"]);
   $ldesc = urlencode($resource["desc"]);
@@ -222,7 +222,6 @@ function html_resource_search_list($obm_q, $prefs, $nb_resource, $resource, $pop
   $resource_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_info_msg("$nb_resource $l_found");
   $block .= $resource_d->display("dis_data_resource");
   $block .= $display_popup_end;
 

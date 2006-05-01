@@ -125,7 +125,7 @@ function of_extmod_dis_search_select($data_array, $data_name, $url) {
         return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\" alt=\"[Clear]\" /></a>
       <br />
-      <div class=\"elementRow\" id=\"sel_$data_name\"><div class=\"elementRowEmpty\">a</div>$sel</div>
+      <div class=\"elementRow\" id=\"sel_$data_name\"><div class=\"elementRowEmpty\"></div>$sel</div>
     </div>";
 
   return $block;

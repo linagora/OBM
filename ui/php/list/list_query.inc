@@ -1381,26 +1381,26 @@ function make_list_query_from_criteria($list) {
   // hash field criteria -> join asociated needed
   $add_join = array (
     "subscription_publication_id" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "publication_lang" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "publication_year" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_renewal" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_reception_id" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_timeafter" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "subscription_timebefore" => "
-       JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
+       LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "companycategory1_code" => "
        LEFT JOIN CompanyCategory1Link ccl%j ON company_id = ccl%j.companycategory1link_company_id 
        LEFT JOIN CompanyCategory1 cc%j ON cc%j.companycategory1_id = ccl%j.companycategory1link_category_id ",
@@ -1498,7 +1498,7 @@ function make_list_query_from_criteria($list) {
 
 		// case AND NOT to n-n criteria line
 		if ($cond_andnotn[$line]) {
-		  $cond_andnotn_join[$line] = str_replace('%j',"",$add_join[$field]);
+		  $cond_andnotn_join[$line] .= " " .str_replace('%j',"",$add_join[$field]);
 		  $operation = $operateurs[$field];
 		  $operation = str_replace('%j',"",$operation);
 		  $operation = str_replace('%f',$field,$operation);

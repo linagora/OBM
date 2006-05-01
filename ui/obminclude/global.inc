@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre4";
+$obm_version = "1.2.0pre5";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -47,7 +47,7 @@ $cg_prod = 3;
 
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned
-$cql_max_cost = 200000;  // Maximum query cost (Postgres)
+$cql_max_cost = 300000;  // Maximum query cost (Postgres)
 
 // Allow * in search field
 $cgp_sql_star = true;
@@ -65,7 +65,7 @@ $ctu_sql_limit = false;
 $cgp_mail_enabled = false;
 
 // is Demo enabled (login screen array with default account)
-$cgp_demo_enabled = false;
+$cgp_demo_enabled = true;
 
 // submit button in the beginning of the form
 $cgp_submit_form_begin_enabled = false;
@@ -422,10 +422,10 @@ $php_regexp_pub_lang = "/^[A-Za-z-]+$/";  // Publication lang
 $js_regexp_list_name = "/^[0-9A-Za-z_\- ]+$/";  // List name
 $js_regexp_import_name = "/^[0-9A-Za-z_\-\. ]+$/";  // Import name
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
-$php_regexp_number = "/^[0-9]*$/"; // only numbers
+$php_regexp_amount = "/^[0-9]+(\.[0-9][0-9]?)?$/";
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
-$php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}.dump$/";
+$php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2})?.dump$/";
 
 $global_dis_debug_msg = "";
 $global_dis_debug_param = "";

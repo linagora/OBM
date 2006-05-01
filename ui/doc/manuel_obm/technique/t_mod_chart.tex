@@ -1,0 +1,111 @@
+% Documentation technique d'OBM : Module Chart
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\clearpage
+\section{Diagrammes}
+
+Depuis la version 1.1, \obm intègre un module de génération de diagrammes.
+
+\obm utilise actuellement la librairie ou le projet Artichow pour la création des diagrammes.
+Le module \chart propose une couche d'abstraction d'utilisation des diagrammes permettant éventuellement de changer de librairie sous-jacente.\\
+
+Le module \chart est particulier car il n'apparait pas dans les menus de l'application mais est un service pour les modules devant générer des diagrammes.
+Le module \chart est appelé via une URL, et retourne, sous forme d'image, le diagramme correspondant aux paramètres passés.
+
+Il n'effectue pas de gestion des droits ou de session.
+
+
+\subsection{Diagrammes proposés}
+
+Artichow étant assez riche, \obm s'enrichi de nouveaux diagrammes au fur et à mesure des besoins.\\
+
+\begin{tabular}{|p{4cm}|p{4cm}|}
+\hline
+\textbf{Diagramme} & \textbf{Version d'\obm} \\
+\hline
+Barre simple & 1.1.1 \\
+\hline
+Barres multiples & 1.2.0 \\
+\hline
+\end{tabular}
+
+
+\subsection{Paramètres et utilisation}
+
+\subsubsection{Diagramme à barre simple}
+
+\begin{tabular}{|p{2cm}|p{3cm}|p{8cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Valeur} & \textbf{Description}\\
+\hline
+action & bar & \\ 
+\hline
+title & texte & Titre du diagramme \\
+\hline
+values & tableau & Valeur des points (barres) \\
+\hline
+labels & tableau & Labels affichés des points (barres) \\
+\hline
+xlabels & tableau & Labels de l'axe X \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Diagramme à barres multiples}
+
+\paragraph{Note :} 1 plot correspond à un ensemble de données (1 jeu de barres), 1 bar correspond à une barre. Une barre peut présenter des informations de plusieurs plots (barre découpée en parties ou couleurs, comme le potentiel des factures).\\
+
+\begin{tabular}{|p{2cm}|p{3cm}|p{8cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Valeur} & \textbf{Description}\\
+\hline
+action & bar\_multiple & \\ 
+\hline
+title & texte & Titre du diagramme \\
+\hline
+xlabels & tableau & Labels de l'axe X \\
+\hline
+plots & \multicolumn{2}{|c|}{tableau avec entrées du tableau suivant} \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Entrées du hachage plots :\\
+
+\begin{tabular}{|p{2cm}|p{3cm}|p{8cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Valeur} & \textbf{Description}\\
+\hline
+values & tableau & values[0] : Valeur des points du 1er plot \\
+\hline
+labels & tableau & labels[0] : Labels affichés des points du 1er plot \\
+\hline
+legends & tableau & legend[0] : Légende associée au 1er plot \\
+\hline
+new\_bar & tableau (1|0) & new\_bar[n]=1 indique si plot n affiché dans une nouvelle barre (sinon affiché sur la barre actuelle) \\
+\hline
+\end{tabular}
+
+
+\paragraph{Exemple :}
+
+\begin{verbatim}
+  $title = "$l_billed $year_prev / $year";
+  $plots["new_bar"] = array(1, 1);
+  $plots["legends"] = array("$year_prev", "$year");
+  $plots["values"] = array($values_prev, $values);
+  $plots["labels"] = array($labels_prev, $labels);
+
+  $chart_ytoy_params .= "&amp;title=".urlencode($title).
+  "&amp;plots=".urlencode(serialize($plots)) .
+  "&amp;xlabels=".urlencode(serialize($xlabels));
+
+  ...
+
+  $block = "
+    <img border=\"0\"
+    src=\"$path/chart/chart_index.php?action=bar_multiple$chart_ytoy_params\"
+     alt=\"\" />
+  ...
+\end{verbatim}

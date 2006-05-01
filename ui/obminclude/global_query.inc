@@ -417,6 +417,38 @@ function get_global_linked_invoice_nb ($id, $entity, $arch="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of payment linked to an entity
+// Parameters:
+//   - $id     : Id of entity
+//   - $entity : entity (account, company, invoice)
+// Return:
+//   - $nb     : number of payment
+///////////////////////////////////////////////////////////////////////////////
+function get_global_linked_payment_nb ($id, $entity) {
+  global $cdg_sql;
+
+  if ($entity == "deal") {
+    $query = "SELECT count(invoice_id) as nb
+      FROM Invoice
+        LEFT JOIN Project on invoice_project_id=project_id
+      WHERE (invoice_deal_id = '$id'
+        OR project_deal_id = '$id')";
+  } else {
+    $query = "SELECT count(payment_id) as nb
+    FROM Payment
+    WHERE payment_${entity}_id = '$id'";
+  }
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of documents linked to an entity
 // Parameters:
 //   - $id     : Id of entity
@@ -866,12 +898,15 @@ function get_last_payment_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "SELECT payment_label FROM Payment WHERE payment_id='$id'";
-    display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
+    $db_type = $obm_q->type;
+    $date = sql_date_format($db_type, "payment_date", "date");
+
+    $query = "SELECT $date, payment_amount FROM Payment WHERE payment_id='$id'";
+    display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("payment_label");
+    return $obm_q->f("payment_amount")." (".date_format($obm_q->f("date")).")";
   }
   return;
 }

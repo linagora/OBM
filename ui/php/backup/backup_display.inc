@@ -42,11 +42,11 @@ function dis_backup_search_form($backup="") {
 //   - $backup[] : default form values
 ///////////////////////////////////////////////////////////////////////////////
 function html_backup_search_form($backup) {
-  global $display, $l_name, $l_name;
-  global $c_all, $l_all, $l_find, $l_author;
+  global $display, $l_find, $l_date, $l_version;
 
   $filename = stripslashes($backup["filename"]);
-  $author = stripslashes($document["author"]);
+  $version = stripslashes($backup["version"]);
+  $date = stripslashes($backup["date"]);
 
   $url = url_prepare("backup_index.php");
 
@@ -55,11 +55,11 @@ function html_backup_search_form($backup) {
   $block = "
   <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
   <div class=\"search\">
-    <div class=\"searchLabel\">$l_name<br />
-      <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"32\" value=\"$name\" />
+    <div class=\"searchLabel\">$l_version<br />
+      <input type=\"text\" name=\"tf_version\" id=\"tf_version\" size=\"8\" maxlength=\"8\" value=\"$version\" />
     </div>
-    <div class=\"searchLabel\">$l_name<br />
-      <input type=\"text\" name=\"tf_filename\" id=\"tf_title\" size=\"16\" value=\"$name\" />
+    <div class=\"searchLabel\">$l_date<br />
+      <script>calendar('tf_date','$date')</script>
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
@@ -105,9 +105,6 @@ function dis_backup_search_list($backup) {
 function html_backup_search_list($files, $nb_files) {
   global $display, $path, $l_found, $l_file, $l_date, $l_size, $l_version;
   global $l_bytes, $l_restore, $l_delete;
-
-  $author = stripslashes($document["author"]);
-  $filename = stripslashes($backup["filename"]);
 
   foreach ($files as $file => $one_file) {
     $cpt++;

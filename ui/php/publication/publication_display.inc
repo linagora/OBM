@@ -140,7 +140,7 @@ function html_publication_search_form ($type_q,$publication) {
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_search_list($publication) {
-  global $display, $l_no_found;
+  global $display, $l_found, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $popup = $publication["popup"];
@@ -151,7 +151,8 @@ function dis_publication_search_list($publication) {
   if ($nb_pub == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_publication_search_list($obm_q,$prefs,$nb_pub,$publication,$popup);
+    $display["msg"] = display_info_msg("$nb_pub $l_found");
+    $block = html_publication_search_list($obm_q,$prefs,$publication,$popup);
   }
 
   return $block;
@@ -163,12 +164,11 @@ function dis_publication_search_list($publication) {
 // Parameters : 
 //   - $pub_q      : publication list
 //   - $prefs      : the fields which have to be displayed
-//   - $nb_pub     : nb publications returned by the search query
 //   - $publication[]  : publication search criteria
 //     keys used   : archive, name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_search_list($pub_q, $prefs, $nb_pub,$publication,$popup) {
-  global $display, $l_found,$l_close;
+function html_publication_search_list($pub_q, $prefs, $publication, $popup) {
+  global $l_close;
 
   if ($popup) {
     $ext_action = $publication["ext_action"];
@@ -199,7 +199,6 @@ function html_publication_search_list($pub_q, $prefs, $nb_pub,$publication,$popu
   $pub_d->data_set = $pub_q;
   $pub_d->data_url = $url;
   $pub_d->data_header = "both";
-  $display["msg"] = display_info_msg("$nb_pub $l_found");
   $block = $pub_d->display("dis_data_publication");
   $block .= $display_popup_end;  
 

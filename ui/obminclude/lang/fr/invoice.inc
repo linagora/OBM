@@ -25,11 +25,14 @@ $l_compute_tax = "Calculer le montant TTC";
 $l_potential = "Potentiel";
 $l_include_archive = "Inclure les archives";
 
+$l_select_invoice = "Sélectionner la facture";
+
 // payment
 $l_no_payment = "Aucun paiement connecté à cette facture";
 $l_list_payment = " Paiements connectés à cette facture";
 
 // Titres
+
 $l_invoice_infos = "Informations à propos de la Facture";
 $l_remaining_amount = "Montant non utilisé";
 $l_to_use_amount = "Montant à affecter à cette Facture";
@@ -57,29 +60,18 @@ $l_invoice_mod = "Modifier la Facture";
 
 // Messages 
 $l_no_display = "Remplissez les critères de recherche et appuyez sur <Chercher> pour lancer la recherche";
-$l_no_deal_display = "Remplissez les critères de recherche et appuyez sur <$l_find> pour lancer la recherche des Affaires";
-$l_no_payment_display = "Remplissez les critères de recherche et appuyez sur <$l_find> pour lancer la recherche des ";
-$l_found="Facture(s) trouvée(s).";
-$l_no_found="Aucune Facture ne correspond à votre requête";
-$l_no_deal_found ="Aucune Affaire ne correspond à votre requête";
+$l_found = "Facture(s) trouvée(s).";
+$l_no_found = "Aucune Facture ne correspond à votre requête";
 $l_no_payment_found ="Auncun Paiement ne correspond à votre requête";
 $l_delete_ok = "La Facture a bien été supprimée";
 $l_delete_error = "La suppression de la Facture a échoué !";
 $l_payments_exist = "Il y a des payments reliés à cette facture !";
-$l_remove_deal_ok = "L'association Affaire Facture a bien été supprimé !";
-$l_remove_deal_error = "La suppression de l'association Affaire Facture a échoué !";
 $l_insert_ok = "La Facture a bien été insérée.";
 $l_insert_error = "L'insertion de la Facture a échoué !";
-$l_insert_deal_ok = "L'association Affaire Facture a bien été insérée !";
-$l_insert_deal_error = "L'insertion de l'association Affaire Facture a échoué !";
 $l_update_ok = "La Facture a bien été mise à jour.";
 $l_update_error = "La mise à jour de la Facture a échoué !";
 $l_query_error = "Problème durant l'exécution de la requête...";
 $l_invalid_payment = "The amount taken from a paiement is bigger than its total";
-$l_too_much_money = "The total amount of paiements is bigger than the invoice total.".
-" If you carry on, this invoice will reach status 'trouble'";
-$l_error_try_again = "There are errors !! Please restart from the beginning";
-$l_try_again = "Try Again !";
 
 $l_link_payment = "Ces paiments sont liés à cette facture";
 $l_link_payment_no = "La facture n'est liée à aucun paiment";
@@ -102,8 +94,6 @@ $l_check_amounts = "\\n Le montant TTC doit être supérieur au montant HT !";
 $l_check_inout = "\\nVous devez choisir un type !";
 $l_changing_inout = "You cannot change an invoice kind if there are \\n deals linked to it...Vous ne pouvez pas changer le type d'une Facture si elle est associée à des Affaires";
 $l_no_number="\\nUne Facture doit avoir un numéro !";
-$l_check_deal = "Vous devez sélectionner une Affaire";
-$l_select_deals = "You have to select a number of deals";
 $l_rate_nan = "Le taux TVA est invalide !";
 $l_ht_nan = "Le montant Hors Taxes est invalide !";
 
@@ -117,3 +107,5 @@ $default_invoice_numbering = "Y"; // we use only year
 // default tax rate 
 // used like that : TTC = HT * $default_tax
 $default_tax= 1.196;
+
+$l_j_select_invoice = "Vous devez sélectionner une facture !";

@@ -530,7 +530,7 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_search_list($contact) {
-  global $display, $l_no_found;
+  global $display, $l_found, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $popup = $contact["popup"];
@@ -541,7 +541,8 @@ function dis_contact_search_list($contact) {
   if ($nb_contact == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_contact_search_list($obm_q, $prefs, $nb_contact, $contact, $popup);
+    $display["msg"] .= display_info_msg("$nb_contact $l_found");
+    $block = html_contact_search_list($obm_q, $prefs, $contact, $popup);
   }
 
   return $block;
@@ -551,15 +552,14 @@ function dis_contact_search_list($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact search result
 // Parameters : 
-//   - $obm_q     : list of the contacts to display 
+//   - $obm_q     : list of contacts to display 
 //   - $prefs     : the fields which have to be displayed
-//   - $nb_con    : nb contacts returned by the search query 
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
-  global $display, $l_found, $l_add, $l_close;
+function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
+  global $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -622,7 +622,6 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
   $dis_contact->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_info_msg("$nb_con $l_found");
   $block .= $dis_contact->display("dis_data_contact");
   $block .= $display_popup_end;
 
@@ -631,10 +630,9 @@ function html_contact_search_list($obm_q, $prefs, $nb_con, $contact, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact search result
+// Display: Contact detail
 // Parameters:
-//   - $contact[] : contact criteria
-//     keys used  : company_id, name, company
+//   - $contact[] : contact values (id)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
   global $display, $l_no_found, $path, $l_query_error;
@@ -1469,7 +1467,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   // Date field
   if ($show_date) {
     $block_date = "
-    </tr><tr>
+    <tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailForm\">
         <script>calendar('tf_date','$date')</script>
@@ -1772,7 +1770,6 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     $block_category2
     $block_category3
     $block_category4
-    </tr>
     </table>
 
     <div class=\"detailHead\">$l_coord</div>

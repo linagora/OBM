@@ -56,10 +56,12 @@
 \hline
 \$of\_display\_name & Nom du dataset of\_display concerné & Permet de gérer plusieurs dataset dans le même écran \\ 
 \hline
+\$popup & indicateur d'affichage en popup (pas de menu) & a vérifier si utilisé directement encore \\ 
+\hline
 \end{tabular}
 
 \subsubsection{Gestion des paramètres}
 
-Aucun paramètre ne doit être utilisé directement !
+Aucun paramètre ne doit être utilisé directement ! Donc traiter les paramètres du tableau précédent.
 
 Afin de permettre la vérification de tous les paramètres (et la désactivation de la directive PHP register\_globals) tous les paramètres doivent être récupérés par la fonction \fonction{get\_params()} qui retourne le haschage \$params à utiliser.

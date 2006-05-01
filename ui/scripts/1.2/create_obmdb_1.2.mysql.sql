@@ -1214,22 +1214,19 @@ CREATE TABLE InvoiceStatus (
 --
 -- New table 'Payment'
 --
-CREATE TABLE  Payment (
+CREATE TABLE Payment (
   payment_id              int(8) auto_increment,
   payment_timeupdate      timestamp(14),
   payment_timecreate      timestamp(14),
   payment_userupdate      int(8),
   payment_usercreate      int(8),
   payment_company_id      int(8) NOT NULL,
-  payment_number          int(10) default null,
-  payment_date            date,
-  payment_expected_date   date,		
-  payment_amount          double(10,2) DEFAULT '0.0' NOT NULL,
-  payment_label           varchar(128) NOT NULL DEFAULT '',
-  payment_paymentkind_id  int(8),
   payment_account_id      int(8),
-  payment_inout           char(1) NOT NULL,
-  payment_paid            char(1) NOT NULL DEFAULT '0',
+  payment_paymentkind_id  int(8) NOT NULL,
+  payment_amount          double(10,2) DEFAULT '0.0' NOT NULL,
+  payment_date            date,
+  payment_inout           char(1) NOT NULL DEFAULT '+',
+  payment_number          varchar(24) DEFAULT '',
   payment_checked         char(1) NOT NULL DEFAULT '0',
   payment_comment         text,
   PRIMARY KEY (payment_id)
@@ -1242,7 +1239,7 @@ CREATE TABLE  Payment (
 CREATE TABLE PaymentKind (
   paymentkind_id          int(8) auto_increment,
   paymentkind_shortlabel  varchar(3) NOT NULL DEFAULT '',
-  paymentkind_longlabel   varchar(40) NOT NULL DEFAULT '',
+  paymentkind_label       varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (paymentkind_id)
 );
 

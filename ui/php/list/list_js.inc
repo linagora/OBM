@@ -17,7 +17,7 @@ return true;
 
 function check_get_id_url(p_url, valeur) {
   if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_company\");
+    alert (\"$l_j_select_list\");
     return false;
   } else {
     new_url = p_url + valeur;
@@ -273,20 +273,20 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_contact_firstname[]\" value=\"\" />';
   }
 
-  if (form.sel_contact_country_iso3166.value != '') {    
+  if (form.sel_contact_country_iso3166.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_country';  
+    cell.innerHTML = '$l_contact: $l_country';
     cell = values.insertCell(i);
     field = form.sel_contact_country_iso3166;
     cell.innerHTML = '<select name=\"sel_contact_country_iso3166[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;    
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_country_iso3166[]\" value=\"\" />';
   }
 
-  if (form.tf_contact_zipcode.value != '') {    
+  if (form.tf_contact_zipcode.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_postcode';  
+    cell.innerHTML = '$l_contact: $l_postcode';
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_zipcode[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_zipcode.value+'\" />';
     i++;
@@ -294,9 +294,9 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_zipcode[]\" value=\"\" />';
   }
 
-  if (form.tf_contact_town.value != '') {    
+  if (form.tf_contact_town.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_town';  
+    cell.innerHTML = '$l_contact: $l_town';
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_town[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_town.value+'\" />';
     i++;
@@ -304,9 +304,9 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_town[]\" value=\"\" />';
   }
 
-  if (form.tf_contact_timeafter.value != '') {    
+  if (form.tf_contact_timeafter.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_timeafter'; 
+    cell.innerHTML = '$l_contact: $l_timeafter';
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timeafter.value+'\" />';
     i++;
@@ -314,9 +314,9 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timeafter[]\" value=\"\" />';
   }
 
-  if (form.tf_contact_timebefore.value != '') {    
+  if (form.tf_contact_timebefore.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_timebefore'; 
+    cell.innerHTML = '$l_contact: $l_timebefore';
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timebefore.value+'\" />';
     i++;
@@ -324,71 +324,71 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timebefore[]\" value=\"\" />';
   }
 
-  if (form.sel_contact_marketingmanager_id.value != '') {    
+  if (form.sel_contact_marketingmanager_id.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_market';  
+    cell.innerHTML = '$l_contact: $l_market';
     cell = values.insertCell(i);
     field = form.sel_contact_marketingmanager_id;
     cell.innerHTML = '<select name=\"sel_contact_marketingmanager_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;    
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_marketingmanager_id[]\" value=\"\" />';
   }
 
-  if (form.sel_contact_datasource_id.value != '') {  
+  if (form.sel_contact_datasource_id.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_datasource'; 
+    cell.innerHTML = '$l_contact: $l_datasource';
     cell = values.insertCell(i);
     field = form.sel_contact_datasource_id;
     cell.innerHTML = '<select name=\"sel_contact_datasource_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_datasource_id[]\" value=\"\" />';
-  }   
+  }
   
-  if (form.sel_contactcategory1link_category_id.value != '') {  
+  if (form.sel_contactcategory1link_category_id.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_contact_cat1'; 
+    cell.innerHTML = '$l_contact: $l_contact_cat1';
     cell = values.insertCell(i);
     field = form.sel_contactcategory1link_category_id;
     cell.innerHTML = '<select name=\"sel_contactcategory1link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory1link_category_id[]\" value=\"\" />';
-  }  
+  }
 
-  if (form.sel_contactcategory2link_category_id.value != '') {  
+  if (form.sel_contactcategory2link_category_id.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_contact_cat2'; 
+    cell.innerHTML = '$l_contact: $l_contact_cat2';
     cell = values.insertCell(i);
     field = form.sel_contactcategory2link_category_id;
     cell.innerHTML = '<select name=\"sel_contactcategory2link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory2link_category_id[]\" value=\"\" />';
-  }  
+  }
   
-  if (form.sel_contact_function_id.value != '') {  
+  if (form.sel_contact_function_id.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_function'; 
+    cell.innerHTML = '$l_contact: $l_function';
     cell = values.insertCell(i);
     field = form.sel_contact_function_id;
     cell.innerHTML = '<select name=\"sel_contact_function_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_function_id[]\" value=\"\" />';
-  }   
+  }
 
-  if (form.sel_kind_lang.value != '') {  
+  if (form.sel_kind_lang.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_lang'; 
+    cell.innerHTML = '$l_contact: $l_lang';
     cell = values.insertCell(i);
     field = form.sel_kind_lang;
     cell.innerHTML = '<select name=\"sel_kind_lang[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
+    i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_kind_lang[]\" value=\"\" />';
-  }    
+  }
 
   
   return i;

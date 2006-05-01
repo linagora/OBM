@@ -248,6 +248,9 @@ $l_header_add_contact = "Ajouter contact";
 // Agenda 
 $l_header_right = "Gestion des droits";
 
+// Payment
+$l_header_link_invoice = "Lier à facture";
+
 // Project headers
 $l_header_man_task = "Tâches";
 $l_header_man_member = "Participants";

@@ -136,10 +136,10 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Deal $join_comp $whereq");
+    $count = get_query_count("SELECT count(*) FROM Deal $join_comp $whereq");
     $obm_q->set_num_rows_total($count);
   }
-  if (($count > 0)  || (! $ctu_sql_limit)) {
+  if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, "deal_search()");
     $obm_q->query($query);
   }
@@ -200,7 +200,7 @@ function run_query_deal_detail($id) {
     WHERE deal_id='$id'
       AND tasktype_id=deal_tasktype_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_deal_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
 

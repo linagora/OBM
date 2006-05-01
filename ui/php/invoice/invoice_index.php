@@ -47,16 +47,23 @@ update_last_visit("invoice", $invoice["id"], $action);
 page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
-// Main program
+// External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-
-if ($action == "index" || $action == "") {
+if ($action == "ext_get_id") {
+  $display["search"] = dis_invoice_search_form($invoice);
+  if ($set_display == "yes") {
+    $display["result"] = dis_invoice_search_list($invoice);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
+  
+} elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_invoice_search_form($invoice); 
   if ($set_display == "yes") { 
     $display["result"] = dis_invoice_search_list($invoice);
   } else { 
-    $display["msg"] .= display_ok_msg($l_no_display); 
+    $display["msg"] .= display_info_msg($l_no_display); 
   } 
 
 } elseif ($action == "search")  { 
@@ -178,9 +185,11 @@ if ($action == "index" || $action == "") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_invoice");
-update_invoice_action();
-$display["header"] = display_menu($module);
 $display["end"] = display_end();
+if (! $invoice["popup"]) {
+  update_invoice_action();
+  $display["header"] = display_menu($module);
+}
 display_page($display);
 
 
@@ -199,6 +208,7 @@ function get_param_invoice() {
   global $param_deal, $deal_label, $deal_new_label, $deal_new_id;
   global $param_project, $project_name, $project_new_name, $project_new_id;
   global $ext_id, $dash_view;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
 
   get_global_param_document($invoice);
 
@@ -223,7 +233,6 @@ function get_param_invoice() {
   if (isset ($tf_datecomment)) $invoice["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $invoice["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $invoice["add_comment"] = trim($ta_add_comment);
-  if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
   if (isset ($year)) $invoice["year"] = $year;
   if (isset ($dash_view)) $invoice["dash_view"] = $dash_view;
@@ -255,12 +264,21 @@ function get_param_invoice() {
 	$data = explode("-", $value);
 	$id = $data[2];
 	$invoice["sel_tt"][] = $id;
-      }
+      } else {
+	// sel_tt contains ids
+	$invoice["sel_tt"][] = $value;
+      }	
     }
   }
 
-  // External parameters
+  // External params
+  if (isset ($popup)) $invoice["popup"] = $popup;
+  if (isset ($ext_action)) $invoice["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $invoice["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $invoice["ext_id"] = $ext_id;
   if (isset ($ext_id)) $invoice["id"] = $ext_id;
+  if (isset ($ext_target)) $invoice["ext_target"] = $ext_target;
+  if (isset ($ext_title)) $invoice["ext_title"] = $ext_title;
 
   display_debug_param($invoice);
 
@@ -377,7 +395,7 @@ function get_invoice_action() {
     'Condition'=> array ('None')
                                         );
 
-// Display Pr�f�rences
+// Display Preferences
   $actions["invoice"]["dispref_level"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=dispref_level",
     'Right'    => $cright_read,
@@ -388,7 +406,13 @@ function get_invoice_action() {
   $actions["invoice"]["document_add"] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
-  );     
+  );
+
+// External Invoice Select 
+  $actions["invoice"]["ext_get_id"]  = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
 
 }
 

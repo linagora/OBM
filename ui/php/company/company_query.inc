@@ -479,7 +479,7 @@ function run_query_company_update($cid, $company) {
     company_comment='$comment'
   WHERE company_id='$cid'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -504,17 +504,18 @@ function run_query_company_update($cid, $company) {
 function run_query_company_delete($p_id) {
   global $cdg_sql;
 
-  $query = "DELETE FROM Company WHERE company_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
 
   run_query_global_delete_document_links($p_id, "company");
 
+  display_debug_msg($query, $cdg_sql, "run_query_company_delete(cat1 links)");
   $query = "DELETE FROM CompanyCategory1Link
     WHERE companycategory1link_company_id='$p_id'";
   $obm_q->query($query);
+
+  $query = "DELETE FROM Company WHERE company_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_company_delete()");
+  $retour = $obm_q->query($query);
 
   return $retour;
 }

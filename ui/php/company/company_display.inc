@@ -381,7 +381,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
-  global $display, $l_no_found;
+  global $display, $l_found, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $popup = $company["popup"];
@@ -391,7 +391,8 @@ function dis_company_search_list($company) {
   if ($nb_company == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_company_search_list($obm_q,$prefs,$nb_company,$company,$popup);
+    $display["msg"] = display_info_msg("$nb_company $l_found");
+    $block = html_company_search_list($obm_q, $prefs, $company, $popup);
   }
 
   return $block;
@@ -401,14 +402,13 @@ function dis_company_search_list($company) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Returns the XHTML result display
 // Parameters : 
-//   - $comp_q     : list of companies
-//   - $prefs      : Display preferences
-//   - $nb_company : nb companies returned by the search query
-//   - $company[]  : company search criteria
-//     keys used   : archive, name, type, zip
+//   - $comp_q    : list of companies
+//   - $prefs     : Display preferences
+//   - $company[] : company search criteria
+//   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) {
-  global $display, $l_found,$l_close;
+function html_company_search_list($comp_q, $prefs, $company, $popup) {
+  global $l_close;
 
   if ($popup) {
     $ext_action = $company["ext_action"];
@@ -456,7 +456,6 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
   $comp_d->data_set = $comp_q;
   $comp_d->data_url = $url;
   $comp_d->data_header = "both";
-  $display["msg"] = display_info_msg("$nb_company $l_found");
   $block = $comp_d->display("dis_data_company");
   $block .= $display_popup_end;
 
@@ -474,10 +473,10 @@ function html_company_search_list($comp_q, $prefs, $nb_company,$company,$popup) 
 function html_company_links($co_q) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   global $ico_document,$ico_document_new, $ico_project, $ico_contract;
-  global $ico_invoice;
+  global $ico_invoice, $ico_payment;
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_contract, $l_module_invoice, $l_module_document;
-  global $l_document_add;
+  global $l_module_payment, $l_document_add;
   global $l_company, $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $co_q->f("company_id");
@@ -598,6 +597,21 @@ function html_company_links($co_q) {
   </ul>";
   }
 
+  // Payment
+  if ($cgp_show["module"]["payment"]) {
+    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;param_company=$id");
+    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;param_company=$id&amp;company_name=$uname");
+    $nb_pay = get_global_linked_payment_nb($id, "company");
+    $block_payment = "
+  <div class=\"linkTitle\">:: $l_module_payment</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+        $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
+    <li><a href=\"$url_pay_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+        <a href=\"$url_pay_new\">$l_new</a></li>
+  </ul>";
+  }
+
   // Links Template  
   $block = "
 <div class=\"link\"> 
@@ -607,6 +621,7 @@ function html_company_links($co_q) {
   $block_contract
   $block_doc
   $block_invoice
+  $block_payment
 </div>";
 
   return $block;

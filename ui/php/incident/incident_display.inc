@@ -200,8 +200,7 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_search_list($incident) {
-  global $display;
-  global $l_no_found;
+  global $display, $l_found, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $prefs = get_display_pref($auth->auth["uid"], "incident");
@@ -210,7 +209,8 @@ function dis_incident_search_list($incident) {
   if ($nb_incident == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_incident_search_list($obm_q,$prefs,$nb_incident,$incident);
+    $display["msg"] = display_info_msg("$nb_incident $l_found");
+    $block = html_incident_search_list($obm_q, $prefs, $incident);
   }
   
   return $block;
@@ -222,13 +222,10 @@ function dis_incident_search_list($incident) {
 // Parameters : 
 //   - $in_q        : list of incidents
 //   - $prefs       : the fields which have to be displayed
-//   - $nb_incident : nb incidents to return by the query search
-//   - $company[]   : incidents search criteria
+//   - $incident[]  : incidents search criteria
 //     keys used    : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
-  global $display;
-  global $l_found, $l_no_found;
+function html_incident_search_list($in_q, $prefs, $incident) {
 
   $lincident = urlencode($incident["lincident"]);
   $lcontract = urlencode($incident["lcontract"]);
@@ -245,7 +242,6 @@ function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
 
   $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
 
-  $in_q->seek($first_row);
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
   $dis_incidents_list->data_url = $url;
@@ -253,7 +249,6 @@ function html_incident_search_list($in_q, $prefs, $nb_incident, $incident) {
 
   // --- HTML Template --------------------------------------------------------
 
-  $display["msg"] = display_info_msg("$nb_incident $l_found");
   $block = $dis_incidents_list->display("dis_data_incident");
   
   return $block;

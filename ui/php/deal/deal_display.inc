@@ -385,7 +385,7 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_search_list($deal) {
-  global $display, $auth, $l_no_found;
+  global $display, $auth, $l_found, $l_no_found;
 
   $new_order = $deal["new_order"];
   $order_dir = $deal["order_dir"];
@@ -395,8 +395,9 @@ function dis_deal_search_list($deal) {
   if ($nb_deal == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
+    $display["msg"] .= display_info_msg("$nb_deal $l_found");
     $prefs = get_display_pref($auth->auth["uid"], "deal", 0);
-    $block = html_deal_search_list($obm_q, $prefs, $nb_deal, $deal);
+    $block = html_deal_search_list($obm_q, $prefs, $deal);
   }
 
   return $block;
@@ -408,13 +409,12 @@ function dis_deal_search_list($deal) {
 // Parameters:
 //   - $deal_q   : list of deals
 //   - $prefs    : fields to display in the list of deals 
-//   - $nb_deal  : nb deals found
 //   - $deal[]   : deal search criteria
 //     keys used : parent, label, company_name, archive, kind, tt, status,
 //                 manager, dateafter, datebefore
 //////////////////////////////////////////////////////////////////////////////
-function html_deal_search_list($deal_q, $prefs, $nb_deal, $deal) {
-  global $display, $l_found, $l_close;
+function html_deal_search_list($deal_q, $prefs, $deal) {
+  global $l_close;
 
   $popup = $deal["popup"];
   $parent = $deal["parent"];
@@ -460,7 +460,6 @@ function html_deal_search_list($deal_q, $prefs, $nb_deal, $deal) {
   $deal_d->data_set = $deal_q;
   $deal_d->data_url = $url;
   $deal_d->data_header = "both";
-  $display["msg"] .= display_info_msg("$nb_deal $l_found");
   $block = $deal_d->display("dis_data_deal");
   $block .= $display_popup_end;
 

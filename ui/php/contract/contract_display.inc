@@ -308,7 +308,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
 //     keys used   : label,...
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_list($contract) {
-  global $l_no_found;
+  global $l_found, $l_no_found;
   global $display, $auth, $new_order, $order_dir;
   
   $popup = $contract["popup"];
@@ -318,7 +318,8 @@ function dis_contract_search_list($contract) {
   if ($nb_contract == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_contract_search_list($obm_q,$prefs,$nb_contract,$contract, $popup);
+    $display["msg"] .= display_info_msg($nb_contract." ".$l_found);
+    $block = html_contract_search_list($obm_q, $prefs, $contract, $popup);
   }
 
   return $block;
@@ -330,13 +331,12 @@ function dis_contract_search_list($contract) {
 // Parameters :
 //   - $contract_q : contracts list
 //   - $prefs      : fields to display in the contracts list
-//   - $nb_con     : nb contract found
 //   - $contract[] : contract search criteria
 //     keys used   : label, type, dateafter, datebefore, company_name, market
 //   - $popup      : popup flag tell if external parameters to handle
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_list($contract_q, $prefs, $nb_con, $contract, $popup) {
-  global $display, $l_found, $l_close;
+function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
+  global $l_close;
   
   if ($popup) {
     $ext_action = $contract["ext_action"];
@@ -383,9 +383,6 @@ function html_contract_search_list($contract_q, $prefs, $nb_con, $contract, $pop
   $contract_d->data_url = $url;
   $contract_d->data_header = "both";
 
-  // --- html template --------------------------------------------------------
-
-  $display["msg"] .= display_info_msg($nb_con." ".$l_found);
   $block = $contract_d->display("dis_data_contract");
 
   return $block;

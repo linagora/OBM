@@ -555,7 +555,7 @@ function get_list_action() {
    'Condition'=> array ('None') 
                                             );
 
-// Company Select 
+// External List Select 
   $actions["list"]["ext_get_id"]  = array (
     'Url'      => "$path/list/list_index.php?action=ext_get_id",
     'Right'    => $cright_read,

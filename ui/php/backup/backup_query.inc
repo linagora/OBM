@@ -18,6 +18,9 @@
 function get_backup_list($backup) {
   global $cbackup_root;
 
+  $version = $backup["version"];
+  $date = $backup["date"];
+
   if ( substr($cbackup_root, strlen($cbackup_root)-1 ) != '/' ) {
     $backup_path = $cbackup_root . '/';
   } else {
@@ -30,9 +33,15 @@ function get_backup_list($backup) {
       $fullname = $backup_path . $file;
       if (! is_dir($fullname)) {
         preg_match('/[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?/', $file, $matches);
-	$files[$file]["version"] = $matches[0];
-	$files[$file]["date"] = filemtime($fullname);
-	$files[$file]["size"] = filesize($fullname);
+	$b_version = $matches[0];
+	if (preg_match("/^$version/", $b_version)) {
+	  $b_date = filemtime($fullname);
+	  if (preg_match("/^$date/", datetime_format($b_date))) {
+	    $files[$file]["version"] = $b_version;
+	    $files[$file]["date"] = $b_date;
+	    $files[$file]["size"] = filesize($fullname);
+	  }
+	}
       }
     }
   }

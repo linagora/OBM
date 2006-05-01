@@ -11,6 +11,19 @@ require("$obminclude/javascript/check_js.inc");
 require_once("$obminclude/of/of_extmod.inc");
 
 $extra_js .= "
+
+function check_get_id_url(p_url, valeur) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_invoice\");
+    return false;
+  } else {
+    new_url = p_url + valeur;
+    window.opener.location.href=new_url;
+    window.close();
+    return true;
+  }
+}
+
 // user input check in  html_invoice_search_form :
 function check_search_form(f_inv){
   j_ht=f_inv.tf_amount_ht.value;

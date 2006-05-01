@@ -8,8 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
 // - index (default)    -- search fields  -- show the invoice search form
-// - display            --                -- display and set display parameters
-// - dispref_level      --                -- update one field display position 
+// - bar                --                -- display a bar chart
+// - bar_multiple       --                -- display a multiple bar chart
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -81,11 +81,6 @@ function dis_chart_bar($chart) {
   $xlabel = new Label($xlabels);
   $plot->xAxis->setlabelText($xlabels);
 
-  // Legend infos
-  $legend = new Legend();
-  $legend->add($plot, "test legende");
-  $legend->show();
-
   // Title infos
   if ($title != "") {
     $graph->title->set("$title");
@@ -104,11 +99,12 @@ function dis_chart_bar($chart) {
 function dis_chart_bar_multiple($chart) {
   global $chart_colors;
 
-  $legends = $chart["plots"]["legends"];
-  $new_bar = $chart["plots"]["new_bar"];
-  $labels = $chart["labels"];
   $title = $chart["title"];
   $xlabels = $chart["xlabels"];
+  $values = $chart["plots"]["values"];
+  $labels = $chart["plots"]["labels"];
+  $legends = $chart["plots"]["legends"];
+  $new_bar = $chart["plots"]["new_bar"];
 
   $graph = new Graph(600, 250);
   $graph->setAntiAliasing(TRUE);
@@ -129,29 +125,31 @@ function dis_chart_bar_multiple($chart) {
     $graph->title->set("$title");
   }
 
-  $new_bar = array(1, 0);
   $num = 0;
   $nb_bars = array_sum($new_bar);
   $num_bar = 0;
-  foreach ($chart["values"] as $num => $values) {
+
+  // $num_plot is the plot number
+  // $num_bar is the bar number (1 bar can cumul more than one plot)
+  foreach ($values as $num_plot => $plot_values) {
     // Chart infos : colors, size, shadow
-    if ($new_bar[$num] == 1) {
+    if ($new_bar[$num_plot] == 1) {
       $num_bar++;
     }
-    $plot = new BarPlot($values, $num_bar, $nb_bars);
-    $plot->setBarColor(new Color($chart_colors[$num][0], $chart_colors[$num][1], $chart_colors[$num][2]));
+    $plot = new BarPlot($plot_values, $num_bar, $nb_bars);
+    $plot->setBarColor(new Color($chart_colors[$num_plot][0], $chart_colors[$num_plot][1], $chart_colors[$num_plot][2]));
     $plot->setBarSize(0.6);
-    if ($new_bar[$num] == 1) {
+    if ($new_bar[$num_plot] == 1) {
       $plot->barShadow->setSize(2);
       $plot->barShadow->smooth(TRUE);
       // Labels infos
-      $label = new Label($labels);
+      $label = new Label($labels[$num_plot]);
       $label->setFont(new Tuffy(8));
       $label->setAlign(NULL, LABEL_TOP_HIGH);
       $plot->label = $label;
     }
     $group->add($plot);
-    $group->legend->add($plot, $legends[$num], LEGEND_BACKGROUND);
+    $group->legend->add($plot, $legends[$num_plot], LEGEND_BACKGROUND);
   }
 
   $graph->add($group);
@@ -163,13 +161,14 @@ function dis_chart_bar_multiple($chart) {
 // returns : $chart hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_chart() {
-  global $title, $values, $chart_plots, $chart_labels, $chart_xlabels;
+  global $title, $values, $plots, $labels, $xlabels;
 
   if (isset ($title)) $chart["title"] = stripslashes($title);
   if (isset ($values)) $chart["values"] = unserialize(stripslashes($values));
-  if (isset ($chart_plots)) $chart["plots"] = unserialize(stripslashes($chart_plots));
-  if (isset ($chart_labels)) $chart["labels"] = unserialize(stripslashes($chart_labels));
-  if (isset ($chart_xlabels)) $chart["xlabels"] = unserialize(stripslashes($chart_xlabels));
+  if (isset ($labels)) $chart["labels"] = unserialize(stripslashes($labels));
+  if (isset ($xlabels)) $chart["xlabels"] = unserialize(stripslashes($xlabels));
+
+  if (isset ($plots)) $chart["plots"] = unserialize(stripslashes($plots));
 
   display_debug_param($chart);
 

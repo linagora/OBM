@@ -26,6 +26,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("backup_query.inc");
 require("backup_display.inc");
+require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
 $backup = get_param_backup();
@@ -119,10 +120,12 @@ display_page($display);
 // returns : $backup hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_backup() {
-  global $tf_filename, $param_backup, $popup; 
+  global $tf_filename, $tf_version, $tf_date, $param_backup, $popup; 
 
   if (isset ($param_backup)) $backup["filename"] = $param_backup;
   if (isset ($tf_filename)) $backup["filename"] = $tf_filename;
+  if (isset ($tf_version)) $backup["version"] = $tf_version;
+  if (isset ($tf_date)) $backup["date"] = $tf_date;
 
   display_debug_param($backup);
 
@@ -137,7 +140,6 @@ function get_backup_action() {
   global $dbackup, $actions, $path;
   global $l_header_list, $l_header_find, $l_header_new, $l_header_delete;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-
 
 // Index  
   $actions["backup"]["index"] = array (

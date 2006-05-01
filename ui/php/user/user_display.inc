@@ -197,7 +197,7 @@ function html_user_search_form($user) {
 //     keys used : name, perms
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_search_list($user) {
-  global $l_no_found;
+  global $l_found, $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
   $popup = $user["popup"];
@@ -209,7 +209,8 @@ function dis_user_search_list($user) {
   if ($nb_user == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup);
+    $display["msg"] .= display_info_msg("$nb_user $l_found");
+    $block = html_user_search_list($obm_q, $prefs, $user, $popup);
   }
 
   return $block;
@@ -221,13 +222,12 @@ function dis_user_search_list($user) {
 // Parameters:
 //   - $obm_q    : database result (user list)
 //   - $prefs    : the fields which have to be displayed
-//   - $nb_user  : nb users returned by the search query
 //   - $user[]   : user search criteria
 //     keys used : login, lastname, pemrs
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
-  global $display, $l_found, $l_close, $l_add;
+function html_user_search_list($obm_q, $prefs, $user, $popup) {
+  global $l_close, $l_add;
 
   $login = urlencode($user["login"]);
   $lname = urlencode($user["lastname"]);
@@ -287,7 +287,6 @@ function html_user_search_list($obm_q, $prefs, $nb_user, $user, $popup) {
   $user_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_info_msg("$nb_user $l_found");
   $block .= $user_d->display("dis_user_data");
   $block .= $display_popup_end;
 
