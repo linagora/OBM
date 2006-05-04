@@ -453,10 +453,11 @@ function html_list_search_list($obm_q, $prefs, $list, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
   $name = urlencode(stripslashes($list["name"]));
+  $email = urlencode(stripslashes($list["email"]));
   $contact = urlencode(stripslashes($list["contact"]));
   $mark = $list["marketing_manager"];
 
-  $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;tf_email=$email&amp;sel_market=$mark$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA", $prefs, "list");
   if ($popup) {

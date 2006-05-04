@@ -84,3 +84,10 @@ ALTER TABLE PaymentKind ALTER COLUMN paymentkind_label SET DEFAULT '';
 ALTER TABLE PaymentKind ALTER COLUMN paymentkind_label SET NOT NULL;
 UPDATE PaymentKind SET paymentkind_label = paymentkind_longlabel;
 ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;
+
+
+-------------------------------------------------------------------------------
+-- Drop deprecated tables
+-------------------------------------------------------------------------------
+DROP TABLE EntryTemp;
+DROP TABLE PaymentTemp;

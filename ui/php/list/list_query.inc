@@ -1518,9 +1518,11 @@ function make_list_query_from_criteria($list) {
 		  $operation = str_replace('%f',$field,$operation);
 		  $operation = str_replace('%v',$value,$operation);
 		  if ($exclusion_where[$line] != "") {
-		    $exclusion_where[$line] .= " AND $operation";
+		    //		    $exclusion_where[$line] .= " AND $operation";
+		    $exclusion_where[$line] .= " OR (NOT $operation or $field is null)";
 		  } else {
-		    $exclusion_where[$line] = " $operation";
+		    //		    $exclusion_where[$line] = " $operation";
+		    $exclusion_where[$line] = " (NOT $operation or $field is null)";
 		  }
 
 		  // Case Normal criteria line
@@ -1611,7 +1613,8 @@ function make_list_query_from_criteria($list) {
 
 	// Exclusion on field with no n-n relation
 	} else {
-	  $exclusion .= " AND NOT ". $exclusion_where[$line];
+	  //	  $exclusion .= " AND NOT ". $exclusion_where[$line];
+	  $exclusion .= " AND (". $exclusion_where[$line].")";
 	}
       }
 

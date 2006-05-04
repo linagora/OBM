@@ -427,12 +427,10 @@ function get_global_linked_invoice_nb ($id, $entity, $arch="") {
 function get_global_linked_payment_nb ($id, $entity) {
   global $cdg_sql;
 
-  if ($entity == "deal") {
-    $query = "SELECT count(invoice_id) as nb
-      FROM Invoice
-        LEFT JOIN Project on invoice_project_id=project_id
-      WHERE (invoice_deal_id = '$id'
-        OR project_deal_id = '$id')";
+  if ($entity == "invoice") {
+    $query = "SELECT count(paymentinvoice_payment_id) as nb
+      FROM PaymentInvoice
+      WHERE paymentinvoice_invoice_id = '$id'";
   } else {
     $query = "SELECT count(payment_id) as nb
     FROM Payment

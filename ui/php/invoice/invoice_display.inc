@@ -369,6 +369,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;param_company=$comp_id".
 		    "&amp;param_deal=$deal_id".
 		    "&amp;param_project=$proj_id".
+		    "&amp;tf_company=$company".
 		    "&amp;cb_archive=$archive".
                     "$url_ext"); 
 
@@ -412,10 +413,9 @@ function dis_invoice_consult($invoice) {
     $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
   }
   if ($id > 0) {
-    $pay_q = run_query_invoice_payment($id);
-    $prefs_p = get_display_pref($uid, "payment");
+    $pays = get_invoice_payment($id);
     $display["detailInfo"] = display_record_info($inv_q);
-    $block = html_invoice_consult($inv_q, $pay_q, $prefs_p);
+    $block = html_invoice_consult($inv_q, $pays);
   }
 
   return $block;
@@ -425,43 +425,65 @@ function dis_invoice_consult($invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display invoice detail screen
 // Parameters:
-//   - $inv_q  : DBO invoice info
-//   - $pay_q  : DBO : payments for the invoice
-//   - prefs_p : display pref for payments
+//   - $inv_q : DBO invoice info
+//   - $pays  : array : payments for the invoice
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_consult($inv_q, $pay_q, $prefs_p) {
-  global $display, $set_theme;
-  global $l_delete, $l_invoice_infos;
-  global $l_list_payment, $l_no_payment, $l_payments_todel;
+function html_invoice_consult($inv_q, $pays) {
+  global $path, $display, $set_theme;
+  global $l_delete, $l_invoice, $l_payment, $l_no_payment, $l_total;
+  global $l_list_payment, $l_company, $l_date, $l_number, $l_amount, $l_payments_todel;
 
   $i_id = $inv_q->f('invoice_id');
 
   $display["link"] = html_invoice_links($inv_q);
   $block = dis_invoice_detail ($inv_q);
   
-  //  payments data :
-  $block .= "<div class=\"detailHead\">$l_list_payment</div>";
+  if (count($pays) > 0) {
+    $l_payment_title = $l_list_payment;
+    $block_payment = "
+<table class=\"resultTable\">
+<tr>
+  <td class=\"resultHead\">$l_date</td>
+  <td class=\"resultHead\">$l_company</td>
+  <td class=\"resultHead\">$l_number</td>
+  <td class=\"resultHead\">$l_amount</td>
+  <td class=\"resultHead\">$l_invoice : $l_amount</td>
+</tr>";
+    $affected_amount_total = 0;
+    foreach ($pays as $one_pay) {
+      $id = $one_pay["id"];
+      $affected_amount = $one_pay["affected_amount"];
+      $amount = $one_pay["amount"];
+      $company = $one_pay["company"];
+      $number = $one_pay["number"];
+      $date = $one_pay["date"];
+      
+      $affected_amount_total += $affected_amount;
 
-  if ($pay_q->nf() == 0) {
-    // no payment
-    $block .= "
-     <table class=\"detail\">
-      <tr>
-       <td class=\"detailLabel\">$l_no_payment</td>
-      </tr>
-     </table>";
+      $block_payment .= "
+<tr class=\"data0\">
+  <td style=\"text-align:center;\"><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;param_payment=$id\">$date</a></td>
+  <td style=\"text-align:center;\">$company</td>
+  <td><a href=\"$path/payment/payment_index.php?action=detailconsult&amp;param_payment=$id\">$number</a></td>
+  <td style=\"text-align:right;\">$amount </td>
+  <td class=\"data2\" style=\"text-align:right;\">$affected_amount </td>
+</tr>";
+    }
+
+    $block_payment .= "
+<tr class=\"data0\">
+  <td colspan=\"4\" style=\"text-align:center;\">$l_total</td>
+  <td class=\"resultHead\" style=\"text-align:right;\">$affected_amount_total</td>
+</tr>
+</table>";
 
   } else {
-    $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=$i_id");
-
-    $dis_payment = new OBM_DISPLAY("DATA", $prefs_p, "invoice");
-    $dis_payment->data_set = $pay_q;
-    $dis_payment->data_header = "top";
-    $dis_payment->data_url = $url;
-    $dis_payment->data_order = false;
-    
-    $block .= $dis_payment->display("dis_data_invoice");
+    $l_payment_title = $l_no_payment;
   }
+
+  //  payments data :
+  $block .= "<div class=\"detailHead\">$l_payment_title</div>
+  $block_payment";
 
   return $block;
 }
@@ -475,8 +497,8 @@ function html_invoice_consult($inv_q, $pay_q, $prefs_p) {
 //   $r : string with XHTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_links($inv_q) {
-  global $set_theme, $ico_document, $ico_document_new;
-  global $l_invoice, $l_new, $l_module_document;
+  global $set_theme, $ico_document, $ico_document_new, $ico_payment;
+  global $l_invoice, $l_new, $l_module_document, $l_module_payment;
   global $l_document_add;
   global $path, $auth, $cgp_show, $popup_height, $popup_width;
 
@@ -506,10 +528,26 @@ function html_invoice_links($inv_q) {
   </ul>";
   }
 
+  // Payment
+  if ($cgp_show["module"]["payment"]) {
+    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;param_invoice=$id");
+    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;param_invoice=$id");
+    $nb_pay = get_global_linked_payment_nb($id, "invoice");
+    $block_payment = "
+  <div class=\"linkTitle\">:: $l_module_payment</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+        $l_module_payment ( <a href=\"$url_pay\">$nb_pay</a> )</li>
+    <li><a href=\"$url_pay_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_payment\" alt=\"\" /></a>
+        <a href=\"$url_pay_new\">$l_new</a></li>
+  </ul>";
+  }
+
   // Links Template  
   $block = "
 <div class=\"link\"> 
   $block_doc
+  $block_payment
 </div>";
 
   return $block;

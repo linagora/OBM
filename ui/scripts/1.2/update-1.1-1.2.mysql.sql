@@ -68,3 +68,10 @@ CREATE TABLE Payment (
 ALTER TABLE PaymentKind ADD COLUMN paymentkind_label varchar(40) NOT NULL DEFAULT '';
 UPDATE PaymentKind SET paymentkind_label = paymentkind_longlabel;
 ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;
+
+
+-------------------------------------------------------------------------------
+-- Drop deprecated tables
+-------------------------------------------------------------------------------
+DROP TABLE IF EXISTS EntryTemp;
+DROP TABLE IF EXISTS PaymentTemp;

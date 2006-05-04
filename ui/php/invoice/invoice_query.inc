@@ -410,7 +410,7 @@ function get_invoicestatus($target="") {
 // if $not_paid == -1, we return only paid payments
 // ie. lines having paymetinvoice_amoount != 0.0
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_payment ($p_invoice, $not_paid=0) {
+function get_invoice_payment ($p_invoice, $not_paid=0) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -422,9 +422,11 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
       payment_id,
       payment_number,
       $date,
-      payment_amount
+      payment_amount,
+      company_name
     FROM PaymentInvoice
       LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
+      LEFT JOIN Company ON payment_company_id=company_id
     WHERE paymentinvoice_invoice_id = '$p_invoice'";
 
   if ($not_paid == 1) {
@@ -433,9 +435,25 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
     $query .= " AND paymentinvoice_amount <> 0.0 ";
   }
   
-  display_debug_msg($query, $cdg_sql, "run_query_invoice_payment");
+  display_debug_msg($query, $cdg_sql, "get_invoice_payment");
   $obm_q->query($query);
-  return $obm_q;
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("payment_id");
+    $number = $obm_q->f("payment_number");
+    $company = $obm_q->f("company_name");
+    $date = date_format($obm_q->f("payment_date"));
+    $amount = $obm_q->f("payment_amount");
+    $affected_amount = $obm_q->f("paymentinvoice_amount");
+    $p[$id] = array ("id" => $id,
+		     "date" => $date,
+		     "number" => $number,
+		     "company" => $company,
+		     "amount" => $amount,
+		     "affected_amount" => $affected_amount);
+  }
+
+  return $p;
 }
 
 

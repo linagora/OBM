@@ -472,7 +472,7 @@ function html_payment_consult($p_q, $invs) {
    </table>
 
   <div class=\"detailHead\">$l_invoice_title</div>
-	
+
   $block_invoice
 ";
 
