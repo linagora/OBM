@@ -427,7 +427,8 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $ctry = $company["country"];
   $type = $company["type"];
   $cat1 = $company["category1"];
-  $cat_tree = $company["cat_tree"];
+  $cat_code = $company["category1_code"];
+  $cat_tree = $company["category1_tree"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $zip = urlencode(stripslashes($company["zip"]));
@@ -437,7 +438,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $datebefore = stripslashes($company["datebefore"]);
   $fuzzy = $company["fuzzy"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;cb_cat_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_fuzzy=$fuzzy$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cb_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_fuzzy=$fuzzy$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {

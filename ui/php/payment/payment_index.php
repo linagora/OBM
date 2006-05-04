@@ -20,7 +20,7 @@ require("payment_js.inc");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
-if ($action == "")  $action = "index";
+if ($action == "") $action = "index";
 $params = get_param_payment();
 get_payment_action();
 $perm->check_permissions($module, $action);
@@ -196,7 +196,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_payment() {
   global $tf_number, $tf_amount, $tf_date_after, $tf_date_before, $rd_inout;
-  global $sel_kind, $sel_account, $cb_checked, $sel_invoice;
+  global $sel_kind, $sel_account, $cb_checked, $sel_invoice, $invoice_name;
   global $tf_date, $ta_comment, $tf_comment, $tf_company;
   global $param_payment;
   global $param_company, $company_name, $company_new_name, $company_new_id;
@@ -222,6 +222,7 @@ function get_param_payment() {
   if (isset ($company_new_id)) $payment["comp_new_id"] = $company_new_id;
 
   if (isset ($sel_invoice)) $payment["invoice_id"] = $sel_invoice;
+  if (isset ($invoice_name)) $payment["invoice_name"] = $invoice_name;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;

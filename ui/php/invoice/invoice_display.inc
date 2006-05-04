@@ -504,6 +504,9 @@ function html_invoice_links($inv_q) {
 
   $id = $inv_q->f("invoice_id");
   $name = $inv_q->f("invoice_label");
+  $company_id = $inv_q->f("invoice_company_id");
+  $company_name = urlencode($inv_q->f("company_name"));
+  $amount = $inv_q->f("invoice_amount_ttc");
 
   $uname = urlencode($name);
 
@@ -530,8 +533,8 @@ function html_invoice_links($inv_q) {
 
   // Payment
   if ($cgp_show["module"]["payment"]) {
-    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;param_invoice=$id");
-    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;param_invoice=$id");
+    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;sel_invoice=$id");
+    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;sel_invoice=$id&amp;invoice_name=$uname&amp;param_company=$company_id&amp;company_name=$company_name&amp;tf_amount=$amount");
     $nb_pay = get_global_linked_payment_nb($id, "invoice");
     $block_payment = "
   <div class=\"linkTitle\">:: $l_module_payment</div>

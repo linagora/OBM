@@ -629,7 +629,7 @@ function dis_payment_form($action, $params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   global $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
-  global $l_payment, $l_account, $l_kind, $l_date, $l_number;
+  global $l_payment, $l_invoice, $l_account, $l_kind, $l_date, $l_number;
   global $l_amount, $l_inout, $l_received, $l_emitted, $l_comment;
   global $l_update, $l_checkdelete, $l_insert;
   global $popup_width, $popup_height;
@@ -677,6 +677,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   if (isset($params["comp_new_id"])) { $c_new_id = $params["comp_new_id"]; }
   if (isset($params["comp_new_name"])) { $c_new_name = $params["comp_new_name"]; }
   if (isset($params["id"])) { $id = $params["id"]; }
+  if (isset($params["invoice_id"])) { $invoice_id = $params["invoice_id"]; }
   if (isset($params["account"])) { $account = $params["account"]; }
   if (isset($params["kind"])) { $kind = $params["kind"]; }
   if (isset($params["date"])) { $date = $params["date"]; }
@@ -688,6 +689,15 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
 
   // Payment kind field
   $block_kind = of_category_dis_entity_form("payment", "kind", $kinds, "mono", $kind, "none");
+
+  // Invoice field (new from Invoice)
+  if (isset($invoice_id)) {
+    $dis_invoice = "
+    <tr>
+      <td class=\"detailLabel\">$l_invoice</td>
+      <td class=\"detailForm\">".$params["invoice_name"]."</td>
+    </tr>";
+  }
 
   // Account select
   $sel_account ="
@@ -729,6 +739,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   // INSERT
   } elseif (($action=="new") || ($action=="insert") || ($action=="detailduplicate")) {
     $dis_button = "
+      <input type=\"hidden\" name=\"sel_invoice\" value=\"$invoice_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
@@ -746,6 +757,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailForm\">$dis_company</td>
     </tr>
+    $dis_invoice
     <tr>
       <td class=\"detailLabel\">$l_amount</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" /></td>

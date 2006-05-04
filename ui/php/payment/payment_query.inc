@@ -181,6 +181,7 @@ function run_query_payment_insert($params) {
   }
 
   $account_id = $params["account"];
+  $invoice_id = $params["invoice_id"];
   $kind = $params["kind"];
   $number = $params["number"];
   $date = ($params["date"] ? "'".$params["date"]."'" : "null");
@@ -223,6 +224,7 @@ function run_query_payment_insert($params) {
 
   $datep = ($params["date"] ? "='".$params["date"]."'" : "is null");
 
+  // Get the payment id inserted
   $query = "SELECT payment_id
     FROM Payment
     WHERE payment_company_id = '$company_id'
@@ -231,10 +233,29 @@ function run_query_payment_insert($params) {
       AND payment_amount = '$amount'
       AND payment_comment = '$comment'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_payment_insert(2)");
   $obm_q->query($query);
   $obm_q->next_record();
   $id = $obm_q->f("payment_id");
+
+  // insert the payment-invoice link, if invoice_id set
+  if ($id > 0 && isset($invoice_id)) {
+    $query = "INSERT INTO PaymentInvoice (
+      paymentinvoice_invoice_id,
+      paymentinvoice_payment_id,
+      paymentinvoice_amount,
+      paymentinvoice_timecreate,
+      paymentinvoice_usercreate
+    ) VALUES (
+      '$invoice_id',
+      '$id',
+      '0',
+      '$now',
+      '$uid')";
+
+    display_debug_msg($query, $cdg_sql, "run_query_payment_insert(3)");
+    $obm_q->query($query);
+  }
 
   return $id;
 }
@@ -308,7 +329,7 @@ function get_payment_invoices($id) {
     company_name,
     SUM(PI2.paymentinvoice_amount) as invoice_already_paid
   FROM PaymentInvoice as PI1
-    LEFT JOIN Invoice on paymentinvoice_invoice_id=invoice_id
+    LEFT JOIN Invoice on PI1.paymentinvoice_invoice_id=invoice_id
     LEFT JOIN Company on invoice_company_id=company_id
     LEFT JOIN PaymentInvoice as PI2 on invoice_id=PI2.paymentinvoice_invoice_id
               and PI2.paymentinvoice_payment_id != '$id'
