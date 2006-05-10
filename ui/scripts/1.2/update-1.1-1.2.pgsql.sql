@@ -39,7 +39,13 @@ UPDATE Contact SET contact_address3='' WHERE contact_address3 is null;
 UPDATE Contact SET contact_zipcode='' WHERE contact_zipcode is null;
 UPDATE Contact SET contact_town='' WHERE contact_town is null;
 UPDATE Contact SET contact_expresspostal='' WHERE contact_expresspostal is null;
+UPDATE Contact SET contact_country_iso3166=0 WHERE contact_country_iso3166='' OR contact_country_iso3166 is null;
+
+ALTER TABLE Contact ALTER COLUMN contact_country_iso3166 SET DEFAULT '0';
+ 
 UPDATE Company SET company_zipcode='' WHERE company_zipcode is null;
+UPDATE Company SET company_country_iso3166=0 WHERE company_country_iso3166='' OR company_country_iso3166 is null;
+ALTER TABLE Company ALTER COLUMN company_country_iso3166 SET DEFAULT '0';
 
 
 -------------------------------------------------------------------------------

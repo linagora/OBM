@@ -117,7 +117,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   if ($company_id != "") {
     $where .= " AND contact_company_id='$company_id'";
   }
-  // If a post code has been specified, get it 
+  // If a post code has been specified, get it
   if ($zip != "") {
     $where .= " AND contact_zipcode $like '$zip%'";
   }
