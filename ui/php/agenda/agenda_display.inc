@@ -1445,13 +1445,13 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
 
   if (isset($agenda["datebegin"])) {
-    $ts = isodate_to_timestamp($agenda["datebegin"]);
+    $ts = isodatetime_to_timestamp($agenda["datebegin"]);
     $datebegin = isodate_format($ts);
     $hourbegin = get_hour($ts);
     $minbegin = date("i", $ts);
   }
   if (isset($agenda["dateend"])) {
-    $ts = isodate_to_timestamp($agenda["dateend"]);
+    $ts = isodatetime_to_timestamp($agenda["dateend"]);
     $dateend = isodate_format($ts);
     $hourend = get_hour($ts);
     $minend = date("i", $ts);

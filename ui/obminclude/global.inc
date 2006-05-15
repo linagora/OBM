@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre6";
+$obm_version = "1.2.0pre7";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -644,7 +644,7 @@ function datetime_format($timestamp="", $null_empty="") {
 // Returns:
 //   timestamp of the date
 ///////////////////////////////////////////////////////////////////////////////
-function isodate_to_timestamp($iso) {
+function isodatetime_to_timestamp($iso) {
 
   preg_match("/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/",$iso, $d);
   $ts = mktime($d[4],$d[5],$d[6],$d[2],$d[3],$d[1]);
@@ -872,42 +872,6 @@ function beautify_comment($com, $p_order="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display an entity dates and users creation / update infos
-// Parameters:
-//   - $obm_q : DBO object : used fields
-//              usercreate userupdate timecreate timeupdate datasource_name
-///////////////////////////////////////////////////////////////////////////////
-function display_record_info($obm_q) {
-  global $set_theme, $ico_created, $ico_updated;
-
-  if (is_object($obm_q)) {
-    $usercreate = $obm_q->f("usercreate");
-    $userupdate = $obm_q->f("userupdate");
-    $timecreate = datetime_format($obm_q->f("timecreate"), 1);
-    $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
-    $datasource = $obm_q->f("datasource_name");
-    
-    $created = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
-    $updated = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
-    
-    if ($datasource != "") {
-      $dis_dsrc = "<br />$datasource";
-    } else {
-      $dis_dsrc = "";
-    }
-    
-    $block = "<div class=\"detailInfo\">$created<br />$updated $dis_dsrc
-  </div>";
-  } else {
-    $block = "<div class=\"detailInfo\">$created<br />$updated $dis_dsrc
-  </div>";
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Check Privacy access
 // if action has privacy enable, check if entity is visible by the user
 // Parameters:
@@ -932,14 +896,15 @@ function check_privacy($module, $table, $action, $id, $p_uid="") {
   } else {
     $uid = $p_uid;
   }
-
+ 
   $entity = strtolower($table);
+  if ($entity == "ugroup") { $entity = "group"; }
 
   $field_pri = "${entity}_privacy";
   $field_uc = "${entity}_usercreate";
   $field_id = "${entity}_id";
 
-  $query = "select $field_pri, $field_uc from $table where $field_id = '$id'";
+  $query = "SELECT $field_pri, $field_uc FROM $table WHERE $field_id = '$id'";
   display_debug_msg($query, $cdg_sql, "${entity}_search()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -948,7 +913,6 @@ function check_privacy($module, $table, $action, $id, $p_uid="") {
   if ($obm_q->num_rows() == 0) {
     return true;
   }
-
   $obm_q->next_record();
 
   // If entity is public or uid is the owner, grant access
@@ -958,6 +922,34 @@ function check_privacy($module, $table, $action, $id, $p_uid="") {
   } else {
     return false;
   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the privacy select
+// Parameters:
+//   - $privacy : entry selected
+// Returns:
+//   privacy select
+///////////////////////////////////////////////////////////////////////////////
+function dis_privacy_search_select($privacy) {
+  global $c_all, $l_all, $c_public, $l_public, $c_private, $l_private;
+
+  $sel = "<select id=\"sel_privacy\" name=\"sel_privacy\">
+<option value=\"$c_all\">$l_all</option>";
+  $sel .= "\n<option value=\"$c_public\"";
+  if ($privacy == $c_public) {
+    $sel .= " selected=\"selected\"";
+  }
+  $sel .= ">$l_public</option>
+<option value=\"$c_private\"";
+  if ($privacy == $c_private) {
+    $sel .= " selected=\"selected\"";
+  }
+  $sel .= ">$l_private</option>
+</select>";
+
+  return $sel;
 }
 
 

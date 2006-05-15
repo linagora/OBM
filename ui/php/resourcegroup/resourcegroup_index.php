@@ -46,7 +46,12 @@ $perm->check_permissions($module, $action);
 
 $uid = $auth->auth["uid"];
 
-update_last_visit("resourcegroup", $param_resourcegroup, $action);
+if (! check_privacy($module, "RGroup", $action, $resourcegroup["id"], 0)) {
+  $display["msg"] = display_err_msg($l_error_visibility);
+  $action = "index";
+} else {
+  update_last_visit("resourcegroup", $resourcegroup["id"], $action);
+}
 
 page_close();
 
@@ -244,7 +249,7 @@ display_page($display);
 function get_param_resourcegroup() {
   global $param_resourcegroup, $popup, $child_res;
   global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_desc, $tf_resource, $tf_email, $cb_vis, $cb_priv;
+  global $tf_name, $tf_desc, $tf_resource, $tf_email, $cb_priv, $sel_privacy;
   global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
   global $ext_element;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
@@ -255,7 +260,8 @@ function get_param_resourcegroup() {
   if (isset ($tf_desc)) $resourcegroup["desc"] = trim($tf_desc);
   if (isset ($tf_email)) $resourcegroup["email"] = $tf_email;
   if (isset ($tf_resource)) $resourcegroup["resource"] = trim($tf_resource);
-  if (isset ($cb_priv)) $resourcegroup["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_priv)) $resourcegroup["privacy"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($sel_privacy)) $resourcegroup["privacy"] = $sel_privacy;
 
   if (isset ($child_res)) $resourcegroup["children_restriction"] = $child_res;
 
@@ -341,21 +347,24 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$resourcegroup["id"]."",
     'Right'    => $cright_read,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate')
                                   );
 
 // Detail Update
   $actions["resourcegroup"]["detailupdate"] = array (
-     'Name'     => $l_header_update,
-     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=".$resourcegroup["id"]."",
-     'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
+    'Name'     => $l_header_update,
+    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=".$resourcegroup["id"]."",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('detailconsult', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
                                      	   );
 
 // Insert
   $actions["resourcegroup"]["insert"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=insert",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      );
 
@@ -363,6 +372,7 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["update"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=update",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      );
 
@@ -371,6 +381,7 @@ function get_resourcegroup_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;param_resourcegroup=".$resourcegroup["id"]."",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
                                      	   );
 
@@ -378,6 +389,7 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["delete"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=delete",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      );
 
@@ -394,6 +406,7 @@ function get_resourcegroup_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_resourcegroup,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                     	  );
 
@@ -404,6 +417,7 @@ function get_resourcegroup_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_resourcegroup,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult','resource_add','resource_del', 'resourcegroup_add','resourcegroup_del', 'update')
                                     	  );
 
@@ -411,6 +425,7 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["resource_add"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resource_add",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 
@@ -418,6 +433,7 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["resource_del"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resource_del",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 
@@ -425,6 +441,7 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["resourcegroup_add"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resourcegroup_add",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 
@@ -432,6 +449,7 @@ function get_resourcegroup_action() {
   $actions["resourcegroup"]["resourcegroup_del"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=resourcegroup_del",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 

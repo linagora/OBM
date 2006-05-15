@@ -339,6 +339,7 @@ function run_query_contact_detail($p_id) {
   }
 
   $query = "SELECT Contact.*,
+        contact_privacy as privacy,
         $timeupdate,
         $timecreate,
         $company_fields,

@@ -661,8 +661,8 @@ END:VCALENDAR";
 ///////////////////////////////////////////////////////////////////////////////
 function check_agenda_conflict($agenda, $sel_entity_id) {
 
-  $ts_begin = isodate_to_timestamp($agenda["datebegin"]);
-  $ts_end = isodate_to_timestamp($agenda["dateend"]);
+  $ts_begin = isodatetime_to_timestamp($agenda["datebegin"]);
+  $ts_end = isodatetime_to_timestamp($agenda["dateend"]);
   $id = $agenda["id"];
   $obm_q = run_query_agenda_conflict_events($ts_begin, $ts_end, $sel_entity_id, $id);
   if ($obm_q->nf() == 0) {

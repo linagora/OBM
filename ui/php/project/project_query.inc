@@ -23,9 +23,7 @@ function run_query_project_search($project, $p_new_order="", $p_order_dir) {
   $company_name = sql_search_text_parse($project["company_name"]);
   $company = $project["company"];
   $deal = $project["deal"];
-  $manager = $project["manager"];
   $member = $project["member"];
-  $user = $project["user"];
   $archive = $project["archive"];
   $date = $project["datebegin"];
 
@@ -71,21 +69,7 @@ function run_query_project_search($project, $p_new_order="", $p_order_dir) {
   if (($member != "") && ($member != $c_all)) {
     $join_member = "LEFT JOIN ProjectUser as Member ON project_id=Member.projectuser_project_id";
     $where .= " AND Member.projectuser_user_id = '$member'
-                AND Member.projectuser_manager = 0
                 AND Member.projectuser_projecttask_id is null";
-  }
-
-  if (($manager != "") && ($manager != $c_all)) {
-    $join_manager = "LEFT JOIN ProjectUser as Manager ON project_id=Manager.projectuser_project_id";
-    $where .= " AND Manager.projectuser_user_id = '$manager'
-                AND Manager.projectuser_manager = 1
-                AND Manager.projectuser_projecttask_id is null";
-  }
-
-  if ($user != "") {
-    $join_user = "LEFT JOIN ProjectUser ON project_id=projectuser_project_id";
-    $where .= " AND projectuser_user_id = '$user'
-                AND projectuser_projecttask_id is null";
   }
 
   $whereq = "WHERE $where";
@@ -110,15 +94,13 @@ function run_query_project_search($project, $p_new_order="", $p_order_dir) {
          LEFT JOIN Deal on project_deal_id=deal_id
          LEFT JOIN TaskType on project_tasktype_id=tasktype_id
          $join_member
-         $join_manager
-         $join_user
     $whereq
     $orderq
     $limit
  ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Project $join_comp $join_member $join_manager $whereq");
+    $count = get_query_count("SELECT count(*) FROM Project $join_comp $join_member $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
@@ -1265,8 +1247,8 @@ function run_query_project_members($p_id = 0) {
       WHERE projectuser_projecttask_id is null
       GROUP BY member_id, member_firstname, member_lastname
       ORDER BY member_lastname";
-
   }
+
   display_debug_msg($query, $cdg_sql, "run_query_project_members");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -1316,34 +1298,6 @@ function get_project_participants($p_id = 0) {
   $users = array_unique ($users_arr);
 
   return $users;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Project managers query
-// Parameters :
-//   - $p_id      : project id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_project_managers($p_id = 0) {
-  global $cdg_sql;
-
-  $query = "SELECT userobm_id as manager_id,
-      userobm_firstname as manager_firstname,
-      userobm_lastname as manager_lastname
-    FROM ProjectUser, UserObm
-    WHERE projectuser_user_id = userobm_id
-      AND projectuser_manager = 1 ";
-  
-  if ($p_id)
-    $query .= "AND projectuser_project_id = '$p_id' ";
-
-  $query .= "GROUP BY manager_id, manager_firstname, manager_lastname
-             ORDER BY manager_lastname";
-
-  display_debug_msg($query, $cdg_sql, "run_query_project_managers");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
 }
 
 

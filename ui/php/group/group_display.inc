@@ -119,7 +119,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
   global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
-  global $c_all, $l_all, $l_visibility, $l_private, $l_public, $c_private, $c_public;
+  global $l_visibility;
  
   $popup = $group["popup"];
 
@@ -156,15 +156,7 @@ function html_group_search_form ($group) {
   $user = stripslashes($group["user"]);
   $privacy = $group["privacy"];
 
-  // Privacy select
-  $sel_privacy = "<select id=\"sel_privacy\" name=\"sel_privacy\"><option value=\"$c_all\">$l_all</option>";
-  $sel_privacy .= "\n<option value=\"$c_public\"";
-  if ($privacy == $c_public) { $sel_privacy .= " selected=\"selected\""; }
-  $sel_privacy .= ">". $l_public . "</option>\n";
-  $sel_privacy .= "\n<option value=\"$c_private\"";
-  if ($privacy  == $c_private) { $sel_privacy .= " selected=\"selected\""; }
-  $sel_privacy .= ">". $l_private . "</option>\n";
-  $sel_privacy .= "</select>";
+  $sel_privacy = dis_privacy_search_select($privacy);
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -325,7 +317,7 @@ function html_group_form($action, $group_q, $group) {
     $name = $group_q->f("group_name");
     $desc = $group_q->f("group_desc");
     $email = $group_q->f("group_email");
-    $priv = $group_q->f("group_privacy");
+    $priv = $group_q->f("privacy");
   } elseif ($action == "new") {
     if ($cgroup_private_default) {
       $private_c = " checked";
@@ -337,7 +329,7 @@ function html_group_form($action, $group_q, $group) {
   if (isset($group["name"])) { $name = stripslashes($group["name"]); }
   if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
   if (isset($group["email"])) { $email = stripslashes($group["email"]); }
-  if (isset($group["priv"])) { $priv = stripslashes($group["priv"]); }
+  if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
 
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -346,7 +338,7 @@ function html_group_form($action, $group_q, $group) {
     if ($priv == '1') {
       $private_c = " checked";
     }
-    $display_private = "
+    $dis_private = "
   <tr>
     <td class=\"detailLabel\">$l_private</td>
     <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />
@@ -363,7 +355,9 @@ function html_group_form($action, $group_q, $group) {
     <td class=\"detailLabel\">$l_name</td>
     <td class=\"detailForm\">
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
-  </tr><tr>
+  </tr>
+  $dis_private
+  <tr>
     <td class=\"detailLabel\">$l_desc</td>
     <td class=\"detailForm\">
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
@@ -372,7 +366,6 @@ function html_group_form($action, $group_q, $group) {
     <td class=\"detailForm\">
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
-  $display_private
   </table>";
 
 
@@ -443,7 +436,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $auth;
   global $l_yes, $l_no, $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
-  global $l_visibility, $l_private, $l_public;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $display, $perm, $module, $action, $cright_write;
@@ -459,23 +451,12 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
-  $priv = $group_q->f("group_privacy");
 
   //$mail = get_mail_info();
   //$main_domain = $mail["main_domain"];
 
   $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = "<div class=\"title\">$l_group : $name</div>";
-
-  // Privacy
-  if ($priv == "1") {
-    $l_priv = $l_private;
-  } else {
-    $l_priv = $l_public;
-  }
-  $dis_priv = "</tr><tr>
-      <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$l_priv</td>";
 
   $block = "
     <div class=\"detailHead\">$l_group</div>
@@ -487,7 +468,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_system</td>
       <td class=\"detailText\">$system</td>
-    $dis_priv
     </tr><tr>
       <td class=\"detailLabel\">$l_local</td>
       <td class=\"detailText\">$local</td>

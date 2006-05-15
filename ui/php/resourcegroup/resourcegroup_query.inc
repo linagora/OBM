@@ -16,9 +16,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resourcegroup_search($group) {
   global $cdg_sql, $ctu_sql_limit, $ctype_resource;
+  global $c_public, $c_private;
   
   $name = sql_search_text_parse($group["name"]);
   $resource = sql_search_text_parse($group["resource"]);
+  $privacy = $group["privacy"];
   $new_order = $group["new_order"];
   $order_dir = $group["order_dir"];
 
@@ -30,6 +32,13 @@ function run_query_resourcegroup_search($group) {
   $timecreate = sql_date_format($db_type,"RGroup.rgroup_timecreate", "timecreate");
 
   $where = "rgroup_name $like '$name%'";
+
+  if ($privacy == $c_public) {
+    $where .= " AND rgroup_privacy = 0";
+  } elseif ($privacy == $c_private) { 
+    $where .= " AND rgroup_privacy = 1";
+  }
+
   if ($resource != '') {
     $join_resource = "
       LEFT JOIN ResourceGroup ON rgroup_id=ResourceGroup_rgroup_id
@@ -133,7 +142,7 @@ function run_query_resourcegroup_search_possible_children($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// RGroup detail query execution                                              //
+// RGroup detail query execution
 // Parameters:
 //   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,6 +156,7 @@ function run_query_resourcegroup_detail($id) {
   $timecreate = sql_date_format($db_type,"RGroup.rgroup_timecreate", "timecreate");
 
   $query = "select *,
+      rgroup_privacy as privacy,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
@@ -174,8 +184,7 @@ function run_query_resourcegroup_insert($group) {
   $id = $group["id"];
   $name = $group["name"];
   $desc = $group["desc"];
-  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
-  $priv=1; // Modif GT
+  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $now = date("Y-m-d H:i:s");
 
   $query = "insert into RGroup (
@@ -218,7 +227,7 @@ function run_query_resourcegroup_id($group) {
 
   $name = $group["name"];
   $desc = $group["desc"];
-  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
+  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
 
   $query = "SELECT rgroup_id
     FROM RGroup
@@ -242,7 +251,7 @@ function run_query_resourcegroup_id($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// RGroup Update query execution                                              //
+// RGroup Update query execution
 // Parameters:
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,7 +261,7 @@ function run_query_resourcegroup_update($group) {
   $id = $group["id"];
   $name = $group["name"];
   $desc = $group["desc"];
-  $priv = 1; // Modif GT 
+  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $now = date("Y-m-d H:i:s");
   
   $query = "update RGroup set
@@ -694,9 +703,7 @@ function check_resourcegroup_context($id, $group) {
 //     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
 function check_resourcegroup_data_form($group) {
-  global $l_fill_name;
-  global $l_group_exists;
-  global $uid, $err_msg, $l_system_no_priv, $l_only_owner_priv;
+  global $uid, $err_msg, $l_fill_name, $l_group_exists;
 
   $id = $group["id"];
   $name = $group["name"];

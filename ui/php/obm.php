@@ -342,7 +342,7 @@ function dis_project_portal() {
 
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_user=$uid")."\">$l_my_project</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("project/project_index.php?action=search&amp;sel_member=$uid")."\">$l_my_project</a></div>
   </div>";
 
   return $block;

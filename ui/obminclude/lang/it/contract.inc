@@ -21,10 +21,7 @@ $l_marketing_manager = "Responsabile Marketing";
 $l_technical_manager = "Responsabile Tecnico";
 $l_client_manager = "Responsabile Client";
 $l_clause = "Clauses";
-$l_date = "Date";
 $l_dateexp = "Data scadenza ";
-$l_last_update = "Ultimo aggiornamento";
-$l_at = "a";
 
 $l_select_contract = "Scegli il contratto";
 

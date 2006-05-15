@@ -390,17 +390,6 @@ if ($action == "ext_get_id") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update right for projectmanagers and admins
-///////////////////////////////////////////////////////////////////////////////
-
-// To be reviewed !!!
-//$consult_actions = Array('detailconsult',
-//                         'update', 'progress_update', 'allocate_update');
-//if (in_array($action, $consult_actions))
-//     $action = (project_manager_rights($uid, $project, $project_q)) ? $action : "consultnoright";
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_project);
@@ -422,7 +411,7 @@ function get_param_project() {
   global $param_project, $param_user, $param_status,$param_company,$param_deal;
   global $tf_missing, $tf_projected, $tf_datebegin, $tf_dateend;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_estimated, $tf_tasklabel;
-  global $sel_tt, $sel_manager, $sel_member, $sel_user, $sel_task, $sel_ptask;
+  global $sel_tt, $sel_member, $sel_task, $sel_ptask;
   global $deal_label, $cb_archive;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
@@ -457,11 +446,8 @@ function get_param_project() {
   if (isset ($tf_name)) $project["name"] = $tf_name;
   if (isset ($tf_company_name)) $project["company_name"] = $tf_company_name;
   if (isset ($sel_tt)) $project["tt"] = $sel_tt;
-  if (isset ($sel_manager)) $project["manager"] = $sel_manager;
   if (isset ($sel_member)) $project["member"] = $sel_member;
   if (isset ($cb_archive)) $project["archive"] = $cb_archive;
-  // Hidden search paramater
-  if (isset ($sel_user)) $project["user"] = $sel_user;
 
   // External param
   if (isset ($popup)) $project["popup"] = $popup;

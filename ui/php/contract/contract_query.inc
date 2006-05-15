@@ -168,6 +168,7 @@ function run_query_contract_detail($id) {
   $timecreate = sql_date_format($db_type, "contract_timecreate", "timecreate");
 
   $query = "SELECT Contract.*,
+      contract_privacy as privacy,
       deal_id,
       deal_label,
       contracttype_label,
@@ -466,7 +467,7 @@ function run_query_contract_manager($archive = false) {
       userobm_lastname,
       userobm_firstname
     FROM Contract
-      LEFT JOIN UserObm ON contract_marketmanager_id=userobm_id
+      JOIN UserObm ON contract_marketmanager_id=userobm_id
     $where
   UNION DISTINCT
     SELECT DISTINCT
@@ -474,7 +475,7 @@ function run_query_contract_manager($archive = false) {
       userobm_lastname,
       userobm_firstname
     FROM Contract
-      LEFT JOIN UserObm ON contract_techmanager_id=userobm_id
+      JOIN UserObm ON contract_techmanager_id=userobm_id
     $where
   ORDER BY userobm_lastname";
 

@@ -68,8 +68,10 @@ Les valeurs définies sont :\\
 \end{tabular}
 \vspace{0.3cm}
 
+
+\paragraph{Actions soumises au test d'accès :}
 Tout accès à une entité doit être validé (passer le test de visibilité).
-Ceci est vrai pour les actions de consultations (detailconsult, detailupdate) mais aussi pour toutes les actions sur une entité (update, delete, document\_add...).\\
+Ceci doit donc être vrai pour les actions de consultations (detailconsult, detailupdate) mais aussi pour toutes les actions sur une entité (update, delete, document\_add...).\\
 
 Pour cette raison et pour éviter la répétition de ce test dans un module, le test est effectué une fois en début de module.\\
 
@@ -128,6 +130,16 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 \end{verbatim}
 
 
+\paragraph{La fonction de récupération} de l'entité (\fonction{run\_query\_entity\_detail()}) doit récuperer le champ en base de données et le présenter sous le nom \textbf{privacy} afin d'être traité de façon générique par l'affichage des informations de l'entité.\\
+
+Exemple d'utilisation :
+\begin{verbatim}
+  $query = "SELECT Deal.*,
+      deal_privacy as privacy,
+  ...
+\end{verbatim}
+
+
 \subsubsection{Gestion de la notion de visibilité et conséquences}
 
 Une entité créée en tant que privée n'est visible que par son créateur.
@@ -147,6 +159,8 @@ contact & 0.4.0 \\
 deal & 0.4.0 \\
 \hline
 list & 0.8.2 \\
+\hline
+contract & 0.9.0 \\
 \hline
 document & 0.7.0 \\
 \hline

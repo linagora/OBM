@@ -162,6 +162,7 @@ function run_query_group_detail($id) {
   $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
 
   $query = "SELECT *,
+      group_privacy as privacy,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
@@ -191,7 +192,7 @@ function run_query_group_insert($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
-  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
+  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $now = date("Y-m-d H:i:s");
 
   $query = "INSERT INTO UGroup (
@@ -238,7 +239,7 @@ function run_query_group_id($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
-  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
+  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
 
   $query = "SELECT group_id
     FROM UGroup
@@ -275,7 +276,7 @@ function run_query_group_update($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
-  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
+  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $now = date("Y-m-d H:i:s");
   
   $query = "UPDATE UGroup SET
@@ -734,7 +735,7 @@ function check_group_data_form($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
-  $priv = $group["priv"];
+  $priv = $group["privacy"];
   $lgroup = get_group_info($id);
   $usercreate = $lgroup["usercreate"];
   $system = $lgroup["system"];

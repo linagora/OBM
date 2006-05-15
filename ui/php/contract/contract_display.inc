@@ -59,14 +59,14 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "contract_marketmanager") {
     if ($link_ok) {
-      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_techmanager_id");
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_marketmanager_id");
     }
     $res["name"] = $OD->data_set->f("lmarket") . " " . $OD->data_set->f("fmarket");
   }
 
   else if ($fieldname == "contract_techmanager") {
     if ($link_ok) {
-      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_marketmanager_id");
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_techmanager_id");
     }
     $res["name"] = $OD->data_set->f("ltech") . " " . $OD->data_set->f("ftech");
   }
@@ -158,9 +158,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $type_id = $contract["type"];
   $dateafter = $contract["dateafter"];
   $datebefore = $contract["datebefore"];
-  $sel_market = $contract["market"];
-  $sel_tech = $contract["tech"];
-  $sel_manager = $contract["manager"];
+  $manager = $contract["manager"];
   $num = $contract["number"]; 
   $archive = ($contract["archive"] == "1" ? "checked = \"checked\"" : ""); 
   $kind = $contract["kind"]; 
@@ -210,22 +208,23 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
     $sel_kind .= " selected=\"selected \" ";
   }
   $sel_kind .= ">$l_cck_customer</option>";
-  $sel_kind .="<option value=\"$cck_supplier\" ";
+  $sel_kind .= "<option value=\"$cck_supplier\" ";
   if ($kind == $cck_supplier) { 
     $sel_kind .= " selected=\"selected \"  ";
   }
   $sel_kind .= " >$l_cck_supplier</option>";
   $sel_kind .= "</select>";
 
-  $dis_resp_tec = "<select name=\"sel_manager\">
+  $sel_manager = "<select name=\"sel_manager\">
     <option value=\"$c_all\">$l_all</option>";
   while($usr_q->next_record()) {
-    $dis_resp_tec .= "\n<option value=\"".$usr_q->f("userobm_id")."\"";
-    if ($usr_q->f("userobm_id") == $sel_manager) 
-      $dis_resp_tec .= " selected=\"selected\"";
-    $dis_resp_tec .= ">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")." </option>";
+    $u_id = $usr_q->f("userobm_id");
+    $sel_manager .= "\n<option value=\"$u_id\"";
+    if ($u_id == $manager) 
+      $sel_manager .= " selected=\"selected\"";
+    $sel_manager .= ">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")." </option>";
   }
-  $dis_resp_tec .="</select>";
+  $sel_manager .= "</select>";
 
   if ($popup) {
     $ext_action = $contract["ext_action"];
@@ -271,10 +270,8 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
     <div class=\"searchLabel\">$l_type<br />
       $dis_cont_typ
     </div>
-    <div class=\"searchLabel\">$l_technical_manager<br />
-    </div>
     <div class=\"searchLabel\">$l_manager<br />
-      $dis_resp_tec
+      $sel_manager
     </div>
     <div class=\"searchLabel\">$l_priority<br />
       $sel_pri
@@ -354,15 +351,14 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
   $dateafter = $contract["dateafter"];
   $datebefore = $contract["datebefore"];
   $company = urlencode($contract["company_name"]);
-  $market = $contract["market"];
-  $tech = $contract["tech"];
+  $manager = $contract["manager"];
   $priority = $contract["priority"];
   $status = $contract["status"];
   $kind = $contract["kind"];
   $format = $contract["format"];
   $archive = ($contract["archive"] == "1" ? "1" : "0"); 
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_tech=$tech&amp;sel_market=$market&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_archive=$archive$url_ext");
   
   $contract_q->seek($first_row);
   $contract_d = new OBM_DISPLAY("DATA", $prefs, "contract");
@@ -512,10 +508,10 @@ function dis_contract_consult($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, $last_inc) {
   global $path, $display, $set_theme, $ico_company,$ico_contact, $ico_deal;
-  global $l_yes, $l_no, $l_contract, $l_company, $l_deal, $l_private,$l_public;
+  global $l_yes, $l_no, $l_contract, $l_company, $l_deal;
   global $l_client_manager,$l_marketing_manager,$l_technical_manager;
   global $l_manager, $l_label, $l_comment, $l_number, $l_clause, $l_archive;
-  global $l_date, $l_signature,$l_begin,$l_exp,$l_renew,$l_date_cancel;
+  global $l_dates, $l_signature,$l_begin,$l_exp,$l_renew,$l_date_cancel;
   global $l_autorenewal, $l_type, $l_priority, $l_status, $l_contract_kind;
   global $l_format,$l_ticket_nb, $l_duration, $l_duration_used;
   global $cck_customer, $cck_supplier, $l_cck_customer, $l_cck_supplier;
@@ -523,7 +519,6 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   
   $usercreate = $contract_q->f("contract_usercreate");
-  $cvis = ($contract_q->f("contract_privacy") == 0 ? $l_no : $l_yes);
   $autorenewal = ($contract_q->f("contract_autorenewal")==0 ? $l_no : $l_yes);
   $priority = $contract_q->f("contractpriority_label");
   $status = $contract_q->f("contractstatus_label");
@@ -674,16 +669,13 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailText\">$archive</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailText\">$cvis</td>
     </tr>
     </table>
 
     </td>
     <td valign=\"top\" width = 50%>
 
-    <div class=\"detailHead\">$l_date</div>
+    <div class=\"detailHead\">$l_dates</div>
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_autorenewal</td>
@@ -819,7 +811,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $comp_id = $contract_q->f("contract_company_id");
     $number = $contract_q->f("contract_number");
     $priority = $contract_q->f("contract_priority_id");
-    $vis = ($contract_q->f("contract_privacy") == 0 ? "0" : "1");
+    $vis = ($contract_q->f("privacy") == 0 ? "0" : "1");
     $usercreate = $contract_q->f("contract_usercreate");
     $status = $contract_q->f("contract_status_id");
     $kind = $contract_q->f("contract_kind");
@@ -1196,7 +1188,9 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
-    </tr><tr>
+    </tr>
+      $dis_vis
+    <tr>
       <td class=\"detailLabel\">$l_signature</td>
       <td class=\"detailForm\"><script>calendar('tf_datesignature','$datesignature')</script></td>
     </tr><tr>
@@ -1233,7 +1227,6 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
     </tr>
-      $dis_vis
     <tr>
       <td class=\"detailLabel\">$l_contract_kind</td>
       <td class=\"detailForm\">$radio_kind</td>
@@ -1302,7 +1295,7 @@ function export_contract($co_q) {
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   global $cck_customer, $cck_supplier;
-  global $l_date, $l_signature, $l_begin, $l_exp, $l_renew, $l_date_cancel;
+  global $l_dates, $l_signature, $l_begin, $l_exp, $l_renew, $l_date_cancel;
   global $l_label,$l_number,$l_clause,$l_comment;
   global $l_company,$l_status,$l_priority,$l_type,$l_cck_customer;
   global $l_cck_supplier,$l_ticket_nb,$l_total_ticket;
@@ -1316,7 +1309,7 @@ function export_contract($co_q) {
   $daterenew = $co_q->f("contract_daterenew");
   $datecancel = $co_q->f("contract_datecancel");
   $datesignature = $co_q->f("contract_datesignature");
-  $export_contractdate = "Contract $l_date: \n";
+  $export_contractdate = "Contract $l_dates: \n";
   if ($datesignature)
     $export_contractdate .= "$l_signature: $datesignature\n";
   if ($datebegin)

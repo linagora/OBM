@@ -129,6 +129,7 @@ function submit_memberdel(form)
 ///////////////////////////////////////////////////////////////////////////////
 // each member should be assigned to at least one task
 
+// Set the hidden fields to update (or delete) the user
 function change_status(user_id, user_status, form)
 {
   for (i = 0; i < form.length; i++) {
@@ -267,17 +268,6 @@ function check_advance_valid(form)
   } else {
     return true;
   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Open the userobm list form window                                         //
-///////////////////////////////////////////////////////////////////////////////
-function submit_memberadd(form, p_id)
-{
-    window.name='Liste';
-    window.open('../user/user_index.php?action=ext_get_ids&popup=1&title=$l_add_member&ext_action=member_add&ext_url=../project/project_index.php&ext_id='+ p_id +'&ext_target=Liste','','height=400,width=620,scrollbars=yes');
-    return false;
 }
 
 

@@ -46,7 +46,12 @@ $perm->check_permissions($module, $action);
 
 $uid = $auth->auth["uid"];
 
-update_last_visit("group", $param_group, $action);
+if (! check_privacy($module, "UGroup", $action, $group["id"])) {
+  $display["msg"] = display_err_msg($l_error_visibility);
+  $action = "index";
+} else {
+  update_last_visit("contract", $group["id"], $action);
+}
 
 page_close();
 
@@ -258,7 +263,7 @@ display_page($display);
 function get_param_group() {
   global $param_group, $popup, $child_res;
   global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis, $cb_priv, $sel_privacy;
+  global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_priv, $sel_privacy;
   global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
   global $ext_element;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
@@ -269,7 +274,7 @@ function get_param_group() {
   if (isset ($tf_desc)) $group["desc"] = trim($tf_desc);
   if (isset ($tf_email)) $group["email"] = $tf_email;
   if (isset ($tf_user)) $group["user"] = trim($tf_user);
-  if (isset ($cb_priv)) $group["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_priv)) $group["privacy"] = ($cb_priv == 1 ? 1 : 0);
   if (isset ($sel_privacy)) $group["privacy"] = $sel_privacy;
 
   if (isset ($child_res)) $group["children_restriction"] = $child_res;
@@ -356,21 +361,24 @@ function get_group_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/group/group_index.php?action=detailconsult&amp;param_group=".$group["id"]."",
     'Right'    => $cright_read,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                   );
 
 // Detail Update
   $actions["group"]["detailupdate"] = array (
-     'Name'     => $l_header_update,
-     'Url'      => "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"]."",
-     'Right'    => $cright_write,
-     'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
+    'Name'     => $l_header_update,
+    'Url'      => "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"]."",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Insert
   $actions["group"]["insert"] = array (
     'Url'      => "$path/group/group_index.php?action=insert",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      );
 
@@ -378,6 +386,7 @@ function get_group_action() {
   $actions["group"]["update"] = array (
     'Url'      => "$path/group/group_index.php?action=update",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      );
 
@@ -386,6 +395,7 @@ function get_group_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/group/group_index.php?action=check_delete&amp;param_group=".$group["id"]."",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
                                      	   );
 
@@ -393,6 +403,7 @@ function get_group_action() {
   $actions["group"]["delete"] = array (
     'Url'      => "$path/group/group_index.php?action=delete",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None') 
                                      );
 
@@ -409,6 +420,7 @@ function get_group_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
                                     	  );
 
@@ -419,6 +431,7 @@ function get_group_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
+    'Privacy'  => true,
     'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del', 'update')
                                     	  );
 
@@ -426,6 +439,7 @@ function get_group_action() {
   $actions["group"]["user_add"] = array (
     'Url'      => "$path/group/group_index.php?action=user_add",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 
@@ -433,6 +447,7 @@ function get_group_action() {
   $actions["group"]["user_del"] = array (
     'Url'      => "$path/group/group_index.php?action=user_del",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 
@@ -440,6 +455,7 @@ function get_group_action() {
   $actions["group"]["group_add"] = array (
     'Url'      => "$path/group/group_index.php?action=group_add",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 
@@ -447,6 +463,7 @@ function get_group_action() {
   $actions["group"]["group_del"] = array (
     'Url'      => "$path/group/group_index.php?action=group_del",
     'Right'    => $cright_write,
+    'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 

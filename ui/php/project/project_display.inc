@@ -77,10 +77,9 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 function dis_project_search_form($project) {
 
   $tts = get_global_tasktype("project");
-  $manager_q = run_query_project_managers();
   $member_q = run_query_project_members();
 
-  $block = html_project_search_form ($tts, $manager_q, $member_q, $project);
+  $block = html_project_search_form ($tts, $member_q, $project);
   return $block;
 }
 
@@ -89,13 +88,12 @@ function dis_project_search_form($project) {
 // Display Html Project search Form
 // Parameters:
 //   - $tts       : tasktype array
-//   - $manager_q : database object with project manager list
 //   - $member_q  : database object with project member list
 //   - $project[] : default form values
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_search_form ($tts, $manager_q, $member_q, $project) {
-  global $l_name, $l_company, $l_tasktype, $l_project_manager, $l_member;
+function html_project_search_form ($tts, $member_q, $project) {
+  global $l_name, $l_company, $l_tasktype, $l_member;
   global $l_all, $l_find, $l_archive;
   global $display, $c_all, $l_select_project, $l_date;
   global $ctt_sales, $ctt_research, $ctt_others;
@@ -105,7 +103,6 @@ function html_project_search_form ($tts, $manager_q, $member_q, $project) {
   $name = $project["name"];
   $company_name = $project["company_name"];
   $tt = $project["tt"];
-  $manager = $project["manager"];
   $member = $project["member"];
   $archive = $project["archive"];
   $date = $project["datebegin"];
@@ -135,17 +132,6 @@ function html_project_search_form ($tts, $manager_q, $member_q, $project) {
     }
     $sel_tt .= "</select>";
   }
-
-  // manager select
-  $sel_manager = "<select id=\"sel_manager\" name=\"sel_manager\">
-    <option value=\"$c_all\">$l_all</option>";
-  while ($manager_q->next_record()) {
-    $mg_id = $manager_q->f("manager_id");
-    $sel_manager .= "\n<option value=\"$mg_id\"";
-    if ($mg_id == $manager) { $sel_manager .= " selected=\"selected\""; }
-    $sel_manager .= ">". $manager_q->f("manager_lastname")." ".$manager_q->f("manager_firstname") . "</option>\n";
-  }
-  $sel_manager .= "</select>";
 
   // member select
   $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
@@ -195,9 +181,6 @@ function html_project_search_form ($tts, $manager_q, $member_q, $project) {
       </div>
       <div class=\"searchLabel\">$l_tasktype<br />
         $sel_tt
-      </div>
-      <div class=\"searchLabel\">$l_project_manager<br />
-        $sel_manager
       </div>
       <div class=\"searchLabel\">$l_member<br />
         $sel_member
@@ -267,7 +250,6 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $name = $project["name"];
   $company_name = $project["company_name"];
   $tt = $project["tt"];
-  $manager = $project["manager"];
   $member = $project["member"];
   $archive = $project["archive"];
 
@@ -281,7 +263,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;cb_archive=$archive$url_ext");
 
   $proj_d = new OBM_DISPLAY("DATA", $prefs, "project");
   if ($popup) {

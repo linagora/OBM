@@ -675,7 +675,6 @@ function dis_contact_consult($contact) {
 function html_contact_header($co_q, $funcs, $cats5) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
-  global $l_public, $l_private, $l_visibility;
   global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
   global $display, $path, $action, $auth;
 
@@ -694,7 +693,6 @@ function html_contact_header($co_q, $funcs, $cats5) {
   $fname = $co_q->f("contact_firstname");
   $aka = $co_q->f("contact_aka");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
-  $priv = $co_q->f("contact_privacy");
   $date = $co_q->f("contact_date");
   $date = ($date != 0) ? date_format($date) : $l_no_date; 
  
@@ -752,16 +750,6 @@ function html_contact_header($co_q, $funcs, $cats5) {
       <td class=\"detailText\">$date</td>";
   }
 
-  if ($usercreate == $auth->auth["uid"]) {
-    if ($priv == 1) 
-      $l_priv = $l_private;
-    else 
-      $l_priv = $l_public;  
-    $l_priv = "</tr><tr>
-      <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$l_priv</td>";
-  }
-
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -778,7 +766,6 @@ function html_contact_header($co_q, $funcs, $cats5) {
     <tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailText\">$kind</td>
-    $l_priv
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailText\">$archive</td>
@@ -1308,7 +1295,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     $email2 = $co_q->f("contact_email2");
     $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
-    $priv = $co_q->f("contact_privacy");
+    $priv = $co_q->f("privacy");
     $comment = $co_q->f("contact_comment");
     $usercomment = $uid;
     $datecomment = isodate_format();

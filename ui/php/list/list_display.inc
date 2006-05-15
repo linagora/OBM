@@ -511,7 +511,7 @@ function dis_list_consult($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $prefs_con, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_static;
-  global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
+  global $l_no,$l_yes;
   global $display, $perm, $module, $cright_write, $ctu_sql_limit, $cdg_sql;
   global $l_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_company, $l_invalid_query;
@@ -525,7 +525,6 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   $userupdate = $list_q->f("list_userupdate");
   $timecreate = $list_q->f("timecreate");
   $timeupdate = $list_q->f("timeupdate");
-  $lpriv = ($list_q->f("list_privacy") == 0 ? $l_public : $l_private);
   $dis_mailing = ($list_q->f("list_mailing_ok") == 0 ? $l_no : $l_yes);
   $dis_con_arch = ($list_q->f("list_contact_archive") == 0 ? $l_no : $l_yes);
   $dis_info_pub = ($list_q->f("list_info_publication") == 0 ? $l_no : $l_yes);
@@ -605,9 +604,6 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     <tr>
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailText\">$name</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$lpriv</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_mailing</td>
       <td class=\"detailText\">$dis_mailing</td>
@@ -777,7 +773,7 @@ function html_list_form($action, $list_q, $list) {
     $structure = $list_q->f("list_structure");
     $criteria = unserialize($structure);
     $query = stripslashes($list_q->f("list_query"));
-    $priv = ($list_q->f("list_privacy") == 0 ? "0" : "1");
+    $priv = ($list_q->f("privacy") == 0 ? "0" : "1");
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
     $contact_arch = ($list_q->f("list_contact_archive") == 0 ? "0" : "1");
     $info_pub = ($list_q->f("list_info_publication") == 0 ? "0" : "1");

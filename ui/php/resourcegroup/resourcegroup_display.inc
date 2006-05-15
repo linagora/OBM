@@ -12,6 +12,7 @@
 //------------------------------------//
 // Direct fields
 $fieldnames["rgroup_name"] = $l_name;
+$fieldnames["rgroup_privacy"] = $l_private;
 $fieldnames["rgroup_desc"] = $l_desc;
 $fieldnames["rgroup_nb_resource"] = $l_nb_resource;
 $fieldnames["usercreate"] = $l_creator;
@@ -38,7 +39,18 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
   if (($fieldname == "rgroup_name") && $link_ok) {
     $res["url"] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$OD->data_set->f("rgroup_id");
   }
-  if (($fieldname == "data_element") && $ext_element != "") {
+
+  else if ($fieldname == "rgroup_privacy") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
+
+  else if (($fieldname == "data_element") && $ext_element != "") {
     $res["name"] = "<span id=\"data-resurcegroup-".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
     $OD->data_set->f("rgroup_name")."</span>";
   } else if ($fieldname == "rgroup_nb_resource") {
@@ -67,13 +79,14 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group search Form                                                 //
+// Display Group search Form
 // Parameters : 
 //   - $group[]   : default form values
 //     keys used  : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_search_form ($group) {
-  global $display, $l_name, $l_resourcegroup_resource, $l_email, $l_find, $l_add_resourcegroup;
+  global $display, $l_name, $l_resourcegroup_resource, $l_email, $l_find;
+  global $l_visibility, $l_add_resourcegroup;
 
   $popup = $group["popup"];
 
@@ -107,6 +120,9 @@ function html_resourcegroup_search_form ($group) {
 
   $name = stripslashes($group["name"]);
   $resource = stripslashes($group["resource"]);
+  $privacy = $group["privacy"];
+
+  $sel_privacy = dis_privacy_search_select($privacy);
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -119,6 +135,9 @@ function html_resourcegroup_search_form ($group) {
     </div>
     <div class=\"searchLabel\">$l_resourcegroup_resource<br />
       <input name=\"tf_resource\" size=\"16\" maxlength=\"16\" value=\"$resource\" />
+    </div>
+    <div class=\"searchLabel\">$l_visibility<br />
+      $sel_privacy
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -249,7 +268,9 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_form($action, $group_q, $group) {
-  global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_private, $l_insert, $l_update, $l_back;
+  global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_private;
+  global $cgroup_private_default, $l_insert, $l_update, $l_back;
+  global $auth;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -257,15 +278,18 @@ function html_resourcegroup_form($action, $group_q, $group) {
     $usercreate = $group_q->f("rgroup_usercreate");
     $name = $group_q->f("rgroup_name");
     $desc = $group_q->f("rgroup_desc");
-  } else {
-    // Values are taken from parameters
-    $id = $group["id"];
-    $name = stripslashes($group["name"]);
-    $desc = stripslashes($group["desc"]);
+    $priv = $group_q->f("privacy");
+  } elseif ($action == "new") {
+    if ($cgroup_private_default) {
+      $private_c = " checked";
+    }
   }
 
-  //  $mail = get_mail_info();
-  //  $main_domain = $mail["main_domain"];
+  // If parameters have been given, they supercede the default action value
+  if (isset($group["id"])) { $id = $group["id"]; }
+  if (isset($group["name"])) { $name = stripslashes($group["name"]); }
+  if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
+  if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
 
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -274,8 +298,12 @@ function html_resourcegroup_form($action, $group_q, $group) {
     if ($priv == '1') {
       $private_c = " checked";
     }
-    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />";
-  }
+    $dis_private = "
+  <tr>
+    <td class=\"detailLabel\">$l_private</td>
+    <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />
+  </tr>";
+  } 
 
   $block = "<center>
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">
@@ -287,7 +315,9 @@ function html_resourcegroup_form($action, $group_q, $group) {
     <td class=\"detailLabel\">$l_name</td>
     <td class=\"detailForm\">
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
-  </tr><tr>
+  </tr>
+  $dis_private
+  <tr>
     <td class=\"detailLabel\">$l_desc</td>
     <td class=\"detailForm\">
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
@@ -361,41 +391,22 @@ function dis_resourcegroup_consult($group, $uid) {
 //   - $r_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
-  global $auth;
+  global $display, $auth, $perm, $module, $action, $cright_write;
   global $l_yes, $l_no, $ico_mail;
   global $l_resourcegroup, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_resourcegroup_resourcegroup;
-  global $l_visibility, $l_private, $l_public;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_resource_sel, $l_resource_member, $l_del_resourcegroup_sel, $l_resourcegroup_member;
-  global $display, $perm, $module, $action, $cright_write;
 
   $id = $group_q->f("rgroup_id");
   $usercreate = $group_q->f("rgroup_usercreate");
   $userupdate = $group_q->f("rgroup_userupdate");
   $timecreate = $group_q->f("timecreate");
   $timeupdate = $group_q->f("timeupdate");
-//  $local = ($group_q->f("group_local") == 1 ? $l_yes : $l_no);
-//  $ext_id = $group_q->f("group_ext_id");
   $name = $group_q->f("rgroup_name");
   $desc = $group_q->f("rgroup_desc");
-//  $priv = $group_q->f("group_privacy");
-
-  //$mail = get_mail_info();
-  //$main_domain = $mail["main_domain"];
 
   $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = "<div class=\"title\">$l_resourcegroup : $name</div>";
-
-  // Privacy
-  if ($priv == "1") {
-    $l_priv = $l_private;
-  } else {
-    $l_priv = $l_public;
-  }
-  $dis_priv = "</tr><tr>
-      <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$l_priv</td>";
-  $l_priv = ""; 
 
   $block = "
     <div class=\"detailHead\">$l_resourcegroup</div>
@@ -407,16 +418,6 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_desc</td>
       <td class=\"detailText\">$desc</td>
-<!-- 
-    </tr><tr>
-      <td class=\"detailLabel\">$l_local</td>
-      <td class=\"detailText\">$local</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_ext_id</td>
-      <td class=\"detailText\">$ext_id</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
--->    
     </tr>
     </table>";
 

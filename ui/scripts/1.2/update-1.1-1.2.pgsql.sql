@@ -97,3 +97,11 @@ ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;
 -------------------------------------------------------------------------------
 DROP TABLE EntryTemp;
 DROP TABLE PaymentTemp;
+
+-------------------------------------------------------------------------------
+-- Update Deal table
+-------------------------------------------------------------------------------
+ALTER TABLE Deal ADD COLUMN deal_dateend date;
+ALTER TABLE Deal ADD COLUMN deal_commission decimal(5,2);
+ALTER TABLE Deal ALTER COLUMN deal_commission SET DEFAULT 0;
+

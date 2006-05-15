@@ -1508,6 +1508,7 @@ function run_query_get_recipients($recipients, $force) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get resources info 
 // Parameters:
@@ -1607,6 +1608,7 @@ function get_modules_array() {
   return $modules;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Create a file with a unique filename 
 // Return 
@@ -1655,6 +1657,7 @@ function secure_tmpname($postfix = '.tmp', $prefix = 'tmp', $dir = null) {
    return false;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Encode string 
 // Return 
@@ -1687,6 +1690,7 @@ function encode($in_str, $charset) {
    }
    return $out_str;
 } 
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if OS is Windows 

@@ -489,10 +489,10 @@ display_page($display);
 // returns : $deal hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_deal() {
-  global $tf_num, $tf_label, $tf_datebegin, $param_parent, $sel_kind, $sel_tt;
+  global $tf_num, $tf_label, $param_parent, $sel_kind, $sel_tt;
   global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
-  global $tf_dateprop, $tf_amount, $sel_status, $tf_datealarm, $ta_com;
-  global $tf_dateexpected;
+  global $tf_amount, $sel_status, $tf_datealarm, $ta_com;
+  global $tf_datebegin, $tf_dateend, $tf_dateprop, $tf_dateexpected;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
   global $tf_plabel, $sel_pmanager, $cb_parchive,$cb_archive,$tf_todo,$cb_priv;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
@@ -521,6 +521,10 @@ function get_param_deal() {
   if (isset ($tf_num)) $deal["num"] = $tf_num;
   if (isset ($tf_label)) $deal["label"] = $tf_label;
   if (isset ($tf_datebegin)) $deal["datebegin"] = $tf_datebegin;
+  if (isset ($tf_dateend)) $deal["dateend"] = $tf_dateend;
+  if (isset ($tf_dateprop)) $deal["dateproposal"] = $tf_dateprop;
+  if (isset ($tf_dateexpected)) $deal["dateexpected"] = $tf_dateexpected;
+  if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
   if (isset ($param_parent)) $deal["parent"] = $param_parent;
   if (isset ($sel_kind)) $deal["kind"] = $sel_kind;
   if (isset ($sel_tt)) $deal["tasktype"] = $sel_tt;
@@ -530,12 +534,9 @@ function get_param_deal() {
   if (isset ($sel_contact2)) $deal["contact2"] = $sel_contact2;
   if (isset ($sel_market)) $deal["market"] = $sel_market;
   if (isset ($sel_tech)) $deal["tech"] = $sel_tech;
-  if (isset ($tf_dateprop)) $deal["dateprop"] = $tf_dateprop;
   if (isset ($tf_amount)) $deal["amount"] = $tf_amount;
   if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
   if (isset ($sel_status)) $deal["status"] = $sel_status;
-  if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
-  if (isset ($tf_dateexpected)) $deal["dateexpected"] = $tf_dateexpected;
   if (isset ($tf_category1_label)) $deal["category1_label"] = $tf_category1_label;
   if (isset ($tf_category1_code)) $deal["category1_code"] = $tf_category1_code;
   if (isset ($sel_category1)) $deal["category1"] = $sel_category1;
@@ -543,7 +544,7 @@ function get_param_deal() {
     $deal["archive"] = $cb_archive;
   }
   if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
-  $deal["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_priv)) { $deal["priv"] = ($cb_priv == 1 ? 1 : 0); };
   if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;

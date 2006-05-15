@@ -1152,6 +1152,42 @@ function display_todos($path="..") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display an entity dates and users creation / update infos
+// Parameters:
+//   - $obm_q : DBO object : used fields
+//          usercreate userupdate timecreate timeupdate datasource_name privacy
+///////////////////////////////////////////////////////////////////////////////
+function display_record_info($obm_q) {
+  global $set_theme, $ico_created, $ico_updated, $l_public, $l_private;
+
+  if (is_object($obm_q)) {
+    $usercreate = $obm_q->f("usercreate");
+    $userupdate = $obm_q->f("userupdate");
+    $timecreate = datetime_format($obm_q->f("timecreate"), 1);
+    $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
+    $datasource = $obm_q->f("datasource_name");
+    $privacy = ($obm_q->f("privacy") == 0 ? $l_public : $l_private);
+    
+    $created = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
+    $updated = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
+
+    if ($datasource != "") {
+      $dis_dsrc = "<br />$datasource";
+    } else {
+      $dis_dsrc = "";
+    }
+    
+    $block = "<div class=\"detailInfo\">$created<br />$updated<br />$privacy $dis_dsrc
+  </div>";
+  } else {
+    $block = "<div class=\"detailInfo\">---</div>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display : end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
 function display_end() { 
@@ -1161,6 +1197,7 @@ function display_end() {
     </html>
   ";
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display : debug

@@ -11,11 +11,10 @@
 // version will come.
 
 // Labels and texts
-$l_minus="-";
-$l_plus="+";
-$l_order="Order";
+$l_minus = "-";
+$l_plus = "+";
+$l_order = "Order";
 $l_todo = "To Do";
-$l_date_proposal="Proposal Date";
 $l_amount_in="Amout of inputs";
 $l_amount_out="Amout of outputs";
 $l_potential = "Weighted Potential";
@@ -27,7 +26,7 @@ $l_origin = "Opprinnelse";
 $l_marketing_manager = "Selgar";
 $l_technical_manager = "Teknisk ansvarleg";
 $l_manager= "Manager";
-$l_proposition = "Forslag";
+$l_proposal = "Forslag";
 $l_amount = "Sum";
 $l_contacts = "Kontaktar";
 $l_company = "Firma";
@@ -39,8 +38,6 @@ $l_date_alarm_after = "Varslingsdato etter";
 $l_date_alarm_before = "Varslingsdato før";
 $l_after = "Etter";
 $l_before = "Før";
-$l_last_update = "Sist oppdatert";
-$l_at = "at";
 
 $l_deal_select_company = "Velg firma det skal inngås avtale med.";
 $l_number_deal="Number";

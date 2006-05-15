@@ -23,10 +23,11 @@ To do
 <LI> how to detect doublons ?
 <li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
+<li> tenir compte contacts prives dans les listes (liste privee =>+ contact prives)!
 </UL>
 
 - admin code : verifier si des actions non utilisees
-- cgp_submit... : soit partout, soit virer
+- cgp_submit... : soit partout, soit virer : a definir avant
 - param global pour recherche prefixees ou non par %
 
 2006-05-10 : version 1.2.0<br>
@@ -47,7 +48,7 @@ To do
 <li> Admin : Clear Session now clear even if session lifetime illimited (0)
 <li> Backup : backup deletion fixed (filename problem)
 <li> Backup : Enable backup search by date and DB version
-<li> Invoice : Dashboard year to year comparison
+<li> Invoice : added dashboard year to year comparison
 <li> Invoice : Dashboard scope can be limited to some task types
 <li> List : Fixed an SQL error on special case with AND NOT operator
 <li> Agenda : fixed a Postgres SQL error on event insertion
@@ -55,6 +56,11 @@ To do
 <li> List : search navigation fixes with email criteria
 <li> List : query generation more consistent with null entries on exclusion
 <li> Company : search navigation fixes with category tree criteria
+<li> Payment module total rewrite
+<li> Entity privacy : entity privacy improved and fixes in deal, group, rgroup
+<li> Deal : added commission, end date fields
+<li> List : normal dynamic public lists now don't include private contacts
+<li> Contract : search navigation fixes with manager criteria
 </ul>
 
 2006-03-02 : version 1.1.2<br>

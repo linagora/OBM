@@ -81,3 +81,10 @@ ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;
 -------------------------------------------------------------------------------
 DROP TABLE IF EXISTS EntryTemp;
 DROP TABLE IF EXISTS PaymentTemp;
+
+
+-------------------------------------------------------------------------------
+-- Update Deal table
+-------------------------------------------------------------------------------
+ALTER TABLE Deal ADD COLUMN deal_dateend date AFTER deal_dateexpected;
+ALTER TABLE Deal ADD COLUMN deal_commission decimal(5,2) DEFAULT 0 AFTER deal_amount;

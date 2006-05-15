@@ -102,6 +102,7 @@ function run_query_list_detail($id) {
   $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
 
   $query = "SELECT *,
+      list_privacy as privacy,
       $timecreate,
       $timeupdate,
       c.userobm_login as usercreate,
@@ -1280,6 +1281,7 @@ function make_list_query_from_db(&$list_q) {
     $structure = $list_q->f("list_structure");
     $mail_ok = $list_q->f("list_mailing_ok");
     $contact_arch = $list_q->f("list_contact_archive");
+    $privacy = $list_q->f("privacy");
     $info_pub = $list_q->f("list_info_publication");
     
     if ($structure != "") {
@@ -1299,6 +1301,7 @@ function make_list_query_from_db(&$list_q) {
       $list_info["mailing_ok"] = $mail_ok;
       $list_info["contact_arch"] = $contact_arch;
       $list_info["info_pub"] = $info_pub;
+      $list_info["privacy"] = $privacy;
       $dynlist = make_list_query_from_criteria($list_info);
     }
   }
@@ -1316,7 +1319,7 @@ function make_list_query_from_db(&$list_q) {
 // $ret array [query] full query, [where] where clause, [from] from clause
 ///////////////////////////////////////////////////////////////////////////////
 function make_list_query_from_criteria($list) {
-  global $cdg_sql;
+  global $cdg_sql, $c_private, $uid;
 
   $id = $list["id"];
   $criteria = $list["criteria"]["modules"];
@@ -1324,6 +1327,7 @@ function make_list_query_from_criteria($list) {
   $logical_criterion = $list["criteria"]["logical"]["AND"];
   $mailing_ok = $list["mailing_ok"];
   $contact_arch = $list["contact_arch"];
+  $privacy = $list["privacy"];
   $info_pub = $list["info_pub"];
   $lang = get_lang();
   
@@ -1631,6 +1635,13 @@ function make_list_query_from_criteria($list) {
   // Handle the contact archive flag
   if ($contact_arch == 0) {
     $where = " contact_archive != 1 AND ($where) ";
+  }
+
+  // Handle the privacy
+  if ($privacy == $c_private) {
+    $where = " (contact_privacy = '0' or contact_usercreate = '$uid') AND ($where) ";
+  } else {
+    $where = " (contact_privacy = '0') AND ($where) ";
   }
 
   // If any (not in insert mode), add statics contacts to the query
