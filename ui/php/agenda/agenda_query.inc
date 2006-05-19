@@ -149,6 +149,32 @@ function run_query_agenda_get_allusers($users_array,$groups_array) {
 
   return $r_array;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the resources of the given group                    //
+// Parameters:
+//   - $group[] : Group parameters
+///////////////////////////////////////////////////////////////////////////////
+function run_query_resource_resourcegroup($group) {
+  global $cdg_sql, $ctype_resource;
+  if (is_array($group) && count($group) > 0) {
+    
+    $obm_q = new DB_OBM;
+    $db_type = $obm_q->type;
+    $query = "SELECT 
+           resource_id,
+           resource_name,
+           rgroup_name, 
+           resourcegroup_rgroup_id as resource_group
+           FROM ResourceGroup LEFT JOIN Resource ON resourcegroup_resource_id=resource_id
+           LEFT JOIN RGroup ON rgroup_id = resourcegroup_rgroup_id
+        WHERE resourcegroup_rgroup_id IN (".implode(",",$group).")";
+
+    display_debug_msg($query, $cdg_sql, "run_query_resource_resourcegroup()");
+    $obm_q->query($query);
+
+    return $obm_q;
+  }
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1233,6 +1259,22 @@ function store_agenda_entities($entities_q) {
       $i++;
     }
   }
+  $resourcegroup_q = $entities_q["resourcegroup"];
+  if (is_object($resourcegroup_q)) {
+    while($resourcegroup_q->next_record()) {
+      $id = $resourcegroup_q->f("resource_id");
+      $entity_tab["resourcegroup"][$id] = array(
+        "name"  => $resourcegroup_q->f("resource_name"),
+        "class" => "agendaEventBg$i",
+        "image" => ${"ico_calendar_user".$i},
+        "type"  => "resourcegroup",
+        "id"    => $id,
+        "group" => $resourcegroup_q->f("resource_group"),
+        "groupLabel" => $resourcegroup_q->f("rgroup_name"),
+      );
+      $i++;
+    }
+  }  
 
   return $entity_tab;
 }
@@ -1703,7 +1745,11 @@ function run_query_agenda_no_repeat_events($start,$end, $calendar_entity) {
       && (count($calendar_entity["resource"]) > 0) ) {
     $has_resource = true;
   }
-
+  if (is_array($calendar_entity["resourcegroup"])
+      && (count($calendar_entity["resourcegroup"]) > 0) ) {
+    $has_resourcegroup = true;
+  }
+  
   if ($has_user) {
     $where_user .= "( evententity_entity_id IN (";
     foreach($calendar_entity["user"] as $id => $prop) {
@@ -1730,7 +1776,43 @@ function run_query_agenda_no_repeat_events($start,$end, $calendar_entity) {
   } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
   }
-
+  
+  if ($has_resourcegroup) {
+    $coma = "";
+    $where_grp .= "( evententity_entity_id IN (";
+    foreach($calendar_entity["resourcegroup"] as $id => $prop) {
+      $where_grp .= "$coma'$id'";
+      $coma = ",";
+    }
+    $where_grp.= ")";
+    $where_grp .= " AND evententity_entity = 'resource' )"; 
+    
+    $union = "
+      UNION
+    SELECT
+      calendarevent_id,
+      calendarevent_title,
+      calendarevent_privacy,
+      calendarevent_description,
+      calendarevent_location,
+      evententity_entity_id,
+      'resourcegroup' as evententity_entity,
+      calendarcategory1_label,
+      $calendarevent_date_l,
+      calendarevent_duration,
+      calendarevent_allday
+    FROM CalendarEvent
+      LEFT JOIN CalendarCategory1
+        ON calendarevent_category1_id = calendarcategory1_id
+      LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
+    WHERE evententity_state = 'A'
+      AND calendarevent_repeatkind = 'none'
+      AND $calendarevent_date >= $start - calendarevent_duration
+      AND $calendarevent_date <= $end
+      AND $where_grp
+    ";
+  }
+  
   $query = "SELECT
       calendarevent_id,
       calendarevent_title,
@@ -1738,6 +1820,7 @@ function run_query_agenda_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_description,
       calendarevent_location,
       evententity_entity_id,
+      evententity_entity,
       calendarcategory1_label,
       $calendarevent_date_l,
       calendarevent_duration,
@@ -1751,7 +1834,9 @@ function run_query_agenda_no_repeat_events($start,$end, $calendar_entity) {
       AND $calendarevent_date >= $start - calendarevent_duration
       AND $calendarevent_date <= $end
       $where_ent
-    ORDER BY calendarevent_date"; 
+      $union
+      ORDER BY calendarevent_date
+      "; 
 
   display_debug_msg($query, $cdg_sql, "run_query_agenda_no_repeat_events()");
   $obm_q->query($query);
@@ -1867,8 +1952,9 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     $duration = $nr_q->f("calendarevent_duration");
     $user_id = $nr_q->f("evententity_entity_id");
     $all_day = $nr_q->f("calendarevent_allday");
+    $entity = $nr_q->f("evententity_entity");
     $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
-    store_agenda_event($date, $event, $day_events, $user_id, $all_day, $end_time);
+    store_agenda_event($date, $event, $day_events, $user_id, $all_day, $end_time, $entity);
   }
   
   $r_q = run_query_agenda_repeat_events($start_time,$end_time,$calendar_entity);
@@ -1897,19 +1983,19 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     $end_date += $day_duration;
     switch ($repeatkind) {
       case "daily" :
-        agenda_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day);	
+        agenda_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);	
         break; 
       case "weekly" :
-	agenda_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day); 
+	agenda_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity); 
 	break;
       case "monthlybyday" :
-	agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day); 
+	agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity); 
         break;
       case "monthlybydate" :
-	agenda_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) ;
+	agenda_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
 	break;
       case "yearly" :
-	agenda_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day);
+	agenda_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
 	break;	
     }
   }
@@ -1922,7 +2008,7 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function store_agenda_event($date, &$event, &$day_events,$user_id,$all_day,$end_time) {
+function store_agenda_event($date, &$event, &$day_events,$user_id,$all_day,$end_time,$entity) {
   $temp_date = $date;
   $event_end = $date + $event->duration;
   do {
@@ -1932,7 +2018,7 @@ function store_agenda_event($date, &$event, &$day_events,$user_id,$all_day,$end_
       $day = &new Day($temp_date);
       $day_events[$iso_date] = &$day;
     }
-    $day->store_agenda_event(&$event,$date,$user_id,$all_day);
+    $day->store_agenda_event(&$event,$date,$user_id,$all_day,$entity);
     $temp_date = strtotime("+1 day",$temp_date);
   } while ($event_end > $temp_date && $temp_date < $end_time);
 }
@@ -1943,7 +2029,7 @@ function store_agenda_event($date, &$event, &$day_events,$user_id,$all_day,$end_
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function agenda_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
+function agenda_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {
   global $day_duration;
 
   $temp_date = $date;
@@ -1963,7 +2049,7 @@ function agenda_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&
       $day = &new Day($temp_date);
       $day_events[$iso_date] = &$day;
     }
-    store_agenda_event($temp_date, $event, $day_events, $user_id, $all_day,$end_date);
+    store_agenda_event($temp_date, $event, $day_events, $user_id, $all_day,$end_date,$entity);
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
   }
 }
@@ -1974,7 +2060,7 @@ function agenda_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function agenda_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
+function agenda_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {
   global $day_duration,$cagenda_weekstart;
 
   $temp_date = get_agenda_date_day_of_week($date, $cagenda_weekstart);
@@ -2002,7 +2088,7 @@ function agenda_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repe
 	    $day = &new Day($current_date);
 	    $day_events[$iso_date] = &$day;
 	  }
-	  store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_date);
+	  store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_date,$entity);
 	}
       }
     } 
@@ -2016,7 +2102,7 @@ function agenda_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repe
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
+function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {
   global $day_duration,$cagenda_weekstart;
 
   $temp_date = $date;
@@ -2053,7 +2139,7 @@ function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$rep
 	$day = &new Day($current_date);
 	$day_events[$iso_date] = &$day;
       }
-      store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_date);
+      store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_date,$entity);
     }
     $ts_cur = strtotime("+$repeatfrequence months", $ts_cur);
   }	
@@ -2065,7 +2151,7 @@ function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$rep
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {  
+function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {  
   global $day_duration;
 
   $temp_date = $date;
@@ -2093,7 +2179,7 @@ function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfre
       $day = &new Day($ts_date);
       $day_events[$iso_date] = &$day;
     }
-    store_agenda_event($ts_date, $event, $day_events,$user_id,$all_day,$end_date);
+    store_agenda_event($ts_date, $event, $day_events,$user_id,$all_day,$end_date,$entity);
     $ts_date = strtotime("+$repeatfrequence months",$ts_date);
   }  
 }
@@ -2104,7 +2190,7 @@ function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfre
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function agenda_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {  
+function agenda_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {  
   global $day_duration;
 
   $temp_date = $date;    
@@ -2131,7 +2217,7 @@ function agenda_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,
       $day = &new Day($ts_date);
       $day_events[$iso_date] = &$day;
     }
-    store_agenda_event($ts_date, $event, $day_events,$user_id,$all_day,$end_date);
+    store_agenda_event($ts_date, $event, $day_events,$user_id,$all_day,$end_date,$entity);
     $ts_date = strtotime("+$repeatfrequence years",$ts_date);
   }
 }
@@ -2161,6 +2247,47 @@ class Event {
     $this->description = $description;
   }
 
+  /**
+   * match_period 
+   *  
+   * Check if an event is in a given lapse of time.
+   * return :
+   * -2 : if the event is before the period
+   * -1 : if the event is after the period
+   * 0 : in all unchecked case (might not happen)
+   * 1 : if the event begin after the beginning of the period but before the end
+   * 2 : if the event begin before the period and end after the beginning of the period
+   * 
+   * @param timestamp $date The timestamp of the event beginning
+   * @param timestamp $start The beginning of the period
+   * @param timestamp $end The end of the period
+   * @access public
+   * @return int
+   */
+  function match_period($date,$start,$end) {
+    
+    $ev_start = $date;
+    $ev_end = $this->duration + $ev_start;
+    
+    if ($ev_end <= $start) {
+      return -2;
+    }
+
+    if ($ev_start >= $end) {
+      return -1;
+    }
+
+    if ($ev_end > $start && $ev_start < $start) {
+      return 2;
+    }
+    
+    if ($ev_start < $end && $ev_end > $start) {
+      return 1;
+    }
+
+    return 0;
+  }
+
 }
   
 ///////////////////////////////////////////////////////////////////////////////
@@ -2177,6 +2304,13 @@ class Day {
     $this->day = $day;
   }
 
+  /**
+   * is_same_day
+   *
+   * @param timestamp $date 
+   * @access public
+   * @return boolean true if it's the same day, false otherwise
+   */
   function is_same_day($date) {
     if (date("Ymd",$this->day) == date("Ymd",$date)) {
       return true;
@@ -2184,31 +2318,72 @@ class Day {
     return false;
   }
   
-  function store_agenda_event(&$event,$begin_date,$uid,$day_event) {
+  /**
+   * store_agenda_event
+   * Add an event in the Day structure 
+   * 
+   * @param Event $event Event object
+   * @param timestamp $begin_date Beginning of the event
+   * @param id $uid entity id
+   * @param string $entity entity kind
+   * @param int $day_event = 1 if the $event var is an all day event
+   * @access public
+   * @return void
+   */
+  function store_agenda_event(&$event,$begin_date,$uid,$day_event,$entity="user") {
     if ($day_event == 1) {
-      $this->add_day_event(&$event,$uid);
+      $this->add_day_event(&$event,$uid,$entity);
     } else {
-      $this->add_event(&$event,$begin_date,$uid);
+      $this->add_event(&$event,$begin_date,$uid,$entity);
     }
   }
 
-  function add_event(&$event,$begin_date,$uid) {
+  /**
+   * add_event
+   * Add a non all day event to the Day structure 
+   * 
+   * @param Event $event event to add
+   * @param timesamp $begin_date  Beginning of the event
+   * @param int $uid User id
+   * @access public
+   * @return void
+   */
+  function add_event(&$event,$begin_date,$uid,$entity) {
     $date = date("YmdHis",$begin_date);
     if (!isset($this->events[$date.".".$event->id])) {
-      $this->events[$date.".".$event->id] = array("event"=>&$event,"date"=>$begin_date,"users"=>array($uid));
+      $this->events[$date.".".$event->id] = array("event"=>&$event,"date"=>$begin_date,$entity=>array($uid));
       ksort($this->events);
     } else {
-      $this->events[$date.".".$event->id]["users"][] = $uid;
+      $this->events[$date.".".$event->id][$entity][] = $uid;
     }
   }
   
-  function add_day_event(&$event,$uid) {
-    $this->day_events[$uid][] = &$event;
+  /**
+   * add_day_event 
+   * Add an all day event
+   * 
+   * @param Event $event event to add
+   * @param int $uid user id
+   * @access public
+   * @return void
+   */
+  function add_day_event(&$event,$uid,$entity) {
+    $this->day_events[$entity][$uid][] = &$event;
   }
 
-  function get_events($uid) {
+  /**
+   * get_events
+   *
+   * Return an Event object array with all the event
+   * off the given user.
+   * 
+   * @param int $uid entity id
+   * @access public
+   * @return array Event
+   */
+  function get_events($uid,$entity="user") {
     foreach($this->events as $event) {
-      if (!in_array($uid,$event["users"])) {
+      if (!is_array($event[$entity]) || !in_array($uid,$event[$entity])) {
 	continue;
       } else {
 	$return[] = $event;
@@ -2217,57 +2392,96 @@ class Day {
     return $return;
   }
  
-  function have_events_between($start,$end) {
+  /**
+   * have_events_between
+   * Test if there is one or more event between the two parameters 
+   * (including all day events)
+   * If an event begin at $end or end at $start it will not be
+   * considerated as between $start and $end
+   * 
+   * @param timestamp $start 
+   * @param timestamp $end 
+   * @access public
+   * @return boolean
+   */
+  function have_events_between($start,$end,$entity="user") {
     if (count($this->day_events) > 0) {
       return true;
     }
     foreach($this->events as $event) {
-      $ev_start = $event["date"];
-      $ev_end = $event["event"]->duration + $ev_start;
-      if ($ev_start < $end && $ev_end > $start) {
-	return true;
+      if(is_array($event[$entity])) {
+        $case = $event["event"]->match_period($event["date"],$start,$end);
+      
+        if ($case > 0) {
+          return true;
+        }
       }
     }
     return false;
   }
 
-  function user_have_events_between($start,$end,$uid) {
-    if (count($this->day_events[$uid]) > 0) {
+  /**
+   * entity_have_events_between
+   * Test if there is one or more event between the two parameters 
+   * (including all day events) for a given user
+   * If an event begin at $end or end at $start it will not be
+   * considerated as between $start and $end.
+   *  
+   * @param timestamp $start 
+   * @param timestamp $end 
+   * @param int $uid entity id
+   * @access public
+   * @return boolean
+   */
+  function entity_have_events_between($start,$end,$uid,$entity="user") {
+    if (count($this->day_events[$entity][$uid]) > 0) {
       return true;
     }
     foreach($this->events as $event) {
-      $ev_start = $event["date"];
-      $ev_end = $event["event"]->duration + $ev_start;
-      if (!in_array($uid,$event["users"])) {
+      if (!is_array($event[$entity]) || !in_array($uid,$event[$entity])) {;
 	continue;
       }
-      if ($ev_start < $end && $ev_end > $start) {
+      
+      $case = $event["event"]->match_period($event["date"],$start,$end);
+      
+      if ($case > 0) {
 	return true;
       }
     }
     return false;
   }
   
-  function get_events_before($end, $uid,$start="") {
+  /**
+   * get_events_before
+   * Return all the events before $end for a given user.
+   * The result will be an array with the duration of
+   * all events which match, and an array of all events which match.
+   * $start is the referer to calculate the duration of the events,
+   * 
+   * @param timestamp $end 
+   * @param int $uid  entity id
+   * @param timestamp $start 
+   * @access public
+   * @return array
+   */
+  function get_events_before($end, $uid,$start,$entity="user") {
     if (count($this->events) > 0) {
       foreach($this->events as $event) {
       
-	$ev_start = $event["date"];
-	$ev_end = $event["event"]->duration + $ev_start;
-          
-	if ($ev_start > $end) {
+        $case = $event["event"]->match_period($event["date"],$start,$end);
+        
+	if ($case == -1) {
 	  break;
 	}
-	
-	if (!in_array($uid,$event["users"])) {
+	if (!is_array($event[$entity]) || !in_array($uid,$event[$entity])) {
 	  continue;
-	}
-	if ($ev_start < $end) {
-	  $return[] = $event;
-	  if ($ev_end > $end) {
-	    $end = $ev_end;
-	  }
-	}
+        }
+        
+	$ev_end = $event["event"]->duration + $event["date"];
+        $return[] = $event;
+        if ($ev_end > $end) {
+          $end = $ev_end;
+        }
       }
     }
     if ($return != null) {
@@ -2276,40 +2490,56 @@ class Day {
     return $return;
   }
     
-  function get_events_between($start, $end, $uid) {
+  /**
+   * get_events_between 
+   * 
+   * Return all the events between $end and $start for a given user.
+   * The result will be an array with the duration of
+   * all events which match, and an array of all events which match.
+   * $start is the referer to calculate the duration of the events,
+   * 
+   * @param timestamp $end 
+   * @param int $uid  entity id
+   * @param timestamp $start 
+   * @access public
+   * @return array
+   */
+  function get_events_between($start, $end, $uid,$entity="user") {
     if (count($this->events) > 0) {
       foreach($this->events as $event) {
-      
-	$ev_start = $event["date"];
-	$ev_end = $event["event"]->duration + $ev_start;
+
+        $case = $event["event"]->match_period($event["date"],$start,$end);
 	
-	if ($ev_end < $start) {
+	if ($case == -2) {
 	  continue;
 	}
 	
-	if ($ev_start > $end) {
+	if ($case == -1) {
 	  break;
 	}
-	
-	if (!in_array($uid,$event["users"])) {
+
+	if (!is_array($event[$entity]) || !in_array($uid,$event[$entity])) {
 	  continue;
-	}
-      
-	if ($ev_end > $start && $ev_start < $start) {
+        }
+        
+	if ($case == 2) {
 	  return -1;
 	}
-      
-	if ($ev_start < $end && $ev_end > $start) {
-	  $return[] = $event;
+              
+	if ($case == 1) {
+          $return[] = $event;
+          $ev_end = $event["event"]->duration + $event["date"];
 	  if ($ev_end > $end) {
 	    $end = $ev_end;
 	  }
 	}
       }
     }
+    
     if ($return != null) {
       $return = array("duration"=>$end - $start,"events"=>$return);
     }
+
     return $return;
   }
 }

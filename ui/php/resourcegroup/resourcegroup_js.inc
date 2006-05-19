@@ -9,6 +9,10 @@
 
 require("obminclude/javascript/check_js.inc");
 
+if ($ext_element != "") {
+  require_once("$obminclude/of/of_extmod.inc");
+}
+
 // to avoid a javascript error when ext_widget is not defined
 if ($ext_widget != "") {
   $extra_js .= "

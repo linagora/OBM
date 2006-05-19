@@ -519,9 +519,9 @@ function dis_agenda_year_planning($agenda, $calendar_entity) {
 	$tr_users = 0;
 
 	// loop through ["user"], ["resource"]
-	foreach ($calendar_entity as $entity) {
+	foreach ($calendar_entity as $type => $entity) {
 	  foreach ($entity as $id => $data) {
-	    $events_data = $dayObj->get_events($id);
+	    $events_data = $dayObj->get_events($id,$type);
 	    $days_events = $dayObj->day_events;
 	    if ($tr_users == 3) {
 	      $dis_event_cal .= "</tr><tr>";   
@@ -698,7 +698,7 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
       $days_events = $day->day_events;
 
       // loop through ["user"], ["resource"]
-      foreach ($calendar_entity as $entity) {
+      foreach ($calendar_entity as $type => $entity) {
 	foreach ($entity as $id => $properties) {
 	  $dis_month_cal .= "
             <td><table style=\"height:10%;width:$td_width;\">";
@@ -710,7 +710,7 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
 	    }
 	    $dis_month_cal .= "</td>";
 	  }
-	  $events_data = $day->get_events($id);
+	  $events_data = $day->get_events($id,$type);
 	  if (is_array($events_data)) {
 	    $list_events = $events_data["events"];
 	    foreach ($events_data as $event) {
@@ -887,9 +887,9 @@ function dis_agenda_week_planning($agenda, $calendar_entity) {
 	    foreach($entity as $id => $properties) {
 	      $indice ++;
 	      if ($j == $cagenda_first_hour && $delta2 == 0) {
-		$events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
+		$events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time,$type);
 	      } else {
-		$events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);
+		$events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id,$type);
 	      }
 	      if ($events_data != null) {
 		if (is_array($events_data)) {
@@ -1037,13 +1037,13 @@ function dis_agenda_day_planning($agenda, $calendar_entity) {
       if (is_object($day)) {
 	$indice = 0;
 	// loop through ["user"], ["resource"]
-	foreach ($calendar_entity as $entity) {
+	foreach ($calendar_entity as $type => $entity) {
 	  foreach ($entity as $id => $properties) {
 	    $indice ++;
 	    if ($i == $cagenda_first_hour && $delta2 == 0) {
-	      $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
+	      $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time,$type);
 	    } else {
-	      $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);	  
+	      $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id,$type);	  ;
 	    }
 	    if ($events_data != null) {
 	      if (is_array($events_data)) {
@@ -2149,11 +2149,11 @@ function html_agenda_dis_delete($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_agenda_meeting_form($agenda, $sel_entity_id) {
   global $display, $path, $set_theme, $set_cal_interval;
-  global $ico_delete, $ico_mini_cal, $ico_add_user, $ico_add_group;
-  global $popup_height,$popup_width;
+  global $ico_delete, $ico_mini_cal, $ico_add_user, $ico_add_group,$ico_add_resource;
+  global $popup_height,$popup_width,$cagenda_resource,$ico_add_resourcegroup;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
-  global $l_groups;
+  global $l_groups,$l_resources,$l_module_resourcegroup;
 
   $time_unit = 60 / $set_cal_interval;
   $datebegin = $agenda["date"];
@@ -2171,9 +2171,9 @@ function dis_agenda_meeting_form($agenda, $sel_entity_id) {
   }
   $res_id = $sel_entity_id["resource"];
   if (count($res_id > 0)) {
-    $resources = get_agenda_resource_from_ids($res_id);
+    $res = get_agenda_resource_from_ids($res_id);
   } else {
-    $resources = array();
+    $res = array();
   }
   $groups_id = $sel_entity_id["group"];
   if (count($groups_id > 0)) {
@@ -2212,9 +2212,71 @@ function dis_agenda_meeting_form($agenda, $sel_entity_id) {
     <td class=\"detailForm\" id=\"sel_user_id\">
       $dis_sel_user
     </td>
-";
-
-
+  ";
+  if ($cagenda_resource) {
+    if (is_array($res["entity"])) {
+      foreach ($res["entity"] as $r_id => $r_ent) {
+	$r_name = $r_ent["label"];
+	$sel_id = "data-resource-$r_id";
+	$div_id = "sel_resource_id-$sel_id";
+	$dis_sel_resource .= "
+          <div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+          </a>
+          $r_name
+          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+          </div>";
+      }
+    }  
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
+    $dis_block_resource = "
+    <tr>
+      <td class=\"detailLabel\">
+      $l_resources
+      <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url_resource','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_resource\" alt=\"[Add]\" />
+      </a>      
+      </td>
+     <td class=\"detailForm\" id=\"sel_resource_id\">
+       $dis_sel_resource
+     </td>      
+    </tr>";
+  
+    if (is_array($res_grp["entity"])) {
+      foreach ($res_grp["entity"] as $rg_id => $rg_ent) {
+	$rg_name = $rg_ent["label"];
+	$sel_id = "data-resourcegroup-$r_id";
+	$div_id = "sel_resource_group_id-$sel_id";
+	$dis_sel_resource_group .= "
+          <div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_resource_group_id');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+          </a>
+          $r_name
+          <input value=\"$sel_id\" name=\"sel_resource_group_id[]\" type=\"hidden\" />
+          </div>";
+      }
+    }  
+    $url_resource_group = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_group_id";
+    $dis_block_resource_group = "
+    <tr>
+      <td class=\"detailLabel\">
+      $l_module_resourcegroup
+      <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url_resource_group','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_resourcegroup\" alt=\"[Add]\" />
+      </a>      
+      </td>
+     <td class=\"detailForm\" id=\"sel_resource_group_id\">
+       $dis_sel_resource_group
+     </td>      
+    </tr>";
+  }
+  
   // group select
   if (is_array($groups["entity"])) {
     foreach ($groups["entity"] as $g_id => $g_ent) {
@@ -2286,6 +2348,8 @@ function dis_agenda_meeting_form($agenda, $sel_entity_id) {
   <tr>
     $block_group
   </tr>
+  $dis_block_resource  
+  $dis_block_resource_group
   <tr>
     <td class=\"detailLabel\">$l_datebegin $l_format</td>
     <td class=\"detailForm\">
@@ -2318,7 +2382,7 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   global $set_theme,$ico_left_day,$ico_right_day;
   global $set_cal_interval;
   global $cagenda_weekstart, $cagenda_first_hour, $cagenda_last_hour;
-  global $l_private,$l_private_description,$display;              
+  global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;              
 
   $iso_date = $agenda["date"];
   $ts_date = strtotime($iso_date);
@@ -2327,6 +2391,7 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   $duration = $agenda["duration"] * 3600;
   $param_duration = $agenda["duration"];
 
+  $nb_group = count($agenda["sel_resource_group_id"]);
   $week_num = get_agenda_week_num($ts_date); 
   $next_week = isodate_format(strtotime("+1 week", $ts_date));
   $prev_week = isodate_format(strtotime("-1 week", $ts_date));
@@ -2340,7 +2405,10 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   $display_date = "$start_week - $end_week"; 
   $events = agenda_events_model($start_week_day,$end_week_time,$entity_store);
   $day_duration = 86400; 
-
+  $resource_div .= "
+  <div id=\"ressource-default\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
+  <div class=\"blockTitle\">:: $l_free_resources $l_all_f</div>
+  </div>";  
   /* Week Days headers */
   for ($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
     $this_date_l = agenda_localizeDate("week_list", $i);
@@ -2365,27 +2433,79 @@ function dis_agenda_free_interval($agenda, $entity_store) {
         $end_time = $current_time + $duration;
 	$begin_date = urlencode(isodate_format($current_time,"",1));
 	$end_date = urlencode(isodate_format($end_time,"",1));
-	$goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date";
+        $goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date";
 	if (isset($events[$dayLink])) {
-	  $day = $events[$dayLink];
-	  $have_event = $day->have_events_between($current_time, $current_time + $time_unit_sec);
-	  $will_have_event = $day->have_events_between($current_time,$end_time);
-	  $goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date";
+          $day = $events[$dayLink];
+	  $have_event = $day->have_events_between($current_time, $current_time + $time_unit_sec,"user");
+          $will_have_event = $day->have_events_between($current_time,$end_time,"user");
+          if(!$have_event) {
+            $have_event = $have_event | $day->have_events_between($current_time, $current_time + $time_unit_sec,"resource");
+            $will_have_event = $will_have_event | $day->have_events_between($current_time,$end_time,"resource");
+          }
+          
+          // Gestion des groupes de ressources
+          if(is_array($entity_store["resourcegroup"]) && count($entity_store["resourcegroup"]) > 0
+            && !$have_event ) {
+            $possible_ressources = array();
+            $free_ressources = array();
+              
+            $resource_ul = "";
+            $resource_url = "";   
+            foreach($entity_store["resourcegroup"] as $groupedresource) {
+              $grid = $groupedresource["id"]; 
+              $grlabel = $groupedresource["name"];
+              $rgid = $groupedresource["group"];
+              $grp_have_event = $day->entity_have_events_between($current_time, $current_time + $time_unit_sec,$grid,"resourcegroup");
+              $grp_will_have_event =   $day->entity_have_events_between($current_time,$end_time,$grid,"resourcegroup");
+               if(!$grp_will_have_event) {
+                 $possible_ressources[$rgid][] = $groupedresource;
+              } 
+              if (!$grp_have_event) {
+                $free_ressources[$rgid][] = $groupedresource;
+              }
+            }
+            if(count($free_ressources) != $nb_group) {
+              $have_event = true;
+            }
+            if(count($possible_ressources) != $nb_group) {
+              $will_have_event = true;
+            }
+            
+            if(count($free_ressources) > 0 && !$have_event) {          
+              foreach($free_ressources as $groupId => $group) {
+                if(is_array($possible_ressources[$groupId])) {
+                  $resource_ul .= html_agenda_ressource_list($group[0]["groupLabel"],$possible_ressources[$groupId]);
+                  $resource_url .= "&amp;sel_resource_id[]=".$possible_ressources[$groupId][0]["id"];
+                }else {
+                  $resource_ul .= html_agenda_ressource_list($group[0]["groupLabel"],$group,true);
+                  $resource_url .= "&amp;sel_resource_id[]=".$free_ressources[$groupId][0]["id"];
+                }
+            }
+              
+             $resource_div .= "
+              <div id=\"ressource-$current_time\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
+               $resource_ul
+              </div>";              
+            }
+          }
+
+          
+	  $goto = "agenda_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date".$resource_url;
 	  if ($have_event) {
 	    $week_cal .= "<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
           } elseif ($will_have_event) {
 	    $week_cal .= "<td class=\"agendaFree\" onclick=\"window.location='$goto'\"
-	     onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer'\"
-	     onmouseout=\"this.className ='agendaFree'\">&nbsp;</td>\n";
+	     onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-$current_time');\"
+	     onmouseout=\"this.className ='agendaFree';agenda_hide('ressource-$current_time');\">&nbsp;</td>\n";
 	  } else {
 	    $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
-	     onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer'\"
-	     onmouseout=\"this.className='agendaPossible'\">&nbsp;</td>\n";
+	     onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-$current_time');\"
+	     onmouseout=\"this.className='agendaPossible';agenda_hide('ressource-$current_time');\">&nbsp;</td>\n";
 	  }
 	} else {
 	  $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
-	   onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer'\"
-	   onmouseout=\"this.className='agendaPossible'\">&nbsp;</td>\n";
+	   onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-default');\"
+	   onmouseout=\"this.className='agendaPossible';agenda_hide('ressource-default');\">&nbsp;</td>\n";
         }
       }
       $week_cal .= "</tr>";
@@ -2412,13 +2532,43 @@ function dis_agenda_free_interval($agenda, $entity_store) {
     </tr>
     $week_cal
    </table>
-  <div>
+   <div>
+   $resource_div
 ";
 
   return  $block;
 }
 
-
+/**
+ * html_agenda_ressource_list
+ * Build the resources pop up 
+ * 
+ * @param mixed $groupLabel 
+ * @param mixed $resource_group 
+ * @param mixed $free 
+ * @access public
+ * @return void
+ */
+function html_agenda_ressource_list($groupLabel,$resource_group,$free=false) {
+  global $l_free_resources;
+  
+  if($free) {
+    $class= "agendaFree";
+  } else {
+    $class = "agendaPossible";
+  }
+  $style ="style=\"font-weight:bold;\"";
+  foreach($resource_group as $resource) {
+    $ret .= "<li class=\"blockItem $class\" $style> ".$resource["name"]."</li>";
+    $style = "";
+  }
+  return "
+  <div class=\"blockTitle\">:: $l_free_resources $groupLabel</div>
+  <ul class=\"blockItem resourceBlock\">
+  $ret
+    </ul>
+  ";
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display the agenda administration index
 ///////////////////////////////////////////////////////////////////////////////

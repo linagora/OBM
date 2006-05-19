@@ -380,6 +380,14 @@ td.agendaFree 	{
     border-right: 		1px dashed #a0b3c4;     
 }
 
+li.agendaFree {
+    color:                      #cee1ed;
+}
+
+li.agendaPossible {
+    color:                      #97bdec;
+}
+   
 td.agendaFreeHover	{ 
     background-color: 		#fdffbf;  
     border-top: 		1px dashed #a0b3c4;

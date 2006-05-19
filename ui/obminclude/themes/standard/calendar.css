@@ -1,4 +1,4 @@
-/*/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 // OBM - File : agenda.css (standard)                                        //
 //     - Desc : CSS style file (standard theme) for Calendar module          //
 // 2003-09-01 Aliacom - Mehdi Rande                                          //
@@ -415,6 +415,15 @@ td.agendaFree 	{
     border-top: 		1px dashed #a0b3c4;
     border-right: 		1px dashed #a0b3c4;     
 }
+
+li.agendaFree {
+    color:                      #cee1ed;
+}
+
+li.agendaPossible {
+    color:                      #97bdec;
+}
+        
 
 td.agendaFreeHover	{ 
     background-color: 		#fdffbf;  

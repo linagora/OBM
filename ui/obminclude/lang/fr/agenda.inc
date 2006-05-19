@@ -10,6 +10,7 @@
 $l_agenda = "Calendrier";
 $l_users = "Utilisateurs";
 $l_resources = "Ressources";
+$l_free_resources = "Resources libres : ";
 $l_groups = "Groupes";
 $l_title = "Titre";
 $l_location = "Lieu";

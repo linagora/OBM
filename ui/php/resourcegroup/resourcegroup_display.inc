@@ -51,7 +51,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
   }
 
   else if (($fieldname == "data_element") && $ext_element != "") {
-    $res["name"] = "<span id=\"data-resurcegroup-".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
+    $res["name"] = "<span id=\"data-resourcegroup-".$OD->data_set->f("rgroup_id")."\" style=\"display:none;\">".
     $OD->data_set->f("rgroup_name")."</span>";
   } else if ($fieldname == "rgroup_nb_resource") {
     $nb_q = new DB_OBM;

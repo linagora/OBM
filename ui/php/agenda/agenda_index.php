@@ -60,6 +60,16 @@ if ( ($agenda["new_group"] == "1")
   }
   $cal_entity_id["group_view"] = $agenda["group_view"];
   $cal_entity_id["resource"] = array();
+     }
+// Resources groups, only on meeting
+if($action == "perform_meeting" && 
+  (is_array($agenda["sel_resource_group_id"]) || is_array($agenda["sel_user_id"])
+  || is_array($agenda["sel_resource_id"]))) { 
+  $cal_entity_id["resource_group"] = $agenda["sel_resource_group_id"];
+  $cal_entity_id["user"] = $agenda["sel_user_id"];
+  $cal_entity_id["resource"] = $agenda["sel_resource_id"];    
+} else if ($action != "perform_meeting") {
+  unset($cal_entity_id["resource_group"]);
 }
 // If event insert or update, reset the selected group
 if (($action == "insert") || ($action == "update")) {
@@ -76,7 +86,10 @@ if (($agenda["new_sel"]) || (is_array($agenda["sel_user_id"]))) {
   $cal_entity_id["user"] = $agenda["sel_user_id"];
 }
 // If resources selection present we override session content
-if (($agenda["new_sel"]) || (is_array($agenda["sel_resource_id"]))) {
+if ($action == "new" && (is_array($agenda["sel_resource_id"]))) {
+  // Join resources from group with normal resources.
+  $cal_entity_id["resource"] = array_merge($agenda["sel_resource_id"],$cal_entity_id["resource"]);
+} else if (($agenda["new_sel"]) || (is_array($agenda["sel_resource_id"]))) {
   $cal_entity_id["resource"] = $agenda["sel_resource_id"];
 } else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
@@ -306,7 +319,9 @@ if ($action == "index") {
   require("agenda_js.inc");
   $cal_entity_id["user"] = run_query_agenda_get_allusers($cal_entity_id["user"], $agenda["sel_group_id"]);
   $entity_readable = get_agenda_entity_readable();
-  $entity_store = store_agenda_entities(run_query_agenda_get_entity_label($cal_entity_id));
+  $ret = run_query_agenda_get_entity_label($cal_entity_id);
+  $ret["resourcegroup"] = run_query_resource_resourcegroup($cal_entity_id["resource_group"]);
+  $entity_store = store_agenda_entities($ret);
   $display["features"] = html_agenda_planning_bar($agenda, $cal_entity_id, $entity_store, $entity_readable);
   $display["detail"] = dis_agenda_free_interval($agenda, $entity_store);
 
@@ -374,7 +389,7 @@ function get_param_agenda() {
   global $tf_date_end, $sel_time_end, $sel_min_end;
   global $sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
   global $param_user, $param_group, $new_group, $sel_user_id, $sel_group_id;
-  global $sel_resource_id, $sel_ent, $new_sel;
+  global $sel_resource_id, $sel_resource_group_id, $sel_ent, $new_sel;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $rd_decision_event,$cb_mail,$param_duration;
@@ -515,6 +530,21 @@ function get_param_agenda() {
     }
   }
 
+  // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
+  if (is_array($sel_resource_group_id)) {
+    while ( list( $key, $value ) = each( $sel_resource_group_id ) ) {
+      // sel_resource_id contains select infos (data-resource-$id)
+      if (strcmp(substr($value, 0, 19),"data-resourcegroup-") == 0) {
+	$data = explode("-", $value);
+	$id = $data[2];
+	$agenda["sel_resource_group_id"][] = $id;
+      } else {
+	// direct id
+	$agenda["sel_resource_group_id"][] = $value;
+      }
+    }
+  }
+  
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
@@ -539,17 +569,9 @@ function get_param_agenda() {
       }
     }
   }
-
+  
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
-  if (debug_level_isset($cdg_param)) {
-    if ( $agenda ) {
-      while ( list( $key, $val ) = each( $agenda ) ) {
-        echo "<br />agenda[$key]=";
-	var_dump($val);
-      }
-    }
-    echo "<br />action = $action";
-  }
+  display_debug_param($agenda);
 
   return $agenda;
 }
