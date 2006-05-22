@@ -35,6 +35,7 @@ $l_bytes = "bytes";
 $l_header_new_dir = "New directory";
 $l_dir = "Directory";
 $l_add_dir = "Create directory";
+$l_update_dir = "Update directory";
 $l_new_file = "File to send";
 $l_link = "HTTP Link";
 $l_links = "HTTPS Link";

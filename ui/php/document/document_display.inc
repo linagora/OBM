@@ -581,19 +581,43 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
 //   - $document[] : default values
 //     keys used  : uri, name
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_dir_form($action, $document) {
+function html_document_dir_form($action, $document,$doc_q=null) {
   global $display,$popup_height,$popup_width;
   global $set_theme,$l_document;
   global $l_path, $l_name,$path,$ico_browse;
-  global $l_dir, $l_add_dir;
+  global $l_dir, $l_add_dir,$l_update_dir;
 
-  $name = $document["name"];
-  $re_path = $document["path"];
-  $dis_button = "
-  <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_dir\" />
-  <input type=\"submit\" value=\"$l_add_dir\" />
-  ";
+  if($action == "detailupdate_dir") {
+    $old_name = $doc_q->f("document_name");
+    $name = $doc_q->f("document_name");
+    $re_path = $doc_q->f("document_path");
+  } 
+  $id = $document["id"];
+  if(isset($document["name"])) $name = $document["name"];
+  if(isset($document["path"]))$re_path = $document["path"];
+  if(isset($document["old_name"]))$old_name = $document["old_name"];
+
+  
   $url = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].elements[1]&amp;ext_disp_file=false"; 
+  if($action == "new_dir" || $action == "insert_dir") {
+    $dis_button = "
+    <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_dir\" />
+    <input type=\"submit\" value=\"$l_add_dir\" />
+    ";    
+    $dis_path = "
+     <input type=\"text\" id=\"tf_path\" name=\"tf_path\" value=\"$re_path\" size=\"50\"/>
+     <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a>      
+     ";
+  } else {
+    $dis_button = "
+    <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update_dir\" />
+    <input type=\"submit\" value=\"$l_update_dir\" />
+    <input type=\"hidden\" id=\"hd_path\" name=\"hd_path\" value=\"$re_path\" size=\"50\"/>
+    <input type=\"hidden\" id=\"hd_old_name\" name=\"hd_old_name\" value=\"$old_name\" size=\"50\"/>
+    ";    
+    
+    $dis_path = $re_path;
+  }
 
   $block = "
     <form method=\"get\" name=\"f_new_dir\"
@@ -609,14 +633,14 @@ function html_document_dir_form($action, $document) {
     </tr><tr>
       <td class=\"detailLabel\">$l_path</td>
       <td class=\"detailForm\">
-     <input type=\"text\" id=\"tf_path\" name=\"tf_path\" value=\"$re_path\" size=\"50\"/>
-       <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a>
+      $dis_path
       </td>
     </tr>
     </table>
 
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
+    <input type=\"hidden\" name=\"param_document\" value=\"$id\" />
     </div>
     </form>
    ";
@@ -1040,6 +1064,15 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
        </tr>
       </table>";
   }
+  if($d_id) {
+    $dis_name = "
+       <a href=\"$path/document/document_index.php?action=detailupdate_dir&amp;param_document=$d_id\"> 
+       $name
+       </a>        
+      ";
+  } else {
+    $dis_name = $name;
+  }  
   if($bool) {
     $block= 
     "<table class=\"document\">
@@ -1047,8 +1080,8 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
-	 </a>
-	 ".$name."
+         </a>
+         $dis_name
 	</td>
 	<td class=\"documentInfo\">&nbsp;</td>
 	<td class=\"documentInfo\">&nbsp;</td>
@@ -1067,7 +1100,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 	 <a href=\"document_index.php?action=dir_check_delete&amp;param_document=$d_id\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
-	 ".$name."
+	 $dis_name
 	</td>
 	<td class=\"documentInfo\">&nbsp;</td>
 	<td class=\"documentInfo\">&nbsp;</td>

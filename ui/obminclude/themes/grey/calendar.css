@@ -349,6 +349,13 @@ li.agendaPossible {
     color:                      #97bdec;
 }
         
+ul.agendaFree {
+   background-color:            #cee1ed;
+}
+
+ul.agendaPossible {
+    background-color:           #97bdec;
+}
 
 td.agendaOccupied 	{ 
     background-color: 		#e3e5ea;  

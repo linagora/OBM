@@ -91,6 +91,12 @@ if ($action == "ext_get_path") {
   require("document_js.inc");
   $display["detail"] = html_document_dir_form($action, $document);
   
+} elseif ($action == "detailupdate_dir")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("document_js.inc");
+  $doc_q = run_query_document_detail($document["id"]);
+  $display["detail"] = html_document_dir_form($action, $document,$doc_q);
+
 } elseif ($action == "tree")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
@@ -167,6 +173,24 @@ if ($document["id"] > 0) {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_document_form($action, $document, "");
   }
+} elseif ($action == "update_dir")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_document_dir_data_form($document)) {
+    $retour = run_query_document_update_dir($document);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_update_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_update_error);
+    }
+    require("document_js.inc");    
+    $display["detail"] = html_document_tree($document,true);
+  // Form data are not valid
+  } else {
+    require("document_js.inc");
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["detail"] = html_document_dir_form($action, $document);
+  }
+
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -381,6 +405,7 @@ function get_param_document() {
   global $param_document, $popup, $param_entity, $entity,$rd_file_update; 
   global $tf_category1_label, $tf_category1_code, $sel_category1;
   global $tf_category2_label, $tf_category2_code, $sel_category2;
+  global $hd_path, $hd_old_name;
 
   if (isset ($param_document)) $document["id"] = $param_document;
   if (isset ($param_entity)) $document["entity_id"] = $param_entity;
@@ -392,6 +417,8 @@ function get_param_document() {
   if (isset ($tf_name)) $document["name"] = $tf_name; // dir
   if (isset ($tf_author)) $document["author"] = $tf_author;
   if (isset ($tf_path)) $document["path"] = format_path(trim($tf_path));
+  if (isset ($hd_path)) $document["path"] = $hd_path;
+  if (isset ($hd_old_name)) $document["old_name"] = $hd_old_name;
   if (isset ($tf_filename)) $document["filename"] = $tf_filename;
 
   if (isset ($rd_kind)) $document["kind"] = $rd_kind;
@@ -504,7 +531,15 @@ function get_document_action() {
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update')
-                                     	      );
+  );
+
+// Detail Update
+  $actions["document"]["detailupdate_dir"] = array (
+    'Url'      => "$path/document/document_index.php?action=detailupdate&amp;param_document=".$document["id"]."",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+  );
 // Update
   $actions["document"]["update"] = array (
     'Url'      => "$path/document/document_index.php?action=update",
@@ -512,7 +547,13 @@ function get_document_action() {
     'Privacy'  => true,
     'Condition'=> array ('None')
                                      	      );
-
+// Update
+  $actions["document"]["update_dir"] = array (
+    'Url'      => "$path/document/document_index.php?action=update_dir",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                     	      );
 // Check_Delete
   $actions["document"]["check_delete"] = array (
     'Name'     => $l_header_delete,

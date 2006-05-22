@@ -157,3 +157,4 @@ $ico_agenda_portal = "ico_portal_agenda.gif";
 $ico_time_portal = "ico_portal_time.gif";
 $ico_contract_portal = "../images/1px.gif";
 $ico_incident_portal = "../images/1px.gif";
+$ico_warning = "../standard/ico_warning.gif";

@@ -2484,6 +2484,8 @@ function dis_agenda_free_interval($agenda, $entity_store) {
               
              $resource_div .= "
               <div id=\"ressource-$current_time\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
+              <div class=\"blockTitle\">:: $l_free_resources </div>
+               <br />
                $resource_ul
               </div>";              
             }
@@ -2550,21 +2552,22 @@ function dis_agenda_free_interval($agenda, $entity_store) {
  * @return void
  */
 function html_agenda_ressource_list($groupLabel,$resource_group,$free=false) {
-  global $l_free_resources;
+  global $l_free_resources,$ico_warning,$set_theme;
   
   if($free) {
     $class= "agendaFree";
+    $ico = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_warning\" alt=\"[Restricted]\" />";
   } else {
     $class = "agendaPossible";
   }
   $style ="style=\"font-weight:bold;\"";
   foreach($resource_group as $resource) {
-    $ret .= "<li class=\"blockItem $class\" $style> ".$resource["name"]."</li>";
+    $ret .= "<li class=\"blockItem\" $style>  ".$resource["name"]."</li>";
     $style = "";
   }
   return "
-  <div class=\"blockTitle\">:: $l_free_resources $groupLabel</div>
-  <ul class=\"blockItem resourceBlock\">
+  <div class=\"blockTitle\">::$ico $groupLabel</div>
+  <ul class=\"blockItem resourceBlock $class\">
   $ret
     </ul>
   ";

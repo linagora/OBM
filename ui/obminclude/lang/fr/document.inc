@@ -35,6 +35,7 @@ $l_bytes = "octets";
 $l_header_new_dir = "Nouveau répertoire";
 $l_dir = "Répertoire";
 $l_add_dir = "Créer le répertoire";
+$l_update_dir = "Mettre à jour";
 $l_header_tree = "Arborescence";
 $l_auto = "Par défaut";
 $l_consult = "Consulter le document";

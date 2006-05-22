@@ -915,6 +915,52 @@ function run_query_document_insert_dir($document) {
 
   return true;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Dir Creation
+// Parameters:
+//   - $id : Mime Type id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_document_update_dir($document) {
+  global $cdg_sql, $auth, $cdoc_kind_dir;
+
+  $uid = $auth->auth["uid"];
+  $now = date("Y-m-d H:i:s");
+  $path = $document["path"].$document["name"];
+  $old_path = $document["path"].$document["old_name"];
+  $name = $document["name"];
+  $id = $document["id"];
+
+  $query = "UPDATE Document SET
+    document_timeupdate = NOW(),
+    document_userupdate = '$uid',
+    document_name = '$name'
+    WHERE 
+    document_id = '$id'
+  ";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $query = "SELECT * FROM Document WHERE document_path  like '$old_path/%'" ;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm2_q = new DB_OBM;
+  $size = strlen($old_path);
+  while($obm_q->next_record()) {
+    $new_path = $path.substr($obm_q->f("document_path"),$size);
+    $query = "UPDATE Document SET
+      document_timeupdate = document_timeupdate,
+      document_path = '$new_path'
+      WHERE 
+      document_id = '".$obm_q->f("document_id")."'
+    ";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm2_q->query($query);
+  }
+
+  return true;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
