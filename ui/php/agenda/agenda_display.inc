@@ -2380,7 +2380,7 @@ function dis_agenda_meeting_form($agenda, $sel_entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_agenda_free_interval($agenda, $entity_store) {
   global $set_theme,$ico_left_day,$ico_right_day;
-  global $set_cal_interval;
+  global $set_cal_interval,$cal_entity_id;
   global $cagenda_weekstart, $cagenda_first_hour, $cagenda_last_hour;
   global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;              
 
@@ -2391,7 +2391,7 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   $duration = $agenda["duration"] * 3600;
   $param_duration = $agenda["duration"];
 
-  $nb_group = count($agenda["sel_resource_group_id"]);
+  $nb_group = count($cal_entity_id["resource_group"]);
   $week_num = get_agenda_week_num($ts_date); 
   $next_week = isodate_format(strtotime("+1 week", $ts_date));
   $prev_week = isodate_format(strtotime("-1 week", $ts_date));
@@ -2442,7 +2442,6 @@ function dis_agenda_free_interval($agenda, $entity_store) {
             $have_event = $have_event | $day->have_events_between($current_time, $current_time + $time_unit_sec,"resource");
             $will_have_event = $will_have_event | $day->have_events_between($current_time,$end_time,"resource");
           }
-          
           // Gestion des groupes de ressources
           if(is_array($entity_store["resourcegroup"]) && count($entity_store["resourcegroup"]) > 0
             && !$have_event ) {
