@@ -153,6 +153,12 @@ if ($cgp_show["module"]["contact"]) {
                              'Url' => "$path/contact/contact_index.php",
                              'Right'=> $cright_read);
 }
+if ($cgp_show["module"]["lead"]) {
+  $modules["lead"] = array('Name'=> $l_module_lead,
+                                  'Ico' => "$ico_lead",
+                                  'Url' => "$path/lead/lead_index.php",
+                                  'Right'=> $cright_read);
+}
 if ($cgp_show["module"]["deal"]) {
   $modules["deal"] = array('Name'=> $l_module_deal,
                                   'Ico' => "$ico_deal",

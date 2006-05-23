@@ -249,7 +249,7 @@ display_page($display);
 function get_param_resourcegroup() {
   global $param_resourcegroup, $popup, $child_res;
   global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_desc, $tf_resource, $tf_email, $cb_priv, $sel_privacy;
+  global $tf_name, $tf_desc, $tf_resource, $tf_email, $cb_privacy, $sel_privacy;
   global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
   global $ext_element;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
@@ -260,7 +260,7 @@ function get_param_resourcegroup() {
   if (isset ($tf_desc)) $resourcegroup["desc"] = trim($tf_desc);
   if (isset ($tf_email)) $resourcegroup["email"] = $tf_email;
   if (isset ($tf_resource)) $resourcegroup["resource"] = trim($tf_resource);
-  if (isset ($cb_priv)) $resourcegroup["privacy"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_privacy)) $resourcegroup["privacy"] = ($cb_privacy == 1 ? 1 : 0);
   if (isset ($sel_privacy)) $resourcegroup["privacy"] = $sel_privacy;
 
   if (isset ($child_res)) $resourcegroup["children_restriction"] = $child_res;

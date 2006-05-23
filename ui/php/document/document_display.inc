@@ -969,7 +969,7 @@ function dis_document_display_pref($prefs) {
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_tree($document,$display_file) {
+function html_document_tree($document, $display_file) {
   global $l_close;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   

@@ -47,6 +47,9 @@ $l_date = "Fecha";
 $l_begin = "Inicio";
 $l_datebegin = "Fecha de Inicio";
 $l_dateend = "Fecha final";
+$l_end = "Final";
+$l_alarm = "Alarma";
+$l_text = "Text";
 $l_name = "Nombre";
 $l_label = "Etiqueta";
 $l_number = "Número";
@@ -102,6 +105,7 @@ $l_aduplicate = "Duplicar";
 // Entities
 $l_company = "Compañía";
 $l_contact = "Contacto";
+$l_lead = "Lead";
 $l_deal = "Negocio";
 $l_list = "Lista";
 $l_publication = "Publicación";
@@ -180,6 +184,7 @@ $l_section_settings = "PREFERENCIAS";
 
 $l_module_company = "Compañías";
 $l_module_contact = "Contactos";
+$l_module_lead = "Leads";
 $l_module_deal = "Negocios";
 $l_module_list = "Listas";
 $l_module_agenda = "Calendario";

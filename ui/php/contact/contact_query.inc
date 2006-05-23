@@ -518,7 +518,7 @@ function run_query_contact_insert($contact) {
   }
 
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
-  $priv = (isset($contact["priv"]) ? $contact["priv"] : '0');
+  $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
 
   $query = "INSERT INTO Contact (contact_timeupdate,
     contact_timecreate,
@@ -722,7 +722,7 @@ function run_query_contact_update($contact) {
   }
 
   $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
-  $priv = (isset($contact["priv"]) ? $contact["priv"] : '0');
+  $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
   $category1 = $contact["category1"];
   $category2 = $contact["category2"];
   $category3 = $contact["category3"];

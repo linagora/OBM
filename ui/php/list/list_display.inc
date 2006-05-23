@@ -781,7 +781,7 @@ function html_list_form($action, $list_q, $list) {
   
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
-  if (isset($list["priv"])) { $priv = $list["priv"]; }
+  if (isset($list["privacy"])) { $priv = $list["privacy"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
@@ -798,7 +798,7 @@ function html_list_form($action, $list_q, $list) {
 	    ($usercreate == $uid) ) ) {
     $dis_priv = "
       <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" ";
+      <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td>
   </tr><tr>";

@@ -578,8 +578,8 @@ function get_param_contact() {
   global $action, $view;
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
-  global $sel_function, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $tf_email2, $tf_date, $cb_mailok, $cb_priv;
+  global $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
+  global $sel_market, $tf_email, $tf_email2, $tf_date, $cb_mailok, $cb_privacy;
   global $ta_com, $ta_com2, $ta_com3, $tf_aka;
   global $tf_datecomment , $sel_usercomment , $ta_add_comment ;
   global $tf_datecomment2, $sel_usercomment2, $ta_add_comment2;
@@ -589,12 +589,13 @@ function get_param_contact() {
   global $company_name, $company_new_name, $company_new_id;
   global $tf_label, $tf_lang, $tf_header, $cb_default;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
-  global $tf_category1_label, $tf_category1_code, $sel_category1; 
-  global $tf_category2_label, $tf_category2_code, $sel_category2; 
-  global $tf_category3_label, $tf_category3_code, $sel_category3; 
-  global $tf_category4_label, $tf_category4_code, $sel_category4; 
-  global $tf_category5_label, $tf_category5_code, $sel_category5; 
-  global $tf_dateafter, $tf_datebefore, $cb_mailing_ok_only; 
+  global $tf_function_label, $tf_function_code, $sel_function;
+  global $tf_category1_label, $tf_category1_code, $sel_category1;
+  global $tf_category2_label, $tf_category2_code, $sel_category2;
+  global $tf_category3_label, $tf_category3_code, $sel_category3;
+  global $tf_category4_label, $tf_category4_code, $sel_category4;
+  global $tf_category5_label, $tf_category5_code, $sel_category5;
+  global $tf_dateafter, $tf_datebefore, $cb_mailing_ok_only;
 
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($view)) $contact["view"] = $view;
@@ -648,7 +649,7 @@ function get_param_contact() {
   if (isset ($tf_datebefore)) $contact["datebefore"] = trim($tf_datebefore);
   if (isset ($cb_mailing_ok_only)) $contact["mailing_ok_only"] = ($cb_mailing_ok_only == 1 ? 1 : 0);
   if (isset ($cb_archive)) $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($cb_priv)) $contact["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_privacy)) $contact["privacy"] = ($cb_privacy == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
   if (isset ($ta_com2)) $contact["com2"] = $ta_com2;

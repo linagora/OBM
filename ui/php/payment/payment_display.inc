@@ -19,7 +19,6 @@ $fieldnames["payment_number"] = $l_number;
 $fieldnames["paymentkind_label"] = $l_kind;
 $fieldnames["payment_comment"] = $l_comment;
 
-
 $fieldnames["invoice_label"] = $l_invoice_label;
 $fieldnames["invoice_date"] = $l_invoice_date;
 $fieldnames["invoice_amount_ttc"] = $l_invoice_ttc;
@@ -29,13 +28,6 @@ $fieldnames["invoice_paid"] = $l_invoice_paid;
 $fieldnames["invoice_company"] = $l_invoice_company;
 $fieldnames["invoice_status"] = $l_invoice_status;
 $fieldnames["invoice_deal"] = $l_deal;
-// for the temp. entries :
-$fieldnames["entrytemp_date"] = $l_entrytemp_date ;
-$fieldnames["entrytemp_type"] = $l_entrytemp_type ;
-$fieldnames["entrytemp_amount"] = $l_entrytemp_amount ;
-$fieldnames["entrytemp_realdate"] = $l_entrytemp_realdate ;
-$fieldnames["entrytemp_label"] = $l_entrytemp_label ;
-$fieldnames["entrytemp_comment"] = $l_entrytemp_comment;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,14 +51,6 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
 
   elseif ($fieldname == "payment_comment") {
     $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$OD->data_set->f("payment_id");
-  }
-
-  elseif ($fieldname == "payment_account_lbl") {
-    $res["url"] = "$path/account/account_index.php?action=detailconsult&amp;param_account=".$OD->data_set->f("account_id");
-  }
-
-  elseif ($fieldname == "pay_inv_label") {
-    $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$OD->data_set->f("invoice_id");
   }
 
   elseif ($fieldname == "company_name") {
@@ -116,11 +100,11 @@ function dis_payment_search_form($params="") {
 //   - $accs     : accounts infos
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_search_form($params, $kinds, $accs) {
-  global $l_all, $c_all;
+  global $l_find, $l_all, $c_all;
   global $l_comment, $l_number, $l_amount, $l_date, $l_after, $l_before;
   global $l_inout, $l_kind, $l_account;
   global $l_company, $l_include_checked;
-  global $l_find, $l_all, $l_both, $l_received, $l_emitted;
+  global $l_both, $l_received, $l_emitted;
 
   $comment = $params["comment"];
   $number = $params["number"];
@@ -230,10 +214,8 @@ function html_payment_search_form($params, $kinds, $accs) {
 //   - $params[] : params (search criteria)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_search_list($params) {
-  global $display, $l_no_found;
+  global $display, $l_found, $l_no_found;
   global $auth, $new_order, $order_dir;
-
-  $popup = $payment["popup"];
 
   $prefs = get_display_pref($auth->auth["uid"], "payment");
   $obm_q = run_query_payment_search($params, $new_order, $order_dir);
@@ -241,7 +223,8 @@ function dis_payment_search_list($params) {
   if ($nb_payment == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_payment_search_list($obm_q, $prefs, $nb_payment, $params, $popup);
+    $display["msg"] .= display_info_msg("$nb_payment $l_found");
+    $block = html_payment_search_list($obm_q, $prefs, $params);
   }
 
   return $block;
@@ -254,20 +237,11 @@ function dis_payment_search_list($params) {
 //   - $obm_q     : list of payments to display 
 //   - $prefs     : the fields which have to be displayed
 //   - $nb        : nb payments returned by the search query 
-//   - $params[]  : parameters (search criteria)
-//   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_payment_search_list($obm_q, $prefs, $nb, $params, $popup) {
-  global $display, $l_found, $l_add, $l_close;
+function html_payment_search_list($obm_q, $prefs, $params) {
+  global $l_add, $l_close;
 
-  if ($popup) {
-    $ext_action = $params["ext_action"];
-    $ext_url = $params["ext_url"];
-    $ext_id = $params["ext_id"];
-    $ext_target = $params["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
-  }
-
+  $popup = $params["popup"];
   $comment = urlencode($payment["comment"]);
   $number = urlencode($payment["number"]);
   $amount = urlencode($payment["amount"]);
@@ -276,6 +250,13 @@ function html_payment_search_list($obm_q, $prefs, $nb, $params, $popup) {
   $inout = $payment["inout"];
   $kind = $payment["kind"];
   $account = $payment["account"];
+  if ($popup) {
+    $ext_action = $params["ext_action"];
+    $ext_url = $params["ext_url"];
+    $ext_id = $params["ext_id"];
+    $ext_target = $params["ext_target"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+  }
 
   $url = url_prepare("payment_index.php?action=search".
 		    "&amp;tf_comment=$comment".
@@ -316,7 +297,6 @@ function html_payment_search_list($obm_q, $prefs, $nb, $params, $popup) {
   $dis_p->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_info_msg("$nb $l_found");
   $block .= $dis_p->display("dis_data_payment");
   $block .= $display_popup_end;
 
@@ -658,17 +638,6 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     $title = $l_header_new;
     $date = date("Y-m-d");
     $inout = '+';
-    // if company given
-    if (is_object($co_q)) {
-      // fill the phone with company one
-      $c_ad1 = $co_q->f("company_address1");
-      $c_zip = $co_q->f("company_zipcode");
-      $c_town = $co_q->f("company_town");
-      $c_id = $co_q->f("company_id");
-      $c_name = $co_q->f("company_name");
-      $c_new_id = $c_id;
-      $c_new_name = $c_name;
-    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -839,7 +808,7 @@ function dis_can_delete_payment($p_id) {
 // Parameters:
 //   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_payment_display_pref ($prefs, $prefs_i, $prefs_t) {
+function dis_payment_display_pref ($prefs) {
   global $l_payment_options, $l_invoice_options, $l_et_options;
   global $set_theme ;
  

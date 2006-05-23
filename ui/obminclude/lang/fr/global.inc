@@ -48,6 +48,8 @@ $l_begin = "Début";
 $l_datebegin = "Date de début";
 $l_end = "Fin";
 $l_dateend = "Date de fin";
+$l_alarm = "Alarme";
+$l_text = "Texte";
 $l_name = "Nom";
 $l_label = "Label";
 $l_number = "Numéro";
@@ -104,6 +106,7 @@ $l_aduplicate = "Duplicata";
 // Entities
 $l_company = "Société";
 $l_contact = "Contact";
+$l_lead = "Opportunité";
 $l_deal = "Affaire";
 $l_list = "Liste";
 $l_publication = "Publication";
@@ -187,6 +190,7 @@ $l_section_settings = "PREFERENCES";
 
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";
+$l_module_lead    = "Opportunités";
 $l_module_deal    = "Affaires";
 $l_module_list    = "Listes";
 $l_module_agenda  = "Agenda";

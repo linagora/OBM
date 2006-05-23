@@ -279,8 +279,8 @@ exit(0);
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $rd_mode;
-  global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
-  global $id_duplicated, $new_order, $order_dir, $popup, $row_index;
+  global $action, $cb_privacy, $ext_action, $ext_url, $ext_id, $ext_target;
+  global $id_duplicated, $new_order, $order_dir, $popup, $row_index, $title;
   global $param_contact, $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
 
   global $tf_company_name, $tf_company_zipcode, $tf_company_town;
@@ -316,7 +316,7 @@ function get_param_list() {
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
   if (isset ($row_index)) $list["row_index"] = $row_index;
-  if (isset($cb_priv)) $list["priv"] = ($cb_priv == "1") ? 1 : 0;
+  if (isset($cb_privacy)) $list["privacy"] = ($cb_privacy == "1") ? 1 : 0;
   if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0;
   if (isset($cb_contact_arch)) $list["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
   if (isset($cb_info_pub)) $list["info_pub"] = $cb_info_pub == 1 ? 1 : 0;

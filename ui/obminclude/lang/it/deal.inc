@@ -16,8 +16,8 @@ $l_marketing_manager = "Resp. Marketing";
 $l_technical_manager = "Resp. Tecnico ";
 $l_amount = "Totale";
 $l_hitrate = "Hit Rate";
-$l_date_expected = "Data";
-$l_date_alarm = "Data Avviso";
+$l_expected = "Objetivo";
+$l_quarter = "Q";
 $l_date_comment = "Data Commento";
 
 // Labels and texts
@@ -30,10 +30,6 @@ $l_potential = "Potenziale pesato";
 $l_label_start = "Nome inizio";
 $l_proposal = "Proposta";
 $l_show_archive = "Mostra archivi";
-$l_date_alarm_after = "Data Avviso dopo";
-$l_date_alarm_before = "Data avviso prima";
-$l_after = "Dopo";
-$l_before = "Prima";
 $l_deal_select_company = "Scegli l'azienda relativa al impegno";
 $l_deal_select_parentdeal = "Scegli il Sub-impegno al quale l'impegno deve essere collegato";
 $l_affect_deal= "Cambia Sub-Impegno ";

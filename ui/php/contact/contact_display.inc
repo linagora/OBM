@@ -1400,7 +1400,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if (isset($contact["category3"])) { $cat3 = $contact["category3"]; }  
   if (isset($contact["category4"])) { $cat4 = $contact["category4"]; }  
   if (isset($contact["category5"])) { $cat5 = $contact["category5"]; }  
-  if (isset($contact["priv"])) { $priv = stripslashes($contact["priv"]); }
+  if (isset($contact["privacy"])) { $priv = stripslashes($contact["privacy"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
   // Conditionnal fields
@@ -1685,7 +1685,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     if ($priv == '1') {
       $private_c = " checked";
     }
-    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />";
+    $display_private = "<input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
   }
 
   // UPDATE 
@@ -1863,7 +1863,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $email = stripslashes($contact["email"]);
   $email2 = stripslashes($contact["email2"]);
   $com = stripslashes($contact["com"]);
-  $priv = $contact["priv"];
+  $priv = $contact["privacy"];
   $archive = ($contact["archive"] == 1 ? "1" : "0");
 
   $disp_same_cont = "
@@ -1910,7 +1910,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
-    <input type=\"hidden\" name=\"cb_priv\" value=\"$priv\" />
+    <input type=\"hidden\" name=\"cb_privacy\" value=\"$privacy\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
 
   $block = "

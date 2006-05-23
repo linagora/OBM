@@ -13,12 +13,18 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["deal_label"] = $l_label;
-$fieldnames["deal_datealarm"] = $l_date_alarm;
-$fieldnames["deal_dateexpected"] = $l_date_expected;
+$fieldnames["deal_datebegin"] = $l_begin;
+$fieldnames["deal_dateproposal"] = $l_proposal;
+$fieldnames["deal_dateexpected"] = $l_expected;
+$fieldnames["expected_quarter"] = "$l_expected $l_quarter";
+$fieldnames["sale_delay"] = "$l_sale_delay";
 $fieldnames["deal_dateend"] = $l_end;
+$fieldnames["end_quarter"] = "$l_end $l_quarter";
+$fieldnames["deal_datealarm"] = $l_alarm;
 $fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
+$fieldnames["deal_commission"] = $l_commission;
 $fieldnames["deal_amount"] = $l_amount;
 $fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["parentdeal_label"] = $l_label;
@@ -33,7 +39,7 @@ $fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
 $fieldnames["parentdeal_technical_lastname"] = $l_technical_manager;
 $fieldnames["parentdeal_status"] = $l_status;
 $fieldnames["parentdeal_dateproposal"] = $l_proposal;
-$fieldnames["parentdeal_datealarm"] = $l_date_alarm;
+$fieldnames["parentdeal_datealarm"] = $l_alarm;
 $fieldnames["parentdeal_amountprovider"] = $l_amount_out;
 $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
 
@@ -48,7 +54,7 @@ $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_deal(&$OD, $fieldname, $link_ok) {
-  global $path, $deal, $col_ok, $col_error, $col_client, $col_frs;
+  global $path, $deal, $col_ok, $col_error, $col_client, $col_frs, $l_quarter;
 
   $ext_url = $deal["ext_url"];
 
@@ -74,6 +80,10 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("parentdeal_technicalmanager_id");
   }
 
+  else if ($fieldname == "deal_commission") {
+    $res["align"] = "center";
+  }
+
   else if ($fieldname == "deal_archive") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
@@ -82,6 +92,10 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
       $res["name"] = "&nbsp;";
       $res["txt_name"] = " ";
     }
+  }
+
+  else if ($fieldname == "deal_amount") {
+    $res["align"] = "center";
   }
 
   else if ($fieldname == "deal_hitrate") {
@@ -93,6 +107,58 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("deal_company_id");
   }
   
+  else if ($fieldname == "deal_datebegin") {
+    $date = date_format( $OD->data_set->f($fieldname), 1);
+    $res["name"] = $date;
+  }
+
+  else if ($fieldname == "deal_dateproposal") {
+    $date = date_format($OD->data_set->f($fieldname), 1);
+    $res["name"] = $date;
+  }
+
+  else if ($fieldname == "deal_dateexpected") {
+    $date = date_format($OD->data_set->f($fieldname), 1);
+    $res["name"] = $date;
+  }
+
+  else if ($fieldname == "expected_quarter") {
+    $date = $OD->data_set->f("deal_dateexpected");
+    if ($date != "") {
+      $month = get_month($date);
+      $q = floor(($month-1) / 3) + 1;
+      $quarter = "$l_quarter$q";
+      $res["align"] = "center";
+      $res["name"] = $quarter;
+    }
+  }
+
+  else if ($fieldname == "sale_delay") {
+    $datebegin = $OD->data_set->f("deal_datebegin");
+    $dateexp = $OD->data_set->f("deal_dateexpected");
+    if (($datebegin != "") && ($dateexp != "")) {
+      $sale_delay = floor(($dateexp - $datebegin) / 86400);
+      $res["align"] = "center";
+      $res["name"] = $sale_delay;
+    }
+  }
+
+  else if ($fieldname == "deal_dateend") {
+    $date = date_format($OD->data_set->f($fieldname), 1);
+    $res["name"] = $date;
+  }
+
+  else if ($fieldname == "end_quarter") {
+    $date = $OD->data_set->f("deal_dateend");
+    if ($date != "") {
+      $month = get_month($date);
+      $q = floor(($month-1) / 3) + 1;
+      $quarter = "$l_quarter$q";
+      $res["align"] = "center";
+      $res["name"] = $quarter;
+    }
+  }
+
   else if ($fieldname == "deal_datealarm") {
     $date = $OD->data_set->f($fieldname);
     $datealarm = date_format($date);
@@ -655,7 +721,7 @@ function html_deal_consult($deal_q) {
   global $l_tt,$l_marketing_manager,$l_technical_manager;
   global $l_number, $l_amount,$l_hitrate, $l_commission, $l_sale_delay;
   global $l_status,$l_archive,$l_comment;
-  global $l_begin, $l_end, $l_proposal, $l_date_expected, $l_date_alarm;
+  global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
   global $l_parentdeal,$l_todo, $l_deal;
   global $display, $path, $auth, $c_yes, $c_no;
 
@@ -665,29 +731,30 @@ function html_deal_consult($deal_q) {
   $label = $deal_q->f("deal_label");
   $num = $deal_q->f("deal_number");
   $datebegin = date_format($deal_q->f("datebegin"), 1);
-  $dateend = date_format($deal_q->f("dateend"), 1);
-  if ($dateend != "") {
-    $month_end = get_month($deal_q->f("dateend"));
-    $q = floor(($month_end-1) / 3) + 1;
-    $quarter_end = "(T$q)";
-  }
-  if (($datebegin != "") && ($dateend != "")) {
-    $sale_delay = floor(($deal_q->f("dateend") - $deal_q->f("datebegin")) / 86400);
-  }
-
-  $kind = $deal_q->f("dealtype_label");
-  $tt_label = $deal_q->f("tasktype_label");
-  $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
-  $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
-  $datepro = date_format($deal_q->f("dateproposal"), 1);
-  $amount = $deal_q->f("deal_amount");
-  $hitrate = $deal_q->f("deal_hitrate");
   $dateexpected = date_format($deal_q->f("dateexpected"), 1);
   if ($dateexpected != "") {
     $month_exp = get_month($deal_q->f("dateexpected"));
     $q = floor(($month_exp-1) / 3) + 1;
     $quarter_exp = "(T$q)";
   }
+  if (($datebegin != "") && ($dateexpected != "")) {
+    $sale_delay = floor(($deal_q->f("dateexpected") - $deal_q->f("datebegin")) / 86400);
+  }
+
+  $dateend = date_format($deal_q->f("dateend"), 1);
+  if ($dateend != "") {
+    $month_end = get_month($deal_q->f("dateend"));
+    $q = floor(($month_end-1) / 3) + 1;
+    $quarter_end = "(T$q)";
+  }
+  $kind = $deal_q->f("dealtype_label");
+  $tt_label = $deal_q->f("tasktype_label");
+  $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
+  $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
+  $commission = $deal_q->f("deal_commission");
+  $datepro = date_format($deal_q->f("dateproposal"), 1);
+  $amount = $deal_q->f("deal_amount");
+  $hitrate = $deal_q->f("deal_hitrate");
   $datealarm = date_format($deal_q->f("datealarm"), 1);
   $status = $deal_q->f("dealstatus_label");
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
@@ -738,6 +805,9 @@ function html_deal_consult($deal_q) {
         <td class=\"detailLabel\">$l_tt</td>
         <td class=\"detailText\">$tt_label</td>
       </tr><tr>
+        <td class=\"detailLabel\">$l_commission</td>
+        <td class=\"detailText\">$commission</td>
+      </tr><tr>
         <td class=\"detailLabel\">$l_marketing_manager</td>
         <td class=\"detailText\">$market</td>
       </tr><tr>
@@ -756,7 +826,7 @@ function html_deal_consult($deal_q) {
         <td class=\"detailLabel\">$l_proposal</td>
         <td class=\"detailText\">$datepro</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_date_expected</td>
+        <td class=\"detailLabel\">$l_expected</td>
         <td class=\"detailText\">$dateexpected $quarter_exp</td>
       </tr>
       <tr>
@@ -805,7 +875,7 @@ function html_deal_consult($deal_q) {
         <td class=\"detailLabel\">$l_archive</td>
         <td class=\"detailText\">$archive</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_date_alarm</td>
+        <td class=\"detailLabel\">$l_alarm</td>
         <td class=\"detailText\">$datealarm</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_status</td>
@@ -910,10 +980,10 @@ function dis_deal_form($deal) {
 function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format, $l_update,$l_insert;
-  global $l_deal, $l_dates, $l_company,$l_label,$l_number,$l_kind;
-  global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
+  global $l_deal, $l_dates, $l_company,$l_label,$l_number,$l_kind, $l_private;
+  global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_commission;
   global $l_amount,$l_hitrate, $l_contact,$l_status, $l_archive, $l_todo;
-  global $l_begin, $l_end, $l_proposal, $l_date_expected, $l_date_alarm;
+  global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
   global $path, $action, $auth, $popup;
@@ -940,6 +1010,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
     $priv = ($deal_q->f("privacy") == 0 ? "0" : "1");
     $market = $deal_q->f("deal_marketingmanager_id");
     $tech = $deal_q->f("deal_technicalmanager_id");
+    $commission = $deal_q->f("deal_commission");
     $amount = $deal_q->f("deal_amount");
     $hitrate = $deal_q->f("deal_hitrate");
     $con1 = $deal_q->f("deal_contact1_id");
@@ -973,7 +1044,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
   if (isset($deal["usercreate"])) { $usercreate = $deal["usercreate"]; }
   if (isset($deal["num"])) { $num = stripslashes($deal["num"]); }
   if (isset($deal["label"])) { $label = stripslashes($deal["label"]); }
-  if (isset($deal["priv"])) { $priv = $deal["priv"]; }
+  if (isset($deal["privacy"])) { $priv = $deal["privacy"]; }
   if (isset($deal["datebegin"])) { $datebegin = stripslashes($deal["datebegin"]); }
   if (isset($deal["dateend"])) { $dateend = stripslashes($deal["dateend"]); }
   if (isset($deal["dateproposal"])) { $dateprop = stripslashes($deal["dateproposal"]); }
@@ -984,6 +1055,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
   if (isset($deal["tech"])) { $tech = $deal["tech"]; }
+  if (isset($deal["commission"])) { $commission = $deal["commission"]; }
   if (isset($deal["amount"])) { $amount = stripslashes($deal["amount"]); }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["contact1"])) { $con1 = $deal["contact1"]; }
@@ -1172,7 +1244,7 @@ $js_status_loop
       <input type=\"submit\" value=\"$l_insert \" />";
     $dis_priv = "
              <td class=\"detailLabel\">$l_private</td>
-             <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" ";
+             <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td></tr><tr>";
   }
@@ -1254,6 +1326,9 @@ $js_status_loop
       <td class=\"detailLabel\">$l_tt</td>
       <td class=\"detailForm\">$sel_tt</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_commission</td>
+      <td class=\"detailForm\"><input name=\"tf_commission\" type=\"text\" size=\"5\" value=\"$commission\" /> %</td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>
       <td class=\"detailForm\">$sel_market</td>
     </tr><tr>
@@ -1267,12 +1342,12 @@ $js_status_loop
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_begin</td>
-      <td class=\"detailForm\"> <script>calendar('tf_datebegin','$datebegin')</script></td>
+      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_proposal</td>
       <td class=\"detailForm\"><script>calendar('tf_dateprop','$dateprop')</script></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_date_expected</td>
+      <td class=\"detailLabel\">$l_expected</td>
       <td class=\"detailForm\"><script>calendar('tf_dateexpected','$dateexpected')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_end</td>
@@ -1292,7 +1367,7 @@ $js_status_loop
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_date_alarm</td>
+      <td class=\"detailLabel\">$l_alarm</td>
       <td class=\"detailForm\"><script>calendar('tf_datealarm','$datealarm')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_status</td>
@@ -1370,7 +1445,7 @@ function dis_deal_quick_form($deal) {
 function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $c_php_isodate_format, $l_update;
   global $l_deal, $l_label;
-  global $l_date_expected, $l_date_alarm, $l_status, $l_hitrate, $l_todo;
+  global $l_expected, $l_alarm, $l_status, $l_hitrate, $l_todo;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
   global $path, $display, $action, $auth;
@@ -1480,7 +1555,7 @@ $js_status_loop
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_date_alarm</td>
+      <td class=\"detailLabel\">$l_alarm</td>
       <td class=\"detailForm\"><script>calendar('tf_datealarm','$datealarm')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_status</td>
@@ -1493,7 +1568,7 @@ $js_status_loop
       <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_date_expected</td>
+      <td class=\"detailLabel\">$l_expected</td>
       <td class=\"detailForm\"><script>calendar('tf_dateexpected','$dateexp')</script></td>
     </tr>
     </table>
@@ -2343,7 +2418,7 @@ function dis_deal_parentdeal_consult($deal) {
 function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$cat_q,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
-  global $l_parentdeal,$l_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_status;
+  global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_status;
   global $l_infos;
   global $popup_width, $popup_height, $l_deal_select_company;
 
@@ -2394,7 +2469,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
 	  <td class=\"detailLabel\">$l_status :</td>
 	  <td class=\"detailText\">$p_status</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_date_alarm</td>
+	  <td class=\"detailLabel\">$l_alarm</td>
 	  <td class=\"detailText\">$p_datealarm</td>
 	</tr><tr>
 	  <td class=\"detailLabel\">$l_amount_out</td>

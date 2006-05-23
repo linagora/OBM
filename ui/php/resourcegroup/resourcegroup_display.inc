@@ -301,7 +301,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
     $dis_private = "
   <tr>
     <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />
+    <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" $private_c />
   </tr>";
   } 
 
@@ -329,7 +329,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   </tr>
   </tr><tr>
     <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c /></td>
+    <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
 -->    
   </tr>
   </table>";

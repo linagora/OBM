@@ -159,7 +159,7 @@ function list_add_slashes_array(&$item, $key) {
 function run_query_list_insert($list) {
   global $auth, $cdg_sql;
 
-  $priv = ($list["priv"]==1) ? 1 : 0;
+  $priv = ($list["privacy"]==1) ? 1 : 0;
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
@@ -274,7 +274,7 @@ function run_query_list_update($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
-  $priv = ($list["priv"]==1) ? 1 : 0;
+  $priv = ($list["privacy"]==1) ? 1 : 0;
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];

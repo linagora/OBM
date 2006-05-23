@@ -491,10 +491,10 @@ display_page($display);
 function get_param_deal() {
   global $tf_num, $tf_label, $param_parent, $sel_kind, $sel_tt;
   global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
-  global $tf_amount, $sel_status, $tf_datealarm, $ta_com;
+  global $tf_amount, $sel_status, $tf_datealarm, $ta_com, $tf_commission;
   global $tf_datebegin, $tf_dateend, $tf_dateprop, $tf_dateexpected;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
-  global $tf_plabel, $sel_pmanager, $cb_parchive,$cb_archive,$tf_todo,$cb_priv;
+  global $tf_plabel, $sel_pmanager, $cb_archive, $tf_todo, $cb_privacy;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
@@ -534,6 +534,7 @@ function get_param_deal() {
   if (isset ($sel_contact2)) $deal["contact2"] = $sel_contact2;
   if (isset ($sel_market)) $deal["market"] = $sel_market;
   if (isset ($sel_tech)) $deal["tech"] = $sel_tech;
+  if (isset ($tf_commission)) $deal["commission"] = $tf_commission;
   if (isset ($tf_amount)) $deal["amount"] = $tf_amount;
   if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
   if (isset ($sel_status)) $deal["status"] = $sel_status;
@@ -544,7 +545,7 @@ function get_param_deal() {
     $deal["archive"] = $cb_archive;
   }
   if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
-  if (isset ($cb_priv)) { $deal["priv"] = ($cb_priv == 1 ? 1 : 0); };
+  if (isset ($cb_privacy)) { $deal["privacy"] = ($cb_privacy == 1 ? 1 : 0); };
   if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;

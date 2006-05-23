@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Theme : Grey                                                        //
 //     - File  : theme.inc                                                   //
@@ -8,10 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Colors used //
-$col_orange = "EE9B00";
-$col_purpleblue = "59519E";
-$col_blue = "009FC2";
-
 $col_label = $col_purpleblue;    // Labels (grey fonce)
 $col_ok = $col_orange;       // Messages color (bleu violet)
 $col_error="FF0000";    // Errors messages color (rouge)
@@ -36,6 +32,7 @@ $ico_add 	    = "ico_select04.gif";
 // Menus Icons
 $ico_contact        = "ico_contact.gif";         // Contact Icon
 $ico_contact_new    = "ico_contact_new.gif";     // New Contact Icon
+$ico_lead           = "ico_lead.gif";            // Lead Icon
 $ico_deal           = "ico_deal.gif";            // Deal Icon
 $ico_parentdeal     = "ico_deal.gif";            // Deal Icon
 $ico_deal_new       = "ico_deal_new.gif";        // New Deal Icon

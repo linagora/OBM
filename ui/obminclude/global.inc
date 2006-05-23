@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre7";
+$obm_version = "1.2.0pre9";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -212,6 +212,7 @@ $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
 // modules
 $cgp_show["module"]["company"] = "com";
 $cgp_show["module"]["contact"] = "com";
+$cgp_show["module"]["lead"] = "com";
 $cgp_show["module"]["deal"] = "com";
 $cgp_show["module"]["list"] = "com";
 $cgp_show["module"]["agenda"] = "com";
@@ -816,7 +817,7 @@ function beautify_comment($com, $p_order="") {
   // Chronological Order
   if ($order == $cco_chro) {
 
-    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
+    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]( [012][0-9]:[0-5][0-9]:[0-5][0-9])?:.*:)/U";
     $replace = "</td>
     </tr>
     <tr>

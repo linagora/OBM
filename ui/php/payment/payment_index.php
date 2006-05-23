@@ -25,7 +25,7 @@ $params = get_param_payment();
 get_payment_action();
 $perm->check_permissions($module, $action);
 
-update_last_visit("payment", $param_payment, $action);
+update_last_visit("payment", $params["id"], $action);
 page_close();
 
 
@@ -158,32 +158,26 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($auth->auth["uid"],"payment",1);
-  $prefs_i = get_display_pref ($auth->auth["uid"], "invoice",1);
-  $prefs_t = get_display_pref ($auth->auth["uid"], "entrytemp",1);
-  $display["detail"] = dis_payment_display_pref ($prefs, $prefs_i, $prefs_t); 
+  $display["detail"] = dis_payment_display_pref ($prefs);
 
 }elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus);
-  $prefs = get_display_pref($auth->auth["uid"],"payment",1);
-  $prefs_i = get_display_pref ($auth->auth["uid"], "invoice",1);
-  $prefs_t = get_display_pref ($auth->auth["uid"], "entrytemp",1);
-  $display["detail"] = dis_payment_display_pref ($prefs, $prefs_i, $prefs_t); 
+  $prefs = get_display_pref($auth->auth["uid"], "payment", 1);
+  $display["detail"] = dis_payment_display_pref($prefs);
 
 }elseif ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
-  $prefs = get_display_pref($auth->auth["uid"],"payment",1);
-  $prefs_i = get_display_pref ($auth->auth["uid"], "invoice",1);
-  $prefs_t = get_display_pref ($auth->auth["uid"], "entrytemp",1);
-  $display["detail"] = dis_payment_display_pref ($prefs, $prefs_i, $prefs_t); 
+  $prefs = get_display_pref($auth->auth["uid"], "payment", 1);
+  $display["detail"] = dis_payment_display_pref($prefs);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head("$l_treso");
+$display["head"] = display_head("$l_payment");
 update_payment_action();
 $display["header"] = display_menu($module);
 $display["end"] = display_end();
@@ -286,7 +280,7 @@ function get_payment_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$params["id"],
     'Right'    => $cright_read,
-    'Condition'=> array ('detail_invoice', 'detailupdate', 'detail_invoice', 'invoice_add', 'invoice_update')
+    'Condition'=> array ('detail_invoice', 'detailupdate', 'invoice_add', 'invoice_update')
                                         );
 
 // Detail Consult Invoice

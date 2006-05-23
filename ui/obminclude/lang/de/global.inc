@@ -38,6 +38,9 @@ $l_archive_first = "A";
 $l_date = "Date";
 $l_datebegin = "Date begin";
 $l_dateend = "Date End";
+$l_end = "End";
+$l_alarm = "Stichdatum";
+$l_text = "Text";
 $l_name = "Name" ;
 $l_label = "Label" ;
 $l_invalid_data = "Falsche Daten";
@@ -65,9 +68,10 @@ $l_category2 = "Kategorie 2";
 $l_aduplicate = "Duplicate";
 
 // Entities
-$l_company = "Société";
+$l_company = "Firma";
 $l_contact = "Contact";
-$l_deal = "Affaire";
+$l_lead = "Lead";
+$l_deal = "Verträge";
 $l_list = "Liste";
 $l_publication = "Publication";
 $l_todo = "A faire";
@@ -148,6 +152,7 @@ $l_section_admin  = "Administration";
 
 $l_module_company = "Firmen";
 $l_module_contact = "Kontakte";
+$l_module_lead = "Lead";
 $l_module_deal = "Verträge";
 $l_module_list = "Maillisten";
 $l_module_agenda = "Kalender";

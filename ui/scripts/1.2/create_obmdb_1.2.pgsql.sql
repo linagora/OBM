@@ -517,7 +517,7 @@ CREATE TABLE Deal (
   deal_dateexpected         date,
   deal_dateend              date,
   deal_amount               decimal(12,2),
-  deal_commission           decimal(5,2) DEFAULT 0,
+  deal_commission           decimal(4,2) DEFAULT 0,
   deal_hitrate              integer DEFAULT 0,
   deal_status_id            integer,
   deal_datealarm            date,

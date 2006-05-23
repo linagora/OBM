@@ -28,9 +28,12 @@ $l_default = "Default";
 $l_status = "Status";
 $l_archive = "Arkiv";
 $l_archive_first = "A";
-$l_date = "Date";
+$l_date = "Dato";
 $l_datebegin = "Begin date";
 $l_dateend = "End date";
+$l_end = "End date";
+$l_alarm = "Varslingsdato";
+$l_text = "Text";
 $l_name = "Namn";
 $l_label = "Namn";
 $l_phone = "Telefon";
@@ -51,6 +54,8 @@ $l_public = "Public";
 $l_category1 = "Kategori 1";
 $l_category2 = "Kategori 2";
 $l_aduplicate = "Duplicate";
+$l_after = "Etter";
+$l_before = "Før";
 
 
 // OBM_DISPLAY

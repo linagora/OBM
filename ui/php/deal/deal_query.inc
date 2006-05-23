@@ -96,9 +96,20 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
 
   $whereq = "WHERE $where";
 
-  // Order by clause
-  $field = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Deal.deal_datealarm";
-  $orderq = " ORDER BY $field $p_order_dir";
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "deal_datealarm";
+
+  // Order exceptions (order on calculated rows)
+  if (strcmp($p_new_order, "expected_quarter")==0) {
+    $order = "deal_dateexpected";
+  } else if (strcmp($p_new_order, "end_quarter")==0) {
+    $order = "deal_dateend";
+  } else if (strcmp($p_new_order, "sale_delay")==0) {
+    $order = "deal_dateexpected-deal_datebegin";
+  }
+  $orderq = " ORDER BY $order $p_order_dir $order_next";
+
 
   $query = "SELECT 
       deal_id as id,
@@ -110,6 +121,7 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
       deal_company_id,
       deal_marketingmanager_id,
       deal_technicalmanager_id,
+      deal_commission,
       deal_amount,
       deal_hitrate,
       deal_status_id,
@@ -221,11 +233,12 @@ function run_query_deal_detail($id) {
 function run_query_deal_insert($deal) {
   global $auth, $cdg_sql,$obm_q;
 
+  $now = date("Y-m-d H:i:s");
   $id = $deal["id"];
   $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
-  $priv = $deal["priv"];
+  $priv = $deal["privacy"];
   $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $dateprop = ($deal["dateproposal"] ? "'".$deal["dateproposal"]."'" : "null");
   $dateend = ($deal["dateend"] ? "'".$deal["dateend"]."'" : "null");
@@ -237,6 +250,7 @@ function run_query_deal_insert($deal) {
   $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
   $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
+  $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
@@ -247,6 +261,10 @@ function run_query_deal_insert($deal) {
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
+    $today = date("Y-m-d");
+    if ($today == $datecomment) {
+      $datecomment = $now;
+    }
     $usercomment = $deal["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
@@ -269,6 +287,7 @@ function run_query_deal_insert($deal) {
     deal_dateexpected,
     deal_dateend,
     deal_amount,
+    deal_commission,
     deal_hitrate,
     deal_status_id,
     deal_datealarm,
@@ -278,7 +297,7 @@ function run_query_deal_insert($deal) {
     deal_parentdeal_id,
     deal_todo)
   VALUES (null,
-    '" . date("Y-m-d H:i:s") ."',
+    '$now',
     null,
     '" . $auth->auth["uid"] . "',
     '$num',
@@ -295,6 +314,7 @@ function run_query_deal_insert($deal) {
     $dateexp,
     $dateend,
     $amount,
+    $commission,
     $hitrate,
     '$status',
     $datealarm,
@@ -338,11 +358,12 @@ function run_query_deal_insert($deal) {
 function run_query_deal_update($deal) {
   global $auth, $cdg_sql, $l_no;
 
+  $now = date("Y-m-d H:i:s");
   $id = $deal["id"];
   $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
-  $priv = $deal["priv"];
+  $priv = $deal["privacy"];
   $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $dateend = ($deal["dateend"] ? "'".$deal["dateend"]."'" : "null");
   $dateprop = ($deal["dateproposal"] ? "'".$deal["dateproposal"]."'" : "null");
@@ -354,6 +375,7 @@ function run_query_deal_update($deal) {
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
+  $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
   $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
   $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
@@ -364,6 +386,10 @@ function run_query_deal_update($deal) {
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
+    $today = date("Y-m-d");
+    if ($today == $datecomment) {
+      $datecomment = $now;
+    }
     $usercomment = $deal["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
@@ -371,7 +397,7 @@ function run_query_deal_update($deal) {
   $category1 = $deal["category1"];
   
   $query = "UPDATE Deal SET
-    deal_timeupdate='". date("Y-m-d H:i:s")."',
+    deal_timeupdate='$now',
     deal_userupdate='".$auth->auth["uid"]."',
     deal_number='$num',
     deal_label='$label',
@@ -387,6 +413,7 @@ function run_query_deal_update($deal) {
     deal_dateexpected=$dateexp,
     deal_dateend=$dateend,
     deal_amount=$amount,
+    deal_commission=$commission,
     deal_hitrate=$hitrate,
     deal_status_id='$status',
     deal_datealarm=$datealarm,
@@ -438,7 +465,7 @@ function run_query_deal_update($deal) {
 function deal_send_mail($deal) {
   global $auth, $uid, $cdg_sql, $cg_com;
   global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
-  global $l_hitrate, $l_todo, $l_status, $l_date_alarm, $l_date_expected, $l_end;
+  global $l_amount, $l_hitrate, $l_todo, $l_status, $l_alarm, $l_expected, $l_end;
 
   $id = $deal["id"];
   $d = get_deal_info($id);
@@ -448,6 +475,7 @@ function deal_send_mail($deal) {
   $company = $d["company"];
   $label = $d["label"];
   $status = $d["status"];
+  $amount = $deal["amount"];
   $hitrate = $deal["hitrate"];
   $dateexp = $deal["dateexpected"];
   $dateend = $deal["dateend"];
@@ -460,11 +488,12 @@ function deal_send_mail($deal) {
   $subject = "$l_obm_title : $l_deal : $company - $label";
   $message = "$l_company: $company
 $l_deal: $label
+$l_amount: $amount
 $l_hitrate: $hitrate
 $l_status: $status
-$l_date_expected: $dateexp
+$l_expected: $dateexp
 $l_end : $dateend
-$l_date_alarm: $datealarm
+$l_alarm: $datealarm
 $l_todo: $todo
 $datecomment:$usercomment:$add_comment";
   if ($mail_comment == "$l_members") {
@@ -542,7 +571,7 @@ function run_query_deal_id($deal) {
 
   $num = $deal["num"];
   $label = $deal["label"];
-  $priv = $deal["priv"];
+  $priv = $deal["privacy"];
   $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
@@ -849,7 +878,7 @@ function run_query_deal_stats($deal, $users_id="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get Deal manager list
+// Get Deal manager list (from deal database content)
 // Parameters:
 //   - $archive : if true, get managers of archive deals too
 // Return:
@@ -1365,9 +1394,9 @@ function run_query_deal_status_links($s_id) {
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_form($did, $deal) {
-  global $php_regexp_isodate, $l_invalid_date, $l_date_alarm;
+  global $php_regexp_isodate, $l_invalid_date, $l_alarm;
   global $err_msg, $l_err_label_empty, $l_err_hitrate, $l_date_comment;
-  global $l_begin, $l_date_expected, $l_proposal, $l_end, $l_date_inconsistency;
+  global $l_begin, $l_expected, $l_proposal, $l_end, $l_date_inconsistency;
   global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
@@ -1427,7 +1456,7 @@ function check_deal_form($did, $deal) {
   $dateexp = $deal["dateexpected"];
   // Expected Date check
   if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
-    $err_msg = "$l_date_expected : $l_invalid_date";
+    $err_msg = "$l_expected : $l_invalid_date";
     return false;
   }
 
@@ -1441,7 +1470,7 @@ function check_deal_form($did, $deal) {
   $datealarm = $deal["datealarm"];
   // Alarm Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err_msg = "$l_date_alarm : $l_invalid_date";
+    $err_msg = "$l_alarm : $l_invalid_date";
     return false;
   }
 
@@ -1460,13 +1489,13 @@ function check_deal_form($did, $deal) {
 
   // Begin Date after expected date
   if (($datebegin != "") && ($dateexp != "") && ($ts_exp < $ts_begin)) {
-    $err_msg = "$l_date_inconsistency : $l_begin > $l_date_expected !";
+    $err_msg = "$l_date_inconsistency : $l_begin > $l_expected !";
     return false;
   }
 
   // Begin Date after alarm date
   if (($datebegin != "") && ($datealarm != "") && ($ts_alarm < $ts_begin)) {
-    $err_msg = "$l_date_inconsistency : $l_begin > $l_date_alarm !";
+    $err_msg = "$l_date_inconsistency : $l_begin > $l_alarm !";
     return false;
   }
 
@@ -1478,13 +1507,13 @@ function check_deal_form($did, $deal) {
 
   // Proposal Date after expected date
   if (($dateprop != "") && ($dateexp != "") && ($ts_exp < $ts_prop)) {
-    $err_msg = "$l_date_inconsistency : $l_proposal > $l_date_expected !";
+    $err_msg = "$l_date_inconsistency : $l_proposal > $l_expected !";
     return false;
   }
 
   // Proposal Date after alarm date
   if (($dateprop != "") && ($datealarm != "") && ($ts_alarm < $ts_prop)) {
-    $err_msg = "$l_date_inconsistency : $l_proposal > $l_date_alarm !";
+    $err_msg = "$l_date_inconsistency : $l_proposal > $l_alarm !";
     return false;
   }
 
@@ -1513,20 +1542,20 @@ function check_deal_form($did, $deal) {
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_quick_form($deal) {
-  global $php_regexp_isodate, $l_invalid_date, $l_date_alarm, $l_date_comment;
-  global $err_msg, $l_date_expected;
+  global $php_regexp_isodate, $l_invalid_date, $l_alarm, $l_date_comment;
+  global $err_msg, $l_expected;
 
   $dateexp = $deal["dateexpected"];
   // Expected Date check
   if (($dateexp != "") && (preg_match($php_regexp_isodate, $dateexp) == 0)) {
-    $err_msg = "$l_date_expected : $l_invalid_date";
+    $err_msg = "$l_expected : $l_invalid_date";
     return false;
   }
 
   $datealarm = $deal["datealarm"];
   // Alarm Date check
   if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
-    $err_msg = "$l_date_alarm : $l_invalid_date";
+    $err_msg = "$l_alarm : $l_invalid_date";
     return false;
   }
 

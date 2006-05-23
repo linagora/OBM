@@ -129,7 +129,7 @@ CREATE TABLE DisplayPref (
 -- References Tables
 -------------------------------------------------------------------------------
 --
--- Table structure for the table  'DataSource'
+-- Table structure for the table 'DataSource'
 --
 CREATE TABLE DataSource (
   datasource_id          int(8) auto_increment,
@@ -143,7 +143,7 @@ CREATE TABLE DataSource (
 
 
 --
--- Table structure for the table  'Country'
+-- Table structure for the table 'Country'
 --
 CREATE TABLE Country (
   country_timeupdate  timestamp(14),
@@ -471,6 +471,47 @@ CREATE TABLE ContactCategory5 (
 
 
 -------------------------------------------------------------------------------
+-- Lead module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'LeadSource'
+--
+CREATE TABLE LeadSource (
+  leadsource_id          int(8) auto_increment,
+  leadsource_timeupdate  timestamp(14),
+  leadsource_timecreate  timestamp(14),
+  leadsource_userupdate  int(8),
+  leadsource_usercreate  int(8),
+  leadsource_code        varchar(10) default '',
+  leadsource_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (leadsource_id)
+);
+
+
+--
+-- Table structure for the table 'Lead'
+--
+CREATE TABLE Lead (
+  lead_id          int(8) auto_increment,
+  lead_timeupdate  timestamp(14),
+  lead_timecreate  timestamp(14),
+  lead_userupdate  int(8),
+  lead_usercreate  int(8),
+  lead_source_id   int(8),
+  lead_manager_id  int(8),
+  lead_company_id  int(8) NOT NULL DEFAULT 0,
+  lead_privacy     int(2) NOT NULL DEFAULT 0,
+  lead_name        varchar(64),
+  lead_date        date,
+  lead_datealarm   date,
+  lead_archive     char(1) DEFAULT '0',
+  lead_todo        varchar(128),
+  lead_comment     text,
+  PRIMARY KEY (lead_id)
+);
+
+
+-------------------------------------------------------------------------------
 -- Deal module tables
 -------------------------------------------------------------------------------
 --
@@ -515,7 +556,7 @@ CREATE TABLE Deal (
   deal_dateexpected         date,
   deal_dateend              date,
   deal_amount               decimal(12,2),
-  deal_commission           decimal(5,2) DEFAULT 0,
+  deal_commission           decimal(4,2) DEFAULT 0,
   deal_hitrate              int(3) DEFAULT 0,
   deal_status_id            int(2),
   deal_datealarm            date,

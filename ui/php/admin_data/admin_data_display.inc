@@ -631,7 +631,7 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
     } elseif ($kind == $cdoc_kind_link) {
       $type = "Link";
     }
-    $disk_path = get_admin_data_document_disk_path($id);
+    $disk_path = get_document_disk_path($id);
     $disk_fn = $disk_path . $id;
     $disk_rel = get_admin_data_document_disk_relative_path($id);
     
