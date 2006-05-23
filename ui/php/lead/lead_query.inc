@@ -123,16 +123,14 @@ function run_query_lead_detail($p_id) {
       $timeupdate,
       $timecreate,
       $date,
-      leadkind_label,
-      account_label,
+      leadsource_label,
       company_name, company_address1, company_zipcode, company_town,
       company_phone,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM Lead
-         LEFT JOIN LeadKind ON lead_leadkind_id=leadkind_id
+         LEFT JOIN LeadSource ON lead_source_id=leadsource_id
          LEFT JOIN Company ON lead_company_id=company_id
-         LEFT JOIN Account ON lead_account_id=account_id
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
     WHERE lead_id='$p_id'";
@@ -161,42 +159,54 @@ function run_query_lead_insert($params) {
     $company_id = $params["company_id"];
   }
 
-  $account_id = $params["account"];
-  $invoice_id = $params["invoice_id"];
-  $kind = $params["kind"];
-  $number = $params["number"];
+  $source_id = $params["source_id"];
+  $manager_id = $params["manager_id"];
+  $name = $params["name"];
   $date = ($params["date"] ? "'".$params["date"]."'" : "null");
-  $amount = $params["amount"];
-  $inout = $params["inout"];
-  $checked = ($params["checked"] == "1" ? "1" : "0");
-  $comment = $params["comment"];
+  $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");
+  $todo = $params["todo"];
+  $archive = ($params["archive"] == 1 ? "1" : "0");
+  $privacy = ($params["privacy"] == 1 ? "1" : "0");
+
+  $add_comment = $params["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $params["datecomment"];
+    $today = date("Y-m-d");
+    if ($today == $datecomment) {
+      $datecomment = $now;
+    }
+    $usercomment = $params["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
 
   $query = "INSERT INTO Lead (
     lead_timeupdate,
     lead_timecreate,
     lead_userupdate,
     lead_usercreate,
+    lead_source_id,
+    lead_manager_id,
     lead_company_id,
-    lead_account_id,
-    lead_leadkind_id,    
-    lead_amount,
+    lead_privacy,    
+    lead_name,
     lead_date,
-    lead_inout,
-    lead_number,
-    lead_checked,
+    lead_datealarm,
+    lead_archive,
+    lead_todo,
     lead_comment)
    VALUES (null,
     '$now',
     null,
     '$uid',
+    '$source_id',
+    '$manager_id',
     '$company_id',
-    '$account_id',
-    '$kind',
-    '$amount',
+    '$privacy',
+    '$name',
     $date,
-    '$inout',
-    '$number',
-    '$checked',
+    $datealarm,
+    '$archive',
+    '$todo',
     '$comment')";
   
   display_debug_msg($query, $cdg_sql, "run_query_lead_insert()");
@@ -209,34 +219,16 @@ function run_query_lead_insert($params) {
   $query = "SELECT lead_id
     FROM Lead
     WHERE lead_company_id = '$company_id'
-      AND lead_leadkind_id = '$kind'
+      AND lead_source_id = '$source_id'
+      AND lead_manager_id = '$manager_id'
       AND lead_date $datep
-      AND lead_amount = '$amount'
+      AND lead_name = '$name'
       AND lead_comment = '$comment'";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_insert(2)");
   $obm_q->query($query);
   $obm_q->next_record();
   $id = $obm_q->f("lead_id");
-
-  // insert the lead-invoice link, if invoice_id set
-  if ($id > 0 && isset($invoice_id)) {
-    $query = "INSERT INTO LeadInvoice (
-      leadinvoice_invoice_id,
-      leadinvoice_lead_id,
-      leadinvoice_amount,
-      leadinvoice_timecreate,
-      leadinvoice_usercreate
-    ) VALUES (
-      '$invoice_id',
-      '$id',
-      '0',
-      '$now',
-      '$uid')";
-
-    display_debug_msg($query, $cdg_sql, "run_query_lead_insert(3)");
-    $obm_q->query($query);
-  }
 
   return $id;
 }
@@ -363,27 +355,20 @@ function get_lead_managers($archive = false) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_lead_data_form($id, $params) {
   global $php_regexp_isodate;
-  global $l_fill_company, $l_fill_kind, $l_fill_number, $l_error_number_exist;
-  global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
+  global $l_fill_name;
+  global $l_fill_date, $l_date, $l_alarm, $l_invalid_date;
   global $err_msg, $l_exist_error;
 
-  $number = $params["number"];
+  $name = $params["name"];
   $date = $params["date"];
-  $inout = $params["inout"];
-  $amount = $params["amount"];
+  $datealarm = $params["datealarm"];
   $c_id = $params["company_id"];
   $c_new_id = $params["comp_new_id"];
   $kind = $params["kind"];
 
-  // MANDATORY: a company must be set
-  if (($c_id < 1) && ($c_new_id < 1)) {
-    $err_msg = $l_fill_company;
-    return false;
-  }
-
-  // MANDATORY: Amount must be set
-  if (!($amount > 0)) {
-    $err_msg = $l_fill_amount;
+  // MANDATORY: Name must be set
+  if (trim($name) == "") {
+    $err_msg = $l_fill_name;
     return false;
   }
 
@@ -393,15 +378,9 @@ function check_lead_data_form($id, $params) {
     return false;
   }
 
-  // MANDATORY: inout must be set
-  if (($inout != "+") && ($inout != "-")) {
-    $err_msg = $l_fill_inout;
-    return false;
-  }
-
-  // MANDATORY: kind must be set
-  if (! ($kind > 0)) {
-    $err_msg = $l_fill_kind;
+  // Date check
+  if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
+    $err_msg = "$l_alarm : $datealarm : $l_invalid_date"; 
     return false;
   }
 

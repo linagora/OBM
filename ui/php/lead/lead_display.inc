@@ -440,10 +440,10 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   global $display, $path, $auth, $c_undef, $l_undef;
   global $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
-  global $l_comment;
   global $l_update, $l_checkdelete, $l_insert;
-  global $popup_width, $popup_height, $l_header_new, $ico_mini_cal;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
+  global $l_no, $l_members, $l_group;
+  global $popup_width, $popup_height, $l_header_new, $ico_mini_cal;
 
   $uid = $auth->auth["uid"];
 
@@ -513,6 +513,13 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
 
   // UPDATE
   if (($action == "detailupdate") || ($action == "update")) {
+    $dis_comment = "
+      <tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+      </tr>";
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_lead\" value=\"$id\" />
@@ -565,13 +572,25 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     </tr>
     </table>
 
-    <div class=\"detailHead\">$l_comment</div>
+  <div class=\"detailHead\">$l_comment</div>
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailForm\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\">
+        <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_mail_comment</td>
+      <td class=\"detailForm\">
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
+        <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
+      </td>
     </tr>
+    <tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+    </tr>
+    $dis_comment
     </table>
 
     <div class=\"detailButton\">

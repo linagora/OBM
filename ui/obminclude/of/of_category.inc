@@ -596,16 +596,19 @@ function of_category_dis_links($entity, $cat, $param, $mode="multi") {
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back,$display;
 
-  $l_entity = "l_${entity}";$l_cat = "l_${cat}"; 
-  global $$l_entity,$$l_cat;
+  $l_entity = "l_${entity}"; $l_cat = "l_${cat}"; 
+  global $$l_entity, $$l_cat;
 
-  $id = $param["${cat}"];
+  $id = $param["${cat}_id"];
+  if (! ($id > 0)) {
+    $id = $param["${cat}"];
+  }
   $label = of_category_get_label($entity, $cat, $id);
   $obm_q = of_category_query_links($entity, $cat, $id, $mode);
 
-  if ($entity=="calendar") {
+  if ($entity == "calendar") {
     $page="agenda_index.php";
-  } elseif ($entity=="subscription") {
+  } elseif ($entity == "subscription") {
     $page="publication_index.php";
   } else {
     $page="${entity}_index.php";
@@ -881,7 +884,10 @@ function of_category_query_update($entity, $cat, $param) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $cat_id = $param["${cat}"];
+  $cat_id = $param["${cat}_id"];
+  if (! ($cat_id > 0)) {
+    $cat_id = $param["${cat}"];
+  }
   $cat_label = $param["${cat}_label"];
   $cat_code = $param["${cat}_code"];
   $table = ucfirst($entity) . ucfirst($cat);
@@ -923,7 +929,10 @@ function of_category_query_delete($entity, $cat, $param) {
   $table = ucfirst($entity) . ucfirst($cat);
   $field_prefix = $entity.$cat."_";
   $field_id = $field_prefix."id";
-  $id = $param["${cat}"];
+  $id = $param["${cat}_id"];
+  if (! ($id > 0)) {
+    $id = $param["${cat}"];
+  }
 
   if ($id != '') {
     $query = "DELETE FROM $table WHERE $field_id ='$id'";
