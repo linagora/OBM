@@ -8,7 +8,7 @@
 ###############################################################################
 
 # Mysql User, Password and Data lang var definition
-U=obm
+U="obm"
 P="obm"
 DB="obm"
 DATA_LANG="en"
@@ -28,7 +28,7 @@ fi
 echo $PHP : PHP interpreter found
 
 # Create the Artichow library link
-ln -s ../../obminclude/Artichow-1.06-php4+5/ ../../obminclude/Artichow
+ln -s ../../obminclude/Artichow-1.06-php4+5/ ../obminclude/Artichow
 
 echo "*** Document repository creation"
 $PHP install_document_1.2.php || (echo $?; exit $?)

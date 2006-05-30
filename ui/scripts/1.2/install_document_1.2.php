@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
+
 if ($obminclude == "") $obminclude = "../../obminclude";
 include("$obminclude/global.inc");
 include("../../php/admin_data/admin_data_query.inc");
