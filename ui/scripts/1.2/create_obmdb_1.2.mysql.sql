@@ -552,6 +552,8 @@ CREATE TABLE Deal (
   deal_contact2_id          int(8),
   deal_marketingmanager_id  int(8),
   deal_technicalmanager_id  int(8),
+  deal_source_id            int(8) DEFAULT 0 NOT NULL,
+  deal_source               varchar(64),
   deal_dateproposal         date,
   deal_dateexpected         date,
   deal_dateend              date,

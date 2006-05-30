@@ -348,7 +348,6 @@ function html_payment_consult($p_q, $invs) {
   $inout = $p_q->f("payment_inout");
   $checked = $p_q->f("payment_checked");
   $comment = $p_q->f("payment_comment");
-  $company_name = $p_q->f("company_name");
   $ad1 = $p_q->f("company_address1");
   $zip = $p_q->f("company_zipcode");
   $town = $p_q->f("company_town");
@@ -411,10 +410,10 @@ function html_payment_consult($p_q, $invs) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_company 
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
       </td>
-      <td class=\"detailText\">$company_name<br />$ad1<br/>$zip $town</td>
+      <td class=\"detailText\">$c_name<br />$ad1<br/>$zip $town</td>
     </tr>
     </table>
 
@@ -702,7 +701,6 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_payment\" value=\"$id\" />
-      <input type=\"hidden\" name=\"hd_usercreate\" value=\"$usercreate\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
   // INSERT

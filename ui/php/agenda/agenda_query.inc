@@ -141,7 +141,7 @@ function run_query_agenda_get_allusers($users_array,$groups_array) {
   $r_array = array();
   if (is_array($groups_array)) {
     foreach($groups_array as $group_id) {
-      $r_array = array_merge($r_array, get_all_users_from_group($group_id));
+      $r_array = array_merge($r_array, get_all_users_id_from_group($group_id));
     }
   }
   $r_array = array_merge($users_array,$r_array);
@@ -309,7 +309,7 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
   $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
     foreach($groups as $group_id) {
-      $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));
+      $user_group_array = array_merge($user_group_array, get_all_users_id_from_group($group_id));
     }
     $users_array = array_merge($users_array, $user_group_array);
     $users_array = array_unique($users_array);
@@ -738,7 +738,7 @@ function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
   $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
     foreach($groups as $group_id) {
-      $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));
+      $user_group_array = array_merge($user_group_array, get_all_users_id_from_group($group_id));
     }
     $users_array = array_merge($users_array,$user_group_array);
     $users_array = array_unique($users_array);
@@ -1074,7 +1074,7 @@ function get_agenda_calendar_readable() {
   $gusers = "";
   if ( (isset($agenda["entity"]["group_view"]))
        && ($agenda["entity"]["group_view"] != $c_all) ) {
-    $gusers = get_all_users_from_group($agenda["entity"]["group_view"]);
+    $gusers = get_all_users_id_from_group($agenda["entity"]["group_view"]);
   }
   $entity = of_right_entity_for_consumer("calendar", "user", $uid, "read", $gusers);
 

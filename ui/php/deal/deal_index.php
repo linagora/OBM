@@ -499,7 +499,7 @@ function get_param_deal() {
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
   global $tf_category1_label, $tf_category1_code, $sel_category1;
-  global $param_deal, $param_contact, $hd_usercreate, $hd_timeupdate;
+  global $param_deal, $param_contact, $param_lead, $sel_source, $tf_source;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir;
@@ -526,6 +526,8 @@ function get_param_deal() {
   if (isset ($tf_dateexpected)) $deal["dateexpected"] = $tf_dateexpected;
   if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
   if (isset ($param_parent)) $deal["parent"] = $param_parent;
+  if (isset ($sel_source)) $deal["source_id"] = $sel_source;
+  if (isset ($tf_source)) $deal["source"] = $tf_source;
   if (isset ($sel_kind)) $deal["kind"] = $sel_kind;
   if (isset ($sel_tt)) $deal["tasktype"] = $sel_tt;
   if (isset ($param_company)) $deal["company"] = $param_company;
@@ -551,8 +553,6 @@ function get_param_deal() {
   if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $deal["add_comment"] = trim($ta_add_comment);
   if (isset ($rd_mail_comment)) $deal["mail_comment"] = trim($rd_mail_comment);
-  if (isset ($hd_usercreate)) $deal["usercreate"] = $hd_usercreate;
-  if (isset ($hd_timeupdate)) $deal["timeupdate"] = $hd_timeupdate;
 
   // Parent Deal fields
   if (isset ($tf_plabel)) $deal["plabel"] = $tf_plabel;
@@ -566,6 +566,8 @@ function get_param_deal() {
   }
   if (isset ($ta_pcom)) $deal["pcom"] = $ta_pcom;
   if (isset ($sel_parent)) $deal["sel_parent"] = $sel_parent;
+
+  if (isset ($param_lead)) $deal["lead_id"] = $param_lead;
 
   // Search fields
   if (isset ($tf_company_name)) $deal["company_name"] = $tf_company_name;
@@ -684,6 +686,12 @@ function get_deal_action() {
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update', 'quick_detail', 'quick_update')
+                                     	    );
+					    
+  // Convert from Lead
+  $actions["deal"]["lead_convert"] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
                                      	    );
 					    
   //  Update

@@ -13,12 +13,13 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["lead_name"] = $l_name;
-$fieldnames["source_name"] = $l_source;
-$fieldnames["lead_date"] = $l_date;
-$fieldnames["lead_datealarm"] = $l_alarm;
+$fieldnames["leadsource_label"] = $l_source;
+$fieldnames["date"] = $l_date;
+$fieldnames["datealarm"] = $l_alarm;
 $fieldnames["company_name"] = $l_company;
+$fieldnames["company_zipcode"] = $l_postcode;
 $fieldnames["lead_todo"] = $l_todo;
-$fieldnames["lead_manager"] = $l_manager;
+$fieldnames["manager"] = $l_manager;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,11 +34,10 @@ $fieldnames["lead_manager"] = $l_manager;
 function dis_data_lead(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $col_frs, $col_client;
 
-  if ($fieldname == "lead_date") {
-    $date = $OD->data_set->f($fieldname);
-    $date = date_format($date);
+  if ($fieldname == "lead_name") {
+    $name = $OD->data_set->f($fieldname);
     $res["url"] = "$path/lead/lead_index.php?action=detailconsult&amp;param_lead=".$OD->data_set->f("lead_id");
-    $res["name"] = $date;
+    $res["name"] = $name;
   }
 
   elseif ($fieldname == "lead_comment") {
@@ -70,7 +70,7 @@ function dis_data_lead(&$OD, $fieldname, $link_ok) {
 function dis_lead_search_form($params="") {
   global $cgp_hide;
 
-  $sources = get_lead_sources();
+  $sources = get_global_lead_sources();
   $managers = get_lead_managers();
   $block .= html_lead_search_form($params, $sources, $managers);
 
@@ -91,8 +91,8 @@ function html_lead_search_form($params, $sources, $managers) {
   global $l_date, $l_after, $l_before;
   global $l_both, $l_received, $l_emitted;
 
-  $source = $params["source_id"];
-  $manager = $params["manager_id"];
+  $source_id = $params["source_id"];
+  $manager_id = $params["manager_id"];
   $company = $params["company"];
   $archive = ($params["archive"] == "1" ? "checked = \"checked\"" : "");
   $text = stripslashes($params["text"]);
@@ -106,7 +106,7 @@ function html_lead_search_form($params, $sources, $managers) {
   if (is_array($sources) && (count($sources) > 0)) {
     foreach($sources as $s_id => $one_source) {
       $slabel = $one_source["label"];
-      $sselect = ($s_id == $source) ? "selected" : "";
+      $sselect = ($s_id == $source_id) ? "selected" : "";
       $sel_source .= "<option value=\"$s_id\" $sselect>$slabel</option>";
     }
   }
@@ -119,7 +119,7 @@ function html_lead_search_form($params, $sources, $managers) {
   if (is_array($managers) && (count($managers) > 0)) {
     foreach($managers as $m_id => $one_manager) {
       $mname = $one_manager["name"];
-      $mselect = ($m_id == $manager) ? "selected" : "";
+      $mselect = ($m_id == $manager_id) ? "selected" : "";
       $sel_manager .= "<option value=\"$m_id\" $mselect>$mname</option>";
     }
   }
@@ -177,8 +177,8 @@ function dis_lead_search_list($params) {
   global $auth, $new_order, $order_dir;
 
   $obm_q = run_query_lead_search($params, $new_order, $order_dir);
-  $nb_lead = $obm_q->num_rows_total();
-  if ($nb_lead == 0) {
+  $nb = $obm_q->num_rows_total();
+  if ($nb == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
     $display["msg"] .= display_info_msg("$nb $l_found");
@@ -260,10 +260,9 @@ function dis_lead_consult($params) {
   $id = $params["id"];
 
   if ($id > 0) {
-    $pay_q = run_query_lead_detail($id);
-    $invs = get_lead_invoices($id);
-    $display["detailInfo"] = display_record_info($pay_q);
-    $block = html_lead_consult($pay_q, $invs);
+    $l_q = run_query_lead_detail($id);
+    $display["detailInfo"] = display_record_info($l_q);
+    $block = html_lead_consult($l_q);
   }
 
   return $block;
@@ -273,131 +272,75 @@ function dis_lead_consult($params) {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display Lead Consultation
 // Parameters:
-//   - $p_q  : lead database result
-//   - $invs : array : invoices connected to the lead
+//   - $l_q  : lead database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_lead_consult($p_q, $invs) {
-  global $path, $display, $set_theme, $ico_company;
-  global $l_lead, $l_invoice, $l_company, $l_received, $l_emitted;
-  global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_no_invoice;
-  global $l_account, $l_kind, $l_inout, $l_total;
+function html_lead_consult($l_q) {
+  global $path, $display, $set_theme, $ico_company, $c_yes, $c_no;
+  global $l_company, $l_comment;
+  global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
 
-  $id = $p_q->f("lead_id");
-  $c_id = $p_q->f("lead_company_id");
-  $c_name = $p_q->f("company_name");
-  $kind = $p_q->f("leadkind_label");
-  $date = date_format($p_q->f("date"));
-  $number = $p_q->f("lead_number");
-  $amount = $p_q->f("lead_amount");
-  $inout = $p_q->f("lead_inout");
-  $checked = $p_q->f("lead_checked");
-  $comment = $p_q->f("lead_comment");
-  $company_name = $p_q->f("company_name");
-  $ad1 = $p_q->f("company_address1");
-  $zip = $p_q->f("company_zipcode");
-  $town = $p_q->f("company_town");
+  $id = $l_q->f("lead_id");
+  $c_id = $l_q->f("lead_company_id");
+  $c_name = $l_q->f("company_name");
+  $source = $l_q->f("leadsource_label");
+  $manager = $l_q->f("manager");
+  $date = date_format($l_q->f("date"));
+  $datealarm = date_format($l_q->f("datealarm"));
+  $name = $l_q->f("lead_name");
+  $archive = ($l_q->f("lead_archive") == 1 ? $c_yes : $c_no);
+  $todo = $l_q->f("lead_todo");
+  $comment = beautify_comment(nl2br($l_q->f("lead_comment")));
+  $ad1 = $l_q->f("company_address1");
+  $zip = $l_q->f("company_zipcode");
+  $town = $l_q->f("company_town");
 
-  if ($inout == "+") {
-    $dis_inout = $l_received;
-  } else {
-    $dis_inout = $l_emitted;
-  }
-
-  if (count($invs) > 0) {
-    $l_invoice_title = $l_invoice;
-    $block_invoice = "
-<table class=\"resultTable\">
-<tr>
-  <td class=\"resultHead\">$l_date</td>
-  <td class=\"resultHead\">$l_company</td>
-  <td class=\"resultHead\">$l_label</td>
-  <td class=\"resultHead\">$l_amount</td>
-  <td class=\"resultHead\">$l_lead : $l_amount</td>
-</tr>";
-    $affected_amount_total = 0;
-    foreach ($invs as $one_inv) {
-      $id = $one_inv["id"];
-      $affected_amount = $one_inv["affected_amount"];
-      $inv_amount = $one_inv["invoice_amount"];
-      $company = $one_inv["company"];
-      $label = $one_inv["label"];
-      $date = $one_inv["date"];
-      
-      $affected_amount_total += $affected_amount;
-
-      $block_invoice .= "
-<tr class=\"data0\">
-  <td style=\"text-align:center;\">$date</td>
-  <td style=\"text-align:center;\">$company</td>
-  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$id\">$label</a></td>
-  <td style=\"text-align:right;\">$inv_amount </td>
-  <td class=\"data2\" style=\"text-align:right;\">$affected_amount </td>
-</tr>";
-    }
-
-    $block_invoice .= "
-<tr class=\"data0\">
-  <td colspan=\"4\" style=\"text-align:center;\">$l_total</td>
-  <td class=\"resultHead\" style=\"text-align:right;\">$affected_amount_total</td>
-</tr>
-</table>";
-
-  } else {
-    $l_invoice_title = $l_no_invoice;
-  }
-
-  $display["title"] = "<div class=\"title\">$l_lead : $date $c_name $amount</div>";
+  $display["title"] = "<div class=\"title\">$l_lead : $date $c_name</div>";
 
   $block = "
 <div class=\"detailHead\">$title</div>
 
-  <div class=\"detailHead\">$l_company</div>
+  <div class=\"detailHead\">$l_lead</div>
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_company 
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
       </td>
-      <td class=\"detailText\">$company_name<br />$ad1<br/>$zip $town</td>
+      <td class=\"detailText\">$c_name<br />$ad1<br/>$zip $town</td>
     </tr>
-    </table>
-
-  <div class=\"detailHead\">$l_lead</div>
-
-  <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_amount</td>
-      <td class=\"detailText\">$amount</td>
+      <td class=\"detailLabel\">$l_source</td>
+      <td class=\"detailText\">$source</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_manager</td>
+      <td class=\"detailText\">$manager</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailText\">$date</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailText\">$inout $dis_inout</td>
+      <td class=\"detailLabel\">$l_alarm</td>
+      <td class=\"detailText\">$datealarm</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
+      <td class=\"detailLabel\">$l_todo</td>
+      <td class=\"detailText\">$todo</td>
     </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$number</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_account</td>
-      <td class=\"detailText\">$account</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_comment</td>
       <td class=\"detailText\">$comment</td>
     </tr>
    </table>
-
-  <div class=\"detailHead\">$l_invoice_title</div>
-
-  $block_invoice
 ";
 
   return $block;
@@ -411,15 +354,18 @@ function html_lead_consult($p_q, $invs) {
 //   - $params[]  : parameters : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_form($action, $params) {
-  global $display, $cg_com, $l_aduplicate;
+  global $display, $uid, $cg_com;
 
   $p_id = $params["id"];
   if ($p_id > 0) {
     $l_q = run_query_lead_detail($p_id);
+    $users = array($uid, $l_q->f("lead_manager_id"));
+  } else {
+    $users = array($uid);
   }
 
-  $sources = get_lead_sources();
-  $managers = get_lead_managers();
+  $sources = get_global_lead_sources();
+  $managers = get_all_users_from_group($cg_com, $users);
 
   $block = html_lead_form($action, $l_q, $sources, $managers, $params);
 
@@ -469,6 +415,8 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   } elseif ($action == "new") {
     $title = $l_header_new;
     $date = date("Y-m-d");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -484,9 +432,14 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (isset($params["datealarm"])) { $datealarm = $params["datealarm"]; }
   if (isset($params["todo"])) { $todo = stripslashes($params["todo"]); }
   if (isset($params["comment"])) { $comment = stripslashes($params["comment"]); }
+  if (isset($params["add_comment"])) { $add_comment = stripslashes($params["add_comment"]); }
+  if (isset($params["usercomment"])) { $usercomment = $params["usercomment"]; }
+  if (isset($params["datecomment"])) { $datecomment = $params["datecomment"]; }
+  if (isset($params["mail_comment"])) { $mail_comment = $params["mail_comment"]; }
+
 
   // Lead kind field
-  $block_source = of_category_dis_entity_form("lead", "source", $sources, "mono", $source, "none");
+  $block_source = of_category_dis_entity_form("lead", "source", $sources, "mono", $source_id, "none");
 
   // Manager select
   $sel_manager = "
@@ -494,8 +447,8 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
      <option value=\"$c_undef\">$l_undef</option>";
   if (is_array($managers) && (count($managers) > 0)) {
     foreach($managers as $m_id => $one_manager) {
-      $mname = $one_manager["name"];
-      $mselect = ($m_id == $manager) ? "selected" : "";
+      $mname = $one_manager["lastname"] . " " . $one_manager["firstname"];
+      $mselect = ($m_id == $manager_id) ? "selected" : "";
       $sel_manager .= "<option value=\"$m_id\" $mselect>$mname</option>";
     }
   }
@@ -511,6 +464,29 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
+  // User comment select construction
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  if (is_array($managers) && (count($managers) > 0)) {
+    foreach($managers as $cid => $one_manager) {
+      $cname = $one_manager["lastname"] . " " . $one_manager["firstname"];
+      $cselect = "";
+      if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+	$cselect = " selected = \"selected\"";
+      }
+      $sel_usercomment .= "<option value=\"$cname\" $cselect>$cname</option>";
+    }
+  }
+  $sel_usercomment .= "</select>";
+
+  // Mail comment radio
+  if (($mail_comment == "") || ($mail_comment == "$l_no")) {
+    $rd_mail_no_c = "checked";
+  } else if ($mail_comment == "$l_members") {
+    $rd_mail_members_c = "checked";
+  } else if ($mail_comment == "$l_group") {
+    $rd_mail_group_c = "checked";
+  }
+
   // UPDATE
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
@@ -518,7 +494,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
       </tr>";
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />

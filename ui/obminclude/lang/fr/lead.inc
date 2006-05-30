@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_source = "Source";
-
 $l_source_manage = "Gestion des opportunités";
 $l_source_exist = "Existantes";
 $l_source_new = "Nouvelle";

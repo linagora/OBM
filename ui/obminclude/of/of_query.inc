@@ -1208,6 +1208,36 @@ function run_query_userobm_active($ids="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the users list (id, name) from the given group
+// Recursive search to handle group trees
+// Parameters:
+//   - $group_id : Group id
+//   - $ids (optionnal) : array of UserObm Id to add to the result
+// Returns:
+//   array of user ids
+///////////////////////////////////////////////////////////////////////////////
+function get_all_users_from_group($g_id, $ids="") {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $users = array();
+  $obm_q = run_query_all_users_from_group($g_id, $ids);
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("userobm_id");
+    $lname = $obm_q->f("userobm_lastname");
+    $fname = $obm_q->f("userobm_firstname");
+    $users[$id] = array ("id" => $id,
+			 "lastname" => $lname,
+			 "firstname" => $fname);
+  }
+  return $users;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Get the users list from the given group
 // Recursive search to handle group trees
 // Parameters:
@@ -1218,7 +1248,7 @@ function run_query_userobm_active($ids="") {
 function run_query_all_users_from_group($g_id, $ids="") {
   global $cdg_sql;
 
-  $gusers = get_all_users_from_group($g_id);
+  $gusers = get_all_users_id_from_group($g_id);
 
   if (is_array($gusers)) {
     $where_gusers = "";
@@ -1256,14 +1286,14 @@ function run_query_all_users_from_group($g_id, $ids="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : Get the users list from the given group
+// Query Execution : Get the users ID list from the given group
 // Recursive search to handle group trees
 // Parameters:
 //   - $group_id : Group id
 // Returns:
 //   array of user ids
 ///////////////////////////////////////////////////////////////////////////////
-function get_all_users_from_group($g_id) {
+function get_all_users_id_from_group($g_id) {
   global $cdg_sql;
 
   if (! ($g_id > 0)) {
@@ -1283,7 +1313,7 @@ function get_all_users_from_group($g_id) {
 
   while ($obm_q->next_record()) {
     $child_id = $obm_q->f("child_id");
-    $gusers = get_all_users_from_group($child_id);
+    $gusers = get_all_users_id_from_group($child_id);
     $users = array_merge($users, $gusers);
   }
 

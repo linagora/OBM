@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_source = "Source";
-
 $l_source_manage = "Lead Source Management";
 $l_source_exist = "Existing Sources";
 $l_source_new = "New Source";

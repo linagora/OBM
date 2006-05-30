@@ -679,7 +679,6 @@ function html_contact_header($co_q, $funcs, $cats5) {
   global $display, $path, $action, $auth;
 
   $c_id = $co_q->f("contact_company_id");
-  $usercreate = $co_q->f("contact_usercreate");
   $c_name = $co_q->f("company_name");
   $id = $co_q->f("contact_id");
   $kind_minilabel = $co_q->f("kind_minilabel");

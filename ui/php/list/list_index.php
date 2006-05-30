@@ -278,7 +278,7 @@ exit(0);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
-  global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $rd_mode;
+  global $param_list, $param_ext, $rd_mode;
   global $action, $cb_privacy, $ext_action, $ext_url, $ext_id, $ext_target;
   global $id_duplicated, $new_order, $order_dir, $popup, $row_index, $title;
   global $param_contact, $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
@@ -320,9 +320,6 @@ function get_param_list() {
   if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0;
   if (isset($cb_contact_arch)) $list["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
   if (isset($cb_info_pub)) $list["info_pub"] = $cb_info_pub == 1 ? 1 : 0;
-
-  if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
-  if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
 
   if (isset ($new_order)) $list["new_order"] = $new_order;
   if (isset ($order_dir)) $list["order_dir"] = $order_dir;

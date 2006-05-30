@@ -198,8 +198,7 @@ function get_param_lead() {
   global $sel_manager, $tf_name, $tf_date, $tf_datealarm, $ta_comment;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
   global $param_lead, $cb_archive, $tf_todo, $cb_privacy;
-  global $tf_source_label, $tf_source_code, $sel_source;
-
+  global $tf_source_label, $tf_source_code, $sel_source, $tf_company;
   global $param_company, $company_name, $company_new_name, $company_new_id;
 
   if (isset ($param_lead)) $lead["id"] = $param_lead;
@@ -238,7 +237,7 @@ function get_lead_action() {
   global $params, $actions, $path;
   global $l_header_find, $l_header_new, $l_header_update, $l_header_delete;
   global $l_header_consult, $l_header_display, $l_header_admin;
-  global $l_header_duplicate;
+  global $l_header_convert_deal;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   $id = $params["id"];
@@ -271,7 +270,15 @@ function get_lead_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/lead/lead_index.php?action=detailconsult&amp;param_lead=".$params["id"],
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate')
+    'Condition'=> array ('detailupdate', 'update')
+                                        );
+
+// Convert to Deal
+  $actions["lead"]["convert_deal"] = array (
+    'Name'     => $l_header_convert_deal,
+    'Url'      => "$path/deal/deal_index.php?action=new&amp;param_lead=".$params["id"],
+    'Right'    => $cright_read,
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                         );
 
 // Detail Update
@@ -279,7 +286,7 @@ function get_lead_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/lead/lead_index.php?action=detailupdate&amp;param_lead=".$params["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 
 // Insert
@@ -301,7 +308,7 @@ function get_lead_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/lead/lead_index.php?action=check_delete&amp;param_lead=".$params["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                      	 );
 
 // Delete

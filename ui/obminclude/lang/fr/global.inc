@@ -73,6 +73,7 @@ $l_country = "Pays";
 $l_desc = "Description";
 $l_priority = "Priorité";
 $l_datasource = "Source de données";
+$l_source = "Source";
 $l_after = "Après";
 $l_before = "Avant";
 $l_fuzzy = "Avancée";
@@ -241,6 +242,7 @@ $l_header_add_user = "Ajouter utilisateur";
 $l_header_add_resource = "Ajouter ressource";
 $l_header_add_group = "Ajouter groupe";
 $l_header_upd_group = "Modifier groupes";
+$l_header_convert_deal = "Convertir en Affaire";
 $l_header_add_deal = "Ajouter affaire";
 $l_header_list = "Liste";
 

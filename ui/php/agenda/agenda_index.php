@@ -54,7 +54,7 @@ if ( ($agenda["new_group"] == "1")
   if ($agenda["group_view"] == $c_all) {
     $cal_entity_id["group"] = array();
   } else {
-    $cal_entity_id["user"] = get_all_users_from_group($agenda["group_view"]);
+    $cal_entity_id["user"] = get_all_users_id_from_group($agenda["group_view"]);
     $cal_entity_id["group"] = array($agenda["group_view"]);
   }
   $cal_entity_id["group_view"] = $agenda["group_view"];

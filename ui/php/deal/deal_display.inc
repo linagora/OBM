@@ -24,6 +24,8 @@ $fieldnames["deal_datealarm"] = $l_alarm;
 $fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
+$fieldnames["deal_source"] = $l_source;
+$fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_commission"] = $l_commission;
 $fieldnames["deal_amount"] = $l_amount;
 $fieldnames["deal_hitrate"] = $l_hitrate;
@@ -78,6 +80,17 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "parentdeal_technical_lastname") {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("parentdeal_technicalmanager_id");
+  }
+
+  else if ($fieldname == "deal_source") {
+    $label = $OD->data_set->f("leadsource_label");
+    $source = $OD->data_set->f("$fieldname");
+    if (($label != "") || ($source != "")) {
+      $res["name"] = "$label : $source";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if ($fieldname == "deal_commission") {
@@ -718,7 +731,7 @@ function dis_deal_consult($deal) {
 function html_deal_consult($deal_q) {
   global $set_theme, $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_label, $l_kind;
-  global $l_tt,$l_marketing_manager,$l_technical_manager;
+  global $l_tt,$l_marketing_manager,$l_technical_manager, $l_source;
   global $l_number, $l_amount,$l_hitrate, $l_commission, $l_sale_delay;
   global $l_status,$l_archive,$l_comment;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
@@ -751,6 +764,8 @@ function html_deal_consult($deal_q) {
   $tt_label = $deal_q->f("tasktype_label");
   $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
   $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
+  $source_label = $deal_q->f("leadsource_label");
+  $source = $deal_q->f("deal_source");
   $commission = $deal_q->f("deal_commission");
   $datepro = date_format($deal_q->f("dateproposal"), 1);
   $amount = $deal_q->f("deal_amount");
@@ -866,6 +881,10 @@ function html_deal_consult($deal_q) {
         <td class=\"detailText\">$dis_con2 - $phone_con2
         </td>
       </tr>
+      <tr>
+        <td class=\"detailLabel\">$l_source</td>
+        <td class=\"detailText\">$source_label : $source</td>
+      </tr>
       </table>
 
     <div class=\"detailHead\">$l_status</div>
@@ -939,6 +958,18 @@ function dis_deal_form($deal) {
     $users = array($uid);
   }
   
+  if (($action == "new") || ($deal["lead_id"] > 0)) {
+    $lead = get_lead_info($deal["lead_id"]);
+    $deal["company"] = $lead["company_id"];
+    $deal["market"] = $lead["manager_id"];
+    $deal["source_id"] = $lead["source_id"];
+    $deal["label"] = $lead["name"];
+    $deal["datebegin"] = $lead["date"];
+    $deal["datealarm"] = $lead["datealarm"];
+    $deal["todo"] = $lead["todo"];
+    $deal["com"] = $lead["comment"];
+  }
+
   if (($action == "new") || ($action == "insert")) {
     $comp_q = run_query_deal_company_info($deal["company"]);
   } else {
@@ -947,6 +978,7 @@ function dis_deal_form($deal) {
 
   $type_q = run_query_deal_type();
   $tts = get_global_tasktype($ctt_sales);
+  $sources = get_global_lead_sources();
   $usrc_q = run_query_all_users_from_group($cg_com, $users);
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
   $sta_q = run_query_deal_status_list();
@@ -954,7 +986,7 @@ function dis_deal_form($deal) {
   
   $cats1 = of_category_get_ordered("deal", "category1", "multi", $did);
 
-  $block = html_deal_form($action, $deal_q, $type_q, $tts, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $sta_q, $deal);
+  $block = html_deal_form($action, $deal_q, $type_q, $tts, $sources, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $sta_q, $deal);
 
   return $block;
 }
@@ -967,6 +999,7 @@ function dis_deal_form($deal) {
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $kind_q    : DBO : deal kind list
 //   - $tts       : TaskType array
+//   - $sources   : Lead Sources array
 //   - $cats1     : array with deal category 1 list 
 //   - $usrc_q    : DBO : list of userobm from system group Commercial
 //   - $usrp_q    : DBO : list of userobm from system group Production
@@ -977,13 +1010,13 @@ function dis_deal_form($deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
+function html_deal_form($action,$deal_q,$kind_q,$tts,$sources,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format, $l_update,$l_insert;
   global $l_deal, $l_dates, $l_company,$l_label,$l_number,$l_kind, $l_private;
   global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_commission;
   global $l_amount,$l_hitrate, $l_contact,$l_status, $l_archive, $l_todo;
-  global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
+  global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
   global $l_no, $l_members, $l_group;
   global $path, $action, $auth, $popup;
@@ -1010,6 +1043,8 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
     $priv = ($deal_q->f("privacy") == 0 ? "0" : "1");
     $market = $deal_q->f("deal_marketingmanager_id");
     $tech = $deal_q->f("deal_technicalmanager_id");
+    $source_id = $deal_q->f("deal_source_id");
+    $source = $deal_q->f("deal_source");
     $commission = $deal_q->f("deal_commission");
     $amount = $deal_q->f("deal_amount");
     $hitrate = $deal_q->f("deal_hitrate");
@@ -1055,6 +1090,8 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
   if (isset($deal["tech"])) { $tech = $deal["tech"]; }
+  if (isset($deal["source_id"])) { $source_id = $deal["source_id"]; }
+  if (isset($deal["source"])) { $source = $deal["source"]; }
   if (isset($deal["commission"])) { $commission = $deal["commission"]; }
   if (isset($deal["amount"])) { $amount = stripslashes($deal["amount"]); }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
@@ -1086,6 +1123,19 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$cats1, $usrc_q,$usrp_q,$co
     $sel_kind .= ">$klabel</option>";
   }
   $sel_kind .= "</select>";
+
+  // Sources select
+  $sel_source = "
+    <select name=\"sel_source\">
+     <option value=\"$c_undef\">$l_undef</option>\n";
+  if (is_array($sources) && (count($sources) > 0)) {
+    foreach($sources as $s_id => $one_source) {
+      $slabel = $one_source["label"];
+      $sselect = ($s_id == $source_id) ? "selected" : "";
+      $sel_source .= "<option value=\"$s_id\" $sselect>$slabel</option>";
+    }
+  }
+  $sel_source .= "</select>";
 
   // Task type select construction
   $sel_tt = "<select name=\"sel_tt\">
@@ -1226,7 +1276,8 @@ $js_status_loop
     $rd_mail_group_c = "checked";
   }
 
-  if (($action == "detailupdate") || ($action == "update")) {
+  //  if (($action == "detailupdate") || ($action == "update")) {
+  if ($comment != "") {
     $dis_comment = "
       </tr><tr>
         <td class=\"detailLabel\">$l_upd_comment</td>
@@ -1306,6 +1357,13 @@ $js_status_loop
     </tr><tr>
       <td class=\"detailLabel\">$l_contact 2 $dis_contact_2</td>
       <td class=\"detailForm\">$sel_con2</td>
+    </tr>
+    <tr>
+      <td rowspan=\"2\" class=\"detailLabel\">$l_source</td>
+      <td class=\"detailForm\">$sel_source</td>
+    </tr>
+    <tr>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_source\" size=\"40\" maxlength=\"64\" value=\"$source\" /></td>
     </tr>
     </table>
 
@@ -1806,7 +1864,7 @@ function dis_deal_potential($deal) {
 
   $block = "$msg
     $dis_potential
-  ";
+";
 
   return $block;
 }
@@ -2193,7 +2251,7 @@ function dis_deal_kind_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the stabtus links                                                //
+// Displays the stabtus links
 // Parameters:
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////

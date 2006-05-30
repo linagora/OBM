@@ -121,6 +121,8 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
       deal_company_id,
       deal_marketingmanager_id,
       deal_technicalmanager_id,
+      deal_source_id,
+      deal_source,
       deal_commission,
       deal_amount,
       deal_hitrate,
@@ -133,17 +135,19 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
       deal_todo,
       deal_privacy,
       dealtype_label,
+      leadsource_label,
       company_name as deal_company_name,
       company_zipcode as deal_company_zipcode,
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
     FROM Deal
-        LEFT JOIN Company ON deal_company_id=company_id 
-        LEFT JOIN DealType ON deal_type_id=dealtype_id 
-        LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id 
-        LEFT JOIN DealStatus ON deal_status_id=dealstatus_id 
-        LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id 
+        LEFT JOIN Company ON deal_company_id=company_id
+        LEFT JOIN DealType ON deal_type_id=dealtype_id
+        LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id
+        LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
+        LEFT JOIN LeadSource ON deal_source_id=leadsource_id
+        LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
         $join_cat
     $whereq
     $orderq
@@ -183,6 +187,7 @@ function run_query_deal_detail($id) {
 
   $query = "SELECT Deal.*,
       deal_privacy as privacy,
+      leadsource_label,
       dealtype_label,
       tasktype_label,
       dealstatus_label,
@@ -212,7 +217,8 @@ function run_query_deal_detail($id) {
         LEFT JOIN UserObm c ON deal_usercreate=c.userobm_id
         LEFT JOIN UserObm u ON deal_userupdate=u.userobm_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
-        LEFT JOIN DealStatus ON deal_status_id=dealstatus_id,
+        LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
+        LEFT JOIN LeadSource ON deal_source_id=leadsource_id,
       TaskType
     WHERE deal_id='$id'
       AND tasktype_id=deal_tasktype_id";
@@ -249,6 +255,8 @@ function run_query_deal_insert($deal) {
   $comp = $deal["company"];
   $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
   $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
+  $source_id = ($deal["source_id"] ? "'".$deal["source_id"]."'" : "0");
+  $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
@@ -258,6 +266,7 @@ function run_query_deal_insert($deal) {
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $category1 = $deal["category1"];
+  $comment = $deal["com"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
@@ -266,7 +275,7 @@ function run_query_deal_insert($deal) {
       $datecomment = $now;
     }
     $usercomment = $deal["usercomment"];
-    $comment = "$datecomment:$usercomment:$add_comment";
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
 
   $query = "INSERT INTO Deal (deal_timeupdate,
@@ -283,6 +292,8 @@ function run_query_deal_insert($deal) {
     deal_contact2_id,
     deal_marketingmanager_id,
     deal_technicalmanager_id,
+    deal_source_id,
+    deal_source,
     deal_dateproposal,
     deal_dateexpected,
     deal_dateend,
@@ -310,6 +321,8 @@ function run_query_deal_insert($deal) {
     '$con2',
     $market,
     $tech,
+    $source_id,
+    '$source',
     $dateprop,
     $dateexp,
     $dateend,
@@ -374,6 +387,8 @@ function run_query_deal_update($deal) {
   $comp = $deal["company"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
+  $source_id = ($deal["source_id"] ? $deal["source_id"] : "0");
+  $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
@@ -409,6 +424,8 @@ function run_query_deal_update($deal) {
     deal_contact2_id=$con2,
     deal_marketingmanager_id='$market',
     deal_technicalmanager_id='$tech',
+    deal_source_id='$source_id',
+    deal_source='$source',
     deal_dateproposal=$dateprop,
     deal_dateexpected=$dateexp,
     deal_dateend=$dateend,
@@ -499,7 +516,7 @@ $datecomment:$usercomment:$add_comment";
   if ($mail_comment == "$l_members") {
     $users_array = array($market, $tech);
   } else if ($mail_comment == "$l_group") {
-    $users_array = get_all_users_from_group($cg_com);
+    $users_array = get_all_users_id_from_group($cg_com);
   }
   if (! is_array($users_array)) {
     $users_array = array();
@@ -680,7 +697,6 @@ function run_query_deal_company_info($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// XXXX Exists in obm_query.inc too
 // Get the amount, balanced amount and number of deals for a set of users
 // Parameters:
 //   - $users_id : array of User id
@@ -706,6 +722,8 @@ function run_query_deal_potential($users_id="") {
       count(*) as nb,
       sum(deal_amount) as amount,
       sum(deal_amount * deal_hitrate / 100) as amount_balanced,
+      sum(deal_amount * deal_commission) as commission,
+      sum(deal_amount * deal_commission * deal_hitrate / 100) as commission_balanced,
       userobm_lastname,
       userobm_firstname
     FROM Deal
@@ -733,6 +751,8 @@ function run_query_deal_potential($users_id="") {
     $u_id = $obm_q->f("uid");
     $res["market"]["$u_id"]["amount"] = $obm_q->f("amount");
     $res["market"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
+    $res["market"]["$u_id"]["commission"] = $obm_q->f("commission");
+    $res["market"]["$u_id"]["commission_balanced"] = $obm_q->f("commission_balanced");
     $res["market"]["$u_id"]["number"] = $obm_q->f("nb");
     $res["market"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
     $am += $res["market"]["$u_id"]["amount"];
@@ -1059,7 +1079,7 @@ function get_deal_info($deal_id) {
       LEFT JOIN DealType on deal_type_id = dealtype_id
     WHERE deal_id='$deal_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_deal_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1070,6 +1090,37 @@ function get_deal_info($deal_id) {
   $res["type"] = $obm_q->f("dealtype_label");
   $res["market"] = $obm_q->f("deal_marketingmanager_id");
   $res["tech"] = $obm_q->f("deal_technicalmanager_id");
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the lead infos
+// Parameters:
+//   - $lead_id : lead id
+// Returns: array of lead infos
+///////////////////////////////////////////////////////////////////////////////
+function get_lead_info($lead_id) {
+  global $cdg_sql;
+
+  $query = "SELECT *
+    FROM Lead
+    WHERE lead_id='$lead_id'";
+
+  display_debug_msg($query, $cdg_sql, "get_lead_info()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  $res["name"] = $obm_q->f("lead_name");
+  $res["company_id"] = $obm_q->f("lead_company_id");
+  $res["source_id"] = $obm_q->f("lead_source_id");
+  $res["manager_id"] = $obm_q->f("lead_manager_id");
+  $res["date"] = $obm_q->f("lead_date");
+  $res["datealarm"] = $obm_q->f("lead_datealarm");
+  $res["todo"] = $obm_q->f("lead_todo");
+  $res["comment"] = $obm_q->f("lead_comment");
 
   return $res;
 }

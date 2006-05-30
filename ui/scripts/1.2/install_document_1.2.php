@@ -28,7 +28,7 @@ if (! is_dir($cdocument_root)) {
 }
 
 // Check that repository root is writable
-$files = get_file_list($cdocument_root);
+$files = get_admin_data_file_list($cdocument_root);
 $nb = count($files);
 if (! is_writable($cdocument_root)) {
   echo "Document repository root, is not writable. Check user and access rights !\n";
@@ -37,7 +37,7 @@ if (! is_writable($cdocument_root)) {
 
 
 // Check that repository is empty, else alert and exit
-$files = get_file_list($cdocument_root);
+$files = get_admin_data_file_list($cdocument_root);
 $nb = count($files);
 if ($nb > 0) {
   echo "Document repository is not empty ! Install stopped\n";

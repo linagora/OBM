@@ -416,14 +416,14 @@ class OBM_DISPLAY {
 	  // Global field display disposition
 	  //--------------------------------------------------
 	  // Format dates
-	  if (substr($fieldname,0,5) == "date_") {
-	    $name = date_format($this->data_set->f($fieldname));
+	  if (substr($fieldname,0,4) == "date") {
+	    $name = date_format($this->data_set->f($fieldname), 1);
 	  }
 	  elseif ($fieldname == "timeupdate") {
-	    $name = datetime_format($this->data_set->f($fieldname));
+	    $name = datetime_format($this->data_set->f($fieldname), 1);
 	  }
 	  else if ($fieldname == "timecreate") {
-	    $name = datetime_format($this->data_set->f($fieldname));
+	    $name = datetime_format($this->data_set->f($fieldname), 1);
 	  }
 	  
 	  //--------------------------------------------------

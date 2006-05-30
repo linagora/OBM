@@ -155,6 +155,30 @@ function run_query_global_contactfunction() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get Lead sources infos
+// Returns:
+//   $ret[] : [id]=[id][name]
+///////////////////////////////////////////////////////////////////////////////
+function get_global_lead_sources() {
+  global $cdg_sql;
+
+  $query = "SELECT * FROM LeadSource ORDER BY leadsource_label";
+
+  display_debug_msg($query, $cdg_sql, "get_global_lead_sources()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("leadsource_id");
+    $label = $obm_q->f("leadsource_label");
+    $ret[$id] = array("id" => $id, "label" => $label);
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // TaskType list query
 // Parameters :
 //   - $tt_cat : tasktype category
@@ -635,6 +659,27 @@ function get_last_contact_text($id) {
     $obm_q->query($query);
     $obm_q->next_record();
     return $obm_q->f("contact_lastname");
+  }
+
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the lead label from the lead Id
+// Parameters:
+//   - $id : lead id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_lead_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "SELECT lead_name FROM Lead WHERE lead_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("lead_name");
   }
 
   return;

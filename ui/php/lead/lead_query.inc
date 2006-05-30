@@ -21,8 +21,8 @@ function run_query_lead_search($params, $p_new_order="") {
   $company = sql_search_text_parse($params["company"]);
   $date_after = $params["date_after"];
   $date_before = $params["date_before"];
-  $source = $params["source"];
-  $manager = $params["manager"];
+  $source = $params["source_id"];
+  $manager = $params["manager_id"];
   $archive = $params["archive"];
 
   $obm_q = new DB_OBM;
@@ -30,8 +30,15 @@ function run_query_lead_search($params, $p_new_order="") {
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
 
-  $date = sql_date_format($db_type, "lead_date", "lead_date");
-  $datealarm = sql_date_format($db_type, "lead_datealarm", "lead_datealarm");
+  $date = sql_date_format($db_type, "lead_date", "date");
+  $datealarm = sql_date_format($db_type, "lead_datealarm", "datealarm");
+
+  $manager_name[] = array("type" => "field", "value" => "userobm_lastname");
+  $manager_name[] = array("type" => "string", "value" => " ");
+  $manager_name[] = array("type" => "field", "value" => "userobm_firstname");
+  $concat_manager = sql_string_concat($db_type, $manager_name);
+
+  $where .= sql_obm_entity_privacy("lead");
 
   // search criterias :
   if ($text != "") {
@@ -40,7 +47,7 @@ function run_query_lead_search($params, $p_new_order="") {
     $and = "AND";
   }
   if ($company != "") {
-    $where .= " $and company_name $like '$company%'";
+    $where .= sql_global_company_name_advanced_search($company, $like);
     $join_comp = "LEFT JOIN Company ON lead_company_id=company_id";
     $and = "AND";
   }
@@ -79,9 +86,9 @@ function run_query_lead_search($params, $p_new_order="") {
     $datealarm,
     lead_todo,
     company_name,
+    company_zipcode,
     leadsource_label,
-    userobm_lastname,
-    userobm_firstname
+    $concat_manager as manager
   FROM Lead
     LEFT JOIN Company ON lead_company_id=company_id
     LEFT JOIN LeadSource ON lead_source_id=leadsource_id
@@ -118,21 +125,29 @@ function run_query_lead_detail($p_id) {
   $timeupdate = sql_date_format($db_type, "lead_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "lead_timecreate", "timecreate");
   $date = sql_date_format($db_type, "lead_date", "date");
+  $datealarm = sql_date_format($db_type, "lead_datealarm", "datealarm");
+  $manager_name[] = array("type" => "field", "value" => "m.userobm_lastname");
+  $manager_name[] = array("type" => "string", "value" => " ");
+  $manager_name[] = array("type" => "field", "value" => "m.userobm_firstname");
+  $concat_manager = sql_string_concat($db_type, $manager_name);
 
   $query = "SELECT Lead.*,
       $timeupdate,
       $timecreate,
       $date,
+      $datealarm,
       leadsource_label,
       company_name, company_address1, company_zipcode, company_town,
       company_phone,
       c.userobm_login as usercreate,
-      u.userobm_login as userupdate
+      u.userobm_login as userupdate,
+      $concat_manager as manager
     FROM Lead
          LEFT JOIN LeadSource ON lead_source_id=leadsource_id
          LEFT JOIN Company ON lead_company_id=company_id
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
+         LEFT JOIN UserObm as m ON lead_manager_id=m.userobm_id
     WHERE lead_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_detail()");
@@ -158,7 +173,6 @@ function run_query_lead_insert($params) {
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
-
   $source_id = $params["source_id"];
   $manager_id = $params["manager_id"];
   $name = $params["name"];
@@ -250,27 +264,39 @@ function run_query_lead_update($pid, $params) {
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
-
-  $account_id = $params["account"];
-  $kind = $params["kind"];
-  $number = $params["number"];
+  $source_id = $params["source_id"];
+  $manager_id = $params["manager_id"];
+  $name = $params["name"];
   $date = ($params["date"] ? "'".$params["date"]."'" : "null");
-  $amount = $params["amount"];
-  $inout = $params["inout"];
-  $checked = ($params["checked"] == "1" ? "1" : "0");
+  $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");
+  $todo = $params["todo"];
+  $archive = ($params["archive"] == 1 ? "1" : "0");
+  $privacy = ($params["privacy"] == 1 ? "1" : "0");
   $comment = $params["comment"];
+
+  $add_comment = $params["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $params["datecomment"];
+    $today = date("Y-m-d");
+    if ($today == $datecomment) {
+      $datecomment = $now;
+    }
+    $usercomment = $params["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
 
   $query = "UPDATE Lead SET
     lead_timeupdate='$now',
     lead_userupdate='$uid',
+    lead_source_id='$source_id',
     lead_company_id='$company_id',
-    lead_account_id='$account_id',
-    lead_leadkind_id='$kind',
-    lead_amount='$amount',
+    lead_manager_id='$manager_id',
+    lead_name='$name',
     lead_date=$date,
-    lead_inout='$inout',
-    lead_number='$number',
-    lead_checked='$checked',
+    lead_datealarm=$datealarm,
+    lead_todo='$todo',
+    lead_archive='$archive',
+    lead_privacy='$privacy',
     lead_comment='$comment'
   WHERE lead_id='$pid'";
 
@@ -279,30 +305,6 @@ function run_query_lead_update($pid, $params) {
   $retour = $obm_q->query($query);
 
   return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get Lead sources infos
-// Returns:
-//   $ret[] : [id]=[id][name]
-///////////////////////////////////////////////////////////////////////////////
-function get_lead_sources() {
-  global $cdg_sql;
-
-  $query = "SELECT * FROM LeadSource ORDER BY leadsource_label";
-
-  display_debug_msg($query, $cdg_sql, "get_lead_sources()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    $id = $obm_q->f("leadsource_id");
-    $label = $obm_q->f("leadsource_label");
-    $ret[$id] = array("id" => $id, "label" => $label);
-  }
-
-  return $ret;
 }
 
 
@@ -329,7 +331,7 @@ function get_lead_managers($archive = false) {
       userobm_lastname,
       userobm_firstname
     FROM Lead
-      LEFT JOIN UserObm ON lead_manager_id=userobm_id
+      JOIN UserObm ON lead_manager_id=userobm_id
     $where
   ORDER BY userobm_lastname";
 
@@ -343,7 +345,7 @@ function get_lead_managers($archive = false) {
     $ret[$id] = array("id" => $id, "name" => $name);
   }
 
-  return $res;
+  return $ret;
 }
 
 

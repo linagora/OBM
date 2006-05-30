@@ -348,7 +348,7 @@ function get_param_contract() {
   global $tf_num,$sel_market, $sel_tech, $sel_con1, $sel_con2, $ta_clause;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_datebegin,$tf_dateexp,$tf_daterenew,$tf_datecancel,$tf_datesignature;
-  global $hd_usercreate,$cb_archive,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
+  global $cb_archive, $param_deal, $deal_label, $deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town,$l_header_export;
   global $popup, $ext_title, $ext_target, $ext_widget, $ext_widget_text;
   global $cdg_param, $action,$sel_priority,$sel_status,$param_contract;
@@ -390,8 +390,6 @@ function get_param_contract() {
   if (isset ($tf_datecomment)) $contract["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $contract["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $contract["add_comment"] = trim($ta_add_comment);
-  if (isset ($hd_usercreate)) $contract["usercreate"] = $hd_usercreate;
-  if (isset ($hd_timeupdate)) $contract["timeupdate"] = $hd_timeupdate;
   if (isset ($cb_autorenew)) $contract["autorenewal"] = $cb_autorenew;
 
   // Admin - Priority fields
