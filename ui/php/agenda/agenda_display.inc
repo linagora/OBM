@@ -526,7 +526,7 @@ function dis_agenda_year_planning($agenda, $calendar_entity) {
 	    if ($tr_users == 3) {
 	      $dis_event_cal .= "</tr><tr>";   
 	    }
-	    if (is_array($events_data) || is_array($days_events[$id])) {
+	    if (is_array($events_data) || is_array($days_events[$type][$id])) {
 	      $dis_event_cal .= "<td class=\"agendaEventYear\">";
 	      $dis_event_cal .= "<img src=\"".C_IMAGE_PATH."/$set_theme/".$data["image"]."\" alt=\"\"/></td>";
 	    } else {
@@ -702,7 +702,7 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
 	foreach ($entity as $id => $properties) {
 	  $dis_month_cal .= "
             <td><table style=\"height:10%;width:$td_width;\">";
-	  $list_events = $days_events[$id];
+	  $list_events = $days_events[$type][$id];
 	  if ($list_events != null) {
 	    $dis_month_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	    foreach ($list_events as $event) {
@@ -835,14 +835,13 @@ function dis_agenda_week_planning($agenda, $calendar_entity) {
 
     $day = $events[$iso_date];
     $days_events = $day->day_events;
-
     // loop through ["user"], ["resource"]
     $indice = 0;
     foreach ($calendar_entity as $type => $entity) {
       foreach($entity as $id => $properties) {
 	$indice++;
 	$ico = "ico_cal_${type}$indice";
-	$list_events = $days_events[$id];
+        $list_events = $days_events[$type][$id];
 	if ($list_events != null) {
 	  // we store the ALL DAY event for further display
 	  $all_days[$iso_date][$type][$id] = true;
@@ -1007,7 +1006,7 @@ function dis_agenda_day_planning($agenda, $calendar_entity) {
     foreach ($entity as $id => $properties) {
       $indice++;
       $ico = "ico_cal_${type}$indice";
-      $list_events = $days_events[$id];
+      $list_events = $days_events[$type][$id];
       if ($list_events != null) {
 	// we store the ALL DAY event for further display
 	$all_days[$iso_date][$type][$id] = true;

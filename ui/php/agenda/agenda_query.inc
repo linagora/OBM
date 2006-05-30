@@ -2405,7 +2405,7 @@ class Day {
    * @return boolean
    */
   function have_events_between($start,$end,$entity="user") {
-    if (count($this->day_events) > 0) {
+    if (count($this->day_events[$entity]) > 0) {
       return true;
     }
     foreach($this->events as $event) {
