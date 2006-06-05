@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 require("$obminclude/javascript/check_js.inc");
-require_once("$obminclude/of/of_extmod.inc");
 
 $extra_js .= "
 

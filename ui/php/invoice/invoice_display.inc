@@ -1363,9 +1363,6 @@ function dis_invoice_dashboard($invoice) {
 
       <div class=\"detailText\">$block_tt</div>
       <div class=\"searchLabel\">&nbsp;<br>
-        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-        <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-        <input type=\"hidden\" name=\"param_project\" value=\"$proj_id\" />
         <input type=\"hidden\" name=\"year\" value=\"$year\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
@@ -1374,6 +1371,7 @@ function dis_invoice_dashboard($invoice) {
       <div class=\"searchEnd\"></div>
 
     </div>
+    </form>
 
     <div class=\"detailHead\">$l_billed ($l_amount_ht)</div>
 
@@ -1424,9 +1422,7 @@ function dis_invoice_dashboard($invoice) {
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
     <br />
     <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pay_params\" alt=\"\" />
-
 ";
-
 
   return $block;
 } 
@@ -1541,9 +1537,6 @@ function dis_invoice_dashboard_year_to_year($invoice) {
 
       <div class=\"detailText\">$block_tt</div>
       <div class=\"searchLabel\">&nbsp;<br>
-        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-        <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-        <input type=\"hidden\" name=\"param_project\" value=\"$proj_id\" />
         <input type=\"hidden\" name=\"year\" value=\"$year\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />

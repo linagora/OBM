@@ -98,10 +98,54 @@ ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;
 DROP TABLE EntryTemp;
 DROP TABLE PaymentTemp;
 
+
 -------------------------------------------------------------------------------
 -- Update Deal table
 -------------------------------------------------------------------------------
+ALTER TABLE Deal ADD COLUMN deal_source_id integer;
+ALTER TABLE Deal ALTER COLUMN deal_source_id SET DEFAULT 0;
+ALTER TABLE Deal ADD COLUMN deal_source varchar(64);
 ALTER TABLE Deal ADD COLUMN deal_dateend date;
 ALTER TABLE Deal ADD COLUMN deal_commission decimal(4,2);
 ALTER TABLE Deal ALTER COLUMN deal_commission SET DEFAULT 0;
 
+
+-------------------------------------------------------------------------------
+-- Lead module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'LeadSource'
+--
+CREATE TABLE LeadSource (
+  leadsource_id          serial,
+  leadsource_timeupdate  timestamp,
+  leadsource_timecreate  timestamp,
+  leadsource_userupdate  integer default 0,
+  leadsource_usercreate  integer default 0,
+  leadsource_code        varchar(10) default '',
+  leadsource_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (leadsource_id)
+);
+
+
+--
+-- Table structure for the table 'Lead'
+--
+CREATE TABLE Lead (
+  lead_id          serial,
+  lead_timeupdate  timestamp,
+  lead_timecreate  timestamp,
+  lead_userupdate  integer default 0,
+  lead_usercreate  integer default 0,
+  lead_source_id   integer default 0,
+  lead_manager_id  integer default 0,
+  lead_company_id  integer NOT NULL DEFAULT 0,
+  lead_privacy     integer DEFAULT 0,
+  lead_name        varchar(64),
+  lead_date        date,
+  lead_datealarm   date,
+  lead_archive     char(1) DEFAULT '0',
+  lead_todo        varchar(128),
+  lead_comment     text,
+  PRIMARY KEY (lead_id)
+);

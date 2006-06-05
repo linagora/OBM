@@ -22,7 +22,6 @@ $l_inout = "Type";
 $l_both = "All";
 $l_tax_rate = "Tax rate";
 $l_compute_tax = "Calculate the taxed amount";
-$l_potential = "Potential";
 $l_include_archive = "Include archives";
 
 $l_select_invoice = "Select the invoice";
@@ -34,6 +33,7 @@ $l_list_payment = "payments related to this invoice";
 
 $l_invoice_infos = "Informations about the invoice";
 $l_affect = "Affect";
+$l_year_to_year = "Years comparison";
 
 // Actions 
 $l_insert= "Insert Invoice";

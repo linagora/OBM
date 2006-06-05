@@ -457,42 +457,6 @@ function get_invoice_payment ($p_invoice, $not_paid=0) {
 }
 
 
-/*
-///////////////////////////////////////////////////////////////////////////////
-// add a payment to an invoice
-///////////////////////////////////////////////////////////////////////////////
-function run_query_add_payment ($p_invoice_id, $p_payment_id, $p_amount){
-  global $auth, $cdg_sql;
-  $db = new DB_OBM;
-  $query = "insert into PaymentInvoice (paymentinvoice_invoice_id, paymentinvoice_payment_id, paymentinvoice_amount, paymentinvoice_usercreate) values('".$p_invoice_id."', '".$p_payment_id."', '".$p_amount."', '".$auth->auth["uid"]."')";
-
-  display_debug_msg ($query, $cdg_sql);
-  $db->query($query);
-
-  // we update the payment too, the payment_amount_used has changed...
-  $query = "update Payment set payment_amount_used = (payment_amount_used + ".$p_amount.") where payment_id = '".$p_payment_id."'";
-}
-*/
-
-/*
-should be considered deprecated...
-///////////////////////////////////////////////////////////////////////////////
-// delete a connection between a payment and an invoice.
-// if $p_payment_id == "", delete all data about that invoice
-///////////////////////////////////////////////////////////////////////////////
-function run_query_remove_payment ($p_invoice_id, $p_payment_id=""){
-  global $cdg_sql;
-  $db = new DB_OBM;
-  $query = "delete from PaymentInvoice where paymentinvoice_invoice_id = '$p_invoice_id'";
-  if ($p_payment_id != ""){
-    $query .= "and  paymentinvoice_payment_id='$p_payment_id'";
-  }
-  display_debug_msg ($query, $cdg_sql);
-  $db->query($query);
-}
-*/
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Invoice Deletion query execution
 // Parameters:

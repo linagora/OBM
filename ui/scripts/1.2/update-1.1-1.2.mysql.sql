@@ -89,7 +89,7 @@ DROP TABLE IF EXISTS PaymentTemp;
 ALTER TABLE Deal ADD COLUMN deal_source_id int(8) DEFAULT 0 AFTER deal_technicalmanager_id;
 ALTER TABLE Deal ADD COLUMN deal_source varchar(64) AFTER deal_source_id;
 ALTER TABLE Deal ADD COLUMN deal_dateend date AFTER deal_dateexpected;
-ALTER TABLE Deal ADD COLUMN deal_commission decimal(4,2) DEFAULT 0 AFTER deal_amount;
+ALTER TABLE Deal ADD COLUMN deal_commission decimal(5,2) DEFAULT 0 AFTER deal_amount;
 
 
 -------------------------------------------------------------------------------

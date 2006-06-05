@@ -11,8 +11,6 @@
 // Deal Search query execution 
 // Parameters :
 //   - $deal[]   : deal search criteria
-//     keys used      : parent, label, company_name, archive, kind, cat, status
-//                      manager, dateafter, datebefore
 //   - $all : if it is set to 1 then return also the private deals ...
 //   - $p_new_order  : if it's set, it replaces the default "order by" value
 //   - $p_order_dir  : direction for order clause (asc, desc)
@@ -31,8 +29,8 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $cat = $deal["category"];
   $status = $deal["status"];
   $manager = $deal["manager"];
-  $dateafter = $deal["dateafter"];
-  $datebefore = $deal["datebefore"];
+  $date_after = $deal["date_after"];
+  $date_before = $deal["date_before"];
   $contact_id = $deal["contact_id"];
 
   $obm_q = new DB_OBM;
@@ -77,11 +75,11 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
   if (($status != $c_all) && ($status != "")) {
     $where .= " AND deal_status_id='$status'";
   }
-  if ($dateafter != "") {
-    $where .= " AND deal_datealarm > '$dateafter'";
+  if ($date_after != "") {
+    $where .= " AND deal_datealarm > '$date_after'";
   }
-  if ($datebefore != "") {
-    $where .= " AND deal_datealarm < '$datebefore'";
+  if ($date_before != "") {
+    $where .= " AND deal_datealarm < '$date_before'";
   }
   if ($archive != "1") {
     $where .= " AND deal_archive=0";
@@ -722,8 +720,8 @@ function run_query_deal_potential($users_id="") {
       count(*) as nb,
       sum(deal_amount) as amount,
       sum(deal_amount * deal_hitrate / 100) as amount_balanced,
-      sum(deal_amount * deal_commission) as commission,
-      sum(deal_amount * deal_commission * deal_hitrate / 100) as commission_balanced,
+      sum(deal_amount * deal_commission / 100) as commission,
+      sum(deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
       userobm_lastname,
       userobm_firstname
     FROM Deal
@@ -745,6 +743,8 @@ function run_query_deal_potential($users_id="") {
 
   $am = 0;
   $ab = 0;
+  $cm = 0;
+  $cb = 0;
   $nb = 0;
 
   while ($obm_q->next_record()) {
@@ -757,19 +757,25 @@ function run_query_deal_potential($users_id="") {
     $res["market"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
     $am += $res["market"]["$u_id"]["amount"];
     $ab += $res["market"]["$u_id"]["amount_balanced"];
+    $cm += $res["market"]["$u_id"]["commission"];
+    $cb += $res["market"]["$u_id"]["commission_balanced"];
     $nb += $res["market"]["$u_id"]["number"];
   }
 
   $res["market"]["0"]["amount"] = $am;
   $res["market"]["0"]["amount_balanced"] = $ab;
+  $res["market"]["0"]["commission"] = $cm;
+  $res["market"]["0"]["commission_balanced"] = $cb;
   $res["market"]["0"]["number"] = $nb;
 
-  // Tech manager stats
+  // Tech manager board
   $query = "SELECT
       deal_technicalmanager_id AS uid,
       count(*) as nb,
       sum(deal_amount) as amount,
       sum(deal_amount * deal_hitrate / 100) as amount_balanced,
+      sum(deal_amount * deal_commission / 100) as commission,
+      sum(deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
       userobm_lastname,
       userobm_firstname
     FROM Deal
@@ -791,22 +797,156 @@ function run_query_deal_potential($users_id="") {
 
   $am = 0;
   $ab = 0;
+  $cm = 0;
+  $cb = 0;
   $nb = 0;
 
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f("uid");
     $res["tech"]["$u_id"]["amount"] = $obm_q->f("amount");
     $res["tech"]["$u_id"]["amount_balanced"] = $obm_q->f("amount_balanced");
+    $res["tech"]["$u_id"]["commission"] = $obm_q->f("commission");
+    $res["tech"]["$u_id"]["commission_balanced"] = $obm_q->f("commission_balanced");
     $res["tech"]["$u_id"]["number"] = $obm_q->f("nb");
     $res["tech"]["$u_id"]["name"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
     $am += $res["tech"]["$u_id"]["amount"];
     $ab += $res["tech"]["$u_id"]["amount_balanced"];
+    $cm += $res["tech"]["$u_id"]["commission"];
+    $cb += $res["tech"]["$u_id"]["commission_balanced"];
     $nb += $res["tech"]["$u_id"]["number"];
   }
 
   $res["tech"]["0"]["amount"] = $am;
   $res["tech"]["0"]["amount_balanced"] = $ab;
+  $res["tech"]["0"]["commission"] = $cm;
+  $res["tech"]["0"]["commission_balanced"] = $cb;
   $res["tech"]["0"]["number"] = $nb;
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get global Deal infos
+// Parameters:
+//   - $date_range  : array [date_start, date_end] for classification only
+//   - $target_date : deal_dateexpected, deal_dateend : date to sort
+//   - $users_id    : array of marketing User id (empty for all deals)
+//   - $sel_tt      : [optionnal] tasktype array filter
+// Returns:
+//     $res : array[date][u_id]([amount]|[balanced]|[commission][commission_ba])
+//            total in u_id=0
+//                 [users_id] = array(u_id)
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpected", $users_id="", $sel_tt="") {
+  global $cdg_sql, $cdg_param;
+  global $l_total;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $dexp = sql_date_format($db_type, "deal_dateexpected", "dateexpected");
+  $dend = sql_date_format($db_type, "deal_dateend", "dateend");
+
+  if (is_array($date_range)) {
+    $past = $date_range[0];
+    $future = $date_range[1];
+  }
+
+  // Tasktype filter
+  if (is_array($sel_tt)) {
+    $where_tt .= " AND (";
+    $or = "";
+    foreach ($sel_tt as $tt_id) {
+      $where_tt .= "$or deal_tasktype_id='$tt_id'";
+      $or = " OR";
+    }
+    $where_tt .= ")";
+  }
+
+  if ((is_array($users_id)) && (count($users_id) > 0)) {
+    $where_market_uid = "AND (";
+    $or = "";
+    foreach ($users_id as $u_id) {
+      $where_market_uid .= " $or deal_marketingmanager_id='$u_id'";
+      $or = "OR";
+    }
+    $where_market_uid .= ")";
+  }
+
+  $query = "SELECT
+      $dexp,
+      $dend,
+      deal_marketingmanager_id AS uid,
+      deal_amount,
+      (deal_amount * deal_hitrate / 100) as amount_balanced,
+      (deal_amount * deal_commission / 100) as commission,
+      (deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
+      userobm_lastname,
+      userobm_firstname
+    FROM Deal
+      LEFT JOIN DealType ON deal_type_id = dealtype_id
+      LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
+    WHERE dealtype_inout = '+'
+      AND deal_hitrate > 0
+      AND deal_hitrate < 100
+      AND deal_archive = '0'
+      $where_market_uid
+      $where_tt
+    ORDER BY
+      $target_date
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_deal_dashboard_infos()");
+  $obm_q->query($query);
+
+  $res_users = array();
+  $am = 0;
+  $ab = 0;
+  $cm = 0;
+  $cb = 0;
+  $nb = 0;
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f("uid");
+    if (! in_array($u_id, $res_users)) {
+      $res_users[] = $u_id;
+    }
+    $am = $obm_q->f("deal_amount");
+    $ab = $obm_q->f("amount_balanced");
+    $ca = $obm_q->f("commission");
+    $cb = $obm_q->f("commission_balanced");
+    $end_date = isodate_format($obm_q->f("dateend"), 1);
+    $exp_date = isodate_format($obm_q->f("dateexpected"), 1);
+    if ($target_date == "deal_dateexpected") {
+      $date_used = $exp_date;
+    } else {
+      $date_used = $end_date;
+    }
+    if ($date_used == "") {
+      $month = "no_date";
+    } else if ($date_used < $past) {
+      $month = "past";
+    } else if ($date_used > $future) {
+      $month = "future";
+    } else {
+      $month = substr($date_used, 0, 7);
+    }
+
+    $res[$month]["$u_id"]["amount"] += $am;
+    $res[$month]["$u_id"]["amount_balanced"] += $ab;
+    $res[$month]["$u_id"]["commission"] += $ca;
+    $res[$month]["$u_id"]["commission_balanced"] += $cb;
+    $res[$month]["$u_id"]["number"] ++;
+    $res["name"]["$u_id"] = $obm_q->f("userobm_lastname") . " " . $obm_q->f("userobm_firstname");
+
+    $res[$month][0]["amount"] += $am;
+    $res[$month][0]["amount_balanced"] += $ab;
+    $res[$month][0]["commission"] += $ca;
+    $res[$month][0]["commission_balanced"] += $cb;
+    $res[$month][0]["number"] ++;
+  }
+
+  $res["users_id"] = $res_users;
 
   return $res;
 }
@@ -818,23 +958,39 @@ function run_query_deal_potential($users_id="") {
 //   - $deal[]   : deal hash info
 //   - $users_id : array of User id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_stats($deal, $users_id="") {
+function run_query_deal_dashboard_list($deal, $users_id="") {
   global $cdg_sql, $cdg_param, $ctu_sql_limit;
+
+  $date_after = $deal["date_after"];
+  $date_before = $deal["date_before"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
+  $datebegin = sql_date_format($db_type, "deal_datebegin", "deal_datebegin");
   $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
+  $dateexp = sql_date_format($db_type, "deal_dateexpected", "deal_dateexpected");
+  $dateend = sql_date_format($db_type, "deal_dateend", "deal_dateend");
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
     $where_uid = "AND (";
     $or = "";
     foreach ($users_id as $u_id) {
       $where_uid .= " $or deal_marketingmanager_id='$u_id'";
-      $where_uid .= " OR deal_technicalmanager_id='$u_id'";
       $or = "OR";
     }
     $where_uid .= ")";
+  }
+ 
+  if ($date_before == "0000-00-00") {
+    $where_date .= " AND deal_dateexpected IS NULL";
+  } else {
+    if ($date_after != "") {
+      $where_date .= " AND deal_dateexpected >= '$date_after'";
+    }
+    if ($date_before != "") {
+      $where_date .= " AND deal_dateexpected <= '$date_before'";
+    }
   }
 
   // Order by clause
@@ -848,31 +1004,42 @@ function run_query_deal_stats($deal, $users_id="") {
       deal_id as id,
       deal_marketingmanager_id AS uid,
       deal_label,
+      deal_source_id,
+      deal_source,
+      deal_commission,
       deal_amount,
       deal_hitrate,
+      $datebegin,
       $datealarm,
+      $dateexp,
+      $dateend,
+      deal_archive,
+      deal_todo,
+      deal_privacy,
+      dealtype_label,
+      leadsource_label,
       company_name as deal_company_name,
       company_zipcode as deal_company_zipcode,
-      dealtype_label,
       tasktype_label,
       dealstatus_label,
-      deal_todo,
       userobm_lastname as deal_marketingmanager
     FROM Deal
       LEFT JOIN Company ON deal_company_id = company_id
       LEFT JOIN DealType ON deal_type_id = dealtype_id
       LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id 
       LEFT JOIN DealStatus ON deal_status_id = dealstatus_id
+      LEFT JOIN LeadSource ON deal_source_id=leadsource_id
       LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
     WHERE dealtype_inout = '+'
       AND deal_hitrate > 0
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_uid
+      $where_date
     $orderq
     $limit
 ";
-  
+
   if ($ctu_sql_limit) {
     $query_count = "SELECT count(deal_id)
     FROM Deal
@@ -884,12 +1051,13 @@ function run_query_deal_stats($deal, $users_id="") {
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_uid
+      $where_date
 ";
     $count = get_query_count($query_count);
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, "run_query_deal_stats()");
+    display_debug_msg($query, $cdg_sql, "run_query_deal_dashboard_list()");
     $obm_q->query($query);
   }
 

@@ -277,7 +277,7 @@ function dis_deal_portal() {
     <div>
     <table>
     <tr>
-      <td><a href=\"".url_prepare("deal/deal_index.php?action=stats&amp;sel_manager=$uid")."\">$l_my_deal_current</a></td>
+      <td><a href=\"".url_prepare("deal/deal_index.php?action=dashboard&amp;sel_manager=$uid")."\">$l_my_deal_current</a></td>
       <td class=\"number\">$m_nb_potential / $t_nb_potential</td>
     </tr><tr>
       <td>$l_deal_total</td>

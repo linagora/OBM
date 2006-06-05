@@ -473,6 +473,47 @@ CREATE TABLE ContactCategory5 (
 
 
 -------------------------------------------------------------------------------
+-- Lead module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'LeadSource'
+--
+CREATE TABLE LeadSource (
+  leadsource_id          serial,
+  leadsource_timeupdate  timestamp,
+  leadsource_timecreate  timestamp,
+  leadsource_userupdate  integer default 0,
+  leadsource_usercreate  integer default 0,
+  leadsource_code        varchar(10) default '',
+  leadsource_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (leadsource_id)
+);
+
+
+--
+-- Table structure for the table 'Lead'
+--
+CREATE TABLE Lead (
+  lead_id          serial,
+  lead_timeupdate  timestamp,
+  lead_timecreate  timestamp,
+  lead_userupdate  integer default 0,
+  lead_usercreate  integer default 0,
+  lead_source_id   integer default 0,
+  lead_manager_id  integer default 0,
+  lead_company_id  integer NOT NULL DEFAULT 0,
+  lead_privacy     integer DEFAULT 0,
+  lead_name        varchar(64),
+  lead_date        date,
+  lead_datealarm   date,
+  lead_archive     char(1) DEFAULT '0',
+  lead_todo        varchar(128),
+  lead_comment     text,
+  PRIMARY KEY (lead_id)
+);
+
+
+-------------------------------------------------------------------------------
 -- Deal module tables
 -------------------------------------------------------------------------------
 --

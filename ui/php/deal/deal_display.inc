@@ -26,7 +26,7 @@ $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_source"] = $l_source;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
-$fieldnames["deal_commission"] = $l_commission;
+$fieldnames["deal_commission"] = $l_commission_p;
 $fieldnames["deal_amount"] = $l_amount;
 $fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["parentdeal_label"] = $l_label;
@@ -138,9 +138,10 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "expected_quarter") {
     $date = $OD->data_set->f("deal_dateexpected");
     if ($date != "") {
+      $year = get_year($date);
       $month = get_month($date);
       $q = floor(($month-1) / 3) + 1;
-      $quarter = "$l_quarter$q";
+      $quarter = "$year$l_quarter$q";
       $res["align"] = "center";
       $res["name"] = $quarter;
     }
@@ -236,8 +237,6 @@ function dis_deal_search_form($deal="") {
 // XHTML Display Deal search form
 // Parameters : 
 //   - $deal[]     : default form values
-//     keys used   : parent, label, company_name, archive, kind, cat, status,
-//                   manager, dateafter, datebefore
 //   - $kind_q     : DB result object (deal kind list)
 //   - $tts        : tasktype array
 //   - $cats1      : array with deal category 1 list 
@@ -263,8 +262,8 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
   $cat1 = $deal["category1"];
   $status = $deal["status"];
   $manager = $deal["manager"];
-  $dateafter = stripslashes($deal["dateafter"]);
-  $datebefore = stripslashes($deal["datebefore"]);
+  $date_after = stripslashes($deal["date_after"]);
+  $date_before = stripslashes($deal["date_before"]);
   $company_id = $deal["company"];
 
   // Kind select construction
@@ -361,7 +360,7 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $stat_q, $manager_q
       <input name=\"tf_zip\" size=\"14\" value=\"$zip\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_dateafter','$dateafter')</script>
+      <script>calendar('tf_date_after','$date_after')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
       <script>calendar('tf_datebefore','$datebefore')</script>
@@ -490,8 +489,6 @@ function dis_deal_search_list($deal) {
 //   - $deal_q   : list of deals
 //   - $prefs    : fields to display in the list of deals 
 //   - $deal[]   : deal search criteria
-//     keys used : parent, label, company_name, archive, kind, tt, status,
-//                 manager, dateafter, datebefore
 //////////////////////////////////////////////////////////////////////////////
 function html_deal_search_list($deal_q, $prefs, $deal) {
   global $l_close;
@@ -507,8 +504,8 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $cat1 = $deal["category1"];
   $status = $deal["status"];
   $manager = $deal["manager"];
-  $dateafter = stripslashes($deal["dateafter"]);
-  $datebefore = stripslashes($deal["datebefore"]);
+  $date_after = stripslashes($deal["date_after"]);
+  $date_before = stripslashes($deal["date_before"]);
   $param_comp = $deal["company"];
   
   if ($popup) {
@@ -521,7 +518,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_category1=$cat1&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_category1=$cat1&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;param_parent=$parent&param_company=$param_comp$url_ext");
 
   $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   if ($popup) {
@@ -732,9 +729,9 @@ function html_deal_consult($deal_q) {
   global $set_theme, $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_label, $l_kind;
   global $l_tt,$l_marketing_manager,$l_technical_manager, $l_source;
-  global $l_number, $l_amount,$l_hitrate, $l_commission, $l_sale_delay;
+  global $l_number, $l_amount,$l_hitrate, $l_commission_p, $l_sale_delay;
   global $l_status,$l_archive,$l_comment;
-  global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
+  global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_quarter;
   global $l_parentdeal,$l_todo, $l_deal;
   global $display, $path, $auth, $c_yes, $c_no;
 
@@ -747,8 +744,9 @@ function html_deal_consult($deal_q) {
   $dateexpected = date_format($deal_q->f("dateexpected"), 1);
   if ($dateexpected != "") {
     $month_exp = get_month($deal_q->f("dateexpected"));
+    $year_exp = get_year($deal_q->f("dateexpected"));
     $q = floor(($month_exp-1) / 3) + 1;
-    $quarter_exp = "(T$q)";
+    $quarter_exp = "($year_exp$l_quarter$q)";
   }
   if (($datebegin != "") && ($dateexpected != "")) {
     $sale_delay = floor(($deal_q->f("dateexpected") - $deal_q->f("datebegin")) / 86400);
@@ -757,8 +755,9 @@ function html_deal_consult($deal_q) {
   $dateend = date_format($deal_q->f("dateend"), 1);
   if ($dateend != "") {
     $month_end = get_month($deal_q->f("dateend"));
+    $year_end = get_year($deal_q->f("dateend"));
     $q = floor(($month_end-1) / 3) + 1;
-    $quarter_end = "(T$q)";
+    $quarter_end = "($year_end$l_quarter$q)";
   }
   $kind = $deal_q->f("dealtype_label");
   $tt_label = $deal_q->f("tasktype_label");
@@ -820,7 +819,7 @@ function html_deal_consult($deal_q) {
         <td class=\"detailLabel\">$l_tt</td>
         <td class=\"detailText\">$tt_label</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_commission</td>
+        <td class=\"detailLabel\">$l_commission_p</td>
         <td class=\"detailText\">$commission</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_marketing_manager</td>
@@ -1012,9 +1011,9 @@ function dis_deal_form($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$tts,$sources,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
-  global $c_php_isodate_format, $l_update,$l_insert;
-  global $l_deal, $l_dates, $l_company,$l_label,$l_number,$l_kind, $l_private;
-  global $l_tt, $l_cat,$l_marketing_manager,$l_technical_manager,$l_commission;
+  global $c_php_isodate_format, $l_update,$l_insert, $l_private, $l_cat;
+  global $l_deal, $l_dates, $l_company, $l_label, $l_number, $l_kind;
+  global $l_tt, $l_marketing_manager, $l_technical_manager, $l_commission_p;
   global $l_amount,$l_hitrate, $l_contact,$l_status, $l_archive, $l_todo;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment;
@@ -1384,7 +1383,7 @@ $js_status_loop
       <td class=\"detailLabel\">$l_tt</td>
       <td class=\"detailForm\">$sel_tt</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_commission</td>
+      <td class=\"detailLabel\">$l_commission_p</td>
       <td class=\"detailForm\"><input name=\"tf_commission\" type=\"text\" size=\"5\" value=\"$commission\" /> %</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>
@@ -1745,16 +1744,61 @@ function html_deal_affect($parent_q, $p_deal_id) {
 
     return $block;
 }
-         
-	  
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the deal dashboard Index
+// Parameters:
+//   - $deal : deal hash infos
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_dashboard_index($deal) {
+  global $display, $set_theme, $path;
+  global $l_deal, $l_header_dashboard, $l_potential, $l_year_detail;
+
+  $view = $deal["dash_view"];
+  $url_total = url_prepare("deal_index.php?action=dashboard");
+  $url_year = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail");
+
+  $display["title"] = "<div class=\"title\">$l_deal : $l_header_dashboard</div>";
+
+  $block = "
+    <div class=\"detailText\"><a href=\"$url_total\">$l_potential</a></div>
+    <div class=\"detailText\"><a href=\"$url_year\">$l_year_detail</a></div>
+";
+
+   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the deal dashboard view
+// Parameters:
+//   - $deal : deal hash infos
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_dashboard_view($deal) {
+  global $display;
+
+  $view = $deal["dash_view"];
+
+  if ($view != "") {
+    $func = "dis_deal_dashboard_$view";
+    $block .= $func($deal);
+  } else {
+    $block .= dis_deal_dashboard_potential($deal);
+  }
+ 
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display The Deal potential block
 // Parameters:
 //   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_potential($deal) {
-  global $display, $set_theme, $l_total;
-  global $l_deal, $l_forecast, $l_deal_total, $l_module_deal, $l_deal_balanced;
+function dis_deal_dashboard_potential($deal) {
+  global $display, $set_theme, $l_deal, $l_module_deal, $l_total, $l_deal_total;
+  global $l_forecast, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
 
   $display["title"] = "<div class=\"title\">$l_deal : $l_forecast</div>";
@@ -1776,20 +1820,26 @@ function dis_deal_potential($deal) {
 	$data = "data" . ($cpt % 2);
 	$amount = number_format($pu["amount"]);
 	$balanced = number_format($pu["amount_balanced"]);
+	$commission = number_format($pu["commission"]);
+	$commission_balanced = number_format($pu["commission_balanced"]);
 	$nb_potential = $pu["number"];
 	$user = $pu["name"];
 	$dis_market_pot .= "
       <tr class=\"$data\">
         <td>$user</td>
-        <td style=\"text-align: center;\">$nb_potential</td>
-        <td style=\"text-align: right;\">$amount</td>
-        <td style=\"text-align: right;\">$balanced</td>
+        <td style=\"text-align: center;\">$nb_potential&nbsp;</td>
+        <td style=\"text-align: right;\">$amount&nbsp;</td>
+        <td style=\"text-align: right;\">$balanced&nbsp;</td>
+        <td style=\"text-align: right;\">$commission&nbsp;</td>
+        <td style=\"text-align: right;\">$commission_balanced&nbsp;</td>
       </tr>";
       }
     }
 
     $m_amount = number_format($potentials["market"]["0"]["amount"]);
     $m_balanced = number_format($potentials["market"]["0"]["amount_balanced"]);
+    $m_commission = number_format($potentials["market"]["0"]["commission"]);
+    $m_commission_balanced = number_format($potentials["market"]["0"]["commission_balanced"]);
     $m_nb_potential = $potentials["market"]["0"]["number"];
   }
 
@@ -1800,20 +1850,26 @@ function dis_deal_potential($deal) {
 	$data = "data" . ($cpt % 2);
 	$amount = number_format($pu["amount"]);
 	$balanced = number_format($pu["amount_balanced"]);
+	$commission = number_format($pu["commission"]);
+	$commission_balanced = number_format($pu["commission_balanced"]);
 	$nb_potential = $pu["number"];
 	$user = $pu["name"];
 	$dis_tech_pot .= "
       <tr class=\"$data\">
         <td>$user</td>
-        <td style=\"text-align: center;\">$nb_potential</td>
-        <td style=\"text-align: right;\">$amount</td>
-        <td style=\"text-align: right;\">$balanced</td>
+        <td style=\"text-align: center;\">$nb_potential&nbsp;</td>
+        <td style=\"text-align: right;\">$amount&nbsp;</td>
+        <td style=\"text-align: right;\">$balanced&nbsp;</td>
+        <td style=\"text-align: right;\">$commission&nbsp;</td>
+        <td style=\"text-align: right;\">$commission_balanced&nbsp;</td>
       </tr>";
       }
     }
 
     $t_amount = number_format($potentials["tech"]["0"]["amount"]);
     $t_balanced = number_format($potentials["tech"]["0"]["amount_balanced"]);
+    $t_commission = number_format($potentials["tech"]["0"]["commission"]);
+    $t_commission_balanced = number_format($potentials["tech"]["0"]["commission_balanced"]);
     $t_nb_potential = $potentials["tech"]["0"]["number"];
   }
 
@@ -1824,13 +1880,17 @@ function dis_deal_potential($deal) {
       <td class=\"resultHead\"># $l_module_deal</td>
       <td class=\"resultHead\">$l_deal_total</td>
       <td class=\"resultHead\">$l_deal_balanced</td>
+      <td class=\"resultHead\">$l_commission</td>
+      <td class=\"resultHead\">$l_commission_balanced</td>
     </tr>
     $dis_market_pot
     <tr class=\"data2\">
       <td>$l_total</td>
-      <td style=\"text-align: center;\">$m_nb_potential</td>
-      <td style=\"text-align: right;\">$m_amount</td>
-      <td style=\"text-align: right;\">$m_balanced</td>
+      <td style=\"text-align: center;\">$m_nb_potential&nbsp;</td>
+      <td style=\"text-align: right;\">$m_amount&nbsp;</td>
+      <td style=\"text-align: right;\">$m_balanced&nbsp;</td>
+      <td style=\"text-align: right;\">$m_commission&nbsp;</td>
+      <td style=\"text-align: right;\">$m_commission_balanced&nbsp;</td>
     </tr>
     </table>
     <p />
@@ -1840,26 +1900,20 @@ function dis_deal_potential($deal) {
       <td class=\"resultHead\"># $l_module_deal</td>
       <td class=\"resultHead\">$l_deal_total</td>
       <td class=\"resultHead\">$l_deal_balanced</td>
+      <td class=\"resultHead\">$l_commission</td>
+      <td class=\"resultHead\">$l_commission_balanced</td>
     </tr>
     $dis_tech_pot
     <tr class=\"data2\">
       <td>$l_total</td>
-      <td style=\"text-align: center;\">$t_nb_potential</td>
-      <td style=\"text-align: right;\">$t_amount</td>
-      <td style=\"text-align: right;\">$t_balanced</td>
+      <td style=\"text-align: center;\">$t_nb_potential&nbsp;</td>
+      <td style=\"text-align: right;\">$t_amount&nbsp;</td>
+      <td style=\"text-align: right;\">$t_balanced&nbsp;</td>
+      <td style=\"text-align: right;\">$t_commission&nbsp;</td>
+      <td style=\"text-align: right;\">$t_commission_balanced&nbsp;</td>
     </tr>
     </table>";
-
-  if (count($deals) > 0) {
-    foreach ($deals as $status => $nb) {
-      $dis_status .= "
-    <tr>
-      <td>$status</td>
-      <td class=\"number\">$nb</td>
-    </tr>";
-    }
-  }
-
+  
   $msg = display_info_msg($l_help_deal_forecast);
 
   $block = "$msg
@@ -1871,18 +1925,403 @@ function dis_deal_potential($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the deal dashboard year detail
+// Parameters:
+//   - $deal     : deal hash infos
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_dashboard_year_detail($deal) {
+  global $display, $set_theme, $path, $ctt_sales;
+  global $l_total, $l_date, $l_amount_ht, $l_amount_ttc;
+  global $l_potential, $l_expected, $l_monthsofyearshort;
+  global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
+  global $l_execute;
+
+  $users_id = $deal["manager"];
+
+  if (isset($deal["year"])) {
+    $year = $deal["year"];
+  } else {
+    $year = date("Y");
+  }
+  $year_prev = $year - 1;
+  $year_next = $year + 1;
+  $date_range = array("$year-01-01", "$year-12-31");
+  $d = run_query_deal_dashboard_infos($date_range, "deal_dateexpected", "", $deal["sel_tt"]);
+  $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_prev");
+  $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_next");
+
+  // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
+  $tt_ids = $deal["sel_tt"];
+  if (! is_array($tt_ids) && ($tt_ids == "")) {
+    $tt_ids = "0";
+  } else {
+    foreach ($tt_ids as $tt_id) {
+      $url_sel_tt .= "&amp;sel_tt[]=$tt_id";
+    }
+  }
+
+  $tts = get_global_tasktype($ctt_sales, $tt_ids);
+
+  $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
+  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
+
+  // Table header
+  for ($month = 1; $month < 13; $month++) {
+    $label = $l_monthsofyearshort[$month - 1];
+    $dis_row_head .= "
+      <td class=\"resultHead\">$label</td>";
+  }
+
+  if ((is_array($users_id)) && (count($users_id) > 0)) {
+    $users = $users_id;
+  } else {
+    $users = $d["users_id"];
+  }
+  if ((is_array($users)) && (count($users) > 0)) {
+    foreach ($users as $m_id) {
+      $url_sel_manager .= "&amp;sel_manager[]=$m_id";
+    }
+  } else if ($users != "") {
+    $url_sel_manager .= "&amp;sel_manager[]=$users";
+  }
+
+  // prepare columns (no_date, past, monthes 1-12, future)
+  $cols = array ("no_date" => "no_date", "past" => "past");
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $cols[$month] = "$year_month";
+   }
+  $cols["future"] = "future";
+  
+
+  // Loop through users (rows)
+  foreach ($users as $u_id) {
+    $u_name = $d["name"][$u_id];
+    $tam = 0;
+    $tab = 0;
+    $tca = 0;
+    $tcb = 0;
+
+    $dis_user_row = "<tr class=\"resultHead\">
+      <td class=\"resultHead\" colspan=\"17\">$u_name</td>
+    </tr>";
+    $dis_amount_row = "<tr class=\"data0\">
+      <td>$l_amount</td>";
+    $dis_balanced_row = "<tr class=\"data1\">
+      <td>$l_deal_balanced</td>";
+    $dis_commission_row = "<tr class=\"data0\">
+      <td>$l_commission</td>";
+    $dis_commission_balanced_row = "<tr class=\"data1\">
+      <td>$l_commission_balanced</td>";
+
+    // Loop through each cols
+    foreach ($cols as $month => $col) {
+
+      // special color for "past", "future" and "no_date" cols
+      if (is_numeric($month)) {
+	$class_am = "data0";
+	$class_ab = "data1";
+	$class_ca = "data0";
+	$class_cb = "data1";
+      } else {
+	$class_am = "data0";
+	$class_ab = "data0";
+	$class_ca = "data0";
+	$class_cb = "data0";
+      }
+
+      if (is_array($d["$col"][$u_id])) {
+	$am = $d["$col"][$u_id]["amount"];
+	$ab = $d["$col"][$u_id]["amount_balanced"];
+	$ca = $d["$col"][$u_id]["commission"];
+	$cb = $d["$col"][$u_id]["commission_balanced"];
+
+	// "past", "future" and "no date" not in Total
+	if (is_numeric($month)) {
+	  $tam += $am;
+	  $tab += $ab;
+	  $tca += $ca;
+	  $tcb += $cb;
+	}
+
+	$dis_am = number_format($am, 2, ",", " ");
+	$dis_ab = number_format($ab, 2, ",", " ");
+	$dis_ca = number_format($ca, 2, ",", " ");
+	$dis_cb = number_format($cb, 2, ",", " ");
+
+	if ($am >= 0) {
+	  if ($month  == "no_date") {
+	    $url_date = "&amp;tf_date_before=0000-00-00";
+	  } else if ($month == "past") {
+	    $month_start = "$year-01-01";
+	    $url_date = "&amp;tf_date_before=$month_start";
+	  } else if ($month == "future") {
+	    $month_end = "$year-12-31";
+	    $url_date = "&amp;tf_date_after=$month_end";
+	  } else {
+	    $month_start = "$col-01";
+	    $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+	    $url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
+	  }
+	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cb_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+	}
+
+	$dis_amount_row .= "
+          <td class=\"$class_am\" style=\"text-align: right;\">$dis_am</td>";
+	$dis_balanced_row .= "
+          <td class=\"$class_ab\" style=\"text-align: right;\">$dis_ab</td>";
+	$dis_commission_row .= "
+          <td class=\"$class_ca\" style=\"text-align: right;\">$dis_ca</td>";
+	$dis_commission_balanced_row .= "
+          <td class=\"$class_cb\" style=\"text-align: right;\">$dis_cb</td>";
+      } else {
+	$dis_amount_row .= "<td class=\"$class_am\"> </td>";
+	$dis_balanced_row .= "<td class=\"$class_ab\"> </td>";
+	$dis_commission_row .= "<td class=\"$class_ca\"> </td>";
+	$dis_commission_balanced_row .= "<td class=\"$class_cb\"> </td>";
+      }
+    }
+
+    $dis_tam = number_format($tam, 2, ",", " ");
+    $dis_tab = number_format($tab, 2, ",", " ");
+    $dis_tca = number_format($tca, 2, ",", " ");
+    $dis_tcb = number_format($tcb, 2, ",", " ");
+
+    $dis_amount_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tam</td>
+      </tr>";
+    $dis_balanced_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tab</td>
+      </tr>";
+    $dis_commission_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tca</td>
+      </tr>";
+    $dis_commission_balanced_row .= "<td class=\"data2\" style=\"text-align: right;\">$dis_tcb</td>
+      </tr>";
+
+    $dis_year_detail .= "
+      $dis_user_row
+      $dis_amount_row
+      $dis_balanced_row
+      $dis_commission_row
+      $dis_commission_balanced_row";
+  }
+
+  // Total row
+  $tam = 0;
+  $tab = 0;
+  $tca = 0;
+  $tcb = 0;
+  // Loop through each cols
+  foreach ($cols as $month => $col) {
+
+    // special color for "past", "future" and "no_date" cols
+    if (is_numeric($month)) {
+      $class_am = "data2";
+      $class_ab = "data2";
+      $class_ca = "data2";
+      $class_cb = "data2";
+    } else {
+      $class_am = "data0";
+      $class_ab = "data0";
+      $class_ca = "data0";
+      $class_cb = "data0";
+    }
+
+    $am = $d[$col][0]["amount"];
+    $ab = $d[$col][0]["amount_balanced"];
+    $ca = $d[$col][0]["commission"];
+    $cb = $d[$col][0]["commission_balanced"];
+
+    // "past", "future" and "no date" not in Total
+    if (is_numeric($month)) {
+      $tam += $am;
+      $tab += $ab;
+      $tca += $ca;
+      $tcb += $cb;
+    }
+
+    if ($am > 0) {
+
+      $dis_am = number_format($am, 2, ",", " ");
+      $dis_ab = number_format($ab, 2, ",", " ");
+      $dis_ca = number_format($ca, 2, ",", " ");
+      $dis_cb = number_format($cb, 2, ",", " ");
+    
+      if ($month  == "no_date") {
+	$url_date = "&amp;tf_date_before=0000-00-00";
+      } else if ($month == "past") {
+	$month_start = "$year-01-01";
+	$url_date = "&amp;tf_date_before=$month_start";
+      } else if ($month == "future") {
+	$month_end = "$year-12-31";
+	$url_date = "&amp;tf_date_after=$month_end";
+      } else {
+	$month_start = "$col-01";
+	$month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
+	$url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
+      }
+      $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cb_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+    } else {
+      $dis_am = "";
+      $dis_ab = "";
+      $dis_ca = "";
+      $dis_cb = "";
+    }
+
+    $dis_total_row .= "
+      <td class=\"$class_am\">$dis_am</td>";
+    $dis_total_balanced_row .= "
+      <td class=\"$class_ab\">$dis_ab</td>";
+    $dis_total_commission_row .= "
+      <td class=\"$class_ca\">$dis_ca</td>";
+    $dis_total_commission_balanced_row .= "
+      <td class=\"$class_cb\">$dis_cb</td>";
+  }
+  $dis_tam = number_format($tam, 2, ",", " ");
+  $dis_tab = number_format($tab, 2, ",", " ");
+  $dis_tca = number_format($tca, 2, ",", " ");
+  $dis_tcb = number_format($tcb, 2, ",", " ");
+  $dis_total_row .= "
+      <td class=\"data2\">&nbsp;$dis_tam</td>";
+  $dis_total_balanced_row .= "
+      <td class=\"data2\">&nbsp;$dis_tab</td>";
+  $dis_total_commission_row .= "
+      <td class=\"data2\">&nbsp;$dis_tca</td>";
+  $dis_total_commission_balanced_row .= "
+      <td class=\"data2\">&nbsp;$dis_tcb</td>";
+
+  // Artichow Chart
+  for ($month = 1; $month < 13; $month++) {
+    // left pad the month
+    if ($month > 9) {
+      $year_month = "$year-$month";
+    } else {
+      $year_month = "$year-0$month";
+    }
+    $am = $d["$year_month"]["0"]["amount"];
+    $ab = $d["$year_month"]["0"]["amount_balanced"];
+    $values[$month-1] = $am;
+    $labels[$month-1] = number_format($am/1000, 0, ",", " ");
+    $xlabels[$month-1] = $l_monthsofyearshort[$month-1];
+    $values_ab[$month-1] = $ab;
+    $labels_ab[$month-1] = number_format($ab/1000, 0, ",", " ");
+  }
+
+  $title = "$l_potential $year";
+  $plots["new_bar"] = array(1, 1);
+  $plots["legends"] = array($l_amount, $l_deal_balanced);
+  $plots["values"] = array($values, $values_ab);
+  $plots["labels"] = array($labels, $labels_ab);
+
+  $chart_pot_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots))."&amp;xlabels=".urlencode(serialize($xlabels));
+
+  $url_form = url_prepare("deal_index.php");
+
+  $block = "
+    <form method=\"post\" name=\"f_search\" action=\"$url_form\">
+
+    <div class=\"search\">
+      <div class=\"searchLabel\">
+        <a href=\"javascript: return false;\"
+          onclick=\"yearfield=window.document.getElementById('year');
+                    newyear=Number(yearfield.innerHTML)-1;
+                    yearfield.innerHTML=newyear;
+                    document.forms.f_search.year.value=newyear;
+                    return false;\">
+        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" /></a>
+      </div>
+      <div class=\"searchLabel\" id=\"year\">$year</div>
+      <div class=\"searchLabel\">
+        <a href=\"javascript: return false;\"
+          onclick=\"yearfield=window.document.getElementById('year');
+                    newyear=Number(yearfield.innerHTML)+1;
+                    yearfield.innerHTML=newyear;
+                    document.forms.f_search.year.value=newyear;
+                    return false;\">
+        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" /></a>
+      </div>
+
+      <div class=\"detailText\">$block_tt</div>
+      <div class=\"searchLabel\">&nbsp;<br>
+        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"year\" value=\"$year\" />
+        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
+        <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"year_detail\" />
+        <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
+      </div>
+
+      <div class=\"searchEnd\"></div>
+
+    </div>
+    </form>
+
+    <div class=\"detailHead\">$l_potential - $l_date $l_expected</div>
+
+    <table class=\"resultTable\">
+    <tr>
+      <td class=\"resultHead\"> </td>
+      <td class=\"resultHead\"> ? </td>
+      <td class=\"resultHead\"> < </td>
+      $dis_row_head
+      <td class=\"resultHead\"> > </td>
+      <td class=\"resultHead\" style=\"text-align: center;\">$l_total $year</td>
+    </tr>
+    $dis_year_detail
+    <tr>
+      <td colspan=\"17\" class=\"resultHead\" style=\"text-align: center;\">----- $l_total -----</td>
+    </tr>
+    <tr class=\"data2\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$l_total</td>
+      $dis_total_row
+    </tr>
+    <tr class=\"data2\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$l_deal_balanced</td>
+      $dis_total_balanced_row
+    </tr>
+    <tr class=\"data2\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$l_commission</td>
+      $dis_total_commission_row
+    </tr>
+    <tr class=\"data2\" style=\"text-align: right;\">
+      <td style=\"text-align: left;\">$l_commission_balanced</td>
+      $dis_total_commission_balanced_row
+    </tr>
+    </table>
+    <p />
+
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar$chart_bil_params\" alt=\"\" />
+    <br />
+    <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_pot_params\" alt=\"\" />
+";
+
+  return $block;
+} 
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display The Deal stats detail
 // Parameters:
 //   - $deal[] : hash values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_deal_stats($deal) {
+function dis_deal_dashboard_list($deal) {
   global $display, $set_theme, $uid;
   global $l_module_deal;
 
+  $date_after = $deal["date_after"];
+  $date_before = $deal["date_before"];
+
   if (is_array($deal["manager"])) {
     $users_id = $deal["manager"];
+    foreach ($deal["manager"] as $m_id) {
+      $url_sel_manager .= "&amp;sel_manager[]=$m_id";
+    }
   } else if ($deal["manager"] != "") {
     $users_id = array($deal["manager"]);
+    $m_id = $deal["manager"];
+    $url_sel_manager .= "&amp;sel_manager=$m_id";
   } else {
     $users_id = "";
   }
@@ -1890,10 +2329,10 @@ function dis_deal_stats($deal) {
   $block .= "
   <div class=\"detailHead\">$l_module_deal</div>";
 
-  $deal_q = run_query_deal_stats($deal, $users_id);
+  $deal_q = run_query_deal_dashboard_list($deal, $users_id);
   $prefs = get_display_pref($uid, "deal", 0);
 
-  $url = url_prepare("deal_index.php?action=stats&amp;sel_manager=".$deal["manager"]);
+  $url = url_prepare("deal_index.php?action=dashboard_list&amp;cb_archive=1&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before$url_sel_manager");
     
   $dis_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
   $dis_deal->data_set = $deal_q;
@@ -2476,7 +2915,7 @@ function dis_deal_parentdeal_consult($deal) {
 function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$cat_q,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
-  global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_status;
+  global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
   global $l_infos;
   global $popup_width, $popup_height, $l_deal_select_company;
 
@@ -2536,7 +2975,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
 	  <td class=\"detailLabel\">$l_amount_in</td>
 	  <td class=\"detailText\">$p_income</td>
 	</tr><tr>
-	  <td class=\"detailLabel\">$l_potential</td>
+	  <td class=\"detailLabel\">$l_potential_balanced</td>
 	  <td class=\"detailText\">$p_potential</td>
 	</tr>
 	</table>
@@ -2577,10 +3016,10 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $tt = $deal["tasktype"];
   $status = $deal["status"];
   $manager = $deal["manager"];
-  $dateafter = stripslashes($deal["dateafter"]);
-  $datebefore = stripslashes($deal["datebefore"]);
+  $date_after = stripslashes($deal["date_after"]);
+  $date_before = stripslashes($deal["date_before"]);
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;param_parent=$parent");
 
   // Display the list of deals attached to the parentdeal
   $dis_list_deal = new OBM_DISPLAY("DATA", $prefs, "deal");

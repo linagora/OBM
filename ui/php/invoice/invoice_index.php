@@ -33,6 +33,7 @@ include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
 require_once("invoice_js.inc");
+require_once("$obminclude/of/of_extmod.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
@@ -106,16 +107,16 @@ if ($action == "ext_get_id") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_invoice_data_form($invoice["id"], $invoice)) {
-    $retour = run_query_invoice_update($invoice); 
+    $retour = run_query_invoice_update($invoice);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok); 
+      $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
-      $display["msg"] .= display_ok_msg($l_update_error); 
+      $display["msg"] .= display_ok_msg($l_update_error);
     }
     $display["detail"] = dis_invoice_consult($invoice);
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
-    $display["search"] = dis_invoice_form($action, $invoice); 
+    $display["search"] = dis_invoice_form($action, $invoice);
   }
 
 } elseif ($action == "check_delete")  {
