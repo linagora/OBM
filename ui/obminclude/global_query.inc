@@ -606,7 +606,7 @@ function global_session_load_user_todos($set_todo="todo_priority") {
   $nb_todo = $todolist_q->num_rows();
   $max = min ($cgp_todo_nb, $nb_todo);
 
-  $todos = "";
+  $todos = array();
 
   for ($rank = 1; $rank <= $max; $rank++) {
     $todolist_q->next_record();

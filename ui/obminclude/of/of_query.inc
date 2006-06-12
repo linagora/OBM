@@ -851,7 +851,7 @@ function session_load_user_prefs() {
   global $sess, $auth, $last_v;
 
   // We reset $last_v in case of session persistence (changing user)
-  $last_v = "";
+  $last_v = array();
 
   $prefs = get_user_pref($auth->auth["uid"]);
   while ( list($option, $info) = each($prefs) ) {
