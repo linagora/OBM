@@ -1888,12 +1888,57 @@ function run_query_agenda_repeat_events($start, $end, $calendar_entity) {
     }
     $where_res.= ")";
     $where_res .= " AND evententity_entity = 'resource' )"; 
-  }   	     	    
+  }   
+
+  if (is_array($calendar_entity["resourcegroup"])
+      && (count($calendar_entity["resourcegroup"]) > 0) ) {
+    $has_resourcegroup = true;
+  }
 
   if ($has_user && $has_resource) {
     $where_ent = "AND ( $where_user OR $where_res)";
   } elseif ($has_user || $has_resource) {
     $where_ent = "AND $where_user $where_res";
+  }
+  
+  if ($has_resourcegroup) {
+    $coma = "";
+    $where_grp .= "( evententity_entity_id IN (";
+    foreach($calendar_entity["resourcegroup"] as $id => $prop) {
+      $where_grp .= "$coma'$id'";
+      $coma = ",";
+    }
+    $where_grp.= ")";
+    $where_grp .= " AND evententity_entity = 'resource' )"; 
+    
+    $union = "
+      UNION
+      SELECT
+      calendarevent_id,
+      calendarevent_title,
+      calendarevent_privacy,
+      calendarevent_description, 
+      calendarevent_location, 
+      calendarcategory1_label,
+      $calendarevent_date_l,
+      calendarevent_duration,
+      calendarevent_repeatkind,
+      $calendarevent_endrepeat_l,
+      calendarevent_repeatfrequence,
+      'resourcegroup' as evententity_entity,
+      evententity_entity_id,
+      calendarevent_repeatdays,
+      calendarevent_allday
+    FROM CalendarEvent
+      LEFT JOIN CalendarCategory1
+        ON calendarevent_category1_id = calendarcategory1_id
+      LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
+   WHERE calendarevent_repeatkind != 'none'
+      AND $calendarevent_date <= $end 
+      AND ($calendarevent_endrepeat >= $start - calendarevent_duration
+      OR $calendarevent_endrepeat = '0')
+      AND $where_grp
+    ";
   }
 
   $query = "SELECT
@@ -1908,6 +1953,7 @@ function run_query_agenda_repeat_events($start, $end, $calendar_entity) {
       calendarevent_repeatkind,
       $calendarevent_endrepeat_l,
       calendarevent_repeatfrequence,
+      evententity_entity,
       evententity_entity_id,
       calendarevent_repeatdays,
       calendarevent_allday
@@ -1919,8 +1965,10 @@ function run_query_agenda_repeat_events($start, $end, $calendar_entity) {
     WHERE calendarevent_repeatkind != 'none'
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
-           OR $calendarevent_endrepeat = '0')
+      OR $calendarevent_endrepeat = '0')
       $where_ent
+      $union
+
     ORDER BY calendarevent_date"; 
 
   display_debug_msg($query, $cdg_sql, "run_query_agenda_repeat_events()");
@@ -1969,6 +2017,7 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     $duration = $r_q->f("calendarevent_duration");
     $repeatkind = $r_q->f("calendarevent_repeatkind");
     $endrepeat = $r_q->f("calendarevent_endrepeat");
+    $entity = $r_q->f("evententity_entity");
     $all_day = $r_q->f("calendarevent_allday");     
     if (!$endrepeat) {
       $endrepeat = $end_time;
