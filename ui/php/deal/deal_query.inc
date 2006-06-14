@@ -1264,6 +1264,45 @@ function get_deal_info($deal_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the dealcompany links infos (other companies)
+// Parameters:
+//   - $deal_id : deal id
+// Returns: array of deal infos
+///////////////////////////////////////////////////////////////////////////////
+function get_deal_dealcompany_info($deal_id) {
+  global $cdg_sql;
+
+  $query = "SELECT
+      dealcompany_id,
+      dealcompany_company_id,
+      company_name,
+      dealcompanyrole_code,
+      dealcompanyrole_label
+    FROM DealCompany
+      LEFT JOIN Company on dealcompany_company_id = company_id
+      LEFT JOIN DealCompanyRole on dealcompany_role_id = dealcompanyrole_id
+    WHERE dealcompany_deal_id='$deal_id'";
+
+  display_debug_msg($query, $cdg_sql, "get_deal_dealcompany_info()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $comp_id = $obm_q->f("dealcompany_company_id");
+    $role_id = $obm_q->f("dealcompany_role_id");
+    $role_code = $obm_q->f("dealcompanyrole_code");
+    $role_label = $obm_q->f("dealcompanyrole_label");
+    $res[$comp_id]["comp_id"] = $comp_id;
+    $res[$comp_id]["role_id"] = $role_id;
+    $res[$comp_id]["role_code"] = $role_code;
+    $res[$comp_id]["role_label"] = $role_label;
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the lead infos
 // Parameters:
 //   - $lead_id : lead id

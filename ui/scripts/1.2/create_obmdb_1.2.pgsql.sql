@@ -556,12 +556,12 @@ CREATE TABLE Deal (
   deal_technicalmanager_id  integer,
   deal_dateproposal         date,
   deal_dateexpected         date,
+  deal_datealarm            date,
   deal_dateend              date,
   deal_amount               decimal(12,2),
   deal_commission           decimal(4,2) DEFAULT 0,
   deal_hitrate              integer DEFAULT 0,
   deal_status_id            integer,
-  deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
   deal_privacy              integer DEFAULT 0,
@@ -602,6 +602,39 @@ CREATE TABLE DealType (
 
 
 --
+-- Table structure for the table  'DealCompanyRole'
+--
+CREATE TABLE DealCompanyRole (
+  dealcompanyrole_id          serial,
+  dealcompanyrole_timeupdate  timestamp,
+  dealcompanyrole_timecreate  timestamp,
+  dealcompanyrole_userupdate  integer default 0,
+  dealcompanyrole_usercreate  integer default 0,
+  dealcompanyrole_code        varchar(10) default '',
+  dealcompanyrole_label       varchar(64) NOT NULL default '',
+  PRIMARY KEY (dealcompanyrole_id)
+);
+
+
+--
+-- Table structure for the table  'DealCompany'
+--
+CREATE TABLE DealCompany (
+  dealcompany_id          serial,
+  dealcompany_timeupdate  timestamp,
+  dealcompany_timecreate  timestamp,
+  dealcompany_userupdate  integer default 0,
+  dealcompany_usercreate  integer default 0,
+  dealcompany_deal_id     integer NOT NULL default 0,
+  dealcompany_company_id  integer NOT NULL default 0,
+  dealcompany_role_id     integer NOT NULL default 0,
+  PRIMARY KEY (dealcompany_id),
+  INDEX dealcompany_idx_deal (dealcompany_deal_id)
+);
+CREATE INDEX dealcompany_idx_deal ON DealCompany (dealcompany_deal_id);
+
+
+--
 -- Table structure for table 'DealCategory1'
 --
 CREATE TABLE DealCategory1 (
@@ -614,6 +647,7 @@ CREATE TABLE DealCategory1 (
   dealcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (dealcategory1_id)
 );
+
 
 -- Table structure for table 'DealCategory1Link'
 --

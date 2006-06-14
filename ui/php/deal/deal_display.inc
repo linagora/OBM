@@ -2346,7 +2346,32 @@ function dis_deal_dashboard_list($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deal Administration Forms
+// Display Deal Administration Index
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_admin_index() {
+  $cgp_hide;
+
+  $kind_q = run_query_deal_type();
+  $status_q = run_query_deal_status_list();
+
+  $block = html_deal_admin_form($kind_q, $status_q);
+
+  $roles = of_category_get_ordered("DealCompany", "role");
+  $block .= "<hr />";
+  $block .= of_category_dis_admin_form("DealCompany", "role", $roles);
+
+  if (! $cgp_hide["deal"]["dealcategory1"]) {
+    $cats1 = of_category_get_ordered("deal", "category1");
+    $block .= "<hr />";
+    $block .= of_category_dis_admin_form("deal", "category1", $cats1);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Deal Administration Forms
 // Parametres:
 //   - $kind_q   : DBO : Deal kind list
 //   - $status_q : DBO : Deal Status list
@@ -2595,13 +2620,6 @@ function html_deal_admin_form($kind_q, $status_q) {
     </td>
   </tr>
   </table>";
-
-  if (! $cgp_hide["deal"]["dealcategory1"]) {
-    $cats1 = of_category_get_ordered("deal", "category1");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("deal", "category1", $cats1);
-  }
-
 
   return $block;
 }

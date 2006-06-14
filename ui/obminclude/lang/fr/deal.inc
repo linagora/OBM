@@ -28,6 +28,7 @@ $l_date_comment = "Date Commentaire";
 $l_todo = "A faire";
 $l_category1 = "Catégorie";
 $l_code = "Code";
+$l_role = "Rôle";
 
 // Labels et textes
 $l_infos = "Dates et montants";
@@ -113,29 +114,11 @@ $l_no_found = "Aucune affaire ne correspond à ces critères !";
 $l_found_parent = "SurAffaires trouvées";
 $l_no_found_parent = "Aucune SurAffaire ne correspond à ces critères !";
 
-$l_delete_ok = "La suppression de l'affaire a été correctement effectuée.";
-$l_delete_error = "La suppression de l'affaire a échoué !";
-$l_insert_ok = "L'insertion de l'affaire a été correctement effectuée.";
-$l_insert_error = "L'insertion de l'affaire a échoué !";
-$l_update_ok = "La modification de l'affaire a été correctement effectuée";
-$l_update_error = "La modification de l'affaire a échoué !";
 $l_query_error = "Problème en exécutant la requête";
-$l_kind_insert_ok = "L'insertion du type a été correctement effectuée.";
-$l_kind_insert_error = "L'insertion du type a échoué !";
-$l_kind_update_ok = "La modification du type a été correctement effectuée";
-$l_kind_update_error = "La modification du type a échoué !";
-$l_kind_delete_error = "La suppression du type a échoué !";
-$l_kind_delete_ok = "La suppression du type a été correctement effectuée.";
 $l_kind_can_delete = "Le type peut être supprimé";
 $l_kind_cant_delete = "Le type ne peut être supprimé";
 $l_kind_link_deal = "Le type est référencé par ces affaires";
 $l_kind_link_deal_no = "Le type n'est pas référencé dans les affaires";
-$l_status_insert_ok = "L'insertion de l'état a été correctement effectuée.";
-$l_status_insert_error = "L'insertion de l'état a échoué !";
-$l_status_update_ok = "La modification de l'état a été correctement effectuée";
-$l_status_update_error = "La modification de l'état a échoué !";
-$l_status_delete_error = "La suppression de l'état a échoué !";
-$l_status_delete_ok = "La suppression de l'état a été correctement effectuée.";
 $l_status_can_delete = "L'état peut être supprimé";
 $l_status_cant_delete = "L'état ne peut être supprimé";
 $l_status_link_deal = "L'état est référencé par ces affaires";

@@ -93,6 +93,41 @@ ALTER TABLE Deal ADD COLUMN deal_commission decimal(5,2) DEFAULT 0 AFTER deal_am
 
 
 -------------------------------------------------------------------------------
+-- DealCompany tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'DealCompanyRole'
+--
+CREATE TABLE DealCompanyRole (
+  dealcompanyrole_id          int(8) auto_increment,
+  dealcompanyrole_timeupdate  timestamp(14),
+  dealcompanyrole_timecreate  timestamp(14),
+  dealcompanyrole_userupdate  int(8) default NULL,
+  dealcompanyrole_usercreate  int(8) default NULL,
+  dealcompanyrole_code        varchar(10) default '',
+  dealcompanyrole_label       varchar(64) NOT NULL default '',
+  PRIMARY KEY (dealcompanyrole_id)
+);
+
+
+--
+-- Table structure for the table 'DealCompany'
+--
+CREATE TABLE DealCompany (
+  dealcompany_id          int(8) auto_increment,
+  dealcompany_timeupdate  timestamp(14),
+  dealcompany_timecreate  timestamp(14),
+  dealcompany_userupdate  int(8) default NULL,
+  dealcompany_usercreate  int(8) default NULL,
+  dealcompany_deal_id     int(8) NOT NULL default 0,
+  dealcompany_company_id  int(8) NOT NULL default 0,
+  dealcompany_role_id     int(8) NOT NULL default 0,
+  PRIMARY KEY (dealcompany_id),
+  INDEX dealcompany_idx_deal (dealcompany_deal_id)
+);
+
+
+-------------------------------------------------------------------------------
 -- Lead module tables
 -------------------------------------------------------------------------------
 --

@@ -374,16 +374,17 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Admin Category section
 // Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $cats      : Category array
+//   - $entity : target entity
+//   - $catu   : target category (string) can have Uppercase eg: CompanyRole
+//   - $cats   : Category array
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_admin_form($entity, $cat, $cats) {
+function of_category_dis_admin_form($entity, $catu, $cats) {
   global $l_c_manage, $l_code, $l_label;
   global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
 
-  $l_cat = "l_${cat}"; 
+  $cat = strtolower($catu);
+  $l_cat = "l_${cat}";
   global $$l_cat;
 
   $indent = 10;
@@ -419,14 +420,6 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
   }
   $sel_cat .= "</select>";
 
-  if ($entity == "calendar") {
-    $page = "agenda_index.php";
-  } elseif ($entity == "subscription") {
-    $page = "publication_index.php";
-  } else {
-    $page = "${entity}_index.php";
-  }
-
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -442,7 +435,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
       <td>
 <!-- Category Check Delete Section -->
         <form name=\"form_${cat}_delete\" method=\"post\"
-          action=\"" . url_prepare("$page") . "\">
+          action=\"" . url_prepare("") . "\">
         <table>
         <tr>
           <td class=\"adminLabel\">".ucfirst(${$l_cat})."</td>
@@ -463,7 +456,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
 
 <!-- Category Update Section -->
 
-          <form name=\"form_${cat}_update\" method=\"get\" action=\"" . url_prepare("$page") . "\">
+          <form name=\"form_${cat}_update\" method=\"get\" action=\"" . url_prepare("") . "\">
         <table heigth=\"100%\">
         <tr>
           <td class=\"adminLabel\">$l_code :</td>
@@ -484,7 +477,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
       </td>
       <td>
 <!-- New Category Section -->
-        <form name=\"form_${cat}_new\" method=\"get\" action=\"" . url_prepare("$page") . "\">
+        <form name=\"form_${cat}_new\" method=\"get\" action=\"" . url_prepare("") . "\">
         <table>
         <tr>
           <td class=\"adminLabel\">$l_code :</td>
@@ -515,7 +508,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
         <tr>
           <td colspan=\"3\">
             <form name=\"form_${cat}_delete\" method=\"post\"
-              action=\"" . url_prepare("$page") . "\">
+              action=\"" . url_prepare("") . "\">
             <table>
             <tr>
               <td class=\"adminLabel\">".ucfirst(${$l_cat})."</td>
@@ -530,11 +523,10 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
           </td>
         </tr>
 
-
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
             <form name=\"form_${cat}_update\" method=\"get\"
-              action=\"" . url_prepare("$page") . "\">
+              action=\"" . url_prepare("") . "\">
             <input type=\"hidden\" name=\"sel_${cat}\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
             <input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" />
@@ -551,7 +543,7 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
 
 
         <form name=\"form_${cat}_new\" method=\"get\"
-          action=\"" . url_prepare("$page") . "\">
+          action=\"" . url_prepare("") . "\">
         <table>
         <tr>
         <td class=\"adminLabel\" colspan=\"2\">$l_c_new</td>
@@ -586,17 +578,19 @@ function of_category_dis_admin_form($entity, $cat, $cats) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: the cat links
 // Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $param     : Entity parameters array
-//   - $mode   : ([mono|multi]) 
+//   - $entity     : target entity
+//   - $cat        : target category
+//   - $param      : Entity parameters array
+//   - $mode       : ([mono|multi])
+//   - $link_table : [optionnal] to handle special
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_dis_links($entity, $cat, $param, $mode="multi") {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back,$display;
 
-  $l_entity = "l_${entity}"; $l_cat = "l_${cat}"; 
+  $l_entity = strtolower("l_${entity}");
+  $l_cat = "l_${cat}";
   global $$l_entity, $$l_cat;
 
   $id = $param["${cat}_id"];
@@ -606,18 +600,10 @@ function of_category_dis_links($entity, $cat, $param, $mode="multi") {
   $label = of_category_get_label($entity, $cat, $id);
   $obm_q = of_category_query_links($entity, $cat, $id, $mode);
 
-  if ($entity == "calendar") {
-    $page="agenda_index.php";
-  } elseif ($entity == "subscription") {
-    $page="publication_index.php";
-  } else {
-    $page="${entity}_index.php";
-  }
-
   $nb_cat = $obm_q->num_rows();
   if ($nb_cat > 0) {
     $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $l_c_cant_delete.");
-    $url = url_prepare("$page?action=search&amp;sel_${cat}=$id");
+    $url = url_prepare("?action=search&amp;sel_${cat}=$id");
 
     $dis_link = "
     <table class=\"detail\">
@@ -625,12 +611,12 @@ function of_category_dis_links($entity, $cat, $param, $mode="multi") {
       <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity}s <a href=\"$url\">($nb_cat)</a>.</td>
     </tr>";
 
-    $dis_link .="
+    $dis_link .= "
     </table>
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
           <form name=\"form_back\" method=\"get\"
-            action=\"" .url_prepare("$page") . "\">
+            action=\"" .url_prepare("") . "\">
           <input type=\"hidden\" name=\"action\" value=\"admin\" />
           <input type=\"submit\" value=\"$l_back\" />
           </form>
@@ -644,20 +630,20 @@ function of_category_dis_links($entity, $cat, $param, $mode="multi") {
     <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
-        ".ucfirst(${$l_cat})."($label) : $l_c_link_no ${$l_entity}s. </td>
+        ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
     </tr>
     </table>
   <div class=\"detailButton\">
     <p class=\"detailButtons\">
       <form name=\"form_act_delete\"
-        method=post action=\"" . url_prepare("$page") . "\">
+        method=post action=\"" . url_prepare("") . "\">
       <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
       <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
       <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
       </form>
 
       <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("$page") . "\">
+        action=\"" .url_prepare("") . "\">
       <input type=\"hidden\" name=\"action\" value=\"admin\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
@@ -742,22 +728,23 @@ function of_category_dis_entity_stats($entity, $cat, $cat_q) {
 // Category query execution
 // Parameters:
 //   - $entity    : target entity
-//   - $cat       : target category
+//   - $catu      : target category (string, may have upper case)
 //   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
 //   - $entity_id : if not 0, get only cat referenced by this entry
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
+function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
   global $cdg_sql, $cgp_hide;
 
+  $cat = strtolower($catu);
   $cats = array();
   if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
     return $cats;
   }
 
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
+  $table = ucfirst($entity) . ucfirst($catu);
+  $field_prefix = strtolower($entity.$cat."_");
   $field_id = $field_prefix."id";
   $field_code = $field_prefix."code";
   $field_label = $field_prefix."label";
@@ -800,21 +787,22 @@ function of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
 ///////////////////////////////////////////////////////////////////////////////
 // Category insertion query construction and execution
 // Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $param     : parameters 
+//   - $entity  : target entity
+//   - $catu    : target category (string, may have upper case)
+//   - $param   : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_insert($entity, $cat, $param) {
+function of_category_query_insert($entity, $catu, $param) {
   global $auth, $cdg_sql;
 
+  $cat = strtolower($catu);
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
   $cat_label = $param["${cat}_label"];
   $cat_code = $param["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
+  $table = ucfirst($entity) . ucfirst($catu);
+  $field_prefix = strtolower($entity.$cat."_");
   $field_timecreate = $field_prefix."timecreate";
   $field_usercreate = $field_prefix."usercreate";
   $field_label = $field_prefix."label";
@@ -831,7 +819,7 @@ function of_category_query_insert($entity, $cat, $param) {
     '$cat_label',
     '$cat_code')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_query_insert()");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
@@ -873,15 +861,16 @@ function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Category update query execution
 // Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $param     : parameters 
+//   - $entity : target entity
+//   - $catu   : target category (string, may have upper case)
+//   - $param  : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_update($entity, $cat, $param) {
+function of_category_query_update($entity, $catu, $param) {
   global $auth, $cdg_sql;
 
+  $cat = strtolower($catu);
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
   $cat_id = $param["${cat}_id"];
@@ -890,7 +879,7 @@ function of_category_query_update($entity, $cat, $param) {
   }
   $cat_label = $param["${cat}_label"];
   $cat_code = $param["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($cat);
+  $table = ucfirst($entity) . ucfirst($catu);
   $field_prefix = $entity.$cat."_";
   $field_timeupdate = $field_prefix."timeupdate";
   $field_userupdate = $field_prefix."userupdate";
@@ -906,7 +895,7 @@ function of_category_query_update($entity, $cat, $param) {
     WHERE
       $field_id='$cat_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_query_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -917,16 +906,17 @@ function of_category_query_update($entity, $cat, $param) {
 ///////////////////////////////////////////////////////////////////////////////
 // Category deletion query execution
 // Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $param     : parameters 
+//   - $entity  : target entity
+//   - $catu    : target category (string, may have upper case)
+//   - $param   : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_delete($entity, $cat, $param) {
+function of_category_query_delete($entity, $catu, $param) {
   global $cdg_sql;
 
-  $table = ucfirst($entity) . ucfirst($cat);
+  $cat = strtolower($catu);
+  $table = ucfirst($entity) . ucfirst($catu);
   $field_prefix = $entity.$cat."_";
   $field_id = $field_prefix."id";
   $id = $param["${cat}_id"];
@@ -937,7 +927,7 @@ function of_category_query_delete($entity, $cat, $param) {
   if ($id != '') {
     $query = "DELETE FROM $table WHERE $field_id ='$id'";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "of_category_query_delete()");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   } else {
@@ -978,9 +968,9 @@ function of_category_query_delete_link($entity, $cat, $entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Activity - Entity links query execution
 // Parameters:
-//   - $entity    : target entity
-//   - $cat       : target category
-//   - $p_id      : activity(category) id
+//   - $entity : target entity
+//   - $cat    : target category
+//   - $p_id   : category id
 //   - $mode   : ([mono|multi]) 
 // Return:
 //   - database handle
@@ -989,35 +979,31 @@ function of_category_query_links($entity, $cat, $p_id, $mode="multi") {
   global $cdg_sql;
 
   $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_code = $field_prefix."code";
-  $field_label = $field_prefix."label";
+  $linkfield_prefix = strtolower($entity.$cat."_");
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
+  $linkfield_ent = $linkfield_prefix."link_".$entity."_id";
+  $linkfield_cat = $linkfield_prefix."link_category_id";
   if ($entity == "calendar") {
     $entitytable = "CalendarEvent";
     $entityfield_prefix = "calendarevent_";
   } else {
     $entitytable = ucfirst($entity);
-    $entityfield_prefix = $entity."_";
+    $entityfield_prefix = strtolower($entity."_");
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
 
   if ($mode == "mono") {
-    $query = "SELECT $entityfield_id, '$p_id'
+    $query = "SELECT $entityfield_id
       FROM $entitytable
       WHERE $entityfield_cat = '$p_id'";
   } else {
-    $query = "SELECT $entityfield_id, '$p_id'
-      FROM $entitytable, $linktable
-      WHERE $entityfield_id = $linkfield_ent 
-        AND $linkfield_cat = '$p_id'";
+    $query = "SELECT $linkfield_ent
+      FROM $linktable
+      WHERE $linkfield_cat = '$p_id'";
   }
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_query_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1112,7 +1098,7 @@ function of_category_get_label($entity, $cat, $id) {
   global $cdg_sql;
 
   $table = ucfirst($entity) . ucfirst($cat);
-  $field_prefix = $entity.$cat."_";
+  $field_prefix = strtolower($entity.$cat."_");
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
 
@@ -1120,7 +1106,7 @@ function of_category_get_label($entity, $cat, $id) {
     FROM $table 
     WHERE $field_id = '$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_get_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

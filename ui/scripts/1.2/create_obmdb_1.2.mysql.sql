@@ -556,12 +556,12 @@ CREATE TABLE Deal (
   deal_source               varchar(64),
   deal_dateproposal         date,
   deal_dateexpected         date,
+  deal_datealarm            date,
   deal_dateend              date,
   deal_amount               decimal(12,2),
   deal_commission           decimal(5,2) DEFAULT 0,
   deal_hitrate              int(3) DEFAULT 0,
   deal_status_id            int(2),
-  deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
   deal_privacy              int(2) NOT NULL DEFAULT 0,
@@ -598,6 +598,38 @@ CREATE TABLE DealType (
   dealtype_label       varchar(16),
   dealtype_inout       varchar(1) DEFAULT '-',
   PRIMARY KEY (dealtype_id)
+);
+
+
+--
+-- Table structure for the table 'DealCompanyRole'
+--
+CREATE TABLE DealCompanyRole (
+  dealcompanyrole_id          int(8) auto_increment,
+  dealcompanyrole_timeupdate  timestamp(14),
+  dealcompanyrole_timecreate  timestamp(14),
+  dealcompanyrole_userupdate  int(8) default NULL,
+  dealcompanyrole_usercreate  int(8) default NULL,
+  dealcompanyrole_code        varchar(10) default '',
+  dealcompanyrole_label       varchar(64) NOT NULL default '',
+  PRIMARY KEY (dealcompanyrole_id)
+);
+
+
+--
+-- Table structure for the table 'DealCompany'
+--
+CREATE TABLE DealCompany (
+  dealcompany_id          int(8) auto_increment,
+  dealcompany_timeupdate  timestamp(14),
+  dealcompany_timecreate  timestamp(14),
+  dealcompany_userupdate  int(8) default NULL,
+  dealcompany_usercreate  int(8) default NULL,
+  dealcompany_deal_id     int(8) NOT NULL default 0,
+  dealcompany_company_id  int(8) NOT NULL default 0,
+  dealcompany_role_id     int(8) NOT NULL default 0,
+  PRIMARY KEY (dealcompany_id),
+  INDEX dealcompany_idx_deal (dealcompany_deal_id)
 );
 
 

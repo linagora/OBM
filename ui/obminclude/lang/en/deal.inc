@@ -25,7 +25,7 @@ $l_date_comment = "Comment Date";
 $l_todo = "To Do";
 $l_category = "Category";
 $l_code = "Code";
-$l_add_cats = "Add these categories";
+$l_role = "Role";
 
 // Labels and texts
 $l_infos = "Informations";
@@ -78,6 +78,7 @@ $l_cat_delete = "Delete";
 $l_cat_checkdelete = "Check or delete Category"; 
 $l_cat_update = "Update category"; 
 $l_cat_insert = "Insert a category";
+$l_add_cats = "Add these categories";
 
 // Messages
 $l_link_contract = "The deal is involved in some contracts";
@@ -105,31 +106,13 @@ $l_no_found = "No deal found matching the query !";
 $l_found_parent = "parentdeals found";
 $l_no_found_parent ="No parentdeal found matching the query !";
 
-$l_delete_ok = "The deal has been deleted successfully.";
-$l_delete_error = "The deletion of the deal has failed !";
-$l_insert_ok = "The deal has been inserted successfully.";
-$l_insert_error = "The insertion of the deal has failed !";
-$l_update_ok = "The deal has been updated successfully.";
-$l_update_error = "The update of the deal has failed !";
 $l_query_error = "Probl&egrave;me en executant la requete";
 $l_no_display_parent ="Fill the search fields and press < Find > to retrieve the parentdeals"; 
 
-$l_kind_insert_ok = "The kind has been inserted successfully.";
-$l_kind_insert_error = "The insertion of the kind has failed !";
-$l_kind_update_ok = "The kind has been updated successfully.";
-$l_kind_update_error = "The kind of the deal has failed !";
-$l_kind_delete_error = "The deletion of the kind has failed !";
-$l_kind_delete_ok = "The kind has been deleted successfully.";
 $l_kind_can_delete = "The Kind can be deleted !";
 $l_kind_cant_delete = "The Kind can't be deleted !";
 $l_kind_link_deal = "The Kind is involved in these deals";
 $l_kind_link_deal_no = "The Kind is not involved in any deal";
-$l_status_insert_ok = "The status has been inserted successfully.";
-$l_status_insert_error = "The insertion of the status has failed !";
-$l_status_update_ok = "The Status has been updated successfully.";
-$l_status_update_error = "The status of the deal has failed !";
-$l_status_delete_error = "The deletion of the status has failed !";
-$l_status_delete_ok = "The status has been deleted successfully.";
 $l_status_can_delete = "The Status can be deleted";
 $l_status_cant_delete = "The Status can't be deleted";
 $l_status_link_deal = "The Status is involved in these deals";

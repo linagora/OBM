@@ -19,6 +19,7 @@ UPDATE List SET temp_name = list_name;
 ALTER TABLE List DROP COLUMN list_name;
 ALTER TABLE List RENAME COLUMN temp_name TO list_name;
 
+
 -------------------------------------------------------------------------------
 -- Update Contract table
 -------------------------------------------------------------------------------
@@ -108,6 +109,42 @@ ALTER TABLE Deal ADD COLUMN deal_source varchar(64);
 ALTER TABLE Deal ADD COLUMN deal_dateend date;
 ALTER TABLE Deal ADD COLUMN deal_commission decimal(4,2);
 ALTER TABLE Deal ALTER COLUMN deal_commission SET DEFAULT 0;
+
+
+-------------------------------------------------------------------------------
+-- DealCompany tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table 'DealCompanyRole'
+--
+CREATE TABLE DealCompanyRole (
+  dealcompanyrole_id          serial,
+  dealcompanyrole_timeupdate  timestamp,
+  dealcompanyrole_timecreate  timestamp,
+  dealcompanyrole_userupdate  integer default 0,
+  dealcompanyrole_usercreate  integer default 0,
+  dealcompanyrole_code        varchar(10) default '',
+  dealcompanyrole_label       varchar(64) NOT NULL default '',
+  PRIMARY KEY (dealcompanyrole_id)
+);
+
+
+--
+-- Table structure for the table 'DealCompany'
+--
+CREATE TABLE DealCompany (
+  dealcompany_id          serial,
+  dealcompany_timeupdate  timestamp,
+  dealcompany_timecreate  timestamp,
+  dealcompany_userupdate  integer default 0,
+  dealcompany_usercreate  integer default 0,
+  dealcompany_deal_id     integer NOT NULL default 0,
+  dealcompany_company_id  integer NOT NULL default 0,
+  dealcompany_role_id     integer NOT NULL default 0,
+  PRIMARY KEY (dealcompany_id),
+  INDEX dealcompany_idx_deal (dealcompany_deal_id)
+);
+CREATE INDEX dealcompany_idx_deal ON DealCompany (dealcompany_deal_id);
 
 
 -------------------------------------------------------------------------------
