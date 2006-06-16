@@ -32,6 +32,7 @@ function run_query_agenda_detail($param_event) {
       calendarevent_owner, 
       calendarevent_title, 
       calendarevent_description,
+      calendarevent_repeatfrequence,
       calendarevent_location, 
       calendarevent_category1_id,
       calendarcategory1_label,
@@ -398,7 +399,8 @@ function run_query_agenda_insert_event_data($agenda) {
   if ($agenda["privacy"]!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $agenda["kind"];
   $repeat_days = $agenda["repeat_days"]; 
-  $repeat_end = $agenda["repeat_end"]; 
+  $repeat_end = $agenda["repeat_end"];
+  $repeatfrequency = $agenda["repeatfrequency"];  
   
   $obm_q = new DB_OBM;
   $query = "INSERT INTO CalendarEvent (
@@ -433,7 +435,7 @@ function run_query_agenda_insert_event_data($agenda) {
     '$privacy',
     '$event_duration',		
     '$repeat_kind',
-    '1',
+    '$repeatfrequency',
     '$repeat_days',
     '$all_day',
     '$repeat_end')";
@@ -869,11 +871,7 @@ function run_query_agenda_update_event_data($agenda) {
   $repeat_kind = $agenda["kind"];
   $repeat_days = $agenda["repeat_days"];
   $repeat_end = $agenda["repeat_end"];
-  if ($repeat_kind != 'none') {
-    $frequency = "1";
-  } else {
-    $frequency = "0";
-  }
+  $frequency = $agenda["repeatfrequency"];  
    
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
@@ -891,7 +889,7 @@ function run_query_agenda_update_event_data($agenda) {
     calendarevent_repeatkind = '$repeat_kind',
     calendarevent_repeatfrequence = '$frequency',
     calendarevent_repeatdays = '$repeat_days',
-    calendarevent_endrepeat = '$repeat_end'
+    calendarevent_endrepeat = '$repeat_end',
   WHERE
     calendarevent_id = '$event_id'";
 
@@ -1411,7 +1409,7 @@ function check_agenda_data_form($agenda) {
   global $err_msg, $php_regexp_isodate, $php_regexp_isodatetime;
   global $l_fill_title, $l_fill_dateend,$l_fill_datebegin,$l_err_weekly_repeat;
   global $l_invalid_date, $l_datebegin, $l_dateend, $l_date_repeatend;
-  global $l_err_begin_end, $l_err_end_repeat,$l_err_end_repeat2;
+  global $l_err_begin_end, $l_err_end_repeat,$l_err_end_repeat2,$l_err_repeatfrequency;
   global $l_err_end_repeat3, $l_err_days_repeat, $l_err_days_repeat_not_weekly;
   
   $title = $agenda["title"];
@@ -1420,6 +1418,7 @@ function check_agenda_data_form($agenda) {
   $repeat_end = $agenda["repeat_end"];
   $kind = $agenda["kind"];
   $repeat_days = $agenda["repeat_days"];
+  $repeatfrequency = $agenda["repeatfrequency"];
 
   if (trim($title) == "") {
     $err_msg = $l_fill_title;
@@ -1451,6 +1450,11 @@ function check_agenda_data_form($agenda) {
       $err_msg = "$l_date_repeatend : $l_invalid_date"; 
       return false;
     }
+  }
+var_dump($repeatfrequency);
+  if(!is_int($repeatfrequency) ||  $repeatfrequency < 1) {
+    $err_msg = $l_err_repeatfrequency;
+    return false;
   }
 
   if ($dateend<$datebegin) {
@@ -1694,7 +1698,8 @@ function run_query_agenda_conflict_events($start,$end,$sel_entity_id,$event_id) 
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description, 
-      calendarevent_location, 
+      calendarevent_location,
+     calendarevent_repeatfrequence, 
       evententity_entity,
       evententity_entity_id,
       $select_user
@@ -1795,6 +1800,7 @@ function run_query_agenda_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_privacy,
       calendarevent_description,
       calendarevent_location,
+      calendarevent_repeatfrequence,
       evententity_entity_id,
       'resourcegroup' as evententity_entity,
       calendarcategory1_label,

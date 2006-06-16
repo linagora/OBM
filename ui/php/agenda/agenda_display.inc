@@ -1403,7 +1403,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   global $l_repeatkind,$l_repeatdays, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort;
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
-  global $l_agenda_select_group, $l_hour,$l_all_day;
+  global $l_agenda_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources;
 
   $time_unit = 60 / $set_cal_interval;  
@@ -1426,6 +1426,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
     $privacy = $event_q->f("calendarevent_privacy");
     $repeat_kind = $event_q->f("calendarevent_repeatkind");
     $repeat_days = $event_q->f("calendarevent_repeatdays");
+    $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");
     if ($event_q->f("calendarevent_endrepeat")) {
       $repeat_end = isodate_format($event_q->f("calendarevent_endrepeat"));
     }
@@ -1442,7 +1443,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
   if (isset($agenda["description"])) { $desc = stripslashes($agenda["description"]); }
   if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
-
+  if (isset($agenda["repeatfrequency"])) { $repeatfrequency = $agenda["repeatfrequency"]; } else { $repeatfrequency = 1; }
   if (isset($agenda["datebegin"])) {
     $ts = isodatetime_to_timestamp($agenda["datebegin"]);
     $datebegin = isodate_format($ts);
@@ -1761,7 +1762,11 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   <tr>    
     <td class=\"detailLabel\">$l_repeatkind</td> 
     <td class=\"detailForm\">$dis_sel_kind</td>
-  </tr>
+    </tr>
+  <tr>    
+    <td class=\"detailLabel\">$l_repeatfrequency</td> 
+    <td class=\"detailForm\"><input type=\"text\" size=\"4\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" /></td>
+  </tr>    
   <tr>    
     <td class=\"detailLabel\">$l_date_repeatend</td> 
     <td class=\"detailForm\">
@@ -1941,7 +1946,7 @@ function html_agenda_calendar_consult($event_q, $entities) {
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_daily, $l_weekly;
   global $l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
-  global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+  global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
   $id = $event_q->f("calendarevent_id");
   $title = $event_q->f("calendarevent_title");
@@ -1949,6 +1954,8 @@ function html_agenda_calendar_consult($event_q, $entities) {
   $cats1 = of_category_get_entitycategories("calendar", "category1", $id, "mono");
   $priority = $event_q->f("calendarevent_priority"); 
   $description = $event_q->f("calendarevent_description");
+  
+  $repeatfrequency = $event_q->f("calendarevent_repeatfrequence");
   $all_day = $event_q->f("calendarevent_allday");
   if ($all_day) {
     $dis_all_day = "<tr><td colspan=\"2\" class=\"detailLabel\">$l_all_day</td></tr>";
@@ -2077,6 +2084,10 @@ function html_agenda_calendar_consult($event_q, $entities) {
     <tr>    
      <td class=\"detailLabel\">$l_repeatkind</td> 
      <td class=\"detailText\">$kind</td>
+    </tr>
+    <tr>    
+     <td class=\"detailLabel\">$l_repeatfrequency</td> 
+     <td class=\"detailText\">$repeatfrequency</td>
     </tr>
     <tr>    
      <td class=\"detailLabel\">$l_date_repeatend</td> 

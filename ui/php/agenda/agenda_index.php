@@ -394,7 +394,7 @@ function get_param_agenda() {
   global $rd_decision_event,$cb_mail,$param_duration;
   global $sel_time_duration,$sel_min_duration;
   global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
-  global $ch_all_day;
+  global $ch_all_day,$tf_repeatfrequency;
   global $tf_category1_label, $tf_category1_code, $sel_category1;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
   
@@ -404,7 +404,10 @@ function get_param_agenda() {
   } else { 
     $agenda["date"] = isodate_format();
   }
+
+
   if (isset($param_event)) $agenda["id"] = $param_event;
+  if (isset($tf_repeatfrequency)) $agenda["repeatfrequency"] = intval($tf_repeatfrequency);
   if (isset($ch_all_day)) $agenda["allday"] = $ch_all_day;
   if (isset($tf_title)) $agenda["title"] = $tf_title;
   if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
