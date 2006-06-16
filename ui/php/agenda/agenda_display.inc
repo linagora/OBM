@@ -1407,6 +1407,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   global $l_resources;
 
   $time_unit = 60 / $set_cal_interval;  
+  $repeatfrequency = 1;
 
   if ($action == "detailupdate") {
     $title = htmlspecialchars($event_q->f("calendarevent_title"));
@@ -1443,7 +1444,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
   if (isset($agenda["description"])) { $desc = stripslashes($agenda["description"]); }
   if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
-  if (isset($agenda["repeatfrequency"])) { $repeatfrequency = $agenda["repeatfrequency"]; } else { $repeatfrequency = 1; }
+  if (isset($agenda["repeatfrequency"])) { $repeatfrequency = $agenda["repeatfrequency"]; }  
   if (isset($agenda["datebegin"])) {
     $ts = isodatetime_to_timestamp($agenda["datebegin"]);
     $datebegin = isodate_format($ts);

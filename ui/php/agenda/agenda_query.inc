@@ -889,7 +889,7 @@ function run_query_agenda_update_event_data($agenda) {
     calendarevent_repeatkind = '$repeat_kind',
     calendarevent_repeatfrequence = '$frequency',
     calendarevent_repeatdays = '$repeat_days',
-    calendarevent_endrepeat = '$repeat_end',
+    calendarevent_endrepeat = '$repeat_end'
   WHERE
     calendarevent_id = '$event_id'";
 
@@ -1451,7 +1451,6 @@ function check_agenda_data_form($agenda) {
       return false;
     }
   }
-var_dump($repeatfrequency);
   if(!is_int($repeatfrequency) ||  $repeatfrequency < 1) {
     $err_msg = $l_err_repeatfrequency;
     return false;
