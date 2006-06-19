@@ -193,8 +193,11 @@ function dis_time_planning($time) {
     $block = dis_time_planning_week($task_q, $time);
 
   } else if ($time["interval"] == "month") {
-    $task_q = run_query_time_task_one_month($time);
-    $block = dis_time_planning_month($task_q, $time);
+    $project_q = run_query_time_project_planning_month($time);
+    $task_q = run_query_time_task_planning_month($time);
+    $block = dis_time_planning_month2($project_q, $task_q, $time);
+   // $task_q = run_query_time_task_one_month($time);
+   // $block = dis_time_planning_month($task_q, $time);
   }
 
   return $block;
@@ -207,7 +210,7 @@ function dis_time_planning($time) {
 //   - $obm_q    : tasks list to display 
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_planning_week($obm_q, $time) {
+function dis_time_planning_week($obm_q,$time) {;
   global $c_working_days, $c_day_fraction, $c_dst_err, $l_daysofweekshort;
 
   while ($obm_q->next_record())  {
@@ -259,6 +262,106 @@ function dis_time_planning_week($obm_q, $time) {
     </tr>
     </table>
   </div>";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the planning for a month
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $time[] : time hash
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_planning_month2($obm_q,$task_q, $time) {
+  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
+
+  $col_width = 20;
+  $time_length = 0;
+  $time_worked = 0;
+  $span = 0;
+  $nb_worked_days = array_sum($c_working_days);
+
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
+
+  // first day of the month in second
+  $first_day_sec = mktime(0,0,0,$month, 1, $year);
+  $last_day_sec = mktime(23,0,0,$month+1, 0, $year);
+  $day_in_sec = $first_day_sec;
+  $dow = date("w", $day_in_sec);
+  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+
+  // Fill the day array -------------------------------------------------------
+  $day = 1;
+  while ($day_in_sec < $last_day_sec) {
+    $fday = ($day>9) ? "$day" : "0$day";
+    $array_res["$fday"]["length"] = 0;
+    $array_res["$fday"]["dow"] = $dow;
+    $array_res["$fday"]["obm_dow"] = $obm_dow;
+    $day++;
+
+    $day_in_sec += 86400;
+    $dow = date("w", $day_in_sec);
+    $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+  }
+  $project_days = array();
+  $task_days = array();
+  $line = array();
+  
+  while ($obm_q->next_record())  {
+    $day = date("d", $obm_q->f("date"));
+    $project_id = $obm_q->f("project_id");
+    $projects[$project_id] = $obm_q->f("project_name");
+    $project_days[$project_id]["$day"] = $obm_q->f("timetask_length");
+  }
+  while ($task_q->next_record())  {
+    $day = date("d", $task_q->f("date"));
+    $tasktype_id = $task_q->f("timetask_tasktype_id");
+    $tasks[$tasktype_id] = $task_q->f("tasktype_label");
+    $task_days[$tasktype_id]["$day"] = $task_q->f("timetask_length");
+  }
+
+  // Display ------------------------------------------------------------------
+  $month_length = count($array_res);
+  // Display the array
+  while (list($day,$val) = each($array_res)) {
+    // Not working days
+    if ($c_working_days[$val["dow"]] == 0) {
+    
+    } else {
+      foreach($project_days as $project_id => $work) {
+        if(isset($work[$day])) {
+          $length = ($work[$day]*100)/8;
+          $line["p".$project_id] .= "<td style=\"border:1px solid black;\" width=\"20px\"><div  style=\"background-color: rgb(222, 91, 91);width:$length%;\">&nbsp;</div></td>";
+        } else {
+          $line["p".$project_id] .= "<td width=\"20px\" style=\"border:1px solid black;\"></td>";
+        }
+      }
+      foreach($task_days as $task_id => $work) {
+        if(isset($work[$day])) {
+          $length = ($work[$day]*100)/8;
+          $line["t".$task_id] .= "<td style=\"border:1px solid black;\" width=\"20px\"><div  style=\"background-color: rgb(222, 91, 91);width:$length%;\">&nbsp;</div></td>";
+        } else {
+          $line["t".$task_id] .= "<td width=\"20px\" style=\"border:1px solid black;\"></td>";
+        }
+      }
+      
+    }
+
+  }
+  foreach($project_days as $project_id => $work) {
+    $line["p".$project_id] = "<tr><th style=\"font-size:8px;\">".$projects[$project_id]."".$line["p".$project_id]."</tr>";
+  }  
+  foreach($task_days as $task_id => $work) {
+    $line["t".$task_id] = "<tr><th style=\"font-size:8px;\">".$tasks[$task_id]."".$line["t".$task_id]."</tr>";
+  }  
+  
+  $block = "
+  <div class=\"timeCenter\">
+  <table >
+    ".implode("",$line)."
+    </table>
+  <div>";
 
   return $block;
 }
