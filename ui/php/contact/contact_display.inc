@@ -1256,7 +1256,6 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
-  global $ico_mini_cal;
   global $display, $path, $auth, $cgp_show, $cgp_hide, $c_undef, $l_undef;
 
   $cat1 = array();$cat2 = array();$cat3 = array();$cat4 = array();$cat5 = array();
@@ -1519,13 +1518,13 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   <option value=\"$c_undef\">$l_undef</option>";
   $sel_kind_header = "<select name=\"sel_kind\">
   <option value=\"$c_undef\">$l_undef</option>";
-  foreach( $k_kind as $k_lang =>  $k_kind_label){
+  foreach ($k_kind as $k_lang => $k_kind_label) {
     $sel_kind_lang .= "\n<option value=\"$k_lang\"";
-    if($k_lang == $kind_lang) {
-      foreach($k_kind_label as $k_label =>  $k_kind_header) {
+    if ($k_lang == $kind_lang) {
+      foreach ($k_kind_label as $k_label => $k_kind_header) {
 	$sel_kind_label .= "\n<option value=\"$k_label\"";
-	if($k_label == $kind_label) {
-	  foreach($k_kind_header as $k_header => $k_id) {
+	if ($k_label == $kind_label) {
+	  foreach ($k_kind_header as $k_header => $k_id) {
 	    $sel_kind_header .= "\n<option value=\"$k_id\"";
 	    if ($k_id == $kind) { 
 	      $sel_kind_lang .= "selected = \"selected\"";

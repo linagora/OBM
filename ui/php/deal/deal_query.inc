@@ -26,11 +26,13 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
-  $cat = $deal["category"];
+  $cat1 = $deal["category1"];
+  $role = $deal["role"];
   $status = $deal["status"];
   $manager = $deal["manager"];
   $date_after = $deal["date_after"];
   $date_before = $deal["date_before"];
+  $role_company = sql_search_text_parse($deal["role_company"]);
   $contact_id = $deal["contact_id"];
 
   $obm_q = new DB_OBM;
@@ -53,9 +55,18 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
   if (($tt != $c_all) && ($tt != "")) {
     $where .= " AND deal_tasktype_id='$tt'";
   }
-  if (($cat != $c_all) && ($cat != "")) {
-    $join_cat = "LEFT JOIN DealCategory1Link ON deal_id=dealcategory1link_deal_id";
+  if (($cat1 != $c_all) && ($cat1 != "")) {
+    $join_cat1 = "LEFT JOIN DealCategory1Link ON deal_id=dealcategory1link_deal_id";
     $where .= " AND dealcategory1link_category_id='$cat'";
+  }
+  if (($role != $c_all) && ($role != "")) {
+    $join_role = "LEFT JOIN DealCompany ON deal_id=dealcompany_deal_id";
+    $where .= " AND dealcompany_role_id='$role'";
+  }
+  if ($role_company != "") {
+    $join_role = "LEFT JOIN DealCompany ON deal_id=dealcompany_deal_id";
+    $join_role .= " LEFT JOIN Company as dc ON dealcompany_company_id=dc.company_id";
+    $where .= sql_global_company_name_advanced_search($role_company, $like, "dc");
   }
   if ($company_id != "") {
     $where .= " AND deal_company_id='$company_id'";
@@ -109,7 +120,7 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $orderq = " ORDER BY $order $p_order_dir $order_next";
 
 
-  $query = "SELECT 
+  $query = "SELECT DISTINCT
       deal_id as id,
       deal_id,
       deal_label,
@@ -134,8 +145,8 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
       deal_privacy,
       dealtype_label,
       leadsource_label,
-      company_name as deal_company_name,
-      company_zipcode as deal_company_zipcode,
+      Company.company_name as deal_company_name,
+      Company.company_zipcode as deal_company_zipcode,
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
@@ -146,13 +157,14 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
         LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
         LEFT JOIN LeadSource ON deal_source_id=leadsource_id
         LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
-        $join_cat
+        $join_cat1
+        $join_role
     $whereq
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Deal $join_comp $whereq");
+    $count = get_query_count("SELECT count(DISTINCT deal_id) FROM Deal $join_comp $join_cat1 $join_role $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {
@@ -235,7 +247,7 @@ function run_query_deal_detail($id) {
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_insert($deal) {
-  global $auth, $cdg_sql,$obm_q;
+  global $auth, $cdg_sql, $l_no;
 
   $now = date("Y-m-d H:i:s");
   $id = $deal["id"];
@@ -275,6 +287,7 @@ function run_query_deal_insert($deal) {
     $usercomment = $deal["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
+  $mail_comment = $deal["mail_comment"];
 
   $query = "INSERT INTO Deal (deal_timeupdate,
     deal_timecreate,
@@ -355,6 +368,16 @@ function run_query_deal_insert($deal) {
   // we increment the company total deal number
   if ($d_id) {
     run_query_deal_company_total_deal_inc($comp);
+  }
+
+  // DealCompany relations handling
+  if ( ($retour) && (is_array($deal["dc"]) )) {
+    $ret = run_query_deal_dealcompany_update($d_id, $deal["dc"]);
+  }
+
+  // If mail comment activated, send the updates by mail
+  if (($mail_comment != "") && ($mail_comment != "$l_no")) {
+    deal_send_mail($deal);
   }
 
   return $d_id;
@@ -444,7 +467,7 @@ function run_query_deal_update($deal) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-
+  // Category handling
   if ($retour) {
     $retour = of_category_query_delete_link("deal", "category1", $id);
     if (is_array($category1)) {
@@ -463,6 +486,11 @@ function run_query_deal_update($deal) {
     }
   }
 
+  // DealCompany relations handling
+  if ( ($retour) && (is_array($deal["dc"]) )) {
+    $ret = run_query_deal_dealcompany_update($id, $deal["dc"]);
+  }
+
   // If mail comment activated, send the updates by mail
   if (($mail_comment != "") && ($mail_comment != "$l_no")) {
     deal_send_mail($deal);
@@ -470,6 +498,48 @@ function run_query_deal_update($deal) {
 
   return $retour;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update the Deal dealcompany relations
+// Parameters:
+//   - $deal_id : deal id
+//   - $dc      : array with dealcompany infos
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_dealcompany_update($deal_id, $dc) {
+  global $cdg_sql;
+
+
+  if ( (is_array($dc)) && (count($dc) > 0) ) {
+    $query = "DELETE FROM DealCompany WHERE dealcompany_deal_id='$deal_id'";
+    display_debug_msg($query, $cdg_sql, "run_query_deal_dealcompany_update(1)");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+
+    foreach ($dc as $one_dc) {
+      $c_id = $one_dc["company_id"];
+      $role_id = $one_dc["role_id"];
+      
+      if ($c_id > 0) {
+  	$query = "INSERT INTO DealCompany (
+          dealcompany_deal_id,
+          dealcompany_company_id,
+          dealcompany_role_id
+        ) VALUES (
+          '$deal_id',
+          '$c_id',
+          '$role_id'
+        )";
+
+	display_debug_msg($query, $cdg_sql, "run_query_deal_dealcompany_update(2)");
+	$obm_q->query($query);
+      }
+    }
+  }
+
+  return $res;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1275,27 +1345,33 @@ function get_deal_dealcompany_info($deal_id) {
   $query = "SELECT
       dealcompany_id,
       dealcompany_company_id,
+      dealcompany_role_id,
       company_name,
       dealcompanyrole_code,
       dealcompanyrole_label
     FROM DealCompany
       LEFT JOIN Company on dealcompany_company_id = company_id
       LEFT JOIN DealCompanyRole on dealcompany_role_id = dealcompanyrole_id
-    WHERE dealcompany_deal_id='$deal_id'";
+    WHERE dealcompany_deal_id='$deal_id'
+    ORDER BY dealcompany_role_id";
 
   display_debug_msg($query, $cdg_sql, "get_deal_dealcompany_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
+  $cpt = 0;
   while ($obm_q->next_record()) {
-    $comp_id = $obm_q->f("dealcompany_company_id");
+    $company_id = $obm_q->f("dealcompany_company_id");
+    $company_name = $obm_q->f("company_name");
     $role_id = $obm_q->f("dealcompany_role_id");
     $role_code = $obm_q->f("dealcompanyrole_code");
     $role_label = $obm_q->f("dealcompanyrole_label");
-    $res[$comp_id]["comp_id"] = $comp_id;
-    $res[$comp_id]["role_id"] = $role_id;
-    $res[$comp_id]["role_code"] = $role_code;
-    $res[$comp_id]["role_label"] = $role_label;
+    $res[$cpt]["company_id"] = $company_id;
+    $res[$cpt]["company_name"] = $company_name;
+    $res[$cpt]["role_id"] = $role_id;
+    $res[$cpt]["role_code"] = $role_code;
+    $res[$cpt]["role_label"] = $role_label;
+    $cpt++;
   }
 
   return $res;

@@ -158,7 +158,7 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_ele
   global $$l_cat;
 
   if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
-    $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append);
+    $sel_cat = of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append);
 
     $block_cat = "
     <div class=\"searchLabel\">${$l_cat}<br />
@@ -192,7 +192,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
   if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
 
     if ($mode == "mono") {
-      $sel_cat = _of_category_html_select($entity, $cat, $cats, $cat_id, $first);
+      $sel_cat = of_category_html_select($entity, $cat, $cats, $cat_id, $first);
       $class = "detailForm";
     } else {
       if (is_array($cats)) {
@@ -231,6 +231,76 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
   }
 
   return $block_cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: category html select component
+// Parameters:
+//   - $entity        : target entity
+//   - $cats          : Category array
+//   - $cat           : target category
+//   - $cat_id        : selected target category
+//   - $first_element : scalar or array : (["all"|"none"])
+//   - $sel_append    : string (eg javascript code) to append at select
+///////////////////////////////////////////////////////////////////////////////
+function of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="") {
+  global $cgp_hide;
+
+  if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
+
+    if (is_array($first_element)) {
+      foreach($first_element as $element) {
+	$l_element = "l_${element}";
+	$c_element = "c_${element}"; 
+	global $$l_element, $$c_element;
+	if ($$c_element == $cat_id) {
+	  $first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+	} else {
+	  $first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+	}
+      }
+    } else if ($first_element != "") {
+      $l_element = "l_${first_element}";
+      $c_element = "c_${first_element}"; 
+      global $$l_element, $$c_element;
+      if ($$c_element == $cat_id) {
+	$first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+      } else {
+	$first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+      }
+    }
+
+    // Category select
+    $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\" $sel_append>
+      $first_option";
+    if (is_array($cats)) {
+      $has_code = false;
+      foreach ($cats as $one_cat) {
+        if ($one_cat["code"] != "") {
+	  $has_code = true;
+	  break;
+	}
+      }
+      foreach ($cats as $one_cat) {
+        $c_id = $one_cat["id"];
+	if ($has_code) {
+	  $c_code = str_pad($one_cat["code"] . " ", 10, ".");
+	}
+        $c_label = htmlentities($one_cat["label"]);
+        $sel_cat .= "\n<option value=\"$c_id\"";
+        if ($c_id == $cat_id) { $sel_cat .= " selected=\"selected\""; }
+        $sel_cat .= ">$c_code $c_label</option>";
+      }
+    }
+    $sel_cat .= "</select>";
+  }
+
+  return $sel_cat;
 }
 
 
@@ -334,10 +404,21 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
   }
 
   if (is_array($cats)) {
+
+    // Check if code are there
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+    $cpt_no_code = 1;
     foreach ($cats as $cat_info) {
-      $hash_code = explode(".",$cat_info["code"]);
-      $deep = count($hash_code);
-      switch ($deep) {
+      if ($cat_info["code"] != "") {
+	$hash_code = explode(".",$cat_info["code"]);
+	$deep = count($hash_code);
+	switch ($deep) {
         case 1:
 	  $tree[$hash_code[0]] = $cat_info;
 	  break;
@@ -347,9 +428,19 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
         case 3:
 	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
 	  break;
+	}
+      } else {
+	// Handle categories where code is not filled (automatic numbering)
+	$no_code = "X";
+	$tree["$no_code"][$cpt_no_code] = $cat_info;
+	$tree["$no_code"]["code"] = "$no_code";
+	$tree["$no_code"]["label"] = "No code";
+	$tree["$no_code"][$cpt_no_code]["code"] = "$no_code.$cpt_no_code";
+	$cpt_no_code++;
       }
     }
     if (is_array($tree)) {
+      print_r($tree);
       $block .= _of_category_dis_tree_node($tree, 0, $multi_select);
     }
   } else {
@@ -608,7 +699,7 @@ function of_category_dis_links($entity, $cat, $param, $mode="multi") {
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity}s <a href=\"$url\">($nb_cat)</a>.</td>
+      <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
     </tr>";
 
     $dis_link .= "
@@ -840,19 +931,21 @@ function of_category_query_insert($entity, $catu, $param) {
 function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
   global $cdg_sql;
 
-  $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $entity.$cat."link_".$entity."_id";
-  $linkfield_cat = $entity.$cat."link_category_id";
+  if ( ($entity_id > 0) && ($cat_id > 0) ) {
+    $linktable = ucfirst($entity) . ucfirst($cat)."Link";
+    $linkfield_ent = $entity.$cat."link_".$entity."_id";
+    $linkfield_cat = $entity.$cat."link_category_id";
 
-  $query = "INSERT INTO $linktable (
+    $query = "INSERT INTO $linktable (
        $linkfield_ent,
        $linkfield_cat)
      VALUES (
        '$entity_id',
        '$cat_id')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, "of_category_query_insert_link()");
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  }
 
   return $retour;
 }
@@ -1174,76 +1267,6 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: category html select component
-// Parameters:
-//   - $entity        : target entity
-//   - $cats          : Category array
-//   - $cat           : target category
-//   - $cat_id        : selected target category
-//   - $first_element : scalar or array : (["all"|"none"])
-//   - $sel_append    : string (eg javascript code) to append at select
-///////////////////////////////////////////////////////////////////////////////
-function _of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append="") {
-  global $cgp_hide;
-
-  if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
-
-    if (is_array($first_element)) {
-      foreach($first_element as $element) {
-	$l_element = "l_${element}";
-	$c_element = "c_${element}"; 
-	global $$l_element, $$c_element;
-	if ($$c_element == $cat_id) {
-	  $first_option .= "
-	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
-	} else {
-	  $first_option .= "
-	<option value=\"${$c_element}\">${$l_element}</option>";
-	}
-      }
-    } else if ($first_element != "") {
-      $l_element = "l_${first_element}";
-      $c_element = "c_${first_element}"; 
-      global $$l_element, $$c_element;
-      if ($$c_element == $cat_id) {
-	$first_option .= "
-	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
-      } else {
-	$first_option .= "
-	<option value=\"${$c_element}\">${$l_element}</option>";
-      }
-    }
-
-    // Category select
-    $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\" $sel_append>
-      $first_option";
-    if (is_array($cats)) {
-      $has_code = false;
-      foreach ($cats as $one_cat) {
-        if ($one_cat["code"] != "") {
-	  $has_code = true;
-	  break;
-	}
-      }
-      foreach ($cats as $one_cat) {
-        $c_id = $one_cat["id"];
-	if ($has_code) {
-	  $c_code = str_pad($one_cat["code"] . " ", 10, ".");
-	}
-        $c_label = htmlentities($one_cat["label"]);
-        $sel_cat .= "\n<option value=\"$c_id\"";
-        if ($c_id == $cat_id) { $sel_cat .= " selected=\"selected\""; }
-        $sel_cat .= ">$c_code $c_label</option>";
-      }
-    }
-    $sel_cat .= "</select>";
-  }
-
-  return $sel_cat;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display: Document Tree
 // Parameters:
 //   - $tree   : array with categories
@@ -1255,7 +1278,7 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
 
   $code = $tree["code"];
   $label = $tree["label"];
-  $id = $tree["id"]; 
+  $id = $tree["id"];
   if ($code != "") {
     $node_to_display = true;
     $indent_file = $indent + 15;

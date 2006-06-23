@@ -31,6 +31,7 @@ $l_code = "Code";
 $l_role = "Rôle";
 
 // Labels et textes
+$l_other_relation = "Autres relations";
 $l_infos = "Dates et montants";
 $l_minus = "-";
 $l_plus = "+";

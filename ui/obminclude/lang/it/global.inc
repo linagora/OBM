@@ -74,6 +74,7 @@ $l_public = "Pubblico";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_manager = "Responsabile";
+$l_relation = "Relation";
 $l_client = "Cliente";
 $l_supplier = "Fornitore";
 $l_total = "Total";

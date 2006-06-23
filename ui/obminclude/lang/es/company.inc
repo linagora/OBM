@@ -52,13 +52,7 @@ $l_err_act_empty = "Debe llenar la actividad de la compañía !";
 $l_no_display = "Llene el campo de búsqueda y presione < Buscar > para obtener compañías";
 $l_found = "compañías encontradas.";
 $l_no_found = "ninguna compañía coincide con la búsqueda !";
-$l_delete_ok = "La compañía ha sido borrada exitosamente.";
-$l_delete_error = "La eliminación de la compañía ha fallado !";
-$l_insert_ok = "La compañía ha sido incluida exitosamente.";
-$l_insert_error = "El ingreso de la compañía ha fallado !";
 $l_check_samecompany = "Estas compañías lucen similares a esta nueva entrada !";
-$l_update_ok = "La compañía ha sido actualizada exitosamente.";
-$l_update_error = "La actualización de la compañía ha fallado !";
 $l_link_contact = "Estos contactos son de esta compañía";
 $l_link_contact_no = "La compañía no tiene contactos";
 $l_link_deal = "La compañía esta involucrada en estos negocios";
@@ -72,12 +66,6 @@ $l_link_invoice_no ="La compañía NO esta involucrada en ninguna factura";
 $l_cant_delete = "La compañía NO puede ser borrada !";
 $l_can_delete = "La compañía puede ser borrada.";
 $l_naf_no = "Código No definido";
-$l_naf_delete_ok = "Código ha sido borrado exitosamente.";
-$l_naf_delete_error = "La eliminación del código ha fallado !";
-$l_naf_insert_ok = "Código ha sido incluida exitosamente.";
-$l_naf_insert_error = "Ingreso de Código ha fallado !";
-$l_naf_update_ok = "Código ha sido actualizado exitosamente.";
-$l_naf_update_error = "Actualización de Código ha fallado !";
 $l_naf_link_company = "Estas compañías son referenciadas como";
 $l_naf_link_company_no = "No compañía desde el Código";
 $l_naf_cant_delete = "Código NO pude ser borrada !";
@@ -148,38 +136,17 @@ $l_act_insert = "Ingresar Actividad";
 $l_cat_no = "No hay categorías definidas";
 $l_query_error = "Problema crítico en la ejecución de la búsqueda.";
 
-$l_kind_insert_ok = "El tipo ha sido incluido exitosamente.";
-$l_kind_insert_error = "El ingreso del tipo ha fallado !";
-$l_kind_delete_ok = "El tipo ha sido borrado exitosamente.";
-$l_kind_delete_error = "La eliminación del tipo ha fallado !";
-$l_kind_update_ok = "El tipo ha sido actualizado exitosamente.";
-$l_kind_update_error = "La actualización del tipo ha fallado !";
 $l_kind_link_company = "Estas compañías son referenciadas como";
 $l_kind_link_company_no = "No existe compañía referenciada como";
 $l_kind_cant_delete = "El tipo no puede ser borrado !";
 $l_kind_can_delete = "El tipo puede ser borrado.";
 
-
-$l_cat_insert_ok = "La categoría ha sido ingresada exitosamente.";
-$l_cat_insert_error = "El ingreso de la categoría ha fallado !";
-$l_cat_delete_ok = "La categoría ha sido borrada exitosamente.";
-$l_cat_delete_error = "La eliminación de la categoría ha fallado !";
-$l_cat_update_ok = "La categoría ha sido actualizado exitosamente.";
-$l_cat_update_error = "La actualización de la categoría ha fallado  !";
 $l_cat_link_company = "Estas compañías son referenciadas como";
 $l_cat_link_company_no = "No compañía referenciada como";
 $l_cat_cant_delete = "La categoría no puede ser borrada !";
 $l_cat_can_delete = "La categoría puede ser borrada.";
 
-$l_act_delete_ok = "Actividad ha sido borrada exitosamente.";
-$l_act_delete_error = "Eliminación de actividad fallado !";
-$l_act_insert_ok = "Actividad ha sido incluida exitosamente.";
-$l_act_insert_error = "Ingreso de actividad ha fallado !";
-$l_act_update_ok = "Actividad ha sido actualizada exitosamente.";
-$l_act_update_error = "Actualización de actividad ha fallado !";
 $l_act_link_company = "Estas compañías son referenciadas como";
 $l_act_link_company_no = "No compañía desde la actividad";
 $l_act_cant_delete = "Actividad NO pude ser borrada !";
 $l_act_can_delete = "Actividad puede ser borrada.";
-
-

@@ -55,19 +55,7 @@ $l_error_permission = "You have not the rights to access this page";
 $l_no_display = "Skriv inn søkekriteria og trykk < Finn > for å finne firma";
 $l_found = "found (to translate) !";
 $l_no_found = "Ingen firma som passa til søket !";
-$l_delete_ok = "Firmaet er sletta.";
-$l_delete_error = "Firmaet kunne ikkje slettast!";
-$l_insert_ok = "Firmaet er lagt til.";
-$l_insert_error = "Firmaet kunne ikkje leggast til!";
-$l_update_ok = "Firmaet er oppdatert.";
-$l_update_error = "Firmaet kunne ikkje oppdaterast !";
 $l_query_error = "Problem med å utføre søket.";
-$l_kind_insert_ok = "Kategori lagt til.";
-$l_kind_insert_error = "Kategori kunne ikkje leggast til!";
-$l_kind_delete_ok = "Kategorien er sletta.";
-$l_kind_delete_error = "Kategorien kunne ikkje slettast.";
-$l_kind_update_ok = "Kategorien er oppdatert.";
-$l_kind_update_error = "Kategorien kunne ikkje oppdaterast.";
 $l_kind_del_verif_error = "(ar) av denne typen finst.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

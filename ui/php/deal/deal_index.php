@@ -510,12 +510,43 @@ function get_param_deal() {
   global $tf_company_name, $tf_zip,$sel_manager, $tf_date_after, $tf_date_before;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
   global $tf_category1_label, $tf_category1_code, $sel_category1;
-  global $tf_role_label, $tf_role_code, $sel_role;
+  global $tf_role_label, $tf_role_code, $sel_role, $tf_role_company;
   global $param_deal, $param_contact, $param_lead, $sel_source, $tf_source;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir, $dash_view;
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
  
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    // Handle DealCompany infos
+    $cpt = 0;
+    global $data_dc_0;
+    while (isset($http_obm_vars["data_dc_$cpt"])) {
+      global ${"data_dccid_$cpt"}; $dccid = ${"data_dccid_$cpt"};
+      global ${"data_dccname_$cpt"}; $dccname = ${"data_dccname_$cpt"};
+      global ${"data_dccnewid_$cpt"}; $dccnewid = ${"data_dccnewid_$cpt"};
+      global ${"data_dccnewname_$cpt"}; $dccnewname = ${"data_dccnewname_$cpt"};
+      global ${"sel_role$cpt"}; $dcroleid = ${"sel_role$cpt"};
+
+      if ($dccnewid > 0) {
+ 	$deal["dc"][$cpt]["company_id"] = $dccnewid;
+ 	$deal["dc"][$cpt]["company_name"] = $dccnewname;
+ 	$deal["dc"][$cpt]["role_id"] = $dcroleid;
+      } else if ($dccid > 0) {
+ 	$deal["dc"][$cpt]["company_id"] = $dccid;
+ 	$deal["dc"][$cpt]["company_name"] = $dccname;
+ 	$deal["dc"][$cpt]["role_id"] = $dcroleid;
+      }
+      $cpt++;
+    }
+  }
+
   if (isset ($popup)) $deal["popup"] = $popup;
   if (isset ($ext_action)) $deal["ext_action"] = $ext_action;
   if (isset ($ext_url)) $deal["ext_url"] = $ext_url;
@@ -610,6 +641,7 @@ function get_param_deal() {
   if (isset ($sel_manager)) $deal["manager"] = $sel_manager;
   if (isset ($tf_date_after)) $deal["date_after"] = $tf_date_after;
   if (isset ($tf_date_before)) $deal["date_before"] = $tf_date_before;
+  if (isset ($tf_role_company)) $deal["role_company"] = $tf_role_company;
 
   // Company infos (with company_name)
   if (isset ($hd_company_ad1)) $deal["company_ad1"] = $hd_company_ad1;

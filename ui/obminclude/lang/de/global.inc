@@ -56,6 +56,7 @@ $l_expresspostal = "Eilzustellung";
 $l_country = "Land";
 $l_desc = "Beschreibung";
 $l_priority = "Priorität";
+$l_relation = "Relation";
 $l_datasource = "Data source";
 $l_visibility = "Zugriff";
 $l_private = "Privat";

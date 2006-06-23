@@ -28,6 +28,7 @@ $l_code = "Code";
 $l_role = "Role";
 
 // Labels and texts
+$l_other_relation = "Autres relations";
 $l_infos = "Informations";
 $l_minus = "-";
 $l_plus = "+";

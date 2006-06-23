@@ -1030,17 +1030,25 @@ function get_global_email_used($id="", $gid="", $lid="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Return the SQL advanced search clause on Company name
 // Parameters:
-//   - $name : company name to search
-//   - $like : like clause (can be ilike for postgres)
+//   - $name        : company name to search
+//   - $like        : like clause (can be ilike for postgres)
+//   - $table_alias : Table where to find Company (case of multiple joins)
 // Returns:
 //   - $sql : sql criteria
 ///////////////////////////////////////////////////////////////////////////////
-function sql_global_company_name_advanced_search($name, $like="like") {
+function sql_global_company_name_advanced_search($name, $like="like", $table_alias="") {
 
   $sound = phonetic_key($name);
-  $sql = " AND (company_name $like '$name%'
-                  OR company_aka $like '%$name%'
-                  OR company_sound = '$sound')";
+
+  if ($table_alias != "") {
+    $alias = "$table_alias.";
+  } else {
+    $alias = "";
+  }
+
+  $sql = " AND (${alias}company_name $like '$name%'
+                 OR ${alias}company_aka $like '%$name%'
+                 OR ${alias}company_sound = '$sound')";
 
   return $sql;
 }

@@ -1050,7 +1050,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
   if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
   if (isset($company["datecomment"])) { $datecomment = $company["datecomment"]; }
-  if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
+  if (isset($company["category1"])) { $cat1 = $company["category1"]; }
 
   // Conditionnal fields
   // category1, activity, type
