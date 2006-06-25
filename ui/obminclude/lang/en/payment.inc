@@ -54,13 +54,6 @@ $l_no_found="No payment corresponding to your query";
 $l_no_invoices_connected = "No Invoices connected to that Payment";
 $l_cant_delete = "The payment can't be deleted !";
 $l_can_delete = "The payment can be deleted.";
-$l_delete_ok = "The payment has been deleted successfully.";
-$l_delete_error = "The deletion of the payment has failed !";
-$l_insert_ok = "The payment has been inserted successfully.";
-$l_insert_error = "The insertion of the payment has failed !";
-$l_update_ok = "The payment has been updated successfully.";
-$l_update_error = "The update of the payment has failed !";
-$l_query_error = "Trouble executing the query...";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_no_number = "\\nThe payment number is not valid!";

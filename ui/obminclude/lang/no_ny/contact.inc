@@ -48,18 +48,11 @@ $l_add_comment3 = "Add a Kommentar 3";
 $l_upd_comment3 = "Update the kommentar 3";
 
 // Messages
-$l_company_del_verif_error = " deal(s) are attached to this company : it can't be deleted";
 $l_error_permission = "You have not the rights to access this page";
 $l_error_visibility = "You can't consult this page : the information is private.";
 $l_no_display = "Fyll inn søkefelta og trykk < Finn > for å hente ut kontaktane";
 $l_found = "found (to translate) !";
 $l_no_found = "Ingen kontaktar passa søket!";
-$l_delete_ok = "Kontakten er sletta.";
-$l_delete_error = "Kontakten kunne ikkje slettast!";
-$l_insert_ok = "Kontakten er lagt til.";
-$l_insert_error = "Kontakten kunne ikkje leggast til!";
-$l_update_ok = "Kontakten er oppdatert.";
-$l_update_error = "Kontakten kunne ikkje oppdaterast.";
 $l_query_error = "Problem med å utføre søket.";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)

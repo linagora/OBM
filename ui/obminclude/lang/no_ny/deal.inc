@@ -40,11 +40,6 @@ $l_type_new = "New Kind";
 $l_status_manage = "Deal Status Management";
 $l_status_exist = "Existing States";
 $l_status_new = "New State";
-$l_category_manage = "Deal Category Management";
-$l_category_exist = "Existing Categories";
-$l_category_new = "New Category";
-$l_category_label="Label";
-$l_category_minilabel="Mini Label";
 $l_affect_deal= "Affect to a parentdeal";
 $l_deal_select_parentdeal = "Select the parentdeal whom the deal must be affected";
 $l_parentdeal="ParentDeal";
@@ -81,9 +76,6 @@ $l_type_insert = "Insert Kind";
 $l_status_update = "Update State";
 $l_status_delete = "Delete State";
 $l_status_insert = "Insert State";
-$l_category_delete = "Delete Category";
-$l_category_update = "Update Category";
-$l_category_insert = "Insert Category";
 
 // Messages
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
@@ -91,13 +83,6 @@ $l_error_visibility = "You can't consult this page : the information is private.
 $l_no_display = "Skriv inn søkekriteria og trykk < Finn > for å finne avtalane";
 $l_found = "found (to translate) !";
 $l_no_found = "Ingen avtalar som passa til søket !";
-$l_delete_ok = "Avtalen er sletta.";
-$l_delete_error = "Avtalen kunne ikkje slettast.";
-$l_insert_ok = "Avtalen er lagt til.";
-$l_insert_error = "Avtalen kunne ikkje leggast til.";
-$l_update_ok = "Avtalen er oppdatert.";
-$l_update_error = "Avtalen kunne ikkje oppdaterast.";
-$l_query_error = "Problem med å utføre søket.";
 $l_archive_ok = "Arkivet er oppdatert.";
 $l_archive_error = "Arkivet kunne ikkje oppdaterast.";
 $l_archive_number = "avtaler lagt til i arkivet.";
@@ -106,30 +91,6 @@ $l_no_display_parent ="Fill the search fields and press < Find > to retrieve the
 $l_no_found_parent ="No parentdeal found matching the query !";
 
 $l_error_permission = "You have not the rights to access this page.";
-$l_type_insert_ok = "The kind has been inserted successfully.";
-$l_type_insert_error = "The insertion of the kind has failed !";
-$l_type_update_ok = "The kind has been updated successfully.";
-$l_type_update_error = "The kind of the deal has failed !";
-$l_type_delete_error = "The deletion of the kind has failed !";
-$l_type_del_verif_error = "(ies) of this kind exist.";
-$l_type_delete_ok = "The kind has been deleted successfully.";
-
-$l_status_insert_ok = "The state has been inserted successfully.";
-$l_status_insert_error = "The insertion of the state has failed !";
-$l_status_update_ok = "The State has been updated successfully.";
-$l_status_update_error = "The state of the deal has failed !";
-$l_status_del_verif_error = "(ies) of this status exist.";
-$l_status_delete_error = "The deletion of the state has failed !";
-$l_status_delete_ok = "The state has been deleted successfully.";
-
-$l_category_insert_ok = "The category has been inserted successfully.";
-$l_category_insert_error = "The insertion of the category has failed !";
-$l_category_update_ok = "The category has been updated successfully.";
-$l_category_update_error = "The category of the deal has failed !";
-$l_category_delete_error = "The deletion of the category has failed !";
-$l_category_del_verif_error = "(ies) of this categorie exist.";
-$l_category_delete_ok = "The category has been deleted successfully.";
-
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "\\n You have to select a parentdeal before submitting.";
@@ -144,14 +105,10 @@ $mj_type_delete_confirm = "Confirm the deal kind deletion ?";
 $mj_type_delete = "You have to select a kind to delete it !";
 $mj_status_delete_confirm = "Confirm the deal status deletion ?";
 $mj_status_delete = "You have to select a state to delete it !";
-$mj_category_delete_confirm = "Confirm the deal category deletion ?";
-$mj_category_delete = "You have to select a category to delete it !";
 $mj_type_update = "You have to select a kind and enter a new name to update it !";
 $mj_status_update = "You have to select a state and enter a new name to update it !";
-$mj_category_update = "You have to select a category and enter a new name to update it !";
 $mj_type_create = "You have to enter a new kind name to create it !";
 $mj_status_create = "You have to enter a new state name to create it !";
-$mj_category_create = "You have to enter a new category name to create it !";
 
 // For the display parameters modification screen
 $l_deal_options = "Display options for deals list"; 

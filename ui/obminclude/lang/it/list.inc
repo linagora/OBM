@@ -38,12 +38,6 @@ $l_delete = "Elimina lista";
 $l_add = "Aggiungi queste liste";
 
 // Messages
-$l_insert_ok = "Lista inserita.";
-$l_insert_error = "Inserimento Lista fallito!";
-$l_update_ok = "Lista modificata.";
-$l_update_error = "Modifica lista fallito!";
-$l_delete_ok = "Lista eliminata.";
-$l_delete_error = "Eliminazione lista fallita!";
 $l_fill_name = "Inserisci nome lista";
 $l_name_list_nomatch = "Nome lista non valido";
 $l_list_exists = "Lista già esistente";

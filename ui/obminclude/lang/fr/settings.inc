@@ -25,8 +25,6 @@ $l_set_csv_sep = "Séparateur pour export CSV";
 $l_set_debug = "Niveau de debug";
 $l_send_mail = "Accepter les e-mail";
 
-$l_update_ok = "Mise à jour de votre configuration correctement effectuée";
-
 // Dates format
 $l_da_iso = "yyyy-mm-dd";
 $l_da_en = "mm/dd/yyyy";

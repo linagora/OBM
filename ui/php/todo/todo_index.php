@@ -54,9 +54,9 @@ if ($action == "index" || $action == "") {
   if (check_todo_data_form($todo)) {
     $retour = run_query_todo_insert($todo);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_todo : $l_insert_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_todo : $l_insert_error");
     }
     $display["result"] = dis_todo_form("");
     $display["result"] .= dis_todo_search_list($todo);
@@ -77,9 +77,9 @@ if ($action == "index" || $action == "") {
   if (check_todo_can_delete($todo["id"])) {
     $retour = run_query_todo_delete_unique($todo["id"]);
     if ($retour) {
-      $display["msg"] = display_ok_msg($l_delete_ok);
+      $display["msg"] = display_ok_msg("$l_todo : $l_delete_ok");
     } else {
-      $display["msg"] = display_err_msg($l_delete_error);
+      $display["msg"] = display_err_msg("$l_todo : $l_delete_error");
     }
     $display["result"] = dis_todo_form($todo);
     $display["result"] .= dis_todo_search_list($todo);

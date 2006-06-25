@@ -42,8 +42,6 @@ $l_delete = "Elimina the Operazione";
 // Messages
 $l_found = "Operazione trovate";
 $l_no_found = "Nessuna Operazione trovata";
-$l_insert_ok = "L'Operazione è stata inserita.";
-$l_delete_ok = "L'Operazione è stata eliminata.";
 $l_no_display = "Riempi i campi di ricerca e premi < Trova > per la lista.";
 $l_select_contract = "Seleziona il contratto dell'operazione";
 

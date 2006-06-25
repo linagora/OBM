@@ -120,10 +120,10 @@ if ($action == "ext_get_id") {
   if (check_project_form("", $project)) {
     $project["id"] = run_query_project_insert($project);
     if ($project["id"]) {
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_project : $l_insert_ok");
       $display["detail"] = dis_project_consult($project["id"]);
     } else {
-      $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
+      $display["msg"] .= display_err_msg("$l_project : $l_insert_error : $err_msg");
     }
   } else { 
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
@@ -135,10 +135,10 @@ if ($action == "ext_get_id") {
   if (check_project_form($project["id"], $project)) {
     $retour = run_query_project_update($project["id"], $project);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_project : $l_update_ok");
       $display["detail"] = dis_project_consult($project["id"]);
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_project : $l_update_error");
       $display["detail"] = dis_project_consult($project["id"]);
     }
   } else {
@@ -162,7 +162,7 @@ if ($action == "ext_get_id") {
   if (check_project_can_delete($project["id"])) {
     $retour = run_query_project_delete($project["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_project : $l_delete_ok");
       $display["search"] = dis_project_search_form($project);
       if ($set_display == "yes") {
         $display["result"] = dis_project_search_list($project);
@@ -170,7 +170,7 @@ if ($action == "ext_get_id") {
         $display["msg"] .= display_info_msg($l_no_display);
       }
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_project : $l_delete_error");
       $display["detail"] = dis_project_consult($project["id"]);
     }
   } else {
@@ -191,9 +191,9 @@ if ($action == "ext_get_id") {
   if (check_project_task_form($project["id"], $project)) {
     $retour = run_query_project_task_insert($project);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_task_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_task : $l_insert_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_task_insert_error");
+      $display["msg"] .= display_err_msg("$l_task : $l_insert_error");
     }
     $project["name"] = run_query_project_name($project["id"]);
     $tasks_q = run_query_project_tasks($project["id"]);
@@ -212,9 +212,9 @@ if ($action == "ext_get_id") {
   if (check_project_task_form($project["id"], $project)) {
     $retour = run_query_project_task_update($project);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_task_update_ok);
+      $display["msg"] .= display_ok_msg("$l_task : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_task_update_error");
+      $display["msg"] .= display_err_msg("$l_task : $l_update_error");
     }
     $project["name"] = run_query_project_name($project["id"]);
     $tasks_q = run_query_project_tasks($project["id"]);
@@ -233,9 +233,9 @@ if ($action == "ext_get_id") {
   if ($project["tsk_nb"] > 0) {
     $nb = run_query_project_task_delete($project);
     if ($nb == $project["tsk_nb"]) {
-      $display["msg"] .= display_ok_msg("$l_task_delete_ok");
+      $display["msg"] .= display_ok_msg("$l_task : $l_delete_ok");
     } else {
-      $display["msg"] .= display_warn_msg("$l_task_delete_error");
+      $display["msg"] .= display_warn_msg("$l_task : $l_delete_error");
     }
   } else {
     $display["msg"] .= display_err_msg("$l_no_task_del");
@@ -293,9 +293,9 @@ if ($action == "ext_get_id") {
   if (!($retour))
     $ins_err = 1;
   if (!($ins_err)) {
-    $display["msg"] .= display_ok_msg($l_allocate_update_ok);
+    $display["msg"] .= display_ok_msg("$l_allocate : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_allocate_update_error);
+    $display["msg"] .= display_err_msg("$l_allocate : $l_update_error");
   }
   $display["detail"] = dis_project_consult($project["id"]);
 
@@ -308,9 +308,9 @@ if ($action == "ext_get_id") {
   if (!($retour))
     $ins_err = 1;
   if (!($ins_err)) {
-    $display["msg"] .= display_ok_msg($l_allocate_update_ok);
+    $display["msg"] .= display_ok_msg("$l_allocate : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_allocate_update_error);
+    $display["msg"] .= display_err_msg("$l_allocate : $l_update_error");
   }
   $display["detail"] = dis_project_consult($project["id"]);
 
@@ -343,7 +343,7 @@ if ($action == "ext_get_id") {
     $nb = run_query_project_memberlist_delete($project);
     $display["msg"] .= display_ok_msg("$nb $l_member_removed");
     if ($nb != $project["mem_nb"])
-      $display["msg"] .= display_warn_msg("$l_member_delete_error");
+      $display["msg"] .= display_warn_msg("$l_member : $l_delete_error");
   } else {
     $display["msg"] .= display_err_msg("$l_no_member_del");
   }
@@ -404,8 +404,8 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Company parameters transmited in $company hash
-// returns : $company hash with parameters set
+// Stores parameters transmited in $project hash
+// returns : $project hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_project() {
   global $param_project, $param_user, $param_status,$param_company,$param_deal;

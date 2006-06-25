@@ -41,6 +41,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("incident_query.inc");
 require("incident_display.inc");
+require_once("incident_js.inc");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
@@ -61,7 +62,6 @@ page_close();
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("incident_js.inc");
   $display["search"] = dis_incident_search_form($incident);
   if ($set_display == "yes") {
     $display["result"] = dis_incident_search_list($incident);
@@ -71,13 +71,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("incident_js.inc");
   $display["search"] = dis_incident_search_form($incident);
   $display["result"] = dis_incident_search_list($incident);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("incident_js.inc");
   $display["detail"] = dis_incident_form($action,$incident);
 
 } elseif ($action == "detailconsult")  {
@@ -91,7 +89,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($incident["id"] > 0) {
-    require("incident_js.inc");
     $display["detailInfo"] = display_record_info($inc_q);
     $display["detail"] = dis_incident_form($action,$incident);
   } else {
@@ -104,15 +101,13 @@ if ($action == "index" || $action == "") {
   if (check_incident_form($incident)) {
     $incident["id"] = run_query_incident_insert($incident);
     if ($incident["id"] > 0) {
-      $display["msg"] = display_ok_msg($l_insert_ok);
+      $display["msg"] = display_ok_msg("$l_incident : $l_insert_ok");
       $display["detail"] = dis_incident_consult($incident);
     } else {
-      $display["msg"] = display_err_msg($l_insert_error);
-      require("incident_js.inc");
+      $display["msg"] = display_err_msg("$l_incident : $l_insert_error");
       $display["detail"] = dis_incident_form($action,$incident);
     }
   } else {
-    require("incident_js.inc");
     $display["msg"] = display_warn_msg($err_msg);
     $display["detail"] = dis_incident_form($action,$incident);
   }
@@ -122,14 +117,13 @@ if ($action == "index" || $action == "") {
   if (check_incident_form($incident)) {
     $ret = run_query_incident_update($incident);
     if ($ret) {
-      $display["msg"] = display_ok_msg($l_update_ok);
+      $display["msg"] = display_ok_msg("$l_incident : $l_update_ok");
       $display["detail"] = dis_incident_consult($incident);
     } else {
-      $display["msg"] = display_error_msg($l_update_error);
+      $display["msg"] = display_error_msg("$l_incident : $l_update_error");
       $display["detail"] = dis_incident_form($action,$incident);
     }
   } else {
-    require("incident_js.inc");
     $display["msg"] = display_warn_msg($err_msg);
     $display["detail"] = dis_incident_form($action,$incident);
   }
@@ -137,7 +131,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_incident($incident["id"])) {
-    require("incident_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_incident($incident["id"]);
   } else {
@@ -151,11 +144,10 @@ if ($action == "index" || $action == "") {
   if (check_can_delete_incident($incident["id"])) {
     $retour = run_query_incident_delete($incident["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_incident : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_incident : $l_delete_error");
     }
-    require("incident_js.inc");
     $display["search"] = dis_incident_search_form($incident);
     if ($set_display == "yes") {
       $display["result"] = dis_incident_search_list($incident);
@@ -170,29 +162,26 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-    require("incident_js.inc");
-    $display["detail"] = dis_incident_admin_index();
+  $display["detail"] = dis_incident_admin_index();
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "priority", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_priority : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_priority)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_priority : $l_insert_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "priority", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_priority : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_priority)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_priority : $l_update_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "priority_checklink")  {
@@ -203,33 +192,30 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "priority", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_priority)." : $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_priority : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_priority)." : $l_c_delete_error");   
+    $display["msg"] .= display_err_msg("$l_priority : $l_delete_error");   
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "status", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_status : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_status)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_status : $l_insert_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "status", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_status : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_status)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_status : $l_update_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "status_checklink")  {
@@ -240,33 +226,30 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "status", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_status)." : $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_status : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_status)." : $l_c_delete_error");
+    $display["msg"] .= display_err_msg("$l_status : $l_delete_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "category1", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "category1", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "category1_checklink")  {
@@ -277,11 +260,10 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "category1", $incident);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
   }
-  require("incident_js.inc");
   $display["detail"] .= dis_incident_admin_index();
 
 } elseif ($action == "display") {

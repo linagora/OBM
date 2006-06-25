@@ -95,10 +95,10 @@ if (($action == "index") || ($action == "")) {
     if ($hd_confirm == $c_yes) {
       $group["id"] = run_query_group_insert($group);
       if ($group["id"]) {
-	$display["msg"] .= display_ok_msg($l_insert_ok);
+	$display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
 	$display["detail"] = dis_group_consult($group, $uid);
       } else {
-	$display["msg"] .= display_err_msg($l_insert_error);
+	$display["msg"] .= display_err_msg("$l_group : $l_insert_error");
 	$display["search"] = html_group_search_form($group);
       }
       
@@ -110,10 +110,10 @@ if (($action == "index") || ($action == "")) {
       } else {
 	$group["id"] = run_query_group_insert($group);
 	if ($group["id"] > 0) {
-	  $display["msg"] .= display_ok_msg($l_insert_ok);
+	  $display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
 	  $display["detail"] = dis_group_consult($group, $uid);
 	} else {
-	  $display["msg"] .= display_err_msg($l_insert_error);
+	  $display["msg"] .= display_err_msg("$l_group : $l_insert_error");
 	  $display["search"] = html_group_search_form($group);
 	}
       }
@@ -125,14 +125,14 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = html_group_form($action, "", $group);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_data_form($group)) {
     $retour = run_query_group_update($group);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_group : $l_update_error");
     }
     $display["detail"] = dis_group_consult($group, $uid);
   } else {
@@ -141,7 +141,7 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = html_group_form($action, $group_q, $group);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_can_delete($group["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
@@ -153,14 +153,14 @@ if (($action == "index") || ($action == "")) {
   }
   //  $display["detail"] = dis_group_warn_delete($group["id"]);
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_can_delete($group["id"])) {
     $retour = run_query_group_delete($group["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_group : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_group : $l_delete_error");
     }
     $display["search"] = html_group_search_form("");
   } else {
@@ -169,7 +169,7 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = dis_group_consult($group, $uid);
   }
 
-} elseif ($action == "user_add")  {
+} elseif ($action == "user_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($group["user_nb"] > 0) {
     $nb = run_query_group_usergroup_insert($group);
@@ -179,7 +179,7 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_group_consult($group, $uid);
 
-} elseif ($action == "user_del")  {
+} elseif ($action == "user_del") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($group["user_nb"] > 0) {
     $nb = run_query_group_usergroup_delete($group);
@@ -189,7 +189,7 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_group_consult($group, $uid);
 
-} elseif ($action == "group_add")  {
+} elseif ($action == "group_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($group["group_nb"] > 0) {
     $nb = run_query_group_group_insert($group);
@@ -199,7 +199,7 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_group_consult($group, $uid);
 
-} elseif ($action == "group_del")  {
+} elseif ($action == "group_del") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($group["group_nb"] > 0) {
     $nb = run_query_group_group_delete($group);

@@ -41,11 +41,6 @@ $l_kind_new = "Nuovo Tipo";
 $l_status_manage = "Gestione stato Impegno ";
 $l_status_exist = "Stati esistenti";
 $l_status_new = "Nuovo Stato";
-$l_category_manage = "Gestione categoria Impegno ";
-$l_category_exist = "Categorie esistenti";
-$l_category_new = "Nuova Categoria";
-$l_category_label="Nome";
-$l_category_minilabel="Nome breve";
 $l_parentdeal_deals = "Impegni appartengono a questo impegno";
 
 // Actions
@@ -83,15 +78,6 @@ $l_status_cant_delete = "Stato non può essere eliminato";
 $l_status_link_deal = "Stato necessario in questi Impegni";
 $l_status_link_deal_no = "Stato no è richiesto in Impegni";
 $l_status_insert = "Inserisci Stato";
-$l_cat_checkdelete = "Controlla o Elimina Categoria";
-$l_cat_delete = "Elimina Categoria";
-$l_cat_can_delete = "Categoria eliminabile";
-$l_cat_cant_delete = "Categoria NON può essere eliminata";
-$l_cat_link_deal = "Categoria richiesta per questi Impegni";
-$l_cat_link_deal_no = "Categoria no richiesta in Impegni";
-$l_cat_update = "Modifica Categoria";
-$l_cat_insert = "Inserisci Categoria";
-
 
 // Messages
 $l_err_parent_has_deal = "L'Impegno ne ha altri collegati, non può essere eliminato!";
@@ -111,13 +97,6 @@ $l_found_parent = "Sub-Impegni trovati";
 $l_no_display_parent ="Scrivi nei campi click su   <TROVA> per la ricerca";
 $l_no_found_parent ="Nessun impegno trovato!";
 
-$l_cat_insert_ok = "Categoria inserita.";
-$l_cat_insert_error = "Inserimento categoria fallita!";
-$l_cat_update_ok = "Categoria modificata.";
-$l_cat_update_error = "Modifica categoria fallita!";
-$l_cat_delete_error = "Eliminazione  categoria fallita!";
-$l_cat_delete_ok = "Categoria  eliminata.";
-
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "Inserisci prima un Sub-impegno.";
 $l_fill_label = "Scrivi prima nome.";
@@ -130,13 +109,10 @@ $l_invalid_date = "Formato data non valido (MM/GG/AAAA or AAAA-MM-GG).";
 $l_delete_confirm = "Confermi impegno Eliminazione ?";
 $l_j_kind_delete = "Inserisci un Tipo per controllo o eliminazione!";
 $l_j_status_delete = "Inserisci uno Stato per controllo o eliminazione!";
-$l_j_category_delete = "Inserisci a categoria per controllo o eliminazione!";
 $l_j_kind_update = "Inserisci un tipo e scrivi un nuovo nome per la modifica!";
 $l_j_status_update = "Inserisci uno Stato e scrivi un nuovo nome per la modifica!";
-$l_j_category_update = "Inserisci a categoria e scrivi un nuovo nome per la modifica!";
 $l_j_kind_create = "Inserisci il nome per un nuovo tipo per crearlo!";
 $l_j_status_create = "Inserisci il nome per un nuovo Stato per crearlo!";
-$l_j_category_create = "Inserisci il nome per una  nuova categoria per crearla!";
 
 // For display parameters modification screen
 $l_deal_display = "Visualizza opzioni per la lista di Impegni";

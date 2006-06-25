@@ -58,27 +58,13 @@ $l_accept = "Accetta";
 $l_reject = "Respingi";
 $l_select = "Scegli";
 
-$l_update_ok = "modifica eseguita";
 $l_update_warning = "attenzione: sono stati rilevati conflitti";
-$l_insert_ok = "registrazione effettauta";
 $l_insert_warning = $l_update_warning;
 $l_insert_error	= "sono stati rilevati conflitti. creazione non effettuata";
 
 // Messages
-$l_category_insert_ok = "la categoria e stata registrata";
-$l_category_insert_error ="attenzione! la categoria NON e stata registrata";
-$l_category_update_ok = "la categoria e stata modificata";
-$l_category_update_error = "attenzione! la categoria NON e stata modificata";
-$l_category_delete_ok = "la categoria e stata eliminata";
-$l_category_delete_error = "attenzione! la categoria NON e stata eliminata";
 $l_select_contacts = "Scegliere un mese od un gruppo.";
 $l_select_repeat_day = "Scegli il giorno della ripetizione.";
-$l_event_insert_ok = "Registrazione appuntamento effettuata;";
-$l_event_insert_error = "Errore di inserimento;";
-$l_event_update_ok = "Modifica dell'appuntamento inserita ";
-$l_event_update_error = "Errore di modifica appuntamento;";
-$l_event_delete_ok = "Eliminazione appuntamento effettuata";
-$l_event_delete_error = "Eliminazione appuntamento non eseguita";
 $l_event_delete_all_ok = "Eliminazione dell' appuntamento e delle ripetizioni eseguita";
 $l_event_delete_all_error = "Errore Eliminazione dell' appuntamento e delle ripetizioni ";
 $l_event_approve_ok = "Scelta eseguita";

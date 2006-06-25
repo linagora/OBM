@@ -24,19 +24,8 @@ $l_contact_new = "New Contact";
 $l_deal_new = "New Deal";
 $l_project_new = "New Projet";
 $l_contract_new = "New Contract";
-$l_kind_manage = "Company Kind Management";
-$l_kind_exist = "Existing Kinds";
-$l_kind_new = "New Kind";
 $l_internal = "Internal";
 $l_cat_tree = "Category tree";
-$l_cat_manage = "Company Category Management";
-$l_cat_exist = "Existing Categories";
-$l_cat_new = "New Category";
-$l_cat_label = "Label";
-$l_cat_code = "Code";
-$l_act_manage = "Company Activity Management";
-$l_act_exist = "Existing Activities";
-$l_act_new = "New Activity";
 $l_naf_manage = "Code Management";
 $l_naf_exist = "Existing codes";
 $l_naf_new = "New Code";
@@ -50,20 +39,6 @@ $l_insert = "Insert the Company";
 $l_update = "Update the Company";
 $l_checkdelete = "Check or Delete the Company";
 $l_delete = "Delete the Company";
-$l_kind_update = "Update Kind";
-$l_kind_checkdelete = "Check or Delete Kind";
-$l_kind_delete = "Delete Kind";
-$l_kind_insert = "Insert Kind";
-
-$l_cat_update = "Update Category";
-$l_cat_checkdelete = "Check or Delete category";
-$l_cat_delete = "Delete category";
-$l_cat_insert = "Insert category";
-
-$l_act_update = "Update Activity";
-$l_act_checkdelete = "Check or Delete Activity";
-$l_act_delete = "Delete Activity";
-$l_act_insert = "Insert Activity";
 
 $l_naf_update = "Update Code";
 $l_naf_checkdelete = "Check or Delete Code";
@@ -79,7 +54,6 @@ $l_no_display = "Fill the search fields and press < Find > to retrieve the compa
 $l_found = "companies found.";
 $l_no_found = "No company found matching the query !";
 $l_check_samecompany = "These companies seem similar to this new entry !";
-$l_query_error = "Critical trouble during the execution of the query.";
 $l_link_contact = "The company has contacts";
 $l_link_contact_no = "The company hasn't any contacts";
 $l_link_deal = "The company is involved in some deals";
@@ -92,20 +66,6 @@ $l_link_invoice = "The company is involved in some invoices";
 $l_link_invoice_no = "The company isn't involved in any invoices";
 $l_cant_delete = "The company can't be deleted !";
 $l_can_delete = "The company can be deleted.";
-$l_kind_link_company = "These companies are referenced as";
-$l_kind_link_company_no = "No company referenced as";
-$l_kind_cant_delete = "The Kind can't be deleted !";
-$l_kind_can_delete = "The Kind can be deleted.";
-
-$l_cat_link_company = "These companies are referenced as";
-$l_cat_link_company_no = "No company referenced as";
-$l_cat_cant_delete = "The category can't be deleted !";
-$l_cat_can_delete = "The category can be deleted.";
-
-$l_act_link_company = "These companies are referenced as";
-$l_act_link_company_no = "No company from activity";
-$l_act_cant_delete = "Activity can't be deleted !";
-$l_act_can_delete = "Activity can be deleted.";
 
 $l_naf_no = "No Code defined";
 $l_naf_link_company = "These companies are referenced as";
@@ -121,18 +81,6 @@ $l_j_check_phone = "The phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
 $l_j_check_email = "The email adress is not valid.";
 $l_j_check_web = "The web adress is not valid.";
-$l_j_kind_delete = "You have to select a kind to check or delete it !";
-$l_j_kind_update = "You have to select a kind and enter a new name to update it !";
-$l_j_kind_create = "You have to enter a new kind name to create it !";
-
-$l_j_cat_delete = "You have to select a category to check or delete it !";
-$l_j_cat_update = "You have to select a category and enter a new name to update it !";
-$l_j_cat_create = "You have to enter a new category name and code to create it !";
-$l_j_cat_deep = "Categories can only have three levels.";
-
-$l_j_act_delete = "You have to select an activity to check or delete it !";
-$l_j_act_update = "You have to select an activity and enter a new name to update it !";
-$l_j_act_create = "You have to enter a new activity name to create it !";
 $l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen

@@ -67,12 +67,6 @@ $l_add = "Adicionar estas listas";
 $l_add_criterion = "Adicionar un criterio";
 
 // Messages
-$l_insert_ok = "La lista ha sido ingresada exitosamente.";
-$l_insert_error = "El ingreso de la lista ha fallado !";
-$l_update_ok = "La lista ha sido actualizada exitosamente.";
-$l_update_error = "La actualización de la lista ha fallado !";
-$l_delete_ok = "La lista ha sido borrada exitosamente.";
-$l_delete_error = "La eliminación de la lista ha fallado !";
 $l_name_list_nomatch = "Nombre de la lista no es válido";
 $l_check_samelist = "Estas listas lucen similar a la nueva entrada !";
 $l_list_exists = "Lo siento pero esta lista ya existe";

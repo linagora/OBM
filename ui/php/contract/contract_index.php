@@ -38,6 +38,7 @@ include("$obminclude/global_pref.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 require("contract_query.inc");
 require("contract_display.inc");
+require("contract_js.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -66,7 +67,6 @@ if (! $popup) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  require("contract_js.inc");
   $display["search"] = dis_contract_search_form($contract);
   if ($set_display == "yes") {
     $display["result"] = dis_contract_search_list($contract);
@@ -79,7 +79,6 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
   $display["search"] = dis_contract_search_form($contract);
   if ($set_display == "yes") {
     $display["result"] = dis_contract_search_list($contract);
@@ -89,13 +88,11 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
   $display["search"] = dis_contract_search_form($contract);
   $display["result"] = dis_contract_search_list($contract);
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");  
   $display["detail"] = dis_contract_form($action,$contract,$param_company);
 
 } elseif ($action == "detailconsult")  {
@@ -109,12 +106,10 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc"); 
   $display["detail"] = dis_contract_form($action, $contract,"");
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
   if (check_contract_form("", $contract)) {
     // If the context (same contracts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
@@ -128,10 +123,10 @@ if ($action == "ext_get_id") {
       } else {
       	$contract["id"] = run_query_contract_insert($contract);
       	if ($contract["id"]) {
-      	  $display["msg"] .= display_ok_msg($l_insert_ok);
+      	  $display["msg"] .= display_ok_msg("$l_contract : $l_insert_ok");
       	  $display["detail"] = dis_contract_consult($contract);
       	} else {
-      	  $display["msg"] .= display_err_msg($l_insert_error);
+      	  $display["msg"] .= display_err_msg("$l_contract : $l_insert_error");
       	}
       }
     }
@@ -145,13 +140,12 @@ if ($action == "ext_get_id") {
   if (check_contract_form("", $contract)) {  
     $ret = run_query_contract_update($contract);         
     if ($ret) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_contract : $l_update_ok");
     } else {
-        $display["msg"] .= display_err_msg($l_update_error);
+        $display["msg"] .= display_err_msg("$l_contract : $l_update_error");
       }
     $display["search"] = dis_contract_consult($contract);      
   } else {
-      require("contract_js.inc");
       $display["msg"] .= display_err_msg($l_invalid_da. " : " . $err_msg);
       $display["detail"] = dis_contract_form($action, $contract,"");
     }
@@ -159,7 +153,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_contract($contract["id"])) {
-    require("contract_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_contract($contract["id"]);
   } else {
@@ -173,9 +166,9 @@ if ($action == "ext_get_id") {
   if (check_can_delete_contract($contract["id"])) {
     $ret = run_query_contract_delete($contract["id"]);
     if ($ret) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_contract : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_contract : $l_delete_error");
     }
     $display["search"] = dis_contract_search_form($contract);
     if ($set_display == "yes") {
@@ -193,11 +186,10 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_priority_insert($contract);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_pri_insert_ok);
+    $display["msg"] = display_ok_msg("$l_priority : $l_insert_ok");
   } else {
-    $display["msg"] = display_err_msg($l_pri_insert_error);
+    $display["msg"] = display_err_msg("$l_priority : $l_insert_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "priority_checklink")  {
@@ -208,44 +200,40 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_priority_update($contract);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_pri_update_ok);
+    $display["msg"] = display_ok_msg("$l_priority : $l_update_ok");
   } else {
-    $display["msg"] = display_err_msg($l_pri_update_error);
+    $display["msg"] = display_err_msg("$l_priority : $l_update_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_priority_delete($contract["priority"]);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_pri_delete_ok);
+    $display["msg"] = display_ok_msg("$l_priority : $l_delete_ok");
   } else {
-    $display["msg"] = display_err_msg($l_pri_delete_error);
+    $display["msg"] = display_err_msg("$l_priority : $l_delete_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_status_insert($contract);
   if ($retour) {
-    display_ok_msg($l_sta_insert_ok);
+    $display["msg"] = display_ok_msg("$l_status : $l_insert_ok");
   } else {
-    display_err_msg($l_sta_insert_error);
+    $display["msg"] = display_err_msg("$l_status : $l_insert_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_status_update($contract);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_sta_update_ok);
+    $display["msg"] = display_ok_msg("$l_status : $l_update_ok");
   } else {
-    $display["msg"] = display_err_msg($l_sta_update_error);
+    $display["msg"] = display_err_msg("$l_status : $l_update_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "status_checklink")  {
@@ -256,11 +244,10 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_status_delete($contract["status"]);
   if ($retour) {
-    $display["msg"] = display_ok_msg($l_sta_delete_ok);
+    $display["msg"] = display_ok_msg("$l_status : $l_delete_ok");
   } else {
-    $display["msg"] = display_err_msg($l_sta_delete_error);
+    $display["msg"] = display_err_msg("$l_status : $l_delete_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();
 
 } elseif ($action == "display") {
@@ -282,46 +269,41 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "admin")  {
 //////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();  
  
 } elseif ($action == "type_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_type_insert($contract);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_type_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_type : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_type_insert_error);
+    $display["msg"] .= display_err_msg("$l_type : $l_insert_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();  
     
 } elseif ($action == "type_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_type_update($contract);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_type_update_ok);
+    $display["msg"] .= display_ok_msg("$l_type : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_type_update_error);
+    $display["msg"] .= display_err_msg("$l_type : $l_update_error");
   }
-  require("contract_js.inc");
   $display["detail"] = dis_contract_admin_index();  
 
 } elseif ($action == "type_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_contract_type_links($contract["type"]);
-  require("contract_js.inc");
   
 } elseif ($action == "type_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_contract_type_delete($contract["type"]);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_type_delete_ok);
+    $display["msg"] .= display_ok_msg("$l_type : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_type_delete_error);
+    $display["msg"] .= display_err_msg("$l_type : $l_delete_error");
   }
-  require("contract_js.inc");
-  $display["detail"] = dis_contract_admin_index();  
+  $display["detail"] = dis_contract_admin_index();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

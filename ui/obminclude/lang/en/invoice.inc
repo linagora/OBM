@@ -48,13 +48,6 @@ $l_no_payment_display = "Fill the search fields and press < Find > to retrieve t
 $l_found = "invoices found";
 $l_no_found="No invoice corresponding to your query";
 $l_no_payment_found ="No payment corresponding to your query";
-$l_delete_ok = "The invoice has been deleted successfully.";
-$l_delete_error = "The deletion of the invoice has failed !";
-$l_insert_ok = "The invoice has been inserted successfully.";
-$l_insert_error = "The insertion of the invoice has failed !";
-$l_update_ok = "The invoice has been updated successfully.";
-$l_update_error = "The update of the invoice has failed !";
-$l_query_error = "Trouble executing the query...";
 
 $l_link_payment = "These payments are connected to this invoice";
 $l_link_payment_no = "The invoice hasn't any payment";

@@ -233,7 +233,7 @@ $theme_dir->close();
 // HTML Display
 ///////////////////////////////////////////////////////////////////////////////
 if ($form_user_pref) {
-  $display["msg"] .= display_ok_msg($l_update_ok);
+  $display["msg"] .= display_ok_msg("$l_settings : $l_update_ok");
 }
 
 $display["detail"] .= "

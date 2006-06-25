@@ -95,10 +95,10 @@ if (($action == "index") || ($action == "")) {
     if ($hd_confirm == $c_yes) {
       $resourcegroup["id"] = run_query_resourcegroup_insert($resourcegroup);
       if ($resourcegroup["id"]) {
-	$display["msg"] .= display_ok_msg($l_insert_ok);
+	$display["msg"] .= display_ok_msg("$l_resourcegroup : $l_insert_ok");
 	$display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
       } else {
-	$display["msg"] .= display_err_msg($l_insert_error);
+	$display["msg"] .= display_err_msg("$l_resourcegroup : $l_insert_error");
 	$display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
       }
       
@@ -110,10 +110,10 @@ if (($action == "index") || ($action == "")) {
       } else {
 	$resourcegroup["id"] = run_query_resourcegroup_insert($resourcegroup);
 	if ($resourcegroup["id"] > 0) {
-	  $display["msg"] .= display_ok_msg($l_insert_ok);
+	  $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_insert_ok");
 	  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
 	} else {
-	  $display["msg"] .= display_err_msg($l_insert_error);
+	  $display["msg"] .= display_err_msg("$l_resourcegroup : $l_insert_error");
 	  $display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
 	}
       }
@@ -125,14 +125,14 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_resourcegroup_data_form($resourcegroup)) {
     $retour = run_query_resourcegroup_update($resourcegroup);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_resourcegroup : $l_update_error");
     }
     $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
   } else {
@@ -141,21 +141,21 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = html_resourcegroup_form($action, $resourcegroup_q, $resourcegroup);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_resourcegroup_warn_delete($resourcegroup["id"]);
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_resourcegroup_delete($hd_resourcegroup_id);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+    $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_err_msg("$l_resourcegroup : $l_delete_error");
   }
   $display["search"] = html_resourcegroup_search_form("");
 
-} elseif ($action == "resource_add")  {
+} elseif ($action == "resource_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($resourcegroup["resource_nb"] > 0) {
     $nb = run_query_resourcegroup_resourcegroup_insert($resourcegroup);
@@ -165,7 +165,7 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
 
-} elseif ($action == "resource_del")  {
+} elseif ($action == "resource_del") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($resourcegroup["resource_nb"] > 0) {
     $nb = run_query_resourcegroup_resourcegroup_delete($resourcegroup);
@@ -175,7 +175,7 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
 
-} elseif ($action == "resourcegroup_add")  {
+} elseif ($action == "resourcegroup_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($resourcegroup["resourcegroup_nb"] > 0) {
     $nb = run_query_resourcegroupresourcegroup_insert($resourcegroup);
@@ -185,7 +185,7 @@ if (($action == "index") || ($action == "")) {
   }
   $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
 
-} elseif ($action == "resourcegroup_del")  {
+} elseif ($action == "resourcegroup_del") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($resourcegroup["resourcegroup_nb"] > 0) {
     $nb = run_query_resourcegroupresourcegroup_delete($resourcegroup);

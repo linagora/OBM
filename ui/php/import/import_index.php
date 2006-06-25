@@ -129,9 +129,9 @@ if (($action == "index") || ($action == "")) {
     if ($hd_confirm == $c_yes) {
       $retour = run_query_import_insert($import);
       if ($retour) {
-        $display["msg"] .= display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg("$l_import : $l_insert_ok");
       } else {
-        $display["msg"] .= display_err_msg($l_insert_error);
+        $display["msg"] .= display_err_msg("$l_import : $l_insert_error");
       }
       $display["search"] = dis_import_search_form($import_q);
 
@@ -143,9 +143,9 @@ if (($action == "index") || ($action == "")) {
       } else {
         $retour = run_query_import_insert($import);
         if ($retour) {
-          $display["msg"] .= display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg("$l_import : $l_insert_ok");
         } else {
-          $display["msg"] .= display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg("$l_import : $l_insert_error");
         }
         $display["search"] = dis_import_search_form($import);
       }
@@ -159,14 +159,14 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = html_import_form($action, $import, "", $dsrc_q, $usr_q);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_import_data_form($import["id"], $import)) {
     $retour = run_query_import_update($import);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_import : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_import : $l_update_error");
     }
     $import_q = run_query_import_detail($import["id"]);
     $display["detail"] = html_import_consult($import_q);
@@ -178,33 +178,33 @@ if (($action == "index") || ($action == "")) {
     $display["detail"] = html_import_form($action, $import, $import_q, $dsrc_q, $usr_q);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_import_warn_delete($import["id"]);
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_import_delete($import["id"]);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok);
+    $display["msg"] .= display_ok_msg("$l_import : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_err_msg("$l_import : $l_delete_error");
   }
   $display["search"] = dis_import_search_form($import);
 
-} elseif ($action == "file_sample")  {
+} elseif ($action == "file_sample") {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_sample($import_q, $import, 5);
 
-} elseif ($action == "file_test")  {
+} elseif ($action == "file_test") {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_import($import_q, $import);
 
-} elseif ($action == "file_import")  {
+} elseif ($action == "file_import") {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_import_detail($import["id"]);
   $display["detail"] = html_import_consult_file($import_q);

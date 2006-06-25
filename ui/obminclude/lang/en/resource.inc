@@ -33,12 +33,6 @@ $l_found = "resource(s) found.";
 $l_no_found = "No resource found matching the query !";
 $l_cant_delete = "The resource can't be deleted !";
 $l_can_delete = "The resource can be deleted.";
-$l_delete_ok = "The resource has been deleted successfully.";
-$l_delete_error = "The deletion of the resource has failed !";
-$l_insert_ok = "The resource has been inserted successfully.";
-$l_insert_error = "The insertion of the resource has failed !";
-$l_update_ok = "The resource has been updated successfully.";
-$l_update_error = "The update of the resource has failed !";
 $l_check_sameuser = "These resources seem similar to this new entry !";
 $l_exist_error = "already exists";
 

@@ -43,7 +43,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] = display_ok_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   $display["search"] = html_account_search_form($action, $account);
@@ -58,14 +58,14 @@ if ($action == "index" || $action == "") {
     $display["msg"] = display_err_msg($l_error_permission);
   }
 
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_account_insert($account);
-  $display["msg"] = display_ok_msg($l_insert_ok);
+  $display["msg"] = display_ok_msg("$l_account : $l_insert_ok");
   require("account_js.inc");
   $display["search"] = html_account_search_form($action, $account);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   if ($account["id"] > 0) {
@@ -73,7 +73,8 @@ if ($action == "index" || $action == "") {
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
-} elseif ($action == "detailupdate")  {
+
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($account["id"] > 0) {
     $ac_q = run_query_account_detail($account["id"]);
@@ -105,7 +106,7 @@ if ($action == "index" || $action == "") {
     // maybe a confirmation from the user would be enough...
   } else {
     run_query_account_delete($account["id"]);
-    $display["msg"] = display_ok_msg($l_delete_ok);
+    $display["msg"] = display_ok_msg("$l_account  : $l_delete_ok");
     require("account_js.inc");
     $display["search"] = html_account_search_form($action,'');
   }

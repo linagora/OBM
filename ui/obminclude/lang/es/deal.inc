@@ -45,9 +45,6 @@ $l_kind_new = "Nuevo Tipo";
 $l_status_manage = "Manejo del Estado del Negocio";
 $l_status_exist = "Estados Existentes";
 $l_status_new = "Nuevo Estado";
-$l_cat_manage = "Manejo de la Categoría del Negocio";
-$l_cat_exist = "Categorías Existentes";
-$l_cat_new = "Nueva Categoría";
 $l_invoice_number = "Número";
 $l_invoice_label = "Etiqueta";
 $l_invoice_ht = "Cantidad HT";
@@ -77,10 +74,6 @@ $l_status_checkdelete = "Revisar or Borrar Estado";
 $l_status_delete = "Borrar Estado";
 $l_status_update = "Actualizar Estado";
 $l_status_insert = "Ingresar Estado";
-$l_cat_checkdelete = "Revisar or Borrar Categoria";
-$l_cat_delete = "Borrar Categoría";
-$l_cat_update = "Actualizar Categoria";
-$l_cat_insert = "Ingresar Categoría";
 
 // Messages
 $l_link_contract = "El negocio esta involucrado en estos contratos";
@@ -117,17 +110,6 @@ $l_status_can_delete = "El Estado puede ser borrado";
 $l_status_cant_delete = "El Estado no puede ser borrado";
 $l_status_link_deal = "El Estado esta involucrado en estos negocios";
 $l_status_link_deal_no = "El Estado NO esta involucrado en ningún negocio";
-$l_cat_delete_ok = "La categoría ha sido borrada exitosamente.";
-$l_cat_delete_error = "El eliminación de la categoría ha fallado !";
-$l_cat_insert_ok = "La categoría ha sido ingresada exitosamente.";
-$l_cat_insert_error = "El ingreso de la categoría ha fallado !";
-$l_cat_update_ok = "La categoría ha sido actualizado exitosamente.";
-$l_cat_update_error = "La actualización de la categoría ha fallado !";
-$l_cat_link_deal = "La Categoría esta involucrada en estos negocios";
-$l_cat_link_deal_no = "La Categoría NO esta involucrada en ningún negocio";
-$l_cat_can_delete = "La Categoría puede ser borrada";
-$l_cat_cant_delete = "La Categoría NO puede ser borrada";
-$l_cat_no = "No hay categorías !";
 
 $l_help_deal_forecast = "La Predicción tiene en cuenta Negocios con este criterio : Negocio no en estado archivado, con una cantidad estimada y una rata de exito > 0 y < 100.";
 
@@ -148,9 +130,6 @@ $l_j_kind_delete = "Debe escoger un tipo para revisar o borrar !";
 $l_j_status_create = "Debe ingresar un nuevo nombre para crear el estado !";
 $l_j_status_update = "Debe escoger un estado  e ingresar un nuevo nombre para actualizar !";
 $l_j_status_delete = "Debe escoger un estado para revisar o borrar !";
-$l_j_cat_create = "Debe ingresar un nuevo nombre para crear la categoría !";
-$l_j_cat_update = "Debe escoger un category e ingresar un nuevo nombre para actualizar !";
-$l_j_cat_delete = "Debe escoger una categoría para revisar o borrar !";
 
 // For the display parameters modification screen
 $l_deal_display = "Opciones de despliegue de lista de negocios";

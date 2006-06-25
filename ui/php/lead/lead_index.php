@@ -16,7 +16,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 require("$obminclude/global_pref.inc");
 require("lead_display.inc");
 require("lead_query.inc");
-require("lead_js.inc");
+require_once("lead_js.inc");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
@@ -48,7 +48,6 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("lead_js.inc");
   $display["detail"] = dis_lead_form($action, $params);
 
 } elseif ($action == "insert") {
@@ -57,13 +56,16 @@ if ($action == "index" || $action == "") {
     $id = run_query_lead_insert($params);
     if ($id > 0) {
       $params["id"] = $id;
-      $display["msg"] = display_ok_msg ($l_insert_ok);
+      $display["msg"] = display_ok_msg ("$l_lead : $l_insert_ok");
       $display["detail"] = dis_lead_consult($params);
+    } else {
+      $display["msg"] .= display_err_msg("$l_lead : $l_insert_error : $err_msg");
+      $display["detail"] = dis_lead_form($action, $params);
     }
+
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    require("lead_js.inc");
     $display["detail"] = dis_lead_form($action, $params);
   }
 
@@ -73,7 +75,6 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("lead_js.inc");
   $display["detail"] = dis_lead_form($action, $params);
 
 } elseif ($action == "update") {
@@ -81,9 +82,9 @@ if ($action == "index" || $action == "") {
   if (check_lead_data_form($params["id"], $params)) {
     $retour = run_query_lead_update($params["id"], $params);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_lead : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_lead : $l_update_error");
     }
     $display["detail"] = dis_lead_consult($params);
   } else {
@@ -94,7 +95,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_lead($params["id"])) {
-    require("lead_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_lead($params["id"]);
   } else {
@@ -108,9 +108,9 @@ if ($action == "index" || $action == "") {
   if (check_can_delete_lead($params["id"])) {
     $retour = run_query_lead_delete($params["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_lead : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_lead : $l_delete_error");
     }
     $display["search"] = dis_lead_search_form($params);
   } else {
@@ -121,29 +121,26 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("lead_js.inc");
   $display["detail"] = dis_lead_admin_index();
 
 } elseif ($action == "source_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("lead", "source", $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_source)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_source : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_source)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_source : $l_insert_error");
   }
-  require("lead_js.inc");
   $display["detail"] .= dis_lead_admin_index();
 
 } elseif ($action == "source_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("lead", "source", $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_source)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_source : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_source)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_source : $l_update_error");
   }
-  require("lead_js.inc");
   $display["detail"] .= dis_lead_admin_index();
 
 } elseif ($action == "source_checklink") {
@@ -154,11 +151,10 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("lead", "source", $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_source)." : $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_source : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_source)." : $l_c_delete_error");
+    $display["msg"] .= display_err_msg("$l_source : $l_delete_error");
   }
-  require("lead_js.inc");
   $display["detail"] .= dis_lead_admin_index();
 
 } elseif ($action == "display") {

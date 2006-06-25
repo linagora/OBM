@@ -47,12 +47,6 @@ $l_can_delete = "Il contatto può essere eliminato.";
 $l_no_display = "Riempi i campi e click <TROVA> per eseguire la ricerca";
 $l_found = "contatti trovati.";
 $l_no_found = "Non sono stato trovati contatti !";
-$l_delete_ok = "Contatto eliminato.";
-$l_delete_error = "Eliminazione contatto fallita!";
-$l_insert_ok = "Contatto inserito .";
-$l_insert_error = "Inserimento contatto fallito!";
-$l_update_ok = "Contatto modificato .";
-$l_update_error = "Modifica contatto fallita !";
 $l_query_error = "Errore durate la ricerca";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)

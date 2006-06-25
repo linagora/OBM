@@ -128,9 +128,9 @@ if ($action == "ext_get_id") {
     if ($hd_confirm == $c_yes) {
       $publication["id"] = run_query_publication_insert($publication);
       if ($publication["id"]) {
-        $display["msg"] .= display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg("$l_publication : $l_insert_ok");
       } else {
-        $display["msg"] .= display_err_msg($l_insert_error);
+        $display["msg"] .= display_err_msg("$l_publication : $l_insert_error");
       }
       $display["detail"] = dis_publication_consult($publication);
     // If it is the first try, we warn the user if some publications seem similar
@@ -141,9 +141,9 @@ if ($action == "ext_get_id") {
       } else {
         $publication["id"] = run_query_publication_insert($publication);
         if ($publication["id"]) {
-          $display["msg"] .= display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg("$l_publication : $l_insert_ok");
         } else {
-          $display["msg"] .= display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg("$l_publication : $l_insert_error");
         }
 	$display["detail"] = dis_publication_consult($publication);
       }
@@ -166,9 +166,9 @@ if ($action == "ext_get_id") {
     $l_close
     </a>";
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_subscription : $l_insert_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_subscription : $l_insert_error");
     }
   // Form data are not valid
   } else {
@@ -195,9 +195,9 @@ if ($action == "ext_get_id") {
     $retour = run_query_publication_auto_subscription($publication,$publication["id"]);
   }
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_subscription : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_insert_error);
+    $display["msg"] .= display_err_msg("$l_subscription : $l_insert_error");
   }
   $display["detail"] = dis_publication_consult($publication);
 
@@ -205,9 +205,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_auto_insert($publication);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_subscription : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_insert_error);
+    $display["msg"] .= display_err_msg("$l_subscription : $l_insert_error");
   } 
   $display["detail"] = dis_publication_consult($publication);
   
@@ -216,9 +216,9 @@ if ($action == "ext_get_id") {
   if (check_publication_data($publication["id"], $publication)) {
     $retour = run_query_publication_update($publication["id"], $publication);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_publication : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_publication : $l_update_error");
     }
     $display["detail"] = dis_publication_consult($publication);
   } else {
@@ -237,9 +237,9 @@ if ($action == "ext_get_id") {
     $l_close
     </a>";
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok.$quit);
+      $display["msg"] .= display_ok_msg("$l_subscription : $l_update_ok$quit");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error.$quit);
+      $display["msg"] .= display_err_msg("$l_subscription : $l_update_error$quit");
     }
   // Form data are not valid
   } else {
@@ -268,9 +268,9 @@ if ($action == "ext_get_id") {
   if (check_publication_can_delete($publication["id"])) {
     $retour = run_query_publication_delete($publication["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_publication : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_publication : $l_delete_error");
     }
     require("publication_js.inc");  
     $type_q = run_query_publication_type();
@@ -290,9 +290,9 @@ if ($action == "ext_get_id") {
   $l_close
   </a>";
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_delete_ok.$quit);
+    $display["msg"] .= display_ok_msg("$l_subscription : $l_delete_ok$quit");
   } else {
-    $display["msg"] .= display_err_msg($l_delete_error.$quit);
+    $display["msg"] .= display_err_msg("$l_subscription : $l_delete_error $quit");
   }
 
 } elseif ($action == "admin") {
@@ -304,9 +304,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_type_insert($publication);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_type_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_type : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_type_insert_error);
+    $display["msg"] .= display_err_msg("$l_type : $l_insert_error");
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();
@@ -315,9 +315,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_type_update($publication);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_type_update_ok);
+    $display["msg"] .= display_ok_msg("$l_type : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_type_update_error);
+    $display["msg"] .= display_err_msg("$l_type : $l_update_error");
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();
@@ -330,9 +330,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_type_delete($publication["type"]);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_type_delete_ok);
+    $display["msg"] .= display_ok_msg("$l_type : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_type_delete_error);
+    $display["msg"] .= display_err_msg("$l_type : $l_delete_error");
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();
@@ -341,9 +341,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_recept_insert($publication);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_recept_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_recept : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_recept_insert_error);
+    $display["msg"] .= display_err_msg("$l_recept : $l_insert_error");
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();
@@ -352,9 +352,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_recept_update($publication);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_recept_update_ok);
+    $display["msg"] .= display_ok_msg("$l_recept : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_recept_update_error);
+    $display["msg"] .= display_err_msg("$l_recept : $l_update_error");
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();
@@ -367,9 +367,9 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_publication_recept_delete($publication["recept"]);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_recept_delete_ok);
+    $display["msg"] .= display_ok_msg("$l_recept : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_recept_delete_error);
+    $display["msg"] .= display_err_msg("$l_recept : $l_delete_error");
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();

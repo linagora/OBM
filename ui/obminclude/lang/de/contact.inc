@@ -52,12 +52,6 @@ $l_upd_comment3 = "Update the kommentar 3";
 $l_contact_del_verif_error = " Verträge sind noch zugeordnet: Kontakt kann nicht gelöscht werden";
 $l_found = "Kontakte gefunden";
 $l_no_found = "No kontakt found matching the query !";
-$l_delete_ok = "The kontakt has been deleted successfully.";
-$l_delete_error = "The deletion of the kontakt has failed !";
-$l_insert_ok = "The kontakt has been inserted successfully.";
-$l_insert_error = "The insertion of the kontakt has failed !";
-$l_update_ok = "The kontakt has been updated successfully.";
-$l_update_error = "The update of the kontakt has failed !";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_lastname = "\\n You have to fill the Lastname before submitting.";

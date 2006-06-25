@@ -32,12 +32,6 @@ $l_delete = "Borrar grupo";
 $l_add = "Adicionar estos grupos";
 
 // Messages
-$l_insert_ok = "El grupo ha sido ingresado exitosamente.";
-$l_insert_error = "El ingreso del grupo ha fallado !";
-$l_update_ok = "El grupo ha sido actualizado exitosamente.";
-$l_update_error = "La actualización del grupo ha fallado !";
-$l_delete_ok = "El grupo ha sido borrado exitosamente.";
-$l_delete_error = "La eliminación del grupo ha fallado !";
 $l_fill_name = "Debe ingresar el nombre del grupo";
 $l_group_exists = "Este grupo ya existe !";
 $l_j_check_email = "El correo electrónico no es válido !";

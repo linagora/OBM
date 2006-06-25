@@ -28,13 +28,7 @@ $l_contact_new = "Neuer Kontakt";
 $l_deal_new = "Neuer Vertrag";
 $l_project_new = "Neuer Project";
 $l_contract_new = "Neuer Contract";
-$l_kind_manage = "Verwaltung Firmenart";
-$l_kind_exist = "Vorhandene Firmenarten";
-$l_kind_new = "Neue Firmenart";
 $l_internal = "Intern";
-$l_act_manage = "Company Activity Management";
-$l_act_exist = "Existing Activities";
-$l_act_new = "New Activity";
 $l_cat_tree = "Category tree";
 
 // Titres
@@ -49,13 +43,6 @@ $l_company_admin = "Firma verwalten";
 $l_insert = "anlegen Firma";
 $l_update = "ändern Firma";
 $l_delete = "löschen Firma";
-$l_kind_update = "ändern Firmenart";
-$l_kind_delete = "löschen Firmenart";
-$l_kind_insert = "anlegen Firmenart";
-$l_act_update = "Update Activity";
-$l_act_checkdelete = "Check or Delete Activity";
-$l_act_delete = "Delete Activity";
-$l_act_insert = "Insert Activity";
 
 // Messages
 $l_link_contact = "These contacts are from this company";
@@ -72,11 +59,6 @@ $l_can_delete = "The company can be deleted.";
 $l_company_del_verif_error = " es sind noch Verträge zugeordnet: Firma kann nicht gelöscht werden";
 $l_found = "Firmen gefunden.";
 $l_no_found = "Keine Firma zum Suchkriterium gefunden!";
-$l_kind_cant_delete = " mehrere(?) Firmenart vorhanden!";
-$l_act_link_company = "These companies are referenced as";
-$l_act_link_company_no = "No company from activity";
-$l_act_cant_delete = "Activity can't be deleted !";
-$l_act_can_delete = "Activity can be deleted.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "\\n Firmenname muß eingetragen sein.";
@@ -92,10 +74,6 @@ $lj_check_mphone = "Telefonnummer mobil ungültig";
 $lj_check_fax = "Telefaxnummer ungültig";
 $lj_check_email = "E-Mail-Adresse ungültig";
 $lj_check_web = "Web-Adresse ungültig";
-$mj_kind_delete = "Firmenart zum Löschen auswählen!";
-$mj_kind_update = "Firmenart auswählen und neuen Namen eintragen!";
-$mj_kind_create = "Neue Firmenart eintragen!";
-$mj_kind_delete_confirm = "Firmenart löschen?";
 
 // For the display parameters modification screen
 $l_company_options = "Anzeige-Optionen für Firma"; 

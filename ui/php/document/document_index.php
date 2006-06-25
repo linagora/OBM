@@ -25,6 +25,7 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("document_query.inc");
 require("document_display.inc");
+require_once("document_js.inc");
 require_once("$obminclude/of/of_category.inc");
 
 
@@ -44,7 +45,6 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
-  require("document_js.inc");
   $display["detail"] = html_document_tree($document, $ext_disp_file);
 } elseif ($action == "accessfile") {
   if ($document["id"] > 0) {
@@ -76,42 +76,37 @@ if ($action == "ext_get_path") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($document);
   $display["result"] = dis_document_search_list($document);
   
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   $display["detail"] = dis_document_form($action, $document, "");
   
-} elseif ($action == "new_dir")  {
+} elseif ($action == "new_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   $display["detail"] = html_document_dir_form($action, $document);
   
-} elseif ($action == "detailupdate_dir")  {
+} elseif ($action == "detailupdate_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   $doc_q = run_query_document_detail($document["id"]);
   $display["detail"] = html_document_dir_form($action, $document,$doc_q);
 
-} elseif ($action == "tree")  {
+} elseif ($action == "tree") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   $display["detail"] = html_document_tree($document,"true");
   
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_document_consult($document);
 
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
 if ($document["id"] > 0) {
     $doc_q = run_query_document_detail($document["id"]);
     if ($doc_q->num_rows() == 1) {
-      require("document_js.inc");
       $display["detailInfo"] = display_record_info($doc_q);
       $display["detail"] = dis_document_form($action, $document, $doc_q);
   } else {
@@ -119,82 +114,75 @@ if ($document["id"] > 0) {
     }
   }
 
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form("", $document)) {
     $document["id"] = run_query_document_insert($document);
     if ($document["id"]) {
       update_last_visit("document", $document["id"], $action);
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
       $display["detail"] = dis_document_consult($document);
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error." ".$err_msg);
+      $display["msg"] .= display_err_msg("$l_document : $l_insert_error $err_msg");
       $display["detail"] = dis_document_form($action, $document, "");
     }
   // Form data are not valid
   } else {
-    require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_document_form($action, $document, "");
   }
 
-} elseif ($action == "insert_dir")  {
+} elseif ($action == "insert_dir") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_dir_data_form($document)) {
     $retour = run_query_document_insert_dir($document);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_dir : $l_insert_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_dir : $l_insert_error");
     }
-    require("document_js.inc");    
     $display["detail"] = html_document_tree($document,true);
   // Form data are not valid
   } else {
-    require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = html_document_dir_form($action, $document);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form($document["id"], $document)) {
     $retour = run_query_document_update($document["id"], $document);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_document : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error."  ".$err_msg);
+      $display["msg"] .= display_err_msg("$l_document : $l_update_error  $err_msg");
     }
     $doc_q = run_query_document_detail($document["id"]);
     $display["detailInfo"] .= display_record_info($doc_q);
     $display["detail"] = html_document_consult($doc_q);
   } else {
-    require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_document_form($action, $document, "");
   }
-} elseif ($action == "update_dir")  {
+
+} elseif ($action == "update_dir") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_dir_data_form($document)) {
     $retour = run_query_document_update_dir($document);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_dir : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_dir : $l_update_error");
     }
-    require("document_js.inc");    
     $display["detail"] = html_document_tree($document,true);
   // Form data are not valid
   } else {
-    require("document_js.inc");
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = html_document_dir_form($action, $document);
   }
 
-
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   if (check_document_can_delete($document["id"])) {
     $display["msg"] .= display_info_msg($err_msg);
     $display["detail"] = dis_document_can_delete($document["id"]);
@@ -203,14 +191,14 @@ if ($document["id"] > 0) {
     $display["detail"] = dis_document_consult($document);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_can_delete($document["id"])) {
     $retour = run_query_document_delete($document["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_document : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_document : $l_delete_error");
     }
     $display["search"] = dis_document_search_form($document);
     $display["result"] = dis_document_search_list($document);
@@ -219,9 +207,8 @@ if ($document["id"] > 0) {
     $display["detail"] = dis_document_consult($document);
   }
 
-} elseif ($action == "dir_check_delete")  {
+} elseif ($action == "dir_check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   if (check_document_can_delete_dir($document["id"])) {
     $display["detail"] = dis_document_can_delete_dir($document["id"]);
   } else {
@@ -229,136 +216,124 @@ if ($document["id"] > 0) {
     $display["detail"] = html_document_tree($document,"true");
   }
 
-} elseif ($action == "dir_delete")  {
+} elseif ($action == "dir_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_can_delete_dir($document["id"])) {
     $retour = run_query_document_delete($document["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_dir : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_dir : $l_delete_error");
     }
   } else {
     $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
   }
-  require("document_js.inc");
   $display["detail"] = html_document_tree($document,"true");
 
-} elseif ($action == "admin")  {
+} elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("document_js.inc");
   $display["detail"] = dis_document_admin_index();
 
-
-} elseif ($action == "category1_insert")  {
+} elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("document", "category1", $document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "category1_update")  {
+} elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("document", "category1", $document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "category1_checklink")  {
+} elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("document", "category1", $document);
+  $display["detail"] .= of_category_dis_links("document", "category1", $document, "mono");
 
-} elseif ($action == "category1_delete")  {
+} elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("document", "category1", $document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "category2_insert")  {
+} elseif ($action == "category2_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("document", "category2", $document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_category2 : $l_insert_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "category2_update")  {
+} elseif ($action == "category2_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("document", "category2", $document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category2)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_category2 : $l_update_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "category2_checklink")  {
+} elseif ($action == "category2_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("document", "category2", $document, "mono");
 
- } elseif ($action == "category2_delete")  {
+ } elseif ($action == "category2_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("document", "category2", $document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category2).": $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category2)." : $l_c_delete_error");
+    $display["msg"] .= display_err_msg("$l_category2 : $l_delete_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "mime_insert")  {
+} elseif ($action == "mime_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_insert($document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_mime_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_mime : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_mime_insert_error);
+    $display["msg"] .= display_err_msg("$l_mime : $l_insert_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "mime_update")  {
+} elseif ($action == "mime_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_update($document);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_mime_update_ok);
+    $display["msg"] .= display_ok_msg("$l_mime : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_mime_update_error);
+    $display["msg"] .= display_err_msg("$l_mime : $l_update_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
-} elseif ($action == "mime_checklink")  {
+} elseif ($action == "mime_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_document_mime_links($document);
 
-} elseif ($action == "mime_delete")  {
+} elseif ($action == "mime_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_delete($document["mime"]);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_mime_delete_ok);
+    $display["msg"] .= display_ok_msg("$l_mime : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_mime_delete_error);
+    $display["msg"] .= display_err_msg("$l_mime : $l_delete_error");
   }
-  require("document_js.inc");
   $display["detail"] .= dis_document_admin_index();
 
 }  elseif ($action == "display") {

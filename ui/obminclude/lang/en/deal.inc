@@ -49,9 +49,6 @@ $l_kind_new = "New Kind";
 $l_status_manage = "Deal Status Management";
 $l_status_exist = "Existing Status";
 $l_status_new = "New Status";
-$l_cat_manage = "Category management";
-$l_cat_exist = "Existing Category";
-$l_cat_new = "New category";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_forecast = "Forecast";
 
@@ -75,10 +72,6 @@ $l_status_update = "Update Status";
 $l_status_checkdelete = "Check or Delete Status";
 $l_status_delete = "Delete Status";
 $l_status_insert = "Insert Status";
-$l_cat_delete = "Delete";
-$l_cat_checkdelete = "Check or delete Category"; 
-$l_cat_update = "Update category"; 
-$l_cat_insert = "Insert a category";
 $l_add_cats = "Add these categories";
 
 // Messages
@@ -119,18 +112,6 @@ $l_status_cant_delete = "The Status can't be deleted";
 $l_status_link_deal = "The Status is involved in these deals";
 $l_status_link_deal_no = "The Status is not involved in any deals";
 
-$l_cat_insert_ok = "The category has been inserted successfully.";
-$l_cat_insert_error = "The insertion of the category has failed !";
-$l_cat_delete_ok = "The category has been deleted successfully.";
-$l_cat_delete_error = "The deletion of the category has failed !";
-$l_cat_update_ok = "The category has been updated successfully.";
-$l_cat_update_error = "The category has been updated has failed !";
-$l_cat_link_deal = "These deals are referenced as";
-$l_cat_link_deal_no = "No deals referenced as";
-$l_cat_cant_delete = "The category can't be deleted !";
-$l_cat_can_delete = "The category can be deleted.";     
-$l_cat_no = "No categories !";
-
 $l_help_deal_forecast = "Forecast take into account deals with these criteria : deal not in an archived state, with an amount estimated and with a hitrate > 0 and < 100.";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
@@ -149,9 +130,6 @@ $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_status_create = "You have to enter a new status name to create it !";
 $l_j_status_update = "You have to select a status and enter a new name to update it !";
 $l_j_status_delete = "You have to select a status to check or delete it !";
-$l_j_cat_create = "You have to fill the label before submitting.";
-$l_j_cat_update = "You have to fill the label before submitting.";
-$l_j_cat_delete = "You have to select a category";
 
 // For the display parameters modification screen
 $l_deal_display = "Display options for deals list";

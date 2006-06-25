@@ -165,7 +165,7 @@ if ($action == "index") {
     require("agenda_js.inc");
     $display["search"] = html_agenda_dis_conflict($agenda, $conflicts) ;
     $display["detail"] = html_agenda_conflict_form($agenda);
-    $display["msg"] .= display_err_msg($l_insert_error);
+    $display["msg"] .= display_err_msg("$l_event : $l_insert_error");
   } else {
     $conflict = run_query_agenda_insert_decision($agenda);
     $obm_wait = run_query_agenda_waiting_events();
@@ -174,7 +174,7 @@ if ($action == "index") {
       $display["detail"] = html_agenda_waiting_events($obm_wait);
     } else {
       require("agenda_js.inc");
-      $display["msg"] .= display_ok_msg($l_update_ok); 
+      $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
       $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
     }
   }
@@ -211,11 +211,11 @@ if ($action == "index") {
     if ( (!$agenda["force"])
 	 && ($conflicts = check_agenda_conflict($agenda, $cal_entity_id)) ) {
       $display["search"] = html_agenda_dis_conflict($agenda,$conflicts) ;
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_event : $l_insert_error");
       $display["detail"] = dis_agenda_event_form($action, $agenda, "",$cal_entity_id);
     } else {
       run_query_agenda_add_event($agenda, $cal_entity_id, $event_id);
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_event : $l_insert_ok");
       $agenda["date"] = $agenda["datebegin"];
       $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
     }
@@ -245,12 +245,12 @@ if ($action == "index") {
 	 && ($conflicts = check_agenda_conflict($agenda, $cal_entity_id)) ) {
       require("agenda_js.inc");
       $display["search"] = html_agenda_dis_conflict($agenda,$conflicts) ;
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_event : $l_update_error");
       $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
     } else {
       run_query_agenda_event_update($agenda, $cal_entity_id, $event_id);
       require("agenda_js.inc");
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
       $agenda["date"] = $agenda["datebegin"];
       $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
     }
@@ -264,7 +264,7 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_agenda_update_occurence_state($agenda["id"],$uid,$agenda["decision_event"]);
   require("agenda_js.inc");
-  $display["msg"] .= display_ok_msg($l_update_ok);
+  $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
   $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
 
 } elseif ($action == "check_delete") {
@@ -304,7 +304,7 @@ if ($action == "index") {
   require("agenda_js.inc");
   $display["title"] = "<div class=\"title\">$l_agenda</div>";
   of_right_update_right($agenda, "calendar");
-  $display["msg"] .= display_ok_msg($l_right_update_ok);
+  $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   $display["msg"] .= display_warn_msg($err_msg);
   $display["detail"] = of_right_dis_admin("calendar", $agenda["entity_id"]);
 
@@ -333,9 +333,9 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("calendar", "category1", $agenda);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_insert_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
   }
   require("agenda_js.inc");
   $display["detail"] .= dis_agenda_admin_index();
@@ -344,9 +344,9 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("calendar", "category1", $agenda);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_update_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_update_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
   }
   require("agenda_js.inc");
   $display["detail"] .= dis_agenda_admin_index();
@@ -359,9 +359,9 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("calendar", "category1", $agenda);
   if ($retour) {
-    $display["msg"] .= display_ok_msg(ucfirst($l_category1)." : $l_c_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg(ucfirst($l_category1)." : $l_c_delete_error");
+    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
   }
   require("agenda_js.inc");
   $display["detail"] .= dis_agenda_admin_index();

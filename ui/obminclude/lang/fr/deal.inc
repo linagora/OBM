@@ -51,9 +51,6 @@ $l_kind_new = "Nouveau Type";
 $l_status_manage = "Gestion des Etats d'Affaires";
 $l_status_exist = "Etats existants";
 $l_status_new = "Nouvel Etat";
-$l_cat_manage = "Gestion des catégories";
-$l_cat_exist = "Catégories existantes";
-$l_cat_new = "Nouvelle catégorie";
 $l_invoice_number = "Numéro";
 $l_invoice_label = "Label";
 $l_invoice_ht = "Montant HT";
@@ -83,10 +80,6 @@ $l_status_checkdelete = "Vérifier ou Supprimer l'état";
 $l_status_delete = "Supprimer l'état";
 $l_status_update = "Modifier l'état";
 $l_status_insert = "Créer l'état";
-$l_cat_checkdelete = "Vérifier ou supprimer la catégorie"; 
-$l_cat_delete = "Supprimer";
-$l_cat_update = "Mettre à jour la catégorie"; 
-$l_cat_insert = "Insérer une catégorie"; 
 $l_add_cats = "Ajouter ces categories";
 
 // Messages
@@ -124,17 +117,6 @@ $l_status_can_delete = "L'état peut être supprimé";
 $l_status_cant_delete = "L'état ne peut être supprimé";
 $l_status_link_deal = "L'état est référencé par ces affaires";
 $l_status_link_deal_no = "L'état n'est pas référencé dans les affaires";
-$l_cat_delete_ok = "La suppression de la catégorie a été correctement effectuée.";
-$l_cat_delete_error = "La suppression de la catégorie a échoué !";
-$l_cat_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
-$l_cat_insert_error = "L'insertion de la catégorie a échoué !";
-$l_cat_update_ok = "La modification de la catégorie a été correctement effectuée";
-$l_cat_update_error = "La modification de la catégorie a &eacute;chou&eacute;e !";
-$l_cat_link_deal = "La catégorie est référencée par ces affaires";
-$l_cat_link_deal_no = "La catégorie n'est référencée par aucune affaire";
-$l_cat_can_delete = " La catégorie peut être supprimée"; 
-$l_cat_cant_delete = " La catégorie ne peut pas etre supprimée";
-$l_cat_no = "Pas de catégories enregistrées !";
 
 $l_help_deal_forecast = "Le prévisionnel regroupe les affaires répondant aux critères : affaire non archivée, avec une estimation de montant et un % de réussite > 0 et < 100.";
 
@@ -155,9 +137,6 @@ $l_j_kind_delete = "Vous devez sélectionner un type pour vérifier ou supprimer !
 $l_j_status_create = "Vous devez saisir un nom d'état pour le créer !";
 $l_j_status_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
 $l_j_status_delete = "Vous devez sélectionner un état pour le vérifier ou supprimer !";
-$l_j_cat_create = "Vous devez renseigner le label de la catégorie";
-$l_j_cat_update = "Vous devez renseigner le label de la catégorie";
-$l_j_cat_delete = "Vous devez sélectionner une catégorie";
 
 // For the display preferences modification screen 
 $l_deal_display = "Options d'affichage des listes d'affaires";

@@ -76,11 +76,11 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_invoice_form($action, $invoice);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_invoice_consult($invoice);
 
-} elseif ($action == "detailupdate")  { 
+} elseif ($action == "detailupdate") { 
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_invoice_form($action, $invoice);
 
@@ -89,14 +89,14 @@ if ($action == "ext_get_id") {
   // we give the user the traditionnal form to modify this invoice :
   $display["detail"] = dis_invoice_form($action, $invoice);
   
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_invoice_data_form("", $invoice)) {
     $retour = run_query_invoice_insert($invoice);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_invoice : $l_insert_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_invoice : $l_insert_error");
     }
     $display["search"] = dis_invoice_search_form($invoice);
   } else {
@@ -104,14 +104,14 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_invoice_form($action, $invoice);
   }
   
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_invoice_data_form($invoice["id"], $invoice)) {
     $retour = run_query_invoice_update($invoice);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_invoice : $l_update_ok");
     } else {
-      $display["msg"] .= display_ok_msg($l_update_error);
+      $display["msg"] .= display_ok_msg("$l_invoice : $l_update_error");
     }
     $display["detail"] = dis_invoice_consult($invoice);
   } else {
@@ -119,7 +119,7 @@ if ($action == "ext_get_id") {
     $display["search"] = dis_invoice_form($action, $invoice);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_invoice($invoice["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
@@ -131,15 +131,15 @@ if ($action == "ext_get_id") {
   }
   //  $display["detail"] = dis_check_invoice_links($invoice["id"]);
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_invoice($invoice["id"])) {
     $retour = run_query_invoice_delete($invoice["id"]); 
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_invoice : $l_delete_ok");
       $display["search"] = dis_invoice_search_form($invoice);
     } else {
-      $display["msg"] .= display_err_msg ($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_invoice : $l_delete_error");
       $display["detail"] = dis_invoice_consult($invoice);
     }
   } else {
@@ -148,12 +148,12 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_invoice_consult($invoice);
   }
 
-} elseif ($action == "dashboard")  {
+} elseif ($action == "dashboard") {
 ///////////////////////////////////////////////////////////////////////////////
   include_once("$obminclude/Artichow/BarPlot.class.php");
   $display["detail"] = dis_invoice_dashboard_index($invoice);
 
-} elseif ($action == "document_add")  {
+} elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($invoice["doc_nb"] > 0) {
     $nb = run_query_global_insert_documents($invoice, "invoice");

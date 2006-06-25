@@ -48,12 +48,6 @@ $l_con_insert = "Insert this contact";
 $l_con_update = "Update the existing contact";
 
 // Messages
-$l_insert_ok = "The import has been inserted successfully.";
-$l_insert_error = "The import insertion has failed !";
-$l_update_ok = "The import has been updated successfully.";
-$l_update_error = "The import update has failed !";
-$l_delete_ok = "The import has been deleted successfully.";
-$l_delete_error = "The import deletion has failed !";
 $l_name_import_nomatch = "Import name is not valid";
 $l_import_exists = "Sorry but this import already exists";
 $l_check_sameimport = "These imports seem similar to this new entry !";

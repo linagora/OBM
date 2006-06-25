@@ -16,10 +16,6 @@ $l_bytes = "bytes";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the backup";
 $l_found = "backup found";
 $l_no_found = "No backup found matching the query !";
-$l_delete_ok = "The backup file has been deleted successfully.";
-$l_delete_error = "The deletion of the backup file has failed !";
-$l_insert_ok = "The backup has been inserted successfully.";
-$l_insert_error = "The insertion of the backup has failed !";
 
 $l_restore_ok = "The backup has been restored successfully.";
 $l_restore_error = "The backup restoration has failed !";

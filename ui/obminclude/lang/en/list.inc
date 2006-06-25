@@ -64,12 +64,6 @@ $l_empty = "&nbsp;";
 $l_exclude = "Exclude";
 
 // Messages
-$l_insert_ok = "The list has been inserted successfully.";
-$l_insert_error = "The list insertion has failed !";
-$l_update_ok = "The list has been updated successfully.";
-$l_update_error = "The list update has failed !";
-$l_delete_ok = "The list has been deleted successfully.";
-$l_delete_error = "The list deletion has failed !";
 $l_name_list_nomatch = "List name is not valid";
 $l_list_exists = "Sorry but this list already exists";
 $l_check_samelist = "These lists seem similar to this new entry !";

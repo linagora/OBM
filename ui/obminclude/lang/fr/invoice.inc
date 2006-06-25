@@ -60,14 +60,7 @@ $l_no_display = "Remplissez les critères de recherche et appuyez sur <Chercher> 
 $l_found = "Facture(s) trouvée(s).";
 $l_no_found = "Aucune Facture ne correspond à votre requête";
 $l_no_payment_found ="Auncun Paiement ne correspond à votre requête";
-$l_delete_ok = "La Facture a bien été supprimée";
-$l_delete_error = "La suppression de la Facture a échoué !";
 $l_payments_exist = "Il y a des payments reliés à cette facture !";
-$l_insert_ok = "La Facture a bien été insérée.";
-$l_insert_error = "L'insertion de la Facture a échoué !";
-$l_update_ok = "La Facture a bien été mise à jour.";
-$l_update_error = "La mise à jour de la Facture a échoué !";
-$l_query_error = "Problème durant l'exécution de la requête...";
 $l_invalid_payment = "The amount taken from a paiement is bigger than its total";
 
 $l_link_payment = "Ces paiments sont liés à cette facture";

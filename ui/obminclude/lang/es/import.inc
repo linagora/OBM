@@ -48,12 +48,6 @@ $l_con_insert = "Ingresar este contacto";
 $l_con_update = "Actualizar contacto existente";
 
 // Messages
-$l_insert_ok = "La importación ha sido ingresada exitosamente.";
-$l_insert_error = "El ingreso de la importación ha fallado !";
-$l_update_ok = "La importación ha sido actualizada exitosamente.";
-$l_update_error = "La actualización de la importación ha fallado !";
-$l_delete_ok = "La importación ha sido borrada exitosamente.";
-$l_delete_error = "La eliminación de la importación ha fallado !";
 $l_name_import_nomatch = "El nombre de la importación no es válido";
 $l_import_exists = "Lo siento pero la importación ya existe";
 $l_check_sameimport = "Estas importaciones lucen similares a la nueva !";

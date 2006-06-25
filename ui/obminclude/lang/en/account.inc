@@ -37,13 +37,6 @@ $l_compute_balance = "Compute Balance";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the accounts";
 $l_found="accounts found.";
 $l_no_found="No account corresponding to your query";
-$l_delete_ok = "The account has been deleted successfully.";
-$l_delete_error = "The deletion of the account has failed !";
-$l_insert_ok = "The account has been inserted successfully.";
-$l_insert_error = "The insertion of the account has failed !";
-$l_update_ok = "The account has been updated successfully.";
-$l_update_error = "The update of the account has failed !";
-$l_query_error = "Trouble executing the query...";
 $l_impossible_deletion = " payments are associated with this account. Deletion is impossible"; // must be used with the number of payments leading...
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

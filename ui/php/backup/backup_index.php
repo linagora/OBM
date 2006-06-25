@@ -47,36 +47,36 @@ if ($action == "index") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_backup_search_form($backup);
   $display["result"] = dis_backup_search_list($backup);
   
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_backup_form($backup);
   
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $ret = run_query_backup_create();
   if ($ret) {
-    $display["msg"] .= display_ok_msg($l_insert_ok);
+    $display["msg"] .= display_ok_msg("$l_backup : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_insert_error." ".$err_msg);
+    $display["msg"] .= display_err_msg("$l_backup : $l_insert_error $err_msg");
   }
   dis_backup_index();
 
-} elseif ($action == "restore")  {
+} elseif ($action == "restore") {
 ///////////////////////////////////////////////////////////////////////////////
   $ret = run_query_backup_restore($backup["filename"]);
   if ($ret) {
-    $display["msg"] .= display_ok_msg($l_restore_ok);
+    $display["msg"] .= display_ok_msg("$l_backup : $l_restore_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_restore_error." ".$err_msg);
+    $display["msg"] .= display_err_msg("$l_backup : $l_restore_error $err_msg");
   }
   dis_backup_index();
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_backup_can_delete($backup["filename"])) {
     $display["msg"] .= display_info_msg($err_msg);
@@ -86,14 +86,14 @@ if ($action == "index") {
     $display["detail"] = dis_backup_index($backup);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_backup_can_delete($backup["filename"])) {
     $retour = run_query_backup_delete($backup["filename"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_backup : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg("$err_msg : $l_delete_error");
+      $display["msg"] .= display_err_msg("$l_backup : $err_msg : $l_delete_error");
     }
     dis_backup_index($backup);
   } else {

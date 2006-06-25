@@ -41,13 +41,6 @@ $l_compute_balance = "Calculer le solde";
 $l_no_display = "Remplissez les critères de recherche et appuyez sur <$l_find> pour lancer la recherche";
 $l_found = "Compte(s) trouvé(s).";
 $l_no_found="Aucun Compte ne correspond à votre requête";
-$l_delete_ok = "Le compte a bien été supprimé.";
-$l_delete_error = "La suppression du compte a échoué !";
-$l_insert_ok = "Le Compte a bien été inséré.";
-$l_insert_error = "L'insertion du compte a échoué !";
-$l_update_ok = "Le compte a bien été mis à jour.";
-$l_update_error = "La mise à jour du compte a échoué !";
-$l_query_error = "Problème durant l'exécution d'une requête...";
 $l_impossible_deletion = " paiements sont liés à ce compte. La suppression est impossible"; // must be used with the number of payments leading...
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

@@ -57,8 +57,11 @@ if ($action == "index" || $action == "") {
     $id = run_query_payment_insert($params);
     if ($id > 0) {
       $params["id"] = $id;
-      $display["msg"] = display_ok_msg ($l_insert_ok);
+      $display["msg"] = display_ok_msg ("$l_payment : $l_insert_ok");
       $display["detail"] = dis_payment_consult($params);
+    } else {
+      $display["msg"] = display_err_msg ("$l_payment : $l_insert_error");
+      $display["detail"] = dis_payment_form($action, $params);
     }
   // Form data are not valid
   } else {
@@ -92,9 +95,9 @@ if ($action == "index" || $action == "") {
   if (check_payment_data_form($params["id"], $params)) {
     $retour = run_query_payment_update($params["id"], $params);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_payment : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_payment : $l_update_error");
     }
     $display["detail"] = dis_payment_consult($params);
   } else {
@@ -107,9 +110,9 @@ if ($action == "index" || $action == "") {
   if (check_payment_invoice_data_form($params)) {
     $retour = run_query_payment_invoice_update($params["id"], $params);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_payment : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_payment : $l_update_error");
     }
     $display["detail"] = dis_payment_consult($params);
   } else {
@@ -134,9 +137,9 @@ if ($action == "index" || $action == "") {
   if (check_can_delete_payment($params["id"])) {
     $retour = run_query_payment_delete($params["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_payment : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_payment : $l_delete_error");
     }
     $display["search"] = dis_payment_search_form($params);
   } else {
@@ -145,7 +148,7 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_payment_consult($params);
   }
   
-} elseif ($action == "invoice_add")  {
+} elseif ($action == "invoice_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if (($params["invoice_id"] > 0) && ($params["id"] > 0)) {
     run_query_payment_invoice_insert($params);

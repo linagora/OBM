@@ -68,20 +68,20 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_user_search_form($obm_user);
   $display["result"] = dis_user_search_list($obm_user);
 
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_user_form("",$obm_user);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_user_consult($obm_user);
 
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_user_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
@@ -91,7 +91,7 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_data_form("", $obm_user)) {
 
@@ -100,10 +100,10 @@ if ($action == "ext_get_ids") {
       $cid = run_query_user_insert($obm_user);
       if ($cid > 0) {
 	$obm_user["id"] = $cid;
-        $display["msg"] .= display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
 	$display["detail"] = dis_user_consult($obm_user);
       } else {
-	$display["msg"] .= display_err_msg($l_insert_error);
+	$display["msg"] .= display_err_msg("$l_user : $l_insert_error");
 	$display["detail"] = html_user_form("",$obm_user);
       }
 
@@ -116,10 +116,10 @@ if ($action == "ext_get_ids") {
         $cid = run_query_user_insert($obm_user);
         if ($cid > 0) {
 	  $obm_user["id"] = $cid;
-          $display["msg"] .= display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
 	  $display["detail"] = dis_user_consult($obm_user);
         } else {
-          $display["msg"] .= display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
 	  $display["detail"] = html_user_form("",$obm_user);
         }
       }
@@ -131,21 +131,21 @@ if ($action == "ext_get_ids") {
     $display["detail"] = html_user_form("", $obm_user);
   }
 
-} elseif ($action == "reset")  {
+} elseif ($action == "reset") {
 ///////////////////////////////////////////////////////////////////////////////
   reset_preferences_to_default($obm_user["id"]);
   session_load_user_prefs();
   $display["msg"] .= display_ok_msg($l_reset_ok);
   $display["detail"] = dis_user_consult($obm_user);
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_data_form($obm_user["id"], $obm_user)) {
     $retour = run_query_user_update($obm_user["id"], $obm_user);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_user : $l_update_error");
     }
     $display["detail"] = dis_user_consult($obm_user);
   } else {
@@ -153,7 +153,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = html_user_form("", $obm_user);
   }
 
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($obm_user["id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
@@ -164,14 +164,14 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_user_consult($obm_user);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($obm_user["id"])) {
     $retour = run_query_user_delete($obm_user["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_user : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_user : $l_delete_error");
     }
     run_query_user_delete_profile($obm_user["id"]);
     $display["search"] = html_user_search_form($obm_user);
@@ -181,7 +181,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_user_consult($obm_user);
   }
 
-} elseif ($action == "group_consult")  {
+} elseif ($action == "group_consult") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_user_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
@@ -190,13 +190,13 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
-} elseif ($action == "group_update")  {
+} elseif ($action == "group_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_user_update_user_group($obm_user);
   if ($retour >= 0) {
-    $display["msg"] .= display_ok_msg($l_update_ok);
+    $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg($l_update_error);
+    $display["msg"] .= display_err_msg("$l_user : $l_update_error");
   }
   $display["detail"] = dis_user_consult($obm_user);
 

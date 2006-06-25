@@ -122,9 +122,9 @@ else if ($action == "new_criterion") {
     if ($hd_confirm == $c_yes) {
       $list["id"] = run_query_list_insert($list);
       if ($list["id"] > 0) {
-        $display["msg"] .= display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg("$l_list : $l_insert_ok");
       } else {
-        $display["msg"] .= display_err_msg($l_insert_error);
+        $display["msg"] .= display_err_msg("$l_list : $l_insert_error");
       }
       $display["detail"] = dis_list_consult($list);
 
@@ -136,9 +136,9 @@ else if ($action == "new_criterion") {
       } else {
 	$list["id"] = run_query_list_insert($list);
         if ($list["id"] > 0) {
-          $display["msg"] .= display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg("$l_list : $l_insert_ok");
         } else {
-          $display["msg"] .= display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg("$l_list : $l_insert_error");
         }
 	$display["detail"] = dis_list_consult($list);
       }
@@ -163,9 +163,9 @@ else if ($action == "new_criterion") {
   if (check_list_data($list["id"], $list)) {
     $retour = run_query_list_update($list);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_list : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_list : $l_update_error");
     }
     $display["detail"] = dis_list_consult($list);
   } else {
@@ -190,9 +190,9 @@ else if ($action == "new_criterion") {
   if (check_list_can_delete($list["id"])) {
     $retour = run_query_list_delete($list["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_list : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_list : $l_delete_error");
     }
     $display["search"] = dis_list_search_form("");
   } else {

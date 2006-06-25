@@ -22,12 +22,6 @@ $l_contact_new = "Nuovo Contatto";
 $l_deal_new = "Nuovo Deal";
 $l_project_new = "Nuovo Projet";
 $l_contract_new = "Nuovo Contratto";
-$l_kind_manage = "Tipo Gestione Azienda";
-$l_kind_exist = "Tipi esistente";
-$l_kind_new = "Nuovo Tipo";
-$l_act_manage = "Attività Gestione Azienda";
-$l_act_exist = "Attività esistente";
-$l_act_new = "Nuova Attività";
 $l_internal = "Interno";
 $l_cat_tree = "Category tree";
 
@@ -36,14 +30,6 @@ $l_insert = "Inserisci Azienda";
 $l_update = "Aggiorna Azienda";
 $l_checkdelete = "Controlla o Elimina Azienda";
 $l_delete = "Elimina Azienda";
-$l_kind_update = "Aggiorna Tipo";
-$l_kind_checkdelete = "Controlla o Elimina Tipo";
-$l_kind_delete = "Elimina Tipo";
-$l_kind_insert = "Inserisci Tipo";
-$l_act_update = "Aggiorna Attività";
-$l_act_checkdelete = "Controlla o Elimina Attività";
-$l_act_delete = "Elimina Attività";
-$l_act_insert = "Inserisci Attività";
 $l_select_company = "Seleziona Azienda";
 
 // Messages
@@ -64,14 +50,6 @@ $l_link_project = "l'Azienda ha dei progetti";
 $l_link_project_no = "l'Azienda non ha degli progetti";
 $l_cant_delete = "Azienda non eliminabile !";
 $l_can_delete = "Azienda eliminabile !";
-$l_kind_link_company = " Aziende legate a  ";
-$l_kind_link_company_no = "Azienda non legata";
-$l_kind_cant_delete = "Tipo non eliminabile.";
-$l_kind_can_delete = "Tipo eliminabile.";
-$l_act_link_company = " Aziende legate a  ";
-$l_act_link_company_no = "Azienda non legata";
-$l_act_cant_delete = "Attività non eliminabile.";
-$l_act_can_delete = "Attività eliminabile.";
 
 // Java Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_delete_confirm = "Conferma eliminazione  Azienda ?";
@@ -81,12 +59,6 @@ $l_j_check_phone = "Telefono non  valido.";
 $l_j_check_fax = "Fax non  valido.";
 $l_j_check_email = " Indirizzo Email non  valido.";
 $l_j_check_web = " Indirizzo  Web non  valido.";
-$l_j_kind_delete = "Scegli un tipo da controllare o eliminare !";
-$l_j_kind_update = "Scegli un tipo e inserisci il nuovo nome per la modifica !";
-$l_j_kind_create = "Inserisci nuovo tipo per crearlo  !";
-$l_j_act_delete = "Scegli una Attività da controllare o eliminare !";
-$l_j_act_update = "Scegli una Attività e inserisci il nuovo nome per la modifica !";
-$l_j_act_create = "Inserisci nuova Attività per crearla !";
 $l_j_select_company = "Scegli Azienda !";
 
 // For the display parameters modification screen

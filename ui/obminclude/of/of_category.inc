@@ -678,7 +678,7 @@ function of_category_dis_admin_form($entity, $catu, $cats) {
 function of_category_dis_links($entity, $cat, $param, $mode="multi") {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
-  global $l_back,$display;
+  global $l_back, $display;
 
   $l_entity = strtolower("l_${entity}");
   $l_cat = "l_${cat}";
@@ -1072,10 +1072,10 @@ function of_category_query_links($entity, $cat, $p_id, $mode="multi") {
   global $cdg_sql;
 
   $table = ucfirst($entity) . ucfirst($cat);
-  $linkfield_prefix = strtolower($entity.$cat."_");
+  $linkfield_prefix = strtolower($entity.$cat."link_");
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
-  $linkfield_ent = $linkfield_prefix."link_".$entity."_id";
-  $linkfield_cat = $linkfield_prefix."link_category_id";
+  $linkfield_ent = $linkfield_prefix.$entity."_id";
+  $linkfield_cat = $linkfield_prefix."category_id";
   if ($entity == "calendar") {
     $entitytable = "CalendarEvent";
     $entityfield_prefix = "calendarevent_";

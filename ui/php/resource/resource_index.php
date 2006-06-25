@@ -13,7 +13,6 @@
 // - detailconsult   -- $param_resource    -- show the resource detail
 // - detailupdate    -- $param_resource    -- show the resource detail form
 // - insert          -- form fields        -- insert the resource 
-// - reset           -- $param_resource    -- reset resource preferences
 // - update          -- form fields        -- update the resource 
 // - check_delete    -- $param_resource    -- check links before delete
 // - delete          -- $param_resource    -- delete the resource 
@@ -104,10 +103,10 @@ if ($action == "ext_get_ids") {
     $rid = run_query_resource_insert($resource);
     if ($rid > 0) {
       $resource["id"] = $rid;
-      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $display["msg"] .= display_ok_msg("$l_resource : $l_insert_ok");
       $display["detail"] = dis_resource_consult($resource);
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg("$l_resource : $l_insert_error");
       $display["search"] = html_resource_search_form($resource);
     }
   // Form data are not valid
@@ -121,9 +120,9 @@ if ($action == "ext_get_ids") {
   if (check_resource_data_form($resource["id"], $resource)) {
     $retour = run_query_resource_update($resource["id"], $resource);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg("$l_resource : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg("$l_resource : $l_update_error");
     }
     $display["detail"] = dis_resource_consult($resource);
   } else {
@@ -147,9 +146,9 @@ if ($action == "ext_get_ids") {
   if (check_resource_can_delete($resource["id"])) {
     $retour = run_query_resource_delete($resource["id"]);
     if ($retour) {
-      $display["msg"] .= display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg("$l_resource : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg("$l_resource : $l_delete_error");
     }
     $display["search"] = html_resource_search_form($resource);
   } else {

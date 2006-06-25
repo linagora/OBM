@@ -42,12 +42,6 @@ $l_no_found = "Aucun Paiement ne correspond à votre requête";
 $l_no_invoice = "Aucune Facture liée à ce paiment";
 $l_cant_delete = "Le paiement ne peut être supprimé !";
 $l_can_delete = "Le paiement peut être supprimé.";
-$l_delete_ok = "Le Paiement a bien été supprimé.";
-$l_delete_error = "La suppression du Paiement a échoué !";
-$l_insert_ok = "Le Paiement a bien été inséré ";
-$l_insert_error = "L'insertion du Paiement a échoué !";
-$l_update_ok = "Le Paiement a bien été mis à jour.";
-$l_update_error = "La mise à jour du Paiement a échoué";
 $l_invoice_added = "L'association Paiement/Facture a été correctement créée";
 $l_no_invoice_added = "L'association Paiement/Facture a échoué !";
 

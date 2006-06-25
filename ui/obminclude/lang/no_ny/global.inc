@@ -24,6 +24,7 @@ $l_id = "Id";
 $l_comment = "Kommentar";
 $l_add_comment = "Add a Kommentar";
 $l_upd_comment = "Update Kommentar";
+$l_rights = "Rights";
 $l_default = "Default";
 $l_status = "Status";
 $l_archive = "Arkiv";

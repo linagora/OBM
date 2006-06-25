@@ -35,13 +35,6 @@ $l_delete = "Slett brukaren";
 $l_no_display = "Fyll inn søkefeltet og trykk < Finn > for å hente ut brukarar";
 $l_found = "found (to translate) !";
 $l_no_found = "Ingen brukar passa til søket!";
-$l_delete_ok = "Brukaren er sletta.";
-$l_delete_error = "Brukaren kunne ikkje slettast!";
-$l_insert_ok = "Brukaren er lagt til.";
-$l_insert_error = "Brukaren kunne ikkje leggast til!";
-$l_update_ok = "Brukaren er oppdatert.";
-$l_update_error = "Brukaren kunne ikkje oppdaterast!";
-$l_query_error = "Problem med å utføre søket.";
 
 $l_exist_error = "finst alt";
 $l_login_error = "Ugyldig brukarnamn";

@@ -33,12 +33,6 @@ $l_delete = "Elimina Gruppo";
 $l_add = "Aggiungi questi  Gruppi";
 
 // Messages
-$l_insert_ok = "Gruppo inserito.";
-$l_insert_error = "Creazione Gruppo non riuscita";
-$l_update_ok = "The Gruppo modificato";
-$l_update_error = "Modifica Gruppo non riuscita";
-$l_delete_ok = "Gruppo eliminato ";
-$l_delete_error = "Eliminazione Gruppo non riuscita";
 $l_fill_name = "YInserisci nome del gruppo";
 $l_group_exists = "Il Gruppo già esiste";
 $l_j_check_email = "indirizzo email non valido";

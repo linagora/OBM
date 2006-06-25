@@ -35,13 +35,6 @@ $l_delete = "löschen Benutzer";
 // Messages
 $l_found = "Benutzer gefunden";
 $l_no_found = "No user found matching the query !";
-$l_delete_ok = "The user has been deleted successfully.";
-$l_delete_error = "The deletion of the user has failed !";
-$l_insert_ok = "The user has been inserted successfully.";
-$l_insert_error = "The insertion of the user has failed !";
-$l_update_ok = "The user has been updated successfully.";
-$l_update_error = "The update of the user has failed !";
-$l_query_error = "Error while executing the query";
 
 $l_exist_error = "bereits vorhanden";
 $l_login_error = "ungültiger Benutzername!";

@@ -38,13 +38,6 @@ $l_generer = "Genere";
 // Messages
 $l_no_display = "Riempi i campi di ricerca e premi < TROVA > per la lista degli affari ";
 $l_no_found = "Alcuni affari non corrispondono ai criteri";
-$l_delete_ok = "Eliminazione dei criteri eseguita";
-$l_delete_error = "Err.3v6987d  durante L'Eliminazione dei criteri";
-$l_insert_ok = "Inserimento del documento eseguito";
-$l_insert_error = "Err.3v6987e  durante L'Inserimento del documento...";
-$l_update_ok = "Modifica dell'affare eseguita";
-$l_update_error = "Err.3v6987e  durante la modifica dell'affare";
-$l_query_error = "Err.3v6987f  durante La query ";
 $l_archive_ok = "Archiviazine eseguita";
 $l_archive_error = "Err.3v6987g  nella query ";
 $l_archive_number = "affari registrati negli archivi";
