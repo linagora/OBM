@@ -10,8 +10,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Invoice search query :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
+function run_query_invoice_search ($invoice) {
   global $auth, $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $sql_order_dir = $invoice["sql_order_dir"];
+  $sql_order_field = $invoice["sql_order_field"];
 
   $label = sql_search_text_parse($invoice["label"]);
   $number = sql_search_text_parse($invoice["number"]);
@@ -107,8 +110,8 @@ function run_query_invoice_search ($invoice, $p_new_order, $p_order_dir) {
   }
   $whereq = "WHERE $where";
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
-  $orderq .= "ORDER BY $order $order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "invoice_date";
+  $orderq .= "ORDER BY $order $sql_order_dir";
 
   // XXXXXX ???? Display archive
   $query = "SELECT Invoice.*,
@@ -208,7 +211,7 @@ function run_query_invoice_detail($p_invoice_id) {
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_insert($invoice) {
-  global $auth, $cdg_sql, $new_order, $order_dir;
+  global $auth, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
@@ -299,7 +302,7 @@ function run_query_invoice_update($invoice) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
-  $id = $invoice["id"];
+  $id = $invoice["invoice_id"];
   $label = $invoice["label"];
   $number = $invoice["number"];
   $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');

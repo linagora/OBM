@@ -40,7 +40,7 @@ function dis_data_account(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme,$col_balance_pos, $col_balance_neg;
 
   if ($fieldname == "account_label") {
-    $res["url"] = "$path/account/account_index.php?action=detailconsult&amp;param_account=".$OD->data_set->f("account_id");
+    $res["url"] = "$path/account/account_index.php?action=detailconsult&amp;account_id=".$OD->data_set->f("account_id");
   }
 
   elseif ( ($fieldname == "account_today") 
@@ -128,10 +128,10 @@ function html_account_search_form ($p_action, $account) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_account_search_list($account) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir,$display;
+  global $auth, $display;
 
   $prefs = get_display_pref($auth->auth["uid"], "account");
-  $obm_q = run_query_account_search($account, $new_order, $order_dir);
+  $obm_q = run_query_account_search($account);
   $nb_account = $obm_q->num_rows_total();
   if ($nb_account == 0) {
     $display["msg"] = display_info_msg($l_no_found);
@@ -232,10 +232,10 @@ function html_account_consult($obm_q_account, $p_action){
 //     $block .= "
 //        <form method=\"post\" action=\"\">";
 //     $url_upd = url_prepare("account_index.php?action=detailupdate".
-// 			   "&amp;param_account=".
+// 			   "&amp;account_id=".
 // 			   $obm_q_account->f("account_id"));
 //     $url_comp = url_prepare("account_index.php?action=compute_balance".
-// 			   "&amp;param_account=".
+// 			   "&amp;account_id=".
 // 			   $obm_q_account->f("account_id"));
     
 //     $block .= " 
@@ -299,7 +299,7 @@ function html_account_form($obm_q_account, $action) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($account["id"])) { $id = $account["id"]; }
+  if (isset($account["account_id"])) { $id = $account["account_id"]; }
   if (isset($account["label"])) { $label = stripslashes($account["label"]); }
   if (isset($account["number"])) { $number = $account["number"]; }
   if (isset($account["balance"])) { $balance = $account["balance"]; }
@@ -310,13 +310,13 @@ function html_account_form($obm_q_account, $action) {
     $action = ($q_payments->nf() != 0) ? "detailupdate_nodel" : $action;
 
     $dis_button = "
-      <input type=\"hidden\" name=\"param_account\" value=\"$id\" />
+      <input type=\"hidden\" name=\"account_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"submit\" name=\"\" value=\"$l_update\" />
     ";
   } else {
     $dis_button = "
-      <input type=\"hidden\" name=\"param_account\" value=\"$id\" />
+      <input type=\"hidden\" name=\"account_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" name=\"\" value=\"$l_insert\" />
     ";
@@ -327,8 +327,8 @@ function html_account_form($obm_q_account, $action) {
 //   if ($action=="detailupdate"){//modifier/supprimer
 //     $action = ($q_payments->nf() != 0)) ? "detailupdate_nodel" : $action;
 
-//     $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=$id");
-//     $url_update = url_prepare("account_index.php?action=update&amp;param_account=$id");
+//     $url_delete = url_prepare("account_index.php?action=delete&amp;account_id=$id");
+//     $url_update = url_prepare("account_index.php?action=update&amp;account_id=$id");
 //     $block .= "
 //             <table border=\"$border\" cellspacing=\"$cell_spacing\"><tr><td>
 //              ">
@@ -445,7 +445,7 @@ function html_account_impossible_deletion ($p_account_id, $q_related_payments) {
     <font color=\"#$FF00FF\">".$q_related_payments->nf()." ".$l_impossible_deletion." : </font><br>";
   while ($q_related_payments->next_record()) {
     $block .= "
-     <a href=\"payment_index.php?action=detailconsult&amp;param_payment=".$q_related_payments->f("payment_id")."\">".$q_related_payments->f("payment_label") . "</a><br>\n";
+     <a href=\"payment_index.php?action=detailconsult&amp;payment_id=".$q_related_payments->f("payment_id")."\">".$q_related_payments->f("payment_label") . "</a><br>\n";
   }
   
   $block .= "
@@ -477,7 +477,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   $p_date = ($p_date =="") ? date("Y-m-d") : $p_date;
 
   // let's compute balance now : 
-  $data = account_compute_balance ($p_account["id"], $p_date);
+  $data = account_compute_balance ($p_account["account_id"], $p_date);
   $q_payments = $data["payments"];
   $q_expected = $data["expected"];
   $nb = $q_expected->nf();
@@ -485,15 +485,15 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   $col_today   = ($data["today"] > 0) ? $col_balance_pos:$col_balance_neg;
 
   // where we go when user clicks on compute :
-  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["id"]);
+  $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account["account_id"]);
 
   // we display all account data :
-  $q_account = run_query_account_detail ($p_account["id"]);
+  $q_account = run_query_account_detail ($p_account["account_id"]);
   html_account_consult ($q_account, "compute_balance");
 
   // the form allowing a date input :
   $block .= "<br><br>";
-  $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["id"]);
+  $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account["account_id"]);
   $block .= "
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
@@ -604,7 +604,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   if ($q_expected->nf() != 0) { 
     $q_expected->seek(0);
     $url_expect = url_prepare ("account_index.php?action=compute_balance".
-			      "&amp;param_account=".$p_account["id"]);
+			      "&amp;account_id=".$p_account["account_id"]);
 
     $dis_expect  = new OBM_DISPLAY ("DATA", $payments_options, "account");
     $dis_expect->data_set = $q_expected;
@@ -619,7 +619,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   if ($q_payments->nf() != 0) { 
     $q_payments->seek(0);
     $url_done = url_prepare ("account_index.php?action=compute_balance".
-			      "&amp;param_account=".$p_account["id"]);
+			      "&amp;account_id=".$p_account["account_id"]);
 
     $dis_done  = new OBM_DISPLAY ("DATA", $payments_options, "account");
     $dis_done->data_set = $q_payments;

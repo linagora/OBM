@@ -36,7 +36,7 @@ function dis_data_publication(&$OD, $fieldname, $link_ok) {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".addslashes($OD->data_set->f("publication_title"))."');";
     }
     else {    
-      $res["url"] = "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$OD->data_set->f("publication_id");
+      $res["url"] = "$path/publication/publication_index.php?action=detailconsult&amp;publication_id=".$OD->data_set->f("publication_id");
     }
   }
 
@@ -141,12 +141,12 @@ function html_publication_search_form ($type_q,$publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_search_list($publication) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $popup = $publication["popup"];
 
   $prefs = get_display_pref($auth->auth["uid"], "publication");
-  $obm_q = run_query_publication_search($publication, $new_order, $order_dir);
+  $obm_q = run_query_publication_search($publication);
   $nb_pub = $obm_q->num_rows_total();
   if ($nb_pub == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -260,8 +260,8 @@ function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publ
 function dis_publication_consult($publication) {
   global $display, $l_query_error;
 
-  if ($publication["id"] > 0) {
-    $pub_q = run_query_publication_detail($publication["id"]);
+  if ($publication["publication_id"] > 0) {
+    $pub_q = run_query_publication_detail($publication["publication_id"]);
     if ($pub_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($pub_q);
       $block = html_publication_consult($pub_q);
@@ -338,8 +338,8 @@ function html_publication_consult($pub_q) {
 function dis_publication_form($action, $publication) {
   global $display, $l_query_error;
 
-  if ($publication["id"] > 0) {
-    $pub_q = run_query_publication_detail($publication["id"]);
+  if ($publication["publication_id"] > 0) {
+    $pub_q = run_query_publication_detail($publication["publication_id"]);
     if ($pub_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($pub_q);
     } else {
@@ -393,7 +393,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
   $concat1 = array();
   $list_sub = array();
   // If parameters have been given, they supercede the default action value
-  if (isset($publication["id"])) { $id = $publication["id"]; }
+  if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
   if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
   if (isset($publication["type"])) { $type = $publication["type"]; }
   if (isset($publication["year"])) { $year = stripslashes($publication["year"]); }
@@ -416,7 +416,7 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />
+      <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
@@ -543,12 +543,12 @@ function html_publication_group_subscription_form($action,$pub_q, $cat1_q, $publ
   $concat1 = array();
   $title = $pub_q->f("publication_title");
   // If parameters have been given, they supercede the default action value
-  if (isset($publication["id"])) { $id = $publication["id"]; }
+  if (isset($publication["publication_id"])) { $id = $publication["publication_id"]; }
   if (isset($publication["concat1"])) { $concat1 = $publication["concat1"]; }
  
 
   $dis_button = "
-    <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />  
+    <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$id\" />  
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_group_subscription\" />
     <input type=\"submit\" value=\"$l_auto_sub\" />
     ";
@@ -635,7 +635,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
    $lang = $sub_q->f("publication_lang"); 
   }
   // If parameters have been given, they supercede the default action value
-  if (isset($publication["id"])) { $pub_id = $publication["id"]; }
+  if (isset($publication["publication_id"])) { $pub_id = $publication["publication_id"]; }
   if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
   if (isset($publication["quantity"])) { $quantity = $publication["quantity"]; }
   if (isset($publication["subscription_id"])) { $sub_id = $publication["subscription_id"]; }
@@ -662,7 +662,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
       <input type=\"hidden\" name=\"param_subscription\" id=\"param_subscription\" value=\"$sub_id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update_subscription\" />
       <input type=\"submit\" value=\"$l_update_sub\" />";
-     $block_publi = "$title<input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />";
+     $block_publi = "$title<input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />";
      	
   } elseif (($action == "new_subscription") || ($action == "insert_subscription")) {
     $dis_button = "
@@ -672,11 +672,11 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
     </a>
-    <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />
+    <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
     ";     
   }
-  $dis_button .= "<input type=\"hidden\" id=\"param_contact\" name=\"param_contact\" value=\"$cont_id\" />
+  $dis_button .= "<input type=\"hidden\" id=\"contact_id\" name=\"contact_id\" value=\"$cont_id\" />
       <input type=\"hidden\" id=\"ext_url\" name=\"ext_url\" value=\"$ext_url\" />
       <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
 
@@ -774,7 +774,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
     </a>
-    <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"\" />
+    <input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"\" />
     ";       
   $block_publi_orig = "$title<input type=\"hidden\" name=\"param_publication_orig\" id=\"param_publication_orig\" value=\"$pub_id\" />";
@@ -840,13 +840,13 @@ function dis_publication_can_delete($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_publication\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"publication_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_publication\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"publication_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
@@ -889,7 +889,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
     $samelang = $pub_q->f("publication_lang");
     $dis_same_pub .= "
       <tr><td colspan =\"2\" class=\"detailText\">
-         <a class=\"detail\" href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;param_publication=$id") . "\">
+         <a class=\"detail\" href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$id") . "\">
           $sametitle ($samelang)</a>
       </td></tr>";
   }
@@ -1070,7 +1070,7 @@ function dis_publication_type_links($publication) {
       $dis_link .="
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;param_publication=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -1249,7 +1249,7 @@ function dis_publication_recept_links($publication) {
       $dis_link .="
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;param_publication=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -1329,7 +1329,7 @@ function dis_publication_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_subscription_external_list($hash_table) {
   global $display,$l_subscription, $l_no_found_subscription;
-  global $auth, $new_order, $order_dir;
+  global $auth;
   
   $obm_q = run_query_publication_subscription_external_search($hash_table);
   $nb_subscription = $obm_q->num_rows();
@@ -1393,11 +1393,11 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
     } else {
       $timeupdate = "&nbsp;";
     }
-    $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
-    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$c_id&amp;view=publication"));
+    $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;publication_id=$p_id");
+    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$c_id&amp;view=publication"));
 
     if ($has_write_right) {
-      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1&amp;ext_url=$ext_url");
+      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;contact_id=$c_id&amp;param_subscription=$s_id&amp;popup=1&amp;ext_url=$ext_url");
       $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
 
       $display_write = "

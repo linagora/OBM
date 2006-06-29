@@ -49,7 +49,7 @@ require("time_query.inc");
 $uid = $auth->auth["uid"]; //current user uid
 
 if (!isset($action)) $action = "index";
-$time = get_param_time();
+$params = get_time_params();
 get_time_actions();
 $perm->check_permissions($module, $action);
 
@@ -70,32 +70,32 @@ $stats_users = $project_managers;
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_time_index($time);
+  dis_time_index($params);
 
 } elseif ($action == "viewmonth") {
 ///////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "month";
-  $display["result"] = dis_time_nav_date($time);
-  $display["result"] .= dis_time_planning($time);
-  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
+  $params["interval"] = "month";
+  $display["result"] = dis_time_nav_date($params);
+  $display["result"] .= dis_time_planning($params);
+  $display["features"] .= dis_user_select($params, run_query_time_get_obmusers());
  
 } elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "week";
-  run_query_time_insert($time);
-  run_query_time_validate($time["user_id"]);
-  dis_time_index($time);
+  $params["interval"] = "week";
+  run_query_time_insert($params);
+  run_query_time_validate($params["user_id"]);
+  dis_time_index($params);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $d_start_week = time_first_day_week($time["date"]);
-  $val_days = run_query_time_valid_search($time);
-  $display["result"] .= dis_time_form_addtask($time, $val_days);
+  $d_start_week = time_first_day_week($params["date"]);
+  $val_days = run_query_time_valid_search($params);
+  $display["result"] .= dis_time_form_addtask($params, $val_days);
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_time_update($time);
-  run_query_time_validate($time["user_id"]);
+  run_query_time_update($params);
+  run_query_time_validate($params["user_id"]);
   // close the popup
   $display["result"] .= "
     <script language=\"javascript\">
@@ -107,40 +107,40 @@ if ($action == "index") {
 } elseif ($action == "delete") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
-  $time["interval"] = "week";
+  $params["interval"] = "week";
   run_query_time_delete($HTTP_POST_VARS);
-  run_query_time_validate($time["user_id"]);
-  dis_time_index($time);
+  run_query_time_validate($params["user_id"]);
+  dis_time_index($params);
   
 } if ($action == "globalview") {
 //////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "month";
-  $display["result"] = dis_time_nav_date($time);
-  $display["result"] .= dis_time_month_users_total($time);
+  $params["interval"] = "month";
+  $display["result"] = dis_time_nav_date($params);
+  $display["result"] .= dis_time_month_users_total($params);
 
 } elseif ($action == "validate") {
 //////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "month";
-  run_query_time_adminvalidate($time);
-  $display["result"] = dis_time_nav_date($time);
-  $display["result"] .= dis_time_month_users_total($time);
+  $params["interval"] = "month";
+  run_query_time_adminvalidate($params);
+  $display["result"] = dis_time_nav_date($params);
+  $display["result"] .= dis_time_month_users_total($params);
 
 } elseif ($action == "unvalidate") {
 //////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "month";
-  run_query_time_adminunvalidate($time);
-  $display["result"] = dis_time_nav_date($time);
-  $display["result"] .= dis_time_month_users_total($time);
+  $params["interval"] = "month";
+  run_query_time_adminunvalidate($params);
+  $display["result"] = dis_time_nav_date($params);
+  $display["result"] .= dis_time_month_users_total($params);
 
 } elseif ($action == "stats") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
-  $time["interval"] = "month";
-  $statproj_q = run_query_time_stat_project($time);
-  $stattt_q = run_query_time_stat_tasktype($time);
-  $display["result"] = dis_time_nav_date($time);
-  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers(), 1);
-  $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
+  $params["interval"] = "month";
+  $statproj_q = run_query_time_stat_project($params);
+  $stattt_q = run_query_time_stat_tasktype($params);
+  $display["result"] = dis_time_nav_date($params);
+  $display["features"] .= dis_user_select($params, run_query_time_get_obmusers(), 1);
+  $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $params);
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,59 +176,47 @@ display_page($display);
 // Stores time parameters transmited in $task hash
 // returns : $task hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_time() {
-  global $uid, $sess, $sess_users, $set_debug, $cdg_param, $action, $wbegin;
-  global $sel_date, $sel_tasktype, $sel_time, $tf_label, $task_id;
-  global $sel_project, $sel_projecttask, $wbegin, $user_id;
-  global $tf_lweek, $f_time, $sel_user_id, $cb_day, $rd_day;
+function get_time_params() {
+  global $sess, $sess_users;  
+  global $cb_day, $rd_day, $user_id, $sel_user_id, $uid;
 
-  if (isset ($action)) $time["action"] = $action;
-  if (isset ($sel_tasktype)) $time["tasktype"] = $sel_tasktype;
-  if (isset ($sel_project)) $time["project"] = $sel_project;
-  if (isset ($sel_projecttask)) $time["projecttask"] = $sel_projecttask;
-  if (isset ($sel_time)) $time["time"] = $sel_time;
-  if (isset ($tf_label)) $time["label"] = $tf_label;
-  if (isset ($f_time)) $time["f_time"] = $f_time;
-  if (isset ($submit)) $time["submit"] = $submit;
-  if (isset ($wbegin)) $time["date"] = $wbegin;
-  if ($time["date"] == "") { $time["date"] = date("Ymd"); }
-  if (isset ($task_id)) $time["task_id"] = $task_id;
 
-  if (is_array($cb_day)) $time["sel_date"] = $cb_day;
-  elseif (isset ($rd_day)) $time["sel_date"] = $rd_day;
+  // Get global params
+  $params = get_global_params();
 
-  if (isset ($user_id)) $time["user_id"] = $user_id;
-  if (isset ($sel_user_id)) $time["user_id"] = $sel_user_id;
-
+  // Get time specific params
+  if ($params["wbegin"] == "") { $params["wbegin"] = date("Ymd"); }
+  if (is_array($cb_day)) $params["sel_date"] = $cb_day;
+    elseif (isset ($rd_day)) $params["sel_date"] = $rd_day;
+  
   // We retrieve the selected users if any, else we get them from sessiom
   if (isset ($sel_user_id)) {
     if (is_array($sel_user_id)) {
-      $time["user_id"] = $uid;
-      $time["user_ids"] = $sel_user_id;
+      $params["user_id"] = $uid;
+      $params["user_ids"] = $sel_user_id;
     } else {
-      $time["user_id"] = $sel_user_id;
-      $time["user_ids"] = array($sel_user_id);
+      $params["user_id"] = $sel_user_id;
+      $params["user_ids"] = array($sel_user_id);
     }
     $sess_users = $sel_user_id;
     $sess->register("sess_users");
   } elseif (isset($sess_users)) {
     if (is_array($sess_users)) {
-      $time["user_id"] = $uid;
-      $time["user_ids"] = $sess_users;
+      $params["user_id"] = $uid;
+      $params["user_ids"] = $sess_users;
     } else {
-      $time["user_id"] = $sess_users;
-      $time["user_ids"] = array($sess_users);
+      $params["user_id"] = $sess_users;
+      $params["user_ids"] = array($sess_users);
     }
   } else {
     $sess_users = $uid;
-    $time["user_id"] = $uid;
-    $time["user_ids"] = array($uid);
+    $params["user_id"] = $uid;
+    $params["user_ids"] = array($uid);
     $sess->register("sess_users");
   }
+  display_debug_param($params);
 
-  display_debug_param($time);
-
-  return $time;
+  return $params;
 }
 
 
@@ -236,7 +224,7 @@ function get_param_time() {
 // Time actions
 //////////////////////////////////////////////////////////////////////////////
 function get_time_actions() {
-  global $time, $path, $actions;
+  global $params, $path, $actions;
   global $l_header_weeklyview, $l_header_monthlyview, $l_header_globalview;
   global $l_header_stats, $l_header_display;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -253,7 +241,7 @@ function get_time_actions() {
   $actions["time"]["viewmonth"] = array (
     'Name'     => "$l_header_monthlyview",
     'Url'      => "$path/time/time_index.php?action=viewmonth".
-                  "&amp;wbegin=" . $time["date"],
+                  "&amp;wbegin=" . $params["date"],
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                     );
@@ -262,7 +250,7 @@ function get_time_actions() {
   $actions["time"]["globalview"] = array (
     'Name'     => "$l_header_globalview",
     'Url'      => "$path/time/time_index.php?action=globalview".
-                  "&amp;wbegin=" . $time["date"],
+                  "&amp;wbegin=" . $params["date"],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
                                     );

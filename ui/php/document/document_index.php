@@ -30,14 +30,14 @@ require_once("$obminclude/of/of_category.inc");
 
 
 if ($action == "") $action = "index";
-$document = get_param_document();
+$params = get_document_params();
 get_document_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Document", $action, $document["id"], $uid)) {
+if (! check_privacy($module, "Document", $action, $params["document_id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("document", $document["id"], $action);
+  update_last_visit("document", $params["document_id"], $action);
 }
 page_close();
 
@@ -45,10 +45,10 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
-  $display["detail"] = html_document_tree($document, $ext_disp_file);
+  $display["detail"] = html_document_tree($params, $ext_disp_file);
 } elseif ($action == "accessfile") {
-  if ($document["id"] > 0) {
-    $doc_q = run_query_document_detail($document["id"]);
+  if ($params["document_id"] > 0) {
+    $doc_q = run_query_document_detail($params["document_id"]);
     if ($doc_q->num_rows() == 1) {
       dis_document_file($doc_q);
       exit();
@@ -57,9 +57,9 @@ if ($action == "ext_get_path") {
     $display["msg"] .= display_err_msg("$l_no_document !");
   }  
 } elseif ($action == "ext_get_ids") {
-  $display["search"] = dis_document_search_form($document);
+  $display["search"] = dis_document_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_document_search_list($document);
+    $display["result"] = dis_document_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
@@ -69,46 +69,46 @@ if ($action == "ext_get_path") {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_document_search_form($document);
+  $display["search"] = dis_document_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_document_search_list($document);
+    $display["result"] = dis_document_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_document_search_form($document);
-  $display["result"] = dis_document_search_list($document);
+  $display["search"] = dis_document_search_form($params);
+  $display["result"] = dis_document_search_list($params);
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_document_form($action, $document, "");
+  $display["detail"] = dis_document_form($action, $params, "");
   
 } elseif ($action == "new_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_document_dir_form($action, $document);
+  $display["detail"] = html_document_dir_form($action, $params);
   
 } elseif ($action == "detailupdate_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  $doc_q = run_query_document_detail($document["id"]);
-  $display["detail"] = html_document_dir_form($action, $document,$doc_q);
+  $doc_q = run_query_document_detail($params["document_id"]);
+  $display["detail"] = html_document_dir_form($action, $params,$doc_q);
 
 } elseif ($action == "tree") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_document_tree($document,"true");
+  $display["detail"] = html_document_tree($params,"true");
   
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_document_consult($document);
+  $display["detail"] = dis_document_consult($params);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-if ($document["id"] > 0) {
-    $doc_q = run_query_document_detail($document["id"]);
+if ($params["document_id"] > 0) {
+    $doc_q = run_query_document_detail($params["document_id"]);
     if ($doc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($doc_q);
-      $display["detail"] = dis_document_form($action, $document, $doc_q);
+      $display["detail"] = dis_document_form($action, $params, $doc_q);
   } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $doc_q->query . " !");
     }
@@ -116,110 +116,110 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_data_form("", $document)) {
-    $document["id"] = run_query_document_insert($document);
-    if ($document["id"]) {
-      update_last_visit("document", $document["id"], $action);
+  if (check_document_data_form("", $params)) {
+    $params["document_id"] = run_query_document_insert($params);
+    if ($params["document_id"]) {
+      update_last_visit("document", $params["document_id"], $action);
       $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
-      $display["detail"] = dis_document_consult($document);
+      $display["detail"] = dis_document_consult($params);
     } else {
       $display["msg"] .= display_err_msg("$l_document : $l_insert_error $err_msg");
-      $display["detail"] = dis_document_form($action, $document, "");
+      $display["detail"] = dis_document_form($action, $params, "");
     }
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_document_form($action, $document, "");
+    $display["detail"] = dis_document_form($action, $params, "");
   }
 
 } elseif ($action == "insert_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_dir_data_form($document)) {
-    $retour = run_query_document_insert_dir($document);
+  if (check_document_dir_data_form($params)) {
+    $retour = run_query_document_insert_dir($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_dir : $l_insert_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_dir : $l_insert_error");
     }
-    $display["detail"] = html_document_tree($document,true);
+    $display["detail"] = html_document_tree($params,true);
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = html_document_dir_form($action, $document);
+    $display["detail"] = html_document_dir_form($action, $params);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_data_form($document["id"], $document)) {
-    $retour = run_query_document_update($document["id"], $document);
+  if (check_document_data_form($params["document_id"], $params)) {
+    $retour = run_query_document_update($params["document_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_document : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_document : $l_update_error  $err_msg");
     }
-    $doc_q = run_query_document_detail($document["id"]);
+    $doc_q = run_query_document_detail($params["document_id"]);
     $display["detailInfo"] .= display_record_info($doc_q);
     $display["detail"] = html_document_consult($doc_q);
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_document_form($action, $document, "");
+    $display["detail"] = dis_document_form($action, $params, "");
   }
 
 } elseif ($action == "update_dir") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_dir_data_form($document)) {
-    $retour = run_query_document_update_dir($document);
+  if (check_document_dir_data_form($params)) {
+    $retour = run_query_document_update_dir($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_dir : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_dir : $l_update_error");
     }
-    $display["detail"] = html_document_tree($document,true);
+    $display["detail"] = html_document_tree($params,true);
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = html_document_dir_form($action, $document);
+    $display["detail"] = html_document_dir_form($action, $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_can_delete($document["id"])) {
+  if (check_document_can_delete($params["document_id"])) {
     $display["msg"] .= display_info_msg($err_msg);
-    $display["detail"] = dis_document_can_delete($document["id"]);
+    $display["detail"] = dis_document_can_delete($params["document_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $display["detail"] = dis_document_consult($document);
+    $display["detail"] = dis_document_consult($params);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_can_delete($document["id"])) {
-    $retour = run_query_document_delete($document["id"]);
+  if (check_document_can_delete($params["document_id"])) {
+    $retour = run_query_document_delete($params["document_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_document : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_document : $l_delete_error");
     }
-    $display["search"] = dis_document_search_form($document);
-    $display["result"] = dis_document_search_list($document);
+    $display["search"] = dis_document_search_form($params);
+    $display["result"] = dis_document_search_list($params);
   } else {
     $display["msg"] .= display_warn_msg("$err_msg $l_cant_delete");
-    $display["detail"] = dis_document_consult($document);
+    $display["detail"] = dis_document_consult($params);
   }
 
 } elseif ($action == "dir_check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_can_delete_dir($document["id"])) {
-    $display["detail"] = dis_document_can_delete_dir($document["id"]);
+  if (check_document_can_delete_dir($params["document_id"])) {
+    $display["detail"] = dis_document_can_delete_dir($params["document_id"]);
   } else {
     $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
-    $display["detail"] = html_document_tree($document,"true");
+    $display["detail"] = html_document_tree($params,"true");
   }
 
 } elseif ($action == "dir_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_document_can_delete_dir($document["id"])) {
-    $retour = run_query_document_delete($document["id"]);
+  if (check_document_can_delete_dir($params["document_id"])) {
+    $retour = run_query_document_delete($params["document_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_dir : $l_delete_ok");
     } else {
@@ -228,7 +228,7 @@ if ($document["id"] > 0) {
   } else {
     $display["msg"] .= display_warn_msg("$err_msg $l_dir_cant_delete");
   }
-  $display["detail"] = html_document_tree($document,"true");
+  $display["detail"] = html_document_tree($params,"true");
 
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -236,7 +236,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("document", "category1", $document);
+  $retour = of_category_query_insert("document", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
@@ -246,7 +246,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("document", "category1", $document);
+  $retour = of_category_query_update("document", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
@@ -256,11 +256,11 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("document", "category1", $document, "mono");
+  $display["detail"] .= of_category_dis_links("document", "category1", $params, "mono");
 
 } elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("document", "category1", $document);
+  $retour = of_category_query_delete("document", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
@@ -270,7 +270,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category2_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("document", "category2", $document);
+  $retour = of_category_query_insert("document", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
   } else {
@@ -280,7 +280,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category2_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("document", "category2", $document);
+  $retour = of_category_query_update("document", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
   } else {
@@ -290,11 +290,11 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "category2_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("document", "category2", $document, "mono");
+  $display["detail"] .= of_category_dis_links("document", "category2", $params, "mono");
 
  } elseif ($action == "category2_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("document", "category2", $document);
+  $retour = of_category_query_delete("document", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
   } else {
@@ -304,7 +304,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "mime_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_document_mime_insert($document);
+  $retour = run_query_document_mime_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_mime : $l_insert_ok");
   } else {
@@ -314,7 +314,7 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "mime_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_document_mime_update($document);
+  $retour = run_query_document_mime_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_mime : $l_update_ok");
   } else {
@@ -324,11 +324,11 @@ if ($document["id"] > 0) {
 
 } elseif ($action == "mime_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_document_mime_links($document);
+  $display["detail"] .= dis_document_mime_links($params);
 
 } elseif ($action == "mime_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_document_mime_delete($document["mime"]);
+  $retour = run_query_document_mime_delete($params["mime"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_mime : $l_delete_ok");
   } else {
@@ -359,7 +359,7 @@ if ($document["id"] > 0) {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_document);
 $display["end"] = display_end();
-if (! $document["popup"]) {
+if (! $params["popup"]) {
   update_document_action();
   $display["header"] = display_menu($module);
 }
@@ -368,67 +368,23 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Company parameters transmited in $document hash
-// returns : $document hash with parameters set
+// Stores Company parameters transmited in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_document() {
-  global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_dir_path;
-  global $tf_extension, $tf_mimetype, $tf_name;
-  global $fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
-  global $sel_mime,$cb_privacy,$rd_kind,$tf_url;
-  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
-  global $param_document, $popup, $param_entity, $entity,$rd_file_update; 
-  global $tf_category1_label, $tf_category1_code, $sel_category1;
-  global $tf_category2_label, $tf_category2_code, $sel_category2;
-  global $hd_path, $hd_old_name;
+function get_document_params() {
+  global $tf_path, $fi_file, $fi_file_name, $fi_file_size, $fi_file_type;
 
-  if (isset ($param_document)) $document["id"] = $param_document;
-  if (isset ($param_entity)) $document["entity_id"] = $param_entity;
-  if (isset ($entity)) $document["entity"] = $entity;
-  if (isset($rd_file_update)) $document["file_update"] = $rd_file_update;
-  if (isset ($tf_url)) $document["url"] = $tf_url;
-  
-  if (isset ($tf_title)) $document["title"] = $tf_title;
-  if (isset ($tf_name)) $document["name"] = $tf_name; // dir
-  if (isset ($tf_author)) $document["author"] = $tf_author;
-  if (isset ($tf_path)) $document["path"] = format_path(trim($tf_path));
-  if (isset ($hd_path)) $document["path"] = $hd_path;
-  if (isset ($hd_old_name)) $document["old_name"] = $hd_old_name;
-  if (isset ($tf_filename)) $document["filename"] = $tf_filename;
+  // Get global params
+  $params = get_global_params("Document");
 
-  if (isset ($rd_kind)) $document["kind"] = $rd_kind;
-  if (isset ($fi_file_name)) $document["name"] = $fi_file_name;
-  if (isset ($fi_file_size)) $document["size"] = $fi_file_size;
-  if (isset ($fi_file_type)) $document["mime_file"] = $fi_file_type;
-  if (isset ($fi_file)) $document["file"] = $fi_file;
+  if (isset ($tf_path)) $params["path"] = format_path(trim($tf_path));
+  if (isset ($fi_file_name)) $params["name"] = $fi_file_name;
+  if (isset ($fi_file_size)) $params["size"] = $fi_file_size;
+  if (isset ($fi_file_type)) $params["mime_file"] = $fi_file_type;
+  if (isset ($fi_file)) $params["file"] = $fi_file;
+  display_debug_param($params);
 
-    // External param
-  if (isset ($popup)) $document["popup"] = $popup;
-  if (isset ($ext_action)) $document["ext_action"] = $ext_action;
-  if (isset ($ext_title)) $document["ext_title"] = $ext_title;
-  if (isset ($ext_url)) $document["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $document["ext_id"] = $ext_id;
-  if (isset ($ext_target)) $document["ext_target"] = $ext_target;
-
-  
-  if (isset ($tf_category1_label)) $document["category1_label"] = $tf_category1_label;
-  if (isset ($tf_category1_code)) $document["category1_code"] = $tf_category1_code;
-  if (isset ($sel_category1)) $document["category1"] = $sel_category1;
-  if (isset ($tf_category2_label)) $document["category2_label"] = $tf_category2_label;
-  if (isset ($tf_category2_code)) $document["category2_code"] = $tf_category2_code;
-  if (isset ($sel_category2)) $document["category2"] = $sel_category2;
-  
-  if (isset ($tf_mime)) $document["mime_label"] = $tf_mime;
-  if (isset ($tf_extension)) $document["extension"] = $tf_extension;
-  if (isset ($tf_mimetype)) $document["mimetype"] = $tf_mimetype;
-
-  if (isset ($sel_mime)) $document["mime"] = $sel_mime;
-
-  if (isset ($cb_privacy)) $document["privacy"] = $cb_privacy;
-
-  display_debug_param($document);
-
-  return $document;
+  return $params;
 }
 
 
@@ -436,7 +392,7 @@ function get_param_document() {
 //  Document Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_action() {
-  global $document, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_tree, $l_header_find, $l_header_new, $l_header_consult;
   global $l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_new_dir;
@@ -485,7 +441,7 @@ function get_document_action() {
 // Detail Consult
   $actions["document"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/document/document_index.php?action=detailconsult&amp;param_document=".$document["id"]."",
+    'Url'      => "$path/document/document_index.php?action=detailconsult&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate') 
@@ -493,7 +449,7 @@ function get_document_action() {
 
 // Access Document
   $actions["document"]["accessfile"]  = array (
-    'Url'      => "$path/document/document_index.php?action=accessfile&amp;param_document=".$document["id"]."",
+    'Url'      => "$path/document/document_index.php?action=accessfile&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('None')
@@ -502,7 +458,7 @@ function get_document_action() {
 // Detail Update
   $actions["document"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/document/document_index.php?action=detailupdate&amp;param_document=".$document["id"]."",
+    'Url'      => "$path/document/document_index.php?action=detailupdate&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update')
@@ -510,7 +466,7 @@ function get_document_action() {
 
 // Detail Update
   $actions["document"]["detailupdate_dir"] = array (
-    'Url'      => "$path/document/document_index.php?action=detailupdate&amp;param_document=".$document["id"]."",
+    'Url'      => "$path/document/document_index.php?action=detailupdate&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')
@@ -532,7 +488,7 @@ function get_document_action() {
 // Check_Delete
   $actions["document"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/document/document_index.php?action=check_delete&amp;param_document=".$document["id"]."",
+    'Url'      => "$path/document/document_index.php?action=check_delete&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
@@ -548,7 +504,7 @@ function get_document_action() {
 
 // Directory Check Delete
   $actions["document"]["dir_check_delete"] = array (
-    'Url'      => "$path/document/document_index.php?action=dir_check_delete&amp;param_document=".$document["id"]."",
+    'Url'      => "$path/document/document_index.php?action=dir_check_delete&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')
@@ -708,20 +664,20 @@ function get_document_action() {
 // Document Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_document_action() {
-  global $document, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $document["id"];
+  $id = $params["document_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["document"]["detailconsult"]["Url"] = "$path/document/document_index.php?action=detailconsult&amp;param_document=$id";
+    $actions["document"]["detailconsult"]["Url"] = "$path/document/document_index.php?action=detailconsult&amp;document_id=$id";
     $actions["document"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["document"]["detailupdate"]['Url'] = "$path/document/document_index.php?action=detailupdate&amp;param_document=$id";
+    $actions["document"]["detailupdate"]['Url'] = "$path/document/document_index.php?action=detailupdate&amp;document_id=$id";
     $actions["document"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["document"]["check_delete"]['Url'] = "$path/document/document_index.php?action=check_delete&amp;param_document=$id";
+    $actions["document"]["check_delete"]['Url'] = "$path/document/document_index.php?action=check_delete&amp;document_id=$id";
     $actions["document"]["check_delete"]['Condition'][] = 'insert';
   }
 }

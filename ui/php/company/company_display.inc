@@ -57,7 +57,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_company_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
     } else {
-      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("company_id");
     }
   }
 
@@ -102,7 +102,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "company_contact_number") {
     $res["name"] = $OD->data_set->f("company_contact_number");
     if (($res["name"] > 0) && $link_ok) {
-      $res["url"] = "$path/contact/contact_index.php?action=search&amp;param_company=".$OD->data_set->f("company_id")."&amp;tf_company=".urlencode("".$OD->data_set->f("company_name"));
+      $res["url"] = "$path/contact/contact_index.php?action=search&amp;company_id=".$OD->data_set->f("company_id")."&amp;tf_company=".urlencode("".$OD->data_set->f("company_name"));
     }
     $res["align"] = "center";
   }
@@ -112,7 +112,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $market = $OD->data_set->f("company_marketingmanager_id");
     $email = $OD->data_set->f("company_email");
     $ctry = $OD->data_set->f("company_country_iso3166");
-    $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_ctry=$ctry&amp;tf_email=$email";
+    $res["url"] = "$path/contact/contact_index.php?action=new&amp;company_id=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email";
     $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
@@ -123,7 +123,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
     $c_id = $OD->data_set->f("company_id");
     if (($res["name"] != "0 / 0") && $link_ok) {
-      $res["url"] = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";
+      $res["url"] = "$path/deal/deal_index.php?action=search&amp;company_id=$c_id";
     }
     $res["align"] = "center";
   }
@@ -211,9 +211,9 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $cat_code = $company["category1_code"];
   $cat_tree = ($company["category1_tree"] == "1" ? "checked = \"checked\"" : "");
   $act = $company["activity"];
-  $naf = $company["nafcode"];
+  $naf = $company["naf"];
   $ctry = $company["country"];
-  $mark = $company["marketing_manager"];
+  $mark = $company["market"];
   $dsrc = $company["datasource"];
   $zip = stripslashes($company["zip"]);
   $dateafter = stripslashes($company["dateafter"]);
@@ -262,7 +262,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   }
 
   // Country select
-  $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
+  $sel_ctry = "<select id=\"sel_country\" name=\"sel_country\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
@@ -382,11 +382,11 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $popup = $company["popup"];
   $prefs = get_display_pref($auth->auth["uid"], "company");
-  $obm_q = run_query_company_search($company, $new_order, $order_dir);
+  $obm_q = run_query_company_search($company);
   $nb_company = $obm_q->num_rows_total();
   if ($nb_company == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -430,15 +430,15 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $cat_code = $company["category1_code"];
   $cat_tree = $company["category1_tree"];
   $act = $company["activity"];
-  $naf = $company["nafcode"];
+  $naf = $company["naf"];
   $zip = urlencode(stripslashes($company["zip"]));
-  $market = $company["marketing_manager"];
+  $market = $company["market"];
   $dsrc = $company["datasource"];
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
   $fuzzy = $company["fuzzy"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cb_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_fuzzy=$fuzzy$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cb_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_fuzzy=$fuzzy$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -493,8 +493,8 @@ function html_company_links($co_q) {
 
   // Contact
   if ($cgp_show["module"]["contact"]) {
-    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
-    $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry&amp;tf_email=$email");
+    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
+    $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;company_id=$id&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email");
     $block_contact = "
   <div class=\"linkTitle\">:: $l_module_contact</div>
   <ul class=\"linkList\">
@@ -507,9 +507,9 @@ function html_company_links($co_q) {
 
   // Deal
   if ($cgp_show["module"]["deal"]) {
-    $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
-    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
-    $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
+    $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname");
+    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
+    $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_deal = "
   <div class=\"linkTitle\">:: $l_module_deal</div>
   <ul class=\"linkList\">
@@ -545,11 +545,11 @@ function html_company_links($co_q) {
 
   // Project
   if ($cgp_show["module"]["project"]) {
-    $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
-    $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
+    $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id");
+    $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id&amp;cb_archive=1");
     $nb_pro = get_global_linked_project_nb($id, "company");
     $nb_pro_total = get_global_linked_project_nb ($id, "company", 1);
-    $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
+    $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_project = "
   <div class=\"linkTitle\">:: $l_module_project</div>
   <ul class=\"linkList\">
@@ -565,9 +565,9 @@ function html_company_links($co_q) {
   if ($cgp_show["module"]["contract"]) {
     $nb_ctra = get_global_linked_contract_nb($id, "company");
     $nb_ctra_total = get_global_linked_contract_nb($id, "company", 1);
-    $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id");
-    $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
-    $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
+    $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id");
+    $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id&amp;cb_archive=1");
+    $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
 
      $block_contract = "
   <div class=\"linkTitle\">:: $l_module_contract</div>
@@ -582,9 +582,9 @@ function html_company_links($co_q) {
 
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
-    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id");
-    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
-    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_company=$id&amp;company_name=$uname");
+    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id&amp;cb_archive=1");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
     $nb_inv_tot = get_global_linked_invoice_nb($id, "company", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "company");
     $block_invoice = "
@@ -600,8 +600,8 @@ function html_company_links($co_q) {
 
   // Payment
   if ($cgp_show["module"]["payment"]) {
-    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;param_company=$id");
-    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;param_company=$id&amp;company_name=$uname");
+    $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;company_id=$id");
+    $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
     $nb_pay = get_global_linked_payment_nb($id, "company");
     $block_payment = "
   <div class=\"linkTitle\">:: $l_module_payment</div>
@@ -637,7 +637,7 @@ function html_company_links($co_q) {
 function dis_company_consult($params) {
   global $path, $display, $obminclude, $set_lang, $l_query_error;
 
-  $cid = $params["id"];
+  $cid = $params["company_id"];
 
   if ($cid > 0) {
     $comp_q = run_query_company_detail($cid);
@@ -925,7 +925,7 @@ function dis_company_form($action, $company) {
   // of: type, activity, category1
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
-  $c_id = $company["id"];
+  $c_id = $company["company_id"];
   if ($c_id > 0) {
     $comp_q = run_query_company_detail($c_id);
     if ($comp_q->num_rows() == 1) {
@@ -944,10 +944,10 @@ function dis_company_form($action, $company) {
   }
 
   $users = array($uid);
-  if ($company["marketing_manager"] > 0) {
-    $users[] = $company["marketing_manager"];
+  if ($company["market"] > 0) {
+    $users[] = $company["market"];
   }
-  if ($company["id"] > 0) {
+  if ($company["company_id"] > 0) {
     $users[] = $comp_q->f("company_marketingmanager_id");
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
@@ -1024,7 +1024,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($company["id"])) { $id = $company["id"]; }
+  if (isset($company["company_id"])) { $id = $company["company_id"]; }
   if (isset($company["num"])) { $num = stripslashes($company["num"]); }
   if (isset($company["vat"])) { $vat = stripslashes($company["vat"]); }
   if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
@@ -1033,8 +1033,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (isset($company["datasource"])) { $dsrc = $company["datasource"]; }
   if (isset($company["type"])) { $kind = $company["type"]; }
   if (isset($company["activity"])) { $act = $company["activity"]; }
-  if (isset($company["nafcode"])) { $naf = $company["nafcode"]; }
-  if (isset($company["marketing_manager"])) { $mark = $company["marketing_manager"]; }
+  if (isset($company["naf"])) { $naf = $company["naf"]; }
+  if (isset($company["market"])) { $mark = $company["market"]; }
   if (isset($company["ad1"])) { $ad1 = stripslashes($company["ad1"]); }
   if (isset($company["ad2"])) { $ad2 = stripslashes($company["ad2"]); }
   if (isset($company["ad3"])) { $ad3 = stripslashes($company["ad3"]); }
@@ -1135,7 +1135,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   }
 
   // Country select
-  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\" onChange=\"
+  $sel_ctry = "<select name=\"sel_country\" id=\"sel_country\" onChange=\"
       if (trim(this.form.tf_phone.value) == '') {
         this.form.tf_phone.value = country_phone[this.options[this.selectedIndex].value];
       }
@@ -1210,7 +1210,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_company\" id=\"param_company\" value=\"$id\" />
+      <input type=\"hidden\" name=\"company_id\" id=\"company_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
@@ -1327,14 +1327,14 @@ function dis_can_delete_company($p_id) {
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("company_index.php") ."\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"company_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\"
       action=\"" . url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"company_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_company_del(this.form)) return true; else return false;\" />
     </form>";
@@ -1372,8 +1372,8 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $kind = $company["kind"];
   $dsrc = $company["datasource"];
   $act = $company["activity"];
-  $naf = $company["nafcode"];
-  $mark = $company["marketing_manager"];
+  $naf = $company["naf"];
+  $mark = $company["market"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $ad3 = $company["ad3"];
@@ -1395,7 +1395,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     $samezip = $co_q->f("company_zip");
     $dis_same_comp .= "
       <tr><td colspan =\"2\" class=\"detailText\">
-         <a class=\"detail\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
+         <a class=\"detail\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;company_id=$id") . "\">
           $samename ($samezip)</a>
       </td></tr>";
   }
@@ -1429,7 +1429,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
@@ -1458,7 +1458,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
@@ -1648,7 +1648,7 @@ function dis_company_nafcode_links($company) {
   global $l_naf_delete, $l_naf_can_delete, $l_naf_cant_delete;
 
   $delete_ok = true;
-  $id = $company["nafcode"];
+  $id = $company["naf"];
   $label = get_company_nafcode_label($id);
   $obm_q = run_query_company_nafcode_links($id);
 
@@ -1668,7 +1668,7 @@ function dis_company_nafcode_links($company) {
       $dis_link .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;company_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }

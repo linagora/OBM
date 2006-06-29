@@ -19,7 +19,7 @@ if (isset($publication["ext_target"]) && $publication["ext_target"]!="") {
       alert (\"$l_j_select_publication\");
       return false;
     } else {
-      window.opener.document.".$publication["ext_target"].".param_publication.value=valeur;
+      window.opener.document.".$publication["ext_target"].".publication_id.value=valeur;
       window.opener.document.".$publication["ext_target"].".tf_title.value=text;
       window.close();
       return true;

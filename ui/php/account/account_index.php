@@ -23,7 +23,7 @@ update_last_visit("account", $param_account, $action);
 // $account is a hash table containing, for each form field set 
 // in the calling page, a couple var_name, var_value...
 if ($action == "") $action = "index";
-$account = get_param_account();
+$params = get_account_params();
 get_account_action();
 $perm->check_permissions($module, $action);
 
@@ -36,9 +36,9 @@ page_close();
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  $display["search"] = html_account_search_form ($action, $account);
+  $display["search"] = html_account_search_form ($action, $params);
   if ($set_display == "yes") {
-    $display["result"] = dis_account_search_list($account);
+    $display["result"] = dis_account_search_list($params);
   } else {
     $display["msg"] = display_ok_msg($l_no_display);
   }
@@ -46,8 +46,8 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  $display["search"] = html_account_search_form($action, $account);
-  $display["result"] = dis_account_search_list($account);
+  $display["search"] = html_account_search_form($action, $params);
+  $display["result"] = dis_account_search_list($params);
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,24 +60,24 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_account_insert($account);
+  run_query_account_insert($params);
   $display["msg"] = display_ok_msg("$l_account : $l_insert_ok");
   require("account_js.inc");
-  $display["search"] = html_account_search_form($action, $account);
+  $display["search"] = html_account_search_form($action, $params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  if ($account["id"] > 0) {
-    $ac_q = run_query_account_detail($account["id"]);
+  if ($params["account_id"] > 0) {
+    $ac_q = run_query_account_detail($params["account_id"]);
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($account["id"] > 0) {
-    $ac_q = run_query_account_detail($account["id"]);
+  if ($params["account_id"] > 0) {
+    $ac_q = run_query_account_detail($params["account_id"]);
     require("account_js.inc");
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_form($ac_q, $action);
@@ -86,26 +86,26 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  run_query_account_update($account);
+  run_query_account_update($params);
 
-  if ($account["id"] > 0) {
-    $ac_q = run_query_account_detail($account["id"]);
+  if ($params["account_id"] > 0) {
+    $ac_q = run_query_account_detail($params["account_id"]);
     $display["detailInfo"] = display_record_info($ac_q);
     $display["detail"] = html_account_consult($ac_q, $action);
   }
 //   $display["msg"] = display_ok_msg($l_update_ok);
 //   require("account_js.inc");
-//   $display["search"] = html_account_search_form($action, $account);
+//   $display["search"] = html_account_search_form($action, $params);
   
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   // checking that no payment is linked to this account
-  $q_related_payments = run_query_account_search_payments ($account["id"]);
+  $q_related_payments = run_query_account_search_payments ($params["account_id"]);
   if ($q_related_payments->nf() != 0){
-    $display["detail"] = html_account_impossible_deletion ($account["id"], $q_related_payments);
+    $display["detail"] = html_account_impossible_deletion ($params["account_id"], $q_related_payments);
     // maybe a confirmation from the user would be enough...
   } else {
-    run_query_account_delete($account["id"]);
+    run_query_account_delete($params["account_id"]);
     $display["msg"] = display_ok_msg("$l_account  : $l_delete_ok");
     require("account_js.inc");
     $display["search"] = html_account_search_form($action,'');
@@ -116,11 +116,11 @@ if ($action == "index" || $action == "") {
   /*  if (true){
     display_ok_msg ("FIXME PERMISSIONS");
     require ("account_js.inc");
-    $q_account = run_query_account_detail ($account["id"]);
+    $q_account = run_query_account_detail ($params["account_id"]);
     // used to compute today balance :
-    $q_payments = run_query_account_search_payments($account["id"], date ("Y-m-d"));
+    $q_payments = run_query_account_search_payments($params["account_id"], date ("Y-m-d"));
     // used to compute balance on $tf_balance_date :
-    $q_expected_payments = run_query_account_search_expected_payments ($account["id"], $tf_balance_date);
+    $q_expected_payments = run_query_account_search_expected_payments ($params["account_id"], $tf_balance_date);
     $payments_options = run_query_display_options ($auth->auth["uid"], "payment");
     $expected_payments_options = run_query_display_options ($auth->auth["uid"], "payment");
     html_account_compute_balance ($q_account, $q_payments, $q_expected_payments, $payments_options, $expected_payments_options, $tf_balance_date);
@@ -132,17 +132,17 @@ if ($action == "index" || $action == "") {
     // account_js.inc needed to check date input by user...
     require ("account_js.inc");
     $display["msg"] = display_ok_msg ("FIXME PERMISSIONS");
-    //$q_account = run_query_account_detail ($account["id"]);
+    //$q_account = run_query_account_detail ($params["account_id"]);
     //    $payments_options = run_query_display_options ($auth->auth["uid"],"payment");
     $payments_prefs = get_display_pref ($auth->auth["uid"], "payment");
 
-    $display["detail"] = html_account_compute_balance ($account["id"], $payments_prefs, $tf_balance_date);
+    $display["detail"] = html_account_compute_balance ($params["account_id"], $payments_prefs, $tf_balance_date);
 
   } else {
     $display["msg"] = display_err_msg($l_error_permission);
   } 
   /*  
-$q_account = run_query_account_detail ($account["id"]);
+$q_account = run_query_account_detail ($params["account_id"]);
   $today = account_compute_balance ($q_account); 
   $other = account_compute_balance ($q_account, $tf_balance_date);  
   echo "<br>calcul du solde pour aujourd'hui : <br>"; 
@@ -193,32 +193,26 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Account parameters transmitted in $account hash
-// returns : $account hash with parameters set
+// Stores Account parameters transmitted in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_account() {
-  global $tf_label, $tf_number, $tf_balance, $tf_bank;
-  global $ta_comment, $tf_balance_date, $hd_balance, $param_account;
-
-  if (isset ($tf_label)) $account["label"] = $tf_label;
-  if (isset ($tf_number)) $account["number"] = $tf_number;
-  if (isset ($param_account)) $account["id"] = $param_account;
-  if (isset ($tf_balance)) $account["balance"] = $tf_balance;
-  if (isset ($hd_balance)) $account["balance"] = $hd_balance;
-  if (isset ($tf_bank)) $account["bank"] = $tf_bank;
-  if (isset ($ta_comment)) $account["comment"] = $ta_comment;
+function get_account_params() {
   
-  display_debug_param($account);
-
-  return $account;
+  // Get global params
+  $params = get_global_params("Account");
+  
+  display_debug_param($params);
+  
+  return $params;
 }
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Account actions
 ///////////////////////////////////////////////////////////////////////////////
 function get_account_action() {
-  global $account, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_compute_balance;
   global $l_header_consult;
@@ -257,7 +251,7 @@ function get_account_action() {
 // Detail Consult
   $actions["account"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/account/account_index.php?action=detailconsult&amp;param_account=".$account["id"]."",
+    'Url'      => "$path/account/account_index.php?action=detailconsult&amp;account_id=".$params["account_id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'compute_balance', 'detailupdate') 
                                        );
@@ -265,7 +259,7 @@ function get_account_action() {
 // Compute Balance
   $actions["account"]["compute_balance"] = array (
     'Name'     => $l_header_compute_balance,
-    'Url'      => "$path/account/account_index.php?action=compute_balance&amp;param_account=".$account["id"]."",
+    'Url'      => "$path/account/account_index.php?action=compute_balance&amp;account_id=".$params["account_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      		 );
@@ -273,7 +267,7 @@ function get_account_action() {
 // Detail Update
   $actions["account"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/account/account_index.php?action=detailupdate&amp;param_account=".$account["id"]."",
+    'Url'      => "$path/account/account_index.php?action=detailupdate&amp;account_id=".$params["account_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update')
                                      	      );
@@ -288,7 +282,7 @@ function get_account_action() {
 // Delete
   $actions["account"]["delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/account/account_index.php?action=delete&amp;param_account=".$account["id"]."",
+    'Url'      => "$path/account/account_index.php?action=delete&amp;account_id=".$params["account_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	);
@@ -332,20 +326,20 @@ function get_account_action() {
 // Account Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_account_action() {
-  global $account, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $account["id"];
+  $id = $params["account_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["account"]["detailconsult"]["Url"] = "$path/account/account_index.php?action=detailconsult&amp;param_account=$id";
+    $actions["account"]["detailconsult"]["Url"] = "$path/account/account_index.php?action=detailconsult&amp;account_id=$id";
     $actions["account"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["account"]["detailupdate"]['Url'] = "$path/account/account_index.php?action=detailupdate&amp;param_account=$id";
+    $actions["account"]["detailupdate"]['Url'] = "$path/account/account_index.php?action=detailupdate&amp;account_id=$id";
     $actions["account"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["account"]["check_delete"]['Url'] = "$path/account/account_index.php?action=check_delete&amp;param_account=$id";
+    $actions["account"]["check_delete"]['Url'] = "$path/account/account_index.php?action=check_delete&amp;account_id=$id";
     $actions["account"]["check_delete"]['Condition'][] = 'insert';
   }
 }

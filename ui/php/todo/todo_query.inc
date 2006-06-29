@@ -13,15 +13,16 @@
 // Parametes:
 //   - $todo[]       : company search criteria
 //     keys used       uid
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_todo_todolist($todo, $p_new_order, $p_order_dir) {
-  global $cdg_sql, $ctu_sql_limit;
+function run_query_todo_todolist($todo) {
+  global $auth, $cdg_sql, $ctu_sql_limit;
 
-  $uid = $todo["uid"];
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "todo_priority";
-  $p_order_dir = (strcmp($p_order_dir,"") != 0) ? $p_order_dir : "desc";
+  $sql_order_dir = $todo["sql_order_dir"];
+  $sql_order_field = $todo["sql_order_field"];
+
+  $uid = $auth->auth["uid"];;
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "todo_priority";
+  $sql_order_dir = (strcmp($sql_order_dir,"") != 0) ? $sql_order_dir : "desc";
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -32,12 +33,12 @@ function run_query_todo_todolist($todo, $p_new_order, $p_order_dir) {
   $whereq = "WHERE todo_user = '$uid'";
 
   // Order exceptions (order on calculated rows)
-  if (strcmp($p_new_order, "todo_update") == 0) {
+  if (strcmp($sql_order_field, "todo_update") == 0) {
     $order = "todo_priority";
-  } else if (strcmp($p_new_order,"") == 0) {
+  } else if (strcmp($sql_order_field,"") == 0) {
     $order = "todo_priority";
   }
-  $orderq = " ORDER BY $order $p_order_dir $order_next";
+  $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
   $query = "SELECT
     todo_id as id,
@@ -75,7 +76,7 @@ function run_query_todo_todolist($todo, $p_new_order, $p_order_dir) {
 function run_query_todo_detail($todo) {
   global $cdg_sql;
 
-  $t_id = $todo["id"];
+  $t_id = $todo["todo_id"];
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -120,10 +121,10 @@ function run_query_todo_detail($todo) {
 //     keys used       uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_insert($todo) {
-  global $cdg_sql;
+  global $auth, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
-  $uid = $todo["uid"];
+  $uid = $auth->auth["uid"];
   $title = $todo["title"];
   $users = $todo["sel_user_id"];
   $priority = $todo["priority"];
@@ -180,12 +181,12 @@ function run_query_todo_insert($todo) {
 //     keys used       id, uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_update($todo) {
-  global $cdg_sql;
+  global $auth, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
 
-  $t_id = $todo["id"];
-  $uid = $todo["uid"];
+  $t_id = $todo["todo_id"];
+  $uid = $auth->auth["uid"];
   $title = $todo["title"];
   $users = $todo["sel_user_id"];
   $user = $users[0];
@@ -287,10 +288,10 @@ function run_query_todo_delete_unique($t_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_todo_data_form($todo) {
   global $php_regexp_percent, $l_err_percent, $l_j_fill_title;
-  global $err_msg;
+  global $err_msg, $auth;
 
-  $t_id = $todo["id"];
-  $uid = $todo["uid"];
+  $t_id = $todo["todo_id"];
+  $uid = $auth->auth["uid"];
   $title = $todo["title"];
   $users = $todo["sel_user_id"];
   $user = $users[0];

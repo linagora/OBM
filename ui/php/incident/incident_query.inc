@@ -13,15 +13,16 @@
 // Parametes:
 //   - $incident[]   : incident search criteria
 //     keys used       status, label incident, priority, label contract
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
+function run_query_incident_search($incident) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
-
+  
+  $sql_order_dir = $incident["sql_order_dir"];
+  $sql_order_field = $incident["sql_order_field"];
+  
   $lincident = sql_search_text_parse($incident["lincident"]);
   $lcontract = sql_search_text_parse($incident["lcontract"]);
-  $i_id = $incident["id"];
+  $i_id = $incident["incident_id"];
   $company = sql_search_text_parse($incident["company"]);
   $priority = $incident["priority"];
   $status = $incident["status"];
@@ -97,8 +98,8 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
   $whereq = "WHERE $where";
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_code";
-  $orderq .= " ORDER BY $order $p_order_dir, incidentpriority_code";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "incidentstatus_code";
+  $orderq .= " ORDER BY $order $sql_order_dir, incidentpriority_code";
 
   $req = "SELECT
       Incident.incident_id as id,
@@ -302,7 +303,7 @@ function run_query_incident_insert($incident) {
     $contract = $inc["contract"];
     $label_mail = stripslashes($lincident);
     $subject = "$l_mail_incident_new_subject : $company_name : $label_mail";
-    $message = "$cgp_host/incident/incident_index.php?action=detailconsult&param_incident=$i_id
+    $message = "$cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$i_id
 
 $l_status: $status
 $l_contract: $contract
@@ -379,7 +380,7 @@ function run_query_incident_update($incident) {
   if ($contract_id < 1) {
     $contract_id = $incident["contract_id"];
   }
-  $param_incident = $incident["id"];
+  $param_incident = $incident["incident_id"];
   $lincident = $incident["lincident"];
   $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : "is null");
   $logger = ($incident["logger"] ? "='".$incident["logger"]."'" : "is null");
@@ -538,7 +539,7 @@ function get_incident_info($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $res["id"] = $obm_q->f("incident_id");
+  $res["incident_id"] = $obm_q->f("incident_id");
   $res["label"] = $obm_q->f("incident_label");
   $res["status"] = $obm_q->f("incidentstatus_label");
   $res["contract"] = $obm_q->f("contract_label");

@@ -11,11 +11,12 @@
 // Contact search query execution
 // Parametes:
 //   - $contact[]    : contact search criteria
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
+function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
+  
+  $sql_order_dir = $contact["sql_order_dir"];
+  $sql_order_field = $contact["sql_order_field"];
 
   $company_id = $contact["company_id"];
   $fuzzy = $contact["fuzzy"];
@@ -24,7 +25,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $phone = sql_search_text_parse($contact["phone"]);
   $email = sql_search_text_parse($contact["email"]);
   $company = sql_search_text_parse($contact["company"]);
-  $market = $contact["marketing_manager"];
+  $market = $contact["market"];
   $func = $contact["function"];
   $title = $contact["title"];
   $zip = sql_search_text_parse($contact["zip"]);
@@ -197,22 +198,22 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   }
 
   // order
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contact_lastname";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "contact_lastname";
   if (($order == "contact_lastname") || ($order == "contact_firstname")) {
     $order = sql_casei_sort($db_type, $order);
   }
 
   // Order exceptions (order on calculated rows)
-  if (strcmp($p_new_order,"contact_address") == 0) {
+  if (strcmp($sql_order_field,"contact_address") == 0) {
     $order = "contact_address1";
     $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town";
-  } else if (strcmp($p_new_order,"country_name") == 0) {
+  } else if (strcmp($sql_order_field,"country_name") == 0) {
     $order = "country_name";
     if ($cgp_show["module"]["company"]) {
       $order_next = ", company_country";
     }
   }
-  $orderq = " ORDER BY $order $p_order_dir $order_next";
+  $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
   $select = "SELECT
       contact_id as id,
@@ -463,7 +464,7 @@ function run_query_contact_insert($contact) {
   $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
-  $market = ($contact["marketing_manager"] ? $contact["marketing_manager"] : 0);
+  $market = ($contact["market"] ? $contact["market"] : 0);
   $lname = $contact["lname"];
   $fname = $contact["fname"];
   $aka = trim($contact["aka"]);
@@ -654,7 +655,7 @@ function run_query_contact_insert($contact) {
 function run_query_contact_update($contact) {
   global $auth, $cgp_show, $cdg_sql;
 
-  $id = $contact["id"];
+  $id = $contact["contact_id"];
   $comp_old_id = $contact["company_id"];
   $comp_new_id = $contact["comp_new_id"];
 
@@ -669,7 +670,7 @@ function run_query_contact_update($contact) {
   $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
-  $market = ($contact["marketing_manager"] ? $contact["marketing_manager"] : 0);
+  $market = ($contact["market"] ? $contact["market"] : 0);
   $lname = $contact["lname"];
   $fname = $contact["fname"];
   $aka = trim($contact["aka"]);

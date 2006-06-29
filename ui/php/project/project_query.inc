@@ -12,11 +12,12 @@
 // Parametes:
 //   - $project[]    : project search criteria
 //     keys used       name, company_name, tt, manager, member
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_search($project, $p_new_order="", $p_order_dir) {
+function run_query_project_search($project) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
+
+  $sql_order_dir = $project["sql_order_dir"];
+  $sql_order_field = $project["sql_order_field"];
 
   $name = sql_search_text_parse($project["name"]);
   $tt = $project["tt"];
@@ -75,8 +76,8 @@ function run_query_project_search($project, $p_new_order="", $p_order_dir) {
   $whereq = "WHERE $where";
 
   // Order by clause
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "project_name";
-  $orderq = " ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "project_name";
+  $orderq = " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT DISTINCT
       project_id as id,
@@ -572,7 +573,7 @@ function run_query_project_name($pid) {
 function run_query_project_task_insert($project) {
   global $auth, $cdg_sql;
 
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];
 
@@ -660,7 +661,7 @@ function run_query_project_task_update($project) {
 function run_query_project_task_delete($project) {
   global $auth, $cdg_sql;
 
-  $id = $project["id"];
+  $id = $project["project_id"];
   $cpt = 0;
   $cpt_del = 0;
   $delete_ok = true;
@@ -732,7 +733,7 @@ function run_query_project_task_delete($project) {
 function run_query_project_memberlist_insert($project) {
   global $auth, $cdg_sql;
 
-  $id = $project["id"];
+  $id = $project["project_id"];
   $cpt = 0;
   $cpt_ins = 0;
   
@@ -790,7 +791,7 @@ function run_query_project_memberlist_insert($project) {
 function run_query_project_memberlist_delete($project) {
   global $auth, $cdg_sql;
 
-  $id = $project["id"];
+  $id = $project["project_id"];
   $cpt = 0;
   $cpt_del = 0;
 
@@ -839,7 +840,7 @@ function run_query_project_memberlist_delete($project) {
 function run_query_project_memberstatus_change($project) {
   global $cdg_sql;
 
-  $p_id = $project["id"];
+  $p_id = $project["project_id"];
   $m_id = $project["user_id"];
   $m_val = $project["user_status"];
 
@@ -900,7 +901,7 @@ function run_query_project_allocation($p_id) {
 function run_query_project_allocate_update($project) {
   global $auth, $cdg_sql;
 
-  $p_id = $project["id"];
+  $p_id = $project["project_id"];
   $new = $project["projected"];
   $uid = $auth->auth["uid"];  
   $date_now = date("Y-m-d H:i:s");
@@ -1011,7 +1012,7 @@ function run_query_project_allocate_update($project) {
 function run_query_project_advance_update($project) {
   global $auth, $cdg_sql;
 
-  $p_id = $project["id"];
+  $p_id = $project["project_id"];
   $new = $project["projected"];
   $uid = $auth->auth["uid"];  
   $date_now = date("Y-m-d H:i:s");
@@ -1317,7 +1318,7 @@ function project_manager_rights($uid, $project, $project_q) {
     return true;
   }
 
-  $pid = $project["id"];
+  $pid = $project["project_id"];
 
   $query = "
     SELECT projectuser_id
@@ -1431,7 +1432,7 @@ function check_project_task_form($pid, $project) {
   global $err_msg, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
   global $l_ptask_has_parent, $l_ptask_and_parent;
 
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $task = $project["task"];
   $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];

@@ -41,15 +41,15 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
   global $col_inc_redhot, $col_inc_hot, $col_inc_closed;
 
   if ($fieldname == "incident_label") {
-    $res["url"] = "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$OD->data_set->f("incident_id");
+    $res["url"] = "$path/incident/incident_index.php?action=detailconsult&amp;incident_id=".$OD->data_set->f("incident_id");
   }
 
   else if ($fieldname == "incident_owner_lastname") {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("incident_owner");
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("incident_owner");
   }
 
   else if ($fieldname == "incident_logger_lastname") {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("incident_logger");
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("incident_logger");
   }
 
   else if ($fieldname == "incident_date") {
@@ -108,7 +108,7 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
   global $l_date_after,$l_date_before,$l_archive;
 
   $lincident = stripslashes($incident["lincident"]);
-  $i_id = $incident["id"];
+  $i_id = $incident["incident_id"];
   $lcontract = stripslashes($incident["lcontract"]);
   $priority = $incident["priority"];
   $company = $incident["company"];
@@ -207,10 +207,10 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_search_list($incident) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $prefs = get_display_pref($auth->auth["uid"], "incident");
-  $obm_q = run_query_incident_search($incident, $new_order, $order_dir);
+  $obm_q = run_query_incident_search($incident);
   $nb_incident = $obm_q->num_rows_total();
   if ($nb_incident == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
@@ -270,7 +270,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
 function dis_incident_consult($incident) {
   global $display, $l_query_error;
 
-  $id = $incident["id"];
+  $id = $incident["incident_id"];
 
   if ($id > 0) {
     $inc_q = run_query_incident_detail($id);
@@ -346,7 +346,7 @@ function html_incident_consult($inc_q) {
   <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_company
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
     </td>
     <td class=\"detailText\">$comp_name</td>
@@ -358,9 +358,9 @@ function html_incident_consult($inc_q) {
     <td class=\"detailText\">$dis_con2</td>
   </tr><tr>
     <td class=\"detailLabel\">
-      <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\"></a> 
+      <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contract_id=$con_cli2")."\"></a> 
       $con_label
-      <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
+      <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$con_id") . "\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
     </td>
     <td class=\"detailText\">
@@ -479,7 +479,7 @@ function html_incident_links($inc_q) {
 function dis_incident_form($action, $incident) {
   global $display, $cg_com, $cg_prod;
 
-  $id = $incident ["id"];
+  $id = $incident ["incident_id"];
   if ($action == "new") {
     $inc_q = "";
     $users = "";
@@ -660,7 +660,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />
+      <input type=\"hidden\" name=\"incident_id\" value=\"$param_incident\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
   // insert
@@ -691,8 +691,8 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           </tr><tr>
             <td class=\"detailLabel\">$l_contract</td>
             <td class=\"detailForm\">
-              <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_label</a>
-              <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
+              <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
+              <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
               <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
               <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
               <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
@@ -757,13 +757,13 @@ function dis_can_delete_incident($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_incident\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"incident_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_incident\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"incident_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 

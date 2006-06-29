@@ -44,7 +44,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new,$ext_element;
 
   if (($fieldname == "group_name") && $link_ok) {
-    $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;param_group=".$OD->data_set->f("group_id");
+    $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f("group_id");
   }
   if (($fieldname == "data_element") && $ext_element != "") {
     $res["name"] = "<span id=\"data-group-".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
@@ -93,7 +93,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   // For User member lists
   elseif (($fieldname == "group_user_lastname")  && $link_ok) {
     if ($cgp_show["module"]["user"]) { 
-      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("group_user_id");
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("group_user_id");
     }
   }
 
@@ -275,7 +275,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
     <p class=\"detailButton\">
     <p class=\"detailButtons\">
       <input type=\"submit\" value=\"$l_add\" />
-      <input type=\"hidden\" name=\"param_group\" value=\"$ext_id\" />
+      <input type=\"hidden\" name=\"group_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
       $input_target
     </p>
@@ -325,7 +325,7 @@ function html_group_form($action, $group_q, $group) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($group["id"])) { $id = $group["id"]; }
+  if (isset($group["group_id"])) { $id = $group["group_id"]; }
   if (isset($group["name"])) { $name = stripslashes($group["name"]); }
   if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
   if (isset($group["email"])) { $email = stripslashes($group["email"]); }
@@ -371,7 +371,7 @@ function html_group_form($action, $group_q, $group) {
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_but = "
-      <input type=\"hidden\" name=\"param_group\" value=\"$id\" />
+      <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
@@ -400,7 +400,7 @@ function html_group_form($action, $group_q, $group) {
 function dis_group_consult($group, $uid) {
   global $ctu_sql_limit;
 
-  $g_id = $group["id"];
+  $g_id = $group["group_id"];
 
   $group_q = run_query_group_detail($g_id);
 
@@ -495,7 +495,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $block .= display_info_msg($message);
 
   if ($nb_g != 0) {
-    $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
+    $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     
     $dis_infos = new OBM_DISPLAY("DATA", $prefs_g, "group", "group_group");
     $dis_infos->data_set = $g_q;
@@ -517,7 +517,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_del_group_sel\" /> 
-        <input type=\"hidden\" name=\"param_group\" value=\"$id\" /> 
+        <input type=\"hidden\" name=\"group_id\" value=\"$id\" /> 
         <input type=\"hidden\" name=\"action\" value=\"group_del\" /> 
         </p>
       </p>
@@ -537,7 +537,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 
   if ($nb_u != 0) {
 
-    $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
+    $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
     $dis_infos = new OBM_DISPLAY("DATA", $prefs_u, "group", "group_user");
     $dis_infos->data_set = $u_q;
     $dis_infos->data_url = $url;
@@ -558,7 +558,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_del_user_sel\" />
-        <input type=\"hidden\" name=\"param_group\" value=\"$id\" />
+        <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"user_del\" />
         </p>
       </p>
@@ -583,13 +583,13 @@ function dis_group_can_delete($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_group\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"group_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_group\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"group_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
@@ -628,7 +628,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
     $samedesc = $g_q->f("group_desc");
     $dis_same_group .= "
       <tr><td class=\"detailLabel\">
-        <a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;param_group=$id") . "\">$samename ($samedesc)</a>
+        <a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;group_id=$id") . "\">$samename ($samedesc)</a>
       </td></tr>";
   }
 

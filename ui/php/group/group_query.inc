@@ -22,8 +22,9 @@ function run_query_group_search($group) {
   $email = sql_search_text_parse($group["email"]);
   $privacy = $group["privacy"];
   $user = sql_search_text_parse($group["user"]);
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  
+  $sql_order_field = $group["sql_order_field"];
+  $sql_order_dir = $group["sql_order_dir"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -53,8 +54,8 @@ function run_query_group_search($group) {
   $whereq = "WHERE $where";
 
   // ORDER construction
-  $order = (strcmp($new_order,"") != 0) ? $new_order : "group_name";
-  $orderq .= " ORDER BY $order $order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "group_name";
+  $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT DISTINCT UGroup.*, group_id as id,
       $timecreate,
@@ -96,8 +97,8 @@ function run_query_group_search_possible_children($group) {
   $name = $group["name"];
   $email = $group["email"];
   $user = $group["user"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $$sql_order_dir = $group["$sql_order_dir"];
 
   $parents = get_group_parents($id);
 
@@ -138,8 +139,8 @@ function run_query_group_search_possible_children($group) {
 
   // ORDER construction
 
-  $order = (strcmp($new_order,"") != 0) ? $new_order : "group_name";
-  $query .= " ORDER BY $order $order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "group_name";
+  $query .= " ORDER BY $order $$sql_order_dir";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -187,7 +188,7 @@ function run_query_group_detail($id) {
 function run_query_group_insert($group) {
   global $uid, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $system = ($group["system"] == 1) ? 1 : 0;
   $name = $group["name"];
   $desc = $group["desc"];
@@ -272,7 +273,7 @@ function run_query_group_id($group) {
 function run_query_group_update($group) {
   global $uid, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
@@ -336,7 +337,7 @@ function run_query_group_delete($p_id) {
 function run_query_group_usergroup_insert($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $group["user_nb"]) {
@@ -377,7 +378,7 @@ function run_query_group_usergroup_insert($group) {
 function run_query_group_usergroup_delete($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group["user_nb"]) {
@@ -408,7 +409,7 @@ function run_query_group_usergroup_delete($group) {
 function run_query_group_group_insert($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $cpt = 0;
   $cpt_ins = 0;
 
@@ -455,7 +456,7 @@ function run_query_group_group_insert($group) {
 function run_query_group_group_delete($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group["group_nb"]) {
@@ -490,13 +491,13 @@ function run_query_group_user_group($group) {
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $entity = $group["entity"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $$sql_order_dir = $group["$sql_order_dir"];
 
-  if (($entity == "group_user") && (trim($new_order) != "")) {
-    $order = "ORDER BY $new_order $order_dir";
+  if (($entity == "group_user") && (trim($sql_order_field) != "")) {
+    $order = "ORDER BY $sql_order_field $$sql_order_dir";
   } else {
     $order = "ORDER BY userobm_lastname";
   }
@@ -535,13 +536,13 @@ function run_query_group_group($group) {
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $entity = $group["entity"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $$sql_order_dir = $group["$sql_order_dir"];
 
-  if (($entity == "group_group") && (trim($new_order) != "")) {
-    $order = "ORDER BY $new_order $order_dir";
+  if (($entity == "group_group") && (trim($sql_order_field) != "")) {
+    $order = "ORDER BY $sql_order_field $$sql_order_dir";
   } else {
     $order = "ORDER BY group_name";
   }
@@ -731,7 +732,7 @@ function check_group_data_form($group) {
   global $l_group_exists, $l_email_exist;
   global $uid, $err_msg, $l_j_check_email, $l_system_no_priv, $l_only_owner_priv;
 
-  $id = $group["id"];
+  $id = $group["group_id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];

@@ -41,14 +41,14 @@ require("$obminclude/lib/right.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$resource = get_param_resource();
+$params = get_resource_params();
 get_resource_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Resource", $action, $resource["id"], $uid)) {
+if (! check_privacy($module, "Resource", $action, $params["resource_id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("resource", $resource["id"], $action);
+  update_last_visit("resource", $params["resource_id"], $action);
 }
 page_close();
 
@@ -57,118 +57,118 @@ page_close();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
-  $display["search"] = html_resource_search_form($resource);
+  $display["search"] = html_resource_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_resource_search_list($resource);
+    $display["result"] = dis_resource_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_resource_search_form($resource);
+  $display["search"] = html_resource_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_resource_search_list($resource);
+    $display["result"] = dis_resource_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_resource_search_form($resource);
-  $display["result"] = dis_resource_search_list($resource);
+  $display["search"] = html_resource_search_form($params);
+  $display["result"] = dis_resource_search_list($params);
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_resource_form("",$resource);
+  $display["detail"] = html_resource_form("",$params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_resource_consult($resource);
+  $display["detail"] = dis_resource_consult($params);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_resource_detail($resource["id"]);
+  $obm_q = run_query_resource_detail($params["resource_id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_resource_form($obm_q, $resource);
+    $display["detail"] = html_resource_form($obm_q, $params);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_data_form("", $resource)) {
+  if (check_resource_data_form("", $params)) {
     // If the context (same resource) was confirmed ok, we proceed
-    $rid = run_query_resource_insert($resource);
+    $rid = run_query_resource_insert($params);
     if ($rid > 0) {
-      $resource["id"] = $rid;
+      $params["resource_id"] = $rid;
       $display["msg"] .= display_ok_msg("$l_resource : $l_insert_ok");
-      $display["detail"] = dis_resource_consult($resource);
+      $display["detail"] = dis_resource_consult($params);
     } else {
       $display["msg"] .= display_err_msg("$l_resource : $l_insert_error");
-      $display["search"] = html_resource_search_form($resource);
+      $display["search"] = html_resource_search_form($params);
     }
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = html_resource_form("", $resource);
+    $display["detail"] = html_resource_form("", $params);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_data_form($resource["id"], $resource)) {
-    $retour = run_query_resource_update($resource["id"], $resource);
+  if (check_resource_data_form($params["resource_id"], $params)) {
+    $retour = run_query_resource_update($params["resource_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_resource : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_resource : $l_update_error");
     }
-    $display["detail"] = dis_resource_consult($resource);
+    $display["detail"] = dis_resource_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = html_resource_form("", $resource);
+    $display["detail"] = html_resource_form("", $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_can_delete($resource["id"])) {
+  if (check_resource_can_delete($params["resource_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_resource_can_delete($resource["id"]);
+    $display["detail"] = dis_resource_can_delete($params["resource_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_resource_consult($resource);
+    $display["detail"] = dis_resource_consult($params);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_can_delete($resource["id"])) {
-    $retour = run_query_resource_delete($resource["id"]);
+  if (check_resource_can_delete($params["resource_id"])) {
+    $retour = run_query_resource_delete($params["resource_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_resource : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_resource : $l_delete_error");
     }
-    $display["search"] = html_resource_search_form($resource);
+    $display["search"] = html_resource_search_form($params);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_resource_consult($resource);
+    $display["detail"] = dis_resource_consult($params);
   }
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["title"] = "<div class=\"title\">$l_resource</div>";
-  $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
+  $display["detail"] = of_right_dis_admin("resource", $params["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["title"] = "<div class=\"title\">$l_resource</div>";
-  of_right_update_right($resource, "resource");
+  of_right_update_right($params, "resource");
   $display["msg"] .= display_ok_msg($l_right_update_ok);
   $display["msg"] .= display_warn_msg($err_msg);
-  $display["detail"] = of_right_dis_admin("resource", $resource["entity_id"]);
+  $display["detail"] = of_right_dis_admin("resource", $params["entity_id"]);
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ if ($action == "ext_get_ids") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_resource);
-if (! $resource["popup"]) {
+if (! $params["popup"]) {
   update_resource_action();
   $display["header"] = display_menu($module);
 }
@@ -202,63 +202,27 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Resource parameters transmited in $resource hash
-// returns : $resource hash with parameters set
+// Stores Resource parameters transmited in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_resource() {
-  global $param_resource, $param_entity;
-  global $tf_name, $tf_desc, $ta_desc, $tf_qty, $tf_qtyinf, $tf_qtysup;
-  global $tf_datebegin, $tf_lastname, $tf_firstname, $cb_archive, $restriction;
-  global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
-  global $ext_widget,$ext_element;
-  global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
-  global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity;
+function get_resource_params() {
+  global $param_ext;
+  
+  // Get global params
+  $params = get_global_params("Resource");
 
-  if (isset ($param_entity)) $resource["id"] = $param_entity;
-  if (isset ($param_ext)) $resource["id"] = $param_ext;
-  if (isset ($param_resource)) $resource["id"] = $param_resource;
-  if (isset ($tf_name)) $resource["name"] = $tf_name;
-  if (isset ($tf_desc)) $resource["desc"] = $tf_desc;
-  if (isset ($ta_desc)) $resource["desc"] = $ta_desc;
-  if (isset ($tf_qty)) $resource["qty"] = $tf_qty;
-  if (isset ($tf_qtyinf)) $resource["qtyinf"] = $tf_qtyinf;
-  if (isset ($tf_qtysup)) $resource["qtysup"] = $tf_qtysup;
-
-  if (isset ($restriction)) $resource["restriction"] = $restriction;
-
-  // External param
-  if (isset ($popup)) $resource["popup"] = $popup;
-  if (isset ($ext_title)) $resource["ext_title"] = $ext_title;
-  if (isset ($ext_action)) $resource["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $resource["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $resource["ext_id"] = $ext_id;
-  if (isset ($ext_element)) $resource["ext_element"] = $ext_element;
-  if (isset ($ext_target)) $resource["ext_target"] = $ext_target;
-  if (isset ($ext_widget)) $resource["ext_widget"] = $ext_widget;
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  // Rights parameters
-  if (isset($param_entity)) $resource["entity_id"] = $param_entity;
-  if (is_array($sel_accept_write)) $resource["accept_w"] = $sel_accept_write;
-  if (is_array($sel_accept_read)) $resource["accept_r"] = $sel_accept_read;
-  if (isset($cb_write_public)) $resource["public_w"] = $cb_write_public;
-  if (isset($cb_read_public)) $resource["public_r"] = $cb_read_public;
-
-  display_debug_param($resource);
-
-  return $resource;
+  //Get resource specific params
+  if (isset ($param_ext)) $params["resource_id"] = $param_ext;
+  display_debug_param($params);
+  
+  return $params;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // User Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_resource_action() {
-  global $resource, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset,$l_header_right;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -303,14 +267,14 @@ function get_resource_action() {
 // Detail Consult
   $actions["resource"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$resource["id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$params["resource_id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'rights_admin', 'rights_update') 
                                   );
 // Detail Update
   $actions["resource"]["detailupdate"] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/resource/resource_index.php?action=detailupdate&amp;param_resource=".$resource["id"]."",
+     'Url'      => "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params["resource_id"]."",
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'insert', 'update')
                                      	   );
@@ -332,14 +296,14 @@ function get_resource_action() {
 // Check Delete
   $actions["resource"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/resource/resource_index.php?action=check_delete&amp;param_resource=".$resource["id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=check_delete&amp;resource_id=".$params["resource_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'insert')
                                      	      );
 
 // Delete
   $actions["resource"]["delete"] = array (
-    'Url'      => "$path/resource/resource_index.php?action=delete&amp;param_resource=".$resource["id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=delete&amp;resource_id=".$params["resource_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
@@ -347,14 +311,14 @@ function get_resource_action() {
 // Rights Admin.
   $actions["resource"]["rights_admin"] = array (
     'Name'     => $l_header_right,
-    'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;param_entity=".$resource["id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;param_entity=".$params["resource_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult')
                                      );
 
 // Rights Update
   $actions["resource"]["rights_update"] = array (
-    'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;param_entity=".$resource["id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;param_entity=".$params["resource_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                      );
@@ -394,16 +358,16 @@ function get_resource_action() {
 // Resource Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_resource_action() {
-  global $resource, $actions, $path;
+  global $params, $actions, $path;
 
   // Detail Consult
-  $actions["resource"]["detailconsult"]["Url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$resource["id"];
+  $actions["resource"]["detailconsult"]["Url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$params["resource_id"];
 
   // Detail Update
-  $actions["resource"]["detailupdate"]["Url"] = "$path/resource/resource_index.php?action=detailupdate&amp;param_resource=".$resource["id"];
+  $actions["resource"]["detailupdate"]["Url"] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params["resource_id"];
 
   // Check Delete
-  $actions["resource"]["check_delete"]["Url"] = "$path/resource/resource_index.php?action=check_delete&amp;param_resource=".$resource["id"];
+  $actions["resource"]["check_delete"]["Url"] = "$path/resource/resource_index.php?action=check_delete&amp;resource_id=".$params["resource_id"];
 
 }
 

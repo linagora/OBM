@@ -40,17 +40,17 @@ require("group_query.inc");
 require("group_js.inc");
 
 if ($action == "") $action = "index";
-$group = get_param_group();
+$params = get_group_params();
 get_group_action();
 $perm->check_permissions($module, $action);
 
 $uid = $auth->auth["uid"];
 
-if (! check_privacy($module, "UGroup", $action, $group["id"])) {
+if (! check_privacy($module, "UGroup", $action, $params["group_id"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("contract", $group["id"], $action);
+  update_last_visit("contract", $params["group_id"], $action);
 }
 
 page_close();
@@ -62,7 +62,7 @@ page_close();
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_group_search_form($group);
+  $display["search"] = html_group_search_form($params);
   if ($set_display == "yes") {
     $display["result"] .= dis_group_search_group("");
   } else {
@@ -71,50 +71,50 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_group_search_form($group);
-  $display["result"] = dis_group_search_group($group);
+  $display["search"] = html_group_search_form($params);
+  $display["result"] = dis_group_search_group($params);
 
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_group_form($action, "", $group);
+  $display["detail"] = html_group_form($action, "", $params);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_group_consult($group, $uid);
+  $display["detail"] = dis_group_consult($params, $uid);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_group_detail($group["id"]);
-  $display["detail"] = html_group_form($action, $obm_q, $group);
+  $obm_q = run_query_group_detail($params["group_id"]);
+  $display["detail"] = html_group_form($action, $obm_q, $params);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_data_form($group)) {
+  if (check_group_data_form($params)) {
 
     // If the context (same group) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $group["id"] = run_query_group_insert($group);
-      if ($group["id"]) {
+      $params["group_id"] = run_query_group_insert($params);
+      if ($params["group_id"]) {
 	$display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
-	$display["detail"] = dis_group_consult($group, $uid);
+	$display["detail"] = dis_group_consult($params, $uid);
       } else {
 	$display["msg"] .= display_err_msg("$l_group : $l_insert_error");
-	$display["search"] = html_group_search_form($group);
+	$display["search"] = html_group_search_form($params);
       }
       
       // If it is the first try, we warn the user if some groups seem similar
     } else {
-      $obm_q = check_group_context("", $group);
+      $obm_q = check_group_context("", $params);
       if ($obm_q->num_rows() > 0) {
-	$display["detail"] = dis_group_warn_insert("", $obm_q, $group);
+	$display["detail"] = dis_group_warn_insert("", $obm_q, $params);
       } else {
-	$group["id"] = run_query_group_insert($group);
-	if ($group["id"] > 0) {
+	$params["group_id"] = run_query_group_insert($params);
+	if ($params["group_id"] > 0) {
 	  $display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
-	  $display["detail"] = dis_group_consult($group, $uid);
+	  $display["detail"] = dis_group_consult($params, $uid);
 	} else {
 	  $display["msg"] .= display_err_msg("$l_group : $l_insert_error");
-	  $display["search"] = html_group_search_form($group);
+	  $display["search"] = html_group_search_form($params);
 	}
       }
     }
@@ -122,41 +122,41 @@ if (($action == "index") || ($action == "")) {
     // Form data are not valid
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = html_group_form($action, "", $group);
+    $display["detail"] = html_group_form($action, "", $params);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_data_form($group)) {
-    $retour = run_query_group_update($group);
+  if (check_group_data_form($params)) {
+    $retour = run_query_group_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_group : $l_update_error");
     }
-    $display["detail"] = dis_group_consult($group, $uid);
+    $display["detail"] = dis_group_consult($params, $uid);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $group_q = run_query_group_detail($group["id"]);
-    $display["detail"] = html_group_form($action, $group_q, $group);
+    $params_q = run_query_group_detail($params["group_id"]);
+    $display["detail"] = html_group_form($action, $params_q, $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_can_delete($group["id"])) {
+  if (check_group_can_delete($params["group_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_group_can_delete($group["id"]);
+    $display["detail"] = dis_group_can_delete($params["group_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_group_consult($group, $uid);
+    $display["detail"] = dis_group_consult($params, $uid);
   }
-  //  $display["detail"] = dis_group_warn_delete($group["id"]);
+  //  $display["detail"] = dis_group_warn_delete($params["group_id"]);
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_can_delete($group["id"])) {
-    $retour = run_query_group_delete($group["id"]);
+  if (check_group_can_delete($params["group_id"])) {
+    $retour = run_query_group_delete($params["group_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_group : $l_delete_ok");
     } else {
@@ -166,48 +166,48 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_group_consult($group, $uid);
+    $display["detail"] = dis_group_consult($params, $uid);
   }
 
 } elseif ($action == "user_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($group["user_nb"] > 0) {
-    $nb = run_query_group_usergroup_insert($group);
+  if ($params["user_nb"] > 0) {
+    $nb = run_query_group_usergroup_insert($params);
     $display["msg"] .= display_ok_msg("$nb $l_user_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_user_added);
   }
-  $display["detail"] = dis_group_consult($group, $uid);
+  $display["detail"] = dis_group_consult($params, $uid);
 
 } elseif ($action == "user_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($group["user_nb"] > 0) {
-    $nb = run_query_group_usergroup_delete($group);
+  if ($params["user_nb"] > 0) {
+    $nb = run_query_group_usergroup_delete($params);
     $display["msg"] .= display_ok_msg("$nb $l_user_removed");
   } else {
     $display["msg"] .= display_err_msg($l_no_user_deleted);
   }
-  $display["detail"] = dis_group_consult($group, $uid);
+  $display["detail"] = dis_group_consult($params, $uid);
 
 } elseif ($action == "group_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($group["group_nb"] > 0) {
-    $nb = run_query_group_group_insert($group);
+  if ($params["group_nb"] > 0) {
+    $nb = run_query_group_group_insert($params);
     $display["msg"] .= display_ok_msg("$nb $l_group_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_group_added);
   }
-  $display["detail"] = dis_group_consult($group, $uid);
+  $display["detail"] = dis_group_consult($params, $uid);
 
 } elseif ($action == "group_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($group["group_nb"] > 0) {
-    $nb = run_query_group_group_delete($group);
+  if ($params["group_nb"] > 0) {
+    $nb = run_query_group_group_delete($params);
     $display["msg"] .= display_ok_msg("$nb $l_group_removed");
   } else {
     $display["msg"] .= display_err_msg($l_no_group_deleted);
   }
-  $display["detail"] = dis_group_consult($group, $uid);
+  $display["detail"] = dis_group_consult($params, $uid);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -233,9 +233,9 @@ if (($action == "index") || ($action == "")) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 } else if ($action == "ext_get_ids") {
-  $display["search"] = html_group_search_form($group);
+  $display["search"] = html_group_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_group_search_group($group);
+    $display["result"] = dis_group_search_group($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
@@ -248,7 +248,7 @@ if (($action == "index") || ($action == "")) {
 // Update actions url in case some values have been updated (id after insert) 
 update_group_action();
 $display["head"] = display_head($l_group);
-if (! $group["popup"]) {
+if (! $params["popup"]) {
   $display["header"] = display_menu($module);
 }
 $display["end"] = display_end();
@@ -257,70 +257,48 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $group hash, Group parameters transmited
-// returns : $group hash with parameters set
+// Stores in $params hash, Group parameters transmited
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_group() {
-  global $param_group, $popup, $child_res;
-  global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_privacy, $sel_privacy;
-  global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
-  global $ext_element;
+function get_group_params() {
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
+  global $ext_id;
+  
+  // Get global params
+  $params = get_global_params("Group");
 
+  // Get group specific params
   // Group fields
-  if (isset ($param_group)) $group["id"] = $param_group;
-  if (isset ($tf_name)) $group["name"] = trim($tf_name);
-  if (isset ($tf_desc)) $group["desc"] = trim($tf_desc);
-  if (isset ($tf_email)) $group["email"] = $tf_email;
-  if (isset ($tf_user)) $group["user"] = trim($tf_user);
-  if (isset ($cb_privacy)) $group["privacy"] = ($cb_privacy == 1 ? 1 : 0);
-  if (isset ($sel_privacy)) $group["privacy"] = $sel_privacy;
-
-  if (isset ($child_res)) $group["children_restriction"] = $child_res;
-
-  if (isset ($new_order)) $group["new_order"] = $new_order;
-  if (isset ($order_dir)) $group["order_dir"] = $order_dir;
-  if (isset ($entity)) $group["entity"] = $entity;
-
-  // External param
-  if (isset ($popup)) $group["popup"] = $popup;
-  if (isset ($ext_action)) $group["ext_action"] = $ext_action;
-  if (isset ($ext_title)) $group["ext_title"] = $ext_title;
-  if (isset ($ext_target)) $group["ext_target"] = $ext_target;
-  if (isset ($ext_url)) $group["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $group["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $group["id"] = $ext_id;
-  if (isset ($ext_element)) $group["ext_element"] = $ext_element;  
-  if (isset ($ext_widget)) $group["ext_widget"] = $ext_widget;
-
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  if (isset ($http_obm_vars)) {
+  if (isset ($ext_id)) $params["group_id"] = trim($ext_id);
+  if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
+  
+    if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+      $http_obm_vars = $HTTP_POST_VARS;
+    } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+      $http_obm_vars = $HTTP_GET_VARS;
+    }
+    
+    if (isset ($http_obm_vars)) {
     $nb_u = 0;
     $nb_group = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
       if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
-	$nb_u++;
+        $nb_u++;
         $u_num = substr($key, 4);
-        $group["user$nb_u"] = $u_num;
+        $params["user$nb_u"] = $u_num;
       } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
-	$nb_group++;
-        $group_num = substr($key, 4);
-        $group["group_$nb_group"] = $group_num;
+        $nb_group++;
+        $params_num = substr($key, 4);
+        $params["group_$nb_group"] = $params_num;
       }
     }
-    $group["user_nb"] = $nb_u;
-    $group["group_nb"] = $nb_group;
+    $params["user_nb"] = $nb_u;
+    $params["group_nb"] = $nb_group;
   }
+  
+  display_debug_param($params);
 
-  display_debug_param($group);
-
-  return $group;
+  return $params;
 }
 
 
@@ -328,7 +306,7 @@ function get_param_group() {
 // Group Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_group_action() {
-  global $group, $actions, $path, $l_group;
+  global $params, $actions, $path, $l_group;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $l_header_add_user, $l_add_user, $l_header_add_group, $l_add_group;
@@ -359,7 +337,7 @@ function get_group_action() {
 // Detail Consult
   $actions["group"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/group/group_index.php?action=detailconsult&amp;param_group=".$group["id"]."",
+    'Url'      => "$path/group/group_index.php?action=detailconsult&amp;group_id=".$params["group_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
@@ -368,7 +346,7 @@ function get_group_action() {
 // Detail Update
   $actions["group"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"]."",
+    'Url'      => "$path/group/group_index.php?action=detailupdate&amp;group_id=".$params["group_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
@@ -393,7 +371,7 @@ function get_group_action() {
 // Check Delete
   $actions["group"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/group/group_index.php?action=check_delete&amp;param_group=".$group["id"]."",
+    'Url'      => "$path/group/group_index.php?action=check_delete&amp;group_id=".$params["group_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
@@ -416,7 +394,7 @@ function get_group_action() {
 // sel group add : Groups selection
   $actions["group"]["sel_group_add"] = array (
     'Name'     => $l_header_add_group,
-    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group&amp;child_res=1",
+    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$params["group_id"]."&amp;ext_target=$l_group&amp;child_res=1",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
@@ -427,7 +405,7 @@ function get_group_action() {
 // Sel user add : Users selection
   $actions["group"]["sel_user_add"] = array (
     'Name'     => $l_header_add_user,
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group",
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$params["group_id"]."&amp;ext_target=$l_group",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
@@ -503,20 +481,20 @@ function get_group_action() {
 // Group Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
 function update_group_action() {
-  global $group, $actions, $path, $l_add_user, $l_add_group, $l_group;
+  global $params, $actions, $path, $l_add_user, $l_add_group, $l_group;
 
-  $id = $group["id"];
+  $id = $params["group_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["group"]["detailconsult"]['Url'] = "$path/group/group_index.php?action=detailconsult&amp;param_group=$id";
+    $actions["group"]["detailconsult"]['Url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=$id";
     $actions["group"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;param_group=$id";
+    $actions["group"]["detailupdate"]['Url'] = "$path/group/group_index.php?action=detailupdate&amp;group_id=$id";
     $actions["group"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;param_group=$id";
+    $actions["group"]["check_delete"]['Url'] = "$path/group/group_index.php?action=check_delete&amp;group_id=$id";
     $actions["group"]["check_delete"]['Condition'][] = 'insert';
 
     // Sel User add

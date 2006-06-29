@@ -36,7 +36,7 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
 
   if (($fieldname == "document_title") && $link_ok) {
-    $res["url"] = "$path/document/document_index.php?action=detailconsult&amp;param_document=".$OD->data_set->f("document_id");
+    $res["url"] = "$path/document/document_index.php?action=detailconsult&amp;document_id=".$OD->data_set->f("document_id");
   }
 
   return $res;
@@ -149,10 +149,10 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_list($document) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $prefs = get_display_pref($auth->auth["uid"], "document");
-  $obm_q = run_query_document_search($document, $new_order, $order_dir);
+  $obm_q = run_query_document_search($document);
   $nb_document = $obm_q->num_rows_total();
   if ($nb_document == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -240,8 +240,8 @@ function html_document_search_list($doc_q, $prefs, $document) {
 function dis_document_consult($document) {
   global $display, $l_no_document;
 
-  if ($document["id"] > 0) {
-    $doc_q = run_query_document_detail($document["id"]);
+  if ($document["document_id"] > 0) {
+    $doc_q = run_query_document_detail($document["document_id"]);
     if ($doc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($doc_q);
       $block = html_document_consult($doc_q);
@@ -283,7 +283,7 @@ function html_document_consult($doc_q) {
   $block_category2 = of_category_dis_block_consult("document", "category2", $cats2, "mono");
 
   $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
-  $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
+  $url = "document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
 
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
 
@@ -416,7 +416,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     $update_file_end = "</div>";
   }
   // If parameters have been given, they supercede the default action value
-  if (isset($document["id"])) { $id = $document["id"]; }
+  if (isset($document["document_id"])) { $id = $document["document_id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
   if (isset($document["name"])) { $title = stripslashes($document["name"]); }
   if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked=\"checked\"" : ""); }
@@ -456,7 +456,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_document\" id=\"param_document\" value=\"$id\" />
+      <input type=\"hidden\" name=\"document_id\" id=\"document_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
@@ -592,7 +592,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
     $name = $doc_q->f("document_name");
     $re_path = $doc_q->f("document_path");
   } 
-  $id = $document["id"];
+  $id = $document["document_id"];
   if(isset($document["name"])) $name = $document["name"];
   if(isset($document["path"]))$re_path = $document["path"];
   if(isset($document["old_name"]))$old_name = $document["old_name"];
@@ -640,7 +640,7 @@ function html_document_dir_form($action, $document,$doc_q=null) {
 
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
-    <input type=\"hidden\" name=\"param_document\" value=\"$id\" />
+    <input type=\"hidden\" name=\"document_id\" value=\"$id\" />
     </div>
     </form>
    ";
@@ -661,13 +661,13 @@ function dis_document_can_delete($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"document_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"document_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
@@ -704,7 +704,7 @@ function dis_document_can_delete_dir($p_id) {
       <p class=\"detailButtons\">
         <form name=\"form_delete\" method=\"post\" action=\"$url\">
         <input type=\"hidden\" name=\"action\" value=\"dir_delete\" />
-        <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
+        <input type=\"hidden\" name=\"document_id\" value=\"$p_id\" />
         <input type=\"submit\" value=\"$l_dir_delete\" />
         </form>
       </p>
@@ -891,7 +891,7 @@ function dis_document_mime_links($document) {
       $dis_link .= "
     <tr>
       <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;param_document=$cid") . "\">$cname</a>
+        <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;document_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -1050,11 +1050,11 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">
-	 <a  href=\"document_index.php?action=detailconsult&amp;param_document=$id\" >
+	 <a  href=\"document_index.php?action=detailconsult&amp;document_id=$id\" >
 	  <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_file\" alt=\"\" />
 	 </a>
 	 <a class=\"documentFile\" 
-	  href=\"document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1\" 
+	  href=\"document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1\" 
 	  target=\"_blank\" >
 	  ".$info["name"]."
 	 </a>
@@ -1066,7 +1066,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   }
   if($d_id) {
     $dis_name = "
-       <a href=\"$path/document/document_index.php?action=detailupdate_dir&amp;param_document=$d_id\"> 
+       <a href=\"$path/document/document_index.php?action=detailupdate_dir&amp;document_id=$d_id\"> 
        $name
        </a>        
       ";
@@ -1097,7 +1097,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"document_index.php?action=dir_check_delete&amp;param_document=$d_id\"> 
+	 <a href=\"document_index.php?action=dir_check_delete&amp;document_id=$d_id\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
 	 $dis_name

@@ -13,11 +13,12 @@
 // Parametes:
 //   - $publication[]    : publication search criteria
 //     keys used       archive, title, phone, type, zip
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_publication_search($publication, $p_new_order, $p_order_dir) {
+function run_query_publication_search($publication) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
+
+  $sql_order_dir = $publication["sql_order_dir"];
+  $sql_order_field = $publication["sql_order_field"];
 
   $archive = $publication["archive"];
   $title = sql_search_text_parse($publication["title"]);
@@ -54,8 +55,8 @@ function run_query_publication_search($publication, $p_new_order, $p_order_dir) 
   }
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : " publication_year DESC,publication_title";
-  $orderq = "ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : " publication_year DESC,publication_title";
+  $orderq = "ORDER BY $order $sql_order_dir";
 
   $query = "SELECT
       publication_id as id,
@@ -224,7 +225,7 @@ function run_query_publication_insert($publication) {
 function run_query_publication_auto_insert($publication) {
   global $auth, $cdg_sql;
   
-  $id = $publication["id"];
+  $id = $publication["publication_id"];
   $id_orig = $publication["id_orig"];
   $recept = $publication["recept"];
   
@@ -388,7 +389,7 @@ function run_query_publication_insert_subscription($publication) {
 
   $c_id = $publication["contact_id"];
   $quantity = $publication["quantity"];
-  $p_id = $publication["id"];
+  $p_id = $publication["publication_id"];
   $renew = $publication["renew"];
   $recept = $publication["recept"];
 /*  $query = "select count(subscription_contact_id) as num from
@@ -928,7 +929,7 @@ function check_publication_data_subscription_form($cid, $publication) {
   global $err_msg;
 
   $quantity = $publication["quantity"];
-  $p_id = $publication["id"];
+  $p_id = $publication["publication_id"];
 
   if (($p_id == "") || !($p_id >= 0) ) {
     $err_msg = $l_j_select_publication;
@@ -973,7 +974,7 @@ function check_publication_can_delete($p_id) {
       $display_linkc .= "
       <tr>
         <td class=\"detailLabel\">
-        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
         </td>
       </tr>";
     }
@@ -1020,7 +1021,7 @@ function run_query_publication_get_contact_lang($p_id) {
 function run_query_publication_subscription_external_search($hash_table) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
-  $contact = $hash_table["id"];
+  $contact = $hash_table["publication_id"];
   $obm_q = new DB_OBM;
   $type = $obm_q->type;     
   $timeupdate = sql_date_format($type, "subscription_timeupdate", "timeupdate");

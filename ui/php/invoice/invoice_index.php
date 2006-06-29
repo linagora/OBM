@@ -12,7 +12,7 @@
 // - new                -- $params        -- show the new invoice form
 // - detailconsult      -- $param_invoice -- show the invoice detail
 // - detailupdate       -- $param_invoice -- show the invoice detail form
-// - duplicate          -- $invoice       -- new invoice form from existing one
+// - duplicate          -- $params       -- new invoice form from existing one
 // - insert             -- form fields    -- insert the invoice
 // - update             -- form fields    -- update the invoice
 // - check_delete       -- $param_invoice -- check links before delete
@@ -20,7 +20,7 @@
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
-// - document_add       -- $invoice sess  -- link documents to an invoice
+// - document_add       -- $params sess  -- link documents to an invoice
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -39,11 +39,11 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$invoice = get_param_invoice();
+$params = get_invoice_params();
 get_invoice_action();
 $perm->check_permissions($module, $action);
 
-update_last_visit("invoice", $invoice["id"], $action);
+update_last_visit("invoice", $params["invoice_id"], $action);
 
 page_close();
 
@@ -51,117 +51,117 @@ page_close();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  $display["search"] = dis_invoice_search_form($invoice);
+  $display["search"] = dis_invoice_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_invoice_search_list($invoice);
+    $display["result"] = dis_invoice_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
   
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_invoice_search_form($invoice); 
+  $display["search"] = dis_invoice_search_form($params); 
   if ($set_display == "yes") { 
-    $display["result"] = dis_invoice_search_list($invoice);
+    $display["result"] = dis_invoice_search_list($params);
   } else { 
     $display["msg"] .= display_info_msg($l_no_display); 
   } 
 
 } elseif ($action == "search")  { 
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_invoice_search_form($invoice); 
-  $display["result"] = dis_invoice_search_list($invoice);
+  $display["search"] = dis_invoice_search_form($params); 
+  $display["result"] = dis_invoice_search_list($params);
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_invoice_form($action, $invoice);
+  $display["detail"] = dis_invoice_form($action, $params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_invoice_consult($invoice);
+  $display["detail"] = dis_invoice_consult($params);
 
 } elseif ($action == "detailupdate") { 
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_invoice_form($action, $invoice);
+  $display["detail"] = dis_invoice_form($action, $params);
 
 } elseif ($action == "duplicate") {
 ///////////////////////////////////////////////////////////////////////////////
   // we give the user the traditionnal form to modify this invoice :
-  $display["detail"] = dis_invoice_form($action, $invoice);
+  $display["detail"] = dis_invoice_form($action, $params);
   
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_invoice_data_form("", $invoice)) {
-    $retour = run_query_invoice_insert($invoice);
+  if (check_invoice_data_form("", $params)) {
+    $retour = run_query_invoice_insert($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_invoice : $l_insert_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_invoice : $l_insert_error");
     }
-    $display["search"] = dis_invoice_search_form($invoice);
+    $display["search"] = dis_invoice_search_form($params);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_invoice_form($action, $invoice);
+    $display["detail"] = dis_invoice_form($action, $params);
   }
   
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_invoice_data_form($invoice["id"], $invoice)) {
-    $retour = run_query_invoice_update($invoice);
+  if (check_invoice_data_form($params["invoice_id"], $params)) {
+    $retour = run_query_invoice_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_invoice : $l_update_ok");
     } else {
       $display["msg"] .= display_ok_msg("$l_invoice : $l_update_error");
     }
-    $display["detail"] = dis_invoice_consult($invoice);
+    $display["detail"] = dis_invoice_consult($params);
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
-    $display["search"] = dis_invoice_form($action, $invoice);
+    $display["search"] = dis_invoice_form($action, $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_invoice($invoice["id"])) {
+  if (check_can_delete_invoice($params["invoice_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_invoice($invoice["id"]);
+    $display["detail"] = dis_can_delete_invoice($params["invoice_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_invoice_consult($invoice);
+    $display["detail"] = dis_invoice_consult($params);
   }
-  //  $display["detail"] = dis_check_invoice_links($invoice["id"]);
+  //  $display["detail"] = dis_check_invoice_links($params["invoice_id"]);
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_invoice($invoice["id"])) {
-    $retour = run_query_invoice_delete($invoice["id"]); 
+  if (check_can_delete_invoice($params["invoice_id"])) {
+    $retour = run_query_invoice_delete($params["invoice_id"]); 
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_invoice : $l_delete_ok");
-      $display["search"] = dis_invoice_search_form($invoice);
+      $display["search"] = dis_invoice_search_form($params);
     } else {
       $display["msg"] .= display_err_msg("$l_invoice : $l_delete_error");
-      $display["detail"] = dis_invoice_consult($invoice);
+      $display["detail"] = dis_invoice_consult($params);
     }
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_invoice_consult($invoice);
+    $display["detail"] = dis_invoice_consult($params);
   }
 
 } elseif ($action == "dashboard") {
 ///////////////////////////////////////////////////////////////////////////////
   include_once("$obminclude/Artichow/BarPlot.class.php");
-  $display["detail"] = dis_invoice_dashboard_index($invoice);
+  $display["detail"] = dis_invoice_dashboard_index($params);
 
 } elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($invoice["doc_nb"] > 0) {
-    $nb = run_query_global_insert_documents($invoice, "invoice");
+  if ($params["doc_nb"] > 0) {
+    $nb = run_query_global_insert_documents($params, "invoice");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $display["detail"] = dis_invoice_consult($invoice);
+  $display["detail"] = dis_invoice_consult($params);
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_invoice");
 $display["end"] = display_end();
-if (! $invoice["popup"]) {
+if (! $params["popup"]) {
   update_invoice_action();
   $display["header"] = display_menu($module);
 }
@@ -195,95 +195,35 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Invoice parameters transmitted in $invoice hash
-// returns : $invoice hash with parameters set
+// Stores Invoice parameters transmitted in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_invoice() {
-  global $year, $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
-  global $ta_comment, $sel_status, $param_invoice, $tf_date, $tf_payment_date;
-  global $tf_expiration_date, $tf_date_after, $tf_date_before;
-  global $tf_date_exp_after, $tf_date_exp_before;
-  global $sel_tt, $tf_deal, $tf_company, $cb_archive, $rd_inout, $hd_inout;
-  global $ta_comment, $sel_usercomment, $tf_datecomment, $ta_add_comment;
-  global $param_company, $company_name, $company_new_name, $company_new_id;
-  global $param_deal, $deal_label, $deal_new_label, $deal_new_id;
-  global $param_project, $project_name, $project_new_name, $project_new_id;
-  global $ext_id, $dash_view;
-  global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
+function get_invoice_params() {
 
-  get_global_param_document($invoice);
+  // Get global params
+  $params = get_global_params("Invoice");
 
-  if (isset ($param_invoice)) $invoice["id"] = $param_invoice;
-  if (isset ($tf_label)) $invoice["label"] = $tf_label;
-  if (isset ($tf_number)) $invoice["number"] = $tf_number;
-  if (isset ($tf_amount_ht)) $invoice["ht"] = $tf_amount_ht;
-  if (isset ($tf_amount_ttc)) $invoice["ttc"] = $tf_amount_ttc;
-  if (isset ($sel_status)) $invoice["status"] = $sel_status;
-  if (isset ($tf_date)) $invoice["date"] = $tf_date;
-  if (isset ($tf_payment_date)) $invoice["pdate"] = $tf_payment_date;
-  if (isset ($tf_expiration_date)) $invoice["edate"] = $tf_expiration_date;
-  if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after;
-  if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before;
-  if (isset ($tf_date_exp_after)) $invoice["dateexp_after"] = $tf_date_exp_after;
-  if (isset ($tf_date_exp_before)) $invoice["dateexp_before"] = $tf_date_exp_before;
-  if (isset ($rd_inout)) $invoice["inout"] = $rd_inout;
-  if (isset ($hd_inout)) $invoice["inout"] = $hd_inout;
-  if (isset ($tf_balance)) $invoice["balance"] = $tf_balance;
-  if (isset ($tf_bank)) $invoice["bank"] = $tf_bank;
-  if (isset ($ta_comment)) $invoice["comment"] = $ta_comment;
-  if (isset ($tf_datecomment)) $invoice["datecomment"] = $tf_datecomment;
-  if (isset ($sel_usercomment)) $invoice["usercomment"] = $sel_usercomment;
-  if (isset ($ta_add_comment)) $invoice["add_comment"] = trim($ta_add_comment);
-  if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
-  if (isset ($year)) $invoice["year"] = $year;
-  if (isset ($dash_view)) $invoice["dash_view"] = $dash_view;
-
-  // Company params
-  if (isset ($param_company)) $invoice["company_id"] = $param_company;
-  if (isset ($tf_company)) $invoice["company"] = $tf_company;
-  if (isset ($company_name)) $invoice["company_name"] = $company_name;
-  if (isset ($company_new_name)) $invoice["comp_new_name"] = $company_new_name;
-  if (isset ($company_new_id)) $invoice["comp_new_id"] = $company_new_id;
-
-  // Deal params
-  if (isset ($param_deal)) $invoice["deal_id"]= $param_deal; 
-  if (isset ($deal_label)) $invoice["deal_label"] = $deal_label;
-  if (isset ($deal_new_label)) $invoice["deal_new_label"] = $deal_new_label;
-  if (isset ($deal_new_id)) $invoice["deal_new_id"] = $deal_new_id;
-
-  // Project params
-  if (isset ($param_project)) $invoice["project_id"]= $param_project; 
-  if (isset ($project_name)) $invoice["project_name"] = $project_name;
-  if (isset ($project_new_name)) $invoice["proj_new_name"] = $project_new_name;
-  if (isset ($project_new_id)) $invoice["proj_new_id"] = $project_new_id;
-
+  //Get company specific params
   // sel_tt
-  if (is_array($sel_tt)) {
-    while ( list( $key, $value ) = each( $sel_tt ) ) {
+  if (is_array($params["tt"])) {
+    while ( list( $key, $value ) = each( $params["tt"] ) ) {
       // sel_tt contains select infos (data-tt-$id)
       if (strcmp(substr($value, 0, 8),"data-tt-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$invoice["sel_tt"][] = $id;
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["tasktype"][] = $id;
       } else {
-	// sel_tt contains ids
-	$invoice["sel_tt"][] = $value;
-      }	
+        // sel_tt contains ids
+        $params["tasktype"][] = $value;
+      } 
     }
   }
+  
+  get_global_params_document($params);
+  
+  display_debug_param($params);
 
-  // External params
-  if (isset ($popup)) $invoice["popup"] = $popup;
-  if (isset ($ext_action)) $invoice["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $invoice["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $invoice["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $invoice["id"] = $ext_id;
-  if (isset ($ext_target)) $invoice["ext_target"] = $ext_target;
-  if (isset ($ext_title)) $invoice["ext_title"] = $ext_title;
-
-  display_debug_param($invoice);
-
-  return $invoice;
+  return $params;
 }
 
 
@@ -291,10 +231,10 @@ function get_param_invoice() {
 // Invoice actions
 ///////////////////////////////////////////////////////////////////////////////
 function get_invoice_action() {
-  global $invoice, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display,$l_header_duplicate,$l_header_admin;
-  global $l_header_add_deal, $l_header_dashboard, $invoice_admin_write;
+  global $l_header_add_deal, $l_header_dashboard, $params_admin_write;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index 
@@ -330,7 +270,7 @@ function get_invoice_action() {
 // Detail Consult
   $actions["invoice"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$invoice["id"]."",
+    'Url'      => "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=".$params["invoice_id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate', 'duplicate', 'update')
                                    );
@@ -338,7 +278,7 @@ function get_invoice_action() {
 // Duplicate
   $actions["invoice"]["duplicate"] = array (
     'Name'     => $l_header_duplicate,
-    'Url'      => "$path/invoice/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["id"]."",
+    'Url'      => "$path/invoice/invoice_index.php?action=duplicate&amp;invoice_id=".$params["invoice_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update')
                                      	   );
@@ -346,7 +286,7 @@ function get_invoice_action() {
 // Detail Update
   $actions["invoice"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/invoice/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["id"]."",
+    'Url'      => "$path/invoice/invoice_index.php?action=detailupdate&amp;invoice_id=".$params["invoice_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update')
                                      	       );
@@ -361,14 +301,14 @@ function get_invoice_action() {
 // Check Delete
   $actions["invoice"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/invoice/invoice_index.php?action=check_delete&amp;param_invoice=".$invoice["id"]."",
+    'Url'      => "$path/invoice/invoice_index.php?action=check_delete&amp;invoice_id=".$params["invoice_id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                      	      );
 
 // Delete
   $actions["invoice"]["delete"] = array (
-    'Url'      => "$path/invoice/invoice_index.php?action=delete&amp;param_invoice=".$invoice["id"],
+    'Url'      => "$path/invoice/invoice_index.php?action=delete&amp;invoice_id=".$params["invoice_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      	);
@@ -422,24 +362,24 @@ function get_invoice_action() {
 // Invoice Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_invoice_action() {
-  global $invoice, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $invoice["id"];
+  $id = $params["invoice_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["invoice"]["detailconsult"]["Url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$id";
+    $actions["invoice"]["detailconsult"]["Url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$id";
     $actions["invoice"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["invoice"]["detailupdate"]['Url'] = "$path/invoice/invoice_index.php?action=detailupdate&amp;param_invoice=$id";
+    $actions["invoice"]["detailupdate"]['Url'] = "$path/invoice/invoice_index.php?action=detailupdate&amp;invoice_id=$id";
     $actions["invoice"]["detailupdate"]['Condition'][] = 'insert';
 
     // Duplicate
-    $actions["invoice"]["duplicate"]['Url'] = "$path/invoice/invoice_index.php?action=duplicate&amp;param_invoice=$id";
+    $actions["invoice"]["duplicate"]['Url'] = "$path/invoice/invoice_index.php?action=duplicate&amp;invoice_id=$id";
     $actions["invoice"]["duplicate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["invoice"]["check_delete"]['Url'] = "$path/invoice/invoice_index.php?action=check_delete&amp;param_invoice=$id";
+    $actions["invoice"]["check_delete"]['Url'] = "$path/invoice/invoice_index.php?action=check_delete&amp;invoice_id=$id";
     $actions["invoice"]["check_delete"]['Condition'][] = 'insert';
   }
 }

@@ -21,11 +21,11 @@ require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
-$params = get_param_lead();
+$params = get_lead_params();
 get_lead_action();
 $perm->check_permissions($module, $action);
 
-update_last_visit("lead", $params["id"], $action);
+update_last_visit("lead", $params["lead_id"], $action);
 page_close();
 
 
@@ -55,7 +55,7 @@ if ($action == "index" || $action == "") {
   if (check_lead_data_form("", $params)) {
     $id = run_query_lead_insert($params);
     if ($id > 0) {
-      $params["id"] = $id;
+      $params["lead_id"] = $id;
       $display["msg"] = display_ok_msg ("$l_lead : $l_insert_ok");
       $display["detail"] = dis_lead_consult($params);
     } else {
@@ -79,8 +79,8 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_lead_data_form($params["id"], $params)) {
-    $retour = run_query_lead_update($params["id"], $params);
+  if (check_lead_data_form($params["lead_id"], $params)) {
+    $retour = run_query_lead_update($params["lead_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_lead : $l_update_ok");
     } else {
@@ -94,9 +94,9 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_lead($params["id"])) {
+  if (check_can_delete_lead($params["lead_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_lead($params["id"]);
+    $display["detail"] = dis_can_delete_lead($params["lead_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
@@ -105,8 +105,8 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_lead($params["id"])) {
-    $retour = run_query_lead_delete($params["id"]);
+  if (check_can_delete_lead($params["lead_id"])) {
+    $retour = run_query_lead_delete($params["lead_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_lead : $l_delete_ok");
     } else {
@@ -190,39 +190,19 @@ display_page($display);
 // Stores Lead parameters transmitted in $lead hash
 // returns : $lead hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_lead() {
-  global $sel_manager, $tf_name, $tf_date, $tf_datealarm, $ta_comment;
-  global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
-  global $param_lead, $cb_archive, $tf_todo, $cb_privacy;
-  global $tf_source_label, $tf_source_code, $sel_source, $tf_company;
-  global $param_company, $company_name, $company_new_name, $company_new_id;
+function get_lead_params() {
+  global $cb_privacy, $cb_privacy;
+  
+    // Get global params
+  $params = get_global_params("Lead");
 
-  if (isset ($param_lead)) $lead["id"] = $param_lead;
-  if (isset ($sel_source)) $lead["source_id"] = $sel_source;
-  if (isset ($sel_manager)) $lead["manager_id"] = $sel_manager;
-  if (isset ($tf_name)) $lead["name"] = $tf_name;
-  if (isset ($tf_date)) $lead["date"] = $tf_date;
-  if (isset ($tf_datealarm)) $lead["datealarm"] = $tf_datealarm;
-  if (isset ($tf_todo)) $lead["todo"] = $tf_todo;
-  if (isset ($cb_privacy)) { $lead["privacy"] = ($cb_privacy == 1 ? 1 : 0); };
-  if (isset ($ta_comment)) $lead["comment"] = $ta_comment;
-  if (isset ($tf_datecomment)) $lead["datecomment"] = $tf_datecomment;
-  if (isset ($sel_usercomment)) $lead["usercomment"] = $sel_usercomment;
-  if (isset ($ta_add_comment)) $lead["add_comment"] = trim($ta_add_comment);
-  if (isset ($cb_archive)) $lead["archive"] = ($cb_archive == 1 ? 1 : 0);
+  //Get company specific params
+  if (isset ($cb_privacy)) { $params["privacy"] = ($cb_privacy == 1 ? 1 : 0); };
+  if (isset ($cb_archive)) $params["archive"] = ($cb_privacy == 1 ? 1 : 0);
 
-  if (isset ($param_company)) $lead["company_id"] = $param_company;
-  if (isset ($tf_company)) $lead["company"] = $tf_company;
-  if (isset ($company_name)) $lead["company_name"] = $company_name;
-  if (isset ($company_new_name)) $lead["comp_new_name"] = $company_new_name;
-  if (isset ($company_new_id)) $lead["comp_new_id"] = $company_new_id;
+  display_debug_param($params);
 
-  if (isset ($tf_source_label)) $lead["source_label"] = $tf_source_label;
-  if (isset ($tf_source_code)) $lead["source_code"] = $tf_source_code;
-
-  display_debug_param($lead);
-
-  return $lead;
+  return $params;
 }
 
 
@@ -236,7 +216,7 @@ function get_lead_action() {
   global $l_header_convert_deal;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
-  $id = $params["id"];
+  $id = $params["lead_id"];
 
 //Index
   $actions["lead"]["index"] = array (
@@ -264,7 +244,7 @@ function get_lead_action() {
 // Detail Consult
   $actions["lead"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/lead/lead_index.php?action=detailconsult&amp;param_lead=".$params["id"],
+    'Url'      => "$path/lead/lead_index.php?action=detailconsult&amp;lead_id=$id",
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate', 'update')
                                         );
@@ -272,7 +252,7 @@ function get_lead_action() {
 // Convert to Deal
   $actions["lead"]["convert_deal"] = array (
     'Name'     => $l_header_convert_deal,
-    'Url'      => "$path/deal/deal_index.php?action=new&amp;param_lead=".$params["id"],
+    'Url'      => "$path/deal/deal_index.php?action=new&amp;lead_id=$id",
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                         );
@@ -280,7 +260,7 @@ function get_lead_action() {
 // Detail Update
   $actions["lead"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/lead/lead_index.php?action=detailupdate&amp;param_lead=".$params["id"],
+    'Url'      => "$path/lead/lead_index.php?action=detailupdate&amp;lead_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
@@ -302,14 +282,14 @@ function get_lead_action() {
 // Check Delete
   $actions["lead"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/lead/lead_index.php?action=check_delete&amp;param_lead=".$params["id"],
+    'Url'      => "$path/lead/lead_index.php?action=check_delete&amp;lead_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                      	 );
 
 // Delete
   $actions["lead"]["delete"] = array (
-    'Url'      => "$path/lead/lead_index.php?action=delete&amp;param_lead=".$params["id"],
+    'Url'      => "$path/lead/lead_index.php?action=delete&amp;lead_id=$id",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      	 );
@@ -382,18 +362,18 @@ function get_lead_action() {
 function update_lead_action() {
   global $params, $actions, $path, $l_lead;
 
-  $id = $params["id"];
+  $id = $params["lead_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["lead"]["detailconsult"]["Url"] = "$path/lead/lead_index.php?action=detailconsult&amp;param_lead=$id";
+    $actions["lead"]["detailconsult"]["Url"] = "$path/lead/lead_index.php?action=detailconsult&amp;lead_id=$id";
     $actions["lead"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["lead"]["detailupdate"]['Url'] = "$path/lead/lead_index.php?action=detailupdate&amp;param_lead=$id";
+    $actions["lead"]["detailupdate"]['Url'] = "$path/lead/lead_index.php?action=detailupdate&amp;lead_id=$id";
     $actions["lead"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["lead"]["check_delete"]['Url'] = "$path/lead/lead_index.php?action=check_delete&amp;param_lead=$id";
+    $actions["lead"]["check_delete"]['Url'] = "$path/lead/lead_index.php?action=check_delete&amp;lead_id=$id";
     $actions["lead"]["check_delete"]['Condition'][] = 'insert';
   }
 }

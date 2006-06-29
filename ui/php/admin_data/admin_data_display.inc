@@ -353,7 +353,7 @@ function dis_admin_data_deal($action, $mode) {
       } else {
 	$arch = (($archive == "1") ? "X" : "&nbsp;");
 	echo "<tr>
-          <td class=\"adminText\"><a href=\"$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$id\">$id</a></td>
+          <td class=\"adminText\"><a href=\"$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$id\">$id</a></td>
           <td class=\"adminText\">$status</td>
           <td class=\"adminText\">$arch</td>
           <td class=\"adminText\">$hitrate</td>
@@ -652,7 +652,7 @@ Id | Document Path | Name | Kind | Disk Path | Missing DB | Missing FS
 	$dis_id = $id;
 	$line = "$dis_id | $dpath | $name | $type | $disk_rel | $miss_bd | $miss_fs - $update\n";
       } else {
-	$dis_id = "<a href=\"$path/document/document_index.php?action=detailconsult&amp;param_document=$id\">$id</a>";
+	$dis_id = "<a href=\"$path/document/document_index.php?action=detailconsult&amp;document_id=$id\">$id</a>";
 	$line = "
      <tr>
 	<td class=\"adminText\">$dis_id</td>

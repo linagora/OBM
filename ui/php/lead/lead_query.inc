@@ -11,17 +11,18 @@
 // Lead search query execution
 // Parametes:
 //   - $lead[]       : lead search criteria
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_lead_search($params, $p_new_order="") {
+function run_query_lead_search($params) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $sql_order_dir = $params["sql_order_dir"];
+  $sql_order_field = $params["sql_order_field"];
 
   $text = sql_search_text_parse($params["text"]);
   $company = sql_search_text_parse($params["company"]);
   $date_after = $params["date_after"];
   $date_before = $params["date_before"];
-  $source = $params["source_id"];
+  $source = $params["source"];
   $manager = $params["manager_id"];
   $archive = $params["archive"];
 
@@ -39,12 +40,13 @@ function run_query_lead_search($params, $p_new_order="") {
   $concat_manager = sql_string_concat($db_type, $manager_name);
 
   $where .= sql_obm_entity_privacy("lead");
-
+  
+  $and = "AND";
+  
   // search criterias :
   if ($text != "") {
     $where .= "$and (lead_name $like '%$text%'
                      OR lead_comment $like '%$text%')";
-    $and = "AND";
   }
   if ($company != "") {
     $where .= sql_global_company_name_advanced_search($company, $like);
@@ -73,8 +75,8 @@ function run_query_lead_search($params, $p_new_order="") {
   }
 
   // Order by clause
-  $field = (strcmp($p_new_order,"") != 0) ? $p_new_order : "lead_datealarm";
-  $orderq = " ORDER BY $field $p_order_dir";
+  $field = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "lead_datealarm";
+  $orderq = " ORDER BY $field $sql_order_dir";
 
   $query = "SELECT
     lead_id,
@@ -169,12 +171,12 @@ function run_query_lead_insert($params) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
-  $company_id = $params["comp_new_id"];
+  $company_id = $params["company_new_id"];
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
-  $source_id = $params["source_id"];
-  $manager_id = $params["manager_id"];
+  $source_id = $params["source"];
+  $manager_id = $params["manager"];
   $name = $params["name"];
   $date = ($params["date"] ? "'".$params["date"]."'" : "null");
   $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");
@@ -264,8 +266,8 @@ function run_query_lead_update($pid, $params) {
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
-  $source_id = $params["source_id"];
-  $manager_id = $params["manager_id"];
+  $source_id = $params["source"];
+  $manager_id = $params["manager"];
   $name = $params["name"];
   $date = ($params["date"] ? "'".$params["date"]."'" : "null");
   $datealarm = ($params["datealarm"] ? "'".$params["datealarm"]."'" : "null");

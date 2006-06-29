@@ -37,7 +37,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new,$ext_element;
 
   if (($fieldname == "rgroup_name") && $link_ok) {
-    $res["url"] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$OD->data_set->f("rgroup_id");
+    $res["url"] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=".$OD->data_set->f("rgroup_id");
   }
 
   else if ($fieldname == "rgroup_privacy") {
@@ -64,7 +64,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
   }
   // For RGroup resource lists
   elseif (($fieldname == "resourcegroup_resource_name")  && $link_ok) {
-    //$res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("group_user_id");
+    //$res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$OD->data_set->f("group_user_id");
     $res["url"] = "";
   }
   elseif (($fieldname == "resourcegroup_resource_desc")  && $link_ok) {
@@ -238,7 +238,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
     <p class=\"detailButton\">
     <p class=\"detailButtons\">
       <input type=\"submit\" value=\"$l_add\" />
-      <input type=\"hidden\" name=\"param_resourcegroup\" value=\"$ext_id\" />
+      <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
       $input_target
     </p>
@@ -286,7 +286,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($group["id"])) { $id = $group["id"]; }
+  if (isset($group["resourcegroup_id"])) { $id = $group["resourcegroup_id"]; }
   if (isset($group["name"])) { $name = stripslashes($group["name"]); }
   if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
   if (isset($group["privacy"])) { $priv = stripslashes($group["privacy"]); }
@@ -337,7 +337,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_but = "
-      <input type=\"hidden\" name=\"param_resourcegroup\" value=\"$id\" />
+      <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
@@ -366,7 +366,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
 function dis_resourcegroup_consult($group, $uid) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $g_id = $group["id"];
+  $g_id = $group["resourcegroup_id"];
 
   $group_q = run_query_resourcegroup_detail($g_id);
 
@@ -432,7 +432,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   $block .= display_info_msg($message);
 
   if ($nb_r != 0) {
-    $url = url_prepare("resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=$id");
+    $url = url_prepare("resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=$id");
     $dis_infos = new OBM_DISPLAY("DATA", $prefs_r, "resourcegroup", "resourcegroup_resource");
     $dis_infos->data_set = $r_q;
     $dis_infos->data_url = $url;
@@ -453,7 +453,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_del_resource_sel\" />
-        <input type=\"hidden\" name=\"param_resourcegroup\" value=\"$id\" />
+        <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"resource_del\" />
         </p>
       </p>
@@ -532,7 +532,7 @@ function dis_resourcegroup_warn_delete($id) {
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("resourcegroup_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_resourcegroup\" value=\"$id\" />
+      <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
     </p>";
@@ -570,7 +570,7 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
     $samedesc = $g_q->f("rgroup_desc");
     $dis_same_group .= "
       <tr><td class=\"detailLabel\">
-        <a href=\"" .url_prepare("resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=$id") . "\">$samename ($samedesc)</a>
+        <a href=\"" .url_prepare("resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=$id") . "\">$samename ($samedesc)</a>
       </td></tr>";
   }
 

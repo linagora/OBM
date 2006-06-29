@@ -40,7 +40,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("project_id").");";
     } else {
-      $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$OD->data_set->f("project_id");
+      $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;project_id=".$OD->data_set->f("project_id");
     }
   }
 
@@ -193,8 +193,8 @@ function html_project_search_form ($tts, $member_q, $project) {
       </div>
       <div class=\"searchLabel\">&nbsp;<br />
         <input name=\"action\" type=\"hidden\" value=\"search\" />
-        <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
-        <input name=\"param_deal\" type=\"hidden\" value=\"$deal_id\" />
+        <input name=\"company_id\" type=\"hidden\" value=\"$company_id\" />
+        <input name=\"deal_id\" type=\"hidden\" value=\"$deal_id\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
         <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
        $ext
@@ -217,11 +217,8 @@ function html_project_search_form ($tts, $member_q, $project) {
 function dis_project_search_list($project) {
   global $display, $auth, $l_found, $l_no_found;
 
-  $new_order = $project["new_order"];
-  $order_dir = $project["order_dir"];
-
   $prefs = get_display_pref($auth->auth["uid"], "project", 0);
-  $obm_q = run_query_project_search($project, $new_order, $order_dir);
+  $obm_q = run_query_project_search($project);
   $nb_project = $obm_q->num_rows_total();
 
   if ($nb_project == 0) {
@@ -334,9 +331,9 @@ function html_project_links($p_q) {
 
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
-    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id");
-    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id&amp;cb_archive=1");
-    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_project=$id&amp;project_name=$uname&amp;param_company=$cid&amp;company_name=$ucname&amp;param_deal=$did&amp;deal_label=$udlabel");
+    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id&amp;cb_archive=1");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;project_id=$id&amp;project_name=$uname&amp;company_id=$cid&amp;company_name=$ucname&amp;deal_id=$did&amp;deal_label=$udlabel");
     $nb_inv_tot = get_global_linked_invoice_nb($id, "project", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "project");
     $block_invoice = "
@@ -438,7 +435,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     </tr><tr>
       <td class=\"detailLabel\">$l_deal</td>
       <td class=\"detailText\">
-        <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal")."\">
+        <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal")."\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"[details]\" /></a>
         $deal_label
       </td>";
@@ -449,7 +446,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     <tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
-        <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$company")."\">
+        <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$company")."\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         $company_name
       </td>
@@ -873,7 +870,7 @@ function html_project_form($action, $project_q, $project) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($project["id"])) { $pid = $project["id"]; }
+  if (isset($project["project_id"])) { $pid = $project["project_id"]; }
   if (isset($project["name"])) { $name = stripslashes($project["name"]); }
   if (isset($project["tt"])) { $tt = $project["tt"]; }
   if (isset($project["company"])) { $company = $project["company"]; }
@@ -1022,9 +1019,9 @@ function html_project_form($action, $project_q, $project) {
   }
 
   $dis_button = "$dis_action
-      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$company\" />
-      <input type=\"hidden\" name=\"param_deal\" value=\"$deal\" />
+      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"company_id\" value=\"$company\" />
+      <input type=\"hidden\" name=\"deal_id\" value=\"$deal\" />
       <input type=\"submit\" value=\"$text_button\" />";
   
   // --- HTML Template --------------------------------------------------------
@@ -1097,13 +1094,13 @@ function dis_can_delete_project($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"project_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"project_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
@@ -1132,7 +1129,7 @@ function html_project_task_form($ptask_q, $project) {
   global $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
   global $l_task_update, $l_task_upd, $l_task;
   
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $pname = $project["name"];
   $label = stripslashes($project["tasklabel"]);
   $task = $project["task"];
@@ -1223,7 +1220,7 @@ function html_project_task_form($ptask_q, $project) {
 
     <div class=\"detailButton\">
     <p class=\"detailButtons\">
-     <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+     <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_add\" />
      <input type=\"submit\" value=\"$l_task_add\" />
     </p>
@@ -1259,7 +1256,7 @@ function html_project_task_form($ptask_q, $project) {
 
     <div class=\"detailButton\">
     <p class=\"detailButtons\">
-     <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+     <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_update\" />
      <input type=\"submit\" value=\"$l_task_upd\" />
     </p>
@@ -1283,7 +1280,7 @@ function html_project_tasklist($tasks_q, $project) {
   global $set_theme;
   global $l_task_list, $l_task_del, $l_no_tasks;
 
-  $pid = $project["id"];
+  $pid = $project["project_id"];
 
   if (($tasks_q != 0) && ($tasks_q->num_rows() != 0)) {
 
@@ -1315,7 +1312,7 @@ function html_project_tasklist($tasks_q, $project) {
    }
     
     $dis_button  = "
-      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
       <input type=\"hidden\" name=\"action\" value=\"task_del\" />
       <input type=\"submit\" value=\"$l_task_del\" />";
 
@@ -1358,7 +1355,7 @@ function html_project_member_form($members_q, $project) {
   global $l_no_members, $l_members_info, $l_del_member_sel;
   global $l_project, $l_project_manager, $l_member;
 
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $pname = $project["name"];
 
   if (($members_q != 0) && ($members_q->num_rows() != 0)) {
@@ -1394,8 +1391,8 @@ function html_project_member_form($members_q, $project) {
     }
 
     $dis_button  = "
-      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-      <input type=\"hidden\" name=\"param_user\" value=\"\" />
+      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"user_id\" value=\"\" />
       <input type=\"hidden\" name=\"param_status\" value=\"\" />
       <input type=\"hidden\" name=\"action\" value=\"member_del\" />
       <input type=\"submit\" value=\"$l_del_member_sel\"
@@ -1455,7 +1452,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 
   $cpt_t=0;
   $cpt_m=0;
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $pname = $project["name"];
 
   // task list
@@ -1559,7 +1556,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
      $dis_member
     </table>
 
-    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+    <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
 
    <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
@@ -1587,7 +1584,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
 
   $cpt_t=0;
   $cpt_m=0;
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $pname = $project["name"];
 
   // task list
@@ -1698,7 +1695,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
     </table>
 
     <input type=\"hidden\" name=\"action\" value=\"advance_update\" />
-    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+    <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
   
     <div class=\"detailButton\">
      <p class=\"detailButtons\">$dis_button</p>
@@ -1719,7 +1716,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
 function dis_project_dashboard($project) {
   global $display;
 
-  $pid = $project["id"];
+  $pid = $project["project_id"];
   $project_q = run_query_project_detail($pid);
   $tasks_q = run_query_project_tasks($pid);
   $members_q = run_query_project_members($pid);

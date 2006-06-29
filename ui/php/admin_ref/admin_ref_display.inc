@@ -226,7 +226,7 @@ function dis_admin_ref_country_links($ref) {
       $dis_link_comp .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;company_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -253,7 +253,7 @@ function dis_admin_ref_country_links($ref) {
       $dis_link_cont .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -449,7 +449,7 @@ function dis_admin_ref_datasource_links($ref) {
       $dis_link_comp .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -477,7 +477,7 @@ function dis_admin_ref_datasource_links($ref) {
       $dis_link_cont .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -695,7 +695,7 @@ function dis_admin_ref_tasktype_links($ref) {
       $dis_link_deal .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
+        <a href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$did") . "\">$dlabel</a>
       </td>
     </tr>";
     }
@@ -731,7 +731,7 @@ function dis_admin_ref_tasktype_links($ref) {
       $dis_link_proj .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$pname</a>
+        <a href=\"" .url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$pid") . "\">$pname</a>
       </td>
     </tr>";
     }

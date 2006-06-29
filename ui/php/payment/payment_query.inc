@@ -11,11 +11,12 @@
 // Payment search query execution
 // Parametes:
 //   - $payment[]    : payment search criteria
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_payment_search($payment, $p_new_order="") {
+function run_query_payment_search($payment) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $sql_order_dir = $payment["sql_order_dir"];
+  $sql_order_field = $payment["sql_order_field"];
 
   $comment = sql_search_text_parse($payment["comment"]);
   $number = sql_search_text_parse($payment["number"]);
@@ -86,8 +87,8 @@ function run_query_payment_search($payment, $p_new_order="") {
   $whereq = "WHERE $where";
 
   // Order by clause
-  $field = (strcmp($p_new_order,"") != 0) ? $p_new_order : "payment_date";
-  $orderq = " ORDER BY $field $p_order_dir";
+  $field = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "payment_date";
+  $orderq = " ORDER BY $field $sql_order_dir";
 
   $query = "SELECT
     payment_id,
@@ -418,7 +419,7 @@ function run_query_payment_invoice_insert($params) {
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
-  $id = $params["id"];
+  $id = $params["payment_id"];
   $amount = $params["amount"];
   $invoice_id = $params["invoice_id"];
 
@@ -609,7 +610,7 @@ function check_payment_invoice_data_form($params) {
   global $l_fill_amount, $l_invalid_amount, $l_err_total_payment_affected;
   global $err_msg, $l_err_affected_invoice;
 
-  $id = $params["id"];
+  $id = $params["payment_id"];
   $invs = $params["invoice"];
 
   // check that each amount are correctly filled

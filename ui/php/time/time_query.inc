@@ -12,8 +12,6 @@
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       interval, date, contact_id
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_time_task_list($time) {
   global $c_day_fraction, $cdg_sql;

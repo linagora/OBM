@@ -9,17 +9,17 @@
 // Actions :
 // - index (default) -- search fields  -- show the deal search form
 // - search          -- search fields  -- show the result set of search
-// - new             -- $param_company -- show the new deal form
-// - detailconsult   -- $param_deal    -- show the deal detail
-// - detailupdate    -- $param_deal    -- show the deal detail form
-// - quick_detail    -- $param_deal    -- show the deal quick detail form
+// - new             -- $company_id -- show the new deal form
+// - detailconsult   -- $deal_id    -- show the deal detail
+// - detailupdate    -- $deal_id    -- show the deal detail form
+// - quick_detail    -- $deal_id    -- show the deal quick detail form
 // - insert          -- form fields    -- insert the deal
 // - update          -- form fields    -- update the deal
 // - quick_update    -- form fields    -- update (quick) the deal
-// - check_delete    -- $param_deal    -- check links before delete
-// - delete          -- $param_deal    -- delete the deal
-// - affect          -- $param_deal    -- show the new parent deal form
-// - affect_update   -- $param_deal    -- affect the deal to the parentdeal
+// - check_delete    -- $deal_id    -- check links before delete
+// - delete          -- $deal_id    -- delete the deal
+// - affect          -- $deal_id    -- show the new parent deal form
+// - affect_update   -- $deal_id    -- affect the deal to the parentdeal
 // - dashboard       -- form fields    -- Display the dashboard screen
 // - document_add    -- form fields    -- Add a doucment
 // - admin           --                -- admin index (kind)
@@ -40,11 +40,11 @@
 // - dispref_level   --                -- update one field display position 
 // - parent_search        -- search fields  -- show the result set of search
 // - parent_new           -- search fields  -- show the result set of search
-// - parent_detailconsult -- $param_parent  -- show the parent detail
-// - parent_detailupdate  -- $param_parent  -- show the parent detail form
+// - parent_detailconsult -- $parentdeal_id  -- show the parent detail
+// - parent_detailupdate  -- $parentdeal_id  -- show the parent detail form
 // - parent_insert        -- form fields    -- insert the deal
 // - parent_update        -- form fields    -- update the parent
-// - parent_delete        -- $param_parent  -- delete the parent
+// - parent_delete        -- $parentdeal_id  -- delete the parent
 // External API ---------------------------------------------------------------
 // - ext_get_id      -- $ext_params    -- select a deal (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,15 +66,15 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$deal = get_param_deal();
+$params = get_deal_params();
 get_deal_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Deal", $action, $deal["id"], $uid)) {
+if (! check_privacy($module, "Deal", $action, $params["deal_id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("deal", $param_deal, $action);
-  update_last_visit("parentdeal", $param_parent, $action);
+  update_last_visit("deal", $params["deal_id"], $action);
+  update_last_visit("parentdeal", $params["parentdeal_id"], $action);
 }
 page_close();
 
@@ -84,7 +84,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 
 // when searching deals belonging to a parent, we display the parent
-if (($action == "search") && ($deal["parent"])) {
+if (($action == "search") && ($params["parentdeal_id"])) {
 ///////////////////////////////////////////////////////////////////////////////
   $action = "parent_detailconsult";
 }
@@ -94,16 +94,16 @@ if (($action == "search") && ($deal["parent"])) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  $display["search"] = dis_deal_search_form($deal);
+  $display["search"] = dis_deal_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_deal_search_list($deal);
+    $display["result"] = dis_deal_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
 } elseif ($action == "ext_get_category1_ids") {
   $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("deal", "category1", $deal, $action);
+  $display["detail"] = of_category_dis_tree("deal", "category1", $params, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -112,101 +112,101 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_deal_index();
   if ($set_display == "yes") {
-    $display["detail"] = dis_deal_search_list($deal);
+    $display["detail"] = dis_deal_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
  
 } elseif ($action == "search") { // tester si hd_parent mis ??? pour form :oui
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_deal_search_form($deal);
-  $display["result"] = dis_deal_search_list($deal);
+  $display["search"] = dis_deal_search_form($params);
+  $display["result"] = dis_deal_search_list($params);
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_form($deal);
+  $display["detail"] = dis_deal_form($params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_consult($deal);
+  $display["detail"] = dis_deal_consult($params);
 
 } elseif ($action == "quick_detail") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_quick_form($deal);
+  $display["detail"] = dis_deal_quick_form($params);
   
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_form($deal);
+  $display["detail"] = dis_deal_form($params);
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_form("", $deal)) {
-    $deal["id"] = run_query_deal_insert($deal);
-    if ($deal["id"]) {
+  if (check_deal_form("", $params)) {
+    $params["deal_id"] = run_query_deal_insert($params);
+    if ($params["deal_id"]) {
       $display["msg"] .= display_ok_msg("$l_deal : $l_insert_ok");
-      $display["detail"] = dis_deal_consult($deal);
+      $display["detail"] = dis_deal_consult($params);
     } else {
       $display["msg"] .= display_err_msg("$l_deal : $l_insert_error : $err_msg");
-      $display["search"] = dis_deal_index($deal);
+      $display["search"] = dis_deal_index($params);
     }
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = dis_deal_form($deal);
+    $display["detail"] = dis_deal_form($params);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_form("", $deal)) {
-    $retour = run_query_deal_update($deal);
+  if (check_deal_form("", $params)) {
+    $retour = run_query_deal_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_deal : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_deal : $l_update_error");
     }
-    $display["detail"] = dis_deal_consult($deal);
+    $display["detail"] = dis_deal_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = dis_deal_form($deal);
+    $display["detail"] = dis_deal_form($params);
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff == "archives") {
-      $obm_q = run_query_deal_detail($deal["id"]);
+      $obm_q = run_query_deal_detail($params["deal_id"]);
       $obm_q->next_record();
-      $deal["parent"] = $obm_q->f("deal_parentdeal_id");
-      run_query_update_archive($deal["id"], $deal["parent"]);
+      $params["parentdeal_id"] = $obm_q->f("deal_parentdeal_id");
+      run_query_update_archive($params["deal_id"], $params["parentdeal_id"]);
     }
   }
 
 } elseif ($action == "quick_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_quick_form($deal)) {
-    $retour = run_query_deal_quick_update($deal);
+  if (check_deal_quick_form($params)) {
+    $retour = run_query_deal_quick_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_deal : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_deal : $l_update_error");
     }
-    $display["detail"] = dis_deal_consult($deal);
+    $display["detail"] = dis_deal_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = dis_deal_quick_form($deal);
+    $display["detail"] = dis_deal_quick_form($params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_deal($deal["id"])) {
+  if (check_can_delete_deal($params["deal_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_deal_can_delete_deal($deal["id"]);
+    $display["detail"] = dis_deal_can_delete_deal($params["deal_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_deal_consult($deal);
+    $display["detail"] = dis_deal_consult($params);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_deal($deal["id"])) {
-    $retour = run_query_deal_delete($deal["id"]);
+  if (check_can_delete_deal($params["deal_id"])) {
+    $retour = run_query_deal_delete($params["deal_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_deal : $l_delete_ok");
     } else {
@@ -216,28 +216,28 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_deal_consult($deal);
+    $display["detail"] = dis_deal_consult($params);
   }
 
 } elseif ($action == "dashboard") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_dashboard_index($deal);
-  $display["detail"] .= dis_deal_dashboard_view($deal);
+  $display["detail"] = dis_deal_dashboard_index($params);
+  $display["detail"] .= dis_deal_dashboard_view($params);
 
 } elseif ($action == "dashboard_list") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_dashboard_index($deal);
-  $display["detail"] .= dis_deal_dashboard_list($deal);
+  $display["detail"] = dis_deal_dashboard_index($params);
+  $display["detail"] .= dis_deal_dashboard_list($params);
 
 } elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($deal["doc_nb"] > 0) {
-    $nb = run_query_global_insert_documents($deal, "deal");
+  if ($params["doc_nb"] > 0) {
+    $nb = run_query_global_insert_documents($params, "deal");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $display["detail"] = dis_deal_consult($deal);
+  $display["detail"] = dis_deal_consult($params);
 
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -245,7 +245,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("deal", "category1", $deal);
+  $retour = of_category_query_insert("deal", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
@@ -255,7 +255,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("deal", "category1", $deal);
+  $retour = of_category_query_update("deal", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
@@ -265,11 +265,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("deal", "category1", $deal);
+  $display["detail"] .= of_category_dis_links("deal", "category1", $params);
 
 } elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("deal", "category1", $deal);
+  $retour = of_category_query_delete("deal", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
@@ -279,7 +279,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "kind_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_kind_insert($deal);
+  $retour = run_query_deal_kind_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_insert_ok");
   } else {
@@ -289,7 +289,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "kind_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_kind_update($deal);
+  $retour = run_query_deal_kind_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_update_ok");
   } else {
@@ -299,11 +299,11 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "kind_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_kind_links($deal["kind"]);
+  $display["detail"] = dis_deal_kind_links($params["kind"]);
   
 } elseif ($action == "kind_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_kind_delete($deal["kind"]);
+  $retour = run_query_deal_kind_delete($params["kind"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_delete_ok");
   } else {
@@ -313,7 +313,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_status_insert($deal);
+  $retour = run_query_deal_status_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_status : $l_insert_ok");
   } else {
@@ -323,7 +323,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_status_update($deal);
+  $retour = run_query_deal_status_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_status : $l_update_ok");
   } else {
@@ -333,11 +333,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_status_links($deal["status"]);
+  $display["detail"] = dis_deal_status_links($params["status"]);
 
 } elseif ($action == "status_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_status_delete($deal["status"]);
+  $retour = run_query_deal_status_delete($params["status"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_status : $l_delete_ok");
   } else {
@@ -347,7 +347,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "role_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("DealCompany", "role", $deal);
+  $retour = of_category_query_insert("DealCompany", "role", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_role : $l_insert_ok");
   } else {
@@ -357,7 +357,7 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "role_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("DealCompany", "role", $deal);
+  $retour = of_category_query_update("DealCompany", "role", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_role : $l_update_ok");
   } else {
@@ -367,11 +367,11 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "role_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("DealCompany", "role", $deal, "mono");
+  $display["detail"] .= of_category_dis_links("DealCompany", "role", $params, "mono");
   
 } elseif ($action == "role_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("DealCompany", "role", $deal);
+  $retour = of_category_query_delete("DealCompany", "role", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_role : $l_delete_ok");
   } else {
@@ -388,74 +388,74 @@ if ($action == "ext_get_id") {
 } elseif ($action == "parent_search") {
 ///////////////////////////////////////////////////////////////////////////////
   $usr_q = run_query_deal_manager();
-  $display["search"] = html_deal_parentdeal_search_form($deal, $usr_q);
-  $display["result"] = dis_deal_parentdeal_search_list($deal);
+  $display["search"] = html_deal_parentdeal_search_form($params, $usr_q);
+  $display["result"] = dis_deal_parentdeal_search_list($params);
 
 } elseif ($action == "parent_new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_parentdeal_form($action, $deal);
+  $display["detail"] = dis_deal_parentdeal_form($action, $params);
 
 } elseif ($action == "parent_detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_parentdeal_consult($deal);
+  $display["detail"] = dis_deal_parentdeal_consult($params);
 
 } elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_parentdeal_form($action, $deal);
+  $display["detail"] = dis_deal_parentdeal_form($action, $params);
   
 } elseif ($action == "parent_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_parent_form("", $deal)) {
-    $retour = run_query_deal_insert_parentdeal($deal);
+  if (check_deal_parent_form("", $params)) {
+    $retour = run_query_deal_insert_parentdeal($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_parentdeal : $l_insert_ok"); 
     } else {
       $display["msg"] .= display_err_msg("$l_parentdeal : $l_insert_error : $err_msg");
     }
-    $display["search"] = html_deal_parentdeal_search_form($deal, run_query_deal_manager(1));
+    $display["search"] = html_deal_parentdeal_search_form($params, run_query_deal_manager(1));
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $display["search"] = html_deal_parentdeal_search_form($deal, run_query_deal_manager(1));
+    $display["search"] = html_deal_parentdeal_search_form($params, run_query_deal_manager(1));
   }
   
 } elseif ($action == "parent_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_can_delete_parentdeal($deal["parent"])) {
-    run_query_deal_parentdeal_delete($deal["parent"]); 
+  if (check_deal_can_delete_parentdeal($params["parentdeal_id"])) {
+    run_query_deal_parentdeal_delete($params["parentdeal_id"]); 
     $display["msg"] .= display_ok_msg("$l_parentdeal : $l_delete_ok"); 
-    $display["search"] = html_deal_parentdeal_search_form($deal, run_query_deal_manager(1));
+    $display["search"] = html_deal_parentdeal_search_form($params, run_query_deal_manager(1));
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete_parent, false);
-    $display["search"] = dis_deal_parentdeal_consult($deal);
+    $display["search"] = dis_deal_parentdeal_consult($params);
   }
   
 } elseif  ($action == "parent_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_deal_parent_form("", $deal)) {
-    $retour = run_query_deal_parentdeal_update($deal);
+  if (check_deal_parent_form("", $params)) {
+    $retour = run_query_deal_parentdeal_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_parentdeal : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_parentdeal : $l_update_error");
     }
-    $display["detail"] = dis_deal_parentdeal_consult($deal);
+    $display["detail"] = dis_deal_parentdeal_consult($params);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = dis_deal_parentdeal_form($action, $deal);
+    $display["detail"] = dis_deal_parentdeal_form($action, $params);
   }
 
 } elseif ($action == "affect") {
 ///////////////////////////////////////////////////////////////////////////////
   $parent_q = run_query_deal_search_parentdeal('');
-  $display["detail"] = html_deal_affect($parent_q, $deal["id"]);
+  $display["detail"] = html_deal_affect($parent_q, $params["deal_id"]);
 
 } elseif ($action == "affect_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($deal["id"] > 0) {
-    run_query_deal_affect_deal_parentdeal($deal["id"], $deal);
+  if ($params["deal_id"] > 0) {
+    run_query_deal_affect_deal_parentdeal($params["deal_id"], $params);
     $display["msg"] .= display_ok_msg($l_updateaffect_ok);
-    $display["detail"] = dis_deal_consult($deal);
+    $display["detail"] = dis_deal_consult($params);
   }
 
 } elseif ($action == "display") {
@@ -496,173 +496,32 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $deal hash, Deal parameters transmited
-// returns : $deal hash with parameters set
+// Stores in $params hash, Deal parameters transmited
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_deal() {
-  global $year, $tf_num, $tf_label, $param_parent, $sel_kind, $sel_tt;
-  global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
-  global $tf_amount, $sel_status, $tf_datealarm, $ta_com, $tf_commission;
-  global $tf_datebegin, $tf_dateend, $tf_dateprop, $tf_dateexpected;
-  global $tf_datecomment, $sel_usercomment, $ta_add_comment, $rd_mail_comment;
-  global $tf_plabel, $sel_pmanager, $cb_archive, $tf_todo, $cb_privacy;
-  global $hd_company_ad1, $hd_company_zip, $hd_company_town;
-  global $tf_company_name, $tf_zip,$sel_manager, $tf_date_after, $tf_date_before;
-  global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
-  global $tf_category1_label, $tf_category1_code, $sel_category1;
-  global $tf_role_label, $tf_role_code, $sel_role, $tf_role_company;
-  global $param_deal, $param_contact, $param_lead, $sel_source, $tf_source;
-  global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
-  global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
-  global $ext_widget, $ext_widget_text, $new_order, $order_dir, $dash_view;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
- 
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  if (isset ($http_obm_vars)) {
-    // Handle DealCompany infos
-    $cpt = 0;
-    global $data_dc_0;
-    while (isset($http_obm_vars["data_dc_$cpt"])) {
-      global ${"data_dccid_$cpt"}; $dccid = ${"data_dccid_$cpt"};
-      global ${"data_dccname_$cpt"}; $dccname = ${"data_dccname_$cpt"};
-      global ${"data_dccnewid_$cpt"}; $dccnewid = ${"data_dccnewid_$cpt"};
-      global ${"data_dccnewname_$cpt"}; $dccnewname = ${"data_dccnewname_$cpt"};
-      global ${"sel_role$cpt"}; $dcroleid = ${"sel_role$cpt"};
-
-      if ($dccnewid > 0) {
- 	$deal["dc"][$cpt]["company_id"] = $dccnewid;
- 	$deal["dc"][$cpt]["company_name"] = $dccnewname;
- 	$deal["dc"][$cpt]["role_id"] = $dcroleid;
-      } else if ($dccid > 0) {
- 	$deal["dc"][$cpt]["company_id"] = $dccid;
- 	$deal["dc"][$cpt]["company_name"] = $dccname;
- 	$deal["dc"][$cpt]["role_id"] = $dcroleid;
-      }
-      $cpt++;
-    }
-  }
-
-  if (isset ($popup)) $deal["popup"] = $popup;
-  if (isset ($ext_action)) $deal["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $deal["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $deal["ext_id"] = $ext_id;
-  if (isset ($ext_title)) $deal["ext_title"] = stripslashes(urldecode($ext_title));
-  if (isset ($ext_target)) $deal["ext_target"] = $ext_target;
-  if (isset ($ext_widget)) $deal["ext_widget"] = $ext_widget;
-  if (isset ($ext_widget_text)) $deal["ext_widget_text"] = $ext_widget_text;
-
-  if (isset ($dash_view)) $deal["dash_view"] = $dash_view;
-
-  if (isset ($new_order)) $deal["new_order"] = $new_order;
-  if (isset ($order_dir)) $deal["order_dir"] = $order_dir;
-
-  // Deal fields
-  if (isset ($param_deal)) $deal["id"] = $param_deal;
-  if (isset ($tf_num)) $deal["num"] = $tf_num;
-  if (isset ($tf_label)) $deal["label"] = $tf_label;
-  if (isset ($tf_datebegin)) $deal["datebegin"] = $tf_datebegin;
-  if (isset ($tf_dateend)) $deal["dateend"] = $tf_dateend;
-  if (isset ($tf_dateprop)) $deal["dateproposal"] = $tf_dateprop;
-  if (isset ($tf_dateexpected)) $deal["dateexpected"] = $tf_dateexpected;
-  if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
-  if (isset ($param_parent)) $deal["parent"] = $param_parent;
-  if (isset ($sel_source)) $deal["source_id"] = $sel_source;
-  if (isset ($tf_source)) $deal["source"] = $tf_source;
-  if (isset ($sel_kind)) $deal["kind"] = $sel_kind;
-  if (isset ($param_company)) $deal["company"] = $param_company;
-  if (isset ($param_contact)) $deal["contact_id"] = $param_contact;
-  if (isset ($sel_contact1)) $deal["contact1"] = $sel_contact1;
-  if (isset ($sel_contact2)) $deal["contact2"] = $sel_contact2;
-  if (isset ($sel_market)) $deal["market"] = $sel_market;
-  if (isset ($sel_tech)) $deal["tech"] = $sel_tech;
-  if (isset ($tf_commission)) $deal["commission"] = $tf_commission;
-  if (isset ($tf_amount)) $deal["amount"] = $tf_amount;
-  if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
-  if (isset ($sel_status)) $deal["status"] = $sel_status;
-  if (isset ($tf_category1_label)) $deal["category1_label"] = $tf_category1_label;
-  if (isset ($tf_category1_code)) $deal["category1_code"] = $tf_category1_code;
-  if (isset ($sel_category1)) $deal["category1"] = $sel_category1;
-  if (isset ($tf_role_label)) $deal["role_label"] = $tf_role_label;
-  if (isset ($tf_role_code)) $deal["role_code"] = $tf_role_code;
-  if (isset ($sel_role)) $deal["role"] = $sel_role;
-  if (isset ($cb_archive)) {
-    $deal["archive"] = $cb_archive;
-  }
-  if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
-  if (isset ($cb_privacy)) { $deal["privacy"] = ($cb_privacy == 1 ? 1 : 0); };
-  if (isset ($ta_com)) $deal["com"] = $ta_com;
-  if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
-  if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;
-  if (isset ($ta_add_comment)) $deal["add_comment"] = trim($ta_add_comment);
-  if (isset ($rd_mail_comment)) $deal["mail_comment"] = trim($rd_mail_comment);
-
-  if (isset ($year)) $deal["year"] = $year;
-
-  // sel_tt
-  if (is_array($sel_tt)) {
-    while ( list( $key, $value ) = each( $sel_tt ) ) {
-      // sel_tt contains select infos (data-tt-$id)
-      if (strcmp(substr($value, 0, 8),"data-tt-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$deal["sel_tt"][] = $id;
-      } else {
-	// sel_tt contains ids
-	$deal["sel_tt"][] = $value;
-      }	
-    }
-  } else {
-    if (isset ($sel_tt)) $deal["tasktype"] = $sel_tt;
-  }
-
-  // Parent Deal fields
-  if (isset ($tf_plabel)) $deal["plabel"] = $tf_plabel;
-  if (isset ($sel_pmarket)) $deal["pmarket"] = $sel_pmarket;
-  if (isset ($sel_ptech)) $deal["ptech"] = $sel_ptech;
-  if (isset ($sel_pmanager)) $deal["pmanager"] = $sel_pmanager; // in search
-  if (isset ($cb_parchive)) {
-    $deal["parchive"] = $cb_parchive;
-  } else {
-    $deal["parchive"] = "0";
-  }
-  if (isset ($ta_pcom)) $deal["pcom"] = $ta_pcom;
-  if (isset ($sel_parent)) $deal["sel_parent"] = $sel_parent;
-
-  if (isset ($param_lead)) $deal["lead_id"] = $param_lead;
-
-  // Search fields
-  if (isset ($tf_company_name)) $deal["company_name"] = $tf_company_name;
-  if (isset ($tf_zip)) $deal["company_zip"] = $tf_zip;
-  if (isset ($sel_manager)) $deal["manager"] = $sel_manager;
-  if (isset ($tf_date_after)) $deal["date_after"] = $tf_date_after;
-  if (isset ($tf_date_before)) $deal["date_before"] = $tf_date_before;
-  if (isset ($tf_role_company)) $deal["role_company"] = $tf_role_company;
-
-  // Company infos (with company_name)
-  if (isset ($hd_company_ad1)) $deal["company_ad1"] = $hd_company_ad1;
-  if (isset ($hd_company_zip)) $deal["company_zip"] = $hd_company_zip;
-  if (isset ($hd_company_town)) $deal["company_town"] = $hd_company_town;
-
-  // Admin - Kind fields
-  // $sel_kind -> "kind" is already set
-  if (isset ($tf_kind)) $deal["kind_label"] = $tf_kind;
-  if (isset ($rd_kind_inout)) $deal["kind_inout"] = $rd_kind_inout;
-
-  // Admin - Status fields
-  // $sel_status -> "status" is already set
-  if (isset ($tf_status)) $deal["status_label"] = $tf_status;
-  $deal["status_order"] = (isset($tf_order) ? $tf_order : "0");
-
-  get_global_param_document($deal);
+function get_deal_params() {
+  global $ext_title, $cb_priv;
+  global $cb_parchive, $tf_order;
   
-  display_debug_param($deal);
+  // Get global params
+  $params = get_global_params("Deal");
+  
+  // Get deal specific params
+  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
+  $params["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_parchive)) {
+    $params["parchive"] = $cb_parchive;
+  } else {
+    $params["parchive"] = "0";
+  }
+    
+  $params["status_order"] = (isset($tf_order) ? $tf_order : "0");
+  
+  get_global_params_document($params);
+  
+  display_debug_param($params);
 
-  return $deal;
+  return $params;
 }
 
 
@@ -670,7 +529,7 @@ function get_param_deal() {
 // Deal Actions 
 ///////////////////////////////////////////////////////////////////////////////
 function get_deal_action() {
-  global $deal, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $l_header_new_child, $l_header_new_parent, $l_header_quickupdate;
@@ -702,14 +561,14 @@ function get_deal_action() {
   // New
   $actions["deal"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company="),
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;company_id="),
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 
                                   );
 
   // New Child
-  $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=". $deal["parent"] . "&amp;sel_market=" . $deal["pmarket"] . "&amp;sel_tech=" . $deal["ptech"] . "&amp;param_company=");
+  $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;parentdeal_id=". $params["parentdeal_id"] . "&amp;sel_market=" . $params["pmarket"] . "&amp;sel_tech=" . $params["ptech"] . "&amp;company_id=");
   $actions["deal"]["new_child"] = array (
     'Name'     => $l_header_new_child,
     'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=$ret_url",
@@ -731,7 +590,7 @@ function get_deal_action() {
   // Detail Consult
   $actions["deal"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailupdate', 'update', 'quick_detail', 'quick_update') 
@@ -740,7 +599,7 @@ function get_deal_action() {
   // Quick Detail
   $actions["deal"]["quick_detail"] = array (
     'Name'     => $l_header_quickupdate,
-    'Url'      => "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=quick_detail&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'quick_update')
@@ -749,7 +608,7 @@ function get_deal_action() {
   // Detail Update
   $actions["deal"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update', 'quick_detail', 'quick_update')
@@ -763,7 +622,7 @@ function get_deal_action() {
 					    
   //  Update
   $actions["deal"]["update"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=update&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=update&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
@@ -771,7 +630,7 @@ function get_deal_action() {
 
   //  Quick Update
   $actions["deal"]["quick_update"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=quick_update&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=quick_update&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
@@ -780,7 +639,7 @@ function get_deal_action() {
   // Parent Detail Consult
   $actions["deal"]["parent_detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$deal["parent"],
+    'Url'      => "$path/deal/deal_index.php?action=parent_detailconsult&amp;parentdeal_id=".$params["parentdeal_id"],
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('parent_detailupdate', 'parent_update') 
@@ -789,14 +648,14 @@ function get_deal_action() {
   // Parent Detail Update
   $actions["deal"]["parent_detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"],
+    'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;parentdeal_id=".$params["parentdeal_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult', 'parent_update') 
                                      		  );
                                                                                                                                                              
   // Parent Update
   $actions["deal"]["parent_update"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=parent_update&amp;param_parent=".$deal["parent"],
+    'Url'      => "$path/deal/deal_index.php?action=parent_update&amp;parentdeal_id=".$params["parentdeal_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                                   );
@@ -818,7 +677,7 @@ function get_deal_action() {
   // Check Delete
   $actions["deal"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update') 
@@ -856,14 +715,14 @@ function get_deal_action() {
   // Parent Delete
   $actions["deal"]["parent_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"],
+    'Url'      => "$path/deal/deal_index.php?action=parent_delete&amp;parentdeal_id=".$params["parentdeal_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
                                      	     );
 
   // Affect
   $actions["deal"]["affect"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=affect&amp;param_parent=".$deal["parent"]."&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=affect&amp;parentdeal_id=".$params["parentdeal_id"]."&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
@@ -871,7 +730,7 @@ function get_deal_action() {
 
   // Affect Update
   $actions["deal"]["affect_update"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=affect_update&amp;sel_parent=".$deal["parent"]."&amp;param_deal=".$deal["id"],
+    'Url'      => "$path/deal/deal_index.php?action=affect_update&amp;sel_parent=".$params["parentdeal_id"]."&amp;deal_id=".$params["deal_id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
@@ -1039,34 +898,34 @@ function get_deal_action() {
 // Deal Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
 function update_deal_action() {
-  global $deal, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $deal["id"];
+  $id = $params["deal_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["deal"]["detailconsult"]['Url'] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$id";
+    $actions["deal"]["detailconsult"]['Url'] = "$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$id";
     $actions["deal"]["detailonsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["deal"]["detailupdate"]['Url'] = "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=$id";
+    $actions["deal"]["detailupdate"]['Url'] = "$path/deal/deal_index.php?action=detailupdate&amp;deal_id=$id";
     $actions["deal"]["detailupdate"]['Condition'][] = 'insert';
     
     // Quick Detail
-    $actions["deal"]["quick_detail"]['Url'] = "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=$id";
+    $actions["deal"]["quick_detail"]['Url'] = "$path/deal/deal_index.php?action=quick_detail&amp;deal_id=$id";
     $actions["deal"]["quick_detail"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["deal"]["check_delete"]['Url'] = "$path/deal/deal_index.php?action=check_delete&amp;param_deal=$id";
+    $actions["deal"]["check_delete"]['Url'] = "$path/deal/deal_index.php?action=check_delete&amp;deal_id=$id";
     $actions["deal"]["check_delete"]['Condition'][] = 'insert';
   }
 
-  $pid = $deal["parent"];
+  $pid = $params["parentdeal_id"];
   if ($pid > 0) {
     // Parent Detail Update
-    $actions["deal"]["parent_detailupdate"]['Url'] = "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=$pid";
+    $actions["deal"]["parent_detailupdate"]['Url'] = "$path/deal/deal_index.php?action=parent_detailupdate&amp;parentdeal_id=$pid";
 
     // Parent Check Delete
-    $actions["deal"]["parent_delete"]['Url'] = "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=$pid";
+    $actions["deal"]["parent_delete"]['Url'] = "$path/deal/deal_index.php?action=parent_delete&amp;parentdeal_id=$pid";
   }
 
 

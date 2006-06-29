@@ -68,12 +68,12 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   if (($fieldname == "contact_lastname") && $link_ok) {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("contact_id");
   }
 
   else if (($fieldname == "company_name") && $link_ok) {
     if ($cgp_show["module"]["company"]) {
-      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contact_company_id");
+      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("contact_company_id");
     } else {
       $res["name"] = $OD->data_set->f("contact_company");
     }      
@@ -373,7 +373,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
   $cat3 = $contact["category3"];
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
-  $mark = $contact["marketing_manager"];
+  $mark = $contact["market"];
   $dateafter = stripslashes($contact["dateafter"]);
   $datebefore = stripslashes($contact["datebefore"]);
   $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
@@ -421,7 +421,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
   }
 
   // Country select
-  $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
+  $sel_ctry = "<select id=\"sel_country\" name=\"sel_country\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
@@ -530,12 +530,12 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_search_list($contact) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $popup = $contact["popup"];
 
   $prefs = get_display_pref($auth->auth["uid"], "contact");
-  $obm_q = run_query_contact_search($contact, $new_order, $order_dir);
+  $obm_q = run_query_contact_search($contact);
   $nb_contact = $obm_q->num_rows_total();
   if ($nb_contact == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -584,14 +584,14 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $company_id = $contact["company_id"];
   $func = $contact["function"];
   $title = urlencode(stripslashes($contact["title"]));
-  $mark = $contact["marketing_manager"];
+  $mark = $contact["market"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
   $cat3 = $contact["category3"];
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;cb_mailing_ok_only=$mailing_ok_only&amp;param_company=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;cb_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -637,7 +637,7 @@ function dis_contact_consult($contact) {
   global $display, $l_no_found, $path, $l_query_error;
 
   $view = $contact["view"];
-  $id = $contact["id"];
+  $id = $contact["contact_id"];
   $con_q = run_query_contact_detail($id);
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
@@ -719,7 +719,7 @@ function html_contact_header($co_q, $funcs, $cats5) {
 
   // Company Display
   if ($cgp_show["module"]["company"]) {
-    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
+    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\"> $c_name</a>";
   } else {
     $dis_company = $c_name;
   }
@@ -1088,8 +1088,8 @@ function html_contact_links($id) {
 
   // Deal
   if ($cgp_show["module"]["deal"]) {
-    $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_contact=$id");
-    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_contact=$id&amp;cb_archive=1");
+    $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id");
+    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id&amp;cb_archive=1");
     $deal_active = get_global_linked_deal_nb($id, "contact1", false, "contact2");
     $deal_total = get_global_linked_deal_nb($id, "contact1", true, "contact2");
     $block_deal = "
@@ -1104,7 +1104,7 @@ function html_contact_links($id) {
 
   // List
   if ($cgp_show["module"]["list"]) {
-    $url_list = url_prepare("$path/list/list_index.php?action=search&amp;param_contact=$id");
+    $url_list = url_prepare("$path/list/list_index.php?action=search&amp;contact_id=$id");
     $list_nb = get_linked_contact_list_nb($id);
     $block_list = "
   <div class=\"linkTitle\">:: $l_module_list</div>
@@ -1118,8 +1118,8 @@ function html_contact_links($id) {
   if ($cgp_show["module"]["contract"]) {
     $contract_active = get_global_linked_contract_nb($id,"contact1",false,"contact2");
     $contract_total = get_global_linked_contract_nb($id,"contact1",true,"contact2");
-    $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_contact=$id");
-    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;param_contact=$id&amp;cb_archive=1");
+    $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id");
+    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id&amp;cb_archive=1");
     $block_contract = "
   <div class=\"linkTitle\">:: $l_module_contract</div>
   <ul class=\"linkList\">
@@ -1154,9 +1154,9 @@ function html_contact_links($id) {
   // Publication  
   if ($cgp_show["module"]["publication"]) {
     $nb_subscription = run_query_contact_subscription_nb($id);
-    $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;param_contact=$id");
+    $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;contact_id=$id");
     $url = urlencode($url_subscription);
-    $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1&amp;ext_url=$url");
+    $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;contact_id=$id&amp;popup=1&amp;ext_url=$url");
     $block_publi = "
   <div class=\"linkTitle\">:: $l_subscription</div>
   <ul class=\"linkList\">
@@ -1194,7 +1194,7 @@ function html_contact_links($id) {
 function dis_contact_form($action, $co_q, $contact) {
   global $display, $cg_com, $cgp_hide, $uid;
 
-  $cid = $contact["id"];
+  $cid = $contact["contact_id"];
   if ($cid > 0) {
     $cats1=array();$cats2=array();$cats3=array();$cats4=array();
     $cats1 = of_category_get_ordered("contact", "category1", "multi", $cid);
@@ -1209,10 +1209,10 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $users = array($uid);
 
-  if ($contact["marketing_manager"] > 0) {
-    $users[] = $contact["marketing_manager"];
+  if ($contact["market"] > 0) {
+    $users[] = $contact["market"];
   }
-  if ($contact["id"] > 0) {
+  if ($contact["contact_id"] > 0) {
     $users[] = $co_q->f("contact_marketingmanager_id");
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
@@ -1354,11 +1354,11 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if (isset($contact["company_name"])) { $c_name = $contact["company_name"]; }
   if (isset($contact["comp_new_id"])) { $c_new_id = $contact["comp_new_id"]; }
   if (isset($contact["comp_new_name"])) { $c_new_name = $contact["comp_new_name"]; }
-  if (isset($contact["id"])) { $id = $contact["id"]; }
+  if (isset($contact["contact_id"])) { $id = $contact["contact_id"]; }
   if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
   if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
   if (isset($contact["kind"])) { $kind = $contact["kind"]; }
-  if (isset($contact["marketing_manager"])) { $mark = $contact["marketing_manager"]; }
+  if (isset($contact["market"])) { $mark = $contact["market"]; }
   if (isset($contact["date"])) { $mark = $contact["date"]; }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
@@ -1547,7 +1547,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     </script>\n";
 
   // Country select
-  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
+  $sel_ctry = "<select name=\"sel_country\" id=\"sel_country\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($ctry_q->next_record()) {
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
@@ -1663,9 +1663,9 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
 
   // Company Display
   if ($cgp_show["module"]["company"]) {
-    $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+    $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
       $c_name
-      </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
+      </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
@@ -1693,7 +1693,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
+      <input type=\"hidden\" name=\"contact_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"hd_usercreate\" value=\"$usercreate\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
@@ -1842,7 +1842,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
   $dsrc = $contact["datasource"];
-  $mark = $contact["marketing_manager"];
+  $mark = $contact["market"];
   $service = stripslashes($contact["service"]);
   $ad1 = stripslashes($contact["ad1"]);
   $ad2 = stripslashes($contact["ad2"]);
@@ -1874,7 +1874,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     $disp_same_cont .= "
       <tr>
         <td colspan =\"2\" class=\"detailLabel\">
-          <a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
+          <a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$id") . "\">
           $samename ($company)</a>
         </td>
       </tr>";
@@ -1884,7 +1884,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   // --- HTML Template --------------------------------------------------------
 
   $hidden = "
-    <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+    <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
@@ -1899,7 +1899,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_hphone\" value=\"$hphone\" />
     <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />
@@ -1951,14 +1951,14 @@ function dis_can_delete_contact($p_id) {
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("contact_index.php") ."\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"contact_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\"
       action=\"" . url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"contact_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_contact_del(this.form)) return true; else return false;\" />
     </form>";
@@ -2240,7 +2240,7 @@ function dis_contact_kind_links($ref) {
       $dis_link_cont .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;contact_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -2324,8 +2324,8 @@ function dis_contact_vcard_export($contact) {
   global $display, $path, $l_query_error;
   global $auth;
 
-  $param_contact = $contact["id"];
-  $con_q = run_query_contact_detail($param_contact);
+  $contact_id = $contact["contact_id"];
+  $con_q = run_query_contact_detail($contact_id);
   $com_q = run_query_contact_company($con_q->f("company_id"));
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");

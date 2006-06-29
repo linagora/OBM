@@ -39,14 +39,14 @@ include("list_query.inc");
 
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
-$list = get_param_list();
+$params = get_list_params();
 get_list_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "List", $action, $list["id"], $uid)) {
+if (! check_privacy($module, "List", $action, $params["list_id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("list", $list["id"], $action);
+  update_last_visit("list", $params["list_id"], $action);
 }
 
 page_close();
@@ -61,20 +61,20 @@ require("list_js.inc");
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  $display["search"] = dis_list_search_form($list);
+  $display["search"] = dis_list_search_form($params);
   if ($set_display == "yes") {
-    $display["detail"] = dis_list_search_list($list, $popup);
+    $display["detail"] = dis_list_search_list($params, $popup);
   } else {
     $display["msg"] .= display_ok_msg($l_no_display);
   }
 
 }
 else if ($action == "new_criterion") {
-  $display["detail"] = dis_list_add_criterion_form($list);
+  $display["detail"] = dis_list_add_criterion_form($params);
 
 } elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_list_search_form($list);
+  $display["search"] = dis_list_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_list_search_list("", $popup);
   } else {
@@ -83,112 +83,112 @@ else if ($action == "new_criterion") {
 
 } else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_list_search_form($list);
-  $display["result"] = dis_list_search_list($list, $popup);
+  $display["search"] = dis_list_search_form($params);
+  $display["result"] = dis_list_search_list($params, $popup);
 
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_list_form($action, "", $list);
+  $display["detail"] = dis_list_form($action, "", $params);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_list_consult($list);
+  $display["detail"] = dis_list_consult($params);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_list_detail($list["id"]);
-  $display["detail"] = dis_list_form($action, $list_q, $list);
+  $params_q = run_query_list_detail($params["list_id"]);
+  $display["detail"] = dis_list_form($action, $params_q, $params);
 
 } else if ($action == "detailduplicate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_list_detail($list["id"]);
-  $list["id_duplicated"] = $list["id"];
-  $list["id"] = "";
-  $list["name"] = $list_q->f("list_name") . " - $l_aduplicate";
-  $display["detail"] = dis_list_form($action, $list_q, $list);
+  $params_q = run_query_list_detail($params["list_id"]);
+  $params["id_duplicated"] = $params["list_id"];
+  $params["list_id"] = "";
+  $params["name"] = $params_q->f("list_name") . " - $l_aduplicate";
+  $display["detail"] = dis_list_form($action, $params_q, $params);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($list["criteria"] != "") {
-    $dynlist = make_list_query_from_criteria($list);
-    $list["query"] = $dynlist["query"];
+  if ($params["criteria"] != "") {
+    $dynlist = make_list_query_from_criteria($params);
+    $params["query"] = $dynlist["query"];
   } else {
     // To change : we do not know if expert mode (query should be stripslashed)
     // or no more graphical criteria (query should be set to empty)
-    $list["query"] = stripslashes($list["query"]);
+    $params["query"] = stripslashes($params["query"]);
   }
-  if (check_list_data("", $list)) {
+  if (check_list_data("", $params)) {
     // If the context (same list) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $list["id"] = run_query_list_insert($list);
-      if ($list["id"] > 0) {
+      $params["list_id"] = run_query_list_insert($params);
+      if ($params["list_id"] > 0) {
         $display["msg"] .= display_ok_msg("$l_list : $l_insert_ok");
       } else {
         $display["msg"] .= display_err_msg("$l_list : $l_insert_error");
       }
-      $display["detail"] = dis_list_consult($list);
+      $display["detail"] = dis_list_consult($params);
 
     // If it is the first try, we warn the user if some lists seem similar
     } else {
-      $obm_q = check_list_context("", $list);
+      $obm_q = check_list_context("", $params);
       if ($obm_q->num_rows() > 0) {
-        $display["detail"] = dis_list_warn_insert($obm_q, $list);
+        $display["detail"] = dis_list_warn_insert($obm_q, $params);
       } else {
-	$list["id"] = run_query_list_insert($list);
-        if ($list["id"] > 0) {
+	$params["list_id"] = run_query_list_insert($params);
+        if ($params["list_id"] > 0) {
           $display["msg"] .= display_ok_msg("$l_list : $l_insert_ok");
         } else {
           $display["msg"] .= display_err_msg("$l_list : $l_insert_error");
         }
-	$display["detail"] = dis_list_consult($list);
+	$display["detail"] = dis_list_consult($params);
       }
     }
 
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $display["detail"] = dis_list_form($action, "", $list);
+    $display["detail"] = dis_list_form($action, "", $params);
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($list["criteria"] != "") {
-    $dynlist = make_list_query_from_criteria($list);
-    $list["query"] = $dynlist["query"];
+  if ($params["criteria"] != "") {
+    $dynlist = make_list_query_from_criteria($params);
+    $params["query"] = $dynlist["query"];
   } else {
     // To change : we do not know if expert mode (query should be stripslashed)
     // or no more graphical criteria (query should be set to empty)
-    $list["query"] = stripslashes($list["query"]);
+    $params["query"] = stripslashes($params["query"]);
   }
-  if (check_list_data($list["id"], $list)) {
-    $retour = run_query_list_update($list);
+  if (check_list_data($params["list_id"], $params)) {
+    $retour = run_query_list_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_list : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_list : $l_update_error");
     }
-    $display["detail"] = dis_list_consult($list);
+    $display["detail"] = dis_list_consult($params);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $list_q = run_query_list_detail($list["id"]);
-    $display["detail"] = dis_list_form($action, $list_q, $list);
+    $params_q = run_query_list_detail($params["list_id"]);
+    $display["detail"] = dis_list_form($action, $params_q, $params);
   }
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_list_can_delete($list["id"])) {
+  if (check_list_can_delete($params["list_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_list_can_delete($list["id"]);
+    $display["detail"] = dis_list_can_delete($params["list_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_list_consult($list);
+    $display["detail"] = dis_list_consult($params);
   }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_list_can_delete($list["id"])) {
-    $retour = run_query_list_delete($list["id"]);
+  if (check_list_can_delete($params["list_id"])) {
+    $retour = run_query_list_delete($params["list_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_list : $l_delete_ok");
     } else {
@@ -198,32 +198,32 @@ else if ($action == "new_criterion") {
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_list_consult($list);
+    $display["detail"] = dis_list_consult($params);
   }
 
 } elseif ($action == "contact_add")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($list["con_nb"] > 0) {
-    $nb = run_query_list_contactlist_insert($list);
-    run_query_list_update_sql($list["id"]);
-    run_query_list_update_static_nb($list["id"]);
+  if ($params["con_nb"] > 0) {
+    $nb = run_query_list_contactlist_insert($params);
+    run_query_list_update_sql($params["list_id"]);
+    run_query_list_update_static_nb($params["list_id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_added");
   } else {
     $display["msg"] .= display_err_msg("no contact to add");
   }
-  $display["detail"] = dis_list_consult($list);
+  $display["detail"] = dis_list_consult($params);
 
 } elseif ($action == "contact_del")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($list["con_nb"] > 0) {
-    $nb = run_query_list_contactlist_delete($list);
-    run_query_list_update_sql($list["id"]);
-    run_query_list_update_static_nb($list["id"]);
+  if ($params["con_nb"] > 0) {
+    $nb = run_query_list_contactlist_delete($params);
+    run_query_list_update_sql($params["list_id"]);
+    run_query_list_update_static_nb($params["list_id"]);
     $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
   } else {
     $display["msg"] .= display_err_msg("no contact to delete");
   }
-  $display["detail"] = dis_list_consult($list);
+  $display["detail"] = dis_list_consult($params);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,9 +249,9 @@ else if ($action == "new_criterion") {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 } else if ($action == "ext_get_ids") {
-  $display["search"] = dis_list_search_form($list);
+  $display["search"] = dis_list_search_form($params);
   if ($set_display == "yes") {
-    $display["detail"] = dis_list_search_list($list, $popup);
+    $display["detail"] = dis_list_search_list($params, $popup);
   } else {
     $display["msg"] .= display_ok_msg($l_no_display);
   }
@@ -273,20 +273,16 @@ display_page($display);
 exit(0);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $list hash, List parameters transmited
-// returns : $list hash with parameters set
+// Stores in $params hash, List parameters transmited
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_list() {
-  global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
-  global $param_list, $param_ext, $rd_mode;
-  global $action, $cb_privacy, $ext_action, $ext_url, $ext_id, $ext_target;
-  global $id_duplicated, $new_order, $order_dir, $popup, $row_index, $title;
-  global $param_contact, $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
-
+function get_list_params() {
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
+  global $param_ext;
   global $tf_company_name, $tf_company_zipcode, $tf_company_town;
   global $tf_company_timeafter, $tf_company_timebefore;
   global $sel_company_country_iso3166, $sel_company_marketingmanager_id;
-  global $sel_company_datasource_id, $sel_companycategory1_code;
+  global $sel_company_datasource_id, $sel_companycategory1_code,$udomain_id;
 
   global $tf_contact_firstname, $tf_contact_lastname;
   global $tf_contact_zipcode, $tf_contact_town, $sel_kind_lang;
@@ -294,114 +290,92 @@ function get_param_list() {
   global $sel_contact_country_iso3166, $sel_contact_marketingmanager_id;
   global $sel_contact_datasource_id, $sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id, $sel_contact_function_id;
-  
-  global $sel_subscription_publication_id,$tf_publication_lang,$tf_publication_year;
-  global $sel_subscription_reception_id, $tf_subscription_renewal;
-  global $tf_subscription_timeafter, $tf_subscription_timebefore;
-  
-  global $sel_log_and,$sel_log_not;
-  global $se_criteria;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
-  // List fields
-  if (isset ($param_ext)) $list["id"] = $param_ext;
-  if (isset ($param_list)) $list["id"] = $param_list;
-  if (isset ($id_duplicated)) $list["id_duplicated"] = $id_duplicated;
-  if (isset ($param_contact)) $list["contact_id"] = $param_contact;
-  if (isset ($tf_name)) $list["name"] = trim($tf_name);
-  if (isset ($tf_subject)) $list["subject"] = trim($tf_subject);
-  if (isset ($tf_email)) $list["email"] = $tf_email;
-  if (isset ($rd_mode)) $list["mode"] = $rd_mode;
-  if (isset ($ta_query)) $list["query"] = trim($ta_query);
-  if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
-  if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
-  if (isset ($row_index)) $list["row_index"] = $row_index;
-  if (isset($cb_privacy)) $list["privacy"] = ($cb_privacy == "1") ? 1 : 0;
-  if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0;
-  if (isset($cb_contact_arch)) $list["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
-  if (isset($cb_info_pub)) $list["info_pub"] = $cb_info_pub == 1 ? 1 : 0;
-
-  if (isset ($new_order)) $list["new_order"] = $new_order;
-  if (isset ($order_dir)) $list["order_dir"] = $order_dir;
-  if (isset ($popup)) $list["popup"] = $popup;
-
-  // External param
-  if (isset ($ext_action)) $list["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $list["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $list["ext_id"] = $ext_id;
-  if (isset ($ext_target)) $list["ext_target"] = $ext_target;
-  if (isset ($title)) $list["title"] = stripslashes($title);
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
     $http_obm_vars = $HTTP_GET_VARS;
   }
   
+    // Get global params
+    $params = get_global_params("List");
+   
+  // Get agenda specific params
+  if (isset ($ta_query)) $params["query"] = trim($ta_query);
+  if (isset ($tf_contact)) $params["contact"] = trim($tf_contact);
+  if (isset($cb_priv)) $params["priv"] = ($cb_priv == "1") ? 1 : 0;
+  if (isset($cb_mailing_ok)) $params["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0;
+  if (isset($cb_contact_arch)) $params["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
+  if (isset($cb_info_pub)) $params["info_pub"] = $cb_info_pub == 1 ? 1 : 0;
+  if (isset ($title)) $params["title"] = stripslashes($title);
+  if (isset ($param_ext)) $params["list_id"] = $param_ext;
+  
   // Criteria params :
   // Company
-  if (isset ($tf_company_name)) $list["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
-  if (isset ($sel_company_country_iso3166)) $list["criteria"]["modules"]["company"]["company_country_iso3166"] = $sel_company_country_iso3166;
-  if (isset ($tf_company_timeafter)) $list["criteria"]["modules"]["company"]["company_timeafter"] = $tf_company_timeafter; 
-  if (isset ($tf_company_zipcode)) $list["criteria"]["modules"]["company"]["company_zipcode"] = $tf_company_zipcode;
-  if (isset ($sel_company_marketingmanager_id)) $list["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $sel_company_marketingmanager_id;
-  if (isset ($tf_company_timebefore)) $list["criteria"]["modules"]["company"]["company_timebefore"] = $tf_company_timebefore;
-  if (isset ($tf_company_town)) $list["criteria"]["modules"]["company"]["company_town"] = $tf_company_town;
-  if (isset ($sel_company_datasource_id)) $list["criteria"]["modules"]["company"]["company_datasource_id"] = $sel_company_datasource_id;
-  if (isset ($sel_companycategory1_code)) $list["criteria"]["modules"]["company"]["companycategory1_code"] = $sel_companycategory1_code;
+  if (isset ($tf_company_name)) $params["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
+  if (isset ($sel_company_country_iso3166)) $params["criteria"]["modules"]["company"]["company_country_iso3166"] = $sel_company_country_iso3166;
+  if (isset ($tf_company_timeafter)) $params["criteria"]["modules"]["company"]["company_timeafter"] = $tf_company_timeafter; 
+  if (isset ($tf_company_zipcode)) $params["criteria"]["modules"]["company"]["company_zipcode"] = $tf_company_zipcode;
+  if (isset ($sel_company_marketingmanager_id)) $params["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $sel_company_marketingmanager_id;
+  if (isset ($tf_company_timebefore)) $params["criteria"]["modules"]["company"]["company_timebefore"] = $tf_company_timebefore;
+  if (isset ($tf_company_town)) $params["criteria"]["modules"]["company"]["company_town"] = $tf_company_town;
+  if (isset ($sel_company_datasource_id)) $params["criteria"]["modules"]["company"]["company_datasource_id"] = $sel_company_datasource_id;
+  if (isset ($sel_companycategory1_code)) $params["criteria"]["modules"]["company"]["companycategory1_code"] = $sel_companycategory1_code;
   
   // Contact
-  if (isset ($tf_contact_firstname)) $list["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
-  if (isset ($sel_contact_country_iso3166)) $list["criteria"]["modules"]["contact"]["contact_country_iso3166"] = $sel_contact_country_iso3166;
-  if (isset ($tf_contact_timeafter)) $list["criteria"]["modules"]["contact"]["contact_timeafter"] = $tf_contact_timeafter;
-  if (isset ($tf_contact_lastname)) $list["criteria"]["modules"]["contact"]["contact_lastname"] = $tf_contact_lastname;
-  if (isset ($sel_contact_marketingmanager_id)) $list["criteria"]["modules"]["contact"]["contact_marketingmanager_id"] = $sel_contact_marketingmanager_id;
-  if (isset ($tf_contact_timebefore)) $list["criteria"]["modules"]["contact"]["contact_timebefore"] = $tf_contact_timebefore;
-  if (isset ($sel_contact_datasource_id)) $list["criteria"]["modules"]["contact"]["contact_datasource_id"] = $sel_contact_datasource_id;
-  if (isset ($tf_contact_town)) $list["criteria"]["modules"]["contact"]["contact_town"] = $tf_contact_town;
-  if (isset ($tf_contact_zipcode)) $list["criteria"]["modules"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
-  if (isset ($sel_contactcategory1link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $sel_contactcategory1link_category_id;
-  if (isset ($sel_contactcategory2link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
-  if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
-  if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
+  if (isset ($tf_contact_firstname)) $params["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
+  if (isset ($sel_contact_country_iso3166)) $params["criteria"]["modules"]["contact"]["contact_country_iso3166"] = $sel_contact_country_iso3166;
+  if (isset ($tf_contact_timeafter)) $params["criteria"]["modules"]["contact"]["contact_timeafter"] = $tf_contact_timeafter;
+  if (isset ($tf_contact_lastname)) $params["criteria"]["modules"]["contact"]["contact_lastname"] = $tf_contact_lastname;
+  if (isset ($sel_contact_marketingmanager_id)) $params["criteria"]["modules"]["contact"]["contact_marketingmanager_id"] = $sel_contact_marketingmanager_id;
+  if (isset ($tf_contact_timebefore)) $params["criteria"]["modules"]["contact"]["contact_timebefore"] = $tf_contact_timebefore;
+  if (isset ($sel_contact_datasource_id)) $params["criteria"]["modules"]["contact"]["contact_datasource_id"] = $sel_contact_datasource_id;
+  if (isset ($tf_contact_town)) $params["criteria"]["modules"]["contact"]["contact_town"] = $tf_contact_town;
+  if (isset ($tf_contact_zipcode)) $params["criteria"]["modules"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
+  if (isset ($sel_contactcategory1link_category_id)) $params["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $sel_contactcategory1link_category_id;
+  if (isset ($sel_contactcategory2link_category_id)) $params["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
+  if (isset ($sel_contact_function_id)) $params["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
+  if (isset ($sel_kind_lang)) $params["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
 
   // Publication
-  if (isset ($sel_subscription_publication_id)) $list["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;
-  if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
-  if (isset ($tf_publication_year)) $list["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
-  if (isset ($sel_subscription_reception_id)) $list["criteria"]["modules"]["publication"]["subscription_reception_id"] = $sel_subscription_reception_id;
-  if (isset ($tf_subscription_renewal)) $list["criteria"]["modules"]["publication"]["subscription_renewal"] = $tf_subscription_renewal;
-  if (isset ($tf_subscription_timeafter)) $list["criteria"]["modules"]["publication"]["subscription_timeafter"] = $tf_subscription_timeafter;
-  if (isset ($tf_subscription_timebefore)) $list["criteria"]["modules"]["publication"]["subscription_timebefore"] = $tf_subscription_timebefore;
+  if (isset ($sel_subscription_publication_id)) $params["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;
+  if (isset ($tf_publication_lang)) $params["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
+  if (isset ($tf_publication_year)) $params["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
+  if (isset ($sel_subscription_reception_id)) $params["criteria"]["modules"]["publication"]["subscription_reception_id"] = $sel_subscription_reception_id;
+  if (isset ($tf_subscription_renewal)) $params["criteria"]["modules"]["publication"]["subscription_renewal"] = $tf_subscription_renewal;
+  if (isset ($tf_subscription_timeafter)) $params["criteria"]["modules"]["publication"]["subscription_timeafter"] = $tf_subscription_timeafter;
+  if (isset ($tf_subscription_timebefore)) $params["criteria"]["modules"]["publication"]["subscription_timebefore"] = $tf_subscription_timebefore;
   
 
-  if (isset ($sel_log_not)) $list["criteria"]["logical"]["NOT"] = $sel_log_not;
-  if (isset ($sel_log_and)) $list["criteria"]["logical"]["AND"] = $sel_log_and;
+  if (isset ($sel_log_not)) $params["criteria"]["logical"]["NOT"] = $sel_log_not;
+  if (isset ($sel_log_and)) $params["criteria"]["logical"]["AND"] = $sel_log_and;
+  
   if (isset ($se_criteria)) {
-    $list["criteria"] = unserialize(urldecode($se_criteria));
+    $params["criteria"] = unserialize(urldecode($se_criteria));
   }
   if (isset ($http_obm_vars)) {
     $nb_con = 0;
     $nb_list = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
       if (strcmp(substr($key, 0, 6),"cb_con") == 0) {
-	$nb_con++;
+  $nb_con++;
         $con_num = substr($key, 6);
-        $list["con$nb_con"] = $con_num;
+        $params["con$nb_con"] = $con_num;
       } elseif (strcmp(substr($key, 0, 7),"cb_list") == 0) {
-	$nb_list++;
-        $list_num = substr($key, 7);
-        $list["list_$nb_list"] = $list_num;
-	// register the list in the list session array
-	$ses_list[$list_num] = $list_num;
+  $nb_list++;
+        $params_num = substr($key, 7);
+        $params["list_$nb_list"] = $params_num;
+  // register the list in the list session array
+  $ses_list[$params_num] = $params_num;
       }
     }
-    $list["con_nb"] = $nb_con;
-    $list["list_nb"] = $nb_list;
+    $params["con_nb"] = $nb_con;
+    $params["list_nb"] = $nb_list;
   }
 
-  display_debug_param($list);
+  display_debug_param($params);
 
-  return $list;
+  return $params;
 }
 
 
@@ -409,7 +383,7 @@ function get_param_list() {
 // list actions
 //////////////////////////////////////////////////////////////////////////////
 function get_list_action() {
-  global $list, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_list,$l_header_display, $l_header_duplicate;
   global $l_header_consult, $l_header_add_contact;
@@ -449,7 +423,7 @@ function get_list_action() {
   // Detail Consult
   $actions["list"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
+    'Url'      => "$path/list/list_index.php?action=detailconsult&amp;list_id=".$params["list_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailduplicate', 'detailupdate') 
@@ -458,7 +432,7 @@ function get_list_action() {
   // Detail Duplicate
   $actions["list"]["detailduplicate"] = array (
     'Name'     => $l_header_duplicate,
-    'Url'      => "$path/list/list_index.php?action=detailduplicate&amp;param_list=".$list["id"]."",
+    'Url'      => "$path/list/list_index.php?action=detailduplicate&amp;list_id=".$params["list_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'contact_add','contact_del', 'update')
@@ -467,7 +441,7 @@ function get_list_action() {
 // Detail Update
   $actions["list"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
+    'Url'      => "$path/list/list_index.php?action=detailupdate&amp;list_id=".$params["list_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailduplicate', 'contact_add','contact_del', 'update')
@@ -491,7 +465,7 @@ function get_list_action() {
 // Check Delete
   $actions["list"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"]."",
+    'Url'      => "$path/list/list_index.php?action=check_delete&amp;list_id=".$params["list_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult','detailupdate','contact_add','contact_del') 
@@ -508,7 +482,7 @@ function get_list_action() {
 // Sel list contacts : Contacts selection
   $actions["list"]["sel_list_contact"] = array (
     'Name'     => $l_header_add_contact,
-    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
+    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$params["list_id"]."&amp;ext_target=$l_list",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_list,
@@ -538,7 +512,7 @@ function get_list_action() {
    'Condition'=> array ('all') 
                                       );
 
-// Display Préférence
+// Display Prï¿½fï¿½rence
   $actions["list"]["dispref_display"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_display",
    'Right'    => $cright_read,
@@ -566,20 +540,20 @@ function get_list_action() {
 // List Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
 function update_list_action() {
-  global $list, $actions, $path, $l_add_contact, $l_list;
+  global $params, $actions, $path, $l_add_contact, $l_list;
 
-  $id = $list["id"];
+  $id = $params["list_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["list"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;param_list=$id";
+    $actions["list"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;list_id=$id";
     $actions["list"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["list"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;param_list=$id";
+    $actions["list"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;list_id=$id";
     $actions["list"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["list"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=$id";
+    $actions["list"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;list_id=$id";
     $actions["list"]["check_delete"]['Condition'][] = 'insert';
 
     // Contact selection

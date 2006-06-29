@@ -82,7 +82,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       $ext_url = $list["ext_url"];
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("list_id").");";
     } elseif($link_ok) {
-      $res["url"] = "list_index.php?action=detailconsult&amp;param_list=".$OD->data_set->f("list_id");
+      $res["url"] = "list_index.php?action=detailconsult&amp;list_id=".$OD->data_set->f("list_id");
     }    
   }
   
@@ -112,11 +112,11 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 
   // For contacts urls (link):
   else if ($fieldname == "contact_lastname") {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("contact_id");
   }
 
   else if ($fieldname == "company_name") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("company_id");
   }
 
   else if ($fieldname == "address") {
@@ -415,10 +415,10 @@ function html_list_search_form ($list, $usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_search_list($list, $popup=false) {
   global $l_found, $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth;
 
   $prefs = get_display_pref($auth->auth["uid"], "list");
-  $obm_q = run_query_list_search($list, $new_order, $order_dir);
+  $obm_q = run_query_list_search($list);
   $nb_list = $obm_q->num_rows_total();
   if ($nb_list == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -491,7 +491,7 @@ function html_list_search_list($obm_q, $prefs, $list, $popup) {
 function dis_list_consult($list) {
   global $uid;
 
-  $id = $list["id"];
+  $id = $list["list_id"];
 
   $list_q = run_query_list_detail($id);
   $prefs_con = get_display_pref($uid, "list_contact");
@@ -644,7 +644,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
 
   if ($nb_con != 0) {
 
-    $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
+    $url=url_prepare("list_index.php?action=detailconsult&amp;list_id=$id");
     
     $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list", "list_contact", "sta");
     $dis_infos->data_set = $con_q;
@@ -663,7 +663,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_del_contact_sel\" />
-        <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
+        <input type=\"hidden\" name=\"list_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
         </p>
       </p>
@@ -679,7 +679,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     $message = "$query_nb $l_dyn_con_found";
     $block .= display_info_msg($message);
 
-    $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
+    $url=url_prepare("list_index.php?action=detailconsult&amp;list_id=$id");
     
     $conq_q = new DB_OBM;
     $db_type = $obm_q->type;
@@ -780,7 +780,7 @@ function html_list_form($action, $list_q, $list) {
   }
   
   // If parameters have been given, they supercede the default action value
-  if (isset($list["id"])) { $id = $list["id"]; }
+  if (isset($list["list_id"])) { $id = $list["list_id"]; }
   if (isset($list["privacy"])) { $priv = $list["privacy"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
@@ -878,7 +878,7 @@ function html_list_form($action, $list_q, $list) {
   </table>";
 
   if (($action == "detailupdate") || ($action == "update")) {
-    $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
+    $block .= "<input type=\"hidden\" name=\"list_id\" value=\"$id\" />";
   }
 
   return $block;
@@ -917,7 +917,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($list["id"])) { $id = $list["id"]; }
+  if (isset($list["list_id"])) { $id = $list["list_id"]; }
   if (isset($list["mode"])) { $mode = $list["mode"]; }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["criteria"])) { 
@@ -1483,14 +1483,14 @@ function dis_list_can_delete($p_id) {
   $dis_back = "<form name=\"form_back\" method=\"get\"
     action=\"".url_prepare("list_index.php") ."\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_list\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"list_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"form\"
       action=\"" . url_prepare("list_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_list\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"list_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
@@ -1536,7 +1536,7 @@ function dis_list_warn_insert($list_q, $list) {
     $samesubject = $list_q->f("list_subject");
     $dis_same_list .= "
       <tr><td class=\"detailLabel\">
-        <a class=\"detail\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</a>
+        <a class=\"detail\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;list_id=$id") . "\">$samename ($samesubject)</a>
       </td></tr>";
   }
 

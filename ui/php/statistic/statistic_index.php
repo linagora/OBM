@@ -21,17 +21,16 @@ include("$obminclude/global_pref.inc");
 require("statistic_display.inc");
 require("statistic_query.inc");
  
-
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$statistic = get_param_statistic();
+$params = get_statistic_params();
 get_statistic_action();
 $perm->check_permissions($module, $action);
 
 page_close();
 
-if (! $statistic["popup"]) {
+if (! $params["popup"]) {
   $display["header"] = display_menu($module);
 }
 
@@ -61,14 +60,14 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("statistic_js.inc");
   require("$path/list/list_query.inc");
-  if ($statistic["list"] == $c_all) {
+  if ($params["list_id"] == $c_all) {
     $cat_q = run_query_statistic_company_per_country_per_cat();
     $nb_comp = run_query_statistic_nb_company();
     $display["title"] = display_title($l_header_comp_stats);
   } else {
-    $obm_q = run_query_statistic_get_list($statistic["list"]);
+    $obm_q = run_query_statistic_get_list($params["list_id"]);
     $query = stripslashes($obm_q->f("list_query"));
-    $com_q = ext_list_get_company_ids($statistic["list"]);
+    $com_q = ext_list_get_company_ids($params["list_id"]);
     $cat_q = run_query_statistic_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
     $display["title"] = display_title("$l_header_comp_stats : ".$obm_q->f("list_name"));
@@ -79,13 +78,13 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "company_statistic_export") {
 ///////////////////////////////////////////////////////////////////////////////
   require("$path/list/list_query.inc");
-  if ($statistic["list"] == $c_all) {
+  if ($params["list_id"] == $c_all) {
     $cat_q = run_query_statistic_company_per_country_per_cat();
     $nb_comp = run_query_statistic_nb_company();
   } else {
-    $obm_q = run_query_statistic_get_list($statistic["list"]);
+    $obm_q = run_query_statistic_get_list($params["list_id"]);
     $query = $obm_q->f("list_query");
-    $com_q = ext_list_get_company_ids($statistic["list"]);
+    $com_q = ext_list_get_company_ids($params["list_id"]);
     $cat_q = run_query_statistic_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
   }
@@ -111,16 +110,17 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Statistic parameters transmited in $statistic hash
-// returns : $statistic hash with parameters set
+// Stores Statistic parameters transmited in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_statistic() {
-  global $action,$sel_list;
-  global $HTTP_POST_VARS,$HTTP_GET_VARS;
-
-  if (isset ($sel_list)) $statistic["list"] = $sel_list;  
-
-  return $statistic;
+function get_statistic_params() {
+  
+  // Get global params
+  $params = get_global_params();
+  
+  display_debug_param($params);
+  
+  return $params;
 }
 
 
@@ -129,7 +129,7 @@ function get_param_statistic() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_statistic_action() {
   global $cright_read, $cright_write,$cright_admin_read,$cright_admin_write;
-  global $path,$actions,$statistic;
+  global $path,$actions,$params;
   global $ico_contact,$ico_company;
   global $l_header_resp_stats,$l_header_comp_stats,$l_header_index,$l_header_export;
   global $l_header_contact_date_evolution_stats;
@@ -167,7 +167,7 @@ function get_statistic_action() {
 					
   $actions["statistic"]["company_statistic_export"] = array (
     'Name'     => $l_header_export,    
-    'Url'      => "$path/statistic/statistic_index.php?action=company_statistic_export&amp;popup=1&amp;sel_list=".$statistic["list"]."",
+    'Url'      => "$path/statistic/statistic_index.php?action=company_statistic_export&amp;popup=1&amp;sel_list=".$params["list_id"]."",
     'Right'    => $cright_read,
     'Popup'    => 1,   
     'Target'   => $l_statistic,

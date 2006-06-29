@@ -1043,7 +1043,7 @@ function html_time_month_users_total($time, $array_res) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_statsuser($statproj_q, $stattt_q, $time) {
-  global $cdg_param, $auth, $new_order, $order_dir;
+  global $cdg_param, $auth;
   global $l_proj_stats, $l_no_proj_stats;
   global $l_tt_stats, $l_no_tt_stats;
 

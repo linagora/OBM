@@ -11,16 +11,17 @@
 // Account search query
 // Parameters:
 //   - $account     : account current infos (after insert, update)
-//   - $p_new_order : infos for order clause
-//   - $p_order_dir : direction for order clause (asc, desc)
 //
 // Problem here : we get from dbase the balance at the account creation.
 // We want to display the balance "today". But, as we are looking for accounts,
 // it's hard to compute the account at the same time...
 //////////////////////////////////////////////////////////////////////////////
-function run_query_account_search ($account, $p_new_order, $p_order_dir) {
+function run_query_account_search ($account) {
   global $auth, $cdg_sql, $ctu_sql_limit;
-
+  
+  $sql_order_dir = $account["sql_order_dir"];
+  $sql_order_field = $account["sql_order_field"];
+  
   $label = sql_search_text_parse($account["label"]);
   $bank = sql_search_text_parse($account["bank"]);
   $number = sql_search_text_parse($account["number"]);
@@ -42,8 +43,8 @@ function run_query_account_search ($account, $p_new_order, $p_order_dir) {
   }
   $whereq = "where $where";
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "account_bank";
-  $orderq = " order by $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "account_bank";
+  $orderq = " order by $order $sql_order_dir";
   
   $query = "select *,
       account_id as id
@@ -163,7 +164,7 @@ function run_query_account_update($account) {
   $number = $account["number"];
   $balance = $account["balance"];
   $comment = $account["comment"];
-  $account_id = $account["id"];
+  $account_id = $account["account_id"];
 
  $query = "UPDATE Account SET 
      account_label='$label',
@@ -279,7 +280,7 @@ function account_compute_balance ($p_account_id, $p_date="") {
   $q_expected = run_query_account_search_expected_payments ($p_account_id, $date);
 
 
-  // FIXME : faire en une fois, avec une seule requete qui récupère tous
+  // FIXME : faire en une fois, avec une seule requete qui rï¿½cupï¿½re tous
   // les payments qqu'ils soient ?
   // lets compute total ins and outs :
   while ($q_payments->next_record()) {

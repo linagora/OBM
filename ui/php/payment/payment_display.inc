@@ -45,16 +45,16 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
   if ($fieldname == "payment_date") {
     $date = $OD->data_set->f($fieldname);
     $date = date_format($date);
-    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$OD->data_set->f("payment_id");
+    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("payment_id");
     $res["name"] = $date;
   }
 
   elseif ($fieldname == "payment_comment") {
-    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$OD->data_set->f("payment_id");
+    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("payment_id");
   }
 
   elseif ($fieldname == "company_name") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("payment_company_id");
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;payment_id=".$OD->data_set->f("payment_company_id");
   }
 
   // amount column color 
@@ -215,10 +215,10 @@ function html_payment_search_form($params, $kinds, $accs) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_search_list($params) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $prefs = get_display_pref($auth->auth["uid"], "payment");
-  $obm_q = run_query_payment_search($params, $new_order, $order_dir);
+  $obm_q = run_query_payment_search($params);
   $nb_payment = $obm_q->num_rows_total();
   if ($nb_payment == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -313,7 +313,7 @@ function dis_payment_consult($params) {
   global $display, $l_no_found, $path, $l_query_error;
 
   $view = $params["view"];
-  $id = $params["id"];
+  $id = $params["payment_id"];
 
   if ($id > 0) {
     $pay_q = run_query_payment_detail($id);
@@ -384,7 +384,7 @@ function html_payment_consult($p_q, $invs) {
 <tr class=\"data0\">
   <td style=\"text-align:center;\">$date</td>
   <td style=\"text-align:center;\">$company</td>
-  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$id\">$label</a></td>
+  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$id\">$label</a></td>
   <td style=\"text-align:right;\">$inv_amount </td>
   <td class=\"data2\" style=\"text-align:right;\">$affected_amount </td>
 </tr>";
@@ -410,7 +410,7 @@ function html_payment_consult($p_q, $invs) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_company 
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\">
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
       </td>
       <td class=\"detailText\">$c_name<br />$ad1<br/>$zip $town</td>
@@ -467,7 +467,7 @@ function html_payment_consult($p_q, $invs) {
 function dis_payment_invoice($params) {
   global $display, $l_no_found, $path;
 
-  $id = $params["id"];
+  $id = $params["payment_id"];
 
   if ($id > 0) {
     $amounts = get_payment_amount_info($id);
@@ -490,7 +490,7 @@ function html_payment_invoice($amounts, $params) {
   global $l_comment, $l_number, $l_amount, $l_date, $l_label, $l_already_paid;
   global $l_total;
 
-  $id = $params["id"];
+  $id = $params["payment_id"];
   $invs = $amounts["invoices"];
   $paid = $amounts["paid_amount"];
 
@@ -527,7 +527,7 @@ function html_payment_invoice($amounts, $params) {
 <tr class=\"data1\">
   <td style=\"text-align:center;\">$date</td>
   <td style=\"text-align:center;\">$company</td>
-  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=$i_id\">$label</a></td>
+  <td><a href=\"$path/invoice/invoice_index.php?action=detailconsult&amp;invoice_id=$i_id\">$label</a></td>
   <td style=\"text-align:right;\">$inv_amount </td>
   <td style=\"text-align:right;\">$already_paid </td>
   <td class=\"data0\" style=\"text-align:right;\"><input type=\"text\" name=\"data-inv-$i_id\" value=\"$affected_amount\" /></td>
@@ -548,7 +548,7 @@ function html_payment_invoice($amounts, $params) {
   <div class=\"detailButton\">
   <p class=\"detailButtons\">
     <input type=\"hidden\" name=\"action\" value=\"invoice_update\" />
-    <input type=\"hidden\" name=\"param_payment\" value=\"$id\" />
+    <input type=\"hidden\" name=\"payment_id\" value=\"$id\" />
     <input type=\"submit\" value=\"$l_update\" />
   </p>
   </div>
@@ -580,7 +580,7 @@ function html_payment_invoice($amounts, $params) {
 function dis_payment_form($action, $params) {
   global $display, $cg_com, $l_aduplicate;
 
-  $p_id = $params["id"];
+  $p_id = $params["payment_id"];
   if ($p_id > 0) {
     $p_q = run_query_payment_detail($p_id);
   } elseif ($params["id_duplicated"] > 0) {
@@ -644,7 +644,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   if (isset($params["company_name"])) { $c_name = $params["company_name"]; }
   if (isset($params["comp_new_id"])) { $c_new_id = $params["comp_new_id"]; }
   if (isset($params["comp_new_name"])) { $c_new_name = $params["comp_new_name"]; }
-  if (isset($params["id"])) { $id = $params["id"]; }
+  if (isset($params["payment_id"])) { $id = $params["payment_id"]; }
   if (isset($params["invoice_id"])) { $invoice_id = $params["invoice_id"]; }
   if (isset($params["account"])) { $account = $params["account"]; }
   if (isset($params["kind"])) { $kind = $params["kind"]; }
@@ -687,9 +687,9 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
 ";
 
   // Company Display
-  $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+  $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
       $c_name
-      </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
+      </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
@@ -700,7 +700,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"param_payment\" value=\"$id\" />
+      <input type=\"hidden\" name=\"payment_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
   // INSERT
@@ -780,13 +780,13 @@ function dis_can_delete_payment($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_payment\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"payment_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_payment\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"payment_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 

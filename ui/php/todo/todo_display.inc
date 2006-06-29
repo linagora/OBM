@@ -40,7 +40,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "todo_title") {
     $t_id = $OD->data_set->f("todo_id");
-    $res["url"] = "todo_index.php?action=detailconsult&amp;param_todo=$t_id";
+    $res["url"] = "todo_index.php?action=detailconsult&amp;todo_id=$t_id";
   }
 
   else if ($fieldname == "todo_priority") {
@@ -64,7 +64,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res["popup"] = true;
     $res["popup_width"] = 700;
     $res["popup_height"] = 260;
-    $res["url"] = "todo_index.php?action=detailupdate&amp;param_todo=$t_id&amp;popup=1";
+    $res["url"] = "todo_index.php?action=detailupdate&amp;todo_id=$t_id&amp;popup=1";
     $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
@@ -81,10 +81,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 function dis_todo_search_list($todo) {
   global $display, $auth, $l_no_found;
 
-  $new_order = $todo["new_order"];
-  $order_dir = $todo["order_dir"];
-
-  $todo_q = run_query_todo_todolist($todo, $new_order, $order_dir);
+  $todo_q = run_query_todo_todolist($todo);
   $nb_todo = $todo_q->num_rows_total();
   if ($nb_todo == 0) {
     $display["msg"] .= display_info_msg($l_no_found);
@@ -105,9 +102,9 @@ function dis_todo_search_list($todo) {
 //   - $prefs  : fields to display in the todo list
 ///////////////////////////////////////////////////////////////////////////////
 function html_todo_search_list($todo, $todo_q, $prefs) {
-  global $l_del, $l_delete;
+  global $auth, $l_del, $l_delete;
 
-  $uid = $todo["uid"];
+  $uid = $auth->auth["uid"];
   $title = $todo["title"];
   $users = $todo["sel_user_id"];
   $user = $users[0];
@@ -213,7 +210,7 @@ function dis_todo_detail($todo, $todo_q) {
 function dis_todo_form($todo, $todo_q = 0) {
   global $path, $uid;
   global $set_theme, $set_date, $ico_mini_cal, $ico_add_user,$ico_delete;
-  global $popup_width, $popup_height;
+  global $popup_width, $popup_height, $auth;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
   global $l_deadline, $l_priority, $l_todotitle, $l_percent, $l_content;
 
@@ -222,7 +219,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   $popup = $todo["popup"];
  
   if ($action == "detailupdate") {
-    $t_id = $todo["id"];
+    $t_id = $todo["todo_id"];
     $u_id = $todo_q->f("todo_user");
     $title = $todo_q->f("todo_title");
     $content = $todo_q->f("todo_content");
@@ -231,13 +228,13 @@ function dis_todo_form($todo, $todo_q = 0) {
     $deadline = $todo_q->f("date_deadline");
     $deadline = ($deadline != 0) ? date_format($deadline, 1) : $l_no_deadline;
   } else {
-    $u_id = $todo["uid"];
+    $u_id = $auth->auth["uid"];
     $priority = intval(($max_priority+1)/2);
     $deadline = date("Y-m-d");
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($todo["id"])) { $t_id = $todo["id"]; }
+  if (isset($todo["todo_id"])) { $t_id = $todo["todo_id"]; }
   if (isset($todo["title"])) { $title = $todo["title"]; }
   if (isset($todo["priority"])) { $priority = $todo["priority"]; }
   if (isset($todo["percent"])) { $percent = $todo["percent"]; }
@@ -296,7 +293,7 @@ function dis_todo_form($todo, $todo_q = 0) {
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
-      <input type=\"hidden\" id=\"param_todo\" name=\"param_todo\" value=\"$t_id\" />
+      <input type=\"hidden\" id=\"todo_id\" name=\"todo_id\" value=\"$t_id\" />
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />
       <input type=\"submit\" value=\"$l_update\" />

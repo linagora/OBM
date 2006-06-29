@@ -12,11 +12,12 @@
 // Parameters :
 //   - $list[]       : list search criteria
 //     keys used     : name, contact
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_list_search($list, $p_new_order, $p_order_dir) {
+function run_query_list_search($list) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
+  
+  $sql_order_dir = $list["sql_order_dir"];
+  $sql_order_field = $list["sql_order_field"];
   
   $name = sql_search_text_parse($list["name"]);
   $email = sql_search_text_parse($list["email"]);
@@ -56,9 +57,9 @@ function run_query_list_search($list, $p_new_order, $p_order_dir) {
   $whereq = "WHERE $where";
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "list_name";
 
-  $orderq .= " ORDER BY $order $p_order_dir $order_next";
+  $orderq .= " ORDER BY $order $sql_order_dir $order_next";
 
   $query = "SELECT DISTINCT List.*, list_id as id,
     $timecreate,
@@ -273,7 +274,7 @@ function get_list_id($list) {
 function run_query_list_update($list) {
   global $auth, $cdg_sql;
 
-  $id = $list["id"];
+  $id = $list["list_id"];
   $priv = ($list["privacy"]==1) ? 1 : 0;
   $name = $list["name"];
   $subject = $list["subject"];
@@ -380,7 +381,7 @@ function run_query_list_delete($p_id) {
 function run_query_list_contactlist_insert($list) {
   global $auth, $cdg_sql;
 
-  $id = $list["id"];
+  $id = $list["list_id"];
 
   // We check the list still exist (in case popup windows here for long...)
   $query = "SELECT list_id FROM List WHERE list_id = '$id'";
@@ -429,7 +430,7 @@ function run_query_list_contactlist_insert($list) {
 function run_query_list_contactlist_delete($list) {
   global $auth, $cdg_sql;
 
-  $id = $list["id"];
+  $id = $list["list_id"];
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $list["con_nb"]) {
@@ -460,9 +461,9 @@ function run_query_list_contactlist_delete($list) {
 function run_query_list_contacts_list($list, $entity="") {
   global $cdg_sql, $ctu_sql_limit;
 
-  $id = $list["id"];
-  $new_order = $list["new_order"];
-  $order_dir = $list["order_dir"];
+  $id = $list["list_id"];
+  $sql_order_field = $list["sql_order_field"];
+  $sql_order_dir = $list["sql_order_dir"];
   $lang = get_lang();
 
   $obm_q = new DB_OBM;
@@ -473,35 +474,35 @@ function run_query_list_contacts_list($list, $entity="") {
   // Order exceptions (order on calculated rows)
   // Addresses are taken from contact or from company (if empty for contact)
 
-  if ( (strcmp($new_order,"address")==0) ) {
+  if ( (strcmp($sql_order_field,"address")==0) ) {
     $order = "contact_address1";
     $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town, company_address1, company_address2, company_address3, company_zipcode, company_town";
-  } else if (strcmp($new_order,"address1")==0) {
+  } else if (strcmp($sql_order_field,"address1")==0) {
     $order = "contact_address1";
     $order_next = ", company_address1";
-  } else if (strcmp($new_order,"address2")==0) {
+  } else if (strcmp($sql_order_field,"address2")==0) {
     $order = "contact_address2";
     $order_next = ", company_address2";
-  } else if (strcmp($new_order,"address3")==0) {
+  } else if (strcmp($sql_order_field,"address3")==0) {
     $order = "contact_address3";
     $order_next = ", company_address3";
-  } else if (strcmp($new_order,"zipcode")==0) {
+  } else if (strcmp($sql_order_field,"zipcode")==0) {
     $order = "contact_zipcode";
     $order_next = ", company_zipcode";
-  } else if (strcmp($new_order,"town")==0) {
+  } else if (strcmp($sql_order_field,"town")==0) {
     $order = "contact_town";
     $order_next = ", company_town";
-  } else if (trim($new_order) == "") {
+  } else if (trim($sql_order_field) == "") {
     $order = "contact_lastname";
   } else {
-    $order = $new_order;
+    $order = $sql_order_field;
   }
 
   if ($entity != "list_contact") {
     $order = "contact_lastname";
   }
 
-  $orderq = "ORDER BY $order $order_dir $order_next";
+  $orderq = "ORDER BY $order $sql_order_dir $order_next";
 
   $query = "SELECT contactlist_contact_id as contact_id,
          contactlist_contact_id as id,
@@ -751,7 +752,7 @@ function check_list_query_coherence($list) {
 
   $coherence_ok = true;
 
-  $id = $list["id"];
+  $id = $list["list_id"];
   $criteria = $list["criteria"]["modules"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
   $info_pub = $list["info_pub"];
@@ -904,7 +905,7 @@ function get_list_info($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $res["id"] = $obm_q->f("list_id");
+  $res["list_id"] = $obm_q->f("list_id");
   $res["name"] = $obm_q->f("list_name");
   $res["structure"] = $obm_q->f("list_structure");
   $res["mailing_ok"] = $obm_q->f("list_mailing_ok");
@@ -1297,7 +1298,7 @@ function make_list_query_from_db(&$list_q) {
 	array_walk($as_criteria, 'list_add_slashes_array');
       }
       $list_info["criteria"] = $as_criteria;
-      $list_info["id"] = $id;
+      $list_info["list_id"] = $id;
       $list_info["mailing_ok"] = $mail_ok;
       $list_info["contact_arch"] = $contact_arch;
       $list_info["info_pub"] = $info_pub;
@@ -1321,7 +1322,7 @@ function make_list_query_from_db(&$list_q) {
 function make_list_query_from_criteria($list) {
   global $cdg_sql, $c_private, $uid;
 
-  $id = $list["id"];
+  $id = $list["list_id"];
   $criteria = $list["criteria"]["modules"];
   $boolean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];

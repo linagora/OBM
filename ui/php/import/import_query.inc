@@ -13,11 +13,12 @@
 // Parameters :
 //   - $import[]     : import search criteria
 //     keys used     : name, contact
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_search($import, $p_new_order, $p_order_dir) {
+function run_query_import_search($import) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
+  
+  $sql_order_dir = $company["sql_order_dir"];
+  $sql_order_field = $company["sql_order_field"];
   
   $name = sql_search_text_parse($import["name"]);
   $dsrc = $import["datasource"];
@@ -43,8 +44,8 @@ function run_query_import_search($import, $p_new_order, $p_order_dir) {
   $whereq = "WHERE $where";
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "import_name";
-  $orderq = " ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "import_name";
+  $orderq = " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT DISTINCT import_id as id,
     import_id,
@@ -129,7 +130,7 @@ function run_query_import_detail($id) {
 function run_query_import_insert($import) {
   global $auth, $cdg_sql;
 
-  $id = $import["id"];
+  $id = $import["import_id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
   $market = $import["market"];
@@ -174,7 +175,7 @@ function run_query_import_insert($import) {
 function run_query_import_update($import) {
   global $auth, $cdg_sql;
 
-  $id = $import["id"];
+  $id = $import["import_id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
   $market = $import["market"];
@@ -259,7 +260,7 @@ function get_import_name_exists($name, $id="") {
 function run_query_import_check($import) {
   global $cdg_sql;
 
-  $id = $import["id"];
+  $id = $import["import_id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
 

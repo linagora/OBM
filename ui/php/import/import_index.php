@@ -111,12 +111,12 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_import_detail($import["id"]);
+  $import_q = run_query_import_detail($import["import_id"]);
   $display["detail"] = html_import_consult($import_q);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_import_detail($import["id"]);
+  $obm_q = run_query_import_detail($import["import_id"]);
   $dsrc_q = run_query_global_datasource();
   $usr_q = run_query_all_users_from_group($cg_com);
   $display["detail"] = html_import_form($action, $import, $obm_q, $dsrc_q, $usr_q);
@@ -161,18 +161,18 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_import_data_form($import["id"], $import)) {
+  if (check_import_data_form($import["import_id"], $import)) {
     $retour = run_query_import_update($import);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_import : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_import : $l_update_error");
     }
-    $import_q = run_query_import_detail($import["id"]);
+    $import_q = run_query_import_detail($import["import_id"]);
     $display["detail"] = html_import_consult($import_q);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $import_q = run_query_import_detail($import["id"]);
+    $import_q = run_query_import_detail($import["import_id"]);
     $dsrc_q = run_query_global_datasource();
     $usr_q = run_query_all_users_from_group($cg_com);
     $display["detail"] = html_import_form($action, $import, $import_q, $dsrc_q, $usr_q);
@@ -180,11 +180,11 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_import_warn_delete($import["id"]);
+  $display["detail"] = dis_import_warn_delete($import["import_id"]);
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_import_delete($import["id"]);
+  $retour = run_query_import_delete($import["import_id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_import : $l_delete_ok");
   } else {
@@ -194,19 +194,19 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "file_sample") {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_import_detail($import["id"]);
+  $import_q = run_query_import_detail($import["import_id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_sample($import_q, $import, 5);
 
 } elseif ($action == "file_test") {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_import_detail($import["id"]);
+  $import_q = run_query_import_detail($import["import_id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_import($import_q, $import);
 
 } elseif ($action == "file_import") {
 ///////////////////////////////////////////////////////////////////////////////
-  $import_q = run_query_import_detail($import["id"]);
+  $import_q = run_query_import_detail($import["import_id"]);
   $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_import($import_q, $import);
 
@@ -457,7 +457,7 @@ function get_import_field_size() {
 function get_param_import() {
   global $tf_name, $sel_dsrc, $sel_market, $rd_sep, $tf_enclosed,$cb_auto_mode;
   global $param_import, $cdg_param;
-  global $tmp_path, $action, $new_order, $order_dir;
+  global $tmp_path, $action;
   global $tf_comp_name, $tf_comp_name_d, $tf_comp_num, $tf_comp_num_d;
   global $tf_comp_cat1, $tf_comp_cat1_d;
   global $tf_comp_ad1, $tf_comp_ad1_d, $tf_comp_ad2, $tf_comp_ad2_d;
@@ -484,7 +484,7 @@ function get_param_import() {
   global $row_start, $rd_conflict, $rd_comp, $rd_con, $company_id;
 
   // Import fields
-  if (isset ($param_import)) $import["id"] = $param_import;
+  if (isset ($param_import)) $import["import_id"] = $param_import;
   if (isset ($tf_name)) $import["name"] = trim($tf_name);
   if (isset ($sel_dsrc)) $import["datasource"] = $sel_dsrc;
   if (isset ($sel_market)) $import["market"] = $sel_market;
@@ -642,7 +642,7 @@ function get_import_action() {
 // Detail Consult
   $actions["import"]["detailconsult"] = array (
      'Name'     => $l_header_consult,
-     'Url'      => "$path/import/import_index.php?action=detailconsult&amp;param_import=".$import["id"]."",
+     'Url'      => "$path/import/import_index.php?action=detailconsult&amp;import_id=".$import["import_id"]."",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('detailupdate', 'file_sample', 'file_test', 'file_import') 
                                       );
@@ -650,7 +650,7 @@ function get_import_action() {
 // Detail Update
   $actions["import"]["detailupdate"] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/import/import_index.php?action=detailupdate&amp;param_import=".$import["id"]."",
+     'Url'      => "$path/import/import_index.php?action=detailupdate&amp;import_id=".$import["import_id"]."",
      'Right'    => $cright_write_admin,
      'Condition'=> array ('detailconsult', 'update', 'file_sample', 'file_test') 
                                            );
@@ -672,7 +672,7 @@ function get_import_action() {
 // Check Delete
   $actions["import"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/import/import_index.php?action=check_delete&amp;param_import=".$import["id"]."",
+    'Url'      => "$path/import/import_index.php?action=check_delete&amp;import_id=".$import["import_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'update') 
                                            );
@@ -686,21 +686,21 @@ function get_import_action() {
 
 // Sample File
   $actions["import"]["file_sample"] = array (
-    'Url'      => "$path/import/import_index.php?action=file_sample&amp;param_import=".$import["id"]."",
+    'Url'      => "$path/import/import_index.php?action=file_sample&amp;import_id=".$import["import_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
 
 // Test File
   $actions["import"]["file_test"] = array (
-    'Url'      => "$path/import/import_index.php?action=file_test&amp;param_import=".$import["id"]."",
+    'Url'      => "$path/import/import_index.php?action=file_test&amp;import_id=".$import["import_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
 
 // Import File
   $actions["import"]["file_import"] = array (
-    'Url'      => "$path/import/import_index.php?action=file_import&amp;param_import=".$import["id"]."",
+    'Url'      => "$path/import/import_index.php?action=file_import&amp;import_id=".$import["import_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );

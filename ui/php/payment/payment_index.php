@@ -21,11 +21,11 @@ require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
-$params = get_param_payment();
+$params = get_payment_params();
 get_payment_action();
 $perm->check_permissions($module, $action);
 
-update_last_visit("payment", $params["id"], $action);
+update_last_visit("payment", $params["payment_id"], $action);
 page_close();
 
 
@@ -56,7 +56,7 @@ if ($action == "index" || $action == "") {
   if (check_payment_data_form("", $params)) {
     $id = run_query_payment_insert($params);
     if ($id > 0) {
-      $params["id"] = $id;
+      $params["payment_id"] = $id;
       $display["msg"] = display_ok_msg ("$l_payment : $l_insert_ok");
       $display["detail"] = dis_payment_consult($params);
     } else {
@@ -86,14 +86,14 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "detailduplicate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $params["id_duplicated"] = $params["id"];
-  $params["id"] = "";
+  $params["id_duplicated"] = $params["payment_id"];
+  $params["payment_id"] = "";
   $display["detail"] = dis_payment_form($action, $params);
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_payment_data_form($params["id"], $params)) {
-    $retour = run_query_payment_update($params["id"], $params);
+  if (check_payment_data_form($params["payment_id"], $params)) {
+    $retour = run_query_payment_update($params["payment_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_payment : $l_update_ok");
     } else {
@@ -108,7 +108,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "invoice_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_payment_invoice_data_form($params)) {
-    $retour = run_query_payment_invoice_update($params["id"], $params);
+    $retour = run_query_payment_invoice_update($params["payment_id"], $params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_payment : $l_update_ok");
     } else {
@@ -122,10 +122,10 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_payment($params["id"])) {
+  if (check_can_delete_payment($params["payment_id"])) {
     require("payment_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_payment($params["id"]);
+    $display["detail"] = dis_can_delete_payment($params["payment_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
@@ -134,8 +134,8 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_payment($params["id"])) {
-    $retour = run_query_payment_delete($params["id"]);
+  if (check_can_delete_payment($params["payment_id"])) {
+    $retour = run_query_payment_delete($params["payment_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_payment : $l_delete_ok");
     } else {
@@ -150,7 +150,7 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "invoice_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (($params["invoice_id"] > 0) && ($params["id"] > 0)) {
+  if (($params["invoice_id"] > 0) && ($params["payment_id"] > 0)) {
     run_query_payment_invoice_insert($params);
     $display["msg"] .= display_ok_msg("$l_invoice_added");
   } else {
@@ -191,55 +191,13 @@ display_page($display);
 // Stores Payment parameters transmitted in $payment hash
 // returns : $payment hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_payment() {
-  global $tf_number, $tf_amount, $tf_date_after, $tf_date_before, $rd_inout;
-  global $sel_kind, $sel_account, $cb_checked, $sel_invoice, $invoice_name;
-  global $tf_date, $ta_comment, $tf_comment, $tf_company;
-  global $param_payment;
-  global $param_company, $company_name, $company_new_name, $company_new_id;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
+function get_payment_params() {
+  // Get global params
+  $params = get_global_params("Payment");
 
-  if (isset ($tf_amount)) $payment["amount"] = $tf_amount;
-  if (isset ($tf_number)) $payment["number"] = $tf_number;
-  if (isset ($tf_date_after)) $payment["date_after"] = $tf_date_after;
-  if (isset ($tf_date_before)) $payment["date_before"] = $tf_date_before;
-  if (isset ($rd_inout)) $payment["inout"] = $rd_inout;
-  if (isset ($sel_kind)) $payment["kind"] = $sel_kind;
-  if (isset ($sel_account)) $payment["account"] = $sel_account;
-  if (isset ($tf_date)) $payment["date"] = $tf_date;
-  if (isset ($param_payment)) $payment["id"] = $param_payment;
-  if (isset ($ta_comment)) $payment["comment"] = $ta_comment;
-  if (isset ($tf_comment)) $payment["comment"] = $tf_comment;
-  if (isset ($cb_checked)) $payment["checked"] = $cb_checked;
-
-  if (isset ($param_company)) $payment["company_id"] = $param_company;
-  if (isset ($tf_company)) $payment["company"] = $tf_company;
-  if (isset ($company_name)) $payment["company_name"] = $company_name;
-  if (isset ($company_new_name)) $payment["comp_new_name"] = $company_new_name;
-  if (isset ($company_new_id)) $payment["comp_new_id"] = $company_new_id;
-
-  if (isset ($sel_invoice)) $payment["invoice_id"] = $sel_invoice;
-  if (isset ($invoice_name)) $payment["invoice_name"] = $invoice_name;
-
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  if (isset ($http_obm_vars)) {
-    while ( list( $key, $value ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 9),"data-inv-") == 0) {
-	$data = explode("-", $key);
-	$id = $data[2];
-	$payment["invoice"][$id] = $value;
-      }
-    }
-  }
-
-  display_debug_param($payment);
-
-  return $payment;
+  display_debug_param($params);
+  
+  return $params;
 }
 
 
@@ -253,7 +211,7 @@ function get_payment_action() {
   global $l_header_duplicate, $l_module_invoice, $l_header_link_invoice;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
-  $id = $params["id"];
+  $id = $params["payment_id"];
 
 //Index
   $actions["payment"]["index"] = array (
@@ -281,7 +239,7 @@ function get_payment_action() {
 // Detail Consult
   $actions["payment"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$params["id"],
+    'Url'      => "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_read,
     'Condition'=> array ('detail_invoice', 'detailupdate', 'invoice_add', 'invoice_update')
                                         );
@@ -289,7 +247,7 @@ function get_payment_action() {
 // Detail Consult Invoice
   $actions["payment"]["detail_invoice"] = array (
     'Name'     => $l_module_invoice,
-    'Url'      => "$path/payment/payment_index.php?action=detail_invoice&amp;param_payment=".$params["id"],
+    'Url'      => "$path/payment/payment_index.php?action=detail_invoice&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate', 'invoice_add', 'invoice_update') 
                                         );
@@ -297,7 +255,7 @@ function get_payment_action() {
 // Sel invoice : Invoice selection (menu)
   $actions["payment"]["sel_invoice"] = array (
     'Name'     => $l_header_link_invoice,
-    'Url'      => "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;param_payment=$id&amp;sel_invoice=")."&amp;ext_id=".$params["id"]."&amp;ext_target=$l_payment",
+    'Url'      => "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice=")."&amp;ext_id=".$params["payment_id"]."&amp;ext_target=$l_payment",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_payment,
@@ -323,7 +281,7 @@ function get_payment_action() {
 // Detail Duplicate
   $actions["payment"]["detailduplicate"] = array (
      'Name'     => $l_header_duplicate,
-     'Url'      => "$path/payment/payment_index.php?action=detailduplicate&amp;param_payment=".$params["id"],
+     'Url'      => "$path/payment/payment_index.php?action=detailduplicate&amp;payment_id=".$params["payment_id"],
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                            );
@@ -331,7 +289,7 @@ function get_payment_action() {
 // Detail Update
   $actions["payment"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=".$params["id"],
+    'Url'      => "$path/payment/payment_index.php?action=detailupdate&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
@@ -360,14 +318,14 @@ function get_payment_action() {
 // Check Delete
   $actions["payment"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/payment/payment_index.php?action=check_delete&amp;param_payment=".$params["id"],
+    'Url'      => "$path/payment/payment_index.php?action=check_delete&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate')
                                      	 );
 
 // Delete
   $actions["payment"]["delete"] = array (
-    'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$params["id"],
+    'Url'      => "$path/payment/payment_index.php?action=delete&amp;payment_id=".$params["payment_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      	 );
@@ -411,26 +369,26 @@ function get_payment_action() {
 function update_payment_action() {
   global $params, $actions, $path, $l_payment;
 
-  $id = $params["id"];
+  $id = $params["payment_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["payment"]["detailconsult"]["Url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=$id";
+    $actions["payment"]["detailconsult"]["Url"] = "$path/payment/payment_index.php?action=detailconsult&amp;payment_id=$id";
     $actions["payment"]["detailconsult"]['Condition'][] = 'insert';
 
     // Sel invoice : Invoice selection (menu)
-    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;param_payment=$id&amp;sel_invoice=")."&amp;ext_id=$id&amp;ext_target=$l_payment";
+    $actions["payment"]["sel_invoice"]["Url"] = "$path/invoice/invoice_index.php?action=ext_get_id&amp;popup=1&amp;ext_action=invoice_add&amp;ext_url=".urlencode($path."/payment/payment_index.php?action=invoice_add&amp;payment_id=$id&amp;sel_invoice=")."&amp;ext_id=$id&amp;ext_target=$l_payment";
     $actions["payment"]["sel_invoice"]['Condition'][] = 'insert';
 
     // Invoice
-    $actions["payment"]["detail_invoice"]["Url"] = "$path/payment/payment_index.php?action=detail_invoice&amp;param_payment=$id";
+    $actions["payment"]["detail_invoice"]["Url"] = "$path/payment/payment_index.php?action=detail_invoice&amp;payment_id=$id";
     $actions["payment"]["detail_invoice"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["payment"]["detailupdate"]['Url'] = "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=$id";
+    $actions["payment"]["detailupdate"]['Url'] = "$path/payment/payment_index.php?action=detailupdate&amp;payment_id=$id";
     $actions["payment"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["payment"]["check_delete"]['Url'] = "$path/payment/payment_index.php?action=check_delete&amp;param_payment=$id";
+    $actions["payment"]["check_delete"]['Url'] = "$path/payment/payment_index.php?action=check_delete&amp;payment_id=$id";
     $actions["payment"]["check_delete"]['Condition'][] = 'insert';
   }
 }

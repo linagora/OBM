@@ -31,7 +31,7 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ext_element;
 
   if (($fieldname == "resource_name") && $link_ok) {
-    $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;param_resource=".$OD->data_set->f("resource_id");
+    $res["url"] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$OD->data_set->f("resource_id");
   }
   if (($fieldname == "data_element") && $ext_element != "") {
     $res["name"] = "<span id=\"data-resource-".$OD->data_set->f("resource_id")."\" style=\"display:none;\">".
@@ -40,7 +40,7 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
   }
   else if ($fieldname == "resource_id") {
     $t_id = $OD->data_set->f("resource_id");
-    $res["url"] = "$path/resource/resource_index.php?action=detailupdate&amp;param_resource=$t_id";
+    $res["url"] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=$t_id";
     $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
@@ -137,13 +137,13 @@ function html_resource_search_form($resource) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resource_search_list($resource) {
   global $l_found, $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth;
 
   $popup = $resource["popup"];
   $restriction = $resource["restriction"];
 
   $prefs = get_display_pref($auth->auth["uid"], "resource");
-  $obm_q = run_query_resource_search($resource, $new_order, $order_dir, $restriction);
+  $obm_q = run_query_resource_search($resource);
   $nb_resource = $obm_q->num_rows_total();
   if ($nb_resource == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -250,7 +250,7 @@ function html_resource_form($usr_q, $resource) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($resource["id"])) { $id = $resource["id"]; }
+  if (isset($resource["resource_id"])) { $id = $resource["resource_id"]; }
   if (isset($resource["name"])) { $name = $resource["name"]; }
   if (isset($resource["qty"])) { $qty = $resource["qty"]; }
 
@@ -261,7 +261,7 @@ function html_resource_form($usr_q, $resource) {
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
-          <input type=\"hidden\" name=\"param_resource\" value=\"$id\">
+          <input type=\"hidden\" name=\"resource_id\" value=\"$id\">
           <input type=\"submit\" value=\"$l_update\">";
   }
 
@@ -303,7 +303,7 @@ function html_resource_form($usr_q, $resource) {
 function dis_resource_consult($resource) {
   global $display, $l_query_error;
 
-  $id = $resource["id"];
+  $id = $resource["resource_id"];
 
   $obm_q = run_query_resource_detail($id);
   if ($obm_q->num_rows() == 1) {
@@ -366,13 +366,13 @@ function dis_resource_can_delete($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_resource\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"resource_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_resource\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"resource_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 

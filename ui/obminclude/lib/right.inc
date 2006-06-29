@@ -432,11 +432,11 @@ function of_right_update_right($param, $entity) {
 
   $consumer = "user";
 
-  $eid = $param["entity_id"];
-  $accept_write = $param["accept_w"];
-  $accept_read = $param["accept_r"];
-  $public_write = $param["public_w"];
-  $public_read = $param["public_r"];
+  $eid = $param["param_entity"];
+  $accept_write = $param["accept_write"];
+  $accept_read = $param["accept_read"];
+  $public_write = $param["write_public"];
+  $public_read = $param["read_public"];
 
   if (! is_array($accept_read)) {
     $accept_read = array();

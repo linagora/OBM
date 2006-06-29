@@ -9,7 +9,7 @@
 // Actions :
 // - index (default) -- search fields   -- show the Contract search form
 // - search          -- search fields   -- show the result set of search
-// - new             -- $param_company, -- show the new Contract form
+// - new             -- $company_id, -- show the new Contract form
 // - detailconsult   -- $param_contract -- show the Contract detail
 // - detailupdate    -- $param_contract -- show the Contract detail form
 // - insert          -- form fields     -- insert the Contract 
@@ -43,15 +43,15 @@ require("contract_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$contract = get_param_contract();
+$params = get_contract_params();
 get_contract_action();
 $perm->check_permissions($module, $action);
 
-if (! check_privacy($module, "Contract", $action, $contract["id"], $uid)) {
+if (! check_privacy($module, "Contract", $action, $params["contract_id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("contract", $contract["id"], $action);
+  update_last_visit("contract", $params["contract_id"], $action);
 }
 
 page_close();
@@ -67,9 +67,9 @@ if (! $popup) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  $display["search"] = dis_contract_search_form($contract);
+  $display["search"] = dis_contract_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_contract_search_list($contract);
+    $display["result"] = dis_contract_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
@@ -79,52 +79,52 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_contract_search_form($contract);
+  $display["search"] = dis_contract_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_contract_search_list($contract);
+    $display["result"] = dis_contract_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
   
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_contract_search_form($contract);
-  $display["result"] = dis_contract_search_list($contract);
+  $display["search"] = dis_contract_search_form($params);
+  $display["result"] = dis_contract_search_list($params);
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_contract_form($action,$contract,$param_company);
+  $display["detail"] = dis_contract_form($action,$params,$param_company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_contract_consult($contract);
+  $display["detail"] = dis_contract_consult($params);
 
 } elseif ($action == "export") {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_contract_export($contract["id"]);
+  dis_contract_export($params["contract_id"]);
   exit();
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_contract_form($action, $contract,"");
+  $display["detail"] = dis_contract_form($action, $params,"");
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contract_form("", $contract)) {
+  if (check_contract_form("", $params)) {
     // If the context (same contracts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $contract["id"] = run_query_contract_insert($contract);
-      $display["detail"] = dis_contract_consult($contract);
+      $params["contract_id"] = run_query_contract_insert($params);
+      $display["detail"] = dis_contract_consult($params);
       // If first try, we warn the user if some contracts seem similar
     } else {
-      $obm_q = check_contract_context("", $contract);
+      $obm_q = check_contract_context("", $params);
       if ($obm_q->num_rows() > 0) {
-	     $display["detail"] = dis_contract_warn_insert("", $obm_q, $contract);
+	     $display["detail"] = dis_contract_warn_insert("", $obm_q, $params);
       } else {
-      	$contract["id"] = run_query_contract_insert($contract);
-      	if ($contract["id"]) {
+      	$params["contract_id"] = run_query_contract_insert($params);
+      	if ($params["contract_id"]) {
       	  $display["msg"] .= display_ok_msg("$l_contract : $l_insert_ok");
-      	  $display["detail"] = dis_contract_consult($contract);
+      	  $display["detail"] = dis_contract_consult($params);
       	} else {
       	  $display["msg"] .= display_err_msg("$l_contract : $l_insert_error");
       	}
@@ -132,59 +132,59 @@ if ($action == "ext_get_id") {
     }
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = dis_contract_form($action, $contract,"");
+    $display["detail"] = dis_contract_form($action, $params,"");
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contract_form("", $contract)) {  
-    $ret = run_query_contract_update($contract);         
+  if (check_contract_form("", $params)) {  
+    $ret = run_query_contract_update($params);         
     if ($ret) {
       $display["msg"] .= display_ok_msg("$l_contract : $l_update_ok");
     } else {
         $display["msg"] .= display_err_msg("$l_contract : $l_update_error");
       }
-    $display["search"] = dis_contract_consult($contract);      
+    $display["search"] = dis_contract_consult($params);      
   } else {
       $display["msg"] .= display_err_msg($l_invalid_da. " : " . $err_msg);
-      $display["detail"] = dis_contract_form($action, $contract,"");
+      $display["detail"] = dis_contract_form($action, $params,"");
     }
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_contract($contract["id"])) {
+  if (check_can_delete_contract($params["contract_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_contract($contract["id"]);
+    $display["detail"] = dis_can_delete_contract($params["contract_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_contract_consult($contract);
+    $display["detail"] = dis_contract_consult($params);
   }
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_contract($contract["id"])) {
-    $ret = run_query_contract_delete($contract["id"]);
+  if (check_can_delete_contract($params["contract_id"])) {
+    $ret = run_query_contract_delete($params["contract_id"]);
     if ($ret) {
       $display["msg"] .= display_ok_msg("$l_contract : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_contract : $l_delete_error");
     }
-    $display["search"] = dis_contract_search_form($contract);
+    $display["search"] = dis_contract_search_form($params);
     if ($set_display == "yes") {
-      $display["result"] = dis_contract_search_list($contract);
+      $display["result"] = dis_contract_search_list($params);
     } else {
       $display["msg"] .= display_info_msg($l_no_display);
     }
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_contract_consult($contract);
+    $display["detail"] = dis_contract_consult($params);
   }
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_priority_insert($contract);
+  $retour = run_query_contract_priority_insert($params);
   if ($retour) {
     $display["msg"] = display_ok_msg("$l_priority : $l_insert_ok");
   } else {
@@ -194,11 +194,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "priority_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_contract_priority_links($contract["priority"]);
+  $display["detail"] = dis_contract_priority_links($params["priority"]);
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_priority_update($contract);
+  $retour = run_query_contract_priority_update($params);
   if ($retour) {
     $display["msg"] = display_ok_msg("$l_priority : $l_update_ok");
   } else {
@@ -208,7 +208,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_priority_delete($contract["priority"]);
+  $retour = run_query_contract_priority_delete($params["priority"]);
   if ($retour) {
     $display["msg"] = display_ok_msg("$l_priority : $l_delete_ok");
   } else {
@@ -218,7 +218,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_status_insert($contract);
+  $retour = run_query_contract_status_insert($params);
   if ($retour) {
     $display["msg"] = display_ok_msg("$l_status : $l_insert_ok");
   } else {
@@ -228,7 +228,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_status_update($contract);
+  $retour = run_query_contract_status_update($params);
   if ($retour) {
     $display["msg"] = display_ok_msg("$l_status : $l_update_ok");
   } else {
@@ -238,11 +238,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_contract_status_links($contract["status"]);
+  $display["detail"] = dis_contract_status_links($params["status"]);
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_status_delete($contract["status"]);
+  $retour = run_query_contract_status_delete($params["status"]);
   if ($retour) {
     $display["msg"] = display_ok_msg("$l_status : $l_delete_ok");
   } else {
@@ -273,7 +273,7 @@ if ($action == "ext_get_id") {
  
 } elseif ($action == "type_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_type_insert($contract);
+  $retour = run_query_contract_type_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_type : $l_insert_ok");
   } else {
@@ -283,7 +283,7 @@ if ($action == "ext_get_id") {
     
 } elseif ($action == "type_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_type_update($contract);
+  $retour = run_query_contract_type_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_type : $l_update_ok");
   } else {
@@ -293,11 +293,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "type_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_contract_type_links($contract["type"]);
+  $display["detail"] = dis_contract_type_links($params["type"]);
   
 } elseif ($action == "type_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contract_type_delete($contract["type"]);
+  $retour = run_query_contract_type_delete($params["type"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_type : $l_delete_ok");
   } else {
@@ -320,91 +320,29 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Contract parameters transmited in $contract hash
-// returns : $contract hash with parameters set
+// Stores Contract parameters transmited in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_contract() {
-  global $tf_label,$tf_company,$sel_type, $tf_type,$rd_kind,$cb_autorenew;
-  global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc;
-  global $param_contract, $param_company, $param_contact;
-  global $tf_num,$sel_market, $sel_tech, $sel_con1, $sel_con2, $ta_clause;
-  global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
-  global $tf_datebegin,$tf_dateexp,$tf_daterenew,$tf_datecancel,$tf_datesignature;
-  global $cb_archive, $param_deal, $deal_label, $deal_new_id;
-  global $hd_company_ad1, $hd_company_zip, $hd_company_town,$l_header_export;
-  global $popup, $ext_title, $ext_target, $ext_widget, $ext_widget_text;
-  global $cdg_param, $action,$sel_priority,$sel_status,$param_contract;
-  global $tf_pri,$tf_code, $tf_status, $tf_color, $tf_ticket_nb;
-  global $tf_duration, $rd_format, $cb_vis;
-
-  if (isset ($popup)) $contract["popup"] = $popup;
-  if (isset ($ext_title)) $contract["ext_title"] = stripslashes(urldecode($ext_title));
-  if (isset ($ext_target)) $contract["ext_target"] = $ext_target;
-  if (isset ($ext_widget)) $contract["ext_widget"] = $ext_widget;
-  if (isset ($ext_widget_text)) $contract["ext_widget_text"] = $ext_widget_text;
-
-  if (isset ($param_contract)) $contract["id"] = $param_contract;
-  if (isset ($param_company)) $contract["company_id"] = $param_company;
-  if (isset ($param_contact)) $contract["contact_id"] = $param_contact;
-  if (isset ($sel_priority)) $contract["priority"] = $sel_priority;
-  if (isset ($sel_status)) $contract["status"] = $sel_status;
-  if (isset( $cb_vis)) $contract["privacy"] = $cb_vis; 
-  if (isset ($rd_kind)) $contract["kind"] = $rd_kind;
-  if (isset ($tf_ticket_nb)) $contract["ticketnumber"] = $tf_ticket_nb;
-  if (isset ($tf_duration)) $contract["duration"] = $tf_duration;
-  if (isset ($rd_format)) $contract["format"] = $rd_format;
-  if (isset ($tf_label)) $contract["label"] = $tf_label;
-  if (isset ($tf_datebegin)) $contract["datebegin"] = $tf_datebegin;
-  if (isset ($tf_dateexp)) $contract["dateexp"] = $tf_dateexp;
-  if (isset ($tf_datesignature)) $contract["datesignature"] = $tf_datesignature;
-  if (isset ($tf_daterenew)) $contract["daterenew"] = $tf_daterenew;
-  if (isset ($tf_datecancel)) $contract["datecancel"] = $tf_datecancel;
-  if (isset ($tf_num)) $contract["number"] = $tf_num;
-  if (isset ($cb_archive)) $contract["archive"] = $cb_archive;
-  if (isset ($sel_market)) $contract["market"] = $sel_market;
-  if (isset ($sel_tech)) $contract["tech"] = $sel_tech;
-  if (isset ($sel_con1)) $contract["contact1"] = $sel_con1;
-  if (isset ($sel_con2)) $contract["contact2"] = $sel_con2;
-  if (isset ($sel_type)) $contract["type"] = $sel_type;
-  if (isset ($cb_arc)) $contract["arc"] = $cb_arc;
-  if (isset ($ta_clause)) $contract["clause"] = $ta_clause;
-  if (isset ($ta_com)) $contract["comment"] = $ta_com;
-  if (isset ($tf_datecomment)) $contract["datecomment"] = $tf_datecomment;
-  if (isset ($sel_usercomment)) $contract["usercomment"] = $sel_usercomment;
-  if (isset ($ta_add_comment)) $contract["add_comment"] = trim($ta_add_comment);
-  if (isset ($cb_autorenew)) $contract["autorenewal"] = $cb_autorenew;
-
+function get_contract_params() {
+  global $ext_title, $tf_code, $tf_color, $tf_code;
+  
+  // Get global params
+  $params = get_global_params("Contract");
+  
+  // Get contract specific params
+  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
+  
   // Admin - Priority fields
-  // $sel_priority -> "priority" is already set
-  if (isset ($tf_pri)) $contract["pri_label"] = $tf_pri;
-  $contract["pri_code"] = (isset($tf_code) ? $tf_code : "0");
-  $contract["pri_color"] = (isset($tf_color) ? $tf_color : "");
+  $params["pri_code"] = (isset($tf_code) ? $tf_code : "0");
+  $params["pri_color"] = (isset($tf_color) ? $tf_color : "");
 
   // Admin - Status fields
-  // $sel_status -> "status" is already set
-  if (isset ($tf_status)) $contract["sta_label"] = $tf_status;
-  $contract["sta_code"] = (isset($tf_code) ? $tf_code : "0");
-
-  // Search fields
-  if (isset ($tf_dateafter)) $contract["dateafter"] = $tf_dateafter;
-  if (isset ($tf_datebefore)) $contract["datebefore"] = $tf_datebefore;
-  if (isset ($sel_manager)) $contract["manager"] = $sel_manager;
-  if (isset ($tf_company)) $contract["company_name"] = $tf_company;
-
-  // Company infos (with company_name)
-  if (isset ($hd_company_ad1)) $contract["company_ad1"] = $hd_company_ad1;
-  if (isset ($hd_company_zip)) $contract["company_zip"] = $hd_company_zip;
-  if (isset ($hd_company_town)) $contract["company_town"] = $hd_company_town;
-
-  // Deal infos
-  if (isset ($param_deal)) $contract["deal_id"] = $param_deal;
-  if (isset ($deal_new_id)) $contract["deal_new_id"] = $deal_new_id;
-  if (isset ($deal_label)) $contract["deal_label"] = $deal_label;
-  if (isset ($tf_type)) $contract["type_label"] = $tf_type;
-
-  display_debug_param($contract);
-
-  return $contract;
+ if (isset ($tf_status)) $params["sta_label"] = $tf_status;
+ $params["sta_code"] = (isset($tf_code) ? $tf_code : "0");
+  
+  display_debug_param($params);
+  
+  return $params;
 }
 
 
@@ -413,7 +351,7 @@ function get_param_contract() {
 // Contract actions
 //////////////////////////////////////////////////////////////////////////////
 function get_contract_action() {
-  global $contract, $actions, $path, $l_select_company;
+  global $params, $actions, $path, $l_select_company;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin,$l_header_export;
@@ -444,7 +382,7 @@ function get_contract_action() {
 // New
   $actions["contract"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;company_id=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('','search','index','detailconsult','admin','type_insert','type_update','type_delete','display','delete')
@@ -460,7 +398,7 @@ function get_contract_action() {
 // Detail Consult
   $actions["contract"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$contract["id"]."",
+    'Url'      => "$path/contract/contract_index.php?action=detailconsult&amp;contract_id=".$params["contract_id"]."",
     'Right'    => $cright_read, 
     'Privacy'  => true,
     'Condition'=> array ('detailupdate')
@@ -469,7 +407,7 @@ function get_contract_action() {
 // Detail Update
   $actions["contract"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."",
+    'Url'      => "$path/contract/contract_index.php?action=detailupdate&amp;contract_id=".$params["contract_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update') 
@@ -486,7 +424,7 @@ function get_contract_action() {
 // Check Delete
   $actions["contract"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."",
+    'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;contract_id=".$params["contract_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,  
     'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
@@ -494,7 +432,7 @@ function get_contract_action() {
 
 // Delete
   $actions["contract"]["delete"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=delete&amp;param_contract=".$contract["id"]."",
+    'Url'      => "$path/contract/contract_index.php?action=delete&amp;contract_id=".$params["contract_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
@@ -511,7 +449,7 @@ function get_contract_action() {
 // Contract export
   $actions["contract"]["export"] = array (
     'Name'     => $l_header_export,
-    'Url'      => "$path/contract/contract_index.php?action=export&amp;popup=1&amp;param_contract=".$contract["id"]."",
+    'Url'      => "$path/contract/contract_index.php?action=export&amp;popup=1&amp;contract_id=".$params["contract_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,    
     'Condition'=> array ('detailconsult','detailupdate','update') 
@@ -636,20 +574,20 @@ function get_contract_action() {
 // Contract Actions updates (after processing, before displaying menu)  
 ///////////////////////////////////////////////////////////////////////////////
 function update_contract_action() {
-  global $contract, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $contract["id"];
+  $id = $params["contract_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["contract"]["detailconsult"]['Url'] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$id";
+    $actions["contract"]["detailconsult"]['Url'] = "$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$id";
     $actions["contract"]["detailconsult"]['Condition'][] = 'insert';
     
     // Detail Update
-    $actions["contract"]["detailupdate"]['Url'] = "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=$id";
+    $actions["contract"]["detailupdate"]['Url'] = "$path/contract/contract_index.php?action=detailupdate&amp;contract_id=$id";
     $actions["contract"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["contract"]["check_delete"]['Url'] = "$path/contract/contract_index.php?action=check_delete&amp;param_contract=$id";
+    $actions["contract"]["check_delete"]['Url'] = "$path/contract/contract_index.php?action=check_delete&amp;contract_id=$id";
     $actions["contract"]["check_delete"]['Condition'][] = 'insert';
   }
 }

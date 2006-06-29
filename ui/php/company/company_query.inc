@@ -13,12 +13,13 @@
 // Parametes:
 //   - $company[]    : company search criteria
 //     keys used       archive, name, phone, type, zip
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company_search($company, $p_new_order, $p_order_dir) {
+function run_query_company_search($company) {
   global $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
 
+  $sql_order_dir = $company["sql_order_dir"];
+  $sql_order_field = $company["sql_order_field"];
+  
   $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
   $name = sql_search_text_parse($company["name"]);
@@ -30,8 +31,8 @@ function run_query_company_search($company, $p_new_order, $p_order_dir) {
   $category1_tree = $company["category1_tree"];
   $category1_code = $company["category1_code"];
   $act = $company["activity"];
-  $naf = $company["nafcode"];
-  $market = $company["marketing_manager"];
+  $naf = $company["naf"];
+  $market = $company["market"];
   $dsrc = $company["datasource"];
   $zip = sql_search_text_parse($company["zip"]);
   $dateafter = $company["dateafter"];
@@ -119,19 +120,18 @@ function run_query_company_search($company, $p_new_order, $p_order_dir) {
   }
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "company_name";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "company_name";
 
   // Order exceptions (order on calculated rows)
   // Contact list and new contact column haven't any meaning for sorting
-  if ( (strcmp($p_new_order,"company_contacts")==0)
-      || (strcmp($p_new_order,"company_new_contact") == 0) ) {
+  if ( (strcmp($sql_order_field,"company_contacts")==0)
+      || (strcmp($sql_order_field,"company_new_contact") == 0) ) {
     $order = "company_name";
-  } else if (strcmp($p_new_order,"company_address")==0) {
+  } else if (strcmp($sql_order_field,"company_address")==0) {
     $order = "company_address1";
     $order_next = ", company_address2, company_address3, company_zipcode, company_town";
   }
-  $orderq = " ORDER BY $order $p_order_dir $order_next";
-
+  $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
   $select = "SELECT distinct
       company_id as id,
@@ -283,8 +283,8 @@ function run_query_company_insert($company) {
   $dsrc = $company["datasource"];
   $type = ($company["type"] != "" ? $company["type"] : "0");
   $act = ($company["activity"] != "" ? $company["activity"] : "0");
-  $naf = ($company["nafcode"] != "" ? $company["nafcode"] : "0");
-  $market = $company["marketing_manager"];
+  $naf = ($company["naf"] != "" ? $company["naf"] : "0");
+  $market = $company["market"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $ad3 = $company["ad3"];
@@ -428,9 +428,9 @@ function run_query_company_update($cid, $company) {
   if ($type != "") $upd_type = "company_type_id='$type',";
   $act = $company["activity"];
   if ($act != "") $upd_act = "company_activity_id='$act',";
-  $naf = $company["nafcode"];
+  $naf = $company["naf"];
   if ($naf != "") $upd_naf = "company_nafcode_id='$naf',";
-  $market = $company["marketing_manager"];
+  $market = $company["market"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $ad3 = $company["ad3"];
@@ -533,7 +533,7 @@ function get_format_company_name($name) {
 
   $res = $name;
   if ($caf_company_name) {
-    $res = format_name($res, 2, true, false);
+    $res = strip_tags(format_name($res, 2, true, false));
   }
 
   return $res;
@@ -637,7 +637,7 @@ function run_query_company_nafcode_update($company) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $company["nafcode"];
+  $id = $company["naf"];
   $code = $company["naf_code"];
   $label = $company["naf_label"];
 

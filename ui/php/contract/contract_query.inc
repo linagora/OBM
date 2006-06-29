@@ -13,11 +13,12 @@
 // Parameters :
 //   - $contract[]  : contract search criteria
 //     keys used       status, label incident, priority, label contract
-//   - $p_new_order : if it's set, replaces the default "order by" value
-//   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contract_search($contract, $p_new_order, $p_order_dir) {
+function run_query_contract_search($contract) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $sql_order_dir = $contract["sql_order_dir"];
+  $sql_order_field = $contract["sql_order_field"];
 
   $label = sql_search_text_parse($contract["label"]);
   $type = $contract["type"];
@@ -90,15 +91,15 @@ function run_query_contract_search($contract, $p_new_order, $p_order_dir) {
 
   $whereq = "WHERE $where";
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "contract_dateexp";
   // Order exceptions
-  if (strcmp($p_new_order,"contract_marketmanager")==0) {
+  if (strcmp($sql_order_field,"contract_marketmanager")==0) {
     $order = "lmarket";
   }
-  if (strcmp($p_new_order,"contract_techmanager")==0) {
+  if (strcmp($sql_order_field,"contract_techmanager")==0) {
     $order = "ltech";
   }
-  $orderq .= " ORDER BY $order $p_order_dir";
+  $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT contract_label,
       contract_id,

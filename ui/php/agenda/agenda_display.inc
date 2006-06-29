@@ -180,7 +180,7 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     } else {
       $selected_s = "";
     }
-    $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=$iso_date&amp;param_group=$g_id&amp;new_group=1")."\" $selected_s>$g_name</option>\n";
+    $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=$iso_date&amp;group_id=$g_id&amp;new_group=1")."\" $selected_s>$g_name</option>\n";
   }
   $sel_group .= "</optgroup>
   </select>";
@@ -218,7 +218,7 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     </tr>";
   }
 
-  $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;new_group=1&amp;param_group=$c_all&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
+  $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;new_group=1&amp;group_id=$c_all&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
 
   $block = "
     <div class=\"block\">
@@ -243,7 +243,7 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
-    <input type=\"hidden\" name=\"param_group\" value=\"$c_all\" />
+    <input type=\"hidden\" name=\"group_id\" value=\"$c_all\" />
     <table class=\"agendaCal\">
     <tbody>
     <tr>
@@ -1303,7 +1303,7 @@ function html_agenda_conflict_form($agenda) {
   <form name=\"f_conflict\" method=\"post\">
    <input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
    <input type=\"hidden\" name=\"action\" value=\"decision\" />
-   <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
+   <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
    <input type=\"hidden\" name=\"cb_force\" value=\"1\" />
    <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />
    <div class=\"detailButton\">
@@ -1445,20 +1445,20 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   if (isset($agenda["description"])) { $desc = stripslashes($agenda["description"]); }
   if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
   if (isset($agenda["repeatfrequency"])) { $repeatfrequency = $agenda["repeatfrequency"]; }  
-  if (isset($agenda["datebegin"])) {
-    $ts = isodatetime_to_timestamp($agenda["datebegin"]);
+  if (isset($agenda["date_begin"])) {
+    $ts = isodatetime_to_timestamp($agenda["date_begin"]);
     $datebegin = isodate_format($ts);
     $hourbegin = get_hour($ts);
     $minbegin = date("i", $ts);
   }
-  if (isset($agenda["dateend"])) {
-    $ts = isodatetime_to_timestamp($agenda["dateend"]);
+  if (isset($agenda["date_end"])) {
+    $ts = isodatetime_to_timestamp($agenda["date_end"]);
     $dateend = isodate_format($ts);
     $hourend = get_hour($ts);
     $minend = date("i", $ts);
   }
   if (isset($agenda["privacy"])) { $privacy = $agenda["privacy"]; }
-  if (isset($agenda["kind"])) { $repeat_kind = $agenda["kind"]; }
+  if (isset($agenda["repeat_kind"])) { $repeat_kind = $agenda["repeat_kind"]; }
   if (isset($agenda["repeat_days"]) && $agenda["repeat_days"] != "000000") { $repeat_days = $agenda["repeat_days"];}
   if (isset($agenda["repeat_end"])) {
     $repeat_end = $agenda["repeat_end"];
@@ -1890,7 +1890,7 @@ function html_agenda_waiting_events($obm_wait) {
       <form method=\"get\" action=\"agenda_index.php\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"param_event\" value=\"".$obm_wait->f("calendarevent_id")."\" />
-       <input type=\"hidden\" name=\"param_user\" value=\"$current_user\" />
+       <input type=\"hidden\" name=\"user_id\" value=\"$current_user\" />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept<br />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait<br />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse

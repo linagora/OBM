@@ -49,24 +49,24 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_contract_get_id_url('$ext_url',".$OD->data_set->f("contract_id").");";
     } else {
-      $res["url"] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$OD->data_set->f("contract_id");
+      $res["url"] = "$path/contract/contract_index.php?action=detailconsult&amp;contract_id=".$OD->data_set->f("contract_id");
     }
   }
 
   else if (($fieldname == "contract_company_name") && $link_ok) {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contract_company_id");
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("contract_company_id");
   }
 
   else if ($fieldname == "contract_marketmanager") {
     if ($link_ok) {
-      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_marketmanager_id");
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("contract_marketmanager_id");
     }
     $res["name"] = $OD->data_set->f("lmarket") . " " . $OD->data_set->f("fmarket");
   }
 
   else if ($fieldname == "contract_techmanager") {
     if ($link_ok) {
-      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_techmanager_id");
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("contract_techmanager_id");
     }
     $res["name"] = $OD->data_set->f("ltech") . " " . $OD->data_set->f("ftech");
   }
@@ -306,11 +306,11 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_list($contract) {
   global $l_found, $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth;
   
   $popup = $contract["popup"];
   $prefs = get_display_pref($auth->auth["uid"], "contract");
-  $obm_q = run_query_contract_search($contract, $new_order, $order_dir);
+  $obm_q = run_query_contract_search($contract);
   $nb_contract = $obm_q->num_rows_total();
   if ($nb_contract == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -404,11 +404,11 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
   global $path, $auth, $cgp_show;
   
-  $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
-  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
+  $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;contract_id=$id");
+  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;contract_id=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
   
   if ($last > 0) {
-    $url_inc_last = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_contract=$id&amp;param_incident=$last");
+    $url_inc_last = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;contract_id=$id&amp;incident_id=$last");
     $dis_last = "<li>
     <a href=\"$url_inc_last\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc_last\">$l_last</a></li>";
@@ -416,7 +416,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 
   // Deal
   if ($cgp_show["module"]["deal"] && $deal_id > 0) {
-    $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
+    $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id");
     $block_deal = "
     <div class=\"linkTitle\">:: $l_module_deal</div>
     <ul class=\"linkList\">
@@ -477,7 +477,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 function dis_contract_consult($contract) {
   global $display, $l_consult_error;
 
-  $id = $contract["id"];
+  $id = $contract["contract_id"];
   if ($id > 0) {
     $contract_q = run_query_contract_detail($id);
     $display["detailInfo"] = display_record_info($contract_q);
@@ -591,7 +591,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   $dis_update = "<form method=\"get\" name=\"f_entity\"
       action=\"".url_prepare("contract_index.php")."\">
     <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
-    <input type=\"hidden\" name=\"param_contract\" value=\"$id\">
+    <input type=\"hidden\" name=\"contract_id\" value=\"$id\">
     <input type=\"submit\" value=\"$l_update\">
   </form>";
 
@@ -611,19 +611,19 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
       <table class=\"detail\">
       <tr>
         <td class=\"detailLabel\">$l_company
-          <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+          <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
         </td>
         <td class=\"detailText\">$comp_name</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_client_manager 1
-          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id") . "\">
+          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1_id") . "\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
         </td>
         <td class=\"detailText\">$con1</td> 
       </tr><tr>
         <td class=\"detailLabel\">$l_client_manager 2
-          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
+          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2_id") . "\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
         </td>
         <td class=\"detailText\">$con2</td>
@@ -744,7 +744,7 @@ function dis_contract_form($action,$contract,$param_company) {
   global $display, $cg_com, $cg_prod;
 
   if ($action == "detailupdate") {
-    $contract_q = run_query_contract_detail($contract["id"]);
+    $contract_q = run_query_contract_detail($contract["contract_id"]);
     $comp_id = $contract_q->f("contract_company_id"); 
     $users = array($contract_q->f("contract_marketmanager_id"), $contract_q->f("contract_techmanager_id"));
     $display["detailInfo"] = display_record_info($contract_q);
@@ -863,7 +863,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["deal_id"])) { $deal_id = $contract["deal_id"]; }
   if (isset($contract["deal_label"])) { $deal_label = stripslashes($contract["deal_label"]); }
   if (isset($contract["deal_new_id"])) { $d_new_id = $contract["deal_new_id"]; }
-  if (isset($contract["id"])) { $id = $contract["id"]; }
+  if (isset($contract["contract_id"])) { $id = $contract["contract_id"]; }
   if (isset($contract["label"])) { $label = stripslashes($contract["label"]); }
   if (isset($contract["company_id"])) { $comp_id = $contract["company_id"]; }
   if (isset($contract["number"])) { $number = $contract["number"]; }
@@ -913,11 +913,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $block_deal = "
     <tr>
       <td class=\"detailLabel\">$l_deal
-        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
       </td>
       <td class=\"detailForm\">
-        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
+        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
@@ -1066,7 +1066,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($action == "detailupdate") {
     if ($con1_id > 0) {
       $dis_con1 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con1_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
     }
   }
 
@@ -1107,12 +1107,12 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($action == "detailupdate") {
     if ($con2_id > 0) {
       $dis_con2 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
     }
   }
 
   $dis_sub = "
-    <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+    <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
     <input type=\"hidden\" name=\"tf_company\" value=\"$comp_name\" />
     <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
@@ -1122,7 +1122,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_sub .= "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
+      <input type=\"hidden\" name=\"contract_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
     $dis_comment = "
       </tr><tr>
@@ -1142,11 +1142,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $block_deal = "
     <tr>
       <td class=\"detailLabel\">$l_deal
-        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
       </td>
       <td class=\"detailForm\">
-        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
+        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
@@ -1164,7 +1164,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
+        <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id"). "\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
         $comp_name
       </td>
@@ -1447,13 +1447,13 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
    
     $dis_same_cont .= "
       <tr><td colspan =\"2\" class=\"detailText\">
-         <a class=\"detail\" href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;param_contract=$id") . "\">
+         <a class=\"detail\" href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$id") . "\">
           $samename </a>
       </td></tr>";
   }
 
   $hidden_fields = "<input type=\"hidden\" name=\"tf_label\" value=\"$name\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+      <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
       <input type=\"hidden\" name=\"ta_clause\" value=\"$ta_clause\" />
       <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
@@ -1474,7 +1474,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
       <input type=\"hidden\" name=\"sel_con2\" value=\"$con2\" />
       <input type=\"hidden\" name=\"sel_tech\" value=\"$sel_tech\" />
       <input type=\"hidden\" name=\"sel_market\" value=\"$sel_market\" />
-      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+      <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
       <input type=\"hidden\" name=\"deal_label\" value=\"$deal_label\" />
       <input type=\"hidden\" name=\"cb_archive\" value=\"$archiv\" />
       <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
@@ -1521,13 +1521,13 @@ function dis_can_delete_contract($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"contract_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_contract\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"contract_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_contract_del(this.form)) return true; else return false;\" />
     </form>";
@@ -1715,7 +1715,7 @@ function dis_contract_priority_links($id) {
       $dis_link .="
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$cname</a>
+        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
@@ -1919,7 +1919,7 @@ function dis_contract_status_links($id) {
       $dis_link.= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;param_incident=$stid") . "\">$stlabel</a>
+        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;incident_id=$stid") . "\">$stlabel</a>
       </td>
     </tr>";
     }
@@ -2107,7 +2107,7 @@ function dis_contract_type_links($id) {
       $dis_link .= "
     <tr>
       <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
+        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$clabel</a>
       </td>
     </tr>";
     }
@@ -2194,7 +2194,7 @@ function html_select_contract($con_q, $title, $url="") {
   }
 
   $display_cont = "
-    <select name=\"param_contract\" size=\"10\" style=\"font-family:fixed,courier\">";
+    <select name=\"contract_id\" size=\"10\" style=\"font-family:fixed,courier\">";
 
   while ($con_q->next_record()) {
     $id = $con_q->f("contract_id");

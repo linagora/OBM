@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resourcegroup_query.inc                                      //
 //     - Desc : Resource group query File                                    //
-// 2005-03-15 Florent Goalabré                                               //
+// 2005-03-15 Florent Goalabrï¿½                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,8 +21,8 @@ function run_query_resourcegroup_search($group) {
   $name = sql_search_text_parse($group["name"]);
   $resource = sql_search_text_parse($group["resource"]);
   $privacy = $group["privacy"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $sql_order_dir = $group["sql_order_dir"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -51,8 +51,8 @@ function run_query_resourcegroup_search($group) {
   $whereq = "where $where";
 
   // ORDER construction
-  $order = (strcmp($new_order,"") != 0) ? $new_order : "rgroup_name";
-  $orderq .= " order by $order $order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "rgroup_name";
+  $orderq .= " order by $order $sql_order_dir";
 
   $query = "select distinct RGroup.*, rgroup_id as id,
       $timecreate,
@@ -93,8 +93,8 @@ function run_query_resourcegroup_search_possible_children($group) {
   $id = $group["ext_id"];
   $name = $group["name"];
   $resource = $group["resource"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $sql_order_dir = $group["sql_order_dir"];
 
   $parents = get_group_parents($id);
 
@@ -132,8 +132,8 @@ function run_query_resourcegroup_search_possible_children($group) {
 
   // ORDER construction
 
-  $order = (strcmp($new_order,"") != 0) ? $new_order : "rgroup_name";
-  $query .= " order by $order $order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "rgroup_name";
+  $query .= " order by $order $sql_order_dir";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -181,7 +181,7 @@ function run_query_resourcegroup_detail($id) {
 function run_query_resourcegroup_insert($group) {
   global $uid, $cdg_sql, $ctype_resource;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
@@ -258,7 +258,7 @@ function run_query_resourcegroup_id($group) {
 function run_query_resourcegroup_update($group) {
   global $uid, $cdg_sql, $ctype_resource;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
@@ -322,7 +322,7 @@ function run_query_resourcegroup_delete($p_id) {
 function run_query_resourcegroup_resourcegroup_insert($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $group["resource_nb"]) {
@@ -361,7 +361,7 @@ function run_query_resourcegroup_resourcegroup_insert($group) {
 function run_query_resourcegroup_resourcegroup_delete($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group["resource_nb"]) {
@@ -391,7 +391,7 @@ function run_query_resourcegroup_resourcegroup_delete($group) {
 function run_query_resourcegroupresourcegroup_insert($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $cpt = 0;
   $cpt_ins = 0;
 
@@ -436,7 +436,7 @@ function run_query_resourcegroupresourcegroup_insert($group) {
 function run_query_resourcegroupresourcegroup_delete($group) {
   global $auth, $cdg_sql;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group["resourcegroup_nb"]) {
@@ -470,13 +470,13 @@ function run_query_resource_resourcegroup($group) {
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $entity = $group["entity"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $sql_order_dir = $group["sql_order_dir"];
 
-  if (($entity == "resourcegroup_resource") && (trim($new_order) != "")) {
-    $order = "order by $new_order $order_dir";
+  if (($entity == "resourcegroup_resource") && (trim($sql_order_field) != "")) {
+    $order = "order by $sql_order_field $sql_order_dir";
   } else {
     $order = "order by resource_name";
   }
@@ -513,13 +513,13 @@ function run_query_resourcegroup_resourcegroup($group) {
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $entity = $group["entity"];
-  $new_order = $group["new_order"];
-  $order_dir = $group["order_dir"];
+  $sql_order_field = $group["sql_order_field"];
+  $sql_order_dir = $group["sql_order_dir"];
 
-  if (($entity == "resourcegroup_resourcegroup") && (trim($new_order) != "")) {
-    $order = "order by $new_order $order_dir";
+  if (($entity == "resourcegroup_resourcegroup") && (trim($sql_order_field) != "")) {
+    $order = "order by $sql_order_field $sql_order_dir";
   } else {
     $order = "order by rgroup_name";
   }
@@ -705,7 +705,7 @@ function check_resourcegroup_context($id, $group) {
 function check_resourcegroup_data_form($group) {
   global $uid, $err_msg, $l_fill_name, $l_group_exists;
 
-  $id = $group["id"];
+  $id = $group["resourcegroup_id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $lgroup = get_resourcegroup_info($id);

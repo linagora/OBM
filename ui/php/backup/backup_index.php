@@ -11,9 +11,9 @@
 // - search             -- search fields  -- show the backup list
 // - new                --                -- New backup form
 // - insert             --                -- create a new backup
-// - check_delete       -- $param_backup  -- Check if a backup can be deleted
-// - delete             -- $param_backup  -- Delete a backup (if ok)
-// - restore            -- $param_backup  -- Restore a backup
+// - check_delete       -- $backup_id  -- Check if a backup can be deleted
+// - delete             -- $backup_id  -- Delete a backup (if ok)
+// - restore            -- $backup_id  -- Restore a backup
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -166,7 +166,7 @@ function get_backup_action() {
 
 // CheckDelete
   $actions["backup"]["check_delete"] = array (
-    'Url'      => "$path/backup/backup_index.php?action=check_delete&amp;param_backup=".$backup["filename"]."",
+    'Url'      => "$path/backup/backup_index.php?action=check_delete&amp;backup_id=".$backup["filename"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 

@@ -41,32 +41,32 @@ require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
-$agenda = get_param_agenda();
+$params = get_agenda_params();
 get_agenda_action();
 $perm->check_permissions($module, $action);
 
 page_close();
 $max_display = 6;
 // If a group has just been selected, automatically select all its members
-if ( ($agenda["new_group"] == "1")
-     && ($agenda["group_view"] != "") ) {
+if ( ($params["new_group"] == "1")
+     && ($params["group_view"] != "") ) {
   // If group selected is ALL, reset group
-  if ($agenda["group_view"] == $c_all) {
+  if ($params["group_view"] == $c_all) {
     $cal_entity_id["group"] = array();
   } else {
-    $cal_entity_id["user"] = get_all_users_id_from_group($agenda["group_view"]);
-    $cal_entity_id["group"] = array($agenda["group_view"]);
+    $cal_entity_id["user"] = get_all_users_id_from_group($params["group_view"]);
+    $cal_entity_id["group"] = array($params["group_view"]);
   }
-  $cal_entity_id["group_view"] = $agenda["group_view"];
+  $cal_entity_id["group_view"] = $params["group_view"];
   $cal_entity_id["resource"] = array();
      }
 // Resources groups, only on meeting
 if($action == "perform_meeting" && 
-  (is_array($agenda["sel_resource_group_id"]) || is_array($agenda["sel_user_id"])
-  || is_array($agenda["sel_resource_id"]))) { 
-  $cal_entity_id["resource_group"] = $agenda["sel_resource_group_id"];
-  $cal_entity_id["user"] = $agenda["sel_user_id"];
-  $cal_entity_id["resource"] = $agenda["sel_resource_id"];    
+  (is_array($params["sel_resource_group_id"]) || is_array($params["sel_user_id"])
+  || is_array($params["sel_resource_id"]))) { 
+  $cal_entity_id["resource_group"] = $params["sel_resource_group_id"];
+  $cal_entity_id["user"] = $params["sel_user_id"];
+  $cal_entity_id["resource"] = $params["sel_resource_id"];    
 } else if ($action != "perform_meeting") {
   unset($cal_entity_id["resource_group"]);
 }
@@ -78,29 +78,29 @@ if (($action == "insert") || ($action == "update")) {
 if ($cal_entity_id["group_view"] == "") $cal_entity_id["group_view"] = $c_all;
 
 // If user selection present we override session content
-if (($agenda["new_sel"]) || (is_array($agenda["sel_user_id"]))) {
-  $cal_entity_id["user"] = $agenda["sel_user_id"];
+if (($params["new_sel"]) || (is_array($params["sel_user_id"]))) {
+  $cal_entity_id["user"] = $params["sel_user_id"];
 } else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["user"] = $agenda["sel_user_id"];
+  $cal_entity_id["user"] = $params["sel_user_id"];
 }
 // If resources selection present we override session content
-if ($action == "new" && (is_array($agenda["sel_resource_id"]))) {
+if ($action == "new" && (is_array($params["sel_resource_id"]))) {
   // Join resources from group with normal resources.
-  $cal_entity_id["resource"] = array_merge($agenda["sel_resource_id"],$cal_entity_id["resource"]);
-} else if (($agenda["new_sel"]) || (is_array($agenda["sel_resource_id"]))) {
-  $cal_entity_id["resource"] = $agenda["sel_resource_id"];
+  $cal_entity_id["resource"] = array_merge($params["sel_resource_id"],$cal_entity_id["resource"]);
+} else if (($params["new_sel"]) || (is_array($params["sel_resource_id"]))) {
+  $cal_entity_id["resource"] = $params["sel_resource_id"];
 } else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["resource"] = $agenda["sel_resource_id"];
+  $cal_entity_id["resource"] = $params["sel_resource_id"];
 }
 
 // If group selection present we override session content
-if (is_array($agenda["sel_group_id"])) {
-  $cal_entity_id["group"] = $agenda["sel_group_id"];
+if (is_array($params["sel_group_id"])) {
+  $cal_entity_id["group"] = $params["sel_group_id"];
 } else if (($action == "insert") || ($action == "update")) {
   // If event creation (form submission) we set session even if selection empty
-  $cal_entity_id["group"] = $agenda["sel_group_id"];
+  $cal_entity_id["group"] = $params["sel_group_id"];
 }
 
 // If no user or resource selected, we select the connected user
@@ -113,7 +113,7 @@ if ( ( (! is_array($cal_entity_id["user"]))
 
 //print_r($cal_entity_id);
 // We copy the entity array structure to the parameter hash
-$agenda["entity"] = $cal_entity_id;
+$params["entity"] = $cal_entity_id;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ if ($popup) {
     require("$obminclude/calendar.inc");
     display_end();
   } elseif ($action == "export") {
-    dis_agenda_export_handle($agenda);
+    dis_agenda_export_handle($params);
   }
   exit();
 }
@@ -143,7 +143,7 @@ if ($action == "index") {
     $display["detail"] = html_agenda_waiting_events($obm_wait);
   } else {
     require("agenda_js.inc");
-    $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+    $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
   }
 
 } elseif ($action == "waiting_events") {
@@ -155,19 +155,19 @@ if ($action == "index") {
   } else {
     $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
     require("agenda_js.inc");
-    $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+    $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
   }
 
 
 } elseif ($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($agenda["force"] && $conflicts = check_agenda_decision_conflict($agenda)) {
+  if ($params["force"] && $conflicts = check_agenda_decision_conflict($params)) {
     require("agenda_js.inc");
-    $display["search"] = html_agenda_dis_conflict($agenda, $conflicts) ;
-    $display["detail"] = html_agenda_conflict_form($agenda);
+    $display["search"] = html_agenda_dis_conflict($params, $conflicts) ;
+    $display["detail"] = html_agenda_conflict_form($params);
     $display["msg"] .= display_err_msg("$l_event : $l_insert_error");
   } else {
-    $conflict = run_query_agenda_insert_decision($agenda);
+    $conflict = run_query_agenda_insert_decision($params);
     $obm_wait = run_query_agenda_waiting_events();
     if ($obm_wait->nf() != 0) {
       $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
@@ -175,154 +175,154 @@ if ($action == "index") {
     } else {
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
-      $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+      $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
     }
   }
 
 } elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id, "day");
+  $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id, "day");
 
 } elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_agenda_calendar_view($agenda, &$cal_entity_id, "week");
+  $display["detail"] = dis_agenda_calendar_view($params, &$cal_entity_id, "week");
 
 } elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id, "month");
+  $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id, "month");
 
 } elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id, "year");
+  $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id, "year");
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
+  $display["detail"] = dis_agenda_event_form($action, $params, "", $cal_entity_id);
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  if (check_agenda_data_form($agenda)) {
-    if ( (!$agenda["force"])
-	 && ($conflicts = check_agenda_conflict($agenda, $cal_entity_id)) ) {
-      $display["search"] = html_agenda_dis_conflict($agenda,$conflicts) ;
+  if (check_agenda_data_form($params)) {
+    if ( (!$params["force"])
+	 && ($conflicts = check_agenda_conflict($params, $cal_entity_id)) ) {
+      $display["search"] = html_agenda_dis_conflict($params,$conflicts) ;
       $display["msg"] .= display_err_msg("$l_event : $l_insert_error");
-      $display["detail"] = dis_agenda_event_form($action, $agenda, "",$cal_entity_id);
+      $display["detail"] = dis_agenda_event_form($action, $params, "",$cal_entity_id);
     } else {
-      run_query_agenda_add_event($agenda, $cal_entity_id, $event_id);
+      run_query_agenda_add_event($params, $cal_entity_id, $event_id);
       $display["msg"] .= display_ok_msg("$l_event : $l_insert_ok");
-      $agenda["date"] = $agenda["datebegin"];
-      $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+      $params["date"] = $params["datebegin"];
+      $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
     }
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
+    $display["detail"] = dis_agenda_event_form($action, $params, "", $cal_entity_id);
   }
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_agenda_event_consult($agenda["id"]);
+  $display["detail"] = dis_agenda_event_consult($params["id"]);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($agenda["id"] > 0) {  
+  if ($params["id"] > 0) {  
     require("agenda_js.inc");
-    $eve_q = run_query_agenda_detail($agenda["id"]);
-    $entities = get_agenda_event_entity($agenda["id"]);
+    $eve_q = run_query_agenda_detail($params["id"]);
+    $entities = get_agenda_event_entity($params["id"]);
     $display["detailInfo"] = display_record_info($eve_q);
-    $display["detail"] = dis_agenda_event_form($action, $agenda, $eve_q, $entities);
+    $display["detail"] = dis_agenda_event_form($action, $params, $eve_q, $entities);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_agenda_data_form($agenda)) {
-    if ( (!$agenda["force"])
-	 && ($conflicts = check_agenda_conflict($agenda, $cal_entity_id)) ) {
+  if (check_agenda_data_form($params)) {
+    if ( (!$params["force"])
+	 && ($conflicts = check_agenda_conflict($params, $cal_entity_id)) ) {
       require("agenda_js.inc");
-      $display["search"] = html_agenda_dis_conflict($agenda,$conflicts) ;
+      $display["search"] = html_agenda_dis_conflict($params,$conflicts) ;
       $display["msg"] .= display_err_msg("$l_event : $l_update_error");
-      $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
+      $display["detail"] = dis_agenda_event_form($action, $params, "", $cal_entity_id);
     } else {
-      run_query_agenda_event_update($agenda, $cal_entity_id, $event_id);
+      run_query_agenda_event_update($params, $cal_entity_id, $event_id);
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
-      $agenda["date"] = $agenda["datebegin"];
-      $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+      $params["date"] = $params["datebegin"];
+      $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
     }
   } else {
     require("agenda_js.inc");
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_agenda_event_form($action, $agenda, "", $cal_entity_id);
+    $display["detail"] = dis_agenda_event_form($action, $params, "", $cal_entity_id);
   }
 
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_agenda_update_occurence_state($agenda["id"],$uid,$agenda["decision_event"]);
+  run_query_agenda_update_occurence_state($params["id"],$uid,$params["decision_event"]);
   require("agenda_js.inc");
   $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
-  $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+  $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_agenda_can_delete($agenda["id"])) {
-    if ($agenda["id"] > 0) {
-      $display["detail"] = html_agenda_dis_delete($agenda);
+  if (check_agenda_can_delete($params["id"])) {
+    if ($params["id"] > 0) {
+      $display["detail"] = html_agenda_dis_delete($params);
     }
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_agenda_event_consult($agenda["id"]);
+    $display["detail"] = dis_agenda_event_consult($params["id"]);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_agenda_can_delete($agenda["id"])) {
+  if (check_agenda_can_delete($params["id"])) {
     require("agenda_js.inc");
-    if ($agenda["id"] > 0) {
-      run_query_agenda_delete($agenda);
+    if ($params["id"] > 0) {
+      run_query_agenda_delete($params);
     }
-    $display["detail"] = dis_agenda_calendar_view($agenda, $cal_entity_id);
+    $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_agenda_event_consult($agenda["id"]);
+    $display["detail"] = dis_agenda_event_consult($params["id"]);
   }
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   $display["title"] = "<div class=\"title\">$l_agenda</div>";
-  $display["detail"] = of_right_dis_admin("calendar", $agenda["entity_id"]);
+  $display["detail"] = of_right_dis_admin("calendar", $params["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   $display["title"] = "<div class=\"title\">$l_agenda</div>";
-  of_right_update_right($agenda, "calendar");
+  of_right_update_right($params, "calendar");
   $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   $display["msg"] .= display_warn_msg($err_msg);
-  $display["detail"] = of_right_dis_admin("calendar", $agenda["entity_id"]);
+  $display["detail"] = of_right_dis_admin("calendar", $params["entity_id"]);
 
 } elseif ($action == "new_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $display["detail"] = dis_agenda_meeting_form($agenda, $cal_entity_id);
+  $display["detail"] = dis_agenda_meeting_form($params, $cal_entity_id);
 
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  $cal_entity_id["user"] = run_query_agenda_get_allusers($cal_entity_id["user"], $agenda["sel_group_id"]);
+  $cal_entity_id["user"] = run_query_agenda_get_allusers($cal_entity_id["user"], $params["sel_group_id"]);
   $entity_readable = get_agenda_entity_readable();
   $ret = run_query_agenda_get_entity_label($cal_entity_id);
   $ret["resourcegroup"] = run_query_resource_resourcegroup($cal_entity_id["resource_group"]);
   $entity_store = store_agenda_entities($ret);
-  $display["features"] = html_agenda_planning_bar($agenda, $cal_entity_id, $entity_store, $entity_readable);
-  $display["detail"] = dis_agenda_free_interval($agenda, $entity_store);
+  $display["features"] = html_agenda_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable);
+  $display["detail"] = dis_agenda_free_interval($params, $entity_store);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -331,7 +331,7 @@ if ($action == "index") {
 
 } elseif ($action == "category1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("calendar", "category1", $agenda);
+  $retour = of_category_query_insert("calendar", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
@@ -342,7 +342,7 @@ if ($action == "index") {
 
 } elseif ($action == "category1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("calendar", "category1", $agenda);
+  $retour = of_category_query_update("calendar", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
@@ -353,11 +353,11 @@ if ($action == "index") {
 
 } elseif ($action == "category1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("calendar", "category1", $agenda, "mono");
+  $display["detail"] .= of_category_dis_links("calendar", "category1", $params, "mono");
 
 } elseif ($action == "category1_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("calendar", "category1", $agenda);
+  $retour = of_category_query_delete("calendar", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
@@ -377,205 +377,134 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores in $agenda hash, Agenda parameters transmited
-// returns : $agenda hash with parameters set
+// Stores in $params hash, Agenda parameters transmited
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_agenda() {
-  global $action, $cagenda_first_hour, $cagenda_last_hour;
-  global $param_date, $tf_title, $tf_location, $ta_event_description;
-  global $param_event, $sel_priority;
-  global $tf_date_begin, $sel_time_begin, $sel_min_begin;
-  global $tf_date_end, $sel_time_end, $sel_min_end;
-  global $sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
-  global $param_user, $param_group, $new_group, $sel_user_id, $sel_group_id;
-  global $sel_resource_id, $sel_resource_group_id, $sel_ent, $new_sel;
-  global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
-  global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
-  global $rd_decision_event,$cb_mail,$param_duration;
-  global $sel_time_duration,$sel_min_duration;
-  global $cb_read_public, $cb_write_public,$sel_accept_write,$sel_accept_read,$param_entity; 
-  global $ch_all_day,$tf_repeatfrequency;
-  global $tf_category1_label, $tf_category1_code, $sel_category1;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
+function get_agenda_params() {
+  global $param_date, $cagenda_first_hour, $cagenda_last_hour;
   
-  // Agenda fields
+  // Get global params
+  $params = get_global_params("Entity");
+
+  // Get agenda specific params
   if (isset ($param_date)) {
-    $agenda["date"] = $param_date; 
+    $params["date"] = $param_date; 
   } else { 
-    $agenda["date"] = isodate_format();
+    $params["date"] = isodate_format();
   }
-
-
-  if (isset($param_event)) $agenda["id"] = $param_event;
-  if (isset($tf_repeatfrequency)) $agenda["repeatfrequency"] = intval($tf_repeatfrequency);
-  if (isset($ch_all_day)) $agenda["allday"] = $ch_all_day;
-  if (isset($tf_title)) $agenda["title"] = $tf_title;
-  if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
-  if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;
-  if (isset ($tf_category1_label)) $agenda["category1_label"] = $tf_category1_label;
-  if (isset ($tf_category1_code)) $agenda["category1_code"] = $tf_category1_code;
-  if (isset ($sel_category1)) $agenda["category1"] = $sel_category1;
-  if (isset($tf_location)) $agenda["location"] = $tf_location;
-  if (isset($cb_force)) $agenda["force"] = $cb_force;
-  if (isset($cb_privacy)) $agenda["privacy"] = $cb_privacy;
-  if (is_array($rd_conflict_event)) $agenda["conflict_event"] = $rd_conflict_event;
-  if (is_array($hd_conflict_end)) $agenda["conflict_end"] = $hd_conflict_end;
-  if (isset($hd_old_begin)) $agenda["old_begin"] = $hd_old_begin;
-  if (isset($hd_old_end)) $agenda["old_end"] = $hd_old_end;
-  if (isset($cb_mail)) $agenda["mail"] = $cb_mail;
-  if (isset($new_group)) $agenda["new_group"] = $new_group;
-  if (isset($param_group) && ($param_group != "")) {
-    $agenda["group_view"] = $param_group;
-  }
-  if (isset($new_sel)) $agenda["new_sel"] = $new_sel;
-
-  if (isset($sel_time_duration)) {
-    $agenda["duration"] = $sel_time_duration;
-    if (isset($sel_min_duration)) {
-      $agenda["duration"] += $sel_min_duration/60;
+  
+  // New meeting event duration
+  if (isset($params["time_duration"])) {
+    $params["event_duration"] = $params["time_duration"];
+    if (isset($params["min_duration"])) {
+      $params["event_duration"] += $params["min_duration"]/60;
     }
   }
-  if (isset($param_user)) $agenda["user_id"] = $param_user;
-  if (isset($param_duration)) $agenda["duration"] = $param_duration;
-  if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;
-  if (isset($cb_repeat_update)) $agenda["repeat_update"] = 1;
-
-  // Rights parameters
-  if (isset($param_entity)) $agenda["entity_id"] = $param_entity;
-  if (is_array($sel_accept_write)) $agenda["accept_w"] = $sel_accept_write;
-  if (is_array($sel_accept_read)) $agenda["accept_r"] = $sel_accept_read;
-  if (isset($cb_write_public)) $agenda["public_w"] = $cb_write_public;
-  if (isset($cb_read_public)) $agenda["public_r"] = $cb_read_public;
-
-  if (isset($sel_time_begin)) {
-    $start_hour = $sel_time_begin;
+  
+  // New appointment hours
+  if (isset($params["time_begin"])) {
+    $start_hour = $params["time_begin"];
   } else {
     $start_hour = $cagenda_first_hour;
   }
-  if (isset($sel_min_begin)) {
-    $start_min = $sel_min_begin;
+  if (isset($params["min_begin"])) {
+    $start_min = $params["min_begin"];
   } else {
     $start_min = "00";
   }
-  if (isset($sel_time_end)) {
-    $end_hour = $sel_time_end;
+  if (isset($params["time_end"])) {
+    $end_hour = $params["time_end"];
   } else {
     $end_hour = $cagenda_last_hour;
   }
-  if (isset($sel_min_end)) {
-    $end_min = $sel_min_end;
+  if (isset($params["min_end"])) {
+    $end_min = $params["min_end"];
   } else {
     $end_min = "00";
   }
-  if (isset($tf_date_begin)) $agenda["datebegin"] = $tf_date_begin;
-  if (strlen($agenda["datebegin"]) == 10) {
-    $agenda["datebegin"] .= " $start_hour:$start_min:00";
+  if (strlen($params["date_begin"]) == 10) {
+    $params["date_begin"] .= " $start_hour:$start_min:00";
   }
-  if (isset($tf_date_end)) $agenda["dateend"] = $tf_date_end;
-  if (strlen($agenda["dateend"]) == 10) {
-    $agenda["dateend"] .= " $end_hour:$end_min:00";
+  if (strlen($params["date_end"]) == 10) {
+    $params["date_end"] .= " $end_hour:$end_min:00";
   }
   
-  $agenda["event_duration"] =  strtotime($agenda["dateend"]) - strtotime($agenda["datebegin"]);
-
-  if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
+  $params["event_duration"] =  strtotime($params["date_end"]) - strtotime($params["date_begin"]);
+  
+  // repeat days
   for ($i=0; $i<7; $i++) {
-    if (isset(${"cb_repeatday_".$i}))  {
-      $agenda["repeat_days"] .= '1';
+    if (isset($params["repeatday_$i"])) {
+      $params["repeat_days"] .= '1';
     } else {
-      $agenda["repeat_days"] .= '0';
+      $params["repeat_days"] .= '0';
     }
   }
 
   // sel_group_id can be filled by sel_group_id
-  if (is_array($sel_group_id)) {
-    while ( list( $key, $value ) = each( $sel_group_id ) ) {
+  if (is_array($params["group_id"])) {
+    while (list($key, $value) = each($params["group_id"]) ) {
       // sel_group_id contains select infos (data-group-$id)
       if (strcmp(substr($value, 0, 11),"data-group-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$agenda["sel_group_id"][] = $id;
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["sel_group_id"][] = $id;
       } else {
-	// direct id
-	$agenda["sel_group_id"][] = $value;
+        // direct id
+        $params["sel_group_id"][] = $value;
       }
     }
   }
 
   // sel_user_id can be filled by sel_user_id or sel_ent (see below)
-  if (is_array($sel_user_id)) {
-    while ( list( $key, $value ) = each( $sel_user_id ) ) {
+  if (is_array($params["user_id"])) {
+    while (list($key, $value) = each($params["user_id"]) ) {
       // sel_user_id contains select infos (data-user-$id)
       if (strcmp(substr($value, 0, 10),"data-user-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$agenda["sel_user_id"][] = $id;
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["sel_user_id"][] = $id;
       } else {
-	// direct id
-	$agenda["sel_user_id"][] = $value;
+        // direct id
+        $params["sel_user_id"][] = $value;
       }
     }
   }
 
   // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
-  if (is_array($sel_resource_id)) {
-    while ( list( $key, $value ) = each( $sel_resource_id ) ) {
+  if (is_array($params["resource_id"])) {
+    while (list($key, $value) = each($params["resource_id"]) ) {
       // sel_resource_id contains select infos (data-resource-$id)
       if (strcmp(substr($value, 0, 14),"data-resource-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$agenda["sel_resource_id"][] = $id;
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["sel_resource_id"][] = $id;
       } else {
-	// direct id
-	$agenda["sel_resource_id"][] = $value;
+        // direct id
+        $params["sel_resource_id"][] = $value;
+      }
+    }
+  }
+  // feature params (user & resource)
+  if (is_array($params["ent"])) {
+    $nb_data = 0;
+    $nb["user"] = 0;
+    $nb["resource"] = 0;
+    while(list($key,$value ) = each($params["ent"])) {
+      if (strcmp(substr($value, 0, 5),"data-") == 0) {
+        $nb_data++;
+        $data = explode("-", $value);
+        $ent = $data[1];
+        $id = $data[2];
+        $nb[$ent]++;
+        $params["sel_${ent}_id"][] = $id;
       }
     }
   }
 
-  // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
-  if (is_array($sel_resource_group_id)) {
-    while ( list( $key, $value ) = each( $sel_resource_group_id ) ) {
-      // sel_resource_id contains select infos (data-resource-$id)
-      if (strcmp(substr($value, 0, 19),"data-resourcegroup-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$agenda["sel_resource_group_id"][] = $id;
-      } else {
-	// direct id
-	$agenda["sel_resource_group_id"][] = $value;
-      }
-    }
-  }
+  display_debug_param($params);
   
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
+  return $params;
 
-  if (isset ($http_obm_vars)) {
-    //    print_r($http_obm_vars["sel_ent"]);
-    if (is_array($http_obm_vars["sel_ent"])) {
-      $nb_data = 0;
-      $nb["user"] = 0;
-      $nb["resource"] = 0;
-      while ( list( $key, $value ) = each( $http_obm_vars["sel_ent"] ) ) {
-	if (strcmp(substr($value, 0, 5),"data-") == 0) {
-	  $nb_data++;
-	  $data = explode("-", $value);
-	  $ent = $data[1];
-	  $id = $data[2];
-	  $nb[$ent]++;
-	  $agenda["sel_${ent}_id"][] = $id;
-	}
-      }
-    }
-  }
-  
-  if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
-  display_debug_param($agenda);
-
-  return $agenda;
 }
 
 
@@ -583,15 +512,15 @@ function get_param_agenda() {
 //  Agenda Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_agenda_action() {
-  global $actions, $path, $agenda;
+  global $actions, $path, $params;
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
   global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_waiting_events;
 
-  $id = $agenda["id"];
-  $date = $agenda["date"];
+  $id = $params["id"];
+  $date = $params["date"];
 
   // Index
   $actions["agenda"]["index"] = array (

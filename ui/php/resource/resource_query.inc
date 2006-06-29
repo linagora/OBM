@@ -12,15 +12,20 @@
 // Parameters:
 //   - $resource[] : resource search criteria
 //     keys used  : name, perms
-//   - $p_new_order : infos for order clause
-//   - $p_order_dir : direction for order clause (asc, desc)
+//   - $sql_order_field : infos for order clause
+//   - $sql_order_dir : direction for order clause (asc, desc)
 //   - $restriction : if and which restriction to set (eg user (who can read))
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_resource_search($resource, $p_new_order, $p_order_dir, $restriction="") {
+function run_query_resource_search($resource) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $name = sql_search_text_parse($resource["name"]);
   $desc = sql_search_text_parse($resource["desc"]);
+  
+  $sql_order_dir = $resource["sql_order_dir"];
+  $sql_order_field = $resource["sql_order_field"];
+  
+  $restriction = $resource["restriction"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -60,8 +65,8 @@ function run_query_resource_search($resource, $p_new_order, $p_order_dir, $restr
   }
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "resource_name";
-  $orderq .= " ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "resource_name";
+  $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
     $whereq
@@ -308,7 +313,7 @@ function check_resource_data_form($p_id, $resource) {
   global $l_lname_error;
   global $err_msg, $action, $cdg_sql;
 
-  $id = $resource["id"];
+  $id = $resource["resource_id"];
   $name = $resource["name"];
   $desc = $resource["desc"];
 

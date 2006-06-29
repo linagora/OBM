@@ -395,9 +395,9 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
 //   - $entity     : entity affected
 //   - $fieldname  : fieldname to change the display value
 //   - $new_status : new display status value; "" if not updated
-//   - $new_order  : new display order; "" if not updated
+//   - $sql_order_field  : new display order; "" if not updated
 ///////////////////////////////////////////////////////////////////////////////
-function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
+function update_display_pref($entity, $fieldname, $new_status, $sql_order_field="") {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -418,15 +418,15 @@ function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
     $new_status = $current_status;
   }
   // if order is updated, update other field concerned too (with current order)
-  if ($new_order != "") {
-    run_query_display_pref_level_update($uid, $entity, $new_order, $current_order);
+  if ($sql_order_field != "") {
+    run_query_display_pref_level_update($uid, $entity, $sql_order_field, $current_order);
   } else {
-    $new_order = $current_order;
+    $sql_order_field = $current_order;
   }
 
   // if new field values = default values and user value exists, erase it
   if ($new_status == $default_status) {
-    if ($new_order == $default_order) {
+    if ($sql_order_field == $default_order) {
       
       $query = "DELETE FROM DisplayPref
       WHERE display_user_id='$uid'
@@ -440,10 +440,10 @@ function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
       
       // if user entry does not exist
       if (! isset($prefs[$uid])) {
-	run_query_display_pref_insert($uid, $entity, $fieldname, $new_status, $new_order);
+	run_query_display_pref_insert($uid, $entity, $fieldname, $new_status, $sql_order_field);
       } else {
 	// user entry is different (=> update it)
-	run_query_display_pref_update($uid, $entity, $fieldname, $new_status, $new_order);
+	run_query_display_pref_update($uid, $entity, $fieldname, $new_status, $sql_order_field);
       }
     }
     
@@ -451,7 +451,7 @@ function update_display_pref($entity, $fieldname, $new_status, $new_order="") {
     
     if (isset($prefs[$uid])) {
       // if user entry exists, we update it
-      run_query_display_pref_update($uid, $entity, $fieldname, $new_status, $new_order);
+      run_query_display_pref_update($uid, $entity, $fieldname, $new_status, $sql_order_field);
     } else {
       // user entry does not exist, we create it
       run_query_display_pref_insert($uid, $entity, $fieldname, $new_status, $default_order);

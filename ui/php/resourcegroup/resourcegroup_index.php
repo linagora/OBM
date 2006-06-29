@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : resourcegroup_index.php                                      //
 //     - Desc : Resource Group Index File                                    //
-// 2005-03-15 Florent Goalabré                                               //
+// 2005-03-15 Florent Goalabrï¿½                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,17 +40,17 @@ require("resourcegroup_query.inc");
 require("resourcegroup_js.inc");
 
 if ($action == "") $action = "index";
-$resourcegroup = get_param_resourcegroup();
+$params = get_resourcegroup_params();
 get_resourcegroup_action();
 $perm->check_permissions($module, $action);
 
 $uid = $auth->auth["uid"];
 
-if (! check_privacy($module, "RGroup", $action, $resourcegroup["id"], 0)) {
+if (! check_privacy($module, "RGroup", $action, $params["resourcegroup_id"], 0)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("resourcegroup", $resourcegroup["id"], $action);
+  update_last_visit("resourcegroup", $params["resourcegroup_id"], $action);
 }
 
 page_close();
@@ -62,7 +62,7 @@ page_close();
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_resourcegroup_search_form($resourcegroup);
+  $display["search"] = html_resourcegroup_search_form($params);
   if ($set_display == "yes") {
     $display["msg"] .= dis_resourcegroup_search_resourcegroup("");
   } else {
@@ -71,50 +71,50 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_resourcegroup_search_form($resourcegroup);
-  $display["result"] = dis_resourcegroup_search_resourcegroup($resourcegroup);
+  $display["search"] = html_resourcegroup_search_form($params);
+  $display["result"] = dis_resourcegroup_search_resourcegroup($params);
 
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
+  $display["detail"] = html_resourcegroup_form($action, "", $params);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $uid);
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_resourcegroup_detail($resourcegroup["id"]);
-  $display["detail"] = html_resourcegroup_form($action, $obm_q, $resourcegroup);
+  $obm_q = run_query_resourcegroup_detail($params["resourcegroup_id"]);
+  $display["detail"] = html_resourcegroup_form($action, $obm_q, $params);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resourcegroup_data_form($resourcegroup)) {
+  if (check_resourcegroup_data_form($params)) {
 
     // If the context (same group) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $resourcegroup["id"] = run_query_resourcegroup_insert($resourcegroup);
-      if ($resourcegroup["id"]) {
+      $params["resourcegroup_id"] = run_query_resourcegroup_insert($params);
+      if ($params["resourcegroup_id"]) {
 	$display["msg"] .= display_ok_msg("$l_resourcegroup : $l_insert_ok");
-	$display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+	$display["detail"] = dis_resourcegroup_consult($params, $uid);
       } else {
 	$display["msg"] .= display_err_msg("$l_resourcegroup : $l_insert_error");
-	$display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
+	$display["detail"] = html_resourcegroup_form($action, "", $params);
       }
       
       // If it is the first try, we warn the user if some groups seem similar
     } else {
-      $obm_q = check_resourcegroup_context("", $resourcegroup);
+      $obm_q = check_resourcegroup_context("", $params);
       if ($obm_q->num_rows() > 0) {
-	$display["detail"] = dis_resourcegroup_warn_insert("", $obm_q, $resourcegroup);
+	$display["detail"] = dis_resourcegroup_warn_insert("", $obm_q, $params);
       } else {
-	$resourcegroup["id"] = run_query_resourcegroup_insert($resourcegroup);
-	if ($resourcegroup["id"] > 0) {
+	$params["resourcegroup_id"] = run_query_resourcegroup_insert($params);
+	if ($params["resourcegroup_id"] > 0) {
 	  $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_insert_ok");
-	  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+	  $display["detail"] = dis_resourcegroup_consult($params, $uid);
 	} else {
 	  $display["msg"] .= display_err_msg("$l_resourcegroup : $l_insert_error");
-	  $display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
+	  $display["detail"] = html_resourcegroup_form($action, "", $params);
 	}
       }
     }
@@ -122,28 +122,28 @@ if (($action == "index") || ($action == "")) {
     // Form data are not valid
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $display["detail"] = html_resourcegroup_form($action, "", $resourcegroup);
+    $display["detail"] = html_resourcegroup_form($action, "", $params);
   }
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resourcegroup_data_form($resourcegroup)) {
-    $retour = run_query_resourcegroup_update($resourcegroup);
+  if (check_resourcegroup_data_form($params)) {
+    $retour = run_query_resourcegroup_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_resourcegroup : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_resourcegroup : $l_update_error");
     }
-    $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+    $display["detail"] = dis_resourcegroup_consult($params, $uid);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
-    $resourcegroup_q = run_query_resourcegroup_detail($resourcegroup["id"]);
-    $display["detail"] = html_resourcegroup_form($action, $resourcegroup_q, $resourcegroup);
+    $params_q = run_query_resourcegroup_detail($params["resourcegroup_id"]);
+    $display["detail"] = html_resourcegroup_form($action, $params_q, $params);
   }
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_resourcegroup_warn_delete($resourcegroup["id"]);
+  $display["detail"] = dis_resourcegroup_warn_delete($params["resourcegroup_id"]);
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,43 +157,43 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "resource_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($resourcegroup["resource_nb"] > 0) {
-    $nb = run_query_resourcegroup_resourcegroup_insert($resourcegroup);
+  if ($params["resource_nb"] > 0) {
+    $nb = run_query_resourcegroup_resourcegroup_insert($params);
     $display["msg"] .= display_ok_msg("$nb $l_resource_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_resource_added);
   }
-  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $uid);
 
 } elseif ($action == "resource_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($resourcegroup["resource_nb"] > 0) {
-    $nb = run_query_resourcegroup_resourcegroup_delete($resourcegroup);
+  if ($params["resource_nb"] > 0) {
+    $nb = run_query_resourcegroup_resourcegroup_delete($params);
     $display["msg"] .= display_ok_msg("$nb $l_resource_removed");
   } else {
     $display["msg"] .= display_err_msg($l_no_resource_deleted);
   }
-  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $uid);
 
 } elseif ($action == "resourcegroup_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($resourcegroup["resourcegroup_nb"] > 0) {
-    $nb = run_query_resourcegroupresourcegroup_insert($resourcegroup);
+  if ($params["resourcegroup_nb"] > 0) {
+    $nb = run_query_resourcegroupresourcegroup_insert($params);
     $display["msg"] .= display_ok_msg("$nb $l_resourcegroup_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_resourcegroup_added);
   }
-  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $uid);
 
 } elseif ($action == "resourcegroup_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($resourcegroup["resourcegroup_nb"] > 0) {
-    $nb = run_query_resourcegroupresourcegroup_delete($resourcegroup);
+  if ($params["resourcegroup_nb"] > 0) {
+    $nb = run_query_resourcegroupresourcegroup_delete($params);
     $display["msg"] .= display_ok_msg("$nb $l_resourcegroup_removed");
   } else {
     $display["msg"] .= display_err_msg($l_no_resourcegroup_deleted);
   }
-  $display["detail"] = dis_resourcegroup_consult($resourcegroup, $uid);
+  $display["detail"] = dis_resourcegroup_consult($params, $uid);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,9 +219,9 @@ if (($action == "index") || ($action == "")) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 } else if ($action == "ext_get_ids") {
-  $display["search"] = html_resourcegroup_search_form($resourcegroup);
+  $display["search"] = html_resourcegroup_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_resourcegroup_search_resourcegroup($resourcegroup);
+    $display["result"] = dis_resourcegroup_search_resourcegroup($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
@@ -234,7 +234,7 @@ if (($action == "index") || ($action == "")) {
 // Update actions url in case some values have been updated (id after insert) 
 update_resourcegroup_action();
 $display["head"] = display_head($l_resourcegroup);
-if (! $resourcegroup["popup"]) {
+if (! $params["popup"]) {
   $display["header"] = display_menu($module);
 }
 $display["end"] = display_end();
@@ -246,41 +246,18 @@ display_page($display);
 // Stores in $group hash, Group parameters transmited
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_resourcegroup() {
-  global $param_resourcegroup, $popup, $child_res;
-  global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_desc, $tf_resource, $tf_email, $cb_privacy, $sel_privacy;
-  global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
-  global $ext_element;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
+function get_resourcegroup_params() {
+  global $tf_name, $tf_desc, $tf_resource, $cb_priv, $HTTP_POST_VARS, $HTTP_GET_VARS;
+  global $ext_id;
+  
+  // Get global params
+  $params = get_global_params("ResourceGroup");
 
-  // Group fields
-  if (isset ($param_resourcegroup)) $resourcegroup["id"] = $param_resourcegroup;
-  if (isset ($tf_name)) $resourcegroup["name"] = trim($tf_name);
-  if (isset ($tf_desc)) $resourcegroup["desc"] = trim($tf_desc);
-  if (isset ($tf_email)) $resourcegroup["email"] = $tf_email;
-  if (isset ($tf_resource)) $resourcegroup["resource"] = trim($tf_resource);
-  if (isset ($cb_privacy)) $resourcegroup["privacy"] = ($cb_privacy == 1 ? 1 : 0);
-  if (isset ($sel_privacy)) $resourcegroup["privacy"] = $sel_privacy;
-
-  if (isset ($child_res)) $resourcegroup["children_restriction"] = $child_res;
-
-  if (isset ($new_order)) $resourcegroup["new_order"] = $new_order;
-  if (isset ($order_dir)) $resourcegroup["order_dir"] = $order_dir;
-  if (isset ($entity)) $resourcegroup["entity"] = $entity;
-
-  // External param
-  if (isset ($popup)) $resourcegroup["popup"] = $popup;
-  if (isset ($ext_action)) $resourcegroup["ext_action"] = $ext_action;
-  if (isset ($ext_title)) $resourcegroup["ext_title"] = $ext_title;
-  if (isset ($ext_target)) $resourcegroup["ext_target"] = $ext_target;
-  if (isset ($ext_url)) $resourcegroup["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $resourcegroup["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $resourcegroup["id"] = $ext_id;
-  if (isset ($ext_element)) $resourcegroup["ext_element"] = $ext_element;  
-  if (isset ($ext_widget)) $resourcegroup["ext_widget"] = $ext_widget;
-
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+  //Get resourcegroup specific params
+  if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($ext_id)) $params["resourcegroup_id"] = $ext_id;
+  
+    if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
     $http_obm_vars = $HTTP_GET_VARS;
@@ -291,22 +268,21 @@ function get_param_resourcegroup() {
     $nb_resourcegroup = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
       if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
-	$nb_u++;
+  $nb_u++;
         $u_num = substr($key, 4);
-        $resourcegroup["resource$nb_u"] = $u_num;
+        $params["resource$nb_u"] = $u_num;
       } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
-	$nb_resourcegroup++;
-        $resourcegroup_num = substr($key, 4);
-        $resourcegroup["resourcegroup_$nb_resourcegroup"] = $resourcegroup_num;
+  $nb_resourcegroup++;
+        $params_num = substr($key, 4);
+        $params["resourcegroup_$nb_resourcegroup"] = $params_num;
       }
     }
-    $resourcegroup["resource_nb"] = $nb_u;
-    $resourcegroup["resourcegroup_nb"] = $nb_resourcegroup;
+    $params["resource_nb"] = $nb_u;
+    $params["resourcegroup_nb"] = $nb_resourcegroup;
   }
+  display_debug_param($params);
 
-  display_debug_param($resourcegroup);
-
-  return $resourcegroup;
+  return $params;
 }
 
 
@@ -314,7 +290,7 @@ function get_param_resourcegroup() {
 // Group Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_resourcegroup_action() {
-  global $resourcegroup, $actions, $path, $l_resourcegroup;
+  global $params, $actions, $path, $l_resourcegroup;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
   global $l_header_add_resource, $l_add_resource, $l_header_add_resourcegroup, $l_add_resourcegroup;
@@ -345,7 +321,7 @@ function get_resourcegroup_action() {
 // Detail Consult
   $actions["resourcegroup"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=".$resourcegroup["id"]."",
+    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=".$params["resourcegroup_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate')
@@ -354,7 +330,7 @@ function get_resourcegroup_action() {
 // Detail Update
   $actions["resourcegroup"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=".$resourcegroup["id"]."",
+    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;resourcegroup_id=".$params["resourcegroup_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
@@ -379,7 +355,7 @@ function get_resourcegroup_action() {
 // Check Delete
   $actions["resourcegroup"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;param_resourcegroup=".$resourcegroup["id"]."",
+    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;resourcegroup_id=".$params["resourcegroup_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'resource_add', 'resource_del', 'resourcegroup_add', 'resourcegroup_del', 'update')
@@ -402,7 +378,7 @@ function get_resourcegroup_action() {
 // sel resourcegroup add : Groups selection
   $actions["resourcegroup"]["sel_resourcegroup_add"] = array (
     'Name'     => $l_header_add_resourcegroup,
-    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resourcegroup)."&amp;ext_action=resourcegroup_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=".$resourcegroup["id"]."&amp;ext_target=$l_resourcegroup&amp;child_res=1",
+    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resourcegroup)."&amp;ext_action=resourcegroup_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=".$params["resourcegroup_id"]."&amp;ext_target=$l_resourcegroup&amp;child_res=1",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_resourcegroup,
@@ -413,7 +389,7 @@ function get_resourcegroup_action() {
 // Sel resource add : Resources selection
   $actions["resourcegroup"]["sel_resource_add"] = array (
     'Name'     => $l_header_add_resource,
-    'Url'      => "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resource)."&amp;ext_action=resource_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=".$resourcegroup["id"]."&amp;ext_target=$l_resourcegroup",
+    'Url'      => "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_resource)."&amp;ext_action=resource_add&amp;ext_url=".urlencode($path."/resourcegroup/resourcegroup_index.php")."&amp;ext_id=".$params["resourcegroup_id"]."&amp;ext_target=$l_resourcegroup",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_resourcegroup,
@@ -488,20 +464,20 @@ function get_resourcegroup_action() {
 // ResourceGroup Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_resourcegroup_action() {
-  global $resourcegroup, $actions, $path, $l_add_resource, $l_add_resourcegroup, $l_resourcegroup;
+  global $params, $actions, $path, $l_add_resource, $l_add_resourcegroup, $l_resourcegroup;
 
-  $id = $resourcegroup["id"];
+  $id = $params["resourcegroup_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["resourcegroup"]["detailconsult"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;param_resourcegroup=$id";
+    $actions["resourcegroup"]["detailconsult"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=$id";
     $actions["resourcegroup"]["detailconsult"]['Condition'][] = 'insert';
 
     // Detail Update
-    $actions["resourcegroup"]["detailupdate"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;param_resourcegroup=$id";
+    $actions["resourcegroup"]["detailupdate"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=detailupdate&amp;resourcegroup_id=$id";
     $actions["resourcegroup"]["detailupdate"]['Condition'][] = 'insert';
 
     // Check Delete
-    $actions["resourcegroup"]["check_delete"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;param_resourcegroup=$id";
+    $actions["resourcegroup"]["check_delete"]['Url'] = "$path/resourcegroup/resourcegroup_index.php?action=check_delete&amp;resourcegroup_id=$id";
     $actions["resourcegroup"]["check_delete"]['Condition'][] = 'insert';
 
     // Sel Resource add

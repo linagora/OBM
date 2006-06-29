@@ -12,15 +12,16 @@
 // Parameters :
 //   - $deal[]   : deal search criteria
 //   - $all : if it is set to 1 then return also the private deals ...
-//   - $p_new_order  : if it's set, it replaces the default "order by" value
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
+function run_query_deal_search($deal, $all="") {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $parent = $deal["parent"];
+  $sql_order_dir = $deal["sql_order_dir"];
+  $sql_order_field = $deal["sql_order_field"];
+
+  $parent = $deal["parentdeal_id"];
   $label = sql_search_text_parse($deal["label"]);
-  $company_id = $deal["company"];
+  $company_id = $deal["company_id"];
   $name = sql_search_text_parse($deal["company_name"]);
   $zip = sql_search_text_parse($deal["company_zip"]);
   $archive = $deal["archive"];
@@ -107,17 +108,17 @@ function run_query_deal_search($deal, $all="", $p_new_order="", $p_order_dir) {
 
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "deal_datealarm";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "deal_datealarm";
 
   // Order exceptions (order on calculated rows)
-  if (strcmp($p_new_order, "expected_quarter")==0) {
+  if (strcmp($sql_order_field, "expected_quarter")==0) {
     $order = "deal_dateexpected";
-  } else if (strcmp($p_new_order, "end_quarter")==0) {
+  } else if (strcmp($sql_order_field, "end_quarter")==0) {
     $order = "deal_dateend";
-  } else if (strcmp($p_new_order, "sale_delay")==0) {
+  } else if (strcmp($sql_order_field, "sale_delay")==0) {
     $order = "deal_dateexpected-deal_datebegin";
   }
-  $orderq = " ORDER BY $order $p_order_dir $order_next";
+  $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
 
   $query = "SELECT DISTINCT
@@ -250,8 +251,8 @@ function run_query_deal_insert($deal) {
   global $auth, $cdg_sql, $l_no;
 
   $now = date("Y-m-d H:i:s");
-  $id = $deal["id"];
-  $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
+  $id = $deal["deal_id"];
+  $pid = ($deal["parentdeal_id"] ? "'".$deal["parentdeal_id"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
   $priv = $deal["privacy"];
@@ -262,10 +263,10 @@ function run_query_deal_insert($deal) {
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
-  $comp = $deal["company"];
+  $comp = $deal["company_id"];
   $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
   $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
-  $source_id = ($deal["source_id"] ? "'".$deal["source_id"]."'" : "0");
+  $source_id = ($deal["source"] ? "'".$deal["source"]."'" : "0");
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
@@ -393,8 +394,8 @@ function run_query_deal_update($deal) {
   global $auth, $cdg_sql, $l_no;
 
   $now = date("Y-m-d H:i:s");
-  $id = $deal["id"];
-  $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
+  $id = $deal["deal_id"];
+  $pid = ($deal["parentdeal_id"] ? "'".$deal["parentdeal_id"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
   $priv = $deal["privacy"];
@@ -405,10 +406,10 @@ function run_query_deal_update($deal) {
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
-  $comp = $deal["company"];
+  $comp = $deal["company_id"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
-  $source_id = ($deal["source_id"] ? $deal["source_id"] : "0");
+  $source_id = ($deal["source"] ? $deal["source"] : "0");
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
@@ -552,7 +553,7 @@ function deal_send_mail($deal) {
   global $l_no, $l_members, $l_group, $l_obm_title, $l_deal, $l_company;
   global $l_amount, $l_hitrate, $l_todo, $l_status, $l_alarm, $l_expected, $l_end;
 
-  $id = $deal["id"];
+  $id = $deal["deal_id"];
   $d = get_deal_info($id);
   $mail_comment = $deal["mail_comment"];
   $market = $d["market"];
@@ -604,7 +605,7 @@ $datecomment:$usercomment:$add_comment";
 function run_query_deal_quick_update($deal) {
   global $auth, $cdg_sql, $l_no;
 
-  $id = $deal["id"];
+  $id = $deal["deal_id"];
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
   $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
@@ -660,7 +661,7 @@ function run_query_deal_id($deal) {
   $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
-  $comp = $deal["company"];
+  $comp = $deal["company_id"];
   $market = ($deal["market"] ? "='".$deal["market"]."'" : "is null");
   $tech = ($deal["tech"] ? "='".$deal["tech"]."'" : "is null");
   $dateprop = ($deal["dateproposal"] ? "='".$deal["dateproposal"]."'" : "is null");
@@ -1064,10 +1065,11 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
   }
 
   // Order by clause
-  $new_order = $deal["new_order"];
-  $order_dir = $deal["order_dir"];
-  $field = (strcmp($new_order,"") != 0) ? $new_order : "deal_marketingmanager";
-  $orderq = " ORDER BY $field $order_dir";
+  $sql_order_field = $deal["sql_order_field"];
+  $sql_order_dir = $deal["sql_order_dir"];
+  
+  $field = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "deal_marketingmanager";
+  $orderq = " ORDER BY $field $sql_order_dir";
 
   $query = "SELECT
       deal_id,
@@ -1398,8 +1400,8 @@ function get_lead_info($lead_id) {
 
   $res["name"] = $obm_q->f("lead_name");
   $res["company_id"] = $obm_q->f("lead_company_id");
-  $res["source_id"] = $obm_q->f("lead_source_id");
-  $res["manager_id"] = $obm_q->f("lead_manager_id");
+  $res["source"] = $obm_q->f("lead_source_id");
+  $res = $obm_q->f("lead_manager_id");
   $res["date"] = $obm_q->f("lead_date");
   $res["datealarm"] = $obm_q->f("lead_datealarm");
   $res["todo"] = $obm_q->f("lead_todo");
@@ -2017,11 +2019,14 @@ function check_deal_can_delete_parentdeal($p_id) {
 // Parameters :
 //   - $deal[]       : parentdeal search criteria
 //     keys used     : plabel, pmanager, parchive
-//   - $p_new_order  : if it's set, it replaces the default "order by" value
-//   - $p_order_dir  : direction for order clause (asc, desc)
+//   - $sql_order_field  : if it's set, it replaces the default "order by" value
+//   - $sql_order_dir  : direction for order clause (asc, desc)
 //////////////////////////////////////////////////////////////////////////////
-function run_query_deal_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
+function run_query_deal_search_parentdeal($deal) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
+
+  $sql_order_dir = $deal["sql_order_dir"];
+  $sql_order_field = $deal["sql_order_field"];
 
   $plabel = sql_search_text_parse($deal["plabel"]);
   $pmanager = $deal["pmanager"];
@@ -2049,8 +2054,8 @@ function run_query_deal_search_parentdeal($deal, $p_new_order="", $p_order_dir="
   $whereq = "WHERE $where";
 
   // Order by clause
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "parentdeal_timecreate"; 
-  $orderq = " ORDER BY $order $p_order_dir";
+  $order=(strcmp($sql_order_field,"") != 0) ? $sql_order_field : "parentdeal_timecreate"; 
+  $orderq = " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT
       parentdeal_id as id,
@@ -2166,7 +2171,7 @@ function run_query_deal_parentdeal_detail($pid) {
 function run_query_deal_parentdeal_update($deal) {
   global $auth, $cdg_sql;
 
-  $pid = ($deal["parent"] ? $deal["parent"] : "null");
+  $pid = ($deal["parentdeal_id"] ? $deal["parentdeal_id"] : "null");
   $plabel = $deal["plabel"];
   $pmarket = ($deal["pmarket"] ? $deal["pmarket"] : "null");
   $ptech = ($deal["ptech"] ? $deal["ptech"] : "null");

@@ -42,7 +42,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail,$ext_element;
 
   if (($fieldname == "userobm_login") && $link_ok) {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("userobm_id");
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
   }
   if (($fieldname == "data_element") && $ext_element != "") {
     $res["name"] = "<span id=\"data-user-".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
@@ -107,7 +107,7 @@ function html_user_search_form($user) {
   $perms = $user["perms"];
   $lname = stripslashes($user["lastname"]);
   $email = $user["email"];
-  $desc = $user["description"];
+  $desc = $user["desc"];
   $group = $user["group"];
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
@@ -198,11 +198,11 @@ function html_user_search_form($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_search_list($user) {
   global $l_found, $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth;
 
   $popup = $user["popup"];
   $restriction = $user["restriction_calendar"];
-  $obm_q = run_query_user_search($user, $new_order, $order_dir, $restriction);
+  $obm_q = run_query_user_search($user);
 
   $prefs = get_display_pref($auth->auth["uid"], "user");
   $nb_user = $obm_q->num_rows_total();
@@ -233,7 +233,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   $lname = urlencode($user["lastname"]);
   $perms = $user["perms"];
   $email = $user["email"];
-  $desc = urlencode($user["description"]);
+  $desc = urlencode($user["desc"]);
   $group = urlencode($user["group"]);
   $archive = $user["archive"];
 
@@ -326,7 +326,7 @@ function html_user_form($usr_q, $user) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($user["id"])) { $id = $user["id"]; }
+  if (isset($user["user_id"])) { $id = $user["user_id"]; }
   if (isset($user["login"])) { $login = $user["login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
   if (isset($user["perms"])) { $perms = $user["perms"]; }
@@ -338,7 +338,7 @@ function html_user_form($usr_q, $user) {
   if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
-  if (isset($user["description"])) { $desc = $user["description"]; }
+  if (isset($user["desc"])) { $desc = $user["desc"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
 
@@ -359,7 +359,7 @@ function html_user_form($usr_q, $user) {
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
-          <input type=\"hidden\" name=\"param_user\" value=\"$id\">
+          <input type=\"hidden\" name=\"user_id\" value=\"$id\">
           <input type=\"submit\" value=\"$l_update\">";
   }
 
@@ -434,7 +434,7 @@ function html_user_form($usr_q, $user) {
 function dis_user_consult($user) {
   global $display, $l_query_error;
 
-  $id = $user["id"];
+  $id = $user["user_id"];
 
   $obm_q = run_query_user_detail($id);
   if ($obm_q->num_rows() == 1) {
@@ -489,7 +489,7 @@ function html_user_consult($obm_q) {
       $dis_group .= "
     </tr><tr>
       <td class=\"detailLabel\">$l_group</td>
-      <td class=\"detailText\"><a href=\"$path/group/group_index.php?action=detailconsult&amp;param_group=$grp_id\">$grp_name</a></td>";
+      <td class=\"detailText\"><a href=\"$path/group/group_index.php?action=detailconsult&amp;group_id=$grp_id\">$grp_name</a></td>";
     }
     $dis_group .= "
     </tr>
@@ -603,7 +603,7 @@ function html_user_group_consult($usr_q) {
   </table>
 
   <p>
-  <input type=\"hidden\" name=\"param_user\" value=\"$id\">
+  <input type=\"hidden\" name=\"user_id\" value=\"$id\">
   <input type=\"hidden\" name=\"action\" value=\"group_update\">
   <input type=\"submit\" value=\"$l_update_group\">
   </form>";
@@ -643,7 +643,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     $samename = $usr_q->f("userobm_login");
     $dis_same_user .= "
         <tr><td colspan =\"2\" class=\"detailLabel\">
-          <a href=\"" . url_prepare("user_index.php?action=detailconsult&amp;param_user=$id") . "\">$samename</a>
+          <a href=\"" . url_prepare("user_index.php?action=detailconsult&amp;user_id=$id") . "\">$samename</a>
         </td></tr>";
   }
 
@@ -702,13 +702,13 @@ function dis_user_can_delete($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_user\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"user_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_user\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"user_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";

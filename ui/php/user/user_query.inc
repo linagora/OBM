@@ -12,18 +12,22 @@
 // Parameters:
 //   - $user[] : user search criteria
 //     keys used  : name, perms
-//   - $p_new_order : infos for order clause
-//   - $p_order_dir : direction for order clause (asc, desc)
+//   - $sql_order_field : infos for order clause
+//   - $sql_order_dir : direction for order clause (asc, desc)
 //   - $restriction : if and which restriction to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_search($user, $p_new_order, $p_order_dir, $restriction="") {
+function run_query_user_search($user) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
+  $sql_order_dir = $user["sql_order_dir"];
+  $sql_order_field = $user["sql_order_field"];
+
+  $restriction = $user["restriction_calendar"];
   $login = sql_search_text_parse($user["login"]);
   $perms = $user["perms"];
   $lname = sql_search_text_parse($user["lastname"]);
   $email = sql_search_text_parse($user["email"]);
-  $desc = sql_search_text_parse($user["description"]);
+  $desc = sql_search_text_parse($user["desc"]);
   $group = sql_search_text_parse($user["group"]);
   $archive = $user["archive"];
 
@@ -106,8 +110,8 @@ function run_query_user_search($user, $p_new_order, $p_order_dir, $restriction="
 
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
-  $orderq .= " ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "userobm_login";
+  $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
     $whereq
@@ -189,7 +193,7 @@ function run_query_user_insert($user) {
   $archive = ($user["archive"] ? "1" : "0");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
-  $desc = $user["description"];
+  $desc = $user["desc"];
   $phone = $user["phone"];
   $phone2 = $user["phone2"];
   $fax = $user["fax"];
@@ -291,7 +295,7 @@ function run_query_user_update($p_id, $user) {
   $fax = $user["fax"];
   $fax2 = $user["fax2"];
   $email = $user["email"];
-  $desc = $user["description"];
+  $desc = $user["desc"];
 
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
@@ -420,7 +424,7 @@ function run_query_user_group() {
 function run_query_user_update_user_group($user) {
   global $cdg_sql;
 
-  $uid = $user["id"];
+  $uid = $user["user_id"];
   $query = "DELETE FROM UserObmGroup WHERE userobmgroup_userobm_id = '$uid'";
 
   display_debug_msg($query, $cdg_sql);
@@ -518,7 +522,7 @@ function check_user_data_form($p_id, $user) {
   global $l_lname_error, $php_regexp_email;
   global $err_msg, $action, $cdg_sql;
 
-  $id = $user["id"];
+  $id = $user["user_id"];
   $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];

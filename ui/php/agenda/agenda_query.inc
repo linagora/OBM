@@ -303,8 +303,8 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
   $mail  = $agenda["mail"];
   $groups = $sel_entity_id["group"];
   $mail_title = stripslashes($agenda["title"]);
-  $datebegin = $agenda["datebegin"];
-  $dateend = $agenda["dateend"];
+  $datebegin = $agenda["date_begin"];
+  $dateend = $agenda["date_end"];
 
   // Get the final user list (merge group)
   $users_array = $sel_entity_id["user"];
@@ -393,8 +393,8 @@ function run_query_agenda_insert_event_data($agenda) {
   $description = $agenda["description"];
   $location = $agenda["location"];
   ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
-  $datebegin = $agenda["datebegin"];
-  $dateend = $agenda["dateend"];
+  $datebegin = $agenda["date_begin"];
+  $dateend = $agenda["date_end"];
   $event_duration = $agenda["event_duration"];
   if ($agenda["privacy"]!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $agenda["kind"];
@@ -689,8 +689,8 @@ END:VCALENDAR";
 ///////////////////////////////////////////////////////////////////////////////
 function check_agenda_conflict($agenda, $sel_entity_id) {
 
-  $ts_begin = isodatetime_to_timestamp($agenda["datebegin"]);
-  $ts_end = isodatetime_to_timestamp($agenda["dateend"]);
+  $ts_begin = isodatetime_to_timestamp($agenda["date_begin"]);
+  $ts_end = isodatetime_to_timestamp($agenda["date_end"]);
   $id = $agenda["id"];
   $obm_q = run_query_agenda_conflict_events($ts_begin, $ts_end, $sel_entity_id, $id);
   if ($obm_q->nf() == 0) {
@@ -728,8 +728,8 @@ function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
   global $cagenda_resource_admin, $l_resource_allocated;
 
-  $datebegin = $agenda["datebegin"];
-  $dateend = $agenda["dateend"];
+  $datebegin = $agenda["date_begin"];
+  $dateend = $agenda["date_end"];
   $event_id = $agenda["id"];
   $groups = $agenda["group"];
   $mail = $agenda["mail"];
@@ -863,7 +863,7 @@ function run_query_agenda_update_event_data($agenda) {
   $priority = $agenda["priority"];
   $description = $agenda["description"];
   $location = $agenda["location"];
-  $datebegin = $agenda["datebegin"];
+  $datebegin = $agenda["date_begin"];
   $event_duration = $agenda["event_duration"];
   ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
   $event_id = $agenda["id"]; 
@@ -1413,10 +1413,10 @@ function check_agenda_data_form($agenda) {
   global $l_err_end_repeat3, $l_err_days_repeat, $l_err_days_repeat_not_weekly;
   
   $title = $agenda["title"];
-  $datebegin = $agenda["datebegin"];
-  $dateend = $agenda["dateend"];
+  $datebegin = $agenda["date_begin"];
+  $dateend = $agenda["date_end"];
   $repeat_end = $agenda["repeat_end"];
-  $kind = $agenda["kind"];
+  $kind = $agenda["repeat_kind"];
   $repeat_days = $agenda["repeat_days"];
   $repeatfrequency = $agenda["repeatfrequency"];
 
@@ -1451,7 +1451,8 @@ function check_agenda_data_form($agenda) {
       return false;
     }
   }
-  if(!is_int($repeatfrequency) ||  $repeatfrequency < 1) {
+  
+  if(!is_numeric($repeatfrequency) ||  $repeatfrequency < 1) {
     $err_msg = $l_err_repeatfrequency;
     return false;
   }

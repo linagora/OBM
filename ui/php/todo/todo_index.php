@@ -31,7 +31,7 @@ if (!(($action == "detailupdate") && ($popup)))
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 
-$todo = get_param_todo();
+$params = get_todo_params();
 get_todo_action();
 $perm->check_permissions($module, $action);
 
@@ -40,65 +40,65 @@ page_close();
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["result"] = dis_todo_form($todo);
-  $display["result"] .= dis_todo_search_list($todo);
+  $display["result"] = dis_todo_form($params);
+  $display["result"] .= dis_todo_search_list($params);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $todo_q = run_query_todo_detail($todo);
-  $display["detailInfo"] = display_record_info($todo_q);
-  $display["detail"] .= dis_todo_detail($todo, $todo_q);
+  $params_q = run_query_todo_detail($params);
+  $display["detailInfo"] = display_record_info($params_q);
+  $display["detail"] .= dis_todo_detail($params, $params_q);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_todo_data_form($todo)) {
-    $retour = run_query_todo_insert($todo);
+  if (check_todo_data_form($params)) {
+    $retour = run_query_todo_insert($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_todo : $l_insert_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_todo : $l_insert_error");
     }
     $display["result"] = dis_todo_form("");
-    $display["result"] .= dis_todo_search_list($todo);
+    $display["result"] .= dis_todo_search_list($params);
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_todo_form($todo);
+    $display["detail"] = dis_todo_form($params);
   }
 
 } else if ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_todo_delete($HTTP_POST_VARS);
-  $display["result"] = dis_todo_form($todo);
-  $display["result"] .= dis_todo_search_list($todo);
+  $display["result"] = dis_todo_form($params);
+  $display["result"] .= dis_todo_search_list($params);
 
 } else if ($action == "delete_unique") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_todo_can_delete($todo["id"])) {
-    $retour = run_query_todo_delete_unique($todo["id"]);
+  if (check_todo_can_delete($params["todo_id"])) {
+    $retour = run_query_todo_delete_unique($params["todo_id"]);
     if ($retour) {
       $display["msg"] = display_ok_msg("$l_todo : $l_delete_ok");
     } else {
       $display["msg"] = display_err_msg("$l_todo : $l_delete_error");
     }
-    $display["result"] = dis_todo_form($todo);
-    $display["result"] .= dis_todo_search_list($todo);
+    $display["result"] = dis_todo_form($params);
+    $display["result"] .= dis_todo_search_list($params);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $todo_q = run_query_todo_detail($todo);
-    $display["detail"] .= dis_todo_detail($todo, $todo_q);
+    $params_q = run_query_todo_detail($params);
+    $display["detail"] .= dis_todo_detail($params, $params_q);
   }
 
 } else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $todo_q = run_query_todo_detail($todo);
-  $display["result"] = dis_todo_form($todo, $todo_q);
+  $params_q = run_query_todo_detail($params);
+  $display["result"] = dis_todo_form($params, $params_q);
 
 } else if ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_todo_data_form($todo)) {
-    $retour = run_query_todo_update($todo);
+  if (check_todo_data_form($params)) {
+    $retour = run_query_todo_update($params);
 
     if ($popup) {
       $display["result"] .= "
@@ -109,13 +109,13 @@ if ($action == "index" || $action == "") {
     } else {
       $action = "index";
       $display["result"] = dis_todo_form("");
-      $display["result"] .= dis_todo_search_list($todo);
+      $display["result"] .= dis_todo_search_list($params);
     }
 
     // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_todo_form($todo);
+    $display["detail"] = dis_todo_form($params);
   }
 
 }  elseif ($action == "display") {
@@ -160,42 +160,29 @@ display_page($display);
 // Stores Company parameters transmited in $company hash
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_todo() {
-  global $uid, $param_todo, $action, $popup, $new_order, $order_dir;
-  global $tf_title, $sel_user_id, $sel_priority, $tf_deadline, $ta_content;
-  global $tf_percent;
+function get_todo_params() {
 
-  if (isset ($uid)) $todo["uid"] = $uid;
-  if (isset ($action)) $todo["action"] = $action;
-  if (isset ($popup)) $todo["popup"] = $popup;
-  if (isset ($param_todo)) $todo["id"] = $param_todo;
-  if (isset ($new_order)) $todo["new_order"] = $new_order;
-  if (isset ($order_dir)) $todo["order_dir"] = $order_dir;
-
-  // Todo form
-  if (isset ($tf_title)) $todo["title"] = $tf_title;
-  if (isset ($tf_deadline)) $todo["deadline"] = $tf_deadline;
-  if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
-  if (isset ($tf_percent)) $todo["percent"] = $tf_percent;
-  if (isset ($ta_content)) $todo["content"] = $ta_content;
-
-  // sel_user_id can be filled by sel_user_id or sel_ent (see below)
-  if (is_array($sel_user_id)) {
-    while ( list( $key, $value ) = each( $sel_user_id ) ) {
-      // sel_user_id contains select infos (data-user-$id)
+  // Get global params
+  $params = get_global_params("Todo");
+  
+  // Get todo specific params
+  if (is_array($params["user_id"])) {
+    while ( list( $key, $value ) = each( $params["user_id"] ) ) {
+      // user_id contains select infos (data-user-$id)
       if (strcmp(substr($value, 0, 10),"data-user-") == 0) {
-	$data = explode("-", $value);
-	$id = $data[2];
-	$todo["sel_user_id"][] = $id;
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["userid"][] = $id;
       } else {
-	// direct id
-	$todo["sel_user_id"][] = $value;
+        // direct id
+        $params["userid"][] = $value;
       }
     }
   }
-  display_debug_param($todo);
+  
+  display_debug_param($params);
 
-  return $todo;
+  return $params;
 }
 
 
@@ -203,7 +190,7 @@ function get_param_todo() {
 // Company Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_todo_action() {
-  global $todo, $actions, $path;
+  global $params, $actions, $path;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_list, $l_header_delete, $l_header_update;
   global $l_header_consult, $l_header_admin, $l_header_display;
@@ -219,7 +206,7 @@ function get_todo_action() {
 // Search
   $actions["todo"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/todo/todo_index.php?action=detailconsult&amp;param_todo=". $todo["id"],
+    'Url'      => "$path/todo/todo_index.php?action=detailconsult&amp;todo_id=". $params["todo_id"],
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
                                     	 );
@@ -240,7 +227,7 @@ function get_todo_action() {
 
 // Update
   $actions["todo"]["update"]  = array (
-    'Url'      => "$path/todo/todo_index.php?action=update&amp;param_todo=". $todo["id"],
+    'Url'      => "$path/todo/todo_index.php?action=update&amp;todo_id=". $params["todo_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
@@ -248,7 +235,7 @@ function get_todo_action() {
 // Update
   $actions["todo"]["detailupdate"]  = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;param_todo=". $todo["id"],
+    'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;todo_id=". $params["todo_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate') 
                                       );
@@ -256,7 +243,7 @@ function get_todo_action() {
 // Delete a todo
   $actions["todo"]["delete_unique"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/todo/todo_index.php?action=delete_unique&amp;param_todo=". $todo["id"],
+    'Url'      => "$path/todo/todo_index.php?action=delete_unique&amp;todo_id=". $params["todo_id"],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
 

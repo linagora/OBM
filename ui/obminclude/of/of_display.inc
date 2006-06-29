@@ -218,9 +218,9 @@ class OBM_DISPLAY {
 	$block .= "
         <td>&nbsp;</td>";
       } else {
-        $new_order = $fieldorder + 1;
+        $sql_order_field = $fieldorder + 1;
 	$block .= "
-        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$new_order")."\">
+        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
           <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
       }
       
@@ -229,10 +229,10 @@ class OBM_DISPLAY {
 	$block .= "
         <td >&nbsp;</td>";
       } else {
-        $new_order = $fieldorder - 1;
+        $sql_order_field = $fieldorder - 1;
 	$block .= "
         <td>
-          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$new_order")."\">
+          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
           <img alt=\"$l_up\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       $block .= "
@@ -526,7 +526,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $page, $new_order, $order_dir, $entity, $of_display_name, $ctu_sql_limit;
+    global $path, $page, $sql_order_field, $sql_order_dir, $entity, $of_display_name, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
@@ -568,26 +568,26 @@ class OBM_DISPLAY {
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
     if ($start_page > 1) {
       $i = $start_page - $nb_page_dis;
-      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
     }
 
     // Previous page
     if ($lpage > 1) {
       $tmppage = $lpage - 1;
-      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     $i = $start_page;
     // Pages display
     while ($i <= $end_page) {
       if ($i != $lpage) {
-	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">$i</a> | \n";
+	$content .= "<a href=\"$url&amp;page=$i&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">$i</a> | \n";
       } else {
 	$content .= "$i | \n";
       }
@@ -597,19 +597,19 @@ class OBM_DISPLAY {
     // Next page
     if ($lpage < $nb_page) {
       $tmppage = $lpage + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
     }
 
     // Go to next $nb_page_dis pages
     if ($end_page < $nb_page) {
       $i = $end_page + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">+$nb_page_dis</a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">+$nb_page_dis</a>";
     }
 
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export - Uses forms to allow big queries to be transmitted
@@ -659,7 +659,7 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $of_display_name, $page, $new_order, $order_dir;
+    global $of_display_name, $page, $sql_order_dir, $sql_order_field;
     global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
 
     // If displayed without links (in popup) add this in url
@@ -698,8 +698,9 @@ class OBM_DISPLAY {
       if (! ($cgp_hide[$entity][$fieldname]
 	     || $cgp_hide[$entity][$fieldname_base])) {
 	$label = $fieldnames[$fieldname];
-	$order = ($order_dir == "DESC" ? "ASC" : "DESC");
-
+  
+  $order = ($sql_order_dir == "DESC" ? "ASC" : "DESC");
+  
 	$block .= "
         <td class=\"resultHead\">";
 	if ($this->data_order) {
@@ -707,9 +708,9 @@ class OBM_DISPLAY {
 	  if ($url != "") {
 	    // If action on this dataset
 	    if ($this_name == $of_display_name) {
-	      $block .= "&amp;page=$page&amp;new_order=$fieldname&amp;order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $block .= "&amp;page=$page&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
 	    } else {
-	      $block .= "&amp;page=1&amp;new_order=$fieldname&amp;order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $block .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
 	    }
 	  }
 	  $block .= "\">";
@@ -1088,7 +1089,7 @@ function display_last_visited($path="..") {
       $text = substr($last_v[$module]["text"], 0, 30);
       $l_ico = "ico_$module";
       global ${$l_ico};
-      $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;param_${module}=$id");
+      $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
       $dis_last .= "
         <li class=\"blockItem; lastItem\"><a href=\"$mod_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"\" /></a>
           <a href=\"$mod_url\">$text</a></li>";
@@ -1129,7 +1130,7 @@ function display_todos($path="..") {
   for ($i = 1; $i <= $nb; $i++) {
     $t_id = $todos[$i]["id"];
     $t_title = $todos[$i]["title"];
-    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=$t_id");
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;todo_id=$t_id");
     $todo_title = substr($t_title, 0, 30);
     $block_todo .= "
       <li class=\"blockItem\"><a href=\"$todo_url\">$todo_title</a></li>";

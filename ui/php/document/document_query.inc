@@ -13,13 +13,14 @@
 // Parametes:
 //   - $document[]    : document search criteria
 //     keys used       archive, name, phone, kind, zip
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_document_search($document, $p_new_order, $p_order_dir) {
+function run_query_document_search($document) {
   global $c_all, $cdg_sql, $auth, $ctu_sql_limit, $cdoc_kind_dir;
 
   $uid = $auth->auth["uid"];
+
+  $sql_order_dir = $document["sql_order_dir"];
+  $sql_order_field = $document["sql_order_field"];
 
   $title = sql_search_text_parse($document["title"]);
   $cat1 = $document["category1"];
@@ -75,8 +76,8 @@ function run_query_document_search($document, $p_new_order, $p_order_dir) {
   $whereq = "WHERE $where";
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "document_title";
-  $orderq = "ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "document_title";
+  $orderq = "ORDER BY $order $sql_order_dir";
   
   $req = "SELECT
       document_id as id,
@@ -226,7 +227,7 @@ function run_query_document_insert(&$document) {
   $retour = $obm_q->query($query);
 
   $doc_id = run_query_document_id($document);
-  $document["id"] = $doc_id;
+  $document["document_id"] = $doc_id;
 
   // If the document is correctly inserted in db
   if ($doc_id > 0) {
@@ -318,7 +319,7 @@ function run_query_document_update($did, &$document) {
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
 
-  $id = $document["id"];
+  $id = $document["document_id"];
   $title = $document["title"];
   $cat1 = $document["category1"];
   $cat2 = $document["category2"];
@@ -437,7 +438,7 @@ function get_document_disk_path($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_create_file($document) {
 
-  $id = $document["id"];
+  $id = $document["document_id"];
   $file = $document["file"];
 
   $disk_path = get_document_disk_path($id);
@@ -928,7 +929,7 @@ function run_query_document_update_dir($document) {
   $path = $document["path"].$document["name"];
   $old_path = $document["path"].$document["old_name"];
   $name = $document["name"];
-  $id = $document["id"];
+  $id = $document["document_id"];
 
   $query = "UPDATE Document SET
     document_timeupdate = NOW(),

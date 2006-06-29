@@ -36,16 +36,16 @@ function dis_data_lead(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "lead_name") {
     $name = $OD->data_set->f($fieldname);
-    $res["url"] = "$path/lead/lead_index.php?action=detailconsult&amp;param_lead=".$OD->data_set->f("lead_id");
+    $res["url"] = "$path/lead/lead_index.php?action=detailconsult&amp;lead_id=".$OD->data_set->f("lead_id");
     $res["name"] = $name;
   }
 
   elseif ($fieldname == "lead_comment") {
-    $res["url"] = "$path/lead/lead_index.php?action=detailconsult&amp;param_lead=".$OD->data_set->f("lead_id");
+    $res["url"] = "$path/lead/lead_index.php?action=detailconsult&amp;lead_id=".$OD->data_set->f("lead_id");
   }
 
   elseif ($fieldname == "company_name") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("lead_company_id");
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f("lead_company_id");
   }
 
   else if ($fieldname == "lead_archive") {
@@ -91,8 +91,8 @@ function html_lead_search_form($params, $sources, $managers) {
   global $l_date, $l_after, $l_before;
   global $l_both, $l_received, $l_emitted;
 
-  $source_id = $params["source_id"];
-  $manager_id = $params["manager_id"];
+  $source_id = $params["source"];
+  $manager_id = $params["manager"];
   $company = $params["company"];
   $archive = ($params["archive"] == "1" ? "checked = \"checked\"" : "");
   $text = stripslashes($params["text"]);
@@ -174,9 +174,9 @@ function html_lead_search_form($params, $sources, $managers) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_search_list($params) {
   global $display, $l_found, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
-  $obm_q = run_query_lead_search($params, $new_order, $order_dir);
+  $obm_q = run_query_lead_search($params);
   $nb = $obm_q->num_rows_total();
   if ($nb == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -206,8 +206,8 @@ function html_lead_search_list($obm_q, $prefs, $params) {
   $company = $params["company"];
   $date_after = $params["date_after"];
   $date_before = $params["date_before"];
-  $source = $params["source_id"];
-  $manager = $params["manager_id"];
+  $source = $params["source"];
+  $manager = $params["manager"];
   $archive = $params["archive"];
 
   if ($popup) {
@@ -257,7 +257,7 @@ function dis_lead_consult($params) {
   global $display, $l_no_found, $path, $l_query_error;
 
   $view = $params["view"];
-  $id = $params["id"];
+  $id = $params["lead_id"];
 
   if ($id > 0) {
     $l_q = run_query_lead_detail($id);
@@ -303,7 +303,7 @@ function html_lead_consult($l_q) {
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_company 
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\">
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
       </td>
       <td class=\"detailText\">$c_name<br />$ad1<br/>$zip $town</td>
@@ -356,7 +356,7 @@ function html_lead_consult($l_q) {
 function dis_lead_form($action, $params) {
   global $display, $uid, $cg_com;
 
-  $p_id = $params["id"];
+  $p_id = $params["lead_id"];
   if ($p_id > 0) {
     $l_q = run_query_lead_detail($p_id);
     $users = array($uid, $l_q->f("lead_manager_id"));
@@ -424,9 +424,9 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (isset($params["company_name"])) { $c_name = $params["company_name"]; }
   if (isset($params["comp_new_id"])) { $c_new_id = $params["comp_new_id"]; }
   if (isset($params["comp_new_name"])) { $c_new_name = $params["comp_new_name"]; }
-  if (isset($params["id"])) { $id = $params["id"]; }
-  if (isset($params["source_id"])) { $source_id = $params["source_id"]; }
-  if (isset($params["manager_id"])) { $manager_id = $params["manager_id"]; }
+  if (isset($params["lead_id"])) { $id = $params["lead_id"]; }
+  if (isset($params["source"])) { $source_id = $params["source"]; }
+  if (isset($params["manager"])) { $manager_id = $params["manager"]; }
   if (isset($params["name"])) { $name = $params["name"]; }
   if (isset($params["date"])) { $date = $params["date"]; }
   if (isset($params["datealarm"])) { $datealarm = $params["datealarm"]; }
@@ -455,12 +455,12 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   $sel_manager .= "</select>";
 
   // Company Display
-  $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+  $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
       $c_name
-      </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
+      </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
@@ -498,7 +498,7 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
       </tr>";
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"param_lead\" value=\"$id\" />
+      <input type=\"hidden\" name=\"lead_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
   // INSERT
@@ -590,13 +590,13 @@ function dis_can_delete_lead($p_id) {
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"param_lead\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"lead_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"param_lead\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"lead_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
@@ -630,12 +630,12 @@ function dis_lead_admin_index() {
 // Parameters:
 //   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_lead_display_pref ($prefs, $prefs_i, $prefs_t) {
-  global $l_lead_options, $l_invoice_options, $l_et_options;
+function dis_lead_display_pref ($prefs) {
+  global $l_lead_display;
   global $set_theme ;
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "lead");
-  $dis_pref->pref_title = $l_lead_options;
+  $dis_pref->pref_title = $l_lead_display;
   $dis_pref->pref_dis_help = 1;
 
   $block .= $dis_pref->display();

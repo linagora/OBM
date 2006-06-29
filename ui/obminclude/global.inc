@@ -761,13 +761,61 @@ function get_lang() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return OBM params
+// Parameters :
+// Returns:
+//   $params : hash table which contains form params
+///////////////////////////////////////////////////////////////////////////////
+function get_global_params($table="") {
+  global $fieldnames;
+
+  $order_dir_values = array("ASC", "DESC");
+  
+  /*
+    tf_  = textfield
+    sel_ = select
+    cb_  = combo
+    ta_  = textarea
+    rd_  = radio
+    hd_  = hidden
+    fi_  = file
+  */
+  
+  $replace = array("tf_", "sel_", "cb_", "ta_", "rd_", "hd_", "fi_");
+  foreach($_REQUEST as $var => $value) {
+    $key = str_replace($replace,"",$var);
+
+    // sql_order_dir value control
+    if($key == "sql_order_dir") {
+      if(!in_array($value, $order_dir_values))
+        $value = $c_order_dir[0];
+    }
+
+    // sql_order_field value control
+    if($key == "sql_order_field") {
+      if(!in_array($value, array_keys($fieldnames)))
+        $value = "";
+    }
+
+    // Add value in hash table
+    if($value != ""){
+      $params[$key] = trim(strip_tags($value));
+    }
+
+  }
+
+  return $params;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the document related parameters in the array given
 // Parameters:
 //   - $mod_params
 // Returns:
 //   $lang
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_param_document(&$mod_params) {
+function get_global_params_document(&$mod_params) {
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
@@ -990,20 +1038,20 @@ function format_name($name, $up, $accent, $dot=false) {
   $res = $name;
 
   if ($accent) {
-    $res = preg_replace("/[èëéê]/i", "e", $name);
-    $res = preg_replace("/[ÈËÉÊ]/i", "E", $res);
-    $res = preg_replace("/[àä]/i", "a", $res);
-    $res = preg_replace("/[ÀÄ]/i", "A", $res);
-    $res = preg_replace("/[îï]/i", "i", $res);
-    $res = preg_replace("/[ÎÏ]/i", "I", $res);
-    $res = preg_replace("/[ôö]/i", "o", $res);
-    $res = preg_replace("/[ÔÖ]/i", "O", $res);
-    $res = preg_replace("/[ûüù]/i", "u", $res);
-    $res = preg_replace("/[ÛÜÙ]/i", "U", $res);
-    $res = preg_replace("/[ç]/i", "c", $res);
-    $res = preg_replace("/[Ç]/i", "C", $res);
-    $res = preg_replace("/[¨]/i", "s", $res);
-    $res = preg_replace("/[¦]/i", "S", $res);
+    $res = preg_replace("/[ï¿½ï¿½ï¿½ï¿½]/i", "e", $name);
+    $res = preg_replace("/[ï¿½ï¿½ï¿½ï¿½]/i", "E", $res);
+    $res = preg_replace("/[ï¿½ï¿½]/i", "a", $res);
+    $res = preg_replace("/[ï¿½ï¿½]/i", "A", $res);
+    $res = preg_replace("/[ï¿½ï¿½]/i", "i", $res);
+    $res = preg_replace("/[ï¿½ï¿½]/i", "I", $res);
+    $res = preg_replace("/[ï¿½ï¿½]/i", "o", $res);
+    $res = preg_replace("/[ï¿½ï¿½]/i", "O", $res);
+    $res = preg_replace("/[ï¿½ï¿½ï¿½]/i", "u", $res);
+    $res = preg_replace("/[ï¿½ï¿½ï¿½]/i", "U", $res);
+    $res = preg_replace("/[ï¿½]/i", "c", $res);
+    $res = preg_replace("/[ï¿½]/i", "C", $res);
+    $res = preg_replace("/[ï¿½]/i", "s", $res);
+    $res = preg_replace("/[ï¿½]/i", "S", $res);
   }
 
   if ($dot) {
@@ -1032,7 +1080,7 @@ function get_format_town($name) {
 
   $res = $name;
   if ($caf_town) {
-    $res = format_name($res, 2, true, false);
+    $res = strip_tags(format_name($res, 2, true, false));
   }
 
   return $res;

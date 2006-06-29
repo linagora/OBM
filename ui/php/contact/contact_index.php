@@ -9,13 +9,13 @@
 // Actions :
 // - index (default)    -- search fields  -- show the contact search form
 // - search             -- search fields  -- show the result set of search
-// - new                -- $param_company -- show the new contact form
-// - detailconsult      -- $param_contact -- show the contact detail
-// - detailupdate       -- $param_contact -- show the contact detail form
+// - new                -- $company_id -- show the new contact form
+// - detailconsult      -- $contact_id -- show the contact detail
+// - detailupdate       -- $contact_id -- show the contact detail form
 // - insert             -- form fields    -- insert the contact
 // - update             -- form fields    -- update the contact
-// - check_delete       -- $param_contact -- check links before delete
-// - delete             -- $param_contact -- delete the contact
+// - check_delete       -- $contact_id -- check links before delete
+// - delete             -- $contact_id -- delete the contact
 // - admin              --                -- admin index (kind)
 // - statistics         --                -- statistics index 
 // - function_insert    -- form fields    -- insert the function
@@ -52,14 +52,14 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$contact = get_param_contact();
+$params = get_contact_params();
 get_contact_action();
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, "Contact", $action, $contact["id"], $uid)) {
+if (! check_privacy($module, "Contact", $action, $params["contact_id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("contact", $contact["id"], $action);
+  update_last_visit("contact", $params["contact_id"], $action);
 }
 page_close();
 
@@ -68,9 +68,9 @@ page_close();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
-  $display["search"] = dis_contact_search_form($contact);
+  $display["search"] = dis_contact_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_contact_search_list($contact);
+    $display["result"] = dis_contact_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
@@ -78,26 +78,26 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "ext_get_category1_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category1", $contact, $action);
+  $display["detail"] = of_category_dis_tree("contact", "category1", $params, $action);
 
 } elseif ($action == "ext_get_category2_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category2", $contact, $action);
+  $display["detail"] = of_category_dis_tree("contact", "category2", $params, $action);
 
 } elseif ($action == "ext_get_category3_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category3", $contact, $action);
+  $display["detail"] = of_category_dis_tree("contact", "category3", $params, $action);
 
 } elseif ($action == "ext_get_category4_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category4", $contact, $action);
+  $display["detail"] = of_category_dis_tree("contact", "category4", $params, $action);
 
 } elseif ($action == "vcard") {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_contact_vcard_export($contact);
+  dis_contact_vcard_export($params);
   exit();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,38 +106,38 @@ if ($action == "ext_get_ids") {
 
 } else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_contact_search_form($contact);
+  $display["search"] = dis_contact_search_form($params);
   if ($set_display == "yes") {
-    $display["result"] = dis_contact_search_list($contact);
+    $display["result"] = dis_contact_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
   
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = dis_contact_search_form($contact);
-  $display["result"] = dis_contact_search_list($contact);
+  $display["search"] = dis_contact_search_form($params);
+  $display["result"] = dis_contact_search_list($params);
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (isset($contact["company_id"])) {
-    $comp_q = run_query_contact_company($contact["company_id"]);
+  if (isset($params["company_id"])) {
+    $comp_q = run_query_contact_company($params["company_id"]);
   }
-  $display["detail"] = dis_contact_form($action, $comp_q, $contact);
+  $display["detail"] = dis_contact_form($action, $comp_q, $params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($contact["id"] > 0) {
-    $display["detail"] = dis_contact_consult($contact);
+  if ($params["contact_id"] > 0) {
+    $display["detail"] = dis_contact_consult($params);
   }
   
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($contact["id"] > 0) {
-    $con_q = run_query_contact_detail($contact["id"]);
+  if ($params["contact_id"] > 0) {
+    $con_q = run_query_contact_detail($params["contact_id"]);
     if ($con_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($con_q);
-      $display["detail"] = dis_contact_form($action, $con_q, $contact);
+      $display["detail"] = dis_contact_form($action, $con_q, $params);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
@@ -145,34 +145,34 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contact_data_form("", $contact)) {
+  if (check_contact_data_form("", $params)) {
 
     // If the context (same contacts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $id = run_query_contact_insert($contact);
+      $id = run_query_contact_insert($params);
       if ($id > 0) {
-        $contact["id"] = $id;
+        $params["contact_id"] = $id;
         $display["msg"] .= display_ok_msg("$l_contact : $l_insert_ok");
       } else {
         $display["msg"] .= display_err_msg("$l_contact : $l_insert_error");
       }
-      $display["detail"] = dis_contact_consult($contact);
+      $display["detail"] = dis_contact_consult($params);
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
-      $obm_q = check_contact_context("", $contact);
+      $obm_q = check_contact_context("", $params);
       if ((is_object($obm_q)) && ($obm_q->num_rows() > 0)) {
 	$display["title"] = display_title("$l_contact : $l_insert");
-        $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
+        $display["detail"] = dis_contact_warn_insert("", $obm_q, $params);
       } else {
-        $id = run_query_contact_insert($contact);
+        $id = run_query_contact_insert($params);
         if ($id > 0) {
-          $contact["id"] = $id;
+          $params["contact_id"] = $id;
           $display["msg"] .= display_ok_msg("$l_contact : $l_insert_ok");
-          $display["detail"] = dis_contact_consult($contact);
+          $display["detail"] = dis_contact_consult($params);
         } else {
           $display["msg"] .= display_err_msg("$l_contact : $l_insert_error");
-          $display["detail"] = dis_contact_form($action, "", $contact);
+          $display["detail"] = dis_contact_form($action, "", $params);
         }
       }
     }
@@ -180,51 +180,51 @@ if ($action == "ext_get_ids") {
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_contact_form($action, "", $contact);
+    $display["detail"] = dis_contact_form($action, "", $params);
   }
   
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_contact_data_form("", $contact)) {
-    $retour = run_query_contact_update($contact);
+  if (check_contact_data_form("", $params)) {
+    $retour = run_query_contact_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_contact : $l_update_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_contact : $l_update_error");
     }
-    if ($contact["id"] > 0) {
-      $display["detail"] = dis_contact_consult($contact);
+    if ($params["contact_id"] > 0) {
+      $display["detail"] = dis_contact_consult($params);
     }    
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = dis_contact_form($action, "", $contact);
+    $display["detail"] = dis_contact_form($action, "", $params);
   }
   
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_contact($contact["id"])) {
+  if (check_can_delete_contact($params["contact_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_can_delete_contact($contact["id"]);
+    $display["detail"] = dis_can_delete_contact($params["contact_id"]);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_contact_consult($contact);
+    $display["detail"] = dis_contact_consult($params);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_can_delete_contact($contact["id"])) {
-    $retour = run_query_contact_delete($contact["id"]);
+  if (check_can_delete_contact($params["contact_id"])) {
+    $retour = run_query_contact_delete($params["contact_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_contact : $l_delete_ok");
     } else {
       $display["msg"] .= display_err_msg("$l_contact : $l_delete_error");
     }
-    $display["search"] = dis_contact_search_form($contact);
+    $display["search"] = dis_contact_search_form($params);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_contact_consult($contact);
+    $display["detail"] = dis_contact_consult($params);
   }
 
 } elseif ($action == "statistics") {
@@ -254,7 +254,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category1", $contact);
+  $retour = of_category_query_insert("contact", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
@@ -264,7 +264,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category1", $contact);
+  $retour = of_category_query_update("contact", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
@@ -274,11 +274,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category1", $contact);
+  $display["detail"] .= of_category_dis_links("contact", "category1", $params);
 
 } elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category1", $contact);
+  $retour = of_category_query_delete("contact", "category1", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
@@ -288,7 +288,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category2_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category2", $contact);
+  $retour = of_category_query_insert("contact", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
   } else {
@@ -298,7 +298,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category2_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category2", $contact);
+  $retour = of_category_query_update("contact", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
   } else {
@@ -308,11 +308,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category2_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category2", $contact);
+  $display["detail"] .= of_category_dis_links("contact", "category2", $params);
 
  } elseif ($action == "category2_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category2", $contact);
+  $retour = of_category_query_delete("contact", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
   } else {
@@ -322,7 +322,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category3_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category3", $contact);
+  $retour = of_category_query_insert("contact", "category3", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category3 : $l_insert_ok");
   } else {
@@ -332,7 +332,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category3_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category3", $contact);
+  $retour = of_category_query_update("contact", "category3", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category3 : $l_update_ok");
   } else {
@@ -342,11 +342,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category3_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category3", $contact);
+  $display["detail"] .= of_category_dis_links("contact", "category3", $params);
 
 } elseif ($action == "category3_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category3", $contact);
+  $retour = of_category_query_delete("contact", "category3", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category3 : $l_delete_ok");
   } else {
@@ -356,7 +356,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category4_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category4", $contact);
+  $retour = of_category_query_insert("contact", "category4", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category4 : $l_insert_ok");
   } else {
@@ -366,7 +366,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category4_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category4", $contact);
+  $retour = of_category_query_update("contact", "category4", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category4 : $l_update_ok");
   } else {
@@ -376,11 +376,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category4_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category4", $contact);
+  $display["detail"] .= of_category_dis_links("contact", "category4", $params);
 
 } elseif ($action == "category4_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category4", $contact);
+  $retour = of_category_query_delete("contact", "category4", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category4 : $l_delete_ok");
   } else {
@@ -390,7 +390,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category5_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category5", $contact);
+  $retour = of_category_query_insert("contact", "category5", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category5 : $l_insert_ok");
   } else {
@@ -400,7 +400,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category5_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category5", $contact);
+  $retour = of_category_query_update("contact", "category5", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category5 : $l_update_ok");
   } else {
@@ -410,11 +410,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "category5_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category5", $contact, "mono");
+  $display["detail"] .= of_category_dis_links("contact", "category5", $params, "mono");
 
 } elseif ($action == "category5_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category5", $contact);
+  $retour = of_category_query_delete("contact", "category5", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category5 : $l_delete_ok");
   } else {
@@ -424,7 +424,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "function", $contact);
+  $retour = of_category_query_insert("contact", "function", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_function : $l_insert_ok");
   } else {
@@ -434,7 +434,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "function", $contact);
+  $retour = of_category_query_update("contact", "function", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_function : $l_update_ok");
   } else {
@@ -444,11 +444,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "function_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "function", $contact, "mono");
+  $display["detail"] .= of_category_dis_links("contact", "function", $params, "mono");
 
 } elseif ($action == "function_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "function", $contact);
+  $retour = of_category_query_delete("contact", "function", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_function : $l_delete_ok");
   } else {
@@ -458,7 +458,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "kind_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_kind_insert($contact);
+  $retour = run_query_contact_kind_insert($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_insert_ok");
   } else {
@@ -468,7 +468,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "kind_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_kind_update($contact);
+  $retour = run_query_contact_kind_update($params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_update_ok");
   } else {
@@ -478,11 +478,11 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "kind_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_contact_kind_links($contact);
+  $display["detail"] .= dis_contact_kind_links($params);
 
 } elseif ($action == "kind_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_kind_delete($contact["kind"]);
+  $retour = run_query_contact_kind_delete($params["kind"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_delete_ok");
   } else {
@@ -509,14 +509,14 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($contact["doc_nb"] > 0) {
-    $nb = run_query_global_insert_documents($contact, "contact");
+  if ($params["doc_nb"] > 0) {
+    $nb = run_query_global_insert_documents($params, "contact");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  if ($contact["id"] > 0) {
-    $display["detail"] = dis_contact_consult($contact);
+  if ($params["contact_id"] > 0) {
+    $display["detail"] = dis_contact_consult($params);
   }
 }
 
@@ -525,7 +525,7 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_contact);
 $display["end"] = display_end();
-if (! $contact["popup"]) {
+if (! $params["popup"]) {
   update_contact_action();
   $display["header"] = display_menu($module);
 }
@@ -534,127 +534,41 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stores Contact parameters transmited in $contact hash
-// returns : $contact hash with parameters set
+// Stores Contact parameters transmited in $params hash
+// returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
-function get_param_contact() {
-  global $action, $view;
-  global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
-  global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
-  global $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $tf_email2, $tf_date, $cb_mailok, $cb_privacy;
-  global $ta_com, $ta_com2, $ta_com3, $tf_aka;
-  global $tf_datecomment , $sel_usercomment , $ta_add_comment ;
-  global $tf_datecomment2, $sel_usercomment2, $ta_add_comment2;
-  global $tf_datecomment3, $sel_usercomment3, $ta_add_comment3;
-  global $cb_archive, $cb_fuzzy;
-  global $param_company, $param_contact, $hd_usercreate;
-  global $company_name, $company_new_name, $company_new_id;
-  global $tf_label, $tf_lang, $tf_header, $cb_default;
-  global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
-  global $tf_function_label, $tf_function_code, $sel_function;
-  global $tf_category1_label, $tf_category1_code, $sel_category1;
-  global $tf_category2_label, $tf_category2_code, $sel_category2;
-  global $tf_category3_label, $tf_category3_code, $sel_category3;
-  global $tf_category4_label, $tf_category4_code, $sel_category4;
-  global $tf_category5_label, $tf_category5_code, $sel_category5;
-  global $tf_dateafter, $tf_datebefore, $cb_mailing_ok_only;
+function get_contact_params() {
+  global $company_name, $company_new_name, $company_new_id, $tf_town;
+  global $cb_mailing_ok_only, $cb_archive, $cb_priv, $cb_mailok;
+  global $cb_fuzzy, $cb_default;
+  
+  // Get global params
+  $params = get_global_params("Contact");
+  
+  // Get contact specific params
+  if (isset ($company_name)) $params["company_name"] = $company_name;
+  if (isset ($company_new_name)) $params["comp_new_name"] = $company_new_name;
+  if (isset ($company_new_id)) $params["comp_new_id"] = $company_new_id;
+  if (isset ($tf_town)) $params["town"] = get_format_town($tf_town);
+  if (isset ($cb_mailing_ok_only)) $params["mailing_ok_only"] = ($cb_mailing_ok_only == 1 ? 1 : 0);
+  if (isset ($cb_archive)) $params["archive"] = ($cb_archive == 1 ? 1 : 0);
+  if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($cb_mailok)) $params["mailok"] = ($cb_mailok == 1 ? 1 : 0);
+  if (isset ($cb_fuzzy)) $params["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
+  if (isset ($cb_default)) $params["kind_default"] = ($cb_default == 1 ? 1 : 0);
+  
+  get_global_params_document($params);
 
-  if (isset ($param_contact)) $contact["id"] = $param_contact;
-  if (isset ($view)) $contact["view"] = $view;
-  if (isset ($tf_category1_label)) $contact["category1_label"] = $tf_category1_label;
-  if (isset ($tf_category1_code)) $contact["category1_code"] = $tf_category1_code;
-  if (isset ($sel_category1)) $contact["category1"] = $sel_category1;
-  if (isset ($tf_category2_label)) $contact["category2_label"] = $tf_category2_label;
-  if (isset ($tf_category2_code)) $contact["category2_code"] = $tf_category2_code;
-  if (isset ($sel_category2)) $contact["category2"] = $sel_category2;
-  if (isset ($tf_category3_label)) $contact["category3_label"] = $tf_category3_label;
-  if (isset ($tf_category3_code)) $contact["category3_code"] = $tf_category3_code;
-  if (isset ($sel_category3)) $contact["category3"] = $sel_category3;
-  if (isset ($tf_category4_label)) $contact["category4_label"] = $tf_category4_label;
-  if (isset ($tf_category4_code)) $contact["category4_code"] = $tf_category4_code;
-  if (isset ($sel_category4)) $contact["category4"] = $sel_category4;
-  if (isset ($tf_category5_label)) $contact["category5_label"] = $tf_category5_label;
-  if (isset ($tf_category5_code)) $contact["category5_code"] = $tf_category5_code;
-  if (isset ($sel_category5)) $contact["category5"] = $sel_category5;
-  if (isset ($tf_function_label)) $contact["function_label"] = $tf_function_label;
-  if (isset ($tf_function_code)) $contact["function_code"] = $tf_function_code;
-  if (isset ($sel_function)) $contact["function"] = $sel_function;
-  if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
-  if (isset ($sel_dsrc)) $contact["datasource"] = $sel_dsrc;
-  if (isset ($sel_kind)) $contact["kind"] = $sel_kind;
-  if (isset ($sel_market)) $contact["marketing_manager"] = $sel_market;
-  if (isset ($tf_date)) $contact["date"] = $tf_date;
-  if (isset ($tf_lname)) $contact["lname"] = trim($tf_lname);
-  if (isset ($tf_fname)) $contact["fname"] = trim($tf_fname);
-  if (isset ($tf_aka)) $contact["aka"] = $tf_aka;
-  if (isset ($param_company)) $contact["company_id"] = $param_company;
-  if (isset ($tf_company)) $contact["company"] = $tf_company;
-  if (isset ($company_name)) $contact["company_name"] = $company_name;
-  if (isset ($company_new_name)) $contact["comp_new_name"] = $company_new_name;
-  if (isset ($company_new_id)) $contact["comp_new_id"] = $company_new_id;
-  if (isset ($tf_service)) $contact["service"] = $tf_service;
-  if (isset ($tf_ad1)) $contact["ad1"] = $tf_ad1;
-  if (isset ($tf_ad2)) $contact["ad2"] = $tf_ad2;
-  if (isset ($tf_ad3)) $contact["ad3"] = $tf_ad3;
-  if (isset ($tf_zip)) $contact["zip"] = $tf_zip;
-  if (isset ($tf_town)) $contact["town"] = get_format_town($tf_town);
-  if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;
-  if (isset ($sel_ctry)) $contact["country"] = $sel_ctry;
-  if (isset ($tf_title)) $contact["title"] = $tf_title;
-  if (isset ($tf_phone)) $contact["phone"] = trim($tf_phone);
-  if (isset ($tf_hphone)) $contact["hphone"] = trim($tf_hphone);
-  if (isset ($tf_mphone)) $contact["mphone"] = trim($tf_mphone);
-  if (isset ($tf_fax)) $contact["fax"] = trim($tf_fax);
-  if (isset ($tf_email)) $contact["email"] = trim($tf_email);
-  if (isset ($tf_email2)) $contact["email2"] = trim($tf_email2);
-  if (isset ($tf_dateafter)) $contact["dateafter"] = trim($tf_dateafter);
-  if (isset ($tf_datebefore)) $contact["datebefore"] = trim($tf_datebefore);
-  if (isset ($cb_mailing_ok_only)) $contact["mailing_ok_only"] = ($cb_mailing_ok_only == 1 ? 1 : 0);
-  if (isset ($cb_archive)) $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($cb_privacy)) $contact["privacy"] = ($cb_privacy == 1 ? 1 : 0);
-  if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
-  if (isset ($ta_com)) $contact["com"] = $ta_com;
-  if (isset ($ta_com2)) $contact["com2"] = $ta_com2;
-  if (isset ($ta_com3)) $contact["com3"] = $ta_com3;
-  if (isset ($tf_datecomment)) $contact["datecomment"] = $tf_datecomment;
-  if (isset ($tf_datecomment2)) $contact["datecomment2"] = $tf_datecomment2;
-  if (isset ($tf_datecomment3)) $contact["datecomment3"] = $tf_datecomment3;
-  if (isset ($sel_usercomment)) $contact["usercomment"] = $sel_usercomment;
-  if (isset ($sel_usercomment2)) $contact["usercomment2"] = $sel_usercomment2;
-  if (isset ($sel_usercomment3)) $contact["usercomment3"] = $sel_usercomment3;
-  if (isset ($ta_add_comment)) $contact["add_comment"] = trim($ta_add_comment);
-  if (isset ($ta_add_comment2)) $contact["add_comment2"] = trim($ta_add_comment2);
-  if (isset ($ta_add_comment3)) $contact["add_comment3"] = trim($ta_add_comment3);
-  if (isset ($cb_fuzzy)) $contact["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
+  display_debug_param($params);
 
-  // Admin - Kind fields
-  if (isset ($tf_label)) $contact["kind_label"] = $tf_label;
-  if (isset ($tf_lang)) $contact["kind_lang"] = $tf_lang;
-  if (isset ($tf_header)) $contact["kind_header"] = $tf_header;
-  if (isset ($cb_default)) $contact["kind_default"] = ($cb_default == 1 ? 1 : 0);
-
-  // External param
-  if (isset ($popup)) $contact["popup"] = $popup;
-  if (isset ($ext_action)) $contact["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $contact["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $contact["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $contact["id"] = $ext_id;
-  if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
-  if (isset ($ext_title)) $contact["ext_title"] = $ext_title;
-
-  get_global_param_document($contact);
-
-  display_debug_param($contact);
-
-  return $contact;
+  return $params;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Contact Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_contact_action() {
-  global $contact, $actions, $path;
+  global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
   global $l_header_consult,$l_header_vcard, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
@@ -710,7 +624,7 @@ function get_contact_action() {
 // Detail Consult
  $actions["contact"]["detailconsult"]   = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
+    'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$params["contact_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult','detailupdate','check_delete') 
@@ -719,7 +633,7 @@ function get_contact_action() {
 // Vcard Export
   $actions["contact"]["vcard"] = array (
     'Name'     => $l_header_vcard,
-    'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;param_contact=".$contact["id"]."",
+    'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;contact_id=".$params["contact_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,    
     'Condition'=> array ('detailconsult','detailupdate','update','check_delete') 
@@ -728,7 +642,7 @@ function get_contact_action() {
 // Detail Update
   $actions["contact"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
+    'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=".$params["contact_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'update','check_delete')
@@ -766,7 +680,7 @@ function get_contact_action() {
 // Check Delete
   $actions["contact"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
+    'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;contact_id=".$params["contact_id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update','check_delete') 
@@ -1012,19 +926,19 @@ function get_contact_action() {
 // Contact Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_contact_action() {
-  global $contact, $actions, $path;
+  global $params, $actions, $path;
 
-  $id = $contact["id"];
+  $id = $params["contact_id"];
   if ($id > 0) {
     // Detail Consult
-    $actions["contact"]["detailconsult"]["Url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$id";
+    $actions["contact"]["detailconsult"]["Url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$id";
     
     // Detail Update
-    $actions["contact"]["detailupdate"]['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=$id";
+    $actions["contact"]["detailupdate"]['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=$id";
     $actions["contact"]["detailupdate"]['Condition'][] = 'insert';
     
     // Check Delete
-    $actions["contact"]["check_delete"]['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;param_contact=$id";
+    $actions["contact"]["check_delete"]['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=$id";
     $actions["contact"]["check_delete"]['Condition'][] = 'insert';
   }
 }

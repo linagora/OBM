@@ -32,7 +32,7 @@ function dis_data_import(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme;
 
   if (($fieldname == "import_name")  && $link_ok) {
-    $res["url"] = "import_index.php?action=detailconsult&amp;param_import=".$OD->data_set->f("import_id");
+    $res["url"] = "import_index.php?action=detailconsult&amp;import_id=".$OD->data_set->f("import_id");
   }
   
   // For contacts urls (link):
@@ -138,10 +138,10 @@ function html_import_search_form ($import, $dsrc_q, $usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_import_search_list($import, $popup=false) {
   global $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth;
 
   $prefs = get_display_pref($auth->auth["uid"], "import");
-  $obm_q = run_query_import_search($import, $new_order, $order_dir);
+  $obm_q = run_query_import_search($import);
   $nb = $obm_q->num_rows_total();
   if ($nb == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -313,7 +313,7 @@ function html_import_consult_file($import_q) {
     <div class=\"detailHead\">$l_file</div>
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_sample\" />
-      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+      <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_sample_file</td>
@@ -341,7 +341,7 @@ function html_import_consult_file($import_q) {
 
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_import\" />
-      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+      <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_import_file</td>
@@ -703,7 +703,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   global $l_conflict, $l_comp_nothing, $l_comp_insert, $l_comp_update;
   global $l_con_nothing, $l_con_insert, $l_con_update;
 
-  $id = $import["id"];
+  $id = $import["import_id"];
   $file = $import["file"];
   $file_name = $import["file_name"];
   $file_saved = $import["file_saved"];
@@ -730,7 +730,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       $rd_check = ($checked) ? "" : "checked";
       $checked = true;
       $comp_id = $comp["comp_id"];
-      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id");
+      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
       $line_log .= "<br />
         <input type=\"radio\" name=\"rd_comp\" value=\"$comp_id\" $rd_check />
         <a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
@@ -751,7 +751,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       $rd_check = ($checked) ? "" : "checked";
       $checked = true;
       $con_id = $con["con_id"];
-      $url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_id");
+      $url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con_id");
       $line_log .= "<br />
         <input type=\"radio\" name=\"rd_con\" value=\"$con_id\" $rd_check />
         <a target=\"New\" href=\"$url\">".$con["con_lname"] . " ".$con["con_fname"] ."</a>";
@@ -792,7 +792,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
         <input type=\"hidden\" name=\"import_file\" value=\"$file\" />
         <input type=\"hidden\" name=\"import_file_name\" value=\"$file_name\" />
         <input type=\"hidden\" name=\"file_saved\" value=\"$file_saved\" />
-        <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+        <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"row_start\" value=\"$num_line\" />
         <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
         <input type=\"hidden\" name=\"action\" value=\"file_import\" />
@@ -841,7 +841,7 @@ function display_import_log_line($log, $fields, $comps) {
     if (is_array($comps)) {
       while ( list($num, $comp) = each($comps) ) {
 	$cid = $comp["comp_id"];
-	$url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$cid");
+	$url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid");
 	$line_log .= "<br />";
 	$line_log .= "<a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
       }
@@ -887,7 +887,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($import["id"])) { $id = $import["id"]; }
+  if (isset($import["import_id"])) { $id = $import["import_id"]; }
   if (isset($import["name"])) { $name = stripslashes($import["name"]); }
   if (isset($import["datasource"])) { $dsrc = $import["datasource"]; }
   if (isset($import["market"])) { $market = $import["market"]; }
@@ -1213,14 +1213,14 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 
   if (($action == "detailupdate") || ($action == "update")) {
      $dis_but .= "
-      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+      <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
        $dis_back = "<form method=\"get\" name=\"f_back\"
         action=\"".url_prepare("import_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+      <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>";
    } else {
@@ -1256,7 +1256,7 @@ function dis_import_warn_delete($id) {
         <form method=\"get\" name=\"form_delete\"
           action=\"" .url_prepare("import_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+        <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
         </form>
       </p>
@@ -1264,7 +1264,7 @@ function dis_import_warn_delete($id) {
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("import_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-        <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+        <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
       </p>
@@ -1296,7 +1296,7 @@ function dis_import_warn_insert($import_q, $import) {
     $samedsrc = $import_q->f("datasource_name");
     $dis_same_import .= "
       <tr><td class=\"detailLabel\">
-        <a class=\"detail\" href=\"" .url_prepare("import_index.php?action=detailconsult&amp;param_import=$id") . "\">$samename ($samedsrc)</a>
+        <a class=\"detail\" href=\"" .url_prepare("import_index.php?action=detailconsult&amp;import_id=$id") . "\">$samename ($samedsrc)</a>
       </td></tr>";
   }
 
