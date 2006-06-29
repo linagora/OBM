@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre13";
+$obm_version = "1.2.0pre14";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -257,6 +257,12 @@ if (! $cgp_show["module"]["company"]) {
   $cgp_show["module"]["invoice"] = false;
 }
 
+if (! $cgp_show["module"]["contact"]) {
+  $cgp_show["module"]["list"] = false;
+  $cgp_hide["company"]["company_contact_number"] = true;
+  $cgp_hide["company"]["company_new_contact"] = true;
+}
+
 if (! $cgp_show["module"]["project"]) {
   $cgp_show["module"]["time"] = false;
 }
@@ -273,11 +279,6 @@ if (! $cgp_show["module"]["deal"]) {
   $cgp_hide["company"]["company_deal_number"] = true;
 }
 
-if (! $cgp_show["module"]["contact"]) {
-  $cgp_hide["company"]["company_contact_number"] = true;
-  $cgp_hide["company"]["company_new_contact"] = true;
-}
-
 if ($cgp_hide["company"]["company_address3"]) {
   $cgp_hide["contact"]["contact_address3"] = true;
   $cgp_hide["list_contact"]["address3"] = true;
@@ -290,9 +291,9 @@ if ($cgp_hide["company"]["company_expresspostal"]) {
   $cgp_hide["list_contact_2"]["expresspostal"] = true;
 }
 
-if ($cgp_hide["contact"]["contactfunction"]) {
-  $cgp_hide["list_contact"]["function_label"] = true;
-  $cgp_hide["list_contact_2"]["function_label"] = true;
+if ($cgp_hide["contact"]["function"]) {
+  $cgp_hide["list_contact"]["function"] = true;
+  $cgp_hide["list_contact_2"]["function"] = true;
 }
 
 //---------------------------------------------------------------------------//

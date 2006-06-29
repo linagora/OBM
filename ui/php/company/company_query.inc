@@ -158,10 +158,10 @@ function run_query_company_search($company, $p_new_order, $p_order_dir) {
       company_contact_number,
       company_deal_number,
       company_deal_total,
-      companytype_label,
-      companyactivity_label,
-      companynafcode_code,
-      companynafcode_label,
+      companytype_label as type_label,
+      companyactivity_label as activity_label,
+      companynafcode_code as nafcode_code,
+      companynafcode_label as nafcode_label,
       country_name
     FROM Company";
 
@@ -578,7 +578,7 @@ function run_query_check_company($p_id, $name, $zip) {
 function run_query_companynafcode() {
   global $cdg_sql, $cgp_hide;
 
-  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
   if ($show_naf) {
     $query = "SELECT * FROM CompanyNafCode ORDER BY companynafcode_code"; 
     $obm_q = new DB_OBM;

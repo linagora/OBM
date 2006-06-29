@@ -166,3 +166,24 @@ CREATE TABLE Lead (
   lead_comment     text,
   PRIMARY KEY (lead_id)
 );
+
+
+-------------------------------------------------------------------------------
+-- Incident module tables
+-------------------------------------------------------------------------------
+ALTER TABLE Incident ADD COLUMN incident_category2_id int(8) DEFAULT 0 AFTER incident_category1_id;
+
+
+--
+-- New table 'IncidentCategory2'
+--
+CREATE TABLE IncidentCategory2 (
+  incidentcategory2_id          int(8) auto_increment,
+  incidentcategory2_timeupdate  timestamp(14),
+  incidentcategory2_timecreate  timestamp(14),
+  incidentcategory2_userupdate  int(8) default NULL,
+  incidentcategory2_usercreate  int(8) default NULL,
+  incidentcategory2_code        varchar(10) default '',
+  incidentcategory2_label       varchar(32) default NULL,
+PRIMARY KEY (incidentcategory2_id)
+);

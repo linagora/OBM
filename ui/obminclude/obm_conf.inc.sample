@@ -150,29 +150,33 @@ $profiles["editor"] = array (
 // Company module
 //$cgp_hide["company"]["company_number"] = true;
 //$cgp_hide["company"]["company_vat"] = true;
-//$cgp_hide["company"]["companytype"] = true;
-//$cgp_hide["company"]["companyactivity"] = true;
-//$cgp_hide["company"]["companynafcode"] = true;
-//$cgp_hide["company"]["companycategory1"] = true;
+//$cgp_hide["company"]["type"] = true;
+//$cgp_hide["company"]["activity"] = true;
+//$cgp_hide["company"]["nafcode"] = true;
+//$cgp_hide["company"]["category1"] = true;
 //$cgp_hide["company"]["company_address3"] = true;
 //$cgp_hide["company"]["company_expresspostal"] = true;
 
 // Contact module
-//$cgp_hide["contact"]["contactfunction"] = true;
+//$cgp_hide["contact"]["function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["responsible"] = true;
-//$cgp_hide["contact"]["contactcategory1"] = true;
-//$cgp_hide["contact"]["contactcategory2"] = true;
-//$cgp_hide["contact"]["contactcategory3"] = true;
-//$cgp_hide["contact"]["contactcategory4"] = true;
-//$cgp_hide["contact"]["contactcategory5"] = true;
+//$cgp_hide["contact"]["category1"] = true;
+//$cgp_hide["contact"]["category2"] = true;
+//$cgp_hide["contact"]["category3"] = true;
+//$cgp_hide["contact"]["category4"] = true;
+//$cgp_hide["contact"]["category5"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
 //$cgp_hide["contact"]["contact_comment2"] = true;
 //$cgp_hide["contact"]["contact_comment3"] = true;
 //$cgp_hide["contact"]["contact_date"] = true;
 
 // Deal module
-//$cgp_hide["deal"]["dealcategory1"] = true;
+//$cgp_hide["deal"]["category1"] = true;
+
+// Incident module
+//$cgp_hide["incident"]["category1"] = true;
+//$cgp_hide["incident"]["category2"] = true;
 
 // AliaSuite : Set if there is a link for Aliamin, Blogs and Aliacms
 //$aliamin_link = "http://aliamin.aliacom.local/";

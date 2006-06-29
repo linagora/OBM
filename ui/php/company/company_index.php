@@ -742,7 +742,7 @@ function get_company_action() {
   $actions["company"]["document_add"] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
-  );     
+					       );
 }
 
 

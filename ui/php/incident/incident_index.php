@@ -27,6 +27,10 @@
 // - category1_update    -- form fields    -- update the category
 // - category1_checklink --                -- check if category is used
 // - category1_delete    -- $sel_cat1      -- delete the category
+// - category2_insert    -- form fields    -- insert the category
+// - category2_update    -- form fields    -- update the category
+// - category2_checklink --                -- check if category is used
+// - category2_delete    -- $sel_cat2      -- delete the category
 // - display             --                -- display, set display parameters
 // - dispref_display     --                -- update one field display value
 // - dispref_level       --                -- update one field display position
@@ -266,6 +270,50 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
+} elseif ($action == "category2_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_category_query_insert("incident", "category2", $incident);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_category2 : $l_insert_error");
+  }
+  $display["detail"] .= dis_incident_admin_index();
+
+} elseif ($action == "category2_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_category_query_update("incident", "category2", $incident);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_category2 : $l_update_error");
+  }
+  $display["detail"] .= dis_incident_admin_index();
+
+} elseif ($action == "category2_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= of_category_dis_links("incident", "category2", $incident, "mono");
+
+} elseif ($action == "category2_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = of_category_query_delete("incident", "category2", $incident);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_category2 : $l_delete_error");
+  }
+  $display["detail"] .= dis_incident_admin_index();
+
+} elseif ($action == "document_add") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($incident["doc_nb"] > 0) {
+    $nb = run_query_global_insert_documents($incident, "incident");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+  $display["detail"] = dis_incident_consult($incident);
+
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($uid, "incident", 1);
@@ -310,48 +358,64 @@ function get_param_incident() {
   global $tf_priority_label, $tf_priority_code, $sel_priority;
   global $tf_status_label, $tf_status_code, $sel_status;
   global $tf_category1_label, $tf_category1_code, $sel_category1;
+  global $tf_category2_label, $tf_category2_code, $sel_category2;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
+  global $ext_widget, $ext_widget_text, $new_order, $order_dir;
 
+  if (isset ($popup)) $params["popup"] = $popup;
+  if (isset ($ext_action)) $params["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $params["ext_url"] = urldecode($ext_url);
+  if (isset ($ext_id)) $params["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $params["id"] = $ext_id;
+  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
+  if (isset ($ext_target)) $params["ext_target"] = $ext_target;
+  if (isset ($ext_widget)) $params["ext_widget"] = $ext_widget;
+  if (isset ($ext_widget_text)) $params["ext_widget_text"] = $ext_widget_text;
 
-  if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
-  if (isset ($tf_datebefore)) $incident["date_before"] = $tf_datebefore;
-  if (isset ($tf_id)) $incident["id"] = $tf_id;
-  if (isset ($param_incident)) $incident["id"] = $param_incident;
-  if (isset ($param_contract)) $incident["contract_id"] = $param_contract;
-  if (isset ($tf_lcontract)) $incident["lcontract"] = $tf_lcontract;
-  if (isset ($tf_lincident)) $incident["lincident"] = $tf_lincident;
-  if (isset ($sel_owner)) $incident["owner"] = $sel_owner;
-  if (isset ($sel_logger)) $incident["logger"] = $sel_logger;
-  if (isset ($tf_date)) $incident["date"] = $tf_date;
-  if (isset ($tf_duration)) $incident["duration"] = $tf_duration;
-  if (isset ($sel_hour)) $incident["hour"] = $sel_hour;
-  if (isset ($ta_solu)) $incident["solution"] = $ta_solu;
-  if (isset ($contract_new_id)) $incident["cont_new_id"] = $contract_new_id;
-  if (isset ($tf_company)) $incident["company"] = $tf_company;
-  if (isset ($ta_com)) $incident["com"] = $ta_com;
-  if (isset ($tf_datecomment)) $incident["datecomment"] = $tf_datecomment;
-  if (isset ($sel_usercomment)) $incident["usercomment"] = $sel_usercomment;
-  if (isset ($ta_add_comment)) $incident["add_comment"] = trim($ta_add_comment);
-  if (isset ($sel_dur)) $incident["add_duration"] = $sel_dur;
-  if (isset ($tf_priority_label)) $incident["priority_label"] = $tf_priority_label;
-  if (isset ($tf_priority_code)) $incident["priority_code"] = $tf_priority_code;
-  if (isset ($sel_priority)) $incident["priority"] = $sel_priority;
-  if (isset ($tf_status_label)) $incident["status_label"] = $tf_status_label;
-  if (isset ($tf_status_code)) $incident["status_code"] = $tf_status_code;
-  if (isset ($sel_status)) $incident["status"] = $sel_status;
-  if (isset ($tf_category1_label)) $incident["category1_label"] = $tf_category1_label;
-  if (isset ($tf_category1_code)) $incident["category1_code"] = $tf_category1_code;
-  if (isset ($sel_category1)) $incident["category1"] = $sel_category1;
+  if (isset ($tf_dateafter)) $params["date_after"] = $tf_dateafter;
+  if (isset ($tf_datebefore)) $params["date_before"] = $tf_datebefore;
+  if (isset ($tf_id)) $params["id"] = $tf_id;
+  if (isset ($param_incident)) $params["id"] = $param_incident;
+  if (isset ($param_contract)) $params["contract_id"] = $param_contract;
+  if (isset ($tf_lcontract)) $params["lcontract"] = $tf_lcontract;
+  if (isset ($tf_lincident)) $params["lincident"] = $tf_lincident;
+  if (isset ($sel_owner)) $params["owner"] = $sel_owner;
+  if (isset ($sel_logger)) $params["logger"] = $sel_logger;
+  if (isset ($tf_date)) $params["date"] = $tf_date;
+  if (isset ($tf_duration)) $params["duration"] = $tf_duration;
+  if (isset ($sel_hour)) $params["hour"] = $sel_hour;
+  if (isset ($ta_solu)) $params["solution"] = $ta_solu;
+  if (isset ($contract_new_id)) $params["cont_new_id"] = $contract_new_id;
+  if (isset ($tf_company)) $params["company"] = $tf_company;
+  if (isset ($ta_com)) $params["com"] = $ta_com;
+  if (isset ($tf_datecomment)) $params["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $params["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $params["add_comment"] = trim($ta_add_comment);
+  if (isset ($sel_dur)) $params["add_duration"] = $sel_dur;
+  if (isset ($tf_priority_label)) $params["priority_label"] = $tf_priority_label;
+  if (isset ($tf_priority_code)) $params["priority_code"] = $tf_priority_code;
+  if (isset ($sel_priority)) $params["priority"] = $sel_priority;
+  if (isset ($tf_status_label)) $params["status_label"] = $tf_status_label;
+  if (isset ($tf_status_code)) $params["status_code"] = $tf_status_code;
+  if (isset ($sel_status)) $params["status"] = $sel_status;
+  if (isset ($tf_category1_label)) $params["category1_label"] = $tf_category1_label;
+  if (isset ($tf_category1_code)) $params["category1_code"] = $tf_category1_code;
+  if (isset ($sel_category1)) $params["category1"] = $sel_category1;
+  if (isset ($tf_category2_label)) $params["category2_label"] = $tf_category2_label;
+  if (isset ($tf_category2_code)) $params["category2_code"] = $tf_category2_code;
+  if (isset ($sel_category2)) $params["category2"] = $sel_category2;
 
-  $incident["archive"] = ( ($cb_archive == '1') ? '1' : '0');
+  $params["archive"] = ( ($cb_archive == '1') ? '1' : '0');
 
   // Admin - Priority fields
-  $incident["pri_color"] = (isset($tf_color) ? $tf_color : "");
+  $params["pri_color"] = (isset($tf_color) ? $tf_color : "");
 
-  display_debug_param($incident);
+  get_global_param_document($params);
 
-  return $incident;
+  display_debug_param($params);
+
+  return $params;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -523,6 +587,40 @@ function get_incident_action() {
     'Condition'=> array ('None') 
                                      		);
 
+//  Category2 insert
+  $actions["incident"]["category2_insert"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category2_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+//  Category2 update
+  $actions["incident"]["category2_update"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category2_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+//  Category2 Check Link
+  $actions["incident"]["category2_checklink"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category2_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+//  Category2 delete
+  $actions["incident"]["category2_delete"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=category2_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Document add
+  $actions["incident"]["document_add"] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+						);
+
 //  Display
   $actions["incident"]["display"] = array (
      'Name'     => $l_header_display,
@@ -531,7 +629,7 @@ function get_incident_action() {
      'Condition'=> array ('all') 
                                       	   );
 
-//  Display Pr�f�rence
+//  Display Preference
   $actions["incident"]["dispref_display"] = array (
      'Url'      => "$path/incident/incident_index.php?action=dispref_display",
      'Right'    => $cright_read,

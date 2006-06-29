@@ -186,3 +186,25 @@ CREATE TABLE Lead (
   lead_comment     text,
   PRIMARY KEY (lead_id)
 );
+
+
+-------------------------------------------------------------------------------
+-- Incident module tables
+-------------------------------------------------------------------------------
+ALTER TABLE Incident ADD COLUMN incident_category2_id integer;
+ALTER TABLE Incident ALTER COLUMN incident_category2_id SET DEFAULT 0;
+
+
+--
+-- New table 'IncidentCategory2'
+--
+CREATE TABLE IncidentCategory2 (
+  incidentcategory2_id          serial,
+  incidentcategory2_timeupdate  timestamp,
+  incidentcategory2_timecreate  timestamp,
+  incidentcategory2_userupdate  integer DEFAULT NULL,
+  incidentcategory2_usercreate  integer DEFAULT NULL,
+  incidentcategory2_code        varchar(10) default '',
+  incidentcategory2_label       varchar(32) DEFAULT NULL,
+  PRIMARY KEY (incidentcategory2_id)
+);

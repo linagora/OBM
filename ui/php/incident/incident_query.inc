@@ -26,6 +26,7 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $category1 = $incident["category1"];
+  $category2 = $incident["category2"];
   $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
@@ -79,10 +80,17 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
   if (($status != $c_all) && ($status != "")) { 
     $where .= " AND Incident.incident_status_id = '$status'";
   }
+
   $join_category1 = "LEFT JOIN IncidentCategory1 ON incident_category1_id=incidentcategory1_id";
   if (($category1 != $c_all) && ($category1 != "")) {
     $where .= " AND Incident.incident_category1_id = '$category1'";
   }
+
+  $join_category2 = "LEFT JOIN IncidentCategory2 ON incident_category2_id=incidentcategory2_id";
+  if (($category2 != $c_all) && ($category2 != "")) {
+    $where .= " AND Incident.incident_category2_id = '$category2'";
+  }
+
   if ($archive == "0") {
     $where .= " AND Incident.incident_archive != '1'";
   }
@@ -104,7 +112,8 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
       incidentpriority_color,
       incident_status_id,
       incidentstatus_label as incident_status,
-      incidentcategory1_label as incident_category1,
+      incidentcategory1_label as category1_label,
+      incidentcategory2_label as category2_label,
       incident_logger,
       incident_owner,
       incident_archive,
@@ -122,6 +131,7 @@ function run_query_incident_search($incident, $p_new_order, $p_order_dir) {
          $join_priority
          $join_status
          $join_category1
+         $join_category2
     $whereq
     $orderq
     $limit
@@ -163,6 +173,7 @@ function run_query_incident_detail($id) {
         incidentpriority_label,
         incidentstatus_label,
         incidentcategory1_label,
+        incidentcategory2_label,
         $date,
         $timeupdate,
         $timecreate,
@@ -188,6 +199,7 @@ function run_query_incident_detail($id) {
         LEFT JOIN IncidentPriority on incident_priority_id=incidentpriority_id
         LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
         LEFT JOIN IncidentCategory1 on incident_category1_id=incidentcategory1_id
+        LEFT JOIN IncidentCategory2 on incident_category2_id=incidentcategory2_id
         LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
         LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
         LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
@@ -229,6 +241,7 @@ function run_query_incident_insert($incident) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $cat1 = $incident["category1"];
+  $cat2 = $incident["category2"];
   $date = $incident["date"];
   $hour = $incident["hour"];
   $add_duration = $incident["add_duration"];
@@ -251,6 +264,7 @@ function run_query_incident_insert($incident) {
     incident_priority_id,
     incident_status_id,
     incident_category1_id,
+    incident_category2_id,
     incident_comment,
     incident_logger,
     incident_owner,
@@ -267,6 +281,7 @@ function run_query_incident_insert($incident) {
     '$priority',
     '$status',
     '$cat1',
+    '$cat2',
     '$comment',
     $logger,
     $owner,
@@ -372,6 +387,7 @@ function run_query_incident_update($incident) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $cat1 = $incident["category1"];
+  $cat2 = $incident["category2"];
   $date = $incident["date"];
   $hour = $incident["hour"];
   $duration = $incident["duration"];
@@ -396,6 +412,7 @@ function run_query_incident_update($incident) {
       incident_priority_id='$priority',
       incident_status_id='$status',
       incident_category1_id='$cat1',
+      incident_category2_id='$cat2',
       incident_resolution = '$solu',
       incident_duration = '$duration',
       incident_comment='$comment',

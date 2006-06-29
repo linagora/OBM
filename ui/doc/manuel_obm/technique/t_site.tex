@@ -367,6 +367,8 @@ Liste des modules dépendants :\\
 \cline{2-2}
 & \invoice \\ 
 \hline
+\contact & \List \\ 
+\hline
 \project & \timemanager \\ 
 \hline
 \contract & \incident \\ 
@@ -431,12 +433,12 @@ Liste des champs paramétrables (masquables) du module \company :
 
 \begin{verbatim}
 // Company module
-$cgp_hide["company"]["company_number"] = true;         // numéro
-$cgp_hide["company"]["company_vat"] = true;            // numéro intracommunautaire
-$cgp_hide["company"]["companytype"] = true;            // type
-$cgp_hide["company"]["companyactivity"] = true;        // secteur d'activité
-$cgp_hide["company"]["companynafcode"] = true;         // code NAF
-$cgp_hide["company"]["companycategory1"] = true;       // catégorie
+$cgp_hide["company"]["company_number"] = true;  // numéro
+$cgp_hide["company"]["company_vat"] = true;     // numéro intracommunautaire
+$cgp_hide["company"]["type"] = true;            // type
+$cgp_hide["company"]["activity"] = true;        // secteur d'activité
+$cgp_hide["company"]["nafcode"] = true;         // code NAF
+$cgp_hide["company"]["category1"] = true;       // catégorie
 $cgp_hide["company"]["company_address3"] = true;       // ligne adresse 3
 $cgp_hide["company"]["company_expresspostal"] = true;  // Cedex
 \end{verbatim}  
@@ -448,14 +450,14 @@ Liste des champs paramétrables (masquables) du module \contact :
 
 \begin{verbatim}
 // Contact module
-$cgp_hide["contact"]["contactfunction"] = true;   // fonction
+$cgp_hide["contact"]["function"] = true;          // fonction
 $cgp_hide["contact"]["contact_title"] = true;     // titre
 $cgp_hide["contact"]["responsible"] = true;       // responsible
-$cgp_hide["contact"]["contactcategory1"] = true;  // catégorie 1
-$cgp_hide["contact"]["contactcategory2"] = true;  // catégorie 2
-$cgp_hide["contact"]["contactcategory3"] = true;  // catégorie 3
-$cgp_hide["contact"]["contactcategory4"] = true;  // catégorie 4
-$cgp_hide["contact"]["contactcategory5"] = true;  // catégorie 5
+$cgp_hide["contact"]["category1"] = true;         // catégorie 1
+$cgp_hide["contact"]["category2"] = true;         // catégorie 2
+$cgp_hide["contact"]["category3"] = true;         // catégorie 3
+$cgp_hide["contact"]["category4"] = true;         // catégorie 4
+$cgp_hide["contact"]["category5"] = true;         // catégorie 5
 $cgp_hide["contact"]["contact_service"] = true;   // ligne service
 $cgp_hide["contact"]["contact_address3"] = [AUTO] // ligne adresse 3
 $cgp_hide["contact"]["contact_expresspostal"] = [AUTO]; // Cedex
@@ -470,7 +472,7 @@ Liste des champs paramétrables (masquables) du module \deal :
 
 \begin{verbatim}
 // Company module
-$cgp_hide["deal"]["dealcategory1"] = true;                 // catégorie
+$cgp_hide["deal"]["category1"] = true;            // catégorie
 \end{verbatim}  
 
 
@@ -497,7 +499,7 @@ Liste des champs dépendants :\\
 \cline{3-4}
 & & list\_contact\_2 & expresspostal \\ 
 \hline
-\multirow{2}{2cm}{contact} & \multirow{2}{2cm}{contactfunction} & list\_contact & function\_label \\ 
+\multirow{2}{2cm}{contact} & \multirow{2}{2cm}{function} & list\_contact & function \\ 
 \cline{3-4}
 & & list\_contact\_2 & function\_label \\ 
 \hline

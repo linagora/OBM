@@ -709,7 +709,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_owner	         int(8) default NULL, 
   calendarevent_title            varchar(255) default NULL,
   calendarevent_location         varchar(100) default NULL,
-  calendarevent_category1_id      int(8) default NULL,
+  calendarevent_category1_id     int(8) default 0,
   calendarevent_priority         int(2) default NULL,
   calendarevent_privacy          int(2) NOT NULL default 0,
   calendarevent_date             timestamp(14) NOT NULL,
@@ -1188,7 +1188,8 @@ CREATE TABLE Incident (
   incident_date             date default NULL,
   incident_priority_id      int(8) default NULL,
   incident_status_id        int(8) default NULL,
-  incident_category1_id     int(8) default NULL,
+  incident_category1_id     int(8) default 0,
+  incident_category2_id     int(8) default 0,
   incident_logger           int(8) default NULL,
   incident_owner            int(8) default NULL,
   incident_duration         char(4) default '0',
@@ -1242,6 +1243,21 @@ CREATE TABLE IncidentCategory1 (
   incidentcategory1_code        varchar(10) default '',
   incidentcategory1_label       varchar(32) default NULL,
 PRIMARY KEY (incidentcategory1_id)
+);
+
+
+--
+-- New table 'IncidentCategory2'
+--
+CREATE TABLE IncidentCategory2 (
+  incidentcategory2_id          int(8) auto_increment,
+  incidentcategory2_timeupdate  timestamp(14),
+  incidentcategory2_timecreate  timestamp(14),
+  incidentcategory2_userupdate  int(8) default NULL,
+  incidentcategory2_usercreate  int(8) default NULL,
+  incidentcategory2_code        varchar(10) default '',
+  incidentcategory2_label       varchar(32) default NULL,
+PRIMARY KEY (incidentcategory2_id)
 );
 
 

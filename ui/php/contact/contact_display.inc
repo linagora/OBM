@@ -351,7 +351,7 @@ function dis_contact_search_form($contact="") {
 //   - $cats4     : array with contact category 4 list
 //   - $cats5     : array with contact category 5 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
+function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $csearch_advanced_default, $l_fuzzy;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
@@ -385,10 +385,9 @@ function html_contact_search_form ($contact, $usr_q, $funcs, $ctry_q, $cats1, $c
     $fuzzy = "";
   }
 
-  $show_func = (! $cgp_hide["contact"]["contactfunction"]);
+  $show_func = (! $cgp_hide["contact"]["function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
-  // category1, category2, category3, category4, category5, function
   
   // Function select
   $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
@@ -1985,7 +1984,7 @@ function dis_contact_admin_index() {
   $kind_q = run_query_contact_kind();
   $block .= html_contact_kind_form($kind_q);
 
-  if (! $cgp_hide["contact"]["contactfunction"]) {
+  if (! $cgp_hide["contact"]["function"]) {
     $funcs = of_category_get_ordered("contact", "function");
     $block .= "<hr />";
     $block .= of_category_dis_admin_form("contact", "function", $funcs);

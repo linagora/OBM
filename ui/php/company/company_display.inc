@@ -226,8 +226,8 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   }
 
   // of: activity, type
-  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
-  $show_cat = (! $cgp_hide["company"]["companycategory1"]);
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
+  $show_cat = (! $cgp_hide["company"]["category1"]);
 
   // Type, category1, activity select
   $block_type = of_category_dis_search_select("company", "type", $types, $type);
@@ -643,6 +643,7 @@ function dis_company_consult($params) {
     $comp_q = run_query_company_detail($cid);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
+      $display["link"] = html_company_links($comp_q);
       $block .= html_company_consult($comp_q);
       $view = $params["view"];
 
@@ -713,7 +714,7 @@ function html_company_consult($co_q) {
   // of: activity, type, category1, activity
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
   // Number field
   if ($show_number) {
@@ -746,7 +747,6 @@ function html_company_consult($co_q) {
     </tr>";
   }
   
-  $display["link"] = html_company_links($co_q);
   $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
   // --- HTML Template --------------------------------------------------------
@@ -923,7 +923,7 @@ function dis_company_form($action, $company) {
   global $display, $cg_com, $cgp_hide, $uid, $l_query_error;
 
   // of: type, activity, category1
-  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
   $c_id = $company["id"];
   if ($c_id > 0) {
@@ -1056,7 +1056,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   // category1, activity, type
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
-  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
@@ -1480,22 +1480,22 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 function dis_company_admin_index() {
   global $cgp_hide;
 
-  if (! $cgp_hide["company"]["companytype"]) {
+  if (! $cgp_hide["company"]["type"]) {
     $types = of_category_get_ordered("company", "type");
     $block .= of_category_dis_admin_form("company", "type", $types);
   }
 
-  if (! $cgp_hide["company"]["companycategory1"]) {
+  if (! $cgp_hide["company"]["category1"]) {
     $cats1 = of_category_get_ordered("company", "category1");
     $block .= of_category_dis_admin_form("company", "category1", $cats1);
   }
 
-  if (! $cgp_hide["company"]["companyactivity"]) {
+  if (! $cgp_hide["company"]["activity"]) {
     $acts = of_category_get_ordered("company", "activity");
     $block .= of_category_dis_admin_form("company", "activity", $acts);
   }
 
-  if (! $cgp_hide["company"]["companynafcode"]) {
+  if (! $cgp_hide["company"]["nafcode"]) {
     $naf_q = run_query_companynafcode();
     $block .= html_company_nafcode_form($naf_q);
   }
@@ -1747,7 +1747,7 @@ function dis_company_display_pref($prefs) {
 function dis_select_company_nafcode($naf_q, $line1, $selected) {
   global $cgp_hide;
 
-  $show_naf = (! $cgp_hide["company"]["companynafcode"]);
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
   if ($show_naf) {
     $sel_naf = "<select id=\"sel_naf\" name=\"sel_naf\">

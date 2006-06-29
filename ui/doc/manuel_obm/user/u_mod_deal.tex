@@ -90,11 +90,13 @@ Par exemple : une organisation géographique, une classification interne...
 Le module \deal étant central à la gestion de la relation client dans \obm, de nombreux liens sont disponibles depuis une affaire et permettent d'accéder directement aux entités liées à cette affaire :\\
 
 \begin{itemize}
-\item SurAffaire, qui est une entité permettant le regroupement des affaires
-\item Projets, résultant de l'affaire
-\item Contrats, générés via cette affaire
-\item Facture, liées à l'affaire
-\item Document
+\item direct : Sociétés en affaire (et en relation)
+\item direct : Contacts de la société en affaire
+\item direct : SurAffaire, qui est le group d'affaires
+\item multiple : Projets
+\item multiple : Contrats
+\item multiple : Factures (liées à l'affaire ou aux projets de l'affaire)
+\item multiple : Documents
 \end{itemize}
 
 

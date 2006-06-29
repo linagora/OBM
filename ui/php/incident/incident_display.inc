@@ -17,7 +17,8 @@ $fieldnames["incident_label"] = $l_label;
 $fieldnames["incident_priority"] = $l_priority;
 $fieldnames["incident_date"] = $l_date;
 $fieldnames["incident_duration"] = $l_duration;
-$fieldnames["incident_category1"] = $l_category1;
+$fieldnames["category1_label"] = $l_category1;
+$fieldnames["category2_label"] = $l_category2;
 
 // Calculate fields
 $fieldnames["timeupdate"] = $l_lastupdate;
@@ -79,9 +80,10 @@ function dis_incident_search_form($incident) {
   $logger_q = run_query_incident_logger($archive);
 
   $cats1 = of_category_get_ordered("incident", "category1");
+  $cats2 = of_category_get_ordered("incident", "category2");
   $pri = of_category_get_ordered("incident", "priority");
   $sta = of_category_get_ordered("incident", "status");
-  $block = html_incident_search_form($owner_q, $logger_q, $pri, $sta, $cats1, $incident);
+  $block = html_incident_search_form($owner_q, $logger_q, $pri, $sta, $cats1, $cats2, $incident);
 
   return $block;
 }
@@ -92,13 +94,14 @@ function dis_incident_search_form($incident) {
 // Parameters:
 //   - $owner_q    : DB result object (userobm list)
 //   - $logger_q   : DB result object (userobm list)
-//   - $pri        : array with incident category 1 list
-//   - $sta        : array with incident category 1 list 
-//   - $cats1      : array with incident category 1 list 
+//   - $pri        : array with incident priority list
+//   - $sta        : array with incident status list
+//   - $cats1      : array with incident category 1 list
+//   - $cats2      : array with incident category 2 list
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $incident) {
+function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats2, $incident) {
   global $c_all, $l_all, $l_label, $l_id, $l_find;
   global $l_owner, $l_logger,$l_company,$l_contract;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -111,6 +114,7 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
   $company = $incident["company"];
   $status = $incident["status"];
   $cat1 = $incident["category1"];
+  $cat2 = $incident["category2"];
   $owner = $incident["owner"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
@@ -142,6 +146,7 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
   $block_priority = of_category_dis_search_select("incident", "priority", $pri, $priority);
   $block_status = of_category_dis_search_select("incident", "status", $sta, $status);
   $block_category1 = of_category_dis_search_select("incident", "category1", $cats1, $cat1);
+  $block_category2 = of_category_dis_search_select("incident", "category2", $cats2, $cat2);
 
   // --- html template --------------------------------------------------------
 
@@ -171,6 +176,7 @@ function html_incident_search_form ($owner_q,$logger_q, $pri, $sta, $cats1, $inc
        $block_priority
        $block_status
        $block_category1
+       $block_category2
        <div class=\"searchLabel\">$l_logger<br />
          $dis_sel_logger
        </div>
@@ -233,6 +239,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $cat1 = $incident["category1"];
+  $cat2 = $incident["category2"];
   $param_contract = $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
@@ -240,7 +247,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
 
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
@@ -269,6 +276,7 @@ function dis_incident_consult($incident) {
     $inc_q = run_query_incident_detail($id);
     if ($inc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($inc_q);
+      $display["link"] = html_incident_links($inc_q);
       $block = html_incident_consult($inc_q);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $inc_q->query . " !");
@@ -319,9 +327,12 @@ function html_incident_consult($inc_q) {
   $email_con1 = $inc_q->f("email_c1");
   $email_con2 = $inc_q->f("email_c2");
   $email_con = ($email_con1 != "" ? $email_con1 : $email_con2);
-  //Category 1
+
+  // Categories
   $cats1 = of_category_get_entitycategories("incident", "category1", $inc_id, "mono");
   $block_category1 = of_category_dis_block_consult("incident", "category1", $cats1, "mono");
+  $cats2 = of_category_get_entitycategories("incident", "category2", $inc_id, "mono");
+  $block_category2 = of_category_dis_block_consult("incident", "category2", $cats2, "mono");
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
@@ -383,6 +394,7 @@ function html_incident_consult($inc_q) {
     <td class=\"detailText\">$date</td>
   </tr>
   $block_category1
+  $block_category2
   <tr>
     <td class=\"detailLabel\">$l_duration</td>
     <td class=\"detailText\">$inc_dur</td>
@@ -407,6 +419,52 @@ function html_incident_consult($inc_q) {
   </tr>
   </table>
 ";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Incident links block
+// Parameters:
+//   - $inc_q : incident database result 
+// Returns:
+//   $r : string with HTML code
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_links($inc_q) {
+  global $set_theme, $ico_document, $ico_document_new;
+  global $l_new, $l_incident, $l_module_document, $l_document_add;
+  global $path, $auth, $cgp_show, $popup_height, $popup_width;
+
+  $id = $inc_q->f("incident_id");
+  $entity = "incident";
+
+  // Document
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=$entity");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=$entity");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/incident/incident_index.php")."&amp;ext_id=$id&amp;ext_target=$l_incident";
+    $nb_document = run_query_global_document_nb ($id, "incident");
+    $block_doc = "
+  <div class=\"linkTitle\">:: $l_module_document</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+        <a href=\"$url_doc_new\">$l_new</a></li>
+    <li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_incident'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>";
+  }
+
+  // Links Template  
+  $block = "
+<div class=\"link\"> 
+  $block_doc
+</div>";
 
   return $block;
 }
@@ -445,8 +503,9 @@ function dis_incident_form($action, $incident) {
   $pri = of_category_get_ordered("incident", "priority");
   $sta = of_category_get_ordered("incident", "status");
   $cats1 = of_category_get_ordered("incident", "category1");
+  $cats2 = of_category_get_ordered("incident", "category2");
 
-  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1);
+  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1, $cats2);
 
   return $block;
 }
@@ -455,16 +514,17 @@ function dis_incident_form($action, $incident) {
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display Incident Form
 // Parameters:
-//   - $action    : action called
-//   - $incident[]: default values
-//   - $inc_q     : incident database result 
-//   - $usr_q     : userobm database result 
-//   - $usrp_q    : userobm list from system group Production
+//   - $action     : action called
+//   - $incident[] : default values
+//   - $inc_q      : incident database result 
+//   - $usr_q      : userobm database result 
+//   - $usrp_q     : userobm list from system group Production
 //   - $pri        : array with incident priority list
 //   - $sta        : array with incident status list
 //   - $cats1      : array with incident category 1 list
+//   - $cats2      : array with incident category 2 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1) {
+function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1, $cats2) {
   global $display, $path, $uid, $set_theme, $ico_contract;
   global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find;
@@ -485,7 +545,8 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $solu = $inc_q->f("incident_resolution");
     $priority = $inc_q->f("incident_priority_id");
     $status = $inc_q->f("incident_status_id");
-    $cat1 = $inc_q->f("incident_cat1_id");
+    $cat1 = $inc_q->f("incident_category1_id");
+    $cat2 = $inc_q->f("incident_category2_id");
     $datecomment = isodate_format();
     $date = isodate_format($inc_q->f("date"));
     $hour = get_hour($inc_q->f("date"));
@@ -508,6 +569,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (isset($incident["priority"])) { $priority = $incident["priority"]; }
   if (isset($incident["status"])) { $status = $incident["status"]; }
   if (isset($incident["cat1"])) { $cat1 = $incident["cat1"]; }
+  if (isset($incident["cat2"])) { $cat2 = $incident["cat2"]; }
   if (isset($incident["date"])) { $date = $incident["date"]; }
   if (isset($incident["hour"])) { $hour = $incident["hour"]; }
   if (isset($incident["archive"])) { $archive = ($incident["archive"] == 1 ? "checked" : ""); }
@@ -543,6 +605,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   $block_priority = of_category_dis_entity_form("incident", "priority", $pri, "mono", $priority);
   $block_status = of_category_dis_entity_form("incident", "status", $sta, "mono", $status);
   $block_category1 = of_category_dis_entity_form("incident", "category1", $cats1, "mono", $cat1);
+  $block_category2 = of_category_dis_entity_form("incident", "category2", $cats2, "mono", $cat2);
 
   // Hour select
   $sel_hour = "<select name=\"sel_hour\">";
@@ -639,6 +702,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           $block_priority
           $block_status
           $block_category1
+          $block_category2
           <tr>
             <td class=\"detailLabel\">$l_date</td>
             <td class=\"detailForm\">
@@ -719,18 +783,29 @@ function dis_can_delete_incident($p_id) {
 // Display the Incident administration index                                 //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_admin_index() {
+  global $cgp_hide;
 
   $block = "";
 
   $pri = of_category_get_ordered("incident", "priority");
   $block .= "<hr />";
   $block .= of_category_dis_admin_form("incident", "priority", $pri);
+
   $sta = of_category_get_ordered("incident", "status");
   $block .= "<hr />";
   $block .= of_category_dis_admin_form("incident", "status", $sta);
-  $cats1 = of_category_get_ordered("incident", "category1");
-  $block .= "<hr />";
-  $block .= of_category_dis_admin_form("incident", "category1", $cats1);
+
+  if (! $cgp_hide["incident"]["category1"]) {
+    $cats1 = of_category_get_ordered("incident", "category1");
+    $block .= "<hr />";
+    $block .= of_category_dis_admin_form("incident", "category1", $cats1);
+  }
+
+  if (! $cgp_hide["incident"]["category2"]) {
+    $cats2 = of_category_get_ordered("incident", "category2");
+    $block .= "<hr />";
+    $block .= of_category_dis_admin_form("incident", "category2", $cats2);
+  }
 
   return $block;
 }
