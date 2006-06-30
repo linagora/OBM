@@ -1594,5 +1594,53 @@ function check_project_progress_form($project) {
   else
     return true;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Timemanager: qet tasks for given projects and month                 
+// Parameters:
+//   - $time[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_month_planning($project) {
+  global $cdg_sql, $cdg_param;
+
+  $year=substr($project["date"],0,4);
+  $month=substr($project["date"],4,2);
+  $day=1;
+  $id = $project["id"];
+  // First and last days of month
+  $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
+  $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
+
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $date = sql_date_format($db_type, "timetask_date", "date");
+
+  $query = "
+    SELECT
+      projecttask_id as id,
+      projecttask_label as label,
+      sum(timetask_length) timetask_length,
+      $date,
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname,      
+      timetask_status
+    FROM TimeTask JOIN UserObm ON timetask_user_id = userobm_id
+    JOIN ProjectTask ON projecttask_id = timetask_projecttask_id
+    JOIN Project ON projecttask_project_id = project_id
+    WHERE timetask_date >= '$month_begin' 
+      AND timetask_date <= '$month_end'
+      AND project_id = $id
+      GROUP BY  project_id,project_name,date, timetask_status,id,label,
+      userobm_id,userobm_lastname,userobm_firstname
+    ";
+  display_debug_msg($query, $cdg_sql, "run_query_project_month_planning");
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db; 
+}
 
 ?>

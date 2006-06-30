@@ -985,6 +985,7 @@ CREATE TABLE Project (
   project_userupdate     integer,
   project_usercreate     integer,
   project_name           varchar(128),
+  project_shortname      varchar(10),
   project_tasktype_id    integer,
   project_company_id     integer,
   project_deal_id        integer,
@@ -1017,6 +1018,19 @@ CREATE TABLE ProjectTask (
 );
 create INDEX pt_idx_pro ON ProjectTask (projecttask_project_id);
 
+--
+-- Table structure for table 'ProjectReferenceTask'
+--
+CREATE TABLE ProjectRefTask (
+  projectreftask_id          serial,
+  projectreftask_timeupdate  timestamp,
+  projectreftask_timecreate  timestamp,
+  projectreftask_userupdate  integer default NULL,
+  projectreftask_usercreate  integer default NULL,
+  projectreftask_code        varchar(10) default '',
+  projectreftask_label       varchar(128) default NULL,
+  PRIMARY KEY (projectreftask_id)
+);
 
 --
 -- Table structure for table 'ProjectUser'

@@ -274,6 +274,7 @@ $l_header_advance = "Advance";
 $l_header_man_affect = "Allocation";
 $l_header_add_member = "Add member";
 $l_header_dashboard = "Dashboard";
+$l_header_planning = "Planning";
 
 // Admin headers
 $l_header_index = "Main";

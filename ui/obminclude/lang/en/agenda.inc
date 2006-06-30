@@ -129,6 +129,7 @@ $l_event_cant_delete = "You can only delete your own events !";
 
 $l_unknown="Inconnu";
 
+$l_header_planning = "Planning";
 $l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
 $l_header_waiting_events = "waiting events";

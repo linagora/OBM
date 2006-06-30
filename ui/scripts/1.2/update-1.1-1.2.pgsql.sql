@@ -187,6 +187,24 @@ CREATE TABLE Lead (
   PRIMARY KEY (lead_id)
 );
 
+-------------------------------------------------------------------------------
+-- Project module tables
+-------------------------------------------------------------------------------
+ALTER TABLE Project ADD COLUMN project_shortname varchar(10) SET DEFAULT '';
+--
+-- Table structure for table 'ProjectReferenceTask'
+--
+CREATE TABLE ProjectRefTask (
+  projectreftask_id          serial,
+  projectreftask_timeupdate  timestamp,
+  projectreftask_timecreate  timestamp,
+  projectreftask_userupdate  integer default NULL,
+  projectreftask_usercreate  integer default NULL,
+  projectreftask_code        varchar(10) default '',
+  projectreftask_label       varchar(128) default NULL,
+  PRIMARY KEY (projectreftask_id)
+);
+
 
 -------------------------------------------------------------------------------
 -- Incident module tables

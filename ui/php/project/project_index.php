@@ -319,7 +319,11 @@ if ($action == "ext_get_id") {
   if ($params["project_id"] > 0) {
     $display["detail"] = dis_project_dashboard($params);
   }
-  
+} elseif ($action == "planning") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($project["id"] > 0) {
+    $display["detail"] = dis_project_planning($project);
+  }
 } elseif ($action == "member_add") {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $params["ext_id"];
@@ -408,38 +412,29 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_project_params() {
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
   
   // Get global params
   $params = get_global_params("Project");
-  
   // Get project specific params
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
 
-  if (isset ($http_obm_vars)) {
-    $nb_mem = 0;
-    $nb_tsk = 0;
+  $nb_mem = 0;
+  $nb_tsk = 0;
 
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      // cb_u is likely to be called cb_user
-      if (strcmp(substr($key, 0, 7),"cb_task") == 0) {
-        $nb_tsk++;
-        $tsk_num = substr($key, 7);
-        $params["tsk$nb_tsk"] = $tsk_num;
-      }
-      else if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
-        $nb_mem++;
-        $mem_num = substr($key, 4);
-        $params["mem$nb_mem"] = $mem_num;
-      } 
+  while ( list( $key ) = each( $_REQUEST ) ) {
+    // cb_u is likely to be called cb_user
+    if (strcmp(substr($key, 0, 7),"cb_task") == 0) {
+      $nb_tsk++;
+      $tsk_num = substr($key, 7);
+      $params["tsk$nb_tsk"] = $tsk_num;
     }
-    $params["mem_nb"] = $nb_mem;
-    $params["tsk_nb"] = $nb_tsk;
+    else if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+      $nb_mem++;
+      $mem_num = substr($key, 4);
+      $params["mem$nb_mem"] = $mem_num;
+    } 
   }
+  $params["mem_nb"] = $nb_mem;
+  $params["tsk_nb"] = $nb_tsk;
   
   get_global_params_document($params);
 
@@ -458,7 +453,7 @@ function get_project_action() {
   global $l_header_display, $l_header_add_member, $l_add_member;
   global $l_header_man_task, $l_header_man_member;
   global $l_header_advance, $l_header_man_affect, $l_header_consult;
-  global $l_header_dashboard;
+  global $l_header_dashboard,$l_header_planning;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // External call : select one deal
@@ -488,7 +483,7 @@ function get_project_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/project/project_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('index', 'search', 'insert', 'detailconsult', 'update', 'delete', 'admin', 'display')
+    'Condition'=> array ('all','!new')
     );
 
 // Detail Consult
@@ -496,15 +491,16 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_update', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update', 'advance', 'advance_update', 'dashboard')
-    );
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+  );
+
 
 // Detail Update
   $actions["project"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update', 'insert', 'progress_update', 'allocate_update', 'advance_update', 'dashboard')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
     );
 
 // Insert
@@ -526,7 +522,7 @@ function get_project_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/project/project_index.php?action=check_delete&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'insert')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      	      );
 
 // Delete
@@ -541,7 +537,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'task', 'task_add', 'task_update', 'task_del', 'advance', 'advance_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'dashboard')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
     );
 
 // Add a task
@@ -570,7 +566,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'task', 'task_add', 'task_update', 'task_del', 'allocate', 'allocate_update', 'advance', 'advance_update', 'dashboard')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      );
 
 // Select members : Lists selection
@@ -580,7 +576,7 @@ function get_project_action() {
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_project,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'member', 'member_add','member_del', 'member_update')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                     	  );
 
 // Add a member
@@ -609,7 +605,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=allocate&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'advance_update', 'advance', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      );
 
 // Time allocation Update
@@ -624,7 +620,7 @@ function get_project_action() {
     'Name'     => $l_header_advance,
     'Url'      => "$path/project/project_index.php?action=advance&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate', 'allocate_update', 'advance', 'advance_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                      );
 
 // Advance Update
@@ -639,8 +635,15 @@ function get_project_action() {
      'Name'     => $l_header_dashboard,
      'Url'      => "$path/project/project_index.php?action=dashboard&amp;project_id=".$params["project_id"],
      'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate', 'allocate_update', 'advance', 'advance_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del')
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                        	 );
+// Detail Consult
+  $actions["project"]["planning"]  = array (
+    'Name'     => $l_header_planning,
+    'Url'      => "$path/project/project_index.php?action=planning&amp;param_project=".$project["id"]."",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+  );
 
 // Display
    $actions["project"]["display"] = array (

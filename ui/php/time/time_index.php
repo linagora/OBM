@@ -74,11 +74,12 @@ if ($action == "index") {
 
 } elseif ($action == "viewmonth") {
 ///////////////////////////////////////////////////////////////////////////////
-  $params["interval"] = "month";
-  $display["result"] = dis_time_nav_date($params);
-  $display["result"] .= dis_time_planning($params);
-  $display["features"] .= dis_user_select($params, run_query_time_get_obmusers());
- 
+  $time["interval"] = "month";
+  $display["result"] = dis_time_nav_date($time);
+  $display["result"] .= dis_time_planning($time);
+  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers(), 1);
+  // 1.1 => FIXME
+  //$display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
 } elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////
   $params["interval"] = "week";

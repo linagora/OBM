@@ -643,23 +643,22 @@ function run_query_time_task_one_month($time) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: qet tasks for given user and month                 
+// Timemanager: qet tasks for given users and month                 
 // Parameters:
 //   - $time[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_time_project_planning_month($time) {
+function run_query_time_user_month_planning($time) {
   global $cdg_sql, $cdg_param;
 
   $year=substr($time["date"],0,4);
   $month=substr($time["date"],4,2);
   $day=1;
-
+  $uid_tab = "(".implode(",",$time["user_ids"]).")";
   // First and last days of month
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
   $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
 
-  $user_id = $time["user_id"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -668,68 +667,42 @@ function run_query_time_project_planning_month($time) {
 
   $query = "
     SELECT
-      project_name,
-      project_id,
+      project_name as label,
+      project_id as id,
       sum(timetask_length) timetask_length,
       $date,
-      timetask_status
-    FROM TimeTask JOIN UserObm ON timetask_user_id = $user_id
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname,
+      timetask_status,
+      'project' as type
+    FROM TimeTask JOIN UserObm ON timetask_user_id = userobm_id
     JOIN ProjectTask ON projecttask_id = timetask_projecttask_id
     JOIN Project ON projecttask_project_id = project_id
     WHERE timetask_date >= '$month_begin' 
       AND timetask_date <= '$month_end'
-      AND timetask_user_id = userobm_id
-    GROUP BY  date, timetask_status, project_id, project_name
-    ORDER by project_name
-    ";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_time_task_one_month");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-
-  return $obm_db; 
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Timemanager: qet tasks for given user and month                 
-// Parameters:
-//   - $time[] : time search criteria
-// Returns : DB object result
-///////////////////////////////////////////////////////////////////////////////
-function run_query_time_task_planning_month($time) {
-  global $cdg_sql, $cdg_param;
-
-  $year=substr($time["date"],0,4);
-  $month=substr($time["date"],4,2);
-  $day=1;
-
-  // First and last days of month
-  $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
-  $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
-
-  $user_id = $time["user_id"];
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-
-  $date = sql_date_format($db_type, "timetask_date", "date");
-
-  $query = "
+      AND timetask_user_id IN $uid_tab
+    GROUP BY  date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
+    UNION
     SELECT
+      tasktype_label as label,
+      timetask_tasktype_id as id,
       sum(timetask_length) timetask_length,
       $date,
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname,
       timetask_status,
-      timetask_tasktype_id,
-      tasktype_label
-    FROM TimeTask JOIN UserObm ON timetask_user_id = $user_id
+      'task' as type
+    FROM TimeTask JOIN UserObm ON  timetask_user_id = userobm_id
     LEFT JOIN ProjectTask ON projecttask_id = timetask_projecttask_id 
     JOIN TaskType ON tasktype_id = timetask_tasktype_id
     WHERE projecttask_id IS NULL
       AND timetask_date >= '$month_begin' 
       AND timetask_date <= '$month_end'
-      AND timetask_user_id = userobm_id
-    GROUP BY  date, timetask_status, timetask_tasktype_id, tasktype_label
-    ORDER by tasktype_label
+      AND timetask_user_id IN $uid_tab
+    GROUP BY  date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
+    ORDER by type,label    
     ";
   
   display_debug_msg($query, $cdg_sql, "run_query_time_task_one_month");
@@ -738,7 +711,6 @@ function run_query_time_task_planning_month($time) {
 
   return $obm_db; 
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: get tasks for given user and week, and returns total by day

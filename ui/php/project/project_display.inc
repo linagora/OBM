@@ -231,7 +231,6 @@ function dis_project_search_list($project) {
   return $block;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display the Project Search result
 // Parameters:
@@ -284,6 +283,194 @@ function html_project_search_list($proj_q, $prefs, $project) {
   return $block;
 }
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the planning for a month
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $project[] : project hash
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_planning($project) {
+  
+  $obm_q = run_query_project_month_planning($project);
+  $block = html_project_nav_date($project);
+  $block .=  html_project_planning($obm_q, $project) ;
+ 
+  return $block;
+}
+//FIXME
+function randomColor() {
+    $color1 = mt_rand(100,200);
+    $color2 = mt_rand(100,200);
+    while(abs($color2-$color1) < 30) {
+      $color2 = mt_rand(100,200);
+    }
+    $color3 = mt_rand(100,200);    
+    while(abs($color3-$color1) < 30) {
+      $color3 = mt_rand(100,200);
+    }
+    return "rgb($color1, $color2, $color3)";
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display Time navigation by date
+// Parameters:
+//   - $time : parameter hash
+///////////////////////////////////////////////////////////////////////////////
+function html_project_nav_date($project) {
+  global $cdg_param, $auth, $set_theme, $c_dst_err, $l_monthsofyear,$action;
+
+  $id = $project["id"];
+
+  $tot_width = 200 ;
+
+  // This should work for january also (month 0 = december) 
+  $month = substr($project["date"],4,2);
+  $year = substr($project["date"],0,4);
+  $d_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
+  $d_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
+  $url_prev = url_prepare("project_index.php?action=$action&amp;param_project=$id&amp;wbegin=$d_prev");
+  $url_next = url_prepare("project_index.php?action=$action&amp;param_project=$id&amp;wbegin=$d_next");
+  $title = $l_monthsofyear[$month-1] . " $year";
+
+  $block = "
+    <div style=\"text-align:center;\">
+      <table style=\" margin: auto;\" width=\"$tot_width\">
+      <tr>
+        <td>
+          <a href=\"$url_prev\">
+          <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" />
+          </a>
+        </td>
+        <td class=\"timePeriod\">
+          $title
+        </td>
+        <td>
+          <a href=\"$url_next\">
+           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" />
+          </a>
+        </td>
+      </tr>
+      </table>    
+      </div>
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML the planning for a month
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $time[] : time hash
+///////////////////////////////////////////////////////////////////////////////
+function html_project_planning($obm_q, $time) {
+  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
+  global $l_daysofweekfirst;
+
+  $p_ids = $time["project_ids"];
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
+
+  // first day of the month in second
+  $first_day_sec = mktime(0,0,0,$month, 1, $year);
+  $last_day_sec = mktime(23,0,0,$month+1, 0, $year);
+  $day_in_sec = $first_day_sec;
+  $dow = date("w", $day_in_sec);
+  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+
+  // Fill the day array -------------------------------------------------------
+  $day = 1;
+  while ($day_in_sec < $last_day_sec) {
+    $fday = ($day>9) ? "$day" : "0$day";
+    $array_res["$fday"]["length"] = 0;
+    $array_res["$fday"]["dow"] = $dow;
+    $array_res["$fday"]["obm_dow"] = $obm_dow;
+    $day++;
+
+    $day_in_sec += 86400;
+    $dow = date("w", $day_in_sec);
+    $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+  }
+  $day_amount = $day - 1;
+  $planning = array();
+  $task_days = array();
+  $line = array();
+  $css = array();
+  while ($obm_q->next_record())  {
+    $day = date("d", $obm_q->f("date"));
+    $project_id = $obm_q->f("project_id");
+    $project_label = $obm_q->f("project_label");
+    $task_id = $obm_q->f("id");
+    $task_label = $obm_q->f("label");
+    $u_id = $obm_q->f("userobm_id");
+    
+    $projects[$project_id] = $project_label;
+    $tasks[$task_id] = "<abbr title=\"$task_label\">".substr($task_label,0,10)."...</abbr>";
+    $users[$u_id] = $obm_q->f("userobm_firstname")." ". $obm_q->f("userobm_lastname");
+
+
+    $planning[$u_id][$task_id]["$day"] = $obm_q->f("timetask_length")/8;
+    $planning[$u_id][$task_id]["length"] += $obm_q->f("timetask_length")/8;
+  }
+
+  while (list($day,$val) = each($array_res)) {
+    $lday = $l_daysofweekfirst[$val["dow"]];
+    
+    $line0 .= "<th>$lday</th>\n";
+    $line1 .= "<td>$day</td>\n";
+
+    foreach($planning as $u_id => $user_planning) {
+      foreach($user_planning as $task_id => $work) {
+        if(isset($work[$day])) {
+          $length = $work[$day]*100;
+          $line[$u_id][$task_id] .= "<td ><div style=\"width:$length%;\">&nbsp;</div></td>";
+        } else {
+          $line[$u_id][$task_id] .= "<td></td>";
+        }
+      }
+    }
+  }
+
+  foreach($planning as $u_id => $user_planning) {
+    foreach($user_planning as $task_id => $work) {
+      $line[$u_id][$task_id] = "<tr class=\"t$task_id\">
+        <th>".$tasks[$task_id]."</th>".$line[$u_id][$task_id]."
+        <th></th><td>".$work["length"]."</td></tr>";
+      $color = randomColor();
+      $css[$project_id] .= ".t$task_id th {color:$color;} \n.t$task_id div {background-color:$color;}";
+    }  
+  } 
+
+  foreach($line as $u_id => $l) {
+    $d_l .= "<tr><th>".$users[$u_id]."</th><th colspan=\"".($day_amount+2)."\"></th></tr>".
+    implode($l);
+  }
+  $css = implode("\n",$css);
+  $block = "
+  <style>
+    $css
+  </style>
+  <div class=\"timeCenter\">
+  <table class=\"planning\">
+  <colgroup>
+  </colgroup>
+  <colgroup class=\"main\" span=\"$day_amount\">
+  </colgroup> 
+  <colgroup class=\"main\" span=\"2\">
+  </colgroup>    
+  <thead>
+  <tr><th></th>$line0</tr>  
+  <tr><th></th>$line1</tr>
+  </thead>
+  $d_l
+  </table>
+    <div>
+    ";
+
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Project links menu

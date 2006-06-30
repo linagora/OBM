@@ -166,6 +166,23 @@ CREATE TABLE Lead (
   lead_comment     text,
   PRIMARY KEY (lead_id)
 );
+-------------------------------------------------------------------------------
+-- Project module tables
+-------------------------------------------------------------------------------
+ALTER TABLE Project ADD COLUMN project_shortname varchar(10) NOT NULL DEFAULT '';
+--
+-- Table structure for table 'ProjectReferenceTask'
+--
+CREATE TABLE ProjectRefTask (
+  projectreftask_id         int(8) auto_increment,
+  projectreftask_timeupdate  timestamp(14),
+  projectreftask_timecreate  timestamp(14),
+  projectreftask_userupdate  int(8) default NULL,
+  projectreftask_usercreate  int(8) default NULL,
+  projectreftask_code        varchar(10) default '',
+  projectreftask_label      varchar(128) default NULL,
+  PRIMARY KEY (projectreftask_id)
+);
 
 
 -------------------------------------------------------------------------------

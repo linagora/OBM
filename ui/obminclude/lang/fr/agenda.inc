@@ -115,6 +115,7 @@ $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de rép
 $l_err_repeatfrequency = "La fréquence est invalide";
 $l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
 
+$l_header_planning = "Planning";
 $l_header_meeting = "Nouvelle réunion";
 $l_header_admin = "Administration";
 $l_header_waiting_events = "Evts en attente";

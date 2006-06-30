@@ -209,8 +209,9 @@ function display_actions_theme($section, $module) {
     foreach ($actions[$module] as $key => $value) {
 
       // If the current action has this action in target
-      if (in_array("all", $value["Condition"])
-	  || in_array($action, $value["Condition"])) {
+      if (!in_array("!$action",$value["Condition"]) 
+        && (in_array("all", $value["Condition"])
+	|| in_array($action, $value["Condition"]))) {
 
 	if (($module_right & $value["Right"]) == $value["Right"]) {
 

@@ -279,6 +279,7 @@ $l_header_advance = "Avancement";
 $l_header_man_affect = "Affectation";
 $l_header_add_member = "Ajouter participant";
 $l_header_dashboard = "Tableau de bord";
+$l_header_planning = "Planning";
 
 // Admin headers
 $l_header_index = "Accueil";

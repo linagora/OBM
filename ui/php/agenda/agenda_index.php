@@ -324,6 +324,14 @@ if ($action == "index") {
   $display["features"] = html_agenda_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable);
   $display["detail"] = dis_agenda_free_interval($params, $entity_store);
 
+} elseif ($action == "planning") {
+///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");  
+  $entity_readable = get_agenda_entity_readable();
+  $calendar_entity = store_agenda_entities(run_query_agenda_get_entity_label($cal_entity_id));
+  $display["features"] = html_agenda_planning_bar($agenda, $calendar_entity, $entity_readable);
+  $display["detail"] = dis_agenda_plain_month_planning($agenda, $calendar_entity);
+
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
@@ -514,7 +522,7 @@ function get_agenda_params() {
 function get_agenda_action() {
   global $actions, $path, $params;
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
-  global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
+  global $l_header_day,$l_header_week,$l_header_year,$l_header_delete,$l_header_planning;
   global $l_header_month,$l_header_new_event,$l_header_admin, $l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_waiting_events;
@@ -589,7 +597,15 @@ function get_agenda_action() {
     'Url'      => "$path/agenda/agenda_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
-                                         );
+  );
+
+  // View Day
+  $actions["agenda"]["planning"] = array (
+    'Name'     => $l_header_planning,
+    'Url'      => "$path/agenda/agenda_index.php?action=planning",
+    'Right'    => $cright_read, 
+    'Condition'=> array ('all') 
+                                    	 );
 
   // View Year
   $actions["agenda"]["view_year"] = array (

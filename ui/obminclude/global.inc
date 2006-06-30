@@ -195,7 +195,8 @@ $profiles["admin"] = array (
   'section' => array (
     'default' => 1),
   'module' => array (
-    'default' => $perm_admin)
+    'default' => $perm_admin
+    )
 );
 
 //-------------------------//

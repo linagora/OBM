@@ -11,7 +11,6 @@
 /* ------------------------------------------------------------------------- */
 
 body 			{
-/*	background-color: #d6dfe7;*/
 	background-color: 	#d7dfe7;
 	color:			#000000;
         border:                 0px;
@@ -41,6 +40,10 @@ p			{
 	margin-right:		auto;
 }	
 
+abbr {
+  cursor: help;
+  border: none;
+}
 	
 .leftpanel {
 	position:absolute;
@@ -929,4 +932,59 @@ td.calendarThisDay:hover {
 .calendarSpan {
 	background-color:#FFF;
 	border:1px solid #CCC;
+}
+
+/*
+ * PLANNING
+ */
+
+table.planning {
+  background-color: white;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: auto;
+}
+table.planning th{
+  white-space: nowrap;
+  font-size: 70%;
+  text-align: center;
+  padding-right: 2px;
+  background-color: white;
+  
+}
+
+table.planning colgroup.main {
+  background-color: #f1f3f2;
+}
+
+table.planning colgroup.total {
+  background-color: #f1f3f2;
+}
+
+table.planning div {
+  height: 20px;
+}
+
+table.planning td {
+  border: 1px solid blue;
+  width: 20px;
+  height: 20px;
+  font-size: 70%;
+  text-align: left;
+}
+
+table.planning thead {
+  background-color: #fffcf7;
+  empty-cells: hide;
+  text-align: center;
+  font-weight: bold;
+  color: #aca0d2;
+}
+
+table.planning thead td{
+  font-size: 70%;
+}
+  
+table.planning thead th {
+  color: black;
 }
