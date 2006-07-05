@@ -218,6 +218,24 @@ include_path = ".;c:\EasyPhp\php\pear\;c:\obm\"
   \end{minipage}
 }
 
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+error_reporting = E_ALL 
+\end{verbatim}
+  \end{minipage}
+}
+
+par la ligne 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+error_reporting = E_ALL & ~E_NOTICE 
+\end{verbatim}
+  \end{minipage}
+}
+
 \fichier{Attention, on suppose toujours OBM enstallé dans c:$\backslash$obm}\\
 \\
 Vérifier les configurations de register\_global, safe\_mode, magic\_quotes\_gpc
@@ -227,6 +245,7 @@ Vérifier les configurations de register\_global, safe\_mode, magic\_quotes\_gpc
 register_global = On
 safe_mode = Off
 magic_quotes_gpc = On
+allow_call_time_pass_reference = On
 \end{verbatim}
   \end{minipage}
 }
@@ -345,15 +364,15 @@ Vous devez voir le prompt suivant.
 \shadowbox{
 	\begin{minipage}{13cm}
 		\begin{verbatim}
-			C:\<nom_de_session>\Documents and Settings>
+			C:\<Documents and Settinfs>\<noms_de_session>
 		\end{verbatim}
 	\end{minipage}
 }
 
 Revenir à la racine et aller dans le répertoire bin de MySQL : 
 \begin{verbatim}
-cd ../..
-cd program files/easyPHP/MySQL/bin			
+cd ..$\backslash$..
+cd program files$\backslash$easyPHP$\backslash$MySQL$\backslash$bin			
 \end{verbatim}
 
 Se connecter à MySQL et créer la base de données:
@@ -362,7 +381,7 @@ Se connecter à MySQL et créer la base de données:
 	\begin{minipage}{13cm}
 		\begin{verbatim}
 			mysql -u root
-			CREATE DATABASE obm
+			CREATE DATABASE obm;
 		\end{verbatim}
 	\end{minipage}
 }
@@ -393,32 +412,34 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
   \end{minipage}
 }
 
-\subsubsection*{Configuration d'OBM}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
 
-\begin{itemize}
-\item spécifier le mode d'authentification "CAS"; 
-\item déclarer les paramètres de connection au serveur CAS.
-\end{itemize}
-
-Les variables suivantes du fichier de configuration doivent être rennseignées:
-
-\shadowbox{
-  \begin{minipage}{13cm}
-\begin{verbatim}
-
-...
-// authentification : 'CAS' (SSO) or 'standalone' (default)
-$auth_kind="CAS";
-$cas_server = "sso.aliacom.local";
-$cas_server_port = "8443";
-$cas_server_uri = "/cas";
-...
-
-\end{verbatim}
-  \end{minipage}
-}
+%\subsubsection*{Configuration d'OBM}
+%
+%Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+%
+%\begin{itemize}
+%\item spécifier le mode d'authentification "CAS"; 
+%\item déclarer les paramètres de connection au serveur CAS.
+%\end{itemize}
+%
+%Les variables suivantes du fichier de configuration doivent être rennseignées:
+%
+%\shadowbox{
+%  \begin{minipage}{13cm}
+%\begin{verbatim}
+%
+%...
+%// authentification : 'CAS' (SSO) or 'standalone' (default)
+%$auth_kind="CAS";
+%$cas_server = "sso.aliacom.local";
+%$cas_server_port = "8443";
+%$cas_server_uri = "/cas";
+%...
+%
+%\end{verbatim}
+%  \end{minipage}
+%}
 
 \subsection{Lancer OBM (accéder à obm.php depuis un navigateur)}
 
