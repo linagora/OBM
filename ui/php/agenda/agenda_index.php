@@ -226,14 +226,14 @@ if ($action == "index") {
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_agenda_event_consult($params["id"]);
+  $display["detail"] = dis_agenda_event_consult($params["agenda_id"]);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["id"] > 0) {  
+  if ($params["agenda_id"] > 0) {  
     require("agenda_js.inc");
-    $eve_q = run_query_agenda_detail($params["id"]);
-    $entities = get_agenda_event_entity($params["id"]);
+    $eve_q = run_query_agenda_detail($params["agenda_id"]);
+    $entities = get_agenda_event_entity($params["agenda_id"]);
     $display["detailInfo"] = display_record_info($eve_q);
     $display["detail"] = dis_agenda_event_form($action, $params, $eve_q, $entities);
   }
@@ -262,35 +262,35 @@ if ($action == "index") {
 
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_agenda_update_occurence_state($params["id"],$uid,$params["decision_event"]);
+  run_query_agenda_update_occurence_state($params["agenda_id"],$uid,$params["decision_event"]);
   require("agenda_js.inc");
   $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
   $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
 
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_agenda_can_delete($params["id"])) {
-    if ($params["id"] > 0) {
+  if (check_agenda_can_delete($params["agenda_id"])) {
+    if ($params["agenda_id"] > 0) {
       $display["detail"] = html_agenda_dis_delete($params);
     }
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_agenda_event_consult($params["id"]);
+    $display["detail"] = dis_agenda_event_consult($params["agenda_id"]);
   }
 
 } elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_agenda_can_delete($params["id"])) {
+  if (check_agenda_can_delete($params["agenda_id"])) {
     require("agenda_js.inc");
-    if ($params["id"] > 0) {
+    if ($params["agenda_id"] > 0) {
       run_query_agenda_delete($params);
     }
     $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
   } else {
     $display["msg"] .= display_warn_msg($err_msg, false);
     $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_agenda_event_consult($params["id"]);
+    $display["detail"] = dis_agenda_event_consult($params["agenda_id"]);
   }
 
 } elseif ($action == "rights_admin") {
@@ -529,7 +529,7 @@ function get_agenda_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   global $l_header_waiting_events;
 
-  $id = $params["id"];
+  $id = $params["agenda_id"];
   $date = $params["date"];
 
   // Index
@@ -566,7 +566,7 @@ function get_agenda_action() {
   // Detail Update
   $actions["agenda"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/agenda/agenda_index.php?action=detailconsult&amp;param_event=$id&amp;param_date=$date",
+    'Url'      => "$path/agenda/agenda_index.php?action=detailconsult&amp;agenda_id=$id&amp;param_date=$date",
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
   );
@@ -574,7 +574,7 @@ function get_agenda_action() {
   // Detail Update
   $actions["agenda"]["detailupdate"] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=$id&amp;param_date=$date",
+    'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;agenda_id=$id&amp;param_date=$date",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
@@ -582,14 +582,14 @@ function get_agenda_action() {
   // Check Delete
   $actions["agenda"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/agenda/agenda_index.php?action=check_delete&amp;param_event=$id&amp;param_date=$date",
+    'Url'      => "$path/agenda/agenda_index.php?action=check_delete&amp;agenda_id=$id&amp;param_date=$date",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult')
                                      		 );
 
   // Delete
   $actions["agenda"]["delete"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=$id&amp;param_date=$date",
+    'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;agenda_id=$id&amp;param_date=$date",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      		 );

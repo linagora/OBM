@@ -68,14 +68,16 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_id") {
+if ($action == "eaxt_get_id") {
   $display["search"] = dis_project_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_project_search_list($params);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-
+///////////////////////////////////////////////////////////////////////////////
+}elseif ($action == "ext_get_id") {
+  $display["detail"] = display_project_task_selector($params); 
 ///////////////////////////////////////////////////////////////////////////////
 // Standard calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -321,8 +323,8 @@ if ($action == "ext_get_id") {
   }
 } elseif ($action == "planning") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($project["id"] > 0) {
-    $display["detail"] = dis_project_planning($project);
+  if ($params["project_id"] > 0) {
+    $display["detail"] = dis_project_planning($params);
   }
 } elseif ($action == "member_add") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -412,13 +414,16 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_project_params() {
-  
   // Get global params
   $params = get_global_params("Project");
   // Get project specific params
 
   $nb_mem = 0;
   $nb_tsk = 0;
+
+  if (!isset ($params["date"])) {
+    $params["date"] = date("Ymd"); 
+  }
 
   while ( list( $key ) = each( $_REQUEST ) ) {
     // cb_u is likely to be called cb_user
@@ -640,7 +645,7 @@ function get_project_action() {
 // Detail Consult
   $actions["project"]["planning"]  = array (
     'Name'     => $l_header_planning,
-    'Url'      => "$path/project/project_index.php?action=planning&amp;param_project=".$project["id"]."",
+    'Url'      => "$path/project/project_index.php?action=planning&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
   );

@@ -320,7 +320,7 @@ function randomColor() {
 function html_project_nav_date($project) {
   global $cdg_param, $auth, $set_theme, $c_dst_err, $l_monthsofyear,$action;
 
-  $id = $project["id"];
+  $id = $project["project_id"];
 
   $tot_width = 200 ;
 
@@ -329,8 +329,8 @@ function html_project_nav_date($project) {
   $year = substr($project["date"],0,4);
   $d_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
   $d_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
-  $url_prev = url_prepare("project_index.php?action=$action&amp;param_project=$id&amp;wbegin=$d_prev");
-  $url_next = url_prepare("project_index.php?action=$action&amp;param_project=$id&amp;wbegin=$d_next");
+  $url_prev = url_prepare("project_index.php?action=$action&amp;project_id=$id&amp;date=$d_prev");
+  $url_next = url_prepare("project_index.php?action=$action&amp;project_id=$id&amp;date=$d_next");
   $title = $l_monthsofyear[$month-1] . " $year";
 
   $block = "
@@ -365,13 +365,13 @@ function html_project_nav_date($project) {
 //   - $obm_q    : tasks list to display 
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_planning($obm_q, $time) {
+function html_project_planning($obm_q, $params) {
   global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
   global $l_daysofweekfirst;
 
-  $p_ids = $time["project_ids"];
-  $year = substr($time["date"],0,4);
-  $month = substr($time["date"],4,2);
+  $p_ids = $params["project_ids"];
+  $year = substr($params["date"],0,4);
+  $month = substr($params["date"],4,2);
 
   // first day of the month in second
   $first_day_sec = mktime(0,0,0,$month, 1, $year);
@@ -2240,5 +2240,114 @@ function dis_project_display_pref($prefs) {
   $block .= $dis_pref->dis_pref_help();
   return $block;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Display the task selector form, for external call
+// Parameters:
+//   - $params: project parameters hashtable
+///////////////////////////////////////////////////////////////////////////////
+function display_project_task_selector($project) {
+  $project_q = run_query_project_tasks_by_users($project);
+  $tasktype_q = run_query_project_used_tasktype();
+  $block = html_project_task_selector($project,$project_q,$tasktype_q);
+  return $block;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display the task selector form, for external call
+// Parameters:
+//   - $params: project parameters hashtable
+///////////////////////////////////////////////////////////////////////////////
+function html_project_task_selector($project,$project_q,$tasktype_q) {
+  global $c_undef, $l_undef, $extra_js,$l_project;
+  global $ctt_sales, $ctt_research, $ctt_others,$l_header_tasktype;
+  global $l_tt_sales, $l_tt_research, $l_tt_others,$l_task;
 
+  $extra_js .= "
+        projects = new Array(); 
+        tasks = new Array();";
+
+  // TaskType select construction
+  $task_list = array($ctt_sales=>$l_tt_sales,
+		     $ctt_research=>$l_tt_research,
+		     $ctt_others=>$l_tt_others);
+
+  $sel_tt = "
+    <select name=\"sel_tasktype\"
+      onchange=\"fill_project( this.value,this.form.sel_project,this.form.sel_projecttask) \">
+      <option value=\"$c_undef\">$l_undef</option>";
+  for ($i=0; $i<2; $i++) {
+    while($tasktype_q->next_record()) {
+      $tt_id = $tasktype_q->f("tasktype_id");
+      $tt_label = $tasktype_q->f("tasktype_label");
+      $tt_internal = $tasktype_q->f("tasktype_internal");
+      //put menu titles
+      if ($tt_internal != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+	$type_prec = $tt_internal;
+      }
+      $extra_js .= "
+        projects[$tt_id] = new Array();";    
+      $sel_tt .= "\n<option value=\"$tt_id\"";
+      if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
+      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+    }
+  }
+  $sel_tt .= "</select>";
+
+  // Project select construction
+  $sel_proj = "
+    <select name=\"sel_project\"
+      onchange=\"fill_projecttask(this.value,this.form.sel_projecttask);return true;\">
+    <option value=\"$c_undef\">$l_undef</option>
+    </select>";
+
+  // ProjectTask select construction
+  $sel_projtask = "
+    <select name=\"sel_projecttask\">
+    <option value=\"$c_undef\">$l_undef</option>
+    </select>";
+
+  while($project_q->next_record()) {
+    $tasktype_id = $project_q->f("project_tasktype_id");
+    $project_id = $project_q->f("project_id");
+    $project_name = addslashes($project_q->f("project_name"));
+    $company_name = $project_q->f("company_name");
+    $task_id = $project_q->f("projecttask_id");
+    $task_label = addslashes($project_q->f("projecttask_label"));
+
+    if($old_project_id != $project_id) {
+      $old_project_id = $project_id;
+      $extra_js .= "
+        projects[$tasktype_id][$project_id] = '$project_name';
+        tasks[$project_id] = new Array();";
+    }
+    
+    $extra_js .= "
+        tasks[$project_id][$task_id] = '$task_label';";
+  }
+
+  $block .= "
+    <form method=\"post\ name=\"f_add_task\" action=\"$url\"  
+    onsubmit=\"check_get_task_id(this.sel_project.value,this.sel_projecttask.value,this.sel_tasktype.value);return false\">
+    <table class=\"detail\" width=\"100%\">
+    <tr>
+      <td class=\"detailLabel\">$l_header_tasktype :</td>
+      <td class=\"detailForm\" colspan=\"4\">$sel_tt</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_project :</td>
+      <td class=\"detailForm\">$sel_proj</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_task :</td>    
+      <td class=\"detailForm\" colspan=\"3\">$sel_projtask</td>
+    </tr>
+    <tr>
+      <td colspan=\"2\" class=\"detailLabel\"><input type=\"submit\"></td>
+    </tr>
+    </table>    
+  </form>
+  "; 
+
+  return $block; 
+}
 ?>

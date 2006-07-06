@@ -10,23 +10,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Project search query execution
 // Parametes:
-//   - $project[]    : project search criteria
+//   - $params[]    : project search criteria
 //     keys used       name, company_name, tt, manager, member
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_search($project) {
+function run_query_project_search($params) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $project["sql_order_dir"];
-  $sql_order_field = $project["sql_order_field"];
+  $sql_order_dir = $params["sql_order_dir"];
+  $sql_order_field = $params["sql_order_field"];
 
-  $name = sql_search_text_parse($project["name"]);
-  $tt = $project["tt"];
-  $company_name = sql_search_text_parse($project["company_name"]);
-  $company = $project["company"];
-  $deal = $project["deal"];
-  $member = $project["member"];
-  $archive = $project["archive"];
-  $date = $project["datebegin"];
+  $name = sql_search_text_parse($params["name"]);
+  $tt = $params["tt"];
+  $company_name = sql_search_text_parse($params["company_name"]);
+  $company = $params["company"];
+  $deal = $params["deal"];
+  $member = $params["member"];
+  $archive = $params["archive"];
+  $date = $params["datebegin"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -257,29 +257,29 @@ function run_query_project_allocation_and_time($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Insertion query execution
 // Parameters:
-//   - $project[] : Entry's values
+//   - $params[] : Entry's values
 //     keys used  : name, soldtime, tt
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_insert($project) {
+function run_query_project_insert($params) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
   $date_now = date("Y-m-d H:i:s");
 
-  $name = $project["name"];
-  $soldtime = ($project["soldtime"] ? "'".$project["soldtime"]."'" : "null");
-  $estimated = ($project["estimated"] ? "'".$project["estimated"]."'" : "null");
-  $tt = $project["tt"];
-  $comp = ($project["company"] ? "'".$project["company"]."'" : "null");
-  $deal = ($project["deal"] ? "'".$project["deal"]."'" : "null");
-  $task = $project["tasklabel"];
-  $member = $project["member"];
-  $datebegin = ($project["datebegin"] ? "'".$project["datebegin"]."'" : "null");
-  $dateend = ($project["dateend"] ? "'".$project["dateend"]."'" : "null");
-  $add_comment = $project["add_comment"];
+  $name = $params["name"];
+  $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
+  $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
+  $tt = $params["tt"];
+  $comp = ($params["company"] ? "'".$params["company"]."'" : "null");
+  $deal = ($params["deal"] ? "'".$params["deal"]."'" : "null");
+  $task = $params["tasklabel"];
+  $member = $params["member"];
+  $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
+  $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
+  $add_comment = $params["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $project["datecomment"];
-    $usercomment = $project["usercomment"];
+    $datecomment = $params["datecomment"];
+    $usercomment = $params["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
   
@@ -430,30 +430,30 @@ function run_query_project_insert($project) {
 // Update query execution
 // Parameters:
 //   - $pid       : project id
-//   - $project[] : Entry's values
+//   - $params[] : Entry's values
 //     keys used  : name, soldtime, tt
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_update($pid, $project) {
+function run_query_project_update($pid, $params) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
-  $name = $project["name"];
-  $soldtime = ($project["soldtime"] ? "'".$project["soldtime"]."'" : "null");
-  $estimated = ($project["estimated"] ? "'".$project["estimated"]."'" : "null");
-  $tt = $project["tt"];
-  $datebegin = ($project["datebegin"] ? "'".$project["datebegin"]."'" : "null");
-  $dateend = ($project["dateend"] ? "'".$project["dateend"]."'" : "null");
-  $archive = $project["archive"];
+  $name = $params["name"];
+  $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
+  $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
+  $tt = $params["tt"];
+  $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
+  $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
+  $archive = $params["archive"];
   if ($archive) {
     $arch = "1";
   } else {
     $arch = "0";
   }
-  $comment = $project["comment"];
-  $add_comment = $project["add_comment"];
+  $comment = $params["comment"];
+  $add_comment = $params["add_comment"];
   if ($add_comment != "") {
-    $datecomment = $project["datecomment"];
-    $usercomment = $project["usercomment"];
+    $datecomment = $params["datecomment"];
+    $usercomment = $params["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
 
@@ -538,7 +538,7 @@ function run_query_project_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : UserList conditionnal insertion
 // Parameters:
-//   - $project[] : Entry's values
+//   - $params[] : Entry's values
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_name($pid) {
@@ -567,15 +567,15 @@ function run_query_project_name($pid) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Task conditionnal insertion
 // Parameters:
-//   - $project[] : Entry's values
+//   - $params[] : Entry's values
 //     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_task_insert($project) {
+function run_query_project_task_insert($params) {
   global $auth, $cdg_sql;
 
-  $pid = $project["project_id"];
-  $ptask = $project["ptask"];
-  $tasklabel = $project["tasklabel"];
+  $pid = $params["project_id"];
+  $ptask = $params["ptask"];
+  $tasklabel = $params["tasklabel"];
 
   $search_q = new DB_OBM;
 
@@ -625,15 +625,15 @@ function run_query_project_task_insert($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Task Update
 // Parameters:
-//   - $project[] : Entry's values
+//   - $params[] : Entry's values
 //     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_task_update($project) {
+function run_query_project_task_update($params) {
   global $auth, $cdg_sql;
 
-  $task = $project["task"];
-  $ptask = $project["ptask"];
-  $tasklabel = $project["tasklabel"];
+  $task = $params["task"];
+  $ptask = $params["ptask"];
+  $tasklabel = $params["tasklabel"];
 
   $query = "
       UPDATE ProjectTask SET
@@ -656,19 +656,19 @@ function run_query_project_task_update($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Tasklist deletion
 // Parameters:
-//   - $project[] : hash info : keys used : id, task_nb, tskX
+//   - $params[] : hash info : keys used : id, task_nb, tskX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_task_delete($project) {
+function run_query_project_task_delete($params) {
   global $auth, $cdg_sql;
 
-  $id = $project["project_id"];
+  $id = $params["project_id"];
   $cpt = 0;
   $cpt_del = 0;
   $delete_ok = true;
   
-  while ($cpt < $project["tsk_nb"]) {
+  while ($cpt < $params["tsk_nb"]) {
     $cpt++;
-    $tsk_id = $project["tsk$cpt"];
+    $tsk_id = $params["tsk$cpt"];
 
     // Check that neither the task to be deleted or its children tasks are
     // assigned to users
@@ -727,19 +727,19 @@ function run_query_project_task_delete($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Member conditionnal insertion
 // Parameters:
-//   - $project[] : hash info : keys used : id, mem_nb, memX
+//   - $params[] : hash info : keys used : id, mem_nb, memX
 // Return: number of users inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_memberlist_insert($project) {
+function run_query_project_memberlist_insert($params) {
   global $auth, $cdg_sql;
 
-  $id = $project["project_id"];
+  $id = $params["project_id"];
   $cpt = 0;
   $cpt_ins = 0;
   
-  while ($cpt < $project["mem_nb"]) {
+  while ($cpt < $params["mem_nb"]) {
     $cpt++;
-    $mem_id = $project["mem$cpt"];
+    $mem_id = $params["mem$cpt"];
 
     $query = "
       SELECT *
@@ -786,21 +786,21 @@ function run_query_project_memberlist_insert($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Member deletion
 // Parameters:
-//   - $project[] : hash info : keys used : id, mem_nb, memX
+//   - $params[] : hash info : keys used : id, mem_nb, memX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_memberlist_delete($project) {
+function run_query_project_memberlist_delete($params) {
   global $auth, $cdg_sql;
 
-  $id = $project["project_id"];
+  $id = $params["project_id"];
   $cpt = 0;
   $cpt_del = 0;
 
   $obm_q = new DB_OBM;
   $search_q = new DB_OBM;
 
-  while ($cpt < $project["mem_nb"]) {
+  while ($cpt < $params["mem_nb"]) {
     $cpt++;
-    $mem_id = $project["mem$cpt"];
+    $mem_id = $params["mem$cpt"];
 
     // Check if the user has filled time management for this project
     $query = "
@@ -835,14 +835,14 @@ function run_query_project_memberlist_delete($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Member status Update query execution
 // Parameters:
-//   - $project[] : hash info : user_id, user_status
+//   - $params[] : hash info : user_id, user_status
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_memberstatus_change($project) {
+function run_query_project_memberstatus_change($params) {
   global $cdg_sql;
 
-  $p_id = $project["project_id"];
-  $m_id = $project["user_id"];
-  $m_val = $project["user_status"];
+  $p_id = $params["project_id"];
+  $m_id = $params["user_id"];
+  $m_val = $params["user_status"];
 
   $query = "
     UPDATE ProjectUser
@@ -896,13 +896,13 @@ function run_query_project_allocation($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Project Allocation Update query execution
 // Parameters:
-//   - $project[] : hash info : keys used : projected
+//   - $params[] : hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_allocate_update($project) {
+function run_query_project_allocate_update($params) {
   global $auth, $cdg_sql;
 
-  $p_id = $project["project_id"];
-  $new = $project["projected"];
+  $p_id = $params["project_id"];
+  $new = $params["projected"];
   $uid = $auth->auth["uid"];  
   $date_now = date("Y-m-d H:i:s");
 
@@ -1007,16 +1007,16 @@ function run_query_project_allocate_update($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Project Advance Update query execution
 // Parameters:
-//   - $project[] : hash info : keys used : projected
+//   - $params[] : hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_advance_update($project) {
+function run_query_project_advance_update($params) {
   global $auth, $cdg_sql;
 
-  $p_id = $project["project_id"];
-  $new = $project["projected"];
+  $p_id = $params["project_id"];
+  $new = $params["projected"];
   $uid = $auth->auth["uid"];  
   $date_now = date("Y-m-d H:i:s");
-  $miss_tab = $project["missing"];
+  $miss_tab = $params["missing"];
 
   $query = "
     SELECT
@@ -1306,19 +1306,19 @@ function get_project_participants($p_id = 0) {
 // New Project Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
-//   - $project[] : values checked
+//   - $params[] : values checked
 //     keys used  : name, tt, soldtime
 // Returns:
 //   - (true | false) : true if user have write rights for this project 
 ///////////////////////////////////////////////////////////////////////////////
-function project_manager_rights($uid, $project, $project_q) {
+function project_manager_rights($uid, $params, $project_q) {
   global $cdg_sql, $perms;
 
   if ($perms == "admin") {
     return true;
   }
 
-  $pid = $project["project_id"];
+  $pid = $params["project_id"];
 
   $query = "
     SELECT projectuser_id
@@ -1343,21 +1343,21 @@ function project_manager_rights($uid, $project, $project_q) {
 // New Project Form Data checking and formatting
 // Parameters:
 //   - $pid       : project id (empty on insertion)
-//   - $project[] : values checked
+//   - $params[] : values checked
 //     keys used  : name, tt, soldtime
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_project_form($pid, $project) {
+function check_project_form($pid, $params) {
   global $l_fill_name, $l_fill_tt, $l_fill_estimated, $l_fill_soldtime;
   global $err_msg, $php_regexp_number;
 
-  $name = $project["name"];
-  $company = $project["company"];
-  $tt = $project["tt"];
-  $soldtime = $project["soldtime"];
-  $estimated = $project["estimated"];
-  $member = $project["member"];
+  $name = $params["name"];
+  $company = $params["company"];
+  $tt = $params["tt"];
+  $soldtime = $params["soldtime"];
+  $estimated = $params["estimated"];
+  $member = $params["member"];
 
   // MANDATORY: Project name
   if (trim($name) == "") {
@@ -1423,19 +1423,19 @@ function check_project_can_delete($p_id) {
 // Project Task Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
-//   - $project[] : values checked
+//   - $params[] : values checked
 //     keys used  : tasklabel
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_project_task_form($pid, $project) {
+function check_project_task_form($pid, $params) {
   global $err_msg, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
   global $l_ptask_has_parent, $l_ptask_and_parent;
 
-  $pid = $project["project_id"];
-  $task = $project["task"];
-  $ptask = $project["ptask"];
-  $tasklabel = $project["tasklabel"];
+  $pid = $params["project_id"];
+  $task = $params["task"];
+  $ptask = $params["ptask"];
+  $tasklabel = $params["tasklabel"];
 
   // MANDATORY: task label
   if (trim($tasklabel) == "") {
@@ -1572,16 +1572,16 @@ function project_task_has_user($tid) {
 // Progress Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
-//   - $project[] : values checked
+//   - $params[] : values checked
 //     keys used  : missing
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_project_progress_form($project) {
+function check_project_progress_form($params) {
 
   $error = 0;
 
-  while ( list($t_id, $misstab) = each($project["missing"]) ) {
+  while ( list($t_id, $misstab) = each($params["missing"]) ) {
     while ( list($m_id, $misstime) = each($misstab) ) {
       if (trim($misstime == "")) {
 	$error = 1;
@@ -1600,13 +1600,13 @@ function check_project_progress_form($project) {
 //   - $time[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_month_planning($project) {
+function run_query_project_month_planning($params) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($project["date"],0,4);
-  $month=substr($project["date"],4,2);
+  $year=substr($params["date"],0,4);
+  $month=substr($params["date"],4,2);
   $day=1;
-  $id = $project["id"];
+  $id = $params["project_id"];
   // First and last days of month
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
   $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
@@ -1642,5 +1642,59 @@ function run_query_project_month_planning($project) {
 
   return $obm_db; 
 }
+///////////////////////////////////////////////////////////////////////////////
+// Get Tasks for a given users list                 
+// Parameters:
+//   - $params[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_tasks_by_users($params) {
+  global $cdg_sql, $cdg_param;
 
+  $uids = implode(",",$params["user_ids"]);
+
+  $query = "
+  SELECT 
+    project_tasktype_id,
+    project_id,
+    project_name,
+    company_name,
+    projecttask_id,
+    projecttask_label
+  FROM  Project
+  LEFT JOIN Company ON company_id = project_company_id
+  JOIN ProjectTask ON projecttask_project_id = project_id
+  JOIN ProjectUser ON projectuser_projecttask_id = projecttask_id
+  WHERE project_archive='0'
+    AND projectuser_user_id IN ($uids)
+    AND projectuser_projectedtime != '0'
+  GROUP BY project_tasktype_id, project_id, project_name, company_name, 
+    projecttask_id, projecttask_label
+  ORDER BY project_tasktype_id, company_name, project_name
+    ";
+  display_debug_msg($query, $cdg_sql, "run_query_project_tasks_by_users");
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db; 
+}
+///////////////////////////////////////////////////////////////////////////////
+// Get Tasks for a given users list                 
+// Parameters:
+//   - $params[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_used_tasktype(){
+  global $cdg_sql, $cdg_param;
+
+  $query = "
+    SELECT *
+    FROM TaskType
+    ORDER BY tasktype_internal, tasktype_label";
+
+  display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
 ?>

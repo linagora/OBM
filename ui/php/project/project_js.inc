@@ -9,6 +9,10 @@
 
 require("$obminclude/javascript/check_js.inc");
 
+$extra_js .= "
+var projects;
+var tasks;";
+
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
 if (($ext_widget != "") || ($ext_widget_text != "")) {
   $extra_js .= "
@@ -23,7 +27,21 @@ function check_get_id(valeur,text) {
     window.close();
     return true;
   }
-}";
+}
+function check_get_task_id(value_project,value_task,value_type) {
+
+  if ((value_task < 1) || (value_task == null)) {
+    alert (\"$l_select_task\");
+    return false;
+  } else {
+    text = projects[value_type][value_project] + ' -- ' + tasks[value_project][value_task];
+    window.opener.document.$ext_widget.value=value_task;
+    window.opener.document.$ext_widget_text.value=text;
+    window.close();
+    return false;
+  }
+}
+";
 }
 
 $extra_js .= "
@@ -269,23 +287,32 @@ function check_advance_valid(form)
     return true;
   }
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// parent task auto select on task selection (task update form)
+// Fill the project select input
 ///////////////////////////////////////////////////////////////////////////////
-function fill_parenttask(sel_pt, sel_t, tf_tname) {
-  var task_id, ptask_id;
 
-  task_id = sel_t.value;
-  ptask_id = parent_task[task_id];
-  pos = parent_pos[ptask_id];
-  sel_pt.options[pos].selected=true;
-  stext = sel_t.options[sel_t.selectedIndex].text;
-  // Delete special space chars at the beginning (&nbsp; ?)
-  new_text = stext.replace(/(\s+)(\S)/, '$2');
-  tf_tname.value = trim(new_text);
+function fill_project(tasktype_id,sel_project,sel_task) {
+  current_project = projects[tasktype_id];
+  empty_select(sel_project);
+  empty_select(sel_task);
+  for (var id in current_project) {
+    sel_project.options.add(new Option(current_project[id], id));
+  }
 }
+function fill_projecttask(project_id,sel_task) {
+  empty_select(sel_task);  
+  current_task = tasks[project_id];  
+  for (var id in current_task) {
+    sel_task.options.add(new Option(current_task[id], id));
+  }
+}
+function empty_select(sel) {
+ for (i = sel.options.length-1; i >= 0; i--) {
+    sel.options[i] = null; 
+  }
+  sel.options.add(new Option('$l_undef','$c_undef'));
+} 
+
 
 ";
 

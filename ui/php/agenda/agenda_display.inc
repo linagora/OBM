@@ -1276,7 +1276,7 @@ function dis_agenda_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_us
   } else {
     $title = $event->title;
     $location = $event->location;
-    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
+    $link = "$path/agenda/agenda_index.php?action=detailconsult&agenda_id=$id";
     $description = $event->description;
     $category1 = $event->category1;
   }    
@@ -1321,7 +1321,7 @@ function dis_agenda_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb_e
   } else {
     $title = $event["event"]->title;
     $location = $event["event"]->location;
-    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
+    $link = "$path/agenda/agenda_index.php?action=detailconsult&agenda_id=$id";
     $description = $event["event"]->description;
     $category1 = $event["event"]->category1;
   }
@@ -1447,11 +1447,11 @@ function html_agenda_dis_conflict($agenda, $c_q) {
 function html_agenda_conflict_form($agenda) {
   global $l_force_insert, $l_refuse_insert, $l_cancel_insert;
   
-  $event_id = $agenda["id"]; 
+  $event_id = $agenda["agenda_id"]; 
   $user_id = $agenda["user_id"];
   $dis_form = "
   <form name=\"f_conflict\" method=\"post\">
-   <input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
+   <input type=\"hidden\" name=\"agenda_id\" value=\"$event_id\" />
    <input type=\"hidden\" name=\"action\" value=\"decision\" />
    <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
    <input type=\"hidden\" name=\"cb_force\" value=\"1\" />
@@ -1503,6 +1503,7 @@ function dis_agenda_event_form($action, $agenda, $event_q, $entities) {
   if ($action == "detailupdate") {
     $users = $entities["user"];
     $resources = $entities["resource"];
+    $tasks = $entities["task"];
   } else {
     $users_id = $entities["user"];
     if (count($users_id > 0)) {
@@ -1525,7 +1526,8 @@ function dis_agenda_event_form($action, $agenda, $event_q, $entities) {
   }
 
   $cats1 = of_category_get_ordered("calendar", "category1");
-  $block = html_agenda_event_form($action, $agenda, $event_q, $users, $resources, $groups, $cats1);
+  $block = html_agenda_event_form($action, $agenda, $event_q, $users, $resources, $groups,$tasks, $cats1);
+  //$block = html_agenda_event_form($action, $agenda, $event_q, $users, $groups, $cats1);
 
   return $block;
 }
@@ -1542,20 +1544,20 @@ function dis_agenda_event_form($action, $agenda, $event_q, $entities) {
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $groups, $cats1) {
+function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $groups,$tasks, $cats1) {
   global $path, $display, $set_theme;
   global $cagenda_resource, $cagenda_weekstart, $set_cal_interval,$ico_project;
   global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
-  global $cagenda_first_hour, $cagenda_last_hour;
+  global $cagenda_first_hour, $cagenda_last_hour,$ico_project;
   // -- Labels
   global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
   global $l_high,$l_low,$l_medium,$l_datebegin,$popup_height,$popup_width;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
-  global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_project;
+  global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_agenda_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
-  global $l_resources,$l_format,$l_daysofweekshort;
+  global $l_resources,$l_format,$l_daysofweekshort,$l_task;
 
   $time_unit = 60 / $set_cal_interval;  
   $repeatfrequency = 1;
@@ -1582,13 +1584,16 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
     if ($event_q->f("calendarevent_endrepeat")) {
       $repeat_end = isodate_format($event_q->f("calendarevent_endrepeat"));
     }
+    $t_id = $tasks["ids"][0];
+    $t_name = $tasks["entity"][$t_id]["label"];
     $id = $event_q->f("calendarevent_id");
+
   } elseif ($action == "new") {
     $repeat_end = isodate_format(strtotime("+1 year"));
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($agenda["id"])) { $id = $agenda["id"]; }
+  if (isset($agenda["agenda_id"])) { $id = $agenda["agenda_id"]; }
   if (isset($agenda["title"])) { $title = stripslashes($agenda["title"]); }
   if (isset($agenda["location"])) { $location = stripslashes($agenda["location"]); }
   if (isset($agenda["category1"])) { $cat1 = $agenda["category1"]; }
@@ -1618,15 +1623,15 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   if ($repeat_kind != "weekly") {
     $repeat_days = "000000";
   }
-  if (isset($agenda["project_id"])) { $p_id = $agenda["project_id"]; }
-  if (isset($agenda["project_name"])) { $p_name = stripslashes($agenda["project_name"]); }
-  if (isset($agenda["proj_new_id"])) { $p_new_id = $agenda["proj_new_id"]; }
-  if (isset($agenda["proj_new_name"])) { $p_new_name = stripslashes($agenda["proj_new_name"]); }
+  if (isset($agenda["task_id"])) { $t_id = $agenda["task_id"]; }
+  if (isset($agenda["task_name"])) { $t_name = stripslashes($agenda["task_name"]); }
+  if (isset($agenda["task_new_id"])) { $t_new_id = $agenda["task_new_id"]; }
+  if (isset($agenda["task_new_name"])) { $t_new_name = stripslashes($agenda["task_new_name"]); }
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
+      <input type=\"hidden\" name=\"agenda_id\" id=\"agenda_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
@@ -1784,18 +1789,28 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
      </td>
 ";
   }
-
-  $block_project = "
-    <td class=\"detailLabel\">$l_project</td>
+  
+  $block_task = "
+    <td class=\"detailLabel\">$l_task</td>
     <td class=\"detailForm\">
-      <a href=\"". url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$d_id") . "\">
-      $p_name
-      </a><input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
-      <input type=\"hidden\" name=\"project_name\" value=\"$p_name\" />
-      <input type=\"hidden\" name=\"project_new_id\" value=\"$p_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.project_new_id&amp;ext_widget_text=f_entity.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+    <script type=\"text/javascript\">
+    function get_selected_users_url() {
+      users = document.getElementById('sel_user_id').childNodes;
+      for(i=0; i<users.length;i++) {
+        if(users[i].nodeName == \"DIV\") {
+          url += '&user_ids[]=' + users[i].id.substr(22);
+        }
+      }
+      return url;
+    }
+    </script>
+      $t_name
+      <input type=\"hidden\" name=\"task_id\" value=\"$t_id\" />
+      <input type=\"hidden\" name=\"task_name\" value=\"$t_name\" />
+      <input type=\"hidden\" name=\"task_new_id\" value=\"$t_new_id\" />
+      <a href=\"\" onclick=\"url = get_selected_users_url();window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
-      <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+      <input type=\"text\" size=\"32\" name=\"task_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>";
 
   if ($force == 1) {
@@ -1898,7 +1913,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
     $block_resource
   </tr>
   <tr>
-    $block_project
+    $block_task
   </tr>    
   </table>
 
@@ -1967,7 +1982,6 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
 
    return $block;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Waiting events
@@ -2061,7 +2075,7 @@ function html_agenda_waiting_events($obm_wait) {
      <td class=\"detailForm\">
       <form method=\"get\" action=\"agenda_index.php\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
-       <input type=\"hidden\" name=\"param_event\" value=\"".$obm_wait->f("calendarevent_id")."\" />
+       <input type=\"hidden\" name=\"agenda_id\" value=\"".$obm_wait->f("calendarevent_id")."\" />
        <input type=\"hidden\" name=\"user_id\" value=\"$current_user\" />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept<br />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait<br />
@@ -2117,7 +2131,7 @@ function html_agenda_calendar_consult($event_q, $entities) {
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_change_state,$l_groups,$l_all_day;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_daily, $l_weekly;
-  global $l_wait;
+  global $l_wait,$l_task;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
 
@@ -2182,7 +2196,7 @@ function html_agenda_calendar_consult($event_q, $entities) {
       <tr>
         <td colspan=\"2\" class=\"detailText\">
 	<input type=\"hidden\" name=\"action\" value=\"update_decision\" />
-	<input type=\"hidden\" name=\"param_event\" value=\"$id\" />
+	<input type=\"hidden\" name=\"agenda_id\" value=\"$id\" />
 	<input $A type=\"radio\" name=\"rd_decision_event\" value=\"A\" onclick=\"this.form.submit()\" />$l_accept
 	<input $W type=\"radio\" name=\"rd_decision_event\" value=\"W\" onclick=\"this.form.submit()\" />$l_wait
 	<input $R type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
@@ -2192,6 +2206,21 @@ function html_agenda_calendar_consult($event_q, $entities) {
       }
       $dis_user_list .= "$label ($state)<br />";
     }
+  }
+
+  $tasks = $entities["task"];
+  if (is_array($tasks["entity"])) {
+    foreach ($tasks["entity"] as $u_id => $entity) {
+      $label = $entity["label"];
+      $state = $entity["state"];
+      $dis_task_list .= "$label<br />";
+    }
+    $dis_task_block = "
+      <tr>
+        <td class=\"detailLabel\">$l_task</td>
+        <td class=\"detailText\">$dis_task_list</td>
+      </tr>
+    ";
   }
 
   if ($cagenda_resource) {
@@ -2235,6 +2264,7 @@ function html_agenda_calendar_consult($event_q, $entities) {
     <td class=\"detailText\">$dis_user_list</td>
   </tr>
   $dis_resource_block
+  $dis_task_block
   </table>
   <div class=\"detailHead\">$l_carac</div>
    <table class=\"detail\">   
@@ -2298,7 +2328,7 @@ function html_agenda_dis_delete($agenda) {
 
   $perms = $auth->auth["perm"];
   $iso_date = $agenda["date"];
-  $event_id = $agenda["id"];
+  $event_id = $agenda["agenda_id"];
   $e = get_agenda_event_info($event_id);
   $usercreate = $e["usercreate"];
 
@@ -2311,11 +2341,11 @@ function html_agenda_dis_delete($agenda) {
   <div class=\"detail\">
    <div class=\"messageWarning\">$l_confirm_delete</div>
    <div class=\"agendaDelete\">
-    <a href=\"agenda_index.php?action=delete&param_event=$event_id&cb_mail=1\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_confirm_mail\" alt=\"[ValidateMail]\"/></a>
+    <a href=\"agenda_index.php?action=delete&agenda_id=$event_id&cb_mail=1\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_confirm_mail\" alt=\"[ValidateMail]\"/></a>
      $l_confirm_mail
-    <a href=\"agenda_index.php?action=delete&param_event=$event_id\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_validate\" alt=\"[Validate]\"  width=\"16\"/></a>
+    <a href=\"agenda_index.php?action=delete&agenda_id=$event_id\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_validate\" alt=\"[Validate]\"  width=\"16\"/></a>
      $l_confirm
-    <a href=\"agenda_index.php?action=detailconsult&param_event=$event_id&param_date=$iso_date\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_cancel\" alt=\"[Cancel]\" width=\"16\" /></a>
+    <a href=\"agenda_index.php?action=detailconsult&agenda_id=$event_id&param_date=$iso_date\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_cancel\" alt=\"[Cancel]\" width=\"16\" /></a>
      $l_cancel
    </div>
   </div>
@@ -2341,7 +2371,7 @@ function dis_agenda_meeting_form($agenda, $sel_entity_id) {
   $time_unit = 60 / $set_cal_interval;
   $datebegin = $agenda["date"];
   $dis_button = "
-     <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
+     <input type=\"hidden\" name=\"agenda_id\" id=\"agenda_id\" value=\"$id\" />
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
      <input type=\"submit\" value=\"$l_meeting_perform\" /> 
 ";

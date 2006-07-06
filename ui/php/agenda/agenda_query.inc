@@ -11,9 +11,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Return events details
 // Parameters:
-//   - $param_event
+//   - $agenda_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_agenda_detail($param_event) {
+function run_query_agenda_detail($agenda_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -46,11 +46,10 @@ function run_query_agenda_detail($param_event) {
       $calendarevent_date
     FROM  
       CalendarEvent
-      LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN UserObm AS c ON calendarevent_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON calendarevent_userupdate = u.userobm_id
-    WHERE calendarevent_id = '$param_event'";
+    WHERE calendarevent_id = '$agenda_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_agenda_detail()");
   $obm_q->query($query);
@@ -106,7 +105,29 @@ function run_query_agenda_get_resource_label($resources) {
 
   return $obm_q;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Return all the label of task
+// Parameters:
+//   - $resources : resource id array, the event is assigned to
+///////////////////////////////////////////////////////////////////////////////
+function run_query_agenda_get_task_label($resources) {
+  global $cdg_sql;
 
+  if (count($resources) > 0) {
+    $in = "'".implode ("','", $resources)."'";
+    $where = "WHERE resource_id IN ($in)";
+  }
+  $obm_q = new DB_OBM;
+  $query = "SELECT resource_name, resource_id
+            FROM Resource 
+            $where";
+
+  $query.= " ORDER BY resource_id";
+  display_debug_msg($query, $cdg_sql, "run_query_agenda_get_resource_label()");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the label of entities 
@@ -186,7 +207,7 @@ function run_query_resource_resourcegroup($group) {
 function run_query_agenda_insert_decision($agenda) {
 
   $user = $agenda["user_id"];
-  $event_id = $agenda["id"];
+  $event_id = $agenda["agenda_id"];
   $state = $agenda["decision_event"];
   run_query_agenda_update_occurence_state($event_id,$user,$state);
 }
@@ -278,7 +299,7 @@ function run_query_agenda_waiting_events() {
 function run_query_agenda_delete_event_entity($agenda) {
   global $cdg_sql;
 
-  $e_id = $agenda["id"];
+  $e_id = $agenda["agenda_id"];
   $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$e_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_agenda_delete_event_entity()");
@@ -305,8 +326,8 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
   $mail_title = stripslashes($agenda["title"]);
   $datebegin = $agenda["datebegin"];
   $dateend = $agenda["dateend"];
-  if($agenda["proj_new_id"]) $project_id = $agenda["proj_new_id"]; 
-  else $project_id = $agenda["project_id"];
+  if($agenda["task_new_id"]) $task_id = $agenda["task_new_id"]; 
+  else $task_id = $agenda["task_id"];
   // Get the final user list (merge group)
   $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
@@ -330,8 +351,8 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
     }
   }
 
-  if($project_id > 0) {
-    run_query_agenda_insert_entity_event("project", $project_id, $event_id, 'A');
+  if($task_id > 0) {
+    run_query_agenda_insert_entity_event("task", $task_id, $event_id, 'A');
   }
   $resources_writable=array(); // Writable Resources  
   $resources_address =array(); // Resource Admin notification
@@ -401,7 +422,7 @@ function run_query_agenda_insert_event_data($agenda) {
   $dateend = $agenda["date_end"];
   $event_duration = $agenda["event_duration"];
   if ($agenda["privacy"]!=1) $privacy = 0; else $privacy = 1; 
-  $repeat_kind = $agenda["kind"];
+  $repeat_kind = $agenda["repeat_kind"];
   $repeat_days = $agenda["repeat_days"]; 
   $repeat_end = $agenda["repeat_end"];
   $repeatfrequency = $agenda["repeatfrequency"];  
@@ -699,7 +720,7 @@ function check_agenda_conflict($agenda, $sel_entity_id) {
 
   $ts_begin = isodatetime_to_timestamp($agenda["date_begin"]);
   $ts_end = isodatetime_to_timestamp($agenda["date_end"]);
-  $id = $agenda["id"];
+  $id = $agenda["agenda_id"];
   $obm_q = run_query_agenda_conflict_events($ts_begin, $ts_end, $sel_entity_id, $id);
   if ($obm_q->nf() == 0) {
     return false;
@@ -714,7 +735,7 @@ function check_agenda_conflict($agenda, $sel_entity_id) {
 function check_agenda_decision_conflict($agenda) {
   
   $user["user"] = $agenda["user_id"];
-  $event_id = $agenda["id"];
+  $event_id = $agenda["agenda_id"];
   $e_q = run_query_agenda_detail($event_id);
   $ts_begin = $e_q->f("calendarevent_date");
   $ts_end = $e_q->f("calendarevent_date") + $e_q->f("calendarevent_duration");
@@ -738,11 +759,14 @@ function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
 
   $datebegin = $agenda["date_begin"];
   $dateend = $agenda["date_end"];
-  $event_id = $agenda["id"];
+  $event_id = $agenda["agenda_id"];
   $groups = $agenda["group"];
   $mail = $agenda["mail"];
   $mail_title = stripslashes($agenda["title"]);
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
+
+  if($agenda["task_new_id"]) $task_id = $agenda["task_new_id"]; 
+  else $task_id = $agenda["task_id"];
 
   // Get the final user list
   $users_array = $sel_entity_id["user"];
@@ -843,6 +867,10 @@ function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
     }
   }
 
+  if($task_id > 0) {
+    run_query_agenda_insert_entity_event("task", $task_id, $event_id, 'A');
+  }
+
   $subject = "$l_update_event_mail_subject" . $mail_title;
   $message = "$l_update_event_mail_head $mail_title
 $l_date : $l_from $datebegin $l_to $dateend";
@@ -874,9 +902,9 @@ function run_query_agenda_update_event_data($agenda) {
   $datebegin = $agenda["date_begin"];
   $event_duration = $agenda["event_duration"];
   ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
-  $event_id = $agenda["id"]; 
+  $event_id = $agenda["agenda_id"]; 
   if ($agenda["privacy"] != 1) $privacy = 0; else $privacy = 1; 
-  $repeat_kind = $agenda["kind"];
+  $repeat_kind = $agenda["repeat_kind"];
   $repeat_days = $agenda["repeat_days"];
   $repeat_end = $agenda["repeat_end"];
   $frequency = $agenda["repeatfrequency"];  
@@ -933,7 +961,7 @@ function run_query_agenda_delete($agenda) {
   global $cagenda_resource_admin, $l_resource_allocated;
 
   $obm_q = new DB_OBM;
-  $event_id = $agenda["id"];
+  $event_id = $agenda["agenda_id"];
   $mail = $agenda["mail"]; 
   
   $users_array = get_agenda_event_users_info($event_id);
@@ -1342,9 +1370,9 @@ function get_agenda_event_users_info($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Return event entities
 // Parameters: 
-//   - $param_event
+//   - $agenda_id
 ///////////////////////////////////////////////////////////////////////////////
-function get_agenda_event_entity($param_event) {
+function get_agenda_event_entity($agenda_id) {
   global $cdg_sql;
 
   // Optimisation possible : 1 seule requete pour toutes les entites
@@ -1359,7 +1387,7 @@ function get_agenda_event_entity($param_event) {
   FROM EventEntity
     LEFT JOIN UserObm ON evententity_entity_id = userobm_id
   WHERE 
-    evententity_event_id = '$param_event' AND 
+    evententity_event_id = '$agenda_id' AND 
     evententity_entity = 'user'";
 
   display_debug_msg($query, $cdg_sql, "get_agenda_event_entity(1)");
@@ -1384,7 +1412,7 @@ function get_agenda_event_entity($param_event) {
   FROM EventEntity
     LEFT JOIN Resource ON evententity_entity_id = resource_id
   WHERE 
-    evententity_event_id = '$param_event'
+    evententity_event_id = '$agenda_id'
     AND evententity_entity = 'resource'";
 
   display_debug_msg($query, $cdg_sql, "get_agenda_event_entity(2)");
@@ -1400,6 +1428,32 @@ function get_agenda_event_entity($param_event) {
 						     "state" => $state);
   }
 
+  $query = "SELECT DISTINCT
+    projecttask_id,
+    project_name,
+    projecttask_label,
+    evententity_entity,
+    evententity_entity_id,
+    evententity_state as state
+  FROM EventEntity
+    LEFT JOIN ProjectTask ON evententity_entity_id = projecttask_id
+    LEFT JOIN Project ON projecttask_project_id = project_id
+  WHERE 
+    evententity_event_id = '$agenda_id'
+    AND evententity_entity = 'task'";
+
+  display_debug_msg($query, $cdg_sql, "get_agenda_event_entity(2)");
+  $r_q = new DB_OBM;
+  $r_q->query($query);
+  while ($r_q->next_record()) {
+    $entity = $r_q->f("evententity_entity");
+    $entity_id = $r_q->f("evententity_entity_id");
+    $state = $r_q->f("state");
+    $label = $r_q->f("project_name")."--".$r_q->f("projecttask_label");
+    $entities[$entity]["ids"][] = $entity_id;
+    $entities[$entity]["entity"][$entity_id] = array("label"=> $label,
+						     "state" => $state);
+  }
   return $entities;
 }
 
