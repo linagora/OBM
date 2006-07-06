@@ -59,9 +59,9 @@ if ( ($params["new_group"] == "1")
   }
   $cal_entity_id["group_view"] = $params["group_view"];
   $cal_entity_id["resource"] = array();
-     }
+}
 // Resources groups, only on meeting
-if($action == "perform_meeting" && 
+if ($action == "perform_meeting" && 
   (is_array($params["sel_resource_group_id"]) || is_array($params["sel_user_id"])
   || is_array($params["sel_resource_id"]))) { 
   $cal_entity_id["resource_group"] = $params["sel_resource_group_id"];
@@ -395,9 +395,11 @@ function get_agenda_params() {
   $params = get_global_params("Entity");
 
   // Get agenda specific params
+  $params["group_view"] = $params["group_id"];
+
   if (isset ($param_date)) {
-    $params["date"] = $param_date; 
-  } else { 
+    $params["date"] = $param_date;
+  } else {
     $params["date"] = isodate_format();
   }
   

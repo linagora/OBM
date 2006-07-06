@@ -9,7 +9,6 @@
 
 
 require("$obminclude/javascript/check_js.inc");
-require("$obminclude/javascript/category_js.inc");
 
 $extra_js .= "
 function confirm_del() {

@@ -191,6 +191,8 @@ CREATE TABLE Lead (
 -- Project module tables
 -------------------------------------------------------------------------------
 ALTER TABLE Project ADD COLUMN project_shortname varchar(10) SET DEFAULT '';
+
+
 --
 -- Table structure for table 'ProjectReferenceTask'
 --
@@ -226,3 +228,27 @@ CREATE TABLE IncidentCategory2 (
   incidentcategory2_label       varchar(32) DEFAULT NULL,
   PRIMARY KEY (incidentcategory2_id)
 );
+
+
+-------------------------------------------------------------------------------
+-- New Region table
+-------------------------------------------------------------------------------
+-- 
+-- Table structure for table 'Region'
+--
+CREATE TABLE Region (
+  region_id          serial,
+  region_timeupdate  TIMESTAMP,
+  region_timecreate  TIMESTAMP,
+  region_userupdate  integer,
+  region_usercreate  integer,
+  region_code        varchar(10) NOT NULL default '',
+  region_label       varchar(64),
+  PRIMARY KEY (region_id)
+);
+
+
+ALTER TABLE Deal ADD COLUMN deal_region_id integer;
+ALTER TABLE Deal ALTER COLUMN deal_region_id SET DEFAULT 0;
+UPDATE Deal SET deal_regionid=0;
+ALTER TABLE Deal ALTER COLUMN deal_region_id SET NOT NULL;

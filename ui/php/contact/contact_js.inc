@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-require("$obminclude/javascript/category_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "

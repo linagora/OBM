@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre14";
+$obm_version = "1.2.0pre16";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -469,20 +469,20 @@ require_once("$obminclude/global_query.inc");
 ///////////////////////////////////////////////////////////////////////////////
 // Display parameters debug block
 // Parameters:
-//   - $param : parameters hash
+//   - $params : parameters hash
 ///////////////////////////////////////////////////////////////////////////////
-function display_debug_param($param) {
+function display_debug_param($params) {
   global $cdg_param, $action, $global_dis_debug_param;
 
   if (debug_level_isset($cdg_param)) {
     $global_dis_debug_param .= "action=$action";
-    if ( $param ) {
-      while ( list( $key, $val ) = each( $param ) ) {
+    if ( $params ) {
+      foreach ($params as $key => $val) {
 	if (is_array($val)) {
-          $global_dis_debug_param .= "<br />param[$key]=";
+          $global_dis_debug_param .= "<br />params[$key]=";
 	  $global_dis_debug_param .= print_r($val, true);
 	} else {
-          $global_dis_debug_param .= "<br />param[$key]=$val";
+          $global_dis_debug_param .= "<br />params[$key]=$val";
 	}
       }
     }
@@ -787,19 +787,21 @@ function get_global_params($table="") {
     $key = str_replace($replace,"",$var);
 
     // sql_order_dir value control
-    if($key == "sql_order_dir") {
-      if(!in_array($value, $order_dir_values))
+    if ($key == "sql_order_dir") {
+      if (!in_array($value, $order_dir_values))
         $value = $c_order_dir[0];
     }
 
     // sql_order_field value control
-    if($key == "sql_order_field") {
-      if(!in_array($value, array_keys($fieldnames)))
+    if ($key == "sql_order_field") {
+      if (!in_array($value, array_keys($fieldnames)))
         $value = "";
     }
 
     // Add value in hash table
-    if($value != ""){
+    if (is_array($value)) {
+      $params[$key] = $value;
+    } else if ($value != "") {
       $params[$key] = trim(strip_tags($value));
     }
 

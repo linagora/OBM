@@ -13,6 +13,8 @@
 // EntityCategoryN (id, time and user * update and create, code, label)
 // EntityCategoryNLink (category_id, entity_id)
 
+require_once("$obminclude/javascript/category_js.inc");
+
 $extra_js .= "
 ///////////////////////////////////////////////////////////////////////////////
 // Category Functions
@@ -744,6 +746,108 @@ function of_category_dis_links($entity, $cat, $param, $mode="multi") {
   }
 
   return $dis_link;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: the cat links
+// Parameters:
+//   - $entities   : target entity : if an array, check for each entities
+//   - $cat        : target category
+//   - $param      : Entity parameters array
+//   - $mode       : ([mono|multi])
+//   - $link_table : [optionnal] to handle special
+///////////////////////////////////////////////////////////////////////////////
+function of_category_dis_links_new($entities, $cat, $param, $mode="multi") {
+  global $l_c_link, $l_c_link_no;
+  global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
+  global $l_back, $display;
+
+  $l_cat = "l_${cat}";
+  global $$l_cat;
+
+  $has_links = false;
+  $id = $param["${cat}_id"];
+  if (! ($id > 0)) {
+    $id = $param["${cat}"];
+  }
+
+  if (is_array($entities)) {
+    $label = of_category_get_label("", $cat, $id);
+    foreach($entities as $entity) {
+      $l_entity = strtolower("l_${entity}");
+      global $$l_entity;
+
+      $obm_q = of_category_query_links($entity, $cat, $id, $mode);
+
+      $nb_cat = $obm_q->num_rows();
+      if ($nb_cat > 0) {
+	$has_links = true;
+        $url = url_prepare("?action=search&amp;sel_${cat}=$id");
+
+	$dis_link .= "
+    <tr>
+      <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
+    </tr>";
+      }
+    }
+
+  } else {
+
+	// XXXX a continuer ici
+
+
+    $dis_link = "
+    <table class=\"detail\">
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">
+        ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
+    </tr>
+    </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+      <form name=\"form_act_delete\"
+        method=post action=\"" . url_prepare("") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
+      <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
+      <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
+      </form>
+
+      <form name=\"form_back\" method=\"get\"
+        action=\"" .url_prepare("") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"admin\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>
+  </div>";
+
+  }
+
+  if ($has_links) {
+    $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $l_c_cant_delete.");
+    $dis_buttons .= "
+    </table>
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">
+          <form name=\"form_back\" method=\"get\"
+            action=\"" .url_prepare("") . "\">
+          <input type=\"hidden\" name=\"action\" value=\"admin\" />
+          <input type=\"submit\" value=\"$l_back\" />
+          </form>
+        </p>
+      </div>";
+  } else {
+    $display["msg"] .= display_ok_msg(ucfirst(${$l_cat}).": $l_c_can_delete.");
+  }
+
+  $block = "
+    <table class=\"detail\">
+      $dis_link
+    </table>
+  $dis_buttons
+";
+
+  return $block;
 }
 
 

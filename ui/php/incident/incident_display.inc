@@ -52,6 +52,10 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("incident_logger");
   }
 
+  else if ($fieldname == "incident_duration") {
+    $res["align"] = "center";
+  }
+
   else if ($fieldname == "incident_date") {
     $res["name"] = date_format($OD->data_set->f("date"));
   }

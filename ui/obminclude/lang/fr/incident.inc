@@ -29,7 +29,7 @@ $l_call = "Appel en abscence";
 $l_waitcall = "Attente de retour";
 $l_paused = "En Attente";
 $l_closed = "Fermé";
-$l_lastupdate = "Date de dernière modification";
+$l_lastupdate = "Dernière modification";
 
 // Action
 $l_select_contract = "Sélectionner le contrat";

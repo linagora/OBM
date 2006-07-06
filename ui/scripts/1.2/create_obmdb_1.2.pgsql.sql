@@ -159,6 +159,21 @@ CREATE TABLE Country (
 );
 
 
+-- 
+-- Table structure for table 'Region'
+--
+CREATE TABLE Region (
+  region_id          serial,
+  region_timeupdate  TIMESTAMP,
+  region_timecreate  TIMESTAMP,
+  region_userupdate  integer,
+  region_usercreate  integer,
+  region_code        varchar(10) NOT NULL default '',
+  region_label       varchar(64),
+  PRIMARY KEY (region_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Company module tables
 -------------------------------------------------------------------------------
@@ -548,6 +563,7 @@ CREATE TABLE Deal (
   deal_datebegin            date,
   deal_parentdeal_id        integer,
   deal_type_id              integer,
+  deal_region_id            integer DEFAULT 0 NOT NULL,
   deal_tasktype_id          integer,
   deal_company_id           integer DEFAULT 0 NOT NULL,
   deal_contact1_id          integer,

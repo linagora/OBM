@@ -79,6 +79,7 @@ $l_expresspostal = "Cedex";
 $l_country = "Pays";
 $l_desc = "Description";
 $l_priority = "Priorité";
+$l_region = "Région";
 $l_datasource = "Source de données";
 $l_source = "Source";
 $l_after = "Après";
@@ -292,6 +293,7 @@ $l_header_reset = "Préférence par défaut";
 $l_header_country = "Pays";
 $l_header_datasource = "Source de données";
 $l_header_tasktype = "Type de tâche";
+$l_header_region = "Régions";
 
 $l_header_day = "Jour";
 $l_header_week = "Semaine";

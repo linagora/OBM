@@ -900,5 +900,19 @@ $table_tt
   return $block;
 }
 
-?>
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the Region index screen
+///////////////////////////////////////////////////////////////////////////////
+function dis_admin_ref_region_index() {
+
+  $regions = of_category_get_ordered("", "region");
+  $block .= "<hr />";
+  $block .= of_category_dis_admin_form("", "region", $regions);
+
+  return $block;
+}
+
+
+
+?>

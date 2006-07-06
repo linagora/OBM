@@ -78,6 +78,7 @@ $l_expresspostal = "Express postal";
 $l_country = "Country";
 $l_desc = "Description";
 $l_priority = "Priority";
+$l_region = "Region";
 $l_datasource = "Data source";
 $l_source = "Source";
 $l_after = "After";
@@ -287,6 +288,7 @@ $l_header_reset = "Default Preferences";
 $l_header_country = "Country";
 $l_header_datasource = "Data Source";
 $l_header_tasktype = "Task Type";
+$l_header_region = "Regions";
 
 $l_header_year = "Year";
 $l_header_day = "Day";

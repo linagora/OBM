@@ -78,6 +78,7 @@ $l_expresspostal = "Dirección de correo";
 $l_country = "País";
 $l_desc = "Descripción";
 $l_priority = "Prioridad";
+$l_region = "Region";
 $l_datasource = "Fuente de Datos";
 $l_after = "Despues";
 $l_before = "Antes";
@@ -278,6 +279,7 @@ $l_header_reset = "Preferencias por omisión";
 $l_header_country = "Pais";
 $l_header_datasource = "Fuente de Datos";
 $l_header_tasktype = "Tipo de Tarea";
+$l_header_region = "Regions";
 
 $l_header_day = "Día";
 $l_header_week = "Semana";

@@ -514,7 +514,7 @@ function get_deal_params() {
   } else {
     $params["parchive"] = "0";
   }
-    
+
   $params["status_order"] = (isset($tf_order) ? $tf_order : "0");
   
   get_global_params_document($params);

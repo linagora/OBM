@@ -66,6 +66,7 @@ $l_expresspostal = "CAP 2";
 $l_country = "Nazione";
 $l_desc = "Descrizione";
 $l_priority = "Priorita";
+$l_region = "Region";
 $l_datasource = "Data sorgente";
 $l_after = "Dopo";
 $l_before = "Prima";
@@ -234,6 +235,7 @@ $l_header_reset = "Resetta";
 $l_header_country = "Paese";
 $l_header_datasource = "Data sorgente";
 $l_header_tasktype = "Tipo di operazione";
+$l_header_region = "Regione";
 
 $l_header_day = "Giorno";
 $l_header_week = "Settimana";

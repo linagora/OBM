@@ -35,6 +35,7 @@ $fieldnames["parentdeal_comment"] = $l_comment;
 $fieldnames["dealstatus_label"] = $l_status;
 $fieldnames["dealtype_label"] = $l_kind;
 $fieldnames["tasktype_label"] = $l_tt;
+$fieldnames["region_label"] = $l_region;
 $fieldnames["deal_company_name"] = $l_company;
 $fieldnames["deal_company_zipcode"] = $l_postcode;
 $fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
@@ -202,12 +203,13 @@ function dis_deal_index($deal="") {
 
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_deal_type();
+  $regions = of_category_get_ordered("", "region");
   $tts = get_global_tasktype($ctt_sales);
   $cats1 = of_category_get_ordered("deal", "category1");
   $roles = of_category_get_ordered("DealCompany", "role");
   $status_q = run_query_deal_status_list();
   $block .= html_deal_parentdeal_search_form($deal, $usr_q);
-  $block .= html_deal_search_form($deal, $type_q, $tts, $cats1, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $cats1, $roles, $status_q, $usr_q);
 
   return $block;
 }
@@ -225,11 +227,12 @@ function dis_deal_search_form($deal="") {
 
   $usr_q = run_query_deal_manager($archive);
   $type_q = run_query_deal_type();
+  $regions = of_category_get_ordered("", "region");
   $tts = get_global_tasktype($ctt_sales);
   $cats1 = of_category_get_ordered("deal", "category1");
   $roles = of_category_get_ordered("DealCompany", "role");
   $status_q = run_query_deal_status_list();
-  $block .= html_deal_search_form($deal, $type_q, $tts, $cats1, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $cats1, $roles, $status_q, $usr_q);
 
   return $block;
 }
@@ -240,15 +243,17 @@ function dis_deal_search_form($deal="") {
 // Parameters : 
 //   - $deal[]     : default form values
 //   - $kind_q     : DB result object (deal kind list)
+//   - $regions    : regions array
 //   - $tts        : tasktype array
 //   - $cats1      : array with deal category 1 list 
 //   - $roles      : array with dealcompany roles list 
 //   - $stat_q     : DB result object (deal status list)
 //   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_form($deal, $kind_q, $tts, $cats1, $roles, $stat_q, $manager_q) {
+function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $stat_q, $manager_q) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
-  global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode, $l_relation;
+  global $l_after, $l_before, $l_manager, $l_show_archive, $l_relation;
+  global $l_postcode, $l_region;
   global $l_all, $l_all_f, $l_find, $c_all;
   global $display, $l_select_deal;
 
@@ -261,6 +266,7 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $roles, $stat_q, $m
   $zip = stripslashes($deal["company_zip"]);
   $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
+  $region = $deal["region"];
   $tt = $deal["tasktype"];
   $cat1 = $deal["category1"];
   $role = $deal["role"];
@@ -302,6 +308,9 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $roles, $stat_q, $m
 
   // Role select construction
   $block_role = of_category_dis_search_select("DealCompany", "role", $roles, $role);
+
+  // Region select construction
+  $block_region = of_category_dis_search_select("", "region", $regions, $region);
 
   // Status select construction
   $sel_status = "<select name=\"sel_status\">
@@ -379,6 +388,7 @@ function html_deal_search_form($deal, $kind_q, $tts, $cats1, $roles, $stat_q, $m
     <div class=\"searchLabel\">$l_tt<br />
       $sel_tt
     </div>
+    $block_region 
     $block_category1 
     $block_role 
     <div class=\"searchLabel\">$l_relation<br />

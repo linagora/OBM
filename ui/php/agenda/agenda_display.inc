@@ -219,7 +219,7 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     </tr>";
   }
 
-  $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;new_group=1&amp;group_id=$c_all&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
+  $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
 
   $block = "
     <div class=\"block\">
@@ -243,8 +243,6 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     <form action=\"agenda_index.php\" method=\"get\">
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
-    <input type=\"hidden\" name=\"new_group\" value=\"1\" />
-    <input type=\"hidden\" name=\"group_id\" value=\"$c_all\" />
     <table class=\"agendaCal\">
     <tbody>
     <tr>
