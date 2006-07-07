@@ -156,7 +156,7 @@ function change_status(user_id, user_status, form)
     
     if (i_name == \"user_id\")
       form.elements[i].value = user_id;
-    else if (i_name == \"param_status\")
+    else if (i_name == \"user_status\")
       form.elements[i].value = user_status;
     else if (i_name == \"action\")
       form.elements[i].value = \"member_update\";

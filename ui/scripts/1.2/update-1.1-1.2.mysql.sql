@@ -183,7 +183,7 @@ CREATE TABLE ProjectRefTask (
   projectreftask_timecreate  timestamp(14),
   projectreftask_userupdate  int(8) default NULL,
   projectreftask_usercreate  int(8) default NULL,
-  projectreftask_code        varchar(10) default '',
+  projectreftask_tasktype_id    int(8),
   projectreftask_label      varchar(128) default NULL,
   PRIMARY KEY (projectreftask_id)
 );

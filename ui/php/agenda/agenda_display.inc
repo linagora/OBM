@@ -1307,7 +1307,7 @@ function dis_agenda_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_us
 //   - $properties :
 ///////////////////////////////////////////////////////////////////////////////
 function dis_agenda_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb_ent,&$properties) {
-  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1;
+  global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1,$l_resource,$l_task;
   global $l_location, $l_private, $l_private_description, $l_begin,$l_end,$l_user;
 
   $id = $event["event"]->id;
@@ -1324,6 +1324,10 @@ function dis_agenda_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb_e
     $link = "$path/agenda/agenda_index.php?action=detailconsult&agenda_id=$id";
     $description = $event["event"]->description;
     $category1 = $event["event"]->category1;
+    $attendee = $event["event"]->attendee;
+    foreach($attendee as $entity => $entities) {
+      $attendee_list .= "<li class=\"blockItem\">".${"l_".$entity}." : ".implode(", ",$entities)."</li>";
+    }
   }
 
   if ($view == "week") {
@@ -1356,15 +1360,15 @@ function dis_agenda_event_planning($view, &$dis_cal, &$hidden_div, &$event,$nb_e
     href=\"$link\">$event_head_display</a><br />";
 
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
-   <div class=\"blockTitle\">:: $title</div>
+  <div id=\"$id-$usr_id\" class=\"eventData\" style=\"display:none;position:absolute;z-index:1000;\">
+   <div class=\"blockTitle\">:: $title <br />($user_info)</div>
    <ul class=\"blockItem\">
-    <li class=\"blockItem\">$l_user : $user_info</li>   
     <li class=\"blockItem\">$l_location : $location</li>
     <li class=\"blockItem\">$l_category1 : $category1</li>
     <li class=\"blockItem\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
     <li class=\"blockItem\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>
     <li class=\"blockItem\">$description</li>
+    $attendee_list
    </ul>
   </div>";
 }

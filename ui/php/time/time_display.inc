@@ -67,7 +67,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
       $res["popup"] = true;
       $res["popup_width"] = 700;
       $res["popup_height"] = 210;
-      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;wbegin=".$time["date"];
+      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;date=".$time["date"];
       $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     } else {
       $res["name"] = "&nbsp;";
@@ -137,8 +137,8 @@ function dis_time_nav_date($time) {
     // get the previous and next beginning of week
     $d_prev = date("Ymd",$d_start_week-7*86400);
     $d_next = date("Ymd",$d_start_week+7*86400+$c_dst_err); // prevent DST bug
-    $url_prev = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_next");
+    $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
 
   } else if ($interval == "month") {
 
@@ -149,8 +149,8 @@ function dis_time_nav_date($time) {
     $year = substr($time["date"],0,4);
     $d_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
     $d_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
-    $url_prev = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_next");
+    $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
     $title = "$user ". $l_monthsofyear[$month-1] . " $year";;
   }
 
@@ -359,7 +359,7 @@ function dis_time_planning_month($obm_q, $time) {
     // last day of the week 
     if (($val["obm_dow"] == 6) or ($day == $month_length)) {
       $week = get_time_week_point($year.$month.$day);
-      $url = url_prepare("time_index.php?action=index&amp;wbegin=".$week[0]);
+      $url = url_prepare("time_index.php?action=index&amp;date=".$week[0]);
       
       if ($time_length != $time_worked) {
 	$class = "class=\"timeUnvalid\"";
@@ -397,7 +397,6 @@ function dis_time_planning_month($obm_q, $time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_planning($time) {
   global $auth, $cdg_param;
-
   if ($time["interval"] == "week") {
     $task_q = run_query_time_task_one_week($time, '');
     $block = dis_time_planning_week($task_q, $time);
@@ -455,7 +454,7 @@ function dis_time_user_planning($obm_q, $time) {
     $project_id = $obm_q->f("id");
     $u_id = $obm_q->f("userobm_id");
     $type = $obm_q->f("type");
-    $projects[$type.$project_id] = substr($obm_q->f("label"),0,10)."...";
+    $projects[$type.$project_id] = "<abbr title=\"".$obm_q->f("label")."\">".substr($obm_q->f("label"),0,10)."...</abbr>";
     $users[$u_id] = $obm_q->f("userobm_firstname")." ". $obm_q->f("userobm_lastname");
     $planning[$u_id][$type.$project_id]["$day"] = $obm_q->f("timetask_length")/8;
     $planning[$u_id][$type.$project_id]["length"] += $obm_q->f("timetask_length")/8;
@@ -579,7 +578,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
       <td class=\"timeUserback\">$sel_user</td>
     </tr><tr>
       <td class=\"timeUserback\">
-        <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+        <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
         <input type=\"hidden\" name=\"action\" value=\"$act\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_see\" />
         $dis_button_all
@@ -649,7 +648,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
 
   $dis_button = "
     <input type=\"hidden\" name=\"sel_user_id\" value=\"".$time["user_id"]."\" />
-    <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+    <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />";
 
@@ -884,7 +883,7 @@ function dis_time_form_addtask($time, $validate_days) {
     // Action button
     $dis_button .= "
       <td class=\"timeForm\">
-       <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+       <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
        <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
        <input type=\"submit\" value=\"$l_update\" />
       </td>";
@@ -908,7 +907,7 @@ function dis_time_form_addtask($time, $validate_days) {
     // Action button
     $dis_button .= "
       <td class=\"timeForm\">
-       <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+       <input type=\"hidden\" name=\"date\" value=\"".$time["date"]."\" />
        <input type=\"submit\" value=\"$l_add\" />
       </td>";
 
@@ -1019,7 +1018,7 @@ function html_time_month_users_total($time, $array_res) {
     if ($user_status == 2) {
       $class = "timeValok";
       $dis_validlink = "
-       <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
+       <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;date=$date&amp;sel_user_id=$uid") ."\">
        <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
       $link_act = "$l_see";
     } else if ($fract != $tot_workingdays) {
@@ -1029,7 +1028,7 @@ function html_time_month_users_total($time, $array_res) {
     } else {
       $class = "timeValfilled";
       $dis_validlink = "
-       <a href=\"". url_prepare("time_index.php?action=validate&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
+       <a href=\"". url_prepare("time_index.php?action=validate&amp;date=$date&amp;sel_user_id=$uid") ."\">
        <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
       $link_act = "$l_see";
     }
@@ -1044,7 +1043,7 @@ function html_time_month_users_total($time, $array_res) {
       <td class=\"$class\">$dis_tot</td>
       <td>&nbsp;&nbsp;</td>
       <td>
-       <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
+       <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;date=$date&amp;sel_user_id=$uid") ."\">
        <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
       </td>
       <td>$dis_validlink</td>

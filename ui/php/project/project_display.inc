@@ -1580,7 +1580,7 @@ function html_project_member_form($members_q, $project) {
     $dis_button  = "
       <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
       <input type=\"hidden\" name=\"user_id\" value=\"\" />
-      <input type=\"hidden\" name=\"param_status\" value=\"\" />
+      <input type=\"hidden\" name=\"user_status\" value=\"\" />
       <input type=\"hidden\" name=\"action\" value=\"member_del\" />
       <input type=\"submit\" value=\"$l_del_member_sel\"
              onclick=\"submit_memberdel(this.form)\" />";

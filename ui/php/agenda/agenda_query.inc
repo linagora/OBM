@@ -2043,6 +2043,37 @@ function run_query_agenda_repeat_events($start, $end, $calendar_entity) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Return 
+// Parameters: 
+//   - $events : ids of the
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_events_attendee($events) {
+  global $cdg_sql, $uid;
+  $event_list = implode(",",$events) ;
+  $obm_q = new DB_OBM;
+
+  $query = "SELECT
+   calendarevent_id,
+   evententity_entity_id,
+   evententity_entity,
+   userobm_firstname,
+   userobm_lastname,
+   resource_name,
+   projecttask_label,
+   project_name
+   FROM CalendarEvent
+   JOIN EventEntity ON evententity_event_id = calendarevent_id
+   LEFT JOIN UserObm ON evententity_entity = 'user' AND evententity_entity_id = userobm_id
+   LEFT JOIN Resource ON evententity_entity = 'resource' AND evententity_entity_id = resource_id
+   LEFT JOIN ProjectTask ON evententity_entity = 'task' AND  evententity_entity_id = projecttask_id
+   LEFT JOIN Project ON project_id = projecttask_project_id
+   WHERE calendarevent_id IN ($event_list)";
+
+  display_debug_msg($query, $cdg_sql, "run_query_get_events_attendee()");
+  $obm_q->query($query);
+  return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
@@ -2068,7 +2099,16 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     $user_id = $nr_q->f("evententity_entity_id");
     $all_day = $nr_q->f("calendarevent_allday");
     $entity = $nr_q->f("evententity_entity");
-    $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
+    if(isset($events_array[$id])) {
+      $event = &$events_array[$id];
+    } else {
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
+      $events_array[$id] = &$event;
+    }
+    $event->add_attendee($entity,$user_id,"");
+    if(!isset($calendar_entity[$entity][$user_id])) {
+      continue;
+    }    
     store_agenda_event($date, $event, $day_events, $user_id, $all_day, $end_time, $entity);
   }
   
@@ -2093,7 +2133,15 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     if (!$endrepeat) {
       $endrepeat = $end_time;
     }
-    $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
+    if(isset($events_array[$id])) {
+      $event = &$events_array[$id];
+    } else {
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
+      $events_array[$id] = &$event;
+    }
+    if(!isset($calendar_entity[$entity][$user_id])) {
+      continue;
+    }
     $event_start =  $start_time ;
     $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
     $delta = floor($delta/$day_duration);
@@ -2117,6 +2165,25 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
 	agenda_yearly_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
 	break;	
     }
+  }
+  $attendee_q = run_query_get_events_attendee(array_keys($events_array));
+  while($attendee_q->next_record()) {
+    $id = $attendee_q->f("calendarevent_id");
+    $entity = $attendee_q->f("evententity_entity");
+    $entity_id = $attendee_q->f("evententity_entity_id");
+    switch($entity) {
+      case "user":
+        $entity_label = $attendee_q->f("userobm_lastname")." ".$attendee_q->f("userobm_firstname");
+        break;
+      case "resource":
+        $entity_label = $attendee_q->f("resource_name");
+        break;
+      case "task":
+        $entity_label = $attendee_q->f("project_name")."-".$attendee_q->f("projecttask_label");
+        break;
+    }
+    $event = &$events_array[$id];
+    $event->add_attendee($entity,$entity_id,$entity_label);
   }
   return $day_events; 
 }
@@ -2356,6 +2423,7 @@ class Event {
   var $category1;
   var $privacy;
   var $description;
+  var $attendee;
 
   function Event($id,$duration,$title,$location,$category1,$privacy,$description) {
     $this->id = $id;
@@ -2365,8 +2433,12 @@ class Event {
     $this->category1 = $category1;
     $this->privacy = $privacy;
     $this->description = $description;
+    $this->attendee = array();
   }
-
+  
+  function add_attendee($entity,$entity_id,$entity_label) {
+    $this->attendee[$entity][$entity_id] = $entity_label;
+  }
   /**
    * match_period 
    *  

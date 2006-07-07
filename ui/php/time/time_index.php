@@ -74,14 +74,14 @@ if ($action == "index") {
 
 } elseif ($action == "viewmonth") {
 ///////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "month";
-  $display["result"] = dis_time_nav_date($time);
-  $display["result"] .= dis_time_planning($time);
-  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers(), 1);
+  $params["interval"] = "month";
+  $display["result"] = dis_time_nav_date($params);
+  $display["result"] .= dis_time_planning($params);
+  $display["features"] .= dis_user_select($params, run_query_time_get_obmusers(), 1);
   // 1.1 => FIXME
   //$display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
 } elseif ($action == "insert") {
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////;
   $params["interval"] = "week";
   run_query_time_insert($params);
   run_query_time_validate($params["user_id"]);
@@ -100,7 +100,7 @@ if ($action == "index") {
   // close the popup
   $display["result"] .= "
     <script language=\"javascript\">
-     window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
+     window.opener.location.href='$path/time/time_index.php?action=index&date=".$params["date"]."';
      window.close();
     </script>
   ";
@@ -186,7 +186,7 @@ function get_time_params() {
   $params = get_global_params();
 
   // Get time specific params
-  if ($params["wbegin"] == "") { $params["wbegin"] = date("Ymd"); }
+  if ($params["date"] == "") { $params["date"] = date("Ymd"); }
   if (is_array($cb_day)) $params["sel_date"] = $cb_day;
     elseif (isset ($rd_day)) $params["sel_date"] = $rd_day;
   
@@ -242,7 +242,7 @@ function get_time_actions() {
   $actions["time"]["viewmonth"] = array (
     'Name'     => "$l_header_monthlyview",
     'Url'      => "$path/time/time_index.php?action=viewmonth".
-                  "&amp;wbegin=" . $params["date"],
+                  "&amp;date=" . $params["date"],
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                     );
@@ -251,7 +251,7 @@ function get_time_actions() {
   $actions["time"]["globalview"] = array (
     'Name'     => "$l_header_globalview",
     'Url'      => "$path/time/time_index.php?action=globalview".
-                  "&amp;wbegin=" . $params["date"],
+                  "&amp;date=" . $params["date"],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
                                     );

@@ -77,7 +77,7 @@ $l_date = "Date";
 $l_user = "User";
 $l_meeting_legend = "Legend";
 $l_selection = "Selection";
-
+$l_task = "Task";
 
 // actions 
 $l_insert = "Insert the event";
