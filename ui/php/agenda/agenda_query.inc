@@ -417,7 +417,7 @@ function run_query_agenda_insert_event_data($agenda) {
   $priority = $agenda["priority"];
   $description = $agenda["description"];
   $location = $agenda["location"];
-  ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
+  ($agenda["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = $agenda["date_begin"];
   $dateend = $agenda["date_end"];
   $event_duration = $agenda["event_duration"];
@@ -901,7 +901,7 @@ function run_query_agenda_update_event_data($agenda) {
   $location = $agenda["location"];
   $datebegin = $agenda["date_begin"];
   $event_duration = $agenda["event_duration"];
-  ($agenda["allday"] != 1)?$all_day= '0':$all_day = '1';
+  ($agenda["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $event_id = $agenda["agenda_id"]; 
   if ($agenda["privacy"] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $agenda["repeat_kind"];
@@ -2084,7 +2084,7 @@ function run_query_get_events_attendee($events) {
 ///////////////////////////////////////////////////////////////////////////////
 function agenda_events_model($start_time, $end_time, $calendar_entity) {
   global $day_duration;
-
+  $events_array = array();
   $day_duration = 86400;
   $nr_q = run_query_agenda_no_repeat_events($start_time,$end_time,$calendar_entity);
   while ($nr_q->next_record()) {
@@ -2104,11 +2104,7 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
       $events_array[$id] = &$event;
-    }
-    $event->add_attendee($entity,$user_id,"");
-    if(!isset($calendar_entity[$entity][$user_id])) {
-      continue;
-    }    
+    }  
     store_agenda_event($date, $event, $day_events, $user_id, $all_day, $end_time, $entity);
   }
   
@@ -2137,10 +2133,6 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
       $event = &$events_array[$id];
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description);
-      $events_array[$id] = &$event;
-    }
-    if(!isset($calendar_entity[$entity][$user_id])) {
-      continue;
     }
     $event_start =  $start_time ;
     $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
@@ -2150,40 +2142,46 @@ function agenda_events_model($start_time, $end_time, $calendar_entity) {
     $end_date += $day_duration;
     switch ($repeatkind) {
       case "daily" :
-        agenda_daily_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);	
+        $stored = agenda_daily_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);	
         break; 
       case "weekly" :
-	agenda_weekly_repeatition($date,$event_start,$end_date,$end_time,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity); 
+	$stored = agenda_weekly_repeatition($date,$event_start,$end_date,$end_time,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity); 
 	break;
       case "monthlybyday" :
-	agenda_agenda_monthlybyday_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity); 
+	$stored = agenda_agenda_monthlybyday_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity); 
         break;
       case "monthlybydate" :
-	agenda_monthlybydate_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
+	$stored = agenda_monthlybydate_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
 	break;
       case "yearly" :
-	agenda_yearly_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
+	$stored = agenda_yearly_repeatition($date,$event_start,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity);
 	break;	
     }
-  }
-  $attendee_q = run_query_get_events_attendee(array_keys($events_array));
-  while($attendee_q->next_record()) {
-    $id = $attendee_q->f("calendarevent_id");
-    $entity = $attendee_q->f("evententity_entity");
-    $entity_id = $attendee_q->f("evententity_entity_id");
-    switch($entity) {
-      case "user":
-        $entity_label = $attendee_q->f("userobm_lastname")." ".$attendee_q->f("userobm_firstname");
-        break;
-      case "resource":
-        $entity_label = $attendee_q->f("resource_name");
-        break;
-      case "task":
-        $entity_label = $attendee_q->f("project_name")."-".$attendee_q->f("projecttask_label");
-        break;
+    if($stored && !isset($events_array[$id])) {
+      $events_array[$id] = &$event;
+      
     }
-    $event = &$events_array[$id];
-    $event->add_attendee($entity,$entity_id,$entity_label);
+  }
+  if(count($events_array) > 0) {
+    $attendee_q = run_query_get_events_attendee(array_keys($events_array));
+    while($attendee_q->next_record()) {
+      $id = $attendee_q->f("calendarevent_id");
+      $entity = $attendee_q->f("evententity_entity");
+      $entity_id = $attendee_q->f("evententity_entity_id");
+      switch($entity) {
+        case "user":
+          $entity_label = $attendee_q->f("userobm_lastname")." ".$attendee_q->f("userobm_firstname");
+          break;
+        case "resource":
+          $entity_label = $attendee_q->f("resource_name");
+          break;
+        case "task":
+          $entity_label = $attendee_q->f("project_name")."-".$attendee_q->f("projecttask_label");
+          break;
+      }
+      $event = &$events_array[$id];
+      $event->add_attendee($entity,$entity_id,$entity_label);
+    }
   }
   return $day_events; 
 }
@@ -2218,6 +2216,7 @@ function store_agenda_event($date, &$event, &$day_events,$user_id,$all_day,$end_
 function agenda_daily_repeatition($date,$start_time,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {
   global $day_duration;
 
+  $return = false;
   $temp_date = $date;
   if ($temp_date < $start_time) {
     $temp_date = ceil(($start_time - $date) / $day_duration);
@@ -2235,9 +2234,11 @@ function agenda_daily_repeatition($date,$start_time,$end_date,$end_time,$repeatf
       $day = &new Day($temp_date);
       $day_events[$iso_date] = &$day;
     }
+    $return = true;
     store_agenda_event($temp_date, $event, $day_events, $user_id, $all_day,$end_time,$entity);
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
   }
+  return $return;
 }
 
 
@@ -2249,6 +2250,7 @@ function agenda_daily_repeatition($date,$start_time,$end_date,$end_time,$repeatf
 function agenda_weekly_repeatition($date,$start_time,$end_date,$end_time,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {
   global $day_duration,$cagenda_weekstart;
 
+  $return = false;
   $temp_date = get_agenda_date_day_of_week($date, $cagenda_weekstart);
   $temp_date = strtotime("+".get_hour($date)." hours +".date("i",$date)." minutes",$temp_date);
   if ($temp_date < $start_time) {
@@ -2260,26 +2262,29 @@ function agenda_weekly_repeatition($date,$start_time,$end_date,$end_time,$repeat
     $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
   $num = (date('w', $temp_date) - date('w', strtotime($cagenda_weekstart)) +7)%7;
-  for ($i=$num; $i<strlen($repeatdays);$i++) {
-    $repeat_days[$i - $num]=substr($repeatdays, $i, 1);
+  for ($i=0; $i<strlen($repeatdays);$i++) {;
+    $k = ($i+$num)%7;
+    $repeat_days[$i]=substr($repeatdays, $k, 1);
   }
   while ($temp_date <= $end_date) {
     foreach ($repeat_days as $delta_day => $repeatition) {	  
       if ($repeatition == 1) {
 	$current_date = strtotime("+$delta_day days",$temp_date);
         $iso_date = isodate_format($current_date);
-	if ($current_date >= $date && $current_date <= $end_date) {
+	if ($current_date >= $start_time && $current_date <= $end_date) {
 	  $day = &$day_events[$iso_date];
 	  if (!is_object($day)) {
 	    $day = &new Day($current_date);
 	    $day_events[$iso_date] = &$day;
-	  }
-	  store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_time,$entity);
+          }
+          store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_time,$entity);
+          $return = true;
 	}
       }
     } 
     $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
   }	
+  return $return;
 }
 
 
@@ -2291,6 +2296,7 @@ function agenda_weekly_repeatition($date,$start_time,$end_date,$end_time,$repeat
 function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {
   global $day_duration,$cagenda_weekstart;
 
+  $return = false;
   $temp_date = $date;
   $start_week = date('w', strtotime($cagenda_weekstart));
   $num = (date('w', $date) - $start_week +7)%7;
@@ -2325,10 +2331,12 @@ function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$end
 	$day = &new Day($current_date);
 	$day_events[$iso_date] = &$day;
       }
+      $return = true;
       store_agenda_event($current_date, $event, $day_events,$user_id,$all_day,$end_time,$entity);
     }
     $ts_cur = strtotime("+$repeatfrequence months", $ts_cur);
   }	
+  return $return;
 }
 
 
@@ -2340,6 +2348,7 @@ function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$end
 function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {  
   global $day_duration;
 
+  $return = false;
   $temp_date = $date;
   if ($temp_date < $start_time) {
     $temp_date = strtotime(date("Y-m-01",$start_time));
@@ -2366,9 +2375,11 @@ function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$end_time,
       $day = &new Day($ts_date);
       $day_events[$iso_date] = &$day;
     }
+    $return = true;
     store_agenda_event($ts_date, $event, $day_events,$user_id,$all_day,$end_time,$entity);
     $ts_date = strtotime("+$repeatfrequence months",$ts_date);
   }  
+  return $return;
 }
 
 
@@ -2380,6 +2391,7 @@ function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$end_time,
 function agenda_yearly_repeatition($date,$start_time,$end_date,$end_time,$repeatfrequence,&$day_events,&$event,$user_id,$all_day,$entity) {  
   global $day_duration;
 
+  $return = false;
   $temp_date = $date;    
   if ($temp_date < $start_time) {
     $temp_date = strtotime(date("Y-m-01",$start_time));
@@ -2404,9 +2416,11 @@ function agenda_yearly_repeatition($date,$start_time,$end_date,$end_time,$repeat
       $day = &new Day($ts_date);
       $day_events[$iso_date] = &$day;
     }
+    $return = true;
     store_agenda_event($ts_date, $event, $day_events,$user_id,$all_day,$end_time,$entity);
     $ts_date = strtotime("+$repeatfrequence years",$ts_date);
   }
+  return $return;
 }
 
 

@@ -1549,7 +1549,7 @@ function dis_agenda_event_form($action, $agenda, $event_q, $entities) {
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
 function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $groups,$tasks, $cats1) {
-  global $path, $display, $set_theme;
+  global $path, $display, $set_theme,$auth;
   global $cagenda_resource, $cagenda_weekstart, $set_cal_interval,$ico_project;
   global $ico_mini_cal, $ico_add_user, $ico_add_resource, $ico_add_group,$ico_delete;
   global $cagenda_first_hour, $cagenda_last_hour,$ico_project;
@@ -1799,20 +1799,23 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
     <td class=\"detailForm\">
     <script type=\"text/javascript\">
     function get_selected_users_url() {
+      var uri = '';
       users = document.getElementById('sel_user_id').childNodes;
       for(i=0; i<users.length;i++) {
         if(users[i].nodeName == \"DIV\") {
-          url += '&user_ids[]=' + users[i].id.substr(22);
+          uri += '&user_ids[]=' + users[i].id.substr(22);
         }
       }
-      return url;
+      if(uri == '') 
+        uri = '&user_ids[]=".$auth->auth["uid"]."';
+      return uri;
     }
     </script>
       $t_name
       <input type=\"hidden\" name=\"task_id\" value=\"$t_id\" />
       <input type=\"hidden\" name=\"task_name\" value=\"$t_name\" />
       <input type=\"hidden\" name=\"task_new_id\" value=\"$t_new_id\" />
-      <a href=\"\" onclick=\"url = get_selected_users_url();window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"url = get_selected_users_url();window.open('$path/project/project_index.php?action=ext_get_task_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"task_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>";
@@ -1926,7 +1929,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   <tr>
     <td class=\"detailLabel\">$l_all_day</td>
     <td class=\"detailForm\">
-      <input onchange=\"show_hide_agenda_dates(this)\" onclick=\"show_hide_agenda_dates(this)\" type=\"checkbox\" name=\"ch_all_day\" value=\"1\" $all_day_checked />
+      <input onchange=\"show_hide_agenda_dates(this)\" onclick=\"show_hide_agenda_dates(this)\" type=\"checkbox\" name=\"cb_all_day\" value=\"1\" $all_day_checked />
     </td>
   </tr>   
   <tr>
