@@ -262,19 +262,6 @@ function dis_time_planning_week($obm_q,$time) {;
 
   return $block;
 }
-//FIXME
-function randomColor() {
-    $color1 = mt_rand(100,200);
-    $color2 = mt_rand(100,200);
-    while(abs($color2-$color1) < 30) {
-      $color2 = mt_rand(100,200);
-    }
-    $color3 = mt_rand(100,200);    
-    while(abs($color3-$color1) < 30) {
-      $color3 = mt_rand(100,200);
-    }
-    return "rgb($color1, $color2, $color3)";
-}
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for a month
 // Parameters : 

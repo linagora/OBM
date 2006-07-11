@@ -328,9 +328,10 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");  
   $entity_readable = get_agenda_entity_readable();
+  $cal_entity_id["group_view"] =  $params["entity"]["group_view"];
   $calendar_entity = store_agenda_entities(run_query_agenda_get_entity_label($cal_entity_id));
-  $display["features"] = html_agenda_planning_bar($agenda, $calendar_entity, $entity_readable);
-  $display["detail"] = dis_agenda_plain_month_planning($agenda, $calendar_entity);
+  $display["features"] = html_agenda_planning_bar($params, $calendar_entity, $entity_readable);
+  $display["detail"] = dis_agenda_plain_month_planning($params, $calendar_entity);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////

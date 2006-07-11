@@ -12,7 +12,7 @@ $l_tasktype = "Category";
 $l_task = "Task";
 $l_soldtime = "Sold time";
 $l_estimatedtime = "Estimated time";
-
+$l_shortname = "Short name";
 $l_sold = "Sold";
 $l_estimated = "Estimated";
 $l_allotted = "Allocated";
@@ -32,6 +32,9 @@ $l_projtime = "Projected time";
 $l_total = "Total";
 $l_resume = "Résumé";
 $l_tasks = "Tasks";
+$l_reftask_manage = "Manage reference tasks"; 
+$l_delete_reftask = "You're about to delete a Reference Task, do you want to continue?";
+$l_reftask = 'Reference Task';
 
 // Titres
 $l_members_info = "Project members";
@@ -91,6 +94,7 @@ $l_fill_projected = "Each member must be assigned to a task";
 $l_fill_projnumber = "The projected time number is not valid.";
 $l_fill_missing = "The missing time must be filled for every member";
 $l_fill_missnumber = "The missing time number is not valid.";
+$l_tolong_shortname = "The short name is too long";
 $l_delete_confirm = "Confirm the project deletion ?";
 
 // For the display preferences modification screen 

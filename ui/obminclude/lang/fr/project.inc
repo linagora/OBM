@@ -12,6 +12,7 @@ $l_tasktype = "Catégorie";
 $l_task = "Tâche";
 $l_soldtime = "Temps vendu";
 $l_estimatedtime = "Temps estimé";
+$l_shortname = "Nom court";
 
 $l_sold = "Vendu";
 $l_estimated = "Estimé";
@@ -32,7 +33,9 @@ $l_projtime = "Temps prévu";
 $l_total = "Total";
 $l_resume = "Résumé";
 $l_tasks = "Tâches";
-
+$l_reftask_manage = "Gestion des taches de référence"; 
+$l_delete_reftask = "Vous etes sur le point de supprimer une tache de référence, voulez vous continuer?";
+$l_reftask = 'Tâche de référence';
 // Titres
 $l_members_info = "Participants au projet";
 $l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
@@ -90,6 +93,6 @@ $l_fill_projnumber = "Le temps prévu doit être un nombre entier de jours.";
 $l_fill_missing = "Le temps manquant doit être indiqué pour tous les membres du projet";
 $l_fill_missnumber = "Le temps manquant doit être un nombre entier de jours.";
 $l_delete_confirm = "Confirmer la suppression du projet ?";
-
+$l_tolong_shortname = "Le nom court est trop long";
 // For the display preferences modification screen 
 $l_project_display = "Options d'affichage des listes de projets";

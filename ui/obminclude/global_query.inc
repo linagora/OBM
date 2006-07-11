@@ -1052,5 +1052,17 @@ function sql_global_company_name_advanced_search($name, $like="like", $table_ali
 
   return $sql;
 }
-
+//FIXME
+function randomColor() {
+    $color1 = mt_rand(100,200);
+    $color2 = mt_rand(100,200);
+    while(abs($color2-$color1) < 30) {
+      $color2 = mt_rand(100,200);
+    }
+    $color3 = mt_rand(100,200);    
+    while(abs($color3-$color1) < 30) {
+      $color3 = mt_rand(100,200);
+    }
+    return "rgb($color1, $color2, $color3)";
+}
 ?>

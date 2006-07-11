@@ -51,6 +51,7 @@ require_once("$obminclude/javascript/calendar_js.inc");
 require("project_query.inc");
 require("project_display.inc");
 require("project_js.inc");
+include("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
 $perms = $auth->auth["perm"];
@@ -380,6 +381,40 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] = dis_project_consult($params["project_id"]);
 
+} elseif ($action == "admin") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_project_admin_index();
+
+} elseif ($action == "reftask_insert") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_project_reftask_insert($params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_reftask : $l_insert_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_reftask : $l_insert_error");
+  }
+  $display["detail"] .= dis_project_admin_index();
+
+} elseif ($action == "reftask_update") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_project_reftask_update( $params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_reftask : $l_update_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_reftask : $l_update_error");
+  }
+  $display["detail"] .= dis_project_admin_index();
+
+} elseif ($action == "reftask_delete") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_project_reftask_delete( $params);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg("$l_reftask : $l_delete_ok");
+  } else {
+    $display["msg"] .= display_err_msg("$l_reftask : $l_delete_error");
+  }
+  $display["detail"] .= dis_project_admin_index();
+
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($uid, "project", 1);
@@ -477,7 +512,7 @@ function get_project_action() {
   global $l_header_display, $l_header_add_member, $l_add_member;
   global $l_header_man_task, $l_header_man_member;
   global $l_header_advance, $l_header_man_affect, $l_header_consult;
-  global $l_header_dashboard,$l_header_planning;
+  global $l_header_dashboard,$l_header_planning,$l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // External call : select one deal
@@ -681,6 +716,42 @@ function get_project_action() {
     'Url'      => "$path/project/project_index.php?action=planning&amp;project_id=".$params["project_id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
+  );
+
+// Admin
+  $actions["project"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/project/project_index.php?action=admin",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('all') 
+                                       );
+
+// Type Insert
+  $actions["project"]["reftask_insert"] = array (
+    'Url'      => "$path/project/project_index.php?action=reftask_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Type Update
+  $actions["project"]["reftask_update"] = array (
+    'Url'      => "$path/project/project_index.php?action=reftask_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Type Check Link
+  $actions["project"]["reftask_checklink"] = array (
+    'Url'      => "$path/project/project_index.php?action=reftask_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Type Delete
+  $actions["project"]["reftask_delete"] = array (
+    'Url'      => "$path/project/project_index.php?action=reftask_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
   );
 
 // Display

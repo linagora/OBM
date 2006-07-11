@@ -299,19 +299,6 @@ function dis_project_planning($project) {
  
   return $block;
 }
-//FIXME
-function randomColor() {
-    $color1 = mt_rand(100,200);
-    $color2 = mt_rand(100,200);
-    while(abs($color2-$color1) < 30) {
-      $color2 = mt_rand(100,200);
-    }
-    $color3 = mt_rand(100,200);    
-    while(abs($color3-$color1) < 30) {
-      $color3 = mt_rand(100,200);
-    }
-    return "rgb($color1, $color2, $color3)";
-}
 ///////////////////////////////////////////////////////////////////////////////
 // Display Time navigation by date
 // Parameters:
@@ -581,7 +568,7 @@ function dis_project_consult($pid) {
 function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
   global $l_name, $l_tasktype, $l_company, $l_total, $l_datebegin, $l_dateend;
-  global $l_deal, $l_project, $l_progress, $l_progressinfos;
+  global $l_deal, $l_project, $l_progress, $l_progressinfos,$l_shortname;
   global $l_used, $l_missing, $l_sold, $l_estimated, $l_comment;
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
   global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
@@ -594,6 +581,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   // retrieve project related infos
   $pid = $project_q->f("project_id");
   $name = $project_q->f("project_name");
+  $shortname = $project_q->f("project_shortname");
   $tt = $project_q->f("project_tasktype_label");
   $company = $project_q->f("project_company_id");
   $company_name = $project_q->f("company_name");
@@ -963,6 +951,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       <td class=\"detailText\">$name</td>
     </tr>
     <tr>
+      <td class=\"detailLabel\">$l_shortname</td>
+      <td class=\"detailText\">$shortname</td>
+    </tr>      
+    <tr>
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailText\">$tt</td>
     </tr><tr>
@@ -1023,7 +1015,7 @@ function html_project_form($action, $project_q, $project) {
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef;
   global $l_comment, $l_add_comment, $l_upd_comment,$ico_project;
-  global $uid, $cg_prod, $c_php_isodate_format;
+  global $uid, $cg_prod, $c_php_isodate_format,$l_shortname;
   global $ctt_sales, $ctt_research, $ctt_others,$set_theme;
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
@@ -1043,6 +1035,7 @@ function html_project_form($action, $project_q, $project) {
     $datebegin = isodate_format($project_q->f("datebegin"), 1);
     $dateend = isodate_format($project_q->f("dateend"), 1);
     $comment = $project_q->f("project_comment");
+    $shortname = $project_q->f("project_shortname");
     $usercomment = $uid;
     $datecomment = isodate_format();
   } else {
@@ -1075,6 +1068,7 @@ function html_project_form($action, $project_q, $project) {
   if (isset($project["add_comment"])) { $add_comment = stripslashes($project["add_comment"]); }
   if (isset($project["usercomment"])) { $usercomment = $project["usercomment"]; }
   if (isset($project["datecomment"])) { $datecomment = $project["datecomment"]; }
+  if (isset($project["shortname"])) { $shortname = $project["shortname"]; }
 
 
   if (($action == "new") || ($action == "insert")) {
@@ -1238,6 +1232,9 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" /></td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_shortname</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_shortname\" size=\"10\" value=\"$shortname\" /></td>
+    </tr><tr>      
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailForm\">$sel_tt</td>
     $dis_sold
@@ -2258,7 +2255,7 @@ function dis_project_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_project_task_selector($project) {
   $project_q = run_query_project_tasks_by_users($project);
-  $tasktype_q = run_query_project_used_tasktype();
+  $tasktype_q = run_query_project_tasktype();
   $block = html_project_task_selector($project,$project_q,$tasktype_q);
   return $block;
 }
@@ -2443,5 +2440,162 @@ function html_project_reftask_selector($project,$projectreftask_q) {
   "; 
 
   return $block; 
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display the project administration index
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_admin_index() {
+
+  $reftask_q = run_query_project_reftasks();
+  $tasktype_q = run_query_project_tasktype();  
+  $block .= dis_project_reftask_form($reftask_q,$tasktype_q);
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Admin Category section
+// Parameters:
+//   - $entity : target entity
+//   - $catu   : target category (string) can have Uppercase eg: CompanyRole
+//   - $cats   : Category array
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_reftask_form($reftask_q,$tasktype_q) {
+  global $l_c_manage, $l_, $l_label,$l_tasktype,$l_delete_reftask;
+  global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
+  global $l_c_j_create, $l_c_j_insert, $l_c_j_update,$l_reftask_manage;
+  global $ctt_sales, $ctt_research, $ctt_others,$l_header_tasktype,$l_reftask;
+  global $l_tt_sales, $l_tt_research, $l_tt_others,$l_task,$extra_js;
+
+  // TaskType select construction
+  $task_list = array($ctt_sales=>$l_tt_sales,
+		     $ctt_research=>$l_tt_research,
+                     $ctt_others=>$l_tt_others);
+  $extra_js .= "
+    var tasktype = Array();
+  ";
+  $sel_reftask = "<select name=\"sel_reftask_id\" onchange=\"
+    mytext = this.options[this.selectedIndex].text;
+    myvalue = this.options[this.selectedIndex].value;
+    forms.form_reftask_update.tf_reftask_label.value=mytext;
+    types = forms.form_reftask_update.sel_tasktype.options;
+    for(key in types) {
+      if(types[key].value == tasktype[myvalue]) {
+        forms.form_reftask_update.sel_tasktype.selectedIndex = key;
+        break;
+      }
+    } 
+    \"
+  size=\"8\" style=\"font-family:monospace;\">";
+  while($reftask_q->next_record()) {
+    $tt_id = $reftask_q->f("tasktype_id");
+    $tt_label = $reftask_q->f("tasktype_label");
+    $projectreftask_id = $reftask_q->f("projectreftask_id");
+    $projectreftask_name = addslashes($reftask_q->f("projectreftask_label"));
+    if($tt_id != $old_tt_id) {
+      $sel_reftask .= "<option disabled=\"disabled\">$tt_label</option>";
+      $old_tt_id = $tt_id;
+    }
+    $extra_js .= "tasktype[$projectreftask_id] = $tt_id;";
+    $sel_reftask .= "\n<option value=\"$projectreftask_id\">$projectreftask_name</option>";
+  }
+  $sel_reftask .= "</select>";
+  $sel_tasktype = "<select size=\"8\" name=\"sel_tasktype\">";
+  while($tasktype_q->next_record()) {
+    $tt_internal = $tasktype_q->f("tasktype_internal");
+    $tt_label = $tasktype_q->f("tasktype_label");
+    $tt_id = $tasktype_q->f("tasktype_id");
+
+    if ($tt_internal != $type_prec) {
+      $sel_tasktype .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+      $type_prec = $tt_internal;
+    }    
+    $sel_tasktype .= "\n<option value=\"$tt_id\">$tt_label</option>";
+
+  }
+  $sel_tasktype .= "</select>";
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <div class=\"admin\">
+    <div class=\"adminTitle\">:: $l_reftask_manage</div>
+    <table class=\"admin\" width=\"100%\">
+    <tr>
+      <td>&nbsp;</td>
+      <td class=\"adminLabel\">$l_c_upd</td>
+      <td class=\"adminLabel\">$l_c_new</td>
+    </tr>
+    <tr>
+      <td>
+<!-- Category Check Delete Section -->
+        <form name=\"form_reftask_delete\" method=\"post\"
+          action=\"\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_reftask</td>
+        </tr>
+        <tr>
+          <td class=\"adminText\">$sel_reftask</td>
+        </tr>
+        <tr>
+          <td>
+          <input type=\"hidden\" name=\"action\" value=\"reftask_delete\" />
+          <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_checkdelete\" 
+          onclick=\"if (check_category_checkdel(this.form.sel_reftask_id,'$l_reftask')) return confirm('$l_delete_reftask'); else return false;\" />
+          </td>
+        </tr> 
+        </table>
+        </form>
+      </td>
+      <td>
+
+<!-- Category Update Section -->
+
+          <form name=\"form_reftask_update\" method=\"get\" action=\"\">
+        <table heigth=\"100%\">
+        <tr>
+          <td class=\"adminLabel\">$l_tasktype :</td>
+          <td>$sel_tasktype</td>
+        </tr><tr>
+          <td class=\"adminLabel\">$l_label :</td>
+          <td><input type=\"text\" name=\"tf_reftask_label\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\" colspan=\"2\">
+            <input type=\"hidden\" name=\"sel_reftask_id\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"reftask_update\" />
+            <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_update\"
+              onclick=\"if (check_category_upd(this.form.tf_reftask_label,this.form.sel_reftask_id,document.form_reftask_delete.sel_reftask_id,'$l_reftask') && check_tasktype(this.form.sel_tasktype)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+          </form>
+      </td>
+      <td>
+<!-- New Category Section -->
+        <form name=\"form_reftask_new\" method=\"get\" action=\"\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_tasktype :</td>
+          <td >$sel_tasktype</td>
+        </tr><tr>
+          <td class=\"adminLabel\">$l_label :</td>
+          <td ><input type=\"text\" name=\"tf_reftask_label\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\" colspan=\"2\">
+            <input type=\"hidden\" name=\"action\" value=\"reftask_insert\" />
+            <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_insert\"
+              onclick=\"if (check_category_new(this.form.tf_reftask_label,'$l_reftask') && check_tasktype(this.form.sel_tasktype)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+
+      </td>
+    </tr>
+    </table>
+    </div>
+";
+
+  return $block;
 }
 ?>

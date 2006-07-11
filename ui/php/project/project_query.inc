@@ -132,6 +132,7 @@ function run_query_project_detail($p_id) {
   $query = "SELECT
       project_id,
       project_name,
+      project_shortname,
       project_tasktype_id,
       project_company_id,
       project_deal_id,
@@ -278,6 +279,7 @@ function run_query_project_insert($params) {
   $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
   $add_comment = $params["add_comment"];
   $ref_task = $params["reftask_id"];
+  $shortname = $params["shortname"];
   if ($add_comment != "") {
     $datecomment = $params["datecomment"];
     $usercomment = $params["usercomment"];
@@ -291,6 +293,7 @@ function run_query_project_insert($params) {
     project_userupdate,
     project_usercreate,
     project_name,
+    project_shortname,
     project_tasktype_id,
     project_company_id,
     project_deal_id,
@@ -305,6 +308,7 @@ function run_query_project_insert($params) {
     null,
     '$uid',
     '$name',
+    '$shortname',
     '$tt',
     $comp,
     $deal,
@@ -464,6 +468,7 @@ function run_query_project_update($pid, $params) {
   $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
   $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
   $archive = $params["archive"];
+  $shortname = $params["shortname"];
   if ($archive) {
     $arch = "1";
   } else {
@@ -481,6 +486,7 @@ function run_query_project_update($pid, $params) {
       project_timeupdate='". date("Y-m-d H:i:s") ."',
       project_userupdate='$uid',
       project_name='$name',
+      project_shortname='$shortname',
       project_tasktype_id='$tt',
       project_soldtime=$soldtime,
       project_estimatedtime=$estimated,
@@ -1370,7 +1376,7 @@ function project_manager_rights($uid, $params, $project_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_project_form($pid, $params) {
   global $l_fill_name, $l_fill_tt, $l_fill_estimated, $l_fill_soldtime;
-  global $err_msg, $php_regexp_number;
+  global $err_msg, $php_regexp_number,$l_tolong_shortname;
 
   $name = $params["name"];
   $company = $params["company"];
@@ -1379,11 +1385,18 @@ function check_project_form($pid, $params) {
   $estimated = $params["estimated"];
   $member = $params["member"];
 
+  $shortname = $params["shortname"];
   // MANDATORY: Project name
   if (trim($name) == "") {
     $err_msg = $l_fill_name;
     return false;
   }
+
+  if (trim($shortname) != "" && strlen(trim($shortname)) > 10) {
+    $err_msg = $l_tolong_shortname;
+    return false;
+  }
+
 
   // MANDATORY: TaskType selection
   if ($tt == 0) {
@@ -1703,14 +1716,12 @@ function run_query_project_tasks_by_users($params) {
 // Parameters:
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project_used_tasktype(){
+function run_query_project_tasktype(){
   global $cdg_sql, $cdg_param;
 
   $query = "
     SELECT tasktype_id,tasktype_label,tasktype_internal
     FROM TaskType
-    JOIN Project ON project_tasktype_id = tasktype_id
-    GROUP BY tasktype_id,tasktype_label,tasktype_internal
     ORDER BY tasktype_internal, tasktype_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
@@ -1745,4 +1756,72 @@ function run_query_project_reftasks(){
   $obm_q->query($query);
   return $obm_q;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Create a new ref task                
+// Parameters:
+//   - $params[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_reftask_insert($params) {
+  global $cdg_sql, $cdg_param,$auth;
+  $uid = $auth->auth["uid"];
+  $tasktype = $params["tasktype"];
+  $label = $params["reftask_label"];
+
+  $query = "INSERT INTO ProjectRefTask (
+    projectreftask_timeupdate,
+    projectreftask_timecreate,
+    projectreftask_usercreate,
+    projectreftask_tasktype_id,
+    projectreftask_label)
+    VALUE (
+    '0',
+    NOW(),
+    '$uid',
+    '$tasktype',
+    '$label'
+    )    
+    ";
+  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_insert");
+  $obm_q= new DB_OBM;
+  return $obm_q->query($query);
+}
+///////////////////////////////////////////////////////////////////////////////
+// Update a ref task                
+// Parameters:
+//   - $params[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_reftask_update($params) {
+  global $cdg_sql, $cdg_param,$auth;
+  $uid = $auth->auth["uid"];
+  $tasktype = $params["tasktype"];
+  $label = $params["reftask_label"];
+  $id = $params["reftask_id"];
+  $query = "UPDATE ProjectRefTask 
+    SET projectreftask_label = '$label',
+    projectreftask_tasktype_id = '$tasktype',
+    projectreftask_userupdate = '$uid',
+    projectreftask_timeupdate = NOW()
+    WHERE projectreftask_id = '$id'";
+  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_update");
+  $obm_q= new DB_OBM;
+  return $obm_q->query($query);  
+}
+///////////////////////////////////////////////////////////////////////////////
+// Update a ref task                
+// Parameters:
+//   - $params[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_reftask_delete($params) {
+  global $cdg_sql, $cdg_param,$auth;
+  $id = $params["reftask_id"];
+  $query = "DELETE ProjectRefTask 
+  WHERE projectreftask_id = '$id'";
+  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_delete");
+  $obm_q= new DB_OBM;
+  return $obm_q->query($query);  
+}
+
 ?>
