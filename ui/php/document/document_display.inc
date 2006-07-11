@@ -1087,7 +1087,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 	<td class=\"documentInfo\">&nbsp;</td>
        </tr>
       </table>
-      <div id=\"$current_dir_id\" style=\"display:none;\" >
+      <div id=\"div_$current_dir_id\" style=\"display:none;\" >
        $content
       </div>";
 
@@ -1142,7 +1142,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
 	<td class=\"documentInfo\">&nbsp;</td>
        </tr>
       </table>
-      <div id='$current_dir_id' style=\"display:none;\" >
+      <div id='div_$current_dir_id' style=\"display:none;\" >
        $content
       </div>";
   }

@@ -68,7 +68,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // External calls
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "eaxt_get_id") {
+if ($action == "ext_get_id") {
   $display["search"] = dis_project_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_project_search_list($params);
@@ -76,8 +76,11 @@ if ($action == "eaxt_get_id") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 ///////////////////////////////////////////////////////////////////////////////
-}elseif ($action == "ext_get_id") {
-  $display["detail"] = display_project_task_selector($params); 
+}elseif ($action == "ext_get_task_id") {
+  $display["detail"] = display_project_task_selector($params);
+///////////////////////////////////////////////////////////////////////////////
+}elseif ($action == "ext_get_reftask_ids") {
+  $display["detail"] = display_project_reftask_selector($params);   
 ///////////////////////////////////////////////////////////////////////////////
 // Standard calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,6 +123,7 @@ if ($action == "eaxt_get_id") {
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_project_form("", $params)) {
+    
     $params["project_id"] = run_query_project_insert($params);
     if ($params["project_id"]) {
       $display["msg"] .= display_ok_msg("$l_project : $l_insert_ok");
@@ -438,6 +442,21 @@ function get_project_params() {
       $params["mem$nb_mem"] = $mem_num;
     } 
   }
+
+  if (is_array($params["task_id"])) {
+    foreach($params["task_id"] as $key => $value) {
+      // sel_user_id contains select infos (data-user-$id)
+      if (strcmp(substr($value, 0, 10),"data-task-") == 0) {
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["reftask_id"][] = $id;
+      } else {
+        // direct id
+        $params["reftask_id"][] = $value;
+      }
+    }
+  }
+  
   $params["mem_nb"] = $nb_mem;
   $params["tsk_nb"] = $nb_tsk;
   
@@ -466,8 +485,22 @@ function get_project_action() {
     'Url'      => "$path/project/project_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
-                                     );
+  );
 
+// External call : select one task
+  $actions["project"]["ext_get_task_id"] = array (
+    'Url'      => "$path/project/project_index.php?action=ext_get_task_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+  );
+
+// External call : select one task
+  $actions["project"]["ext_get_reftask_ids"] = array (
+    'Url'      => "$path/project/project_index.php?action=ext_get_retask_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+  );  
+  
 // Index
   $actions["project"]["index"] = array (
     'Name'     => $l_header_find,

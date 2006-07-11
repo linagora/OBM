@@ -43,6 +43,9 @@ function check_get_task_id(value_project,value_task,value_type) {
 }
 ";
 }
+if ($ext_element != "") {
+  require_once("$obminclude/of/of_extmod.inc");
+}
 
 $extra_js .= "
 
@@ -250,8 +253,6 @@ function check_progressvalid(form)
     return true;
   }
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Check that the advance form is valid
 ///////////////////////////////////////////////////////////////////////////////
@@ -293,27 +294,41 @@ function check_advance_valid(form)
 
 function fill_project(tasktype_id,sel_project,sel_task) {
   current_project = projects[tasktype_id];
-  empty_select(sel_project);
-  empty_select(sel_task);
+  empty_select(sel_project,true);
+  empty_select(sel_task,true);
   for (var id in current_project) {
     sel_project.options.add(new Option(current_project[id], id));
   }
 }
 function fill_projecttask(project_id,sel_task) {
-  empty_select(sel_task);  
+  empty_select(sel_task,true);  
   current_task = tasks[project_id];  
   for (var id in current_task) {
     sel_task.options.add(new Option(current_task[id], id));
   }
 }
-function empty_select(sel) {
+function empty_select(sel,have_undef) {
  for (i = sel.options.length-1; i >= 0; i--) {
     sel.options[i] = null; 
   }
-  sel.options.add(new Option('$l_undef','$c_undef'));
+  if(have_undef)
+    sel.options.add(new Option('$l_undef','$c_undef'));
 } 
 
-
+function fill_projectreftask(tasktype_id,sel_task) {
+  current_task = tasks[tasktype_id]; 
+  container = document.getElementById('task_checkbox');
+  container.innerHTML = '';
+  index = 0;
+  for (var id in current_task) {
+    row = container.insertRow(index);
+    cell = row.insertCell(0);
+    cell.innerHTML =  '<td class=\"detailLabel\"><input id=\"'+id+'\" name=\"'+id+'\" type=\"checkbox\"></td>';   
+    cell = row.insertCell(1);    
+    cell.innerHTML = '<td class=\"detailForm\"><span id=\"data-task-'+id+'\" style=\"display: none;\">'+current_task[id]+'</span>'+current_task[id]+'</td>';
+    index++;
+  }
+}
 ";
 
 ?>

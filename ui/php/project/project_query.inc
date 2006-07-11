@@ -277,6 +277,7 @@ function run_query_project_insert($params) {
   $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
   $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
   $add_comment = $params["add_comment"];
+  $ref_task = $params["reftask_id"];
   if ($add_comment != "") {
     $datecomment = $params["datecomment"];
     $usercomment = $params["usercomment"];
@@ -358,7 +359,26 @@ function run_query_project_insert($params) {
     display_debug_msg($query, $cdg_sql, "run_query_project_insert (create task)");
     $retour = $obm_q->query($query);
   }
-
+  if(is_array($ref_task)) {
+    $query = "
+      INSERT INTO ProjectTask (
+      projecttask_project_id,
+      projecttask_timecreate,
+      projecttask_usercreate,
+      projecttask_label,
+      projecttask_parenttask_id,
+      projecttask_rank)
+      SELECT 
+      '$pid',
+      '$date_now',
+      '$uid',
+      projectreftask_label,
+      '0',
+      '1' FROM ProjectRefTask WHERE
+      projectreftask_id IN (".implode(",",$ref_task).")";
+      display_debug_msg($query, $cdg_sql, "run_query_project_insert (create ref task)");
+      $retour = $obm_q->query($query);
+  }
   // If a member has been given, We insert it
   if ($member > 0) {
 
@@ -1679,18 +1699,46 @@ function run_query_project_tasks_by_users($params) {
   return $obm_db; 
 }
 ///////////////////////////////////////////////////////////////////////////////
-// Get Tasks for a given users list                 
+// Get Taskstypes                 
 // Parameters:
-//   - $params[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_used_tasktype(){
   global $cdg_sql, $cdg_param;
 
   $query = "
-    SELECT *
+    SELECT tasktype_id,tasktype_label,tasktype_internal
     FROM TaskType
+    JOIN Project ON project_tasktype_id = tasktype_id
+    GROUP BY tasktype_id,tasktype_label,tasktype_internal
     ORDER BY tasktype_internal, tasktype_label";
+
+  display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Get Reference Tasks                 
+// Parameters:
+//   - $params[] : time search criteria
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_project_reftasks(){
+  global $cdg_sql, $cdg_param;
+
+  $query = "
+    SELECT 
+    projectreftask_id,
+    projectreftask_label,
+    tasktype_id,
+    tasktype_label,
+    tasktype_internal
+    FROM ProjectRefTask
+    JOIN TaskType ON projectreftask_tasktype_id = tasktype_id
+    GROUP BY projectreftask_id,projectreftask_label,tasktype_id,
+    tasktype_label,tasktype_internal
+    ORDER BY projectreftask_tasktype_id";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
   $obm_q= new DB_OBM;

@@ -1022,9 +1022,9 @@ function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef;
-  global $l_comment, $l_add_comment, $l_upd_comment;
+  global $l_comment, $l_add_comment, $l_upd_comment,$ico_project;
   global $uid, $cg_prod, $c_php_isodate_format;
-  global $ctt_sales, $ctt_research, $ctt_others;
+  global $ctt_sales, $ctt_research, $ctt_others,$set_theme;
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $usr_q = run_query_all_users_from_group($cg_prod, array($uid));
@@ -1097,11 +1097,22 @@ function html_project_form($action, $project_q, $project) {
     <td class=\"detailLabel\">$l_member</td>
     <td class=\"detailForm\">$sel_member</td>";
 
-    // task
-    $dis_task = "
+
+    $url = "$path/project/project_index.php?action=ext_get_reftask_ids&amp;popup=1&amp;ext_element=sel_task_id";
+  // task
+  $dis_task = "
   </tr><tr>
     <td class=\"detailLabel\">$l_task</td>
-    <td class=\"detailForm\"><input name=\"tf_tasklabel\" size=\"40\" maxlength=\"128\" value=\"$task\" /></td>";
+    <td class=\"detailForm\"><input name=\"tf_tasklabel\" size=\"40\" maxlength=\"128\" value=\"$task\" /></td>
+  </tr><tr>
+  <td class=\"detailLabel\">$l_tasks
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"[Add]\" />
+      </a>  
+  </td>
+    <td class=\"detailForm\" id=\"sel_task_id\">$dis_sel_tasks</td>";
   }
 
   // We select the task list depending on task category (or if company filled)
@@ -2345,6 +2356,89 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
       <td colspan=\"2\" class=\"detailLabel\"><input type=\"submit\"></td>
     </tr>
     </table>    
+  </form>
+  "; 
+
+  return $block; 
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display the task selector form, for external call
+// Parameters:
+//   - $params: project parameters hashtable
+///////////////////////////////////////////////////////////////////////////////
+function display_project_reftask_selector($project) {
+  $reftask_q = run_query_project_reftasks();
+  $block = html_project_reftask_selector($project,$reftask_q);
+  return $block;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display the task selector form, for external call
+// Parameters:
+//   - $params: project parameters hashtable
+///////////////////////////////////////////////////////////////////////////////
+function html_project_reftask_selector($project,$projectreftask_q) {
+  global $c_undef, $l_undef, $extra_js,$l_project,$l_add;
+  global $ctt_sales, $ctt_research, $ctt_others,$l_header_tasktype;
+  global $l_tt_sales, $l_tt_research, $l_tt_others,$l_task;
+
+  $extra_js .= "
+        tasks = new Array();";
+
+  // TaskType select construction
+  $task_list = array($ctt_sales=>$l_tt_sales,
+		     $ctt_research=>$l_tt_research,
+		     $ctt_others=>$l_tt_others);
+
+  $sel_tt = "
+    <select name=\"sel_tasktype\"
+      onchange=\"fill_projectreftask( this.value,this.form.elements[1]) \">
+      <option value=\"$c_undef\">$l_undef</option>";
+  for ($i=0; $i<2; $i++) {
+    while($projectreftask_q->next_record()) {
+      $tt_id = $projectreftask_q->f("tasktype_id");
+      $tt_label = $projectreftask_q->f("tasktype_label");
+      $tt_internal = $projectreftask_q->f("tasktype_internal");
+      $projectreftask_id = $projectreftask_q->f("projectreftask_id");
+      $projectreftask_name = addslashes($projectreftask_q->f("projectreftask_label"));
+      
+      //put menu titles
+      if ($tt_internal != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+	$type_prec = $tt_internal;
+      }
+      if ($tt_id != $old_tt_id) {
+        $extra_js .= "
+        tasks[$tt_id] = new Array();";    
+      }
+      $extra_js .= "
+        tasks[$tt_id][$projectreftask_id] = '$projectreftask_name';";
+
+      $sel_tt .= "\n<option value=\"$tt_id\"";
+      if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
+      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+    }
+  }
+  $sel_tt .= "</select>";
+
+  // ProjectTask select construction
+
+  $block .= "
+    <form method=\"post\ name=\"f_add_task\" action=\"$url\"  
+    onsubmit=\"of_extmod_fill_ext_element(this,'task');window.close();return false\">
+    <table class=\"detail\" width=\"100%\">
+    <tr>
+      <td class=\"detailLabel\">$l_header_tasktype :</td>
+      <td class=\"detailForm\" colspan=\"4\">$sel_tt</td>
+    </tr>
+    </table>  
+    <div class=\"detailHead\">$l_task</div>
+    <table  class=\"detail\" width=\"100%\" id=\"task_checkbox\">
+    </table>  
+    <table  class=\"detail\" width=\"100%\">
+      <tr>
+      <td colspan=\"2\" class=\"detailLabel\"><input type=\"submit\" value=\"$l_add\"></td>
+      </tr>
+    </table>
   </form>
   "; 
 
