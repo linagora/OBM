@@ -406,12 +406,12 @@ function get_agenda_params() {
   
   // New meeting event duration
   if (isset($params["time_duration"])) {
-    $params["event_duration"] = $params["time_duration"];
+    $params["meeting_duration"] = $params["time_duration"];
     if (isset($params["min_duration"])) {
-      $params["event_duration"] += $params["min_duration"]/60;
+      $params["meeting_duration"] += $params["min_duration"]/60;
     }
   }
-  
+
   // New appointment hours
   if (isset($params["time_begin"])) {
     $start_hour = $params["time_begin"];
@@ -495,6 +495,20 @@ function get_agenda_params() {
       }
     }
   }
+  // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
+  if (is_array($params["resource_group_id"])) {
+    while (list($key, $value) = each($params["resource_group_id"]) ) {
+      // sel_resource_id contains select infos (data-resource-$id)
+      if (strcmp(substr($value, 0, 19),"data-resourcegroup-") == 0) {
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["sel_resource_group_id"][] = $id;
+      } else {
+        // direct id
+        $params["sel_resource_group_id"][] = $value;
+      }
+    }
+  }  
   // feature params (user & resource)
   if (is_array($params["ent"])) {
     $nb_data = 0;

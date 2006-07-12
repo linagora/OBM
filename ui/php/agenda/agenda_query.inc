@@ -1885,6 +1885,7 @@ function run_query_agenda_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description,
+      calendarevent_repeatfrequence,
       calendarevent_location,
       evententity_entity_id,
       evententity_entity,

@@ -2609,8 +2609,8 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   $ts_date = strtotime($iso_date);
   $time_unit = 60 / $set_cal_interval; 
   $time_unit_sec = 3600 / $set_cal_interval;; 
-  $duration = $agenda["duration"] * 3600;
-  $param_duration = $agenda["duration"];
+  $duration = $agenda["meeting_duration"] * 3600;
+  $param_duration = $agenda["meeting_duration"];
 
   $nb_group = count($cal_entity_id["resource_group"]);
   $week_num = get_agenda_week_num($ts_date); 
@@ -2620,7 +2620,13 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   $start_week_day = get_agenda_date_day_of_week($ts_date, $cagenda_weekstart);
   $end_week_time = $start_week_day + ((6 * 24 + $cagenda_last_hour) * 3600);
   $start_week_time = strtotime("+ $cagenda_first_hour hours",$start_week_day);
-  
+
+  if(is_array($entity_store["resourcegroup"]) && count($entity_store["resourcegroup"]) > 0) {
+    $have_resource_grp = true;
+  } else {
+    $have_resource_grp = false;
+  }
+
   $start_week = agenda_localizeDate("week", $start_week_time);
   $end_week = agenda_localizeDate("week", $end_week_time);
   $display_date = "$start_week - $end_week"; 
@@ -2664,8 +2670,7 @@ function dis_agenda_free_interval($agenda, $entity_store) {
             $will_have_event = $will_have_event | $day->have_events_between($current_time,$end_time,"resource");
           }
           // Gestion des groupes de ressources
-          if(is_array($entity_store["resourcegroup"]) && count($entity_store["resourcegroup"]) > 0
-            && !$have_event ) {
+          if($have_resource_grp && !$have_event ) {
             $possible_ressources = array();
             $free_ressources = array();
               
@@ -2716,18 +2721,36 @@ function dis_agenda_free_interval($agenda, $entity_store) {
 	  if ($have_event) {
 	    $week_cal .= "<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
           } elseif ($will_have_event) {
-	    $week_cal .= "<td class=\"agendaFree\" onclick=\"window.location='$goto'\"
-	     onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-$current_time');\"
-	     onmouseout=\"this.className ='agendaFree';agenda_hide('ressource-$current_time');\">&nbsp;</td>\n";
-	  } else {
-	    $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
-	     onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-$current_time');\"
-	     onmouseout=\"this.className='agendaPossible';agenda_hide('ressource-$current_time');\">&nbsp;</td>\n";
+            if($have_resource_grp) {
+              $week_cal .= "<td class=\"agendaFree\" onclick=\"window.location='$goto'\"
+               onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-$current_time');\"
+               onmouseout=\"this.className ='agendaFree';agenda_hide('ressource-$current_time');\">&nbsp;</td>\n";
+            } else {
+              $week_cal .= "<td class=\"agendaFree\" onclick=\"window.location='$goto'\"
+               onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer';\"
+               onmouseout=\"this.className ='agendaFree';\">&nbsp;</td>\n";
+            }
+          } else {
+            if($have_resource_grp) {
+              $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
+               onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-$current_time');\"
+               onmouseout=\"this.className='agendaPossible';agenda_hide('ressource-$current_time');\">&nbsp;</td>\n";
+            } else {
+              $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
+               onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';\"
+               onmouseout=\"this.className='agendaPossible';\">&nbsp;</td>\n";
+            }            
 	  }
-	} else {
-	  $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
-	   onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-default');\"
-	   onmouseout=\"this.className='agendaPossible';agenda_hide('ressource-default');\">&nbsp;</td>\n";
+        } else {
+          if($have_resource_grp) {    
+            $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
+             onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';agenda_show(event,'ressource-default');\"
+             onmouseout=\"this.className='agendaPossible';agenda_hide('ressource-default');\">&nbsp;</td>\n";
+          } else {
+            $week_cal .= "<td class=\"agendaPossible\" onclick=\"window.location='$goto'\"
+             onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';\"
+             onmouseout=\"this.className='agendaPossible';\">&nbsp;</td>\n";
+          }
         }
       }
       $week_cal .= "</tr>";
@@ -2739,13 +2762,13 @@ function dis_agenda_free_interval($agenda, $entity_store) {
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;param_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" /></a>
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;meeting_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" /></a>
      </td>
      <td colspan=\"$col_span\" class=\"agendaHead\">
       $display_date
      </td>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;param_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" /></a>     
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;meeting_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" /></a>     
      </td>
     </tr>
     <tr>
