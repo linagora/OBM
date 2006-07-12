@@ -782,9 +782,9 @@ function get_global_params($table="") {
     fi_  = file
   */
   
-  $replace = array("tf_", "sel_", "cb_", "ta_", "rd_", "hd_", "fi_");
+  $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/", "/^fi_/");
   foreach($_REQUEST as $var => $value) {
-    $key = str_replace($replace,"",$var);
+    $key = preg_replace($replace,"",$var);
 
     // sql_order_dir value control
     if ($key == "sql_order_dir") {

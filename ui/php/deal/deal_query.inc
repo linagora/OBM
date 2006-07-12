@@ -26,6 +26,7 @@ function run_query_deal_search($deal, $all="") {
   $zip = sql_search_text_parse($deal["company_zip"]);
   $archive = $deal["archive"];
   $kind = $deal["kind"];
+  $region = $deal["region"];
   $tt = $deal["tasktype"];
   $cat1 = $deal["category1"];
   $role = $deal["role"];
@@ -52,6 +53,9 @@ function run_query_deal_search($deal, $all="") {
   }
   if (($kind != $c_all) && ($kind != "")) {
     $where .= " AND deal_type_id='$kind'";
+  }
+  if (($region != $c_all) && ($region != "")) {
+    $where .= " AND deal_region_id='$region'";
   }
   if (($tt != $c_all) && ($tt != "")) {
     $where .= " AND deal_tasktype_id='$tt'";
@@ -145,6 +149,7 @@ function run_query_deal_search($deal, $all="") {
       deal_todo,
       deal_privacy,
       dealtype_label,
+      region_label,
       leadsource_label,
       Company.company_name as deal_company_name,
       Company.company_zipcode as deal_company_zipcode,
@@ -154,6 +159,7 @@ function run_query_deal_search($deal, $all="") {
     FROM Deal
         LEFT JOIN Company ON deal_company_id=company_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
+        LEFT JOIN Region ON deal_region_id=region_id
         LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id
         LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
         LEFT JOIN LeadSource ON deal_source_id=leadsource_id
@@ -200,6 +206,7 @@ function run_query_deal_detail($id) {
       deal_privacy as privacy,
       leadsource_label,
       dealtype_label,
+      region_label,
       tasktype_label,
       dealstatus_label,
       company_name, company_address1, company_zipcode, company_town,
@@ -229,7 +236,8 @@ function run_query_deal_detail($id) {
         LEFT JOIN UserObm u ON deal_userupdate=u.userobm_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
         LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
-        LEFT JOIN LeadSource ON deal_source_id=leadsource_id,
+        LEFT JOIN LeadSource ON deal_source_id=leadsource_id
+        LEFT JOIN Region ON deal_region_id=region_id,
       TaskType
     WHERE deal_id='$id'
       AND tasktype_id=deal_tasktype_id";
@@ -262,6 +270,7 @@ function run_query_deal_insert($deal) {
   $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $kind = $deal["kind"]; 
+  $region = $deal["region"]; 
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
   $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
@@ -298,6 +307,7 @@ function run_query_deal_insert($deal) {
     deal_label,
     deal_datebegin,
     deal_type_id,
+    deal_region_id,
     deal_tasktype_id,
     deal_company_id,
     deal_contact1_id,
@@ -327,6 +337,7 @@ function run_query_deal_insert($deal) {
     '$label',
     $datebegin,
     '$kind',
+    '$region',
     '$tt',
     '$comp',
     '$con1',
@@ -405,6 +416,7 @@ function run_query_deal_update($deal) {
   $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $kind = $deal["kind"]; 
+  $region = $deal["region"]; 
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
   $market = ($deal["market"] ? $deal["market"] : "null");
@@ -440,6 +452,7 @@ function run_query_deal_update($deal) {
     deal_label='$label',
     deal_datebegin=$datebegin,
     deal_type_id='$kind',
+    deal_region_id='$region',
     deal_tasktype_id='$tt',
     deal_company_id='$comp',
     deal_contact1_id=$con1,
@@ -464,7 +477,7 @@ function run_query_deal_update($deal) {
 
   $archive_old = get_deal_archive($id);
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_deal_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -487,6 +500,7 @@ function run_query_deal_update($deal) {
     }
   }
 
+    print_r($deal["dc"]);
   // DealCompany relations handling
   if ( ($retour) && (is_array($deal["dc"]) )) {
     $ret = run_query_deal_dealcompany_update($id, $deal["dc"]);
@@ -659,7 +673,8 @@ function run_query_deal_id($deal) {
   $label = $deal["label"];
   $priv = $deal["privacy"];
   $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
-  $kind = $deal["kind"]; 
+  $kind = $deal["kind"];
+  $region = $deal["region"];
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
   $market = ($deal["market"] ? "='".$deal["market"]."'" : "is null");
@@ -681,6 +696,7 @@ function run_query_deal_id($deal) {
     AND deal_label='$label'
     AND deal_datebegin $datebegin
     AND deal_type_id='$kind'
+    AND deal_region_id='$region'
     AND deal_tasktype_id='$tt'
     AND deal_company_id='$comp'
     AND deal_contact1_id='$con1'
@@ -905,7 +921,7 @@ function run_query_deal_potential($users_id="") {
 //   - $users_id    : array of marketing User id (empty for all deals)
 //   - $sel_tt      : [optionnal] tasktype array filter
 // Returns:
-//     $res : array[date][u_id]([amount]|[balanced]|[commission][commission_ba])
+//     $res :array[date][u_id]([amount]|[balanced]|[commission][commission_ba])
 //            total in u_id=0
 //                 [users_id] = array(u_id)
 ///////////////////////////////////////////////////////////////////////////////
@@ -1089,6 +1105,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
       deal_todo,
       deal_privacy,
       dealtype_label,
+      region_label,
       leadsource_label,
       company_name as deal_company_name,
       company_zipcode as deal_company_zipcode,
@@ -1098,6 +1115,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
     FROM Deal
       LEFT JOIN Company ON deal_company_id = company_id
       LEFT JOIN DealType ON deal_type_id = dealtype_id
+      LEFT JOIN Region ON deal_region_id = region_id
       LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id 
       LEFT JOIN DealStatus ON deal_status_id = dealstatus_id
       LEFT JOIN LeadSource ON deal_source_id=leadsource_id

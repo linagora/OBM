@@ -631,9 +631,9 @@ function of_category_dis_admin_form($entity, $catu, $cats) {
           <td>&nbsp;</td>
         </tr>
         </table>
+
       </td>
       <td>
-
 
         <form name=\"form_${cat}_new\" method=\"get\"
           action=\"" . url_prepare("") . "\">
@@ -671,94 +671,13 @@ function of_category_dis_admin_form($entity, $catu, $cats) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: the cat links
 // Parameters:
-//   - $entity     : target entity
-//   - $cat        : target category
-//   - $param      : Entity parameters array
-//   - $mode       : ([mono|multi])
-//   - $link_table : [optionnal] to handle special
-///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_links($entity, $cat, $param, $mode="multi") {
-  global $l_c_link, $l_c_link_no;
-  global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
-  global $l_back, $display;
-
-  $l_entity = strtolower("l_${entity}");
-  $l_cat = "l_${cat}";
-  global $$l_entity, $$l_cat;
-
-  $id = $param["${cat}_id"];
-  if (! ($id > 0)) {
-    $id = $param["${cat}"];
-  }
-  $label = of_category_get_label($entity, $cat, $id);
-  $obm_q = of_category_query_links($entity, $cat, $id, $mode);
-
-  $nb_cat = $obm_q->num_rows();
-  if ($nb_cat > 0) {
-    $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $l_c_cant_delete.");
-    $url = url_prepare("?action=search&amp;sel_${cat}=$id");
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
-    </tr>";
-
-    $dis_link .= "
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-          <form name=\"form_back\" method=\"get\"
-            action=\"" .url_prepare("") . "\">
-          <input type=\"hidden\" name=\"action\" value=\"admin\" />
-          <input type=\"submit\" value=\"$l_back\" />
-          </form>
-        </p>
-      </div>";
-
-  } else {
-    $display["msg"] .= display_ok_msg(ucfirst(${$l_cat}).": $l_c_can_delete.");
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-      <form name=\"form_act_delete\"
-        method=post action=\"" . url_prepare("") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
-      <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
-      </form>
-
-      <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
-  }
-
-  return $dis_link;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: the cat links
-// Parameters:
 //   - $entities   : target entity : if an array, check for each entities
 //   - $cat        : target category
 //   - $param      : Entity parameters array
 //   - $mode       : ([mono|multi])
 //   - $link_table : [optionnal] to handle special
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_links_new($entities, $cat, $param, $mode="multi") {
+function of_category_dis_links($entities, $cat, $param, $mode="multi") {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back, $display;
@@ -772,6 +691,7 @@ function of_category_dis_links_new($entities, $cat, $param, $mode="multi") {
     $id = $param["${cat}"];
   }
 
+  // Category is multi-entities (check for each entity)
   if (is_array($entities)) {
     $label = of_category_get_label("", $cat, $id);
     foreach($entities as $entity) {
@@ -791,60 +711,56 @@ function of_category_dis_links_new($entities, $cat, $param, $mode="multi") {
     </tr>";
       }
     }
-
   } else {
+    $entity = $entities;
+    $l_entity = strtolower("l_${entity}");
+    global $$l_entity;
+    $label = of_category_get_label($entity, $cat, $id);
+    $obm_q = of_category_query_links($entity, $cat, $id, $mode);
 
-	// XXXX a continuer ici
+    $nb_cat = $obm_q->num_rows();
+    if ($nb_cat > 0) {
+      $has_links = true;
+      $url = url_prepare("?action=search&amp;sel_${cat}=$id");
 
-
-    $dis_link = "
-    <table class=\"detail\">
+    $dis_link .= "
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
         ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-      <form name=\"form_act_delete\"
-        method=post action=\"" . url_prepare("") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
-      <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
-      </form>
-
-      <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
+    </tr>";
+    }
   }
 
   if ($has_links) {
     $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $l_c_cant_delete.");
-    $dis_buttons .= "
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-          <form name=\"form_back\" method=\"get\"
-            action=\"" .url_prepare("") . "\">
-          <input type=\"hidden\" name=\"action\" value=\"admin\" />
-          <input type=\"submit\" value=\"$l_back\" />
-          </form>
-        </p>
-      </div>";
   } else {
     $display["msg"] .= display_ok_msg(ucfirst(${$l_cat}).": $l_c_can_delete.");
+
+    $dis_buttons .= "
+      <form name=\"form_cat_delete\"
+        method=post action=\"" . url_prepare("") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
+      <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
+      <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
+      </form>";
   }
+
+  $dis_buttons .= "
+        <form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"region\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
 
   $block = "
     <table class=\"detail\">
       $dis_link
     </table>
-  $dis_buttons
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+      $dis_buttons
+    </p>
+  </div>
 ";
 
   return $block;

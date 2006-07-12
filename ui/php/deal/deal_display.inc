@@ -274,7 +274,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   $manager = $deal["manager"];
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
-  $company_id = $deal["company"];
+  $company_id = $deal["company_id"];
   $role_company = $deal["role_company"];
 
   // Kind select construction
@@ -519,6 +519,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $zip = urlencode(stripslashes($deal["company_zip"]));
   $archive = $deal["archive"];
   $kind = $deal["kind"];
+  $region = $deal["region"];
   $tt = $deal["tasktype"];
   $cat1 = $deal["category1"];
   $role = $deal["role"];
@@ -527,7 +528,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $manager = $deal["manager"];
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
-  $param_comp = $deal["company"];
+  $param_comp = $deal["company_id"];
   
   if ($popup) {
     $ext_action = $deal["ext_action"];
@@ -539,7 +540,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_category1=$cat1&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_region=$region&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_category1=$cat1&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_ext");
 
   $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   if ($popup) {
@@ -751,11 +752,11 @@ function dis_deal_consult($deal) {
 function html_deal_consult($deal_q, $dc="") {
   global $set_theme, $ico_company, $ico_contact, $display;
   global $l_dates, $l_company, $l_contact, $l_other_relation, $l_relation;
-  global $l_label, $l_kind, $l_marketing_manager,$l_technical_manager,$l_source;
+  global $l_label, $l_kind,$l_region,$l_marketing_manager,$l_technical_manager;
   global $l_number, $l_amount,$l_hitrate, $l_commission_p, $l_sale_delay;
   global $l_tt, $l_status,$l_archive,$l_comment;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_quarter;
-  global $l_parentdeal,$l_todo, $l_deal;
+  global $l_parentdeal,$l_todo, $l_deal, $l_source;
   global $display, $path, $auth, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
@@ -784,6 +785,7 @@ function html_deal_consult($deal_q, $dc="") {
   }
   $kind = $deal_q->f("dealtype_label");
   $tt_label = $deal_q->f("tasktype_label");
+  $region_label = $deal_q->f("region_label");
   $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
   $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
   $source_label = $deal_q->f("leadsource_label");
@@ -859,6 +861,10 @@ function html_deal_consult($deal_q, $dc="") {
       <tr>
         <td class=\"detailLabel\">$l_tt</td>
         <td class=\"detailText\">$tt_label</td>
+      </tr>
+      <tr>
+        <td class=\"detailLabel\">$l_region</td>
+        <td class=\"detailText\">$region_label</td>
       </tr>
       <tr>
         <td class=\"detailLabel\">$l_source</td>
@@ -987,7 +993,7 @@ function dis_deal_form($deal) {
   if ($action == "detailupdate") {
     $deal_q = run_query_deal_detail($deal["deal_id"]);
     $display["detailInfo"] = display_record_info($deal_q);
-    $deal["company"] = $deal_q->f("deal_company_id");
+    $deal["company_id"] = $deal_q->f("deal_company_id");
     $users = array($uid, $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
     $dc = get_deal_dealcompany_info($deal["deal_id"]);
     $cats1 = of_category_get_ordered("deal", "category1", "multi", $deal["deal_id"]);
@@ -1002,7 +1008,7 @@ function dis_deal_form($deal) {
   
   if (($action == "new") && ($deal["lead_id"] > 0)) {
     $lead = get_lead_info($deal["lead_id"]);
-    $deal["company"] = $lead["company_id"];
+    $deal["company_id"] = $lead["company_id"];
     $deal["market"] = $lead["manager"];
     $deal["source"] = $lead["source"];
     $deal["label"] = $lead["name"];
@@ -1025,9 +1031,10 @@ function dis_deal_form($deal) {
   $usrp_q = run_query_all_users_from_group($cg_prod, $users);
   $sta_q = run_query_deal_status_list();
   $con_q = run_query_deal_contact($deal["company_id"]);
+  $regions = of_category_get_ordered("", "region");
   $roles = of_category_get_ordered("DealCompany", "role");
 
-  $block = html_deal_form($action, $deal_q, $type_q, $tts, $sources, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
+  $block = html_deal_form($action, $deal_q, $type_q, $regions, $tts, $sources, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
 
   return $block;
 }
@@ -1039,6 +1046,7 @@ function dis_deal_form($deal) {
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $kind_q    : DBO : deal kind list
+//   - $regions   : Regions array
 //   - $tts       : TaskType array
 //   - $sources   : Lead Sources array
 //   - $cats1     : array with deal category 1 list 
@@ -1053,10 +1061,11 @@ function dis_deal_form($deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$tts,$sources,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
+function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
   global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private, $l_cat;
-  global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label, $l_number, $l_kind;
+  global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
+  global $l_number, $l_kind, $l_region;
   global $l_tt, $l_marketing_manager, $l_technical_manager, $l_commission_p;
   global $l_amount,$l_hitrate, $l_contact,$l_status, $l_archive, $l_todo;
   global $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm, $l_source;
@@ -1082,6 +1091,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$sources,$cats1, $usrc_q,$u
     $dateexpected = isodate_format($deal_q->f("dateexpected"), 1);
     $datealarm = isodate_format($deal_q->f("datealarm"), 1);
     $kind = $deal_q->f("deal_type_id");
+    $region = $deal_q->f("deal_region_id");
     $tt = $deal_q->f("deal_tasktype_id");
     $priv = ($deal_q->f("privacy") == 0 ? "0" : "1");
     $market = $deal_q->f("deal_marketingmanager_id");
@@ -1129,6 +1139,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$sources,$cats1, $usrc_q,$u
   if (isset($deal["dateexpected"])) { $dateexpected = stripslashes($deal["dateexpected"]); }
   if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
   if (isset($deal["kind"])) { $kind = $deal["kind"]; }
+  if (isset($deal["region"])) { $region = $deal["region"]; }
   if (isset($deal["tasktype"])) { $tt = $deal["tasktype"]; }
   if (isset($deal["category1"])) { $cat1 = $deal["category1"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
@@ -1166,6 +1177,8 @@ function html_deal_form($action,$deal_q,$kind_q,$tts,$sources,$cats1, $usrc_q,$u
     $sel_kind .= ">$klabel</option>";
   }
   $sel_kind .= "</select>";
+
+  $sel_region = of_category_html_select("", "region", $regions, "", "none");
 
   // Sources select
   $sel_source = "
@@ -1458,9 +1471,14 @@ $js_status_loop
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\">$sel_kind</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_tt</td>
       <td class=\"detailForm\">$sel_tt</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_region</td>
+      <td class=\"detailForm\">$sel_region</td>
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_source</td>

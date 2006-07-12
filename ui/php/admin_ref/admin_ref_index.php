@@ -203,7 +203,7 @@ if ($action == "tt_ext_get_ids") {
   
 } elseif ($action == "region_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("deal", "region", $params, "mono");
+  $display["detail"] .= of_category_dis_links(array("deal"), "region", $params, "mono");
   
 } elseif ($action == "region_delete") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ if ($action == "tt_ext_get_ids") {
     $display["msg"] .= display_err_msg("$l_region : $l_delete_error");
   }
   $display["detail"] = dis_admin_ref_region_index();
-  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display

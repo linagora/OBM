@@ -147,6 +147,9 @@ $profiles["editor"] = array (
 //$cgp_show["module"] = ""; // Needed if module order to change
 //$cgp_show["module"]["company"] = "com";
 
+// References fields
+//$cgp_hide[""]["region"] = true;
+
 // Company module
 //$cgp_hide["company"]["company_number"] = true;
 //$cgp_hide["company"]["company_vat"] = true;
