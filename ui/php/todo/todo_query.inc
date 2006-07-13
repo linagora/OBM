@@ -126,7 +126,7 @@ function run_query_todo_insert($todo) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
   $title = $todo["title"];
-  $users = $todo["sel_user_id"];
+  $users = $todo["userid"];
   $priority = $todo["priority"];
   $percent = $todo["percent"];
   if ($percent == "") {
@@ -188,7 +188,7 @@ function run_query_todo_update($todo) {
   $t_id = $todo["todo_id"];
   $uid = $auth->auth["uid"];
   $title = $todo["title"];
-  $users = $todo["sel_user_id"];
+  $users = $todo["userid"];
   $user = $users[0];
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];
@@ -293,7 +293,7 @@ function check_todo_data_form($todo) {
   $t_id = $todo["todo_id"];
   $uid = $auth->auth["uid"];
   $title = $todo["title"];
-  $users = $todo["sel_user_id"];
+  $users = $todo["userid"];
   $user = $users[0];
   $priority = $todo["priority"];
   $deadline = $todo["deadline"];

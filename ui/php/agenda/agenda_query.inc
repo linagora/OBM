@@ -324,8 +324,8 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
   $mail  = $agenda["mail"];
   $groups = $sel_entity_id["group"];
   $mail_title = stripslashes($agenda["title"]);
-  $datebegin = $agenda["datebegin"];
-  $dateend = $agenda["dateend"];
+  $datebegin = $agenda["date_begin"];
+  $dateend = $agenda["date_end"];
   if($agenda["task_new_id"]) $task_id = $agenda["task_new_id"]; 
   else $task_id = $agenda["task_id"];
   // Get the final user list (merge group)

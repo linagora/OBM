@@ -3120,7 +3120,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $block .= display_info_msg($l_parentdeal_deals);
 
   //----- deal search form 
-  $block .= html_deal_search_form($deal, $kind_q, $tts, $cat_q, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $kind_q, $regions, $tts, $cat_q, $roles, $status_q, $usr_q);
 
   //-----> deal list
   // if no record found, display it and stop

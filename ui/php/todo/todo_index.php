@@ -161,14 +161,13 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_todo_params() {
-  global $user_id;
   
-  // Get global params
+// Get global params
   $params = get_global_params("Todo");
   
   // Get todo specific params
-  if (is_array($user_id) {
-    while ( list( $key, $value ) = each($user_id)) {
+  if (is_array($params["user_id"])) {
+    while ( list( $key, $value ) = each($params["user_id"])) {
       // user_id contains select infos (data-user-$id)
       if (strcmp(substr($value, 0, 10),"data-user-") == 0) {
         $data = explode("-", $value);

@@ -216,7 +216,7 @@ if ($action == "index") {
     } else {
       run_query_agenda_add_event($params, $cal_entity_id, $event_id);
       $display["msg"] .= display_ok_msg("$l_event : $l_insert_ok");
-      $params["date"] = $params["datebegin"];
+      $params["date"] = $params["date_begin"];
       $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
     }
   } else {
@@ -251,7 +251,7 @@ if ($action == "index") {
       run_query_agenda_event_update($params, $cal_entity_id, $event_id);
       require("agenda_js.inc");
       $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
-      $params["date"] = $params["datebegin"];
+      $params["date"] = $params["date_begin"];
       $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id);
     }
   } else {

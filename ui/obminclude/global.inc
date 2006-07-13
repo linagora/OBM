@@ -110,9 +110,15 @@ $ccontact_private_default = false;
 
 // Calendar : show public groups
 $cagenda_public_groups = true;
-
+// Calendar : First day of the week
+$phpversion = substr(phpversion(),0,1);
+if($phpversion >= 5) {
+  $cagenda_weekstart = "monday";
+} else {
+  $cagenda_weekstart = "monday + 2 hours"; // +2h to fix a DST php4 bug //
+}
 // Calendar : First day of the week (+2h to fix a DST php bug)
-$cagenda_weekstart = "monday + 2 hours";
+//$cagenda_weekstart = "monday + 2 hours";
 
 // Calendar first and last hour display
 $cagenda_first_hour = 8;

@@ -161,8 +161,8 @@ function html_invoice_search_form($invoice, $sta, $tts) {
 
   $label = $invoice["label"];
   $number = $invoice["number"];
-  $ht = $invoice["ht"];
-  $ttc = $invoice["ttc"];
+  $ht = $invoice["amount_ht"];
+  $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
@@ -173,7 +173,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $deal_id = $invoice["deal_id"];
   $company = $invoice["company"];
   $comp_id = $invoice["company_id"];
-  $proj_id = $invoice["project_id"];
+  $project_new_id = $invoice["project_id"];
   $archive = ($invoice["archive"]) ? "checked" : "" ;
 
   $url_form = url_prepare("invoice_index.php");
@@ -274,7 +274,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     <div class=\"searchLabel\">&nbsp;<br>
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
       <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
-      <input type=\"hidden\" name=\"project_id\" value=\"$proj_id\" />
+      <input type=\"hidden\" name=\"project_id\" value=\"$project_new_id\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
@@ -334,8 +334,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 
   $label = urlencode($invoice["label"]);
   $number = urlencode($invoice["number"]);
-  $ht = urlencode($invoice["ht"]);
-  $ttc = urlencode($invoice["ttc"]);
+  $ht = urlencode($invoice["amount_ht"]);
+  $ttc = urlencode($invoice["amount_ttc"]);
   $status = $invoice["status"];
   if (is_array($status) && (count($status) > 0)) {
     foreach ($status as $s_id) {
@@ -353,7 +353,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   $archive = $invoice["archive"];
   $deal_id = $invoice["deal_id"];
   $comp_id = $invoice["company_id"];
-  $proj_id = $invoice["project_id"];
+  $project_new_id = $invoice["project_id"];
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -368,7 +368,7 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;rd_inout=$inout".
 		    "&amp;company_id=$comp_id".
 		    "&amp;deal_id=$deal_id".
-		    "&amp;project_id=$proj_id".
+		    "&amp;project_id=$project_new_id".
 		    "&amp;tf_company=$company".
 		    "&amp;cb_archive=$archive".
                     "$url_ext"); 
@@ -596,7 +596,7 @@ function dis_invoice_detail($inv_q) {
   }
   if ($project_id > 0) {
     $url_proj = url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$project_id");
-    $proj_link = "<a href=\"$url_proj\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>";
+    $project_new_link = "<a href=\"$url_proj\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>";
   }
 
   $block .= "
@@ -612,7 +612,7 @@ function dis_invoice_detail($inv_q) {
       <td class=\"detailText\">$deal</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_project $proj_link</td>
+      <td class=\"detailLabel\">$l_project $project_new_link</td>
       <td class=\"detailText\">$project</td>
     </tr>
     </table>
@@ -727,8 +727,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $comment = $inv_q->f("invoice_comment");
     $status = $inv_q->f("invoice_status_id");
     $date = isodate_format($inv_q->f("date"), 1);
-    $edate = isodate_format($inv_q->f("expiration_date"), 1);
-    $pdate = isodate_format($inv_q->f("payment_date"), 1);
+    $expiration_date = isodate_format($inv_q->f("expiration_date"), 1);
+    $payment_date = isodate_format($inv_q->f("payment_date"), 1);
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
@@ -744,8 +744,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   // New form and first time
   } elseif ($action == "new") {
     $date = date($c_php_isodate_format); 
-    $edate = $date;
-    $pdate = $date;
+    $expiration_date = $date;
+    $payment_date = $date;
     $number = date ($default_invoice_numbering);
     // when creating from a deal, default to use same "inout" as the dealtype
     if ($d_id >= 1) {
@@ -768,12 +768,12 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["number"])) { $number = $invoice["number"]; }
   if (isset($invoice["archive"])) { $archive = ($invoice["archive"] == 1 ? "checked" : ""); }
   if (isset($invoice["date"])) { $date = $invoice["date"]; }
-  if (isset($invoice["edate"])) { $edate = $invoice["edate"]; }
-  if (isset($invoice["pdate"])) { $pdate = $invoice["pdate"]; }
+  if (isset($invoice["expiration_date"])) { $expiration_date = $invoice["expiration_date"]; }
+  if (isset($invoice["payment_date"])) { $payment_date = $invoice["payment_date"]; }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
   if (isset($invoice["ht"])) { $ht = $invoice["ht"]; }
-  if (isset($invoice["ttc"])) { $ttc = $invoice["ttc"]; }
+  if (isset($invoice["amount_ttc"])) { $ttc = $invoice["amount_ttc"]; }
   if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
   if (isset($invoice["add_comment"])) { $add_comment = stripslashes($invoice["add_comment"]); }
   if (isset($invoice["usercomment"])) { $usercomment = $invoice["usercomment"]; }
@@ -781,16 +781,16 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
 
   if (isset($invoice["company_id"])) { $c_id = $invoice["company_id"]; }
   if (isset($invoice["company_name"])) { $c_name = stripslashes($invoice["company_name"]); }
-  if (isset($invoice["comp_new_id"])) { $c_new_id = $invoice["comp_new_id"]; }
-  if (isset($invoice["comp_new_name"])) { $c_new_name = stripslashes($invoice["comp_new_name"]); }
+  if (isset($invoice["company_new_id"])) { $c_new_id = $invoice["company_new_id"]; }
+  if (isset($invoice["company_new_name"])) { $c_new_name = stripslashes($invoice["company_new_name"]); }
   if (isset($invoice["deal_id"])) { $d_id = $invoice["deal_id"]; }
   if (isset($invoice["deal_label"])) { $d_label = stripslashes($invoice["deal_label"]); }
   if (isset($invoice["deal_new_id"])) { $d_new_id = $invoice["deal_new_id"]; }
   if (isset($invoice["deal_new_label"])) { $d_new_label = stripslashes($invoice["deal_new_label"]); }
   if (isset($invoice["project_id"])) { $p_id = $invoice["project_id"]; }
   if (isset($invoice["project_name"])) { $p_name = stripslashes($invoice["project_name"]); }
-  if (isset($invoice["proj_new_id"])) { $p_new_id = $invoice["proj_new_id"]; }
-  if (isset($invoice["proj_new_name"])) { $p_new_name = stripslashes($invoice["proj_new_name"]); }
+  if (isset($invoice["project_new_new_id"])) { $p_new_id = $invoice["project_new_new_id"]; }
+  if (isset($invoice["project_new_new_name"])) { $p_new_name = stripslashes($invoice["project_new_new_name"]); }
 
   $title = ($inout == '-') ? $l_supplier : $l_client;
 
@@ -930,12 +930,12 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   </tr><tr>
     <td class=\"detailLabel\">$l_expiration_date</td>
     <td class=\"detailForm\">
-      <script>calendar('tf_expiration_date','$edate')</script>
+      <script>calendar('tf_expiration_date','$expiration_date')</script>
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_payment_date</td>
     <td class=\"detailForm\">
-      <script>calendar('tf_payment_date','$pdate')</script>
+      <script>calendar('tf_payment_date','$payment_date')</script>
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_status</td>
