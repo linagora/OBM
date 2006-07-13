@@ -878,11 +878,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["type"])) { $type_id = $contract["type"]; }
   if (isset($contract["autorenewal"])) { $autorenewal = $contract["autorenewal"]; }
   if (isset($contract["format"])) { $format = $contract["format"]; }
-  if (isset($contract["ticketnumber"])) { $ticket_nb = $contract["ticketnumber"]; }
+  if (isset($contract["ticket_nb"])) { $ticket_nb = $contract["ticket_nb"]; }
   if (isset($contract["duration"])) { $duration = $contract["duration"]; }
   if (isset($contract["kind"])) { $kind = $contract["kind"]; }
-  if (isset($contract["contact1"])) { $con1_id = $contract["contact1"]; }
-  if (isset($contract["contact2"])) { $con2_id = $contract["contact2"]; }
+  if (isset($contract["con1"])) { $con1_id = $contract["con1"]; }
+  if (isset($contract["con2"])) { $con2_id = $contract["con2"]; }
   if (isset($contract["market"])) { $market_id = $contract["market"]; }
   if (isset($contract["tech"])) { $tech = $contract["tech"]; }
   if (isset($contract["clause"])) { $clause = stripslashes($contract["clause"]); }
@@ -1422,7 +1422,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
   $status = $contract["status"];
   $kind = $contract["kind"];
   $format =$contract["format"];
-  $ticket_nb =$contract["ticketnumber"];
+  $ticket_nb =$contract["ticket_nb"];
   $duration = $contract["duration"];
   $autorenewal =$contract["autorenewal"];
   $daterenew = $contract["daterenew"];
@@ -1430,8 +1430,8 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
   $datesignature = $contract["datesignature"];
   $sel_type = $contract["type"];
   $ta_com = $contract["comment"];
-  $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
-  $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
+  $con1 = ($contract["con1"] ? $contract["con1"] : "0");
+  $con2 = ($contract["con2"] ? $contract["con2"] : "0");
   $sel_tech  = $contract["tech"];
   $sel_market = $contract["market"];
   $deal_id = ($contract["deal_new_id"] ? $contract["deal_new_id"] : "0");

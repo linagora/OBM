@@ -22,7 +22,7 @@ function run_query_project_search($params) {
   $name = sql_search_text_parse($params["name"]);
   $tt = $params["tt"];
   $company_name = sql_search_text_parse($params["company_name"]);
-  $company = $params["company"];
+  $company = $params["company_id"];
   $deal = $params["deal"];
   $member = $params["member"];
   $archive = $params["archive"];
@@ -271,7 +271,7 @@ function run_query_project_insert($params) {
   $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
   $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
   $tt = $params["tt"];
-  $comp = ($params["company"] ? "'".$params["company"]."'" : "null");
+  $comp = ($params["company_id"] ? "'".$params["company_id"]."'" : "null");
   $deal = ($params["deal"] ? "'".$params["deal"]."'" : "null");
   $task = $params["tasklabel"];
   $member = $params["member"];
@@ -1379,7 +1379,7 @@ function check_project_form($pid, $params) {
   global $err_msg, $php_regexp_number,$l_tolong_shortname;
 
   $name = $params["name"];
-  $company = $params["company"];
+  $company = $params["company_id"];
   $tt = $params["tt"];
   $soldtime = $params["soldtime"];
   $estimated = $params["estimated"];

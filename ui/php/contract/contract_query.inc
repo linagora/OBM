@@ -248,12 +248,12 @@ function run_query_contract_insert($contract) {
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
   $format = $contract["format"];
-  $ticket_nb = ($contract["ticketnumber"] ? $contract["ticketnumber"] : "0");
+  $ticket_nb = ($contract["ticket_nb"] ? $contract["ticket_nb"] : "0");
   $duration = $contract["duration"];
   $autorenewal = ($contract["autorenewal"] ? $contract["autorenewal"] : "0");
   $sel_type = $contract["type"];
-  $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
-  $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
+  $con1 = ($contract["con1"] ? $contract["con1"] : "0");
+  $con2 = ($contract["con2"] ? $contract["con2"] : "0");
   $tech = ($contract["tech"] ? $contract["tech"] : "0");
   $market = ($contract["market"] ? $contract["market"] : "0");
   $add_comment = $contract["add_comment"];
@@ -357,7 +357,7 @@ function run_query_contract_update($contract) {
   $autorenewal = ($contract["autorenewal"] ? $contract["autorenewal"] : "0");
   $format = $contract["format"];
   if ($format == $ccf_ticket) {
-    $ticket_nb = ($contract["ticketnumber"] ? $contract["ticketnumber"] : "0");
+    $ticket_nb = ($contract["ticket_nb"] ? $contract["ticket_nb"] : "0");
   } else {
     $ticket_nb = 0;
   }
@@ -367,8 +367,8 @@ function run_query_contract_update($contract) {
     $duration = 0;
   }
   $company_id = $contract["company_id"];
-  $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
-  $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
+  $con1 = ($contract["con1"] ? $contract["con1"] : "0");
+  $con2 = ($contract["con2"] ? $contract["con2"] : "0");
   $tech = ($contract["tech"] ? $contract["tech"] : "0");
   $market = ($contract["market"] ? $contract["market"] : "0");
   $comment = $contract["comment"];
@@ -1048,7 +1048,7 @@ function run_query_contract_id($contract) {
   $status = $contract["status"];
   $contract_kind = $contract["kind"];
   $format = $contract["format"];
-  $ticket_nb = $contract["ticketnumber"];
+  $ticket_nb = $contract["ticket_nb"];
   $duration = $contract["duration"];
   $autorenewal =$contract["autorenewal"];
   $sel_type = $contract["type"];
@@ -1153,7 +1153,7 @@ function check_contract_form($cid, $contract) {
   $daterenew = $contract["daterenew"];
   $datecancel = $contract["datecancel"];
   $format = $contract["format"];
-  $ticket_nb = $contract["ticketnumber"];
+  $ticket_nb = $contract["ticket_nb"];
   $duration = $contract["duration"];
 
   // Check if the label is filled
