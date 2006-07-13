@@ -213,6 +213,8 @@ CREATE TABLE ProjectRefTask (
 -------------------------------------------------------------------------------
 ALTER TABLE Incident ADD COLUMN incident_category2_id integer;
 ALTER TABLE Incident ALTER COLUMN incident_category2_id SET DEFAULT 0;
+ALTER TABLE Incident ADD COLUMN incident_reference varchar(32) ;
+ALTER TABLE Incident ALTER COLUMN incident_reference SET DEFAULT NULL;
 
 
 --

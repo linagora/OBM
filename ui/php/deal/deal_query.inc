@@ -500,7 +500,6 @@ function run_query_deal_update($deal) {
     }
   }
 
-    print_r($deal["dc"]);
   // DealCompany relations handling
   if ( ($retour) && (is_array($deal["dc"]) )) {
     $ret = run_query_deal_dealcompany_update($id, $deal["dc"]);

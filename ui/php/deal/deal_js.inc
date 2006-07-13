@@ -244,7 +244,60 @@ function check_status_new(form)
       return false;
    }
 }
-
+///////////////////////////////////////////////////////////////////////////////
+// Add a new deal dc form line                                               //
+///////////////////////////////////////////////////////////////////////////////
+function add_DC_line() {
+  dcContainer = document.getElementById('dc_container');
+  dcChildren = dcContainer.childNodes;
+  cpt = 0;
+  for(i=0; i < dcChildren.length; i++) {
+    if(dcChildren[i].nodeName == 'DIV') {
+      sampleDC = dcChildren[i].childNodes;
+      cpt ++;
+    }
+  }
+  for(i=0;i < sampleDC.length; i++) {
+    if(sampleDC[i].nodeName == 'SELECT') {
+      option = sampleDC[i].options;
+    }
+  }
+  div = document.createElement('div');
+  dcContainer.appendChild(div);
+  cat_selector = document.createElement('select');
+  cat_selector.name = 'role'+cpt;
+  for(i=0;i < option.length; i++) {
+    cat_selector.options[i] = new Option(option[i].text,option[i].value);
+  }
+  div.appendChild(cat_selector);
+  ipt = document.createElement('input');
+  ipt.type = 'hidden';
+  ipt.name='data_dc_'+cpt;
+  ipt.value=cpt;
+  div.appendChild(ipt);
+  ipt = document.createElement('input');
+  ipt.type = 'hidden';
+  ipt.name='data_dccid_'+cpt;
+  div.appendChild(ipt);
+  ipt = document.createElement('input');
+  ipt.type = 'hidden';
+  ipt.name='data_dccname_'+cpt;
+  div.appendChild(ipt);
+  ipt = document.createElement('input');
+  ipt.type = 'hidden';
+  ipt.name='data_dccnewid_'+cpt;
+  div.appendChild(ipt);
+  span = document.createElement('span');
+  onclick= \"window.open('$path/company/company_index.php?action=ext_get_id&popup=1&ext_widget=f_entity.data_dccnewid_\"+cpt+\"&ext_widget_text=f_entity.data_dccnewname_\"+cpt+\"','Company','height=,width=,scrollbars=yes'); return false;\";
+  span.innerHTML = '<a href=\"\" onclick=\"'+onclick+'\"> <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>';
+  div.appendChild(span);
+  ipt = document.createElement('input');
+  ipt.type = 'text';
+  ipt.name='data_dccnewname_'+cpt;
+  ipt.readonly = true;
+  ipt.setAttribute('onfocus','this.blur();');
+  div.appendChild(ipt);
+}
 ";
 
 ?>

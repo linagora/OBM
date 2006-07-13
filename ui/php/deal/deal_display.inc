@@ -1284,7 +1284,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
       <input type=\"hidden\" name=\"data_dccid_$cpt\" value=\"$dc_cid\" />
       <input type=\"hidden\" name=\"data_dccname_$cpt\" value=\"$dc_cname\" />
       <input type=\"hidden\" name=\"data_dccnewid_$cpt\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
@@ -1299,7 +1299,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
       <input type=\"hidden\" name=\"data_dccid_$cpt\" value=\"\" />
       <input type=\"hidden\" name=\"data_dccname_$cpt\" value=\"\" />
       <input type=\"hidden\" name=\"data_dccnewid_$cpt\" value=\"\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.data_dccnewid_$cpt&amp;ext_widget_text=f_entity.data_dccnewname_$cpt','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
@@ -1453,8 +1453,8 @@ $js_status_loop
       <td class=\"detailForm\">$dis_contact_2 $sel_con2</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_other_relation</td>
-      <td class=\"detailForm\">$dis_dc</td>
+      <td class=\"detailLabel\">$l_other_relation <a href=\"\" onclick=\"add_DC_line();return false\">+</a></td>
+      <td class=\"detailForm\" id=\"dc_container\">$dis_dc</td>
     </tr>
     </table>
 

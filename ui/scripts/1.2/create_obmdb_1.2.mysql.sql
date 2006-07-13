@@ -1215,6 +1215,7 @@ CREATE TABLE Incident (
   incident_usercreate       int(8) default NULL,
   incident_contract_id      int(8) NOT NULL,
   incident_label            varchar(100) default NULL,
+  incident_reference        varchar(32) default NULL,
   incident_date             date default NULL,
   incident_priority_id      int(8) default NULL,
   incident_status_id        int(8) default NULL,

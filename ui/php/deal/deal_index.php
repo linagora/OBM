@@ -514,6 +514,26 @@ function get_deal_params() {
   } else {
     $params["parchive"] = "0";
   }
+   // Handle DealCompany infos
+  $cpt = 0;
+  while (isset($params["data_dc_$cpt"])) {
+    $dccid = $params["data_dccid_$cpt"];
+    $dccname = $params["data_dccname_$cpt"];
+    $dccnewid = $params["data_dccnewid_$cpt"];
+    $dccnewname = $params["data_dccnewname_$cpt"];
+    $dcroleid = $params["role$cpt"];
+
+    if ($dccnewid > 0) {
+      $params["dc"][$cpt]["company_id"] = $dccnewid;
+      $params["dc"][$cpt]["company_name"] = $dccnewname;
+      $params["dc"][$cpt]["role_id"] = $dcroleid;
+    } else if ($dccid > 0) {
+      $params["dc"][$cpt]["company_id"] = $dccid;
+      $params["dc"][$cpt]["company_name"] = $dccname;
+      $params["dc"][$cpt]["role_id"] = $dcroleid;
+    }
+    $cpt++;
+  }
 
   $params["status_order"] = (isset($tf_order) ? $tf_order : "0");
   

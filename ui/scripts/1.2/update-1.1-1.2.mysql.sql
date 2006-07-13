@@ -193,6 +193,7 @@ CREATE TABLE ProjectRefTask (
 -- Incident module tables
 -------------------------------------------------------------------------------
 ALTER TABLE Incident ADD COLUMN incident_category2_id int(8) DEFAULT 0 AFTER incident_category1_id;
+ALTER TABLE Incident ADD COLUMN incident_reference varchar(32) DEFAULT NULL AFTER incident_label;
 
 
 --
