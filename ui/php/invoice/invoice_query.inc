@@ -21,7 +21,7 @@ function run_query_invoice_search ($invoice) {
   $ht = $invoice["amount_ht"];
   $ttc = $invoice["amount_ttc"];
   $status = $invoice["status"];
-  $sel_tt = $invoice["sel_tt"];
+  $sel_tt = $invoice["tasktype"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
   $dateexp_after = $invoice["dateexp_after"];

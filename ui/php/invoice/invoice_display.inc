@@ -132,7 +132,7 @@ function dis_invoice_search_form($invoice="") {
   global $ctt_sales;
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $invoice["sel_tt"];
+  $tt_ids = $invoice["tasktype"];
   if (! is_array($tt_ids) && ($tt_ids == "")) {
     $tt_ids = "0";
   }
@@ -1067,12 +1067,12 @@ function dis_invoice_dashboard($invoice) {
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["sel_tt"]);
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["tasktype"]);
   $url_prev = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_prev");
   $url_next = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_next");
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $invoice["sel_tt"];
+  $tt_ids = $invoice["tasktype"];
   if (! is_array($tt_ids) && ($tt_ids == "")) {
     $tt_ids = "0";
   } else {
@@ -1242,7 +1242,7 @@ function dis_invoice_dashboard($invoice) {
   // Payment infos ------------------------------------------------------------
 
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date", $invoice["sel_tt"]);
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_expiration_date", $invoice["taskttype"]);
 
   $status_pay = get_invoicestatus("payment");
 
@@ -1448,10 +1448,10 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["sel_tt"]);
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["tasktype"]);
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $invoice["sel_tt"];
+  $tt_ids = $invoice["tasktype"];
   if (! is_array($tt_ids) && ($tt_ids == "")) {
     $tt_ids = "0";
   } else {
@@ -1468,7 +1468,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   // Billed infos Year-1 and Year ----------------------------------------------
 
   $date_ranges = array(array("$year_prev-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["sel_tt"]);
+  $inv = run_query_invoice_amounts($date_ranges, "invoice_date", $invoice["tasktype"]);
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {

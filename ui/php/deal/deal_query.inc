@@ -2220,7 +2220,7 @@ function run_query_deal_parentdeal_update($deal) {
 function run_query_deal_affect_deal_parentdeal($id, $deal) {
   global $auth, $cdg_sql;
     
-  $pid = $deal["sel_parent"];
+  $pid = $deal["parent"];
 
   $query = "UPDATE Deal SET
     deal_parentdeal_id='$pid',

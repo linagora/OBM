@@ -106,7 +106,7 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 
   $uid = $auth->auth["uid"];
   $title = $todo["title"];
-  $users = $todo["sel_user_id"];
+  $users = $todo["userid"];
   $user = $users[0];
   $priority = $todo["priority"];
 
@@ -240,8 +240,8 @@ function dis_todo_form($todo, $todo_q = 0) {
   if (isset($todo["percent"])) { $percent = $todo["percent"]; }
   if (isset($todo["deadline"])) { $deadline = $todo["deadline"]; }
   if (isset($todo["content"])) { $content = $todo["content"]; }
-  if (is_array($todo["sel_user_id"])) {
-    $p_user_array = $todo["sel_user_id"];
+  if (is_array($todo["userid"])) {
+    $p_user_array = $todo["userid"];
   } else if ($u_id > 0) {
     $p_user_array = array($u_id);
   } else {

@@ -287,6 +287,7 @@ function add_DC_line() {
   ipt.type = 'hidden';
   ipt.name='data_dccnewid_'+cpt;
   div.appendChild(ipt);
+  eval('f_entity.data_dccnewid_'+cpt+' = ipt');
   span = document.createElement('span');
   onclick= \"window.open('$path/company/company_index.php?action=ext_get_id&popup=1&ext_widget=f_entity.data_dccnewid_\"+cpt+\"&ext_widget_text=f_entity.data_dccnewname_\"+cpt+\"','Company','height=,width=,scrollbars=yes'); return false;\";
   span.innerHTML = '<a href=\"\" onclick=\"'+onclick+'\"> <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>';
@@ -296,6 +297,7 @@ function add_DC_line() {
   ipt.name='data_dccnewname_'+cpt;
   ipt.readonly = true;
   ipt.setAttribute('onfocus','this.blur();');
+  eval('f_entity.data_dccnewname_'+cpt+' = ipt');
   div.appendChild(ipt);
 }
 ";

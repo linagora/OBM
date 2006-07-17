@@ -2052,12 +2052,12 @@ function dis_deal_dashboard_year_detail($deal) {
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_range = array("$year-01-01", "$year-12-31");
-  $d = run_query_deal_dashboard_infos($date_range, "deal_dateexpected", "", $deal["sel_tt"]);
+  $d = run_query_deal_dashboard_infos($date_range, "deal_dateexpected", "", $deal["tasktype"]);
   $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_prev");
   $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_next");
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
-  $tt_ids = $deal["sel_tt"];
+  $tt_ids = $deal["tasktype"];
   if (! is_array($tt_ids) && ($tt_ids == "")) {
     $tt_ids = "0";
   } else {

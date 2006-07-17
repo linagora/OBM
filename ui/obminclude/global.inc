@@ -786,6 +786,7 @@ function get_global_params($table="") {
     rd_  = radio
     hd_  = hidden
     fi_  = file
+    data-= external call
   */
   
   $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/", "/^fi_/");
@@ -806,7 +807,10 @@ function get_global_params($table="") {
 
     // Add value in hash table
     if (is_array($value)) {
-      $params[$key] = $value;
+      //external call 
+
+        $params[$key] = $value;
+
     } else if ($value != "") {
       $params[$key] = trim(strip_tags($value));
     }
