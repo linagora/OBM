@@ -56,10 +56,10 @@ include("$obminclude/of/of_category.inc");
 $uid = $auth->auth["uid"];
 $perms = $auth->auth["perm"];
 
-update_last_visit("project", $param_project, $action);
+$params = get_project_params();
+update_last_visit("project", $params["project_id"], $action);
 
 if ($action == "") $action = "index";
-$params = get_project_params();
 get_project_action();
 $perm->check_permissions($module, $action);
 
