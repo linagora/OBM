@@ -237,7 +237,7 @@ function run_query_invoice_insert($invoice) {
   $deal_id = $invoice["deal_new_id"];
   if ($deal_id < 1) { $deal_id = $invoice["deal_id"]; }
   if ($deal_id == "") { $deal_id = "0"; }
-  $project_new_id = $invoice["project_new_new_id"];
+  $project_new_id = $invoice["project_new_id"];
   if ($project_new_id < 1) { $project_new_id = $invoice["project_id"]; }
   if ($project_new_id == "") { $project_new_id = "0"; }
 
@@ -329,7 +329,7 @@ function run_query_invoice_update($invoice) {
   $deal_id = $invoice["deal_new_id"];
   if ($deal_id < 1) { $deal_id = $invoice["deal_id"]; }
   if ($deal_id == "") { $deal_id = "0"; }
-  $project_new_id = $invoice["project_new_new_id"];
+  $project_new_id = $invoice["project_new_id"];
   if ($project_new_id < 1) { $project_new_id = $invoice["project_id"]; }
   if ($project_new_id == "") { $project_new_id = "0"; }
 
