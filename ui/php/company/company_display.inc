@@ -15,6 +15,7 @@
 $fieldnames["company_name"] = $l_name;
 $fieldnames["company_number"] = $l_number;
 $fieldnames["company_vat"] = $l_vat;
+$fieldnames["company_siret"] = $l_siret;
 $fieldnames["company_archive"] = $l_archive_first;
 $fieldnames["company_address"] = $l_address;
 $fieldnames["company_address1"] = "$l_address 1";
@@ -675,13 +676,14 @@ function dis_company_consult($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat, $l_market, $l_archive;
-  global $l_company;
+  global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat, $l_siret, $l_market;
+  global $l_company, $l_archive;
   global $display, $l_yes, $l_no, $cgp_hide;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
   $vat = $co_q->f("company_vat");
+  $siret = $co_q->f("company_siret");
   $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
   $name = $co_q->f("company_name");
   $aka = $co_q->f("company_aka");
@@ -714,6 +716,7 @@ function html_company_consult($co_q) {
   // of: activity, type, category1, activity
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
+  $show_siret = (! $cgp_hide["company"]["company_siret"]);
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
   // Number field
@@ -731,6 +734,15 @@ function html_company_consult($co_q) {
     <tr>
       <td class=\"detailLabel\">$l_vat</td>
       <td class=\"detailText\">$vat</td>
+    </tr>";
+  }
+
+  // SIRET field
+  if ($show_siret) {
+    $block_siret = "
+    <tr>
+      <td class=\"detailLabel\">$l_siret</td>
+      <td class=\"detailText\">$siret</td>
     </tr>";
   }
 
@@ -762,6 +774,7 @@ function html_company_consult($co_q) {
     $dis_aka
     $block_num
     $block_vat
+    $block_siret
     <tr> 
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailText\">$archive</td>
@@ -981,7 +994,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
-  global $l_number, $l_vat, $l_market, $l_coord;
+  global $l_number, $l_vat, $l_siret, $l_market, $l_coord;
   global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
 
   $uid = $auth->auth["uid"];
@@ -992,6 +1005,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $id = $co_q->f("company_id");
     $num = $co_q->f("company_number");
     $vat = $co_q->f("company_vat");
+    $siret = $co_q->f("company_siret");
     $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
     $name = $co_q->f("company_name");
     $aka = $co_q->f("company_aka");
@@ -1027,6 +1041,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (isset($company["company_id"])) { $id = $company["company_id"]; }
   if (isset($company["num"])) { $num = stripslashes($company["num"]); }
   if (isset($company["vat"])) { $vat = stripslashes($company["vat"]); }
+  if (isset($company["siret"])) { $siret = stripslashes($company["siret"]); }
   if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
   if (isset($company["name"])) { $name = stripslashes($company["name"]); }
   if (isset($company["aka"])) { $aka = stripslashes($company["aka"]); }
@@ -1056,6 +1071,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   // category1, activity, type
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
+  $show_siret = (! $cgp_hide["company"]["company_siret"]);
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
@@ -1079,6 +1095,14 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     </tr><tr>
       <td class=\"detailLabel\">$l_vat</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_vat\" name=\"tf_vat\" value=\"$vat\" size=\"20\" maxlength=\"20\" /></td>";
+  }
+
+  // Siret field
+  if ($show_siret) {
+    $block_siret = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_siret</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_siret\" name=\"tf_siret\" value=\"$siret\" size=\"14\" maxlength=\"14\" /></td>";
   }
 
   // data source select
@@ -1242,6 +1266,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     $block_num
     $block_vat
+    $block_siret
     </tr><tr>
       <td class=\"detailLabel\">$l_datasource</td> 
       <td class=\"detailForm\">$sel_dsrc</td>
@@ -1367,6 +1392,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 
   $num = $company["num"];
   $vat = $company["vat"];
+  $siret = $company["siret"];
   $archive = ($company["archive"] == 1 ? "1" : "0");
   $name = $company["name"];
   $kind = $company["kind"];
@@ -1404,6 +1430,33 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     $dis_cat .= "<input type=\"hidden\" name=\"sel_cat[]\" value=\"$cat\" />";
     }
   }
+
+  $hidden_fields = "
+    <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+    <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
+    <input type=\"hidden\" name=\"tf_siret\" value=\"$siret\" />
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
+    <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+    <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
+    <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
+    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
+    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
+    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
+    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
+    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
+    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
+    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
+    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
+    <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
+    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    $dis_cat
+    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+";
+
   $block = "
   <table class=\"detail\">
     $dis_same_comp
@@ -1414,28 +1467,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-    <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
-    <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
-    <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
-    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
-    <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
-    <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
-    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
-    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
-    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
-    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
-    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
-    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
-    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
-    <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    $dis_cat
-    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+    $hidden_fields
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
     </p>
@@ -1443,28 +1475,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <form name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
-    <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
-    <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
-    <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
-    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
-    <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
-    <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
-    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
-    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
-    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
-    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
-    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
-    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
-    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
-    <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    $dis_cat
-    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+    $hidden_fields
     <input type=\"submit\" value=\"$l_back\" />
     </form>
     </p>

@@ -18,6 +18,7 @@ $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Details";
 $l_vat = "EU VAT";
+$l_siret = "SIRET";
 
 // Labels and texts
 $l_contact_new = "New Contact";

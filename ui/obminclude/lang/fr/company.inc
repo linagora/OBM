@@ -18,6 +18,7 @@ $l_web = "W";
 $l_email = "@M";
 $l_coord = "Coordonnées";
 $l_vat = "Numéro Intracommunautaire";
+$l_siret = "SIRET";
 
 // Labels et textes
 $l_comment = "Commentaire";

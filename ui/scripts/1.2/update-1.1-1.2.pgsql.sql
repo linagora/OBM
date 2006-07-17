@@ -254,3 +254,10 @@ ALTER TABLE Deal ADD COLUMN deal_region_id integer;
 ALTER TABLE Deal ALTER COLUMN deal_region_id SET DEFAULT 0;
 UPDATE Deal SET deal_regionid=0;
 ALTER TABLE Deal ALTER COLUMN deal_region_id SET NOT NULL;
+
+
+-------------------------------------------------------------------------------
+-- Company table
+-------------------------------------------------------------------------------
+ALTER TABLE Company ADD COLUMN company_siret varchar(14);
+ALTER TABLE Company ALTER COLUMN company_siret SET DEFAULT '';

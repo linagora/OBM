@@ -230,3 +230,9 @@ CREATE TABLE Region (
 
 
 ALTER TABLE Deal ADD COLUMN deal_region_id int(8) NOT NULL DEFAULT 0 AFTER deal_type_id;
+
+
+-------------------------------------------------------------------------------
+-- Company table
+-------------------------------------------------------------------------------
+ALTER TABLE Company ADD COLUMN company_siret varchar(14) DEFAULT '' after company_vat;

@@ -234,6 +234,7 @@ CREATE TABLE Company (
   company_datasource_id        int(8) DEFAULT 0,
   company_number               varchar(32),
   company_vat                  varchar(20),
+  company_siret                varchar(14),
   company_archive              char(1) DEFAULT '0' NOT NULL,
   company_name                 varchar(96) DEFAULT '' NOT NULL,
   company_aka                  varchar(255),

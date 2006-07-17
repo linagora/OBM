@@ -139,6 +139,7 @@ function run_query_company_search($company) {
       company_name,
       company_number,
       company_vat,
+      company_siret,
       company_archive,
       company_type_id,
       company_activity_id,
@@ -269,6 +270,7 @@ function run_query_company_insert($company) {
 
   $num = $company["num"];
   $vat = $company["vat"];
+  $siret = $company["siret"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $aka = trim($company["aka"]);
@@ -311,6 +313,7 @@ function run_query_company_insert($company) {
     company_datasource_id,
     company_number,
     company_vat,
+    company_siret,
     company_archive,
     company_name,
     company_aka,
@@ -338,6 +341,7 @@ function run_query_company_insert($company) {
     '$dsrc',
     '$num',
     '$vat',
+    '$siret',
     '$archive',
     '$name',
     '$aka',
@@ -412,6 +416,7 @@ function run_query_company_update($cid, $company) {
 
   $num = $company["num"];
   $vat = $company["vat"];
+  $siret = $company["siret"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $aka = trim($company["aka"]);
@@ -457,6 +462,7 @@ function run_query_company_update($cid, $company) {
     company_datasource_id='$dsrc',
     company_number='$num',
     company_vat='$vat',
+    company_siret='$siret',
     company_archive='$archive',
     company_name='$name',
     company_aka='$aka',

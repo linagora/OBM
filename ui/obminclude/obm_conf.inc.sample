@@ -153,6 +153,7 @@ $profiles["editor"] = array (
 // Company module
 //$cgp_hide["company"]["company_number"] = true;
 //$cgp_hide["company"]["company_vat"] = true;
+//$cgp_hide["company"]["company_siret"] = true;
 //$cgp_hide["company"]["type"] = true;
 //$cgp_hide["company"]["activity"] = true;
 //$cgp_hide["company"]["nafcode"] = true;
