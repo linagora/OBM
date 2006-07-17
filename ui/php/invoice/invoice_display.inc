@@ -789,8 +789,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   if (isset($invoice["deal_new_label"])) { $d_new_label = stripslashes($invoice["deal_new_label"]); }
   if (isset($invoice["project_id"])) { $p_id = $invoice["project_id"]; }
   if (isset($invoice["project_name"])) { $p_name = stripslashes($invoice["project_name"]); }
-  if (isset($invoice["project_new_new_id"])) { $p_new_id = $invoice["project_new_new_id"]; }
-  if (isset($invoice["project_new_new_name"])) { $p_new_name = stripslashes($invoice["project_new_new_name"]); }
+  if (isset($invoice["project_new_id"])) { $p_new_id = $invoice["project_new_id"]; }
+  if (isset($invoice["project_new_name"])) { $p_new_name = stripslashes($invoice["project_new_name"]); }
 
   $title = ($inout == '-') ? $l_supplier : $l_client;
 
