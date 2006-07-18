@@ -453,7 +453,7 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_project_params() {
-
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
   // Get global params
   $params = get_global_params("Project");
 
@@ -464,8 +464,15 @@ function get_project_params() {
   if (!isset ($params["date"])) {
     $params["date"] = date("Ymd"); 
   }
+  
   // Get project specific params
-  while ( list( $key ) = each( $_REQUEST ) ) {
+    if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+  
+  while ( list( $key ) = each( $http_obm_vars ) ) {
     // cb_u is likely to be called cb_user
     if (strcmp(substr($key, 0, 7),"cb_task") == 0) {
       $nb_tsk++;
