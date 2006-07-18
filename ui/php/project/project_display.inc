@@ -107,7 +107,7 @@ function html_project_search_form ($tts, $member_q, $project) {
   $archive = $project["archive"];
   $date = $project["datebegin"];
   $company_id = $project["company_id"];
-  $deal_id = $project["deal"];
+  $deal_id = $project["deal_id"];
 
   $task_list = array($ctt_sales => $l_tt_sales,
 		     $ctt_research => $l_tt_research,
@@ -1054,7 +1054,7 @@ function html_project_form($action, $project_q, $project) {
   if (isset($project["name"])) { $name = stripslashes($project["name"]); }
   if (isset($project["tt"])) { $tt = $project["tt"]; }
   if (isset($project["company_id"])) { $company = $project["company_id"]; }
-  if (isset($project["deal"])) { $deal = $project["deal"]; }
+  if (isset($project["deal_id"])) { $deal = $project["deal_id"]; }
   if (isset($project["soldtime"])) { $soldtime = $project["soldtime"]; }
   if (isset($project["estimated"])) { $estimated = $project["estimated"]; }
   if (isset($project["company_name"])) { $company_name = stripslashes($project["company_name"]); }
@@ -1233,7 +1233,7 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_shortname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_shortname\" size=\"10\" value=\"$shortname\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_shortname\" size=\"10\" maxlength=\"10\" value=\"$shortname\" /></td>
     </tr><tr>      
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailForm\">$sel_tt</td>

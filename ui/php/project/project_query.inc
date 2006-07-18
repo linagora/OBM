@@ -23,7 +23,7 @@ function run_query_project_search($params) {
   $tt = $params["tt"];
   $company_name = sql_search_text_parse($params["company_name"]);
   $company = $params["company_id"];
-  $deal = $params["deal"];
+  $deal = $params["deal_id"];
   $member = $params["member"];
   $archive = $params["archive"];
   $date = $params["datebegin"];
@@ -272,7 +272,7 @@ function run_query_project_insert($params) {
   $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
   $tt = $params["tt"];
   $comp = ($params["company_id"] ? "'".$params["company_id"]."'" : "null");
-  $deal = ($params["deal"] ? "'".$params["deal"]."'" : "null");
+  $deal = ($params["deal_id"] ? "'".$params["deal_id"]."'" : "null");
   $task = $params["tasklabel"];
   $member = $params["member"];
   $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");

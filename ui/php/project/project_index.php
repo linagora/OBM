@@ -765,7 +765,7 @@ function get_project_action() {
      'Condition'=> array ('all')
                                        	 );
 
-// Display Pr�f�rences
+// Display Preferences
   $actions["project"]["dispref_display"] = array (
     'Url'      => "$path/project/project_index.php?action=dispref_display",
     'Right'    => $cright_read,
