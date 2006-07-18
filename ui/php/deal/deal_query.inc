@@ -360,7 +360,7 @@ function run_query_deal_insert($deal) {
     $pid,
     '$todo')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_deal_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);  
 

@@ -203,7 +203,7 @@ function get_invoice_params() {
   // Get global params
   $params = get_global_params("Invoice");
 
-  //Get company specific params
+  // Get Invoice specific params
   // sel_tt
   if (is_array($params["tt"])) {
     while ( list( $key, $value ) = each( $params["tt"] ) ) {

@@ -508,13 +508,33 @@ function get_deal_params() {
   
   // Get deal specific params
   if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
+
+  // privacy : why here ? XXXX
   $params["priv"] = ($cb_priv == 1 ? 1 : 0);
+
+  // parentdeal archive : why here XXXX ?
   if (isset ($cb_parchive)) {
     $params["parchive"] = $cb_parchive;
   } else {
     $params["parchive"] = "0";
   }
-   // Handle DealCompany infos
+
+  // sel_tt
+  if (is_array($params["tt"])) {
+    while ( list( $key, $value ) = each( $params["tt"] ) ) {
+      // sel_tt contains select infos (data-tt-$id)
+      if (strcmp(substr($value, 0, 8),"data-tt-") == 0) {
+        $data = explode("-", $value);
+        $id = $data[2];
+        $params["tasktype"][] = $id;
+      } else {
+        // sel_tt contains ids
+        $params["tasktype"][] = $value;
+      } 
+    }
+  }
+
+  // Handle DealCompany infos
   $cpt = 0;
   while (isset($params["data_dc_$cpt"])) {
     $dccid = $params["data_dccid_$cpt"];

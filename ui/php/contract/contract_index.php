@@ -553,7 +553,7 @@ function get_contract_action() {
     'Condition'=> array ('all') 
                                       	  );
 
-// Display Pr�f�rence
+// Display Preference
   $actions["contract"]["dispref_display"] = array (
     'Url'      => "$path/contract/contract_index.php?action=dispref_display",
     'Right'    => $cright_read,

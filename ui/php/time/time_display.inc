@@ -41,7 +41,7 @@ $fieldnames["timetask_id"] = "";
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_data(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $time;
+  global $path, $set_theme, $params;
 
   $res["style"] = "";
   
@@ -67,7 +67,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
       $res["popup"] = true;
       $res["popup_width"] = 700;
       $res["popup_height"] = 210;
-      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;date=".$time["date"];
+      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;date=".$params["date"];
       $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     } else {
       $res["name"] = "&nbsp;";
@@ -384,6 +384,7 @@ function dis_time_planning_month($obm_q, $time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_planning($time) {
   global $auth, $cdg_param;
+
   if ($time["interval"] == "week") {
     $task_q = run_query_time_task_one_week($time, '');
     $block = dis_time_planning_week($task_q, $time);
@@ -875,16 +876,21 @@ function dis_time_form_addtask($time, $validate_days) {
        <input type=\"submit\" value=\"$l_update\" />
       </td>";
 
-    // Script that prefill values
+    // Script that prefill values (only if tasktype has project and tasks)
+    if ($is_proj > 0) {
+      $dis_select_defaults = "
+        fill_projecttask(document.f_add_task.sel_projecttask, \"$is_proj\");
+        select_default(document.f_add_task.sel_project, $is_proj);
+        select_default(document.f_add_task.sel_projecttask, \"$is_projtask\");
+";
+    }
     $dis_script .= "
       <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />
       <script type=\"text/javascript\">
         fill_project(document.f_add_task.sel_project,
           document.f_add_task.sel_tasktype.value,
           document.f_add_task.sel_projecttask);
-        fill_projecttask(document.f_add_task.sel_projecttask, \"$is_proj\");
-        select_default(document.f_add_task.sel_project, $is_proj);
-        select_default(document.f_add_task.sel_projecttask, \"$is_projtask\");
+        $dis_select_defaults
       </script>";
 
     // New timetask -----------------------------------------------------------

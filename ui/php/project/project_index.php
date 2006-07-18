@@ -456,8 +456,8 @@ function get_project_params() {
 
   // Get global params
   $params = get_global_params("Project");
-  // Get project specific params
 
+  // Get project specific params
   $nb_mem = 0;
   $nb_tsk = 0;
 

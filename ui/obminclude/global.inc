@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.0pre18";
+$obm_version = "1.2.0pre19";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -807,10 +807,7 @@ function get_global_params($table="") {
 
     // Add value in hash table
     if (is_array($value)) {
-      //external call 
-
-        $params[$key] = $value;
-
+      $params[$key] = $value;
     } else if ($value != "") {
       $params[$key] = trim(strip_tags($value));
     }

@@ -15,7 +15,7 @@ $l_activity = "Attività";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Details";
-$l_vat = "EU VAT";
+$l_vat = "Part. IVA";
 
 // Labels and texts
 $l_contact_new = "Nuovo Contatto";

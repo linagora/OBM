@@ -348,13 +348,17 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_incident_params() {
-  global $cb_archive, $tf_color;
+  global $cb_archive, $tf_color, $contract_new_id;
   
   // Get global params
   $params = get_global_params("Incident");
   
-  // Get company specific params
+  // Get incident specific params
   $params["archive"] = ( ($cb_archive == '1') ? '1' : '0');
+
+  // Contract update
+  if (isset ($contract_new_id)) $params["cont_new_id"] = $contract_new_id;
+
   // Admin - Priority fields
   $params["pri_color"] = (isset($tf_color) ? $tf_color : "");
 
