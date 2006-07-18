@@ -398,8 +398,8 @@ function html_project_planning($obm_q, $params) {
     $users[$u_id] = $obm_q->f("userobm_firstname")." ". $obm_q->f("userobm_lastname");
 
 
-    $planning[$u_id][$task_id]["$day"] = $obm_q->f("timetask_length")/8;
-    $planning[$u_id][$task_id]["length"] += $obm_q->f("timetask_length")/8;
+    $planning[$u_id][$task_id]["$day"] = $obm_q->f("timetask_length")/$c_day_fraction;
+    $planning[$u_id][$task_id]["length"] += $obm_q->f("timetask_length")/$c_day_fraction;
   }
 
   while (list($day,$val) = each($array_res)) {
@@ -412,7 +412,7 @@ function html_project_planning($obm_q, $params) {
       foreach($user_planning as $task_id => $work) {
         if(isset($work[$day])) {
           $length = $work[$day]*100;
-          $line[$u_id][$task_id] .= "<td ><div style=\"width:$length%;\">&nbsp;</div></td>";
+          $line[$u_id][$task_id] .= "<td title=\"$length%\" ><div style=\"width:$length%;\">&nbsp;</div></td>";
         } else {
           $line[$u_id][$task_id] .= "<td></td>";
         }

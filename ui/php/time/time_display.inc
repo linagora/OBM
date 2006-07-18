@@ -444,8 +444,8 @@ function dis_time_user_planning($obm_q, $time) {
     $type = $obm_q->f("type");
     $projects[$type.$project_id] = "<abbr title=\"".$obm_q->f("label")."\">".substr($obm_q->f("label"),0,10)."...</abbr>";
     $users[$u_id] = $obm_q->f("userobm_firstname")." ". $obm_q->f("userobm_lastname");
-    $planning[$u_id][$type.$project_id]["$day"] = $obm_q->f("timetask_length")/8;
-    $planning[$u_id][$type.$project_id]["length"] += $obm_q->f("timetask_length")/8;
+    $planning[$u_id][$type.$project_id]["$day"] = $obm_q->f("timetask_length")/$c_day_fraction;
+    $planning[$u_id][$type.$project_id]["length"] += $obm_q->f("timetask_length")/$c_day_fraction;
   }
 
   while (list($day,$val) = each($array_res)) {
@@ -458,7 +458,7 @@ function dis_time_user_planning($obm_q, $time) {
       foreach($user_planning as $project_id => $work) {
         if(isset($work[$day])) {
           $length = $work[$day]*100;
-          $line[$u_id][$project_id] .= "<td ><div style=\"width:$length%;\">&nbsp;</div></td>";
+          $line[$u_id][$project_id] .= "<td title=\"$length%\"><div style=\"width:$length%;\">&nbsp;</div></td>";
         } else {
           $line[$u_id][$project_id] .= "<td></td>";
         }
