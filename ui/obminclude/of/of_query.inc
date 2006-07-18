@@ -1420,7 +1420,6 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
   } else {
     // Commented as this breaks mail encoding
     // $headers.="Mime-Version: 1.0\nContent-Type: text/plain;\n charset=$charset\n"; 
-    $headers .= "Mime-Version: 1.0\nContent-Type: multipart/mixed;\n boundary=\"$boundary\"\n"; 
   } 
   $headers .= "X-Mailer: OBM $obm_version\n";
   
@@ -1476,12 +1475,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force="", $h_file=
       $msg .= $sep.$content;
     }
   } else {
-    $ctencoding = "quoted-printable";
-    // $disposition="inline";  // Not used for now
-    // $body=iconv("ISO-8859-1","UTF-8",$body);
-    $msg .="This is a multi-part message in MIME format.\n--$boundary\n";
-    $msg .= "Content-Type: text/plain; charset=\"$charset\"\n";
-    $msg .= "Content-Transfer-Encoding: $ctencoding\n\n" . $body ."\n";
+    $msg = $message; 
   }
 
   if ($reci_list != "") {
