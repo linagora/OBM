@@ -123,13 +123,17 @@ function html_project_search_form ($tts, $member_q, $project) {
       $internal = $one_tt["internal"];
       // put menu titles
       if ($internal != $type_prec) {
-	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$internal]." </option>";
+        if($type_prec != "") {
+          $sel_tt .= "</optgroup>";
+        }
+        $sel_tt .= "<optgroup label=\"".$task_list[$internal]."\">";        
 	$type_prec = $internal;
       }
       $sel_tt .= "\n<option value=\"$id\"";
       if ($tt == $id) $sel_tt .= "selected =\"selected\"";
-      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+      $sel_tt .= ">$tt_label</option>\n";
     }
+    $sel_tt .= "</optgroup>";
     $sel_tt .= "</select>";
   }
 
@@ -1143,7 +1147,7 @@ function html_project_form($action, $project_q, $project) {
   $task_list = array($ctt_sales=>$l_tt_sales,
 		     $ctt_research=>$l_tt_research,
 		     $ctt_others=>$l_tt_others);
-  $type_prec = -1;
+  $type_ddec = -1;
   $sel_tt = "
         <select id=\"sel_tt\" name=\"sel_tt\">
           <option value=\"$c_undef\">$l_undef</option>";
@@ -1153,13 +1157,17 @@ function html_project_form($action, $project_q, $project) {
       $internal = $one_tt["internal"];
       // put menu titles
       if ($internal != $type_prec) {
-	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$internal]." </option>";
+        if($type_prec != "") {
+          $sel_tt .= "</optgroup>";
+        }
+        $sel_tt .= "<optgroup label=\"".$task_list[$internal]."\">";
 	$type_prec = $internal;
       }
       $sel_tt .= "\n<option value=\"$id\"";
       if ($tt == $id) $sel_tt .= "selected =\"selected\"";
-      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+      $sel_tt .= ">$tt_label</option>\n";
     }
+    $sel_tt .= "</optgroup>";
     $sel_tt .= "</select>";
   }
 
@@ -2290,7 +2298,10 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
       $tt_internal = $tasktype_q->f("tasktype_internal");
       //put menu titles
       if ($tt_internal != $type_prec) {
-	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+        if($type_prec != "") {
+          $sel_tt .= "</optgroup>";
+        }
+        $sel_tt .= "<optgroup label=\"".$task_list[$tt_internal]."\">";
 	$type_prec = $tt_internal;
       }
       $extra_js .= "
@@ -2300,6 +2311,7 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
       $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
   }
+  $sel_tt .= "</optgroup>";
   $sel_tt .= "</select>";
 
   // Project select construction
@@ -2401,7 +2413,10 @@ function html_project_reftask_selector($project,$projectreftask_q) {
       
       //put menu titles
       if ($tt_internal != $type_prec) {
-	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+        if($type_prec != "") {
+          $sel_tt .= "</optgroup>";
+        }
+        $sel_tt .= "<optgroup label=\"".$task_list[$tt_internal]."\">";
 	$type_prec = $tt_internal;
       }
       if ($tt_id != $old_tt_id) {
@@ -2416,6 +2431,7 @@ function html_project_reftask_selector($project,$projectreftask_q) {
       $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
   }
+  $sel_tt .= "</optgroup>";
   $sel_tt .= "</select>";
 
   // ProjectTask select construction
@@ -2480,9 +2496,9 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     myvalue = this.options[this.selectedIndex].value;
     forms.form_reftask_update.tf_reftask_label.value=mytext;
     types = forms.form_reftask_update.sel_tasktype.options;
-    for(key in types) {
-      if(types[key].value == tasktype[myvalue]) {
-        forms.form_reftask_update.sel_tasktype.selectedIndex = key;
+    for(k=0;k<types.length;k++) {
+      if(types[k].value == tasktype[myvalue]) {
+        forms.form_reftask_update.sel_tasktype.selectedIndex = k;
         break;
       }
     } 
@@ -2494,12 +2510,16 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     $projectreftask_id = $reftask_q->f("projectreftask_id");
     $projectreftask_name = addslashes($reftask_q->f("projectreftask_label"));
     if($tt_id != $old_tt_id) {
-      $sel_reftask .= "<option disabled=\"disabled\">$tt_label</option>";
+      if($old_tt_id != "") {
+        $sel_reftask .= "</optgroup>";
+      }
+      $sel_reftask .= "<optgroup label=\"".$tt_label."\">";
       $old_tt_id = $tt_id;
     }
     $extra_js .= "tasktype[$projectreftask_id] = $tt_id;";
     $sel_reftask .= "\n<option value=\"$projectreftask_id\">$projectreftask_name</option>";
   }
+  $sel_reftask .= "</optgroup>";
   $sel_reftask .= "</select>";
   $sel_tasktype = "<select size=\"8\" name=\"sel_tasktype\">";
   while($tasktype_q->next_record()) {
@@ -2508,12 +2528,16 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     $tt_id = $tasktype_q->f("tasktype_id");
 
     if ($tt_internal != $type_prec) {
-      $sel_tasktype .= "<option disabled=\"disabled\">".$task_list[$tt_internal]."</option>";
+      if($type_prec != "") {
+        $sel_tasktype .= "</optgroup>";
+      }
+      $sel_tasktype .= "<optgroup label=\"".$task_list[$tt_internal]."\">";      
       $type_prec = $tt_internal;
     }    
     $sel_tasktype .= "\n<option value=\"$tt_id\">$tt_label</option>";
 
   }
+  $sel_tasktype .= "</optgroup>";
   $sel_tasktype .= "</select>";
   // --- HTML Template --------------------------------------------------------
 

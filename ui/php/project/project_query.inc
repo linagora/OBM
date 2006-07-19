@@ -1826,8 +1826,7 @@ function run_query_project_reftask_update($params) {
 function run_query_project_reftask_delete($params) {
   global $cdg_sql, $cdg_param,$auth;
   $id = $params["reftask_id"];
-  $query = "DELETE ProjectRefTask 
-  WHERE projectreftask_id = '$id'";
+  $query = "DELETE FROM ProjectRefTask WHERE projectreftask_id = '$id'";
   display_debug_msg($query, $cdg_sql, "run_query_project_reftask_delete");
   $obm_q= new DB_OBM;
   return $obm_q->query($query);  

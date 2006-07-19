@@ -711,7 +711,6 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
 	  }
 	  $events_data = $day->get_events($id,$type);
 	  if (is_array($events_data)) {
-	    $list_events = $events_data["events"];
 	    foreach ($events_data as $event) {
 	      $dis_month_cal .= "<tr><td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	      dis_agenda_event_planning("month", $dis_month_cal,$hidden_div,$event,$nb_ent,$properties);	   
@@ -1145,9 +1144,9 @@ $hidden_div
 ///////////////////////////////////////////////////////////////////////////////
 function dis_agenda_plain_month_planning($agenda, $calendar_entity) { 
   global $set_theme,$ico_left_day,$ico_right_day;
-  global $cagenda_weekstart, $ico_new_event;
+  global $cagenda_weekstart, $ico_new_event,$l_all_day;
   global $cagenda_first_hour, $cagenda_last_hour;
-  global $l_private,$l_daysofweekfirst;
+  global $l_private,$l_daysofweekfirst,$l_daysofweek;
   $iso_date = $agenda["date"];
   $ts_date = strtotime($iso_date);  
   $this_month = get_month($ts_date);
@@ -1173,6 +1172,7 @@ function dis_agenda_plain_month_planning($agenda, $calendar_entity) {
     $day_num = date("w", $current_time);
     $this_day = date("j", $current_time);
     $day_label = $l_daysofweekfirst[$day_num];
+    $day_long_label = $l_daysofweek[$day_num];
     $iso_day = isodate_format($current_time);
     if (isset($events[$iso_day])) {
       $empty = false;
@@ -1185,16 +1185,47 @@ function dis_agenda_plain_month_planning($agenda, $calendar_entity) {
     $line1 .= "<td>$this_day</td>\n";
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
-        $list_events = $days_events[$type][$id];
         $line_id = $type." ".$id;
+        $haveevent = false;
         if($empty) {
           $line[$line_id] .= "<td></td>";
-        } elseif ($list_events != null) {
-          $line[$line_id] .= "<td class=\"".$properties["class"]."\"></td>";
         } else {
+          $today_events = array();
+          $list_events = $days_events[$type][$id];
           $events_data = $day->get_events($id,$type);
+          if ($list_events != null) {
+            $haveevent = true;
+            foreach ($list_events as $event) {
+              if ($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
+                $today_events[] = "$l_private : $l_all_day";
+              } else {
+                $today_events[] = $event->title." : $l_all_day";
+              }
+            }            
+          }
           if(is_array($events_data)) {
-            $line[$line_id] .= "<td  class=\"".$properties["class"]."\"></td>";
+            $haveevent = true;
+            foreach ($events_data as $event) {
+              if ($event->privacy == 1 && $auth->auth["uid"] != $id) {
+                $today_events[] = "$l_private : ".date("H:i",$event["date"])."-".date("H:i",$event["date"] + $event["event"]->duration);
+              } else {
+                $today_events[] = $event["event"]->title." : ".date("H:i",$event["date"])."-".date("H:i",$event["date"] + $event["event"]->duration);
+              }
+            }
+          }
+          if($haveevent) {
+            $hidden_div .= "
+              <div id=\"$id-$this_day\" class=\"eventData\" style=\"display:none;position:absolute;z-index:1000;\">
+               <div class=\"blockTitle\">::$day_long_label $this_day</div>
+               <ul class=\"blockItem\">
+               <li class=\"blockItem\">
+               ".implode("</li><li class=\"blockItem\">",$today_events)."
+                </li>
+               </ul>
+              </div>";            
+            $line[$line_id] .= "<td class=\"".$properties["class"]."\"
+                                    onMouseOver=\"agenda_show(event,'$id-$this_day'); return true;\"
+                                    onMouseOut=\"agenda_hide('$id-$this_day'); return true;\"></td>";
           } else {
             $line[$line_id] .= "<td></td>";
           }
@@ -1248,7 +1279,8 @@ function dis_agenda_plain_month_planning($agenda, $calendar_entity) {
   </thead>
   $d_l
   </table>
-    <div>
+  <div>
+  $hidden_div
     ";    
 
   return $block;

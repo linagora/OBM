@@ -80,7 +80,7 @@ $l_no_member_add = "Aucun participant à ajouter";
 $l_no_member_del = "Aucun participant à effacer";
 $l_add_member = "Ajouter des participants au projet";
 $l_board_no_data = "Le tableau de bord ne peut être affiché si les tâches ou les participants ne sont pas définis !";
-
+$l_select_task = "Veuillez sélectionner un tâche";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
 $l_fill_tt = "Vous devez indiquer la catégorie avant de valider.";

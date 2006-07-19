@@ -575,7 +575,7 @@ function get_agenda_action() {
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
        'update_decision','decision','update','delete', 'new_meeting',
        'view_month','view_week','view_day','view_year',
-		  'rights_admin','rights_update', 'waiting_events')
+		  'rights_admin','rights_update', 'waiting_events',"planning")
 		);
 
   // Detail Update
