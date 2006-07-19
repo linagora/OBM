@@ -154,7 +154,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $status = $contract["status"];
   $priority = $contract["priority"];
   $label = $contract["label"];
-  $comp = $contract["company_name"];
+  $comp = $contract["company"];
   $type_id = $contract["type"];
   $dateafter = $contract["dateafter"];
   $datebefore = $contract["datebefore"];
@@ -253,7 +253,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
 
   <div class=\"search\">
     <div class=\"searchLabel\">$l_number<br />
-      <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$num\" />
+      <input type=\"text\" name=\"tf_number\" size=\"20\" value=\"$num\" />
     </div>
     <div class=\"searchLabel\">$l_company<br />
       <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
@@ -329,7 +329,7 @@ function dis_contract_search_list($contract) {
 //   - $contract_q : contracts list
 //   - $prefs      : fields to display in the contracts list
 //   - $contract[] : contract search criteria
-//     keys used   : label, type, dateafter, datebefore, company_name, market
+//     keys used   : label, type, dateafter, datebefore, company, market
 //   - $popup      : popup flag tell if external parameters to handle
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
@@ -350,7 +350,7 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
   $type = $contract["type"];
   $dateafter = $contract["dateafter"];
   $datebefore = $contract["datebefore"];
-  $company = urlencode($contract["company_name"]);
+  $company = urlencode($contract["company"]);
   $manager = $contract["manager"];
   $priority = $contract["priority"];
   $status = $contract["status"];
@@ -890,7 +890,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["add_comment"])) { $add_comment = stripslashes($contract["add_comment"]); }
   if (isset($contract["usercomment"])) { $usercomment = $contract["usercomment"]; }
   if (isset($contract["datecomment"])) { $datecomment = $contract["datecomment"]; }
-  if (isset($contract["company_name"])) { $comp_name = stripslashes($contract["company_name"]); }
+  if (isset($contract["company"])) { $comp_name = stripslashes($contract["company"]); }
   if (isset($contract["company_ad1"])) { $ad1 = stripslashes($contract["company_ad1"]); }
   if (isset($contract["company_zip"])) { $zip = $contract["company_zip"]; }
   if (isset($contract["company_town"])) { $town = stripslashes($contract["company_town"]); }
@@ -1187,7 +1187,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" maxlength=\"40\" value=\"$label\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
+      <td class=\"detailForm\"><input name=\"tf_number\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
     </tr>
       $dis_vis
     <tr>
@@ -1397,9 +1397,8 @@ function export_contract($co_q) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a contract insertion or update                  //
+// Display the context about a contract insertion or update
 // When similar contracts exists we show these and ask confirmation
 // Parameters:
 //   - $c_id       : contract id

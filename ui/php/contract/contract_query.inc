@@ -24,7 +24,7 @@ function run_query_contract_search($contract) {
   $type = $contract["type"];
   $dateafter = $contract["dateafter"];
   $datebefore = $contract["datebefore"];
-  $comp = sql_search_text_parse($contract["company_name"]);
+  $comp = sql_search_text_parse($contract["company"]);
   $num = sql_search_text_parse($contract["number"]);
   $manager = $contract["manager"];
   $deal = $contract["deal_id"];
@@ -144,7 +144,7 @@ function run_query_contract_search($contract) {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_contract_search()");
     $obm_q->query($query);
   }
 
@@ -1125,7 +1125,7 @@ function run_query_check_contract($c_id, $name) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_context($c_id, $contract) {
 
-  $num = $contract["num"];
+  $num = $contract["number"];
   $name = $contract["label"];
  
   // if a company with same name and zip exists, return false

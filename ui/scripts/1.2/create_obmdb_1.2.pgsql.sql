@@ -645,8 +645,7 @@ CREATE TABLE DealCompany (
   dealcompany_deal_id     integer NOT NULL default 0,
   dealcompany_company_id  integer NOT NULL default 0,
   dealcompany_role_id     integer NOT NULL default 0,
-  PRIMARY KEY (dealcompany_id),
-  INDEX dealcompany_idx_deal (dealcompany_deal_id)
+  PRIMARY KEY (dealcompany_id)
 );
 CREATE INDEX dealcompany_idx_deal ON DealCompany (dealcompany_deal_id);
 

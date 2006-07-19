@@ -88,6 +88,7 @@ CREATE TABLE Payment (
 -------------------------------------------------------------------------------
 ALTER TABLE PaymentKind ADD COLUMN paymentkind_label varchar(40);
 ALTER TABLE PaymentKind ALTER COLUMN paymentkind_label SET DEFAULT '';
+UPDATE PaymentKind SET paymentkind_label = '' WHERE paymentkind_label IS NULL;
 ALTER TABLE PaymentKind ALTER COLUMN paymentkind_label SET NOT NULL;
 UPDATE PaymentKind SET paymentkind_label = paymentkind_longlabel;
 ALTER TABLE PaymentKind DROP COLUMN paymentkind_longlabel;
@@ -141,8 +142,7 @@ CREATE TABLE DealCompany (
   dealcompany_deal_id     integer NOT NULL default 0,
   dealcompany_company_id  integer NOT NULL default 0,
   dealcompany_role_id     integer NOT NULL default 0,
-  PRIMARY KEY (dealcompany_id),
-  INDEX dealcompany_idx_deal (dealcompany_deal_id)
+  PRIMARY KEY (dealcompany_id)
 );
 CREATE INDEX dealcompany_idx_deal ON DealCompany (dealcompany_deal_id);
 
@@ -190,7 +190,8 @@ CREATE TABLE Lead (
 -------------------------------------------------------------------------------
 -- Project module tables
 -------------------------------------------------------------------------------
-ALTER TABLE Project ADD COLUMN project_shortname varchar(10) SET DEFAULT '';
+ALTER TABLE Project ADD COLUMN project_shortname varchar(10);
+ALTER TABLE Project ALTER COLUMN project_shortname SET DEFAULT '';
 
 
 --
@@ -252,7 +253,7 @@ CREATE TABLE Region (
 
 ALTER TABLE Deal ADD COLUMN deal_region_id integer;
 ALTER TABLE Deal ALTER COLUMN deal_region_id SET DEFAULT 0;
-UPDATE Deal SET deal_regionid=0;
+UPDATE Deal SET deal_region_id=0;
 ALTER TABLE Deal ALTER COLUMN deal_region_id SET NOT NULL;
 
 

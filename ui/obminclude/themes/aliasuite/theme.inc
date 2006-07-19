@@ -33,7 +33,7 @@ $ico_delete	    = "ico_delete.gif";
 // Menus Icons
 $ico_contact        = "ico_contact.gif";         // Contact Icon
 $ico_contact_new    = "ico_contact_new.gif";     // New Contact Icon
-$ico_lead           = "ico_lead.gif";            // Lead Icon
+$ico_lead           = "../standard/ico_lead.gif";            // Lead Icon
 $ico_deal           = "ico_deal.gif";            // Deal Icon
 $ico_parentdeal     = "ico_deal.gif";            // Deal Icon
 $ico_deal_new       = "ico_deal_new.gif";        // New Deal Icon
