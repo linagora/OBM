@@ -246,6 +246,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $name = $project["name"];
   $company_name = $project["company_name"];
   $tt = $project["tt"];
+  $manager = $project["manager"];
   $member = $project["member"];
   $archive = $project["archive"];
 
@@ -259,7 +260,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cb_archive=$archive$url_ext");
 
   $proj_d = new OBM_DISPLAY("DATA", $prefs, "project");
   if ($popup) {
@@ -1198,7 +1199,7 @@ function html_project_form($action, $project_q, $project) {
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
 
     $dis_action = "

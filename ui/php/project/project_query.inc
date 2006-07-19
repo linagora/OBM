@@ -24,6 +24,7 @@ function run_query_project_search($params) {
   $company_name = sql_search_text_parse($params["company_name"]);
   $company = $params["company_id"];
   $deal = $params["deal_id"];
+  $manager = $params["manager"];
   $member = $params["member"];
   $archive = $params["archive"];
   $date = $params["datebegin"];
@@ -73,6 +74,14 @@ function run_query_project_search($params) {
                 AND Member.projectuser_projecttask_id is null";
   }
 
+  if (($manager != "") && ($manager != $c_all)) {
+    $join_member = "LEFT JOIN ProjectUser as Member
+                      ON project_id=Member.projectuser_project_id
+                        AND Member.projectuser_manager = 1";
+    $where .= " AND Member.projectuser_user_id = '$manager'
+                AND Member.projectuser_projecttask_id is null";
+  }
+
   $whereq = "WHERE $where";
 
   // Order by clause
@@ -98,7 +107,7 @@ function run_query_project_search($params) {
     $whereq
     $orderq
     $limit
- ";
+";
 
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(*) FROM Project $join_comp $join_member $whereq");
