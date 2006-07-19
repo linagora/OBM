@@ -1,17 +1,17 @@
 <html>
 <head>
-<title>Basic steps to build and install OBM 1.0.x</title>
+<title>Basic steps to build and install OBM 1.2.x</title>
 </head>
 <!-- $Id$ -->
 <body bgcolor="#FFFFFF">
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 1.1.x
+<p />These docs are valid for OBM 1.2.x
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
-<h1>Basic steps to build and install OBM 1.1..x</h1>
+<h1>Basic steps to build and install OBM 1.2..x</h1>
 
 <h2> Assumptions</h2>
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-1.1.0.tar.gz
-tar -C /var/www -xzvf obm-1.1.0.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-1.2.0.tar.gz
+tar -C /var/www -xzvf obm-1.2.0.tar.gz
 cd /var/www
-ln -s obm-1.1.0 obm
+ln -s obm-1.2.0 obm
 </pre>
   </td>
 </tr>
@@ -308,7 +308,7 @@ $gp_mail_enabled = false;
 
 <h3>4.2: Document repository</h3>
 
-Since OBM 1.1.0, the document repository is automatically handled by OBM.
+Since OBM 1.2.0, the document repository is automatically handled by OBM.
 In the install step OBM populate the repository configured with some structured directories for internal storage.
 <br />
 Declare your document repository
@@ -337,12 +337,12 @@ $ chmod a+rwx /var/www/obmdocuments
 
 
 <h3>4.3: Database Configuration and Creation</h3>
-The scripts are in the scripts/1.1 directory.
+The scripts are in the scripts/1.2 directory.
 
 <h4>4.3.1: Default Data language</h4>
 
 Some references values are inserted by default. These values can be in french (by default) or in english.
-To toggle these to english for installation edit the file scripts/1.1/install_obmdb_1.1.mysql.sh (pr pgsql) and change the DATA_LANG value to en :
+To toggle these to english for installation edit the file scripts/1.2/install_obmdb_1.2.mysql.sh (pr pgsql) and change the DATA_LANG value to en :
 
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -375,15 +375,15 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* 
 </table>
 <p />
 
-The script <i>install_obmdb_1.1.mysql.sh</i> handle all the database creation steps.
+The script <i>install_obmdb_1.2.mysql.sh</i> handle all the database creation steps.
 <br>
 Set the correct User / password (or DB) in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-cd obm/scripts/1.1
-emacs /install_obmdb_1.1.mysql.sh
-./install_obmdb_1.1.mysql.sh
+cd obm/scripts/1.2
+emacs /install_obmdb_1.2.mysql.sh
+./install_obmdb_1.2.mysql.sh
 </pre>
   </td>
 </tr>
@@ -406,7 +406,7 @@ create database obm with owner = obm;
 
 <h5>4.3.3.1: Encoding</h5>
 If your Postgres server is not configured with latin1 character set:
- edit the file scripts/1.1/postgres-pre.sql and uncomment the line (now uncommented by default)
+ edit the file scripts/1.2/postgres-pre.sql and uncomment the line (now uncommented by default)
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
@@ -420,15 +420,15 @@ OBM should in the future be converted to UTF8 by default.
 <p />
 
 <h5>4.3.3.2: Install</h5>
-The script <i>install_obmdb_1.1.pgsql.sh</i> handle all the database creation steps.
+The script <i>install_obmdb_1.2.pgsql.sh</i> handle all the database creation steps.
 <br>
 Edit User / password (or DB) infos in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-cd obm/scripts/1.1
-emacs install_obmdb_1.1_pgsql.sh
-./install_obmdb_1.1_pgsql.sh
+cd obm/scripts/1.2
+emacs install_obmdb_1.2_pgsql.sh
+./install_obmdb_1.2_pgsql.sh
 </pre>
   </td>
 </tr>
@@ -454,14 +454,14 @@ emacs install_obmdb_1.1_pgsql.sh
 
 
 <p/>
-<a name="upgrade"><h1>UPGRADE from version 1.0.x to version 1.1.x</h1></a>
+<a name="upgrade"><h1>UPGRADE from version 1.1.x to version 1.2.x</h1></a>
 
 <h3>Update Database model</h3>
 # MySQL
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-mysql -u obm -pobm obm < scripts/1.1/update-1.0-1.1.mysql.sql
+mysql -u obm -pobm obm < scripts/1.2/update-1.1-1.2.mysql.sql
 </pre>
   </td>
 </tr>
@@ -471,19 +471,7 @@ mysql -u obm -pobm obm < scripts/1.1/update-1.0-1.1.mysql.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-psql -U obm obm < scripts/1.1/update-1.0-1.1.pgsql.sql
-</pre>
-  </td>
-</tr>
-</table>
-
-
-<h3>Update data to new database model</h3>
-
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-php scripts/1.1/update-1.0-1.1.php
+psql -U obm obm < scripts/1.2/update-1.1-1.2.pgsql.sql
 </pre>
   </td>
 </tr>
@@ -495,7 +483,7 @@ php scripts/1.1/update-1.0-1.1.php
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-mysql -u obm -pobm obm < scripts/1.1/obmdb_default_values_1.1.sql
+mysql -u obm -pobm obm < scripts/1.2/obmdb_default_values_1.2.sql
 </pre>
   </td>
 </tr>
@@ -505,7 +493,7 @@ mysql -u obm -pobm obm < scripts/1.1/obmdb_default_values_1.1.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-psql -U obm obm < scripts/1.1/obmdb_default_values_1.1.sql
+psql -U obm obm < scripts/1.2/obmdb_default_values_1.2.sql
 </pre>
   </td>
 </tr>
@@ -531,7 +519,7 @@ A naf code dump is available (french naf codes). It has not been updated from 1.
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-mysql -u obm -pobm obm < scripts/1.1/data-fr/obmdb_nafcode_1.1.sql
+mysql -u obm -pobm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
 </pre>
   </td>
 </tr>
@@ -541,7 +529,7 @@ mysql -u obm -pobm obm < scripts/1.1/data-fr/obmdb_nafcode_1.1.sql
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-psql -U obm obm < scripts/1.1/data-fr/obmdb_nafcode_1.1.sql
+psql -U obm obm < scripts/1.2/data-fr/obmdb_nafcode_1.2.sql
 </pre>
   </td>
 </tr>
