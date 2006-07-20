@@ -717,7 +717,7 @@ function get_project_action() {
      'Right'    => $cright_read,
     'Condition'=> array ('all','!ext_get_id','!index','!search','!new','!display','!dispref_display','!dispref_level')
                                        	 );
-// Detail Consult
+// Planning
   $actions["project"]["planning"]  = array (
     'Name'     => $l_header_planning,
     'Url'      => "$path/project/project_index.php?action=planning&amp;project_id=".$params["project_id"]."",
@@ -816,11 +816,17 @@ function update_project_action() {
   // Select Member
   $actions["project"]["sel_member"]['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$params["project_id"]."&amp;ext_target=$l_project";
 
+  // Time Allocation
+  $actions["project"]["allocate"]['Url'] = "$path/project/project_index.php?action=allocate&amp;project_id=".$params["project_id"];
+
   // Advance
   $actions["project"]["advance"]['Url'] = "$path/project/project_index.php?action=advance&amp;project_id=".$params["project_id"];
 
   // Dashboard
   $actions["project"]["dashboard"]['Url'] = "$path/project/project_index.php?action=dashboard&amp;project_id=".$params["project_id"];
+
+  // Planning
+  $actions["project"]["planning"]['Url'] = "$path/project/project_index.php?action=planning&amp;project_id=".$params["project_id"];
 
 }
 

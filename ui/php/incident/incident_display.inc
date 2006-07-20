@@ -721,7 +721,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
       <div class=\"detailHead\">$l_solution</div>
         <table class=\"detail\">
           <tr>
-            <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_solu\" rows=\"6\" cols=\"60\">$solu</textarea></td>
+            <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_solution\" rows=\"6\" cols=\"60\">$solu</textarea></td>
           </tr>
         </table>
       <div class=\"detailHead\">$l_comment</div>

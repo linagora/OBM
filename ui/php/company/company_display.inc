@@ -30,9 +30,9 @@ $fieldnames["company_fax"] = $l_fax;
 $fieldnames["company_email"] = $l_email;
 $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
-$fieldnames["companytype_label"] = $l_type;
-$fieldnames["companyactivity_label"] = $l_activity;
-$fieldnames["companynafcode_code"] = $l_nafcode;
+$fieldnames["type_label"] = $l_type;
+$fieldnames["activity_label"] = $l_activity;
+$fieldnames["nafcode_code"] = $l_nafcode;
 $fieldnames["company_contact_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"C\" />";
 $fieldnames["company_new_contact"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" alt=\"NC\" />";
 $fieldnames["company_deal_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"D\" />";

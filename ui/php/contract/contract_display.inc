@@ -204,7 +204,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $sel_kind = "<select name=\"rd_kind\">
               <option value=\"$c_all\">$l_all</option>
               <option value=\"$cck_customer\" ";
-  if ($kind == $cck_customer) {
+  if ($kind === "$cck_customer") {
     $sel_kind .= " selected=\"selected \" ";
   }
   $sel_kind .= ">$l_cck_customer</option>";

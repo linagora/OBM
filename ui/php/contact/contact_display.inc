@@ -14,7 +14,7 @@
 // Direct fields
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
-$fieldnames["contactfunction_label"] = $l_function;
+$fieldnames["function_label"] = $l_function;
 $fieldnames["contact_title"] = $l_title;
 $fieldnames["kind_minilabel"] = $l_kind;
 $fieldnames["kind_header"] = $l_header;

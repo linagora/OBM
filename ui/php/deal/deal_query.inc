@@ -1090,6 +1090,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
       deal_id,
       deal_id as id,
       deal_marketingmanager_id AS uid,
+      deal_company_id,
       deal_label,
       deal_source_id,
       deal_source,
