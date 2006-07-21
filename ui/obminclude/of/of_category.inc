@@ -442,7 +442,6 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
       }
     }
     if (is_array($tree)) {
-      print_r($tree);
       $block .= _of_category_dis_tree_node($tree, 0, $multi_select);
     }
   } else {
