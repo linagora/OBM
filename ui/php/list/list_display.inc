@@ -1214,7 +1214,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
+    <td class=\"detailForm\"><select multiple=\"multiple\" name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
       <script>calendar('tf_company_timebefore','$company_timebefore')</script>
     </td> 

@@ -304,8 +304,20 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg("$l_type : $l_delete_error");
   }
   $display["detail"] = dis_contract_admin_index();
-}
 
+} elseif ($action == "document_add")  {
+///////////////////////////////////////////////////////////////////////////////
+  $params["contract_id"] = $params["ext_id"];
+  if ($params["doc_nb"] > 0) {
+    $nb = run_query_global_insert_documents($params, "contract");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+  if ($params["contract_id"] > 0) {
+    $display["detail"] = dis_contract_consult($params);
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -341,7 +353,8 @@ function get_contract_params() {
  $params["sta_code"] = (isset($tf_code) ? $tf_code : "0");
   
   display_debug_param($params);
-  
+  get_global_params_document($params);
+
   return $params;
 }
 

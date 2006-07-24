@@ -536,7 +536,10 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id="") {
 function run_query_global_insert_documents($ids, $entity) {
   global $cdg_sql;
 
-  $id = $ids["id"];
+  $id = $ids[$entity."_id"];
+  if($id == "") {
+    $id = $ids["ext_id"];
+  }
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $ids["doc_nb"]) {

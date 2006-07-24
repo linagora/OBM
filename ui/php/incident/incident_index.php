@@ -272,7 +272,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "category2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("incident", "category2", $incident);
+  $retour = of_category_query_insert("incident", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
   } else {
@@ -282,7 +282,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "category2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("incident", "category2", $incident);
+  $retour = of_category_query_update("incident", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
   } else {
@@ -292,11 +292,11 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "category2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("incident", "category2", $incident, "mono");
+  $display["detail"] .= of_category_dis_links("incident", "category2", $params, "mono");
 
 } elseif ($action == "category2_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("incident", "category2", $incident);
+  $retour = of_category_query_delete("incident", "category2", $params);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
   } else {
@@ -306,13 +306,14 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($incident["doc_nb"] > 0) {
-    $nb = run_query_global_insert_documents($incident, "incident");
+  $params["incident_id"] = $params["ext_id"];
+  if ($params["doc_nb"] > 0) {
+    $nb = run_query_global_insert_documents($params, "incident");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $display["detail"] = dis_incident_consult($incident);
+  $display["detail"] = dis_incident_consult($params);
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -361,6 +362,8 @@ function get_incident_params() {
 
   // Admin - Priority fields
   $params["pri_color"] = (isset($tf_color) ? $tf_color : "");
+
+  get_global_params_document($params);
 
   display_debug_param($params);
 

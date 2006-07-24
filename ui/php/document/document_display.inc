@@ -194,7 +194,7 @@ function html_document_search_list($doc_q, $prefs, $document) {
     $ext_target = $document["ext_target"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
   }  
-  $url = url_prepare("document_index.php?tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;param_entity=$entity_id&amp;action=search$url_ext");
+  $url = url_prepare("document_index.php?tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;entity_id=$entity_id&amp;action=search$url_ext");
 
   $doc_d = new OBM_DISPLAY("DATA", $prefs, "document");
 
@@ -564,7 +564,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\">
     <input type=\"hidden\" name=\"upload\" value=\"yes\">
     $dis_button
-    <input type=\"hidden\" name=\"param_entity\" value=\"$entity_id\" />
+    <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"entity\" value=\"$entity\" />
     </p>
     </div>

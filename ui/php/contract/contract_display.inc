@@ -402,7 +402,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
-  global $path, $auth, $cgp_show;
+  global $path, $auth, $cgp_show,$popup_height,$popup_width;
   
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;contract_id=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;contract_id=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
@@ -429,8 +429,8 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 
   // Document  
   if ($cgp_show["module"]["document"]) {
-    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contract");
-    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contract");
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=Contract");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=Contract");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contract/contract_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contract";
 
     $nb_document = run_query_global_document_nb ($id,"Contract");
@@ -444,7 +444,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
 	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
-	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	<a href=\"\" onclick=\"window.name='$l_contract'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
   }

@@ -826,26 +826,16 @@ function get_global_params($table="") {
 //   $lang
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_params_document(&$mod_params) {
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
-
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
+  $nb_d = 0;
+  foreach($_REQUEST as $key => $value) {
+    if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+      $nb_d++;
+      $d_num = substr($key, 4);
+      $mod_params["doc$nb_d"] = $d_num;
+    }
   }
-
-  if (isset ($http_obm_vars)) {
-    $nb_d = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
-	$nb_d++;
-	$d_num = substr($key, 4);
-	$mod_params["doc$nb_d"] = $d_num;
-      }
-    }
-    if ($nb_d > 0) {
-      $mod_params["doc_nb"] = $nb_d;
-    }
+  if ($nb_d > 0) {
+    $mod_params["doc_nb"] = $nb_d;
   }
 
   return true;

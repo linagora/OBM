@@ -380,6 +380,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "document_add") {
 ///////////////////////////////////////////////////////////////////////////////
+  $params["company_id"] = $params["ext_id"];
   if ($params["doc_nb"] > 0) {
     $nb = run_query_global_insert_documents($params, "company");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
