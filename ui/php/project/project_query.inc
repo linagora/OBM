@@ -282,7 +282,7 @@ function run_query_project_insert($params) {
   $tt = $params["tt"];
   $comp = ($params["company_id"] ? "'".$params["company_id"]."'" : "null");
   $deal = ($params["deal_id"] ? "'".$params["deal_id"]."'" : "null");
-  $task = $params["tasklabel"];
+  $task = trim($params["tasklabel"]);
   $member = $params["member"];
   $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
   $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
@@ -463,7 +463,7 @@ function run_query_project_insert($params) {
 // Update query execution
 // Parameters:
 //   - $pid       : project id
-//   - $params[] : Entry's values
+//   - $params[] : Entry's va)lues
 //     keys used  : name, soldtime, tt
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_update($pid, $params) {
@@ -610,7 +610,8 @@ function run_query_project_task_insert($params) {
 
   $pid = $params["project_id"];
   $ptask = $params["ptask"];
-  $tasklabel = $params["tasklabel"];
+  $tasklabel = trim($params["tasklabel"]);
+  $ref_task = $params["reftask_id"];
 
   $search_q = new DB_OBM;
 
@@ -630,26 +631,47 @@ function run_query_project_task_insert($params) {
   }
 
   if (($ptask == 0) or ($search_q->nf() == 0))  {
-    $query = "
-      INSERT INTO ProjectTask (
+    $obm_q = new DB_OBM;
+    if($tasklabel != "") {
+      $query = "
+        INSERT INTO ProjectTask (
+          projecttask_project_id,
+          projecttask_timecreate,
+          projecttask_usercreate,
+          projecttask_label,
+          projecttask_parenttask_id,
+          projecttask_rank)
+        VALUES (
+          '$pid',
+          '". date("Y-m-d H:i:s") ."',
+          '". $auth->auth["uid"] ."',
+          '$tasklabel',
+          '$ptask',
+          '1')";
+
+      display_debug_msg($query, $cdg_sql, "run_query_project_task_insert(2)");
+      $obm_q->query($query);
+    }
+    if(is_array($ref_task)) {
+      $query = "
+        INSERT INTO ProjectTask (
         projecttask_project_id,
         projecttask_timecreate,
         projecttask_usercreate,
         projecttask_label,
         projecttask_parenttask_id,
         projecttask_rank)
-      VALUES (
+        SELECT 
         '$pid',
         '". date("Y-m-d H:i:s") ."',
-        '". $auth->auth["uid"] ."',
-        '$tasklabel',
+        '$uid',
+        projectreftask_label,
         '$ptask',
-        '1')";
-
-    display_debug_msg($query, $cdg_sql, "run_query_project_task_insert(2)");
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-  
+        '1' FROM ProjectRefTask WHERE
+        projectreftask_id IN (".implode(",",$ref_task).")";
+      display_debug_msg($query, $cdg_sql, "run_query_project_insert (create ref task)");
+      $obm_q->query($query);
+    }    
     return $obm_q;
   } else {
     return 0;
@@ -1478,9 +1500,9 @@ function check_project_task_form($pid, $params) {
   $task = $params["task"];
   $ptask = $params["ptask"];
   $tasklabel = $params["tasklabel"];
-
+  $ref_task = $params["reftask_id"];
   // MANDATORY: task label
-  if (trim($tasklabel) == "") {
+  if (trim($tasklabel) == "" && !is_array($ref_task)) {
     $err_msg = $l_fill_tasklabel;
     return false;
   }

@@ -86,23 +86,26 @@ function check_project(form) {
     alert (\"$l_fill_tt\");
     return false;
   }
+  try {
 
-  // MANDATORY : Check that the Project soldtime is not empty
-  else if (trim(form.tf_soldtime.value) == \"\") {
-    alert (\"$l_fill_soldtime\");
-    return false;
-  }
+    // MANDATORY : Check that the Project soldtime is not empty
+    if (trim(form.tf_soldtime.value) == \"\") {
+      alert (\"$l_fill_soldtime\");
+      return false;
+    }
 
-  // MANDATORY : Check that the Project soldtime is a number
-  else if (!(check_number(form.tf_soldtime.value))) {
-    alert (\"$l_fill_soldnumber\");
-    return false;
-  }
+    // MANDATORY : Check that the Project soldtime is a number
+    else if (!(check_number(form.tf_soldtime.value))) {
+      alert (\"$l_fill_soldnumber\");
+      return false;
+    }
 
-  // MANDATORY : Check that the Project soldtime is not null
-  else if ((form.tf_soldtime.value) == 0) {
-    alert (\"$l_fill_soldnumber\");
-    return false;
+    // MANDATORY : Check that the Project soldtime is not null
+    else if ((form.tf_soldtime.value) == 0) {
+      alert (\"$l_fill_soldnumber\");
+      return false;
+    }
+  } catch (err) {
   }
   return true;
 } 
@@ -113,14 +116,8 @@ function check_project(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_taskadd(form)
 {
-  // MANDATORY : Check that the ProjectTask label is not empty
-  if (trim(form.tf_tasklabel.value) == \"\") {
-    alert (\"$l_fill_tasklabel\");
-    return false;
-  }
-  else {
+
     return true;
-  }
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Select the task add form                                                  //

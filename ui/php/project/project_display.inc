@@ -1330,9 +1330,10 @@ function dis_can_delete_project($p_id) {
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_task_form($ptask_q, $project) {
-  global $display, $c_undef, $l_undef;
+  global $display, $c_undef, $l_undef,$popup_height,$ico_project;
   global $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
-  global $l_task_update, $l_task_upd, $l_task;
+  global $l_task_update, $l_task_upd, $l_task,$l_tasks,$set_theme;
+  global $popup_width;
   
   $pid = $project["project_id"];
   $pname = $project["name"];
@@ -1402,6 +1403,9 @@ function html_project_task_form($ptask_q, $project) {
 
   // --- HTML Template --------------------------------------------------------
 
+
+    $url = "$path/project/project_index.php?action=ext_get_reftask_ids&amp;popup=1&amp;ext_element=sel_task_id";
+
   $block = "
    $js_script
    <form method=\"post\" name=\"f_entity\"
@@ -1414,8 +1418,16 @@ function html_project_task_form($ptask_q, $project) {
     <tr>
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
-    </tr>
-    <tr>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_tasks
+      <a href=\"javascript: return false;\" 
+        onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+        return false;\">
+         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"[Add]\" />
+        </a>  
+    </td>
+    <td class=\"detailForm\" id=\"sel_task_id\">$dis_sel_tasks</td>      
+    </tr><tr>
       <td class=\"detailLabel\">$l_parent</td>
       <td class=\"detailForm\">
       $sel_ptask
