@@ -109,9 +109,10 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
   global $c_all, $l_all, $l_label, $l_id, $l_find;
   global $l_owner, $l_logger,$l_company,$l_contract;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
-  global $l_date_after,$l_date_before,$l_archive;
+  global $l_date_after,$l_date_before,$l_archive,$l_reference;
 
   $lincident = stripslashes($incident["lincident"]);
+  $reference = stripslashes($incident["reference"]);
   $i_id = $incident["incident_id"];
   $lcontract = stripslashes($incident["lcontract"]);
   $priority = $incident["priority"];
@@ -162,6 +163,9 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
        <div class=\"searchLabel\">$l_label<br />
          <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
        </div>
+       <div class=\"searchLabel\">$l_reference<br />
+         <input type=\"text\" name=\"tf_reference\" size=\"16\" value=\"$reference\" />
+       </div>         
        <div class=\"searchLabel\">$l_id<br />
          <input type=\"text\" name=\"tf_id\" size=\"10\" value=\"$i_id\" />
        </div>

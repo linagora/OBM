@@ -2309,7 +2309,7 @@ function html_project_task_selector($project,$project_q,$tasktype_q) {
         projects[$tt_id] = new Array();";    
       $sel_tt .= "\n<option value=\"$tt_id\"";
       if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
-      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+      $sel_tt .= ">$tt_label</option>\n";
     }
   }
   $sel_tt .= "</optgroup>";
@@ -2422,14 +2422,14 @@ function html_project_reftask_selector($project,$projectreftask_q) {
       }
       if ($tt_id != $old_tt_id) {
         $extra_js .= "
-        tasks[$tt_id] = new Array();";    
+          tasks[$tt_id] = new Array();"; 
+        $sel_tt .= "\n<option value=\"$tt_id\">$tt_label</option>\n";   
+        $old_tt_id =  $tt_id;
       }
       $extra_js .= "
         tasks[$tt_id][$projectreftask_id] = '$projectreftask_name';";
 
-      $sel_tt .= "\n<option value=\"$tt_id\"";
-      if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
-      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
+
     }
   }
   $sel_tt .= "</optgroup>";

@@ -1227,7 +1227,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   <tr>    
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td> 
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-    <select  readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory1_code\">$sel_cat</select>
+    <select  multiple=\"multiple\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory1_code\">$sel_cat</select>
      <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_category1_code&amp;popup=1&amp;ext_target=f_new_criterion.sel_companycategory1_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />
 

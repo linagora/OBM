@@ -126,7 +126,7 @@ function check_taskadd(form)
 // Select the task add form                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 function check_tasktype(sel_tasktype) {
-  if(sel_tasktype.selectedIndex > 0)
+  if(sel_tasktype.selectedIndex >= 0)
     return true;
   else {
     alert (\"$l_fill_tt\");
@@ -327,14 +327,20 @@ function empty_select(sel,have_undef) {
 function fill_projectreftask(tasktype_id,sel_task) {
   current_task = tasks[tasktype_id]; 
   container = document.getElementById('task_checkbox');
-  container.innerHTML = '';
+  while( container.rows.length > 0) {
+    container.deleteRow(0);
+  }
   index = 0;
   for (var id in current_task) {
     row = container.insertRow(index);
     cell = row.insertCell(0);
-    cell.innerHTML =  '<td class=\"detailLabel\"><input id=\"'+id+'\" name=\"'+id+'\" type=\"checkbox\"></td>';   
+    cell.className='detailForm';    
+    cell.style.width = '50%'
+    cell.innerHTML =  '<input id=\"'+id+'\" name=\"'+id+'\" type=\"checkbox\">';   ;
     cell = row.insertCell(1);    
-    cell.innerHTML = '<td class=\"detailForm\"><span id=\"data-task-'+id+'\" style=\"display: none;\">'+current_task[id]+'</span>'+current_task[id]+'</td>';
+    cell.className='detailForm';
+    cell.style.width = '50%'
+    cell.innerHTML = '<span id=\"data-task-'+id+'\" style=\"display: none;\">'+current_task[id]+'</span>'+current_task[id];
     index++;
   }
 }

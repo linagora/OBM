@@ -34,6 +34,7 @@ function run_query_incident_search($incident) {
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
   $archive = $incident["archive"];
+  $reference = $incident["reference"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -45,6 +46,9 @@ function run_query_incident_search($incident) {
   $where = "1=1";
   if ($lincident != "") {
      $where .= " AND Incident.incident_label $like '$lincident%'";
+  }
+  if ($reference != "") {
+     $where .= " AND Incident.incident_reference $like '$reference%'";
   }
   if ($i_id != "") {
      $where .= " AND Incident.incident_id $like '$i_id%'";

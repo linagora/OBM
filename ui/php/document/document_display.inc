@@ -371,7 +371,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
   global $display, $path, $default_path, $set_theme;
   global $l_document,$l_new_file,$l_link,$l_noupdate_file,$l_update_file;
   global $l_title, $l_mimetype, $l_private, $ico_browse, $l_url, $l_links;
-  global $l_name, $l_author, $l_path, $l_kind; 
+  global $l_name, $l_author, $l_path, $l_kind,$auth; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$l_auto,$c_auto;
   global $popup_width, $popup_height;
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
@@ -414,6 +414,9 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     </table>
     <div id=\"file_update\" style=\"display: none\">";
     $update_file_end = "</div>";
+  } elseif($action == "new") {
+    $usr_q = get_user_info($auth->auth["uid"]);
+    $author = $usr_q["lastname"]." ".$usr_q["firstname"];
   }
   // If parameters have been given, they supercede the default action value
   if (isset($document["document_id"])) { $id = $document["document_id"]; }
