@@ -886,13 +886,14 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
     $dis_member .= "</tr>\n";
 
+    if($estimed != 0) {
+      // ratios
+      $ratio_alloestimated = intval(($allotted/$estimated)*100);
+      $ratio_usedestimated = intval(($usedtime/$estimated)*100);
+      $ratio_progress = (($usedtime + $missingtime) == 0) ? 0 : intval(($usedtime/($usedtime + $missingtime))*100);
+      $ratio_progeval = intval((($usedtime + $missingtime)/$estimated)*100);
+    }
 
-    // ratios
-    $ratio_alloestimated = intval(($allotted/$estimated)*100);
-    $ratio_usedestimated = intval(($usedtime/$estimated)*100);
-
-    $ratio_progress = (($usedtime + $missingtime) == 0) ? 0 : intval(($usedtime/($usedtime + $missingtime))*100);
-    $ratio_progeval = intval((($usedtime + $missingtime)/$estimated)*100);
 
     if ($ratio_progeval < 70)
       $symbol_progeval = "++";
@@ -1018,11 +1019,11 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
-  global $l_datebegin, $l_dateend, $c_undef, $l_undef;
-  global $l_comment, $l_add_comment, $l_upd_comment,$ico_project;
-  global $uid, $cg_prod, $c_php_isodate_format,$l_shortname;
-  global $ctt_sales, $ctt_research, $ctt_others,$set_theme;
-  global $l_tt_sales, $l_tt_research, $l_tt_others;
+  global $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
+  global $l_comment, $l_add_comment, $l_upd_comment,$ico_project,$popup_width;
+  global $uid, $cg_prod, $c_php_isodate_format,$l_shortname,$popup_height;
+  global $ctt_sales, $ctt_research, $ctt_others,$set_theme,$l_other;
+  global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
   $usr_q = run_query_all_users_from_group($cg_prod, array($uid));
 
