@@ -1333,7 +1333,7 @@ function html_project_task_form($ptask_q, $project) {
   global $display, $c_undef, $l_undef,$popup_height,$ico_project;
   global $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
   global $l_task_update, $l_task_upd, $l_task,$l_tasks,$set_theme;
-  global $popup_width;
+  global $popup_width,$path;
   
   $pid = $project["project_id"];
   $pname = $project["name"];
