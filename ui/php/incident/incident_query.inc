@@ -235,6 +235,7 @@ function run_query_incident_insert($incident) {
   }
 
   $lincident = $incident["lincident"];
+  $reference = $incident["reference"];
   $owner = ($incident["owner"] ? "'".$incident["owner"]."'" : "null");
   $logger = ($incident["logger"] ? "'".$incident["logger"]."'" : "null");
   $archive = ($incident["archive"] ? $incident["archive"] : "0");
@@ -260,6 +261,7 @@ function run_query_incident_insert($incident) {
     incident_userupdate,
     incident_usercreate,
     incident_label,
+    incident_reference,
     incident_contract_id,
     incident_date,
     incident_priority_id,
@@ -277,6 +279,7 @@ function run_query_incident_insert($incident) {
     null,
     '$uid',
     '$lincident',
+    '$reference',
     '$contract_id',
     '$call_date',
     '$priority',
@@ -382,6 +385,7 @@ function run_query_incident_update($incident) {
   }
   $param_incident = $incident["incident_id"];
   $lincident = $incident["lincident"];
+  $reference = $incident["reference"];
   $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : "is null");
   $logger = ($incident["logger"] ? "='".$incident["logger"]."'" : "is null");
   $solu = $incident["solution"];
@@ -409,6 +413,7 @@ function run_query_incident_update($incident) {
       incident_logger $logger,
       incident_owner $owner,
       incident_label='$lincident',
+      incident_reference='$reference',
       incident_date='$call_date', 
       incident_priority_id='$priority',
       incident_status_id='$status',
@@ -562,6 +567,7 @@ function check_incident_form($incident) {
 
   $c_id = $incident["contract_id"];
   $c_new_id = $incident["cont_new_id"];
+  $reference = $incident["reference"];
 
   // Check the label is filled
   if (trim($incident["lincident"]) == "") {
@@ -589,6 +595,11 @@ function check_incident_form($incident) {
 
   if (strlen($incident["lincident"]) > 100) {
     $err_msg = $l_length_label;
+    return false;
+  }
+
+  if (strlen($reference) > 32) {
+    $err_msg = $l_length_reference;
     return false;
   }
 

@@ -301,13 +301,14 @@ function html_incident_consult($inc_q) {
   global $set_theme, $ico_contract, $ico_company, $ico_mail;
   global $l_incident, $l_contract, $l_company;
   global $l_label, $l_logger, $l_owner, $l_priority, $l_status, $l_archive;
-  global $l_duration, $l_solution, $l_date;
+  global $l_duration, $l_solution, $l_date,$l_reference;
   global $l_client_manager;
   global $l_comment;
 
   $id = $inc_q->f("incident_id");
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
   $label = $inc_q->f("incident_label");
+  $reference = $inc_q->f("incident_reference");
   $priority = $inc_q->f("incidentpriority_label");
   $status = $inc_q->f("incidentstatus_label");
   $date = datetime_format($inc_q->f("date"), 1);
@@ -381,6 +382,9 @@ function html_incident_consult($inc_q) {
   <tr>
     <td class=\"detailLabel\">$l_label</td>
     <td class=\"detailText\">$label</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_reference</td>
+    <td class=\"detailText\">$reference</td>
   </tr><tr>
     <td class=\"detailLabel\">$l_logger</td>
     <td class=\"detailText\">$logger</td>
@@ -531,7 +535,7 @@ function dis_incident_form($action, $incident) {
 function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $sta, $cats1, $cats2) {
   global $display, $path, $uid, $set_theme, $ico_contract;
   global $c_php_isodate_format;
-  global $l_label,$l_contract,$l_status, $l_find;
+  global $l_label,$l_contract,$l_status, $l_find,$l_reference;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
   global $l_update, $l_insert;
@@ -542,6 +546,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if ($action == "detailupdate") {
     $param_contract = $inc_q->f("incident_contract_id");
     $lincident = $inc_q->f("incident_label");
+    $reference = $inc_q->f("incident_reference");
     $owner = $inc_q->f("incident_owner");
     $logger = $inc_q->f("incident_logger");
     $duration = $inc_q->f("incident_duration");
@@ -582,7 +587,8 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (isset($incident["add_comment"])) { $add_comment = stripslashes($incident["add_comment"]); }
   if (isset($incident["usercomment"])) { $usercomment = $incident["usercomment"]; }
   if (isset($incident["datecomment"])) { $datecomment = $incident["datecomment"]; }
-  
+  if (isset($incident["reference"])) { $reference = $incident["reference"]; }
+
   // Owner select
   if (! isset($owner)) { $owner = $uid; }
   $dis_sel_owner="<select name=\"sel_owner\">";
@@ -683,6 +689,9 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           <tr>
             <td class=\"detailLabel\">$l_label</td>
             <td class=\"detailForm\"><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
+          </tr><tr>
+            <td class=\"detailLabel\">$l_reference</td>
+            <td class=\"detailForm\"><input name=\"tf_reference\" size=\"10\" value=\"$reference\" /></td>
           </tr><tr>
             <td class=\"detailLabel\">$l_logger</td>
             <td class=\"detailForm\">$dis_sel_logger</td>

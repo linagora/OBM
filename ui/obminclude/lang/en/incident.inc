@@ -18,6 +18,7 @@ $l_client_manager = "Client Managers";
 $l_lastupdate = "Date of last update";
 $l_archive_new = "To File";
 $l_res_duration = "Resolution duration";
+$l_reference = "Reference";
 
 // Title 
 $l_redhot = "Redhot";
@@ -51,6 +52,7 @@ $l_incident_display = "Display options for Incidents";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_length_label = "The Label is too long";
+$l_length_label = "The Reference is too long";
 $l_fill_contract = "You have to assigned a Contract before submitting.";
 $l_j_select_contract = "You have to select a contract !";
 $l_delete_confirm = "Really delete the Incident ?";

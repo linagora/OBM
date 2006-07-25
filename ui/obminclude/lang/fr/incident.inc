@@ -18,6 +18,7 @@ $l_date_before ="Date Avant";
 $l_date_after ="Date Après";
 $l_archive_new = "Archiver";
 $l_res_duration = "Durée de résolution";
+$l_reference = "Référence";
 
 // Title 
 $l_redhot = "Très Urgent";
@@ -52,6 +53,7 @@ $l_incident_display = "Options d'affichage des Incidents";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_length_label = "Le champ Label est trop long";
+$l_length_reference = "Le champ Référence est trop long";
 $l_fill_contract = "Vous devez sélectionner un contrat avant de valider.";
 $l_j_select_contract = "Vous devez sélectionner un Contrat!";
 $l_delete_confirm = "Confirmer la suppression de l'Incident ?";
