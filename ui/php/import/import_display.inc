@@ -377,9 +377,10 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   }
   $enclosed = $import_q->f("import_enclosed");
   if(!is_string($enclosed)) {
-    $enclosed = "";
+    $enclosed = " ";
+  } else {
+    $enclosed = trim($enclosed);
   }
-  $enclosed = trim($enclosed);
   $map = get_import_field_mapping($import_q);
 
   // Sample header
@@ -456,9 +457,10 @@ function html_import_file_import($import_q, $import) {
   }
   $enclosed = $import_q->f("import_enclosed");
   if(!is_string($enclosed)) {
-    $enclosed = "";
+    $enclosed = " ";
+  } else {
+    $enclosed = trim($enclosed);  
   }
-  $enclosed = trim($enclosed);  
   $run_mode = $import["run_mode"];
   $row_start = ($import["row_start"] ? $import["row_start"] : 1);
   $conflict_action = $import["conflict_action"];
