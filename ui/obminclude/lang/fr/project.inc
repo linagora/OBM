@@ -47,6 +47,10 @@ $l_task_list = "Tâches définies";
 $l_progress_info = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
 $l_select_project = "Sélectionner un projet";
 
+// Mail
+$l_mail_project_subject = "OBM : Chef de projet";
+$l_mail_project_intro = "Vous avez été désigné chef de projet sur le projet suivant :";
+
 // Actions
 $l_insert = "Créer le projet";
 $l_update = "Modifier le Projet";

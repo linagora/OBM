@@ -415,7 +415,8 @@ function run_query_project_insert($params) {
 
     display_debug_msg($query, $cdg_sql, "run_query_project_insert (add member)");
     $retour = $obm_q->query($query);
-
+    
+    project_send_mail($params,$pid);
     // We get the projecttask_id if a project task has been filled
     if ($task != "") {
       $query = "
@@ -911,7 +912,9 @@ function run_query_project_memberstatus_change($params) {
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_project_memberstatus_change");
   $obm_q->query($query);
-
+  if($m_val == 1) {
+    project_send_mail($params,$pid);
+  }
   return $obm_q;
 }
 
@@ -1853,5 +1856,49 @@ function run_query_project_reftask_delete($params) {
   $obm_q= new DB_OBM;
   return $obm_q->query($query);  
 }
+///////////////////////////////////////////////////////////////////////////////
+// Project Send Mail
+// Parameters:
+//   - $project[] : project hash info
+////////////////////////////////////////////
+function project_send_mail($params,$pid) {
+  global $cgp_host, $l_mail_project_intro,$l_sold, $l_estimated;
+  global $l_datebegin,$l_dateend;
+  if(!$pid) {
+    return 0;
+  }
+  if(isset($params["member"])) {
+    $member = $params["member"];
+  } elseif (isset($params["user_id"])) {
+    $member = $params["user_id"];
+  } else {
+    return 0;
+  }
 
+  $name = $params["name"];
+  $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
+  $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
+  $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
+  $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
+  if ($add_comment != "") {
+    $datecomment = $params["datecomment"];
+    $usercomment = $params["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }    
+  $inc = get_incident_info($i_id);
+  $company_name = $inc["company"];
+  $status = $inc["status"];
+  $contract = $inc["contract"];
+  $label_mail = stripslashes($lincident);
+  $subject = "$l_mail_incident_new_subject : $company_name : $label_mail";
+  $message = "$cgp_host/project/project_index.php?action=detailconsult&project_id=$pid
+  $l_mail_project_intro
+  $l_name: $name
+  $l_estimated : $estimated
+  $l_sold : $l_sold
+  $l_datebegin : $datebegin
+  $l_dateend : $dateend
+  $comment";
+  send_mail($subject, $message, array($member), array(), 1);
+}
 ?>
