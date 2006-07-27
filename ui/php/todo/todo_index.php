@@ -68,7 +68,7 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_todo_delete($HTTP_POST_VARS);
+  $retour = run_query_todo_delete($_POST);
   $display["result"] = dis_todo_form($params);
   $display["result"] .= dis_todo_search_list($params);
 

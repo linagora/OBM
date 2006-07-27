@@ -327,7 +327,7 @@ function html_import_consult_file($import_q) {
 
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_test\" />
-      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+      <input type=\"hidden\" name=\"import_id\" value=\"$id\" />
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_test_file</td>

@@ -238,7 +238,6 @@ function get_admin_ref_param() {
   global $sel_region, $tf_region_label, $tf_region_code;
   global $tt_target, $cdg_param, $ext_element;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
-  global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   // Admin - generic fields
   if (isset ($tf_name)) $params["name"] = trim($tf_name);

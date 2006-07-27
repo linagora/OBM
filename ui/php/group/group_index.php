@@ -261,7 +261,6 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_group_params() {
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
   global $ext_id;
   
   // Get global params
@@ -272,29 +271,22 @@ function get_group_params() {
   if (isset ($ext_id)) $params["group_id"] = trim($ext_id);
   if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
   
-    if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-      $http_obm_vars = $HTTP_POST_VARS;
-    } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-      $http_obm_vars = $HTTP_GET_VARS;
-    }
     
-    if (isset ($http_obm_vars)) {
-    $nb_u = 0;
-    $nb_group = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
-        $nb_u++;
-        $u_num = substr($key, 4);
-        $params["user$nb_u"] = $u_num;
-      } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
-        $nb_group++;
-        $params_num = substr($key, 4);
-        $params["group_$nb_group"] = $params_num;
-      }
+  $nb_u = 0;
+  $nb_group = 0;
+  while ( list( $key ) = each( $_REQUEST ) ) {
+    if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+      $nb_u++;
+      $u_num = substr($key, 4);
+      $params["user$nb_u"] = $u_num;
+    } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
+      $nb_group++;
+      $params_num = substr($key, 4);
+      $params["group_$nb_group"] = $params_num;
     }
-    $params["user_nb"] = $nb_u;
-    $params["group_nb"] = $nb_group;
   }
+  $params["user_nb"] = $nb_u;
+  $params["group_nb"] = $nb_group;
   
   display_debug_param($params);
 

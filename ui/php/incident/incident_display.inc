@@ -632,7 +632,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   $sel_hour .= "</select>";
 
   // Duration select 2
-  $sel_dur = "<select name=\"sel_dur\">";
+  $sel_dur = "<select name=\"sel_add_duration\">";
   for ($cpt = 0.25; $cpt < 2; $cpt += 0.25) {
     $sel_dur .= "\n<option value=\"$cpt\"";
     $sel_dur .= ">$cpt</option>";

@@ -237,14 +237,14 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_params() {
-  global $HTTP_POST_VARS, $udomain_id, $c_domain;
+  global  $udomain_id, $c_domain;
   
   // Get global params
   $params = get_global_params("UserObm");
 
-  if (isset($HTTP_POST_VARS)) {
+  if (isset($_POST)) {
     $nb_group = 0;
-    while ( list( $key ) = each( $HTTP_POST_VARS) ) {
+    while ( list( $key ) = each( $_POST) ) {
       if (strcmp(substr($key, 0, 4),"cb_g") == 0) {
         $nb_group++;
         $group_num = substr($key, 4);

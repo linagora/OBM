@@ -57,8 +57,6 @@ page_close();
 
 require("time_js.inc");
 //$extra_file_js = "time_js.inc";
-
-
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = run_query_time_managers();
@@ -109,7 +107,7 @@ if ($action == "index") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $params["interval"] = "week";
-  run_query_time_delete($HTTP_POST_VARS);
+  run_query_time_delete($_REQUEST);
   run_query_time_validate($params["user_id"]);
   dis_time_index($params);
   

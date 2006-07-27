@@ -478,13 +478,13 @@ function get_param_import() {
   global $tf_con_mpho, $tf_con_mpho_d, $tf_con_fax, $tf_con_fax_d;
   global $tf_con_mail, $tf_con_mail_d, $tf_con_mailok, $tf_con_mailok_d;
   global $tf_con_com, $tf_con_com_d;
-  global $sample_file, $sample_file_name, $sample_file_size;
+  global $sample_file, $sample_file_name, $sample_file_size,$import_id;
   global $test_file, $test_file_name, $test_file_size;
   global $import_file, $import_file_name, $import_file_size, $file_saved;
   global $row_start, $rd_conflict, $rd_comp, $rd_con, $company_id;
 
   // Import fields
-  if (isset ($param_import)) $import["import_id"] = $param_import;
+  if (isset ($import_id)) $import["import_id"] = $import_id;
   if (isset ($tf_name)) $import["name"] = trim($tf_name);
   if (isset ($sel_dsrc)) $import["datasource"] = $sel_dsrc;
   if (isset ($sel_market)) $import["market"] = $sel_market;

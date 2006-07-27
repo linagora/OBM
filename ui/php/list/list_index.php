@@ -278,7 +278,6 @@ exit(0);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_list_params() {
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
   global $param_ext;
   global $tf_company_name, $tf_company_zipcode, $tf_company_town;
   global $tf_company_timeafter, $tf_company_timebefore;
@@ -292,11 +291,6 @@ function get_list_params() {
   global $sel_contact_datasource_id, $sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id, $sel_contact_function_id;
 
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
   
     // Get global params
     $params = get_global_params("List");
@@ -354,25 +348,24 @@ function get_list_params() {
   if (isset ($se_criteria)) {
     $params["criteria"] = unserialize(urldecode($se_criteria));
   }
-  if (isset ($http_obm_vars)) {
-    $nb_con = 0;
-    $nb_list = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 6),"cb_con") == 0) {
-  $nb_con++;
-        $con_num = substr($key, 6);
-        $params["con$nb_con"] = $con_num;
-      } elseif (strcmp(substr($key, 0, 7),"cb_list") == 0) {
-  $nb_list++;
-        $params_num = substr($key, 7);
-        $params["list_$nb_list"] = $params_num;
-  // register the list in the list session array
-  $ses_list[$params_num] = $params_num;
-      }
+
+  $nb_con = 0;
+  $nb_list = 0;
+  while ( list( $key ) = each( $_REQUEST ) ) {
+    if (strcmp(substr($key, 0, 6),"cb_con") == 0) {
+$nb_con++;
+      $con_num = substr($key, 6);
+      $params["con$nb_con"] = $con_num;
+    } elseif (strcmp(substr($key, 0, 7),"cb_list") == 0) {
+$nb_list++;
+      $params_num = substr($key, 7);
+      $params["list_$nb_list"] = $params_num;
+// register the list in the list session array
+$ses_list[$params_num] = $params_num;
     }
-    $params["con_nb"] = $nb_con;
-    $params["list_nb"] = $nb_list;
   }
+  $params["con_nb"] = $nb_con;
+  $params["list_nb"] = $nb_list;
 
   display_debug_param($params);
 

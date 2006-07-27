@@ -247,7 +247,7 @@ display_page($display);
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_resourcegroup_params() {
-  global $tf_name, $tf_desc, $tf_resource, $cb_priv, $HTTP_POST_VARS, $HTTP_GET_VARS;
+  global $tf_name, $tf_desc, $tf_resource, $cb_priv;
   global $ext_id;
   
   // Get global params
@@ -257,29 +257,21 @@ function get_resourcegroup_params() {
   if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
   if (isset ($ext_id)) $params["resourcegroup_id"] = $ext_id;
   
-    if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  if (isset ($http_obm_vars)) {
-    $nb_u = 0;
-    $nb_resourcegroup = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
-  $nb_u++;
-        $u_num = substr($key, 4);
-        $params["resource$nb_u"] = $u_num;
-      } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
-  $nb_resourcegroup++;
-        $params_num = substr($key, 4);
-        $params["resourcegroup_$nb_resourcegroup"] = $params_num;
-      }
+  $nb_u = 0;
+  $nb_resourcegroup = 0;
+  while ( list( $key ) = each( $_REQUEST ) ) {
+    if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+$nb_u++;
+      $u_num = substr($key, 4);
+      $params["resource$nb_u"] = $u_num;
+    } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
+$nb_resourcegroup++;
+      $params_num = substr($key, 4);
+      $params["resourcegroup_$nb_resourcegroup"] = $params_num;
     }
-    $params["resource_nb"] = $nb_u;
-    $params["resourcegroup_nb"] = $nb_resourcegroup;
   }
+  $params["resource_nb"] = $nb_u;
+  $params["resourcegroup_nb"] = $nb_resourcegroup;
   display_debug_param($params);
 
   return $params;
