@@ -1238,8 +1238,6 @@ function dis_agenda_plain_month_planning($agenda, $calendar_entity) {
     foreach ($entity as $id => $properties) {
       $line_id = $type." ".$id;
       $d_l .= "<tr><th>".$properties["name"]."</th>".$line[$line_id]."</tr>";
-      $color = randomColor();
-      $css .= ".".$properties["class"]." {background-color:$color; border : 1px solid #336600; text-align: center;vertical-align:top;} ";
     }  
   } 
 
