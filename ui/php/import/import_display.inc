@@ -376,7 +376,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
     $csv_sep = "\t";
   }
   $enclosed = $import_q->f("import_enclosed");
-  if(!is_string($enclosed)) {
+  if($enclosed == "") {
     $enclosed = " ";
   } else {
     $enclosed = trim($enclosed);
@@ -456,7 +456,7 @@ function html_import_file_import($import_q, $import) {
     $csv_sep = "\t";
   }
   $enclosed = $import_q->f("import_enclosed");
-  if(!is_string($enclosed)) {
+  if($enclosed == "") {
     $enclosed = " ";
   } else {
     $enclosed = trim($enclosed);  
@@ -928,8 +928,8 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   }
   $sel_market .= "</select>";
 
-  if ($sep == $ccsvd_sc) $csvd_sc = "checked";
   if ($sep == $ccsvd_tab) $csvd_tab = "checked";
+  else $csvd_sc = "checked";
 
   $url = url_prepare("import_index.php");
   $display["title"] = "<div class=\"title\">$l_import : $name</div>";
