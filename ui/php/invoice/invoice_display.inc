@@ -363,8 +363,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "$param_status".
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;tf_date_before=$date_before".
-		    "&amp;tf_date_exp_after=$dateexp_after".
-		    "&amp;tf_date_exp_before=$dateexp_before".
+		    "&amp;tf_dateexp_after=$dateexp_after".
+		    "&amp;tf_dateexp_before=$dateexp_before".
 		    "&amp;rd_inout=$inout".
 		    "&amp;company_id=$comp_id".
 		    "&amp;deal_id=$deal_id".
@@ -1277,7 +1277,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date("Y-m-d", mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_date_exp_after=$month_start&amp;tf_date_exp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td class=\"$data\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;cb_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= "
           <td class=\"$data\"> </td>";
@@ -1305,7 +1305,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
       $dis_pay_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cb_archive=1&amp;tf_date_exp_after=$month_start&amp;tf_date_exp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;cb_archive=1&amp;tf_dateexp_after=$month_start&amp;tf_dateexp_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
     } else {
       $dis_pay_row_total .= "
           <td>&nbsp;$dis_amount_ttc</td>";
