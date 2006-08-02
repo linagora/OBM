@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.1pre1";
+$obm_version = "1.2.1pre2";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -893,14 +893,14 @@ function beautify_comment($com, $p_order="") {
     // U : Ungreedy
     // s : "." matches all chars even newlines
     // D : $ matches only end of text, not end of line
-    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)(.*)($|((^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)))/UsD";
-    $replace = "\\4";
+    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]( [012][0-9]:[0-5][0-9]:[0-5][0-9])?:.*:)(.*)($|((^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]( [012][0-9]:[0-5][0-9]:[0-5][0-9])?:.*:)))/UsD";
+    $replace = "\\5";
     $tmp = $com;
     
     while (preg_match($pattern, $tmp, $matches)) {
       $nb++;
       $who = $matches[2];
-      $text = $matches[3];
+      $text = $matches[4];
       $row = "
     <tr>
       <td bgcolor=\"#$col1\">$who</td>

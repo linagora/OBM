@@ -298,11 +298,16 @@ function run_query_company_insert($company) {
   $fax = $company["fax"];
   $web = $company["web"];
   $email = $company["email"];
+  $comment = $company["com"];
   $add_comment = $company["add_comment"];
   if ($add_comment != "") {
     $datecomment = $company["datecomment"];
+    $today = date("Y-m-d");
+    if ($today == $datecomment) {
+      $datecomment = $now;
+    }
     $usercomment = $company["usercomment"];
-    $comment = "$datecomment:$usercomment:$add_comment";
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $category1 = $company["category1"];
   
