@@ -97,7 +97,7 @@ function agenda_show ( evt, name ) {
   else {
     x = currentX;
   }
-   x = x - 196;
+   x = x - 176;
   y = currentY + 20;
   y = y - 150;
   if ( IE4 ) {
