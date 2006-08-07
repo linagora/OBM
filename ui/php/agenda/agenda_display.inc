@@ -1295,10 +1295,11 @@ function dis_agenda_plain_month_planning($agenda, $calendar_entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_agenda_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_user,&$properties) {
   global $path, $auth, $set_theme, $ico_event, $ico_calendar_day, $l_category1;
-  global $l_location, $l_private, $l_private_description, $l_begin,$l_end;
+  global $l_location, $l_private, $l_private_description, $l_begin,$l_end,$l_resource,$l_task,$l_user;
 
   $id = $event->id;
   $usr_id = $properties["id"];
+  $user_info = $properties["name"];  
   if ($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
     $title = $l_private;
     $description = $l_private_description;
@@ -1310,6 +1311,10 @@ function dis_agenda_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_us
     $link = "$path/agenda/agenda_index.php?action=detailconsult&agenda_id=$id";
     $description = $event->description;
     $category1 = $event->category1;
+    $attendee = $event->attendee;
+    foreach($attendee as $entity => $entities) {
+      $attendee_list .= "<li class=\"blockItem\">".${"l_".$entity}." : ".implode(", ",$entities)."</li>";
+    }    
   }    
   $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
 
@@ -1317,11 +1322,12 @@ function dis_agenda_event_allday_planning(&$dis_cal, &$hidden_div,&$event,$nb_us
 
   $hidden_div .= "
   <div id=\"$id-$usr_id\" class=\"block\" style=\"display:none;position:absolute;z-index:1000;\">
-   <div class=\"blockTitle\">:: $title</div>
+   <div class=\"blockTitle\">:: $title<br />($user_info)</div>
    <ul class=\"blockItem\">
     <li class=\"blockItem\">$l_location : $location</li>
     <li class=\"blockItem\">$l_category1 : $category1</li>
     <li class=\"blockItem\">$description</li>
+    $attendee_list
    </ul>
   </div>";
 }
@@ -1915,7 +1921,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_entity\"
-   onsubmit=\"if (check_agenda_calendar(this)) return true; else return false;\"
+   onsubmit=\"if(this.tf_title.value == '')this.tf_title.value = this.task_new_name.value; if (check_agenda_calendar(this)) return true; else return false;\"
    action=\"".url_prepare("agenda_index.php")."\">
 
   <div class=\"detailHead\">$l_module_agenda</div>
