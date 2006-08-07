@@ -259,7 +259,7 @@ function get_resourcegroup_params() {
   
   $nb_u = 0;
   $nb_resourcegroup = 0;
-  while ( list( $key ) = each( $_REQUEST ) ) {
+  foreach($_REQUEST as $key => $value ) {
     if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
 $nb_u++;
       $u_num = substr($key, 4);

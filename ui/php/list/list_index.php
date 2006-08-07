@@ -351,17 +351,17 @@ function get_list_params() {
 
   $nb_con = 0;
   $nb_list = 0;
-  while ( list( $key ) = each( $_REQUEST ) ) {
+  foreach($_REQUEST as $key => $value ) {
     if (strcmp(substr($key, 0, 6),"cb_con") == 0) {
-$nb_con++;
+      $nb_con++;
       $con_num = substr($key, 6);
       $params["con$nb_con"] = $con_num;
     } elseif (strcmp(substr($key, 0, 7),"cb_list") == 0) {
-$nb_list++;
+      $nb_list++;
       $params_num = substr($key, 7);
       $params["list_$nb_list"] = $params_num;
-// register the list in the list session array
-$ses_list[$params_num] = $params_num;
+      // register the list in the list session array
+      $ses_list[$params_num] = $params_num;
     }
   }
   $params["con_nb"] = $nb_con;
