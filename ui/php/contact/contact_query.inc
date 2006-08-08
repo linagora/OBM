@@ -700,21 +700,21 @@ function run_query_contact_update($contact) {
   $email2 = $contact["email2"];
   $mailok = $contact["mailok"];
   $date = ($contact["date"] ? "'".$contact["date"]."'" : "null");
-  $comment = $contact["com"];
+  $comment = $contact["comment"];
   $add_comment = $contact["add_comment"];
   if ($add_comment != "") {
     $datecomment = $contact["datecomment"];
     $usercomment = $contact["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $comment2 = $contact["com2"];
+  $comment2 = $contact["comment2"];
   $add_comment2 = $contact["add_comment2"];
   if ($add_comment2 != "") {
     $datecomment2 = $contact["datecomment2"];
     $usercomment2 = $contact["usercomment2"];
     $comment2 .= "\n$datecomment2:$usercomment2:$add_comment2";
   }
-  $comment3 = $contact["com3"];
+  $comment3 = $contact["comment3"];
   $add_comment3 = $contact["add_comment3"];
   if ($add_comment3 != "") {
     $datecomment3 = $contact["datecomment3"];

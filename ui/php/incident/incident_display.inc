@@ -106,11 +106,12 @@ function dis_incident_search_form($incident) {
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats2, $incident) {
-  global $c_all, $l_all, $l_label, $l_id, $l_find;
+  global $c_all, $l_all, $l_text, $l_label, $l_id, $l_find;
   global $l_owner, $l_logger,$l_company,$l_contract;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_date_after,$l_date_before,$l_archive,$l_reference;
 
+  $text = stripslashes($incident["text"]);
   $lincident = stripslashes($incident["lincident"]);
   $reference = stripslashes($incident["reference"]);
   $i_id = $incident["incident_id"];
@@ -160,18 +161,21 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
     url_prepare("incident_index.php") . " \">
 
     <div class=\"search\">
+       <div class=\"searchLabel\">$l_text<br />
+         <input type=\"text\" name=\"tf_text\" size=\"16\" value=\"$text\" />
+       </div>
        <div class=\"searchLabel\">$l_label<br />
          <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
        </div>
        <div class=\"searchLabel\">$l_reference<br />
          <input type=\"text\" name=\"tf_reference\" size=\"16\" value=\"$reference\" />
-       </div>         
+       </div>
        <div class=\"searchLabel\">$l_id<br />
-         <input type=\"text\" name=\"tf_id\" size=\"10\" value=\"$i_id\" />
+         <input type=\"text\" name=\"tf_incident_id\" size=\"10\" value=\"$i_id\" />
        </div>
        <div class=\"searchLabel\">$l_company<br />
          <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
-       </div>	    
+       </div>
        <div class=\"searchLabel\">$l_contract<br />
          <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
        </div>
@@ -587,7 +591,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (isset($incident["hour"])) { $hour = $incident["hour"]; }
   if (isset($incident["archive"])) { $archive = ($incident["archive"] == 1 ? "checked" : ""); }
   if (isset($incident["lcontract"])) { $c_label = stripslashes($incident["lcontract"]); }
-  if (isset($incident["com"])) { $comment = stripslashes($incident["com"]); }
+  if (isset($incident["comment"])) { $comment = stripslashes($incident["comment"]); }
   if (isset($incident["add_comment"])) { $add_comment = stripslashes($incident["add_comment"]); }
   if (isset($incident["usercomment"])) { $usercomment = $incident["usercomment"]; }
   if (isset($incident["datecomment"])) { $datecomment = $incident["datecomment"]; }
@@ -666,7 +670,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   }
 

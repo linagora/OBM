@@ -702,14 +702,22 @@ function of_category_dis_links($entities, $cat, $param, $mode="multi") {
       $nb_cat = $obm_q->num_rows();
       if ($nb_cat > 0) {
 	$has_links = true;
-        $url = url_prepare("?action=search&amp;sel_${cat}=$id");
+        $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cb_archive=1");
 
 	$dis_link .= "
     <tr>
       <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
     </tr>";
+      } else {
+	$dis_link .= "
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">
+          ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
+    </tr>";
       }
     }
+
+    // Category is dedicated to an entity
   } else {
     $entity = $entities;
     $l_entity = strtolower("l_${entity}");
@@ -720,12 +728,18 @@ function of_category_dis_links($entities, $cat, $param, $mode="multi") {
     $nb_cat = $obm_q->num_rows();
     if ($nb_cat > 0) {
       $has_links = true;
-      $url = url_prepare("?action=search&amp;sel_${cat}=$id");
+      $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cb_archive=1");
 
-    $dis_link .= "
+      $dis_link .= "
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
-        ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
+        ".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
+    </tr>";
+    } else {
+      $dis_link .= "
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">
+          ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
     </tr>";
     }
   }

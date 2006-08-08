@@ -342,7 +342,7 @@ function run_query_contract_update($contract) {
   global $auth, $cdg_sql, $ccf_ticket, $ccf_duration;
 
   $vis = ($contract["privacy"]==1)?1:0;
-  $id = $contract["id"];
+  $id = $contract["contract_id"];
   $num = $contract["number"];
   $label = $contract["label"];
   $datesignature = ($contract["datesignature"] ? "'".$contract["datesignature"]."'" : "null");
@@ -419,7 +419,7 @@ function run_query_contract_update($contract) {
       contract_archive = '$archive'
     WHERE contract_id = '$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_update()");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);  
 

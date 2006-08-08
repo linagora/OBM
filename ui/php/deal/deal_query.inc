@@ -259,7 +259,6 @@ function run_query_deal_insert($deal) {
   global $auth, $cdg_sql, $l_no;
 
   $now = date("Y-m-d H:i:s");
-  $id = $deal["deal_id"];
   $pid = ($deal["parentdeal_id"] ? "'".$deal["parentdeal_id"]."'" : "null");
   $num = $deal["num"];
   $label = $deal["label"];
@@ -286,7 +285,7 @@ function run_query_deal_insert($deal) {
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $category1 = $deal["category1"];
-  $comment = $deal["com"];
+  $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
@@ -365,6 +364,7 @@ function run_query_deal_insert($deal) {
   $retour = $obm_q->query($query);  
 
   $d_id = run_query_deal_id($deal);
+  $deal["deal_id"] = $d_id;
 
   if ($retour && is_array($category1)) {
     foreach($category1 as $categoryid) {
@@ -431,7 +431,7 @@ function run_query_deal_update($deal) {
   $status = $deal["status"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
-  $comment = $deal["com"];
+  $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
@@ -624,7 +624,7 @@ function run_query_deal_quick_update($deal) {
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $status = $deal["status"];
   $todo = $deal["todo"];
-  $comment = $deal["com"];
+  $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];

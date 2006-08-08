@@ -624,15 +624,15 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
   $popup = $publication["popup"];
   $ext_url = $publication["ext_url"];
 
-  if($action == "detailupdate_subscription") {
-   $pub_id = $sub_q->f("subscription_publication_id"); 
-   $title = $sub_q->f("publication_title"); 
-   $cont_id = $sub_q->f("subscription_contact_id"); 
-   $sub_id = $sub_q->f("subscription_id"); 
+  if ($action == "detailupdate_subscription") {
+   $sub_id = $sub_q->f("subscription_id");
+   $pub_id = $sub_q->f("subscription_publication_id");
+   $title = $sub_q->f("publication_title");
+   $cont_id = $sub_q->f("subscription_contact_id");
    $quantity = $sub_q->f("subscription_quantity");
    if ($sub_q->f("subscription_renewal") == 1) $renew = " checked=\"checked\"";
-   $recept = $sub_q->f("subscription_reception_id"); 
-   $lang = $sub_q->f("publication_lang"); 
+   $recept = $sub_q->f("subscription_reception_id");
+   $lang = $sub_q->f("publication_lang");
   }
   // If parameters have been given, they supercede the default action value
   if (isset($publication["publication_id"])) { $pub_id = $publication["publication_id"]; }
@@ -659,7 +659,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
   if (($action == "detailupdate_subscription") || ($action == "update_subscription")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=\"hidden\" name=\"param_subscription\" id=\"param_subscription\" value=\"$sub_id\" />
+      <input type=\"hidden\" name=\"subscription_id\" id=\"subscription_id\" value=\"$sub_id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update_subscription\" />
       <input type=\"submit\" value=\"$l_update_sub\" />";
      $block_publi = "$title<input type=\"hidden\" name=\"publication_id\" id=\"publication_id\" value=\"$pub_id\" />";
@@ -676,14 +676,15 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
     ";     
   }
-  $dis_button .= "<input type=\"hidden\" id=\"contact_id\" name=\"contact_id\" value=\"$cont_id\" />
+  $dis_button .= "
+      <input type=\"hidden\" id=\"contact_id\" name=\"contact_id\" value=\"$cont_id\" />
       <input type=\"hidden\" id=\"ext_url\" name=\"ext_url\" value=\"$ext_url\" />
       <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
 
   $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
 
   // --- HTML Template --------------------------------------------------------
-  if(!isset($quantity)) $quantity = 1;
+  if (!isset($quantity)) $quantity = 1;
   $block = "
     $js_ctry
 

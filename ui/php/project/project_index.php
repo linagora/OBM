@@ -304,9 +304,9 @@ if ($action == "ext_get_id") {
   if (!($retour))
     $ins_err = 1;
   if (!($ins_err)) {
-    $display["msg"] .= display_ok_msg("$l_allocate : $l_update_ok");
+    $display["msg"] .= display_ok_msg("$l_project : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_allocate : $l_update_error");
+    $display["msg"] .= display_err_msg("$l_project : $l_update_error");
   }
   $display["detail"] = dis_project_consult($params["project_id"]);
 
@@ -319,9 +319,9 @@ if ($action == "ext_get_id") {
   if (!($retour))
     $ins_err = 1;
   if (!($ins_err)) {
-    $display["msg"] .= display_ok_msg("$l_allocate : $l_update_ok");
+    $display["msg"] .= display_ok_msg("$l_project : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_allocate : $l_update_error");
+    $display["msg"] .= display_err_msg("$l_project : $l_update_error");
   }
   $display["detail"] = dis_project_consult($params["project_id"]);
 
@@ -330,6 +330,7 @@ if ($action == "ext_get_id") {
   if ($params["project_id"] > 0) {
     $display["detail"] = dis_project_dashboard($params);
   }
+
 } elseif ($action == "planning") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params["project_id"] > 0) {

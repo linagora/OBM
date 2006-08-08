@@ -1226,7 +1226,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   }
 
@@ -1454,7 +1454,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     $dis_cat
-    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+    <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
 ";
 
   $block = "

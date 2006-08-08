@@ -651,7 +651,7 @@ function dis_contact_consult($contact) {
   if ($view != "") {
     include("$path/$view/".$view."_display.inc");
     include("$path/$view/".$view."_query.inc");
-    $block .= dis_subscription_external_list($contact);
+    $block .= dis_publication_subscription_external_list($contact);
   } else {
     $cats1 = of_category_get_entitycategories("contact", "category1", $id);
     $cats2 = of_category_get_entitycategories("contact", "category2", $id);
@@ -1380,15 +1380,15 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
   if (isset($contact["email2"])) { $email2 = stripslashes($contact["email2"]); }
   if (isset($contact["mailok"])) { $mailok = ($contact["mailok"] == 1 ? "checked" : ""); }
-  if (isset($contact["comment"])) { $comment = stripslashes($contact["com"]); }
+  if (isset($contact["comment"])) { $comment = stripslashes($contact["comment"]); }
   if (isset($contact["add_comment"])) { $add_comment = stripslashes($contact["add_comment"]); }
   if (isset($contact["usercomment"])) { $usercomment = $contact["usercomment"]; }
   if (isset($contact["datecomment"])) { $datecomment = $contact["datecomment"]; }
-  if (isset($contact["comment2"])) { $comment2 = stripslashes($contact["com"]); }
+  if (isset($contact["comment2"])) { $comment2 = stripslashes($contact["comment2"]); }
   if (isset($contact["add_comment2"])) { $add_comment2 = stripslashes($contact["add_comment2"]); }
   if (isset($contact["usercomment2"])) { $usercomment2 = $contact["usercomment2"]; }
   if (isset($contact["datecomment2"])) { $datecomment2 = $contact["datecomment2"]; }
-  if (isset($contact["comment3"])) { $comment3 = stripslashes($contact["com"]); }
+  if (isset($contact["comment3"])) { $comment3 = stripslashes($contact["comment3"]); }
   if (isset($contact["add_comment3"])) { $add_comment3 = stripslashes($contact["add_comment3"]); }
   if (isset($contact["usercomment3"])) { $usercomment3 = $contact["usercomment3"]; }
   if (isset($contact["datecomment3"])) { $datecomment3 = $contact["datecomment3"]; }
@@ -1609,7 +1609,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
         <td class=\"detailLabel\">$l_upd_comment1</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
     if ($show_comment2) {
       $dis_comment2 = "
@@ -1617,7 +1617,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
         <td class=\"detailLabel\">$l_upd_comment2</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com2\" rows=\"6\" cols=\"78\">$comment2</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment2\" rows=\"6\" cols=\"78\">$comment2</textarea></td>
       ";
     }
     if ($show_comment3) {
@@ -1626,7 +1626,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
         <td class=\"detailLabel\">$l_upd_comment3</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com3\" rows=\"6\" cols=\"78\">$comment3</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment3\" rows=\"6\" cols=\"78\">$comment3</textarea></td>
       ";
     }
   }
@@ -1859,7 +1859,9 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $fax = stripslashes($contact["fax"]);
   $email = stripslashes($contact["email"]);
   $email2 = stripslashes($contact["email2"]);
-  $com = stripslashes($contact["com"]);
+  $com = stripslashes($contact["comment"]);
+  $com2 = stripslashes($contact["comment2"]);
+  $com3 = stripslashes($contact["comment3"]);
   $priv = $contact["privacy"];
   $archive = ($contact["archive"] == 1 ? "1" : "0");
 
@@ -1906,7 +1908,9 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
-    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+    <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
+    <input type=\"hidden\" name=\"ta_comment2\" value=\"$com2\" />
+    <input type=\"hidden\" name=\"ta_comment3\" value=\"$com3\" />
     <input type=\"hidden\" name=\"cb_privacy\" value=\"$privacy\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
 

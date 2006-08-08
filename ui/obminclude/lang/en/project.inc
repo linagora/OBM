@@ -47,6 +47,10 @@ $l_task_list = "Defined tasks";
 $l_progress_info = "Fill in the working length (in days) missing for each person to complete a task";
 $l_select_project = "Select a project";
 
+// Mail
+$l_mail_project_subject = "OBM : Project";
+$l_mail_project_member = "You have been assigned on the project :";
+
 // Actions
 $l_insert = "Create the project";
 $l_update = "Update the project";

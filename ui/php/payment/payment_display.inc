@@ -129,13 +129,15 @@ function html_payment_search_form($params, $kinds, $accs) {
     ";
 
   // Account select
-  $sel_account ="
+  $sel_account = "
     <select name=\"sel_account\">
      <option value=\"$c_all\">$l_all</option>\n";
-  foreach($accs as $a_id => $one_acc) {
-    $alabel = $one_acc["label"];
-    $aselect = ($a_id == $account) ? "selected" : "";
-    $sel_account .= "<option value=\"$a_id\" $aselect>$alabel</option>";
+  if (is_array($accs)) {
+    foreach($accs as $a_id => $one_acc) {
+      $alabel = $one_acc["label"];
+      $aselect = ($a_id == $account) ? "selected" : "";
+      $sel_account .= "<option value=\"$a_id\" $aselect>$alabel</option>";
+    }
   }
   $sel_account .= "</select>";
   

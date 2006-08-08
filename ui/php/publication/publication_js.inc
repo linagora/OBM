@@ -11,7 +11,8 @@
 require("$obminclude/javascript/check_js.inc");
 
 
-if (isset($publication["ext_target"]) && $publication["ext_target"]!="") {
+if (isset($params["ext_target"]) && $params["ext_target"] != "") {
+  //if (isset($params["ext_target"])) {
   $extra_js .= "
 
   function check_get_id(valeur,text) {
@@ -19,8 +20,8 @@ if (isset($publication["ext_target"]) && $publication["ext_target"]!="") {
       alert (\"$l_j_select_publication\");
       return false;
     } else {
-      window.opener.document.".$publication["ext_target"].".publication_id.value=valeur;
-      window.opener.document.".$publication["ext_target"].".tf_title.value=text;
+      window.opener.document.".$params["ext_target"].".publication_id.value=valeur;
+      window.opener.document.".$params["ext_target"].".tf_title.value=text;
       window.close();
       return true;
     }
@@ -48,12 +49,12 @@ function check_publication(form) {
   }
 
   return true;
-} 
+}
 
 
 function check_subscription(form) {
-  // MANDATORY : Check that the Company name is not empty
-  if (form.sel_publi.selectedIndex != 0 || !(form.sel_publi.options[form.sel_publi.selectIndex].value > 0)) {
+  // MANDATORY : Check that a publication has been selected
+  if (!form.publication_id.value > 0) {
     alert (\"$l_j_select_publication\");
     return false;
   }
@@ -88,7 +89,7 @@ function check_renew_checkdel(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the renew update is possible                                    //
+// Check if the renew update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_renew_upd(form,formd)
 {
@@ -101,6 +102,7 @@ function check_renew_upd(form,formd)
     return false;
   }
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the renew creation is possible

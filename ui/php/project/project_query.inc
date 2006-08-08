@@ -554,17 +554,17 @@ function run_query_project_delete($p_id) {
 
   // Delete all users associations to the project
   $query = "DELETE FROM ProjectUser WHERE projectuser_project_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_project_delete(1)");
   $retour = $obm_q->query($query);
 
   // Delete all task assigned to the project
   $query = "DELETE FROM ProjectTask WHERE projecttask_project_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_project_delete(2)");
   $retour = $obm_q->query($query);
 
   // Delete the project
   $query = "DELETE FROM Project WHERE project_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_project_delete(3)");
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -1363,6 +1363,57 @@ function get_project_participants($p_id = 0) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get Project infos
+// Parameters:
+//   - $id : project id
+///////////////////////////////////////////////////////////////////////////////
+function get_project_info($id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datebegin = sql_date_format($db_type, "project_datebegin", "project_datebegin");
+  $dateend = sql_date_format($db_type, "project_dateend", "project_dateend");
+
+  $query = "SELECT
+      project_id,
+      project_name,
+      project_shortname,
+      $datebegin,
+      $dateend,
+      project_soldtime,
+      project_estimatedtime,
+      project_comment,
+      tasktype_label,
+      company_name,
+      deal_label
+    FROM Project
+      LEFT JOIN TaskType on project_tasktype_id=tasktype_id
+      LEFT JOIN Deal on project_deal_id=deal_id
+      LEFT JOIN Company on project_company_id=company_id
+    WHERE project_id='$id'";
+
+  display_debug_msg($query, $cdg_sql, "get_project_info()");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $res["project_id"] = $obm_q->f("project_id");
+  $res["name"] = $obm_q->f("project_name");
+  $res["tasktype"] = $obm_q->f("tasktype_label");
+  $res["deal"] = $obm_q->f("deal_label");
+  $res["company"] = $obm_q->f("company_name");
+  $res["datebegin"] = $obm_q->f("project_datebegin");
+  $res["dateend"] = $obm_q->f("project_dateend");
+  $res["shortname"] = $obm_q->f("project_shortname");
+  $res["soldtime"] = $obm_q->f("project_soldtime");
+  $res["estimatedtime"] = $obm_q->f("project_estimatedtime");
+  $res["comment"] = $obm_q->f("project_comment");
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // New Project Form Data checking and formatting
 // Parameters:
 //   - $pid   : project id
@@ -1570,7 +1621,7 @@ function project_is_task_parent($tid) {
     FROM ProjectTask
     WHERE projecttask_parenttask_id = '$tid'";
 
-  display_debug_msg($query, $cdg_sql, "project_is_task_parent");
+  display_debug_msg($query, $cdg_sql, "project_is_task_parent()");
   $t_q = new DB_OBM;
   $t_q->query($query);
   
@@ -1596,7 +1647,7 @@ function project_task_has_parent($tid) {
     FROM ProjectTask
     WHERE projecttask_id = '$tid'";
 
-  display_debug_msg($query, $cdg_sql, "project_task_has_parent");
+  display_debug_msg($query, $cdg_sql, "project_task_has_parent()");
   $t_q = new DB_OBM;
   $t_q->query($query);
   $t_q->next_record();
@@ -1623,7 +1674,7 @@ function project_task_has_user($tid) {
     FROM ProjectUser
     WHERE projectuser_projecttask_id = '$tid'";
 
-  display_debug_msg($query, $cdg_sql, "project_task_has_user");
+  display_debug_msg($query, $cdg_sql, "project_task_has_user()");
   $t_q = new DB_OBM;
   $t_q->query($query);
 
@@ -1661,6 +1712,8 @@ function check_project_progress_form($params) {
   else
     return true;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: qet tasks for given projects and month                 
 // Parameters:
@@ -1703,12 +1756,14 @@ function run_query_project_month_planning($params) {
       GROUP BY  project_id,project_name,date, timetask_status,id,label,
       userobm_id,userobm_lastname,userobm_firstname
     ";
-  display_debug_msg($query, $cdg_sql, "run_query_project_month_planning");
+  display_debug_msg($query, $cdg_sql, "run_query_project_month_planning()");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
   return $obm_db; 
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get Tasks for a given users list                 
 // Parameters:
@@ -1739,12 +1794,14 @@ function run_query_project_tasks_by_users($params) {
     projecttask_id, projecttask_label
   ORDER BY project_tasktype_id, company_name, project_name
     ";
-  display_debug_msg($query, $cdg_sql, "run_query_project_tasks_by_users");
+  display_debug_msg($query, $cdg_sql, "run_query_project_tasks_by_users()");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
   return $obm_db; 
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get Taskstypes                 
 // Parameters:
@@ -1758,11 +1815,13 @@ function run_query_project_tasktype(){
     FROM TaskType
     ORDER BY tasktype_internal, tasktype_label";
 
-  display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
+  display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get Reference Tasks                 
 // Parameters:
@@ -1773,23 +1832,25 @@ function run_query_project_reftasks(){
   global $cdg_sql, $cdg_param;
 
   $query = "
-    SELECT 
+  SELECT 
     projectreftask_id,
     projectreftask_label,
     tasktype_id,
     tasktype_label,
     tasktype_internal
-    FROM ProjectRefTask
+  FROM ProjectRefTask
     JOIN TaskType ON projectreftask_tasktype_id = tasktype_id
-    GROUP BY projectreftask_id,projectreftask_label,tasktype_id,
+  GROUP BY projectreftask_id,projectreftask_label,tasktype_id,
     tasktype_label,tasktype_internal
-    ORDER BY projectreftask_tasktype_id";
+  ORDER BY projectreftask_tasktype_id";
 
-  display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype");
+  display_debug_msg($query, $cdg_sql, "run_query_time_used_tasktype()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Create a new ref task                
 // Parameters:
@@ -1798,6 +1859,7 @@ function run_query_project_reftasks(){
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_reftask_insert($params) {
   global $cdg_sql, $cdg_param,$auth;
+
   $uid = $auth->auth["uid"];
   $tasktype = $params["tasktype"];
   $label = $params["reftask_label"];
@@ -1816,10 +1878,12 @@ function run_query_project_reftask_insert($params) {
     '$label'
     )    
     ";
-  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_insert");
+  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_insert()");
   $obm_q= new DB_OBM;
   return $obm_q->query($query);
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Update a ref task                
 // Parameters:
@@ -1827,7 +1891,8 @@ function run_query_project_reftask_insert($params) {
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_reftask_update($params) {
-  global $cdg_sql, $cdg_param,$auth;
+  global $cdg_sql, $cdg_param, $auth;
+
   $uid = $auth->auth["uid"];
   $tasktype = $params["tasktype"];
   $label = $params["reftask_label"];
@@ -1838,10 +1903,12 @@ function run_query_project_reftask_update($params) {
     projectreftask_userupdate = '$uid',
     projectreftask_timeupdate = NOW()
     WHERE projectreftask_id = '$id'";
-  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_update");
-  $obm_q= new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_update()");
+  $obm_q = new DB_OBM;
   return $obm_q->query($query);  
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Update a ref task                
 // Parameters:
@@ -1850,24 +1917,28 @@ function run_query_project_reftask_update($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project_reftask_delete($params) {
   global $cdg_sql, $cdg_param,$auth;
+
   $id = $params["reftask_id"];
   $query = "DELETE FROM ProjectRefTask WHERE projectreftask_id = '$id'";
-  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_delete");
+  display_debug_msg($query, $cdg_sql, "run_query_project_reftask_delete()");
   $obm_q= new DB_OBM;
   return $obm_q->query($query);  
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Project Send Mail
 // Parameters:
 //   - $project[] : project hash info
-////////////////////////////////////////////
-function project_send_mail($params,$pid) {
-  global $cgp_host, $l_mail_project_intro,$l_sold, $l_estimated;
-  global $l_datebegin,$l_dateend;
-  if(!$pid) {
+///////////////////////////////////////////////////////////////////////////////
+function project_send_mail($params, $p_id) {
+  global $cgp_host, $l_mail_project_subject, $l_mail_project_member;
+  global $l_company, $l_name, $l_sold, $l_estimated, $l_datebegin,$l_dateend;
+
+  if (!$p_id) {
     return 0;
   }
-  if(isset($params["member"])) {
+  if (isset($params["member"])) {
     $member = $params["member"];
   } elseif (isset($params["user_id"])) {
     $member = $params["user_id"];
@@ -1875,25 +1946,19 @@ function project_send_mail($params,$pid) {
     return 0;
   }
 
-  $name = $params["name"];
-  $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
-  $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
-  $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
-  $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
-  if ($add_comment != "") {
-    $datecomment = $params["datecomment"];
-    $usercomment = $params["usercomment"];
-    $comment = "$datecomment:$usercomment:$add_comment";
-  }    
-  $inc = get_incident_info($i_id);
-  $company_name = $inc["company"];
-  $status = $inc["status"];
-  $contract = $inc["contract"];
+  $p = get_project_info($p_id);
+  $name = $p["name"];
+  $company = $p["company"];
+  $deal = $p["deal"];
+  $tasktype = $p["tasktype"];
+  $comment = $p["comment"];
   $label_mail = stripslashes($lincident);
-  $subject = "$l_mail_incident_new_subject : $company_name : $label_mail";
-  $message = "$cgp_host/project/project_index.php?action=detailconsult&project_id=$pid
-  $l_mail_project_intro
-  $l_name: $name
+  $subject = "$l_mail_project_subject : $company : $name";
+  $message = "$l_mail_project_member
+$cgp_host/project/project_index.php?action=detailconsult&project_id=$p_id
+
+  $l_company : $company
+  $l_name : $name
   $l_estimated : $estimated
   $l_sold : $l_sold
   $l_datebegin : $datebegin

@@ -48,8 +48,8 @@ $l_progress_info = "Renseignez le temps de travail (en jours) estimé pour termin
 $l_select_project = "Sélectionner un projet";
 
 // Mail
-$l_mail_project_subject = "OBM : Chef de projet";
-$l_mail_project_intro = "Vous avez été désigné chef de projet sur le projet suivant :";
+$l_mail_project_subject = "OBM : Projet";
+$l_mail_project_member = "Vous avez été positionnés sur le projet suivant :";
 
 // Actions
 $l_insert = "Créer le projet";

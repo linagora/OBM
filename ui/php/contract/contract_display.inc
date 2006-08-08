@@ -1129,7 +1129,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   } else {
     $dis_sub .= "
@@ -1428,7 +1428,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
   $datecancel = $contract["datecancel"];
   $datesignature = $contract["datesignature"];
   $sel_type = $contract["type"];
-  $ta_com = $contract["comment"];
+  $ta_comment = $contract["comment"];
   $con1 = ($contract["con1"] ? $contract["con1"] : "0");
   $con2 = ($contract["con2"] ? $contract["con2"] : "0");
   $sel_tech  = $contract["tech"];
@@ -1468,7 +1468,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
       <input type=\"hidden\" name=\"tf_datecancel\" value=\"$datecancel\" />
       <input type=\"hidden\" name=\"tf_datesignature\" value=\"$datesignature\" />
       <input type=\"hidden\" name=\"sel_type\" value=\"$sel_type\" />
-      <input type=\"hidden\" name=\"ta_com\" value=\"$ta_com\" />
+      <input type=\"hidden\" name=\"ta_comment\" value=\"$ta_comment\" />
       <input type=\"hidden\" name=\"sel_con1\" value=\"$con1\" />
       <input type=\"hidden\" name=\"sel_con2\" value=\"$con2\" />
       <input type=\"hidden\" name=\"sel_tech\" value=\"$sel_tech\" />

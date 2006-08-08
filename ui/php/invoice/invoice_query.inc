@@ -490,7 +490,7 @@ function run_query_invoice_delete($p_id) {
 function run_query_linked_invoice_payment($p_id) {
   global $cdg_sql;
 
-  $query = "SELECT distinct payment_id, payment_label, payment_amount 
+  $query = "SELECT distinct payment_id 
     FROM Payment
       LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id
     WHERE paymentinvoice_invoice_id='$p_id'";
@@ -506,7 +506,7 @@ function run_query_linked_invoice_payment($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // returns the value of the inout attribute of the given deal
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_deal_get_inout ($p_deal_id) {
+function run_query_invoice_deal_get_inout($p_deal_id) {
   global $cdg_sql;
 
   $query = "SELECT dealtype_inout

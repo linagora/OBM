@@ -298,7 +298,7 @@ function run_query_company_insert($company) {
   $fax = $company["fax"];
   $web = $company["web"];
   $email = $company["email"];
-  $comment = $company["com"];
+  $comment = $company["comment"];
   $add_comment = $company["add_comment"];
   if ($add_comment != "") {
     $datecomment = $company["datecomment"];

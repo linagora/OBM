@@ -1376,7 +1376,7 @@ $js_status_loop
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   }
 
@@ -1756,7 +1756,7 @@ $js_status_loop
       <td class=\"detailLabel\">$l_upd_comment</td>
       <td>&nbsp;</td>
     </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"8\" cols=\"78\">$comment</textarea></td>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"8\" cols=\"78\">$comment</textarea></td>
     </tr>
     </table>
 

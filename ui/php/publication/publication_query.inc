@@ -1021,9 +1021,9 @@ function run_query_publication_get_contact_lang($p_id) {
 function run_query_publication_subscription_external_search($hash_table) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
-  $contact = $hash_table["publication_id"];
+  $contact = $hash_table["contact_id"];
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;     
+  $type = $obm_q->type;
   $timeupdate = sql_date_format($type, "subscription_timeupdate", "timeupdate");
   $timecreate = sql_date_format($type, "subscription_timecreate", "timecreate");
 
@@ -1047,6 +1047,7 @@ function run_query_publication_subscription_external_search($hash_table) {
 
   display_debug_msg($query, $cdg_sql, "run_query_publication_subscription_external_search()");
   $obm_q->query($query);
+
   return $obm_q;
 }
 
@@ -1062,6 +1063,7 @@ function run_query_publication_subscription_detail($s_id){
   $obm_q = new DB_OBM;
 
   $query = "SELECT
+      subscription_id,
       subscription_contact_id,
       subscription_publication_id,
       publication_title,

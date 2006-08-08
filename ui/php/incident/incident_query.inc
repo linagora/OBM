@@ -20,6 +20,7 @@ function run_query_incident_search($incident) {
   $sql_order_dir = $incident["sql_order_dir"];
   $sql_order_field = $incident["sql_order_field"];
   
+  $text = sql_search_text_parse($incident["text"]);
   $lincident = sql_search_text_parse($incident["lincident"]);
   $lcontract = sql_search_text_parse($incident["lcontract"]);
   $i_id = $incident["incident_id"];
@@ -44,8 +45,14 @@ function run_query_incident_search($incident) {
   $timeupdate = sql_date_format($db_type, "incident_timeupdate", "timeupdate");
 
   $where = "1=1";
+  if ($text != "") {
+     $where .= " AND (Incident.incident_label $like '%$text%'
+       OR Incident.incident_reference $like '%$text%'
+       OR Incident.incident_comment $like '%$text%'
+       OR Incident.incident_resolution $like '%$text%')";
+  }
   if ($lincident != "") {
-     $where .= " AND Incident.incident_label $like '$lincident%'";
+     $where .= " AND Incident.incident_label $like '%$lincident%'";
   }
   if ($reference != "") {
      $where .= " AND Incident.incident_reference $like '$reference%'";
@@ -148,7 +155,7 @@ function run_query_incident_search($incident) {
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($req, $cdg_sql);
+    display_debug_msg($req, $cdg_sql, "run_query_incident_search()");
     $obm_q->query($req);
   }
 
@@ -402,7 +409,7 @@ function run_query_incident_update($incident) {
   $duration = $incident["duration"];
   $archive = $incident["archive"];
   $call_date = "$date $hour:0:0";
-  $comment = $incident["com"];
+  $comment = $incident["comment"];
   $add_comment = $incident["add_comment"];
   if ($add_comment != "") {
     $datecomment = $incident["datecomment"];
@@ -523,6 +530,7 @@ function run_query_incident_logger($archive = false) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get Incident infos
 // Parameters:
@@ -556,6 +564,7 @@ function get_incident_info($id) {
 
   return $res;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Incident Form Data checking and formatting
