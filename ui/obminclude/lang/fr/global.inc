@@ -137,6 +137,7 @@ $l_resource = "Resource";
 $l_group = "Groupe";
 $l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
+$l_backup = "Sauvegarde";
 
 // OBM_DISPLAY
 $l_entries = "Entrées";

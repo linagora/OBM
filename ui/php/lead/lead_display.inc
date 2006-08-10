@@ -282,7 +282,7 @@ function html_lead_consult($l_q) {
   $id = $l_q->f("lead_id");
   $c_id = $l_q->f("lead_company_id");
   $c_name = $l_q->f("company_name");
-  $source = $l_q->f("leadsource_label");
+  $source_label = $l_q->f("leadsource_label");
   $manager = $l_q->f("manager");
   $date = date_format($l_q->f("date"));
   $datealarm = date_format($l_q->f("datealarm"));
@@ -310,7 +310,7 @@ function html_lead_consult($l_q) {
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_source</td>
-      <td class=\"detailText\">$source</td>
+      <td class=\"detailText\">$source_label</td>
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_manager</td>

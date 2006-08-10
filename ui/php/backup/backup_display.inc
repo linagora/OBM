@@ -119,8 +119,8 @@ function html_backup_search_list($files, $nb_files) {
         <td style=\"text-align: right;\">$date &nbsp;</td>
         <td style=\"text-align: right;\">$version &nbsp;</td>
         <td style=\"text-align: right;\">$size &nbsp;</td>
-        <td style=\"text-align: center;\"><a href=\"$path/backup/backup_index.php?action=restore&amp;backup_id=$file\">$l_restore</a></td>
-        <td style=\"text-align: center;\"><a href=\"$path/backup/backup_index.php?action=check_delete&amp;backup_id=$file\">$l_delete</a></td>
+        <td style=\"text-align: center;\"><a href=\"$path/backup/backup_index.php?action=restore&amp;tf_filename=$file\">$l_restore</a></td>
+        <td style=\"text-align: center;\"><a href=\"$path/backup/backup_index.php?action=check_delete&amp;tf_filename=$file\">$l_delete</a></td>
       </tr>";
   }
 
@@ -153,7 +153,7 @@ function dis_backup_form() {
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"index\" />
-    <input type=\"hidden\" name=\"backup_id\" value=\"$filename\" />
+    <input type=\"hidden\" name=\"tf_filename\" value=\"$filename\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
@@ -186,13 +186,13 @@ function dis_can_delete_backup($filename) {
 
   $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"index\" />
-    <input type=\"hidden\" name=\"backup_id\" value=\"$filename\" />
+    <input type=\"hidden\" name=\"tf_filename\" value=\"$filename\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"backup_id\" value=\"$filename\" />
+    <input type=\"hidden\" name=\"tf_filename\" value=\"$filename\" />
     <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 

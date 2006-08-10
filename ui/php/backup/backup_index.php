@@ -122,14 +122,17 @@ display_page($display);
 function get_param_backup() {
   global $tf_filename, $tf_version, $tf_date, $param_backup, $popup; 
 
-  if (isset ($param_backup)) $backup["filename"] = $param_backup;
-  if (isset ($tf_filename)) $backup["filename"] = $tf_filename;
-  if (isset ($tf_version)) $backup["version"] = $tf_version;
-  if (isset ($tf_date)) $backup["date"] = $tf_date;
+  // Get global params
+  $params = get_global_params("Backup");
 
-  display_debug_param($backup);
+  if (isset ($param_backup)) $params["filename"] = $param_backup;
+  if (isset ($tf_filename)) $params["filename"] = $tf_filename;
+  if (isset ($tf_version)) $params["version"] = $tf_version;
+  if (isset ($tf_date)) $params["date"] = $tf_date;
 
-  return $backup;
+  display_debug_param($params);
+
+  return $params;
 }
 
 

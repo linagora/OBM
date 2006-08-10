@@ -176,7 +176,7 @@ function run_query_payment_insert($params) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
-  $company_id = $params["comp_new_id"];
+  $company_id = $params["company_new_id"];
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
@@ -274,7 +274,7 @@ function run_query_payment_update($pid, $params) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
-  $company_id = $params["comp_new_id"];
+  $company_id = $params["company_new_id"];
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
@@ -545,7 +545,7 @@ function check_payment_data_form($id, $params) {
   $inout = $params["inout"];
   $amount = $params["amount"];
   $c_id = $params["company_id"];
-  $c_new_id = $params["comp_new_id"];
+  $c_new_id = $params["company_new_id"];
   $kind = $params["kind"];
 
   // MANDATORY: a company must be set

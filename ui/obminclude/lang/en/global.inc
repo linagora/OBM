@@ -134,6 +134,7 @@ $l_resource = "Resource";
 $l_group = "Group";
 $l_resourcegroup = "Resources Group";
 $l_settings = "Settings";
+$l_backup = "Backup";
 
 // Global display
 $l_last_visit = "Bookmarks";

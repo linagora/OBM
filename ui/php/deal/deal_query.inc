@@ -274,7 +274,7 @@ function run_query_deal_insert($deal) {
   $comp = $deal["company_id"];
   $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
   $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
-  $source_id = ($deal["source"] ? "'".$deal["source"]."'" : "0");
+  $source_id = ($deal["source_id"] ? "'".$deal["source_id"]."'" : "0");
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
@@ -421,7 +421,7 @@ function run_query_deal_update($deal) {
   $comp = $deal["company_id"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
-  $source_id = ($deal["source"] ? $deal["source"] : "0");
+  $source_id = ($deal["source_id"] ? $deal["source_id"] : "0");
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
@@ -1418,7 +1418,7 @@ function get_lead_info($lead_id) {
 
   $res["name"] = $obm_q->f("lead_name");
   $res["company_id"] = $obm_q->f("lead_company_id");
-  $res["source"] = $obm_q->f("lead_source_id");
+  $res["source_id"] = $obm_q->f("lead_source_id");
   $res = $obm_q->f("lead_manager_id");
   $res["date"] = $obm_q->f("lead_date");
   $res["datealarm"] = $obm_q->f("lead_datealarm");

@@ -1010,7 +1010,7 @@ function dis_deal_form($deal) {
     $lead = get_lead_info($deal["lead_id"]);
     $deal["company_id"] = $lead["company_id"];
     $deal["market"] = $lead["manager"];
-    $deal["source"] = $lead["source"];
+    $deal["source_id"] = $lead["source_id"];
     $deal["label"] = $lead["name"];
     $deal["datebegin"] = $lead["date"];
     $deal["datealarm"] = $lead["datealarm"];
@@ -1144,7 +1144,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
   if (isset($deal["category1"])) { $cat1 = $deal["category1"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
   if (isset($deal["tech"])) { $tech = $deal["tech"]; }
-  if (isset($deal["source"])) { $source_id = $deal["source"]; }
+  if (isset($deal["source_id"])) { $source_id = $deal["source_id"]; }
   if (isset($deal["source"])) { $source = $deal["source"]; }
   if (isset($deal["commission"])) { $commission = $deal["commission"]; }
   if (isset($deal["amount"])) { $amount = stripslashes($deal["amount"]); }
@@ -1182,7 +1182,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
 
   // Sources select
   $sel_source = "
-    <select name=\"sel_source\">
+    <select name=\"sel_source_id\">
      <option value=\"$c_undef\">$l_undef</option>\n";
   if (is_array($sources) && (count($sources) > 0)) {
     foreach($sources as $s_id => $one_source) {
