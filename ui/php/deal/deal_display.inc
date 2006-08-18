@@ -1015,7 +1015,7 @@ function dis_deal_form($deal) {
     $deal["datebegin"] = $lead["date"];
     $deal["datealarm"] = $lead["datealarm"];
     $deal["todo"] = $lead["todo"];
-    $deal["com"] = $lead["comment"];
+    $deal["comment"] = $lead["comment"];
   }
 
   if (($action == "new") || ($action == "insert")) {
@@ -1155,7 +1155,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
   if (isset($deal["timeupdate"])) { $timeupdate = $deal["timeupdate"]; }
   if (isset($deal["archive"])) { $archive = ($deal["archive"] == 1 ? "checked" : ""); }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
-  if (isset($deal["com"])) { $comment = stripslashes($deal["com"]); }
+  if (isset($deal["comment"])) { $comment = stripslashes($deal["comment"]); }
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
   if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
   if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
@@ -1639,7 +1639,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   if (isset($deal["status"])) { $status = $deal["status"]; }
   if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
   if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
-  if (isset($deal["com"])) { $comment = stripslashes($deal["com"]); }
+  if (isset($deal["comment"])) { $comment = stripslashes($deal["comment"]); }
   if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
   if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
   if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
