@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.2pre1";
+$obm_version = "1.2.2pre2";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -430,6 +430,7 @@ $php_regexp_isodatetime = "/^[0-9]{4}-[01][0-9]-[0123][0-9] [012][0-9]:[0-5][0-9
 $php_regexp_pub_lang = "/^[A-Za-z-]+$/";  // Publication lang
 $js_regexp_list_name = "/^[0-9A-Za-z_\- ]+$/";  // List name
 $js_regexp_import_name = "/^[0-9A-Za-z_\-\. ]+$/";  // Import name
+$php_regexp_number = "/^[-]?[0-9]*$/"; // only numbers
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_amount = "/^[0-9]+(\.[0-9][0-9]?)?$/";
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'

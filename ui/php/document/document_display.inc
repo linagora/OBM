@@ -238,7 +238,7 @@ function html_document_search_list($doc_q, $prefs, $document) {
 //   - $doc_q      : document database result 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_consult($document) {
-  global $display, $l_no_document;
+  global $display, $l_err_reference;
 
   if ($document["document_id"] > 0) {
     $doc_q = run_query_document_detail($document["document_id"]);
@@ -246,8 +246,10 @@ function dis_document_consult($document) {
       $display["detailInfo"] = display_record_info($doc_q);
       $block = html_document_consult($doc_q);
     } else {
-      $display["msg"] .= display_err_msg("$l_no_document !");
-    }
+      $display["msg"] .= display_err_msg($l_err_reference);
+    }  
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

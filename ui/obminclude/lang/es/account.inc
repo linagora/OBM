@@ -47,7 +47,6 @@ $l_insert_ok = "La cuenta ha sido ingresada correctamente.";
 $l_insert_error = "El ingreso de la cuenta ha fallado !";
 $l_update_ok = "La cuenta ha sido actualizada correctamente.";
 $l_update_error = "La actualización ha fallado !";
-$l_query_error = "Problemas ejecutando la búsqueda...";
 $l_impossible_deletion = " existen pagos asociados con esta cuenta. Eliminarla no es posible"; // debe ser usada con los pagos iniciando por...
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

@@ -51,10 +51,9 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
-update_last_visit("incident", $param_incident, $action);
-
 if ($action == "") $action = "index";
 $params = get_incident_params();
+update_last_visit("incident", $params["incident_id"], $action);
 get_incident_action();
 $perm->check_permissions($module, $action);
 
@@ -87,7 +86,7 @@ if ($action == "index" || $action == "") {
   if ($params["incident_id"] > 0) {
     $display["detail"] = dis_incident_consult($params);
   } else {
-    $display["msg"] .= display_err_msg($l_error_visibility);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "detailupdate")  {
@@ -96,8 +95,7 @@ if ($action == "index" || $action == "") {
     $display["detailInfo"] = display_record_info($inc_q);
     $display["detail"] = dis_incident_form($action,$params);
   } else {
-    $display["msg"] = display_err_msg($l_query_error . " - " . $con_q->query . " !");
-    $display["search"] = dis_incident_search_form($params);
+    $display["msg"] = display_err_msg($l_err_reference);
   }
   
 } elseif ($action == "insert")  {

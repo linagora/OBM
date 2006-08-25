@@ -301,15 +301,19 @@ function html_resource_form($usr_q, $resource) {
 //   - $resource : resource database result
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resource_consult($resource) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
   $id = $resource["resource_id"];
 
-  $obm_q = run_query_resource_detail($id);
-  if ($obm_q->num_rows() == 1) {
-    $block = html_resource_consult($obm_q);
+  if ($id > 0) {
+    $obm_q = run_query_resource_detail($id);
+    if ($obm_q->num_rows() == 1) {
+      $block = html_resource_consult($obm_q);
+    } else {
+      $display["msg"] .= display_err_msg($l_err_reference);
+    }
   } else {
-    $display["msg"] .= display_err_msg($l_query_error);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

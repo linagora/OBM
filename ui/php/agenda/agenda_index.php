@@ -236,6 +236,8 @@ if ($action == "index") {
     $entities = get_agenda_event_entity($params["agenda_id"]);
     $display["detailInfo"] = display_record_info($eve_q);
     $display["detail"] = dis_agenda_event_form($action, $params, $eve_q, $entities);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "update") {

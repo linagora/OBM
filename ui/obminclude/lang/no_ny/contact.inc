@@ -53,7 +53,6 @@ $l_error_visibility = "You can't consult this page : the information is private.
 $l_no_display = "Fyll inn søkefelta og trykk < Finn > for å hente ut kontaktane";
 $l_found = "found (to translate) !";
 $l_no_found = "Ingen kontaktar passa søket!";
-$l_query_error = "Problem med å utføre søket.";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_lastname = "\\n Du må fylle inn etternamn før du legg inn.";

@@ -104,14 +104,16 @@ if ($action == "ext_get_path") {
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-if ($params["document_id"] > 0) {
+  if ($params["document_id"] > 0) {
     $doc_q = run_query_document_detail($params["document_id"]);
     if ($doc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($doc_q);
       $display["detail"] = dis_document_form($action, $params, $doc_q);
-  } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $doc_q->query . " !");
+    } else {
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "insert") {

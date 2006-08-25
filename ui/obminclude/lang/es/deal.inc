@@ -101,7 +101,6 @@ $l_no_found = "No hay negocios correspondientes a su búsqueda!";
 $l_found_parent = "negocios originales(padres) encontrados";
 $l_no_found_parent ="No hay negocios originales(padres) correspondientes a su búsqueda!";
 
-$l_query_error = "Problemas ejecutando la búsqueda...";
 $l_kind_can_delete = "El Tipo puede ser borrado !";
 $l_kind_cant_delete = "El Tipo no puede ser borrado!";
 $l_kind_link_deal = "El Tipo esta involucrado en estos negocios";

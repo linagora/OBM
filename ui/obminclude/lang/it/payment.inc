@@ -60,7 +60,6 @@ $l_insert_ok = "Pagamento inserito.";
 $l_insert_error = "Inserimento pagamento fallito !";
 $l_update_ok = "Pagamento modificato.";
 $l_update_error = "Modifica pagamento fallita!";
-$l_query_error = "Problemi durante la query.....";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_no_number = "\\nNumero pagamento non valido!";

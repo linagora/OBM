@@ -90,7 +90,6 @@ $l_insert_ok = "El pago ha sido inserted exitosamente.";
 $l_insert_error = "El ingreso del pago ha fallado !";
 $l_update_ok = "El pago ha sido actualizado exitosamente.";
 $l_update_error = "La actualización del pago ha fallado !";
-$l_query_error = "Problemas ejecutando la búsqueda...";
 $l_insert_paymentinvoice_ok = "La asociación entre Pagos y Facturas fue realizada correctamente";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

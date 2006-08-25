@@ -78,7 +78,6 @@ function run_query_deal_search($deal, $all="") {
   }
   if ($name != "") {
     $where .= sql_global_company_name_advanced_search($name, $like);
-    $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
   }
   if ($contact_id > 0) {
     $where .= " AND (deal_contact1_id='$contact_id'
@@ -86,7 +85,6 @@ function run_query_deal_search($deal, $all="") {
   }
   if ($zip != "") {
     $where .= " AND company_zipcode $like '$zip%'";
-    $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
   }
   if (($status != $c_all) && ($status != "")) {
     $where .= " AND deal_status_id='$status'";
@@ -157,7 +155,7 @@ function run_query_deal_search($deal, $all="") {
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
     FROM Deal
-        LEFT JOIN Company ON deal_company_id=company_id
+        LEFT JOIN Company as Company ON deal_company_id=Company.company_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
         LEFT JOIN Region ON deal_region_id=region_id
         LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id
@@ -278,7 +276,11 @@ function run_query_deal_insert($deal) {
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
-  $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
+  if (($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
+    $hitrate = "'".$deal["hitrate"]."'";
+  } else {
+    $hitrate = "null";
+  }
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
   $status = $deal["status"];
@@ -425,7 +427,11 @@ function run_query_deal_update($deal) {
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
-  $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
+  if (($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
+    $hitrate = "'".$deal["hitrate"]."'";
+  } else {
+    $hitrate = "null";
+  }
   $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
   $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
   $status = $deal["status"];

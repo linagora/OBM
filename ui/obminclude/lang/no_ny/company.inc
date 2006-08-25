@@ -55,7 +55,6 @@ $l_error_permission = "You have not the rights to access this page";
 $l_no_display = "Skriv inn søkekriteria og trykk < Finn > for å finne firma";
 $l_found = "found (to translate) !";
 $l_no_found = "Ingen firma som passa til søket !";
-$l_query_error = "Problem med å utføre søket.";
 $l_kind_del_verif_error = "(ar) av denne typen finst.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

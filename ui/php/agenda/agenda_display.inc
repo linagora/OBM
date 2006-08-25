@@ -1514,7 +1514,7 @@ function html_agenda_conflict_form($agenda) {
 //   - $id : event id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_agenda_event_consult($id) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
   if ($id > 0) {
     $eve_q = run_query_agenda_detail($id);
@@ -1523,8 +1523,10 @@ function dis_agenda_event_consult($id) {
       $display["detailInfo"] = display_record_info($eve_q);
       $block = html_agenda_calendar_consult($eve_q, $entities);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error);
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

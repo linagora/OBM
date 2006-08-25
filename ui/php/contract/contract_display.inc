@@ -475,7 +475,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 //   - $contract[]    
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_consult($contract) {
-  global $display, $l_consult_error;
+  global $display, $l_err_reference;
 
   $id = $contract["contract_id"];
   if ($id > 0) {
@@ -491,6 +491,8 @@ function dis_contract_consult($contract) {
     }
     
     $block = html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, $last_inc);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -1272,14 +1274,14 @@ $dis_format_detail
 //     keys used  : contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_export($param_contract) {
-  global $display, $path, $l_query_error;
+  global $display, $path, $l_err_reference;
   global $auth;
 
   $con_q = run_query_contract_detail($param_contract);
   $company_id = $con_q->f("company_id");
 
   if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   export_contract($con_q);

@@ -171,6 +171,8 @@ function run_query_agenda_get_allusers($users_array,$groups_array) {
 
   return $r_array;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Get the resources of the given group                    //
 // Parameters:
@@ -341,8 +343,10 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
     $users_array = array();
   }
 
+  // Insert the Event
   $event_id = run_query_agenda_insert_event_data($agenda);   
 
+  // Insert Event users
   foreach ($users_array as $user_id) {
     if ($user_id == $uid || in_array($user_id, $writable_cal["ids"])) {
       run_query_agenda_insert_entity_event("user", $user_id, $event_id, 'A');
@@ -351,11 +355,14 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
     }
   }
 
-  if($task_id > 0) {
+  // Insert The event task
+  if ($task_id > 0) {
     run_query_agenda_insert_entity_event("task", $task_id, $event_id, 'A');
   }
-  $resources_writable=array(); // Writable Resources  
-  $resources_address =array(); // Resource Admin notification
+
+  // Insert Event resources
+  $resources_writable = array(); // Writable Resources  
+  $resources_address = array(); // Resource Admin notification
   // Get the final resource list and insert resource links
   $resources_array = $sel_entity_id["resource"];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
@@ -377,7 +384,7 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
     }
   }
 
-
+  // Send mail to users
   $subject = "$l_add_event_mail_subject" . $mail_title;
   $message = "$l_add_event_mail_head $mail_title $l_date : $l_from $datebegin $l_to $dateend $message_resource";
   if (is_array($users_array)) {
@@ -415,7 +422,7 @@ function run_query_agenda_insert_event_data($agenda) {
   $title = $agenda["title"];
   $category1_id = $agenda["category1"];
   $priority = $agenda["priority"];
-  $description = $agenda["description"];
+  $description = $agenda["event_description"];
   $location = $agenda["location"];
   ($agenda["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = $agenda["date_begin"];
@@ -897,7 +904,7 @@ function run_query_agenda_update_event_data($agenda) {
   $title = $agenda["title"];
   $category1_id = $agenda["category1"];
   $priority = $agenda["priority"];
-  $description = $agenda["description"];
+  $description = $agenda["event_description"];
   $location = $agenda["location"];
   $datebegin = $agenda["date_begin"];
   $event_duration = $agenda["event_duration"];

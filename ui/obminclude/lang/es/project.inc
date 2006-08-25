@@ -95,6 +95,3 @@ $l_delete_confirm = "Confirme la eliminación del proyecto ?";
 
 // For the display preferences modification screen 
 $l_project_display = "Opciones de despliegue de listas de proyectos";
-
-// Other Skina
-$l_query_error = "Problemas ejecutando la búsqueda...";

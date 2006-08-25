@@ -100,7 +100,6 @@ $l_no_found = "No deal found matching the query !";
 $l_found_parent = "parentdeals found";
 $l_no_found_parent ="No parentdeal found matching the query !";
 
-$l_query_error = "Probl&egrave;me en executant la requete";
 $l_no_display_parent ="Fill the search fields and press < Find > to retrieve the parentdeals"; 
 
 $l_kind_can_delete = "The Kind can be deleted !";

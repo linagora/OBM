@@ -88,7 +88,7 @@ if ($action == "ext_get_ids") {
     $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_user_form($obm_q, $params);
   } else {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "insert") {
@@ -187,7 +187,7 @@ if ($action == "ext_get_ids") {
   if ($obm_q->num_rows() == 1) {
     $display["detail"] = html_user_group_consult($obm_q);
   } else {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "group_update") {

@@ -489,14 +489,18 @@ function html_list_search_list($obm_q, $prefs, $list, $popup) {
 //   - $list[] : list parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_consult($list) {
-  global $uid;
+  global $uid, $l_err_reference;
 
   $id = $list["list_id"];
 
-  $list_q = run_query_list_detail($id);
-  $prefs_con = get_display_pref($uid, "list_contact");
-  $con_q = run_query_list_contacts_list($list, "list_contact");
-  $block = html_list_consult($list_q, $prefs_con, $con_q);
+  if ($id > 0) {
+    $list_q = run_query_list_detail($id);
+    $prefs_con = get_display_pref($uid, "list_contact");
+    $con_q = run_query_list_contacts_list($list, "list_contact");
+    $block = html_list_consult($list_q, $prefs_con, $con_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
+  }
 
   return $block;
 }

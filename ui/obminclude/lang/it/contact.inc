@@ -47,7 +47,6 @@ $l_can_delete = "Il contatto può essere eliminato.";
 $l_no_display = "Riempi i campi e click <TROVA> per eseguire la ricerca";
 $l_found = "contatti trovati.";
 $l_no_found = "Non sono stato trovati contatti !";
-$l_query_error = "Errore durate la ricerca";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_lastname = "Inserisci prima il Cognome.";

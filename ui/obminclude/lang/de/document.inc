@@ -46,7 +46,6 @@ $l_insert_ok = "L'insertion du Dokument a &eacute;t&eacute; correctement effectu
 $l_insert_error = "L'insertion du Dokument  a &eacute;chou&eacute;e !";
 $l_update_ok = "La modification de l'affaire a &eacute;t&eacute; correctement effectu&eacute;e";
 $l_update_error = "La modification de l'affaire a &eacute;chou&eacute;e !";
-$l_query_error = "Probl&egrave;me en executant la requete";
 $l_archive_ok = "La mise &agrave; jour des archives s'est bien effectu&eacute;e.";
 $l_archive_error = "Erreur lors de l'archivage de l'affaire de code ";
 $l_archive_number = "affaires enregistr&eacute;es dans les archives.";

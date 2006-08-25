@@ -543,7 +543,7 @@ function html_project_links($p_q) {
 //   - $pid : project id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_consult($pid) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
   $project_q = run_query_project_detail($pid);
   $tasks_q = run_query_project_tasks($pid);
@@ -551,7 +551,7 @@ function dis_project_consult($pid) {
   $times = run_query_project_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   $display["detailInfo"] = display_record_info($project_q);
@@ -1931,7 +1931,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
 //   - $project : project hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_dashboard($project) {
-  global $display;
+  global $display, $l_err_reference;
 
   $pid = $project["project_id"];
   $project_q = run_query_project_detail($pid);
@@ -1940,7 +1940,7 @@ function dis_project_dashboard($project) {
   $times = run_query_project_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   $block = html_project_dashboard($project_q, $tasks_q, $members_q, $times);

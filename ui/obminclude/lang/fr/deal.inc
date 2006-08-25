@@ -108,7 +108,6 @@ $l_no_found = "Aucune affaire ne correspond à ces critères !";
 $l_found_parent = "SurAffaires trouvées";
 $l_no_found_parent = "Aucune SurAffaire ne correspond à ces critères !";
 
-$l_query_error = "Problème en exécutant la requête";
 $l_kind_can_delete = "Le type peut être supprimé";
 $l_kind_cant_delete = "Le type ne peut être supprimé";
 $l_kind_link_deal = "Le type est référencé par ces affaires";

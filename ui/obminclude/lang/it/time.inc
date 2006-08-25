@@ -68,7 +68,6 @@ $l_insert_ok = "Contatto creato.";
 $l_insert_error = "Inserimento Contatto fallito !";
 $l_update_ok = "Contatto modificato.";
 $l_update_error = "Modifica contatto fallita!";
-$l_query_error = "Query errata";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Inserisci prima il nome.";

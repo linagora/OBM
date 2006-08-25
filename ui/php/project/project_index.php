@@ -112,7 +112,7 @@ if ($action == "ext_get_id") {
   if ($params["project_id"] > 0) {
     $display["detail"] = dis_project_consult($params["project_id"]);
   } else {
-    $display["msg"] .= display_err_msg($l_query_error);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
   
 } elseif ($action == "detailupdate") {
@@ -122,7 +122,7 @@ if ($action == "ext_get_id") {
     $display["detailInfo"] = display_record_info($params_q);
     $display["detail"] = html_project_form($action, $params_q, $params);
   } else {
-    $display["msg"] .= display_err_msg($l_query_error);
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
 } elseif ($action == "insert") {

@@ -65,7 +65,6 @@ $l_error_permission = "Ud. NO tiene permitido ejecutar esta acción";
 $l_error_visibility = "Ud. NO puede tiene acceso a esta información, es privada.";
 $l_err_reference = "Referencia equivocada. Esta entidad no existe.";
 $l_err_fill = "El campo debe ser llenado";
-$l_query_error = "Problemas ejecutando la búsqueda.";
 $l_color = "Color";
 $l_phone = "Teléfono";
 $l_hphone = "Teléfono Casa";

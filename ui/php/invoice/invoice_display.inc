@@ -403,19 +403,20 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 //   - $invoice[] : invoice hash parameters
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_consult($invoice) {
-  global $auth, $display, $l_no_found, $l_query_error;
+  global $auth, $display, $l_no_found, $l_err_reference;
 
   $id = $invoice["invoice_id"];
   $uid = $auth->auth["uid"];
-
-  $inv_q = run_query_invoice_detail($id);
-  if ($inv_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
-  }
   if ($id > 0) {
+    $inv_q = run_query_invoice_detail($id);
+    if ($inv_q->num_rows() != 1) {
+      $display["msg"] .= display_err_msg($l_err_reference);
+    }
     $pays = get_invoice_payment($id);
     $display["detailInfo"] = display_record_info($inv_q);
     $block = html_invoice_consult($inv_q, $pays);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

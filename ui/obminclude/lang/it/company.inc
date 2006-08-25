@@ -39,7 +39,6 @@ $l_no_display = "Riempi i  campi  e premi < Trova> per la ricerca";
 $l_found = "Aziende Trovate.";
 $l_no_found = "Nessuna  Azienda trovata !";
 $l_check_samecompany = "Queste Aziende sembra simili alla nuova ...";
-$l_query_error = "Errore critico nell'esecuzione della query.";
 $l_link_contact = "Questi contatti sono di questa Azienda";
 $l_link_contact_no = "l' Azienda non ha contatti";
 $l_link_deal = "l'Azienda ha degli impegni";

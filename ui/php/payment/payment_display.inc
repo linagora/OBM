@@ -312,7 +312,7 @@ function html_payment_search_list($obm_q, $prefs, $params) {
 //   - $params[] : payment values (id)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_payment_consult($params) {
-  global $display, $l_no_found, $path, $l_query_error;
+  global $display, $l_no_found, $path, $l_err_reference;
 
   $view = $params["view"];
   $id = $params["payment_id"];
@@ -322,6 +322,8 @@ function dis_payment_consult($params) {
     $invs = get_payment_invoices($id);
     $display["detailInfo"] = display_record_info($pay_q);
     $block = html_payment_consult($pay_q, $invs);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

@@ -184,6 +184,30 @@ function html_import_search_list($obm_q, $prefs, $nb, $import, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Import detail page
+// Parameters:
+//   - $id : import id
+///////////////////////////////////////////////////////////////////////////////
+function dis_import_consult($params) {
+  global $display, $l_err_reference;
+
+  $id = $params["import_id"];
+  if ($id > 0) {
+    $import_q = run_query_import_detail($id);
+    if ($import_q->num_rows() != 1) {
+      $display["msg"] .= display_err_msg($l_err_reference);
+    }
+    $display["detailInfo"] = display_record_info($import_q);
+    $block = html_import_consult($import_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HTML Display Import Consultation
 // Parameters:
 //   - $import_q : Import database result 

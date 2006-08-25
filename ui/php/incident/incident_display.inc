@@ -280,7 +280,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
 //   - $incident[]    
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_consult($incident) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
   $id = $incident["incident_id"];
 
@@ -291,8 +291,10 @@ function dis_incident_consult($incident) {
       $display["link"] = html_incident_links($inc_q);
       $block = html_incident_consult($inc_q);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $inc_q->query . " !");
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

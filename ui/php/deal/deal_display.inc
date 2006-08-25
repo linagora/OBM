@@ -730,15 +730,17 @@ function html_deal_links($deal_q) {
 //   - $deal[] : deal values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_consult($deal) {
-  global $display;
+  global $display, $l_err_reference;
 
   if ($deal["deal_id"] > 0) {
     $deal_q = run_query_deal_detail($deal["deal_id"]);
     $dc = get_deal_dealcompany_info($deal["deal_id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $block = html_deal_consult($deal_q, $dc);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
-
+  
   return $block;
 }
 

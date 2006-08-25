@@ -254,7 +254,7 @@ function html_lead_search_list($obm_q, $prefs, $params) {
 //   - $params[] : lead values (id)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_lead_consult($params) {
-  global $display, $l_no_found, $path, $l_query_error;
+  global $display, $l_no_found, $path, $l_err_reference;
 
   $view = $params["view"];
   $id = $params["lead_id"];
@@ -263,6 +263,8 @@ function dis_lead_consult($params) {
     $l_q = run_query_lead_detail($id);
     $display["detailInfo"] = display_record_info($l_q);
     $block = html_lead_consult($l_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;

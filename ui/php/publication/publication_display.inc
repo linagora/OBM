@@ -258,7 +258,7 @@ function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publ
 //   - $publication[] : publication values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_consult($publication) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
   if ($publication["publication_id"] > 0) {
     $pub_q = run_query_publication_detail($publication["publication_id"]);
@@ -266,10 +266,12 @@ function dis_publication_consult($publication) {
       $display["detailInfo"] = display_record_info($pub_q);
       $block = html_publication_consult($pub_q);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $pub_q->query . " !");
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
-
+  
   return $block;
 }
 
@@ -336,14 +338,14 @@ function html_publication_consult($pub_q) {
 //   - $publication : hash values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_publication_form($action, $publication) {
-  global $display, $l_query_error;
+  global $display, $l_err_reference;
 
   if ($publication["publication_id"] > 0) {
     $pub_q = run_query_publication_detail($publication["publication_id"]);
     if ($pub_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($pub_q);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $pub_q->query . " !");
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
     $concat1_q = "";
   } else {

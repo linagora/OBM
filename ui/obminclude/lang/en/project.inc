@@ -77,7 +77,6 @@ $l_ptask_and_parent = "A parent task can't have a parent !";
 $l_ptask_has_parent = "The task given as parent has a parent now !";
 $l_ptask_has_user = "The task given as parent is assigned to user !";
 
-$l_query_error = "Problem executing the query";
 $l_del_member_sel = "remove these members";
 $l_member_added = "member(s) added";
 $l_member_removed = "member(s) removed";

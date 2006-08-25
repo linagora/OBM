@@ -92,7 +92,6 @@ $l_updateaffect_ok = "Impegno collegato all'impegno";
 $l_no_display = "Scrivi nei campi e click su < TROVA > per la ricerca";
 $l_found = "Impegni trovati.";
 $l_no_found = "Non sono stati trovati impegni!";
-$l_query_error = "Errore nell'esecuzione ricerca ";
 $l_found_parent = "Sub-Impegni trovati";
 $l_no_display_parent ="Scrivi nei campi click su   <TROVA> per la ricerca";
 $l_no_found_parent ="Nessun impegno trovato!";

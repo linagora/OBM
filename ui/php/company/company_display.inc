@@ -636,7 +636,7 @@ function html_company_links($co_q) {
 //   - $params[] : company criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_consult($params) {
-  global $path, $display, $obminclude, $set_lang, $l_query_error;
+  global $path, $display, $obminclude, $set_lang, $l_err_reference;
 
   $cid = $params["company_id"];
 
@@ -661,8 +661,10 @@ function dis_company_consult($params) {
 	$block .= html_company_consult_address($comp_q, $cats1);
       }
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
 
   return $block;
@@ -933,7 +935,7 @@ function html_company_consult_address($co_q, $cats1) {
 //   - $company[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_form($action, $company) {
-  global $display, $cg_com, $cgp_hide, $uid, $l_query_error;
+  global $display, $cg_com, $cgp_hide, $uid, $l_err_reference;
 
   // of: type, activity, category1
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
@@ -945,7 +947,7 @@ function dis_company_form($action, $company) {
       $display["detailInfo"] = display_record_info($comp_q);
       $cats1 = of_category_get_ordered("company", "category1", "multi", $c_id);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
   }
   $dsrc_q = run_query_global_datasource();

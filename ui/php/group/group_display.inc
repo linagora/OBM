@@ -398,26 +398,30 @@ function html_group_form($action, $group_q, $group) {
 //   - $uid     : user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_consult($group, $uid) {
-  global $ctu_sql_limit;
+  global $ctu_sql_limit, $l_err_reference;
 
   $g_id = $group["group_id"];
 
-  $group_q = run_query_group_detail($g_id);
+  if ($g_id > 0) {
+    $group_q = run_query_group_detail($g_id);
 
-  $prefs_u = get_display_pref($uid, "group_user");
-  $u_q = run_query_group_user_group($group);
-  if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id=$g_id");
-    $u_q->set_num_rows_total($count);
-  }
+    $prefs_u = get_display_pref($uid, "group_user");
+    $u_q = run_query_group_user_group($group);
+    if ($ctu_sql_limit) {
+      $count = get_query_count("SELECT count(*) FROM UserObmGroup WHERE userobmgroup_group_id=$g_id");
+      $u_q->set_num_rows_total($count);
+    }
 
-  $prefs_g = get_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($group);
-  if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
-    $g_q->set_num_rows_total($count);
+    $prefs_g = get_display_pref($uid, "group_group");
+    $g_q = run_query_group_group($group);
+    if ($ctu_sql_limit) {
+      $count = get_query_count("SELECT count(*) FROM GroupGroup WHERE groupgroup_parent_id=$g_id");
+      $g_q->set_num_rows_total($count);
+    }
+    $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
-  $block = html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q);
 
   return $block;
 }

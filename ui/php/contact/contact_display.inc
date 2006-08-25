@@ -634,13 +634,13 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 //   - $contact[] : contact values (id)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
-  global $display, $l_no_found, $path, $l_query_error;
+  global $display, $l_no_found, $path, $l_err_reference;
 
   $view = $contact["view"];
   $id = $contact["contact_id"];
   $con_q = run_query_contact_detail($id);
   if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
   $display["detailInfo"] = display_record_info($con_q);
   $display["link"] = html_contact_links($id);
@@ -2325,14 +2325,14 @@ function dis_contact_display_pref($prefs) {
 //     keys used  : contact_id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_vcard_export($contact) {
-  global $display, $path, $l_query_error;
+  global $display, $path, $l_err_reference;
   global $auth;
 
   $contact_id = $contact["contact_id"];
   $con_q = run_query_contact_detail($contact_id);
   $com_q = run_query_contact_company($con_q->f("company_id"));
   if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
   export_contact_vcard($con_q,$com_q);
 }

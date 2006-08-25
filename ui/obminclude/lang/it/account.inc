@@ -46,7 +46,6 @@ $l_insert_ok = "Account inserito .";
 $l_insert_error = "Inserimento account Fallito  !";
 $l_update_ok = "Account Aggiornato .";
 $l_update_error = "Aggiornamento account fallito !";
-$l_query_error = "Problemi nell'esecuzione della ricerca...";
 $l_impossible_deletion = " alcuni pagamenti sono associati a questo account. Impossibile cancellare";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

@@ -364,20 +364,24 @@ function html_resourcegroup_form($action, $group_q, $group) {
 //   - $uid     : user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resourcegroup_consult($group, $uid) {
-  global $c_all, $cdg_sql, $ctu_sql_limit;
+  global $c_all, $cdg_sql, $ctu_sql_limit, $l_err_reference;
 
   $g_id = $group["resourcegroup_id"];
 
-  $group_q = run_query_resourcegroup_detail($g_id);
+  if ($g_id > 0) {
+    $group_q = run_query_resourcegroup_detail($g_id);
 
-  $prefs_r = get_display_pref($uid, "resourcegroup_resource");
-  $r_q = run_query_resource_resourcegroup($group);
-  if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM ResourceGroup WHERE resourcegroup_rgroup_id=$g_id");
-    $r_q->set_num_rows_total($count);
+    $prefs_r = get_display_pref($uid, "resourcegroup_resource");
+    $r_q = run_query_resource_resourcegroup($group);
+    if ($ctu_sql_limit) {
+      $count = get_query_count("SELECT count(*) FROM ResourceGroup WHERE resourcegroup_rgroup_id=$g_id");
+      $r_q->set_num_rows_total($count);
+    }
+
+    $block = html_resourcegroup_consult($group_q, $prefs_r, $r_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_err_reference);
   }
-
-  $block = html_resourcegroup_consult($group_q, $prefs_r, $r_q);
 
   return $block;
 }

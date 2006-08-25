@@ -139,7 +139,7 @@ if ($action == "ext_get_ids") {
       $display["detailInfo"] = display_record_info($con_q);
       $display["detail"] = dis_contact_form($action, $con_q, $params);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+      $display["msg"] .= display_err_msg($l_err_reference);
     }
   }
 
