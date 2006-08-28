@@ -146,6 +146,7 @@ class OBM_Challenge_Auth extends Auth {
   function auth_loginform() {
     global $sess, $obminclude, $obm_version, $module, $path, $login_action;
     global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
+    global $params;
 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
@@ -155,8 +156,15 @@ class OBM_Challenge_Auth extends Auth {
   }
   
   function auth_validatelogin() {
-    global $login, $password, $challenge, $response;
+    global $params, $login, $password, $challenge, $response;
     global $auth_encryption, $password_encryption;
+
+    //    echo "auth_validatelogin";
+
+    $login = $params["login"];
+    $password = $params["password"];
+    $challenge = $params["challenge"];
+    $response = $params["response"];
 
     if (isset($login)) {
       $this->auth["uname"] = $login; // provides access for loginform.ihtml

@@ -19,7 +19,7 @@ We suppose apache, php and a database server (mysql or postgres) are correctly i
 <br>
 For pre-packaged distributions, check in your distribution docs.
 <br>
-In Debian, install php4, php4-cgi, php4-mysql or php4-pgsql, apache, apache-common
+In Debian, install php4, php4-cgi, php4-mysql or php4-pgsql (or php5 ones), apache, apache-common (or apache2 ones)
 
 <p />
 We suppose that as an example the obm root is /var/www/obm
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-1.2.0.tar.gz
-tar -C /var/www -xzvf obm-1.2.0.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-1.2.2.tar.gz
+tar -C /var/www -xzvf obm-1.2.2.tar.gz
 cd /var/www
-ln -s obm-1.2.0 obm
+ln -s obm-1.2.2 obm
 </pre>
   </td>
 </tr>
@@ -96,6 +96,18 @@ register_globals = On
 </table>
 <p>
 
+To avoid some PHP warnings for a previous php version bug, turn on these 2 directives :
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+session.bug_compat_42 = 1
+session.bug_compat_warn = 1
+</pre>
+  </td>
+</tr>
+</table>
+<p>
+
 Magic quotes must be On :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -135,11 +147,12 @@ extension=pgsql.so
 
 OBM sources are in the php directory.
 Included files are in the obminclude directory.
-<p />
-For the OBM web application, all the apache and php configuration is done through the apache <b>httpd.conf</b> file.
 
 
 <h3>Configure apache to process PHP files</h3>
+
+In recent distribution (Debian,...) this step is automatically done when you install the packages.
+<p />
 Edit your httpd.conf or srm.conf file and add:
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -150,9 +163,10 @@ Edit your httpd.conf or srm.conf file and add:
 </tr>
 </table>
 <p>
-On RedHat 8 with apache2, chech that your /etc/httpd/conf.d/php.conf is correct
+On RedHat 8 with apache2, check that your /etc/httpd/conf.d/php.conf is correct
 
-<p />
+<h3>OBM virtual host creation</h3>
+
 We set up a virtual host to handle one occurence of OBM (there can be several on one server).
 In the virtual host section set :
 
@@ -247,6 +261,19 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 </table>
 
 
+<h3>Default Charset</h3>
+OBM lang files are coded in latin 9.
+Set the charset to ISO-8859-15 (latin 9).
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+  AddDefaultCharset ISO-8859-15
+</pre>
+  </td>
+</tr>
+</table>
+
+
 <h3>Complete virtual host block example</h3>
 
 Be sure that your ip is defined as a named virtual host and enter this block
@@ -264,6 +291,7 @@ NameVirtualHost 127.0.0.1
     SetEnv OBM_INCLUDE_VAR obminclude
     Alias /images /var/www/obm/obminclude/themes
     DirectoryIndex obm.php
+    AddDefaultCharset ISO-8859-15
 &lt;/VirtualHost>
 </pre>
   </td>
@@ -308,7 +336,7 @@ $gp_mail_enabled = false;
 
 <h3>4.2: Document repository</h3>
 
-Since OBM 1.2.0, the document repository is automatically handled by OBM.
+Since OBM 1.1, the document repository is automatically handled by OBM.
 In the install step OBM populate the repository configured with some structured directories for internal storage.
 <br />
 Declare your document repository

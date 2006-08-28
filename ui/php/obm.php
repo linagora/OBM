@@ -9,7 +9,6 @@
 
 // $module and $action defined for ActiveUser stats
 $module = "obm";
-if ($action == "") { $action = "home"; }
 $path = ".";
 $extra_css = "portal.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -18,6 +17,11 @@ include("$obminclude/global.inc");
 include_once("obm_query.inc");
 require("$obminclude/lib/right.inc");
 
+$params = get_obm_params();
+$action = $params["action"];
+$OBM_Session = $params["OBM_Session"];
+if ($action == "") { $action = "home"; }
+//print_r($params);  
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 
 if ($action == "logout") {
@@ -97,7 +101,22 @@ display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display detail of logout page                                             //
+// Stores parameters transmited in $params hash
+// returns : $params hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_obm_params() {
+
+  // Get global params
+  $params = get_global_params("Obm");
+  
+  display_debug_param($params);
+
+  return $params;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display detail of logout page
 ///////////////////////////////////////////////////////////////////////////////
 function dis_logout_detail() {
   global $l_connection_end, $l_reconnect;

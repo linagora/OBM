@@ -363,7 +363,7 @@ function html_list_search_form ($list, $usr_q) {
   $mark = $list["marketing_manager"];
 
   // Marketing manager select
-  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+  $sel_market = "<select id=\"sel_marketing_manager\" name=\"sel_marketing_manager\">
     <option value=\"$c_all\">$l_all</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
@@ -457,7 +457,7 @@ function html_list_search_list($obm_q, $prefs, $list, $popup) {
   $contact = urlencode(stripslashes($list["contact"]));
   $mark = $list["marketing_manager"];
 
-  $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;tf_email=$email&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("list_index.php?action=search&amp;tf_name=$name&amp;tf_contact=$contact&amp;tf_email=$email&amp;sel_marketing_manager=$mark$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA", $prefs, "list");
   if ($popup) {

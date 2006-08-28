@@ -100,7 +100,7 @@ function doChallengeResponse() {
 </tr>
 </table>
 
- <?php global $login; if ( isset($login) ): ?>
+ <?php if ( isset($params["login"]) ): ?>
  <!-- failed login code -->
 
 <p />

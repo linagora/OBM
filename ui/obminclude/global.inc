@@ -812,8 +812,17 @@ function get_global_params($table="") {
     } else if ($value != "") {
       $params[$key] = trim(strip_tags($value));
     }
-
   }
+
+/*  if (is_array($_SESSION)) {
+      foreach($_SESSION as $var => $value) {
+        if (is_array($value)) {
+	  $params[$key] = $value;
+        } else if ($value != "") {
+	  $params[$key] = trim(strip_tags($value));
+        }
+      }
+    } */
 
   return $params;
 }

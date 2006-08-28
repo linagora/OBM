@@ -290,12 +290,13 @@ function get_list_params() {
   global $sel_contact_country_iso3166, $sel_contact_marketingmanager_id;
   global $sel_contact_datasource_id, $sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id, $sel_contact_function_id;
-
+  global $sel_log_and, $sel_log_not;
+  global $se_criteria;
   
-    // Get global params
-    $params = get_global_params("List");
+  // Get global params
+  $params = get_global_params("List");
    
-  // Get agenda specific params
+  // Get List specific params
   if (isset ($ta_query)) $params["query"] = trim($ta_query);
   if (isset ($tf_contact)) $params["contact"] = trim($tf_contact);
   if (isset($cb_priv)) $params["priv"] = ($cb_priv == "1") ? 1 : 0;

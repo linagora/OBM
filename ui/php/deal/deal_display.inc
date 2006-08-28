@@ -254,6 +254,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_relation;
   global $l_postcode, $l_region;
+  global $l_date, $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
   global $l_all, $l_all_f, $l_find, $c_all;
   global $display, $l_select_deal;
 
@@ -272,6 +273,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   $role = $deal["role"];
   $status = $deal["status"];
   $manager = $deal["manager"];
+  $date_field = $deal["date_field"];
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
   $company_id = $deal["company_id"];
@@ -375,6 +377,14 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
     </div>
     <div class=\"searchLabel\">$l_postcode<br />
       <input name=\"tf_zip\" size=\"14\" value=\"$zip\" />
+    </div>
+    <div class=\"searchLabel\">$l_date<br />
+      <select name=\"sel_date_field\">
+        <option value=\"$l_alarm\">$l_alarm</option>
+        <option value=\"$l_begin\">$l_begin</option>
+        <option value=\"$l_expected\">$l_expected</option>
+        <option value=\"$l_end\">$l_end</option>
+      </select>
     </div>
     <div class=\"searchLabel\">$l_after<br />
       <script>calendar('tf_date_after','$date_after')</script>

@@ -50,7 +50,6 @@ class Auth {
     // OBM : We set the auth lifetime with the global session lifetime (if set)
     // It is not set at the login (cause page_open before session_load_global)
     if ($lifetime) $this->lifetime = $lifetime;
-
     ## This is for performance, I guess but I'm not sure if it could
     ## be safely removed -- negro
     if (! $this->in) {
@@ -67,6 +66,7 @@ class Auth {
     #  1) Not logged in (no valid auth info or auth expired)
     #  2) Logged in (valid auth info)
     #  3) Login in progress (if $$cl, revert to state 1)
+//      echo "uid(start)=".$this->auth["uid"]."-";
     if ($this->is_authenticated()) {
       $uid = $this->auth["uid"];
 //echo "<p>auth_>start : is_authenticated : ok : uid = $uid";
@@ -95,9 +95,11 @@ class Auth {
       $this->unauth();
       $state = 1;
     }
+//      echo "uid=".$this->auth["uid"]."-";
 
     switch ($state) {
       case 1:
+//      echo "uid(cas1)=".$this->auth["uid"]."-";
         # No valid auth info or auth is expired
         
         # Check for user supplied automatic login procedure 
@@ -107,6 +109,7 @@ class Auth {
           $this->auth["refresh"] = time() + (60 * $this->refresh);
           return true;
         }
+//      echo "uid(cas1.2)=".$this->auth["uid"]."-".$this->mode."-";
         
         # Check for "log" vs. "reg" mode
         switch ($this->mode) {
@@ -118,6 +121,7 @@ class Auth {
               # $this->auth["uname"] = "nobody";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
+//      echo "uid(fcas1)=".$this->auth["uid"]."-";
               return true;
             } else {
               # Show the login form
@@ -125,6 +129,7 @@ class Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
+//      echo "uid(f2cas1)=".$this->auth["uid"]."-";
               exit;
             }
             break;
@@ -134,6 +139,7 @@ class Auth {
             $this->auth["uid"] = "form";
             $this->auth["exp"] = 0x7fffffff;
             $this->auth["refresh"] = 0x7fffffff;
+//      echo "uid(f3cas1)=".$this->auth["uid"]."-";
             exit;
             break;
           default:
@@ -152,6 +158,7 @@ class Auth {
         }
         break;
       case 3:
+//      echo "uid(cas3)=".$this->auth["uid"]."-";
         # Login in progress, check results and act accordingly
         // OBM : login paramaters has been submitted
         switch ($this->mode) {
@@ -227,7 +234,7 @@ class Auth {
 
   function is_authenticated() {
     if (
-      $this->auth["uid"] 
+      $this->auth["uid"]
         && 
       (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
     ) {

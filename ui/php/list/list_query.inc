@@ -1326,6 +1326,8 @@ function make_list_query_from_criteria($list) {
   $criteria = $list["criteria"]["modules"];
   $boolean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
+  echo "<br>logical=";
+  print_r($list["criteria"]["logical"]);
   $mailing_ok = $list["mailing_ok"];
   $contact_arch = $list["contact_arch"];
   $privacy = $list["privacy"];
@@ -1706,6 +1708,7 @@ function make_list_query_from_criteria($list) {
   $ret["where"] = $where;
   $ret["from"] = $from;
 
+  echo "<br>q=$query";
   return $ret;
 }
 
