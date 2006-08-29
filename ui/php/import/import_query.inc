@@ -530,14 +530,26 @@ function get_import_similar_company($fields, $map) {
     WHERE (company_name $like '$name%' OR company_aka $like '%$name%')
       AND (company_zipcode $like '$zip' OR company_town $like '$town')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_import_similar_company()");
   $obm_q->query($query);
-  $cpt = 0;
+  $cpt_same = 0;
+  $cpt_similar = 0;
+  $comps = array();
   while ($obm_q->next_record()) {
-    $comps[$cpt]["comp_id"] = $obm_q->f("company_id");
-    $comps[$cpt]["comp_name"] = $obm_q->f("company_name");
-    $comps[$cpt]["comp_zip"] = $obm_q->f("company_zipcode");
-    $cpt++;
+    $db_id = $obm_q->f("company_id");
+    $db_name = $obm_q->f("company_name");
+    $db_zip = $obm_q->f("company_zipcode");
+    if (($name == $db_name) && ($zip == $db_zip)) {
+      $comps["same"][$cpt_same]["comp_id"] = $db_id;
+      $comps["same"][$cpt_same]["comp_name"] = $db_name;
+      $comps["same"][$cpt_same]["comp_zip"] = $db_zip;
+      $cpt_same++;
+    } else {
+      $comps["similar"][$cpt_similar]["comp_id"] = $db_id;
+      $comps["similar"][$cpt_similar]["comp_name"] = $db_name;
+      $comps["similar"][$cpt_similar]["comp_zip"] = $db_zip;
+      $cpt_similar++;
+    }
   }
 
   return $comps;
@@ -802,7 +814,7 @@ function get_import_similar_contact($fields, $cid) {
             WHERE contact_lastname $like '$lname%'
               AND contact_company_id = '$cid'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_import_similar_contact()");
   $obm_q->query($query);
   $cpt = 0;
   while ($obm_q->next_record()) {
@@ -944,7 +956,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$priv',
     '$com')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 

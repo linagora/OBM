@@ -480,7 +480,7 @@ function html_import_file_import($import_q, $import) {
     $csv_sep = "\t";
   }
   $enclosed = $import_q->f("import_enclosed");
-  if($enclosed == "") {
+  if ($enclosed == "") {
     $enclosed = " ";
   } else {
     $enclosed = trim($enclosed);  
@@ -605,7 +605,7 @@ function html_import_file_import($import_q, $import) {
   }
 
 
-  // Loop through the file ----------------------------------------------------
+  // Loop through the file : Run until conflict or End ------------------------
   while ( ($row = fgetcsv($fh, 4000, $csv_sep, $enclosed))
 	  && ($stop == false) ) {
     $log = "";
@@ -622,9 +622,54 @@ function html_import_file_import($import_q, $import) {
 	$log["res"] = $l_company_defaultname;
       }
 
-      // Test if similar companies exist --------------------------------------
       $comps = get_import_similar_company($fields, $map);
-      if (is_array($comps)) {
+      
+      // Same company exists : we use it ======================================
+      if (is_array($comps["same"])) {
+	$company_id = $comps["same"][0]["comp_id"];
+	//	echo "<br>same_id=$company_id";
+	// test for contact
+	if ( (import_row_has_contact($fields)) &&
+	     ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
+	
+	  // Test if similar contact exist ------------------------------------
+	  $conts = get_import_similar_contact($fields, $company_id);
+	  if (is_array($conts)) {
+	    $log["display"] = true;
+	    $log["res"] = $l_similar_contact;
+	    // Automatic mode
+	    if ($run_mode == "auto") {
+	      // XXXX action auto
+	      
+	      // Test mode (no database updates) Should never happens here
+	    } else if ($run_mode == "test") {
+	      // Normal mode (Interactive)
+	    } else {
+	      $stop = true;
+	      $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps, $conts);
+	      $display["msg"] .= display_warn_msg($l_conflict_detected);
+	    }
+	  } else {
+	    // Test mode (no database updates) Do nothing : only log
+	    if ($run_mode == "test") {
+
+	      // Auto or Normal mode (Interactive)
+	    } else {
+	      // No similar contacts exists -----------------------------------
+	      if ($fields["con_ln"] == "") {
+		$log["res"] .= $l_contact_defaultname;
+	      }
+	      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds, $functions);
+	      $nb_con_ins++;
+	    }
+	  }
+
+	} else {
+	// Row has no contact
+	}
+
+      // Similar company exists : conflict ====================================
+      }	else if (is_array($comps["similar"])) {
 	$nb_line_conf++;
 	$log["display"] = true;
 	$log["res"] .= $l_similar_company;
@@ -643,7 +688,7 @@ function html_import_file_import($import_q, $import) {
 	  $display["msg"] .= display_warn_msg($l_conflict_detected);
 	}
 	
-	// No similar companies exists ----------------------------------------
+	// No similar companies exists, we proceed ============================
       } else {
 
 	// Test mode (no database updates) Do nothing : only log
@@ -741,6 +786,11 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   $file_name = $import["file_name"];
   $file_saved = $import["file_saved"];
   $comp_id = $import["company_id"];
+  //  if ($comp_id == "") {
+    $comp_id = $comps["same"][0]["comp_id"];
+    //    echo "cid0=$comp_id";
+    //  }
+    //  echo "cid1=$comp_id";
 
   $num_line = $log["num_line"];
 
@@ -757,15 +807,15 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       <td class=\"detailForm\">$con_info</td>
       <td class=\"detailForm\">$res";
 
-  if (is_array($comps)) {
+  if (is_array($comps["similar"])) {
     $checked = false;
-    while ( list($num, $comp) = each($comps) ) {
+    while ( list($num, $comp) = each($comps["similar"]) ) {
       $rd_check = ($checked) ? "" : "checked";
       $checked = true;
       $comp_id = $comp["comp_id"];
       $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
       $line_log .= "<br />
-        <input type=\"radio\" name=\"rd_comp\" value=\"$comp_id\" $rd_check />
+        <input type=\"radio\" name=\"company_id\" value=\"$comp_id\" $rd_check />
         <a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
     }
     $line_log .= "</td>
@@ -816,7 +866,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
     <tr>    
       <td class=\"detailLabel\">
         <input type=\"radio\" name=\"rd_conflict\" value=\"$act_nothing\" checked />$lab_nothing
-        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_insert\" />$lab_insert
+        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_insert\">$lab_insert</input>
         <input type=\"radio\" name=\"rd_conflict\" value=\"$act_update\" />$lab_update
       </td>
     </tr>
@@ -871,8 +921,8 @@ function display_import_log_line($log, $fields, $comps) {
       <td class=\"detailForm\">$con_info</td>
       <td class=\"detailForm\">$res";
 
-    if (is_array($comps)) {
-      while ( list($num, $comp) = each($comps) ) {
+    if (is_array($comps["similar"])) {
+      while ( list($num, $comp) = each($comps["similar"]) ) {
 	$cid = $comp["comp_id"];
 	$url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid");
 	$line_log .= "<br />";
