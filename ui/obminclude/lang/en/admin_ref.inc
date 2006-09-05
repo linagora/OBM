@@ -66,8 +66,8 @@ $l_j_ctry_create = "You have to enter a new country name to create it !";
 $l_iso_3166 = "Iso Code 3166";
 
 // Task Type
-$l_tt_manage = "Countries management";
-$l_tt_exist = "Existing Countries";
+$l_tt_manage = "Task Type management";
+$l_tt_exist = "Existing Task Types";
 $l_tt_new = "New Task Type";
 $l_tt_no = "No Task Type defined";
 $l_tt_update = "Update Task Type";

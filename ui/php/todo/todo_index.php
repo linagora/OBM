@@ -19,19 +19,17 @@ $module = "todo";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_todo_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("todo_query.inc");
 require("todo_display.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
-
-if (!(($action == "detailupdate") && ($popup)))
-  require("todo_js.inc");
+require_once("todo_js.inc");
 
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 
-$params = get_todo_params();
 get_todo_action();
 $perm->check_permissions($module, $action);
 
@@ -180,8 +178,6 @@ function get_todo_params() {
     }
   }
   
-  display_debug_param($params);
-
   return $params;
 }
 

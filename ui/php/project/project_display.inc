@@ -149,7 +149,7 @@ function html_project_search_form ($tts, $member_q, $project) {
   $sel_member .= "</select>";
 
   $checked = ($archive) ? "checked" : "";
-  $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $checked />";
+  $cb_archive = "<input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $checked />";
 
   $url = url_prepare("project_index.php");
 
@@ -264,7 +264,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cba_archive=$archive$url_ext");
 
   $proj_d = new OBM_DISPLAY("DATA", $prefs, "project");
   if ($popup) {
@@ -511,7 +511,7 @@ function html_project_links($p_q) {
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id");
-    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id&amp;cb_archive=1");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id&amp;cba_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;project_id=$id&amp;project_name=$uname&amp;company_id=$cid&amp;company_name=$ucname&amp;deal_id=$did&amp;deal_label=$udlabel");
     $nb_inv_tot = get_global_linked_invoice_nb($id, "project", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "project");
@@ -1176,7 +1176,7 @@ function html_project_form($action, $project_q, $project) {
   if ($action == "detailupdate") {
     $dis_archive = "<tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" $arc_val /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" $arc_val /></td>
      </tr>";
   } else {
     $dis_archive = "";
@@ -1261,7 +1261,7 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><script>calendar('tf_dateend','$dateend')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" $arc_val /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" $arc_val /></td>
     </tr>
     </table>
 

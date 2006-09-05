@@ -262,7 +262,7 @@ function run_query_lead_update($pid, $params) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
-  $company_id = $params["comp_new_id"];
+  $company_id = $params["company_new_id"];
   if ($company_id < 1) {
     $company_id = $params["company_id"];
   }
@@ -367,7 +367,7 @@ function check_lead_data_form($id, $params) {
   $date = $params["date"];
   $datealarm = $params["datealarm"];
   $c_id = $params["company_id"];
-  $c_new_id = $params["comp_new_id"];
+  $c_new_id = $params["company_new_id"];
   $kind = $params["kind"];
 
   // MANDATORY: Name must be set

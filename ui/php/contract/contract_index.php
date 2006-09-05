@@ -33,6 +33,7 @@ $module = "contract";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_contract_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
@@ -43,7 +44,6 @@ require("contract_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_contract_params();
 get_contract_action();
 $perm->check_permissions($module, $action);
 
@@ -336,23 +336,13 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_contract_params() {
-  global $ext_title, $tf_code, $tf_color, $tf_code;
   
   // Get global params
   $params = get_global_params("Contract");
   
   // Get contract specific params
-  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
-  
-  // Admin - Priority fields
-  $params["pri_code"] = (isset($tf_code) ? $tf_code : "0");
-  $params["pri_color"] = (isset($tf_color) ? $tf_color : "");
+  $params["code"] = (isset($params["code"]) ? $params["code"] : "0");
 
-  // Admin - Status fields
- if (isset ($tf_status)) $params["sta_label"] = $tf_status;
- $params["sta_code"] = (isset($tf_code) ? $tf_code : "0");
-  
-  display_debug_param($params);
   get_global_params_document($params);
 
   return $params;

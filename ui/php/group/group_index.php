@@ -32,6 +32,7 @@ $module = "group";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_group_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
@@ -40,7 +41,6 @@ require("group_query.inc");
 require("group_js.inc");
 
 if ($action == "") $action = "index";
-$params = get_group_params();
 get_group_action();
 $perm->check_permissions($module, $action);
 
@@ -288,8 +288,6 @@ function get_group_params() {
   $params["user_nb"] = $nb_u;
   $params["group_nb"] = $nb_group;
   
-  display_debug_param($params);
-
   return $params;
 }
 

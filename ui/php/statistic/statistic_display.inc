@@ -117,6 +117,7 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the companies 
 // Parameters:
@@ -127,7 +128,7 @@ function dis_statistic_list_select($list_q) {
   global $l_select_list, $c_all, $l_all,$l_generate_stats;
   global $path,$popup_height,$popup_width;
 
-  $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_list)."&amp;ext_action=company&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=company_statistic&amp;sel_list=")."&amp;ext_target=$l_statistc";
+  $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_list)."&amp;ext_action=company&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=company_statistic&amp;list_id=")."&amp;ext_target=$l_statistc";
   $block .= "
   <form action=\"statistic_index.php\">
   <div class=\"detailButton\">
@@ -135,7 +136,7 @@ function dis_statistic_list_select($list_q) {
   <input type=\"button\"
   onclick=\"window.open('$url','$l_statistc','height=$popup_height,width=$popup_width,scrollbars=yes'); return false; \" value=\"$l_select_list\" />
   <input type=\"hidden\" name=\"action\" value=\"company_statistic\" />
-  <input type=\"hidden\" name=\"sel_list\" value=\"$c_all\" />
+  <input type=\"hidden\" name=\"list_id\" value=\"$c_all\" />
   <input type=\"submit\" value=\"$l_generate_stats\" />
   </p>
   </div>

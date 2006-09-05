@@ -247,7 +247,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
     $block_cat = "
     $block_category1
     <div class=\"searchLabel\">$l_cat_tree<br />
-      <input type=\"checkbox\" name=\"cb_category1_tree\" value=\"1\" $cat_tree />
+      <input type=\"checkbox\" name=\"cba_category1_tree\" value=\"1\" $cat_tree />
       <input type=\"hidden\" name=\"tf_category1_code\" value=\"$cat_code\" />
     </div>";
   }
@@ -356,10 +356,10 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
       <script>calendar('tf_datebefore','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </div>
     <div class=\"searchLabel\">$l_fuzzy<br />
-      <input type=\"checkbox\" name=\"cb_fuzzy\" value=\"1\" $fuzzy />
+      <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
@@ -439,7 +439,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $datebefore = stripslashes($company["datebefore"]);
   $fuzzy = $company["fuzzy"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cb_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_fuzzy=$fuzzy$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cba_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cba_fuzzy=$fuzzy$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -474,11 +474,11 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($co_q) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
-  global $ico_document,$ico_document_new, $ico_project, $ico_contract;
+  global $ico_document,$ico_document_new, $ico_project, $ico_contract, $ico_lead;
   global $ico_invoice, $ico_payment;
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
-  global $l_module_contract, $l_module_invoice, $l_module_document;
-  global $l_module_payment, $l_document_add;
+  global $l_module_lead, $l_module_contract, $l_module_invoice;
+  global $l_module_document, $l_module_payment, $l_document_add;
   global $l_company, $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $co_q->f("company_id");
@@ -509,7 +509,7 @@ function html_company_links($co_q) {
   // Deal
   if ($cgp_show["module"]["deal"]) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname");
-    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
+    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname&amp;cba_archive=1");
     $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
     $block_deal = "
   <div class=\"linkTitle\">:: $l_module_deal</div>
@@ -520,6 +520,21 @@ function html_company_links($co_q) {
         <a href=\"$url_deal_total\">$deal_total</a> )</li>
     <li><a href=\"$url_deal_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_new</a></li>
+  </ul>";
+  }
+
+  // Lead
+  if ($cgp_show["module"]["lead"]) {
+    $nb_lead = get_global_linked_element_nb("Lead", $id, "company", 1);
+    $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
+    $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
+    $block_lead = "
+  <div class=\"linkTitle\">:: $l_module_lead</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_lead_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead\" /></a>
+        $l_module_lead (<a href=\"$url_lead_list\">$nb_lead</a>)</li>
+    <li><a href=\"$url_lead_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead_new\" /></a>
+        <a href=\"$url_lead_new\">$l_new</a></li>
   </ul>";
   }
 
@@ -547,7 +562,7 @@ function html_company_links($co_q) {
   // Project
   if ($cgp_show["module"]["project"]) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id");
-    $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id&amp;cb_archive=1");
+    $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $nb_pro = get_global_linked_project_nb($id, "company");
     $nb_pro_total = get_global_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
@@ -567,7 +582,7 @@ function html_company_links($co_q) {
     $nb_ctra = get_global_linked_contract_nb($id, "company");
     $nb_ctra_total = get_global_linked_contract_nb($id, "company", 1);
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id");
-    $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id&amp;cb_archive=1");
+    $url_ctra_total = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
 
      $block_contract = "
@@ -584,7 +599,7 @@ function html_company_links($co_q) {
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id");
-    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id&amp;cb_archive=1");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
     $nb_inv_tot = get_global_linked_invoice_nb($id, "company", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "company");
@@ -618,6 +633,7 @@ function html_company_links($co_q) {
   $block = "
 <div class=\"link\"> 
   $block_contact
+  $block_lead
   $block_deal
   $block_project
   $block_contract
@@ -1274,7 +1290,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
       <td class=\"detailForm\">$sel_dsrc</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     $block_type
     $block_cat1
     $block_activity
@@ -1437,7 +1453,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
     <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
     <input type=\"hidden\" name=\"tf_siret\" value=\"$siret\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
+    <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
@@ -1536,9 +1552,9 @@ function html_company_nafcode_form($naf_q) {
     code = mytext.substr(1, pos-1);
     mytext = mytext.substr(pos+2); 
     if (title == '$char_title') {
-     forms.form_naf_update.cb_naf_title.checked=true;
+     forms.form_naf_update.cba_naf_title.checked=true;
     } else {
-     forms.form_naf_update.cb_naf_title.checked=false;
+     forms.form_naf_update.cba_naf_title.checked=false;
     }
     forms.form_naf_update.tf_naf_label.value=mytext;
     forms.form_naf_update.tf_naf_code.value=code;\"
@@ -1600,7 +1616,7 @@ function html_company_nafcode_form($naf_q) {
               action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_naf\" value=\"\" />
 	    <input type=\"hidden\" name=\"action\" value=\"nafcode_update\" />
-            <input type=\"checkbox\" name=\"cb_naf_title\" />
+            <input type=\"checkbox\" name=\"cba_naf_title\" />
  	    <input type=\"text\" size=\"4\" maxlength=\"4\" name=\"tf_naf_code\" />
             <input type=\"text\" name=\"tf_naf_label\" />
             <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_update\"
@@ -1620,7 +1636,7 @@ function html_company_nafcode_form($naf_q) {
         <table>
 	<tr>
 	 <td class=\"adminLabel\">$l_naf_istitle :
-	  <input type=\"checkbox\" name=\"cb_naf_title\" value=\"1\"/>
+	  <input type=\"checkbox\" name=\"cba_naf_title\" value=\"1\"/>
 	 </td>
         </tr>
 	<tr>

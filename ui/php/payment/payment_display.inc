@@ -283,7 +283,7 @@ function html_payment_search_list($obm_q, $prefs, $params) {
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
-        <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
       </p>

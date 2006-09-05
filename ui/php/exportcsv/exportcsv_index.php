@@ -16,12 +16,11 @@ $module = "exportcsv";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_param_export();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
 page_close();
-
-$params = get_param_export();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main program                                                              //
@@ -96,8 +95,6 @@ function get_param_export() {
   if (isset ($call_module)) $params["module"] = $call_module;
   if (isset ($entity)) $params["entity"] = $entity;
   if (isset ($func_data)) $params["function"] = $func_data;
-
-  display_debug_param($params);
 
   return $params;
 }

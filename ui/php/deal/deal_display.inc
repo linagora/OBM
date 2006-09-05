@@ -273,7 +273,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   $role = $deal["role"];
   $status = $deal["status"];
   $manager = $deal["manager"];
-  $date_field = $deal["date_field"];
+  $date_field = ( $deal["date_field"] ? $deal["date_field"] : "datealarm");
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
   $company_id = $deal["company_id"];
@@ -341,6 +341,8 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   }
   $sel_manager .= "</select>";
 
+  // Manager select construction
+  $s_date_field[$date_field] = "selected=\"selected\"";
 
   $url = url_prepare("deal_index.php");
 
@@ -380,10 +382,10 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
     </div>
     <div class=\"searchLabel\">$l_date<br />
       <select name=\"sel_date_field\">
-        <option value=\"$l_alarm\">$l_alarm</option>
-        <option value=\"$l_begin\">$l_begin</option>
-        <option value=\"$l_expected\">$l_expected</option>
-        <option value=\"$l_end\">$l_end</option>
+        <option value=\"datealarm\" $s_date_field[datealarm]>$l_alarm</option>
+        <option value=\"datebegin\" $s_date_field[datebegin]>$l_begin</option>
+        <option value=\"dateexpected\" $s_date_field[dateexpected]>$l_expected</option>
+        <option value=\"dateend\" $s_date_field[dateend]>$l_end</option>
       </select>
     </div>
     <div class=\"searchLabel\">$l_after<br />
@@ -411,7 +413,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
       $sel_manager
     </div>
     <div class=\"searchLabel\">$l_show_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </div>
     <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -475,7 +477,7 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
       $sel_pmanager
     </div>
     <div class=\"searchLabel\">$l_show_archive<br />
-      <input type=\"checkbox\" name=\"cb_parchive\" value=\"1\" $parchive />
+      <input type=\"checkbox\" name=\"cba_parchive\" value=\"1\" $parchive />
     </div>
     <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"parent_search\" />
@@ -550,7 +552,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_region=$region&amp;sel_status=$status&amp;sel_tasktype=$tt&amp;sel_category1=$cat1&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_kind=$kind&amp;sel_region=$region&amp;sel_status=$status&amp;sel_tasktype=$tt&amp;sel_category1=$cat1&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_ext");
 
   $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   if ($popup) {
@@ -622,7 +624,7 @@ function html_deal_links($deal_q) {
     $nb_pro = get_global_linked_project_nb ($id, "deal");
     $nb_pro_arch = get_global_linked_project_nb ($id, "deal", 1);
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id");
-    $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id&amp;cb_archive=1");
+    $url_pro_arch = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_ico_project = "
         <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
             $l_module_project (<a href=\"$url_pro\">$nb_pro</a> / <a href=\"$url_pro_arch\">$nb_pro_arch</a>)</li>";
@@ -647,7 +649,7 @@ function html_deal_links($deal_q) {
     $contract_active = get_global_linked_contract_nb($id, "deal");
     $contract_total = get_global_linked_contract_nb($id, "deal", 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id");
-    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id&amp;cb_archive=1");
+    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_contract = "
     <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
         $l_module_contract (
@@ -671,7 +673,7 @@ function html_deal_links($deal_q) {
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id");
-    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id&amp;cb_archive=1");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $nb_inv_tot = get_global_linked_invoice_nb($id, "deal", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "deal");
     $dis_invoice = "
@@ -1400,7 +1402,7 @@ $js_status_loop
       <input type=\"submit\" value=\"$l_insert \" />";
     $dis_priv = "
              <td class=\"detailLabel\">$l_private</td>
-             <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" ";
+             <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td></tr><tr>";
   }
@@ -1552,7 +1554,7 @@ $js_status_loop
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
     </table>
 
@@ -2186,7 +2188,7 @@ function dis_deal_dashboard_year_detail($deal) {
 	    $month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
 	    $url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
 	  }
-	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cb_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
 	}
 
 	$dis_amount_row .= "
@@ -2281,7 +2283,7 @@ function dis_deal_dashboard_year_detail($deal) {
 	$month_end = date("Y-m-d", mktime(0,0,0,$month+1, 0, $year));
 	$url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
       }
-      $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cb_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+      $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
     } else {
       $dis_am = "";
       $dis_ab = "";
@@ -2450,7 +2452,7 @@ function dis_deal_dashboard_list($deal) {
   $deal_q = run_query_deal_dashboard_list($deal, $users_id);
   $prefs = get_display_pref($uid, "deal", 0);
 
-  $url = url_prepare("deal_index.php?action=dashboard_list&amp;cb_archive=1&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before$url_sel_manager");
+  $url = url_prepare("deal_index.php?action=dashboard_list&amp;cba_archive=1&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before$url_sel_manager");
     
   $dis_deal = new OBM_DISPLAY("DATA", $prefs, "deal");
   $dis_deal->data_set = $deal_q;
@@ -2987,7 +2989,7 @@ function html_deal_parentdeal_search_list($obm_q, $prefs, $nb_parentdeals, $deal
   $parchive = $deal["parchive"];
   $display["msg"] .= display_info_msg($nb_parentdeals." ".$l_found_parent);
 
-  $url = url_prepare("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
+  $url = url_prepare("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cba_parchive=$parchive");
 
   $parentdeal_d = new OBM_DISPLAY("DATA", $prefs, "deal", "parentdeal");
   $parentdeal_d->data_set = $obm_q;
@@ -3150,7 +3152,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cba_archive=$archive&amp;sel_kind=$kind&amp;sel_status=$status&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent");
 
   // Display the list of deals attached to the parentdeal
   $dis_list_deal = new OBM_DISPLAY("DATA", $prefs, "deal");

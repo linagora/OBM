@@ -343,6 +343,7 @@ $l_c_j_delete = "Une entrée doit être sélectionnée.";
 // OF messages
 //---------------------------------------------------------------------------//
 $l_of_right_err_auth = "Droits insuffisants pour exécuter la modification des droits !";
+$l_of_right_err_empty = "La référence de l'objet à afficher est manquante !";
 
 //---------------------------------------------------------------------------//
 // Home page portlets

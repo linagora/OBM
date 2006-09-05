@@ -41,6 +41,7 @@ $module = "contact";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_contact_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("contact_display.inc");
@@ -52,7 +53,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_contact_params();
 get_contact_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Contact", $action, $params["contact_id"], $uid)) {
@@ -539,31 +539,18 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_contact_params() {
-  global $company_name, $company_new_name, $company_new_id, $tf_town;
-  global $cb_mailing_ok_only, $cb_archive, $cb_priv, $cb_mailok;
-  global $cb_fuzzy, $cb_default;
   
   // Get global params
   $params = get_global_params("Contact");
   
   // Get contact specific params
-  if (isset ($company_name)) $params["company_name"] = $company_name;
-  if (isset ($company_new_name)) $params["comp_new_name"] = $company_new_name;
-  if (isset ($company_new_id)) $params["comp_new_id"] = $company_new_id;
-  if (isset ($tf_town)) $params["town"] = get_format_town($tf_town);
-  if (isset ($cb_mailing_ok_only)) $params["mailing_ok_only"] = ($cb_mailing_ok_only == 1 ? 1 : 0);
-  if (isset ($cb_archive)) $params["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
-  if (isset ($cb_mailok)) $params["mailok"] = ($cb_mailok == 1 ? 1 : 0);
-  if (isset ($cb_fuzzy)) $params["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
-  if (isset ($cb_default)) $params["kind_default"] = ($cb_default == 1 ? 1 : 0);
-  
-  get_global_params_document($params);
+  if (isset ($params["town"])) $params["town"] = get_format_town($params["town"]);
 
-  display_debug_param($params);
+  get_global_params_document($params);
 
   return $params;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Contact Action 

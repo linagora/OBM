@@ -146,7 +146,7 @@ function dis_contract_search_form($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   global $l_number,$l_label_libelle,$l_company,$l_type,$l_after,$l_before;
-  global $l_find,$l_manager,$l_priority, $l_archive, $l_status;
+  global $l_find, $l_manager, $l_priority, $l_archive, $l_status;
   global $cck_customer, $cck_supplier, $l_contract_kind,$l_cck_customer,$l_cck_supplier;
   global $c_all, $l_all;
  
@@ -283,7 +283,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
       $sel_kind
      </div>
     <div class=\"searchLabel\">$l_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </div>
     <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -358,7 +358,7 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
   $format = $contract["format"];
   $archive = ($contract["archive"] == "1" ? "1" : "0"); 
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cba_archive=$archive$url_ext");
   
   $contract_q->seek($first_row);
   $contract_d = new OBM_DISPLAY("DATA", $prefs, "contract");
@@ -906,7 +906,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
          ($usercreate == $uid) ) ) {
     $dis_vis = "<tr>
       <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
+      <td class=\"detailForm\"><input name=\"cba_vis\" type=\"checkbox\" value=\"1\" ";
     if ($vis == 1) $dis_vis .= "checked = \"checked\"";
       $dis_vis .= " /></td></tr>";
   }
@@ -987,7 +987,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($autorenewal == 1) { 
     $autorenew_c = "checked";
   }
-  $autorenewal_display = "<input type=\"checkbox\" name=\"cb_autorenew\" value=\"1\" $autorenew_c />";
+  $autorenewal_display = "<input type=\"checkbox\" name=\"cba_autorenew\" value=\"1\" $autorenew_c />";
 
   // Contract kind : customer or supplier
   if ($kind == "$cck_customer") {
@@ -1227,7 +1227,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailForm\">$autorenewal_display</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
+      <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_contract_kind</td>
@@ -1465,7 +1465,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
       <input type=\"hidden\" name=\"rd_format\" value=\"$format\" />      
       <input type=\"hidden\" name=\"tf_ticket_nb\" value=\"$ticket_nb\" />
       <input type=\"hidden\" name=\"tf_duration\" value=\"$duration\" />
-      <input type=\"hidden\" name=\"cb_autorenew\" value=\"$autorenewal\" /> 
+      <input type=\"hidden\" name=\"cba_autorenew\" value=\"$autorenewal\" /> 
       <input type=\"hidden\" name=\"tf_daterenew\" value=\"$daterenew\" />
       <input type=\"hidden\" name=\"tf_datecancel\" value=\"$datecancel\" />
       <input type=\"hidden\" name=\"tf_datesignature\" value=\"$datesignature\" />
@@ -1477,8 +1477,8 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
       <input type=\"hidden\" name=\"sel_market\" value=\"$sel_market\" />
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
       <input type=\"hidden\" name=\"deal_label\" value=\"$deal_label\" />
-      <input type=\"hidden\" name=\"cb_archive\" value=\"$archiv\" />
-      <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
+      <input type=\"hidden\" name=\"cba_archive\" value=\"$archiv\" />
+      <input type=\"hidden\" name=\"cba_vis\" value=\"$vis\" />
 ";
 
   $block = "
@@ -1561,9 +1561,9 @@ function html_contract_priority_form($pri_q) {
     col = mytext.substr(pos+1);
     pos2 = col.indexOf(')');
     col = col.substr(0,pos2);
-    mytext = mytext.substr(0, pos);
+    mytext = mytext.substr(0, pos-1);
     pos = mytext.indexOf('-');
-    forms.form_pri_update.tf_pri.value=mytext.substr(pos+1);
+    forms.form_pri_update.tf_label.value=mytext.substr(pos+1);
     forms.form_pri_update.tf_code.value=mytext.substr(0,pos);
     forms.form_pri_update.tf_color.value=col;\"
     size=\"4\" >";
@@ -1620,7 +1620,7 @@ function html_contract_priority_form($pri_q) {
           <table>
           <tr>
             <td class=\"adminLabel\">$l_label: </td>
-            <td><input type=\"text\" name=\"tf_pri\" /></td>
+            <td><input type=\"text\" name=\"tf_label\" /></td>
             <td rowspan=\"3\">
               <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_update\"
               onclick=\"if (check_contract_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
@@ -1654,7 +1654,7 @@ function html_contract_priority_form($pri_q) {
         <table>
         <tr>
           <td class=\"adminLabel\">$l_pri_new : </td>
-          <td><input name=\"tf_pri\" /></td>
+          <td><input name=\"tf_label\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">$l_code : </td>
           <td><input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" /></td>
@@ -1761,8 +1761,6 @@ function dis_contract_priority_links($id) {
 }
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Contract Status section
 // Parameters:
@@ -1777,7 +1775,7 @@ function html_contract_status_form($sta_q) {
   $sel_sta = "<select name=\"sel_status\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
     pos = mytext.indexOf('-');
-    forms.form_status_update.tf_status.value=mytext.substr(pos+1);
+    forms.form_status_update.tf_label.value=mytext.substr(pos+1);
     forms.form_status_update.tf_code.value=mytext.substr(0,pos);\"
    size=\"4\">";
   while ($sta_q->next_record()) {
@@ -1833,7 +1831,7 @@ function html_contract_status_form($sta_q) {
         <table>
         <tr>
           <td class=\"adminLabel\">$l_label : </td>
-          <td><input type=\"text\" name=\"tf_status\" /></td>
+          <td><input type=\"text\" name=\"tf_label\" /></td>
           <td rowspan=\"2\">
             <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_update\"
             onclick=\"if (check_contract_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
@@ -1861,7 +1859,7 @@ function html_contract_status_form($sta_q) {
       <table>
       <tr>
         <td class=\"adminLabel\">$l_sta_new : </td>
-          <td><input type=\"text\" name=\"tf_status\" /></td>
+          <td><input type=\"text\" name=\"tf_label\" /></td>
         </tr>
         <tr>
           <td class=\"adminLabel\">$l_code : </td>

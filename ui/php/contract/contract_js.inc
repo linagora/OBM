@@ -64,7 +64,7 @@ function confirm_contract_del() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the priority check or deletion is possible                       //
+// Check if the priority check or deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_priority_checkdel(form)
 {
@@ -80,36 +80,13 @@ function check_contract_priority_checkdel(form)
 }
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the priority update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_priority_upd(form,formd)
 {
-  if (formd.sel_priority.selectedIndex < 0){
-    alert(\"$l_j_pri_update\");
-    return false;
-  }
-  form.sel_priority.value=formd.sel_priority.options[formd.sel_type.selectedIndex].value;
-  if ((formd.sel_type.selectedIndex >= 0) && (form.tf_type.value != \"\"))
-    return true;
-  else {
-    alert(\"$l_j_type_update\");
-    return false;
-  }
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the priority update is possible                                  //
-///////////////////////////////////////////////////////////////////////////////
-function check_contract_priority_upd(form,formd)
-{
   pri_pos = formd.sel_priority.selectedIndex;
-  if ((pri_pos >= 0) && (form.tf_pri.value != \"\")) {
+  if ((pri_pos >= 0) && (form.tf_label.value != \"\")) {
     form.sel_priority.value=formd.sel_priority.options[pri_pos].value;
     return true;
   } else {
@@ -120,7 +97,7 @@ function check_contract_priority_upd(form,formd)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the priority creation is possible                                //
+// Check if the priority creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_priority_new(form)
 {
@@ -153,12 +130,12 @@ function check_contract_status_checkdel(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the status update is possible                                    //
+// Check if the status update is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_status_upd(form,formd)
 {
   status_pos = formd.sel_status.selectedIndex;
-  if ((status_pos >= 0) && (form.tf_status.value != \"\")) {
+  if ((status_pos >= 0) && (form.tf_label.value != \"\")) {
     form.sel_status.value=formd.sel_status.options[status_pos].value;
     return true;
   } else {
@@ -169,7 +146,7 @@ function check_contract_status_upd(form,formd)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the status creation is possible                                  //
+// Check if the status creation is possible
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_status_new(form)
 {

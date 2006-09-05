@@ -499,13 +499,13 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
       <script>calendar('tf_datebefore','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_mailing_ok_only<br />
-      <input type=\"checkbox\" name=\"cb_mailing_ok_only\" value=\"1\" $mailing_ok_only />
+      <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
     </div>
     <div class=\"searchLabel\">$l_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </div>
     <div class=\"searchLabel\">$l_fuzzy<br />
-      <input type=\"checkbox\" name=\"cb_fuzzy\" value=\"1\" $fuzzy />
+      <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"\" />
@@ -591,7 +591,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;cb_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -605,7 +605,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
       <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
-        <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
       </p>
@@ -1089,7 +1089,7 @@ function html_contact_links($id) {
   // Deal
   if ($cgp_show["module"]["deal"]) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id");
-    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id&amp;cb_archive=1");
+    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id&amp;cba_archive=1");
     $deal_active = get_global_linked_deal_nb($id, "contact1", false, "contact2");
     $deal_total = get_global_linked_deal_nb($id, "contact1", true, "contact2");
     $block_deal = "
@@ -1119,7 +1119,7 @@ function html_contact_links($id) {
     $contract_active = get_global_linked_contract_nb($id,"contact1",false,"contact2");
     $contract_total = get_global_linked_contract_nb($id,"contact1",true,"contact2");
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id");
-    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id&amp;cb_archive=1");
+    $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id&amp;cba_archive=1");
     $block_contract = "
   <div class=\"linkTitle\">:: $l_module_contract</div>
   <ul class=\"linkList\">
@@ -1352,8 +1352,8 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   // If parameters have been given, they supercede the default action value
   if (isset($contact["company_id"])) { $c_id = $contact["company_id"]; }
   if (isset($contact["company_name"])) { $c_name = $contact["company_name"]; }
-  if (isset($contact["comp_new_id"])) { $c_new_id = $contact["comp_new_id"]; }
-  if (isset($contact["comp_new_name"])) { $c_new_name = $contact["comp_new_name"]; }
+  if (isset($contact["company_new_id"])) { $c_new_id = $contact["company_new_id"]; }
+  if (isset($contact["company_new_name"])) { $c_new_name = $contact["company_new_name"]; }
   if (isset($contact["contact_id"])) { $id = $contact["contact_id"]; }
   if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
   if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
@@ -1682,7 +1682,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     if ($priv == '1') {
       $private_c = " checked";
     }
-    $display_private = "<input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
+    $display_private = "<input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
   }
 
   // UPDATE 
@@ -1740,7 +1740,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
       <td class=\"detailForm\">$display_private</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailForm\">$dis_company</td>
@@ -1797,7 +1797,7 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_email2\" size=\"52\" maxlength=\"128\" value=\"$email2\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_mailing_ok</td>
-    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_mailok\" value=\"1\" $mailok /></td>
+    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
     </tr>
     </table>
 
@@ -1837,7 +1837,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $comp_id = ($contact["comp_new_id"] ? $contact["comp_new_id"] : $contact["company_id"]);
+  $comp_id = ($contact["company_new_id"] ? $contact["company_new_id"] : $contact["company_id"]);
   $kind = $contact["kind"];
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
@@ -1911,8 +1911,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
     <input type=\"hidden\" name=\"ta_comment2\" value=\"$com2\" />
     <input type=\"hidden\" name=\"ta_comment3\" value=\"$com3\" />
-    <input type=\"hidden\" name=\"cb_privacy\" value=\"$privacy\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
+    <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
+    <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />";
 
   $block = "
     <table class=\"detail\">
@@ -2063,9 +2063,9 @@ function html_contact_kind_form($kind_q) {
 
       forms.form_kind_update.tf_lang.value=lang;
       if (ldefault == 'X') {
-        forms.form_kind_update.cb_default.checked=true;
+        forms.form_kind_update.cba_default.checked=true;
       } else {
-        forms.form_kind_update.cb_default.checked=false;
+        forms.form_kind_update.cba_default.checked=false;
       }
       forms.form_kind_update.tf_label.value=label;
       forms.form_kind_update.tf_header.value=header;\"
@@ -2128,7 +2128,7 @@ function html_contact_kind_form($kind_q) {
         <tr>
           <td class=\"adminLabel\">$l_default : </td>
           <td>
-            <input type=\"checkbox\" name=\"cb_default\" value=\"1\" />
+            <input type=\"checkbox\" name=\"cba_default\" value=\"1\" />
 	  </td>
         </tr>
         <tr>
@@ -2184,7 +2184,7 @@ function html_contact_kind_form($kind_q) {
         <tr>
           <td class=\"adminLabel\">$l_default : </td>
           <td>
-            <input type=\"checkbox\" name=\"cb_default\" value=\"1\"/>
+            <input type=\"checkbox\" name=\"cba_default\" value=\"1\"/>
 	  </td>
         </tr>
         <tr>

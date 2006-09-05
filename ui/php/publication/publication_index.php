@@ -33,6 +33,7 @@ $module = "publication";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_publication_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("publication_query.inc");
@@ -41,7 +42,6 @@ require("publication_display.inc");
 update_last_visit("publication", $param_publication, $action);
 
 if ($action == "") $action = "index";
-$params = get_publication_params();
 require("publication_js.inc");
 get_publication_action();
 $perm->check_permissions($module, $action);
@@ -395,17 +395,9 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_publication_params() {
-  global $ext_url, $ext_title;
-  global $udomain_id;
   
   // Get global params
   $params = get_global_params("Publication");
-
-  // Get publication specific params
-  if (isset ($ext_url)) $params["ext_url"] = urldecode($ext_url);
-  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
-  
-  display_debug_param($params);
 
   return $params;
 }
@@ -623,7 +615,7 @@ function get_publication_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-// Display Pr�f�rences
+// Display Preferences
   $actions["publication"]["dispref_display"] = array (
     'Url'      => "$path/publication/publication_index.php?action=dispref_display",
     'Right'    => $cright_read,

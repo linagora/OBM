@@ -128,7 +128,7 @@ function html_admin_code_index($actions, $words) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display files containing '&' but not in exluded words from $words         //
+// Display files containing '&' but not in exluded words from $words
 // Parameters:
 //   - $mode  : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ function dis_admin_code_amp_file($mode, $file) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display defined functions that are not used in code                       //
+// Display defined functions that are not used in code
 // Parameters:
 //   - $mode   : "txt" or "html"
 //   - $module : module to process (or All)
@@ -329,7 +329,7 @@ function dis_admin_code_unused_func_content($mode, $def, $used) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display one function uses                                                 //
+// Display one function uses
 // Parameters:
 //   - $mode : "txt" or "html"
 //   - $func : function to display
@@ -409,7 +409,8 @@ function dis_admin_code_function_uses_content($mode, $function, $dir) {
 //   - $file     : file to process
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_code_function_uses_content_file($mode, $function, $file) {
-  global $regexp_used_func, $regexp_used_func_not, $used_table;
+  global $regexp_used_func, $regexp_used_func_not_def, $used_table;
+  global $regexp_used_func_not_debug;
 
   $contents = array();
   if (file_exists($file)) {
@@ -419,9 +420,10 @@ function dis_admin_code_function_uses_content_file($mode, $function, $file) {
   // For each line of the file
   while (list($line_num, $line) = each($contents)) {
 
-    // If the line is not a function definition
-    if (! preg_match($regexp_used_func_not, $line, $tmp)) {
-
+    // If the line is not a function definition and not a debug msg
+    if ((! preg_match($regexp_used_func_not_def, $line, $tmp))
+	&& (! preg_match($regexp_used_func_not_debug, $line, $tmp))) {
+      
       // If a function is used, we note it
       while (preg_match($regexp_used_func, $line, $matches)) {
 	$func_name =  $matches[1];

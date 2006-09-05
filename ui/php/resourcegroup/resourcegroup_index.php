@@ -32,6 +32,7 @@ $module = "resourcegroup";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_resourcegroup_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
@@ -40,7 +41,6 @@ require("resourcegroup_query.inc");
 require("resourcegroup_js.inc");
 
 if ($action == "") $action = "index";
-$params = get_resourcegroup_params();
 get_resourcegroup_action();
 $perm->check_permissions($module, $action);
 
@@ -272,7 +272,6 @@ $nb_resourcegroup++;
   }
   $params["resource_nb"] = $nb_u;
   $params["resourcegroup_nb"] = $nb_resourcegroup;
-  display_debug_param($params);
 
   return $params;
 }

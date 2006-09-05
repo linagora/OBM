@@ -21,6 +21,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 $extra_css = "document.css";
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_document_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("document_query.inc");
@@ -30,7 +31,6 @@ require_once("$obminclude/of/of_category.inc");
 
 
 if ($action == "") $action = "index";
-$params = get_document_params();
 get_document_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Document", $action, $params["document_id"], $uid)) {
@@ -384,7 +384,6 @@ function get_document_params() {
   if (isset ($fi_file_size)) $params["size"] = $fi_file_size;
   if (isset ($fi_file_type)) $params["mime_file"] = $fi_file_type;
   if (isset ($fi_file)) $params["file"] = $fi_file;
-  display_debug_param($params);
 
   return $params;
 }

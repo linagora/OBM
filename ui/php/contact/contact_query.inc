@@ -430,7 +430,7 @@ function run_query_contact_kind() {
     FROM Kind
     ORDER BY kind_lang, kind_minilabel, kind_header";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_kind()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -452,7 +452,7 @@ function run_query_contact_insert($contact) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
-  $comp_id = $contact["comp_new_id"];
+  $comp_id = $contact["company_new_id"];
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
   }
@@ -597,7 +597,7 @@ function run_query_contact_insert($contact) {
     '$category5'
   )";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -657,9 +657,9 @@ function run_query_contact_update($contact) {
 
   $id = $contact["contact_id"];
   $comp_old_id = $contact["company_id"];
-  $comp_new_id = $contact["comp_new_id"];
+  $comp_new_id = $contact["company_new_id"];
 
-  $comp_id = $contact["comp_new_id"];
+  $comp_id = $contact["company_new_id"];
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
   }
@@ -768,7 +768,7 @@ function run_query_contact_update($contact) {
     contact_category5_id='$category5'
   WHERE contact_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -831,7 +831,7 @@ function get_linked_contact_list_nb($p_id) {
     FROM ContactList
     WHERE contactlist_contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_linked_contact_list_nb()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -853,7 +853,7 @@ function get_linked_contact_publication_nb($p_id) {
     FROM Subscription 
     WHERE subscription_contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_linked_contact_publication_nb()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -877,7 +877,7 @@ function run_query_contact_delete($p_id) {
   run_query_contact_delete_subscription($p_id);    
 
   $query = "DELETE FROM Contact WHERE contact_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_delete(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -887,7 +887,7 @@ function run_query_contact_delete($p_id) {
     $query = "INSERT INTO
       DeletedContact (deletedcontact_contact_id, deletedcontact_timestamp)
       VALUES ('$p_id', '$now')";
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_contact_delete(2)");
     $retour = $obm_q->query($query);
   }
 
@@ -908,7 +908,7 @@ function run_query_contact_delete_subscription($p_id) {
 
   $query = "delete from Subscription where subscription_contact_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_delete_subscription()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -943,7 +943,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
       ((contact_lastname='$lname' AND contact_firstname='$fname')
         OR (contact_company_id='$comp_id' AND contact_lastname='$lname'))";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_check()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -965,7 +965,7 @@ function check_contact_context($cid, $contact) {
 
   $lname = $contact["lname"];
   $fname = $contact["fname"];
-  $comp_new_id = $contact["comp_new_id"];
+  $comp_new_id = $contact["company_new_id"];
   $comp_id = $contact["company_id"];
   $comp = ($comp_new_id != "") ? $comp_new_id : $comp_id;
 
@@ -1000,7 +1000,7 @@ function check_contact_data_form($cid, $contact) {
   $email = stripslashes($contact["email"]);
   $email2 = stripslashes($contact["email2"]);
   $c_id = $contact["company_id"];
-  $c_new_id = $contact["comp_new_id"];
+  $c_new_id = $contact["company_new_id"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
   $cat3 = $contact["category3"];
@@ -1129,7 +1129,7 @@ function get_contact_info($con_id) {
     FROM Contact
     WHERE contact_id='$con_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_contact_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1150,10 +1150,10 @@ function run_query_contact_kind_insert($contact) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $label = $contact["kind_label"];
-  $lang = $contact["kind_lang"];
-  $header = $contact["kind_header"];
-  $default = ($contact["kind_default"] == 1 ? 1 : 0);
+  $label = $contact["label"];
+  $lang = $contact["lang"];
+  $header = $contact["header"];
+  $default = ($contact["default"] == 1 ? 1 : 0);
 
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1175,7 +1175,7 @@ function run_query_contact_kind_insert($contact) {
     '$lang',
     '$default')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1195,7 +1195,7 @@ function run_query_contact_kind_clear_default($lang) {
     SET kind_default=0
     WHERE kind_lang = '$lang'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_clear_default()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1215,10 +1215,10 @@ function run_query_contact_kind_update($contact) {
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
   $id = $contact["kind"];
-  $label = $contact["kind_label"];
-  $lang = $contact["kind_lang"];
-  $header = $contact["kind_header"];
-  $default = ($contact["kind_default"] == 1 ? 1 : 0);
+  $label = $contact["label"];
+  $lang = $contact["lang"];
+  $header = $contact["header"];
+  $default = ($contact["default"] == 1 ? 1 : 0);
 
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1235,7 +1235,7 @@ function run_query_contact_kind_update($contact) {
     WHERE
       kind_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1253,7 +1253,7 @@ function run_query_contact_kind_delete($id) {
 
   $query = "DELETE FROM Kind WHERE kind_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1276,7 +1276,7 @@ function run_query_contact_kind_links($id) {
     FROM Contact
     WHERE contact_kind_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_kind_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1296,7 +1296,7 @@ function get_contact_kind_label($id) {
     FROM Kind
     WHERE kind_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_contact_kind_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1305,6 +1305,7 @@ function get_contact_kind_label($id) {
             $obm_q->f("kind_header");
   return $retour;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Count the number of subscription

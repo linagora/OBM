@@ -31,6 +31,7 @@ $module = "resource";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_resource_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("resource_display.inc");
@@ -41,7 +42,6 @@ require("$obminclude/lib/right.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_resource_params();
 get_resource_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Resource", $action, $params["resource_id"], $uid)) {
@@ -159,16 +159,16 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["title"] = "<div class=\"title\">$l_resource</div>";
-  $display["detail"] = of_right_dis_admin("resource", $params["entity_id"]);
+  $display["detail"] = dis_resource_right_dis_admin($params["entity_id"]);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["title"] = "<div class=\"title\">$l_resource</div>";
-  of_right_update_right($params, "resource");
-  $display["msg"] .= display_ok_msg($l_right_update_ok);
-  $display["msg"] .= display_warn_msg($err_msg);
-  $display["detail"] = of_right_dis_admin("resource", $params["entity_id"]);
+  if (of_right_update_right($params, "resource")) {
+    $display["msg"] .= display_ok_msg($l_right_update_ok);
+  } else {
+    $display["msg"] .= display_warn_msg($err_msg);
+  }
+  $display["detail"] = dis_resource_right_dis_admin($params["entity_id"]);
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -206,17 +206,19 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_resource_params() {
-  global $param_ext;
   
   // Get global params
   $params = get_global_params("Resource");
 
   //Get resource specific params
-  if (isset ($param_ext)) $params["resource_id"] = $param_ext;
-  display_debug_param($params);
-  
+  if (isset ($params["ext_id"])) $params["resource_id"] = $params["ext_id"];
+  if ((isset ($params["entity_id"])) && (! isset($params["resource_id"]))) {
+    $params["resource_id"] = $params["entity_id"];
+  }
+
   return $params;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // User Action 
@@ -311,14 +313,14 @@ function get_resource_action() {
 // Rights Admin.
   $actions["resource"]["rights_admin"] = array (
     'Name'     => $l_header_right,
-    'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;param_entity=".$params["resource_id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params["resource_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult')
                                      );
 
 // Rights Update
   $actions["resource"]["rights_update"] = array (
-    'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;param_entity=".$params["resource_id"]."",
+    'Url'      => "$path/resource/resource_index.php?action=rights_update&amp;entity_id=".$params["resource_id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                      );

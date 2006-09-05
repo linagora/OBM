@@ -14,6 +14,7 @@
 // Direct fields
 $fieldnames["incident_status"] = $l_status;
 $fieldnames["incident_label"] = $l_label;
+$fieldnames["incident_reference"] = $l_reference;
 $fieldnames["incident_priority"] = $l_priority;
 $fieldnames["incident_date"] = $l_date;
 $fieldnames["incident_duration"] = $l_duration;
@@ -196,7 +197,7 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
          $dis_sel_owner
        </div>
        <div class=\"searchLabel\">$l_archive<br />
-         <input name=\"cb_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
+         <input name=\"cba_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
        </div>
        <div class=\"searchLabel\">&nbsp;<br />
          <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />     
@@ -259,7 +260,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cb_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
 
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
@@ -710,7 +711,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
             <td class=\"detailForm\">$dis_sel_owner</td>
           </tr><tr>
             <td class=\"detailLabel\">$l_archive_new</td>
-            <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
+            <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
           </tr><tr>
             <td class=\"detailLabel\">$l_contract</td>
             <td class=\"detailForm\">

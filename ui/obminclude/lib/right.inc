@@ -7,6 +7,9 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
+  // XXXXX to update : remove references to Calendar or resource in
+  // of_right_entity_for_consumer and of_right_update_right
+
 $extra_js .= "
 function remove_allelements(parentId) {
   // Remove all elements in the list form
@@ -54,23 +57,19 @@ function show_hide_write_right(field) {
 //   - $entity_id : entity id
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_dis_admin($entity, $entity_id) {
-  global $display, $auth;
+  global $display, $auth, $l_of_right_err_empty;
+
+  if (!isset($entity_id) || ($entity_id == "")) {
+    $display["msg"] .= display_err_msg($l_of_right_err_empty);
+    return;
+  }
 
   $uid = $auth->auth["uid"];
   $consumer = "user";
   $consumer_id = "$uid";
   $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
 
-  // Default value in case entity id not set (eg: action admin_right)
-  if (!isset($entity_id) || ($entity_id == "")) {
-    if ($entity == "calendar") {
-      $entity_id = $auth->auth["uid"];
-    } elseif ($entity == "resource") {
-      $entity_id = $writable_entity["entity"][0]["id"];
-    }
-  }
   $consumers = of_right_consumer_for_entity($entity, $entity_id, $consumer);
-
   $display["features"] = html_entitywritable_bar($writable_entity ,$entity_id, $entity);
 
   return html_dis_right_admin($consumers, $entity_id);
@@ -87,7 +86,7 @@ function html_entitywritable_bar($writable_entity,$entity_id, $entity) {
 
   // Entity Selection
   if (count($writable_entity["ids"]) > 0) {
-    $dis_sel .= "<select name=\"param_entity\">";
+    $dis_sel .= "<select name=\"entity_id\">";
     foreach ($writable_entity["entity"] as $entity) {
       $id = $entity["id"];
       $label =  $entity["label"];
@@ -241,7 +240,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   </table>
 
   <div class=\"detailButton\">
-    <input type=\"hidden\" name=\"param_entity\" value=\"$entity_id\" />
+    <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
     <input type=\"submit\" value=\"$l_right_validate\" />
   </div>
@@ -432,7 +431,7 @@ function of_right_update_right($param, $entity) {
 
   $consumer = "user";
 
-  $eid = $param["param_entity"];
+  $eid = $param["entity_id"];
   $accept_write = $param["accept_write"];
   $accept_read = $param["accept_read"];
   $public_write = $param["write_public"];
@@ -450,7 +449,7 @@ function of_right_update_right($param, $entity) {
     $writable_entity = of_right_entity_for_consumer($entity, $consumer, $consumer_id, "write");
     if (!in_array($eid, $writable_entity["ids"])) {
       $err_msg = $l_of_right_err_auth;
-      return 0;
+      return false;
     }
   }
 
@@ -537,6 +536,8 @@ function of_right_update_right($param, $entity) {
       }
     }
   }
+
+  return true;
 }
 
 ?>

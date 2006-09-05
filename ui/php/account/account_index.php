@@ -12,6 +12,7 @@ $module = "account";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_account_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("account_display.inc");
@@ -23,7 +24,6 @@ update_last_visit("account", $param_account, $action);
 // $account is a hash table containing, for each form field set 
 // in the calling page, a couple var_name, var_value...
 if ($action == "") $action = "index";
-$params = get_account_params();
 get_account_action();
 $perm->check_permissions($module, $action);
 
@@ -200,8 +200,6 @@ function get_account_params() {
   
   // Get global params
   $params = get_global_params("Account");
-  
-  display_debug_param($params);
   
   return $params;
 }

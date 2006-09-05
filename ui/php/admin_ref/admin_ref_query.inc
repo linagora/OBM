@@ -212,7 +212,7 @@ function run_query_admin_ref_datasource_update($dsrc) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $dsrc["datasource"];
+  $id = $dsrc["datasource_id"];
   $name = $dsrc["name"];
 
   $query = "UPDATE DataSource SET
@@ -238,7 +238,7 @@ function run_query_admin_ref_datasource_update($dsrc) {
 function run_query_admin_ref_datasource_delete($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["datasource"];
+  $id = $dsrc["datasource_id"];
 
   $query = "DELETE FROM DataSource WHERE datasource_id='$id'";
 
@@ -258,7 +258,7 @@ function run_query_admin_ref_datasource_delete($dsrc) {
 function run_query_admin_ref_datasource_company_links($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["datasource"];
+  $id = $dsrc["datasource_id"];
 
   $query = "SELECT company_id,
       company_name,
@@ -282,7 +282,7 @@ function run_query_admin_ref_datasource_company_links($dsrc) {
 function run_query_admin_ref_datasource_contact_links($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["datasource"];
+  $id = $dsrc["datasource_id"];
 
   $query = "SELECT contact_id,
       contact_lastname,
@@ -363,7 +363,7 @@ function run_query_admin_ref_tasktype_update($tt) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $tt["tasktype"];
+  $id = $tt["tasktype_id"];
   $label = $tt["label"];
   $int = $tt["internal"];
 
@@ -390,7 +390,7 @@ function run_query_admin_ref_tasktype_update($tt) {
 function run_query_admin_ref_tasktype_delete($tt) {
   global $cdg_sql;
 
-  $id = $tt["tasktype"];
+  $id = $tt["tasktype_id"];
 
   $query = "delete from TaskType where tasktype_id='$id'";
 
@@ -410,7 +410,7 @@ function run_query_admin_ref_tasktype_delete($tt) {
 function run_query_admin_ref_tasktype_deal_links($tt) {
   global $cdg_sql;
 
-  $id = $tt["tasktype"];
+  $id = $tt["tasktype_id"];
 
   $query = "select deal_id,
       deal_label,
@@ -434,7 +434,7 @@ function run_query_admin_ref_tasktype_deal_links($tt) {
 function run_query_admin_ref_tasktype_project_links($tt) {
   global $cdg_sql;
 
-  $id = $tt["tasktype"];
+  $id = $tt["tasktype_id"];
 
   $query = "select project_id,
       project_name,
@@ -457,7 +457,7 @@ function run_query_admin_ref_tasktype_project_links($tt) {
 function run_query_admin_ref_tasktype_timetask_links($tt) {
   global $cdg_sql;
 
-  $id = $tt["tasktype"];
+  $id = $tt["tasktype_id"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

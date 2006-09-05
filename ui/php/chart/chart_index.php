@@ -17,9 +17,9 @@ $module = "chart";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$chart = get_param_chart();
 
 if ($action == "") $action = "index";
-$chart = get_param_chart();
 
 $chart_colors = array(array(42, 180, 180), array(42, 71, 180));
 
@@ -169,8 +169,6 @@ function get_param_chart() {
   if (isset ($xlabels)) $chart["xlabels"] = unserialize(stripslashes($xlabels));
 
   if (isset ($plots)) $chart["plots"] = unserialize(stripslashes($plots));
-
-  display_debug_param($chart);
 
   return $chart;
 }

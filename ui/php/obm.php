@@ -21,7 +21,7 @@ $params = get_obm_params();
 $action = $params["action"];
 $OBM_Session = $params["OBM_Session"];
 if ($action == "") { $action = "home"; }
-//print_r($params);  
+//print_r($params);
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 
 if ($action == "logout") {
@@ -50,7 +50,7 @@ if ($c_home_redirect != "") {
   header("Status: 301 OK");
   header("Location: $c_home_redirect");
   exit();
- }
+}
 
 $display["head"] = display_head("OBM Version $obm_version");
 $display["header"] = display_menu("");
@@ -109,8 +109,6 @@ function get_obm_params() {
   // Get global params
   $params = get_global_params("Obm");
   
-  display_debug_param($params);
-
   return $params;
 }
 

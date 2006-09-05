@@ -424,8 +424,8 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   // If parameters have been given, they supercede the default action value
   if (isset($params["company_id"])) { $c_id = $params["company_id"]; }
   if (isset($params["company_name"])) { $c_name = $params["company_name"]; }
-  if (isset($params["comp_new_id"])) { $c_new_id = $params["comp_new_id"]; }
-  if (isset($params["comp_new_name"])) { $c_new_name = $params["comp_new_name"]; }
+  if (isset($params["company_new_id"])) { $c_new_id = $params["company_new_id"]; }
+  if (isset($params["company_new_name"])) { $c_new_name = $params["company_new_name"]; }
   if (isset($params["lead_id"])) { $id = $params["lead_id"]; }
   if (isset($params["source"])) { $source_id = $params["source"]; }
   if (isset($params["manager"])) { $manager_id = $params["manager"]; }

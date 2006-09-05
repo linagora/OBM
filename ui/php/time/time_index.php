@@ -31,9 +31,6 @@
 // - point sur timetask_status ! dans globalview : incoherent
 //   => d'ou sur validate, unvalidate et valid auto
 
-///////////////////////////////////////////////////////////////////////////////
-// Session,Auth,Perms  Management                                            //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $module = "time";
 $extra_css = "time.css";
@@ -41,22 +38,22 @@ $extra_css = "time.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
+$params = get_time_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+$uid = $auth->auth["uid"];
+update_time_session_params();
 include("$obminclude/global_pref.inc");
 require("time_display.inc");
 require("time_query.inc");
-
-$uid = $auth->auth["uid"]; //current user uid
+require("time_js.inc");
 
 if (!isset($action)) $action = "index";
-$params = get_time_params();
 get_time_actions();
 $perm->check_permissions($module, $action);
 
 page_close();
 
-require("time_js.inc");
-//$extra_file_js = "time_js.inc";
+
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = run_query_time_managers();
@@ -95,13 +92,6 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_time_update($params);
   run_query_time_validate($params["user_id"]);
-  // close the popup
-  $display["result"] .= "
-    <script language=\"javascript\">
-     window.opener.location.href='$path/time/time_index.php?action=index&date=".$params["date"]."';
-     window.close();
-    </script>
-  ";
 
 } elseif ($action == "delete") {
 //////////////////////////////////////////////////////////////////////////////
@@ -176,28 +166,36 @@ display_page($display);
 // returns : $task hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_time_params() {
-  global $sess, $sess_users;  
-  global $cb_day, $rd_day, $user_id, $sel_user_id, $uid;
-
+  global $uid;
 
   // Get global params
   $params = get_global_params();
 
   // Get time specific params
   if ($params["date"] == "") { $params["date"] = date("Ymd"); }
-  if (is_array($cb_day)) $params["sel_date"] = $cb_day;
-    elseif (isset ($rd_day)) $params["sel_date"] = $rd_day;
   
   // We retrieve the selected users if any, else we get them from sessiom
-  if (isset ($sel_user_id)) {
-    if (is_array($sel_user_id)) {
-      $params["user_id"] = $uid;
-      $params["user_ids"] = $sel_user_id;
+  if (isset ($params["user_id"])) {
+    if (is_array($params["user_id"])) {
+      $params["user_ids"] = $params["user_id"];
     } else {
-      $params["user_id"] = $sel_user_id;
-      $params["user_ids"] = array($sel_user_id);
+      $params["user_ids"] = array($params["user_id"]);
     }
-    $sess_users = $sel_user_id;
+  }
+
+  return $params;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update session and parameters
+///////////////////////////////////////////////////////////////////////////////
+function update_time_session_params() {
+  global $sess, $sess_users, $params, $uid;
+
+  // We retrieve the selected users if any, else we get them from sessiom
+  if (isset($params["user_ids"])) {
+    $sess_users = $params["user_ids"];
     $sess->register("sess_users");
   } elseif (isset($sess_users)) {
     if (is_array($sess_users)) {
@@ -213,9 +211,6 @@ function get_time_params() {
     $params["user_ids"] = array($uid);
     $sess->register("sess_users");
   }
-  display_debug_param($params);
-
-  return $params;
 }
 
 

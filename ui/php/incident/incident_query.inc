@@ -118,6 +118,7 @@ function run_query_incident_search($incident) {
       incident_timeupdate,
       incident_contract_id,
       incident_label,
+      incident_reference,
       incident_date,
       incident_priority_id,
       incidentpriority_label as incident_priority,
@@ -240,7 +241,7 @@ function run_query_incident_insert($incident) {
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
 
-  $contract_id = $incident["cont_new_id"];
+  $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
     $contract_id = $incident["contract_id"];
   }
@@ -339,7 +340,7 @@ $comment";
 function run_query_incident_id($incident) {
   global $cdg_sql;
 
-  $contract_id = $incident["cont_new_id"];
+  $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
     $contract_id = $incident["contract_id"];
   }
@@ -390,7 +391,7 @@ function run_query_incident_id($incident) {
 function run_query_incident_update($incident) {
   global $auth, $cdg_sql;
 
-  $contract_id = $incident["cont_new_id"];
+  $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
     $contract_id = $incident["contract_id"];
   }
@@ -579,7 +580,7 @@ function check_incident_form($incident) {
   global $err_msg,$l_length_label,$l_invalid_date;
 
   $c_id = $incident["contract_id"];
-  $c_new_id = $incident["cont_new_id"];
+  $c_new_id = $incident["contract_new_id"];
   $reference = $incident["reference"];
 
   // Check the label is filled

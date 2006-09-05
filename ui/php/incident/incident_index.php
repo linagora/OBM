@@ -41,6 +41,7 @@ $module = "incident";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_incident_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("incident_query.inc");
@@ -52,7 +53,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_incident_params();
 update_last_visit("incident", $params["incident_id"], $action);
 get_incident_action();
 $perm->check_permissions($module, $action);
@@ -347,23 +347,12 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_incident_params() {
-  global $cb_archive, $tf_color, $contract_new_id;
+  global $tf_color, $contract_new_id;
   
   // Get global params
   $params = get_global_params("Incident");
   
-  // Get incident specific params
-  $params["archive"] = ( ($cb_archive == '1') ? '1' : '0');
-
-  // Contract update
-  if (isset ($contract_new_id)) $params["cont_new_id"] = $contract_new_id;
-
-  // Admin - Priority fields
-  $params["pri_color"] = (isset($tf_color) ? $tf_color : "");
-
   get_global_params_document($params);
-
-  display_debug_param($params);
 
   return $params;
 }

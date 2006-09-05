@@ -332,6 +332,7 @@ $l_c_j_delete = "An entry must be selected";
 // OF messages
 //---------------------------------------------------------------------------//
 $l_of_right_err_auth = "Insufficient rights to update rights !";
+$l_of_right_err_empty = "The object reference is missing !";
 
 //---------------------------------------------------------------------------//
 // Home page portlets

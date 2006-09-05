@@ -12,6 +12,7 @@ $module = "lead";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
+$params = get_lead_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
 require("lead_display.inc");
@@ -21,7 +22,6 @@ require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
-$params = get_lead_params();
 get_lead_action();
 $perm->check_permissions($module, $action);
 
@@ -191,16 +191,8 @@ display_page($display);
 // returns : $lead hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_lead_params() {
-  global $cb_privacy, $cb_privacy;
   
-    // Get global params
   $params = get_global_params("Lead");
-
-  //Get company specific params
-  if (isset ($cb_privacy)) { $params["privacy"] = ($cb_privacy == 1 ? 1 : 0); };
-  if (isset ($cb_archive)) $params["archive"] = ($cb_privacy == 1 ? 1 : 0);
-
-  display_debug_param($params);
 
   return $params;
 }

@@ -44,6 +44,7 @@ $extra_css = "project.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_project_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
@@ -56,7 +57,6 @@ include("$obminclude/of/of_category.inc");
 $uid = $auth->auth["uid"];
 $perms = $auth->auth["perm"];
 
-$params = get_project_params();
 update_last_visit("project", $params["project_id"], $action);
 
 if ($action == "") $action = "index";
@@ -473,7 +473,7 @@ function get_project_params() {
   
   // Get project specific params
   
-  foreach($_REQUEST as $key => $value) {
+  foreach($params as $key => $value) {
     // cb_u is likely to be called cb_user
     if (strcmp(substr($key, 0, 7),"cb_task") == 0) {
       $nb_tsk++;
@@ -505,8 +505,6 @@ function get_project_params() {
   $params["tsk_nb"] = $nb_tsk;
   
   get_global_params_document($params);
-
-  display_debug_param($params);
 
   return $params;
 }

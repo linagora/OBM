@@ -22,6 +22,7 @@ $module = "backup";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$backup = get_param_backup();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("backup_query.inc");
@@ -29,7 +30,6 @@ require("backup_display.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
-$backup = get_param_backup();
 get_backup_action();
 $perm->check_permissions($module, $action);
 
@@ -129,8 +129,6 @@ function get_param_backup() {
   if (isset ($tf_filename)) $params["filename"] = $tf_filename;
   if (isset ($tf_version)) $params["version"] = $tf_version;
   if (isset ($tf_date)) $params["date"] = $tf_date;
-
-  display_debug_param($params);
 
   return $params;
 }

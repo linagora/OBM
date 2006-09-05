@@ -40,7 +40,10 @@ function check_addtaskform(f_aff) {
   else if (! check_sel_tasktype(f_aff)) {
     return false;
   }
-  else
+  else {
+     window.opener.location.href='$path/time/time_index.php?action=index&user_id=".$params["user_id"]."&date=".$params["date"]."';
+     window.close();
+  }
     return true;
 }
 
@@ -77,6 +80,7 @@ function check_sel_tasktype(form) {
   } else
     return true;
 }
+
 
 /////////////////////////////////////
 // tasklist auto-selection         //

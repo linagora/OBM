@@ -521,7 +521,7 @@ function run_query_contract_priority() {
     FROM ContractPriority 
     ORDER BY contractpriority_code";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_priority()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -538,7 +538,7 @@ function run_query_contract_status() {
     FROM ContractStatus 
     ORDER BY contractstatus_code";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_status()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -553,9 +553,9 @@ function run_query_contract_status() {
 function run_query_contract_priority_insert($contract) {
   global $auth, $cdg_sql;
 	
-  $code = $contract["pri_code"];
-  $color = $contract["pri_color"];
-  $label = $contract["pri_label"];
+  $code = $contract["code"];
+  $color = $contract["color"];
+  $label = $contract["label"];
 
   $query = "INSERT INTO ContractPriority (
     contractpriority_timeupdate,
@@ -571,7 +571,7 @@ function run_query_contract_priority_insert($contract) {
     '$color',
     '$label')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_priority_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -589,9 +589,9 @@ function run_query_contract_priority_update($contract) {
   global $auth, $cdg_sql;
 
   $priority = $contract["priority"];
-  $code = $contract["pri_code"];
-  $color = $contract["pri_color"];
-  $label = $contract["pri_label"];
+  $code = $contract["code"];
+  $color = $contract["color"];
+  $label = $contract["label"];
 
   $query = "UPDATE ContractPriority SET
     contractpriority_label='$label',
@@ -599,9 +599,9 @@ function run_query_contract_priority_update($contract) {
     contractpriority_userupdate='".$auth->auth["uid"]."',
     contractpriority_code='$code',
     contractpriority_color='$color'
-  WHERE contractpriority_id='$priority' ";
+  WHERE contractpriority_id='$priority'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_priority_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -619,7 +619,7 @@ function run_query_contract_priority_delete($id) {
 
   $query = "DELETE FROM ContractPriority WHERE contractpriority_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_priority_delete()");
   $sta_q = new DB_OBM;
   $retour = $sta_q->query($query);
 
@@ -641,7 +641,7 @@ function run_query_contract_priority_links($p_id) {
     FROM Contract 
     WHERE contract_priority_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_priority_links()");
   $pri_q = new DB_OBM;
   $pri_q->query($query);
 
@@ -659,8 +659,8 @@ function run_query_contract_status_insert($contract) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $label = $contract["sta_label"];
-  $code = $contract["sta_code"];
+  $label = $contract["label"];
+  $code = $contract["code"];
 
   $query = "INSERT INTO ContractStatus (
     contractstatus_timecreate,
@@ -673,7 +673,7 @@ function run_query_contract_status_insert($contract) {
     '$label',
     '$code')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_status_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -693,8 +693,8 @@ function run_query_contract_status_update($contract) {
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
   $status = $contract["status"];
-  $label = $contract["sta_label"];
-  $code = $contract["sta_code"];
+  $label = $contract["label"];
+  $code = $contract["code"];
 
   $query = "UPDATE ContractStatus SET
     contractstatus_label='$label',
@@ -703,7 +703,7 @@ function run_query_contract_status_update($contract) {
     contractstatus_code='$code'
   WHERE contractstatus_id='$status'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_status_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -721,7 +721,7 @@ function run_query_contract_status_delete($id) {
 
   $query = "DELETE FROM ContractStatus WHERE contractstatus_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_status_delete()");
   $sta_q = new DB_OBM;
   $retour = $sta_q->query($query);
 
@@ -743,7 +743,7 @@ function run_query_contract_status_links($s_id) {
     FROM Contract 
     WHERE contract_status_id='$s_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_status_links()");
   $sta_q = new DB_OBM;
   $sta_q->query($query);
 
@@ -764,7 +764,7 @@ function get_contract_priority_label($id) {
     FROM ContractPriority
     WHERE contractpriority_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_contract_priority_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -787,7 +787,7 @@ function get_contract_status_label($id) {
     FROM ContractStatus
     WHERE contractstatus_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_contract_status_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -805,7 +805,7 @@ function run_query_contract_type() {
 
   $obm_q = new DB_OBM;
   $query = "SELECT contracttype_label, contracttype_id FROM ContractType";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_type()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -829,7 +829,7 @@ function run_query_company_info($id) {
     FROM Company 
     WHERE company_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

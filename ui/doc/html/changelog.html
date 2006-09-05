@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 1.2 ChangeLog</h1>
-version 1.2.2 - 2006-08-25
+version 1.2.2 - 2006-09-07
 <p>
 </center>
 
@@ -26,7 +26,6 @@ To do
 <li> tenir compte contacts prives dans les listes (liste privee =>+ contact prives)!
 </UL>
 
-- admin code : verifier si des actions non utilisees
 - cgp_submit... : soit partout, soit virer : a definir avant
 - param global pour recherche prefixees ou non par %
 roadmap : gestion categories dans 2 tables : categoryentity et categorylink; du coup : mono, multi : en parametre plus besoin de creation en bd (donc dans 1 enr: enr_cat1_id, enr_cat2_id,.. tout le temps)
@@ -34,16 +33,28 @@ roadmap : gestion categories dans 2 tables : categoryentity et categorylink; du 
 - templates : pour personnaliser vues !
 - cgphide categorie....
 - doc : categories a completer
+- responsable de ressource ? processus quand reservation d'une res sans les droits
 
-2006-08-25 : version 1.2.2<br>
+- virer global dans get_module_global_param() + cb_ => cba_: ok company - contract + admin_ref
+
+2006-09-05 : version 1.2.2<br>
 
 <ul>
+<li> BUG#585 : Re-connexion OK after a disconnect or pointing to internal url
 <li> BUG#583 : Agenda : event comment now saved
 <li> BUG#580 : Explicit error message when accessing an unexisting element
 <li> Deal : fixed a case where a comment could be lost after an update warning
 <li> Deal : search by company relation fixed
 <li> Deal : hitrate set to 0 keep the 0 value (and not null !)
 <li> List : fixed some insert and update problems due to parameters handling
+<li> Contact : fixed Kind insert and update
+<li> Admin code : improved unused function detection
+<li> Rights management enhancements in Agenda and Resource
+<li> Deal : search by date criteria for all dates (alarm, begin, expected, end)
+<li> Lead to Deal conversion fixed
+<li> Company : added links to company leads
+<li> Stats : fixed statistics from a selected company list
+<li> Incident : added reference in result list (reload obmdb_default_values)
 </ul>
 
 2006-08-10 : version 1.2.1<br>

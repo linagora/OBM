@@ -32,6 +32,7 @@ $module = "import";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
+$params = get_import_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,7 +73,6 @@ require("import_js.inc");
 
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
-$params = get_import_params();
 get_import_action();
 $perm->check_permissions($module, $action);
 
@@ -598,8 +598,6 @@ function get_import_params() {
       $import["run_mode"] = "run";
     }
   }
-
-  display_debug_param($import);
 
   return $import;
 }

@@ -28,6 +28,7 @@ $module = "invoice";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_invoice_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
@@ -39,7 +40,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_invoice_params();
 get_invoice_action();
 $perm->check_permissions($module, $action);
 
@@ -222,8 +222,6 @@ function get_invoice_params() {
   
   get_global_params_document($params);
   
-  display_debug_param($params);
-
   return $params;
 }
 

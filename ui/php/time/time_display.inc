@@ -67,7 +67,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
       $res["popup"] = true;
       $res["popup_width"] = 700;
       $res["popup_height"] = 210;
-      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;date=".$params["date"];
+      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;user_id=".$OD->data_set->f("timetask_user_id")."&amp;date=".$params["date"];
       $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     } else {
       $res["name"] = "&nbsp;";
@@ -670,6 +670,7 @@ function dis_time_form_addtask($time, $validate_days) {
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $action = $time["action"];
+  $user_id = $time["user_id"];
   $project_q = run_query_time_project($time);
   $projecttask_q = run_query_time_projecttask($time);
   $tasktype_q = run_query_time_used_tasktype($time["user_id"]);
@@ -918,6 +919,7 @@ function dis_time_form_addtask($time, $validate_days) {
     onsubmit=\"if (check_addtaskform(this)) return true; else return false;\">
     <input type=\"hidden\" name=\"action\" value=\"$obm_action\" />
     <input type=\"hidden\" name=\"popup\" value=\"0\" />
+    <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
 
   <div class=\"detailHead\">$l_fill_addtask</div>
 

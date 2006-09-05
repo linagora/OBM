@@ -105,29 +105,7 @@ function run_query_agenda_get_resource_label($resources) {
 
   return $obm_q;
 }
-///////////////////////////////////////////////////////////////////////////////
-// Return all the label of task
-// Parameters:
-//   - $resources : resource id array, the event is assigned to
-///////////////////////////////////////////////////////////////////////////////
-function run_query_agenda_get_task_label($resources) {
-  global $cdg_sql;
 
-  if (count($resources) > 0) {
-    $in = "'".implode ("','", $resources)."'";
-    $where = "WHERE resource_id IN ($in)";
-  }
-  $obm_q = new DB_OBM;
-  $query = "SELECT resource_name, resource_id
-            FROM Resource 
-            $where";
-
-  $query.= " ORDER BY resource_id";
-  display_debug_msg($query, $cdg_sql, "run_query_agenda_get_resource_label()");
-  $obm_q->query($query);
-
-  return $obm_q;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the label of entities 
@@ -247,8 +225,8 @@ function run_query_agenda_waiting_events() {
   $uid = $auth->auth["uid"];
   
   $writable_cal = of_right_entity_for_consumer("calendar", "user", $uid, "write");
-  $obm_db = new DB_OBM;
-  $db_type = $obm_db->type;
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");    
   $query = "SELECT attendee.userobm_id,
@@ -288,8 +266,8 @@ function run_query_agenda_waiting_events() {
   }
   $query .= " ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql, "run_query_agenda_waiting_events()");
-  $obm_db->query($query);
-  return $obm_db;
+  $obm_q->query($query);
+  return $obm_q;
 }
 
 
@@ -1039,54 +1017,6 @@ function run_query_agenda_delete($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the list of default agenda resources for the current group
-///////////////////////////////////////////////////////////////////////////////
-function get_agenda_default_group_resource_ids($p_group) {
-  global $cdg_sql, $auth, $agenda, $c_all;
-
-  $uid = $auth->auth["uid"];
-  $group = $p_group;
-  if ($p_group != $c_all) {
-  $query = "SELECT r.*,
-      c.entityright_read
-    FROM RGroup g, ResourceGroup rg, Resource as r
-      LEFT OUTER JOIN EntityRight as c
-        ON 
-          c.entityright_customer_id = '$uid' AND 
-          r.resource_id = c.entityright_entity_id AND
-          c.entityright_entity = 'resource'
-    WHERE
-      g.rgroup_id = '$group' AND
-      rg.resourcegroup_rgroup_id = g.rgroup_id AND
-      rg.resourcegroup_resource_id = r.resource_id AND
-      (c.entityright_read = 1 OR r.resource_id='$uid') 
-    ORDER BY r.resource_name";
-  } else {
-    $query = "SELECT r.*,
-        c.entityright_read
-      FROM Resource as r
-        LEFT OUTER JOIN EntityRight as c
-          ON 
-            c.entityright_customer_id = '$uid' AND 
-            r.resource_id = c.entityright_entity_id AND
-            c.entityright_entity = 'resource'
-      WHERE (c.entityright_read = 1 OR r.resource_id='$uid')
-      ORDER BY r.resource_name";
-  }
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "get_agenda_default_group_resource_ids()");
-  $obm_db->query($query);
-
-  $ret_array = array();
-  while($obm_db->next_record()) {
-     $ret_array[] = $obm_db->f("resource_id");
-  }
-
-  return $ret_array;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable agenda entities for the current user:
 //   - user
 //   - users group
@@ -1246,20 +1176,6 @@ function get_agenda_group_from_ids($groups) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the list of writable agenda groups for the current user
-///////////////////////////////////////////////////////////////////////////////
-function run_query_agenda_group_writable() {
-  global $cdg_sql,$auth;
-
-  $uid = $auth->auth["uid"];
-
-  $query = "SELECT * from UGroup";
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_agenda_group_writable()");	    
-  $obm_db->query($query);
-  return $obm_db;
-}
-///////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed entities.
 // Parameters :
 //  - $entities_array : hashed array of userobm and resource DBO
@@ -1385,7 +1301,7 @@ function get_agenda_event_users_info($id) {
 function get_agenda_event_entity($agenda_id) {
   global $cdg_sql;
 
-  // Optimisation possible : 1 seule requete pour toutes les entites
+  // XXXX Optimisation possible : 1 seule requete pour toutes les entites
 
   $query = "SELECT DISTINCT
     userobm_id,

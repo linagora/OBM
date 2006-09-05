@@ -149,7 +149,7 @@ function run_query_statistic_selected_company_per_country_per_cat($obm_q) {
   global $cdg_sql;
 
   $lang = get_lang();
-  if ($obm_q->nf()!= 0) { 
+  if ($obm_q->nf()!= 0) {
     $where = " where company_id in(";
     while ($obm_q->next_record()) {
       $where .= $coma.$obm_q->f("company_id");
@@ -181,10 +181,11 @@ function run_query_statistic_selected_company_per_country_per_cat($obm_q) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // return the contact date 
 // Parameters:
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function get_statistic_contact_date_total() {
   global $obmdb_dbtype, $db_type_mysql, $db_type_pgsql, $cdg_sql;
 

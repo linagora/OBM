@@ -246,28 +246,30 @@ function get_global_tasktype($tt_cat="", $tt_ids="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : number of contacts linked to an entity
+// Query execution : number of Elements linked to an entity
 // Parameters:
-//   - $id     : Id of entity
-//   - $entity : entity (company)
-//   - $arch   : flag to tell if archived contacts should be counted (if true)
+//   - $element : element linked "Contact, Lead,..." (table name)
+//   - $id      : Id of entity
+//   - $entity  : entity (company)
+//   - $arch    : flag to tell if archived contacts should be counted (if true)
 // Return:
-//   - $nb     : number of Contact
+//   - $nb      : number of Contact
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_linked_contact_nb ($id, $entity, $arch="") {
+function get_global_linked_element_nb ($element, $id, $entity, $arch="") {
   global $cdg_sql;
 
-  $query = "SELECT count(contact_id) as nb
-    FROM Contact
-    WHERE contact_${entity}_id = '$id'";
+  $lelement = strtolower($element);
+  $query = "SELECT count(${lelement}_id) as nb
+    FROM $element
+    WHERE ${lelement}_${entity}_id = '$id'";
 
   if (! $arch) {
-    $query .= " AND contact_archive='0'";
+    $query .= " AND ${lelement}_archive='0'";
   }
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_global_linked_element_nb()");
   $obm_q->next_record();
 
   return $obm_q->f("nb");

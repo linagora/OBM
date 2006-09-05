@@ -54,7 +54,7 @@ $module = "deal";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-
+$params = get_deal_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("deal_query.inc");
@@ -66,7 +66,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_deal_params();
 get_deal_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Deal", $action, $params["deal_id"], $uid)) {
@@ -167,14 +166,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     $display["detail"] = dis_deal_form($params);
-
-    // If deal archived, we look about archiving the parentdeal ?????
-    if ($cb_arc_aff == "archives") {
-      $obm_q = run_query_deal_detail($params["deal_id"]);
-      $obm_q->next_record();
-      $params["parentdeal_id"] = $obm_q->f("deal_parentdeal_id");
-      run_query_update_archive($params["deal_id"], $params["parentdeal_id"]);
-    }
   }
 
 } elseif ($action == "quick_update") {
@@ -501,25 +492,11 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_deal_params() {
-  global $ext_title, $cb_priv;
-  global $cb_parchive, $tf_order;
   
   // Get global params
   $params = get_global_params("Deal");
   
   // Get deal specific params
-  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
-
-  // privacy : why here ? XXXX
-  $params["priv"] = ($cb_priv == 1 ? 1 : 0);
-
-  // parentdeal archive : why here XXXX ?
-  if (isset ($cb_parchive)) {
-    $params["parchive"] = $cb_parchive;
-  } else {
-    $params["parchive"] = "0";
-  }
-
   // sel_tt
   if (is_array($params["tt"])) {
     while ( list( $key, $value ) = each( $params["tt"] ) ) {
@@ -556,12 +533,10 @@ function get_deal_params() {
     $cpt++;
   }
 
-  $params["status_order"] = (isset($tf_order) ? $tf_order : "0");
+  $params["status_order"] = (isset($_REQUEST["order"]) ? $_REQUEST["order"] : "0");
   
   get_global_params_document($params);
   
-  display_debug_param($params);
-
   return $params;
 }
 
@@ -968,7 +943,6 @@ function update_deal_action() {
     // Parent Check Delete
     $actions["deal"]["parent_delete"]['Url'] = "$path/deal/deal_index.php?action=parent_delete&amp;parentdeal_id=$pid";
   }
-
 
 }
 

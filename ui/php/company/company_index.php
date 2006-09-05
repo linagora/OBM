@@ -45,17 +45,18 @@ $module = "company";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_company_params();
+
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-require("company_query.inc");
 require("company_display.inc");
+require("company_query.inc");
 include("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
 if ($action == "") $action = "index";
-$params = get_company_params();
 get_company_action();
 $perm->check_permissions($module, $action);
 update_last_visit("company", $params["company_id"], $action);
@@ -411,27 +412,37 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_company_params() {
-  global $ext_url, $ext_title;
-  global $cb_archive, $tf_name, $tf_town;
-  global $cb_fuzzy, $cb_category1_tree;
 
   // Get global params
   $params = get_global_params("Company");
   
   // Get company specific params
-  if (isset ($ext_url)) $params["ext_url"] = urldecode($ext_url);
-  if (isset ($ext_title)) $params["ext_title"] = stripslashes(urldecode($ext_title));
-  if (isset ($cb_archive)) $params["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($tf_name)) $params["name"] = get_format_company_name($tf_name);
-  if (isset ($tf_town)) $params["town"] = get_format_town($tf_town);
-  if (isset ($cb_fuzzy)) $params["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
-  if (isset ($cb_category1_tree)) $params["category1_tree"] = ($cb_category1_tree == 1 ? 1 : 0);
+  if (isset ($params["name"])) $params["name"] = get_format_company_name($params["name"]);
+  if (isset ($params["town"])) $params["town"] = get_format_town($params["town"]);
   
   get_global_params_document($params);
   
-  display_debug_param($params);
-  
   return $params;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Auto transform company name (could become a HOOK)
+// Here cause used in get_company_params()
+// Parameters:
+//   - $name : company name
+// Returns:
+//   $name formatted
+///////////////////////////////////////////////////////////////////////////////
+function get_format_company_name($name) {
+  global $caf_company_name;
+
+  $res = $name;
+  if ($caf_company_name) {
+    $res = strip_tags(format_name($res, 2, true, false));
+  }
+
+  return $res;
 }
 
 
@@ -640,7 +651,7 @@ function get_company_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-// Display Pr�f�rences
+// Display Preferences
   $actions["company"]["dispref_display"] = array (
     'Url'      => "$path/company/company_index.php?action=dispref_display",
     'Right'    => $cright_read,

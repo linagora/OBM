@@ -371,63 +371,41 @@ function get_resource_id($name) {
   $obm_q = new DB_OBM ;
   if (isset($name)) {
     $query = "SELECT resource_id FROM Resource WHERE resource_name='$name'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query) ;
-    $obm_q->next_record() ;
-    return $obm_q->f("resource_id") ;
+    display_debug_msg($query, $cdg_sql, "get_resource_id()");
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("resource_id");
   } else {
-    return "" ;
+    return "";
   }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : set the Ressource calendar Rights
+// Query Execution : get resources infos from its id
 // Parameters:
-//   - $id  : id 
+//   - $id : resource id
 // Returns:
-//   - resource's Id
+//   - array
 ///////////////////////////////////////////////////////////////////////////////
-function set_resource_calendar_rights($id) {
+function get_resource_infos($id) {
   global $cdg_sql;
 
-  $user_q = get_resource_all_users();
-  while ($user_q->next_record()) {
-    $u_id = $user_q->f("userobm_id");
-    $query = "INSERT INTO EntityRight (
-        entityright_entity,
-        entityright_entity_id,
-        entityright_consumer,
-        entityright_consumer_id,
-        entityright_read,
-        entityright_write
-      VALUES (
-        'resource',
-        '$id',
-        'user',
-        '$u_id',
-        '1',
-        '1');";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query) ;
+  $obm_q = new DB_OBM ;
+  if (isset($id)) {
+    $query = "SELECT *
+      FROM Resource
+      WHERE resource_id='$id'";
+    display_debug_msg($query, $cdg_sql, "get_resource_infos()");
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $ret["name"] = $obm_q->f("resource_name");
+    $ret["description"] = $obm_q->f("resource_description");
+    return $ret;
+  } else {
+    return "";
   }
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get all users id 
-// Parameters:
-// Returns:
-//   - users Id
-///////////////////////////////////////////////////////////////////////////////
-function get_resource_all_users() {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "SELECT userobm_id FROM UserObm";
-  display_debug_msg($query, $cdg_sql);
-  $retour = $obm_q->query($query) ;
-}
 
 ?>

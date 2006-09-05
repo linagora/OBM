@@ -392,6 +392,23 @@ function dis_resource_can_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Resource rights admin form
+// Parameters:
+//   - $id : resource id
+///////////////////////////////////////////////////////////////////////////////
+function dis_resource_right_dis_admin($id) {
+  global $display, $l_resource;
+
+  $infos = get_resource_infos($id);
+  $name = $infos["name"];
+  $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
+  $block = of_right_dis_admin("resource", $id);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display: the Resource Display preference screen
 // Parameters:
 //   - $prefs : DBO : Field list to display

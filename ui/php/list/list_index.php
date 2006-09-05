@@ -30,6 +30,7 @@ $module = "list";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
+$params = get_list_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
 
@@ -40,7 +41,6 @@ include("list_query.inc");
 
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
-$params = get_list_params();
 get_list_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "List", $action, $params["list_id"], $uid)) {
@@ -278,76 +278,54 @@ exit(0);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_list_params() {
-  global $param_ext;
-  global $tf_company_name, $tf_company_zipcode, $tf_company_town;
-  global $tf_company_timeafter, $tf_company_timebefore;
-  global $sel_company_country_iso3166, $sel_company_marketingmanager_id;
-  global $sel_company_datasource_id, $sel_companycategory1_code,$udomain_id;
-
-  global $tf_contact_firstname, $tf_contact_lastname;
-  global $tf_contact_zipcode, $tf_contact_town, $sel_kind_lang;
-  global $tf_contact_timeafter, $tf_contact_timebefore;
-  global $sel_contact_country_iso3166, $sel_contact_marketingmanager_id;
-  global $sel_contact_datasource_id, $sel_contactcategory1link_category_id;
-  global $sel_contactcategory2link_category_id, $sel_contact_function_id;
-  global $sel_log_and, $sel_log_not;
-  global $se_criteria;
   
   // Get global params
   $params = get_global_params("List");
    
   // Get List specific params
-  if (isset ($ta_query)) $params["query"] = trim($ta_query);
-  if (isset ($tf_contact)) $params["contact"] = trim($tf_contact);
-  if (isset($cb_priv)) $params["priv"] = ($cb_priv == "1") ? 1 : 0;
-  if (isset($cb_mailing_ok)) $params["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0;
-  if (isset($cb_contact_arch)) $params["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
-  if (isset($cb_info_pub)) $params["info_pub"] = $cb_info_pub == 1 ? 1 : 0;
-  if (isset ($title)) $params["title"] = stripslashes($title);
-  if (isset ($param_ext)) $params["list_id"] = $param_ext;
+  if (isset ($params["ext_id"])) $params["list_id"] = $params["ext_id"];
   
   // Criteria params :
   // Company
-  if (isset ($tf_company_name)) $params["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
-  if (isset ($sel_company_country_iso3166)) $params["criteria"]["modules"]["company"]["company_country_iso3166"] = $sel_company_country_iso3166;
-  if (isset ($tf_company_timeafter)) $params["criteria"]["modules"]["company"]["company_timeafter"] = $tf_company_timeafter; 
-  if (isset ($tf_company_zipcode)) $params["criteria"]["modules"]["company"]["company_zipcode"] = $tf_company_zipcode;
-  if (isset ($sel_company_marketingmanager_id)) $params["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $sel_company_marketingmanager_id;
-  if (isset ($tf_company_timebefore)) $params["criteria"]["modules"]["company"]["company_timebefore"] = $tf_company_timebefore;
-  if (isset ($tf_company_town)) $params["criteria"]["modules"]["company"]["company_town"] = $tf_company_town;
-  if (isset ($sel_company_datasource_id)) $params["criteria"]["modules"]["company"]["company_datasource_id"] = $sel_company_datasource_id;
-  if (isset ($sel_companycategory1_code)) $params["criteria"]["modules"]["company"]["companycategory1_code"] = $sel_companycategory1_code;
+  if (isset ($params["company_name"])) $params["criteria"]["modules"]["company"]["company_name"] = $params["company_name"];
+  if (isset ($params["company_country_iso3166"])) $params["criteria"]["modules"]["company"]["company_country_iso3166"] = $params["company_country_iso3166"];
+  if (isset ($params["company_timeafter"])) $params["criteria"]["modules"]["company"]["company_timeafter"] = $params["company_timeafter"]; 
+  if (isset ($params["company_timebefore"])) $params["criteria"]["modules"]["company"]["company_timebefore"] = $params["company_timebefore"];
+  if (isset ($params["company_zipcode"])) $params["criteria"]["modules"]["company"]["company_zipcode"] = $params["company_zipcode"];
+  if (isset ($params["company_marketingmanager_id"])) $params["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $params["company_marketingmanager_id"];
+  if (isset ($params["company_town"])) $params["criteria"]["modules"]["company"]["company_town"] = $params["company_town"];
+  if (isset ($params["company_datasource_id"])) $params["criteria"]["modules"]["company"]["company_datasource_id"] = $params["company_datasource_id"];
+  if (isset ($params["companycategory1_code"])) $params["criteria"]["modules"]["company"]["companycategory1_code"] = $params["companycategory1_code"];
   
   // Contact
-  if (isset ($tf_contact_firstname)) $params["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
-  if (isset ($sel_contact_country_iso3166)) $params["criteria"]["modules"]["contact"]["contact_country_iso3166"] = $sel_contact_country_iso3166;
-  if (isset ($tf_contact_timeafter)) $params["criteria"]["modules"]["contact"]["contact_timeafter"] = $tf_contact_timeafter;
-  if (isset ($tf_contact_lastname)) $params["criteria"]["modules"]["contact"]["contact_lastname"] = $tf_contact_lastname;
-  if (isset ($sel_contact_marketingmanager_id)) $params["criteria"]["modules"]["contact"]["contact_marketingmanager_id"] = $sel_contact_marketingmanager_id;
-  if (isset ($tf_contact_timebefore)) $params["criteria"]["modules"]["contact"]["contact_timebefore"] = $tf_contact_timebefore;
-  if (isset ($sel_contact_datasource_id)) $params["criteria"]["modules"]["contact"]["contact_datasource_id"] = $sel_contact_datasource_id;
-  if (isset ($tf_contact_town)) $params["criteria"]["modules"]["contact"]["contact_town"] = $tf_contact_town;
-  if (isset ($tf_contact_zipcode)) $params["criteria"]["modules"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
-  if (isset ($sel_contactcategory1link_category_id)) $params["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $sel_contactcategory1link_category_id;
-  if (isset ($sel_contactcategory2link_category_id)) $params["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
-  if (isset ($sel_contact_function_id)) $params["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
-  if (isset ($sel_kind_lang)) $params["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
+  if (isset ($params["contact_lastname"])) $params["criteria"]["modules"]["contact"]["contact_lastname"] = $params["contact_lastname"];
+  if (isset ($params["contact_firstname"])) $params["criteria"]["modules"]["contact"]["contact_firstname"] = $params["contact_firstname"];
+  if (isset ($params["contact_country_iso3166"])) $params["criteria"]["modules"]["contact"]["contact_country_iso3166"] = $params["contact_country_iso3166"];
+  if (isset ($params["contact_timeafter"])) $params["criteria"]["modules"]["contact"]["contact_timeafter"] = $params["contact_timeafter"];
+  if (isset ($params["contact_timebefore"])) $params["criteria"]["modules"]["contact"]["contact_timebefore"] = $params["contact_timebefore"];
+  if (isset ($params["contact_marketingmanager_id"])) $params["criteria"]["modules"]["contact"]["contact_marketingmanager_id"] = $params["contact_marketingmanager_id"];
+  if (isset ($params["contact_datasource_id"])) $params["criteria"]["modules"]["contact"]["contact_datasource_id"] = $params["contact_datasource_id"];
+  if (isset ($params["contact_town"])) $params["criteria"]["modules"]["contact"]["contact_town"] = $params["contact_town"];
+  if (isset ($params["contact_zipcode"])) $params["criteria"]["modules"]["contact"]["contact_zipcode"] = $params["contact_zipcode"];
+  if (isset ($params["contactcategory1link_category_id"])) $params["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $params["contactcategory1link_category_id"];
+  if (isset ($params["contactcategory2link_category_id"])) $params["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $params["contactcategory2link_category_id"];
+  if (isset ($params["contact_function_id"])) $params["criteria"]["modules"]["contact"]["contact_function_id"] = $params["contact_function_id"];
+  if (isset ($params["kind_lang"])) $params["criteria"]["modules"]["contact"]["kind_lang"] = $params["kind_lang"];
 
   // Publication
-  if (isset ($sel_subscription_publication_id)) $params["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;
-  if (isset ($tf_publication_lang)) $params["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
-  if (isset ($tf_publication_year)) $params["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
-  if (isset ($sel_subscription_reception_id)) $params["criteria"]["modules"]["publication"]["subscription_reception_id"] = $sel_subscription_reception_id;
-  if (isset ($tf_subscription_renewal)) $params["criteria"]["modules"]["publication"]["subscription_renewal"] = $tf_subscription_renewal;
-  if (isset ($tf_subscription_timeafter)) $params["criteria"]["modules"]["publication"]["subscription_timeafter"] = $tf_subscription_timeafter;
-  if (isset ($tf_subscription_timebefore)) $params["criteria"]["modules"]["publication"]["subscription_timebefore"] = $tf_subscription_timebefore;
-  
+  if (isset ($params["subscription_publication_id"])) $params["criteria"]["modules"]["publication"]["subscription_publication_id"] = $params["subscription_publication_id"];
+  if (isset ($params["publication_lang"])) $params["criteria"]["modules"]["publication"]["publication_lang"] = $params["publication_lang"];
+  if (isset ($params["publication_year"])) $params["criteria"]["modules"]["publication"]["publication_year"] = $params["publication_year"];
+  if (isset ($params["subscription_reception_id"])) $params["criteria"]["modules"]["publication"]["subscription_reception_id"] = $params["subscription_reception_id"];
+  if (isset ($params["subscription_renewal"])) $params["criteria"]["modules"]["publication"]["subscription_renewal"] = $params["subscription_renewal"];
+  if (isset ($params["subscription_timeafter"])) $params["criteria"]["modules"]["publication"]["subscription_timeafter"] = $params["subscription_timeafter"];
+  if (isset ($params["subscription_timebefore"])) $params["criteria"]["modules"]["publication"]["subscription_timebefore"] = $params["subscription_timebefore"];
 
-  if (isset ($sel_log_not)) $params["criteria"]["logical"]["NOT"] = $sel_log_not;
-  if (isset ($sel_log_and)) $params["criteria"]["logical"]["AND"] = $sel_log_and;
+  if (isset ($params["log_not"])) $params["criteria"]["logical"]["NOT"] = $params["log_not"];
+  if (isset ($params["log_and"])) $params["criteria"]["logical"]["AND"] = $params["log_and"];
   
-  if (isset ($se_criteria)) {
-    $params["criteria"] = unserialize(urldecode($se_criteria));
+  if (isset ($params["se_criteria"])) {
+    $params["criteria"] = unserialize(urldecode($params["se_criteria"]));
   }
 
   $nb_con = 0;
@@ -357,18 +335,10 @@ function get_list_params() {
       $nb_con++;
       $con_num = substr($key, 6);
       $params["con$nb_con"] = $con_num;
-    } elseif (strcmp(substr($key, 0, 7),"cb_list") == 0) {
-      $nb_list++;
-      $params_num = substr($key, 7);
-      $params["list_$nb_list"] = $params_num;
-      // register the list in the list session array
-      $ses_list[$params_num] = $params_num;
     }
   }
   $params["con_nb"] = $nb_con;
   $params["list_nb"] = $nb_list;
-
-  display_debug_param($params);
 
   return $params;
 }

@@ -39,7 +39,7 @@ function check_admin_ref_dsrc_upd(form, sel_del_dsrc)
 {
   dsrc_pos = sel_del_dsrc.selectedIndex;
   if ((dsrc_pos >= 0) && (form.tf_name.value != \"\")) {
-    form.sel_dsrc.value=sel_del_dsrc.options[dsrc_pos].value;
+    form.sel_datasource_id.value=sel_del_dsrc.options[dsrc_pos].value;
     return true;
    } else {
      alert(\"$l_j_dsrc_update\");
@@ -87,7 +87,7 @@ function check_admin_ref_ctry_upd(form, sel_del_ctry)
 {
   ctry_pos = sel_del_ctry.selectedIndex;
   if ((ctry_pos >= 0) && (form.tf_name.value != \"\")) {
-    form.sel_ctry.value=sel_del_ctry.options[ctry_pos].value;
+    form.sel_country.value=sel_del_ctry.options[ctry_pos].value;
     return true;
    } else {
      alert(\"$l_j_ctry_update\");
@@ -135,7 +135,7 @@ function check_admin_ref_tt_upd(form, sel_del_tt)
 {
   tt_pos = sel_del_tt.selectedIndex;
   if ((tt_pos >= 0) && (form.tf_label.value != \"\")) {
-    form.sel_tt.value=sel_del_tt.options[tt_pos].value;
+    form.sel_tasktype_id.value=sel_del_tt.options[tt_pos].value;
     return true;
    } else {
      alert(\"$l_j_tt_update\");

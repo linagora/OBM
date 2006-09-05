@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.2pre2";
+$obm_version = "1.2.2pre3";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -792,6 +792,15 @@ function get_global_params($table="") {
   
   $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/", "/^fi_/");
   foreach($_REQUEST as $var => $value) {
+
+    // Handle automatic checkbox (1,0) paramaters (cba_)
+    $key = preg_replace("/^cba_/", "", $var);
+    if ($key != $var) {
+      $value = ($value == 1 ? 1 : 0);
+      $params[$key] = $value;
+      continue;
+    }
+
     $key = preg_replace($replace,"",$var);
 
     // sql_order_dir value control
@@ -800,10 +809,21 @@ function get_global_params($table="") {
         $value = $c_order_dir[0];
     }
 
+    // XXXX SQL_order below can't access here $fieldnames...
     // sql_order_field value control
     if ($key == "sql_order_field") {
       if (!in_array($value, array_keys($fieldnames)))
         $value = "";
+    }
+
+    // auto decode urls
+    if (preg_match('/_url$/', $key)) {
+      $value = urldecode($value);
+    }
+
+    // external text parameters (title)
+    if ($key == "ext_title") {
+      $value = stripslashes(urldecode($value));
     }
 
     // Add value in hash table
@@ -814,6 +834,7 @@ function get_global_params($table="") {
     }
   }
 
+  // Session not here cause session not opened at this moment
 /*  if (is_array($_SESSION)) {
       foreach($_SESSION as $var => $value) {
         if (is_array($value)) {

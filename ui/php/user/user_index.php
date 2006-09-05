@@ -28,6 +28,7 @@ $module = "user";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_user_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("user_display.inc");
@@ -38,7 +39,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 //There is no page_close(). yes, at the end
 if ($action == "") $action = "index";
-$params = get_user_params();  // $user is used by phplib
 get_user_action();
 $perm->check_permissions($module, $action);
 $uid = $auth->auth["uid"];
@@ -254,10 +254,9 @@ function get_user_params() {
     $params["group_nb"] = $nb_group;
   }
   
-  display_debug_param($params);
-
   return $params;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // User Action 

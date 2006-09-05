@@ -37,6 +37,7 @@ $module = "admin_ref";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc"); 
+$params = get_admin_ref_param();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
@@ -46,14 +47,13 @@ require_once("admin_ref_js.inc");
 require_once("$obminclude/of/of_category.inc");
 
 if ( ($action == "") || ($action == "index")) $action = "country";
-$params = get_admin_ref_param();
 get_admin_ref_action();
 $perm->check_permissions($module, $action);
 
 page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
-// External calls (main menu not displayed)                                  //
+// External calls (main menu not displayed)
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "tt_ext_get_ids") {
   $display["detail"] = html_admin_ref_tasktype_select_list($params);
@@ -233,58 +233,18 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_ref_param() {
-  global $tf_name, $sel_dsrc, $sel_ctry, $tf_iso, $tf_lang, $tf_phone;
-  global $sel_tt, $tf_label, $rd_tt_internal, $hd_old_iso, $hd_old_lang;
-  global $sel_region, $tf_region_label, $tf_region_code;
-  global $tt_target, $cdg_param, $ext_element;
-  global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
 
-  // Admin - generic fields
-  if (isset ($tf_name)) $params["name"] = trim($tf_name);
-
-  // Admin - Data Source fields
-  if (isset ($sel_dsrc)) $params["datasource"] = $sel_dsrc;
+  $params = get_global_params("admin_ref");
 
   // Admin - Country fields
-  if (isset ($sel_ctry)) {
-    $pos = strpos($sel_ctry, "-");
-    $params["iso"] = substr($sel_ctry, 0, $pos);
-    $params["lang"] = substr($sel_ctry, $pos+1);
+  if (isset ($params["country"])) {
+    $sel_country = $params["country"];
+    $pos = strpos($sel_country, "-");
+    $params["iso"] = substr($sel_country, 0, $pos);
+    $params["lang"] = substr($sel_country, $pos+1);
   }
-  if (isset ($tf_iso)) $params["iso"] = $tf_iso;
-  if (isset ($tf_lang)) $params["lang"] = $tf_lang;
-  if (isset ($tf_phone)) $params["phone"] = $tf_phone;
-  if (isset ($hd_old_iso)) $params["old_iso"] = $hd_old_iso;
-  if (isset ($hd_old_lang)) $params["old_lang"] = $hd_old_lang;
 
-  // Admin - Task Type fields
-  if (isset ($sel_tt)) $params["tasktype"] = $sel_tt;
-  if (isset ($tf_label)) $params["label"] = trim($tf_label);
-  if (isset ($rd_tt_internal)) $params["internal"] = $rd_tt_internal;
-
-  // Admin - Region fields
-  if (isset ($sel_region)) $params["region"] = $sel_region;
-  if (isset ($tf_region_label)) $params["region_label"] = trim($tf_region_label);
-  if (isset ($tf_region_code)) $params["region_code"] = $tf_region_code;
-
-  // External param
-  if (isset ($popup)) $params["popup"] = $popup;
-  if (isset ($ext_action)) $params["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $params["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $params["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $params["id"] = $ext_id;
-  if (isset ($ext_target)) $params["ext_target"] = $ext_target;
-  if (isset ($ext_title)) $params["ext_title"] = $ext_title;
-  if (isset ($ext_element)) $params["ext_element"] = $ext_element;
-  if (isset ($tt_target)) $params["tt_target"] = $tt_target;
-
-  if (debug_level_isset($cdg_param)) {
-    if ( $params ) {
-      while ( list( $key, $val ) = each( $params ) ) {
-        echo "<br />ref[$key]=$val";
-      }
-    }
-  }
+  if (isset ($$params["ext_id"])) { $params["id"] = $params["ext_id"]; }
 
   return $params;
 }
@@ -298,7 +258,6 @@ function get_admin_ref_action() {
   global $l_header_datasource, $l_header_country, $l_header_tasktype;
   global $l_header_region;
   global $cright_read, $cright_read_admin, $cright_write_admin;
-
 
   // Country index
   $actions["admin_ref"]["country"] = array (

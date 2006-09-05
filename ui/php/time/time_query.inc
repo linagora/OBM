@@ -41,6 +41,7 @@ function run_query_time_task_list($time) {
 
   $query = "
     SELECT timetask_id,
+      timetask_user_id,
       $datetask,
       $timeupdate,
       $timecreate,
@@ -62,7 +63,7 @@ function run_query_time_task_list($time) {
       AND timetask_date <'". $array_date[1] ."'
       AND timetask_user_id = '$user_id'
     ORDER BY timetask_date
-    ";
+";
 
   display_debug_msg($query, $cdg_sql,"run_query_search");
   $obm_db = new DB_OBM;
@@ -93,8 +94,8 @@ function run_query_time_stat_project($time) {
 
   $uid_tab .= ")";
 
-  $year=substr($time["date"],0,4);
-  $month=substr($time["date"],4,2);
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
   $day=1;
 
   // First and last days of month
@@ -149,9 +150,9 @@ function run_query_time_stat_tasktype($time) {
 
   $uid_tab .= ")";
 
-  $year=substr($time["date"],0,4);
-  $month=substr($time["date"],4,2);
-  $day=1;
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
+  $day = 1;
 
   // First and last days of month
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
@@ -266,7 +267,7 @@ function run_query_time_insert($task) {
   global $uid, $cdg_sql;
 
   $valid_date = run_query_time_valid_search($task);
-  $date = $task["sel_date"];
+  $day = $task["day"];
   $ttype = $task["tasktype"];
   $projecttask = ($task["projecttask"] == 0) ? 'null' : $task["projecttask"];
   $time = $task["time"];
@@ -275,8 +276,8 @@ function run_query_time_insert($task) {
 
   if ( $ttype != 0 ) {
     // for navigators wich doesn't support HTML 4 => <option disabled>
-    if (is_array($date)) {
-      foreach ($date as $key => $value) {
+    if (is_array($day)) {
+      foreach ($day as $key => $value) {
 	$query = "
        INSERT INTO TimeTask (
          timetask_timeupdate,
@@ -356,11 +357,11 @@ function run_query_time_update($task) {
   $projecttask = $task["projecttask"];
   $time = $task["time"];
   $label = $task["label"];
-  $date = $task["sel_date"];
+  $day = $task["day"];
   
   $query = "
   UPDATE TimeTask SET
-    timetask_date='$date',
+    timetask_date='$day',
     timetask_tasktype_id='$ttype',
     timetask_length='$time',
     timetask_label='$label',
@@ -368,8 +369,8 @@ function run_query_time_update($task) {
   WHERE timetask_id='$id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_update");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
 }
 
 

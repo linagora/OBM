@@ -12,6 +12,7 @@ $module = "payment";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
+$params = get_payment_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
 require("payment_display.inc");
@@ -21,7 +22,6 @@ require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 if ($action == "") $action = "index";
-$params = get_payment_params();
 get_payment_action();
 $perm->check_permissions($module, $action);
 
@@ -192,11 +192,10 @@ display_page($display);
 // returns : $payment hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_payment_params() {
+
   // Get global params
   $params = get_global_params("Payment");
 
-  display_debug_param($params);
-  
   return $params;
 }
 

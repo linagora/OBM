@@ -59,7 +59,7 @@ $fieldnames["publication_lang"] = $l_publication." ".$l_lang;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_list(&$OD, $fieldname, $link_ok) {
-  global $path, $list, $set_theme, $clist_mode_normal, $clist_mode_expert;
+  global $path, $params, $set_theme, $clist_mode_normal, $clist_mode_expert;
   global $l_normal, $l_expert;
 
   // We set an indicator to tell if the contact has an address
@@ -79,7 +79,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("list_id").",'".addslashes($OD->data_set->f("list_name"))."');";
     } else if ($OD->display_ext == "get_id_url") {
-      $ext_url = $list["ext_url"];
+      $ext_url = $params["ext_url"];
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("list_id").");";
     } elseif($link_ok) {
       $res["url"] = "list_index.php?action=detailconsult&amp;list_id=".$OD->data_set->f("list_id");
@@ -344,7 +344,6 @@ function html_list_search_form ($list, $usr_q) {
   global $popup;
 
   if ($popup) {
-    $title = $list["title"];
     $ext_action = $list["ext_action"];
     $ext_url = $list["ext_url"];
     $ext_id = $list["ext_id"];
@@ -802,7 +801,7 @@ function html_list_form($action, $list_q, $list) {
 	    ($usercreate == $uid) ) ) {
     $dis_priv = "
       <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" ";
+      <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" ";
     if ($priv == 1) $dis_priv .= "checked = \"checked\"";
     $dis_priv .= " /></td>
   </tr><tr>";
@@ -816,7 +815,7 @@ function html_list_form($action, $list_q, $list) {
     $dis_pub = "
     <tr>
       <td class=\"detailLabel\">$l_info_pub</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" $dis_info_pub name=\"cb_info_pub\" value=\"1\" /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" $dis_info_pub name=\"cba_info_pub\" value=\"1\" /></td>
     </tr>";
   }
 
@@ -856,12 +855,12 @@ function html_list_form($action, $list_q, $list) {
   <tr>
     <td class=\"detailLabel\">$l_mailing</td>
     <td class=\"detailForm\">
-      <input type=\"checkbox\" $dis_mailing name=\"cb_mailing_ok\" value=\"1\" /></td>
+      <input type=\"checkbox\" $dis_mailing name=\"cba_mailing_ok\" value=\"1\" /></td>
   </tr>  
   <tr>
     <td class=\"detailLabel\">$l_contact_archive</td>
     <td class=\"detailForm\">
-      <input type=\"checkbox\" $dis_con_arch name=\"cb_contact_arch\" value=\"1\" /></td>
+      <input type=\"checkbox\" $dis_con_arch name=\"cba_contact_arch\" value=\"1\" /></td>
   </tr>  
   $dis_pub
   </table>
@@ -1548,9 +1547,9 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
       <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
       <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"cb_mailing_ok\" value=\"$mailing_ok\" />
-      <input type=\"hidden\" name=\"cb_contact_arch\" value=\"$contact_arch\" />
-      <input type=\"hidden\" name=\"cb_info_pub\" value=\"$info_pub\" />
+      <input type=\"hidden\" name=\"cba_mailing_ok\" value=\"$mailing_ok\" />
+      <input type=\"hidden\" name=\"cba_contact_arch\" value=\"$contact_arch\" />
+      <input type=\"hidden\" name=\"cba_info_pub\" value=\"$info_pub\" />
       <input type=\"hidden\" name=\"rd_mode\" value=\"$mode\" />
       <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />
       <input type=\"hidden\" name=\"id_duplicated\" value=\"$id_duplicated\" />";

@@ -247,7 +247,7 @@ function run_query_company_detail($p_id) {
          LEFT JOIN UserObm as u ON company_userupdate=u.userobm_id
     WHERE company_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -368,7 +368,7 @@ function run_query_company_insert($company) {
     '$email',
     '$comment')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_insert(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -393,7 +393,7 @@ function run_query_company_insert($company) {
       AND company_phone = '$phone'
       AND company_zipcode = '$zip'";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_insert(2)");
   $obm_q->query($query);
   $obm_q->next_record();
   $id = $obm_q->f("id");
@@ -533,25 +533,6 @@ function run_query_company_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Auto transform company name (could become a HOOK)
-// Parameters:
-//   - $name : company name
-// Returns:
-//   $name formatted
-///////////////////////////////////////////////////////////////////////////////
-function get_format_company_name($name) {
-  global $caf_company_name;
-
-  $res = $name;
-  if ($caf_company_name) {
-    $res = strip_tags(format_name($res, 2, true, false));
-  }
-
-  return $res;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return the companies with this name and zip (not with this id if set)
 // Parameters:
 //   - $p_id : company Id not to return
@@ -574,7 +555,7 @@ function run_query_check_company($p_id, $name, $zip) {
             WHERE company_name $like '$name%'
               $where_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_check_company()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -594,7 +575,7 @@ function run_query_companynafcode() {
     $query = "SELECT * FROM CompanyNafCode ORDER BY companynafcode_code"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_companynafcode()");
   } else {
     $obm_q = "";
   }
@@ -630,7 +611,7 @@ function run_query_company_nafcode_insert($company) {
       '$code',
       '$label')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_nafcode_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -660,7 +641,7 @@ function run_query_company_nafcode_update($company) {
     WHERE
       companynafcode_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_nafcode_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -678,7 +659,7 @@ function run_query_company_nafcode_delete($id) {
 
   $query = "DELETE FROM CompanyNafCode WHERE companynafcode_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_nafcode_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -698,7 +679,7 @@ function run_query_company_nafcode_links($p_id) {
     FROM Company
     WHERE company_nafcode_id='$p_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_company_nafcode_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -719,7 +700,7 @@ function get_company_nafcode_label($id) {
     FROM CompanyNafCode
     WHERE companynafcode_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_company_nafcode_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -835,7 +816,7 @@ function check_can_delete_company($p_id) {
   $delete_ok = true;
 
   // Links from Contact
-  $nb = get_global_linked_contact_nb($p_id, "company", true);
+  $nb = get_global_linked_element_nb("Contact", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "$l_link_contact";
@@ -844,7 +825,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from deals
-  $nb = get_global_linked_deal_nb($p_id, "company", true);
+  $nb = get_global_linked_element_nb("Deal", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_deal";
@@ -853,7 +834,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from Contracts
-  $nb = get_global_linked_contract_nb($p_id, "company", true);
+  $nb = get_global_linked_element_nb("Contract", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_contract";
@@ -862,7 +843,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from Project
-  $nb = get_global_linked_project_nb($p_id, "company", true);
+  $nb = get_global_linked_element_nb("Project", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_project";
@@ -871,7 +852,7 @@ function check_can_delete_company($p_id) {
   }
 
   // Links from Invoice
-  $nb = get_global_linked_invoice_nb($p_id, "company", true);
+  $nb = get_global_linked_element_nb("Invoice", $p_id, "company", true);
   if ($nb > 0) {
     $delete_ok = false;
     $err_msg .= "<br />$l_link_invoice";

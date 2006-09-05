@@ -23,6 +23,9 @@ if (($set_lang == "")  && ($mode != "txt")) {
   run_query_userobm_update_lastaccess($auth->auth["uid"]);
 }
 
+// Display parameters if debug level is set
+display_debug_param($params);
+
 // Display session content if debug level is set
 if (($set_debug & $cdg_sess) == $cdg_sess) {
   while (list($key, $val) = each ($_SESSION)) {

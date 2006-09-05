@@ -228,7 +228,7 @@ function html_publication_subscription_search_list($pub_q, $prefs, $nb_pub,$publ
   $market = $publication["marketing_manager"];
   $popup = $publication["popup"]; 
   
-  $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
+  $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market$url_ext");
 
   $pub_q->seek($first_row);
 
@@ -710,7 +710,7 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
     </tr><tr>
       <td class=\"detailLabel\">$l_renew</td>
       <td class=\"detailForm\">
-      <input type=\"checkbox\" $renew name=\"cb_renewal\" value=\"1\" />
+      <input type=\"checkbox\" $renew name=\"cba_renewal\" value=\"1\" />
       </td>      
     </tr><tr>
       <td class=\"detailLabel\">$l_recept</td>

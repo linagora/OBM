@@ -8,8 +8,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $regexp_def_func = '/^\s*function ([a-z_]*)\s{0,3}\(.*/Us';
-$regexp_used_func = '/^.*([a-z_]{1,64})\s{0,3}\(.*$/Us';
-$regexp_used_func_not = '/^\s*(function|\/\/).*$/Us';
+$regexp_used_func = '/^.*([a-z_]{1,96})\s{0,3}\(.*$/Us';
+$regexp_used_func_not_def = '/^\s*(function|\/\/).*$/Us';
+$regexp_used_func_not_debug = '/display_debug_msg.*([a-z_]{1,96})\s{0,3}\(.*$/Us';
 
 $modules = get_modules_array();
 array_unshift($modules, $c_all);
@@ -81,7 +82,7 @@ function get_admin_code_def_functions($file) {
 
     // If a function is defined, we note it
     if (preg_match($regexp_def_func, $line, $matches)) {
-      $func_name =  $matches[1];
+      $func_name = $matches[1];
       $tableau[$func_name]["file"] = $file;
       $tableau[$func_name]["line_num"] = $line_num;
       $tableau[$func_name]["cpt"] += 1;
@@ -167,7 +168,8 @@ function get_admin_code_used_func_directory($dir) {
 //   - $resultat : array of functions (defined or used)
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_code_used_func_file($file) {
-  global $debug, $path, $regexp_used_func, $regexp_used_func_not, $used_table;
+  global $debug, $path, $regexp_used_func, $regexp_used_func_not_def;
+  global $regexp_used_func_not_debug, $used_table;
 
   $contents = array();
   if (file_exists($file)) {
@@ -178,8 +180,9 @@ function get_admin_code_used_func_file($file) {
   // For each line of the file
   while (list($line_num, $line) = each($contents)) {
 
-    // If the line is not a function definition
-    if (! preg_match($regexp_used_func_not, $line, $tmp)) {
+    // If the line is not a function definition and not a debug msg
+    if ((! preg_match($regexp_used_func_not_def, $line, $tmp))
+	&& (! preg_match($regexp_used_func_not_debug, $line, $tmp))) {
 
       // If a function is used, we note it
       while (preg_match($regexp_used_func, $line, $matches)) {
