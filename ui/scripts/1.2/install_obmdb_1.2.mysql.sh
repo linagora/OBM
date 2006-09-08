@@ -28,7 +28,7 @@ fi
 echo $PHP : PHP interpreter found
 
 # Create the Artichow library link
-mv ../../obminclude/Artichow-1.06-php4+5/ ../obminclude/Artichow
+mv ../../obminclude/Artichow-1.06-php4+5/ ../../obminclude/Artichow
 
 echo "*** Document repository creation"
 $PHP install_document_1.2.php || (echo $?; exit $?)
