@@ -396,10 +396,16 @@ function html_project_planning($obm_q, $params) {
     $project_label = $obm_q->f("project_label");
     $task_id = $obm_q->f("id");
     $task_label = $obm_q->f("label");
+    if (mb_strlen($task_label) > 15) {
+      $dis_task_label = substr($task_label,0,15) . "..";
+    } else {
+      $dis_task_label = $task_label;
+    }
     $u_id = $obm_q->f("userobm_id");
-    
+
     $projects[$project_id] = $project_label;
-    $tasks[$task_id] = "<abbr title=\"$task_label\">".substr($task_label,0,10)."...</abbr>";
+    
+    $tasks[$task_id] = "<abbr title=\"$task_label\">$dis_task_label</abbr>";
     $users[$u_id] = $obm_q->f("userobm_firstname")." ". $obm_q->f("userobm_lastname");
 
 
@@ -459,10 +465,11 @@ function html_project_planning($obm_q, $params) {
   $d_l
   </table>
     <div>
-    ";
+";
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Project links menu

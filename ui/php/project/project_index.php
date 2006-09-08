@@ -59,7 +59,6 @@ $perms = $auth->auth["perm"];
 
 update_last_visit("project", $params["project_id"], $action);
 
-if ($action == "") $action = "index";
 get_project_action();
 $perm->check_permissions($module, $action);
 

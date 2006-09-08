@@ -29,8 +29,6 @@ require("document_display.inc");
 require_once("document_js.inc");
 require_once("$obminclude/of/of_category.inc");
 
-
-if ($action == "") $action = "index";
 get_document_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Document", $action, $params["document_id"], $uid)) {
@@ -46,7 +44,9 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
   $display["detail"] = html_document_tree($params, $ext_disp_file);
+
 } elseif ($action == "accessfile") {
+///////////////////////////////////////////////////////////////////////////////
   if ($params["document_id"] > 0) {
     $doc_q = run_query_document_detail($params["document_id"]);
     if ($doc_q->num_rows() == 1) {
@@ -56,7 +56,9 @@ if ($action == "ext_get_path") {
   } else {
     $display["msg"] .= display_err_msg("$l_no_document !");
   }  
+
 } elseif ($action == "ext_get_ids") {
+///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_document_search_list($params);
@@ -64,9 +66,6 @@ if ($action == "ext_get_path") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-///////////////////////////////////////////////////////////////////////////////
-// Normal calls
-///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($params);
@@ -120,6 +119,7 @@ if ($action == "ext_get_path") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form("", $params)) {
     $params["document_id"] = run_query_document_insert($params);
+    echo "p1=".$params["document_id"];
     if ($params["document_id"]) {
       update_last_visit("document", $params["document_id"], $action);
       $display["msg"] .= display_ok_msg("$l_document : $l_insert_ok");
@@ -374,16 +374,17 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_params() {
-  global $tf_path, $fi_file, $fi_file_name, $fi_file_size, $fi_file_type;
 
   // Get global params
   $params = get_global_params("Document");
 
-  if (isset ($tf_path)) $params["path"] = format_path(trim($tf_path));
-  if (isset ($fi_file_name)) $params["name"] = $fi_file_name;
-  if (isset ($fi_file_size)) $params["size"] = $fi_file_size;
-  if (isset ($fi_file_type)) $params["mime_file"] = $fi_file_type;
-  if (isset ($fi_file)) $params["file"] = $fi_file;
+  if (isset ($params["path"])) $params["path"] = format_path(trim($params["path"]));
+  if (isset ($_FILES['fi_file'])) {
+    $params["file_tmp"] = $_FILES['fi_file']["tmp_name"];
+    $params["name"] = $_FILES['fi_file']['name'];
+    $params["size"] = $_FILES['fi_file']['size'];
+    $params["type"] = $_FILES['fi_file']['type'];
+  }
 
   return $params;
 }
@@ -398,7 +399,6 @@ function get_document_action() {
   global $l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_new_dir;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-
 
 // Index  
   $actions["document"]["index"] = array (

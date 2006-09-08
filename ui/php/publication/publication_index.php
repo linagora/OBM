@@ -41,7 +41,6 @@ require("publication_display.inc");
 
 update_last_visit("publication", $param_publication, $action);
 
-if ($action == "") $action = "index";
 require("publication_js.inc");
 get_publication_action();
 $perm->check_permissions($module, $action);

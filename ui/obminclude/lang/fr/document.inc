@@ -90,3 +90,4 @@ $l_fill_dir_name = "Vous devez donner un nom à vote répertoire";
 $l_invalid_dir_path = "Le chemin spécifié est invalide";
 $l_invalid_file = "Fichier incorrect";
 $l_invalid_existing_file = "Le chemin spécifié ne pointe pas vers un fichier valid";
+$l_error_dir = "Le répertoire n'est pas valide. Vérifier le chemin et le nom";

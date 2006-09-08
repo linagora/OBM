@@ -41,7 +41,6 @@ require("$obminclude/lib/right.inc");
 
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 get_resource_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Resource", $action, $params["resource_id"], $uid)) {

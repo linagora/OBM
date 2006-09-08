@@ -933,7 +933,7 @@ function run_query_deal_potential($users_id="") {
 //            total in u_id=0
 //                 [users_id] = array(u_id)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpected", $users_id="", $sel_tt="") {
+function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpected", $users_id="", $tts="") {
   global $cdg_sql, $cdg_param;
   global $l_total;
 
@@ -948,10 +948,10 @@ function run_query_deal_dashboard_infos($date_range, $target_date="deal_dateexpe
   }
 
   // Tasktype filter
-  if (is_array($sel_tt)) {
+  if (is_array($tts)) {
     $where_tt .= " AND (";
     $or = "";
-    foreach ($sel_tt as $tt_id) {
+    foreach ($tts as $tt_id) {
       $where_tt .= "$or deal_tasktype_id='$tt_id'";
       $or = " OR";
     }
@@ -1088,6 +1088,18 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
     }
   }
 
+  // Tasktype filter
+  if (is_array($deal["tasktype"])) {
+    $where_tt .= " AND (";
+    $or = "";
+    foreach ($deal["tasktype"] as $tt_id) {
+      $where_tt .= "$or deal_tasktype_id='$tt_id'";
+      $or = " OR";
+    }
+    $where_tt .= ")";
+  }
+
+
   // Order by clause
   $sql_order_field = $deal["sql_order_field"];
   $sql_order_dir = $deal["sql_order_dir"];
@@ -1135,6 +1147,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
       AND deal_archive = '0'
       $where_uid
       $where_date
+      $where_tt
     $orderq
     $limit
 ";

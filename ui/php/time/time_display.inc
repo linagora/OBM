@@ -399,6 +399,7 @@ function dis_time_planning($time) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for a month
 // Parameters : 
@@ -442,7 +443,17 @@ function dis_time_user_planning($obm_q, $time) {
     $project_id = $obm_q->f("id");
     $u_id = $obm_q->f("userobm_id");
     $type = $obm_q->f("type");
-    $projects[$type.$project_id] = "<abbr title=\"".$obm_q->f("label")."\">".substr($obm_q->f("label"),0,10)."...</abbr>";
+    $shortname = $obm_q->f("shortname");
+    $label = $obm_q->f("label");
+    if (mb_strlen($label) > 15) {
+      $dis_label = substr($label,0,15) . "..";
+    } else {
+      $dis_task_label = $label;
+    }
+    if ($shortname == "") {
+      $shortname = $dis_label;
+    }
+    $projects[$type.$project_id] = "<abbr title=\"$label\">$shortname</abbr>";
     $users[$u_id] = $obm_q->f("userobm_firstname")." ". $obm_q->f("userobm_lastname");
     $planning[$u_id][$type.$project_id]["$day"] = $obm_q->f("timetask_length")/$c_day_fraction;
     $planning[$u_id][$type.$project_id]["length"] += $obm_q->f("timetask_length")/$c_day_fraction;

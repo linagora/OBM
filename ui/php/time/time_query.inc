@@ -652,9 +652,9 @@ function run_query_time_task_one_month($time) {
 function run_query_time_user_month_planning($time) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($time["date"],0,4);
-  $month=substr($time["date"],4,2);
-  $day=1;
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
+  $day = 1;
   $uid_tab = "(".implode(",",$time["user_ids"]).")";
   // First and last days of month
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
@@ -669,6 +669,7 @@ function run_query_time_user_month_planning($time) {
   $query = "
     SELECT
       project_name as label,
+      project_shortname as shortname,
       project_id as id,
       sum(timetask_length) timetask_length,
       $date,
@@ -687,6 +688,7 @@ function run_query_time_user_month_planning($time) {
     UNION
     SELECT
       tasktype_label as label,
+      tasktype_label as shortname,
       timetask_tasktype_id as id,
       sum(timetask_length) timetask_length,
       $date,

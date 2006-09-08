@@ -46,7 +46,7 @@ require("admin_ref_query.inc");
 require_once("admin_ref_js.inc");
 require_once("$obminclude/of/of_category.inc");
 
-if ( ($action == "") || ($action == "index")) $action = "country";
+if ($action == "index") $action = "country";
 get_admin_ref_action();
 $perm->check_permissions($module, $action);
 

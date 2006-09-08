@@ -900,8 +900,20 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
     $cats[] = $cat_info;
   }
 
-  if (count($cats) > 0) {
-    usort($cats, "_of_category_compare");
+  if (is_array($cats)) {
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+
+    if ($has_code) {
+      if (count($cats) > 0) {
+	usort($cats, "_of_category_compare");
+      }
+    }
   }
 
   return $cats;

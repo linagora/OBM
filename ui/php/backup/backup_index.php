@@ -29,7 +29,6 @@ require("backup_query.inc");
 require("backup_display.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
-if ($action == "") $action = "index";
 get_backup_action();
 $perm->check_permissions($module, $action);
 

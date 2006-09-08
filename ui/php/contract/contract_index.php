@@ -43,7 +43,6 @@ require("contract_js.inc");
 
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 get_contract_action();
 $perm->check_permissions($module, $action);
 

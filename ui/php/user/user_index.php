@@ -37,8 +37,6 @@ require("user_js.inc");
 require("$obminclude/lib/right.inc"); // needed by call from calendar
 require_once("$obminclude/javascript/calendar_js.inc");
 
-//There is no page_close(). yes, at the end
-if ($action == "") $action = "index";
 get_user_action();
 $perm->check_permissions($module, $action);
 $uid = $auth->auth["uid"];
@@ -237,14 +235,13 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_params() {
-  global  $udomain_id, $c_domain;
   
   // Get global params
   $params = get_global_params("UserObm");
 
-  if (isset($_POST)) {
+  if (isset($_REQUEST)) {
     $nb_group = 0;
-    while ( list( $key ) = each( $_POST) ) {
+    while ( list( $key ) = each($_REQUEST) ) {
       if (strcmp(substr($key, 0, 4),"cb_g") == 0) {
         $nb_group++;
         $group_num = substr($key, 4);

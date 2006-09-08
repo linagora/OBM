@@ -39,7 +39,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 get_invoice_action();
 $perm->check_permissions($module, $action);
 

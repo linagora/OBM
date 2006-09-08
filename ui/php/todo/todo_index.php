@@ -27,7 +27,6 @@ require("todo_display.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 require_once("todo_js.inc");
 
-if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 
 get_todo_action();

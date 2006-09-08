@@ -35,14 +35,15 @@ roadmap : gestion categories dans 2 tables : categoryentity et categorylink; du 
 - doc : categories a completer
 - responsable de ressource ? processus quand reservation d'une res sans les droits
 
-- virer global dans get_module_global_param() + cb_ => cba_: ok company - contract + admin_ref
+- virer global dans get_module_global_param() + cb_ => cba_: ok company - resourcegroup + admin_ref
 
-2006-09-05 : version 1.2.2<br>
+2006-09-08 : version 1.2.2<br>
 
 <ul>
 <li> BUG#585 : Re-connexion OK after a disconnect or pointing to internal url
 <li> BUG#583 : Agenda : event comment now saved
 <li> BUG#580 : Explicit error message when accessing an unexisting element
+<li> BUG#416 : Categories are now sorted either by code or by label (alpha)
 <li> Deal : fixed a case where a comment could be lost after an update warning
 <li> Deal : search by company relation fixed
 <li> Deal : hitrate set to 0 keep the 0 value (and not null !)
@@ -55,6 +56,9 @@ roadmap : gestion categories dans 2 tables : categoryentity et categorylink; du 
 <li> Company : added links to company leads
 <li> Stats : fixed statistics from a selected company list
 <li> Incident : added reference in result list (reload obmdb_default_values)
+<li> Project : planning view now display project shortname if available
+<li> Project and Time planning views : label enhancements (size, ...,)
+<li> Deal : tasktype criteria now preserved in year detail dashboard views
 </ul>
 
 2006-08-10 : version 1.2.1<br>

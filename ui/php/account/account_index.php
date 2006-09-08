@@ -21,9 +21,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 update_last_visit("account", $param_account, $action);
 
-// $account is a hash table containing, for each form field set 
-// in the calling page, a couple var_name, var_value...
-if ($action == "") $action = "index";
 get_account_action();
 $perm->check_permissions($module, $action);
 
@@ -33,7 +30,7 @@ page_close();
 // Programme principal                                                       //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index" || $action == "") {
+if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   $display["search"] = html_account_search_form ($action, $params);

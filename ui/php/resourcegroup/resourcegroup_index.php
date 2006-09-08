@@ -40,7 +40,6 @@ require("resourcegroup_display.inc");
 require("resourcegroup_query.inc");
 require("resourcegroup_js.inc");
 
-if ($action == "") $action = "index";
 get_resourcegroup_action();
 $perm->check_permissions($module, $action);
 
@@ -247,16 +246,13 @@ display_page($display);
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_resourcegroup_params() {
-  global $tf_name, $tf_desc, $tf_resource, $cb_priv;
-  global $ext_id;
-  
+
   // Get global params
   $params = get_global_params("ResourceGroup");
 
   //Get resourcegroup specific params
-  if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
-  if (isset ($ext_id)) $params["resourcegroup_id"] = $ext_id;
-  
+  if (isset ($params["ext_id"])) $params["resourcegroup_id"] = $params["ext_id"];
+
   $nb_u = 0;
   $nb_resourcegroup = 0;
   foreach($_REQUEST as $key => $value ) {

@@ -40,7 +40,6 @@ require("group_display.inc");
 require("group_query.inc");
 require("group_js.inc");
 
-if ($action == "") $action = "index";
 get_group_action();
 $perm->check_permissions($module, $action);
 
@@ -261,16 +260,13 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_group_params() {
-  global $ext_id;
   
   // Get global params
   $params = get_global_params("Group");
 
   // Get group specific params
   // Group fields
-  if (isset ($ext_id)) $params["group_id"] = trim($ext_id);
-  if (isset ($cb_priv)) $params["priv"] = ($cb_priv == 1 ? 1 : 0);
-  
+  if (isset ($params["ext_id"])) $params["group_id"] = trim($params["ext_id"]);
     
   $nb_u = 0;
   $nb_group = 0;

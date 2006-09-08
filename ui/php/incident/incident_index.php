@@ -52,7 +52,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 update_last_visit("incident", $params["incident_id"], $action);
 get_incident_action();
 $perm->check_permissions($module, $action);
@@ -72,16 +71,16 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search")  {
+} elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_incident_search_form($params);
   $display["result"] = dis_incident_search_list($params);
 
-} elseif ($action == "new")  {
+} elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_incident_form($action,$params);
 
-} elseif ($action == "detailconsult")  {
+} elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params["incident_id"] > 0) {
     $display["detail"] = dis_incident_consult($params);
@@ -89,7 +88,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_err_reference);
   }
 
-} elseif ($action == "detailupdate")  {
+} elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params["incident_id"] > 0) {
     $display["detailInfo"] = display_record_info($inc_q);
@@ -98,7 +97,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] = display_err_msg($l_err_reference);
   }
   
-} elseif ($action == "insert")  {
+} elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($params)) {
     $params["incident_id"] = run_query_incident_insert($params);
@@ -114,7 +113,7 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_incident_form($action,$params);
   }
 
-} elseif ($action == "update")  {
+} elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($params)) {
     $ret = run_query_incident_update($params);
@@ -130,7 +129,7 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_incident_form($action,$params);
   }
  
-} elseif ($action == "check_delete")  {
+} elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_incident($params["incident_id"])) {
     $display["msg"] .= display_info_msg($ok_msg, false);
@@ -141,7 +140,7 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_incident_consult($params);
   }
 
-} elseif ($action == "delete")  {
+} elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_incident($params["incident_id"])) {
     $retour = run_query_incident_delete($params["incident_id"]);
@@ -162,11 +161,11 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_incident_consult($params);
   }
 
-} elseif ($action == "admin")  {
+} elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_incident_admin_index();
 
-} elseif ($action == "priority_insert")  {
+} elseif ($action == "priority_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "priority", $params);
   if ($retour) {
@@ -176,7 +175,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "priority_update")  {
+} elseif ($action == "priority_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "priority", $params);
   if ($retour) {
@@ -186,11 +185,11 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "priority_checklink")  {
+} elseif ($action == "priority_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("incident", "priority", $params, "mono");
 
-} elseif ($action == "priority_delete")  {
+} elseif ($action == "priority_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "priority", $params);
   if ($retour) {
@@ -200,7 +199,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "status_insert")  {
+} elseif ($action == "status_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "status", $params);
   if ($retour) {
@@ -210,7 +209,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "status_update")  {
+} elseif ($action == "status_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "status", $params);
   if ($retour) {
@@ -220,11 +219,11 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "status_checklink")  {
+} elseif ($action == "status_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("incident", "status", $params, "mono");
 
-} elseif ($action == "status_delete")  {
+} elseif ($action == "status_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "status", $params);
   if ($retour) {
@@ -234,7 +233,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category1_insert")  {
+} elseif ($action == "category1_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "category1", $params);
   if ($retour) {
@@ -244,7 +243,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category1_update")  {
+} elseif ($action == "category1_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "category1", $params);
   if ($retour) {
@@ -254,11 +253,11 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category1_checklink")  {
+} elseif ($action == "category1_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("incident", "category1", $params, "mono");
 
-} elseif ($action == "category1_delete")  {
+} elseif ($action == "category1_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "category1", $params);
   if ($retour) {
@@ -268,7 +267,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category2_insert")  {
+} elseif ($action == "category2_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_insert("incident", "category2", $params);
   if ($retour) {
@@ -278,7 +277,7 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category2_update")  {
+} elseif ($action == "category2_update") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_update("incident", "category2", $params);
   if ($retour) {
@@ -288,11 +287,11 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category2_checklink")  {
+} elseif ($action == "category2_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= of_category_dis_links("incident", "category2", $params, "mono");
 
-} elseif ($action == "category2_delete")  {
+} elseif ($action == "category2_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = of_category_query_delete("incident", "category2", $params);
   if ($retour) {
@@ -347,7 +346,6 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_incident_params() {
-  global $tf_color, $contract_new_id;
   
   // Get global params
   $params = get_global_params("Incident");

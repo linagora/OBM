@@ -56,7 +56,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 get_company_action();
 $perm->check_permissions($module, $action);
 update_last_visit("company", $params["company_id"], $action);

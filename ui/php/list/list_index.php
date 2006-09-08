@@ -39,7 +39,6 @@ require_once("$obminclude/of/of_extmod.inc");
 include("list_display.inc");
 include("list_query.inc");
 
-if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 get_list_action();
 $perm->check_permissions($module, $action);

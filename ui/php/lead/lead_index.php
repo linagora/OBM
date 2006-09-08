@@ -21,7 +21,6 @@ require_once("lead_js.inc");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
-if ($action == "") $action = "index";
 get_lead_action();
 $perm->check_permissions($module, $action);
 

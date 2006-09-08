@@ -24,7 +24,6 @@ require("statistic_query.inc");
  
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 get_statistic_action();
 $perm->check_permissions($module, $action);
 

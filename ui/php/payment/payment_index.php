@@ -21,7 +21,6 @@ require("payment_js.inc");
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
-if ($action == "") $action = "index";
 get_payment_action();
 $perm->check_permissions($module, $action);
 
@@ -32,7 +31,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "index" || $action == "") {
+if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_payment_search_form($params);
   if ($set_display == "yes") {

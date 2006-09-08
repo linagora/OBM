@@ -27,7 +27,7 @@ function run_query_document_search($document) {
   $cat2 = $document["category2"];
   $author = sql_search_text_parse($document["author"]);
   $mime = $document["mime"];
-  $name = sql_search_text_parse($document["filename"]);
+  $name = sql_search_text_parse($document["name"]);
   $entity = $document["entity"];
   $entity_id = $document["entity_id"];  
 
@@ -222,7 +222,7 @@ function run_query_document_insert(&$document) {
     '$privacy'
   )";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_document_insert(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -234,7 +234,8 @@ function run_query_document_insert(&$document) {
 
     // We create the document on disk
     if ($kind == $cdoc_kind_file) {
-      if (! run_query_document_create_file($document)){
+      if (! run_query_document_create_file($document)) {
+  echo "p2=$doc_id";
 	$err_msg = $l_create_file_error;
 	// If error, we delete The document infos to keep bd and rep on sync
 	run_query_document_delete($doc_id);
@@ -248,7 +249,7 @@ function run_query_document_insert(&$document) {
         documententity_entity,
         documententity_entity_id,
         documententity_document_id
-      ) VALUES (    
+      ) VALUES (
         '$entity',
         '$entity_id',
         '$doc_id'
@@ -439,7 +440,7 @@ function get_document_disk_path($id) {
 function run_query_document_create_file($document) {
 
   $id = $document["document_id"];
-  $file = $document["file"];
+  $file = $document["file_tmp"];
 
   $disk_path = get_document_disk_path($id);
   $disk_fullname = $disk_path . $id; 
@@ -690,7 +691,7 @@ function check_document_data_form($cid, $document) {
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
   global $l_fill_title, $l_fill_author, $l_fill_path;
   global $l_invalid_file, $l_invalid_existing_file, $l_invalid_url;
-  global $err_msg, $l_invalid_link_file, $l_invalid_dir_path;
+  global $err_msg, $l_invalid_link_file, $l_invalid_dir_path, $l_dir_error;
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -731,6 +732,13 @@ function check_document_data_form($cid, $document) {
   // If document is a link, check that the url is filled
   if (($kind == $cdoc_kind_link) && ($url == "") && ($file_update != "no")) {
     $err_msg = $l_invalid_url;
+    return false;
+  } 
+
+  // If document is a directory, check that name and path are ok
+  if (($kind == $cdoc_kind_dir) && ($name == "") && ($file_update != "no")
+       && (! document_path_exists($path)) ) {
+    $err_msg = $l_invalid_dir;
     return false;
   } 
 
@@ -916,6 +924,8 @@ function run_query_document_insert_dir($document) {
 
   return true;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Dir Creation
 // Parameters:

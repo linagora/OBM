@@ -47,7 +47,6 @@ require("time_display.inc");
 require("time_query.inc");
 require("time_js.inc");
 
-if (!isset($action)) $action = "index";
 get_time_actions();
 $perm->check_permissions($module, $action);
 
@@ -75,6 +74,7 @@ if ($action == "index") {
   $display["features"] .= dis_user_select($params, run_query_time_get_obmusers(), 1);
   // 1.1 => FIXME
   //$display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
+
 } elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////;
   $params["interval"] = "week";

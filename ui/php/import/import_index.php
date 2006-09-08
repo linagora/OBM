@@ -71,7 +71,6 @@ include("import_display.inc");
 include("import_query.inc");
 require("import_js.inc");
 
-if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 get_import_action();
 $perm->check_permissions($module, $action);

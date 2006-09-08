@@ -14,11 +14,10 @@ $extra_css = "portal.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
+$params = get_obm_params();
 include_once("obm_query.inc");
 require("$obminclude/lib/right.inc");
 
-$params = get_obm_params();
-$action = $params["action"];
 $OBM_Session = $params["OBM_Session"];
 if ($action == "") { $action = "home"; }
 //print_r($params);

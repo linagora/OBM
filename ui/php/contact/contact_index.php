@@ -52,7 +52,6 @@ require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
-if ($action == "") $action = "index";
 get_contact_action();
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, "Contact", $action, $params["contact_id"], $uid)) {

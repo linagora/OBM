@@ -76,7 +76,7 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
   $cat2 = $document["category2"];
   $author = stripslashes($document["author"]);
   $mime = $document["mime"];
-  $name = stripslashes($document["filename"]);
+  $name = stripslashes($document["name"]);
   $popup = $document["popup"];
 
   if ($popup) {
@@ -118,7 +118,7 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
       <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"16\" value=\"$title\" />
     </div>
     <div class=\"searchLabel\">$l_name<br />
-      <input type=\"text\" name=\"tf_filename\" id=\"tf_title\" size=\"16\" value=\"$name\" />
+      <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\" value=\"$name\" />
     </div>
     $block_category1 
     $block_category2
@@ -423,7 +423,6 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
   // If parameters have been given, they supercede the default action value
   if (isset($document["document_id"])) { $id = $document["document_id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
-  if (isset($document["name"])) { $title = stripslashes($document["name"]); }
   if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked=\"checked\"" : ""); }
   if (isset($document["category1"])) { $cat1 = $document["category1"]; }
   if (isset($document["category2"])) { $cat2 = $document["category2"]; }
@@ -441,7 +440,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     $url = $url_parse["host"].$url_parse["path"];
   }
 
-  if ($fi_path =="") $fi_path = $default_path;
+  if ($fi_path == "") $fi_path = $default_path;
 
   $block_category1 = of_category_dis_entity_form("document", "category1", $cats1, "mono", $cat1);
   $block_category2 = of_category_dis_entity_form("document", "category2", $cats2, "mono", $cat2, "none");
@@ -554,8 +553,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     </tr> 
     <tr id=\"browse_field\" $dis_field>
       <td class=\"detailLabel\">$l_file</td>
-      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file
-\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
+      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
     </tr>
     <tr id=\"url_field\" $dis_url>
       <td class=\"detailLabel\">$l_url</td>
@@ -574,7 +572,7 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     </p>
     </div>
     </form>
-   ";
+";
 
   return $block;
 }
@@ -592,15 +590,15 @@ function html_document_dir_form($action, $document,$doc_q=null) {
   global $l_path, $l_name,$path,$ico_browse;
   global $l_dir, $l_add_dir,$l_update_dir;
 
-  if($action == "detailupdate_dir") {
+  if ($action == "detailupdate_dir") {
     $old_name = $doc_q->f("document_name");
     $name = $doc_q->f("document_name");
     $re_path = $doc_q->f("document_path");
-  } 
+  }
   $id = $document["document_id"];
-  if(isset($document["name"])) $name = $document["name"];
-  if(isset($document["path"]))$re_path = $document["path"];
-  if(isset($document["old_name"]))$old_name = $document["old_name"];
+  if (isset($document["name"])) $name = $document["name"];
+  if (isset($document["path"])) $re_path = $document["path"];
+  if (isset($document["old_name"])) $old_name = $document["old_name"];
 
   
   $url = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].elements[1]&amp;ext_disp_file=false"; 

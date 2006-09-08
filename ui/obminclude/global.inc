@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.2pre3";
+$obm_version = "1.2.2";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -775,22 +775,22 @@ function get_lang() {
 //   $params : hash table which contains form params
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_params($table="") {
-  global $fieldnames;
+  global $fieldnames, $action;
 
   $order_dir_values = array("ASC", "DESC");
   
   /*
     tf_  = textfield
     sel_ = select
-    cb_  = combo
+    cb_  = checkbox
+    cb_  = checkbox with auto handling
     ta_  = textarea
     rd_  = radio
     hd_  = hidden
-    fi_  = file
     data-= external call
   */
-  
-  $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/", "/^fi_/");
+
+  $replace = array("/^tf_/", "/^sel_/", "/^cb_/", "/^ta_/", "/^rd_/", "/^hd_/");
   foreach($_REQUEST as $var => $value) {
 
     // Handle automatic checkbox (1,0) paramaters (cba_)
@@ -844,6 +844,9 @@ function get_global_params($table="") {
         }
       }
     } */
+
+  $action = $params["action"];
+  if ($action == "") $action = "index";
 
   return $params;
 }

@@ -341,7 +341,7 @@ function html_group_form($action, $group_q, $group) {
     $dis_private = "
   <tr>
     <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cb_privacy\" type=\"checkbox\" value=\"1\" $private_c />
+    <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />
   </tr>";
   } 
 
