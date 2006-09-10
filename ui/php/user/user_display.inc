@@ -173,7 +173,7 @@ function html_user_search_form($user) {
       value=\"$group\" />
     </div>
     <div class=\"searchLabel\">$l_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive>
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive>
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\">
@@ -247,14 +247,14 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;tf_desc=$desc&amp;tf_group=$group&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;tf_email=$email&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
-    $user_d->data_cb_name = "cb_u";
+    $user_d->data_cb_name = "data-u-";
     if ($ext_element != "") {
       $user_d->data_cb_name = "";
       $user_d->data_form_head = "
@@ -380,7 +380,7 @@ function html_user_form($usr_q, $user) {
       <td class=\"detailForm\"><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
+      <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_user_perms</td>
       <td class=\"detailForm\"><select name=\"sel_perms\">
@@ -592,7 +592,7 @@ function html_user_group_consult($usr_q) {
     $dis_group .= "
     <tr>
       <td class=\"detailLabel\">$grp_name</td>
-      <td class=\"detailForm\"><input name=\"cb_g$grp_id\" type=\"checkbox\" value=\"1\" $checked></td>
+      <td class=\"detailForm\"><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked></td>
     </tr>";
   }
 
@@ -661,7 +661,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_fax2\" value=\"$fax2\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
+    <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />";
 
   $block = "
   <table class=\"detail\">

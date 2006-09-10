@@ -279,7 +279,8 @@ function run_query_deal_insert($deal) {
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
-  if (($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
+  if (($deal["hitrate"] != "")
+      && ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
     $hitrate = "'".$deal["hitrate"]."'";
   } else {
     $hitrate = "null";
@@ -430,7 +431,8 @@ function run_query_deal_update($deal) {
   $source = $deal["source"];
   $amount = ($deal["amount"] ? "'".$deal["amount"]."'" : "null");
   $commission = ($deal["commission"] ? "'".$deal["commission"]."'" : "0");
-  if (($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
+  if (($deal["hitrate"] != "")
+      && ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) {
     $hitrate = "'".$deal["hitrate"]."'";
   } else {
     $hitrate = "null";

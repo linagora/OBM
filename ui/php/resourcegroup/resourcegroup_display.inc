@@ -221,7 +221,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
     $dis_group->display_link = false;
     $dis_group->data_cb_text = "X";
     $dis_group->data_idfield = "rgroup_id";
-    $dis_group->data_cb_name = "cb_g";
+    $dis_group->data_cb_name = "data-g-";
     if ($ext_element != "") {
       $dis_group->data_cb_name = "";
       $form_attr = "
@@ -445,7 +445,7 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
     if ($perm->check_right($module, $cright_write)) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "resourcegroup_resource_id";
-      $dis_infos->data_cb_name = "cb_u";
+      $dis_infos->data_cb_name = "data-r-";
       $dis_infos->data_cb_field = "";
       $block .= "<form method=\"get\" action=\"resourcegroup_index.php\">";
     }

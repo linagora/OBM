@@ -255,14 +255,14 @@ function get_resourcegroup_params() {
 
   $nb_u = 0;
   $nb_resourcegroup = 0;
-  foreach($_REQUEST as $key => $value ) {
-    if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+  foreach($params as $key => $value ) {
+    if (strcmp(substr($key, 0, 7),"data-r-") == 0) {
 $nb_u++;
-      $u_num = substr($key, 4);
+      $u_num = substr($key, 7);
       $params["resource$nb_u"] = $u_num;
-    } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
+    } elseif (strcmp(substr($key, 0, 7),"data-g-") == 0) {
 $nb_resourcegroup++;
-      $params_num = substr($key, 4);
+      $params_num = substr($key, 7);
       $params["resourcegroup_$nb_resourcegroup"] = $params_num;
     }
   }

@@ -318,7 +318,7 @@ function html_incident_consult($inc_q) {
 
   $id = $inc_q->f("incident_id");
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
-  $label = $inc_q->f("incident_label");
+  $label = htmlentities($inc_q->f("incident_label"));
   $reference = $inc_q->f("incident_reference");
   $priority = $inc_q->f("incidentpriority_label");
   $status = $inc_q->f("incidentstatus_label");
@@ -423,7 +423,7 @@ function html_incident_consult($inc_q) {
   </tr>
   </table>
 
-  <div class=\"detailHead\">$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$resolution\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
+  <div class=\"detailHead\">$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
 </div>
   <table class=\"detail\"> 
   <tr>

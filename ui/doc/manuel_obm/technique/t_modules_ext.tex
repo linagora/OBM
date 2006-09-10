@@ -250,7 +250,7 @@ De même, le code de génération du formulaire de récupération des données (ex: sé
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
-    $user_d->data_cb_name = "cb_u";
+    $user_d->data_cb_name = "data-u-";
     if ($ext_widget != "") {
       $user_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";

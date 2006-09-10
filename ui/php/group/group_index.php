@@ -49,7 +49,7 @@ if (! check_privacy($module, "UGroup", $action, $params["group_id"])) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
-  update_last_visit("contract", $params["group_id"], $action);
+  update_last_visit("group", $params["group_id"], $action);
 }
 
 page_close();
@@ -270,14 +270,14 @@ function get_group_params() {
     
   $nb_u = 0;
   $nb_group = 0;
-  foreach ( $_REQUEST as $key => $value ) {
-    if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+  foreach ($params as $key => $value) {
+    if (strcmp(substr($key, 0, 7),"data-u-") == 0) {
       $nb_u++;
-      $u_num = substr($key, 4);
+      $u_num = substr($key, 7);
       $params["user$nb_u"] = $u_num;
-    } elseif (strcmp(substr($key, 0, 4),"cb_g") == 0) {
+    } elseif (strcmp(substr($key, 0, 7),"data-g-") == 0) {
       $nb_group++;
-      $params_num = substr($key, 4);
+      $params_num = substr($key, 7);
       $params["group_$nb_group"] = $params_num;
     }
   }

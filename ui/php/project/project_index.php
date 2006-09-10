@@ -473,15 +473,14 @@ function get_project_params() {
   // Get project specific params
   
   foreach($params as $key => $value) {
-    // cb_u is likely to be called cb_user
-    if (strcmp(substr($key, 0, 7),"cb_task") == 0) {
+    if (strcmp(substr($key, 0, 10),"data-task-") == 0) {
       $nb_tsk++;
-      $tsk_num = substr($key, 7);
+      $tsk_num = substr($key, 10);
       $params["tsk$nb_tsk"] = $tsk_num;
     }
-    else if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+    else if (strcmp(substr($key, 0, 7),"data-u-") == 0) {
       $nb_mem++;
-      $mem_num = substr($key, 4);
+      $mem_num = substr($key, 7);
       $params["mem$nb_mem"] = $mem_num;
     } 
   }

@@ -532,7 +532,7 @@ function get_deal_params() {
     $cpt++;
   }
 
-  $params["status_order"] = (isset($_REQUEST["order"]) ? $_REQUEST["order"] : "0");
+  $params["status_order"] = (isset($params["order"]) ? $params["order"] : "0");
   
   get_global_params_document($params);
   

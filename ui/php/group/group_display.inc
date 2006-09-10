@@ -258,7 +258,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
     $dis_group->display_link = false;
     $dis_group->data_cb_text = "X";
     $dis_group->data_idfield = "group_id";
-    $dis_group->data_cb_name = "cb_g";
+    $dis_group->data_cb_name = "data-g-";
     if ($ext_element != "") {
       $dis_group->data_cb_name = "";
       $form_attr = "
@@ -509,7 +509,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     if ($perm->check_right($module, $cright_write)) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "child_id";
-      $dis_infos->data_cb_name = "cb_g";
+      $dis_infos->data_cb_name = "data-g-";
       $dis_infos->data_cb_field = "";
       $block .= "<form method=\"get\" action=\"group_index.php\">";
     }
@@ -550,7 +550,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     if ($perm->check_right($module, $cright_write)) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "group_user_id";
-      $dis_infos->data_cb_name = "cb_u";
+      $dis_infos->data_cb_name = "data-u-";
       $dis_infos->data_cb_field = "";
       $block .= "<form method=\"get\" action=\"group_index.php\">";
     }

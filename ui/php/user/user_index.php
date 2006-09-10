@@ -41,7 +41,7 @@ get_user_action();
 $perm->check_permissions($module, $action);
 $uid = $auth->auth["uid"];
 
-update_last_visit("user", $param_user, $action);
+update_last_visit("user", $params["user_id"], $action);
 
 page_close();
 
@@ -239,12 +239,12 @@ function get_user_params() {
   // Get global params
   $params = get_global_params("UserObm");
 
-  if (isset($_REQUEST)) {
+  if (isset($params)) {
     $nb_group = 0;
-    while ( list( $key ) = each($_REQUEST) ) {
-      if (strcmp(substr($key, 0, 4),"cb_g") == 0) {
+    while ( list( $key ) = each($params) ) {
+      if (strcmp(substr($key, 0, 7),"data-g-") == 0) {
         $nb_group++;
-        $group_num = substr($key, 4);
+        $group_num = substr($key, 7);
         $params["group_$nb_group"] = $group_num;
       }
     }

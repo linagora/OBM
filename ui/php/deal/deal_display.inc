@@ -1478,7 +1478,7 @@ $js_status_loop
     <tr>
       $dis_priv
       <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
+      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" maxlength=\"128\" size=\"40\" value=\"$label\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_number</td>
         <td class=\"detailForm\"><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>

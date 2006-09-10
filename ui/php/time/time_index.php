@@ -92,6 +92,14 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_time_update($params);
   run_query_time_validate($params["user_id"]);
+  // Javascript here because muist be run after the form submit
+  $display["result"] .= "
+    <script language=\"javascript\">
+     window.opener.location.href='$path/time/time_index.php?action=index&user_id=".$params["user_id"]."&date=".$params["date"]."';
+     window.close();
+    </script>
+  ";
+
 
 } elseif ($action == "delete") {
 //////////////////////////////////////////////////////////////////////////////

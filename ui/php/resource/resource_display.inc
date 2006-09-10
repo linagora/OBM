@@ -190,7 +190,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     $resource_d->display_link = false;
     $resource_d->data_cb_text = "X";
     $resource_d->data_idfield = "resource_id";
-    $resource_d->data_cb_name = "cb_u";
+    $resource_d->data_cb_name = "data-r-";
     if ($ext_widget != "") {
       $resource_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";

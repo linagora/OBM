@@ -893,7 +893,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
     $dis_member .= "</tr>\n";
 
-    if($estimed != 0) {
+    if ($estimated != 0) {
       // ratios
       $ratio_alloestimated = intval(($allotted/$estimated)*100);
       $ratio_usedestimated = intval(($usedtime/$estimated)*100);
@@ -1179,16 +1179,6 @@ function html_project_form($action, $project_q, $project) {
     $sel_tt .= "</select>";
   }
 
-  // archive field
-  if ($action == "detailupdate") {
-    $dis_archive = "<tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" $arc_val /></td>
-     </tr>";
-  } else {
-    $dis_archive = "";
-  }
-
   // User comment select construction
   if ($usr_q->nf()>0) {
     $usr_q->seek(0);
@@ -1268,7 +1258,7 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><script>calendar('tf_dateend','$dateend')</script></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" $arc_val /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $arc_val /></td>
     </tr>
     </table>
 
@@ -1518,7 +1508,7 @@ function html_project_tasklist($tasks_q, $project) {
 	$dis_task .= "
          <tr>
           <td align=\"right\" width=\"5%\">
-	   <input type=\"checkbox\" name=\"cb_task$t_id\" />
+	   <input type=\"checkbox\" name=\"data-task-$t_id\" />
 	  </td>
 	  <td class=\"detailText\" colspan=\"2\">$t_label</td>
          </tr>";
@@ -1526,7 +1516,7 @@ function html_project_tasklist($tasks_q, $project) {
 	$dis_task .= "
          <tr>
           <td align=\"right\">
-           <input type=\"checkbox\" name=\"cb_task$t_id\" />
+           <input type=\"checkbox\" name=\"data-task-$t_id\" />
           </td>
 	  <td class=\"detailText\" colspan=\"2\">
            <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />$t_label
@@ -1608,7 +1598,7 @@ function html_project_member_form($members_q, $project) {
 
       $dis_member .= "
         <tr>
-         <td class=\"projectMember\"><input type=\"checkbox\" name=\"cb_u$m_id\"/></td>
+         <td class=\"projectMember\"><input type=\"checkbox\" name=\"data-u-$m_id\"/></td>
          <td class=\"projectMember\">$m_name</td>
          <td class=\"projectMemberrd\">$rd_manager</td>
         </tr>";
