@@ -63,11 +63,11 @@ if ($cgp_show["module"]["agenda"] && $perm->check_right("agenda", $cright_read))
   $block .= dis_calendar_portal();
 }
 
-if ($cgp_show["module"]["time"] && $perm->check_right("time", $cright_read)) { 
+if ($cgp_show["module"]["time"] && $perm->check_right("time", $cright_write)) { 
   $block .= dis_time_portal();
 }
 
-if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_read)) { 
+if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_write)) { 
   require_once("$path/deal/deal_query.inc");
   $block .= dis_deal_portal();
 }
@@ -76,11 +76,11 @@ if ($cgp_show["module"]["project"] && $perm->check_right("project", $cright_read
   $block .= dis_project_portal();
 }
 
-if ($cgp_show["module"]["incident"] && $perm->check_right("incident", $cright_read)) { 
+if ($cgp_show["module"]["incident"] && $perm->check_right("incident", $cright_write)) { 
   $block .= dis_incident_portal();
 }
 
-if ($cgp_show["module"]["contract"] && $perm->check_right("contract", $cright_read)) { 
+if ($cgp_show["module"]["contract"] && $perm->check_right("contract", $cright_write)) { 
   $block .= dis_contract_portal();
 }
 

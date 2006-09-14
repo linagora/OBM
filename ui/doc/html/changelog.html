@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 1.2 ChangeLog</h1>
-version 1.2.3 - 2006-09-10
+version 1.2.4 - 2006-09-25
 <p>
 </center>
 
@@ -36,6 +36,26 @@ roadmap : gestion categories dans 2 tables : categoryentity et categorylink; du 
 - responsable de ressource ? processus quand reservation d'une res sans les droits
 
 - virer global dans get_module_global_param() + cb_ => cba_: ok company - resourcegroup + admin_ref
+
+2006-09-20 : version 1.2.4<br>
+
+<ul>
+<li> BUG#596 : deal : expexted date keep on quick update
+<li> BUG#595 : Duplicate of 566
+<li> Import : import available again (security rights check now ok)
+<li> Project : mail notification now displays more and correct infos
+<li> Contract : fixed company selection rights on new contract
+<li> Incident : fixed wrong error message on incident deletion
+<li> Incident : archive flag correctly handled on search
+<li> of_category : Back button after a deletion check now correct
+<li> Time : short project names (not short names) now displayed in planning
+<li> Time : fixed some user selection problems when navigating through views
+<li> Time : update rights check to conform to obm rights model
+<li> Home page : Deal, Time, Contract, Incident portlets now need write right
+<li> Project : correct some case where project stats where wrong
+<li> Contact : search from a redundant company name now preserve company
+<li> Contact : datasource now preserved on contact update
+</ul>
 
 2006-09-10 : version 1.2.3<br>
 

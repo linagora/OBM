@@ -392,7 +392,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
       <script>calendar('tf_date_after','$date_after')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_datebefore','$datebefore')</script>
+      <script>calendar('tf_date_before','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_kind<br />
       $sel_kind
@@ -1610,7 +1610,7 @@ function dis_deal_quick_form($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal Form                   
+// Display Deal Form
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
@@ -1634,7 +1634,7 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   // if update mode and first time, values are taken from db
   if ($action == "quick_detail") {
-    $dateexpected = isodate_format($deal_q->f("dateexpected"), 1);
+    $dateexp = isodate_format($deal_q->f("dateexpected"), 1);
     $datealarm = isodate_format($deal_q->f("datealarm"), 1);
     $status = $deal_q->f("deal_status_id");
     $hitrate = $deal_q->f("deal_hitrate");

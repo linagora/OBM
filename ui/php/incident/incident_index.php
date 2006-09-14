@@ -146,6 +146,7 @@ if ($action == "index" || $action == "") {
     $retour = run_query_incident_delete($params["incident_id"]);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_incident : $l_delete_ok");
+      $params["incident_id"] = "";
     } else {
       $display["msg"] .= display_err_msg("$l_incident : $l_delete_error");
     }

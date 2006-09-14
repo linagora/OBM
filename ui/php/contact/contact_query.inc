@@ -36,8 +36,8 @@ function run_query_contact_search($contact) {
   $category3 = $contact["category3"];
   $category4 = $contact["category4"];
   $category5 = $contact["category5"];
-  $dateafter = $contact["dateafter"];
-  $datebefore = $contact["datebefore"];
+  $dateafter = $contact["date_after"];
+  $datebefore = $contact["date_before"];
   $mailing_ok_only = $contact["mailing_ok_only"];
   $archive = $contact["archive"];
   $lang = get_lang();
@@ -668,7 +668,6 @@ function run_query_contact_update($contact) {
     $comp_id = "0";
   }
   $company = $contact["company"];
-  $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
   $market = ($contact["market"] ? $contact["market"] : 0);
   $lname = $contact["lname"];
@@ -733,7 +732,6 @@ function run_query_contact_update($contact) {
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
     contact_userupdate='".$auth->auth["uid"]."',
-    contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
     contact_company='$company',
     contact_kind_id='$kind',

@@ -23,7 +23,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Todo
-// - handle project_managers
 // - review actions : stats
 // - probleme de date !! stockage different Mysql et postgres (timetask_date)
 //   mysql : 20041116..., postgres 2004-11-16...
@@ -54,11 +53,6 @@ page_close();
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//perms for manage task ??? To update when access rights model will change
-$project_managers = run_query_time_managers();
-$stats_users = $project_managers;
-
-///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -71,10 +65,9 @@ if ($action == "index") {
   $params["interval"] = "month";
   $display["result"] = dis_time_nav_date($params);
   $display["result"] .= dis_time_planning($params);
-  $display["features"] .= dis_user_select($params, run_query_time_get_obmusers(), 1);
-  // 1.1 => FIXME
-  //$display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
-
+  if ($perm->check_right("time", $cright_read_admin)) {
+    $display["features"] .= dis_user_select($params, run_query_userobm_active(), 1);
+  }
 } elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////;
   $params["interval"] = "week";
@@ -99,7 +92,6 @@ if ($action == "index") {
      window.close();
     </script>
   ";
-
 
 } elseif ($action == "delete") {
 //////////////////////////////////////////////////////////////////////////////
@@ -136,7 +128,9 @@ if ($action == "index") {
   $statproj_q = run_query_time_stat_project($params);
   $stattt_q = run_query_time_stat_tasktype($params);
   $display["result"] = dis_time_nav_date($params);
-  $display["features"] .= dis_user_select($params, run_query_time_get_obmusers(), 1);
+  if ($perm->check_right("time", $cright_read_admin)) {
+    $display["features"] .= dis_user_select($params, run_query_userobm_active(), 1);
+  }
   $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $params);
 
 } elseif ($action == "display") {
@@ -202,23 +196,34 @@ function update_time_session_params() {
   global $sess, $sess_users, $params, $uid;
 
   // We retrieve the selected users if any, else we get them from sessiom
-  if (isset($params["user_ids"])) {
-    $sess_users = $params["user_ids"];
-    $sess->register("sess_users");
-  } elseif (isset($sess_users)) {
-    if (is_array($sess_users)) {
-      $params["user_id"] = $uid;
-      $params["user_ids"] = $sess_users;
-    } else {
-      $params["user_id"] = $sess_users;
-      $params["user_ids"] = array($sess_users);
+  // or from selected user (alone) or we set it to uid
+  if (! isset($params["user_ids"])) {
+    if (isset($sess_users)) {
+      if (is_array($sess_users)) {
+	$params["user_ids"] = $sess_users;
+      } else {
+	$params["user_ids"] = array($sess_users);
+      }
+    } else if (isset($params["user_id"])) {
+      $params["user_ids"] = array($params["user_id"]);
+    } else {      
+      $params["user_ids"] = array($uid);
     }
-  } else {
-    $sess_users = $uid;
-    $params["user_id"] = $uid;
-    $params["user_ids"] = array($uid);
-    $sess->register("sess_users");
   }
+  $sess_users = $params["user_ids"];
+  $sess->register("sess_users");
+
+
+  // We retrieve the selected user if set, else we set it them from multi select
+  // or from uid
+  if (! isset($params["user_id"])) {
+    if (is_array($params["user_ids"]) && (count($params["user_ids"]) == 1) ) {
+      $params["user_id"] = $params["user_ids"][0];
+    } else {
+      $params["user_id"] = $uid;
+    }
+  }
+
 }
 
 

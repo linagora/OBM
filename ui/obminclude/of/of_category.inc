@@ -761,7 +761,7 @@ function of_category_dis_links($entities, $cat, $param, $mode="multi") {
   $dis_buttons .= "
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"region\" />
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 

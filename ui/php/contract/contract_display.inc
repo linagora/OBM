@@ -156,8 +156,8 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $label = $contract["label"];
   $comp = $contract["company"];
   $type_id = $contract["type"];
-  $dateafter = $contract["dateafter"];
-  $datebefore = $contract["datebefore"];
+  $dateafter = $contract["date_after"];
+  $datebefore = $contract["date_before"];
   $manager = $contract["manager"];
   $num = $contract["number"]; 
   $archive = ($contract["archive"] == "1" ? "checked = \"checked\"" : ""); 
@@ -259,10 +259,10 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
       <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_dateafter','$dateafter')</script>
+      <script>calendar('tf_date_after','$dateafter')</script>
    </div>
     <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_datebefore','$datebefore')</script>
+      <script>calendar('tf_date_before','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_label_libelle<br />
       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
@@ -348,8 +348,8 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
   $num = urlencode($contract["number"]); 
   $label = urlencode($contract["label"]);
   $type = $contract["type"];
-  $dateafter = $contract["dateafter"];
-  $datebefore = $contract["datebefore"];
+  $dateafter = $contract["date_after"];
+  $datebefore = $contract["date_before"];
   $company = urlencode($contract["company"]);
   $manager = $contract["manager"];
   $priority = $contract["priority"];
@@ -358,7 +358,7 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
   $format = $contract["format"];
   $archive = ($contract["archive"] == "1" ? "1" : "0"); 
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cba_archive=$archive$url_ext");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_archive=$archive$url_ext");
   
   $contract_q->seek($first_row);
   $contract_d = new OBM_DISPLAY("DATA", $prefs, "contract");

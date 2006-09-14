@@ -84,7 +84,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
 //   - $time[] : time search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_index($time) {
-  global $uid, $display;
+  global $uid, $display, $perm, $cright_write_admin;
 
   $time["interval"] = "week";
   $display["result"] = dis_time_nav_date($time);
@@ -94,7 +94,9 @@ function dis_time_index($time) {
   $display["result"] .= dis_time_form_addtask($time, $val_days); 
 
   $display["result"] .= dis_time_task_list($time);
-  $display["features"] .= dis_user_select($time, run_query_time_get_obmusers());
+  if ($perm->check_right("time", $cright_write_admin)) {
+    $display["features"] .= dis_user_select($time, run_query_userobm_active());
+  }
 }
 
 
@@ -137,8 +139,6 @@ function dis_time_nav_date($time) {
     // get the previous and next beginning of week
     $d_prev = date("Ymd",$d_start_week-7*86400);
     $d_next = date("Ymd",$d_start_week+7*86400+$c_dst_err); // prevent DST bug
-    $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
 
   } else if ($interval == "month") {
 
@@ -149,10 +149,11 @@ function dis_time_nav_date($time) {
     $year = substr($time["date"],0,4);
     $d_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
     $d_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
-    $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
     $title = "$user ". $l_monthsofyear[$month-1] . " $year";;
   }
+
+    $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
 
   $block = "
     <div class=\"timeCenter\">
@@ -262,6 +263,8 @@ function dis_time_planning_week($obm_q,$time) {;
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for a month
 // Parameters : 
@@ -300,7 +303,7 @@ function dis_time_planning_month($obm_q, $time) {
     $dow = date("w", $day_in_sec);
     $obm_dow = ($dow - $c_week_first_day + 7) % 7;
   }
-  
+
   while ($obm_q->next_record())  {
     $day = date("d", $obm_q->f("date"));
     $status = $obm_q->f("timetask_status");
@@ -377,6 +380,7 @@ function dis_time_planning_month($obm_q, $time) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning according to the interval given
 // Parameters:
@@ -448,7 +452,7 @@ function dis_time_user_planning($obm_q, $time) {
     if (mb_strlen($label) > 15) {
       $dis_label = substr($label,0,15) . "..";
     } else {
-      $dis_task_label = $label;
+      $dis_label = $label;
     }
     if ($shortname == "") {
       $shortname = $dis_label;
@@ -508,11 +512,12 @@ function dis_time_user_planning($obm_q, $time) {
   </thead>
   $d_l
   </table>
-    <div>
-    ";
+  <div>
+";
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display TimeManager User search Form
@@ -522,51 +527,50 @@ function dis_time_user_planning($obm_q, $time) {
 //   - $multi  : if false, mono select else select multi
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_select($time, $usr_q, $multi=false) {
-  global $l_see, $project_managers, $l_user, $l_all;
+  global $l_see, $l_user, $l_all;
   global $uid;
 
-  if (in_array($uid, $project_managers)) {
-    $sel_user_ids = $time["user_ids"];
+  $sel_user_ids = $time["user_ids"];
 
-    if ($multi) {
-      $size = 12;
-      $type = "multiple";
-      $alt = "[]";
-      $dis_button_all = "
-        <input type=\"submit\" name=\"submit\" value=\"$l_all\"
-               onclick=\"select_all(f_time)\" />";
-    } else {
-      $size = 6;
-    }
+  if ($multi) {
+    $size = 12;
+    $type = "multiple";
+    $alt = "[]";
+    $dis_button_all = "
+      <input type=\"submit\" name=\"submit\" value=\"$l_all\"
+             onclick=\"select_all(f_time)\" />";
+  } else {
+    $size = 6;
+  }
   
-    // UserObm Select
-    $sel_user = "<select name=\"sel_user_id$alt\" $type size=\"$size\">";
-    $selected = false;
-    while ($usr_q->next_record()) {
-      $u_id = $usr_q->f("userobm_id");
-      $lname = $usr_q->f("userobm_lastname");
-      $fname = $usr_q->f("userobm_firstname");
-      $sel_user .= "\n<option value=\"$u_id\" ";
-
-      if (in_array($u_id, $sel_user_ids)) {
-	$sel_user .= "selected=\"selected\"";
-      }
-
-      $sel_user .= " >$lname $fname</option>";
-    }
-    $sel_user .= "</select>";
+  // UserObm Select
+  $sel_user = "<select name=\"sel_user_id$alt\" $type size=\"$size\">";
+  $selected = false;
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $lname = $usr_q->f("userobm_lastname");
+    $fname = $usr_q->f("userobm_firstname");
+    $sel_user .= "\n<option value=\"$u_id\" ";
     
-    // Define the action to follow
-    if ($time["action"] == "stats")
-      $act = "stats";
-    else if ($time["action"] == "viewmonth")
-      $act = "viewmonth";
-    else 
-      $act = "index";
-
-    $url = url_prepare("time_index.php");
-
-    $block = "<br />
+    if (in_array($u_id, $sel_user_ids)) {
+      $sel_user .= "selected=\"selected\"";
+    }
+    
+    $sel_user .= " >$lname $fname</option>";
+  }
+  $sel_user .= "</select>";
+  
+  // Define the action to follow
+  if ($time["action"] == "stats")
+    $act = "stats";
+  else if ($time["action"] == "viewmonth")
+    $act = "viewmonth";
+  else 
+    $act = "index";
+  
+  $url = url_prepare("time_index.php");
+  
+  $block = "<br />
     <div class=\"timeBar\">
     <form method=\"post\" name=\"f_time\" action=\"$url\">
 
@@ -587,7 +591,6 @@ function dis_user_select($time, $usr_q, $multi=false) {
     </form>
     </div>
 ";
-  }
 
   return $block;
 }
@@ -657,7 +660,7 @@ function dis_time_list_result($task_q,$prefs,$time) {
      </p>
 
      </form>
-     ";
+";
 
   return $block;
 }

@@ -35,8 +35,8 @@ function run_query_company_search($company) {
   $market = $company["market"];
   $dsrc = $company["datasource"];
   $zip = sql_search_text_parse($company["zip"]);
-  $dateafter = $company["dateafter"];
-  $datebefore = $company["datebefore"];
+  $dateafter = $company["date_after"];
+  $datebefore = $company["date_before"];
   $lang = get_lang();
 
   $obm_q = new DB_OBM;

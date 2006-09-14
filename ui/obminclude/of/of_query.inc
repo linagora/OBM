@@ -894,7 +894,7 @@ function run_query_userobm_update_lastaccess($id) {
     SET userobm_timelastaccess='".date("Y-m-d H:i:s")."'
     WHERE userobm_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_userobm_update_lastaccess(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 }
@@ -912,17 +912,17 @@ function run_query_logout() {
   $query = "SELECT *
     FROM ActiveUserObm 
     WHERE activeuserobm_sid = '".$sess->id."'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_logout(1)");
   $obm_q->query($query) ;
 
-  if($obm_q->next_record()) {
+  if ($obm_q->next_record()) {
     // Log the connexion in the session log
     run_query_log_session($obm_q);
 
     // drop the connexion from the active user session table
     $query = "DELETE FROM ActiveUserObm
       WHERE activeuserobm_sid = '".$obm_q->f('activeuserobm_sid')."'";
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_logout(2)");
     $obm_q->query($query) ;
   }
 }
@@ -968,13 +968,13 @@ function run_query_log_session($obm_q) {
     $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'));
 
   $obm_q2 = new DB_OBM ;
-  display_debug_msg($uquery, $cdg_sql);
+  display_debug_msg($uquery, $cdg_sql, "run_query_log_session(1)");
   $obm_q2->query($uquery);
   if ( $obm_q2->affected_rows() == 0) {
-    display_debug_msg($squery, $cdg_sql);
+    display_debug_msg($squery, $cdg_sql, "run_query_log_session(2)");
     if ( $obm_q2->query($squery)
          && $obm_q2->next_record() && $obm_q2->f(0) == 0 ) {
-      display_debug_msg($iquery, $cdg_sql);
+      display_debug_msg($iquery, $cdg_sql, "run_query_log_session(3)");
       $obm_q2->query($iquery);
     }
   }
@@ -1014,7 +1014,7 @@ function get_last_user_text($id) {
 
   if ($id > 0) {
     $query = "SELECT userobm_login FROM UserObm WHERE userobm_id='$id'";
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "get_last_user_text()");
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
@@ -1034,7 +1034,7 @@ function get_last_group_text($id) {
   
   if ($id > 0) {
     $query = "SELECT group_name FROM UGroup WHERE group_id='$id'";
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "get_last_group_text()");
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
@@ -1101,7 +1101,7 @@ function get_user_id($login) {
   if (isset($login)) {
     $query = "SELECT userobm_id FROM UserObm WHERE userobm_login='$login'";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "get_user_id()");
     $obm_q = new DB_OBM;
     $obm_q->query($query) ;
     $obm_q->next_record() ;
@@ -1195,13 +1195,16 @@ function run_query_userobm_active($ids="") {
     }
   }
 
-  $query = "SELECT * FROM UserObm
+  $query = "SELECT userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    FROM UserObm
     WHERE userobm_archive != '1'
       $where_add
     ORDER BY userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg("run_query_userobm_active() : $query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_userobm_active()");
 
   return $obm_q;
 }
@@ -1308,7 +1311,7 @@ function get_all_users_id_from_group($g_id) {
       WHERE groupgroup_parent_id='$g_id'";
 
   $obm_q = new DB_OBM; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_all_users_id_from_group(1)");
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
@@ -1323,7 +1326,7 @@ function get_all_users_id_from_group($g_id) {
     WHERE userobmgroup_group_id='$g_id'";
 
   $obm_q = new DB_OBM; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_all_users_id_from_group(2)");
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
@@ -1525,7 +1528,7 @@ function run_query_get_recipients($recipients, $force) {
       userobm_email != ''
       $mail_filter";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_recipients()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1560,7 +1563,7 @@ function run_query_get_resources_info($resources) {
     WHERE $res_in
   ";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_resources_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1579,7 +1582,7 @@ function run_query_get_sender() {
     FROM UserObm
     WHERE userobm_id = '$uid'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_sender()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1597,7 +1600,7 @@ function run_query_get_domain() {
     FROM Mail
     WHERE mail_name = 'main_domain'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_get_domain()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1691,26 +1694,26 @@ function encode($in_str, $charset) {
    $out_str = $in_str;
    if ($out_str && $charset) {
 
-       // define start delimimter, end delimiter and spacer
-       $end = "?=";
-       $start = "=?" . $charset . "?B?";
-       $spacer = $end . "\r\n " . $start;
+     // define start delimimter, end delimiter and spacer
+     $end = "?=";
+     $start = "=?" . $charset . "?B?";
+     $spacer = $end . "\r\n " . $start;
 
-       // determine length of encoded text within chunks
-       // and ensure length is even
-       $length = 75 - strlen($start) - strlen($end);
-       $length = floor($length/2) * 2;
+     // determine length of encoded text within chunks
+     // and ensure length is even
+     $length = 75 - strlen($start) - strlen($end);
+     $length = floor($length/2) * 2;
 
-       // encode the string and split it into chunks
-       // with spacers after each chunk
-       $out_str = base64_encode($out_str);
-       $out_str = chunk_split($out_str, $length, $spacer);
+     // encode the string and split it into chunks
+     // with spacers after each chunk
+     $out_str = base64_encode($out_str);
+     $out_str = chunk_split($out_str, $length, $spacer);
 
-       // remove trailing spacer and
-       // add start and end delimiters
-       $spacer = preg_quote($spacer);
-       $out_str = preg_replace("/" . $spacer . "$/", "", $out_str);
-       $out_str = $start . $out_str . $end;
+     // remove trailing spacer and
+     // add start and end delimiters
+     $spacer = preg_quote($spacer);
+     $out_str = preg_replace("/" . $spacer . "$/", "", $out_str);
+     $out_str = $start . $out_str . $end;
    }
    return $out_str;
 } 

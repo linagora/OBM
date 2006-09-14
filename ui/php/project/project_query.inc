@@ -64,7 +64,7 @@ function run_query_project_search($params) {
                   AND (project_dateend < '$date' OR project_dateend is null)";
   }
 
-  if (! $archive) {
+  if ($archive != "1") {
     $where .= " AND project_archive = '0'";
   }
 
@@ -197,11 +197,11 @@ function run_query_project_allocation_and_time($p_id) {
       projectuser_projectedtime as projected_time,
       projectuser_missingtime as missing_time
     FROM ProjectUser
-      left join ProjectTask
+      JOIN ProjectTask
         on projectuser_projecttask_id = projecttask_id
-      left join UserObm
+      LEFT JOIN UserObm
         on projectuser_user_id = userobm_id
-      left join TimeTask
+      LEFT JOIN TimeTask
         on timetask_projecttask_id = projecttask_id
         and timetask_user_id = userobm_id
     WHERE projectuser_project_id = '$p_id'
@@ -210,7 +210,7 @@ function run_query_project_allocation_and_time($p_id) {
           OR (projectuser_missingtime != '0'
              AND projectuser_missingtime is not null) )
     GROUP BY userobm_id, projecttask_id, projected_time, missing_time
-    ";
+";
 
   display_debug_msg($query, $cdg_sql, "run_query_project_allocation_and_time");
   $obm_q = new DB_OBM;
@@ -372,26 +372,30 @@ function run_query_project_insert($params) {
     display_debug_msg($query, $cdg_sql, "run_query_project_insert (create task)");
     $retour = $obm_q->query($query);
   }
-  if(is_array($ref_task)) {
+
+  if (is_array($ref_task)) {
     $query = "
-      INSERT INTO ProjectTask (
+    INSERT INTO ProjectTask (
       projecttask_project_id,
       projecttask_timecreate,
       projecttask_usercreate,
       projecttask_label,
       projecttask_parenttask_id,
       projecttask_rank)
-      SELECT 
+    SELECT 
       '$pid',
       '$date_now',
       '$uid',
       projectreftask_label,
       '0',
-      '1' FROM ProjectRefTask WHERE
+      '1'
+    FROM ProjectRefTask
+    WHERE
       projectreftask_id IN (".implode(",",$ref_task).")";
       display_debug_msg($query, $cdg_sql, "run_query_project_insert (create ref task)");
       $retour = $obm_q->query($query);
   }
+
   // If a member has been given, We insert it
   if ($member > 0) {
 
@@ -416,7 +420,9 @@ function run_query_project_insert($params) {
     display_debug_msg($query, $cdg_sql, "run_query_project_insert (add member)");
     $retour = $obm_q->query($query);
     
-    project_send_mail($params,$pid);
+    // Alert the user he has been affected to the project
+    project_send_mail($params, $pid);
+
     // We get the projecttask_id if a project task has been filled
     if ($task != "") {
       $query = "
@@ -451,7 +457,7 @@ function run_query_project_insert($params) {
         $estimated,
         '$date_now')";
 
-      display_debug_msg($query, $cdg_sql, "run_query_project_insert (add member)");
+      display_debug_msg($query, $cdg_sql, "run_query_project_insert (affect member)");
       $retour = $obm_q->query($query);
     }
   }
@@ -912,7 +918,7 @@ function run_query_project_memberstatus_change($params) {
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_project_memberstatus_change");
   $obm_q->query($query);
-  if($m_val == 1) {
+  if ($m_val == 1) {
     project_send_mail($params,$pid);
   }
   return $obm_q;
@@ -1723,14 +1729,13 @@ function check_project_progress_form($params) {
 function run_query_project_month_planning($params) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($params["date"],0,4);
-  $month=substr($params["date"],4,2);
-  $day=1;
+  $year = substr($params["date"],0,4);
+  $month = substr($params["date"],4,2);
+  $day = 1;
   $id = $params["project_id"];
   // First and last days of month
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
   $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
-
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -1755,12 +1760,12 @@ function run_query_project_month_planning($params) {
       AND project_id = $id
       GROUP BY  project_id,project_name,date, timetask_status,id,label,
       userobm_id,userobm_lastname,userobm_firstname
-    ";
+";
   display_debug_msg($query, $cdg_sql, "run_query_project_month_planning()");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
 
-  return $obm_db; 
+  return $obm_q; 
 }
 
 
@@ -1932,8 +1937,9 @@ function run_query_project_reftask_delete($params) {
 //   - $project[] : project hash info
 ///////////////////////////////////////////////////////////////////////////////
 function project_send_mail($params, $p_id) {
-  global $cgp_host, $l_mail_project_subject, $l_mail_project_member;
-  global $l_company, $l_name, $l_sold, $l_estimated, $l_datebegin,$l_dateend;
+  global $cgp_host, $l_mail_project_subject, $l_mail_project_member, $l_company;
+  global $l_name, $l_sold, $l_estimated, $l_datebegin,$l_dateend, $l_tasktype;
+  global $l_deal;
 
   if (!$p_id) {
     return 0;
@@ -1948,21 +1954,28 @@ function project_send_mail($params, $p_id) {
 
   $p = get_project_info($p_id);
   $name = $p["name"];
+  $shortname = $p["shortname"];
   $company = $p["company"];
   $deal = $p["deal"];
   $tasktype = $p["tasktype"];
+  $datebegin = date_format($p["datebegin"], true);
+  $dateend = date_format($p["dateend"], true);
+  $sold = $p["soldtime"];
+  $estimated = $p["estimatedtime"];
   $comment = $p["comment"];
-  $label_mail = stripslashes($lincident);
   $subject = "$l_mail_project_subject : $company : $name";
   $message = "$l_mail_project_member
 $cgp_host/project/project_index.php?action=detailconsult&project_id=$p_id
 
   $l_company : $company
-  $l_name : $name
+  $l_deal : $deal
+  $l_tasktype : $tasktype
+  $l_name : $name ($shortname)
   $l_estimated : $estimated
-  $l_sold : $l_sold
+  $l_sold : $sold
   $l_datebegin : $datebegin
   $l_dateend : $dateend
+
   $comment";
   send_mail($subject, $message, array($member), array(), 1);
 }

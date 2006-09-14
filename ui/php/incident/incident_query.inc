@@ -103,8 +103,8 @@ function run_query_incident_search($incident) {
     $where .= " AND Incident.incident_category2_id = '$category2'";
   }
 
-  if ($archive == "0") {
-    $where .= " AND Incident.incident_archive != '1'";
+  if ($archive != "1") {
+    $where .= " AND Incident.incident_archive = '0'";
   }
   $whereq = "WHERE $where";
 
@@ -457,8 +457,10 @@ function run_query_incident_delete($i_id) {
   $query = "DELETE FROM Incident WHERE incident_id='$i_id'";
 
   $i_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
-  $i_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_incident_delete()");
+  $ret = $i_q->query($query);
+
+  return $ret;
 }
 
 

@@ -335,6 +335,7 @@ if ($action == "ext_get_id") {
   if ($params["project_id"] > 0) {
     $display["detail"] = dis_project_planning($params);
   }
+
 } elseif ($action == "member_add") {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $params["ext_id"];

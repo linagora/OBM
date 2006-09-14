@@ -5,6 +5,8 @@
 \clearpage
 \section{Le module \project}
 
+révision : \obm 1.2.4
+
 \subsection{Présentation du module \project}
 
 Ce module est une gestion de projet.\\
@@ -17,6 +19,7 @@ Les principales composantes du module \project sont énumérées ci-dessous et décr
 \begin{itemize}
 \item entité Projet
 \item entité Tâche
+\item entité Tâche de référence
 \item entité Membre
 \item Affectation (affectation des tâches aux membres avec une durée prévue)
 \item Avancement (suivi de l'avancement du projet par un chef de projet)
@@ -31,6 +34,8 @@ Composantes d'un projet :\\
 \textbf{Nom} & \textbf{Description} \\
 \hline
 Nom & Nom du projet \\
+\hline
+Nom court & Nom court du projet utilisé pour des affichages synthétiques (ex: vue planning)\\
 \hline
 Catégorie & Catégorie du projet. On distingue les catégories de tâches facturées (projets clients) des tâches non facturées (projets internes). Les catégories de tâches sont gérées dans le module référentiel de la section administration.\\
 \hline
@@ -71,6 +76,30 @@ Tâche parent & référence à la tâche parente si la tâche fait partie d'un groupe 
 \hline
 \end{tabular}
 
+
+\subsection{Les tâches de référence}
+
+Les tâches de référence ont pour objectif de simplifier et d'homogénéïser la création de tâches pour une catégorie de projets.
+Un projet de catégorie (ou type de tâche) Développement comportera souvent les même tâches (comme : conception, développement, tests,...).\\
+
+Les tâches de référence sont associées à une catégorie de projet.
+A la création d'un projet il est possible de sélectionner simplement des tâches, parmi les tâches de référence de la catégorie de projet, qui seront automatiquement créées.\\
+
+Les tâches de référence s'administrent via l'interface d'administration du module \project.\\
+
+Composantes d'une tâche de référence :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Type de tâche & (ou catégorie de projet) Type de tâche à laquelle est associée la tâche de référence \\
+\hline
+Label & Nom de la tâche \\
+\hline
+\end{tabular}
+
+
 \subsection{Description d'un participant}
 
 Des personnes (les membres ou participants) vont être affectées à la réalisation des différentes tâches du projet.\\
@@ -86,7 +115,9 @@ Utilisateur & Nom du membre \\
 Statut & statut du membre (chef de projet, participant) \\
 \hline
 \end{tabular}
+\vspace{0.3cm}
 
+Lorsqu'un participant est affecté à un projet au rôle de chef de projet (soit affecté à la création initiale du projet, soit positionné en chef de projet en modifiant son statut dans le projet), il est alerté par email.
 
 \subsection{Description d'une affectation}
 
@@ -143,7 +174,24 @@ Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
 \end{itemize}
 
 Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.
+
+\subsubsection{La vue planning}
+
+Il s'agit d'une vue globale de l'activité sur un projet présentant pour chaque participant, le temps passé sur chaque tâche pour un mois donné sous forme de planning.
+
+\begin{figure}[h]
+   \begin{center}
+ \includegraphics[width=12cm]{user/images/u_project_planning.jpg}
+   \caption{\project : vue planning}
+   \end{center}
+\end{figure}
+
  
+
+\subsection{Les alertes par email}
+
+Lorsqu'un participant est affecté à un projet au rôle de chef de projet (soit affecté à la création initiale du projet, soit positionné en chef de projet en modifiant son statut dans le projet), il est alerté par email.
+
 
 \subsection{Les sous-menus du module \project}
 
@@ -170,6 +218,10 @@ Participants & Gérer (mettre à jour / supprimer) les utilisateurs affectés au pr
 Ajouter participant & Ajouter des participants au projet\\
 \hline
 Avancement & Actualiser les affectations et l'état d'avancement des différentes tâches pour chaque participant au projet\\
+\hline
+Tableau de bord & Affichage de la synthèse de l'avancement du projet (participants / tâches)\\
+\hline
+Planning & Affichage de la vue planning du projet\\
 \hline
 Affichage & Personnalisation de l'affichage de la liste des projets\\
 \hline

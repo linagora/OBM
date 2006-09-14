@@ -374,8 +374,8 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
   $cat4 = $contact["category4"];
   $cat5 = $contact["category5"];
   $mark = $contact["market"];
-  $dateafter = stripslashes($contact["dateafter"]);
-  $datebefore = stripslashes($contact["datebefore"]);
+  $dateafter = stripslashes($contact["date_after"]);
+  $datebefore = stripslashes($contact["date_before"]);
   $mailing_ok_only = ($contact["mailing_ok_only"] == "1" ? "checked = \"checked\"" : "");
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
   if (($contact["fuzzy"] == "1") ||
@@ -384,6 +384,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
   } else {
     $fuzzy = "";
   }
+  $company_id = $contact["company_id"];
 
   $show_func = (! $cgp_hide["contact"]["function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
@@ -493,10 +494,10 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
     $block_category4
     $block_resp
     <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_dateafter','$dateafter')</script>
+      <script>calendar('tf_date_after','$dateafter')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_datebefore','$datebefore')</script>
+      <script>calendar('tf_date_before','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
@@ -508,7 +509,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
       <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"hd_company_id\" type=\"hidden\" value=\"\" />
+      <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -578,8 +579,8 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $zip = stripslashes($contact["zip"]);
   $town = stripslashes($contact["town"]);
   $ctry = $contact["country"];
-  $dateafter = stripslashes($contact["dateafter"]);
-  $datebefore = stripslashes($contact["datebefore"]);
+  $dateafter = stripslashes($contact["date_after"]);
+  $datebefore = stripslashes($contact["date_before"]);
   $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
   $func = $contact["function"];

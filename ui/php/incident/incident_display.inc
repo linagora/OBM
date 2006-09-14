@@ -181,10 +181,10 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
          <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
        </div>
        <div class=\"searchLabel\">$l_date_after<br />
-        <script>calendar('tf_dateafter','$dateafter')</script>
+        <script>calendar('tf_date_after','$dateafter')</script>
        </div>
        <div class=\"searchLabel\">$l_date_before<br />
-        <script>calendar('tf_datebefore','$datebefore')</script>
+        <script>calendar('tf_date_before','$datebefore')</script>
        </div>
        $block_priority
        $block_status
@@ -260,7 +260,7 @@ function html_incident_search_list($in_q, $prefs, $incident) {
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;param_contract=$param_contract&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
 
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
@@ -694,7 +694,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
+    <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
       <div class=\"detailHead\">$l_incident</div>
         <table class=\"detail\">
           <tr>

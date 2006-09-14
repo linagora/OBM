@@ -289,7 +289,6 @@ function html_project_search_list($proj_q, $prefs, $project) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for a month
 // Parameters : 
@@ -297,13 +296,24 @@ function html_project_search_list($proj_q, $prefs, $project) {
 //   - $project[] : project hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_planning($project) {
+  global $display, $l_project;
   
   $obm_q = run_query_project_month_planning($project);
   $block = html_project_nav_date($project);
-  $block .=  html_project_planning($obm_q, $project) ;
- 
+  $block .= html_project_planning($obm_q, $project) ;
+
+  $p = get_project_info($project["project_id"]);
+  $title = $p["name"];
+  $shortname = $p["shortname"];
+  if ($shortname != "") {
+    $title .= " ($shortname)";
+  }
+  $display["title"] = "<div class=\"title\">$l_project : $title</div>";
+
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Time navigation by date
 // Parameters:

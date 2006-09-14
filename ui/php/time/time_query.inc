@@ -684,7 +684,7 @@ function run_query_time_user_month_planning($time) {
     WHERE timetask_date >= '$month_begin' 
       AND timetask_date <= '$month_end'
       AND timetask_user_id IN $uid_tab
-    GROUP BY  date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
+    GROUP BY date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
     UNION
     SELECT
       tasktype_label as label,
@@ -882,62 +882,10 @@ function run_query_time_projecttask($time) {
       order by a.projecttask_project_id, a.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_time_projecttask");
-  $obm_q= new DB_OBM;
+  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-// Return th Id of people that will see the globalview
-//  -- THIS SHOULD CHANGE TO USE THE User TABLE --
-//////////////////////////////////////////////////////////////////////////
-function run_query_time_managers() {
-  global $cdg_sql;
- 
-  // should use union (mysql 4.0.0 and further)
-
-  $manager=new DB_OBM;
-  $query="select projectuser_user_id as manager_id from ProjectUser where projectuser_manager = 1";
-  display_debug_msg($query, $cdg_sql, "run_query_time_managers(manager)");
-  $manager->query($query);
-
-  $admin=new DB_OBM;
-  $query="select userobm_id as manager_id from UserObm where userobm_perms = 'admin'";
-  display_debug_msg($query, $cdg_sql, "run_query_time_managers(admin)");
-  $admin->query($query);
-
-  $m_array = array();
-
-  while ($manager->next_record())  {
-    $id = $manager->f("manager_id");
-    array_push($m_array, $id);
-  }
-
-  while ($admin->next_record())  {
-    $id = $admin->f("manager_id");
-    array_push($m_array, $id);
-  }
-    
-  return $m_array;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-// Get all the contacts of the companyusing obm
-//  -- THIS SHOULD CHANGE TO USE THE User TABLE --
-//////////////////////////////////////////////////////////////////////////
-function run_query_time_get_obmusers() {
-  global $cdg_sql;
- 
-  $obm_db=new DB_OBM;
-  $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm 
-          where userobm_archive!=1 order by userobm_lastname";
-  display_debug_msg($query, $cdg_sql, "run_query_time_get_obmusers");
-
-  $obm_db->query($query);
-  return $obm_db;
 }
 
 
@@ -1029,9 +977,6 @@ function time_array_to_list($array) {
 	$i++;
   }
   $list .= ")";
-
-  if (debug_level_isset($cdg_param))
-	echo "liste : $list <br>";
 
   return $list;
 }

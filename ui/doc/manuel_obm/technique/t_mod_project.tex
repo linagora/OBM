@@ -5,15 +5,17 @@
 
 \clearpage
 \section{Project}
+révision : \obm 1.2.4
 
 Le module \project \obm.
 
 \subsection{Organisation de la base de données}
 
-Le module \project utilise 4 tables :
+Le module \project utilise 5 tables :
 \begin{itemize}
  \item Project
  \item ProjectTask
+ \item ProjectRefTask
  \item ProjectUser
  \item ProjectStat
 \end{itemize}
@@ -37,6 +39,8 @@ Table principale des informations d'un projet.\\
 \hline
 \_name & varchar 128 & Nom du projet & \\
 \hline
+\_shortname & varchar 10 & Nom court du projet & \\
+\hline
 \_tasktype\_id & int 8 & Type de tâche du projet & \\
 \hline
 \_company\_id & int 8 & Société contractante & NULL (projets internes)\\
@@ -44,6 +48,12 @@ Table principale des informations d'un projet.\\
 \_deal\_id & int 8 & Affaire d'origine & NULL (projets internes)\\
 \hline
 \_soldtime & int 8 & Durée (jours) vendue & \\
+\hline
+\_estimatedtime & int 8 & Durée (jours) estimée & \\
+\hline
+\_datebegin & date & Date de début de projet & \\
+\hline
+\_dateend & date & Date de fin de projet & \\
 \hline
 \_archive & int 2 & Indicateur d'archivage & (1 = 0ui)\\
 \hline
@@ -76,6 +86,30 @@ Table des informations des tâches des projets.\\
 \_parenttask\_id & int 8 & Tâche mère (ProjectTask) & 0 si racine \\
 \hline
 \_rank & int 8 & Ordre d'affichage de la tâche & \\
+\hline
+\end{tabular}
+
+
+\subsection{ProjectRefTask}
+Table des informations des tâches de référence.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_tasktype\_id & int 8 & Type de tâche de la tâche de référence & \\
+\hline
+\_label & varchar 128 & Label de la tâche de référence & \\
 \hline
 \end{tabular}
 
@@ -181,6 +215,10 @@ Voici la liste des actions du module \project, avec le droit d'accès requis ains
   task\_update & write & Modification d'une tâche. \\
  \hline
   task\_del & write & Suppression de tâches. \\
+ \hline
+  dashboard & read & consultation du tableau de bord. \\
+ \hline
+  planning & read & consultation du planning. \\
  \hline
   member & write & Liste des participants au projet. \\
  \hline

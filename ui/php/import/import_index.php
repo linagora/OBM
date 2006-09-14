@@ -481,6 +481,9 @@ function get_import_params() {
   global $import_file, $import_file_name, $import_file_size, $file_saved;
   global $row_start, $rd_conflict, $rd_comp, $rd_con, $company_id;
 
+  // Get global params
+  $params = get_global_params("Import");
+
   // Import fields
   if (isset ($import_id)) $import["import_id"] = $import_id;
   if (isset ($tf_name)) $import["name"] = trim($tf_name);

@@ -217,8 +217,8 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $mark = $company["market"];
   $dsrc = $company["datasource"];
   $zip = stripslashes($company["zip"]);
-  $dateafter = stripslashes($company["dateafter"]);
-  $datebefore = stripslashes($company["datebefore"]);
+  $dateafter = stripslashes($company["date_after"]);
+  $datebefore = stripslashes($company["date_before"]);
   if (($company["fuzzy"] == "1") ||
       ($csearch_advanced_default && $action != "search") ) {
     $fuzzy = "checked = \"checked\"";
@@ -285,7 +285,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $sel_market .= "</select>";
 
   // Data source select
-  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_all\">$l_all</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
@@ -350,10 +350,10 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
       $sel_market
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_dateafter','$dateafter')</script>
+      <script>calendar('tf_date_after','$dateafter')</script>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_datebefore','$datebefore')</script>
+      <script>calendar('tf_date_before','$datebefore')</script>
     </div>
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
@@ -413,7 +413,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
 
   if ($popup) {
     $ext_action = $company["ext_action"];
-    $ext_url = $company["ext_url"];
+    $ext_url = urlencode($company["ext_url"]);
     $ext_id = $company["ext_id"];
     $ext_target = $company["ext_target"];
     $ext_widget = $company["ext_widget"];
@@ -421,7 +421,6 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
   // we urlencode to avoid breakage for space char
-  $archive = $company["archive"];
   $name = urlencode(stripslashes($company["name"]));
   $phone = urlencode(stripslashes($company["phone"]));
   $town = stripslashes($company["town"]);
@@ -435,11 +434,12 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["market"];
   $dsrc = $company["datasource"];
-  $dateafter = stripslashes($company["dateafter"]);
-  $datebefore = stripslashes($company["datebefore"]);
+  $dateafter = stripslashes($company["date_after"]);
+  $datebefore = stripslashes($company["date_before"]);
   $fuzzy = $company["fuzzy"];
+  $archive = $company["archive"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cba_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;cba_fuzzy=$fuzzy$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cba_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -1124,7 +1124,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   }
 
   // data source select
-  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
@@ -1456,7 +1456,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
-    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+    <input type=\"hidden\" name=\"sel_datasource\" value=\"$datasource\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
     <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
     <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />

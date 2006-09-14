@@ -15,21 +15,39 @@ Le \timemanager utilise une table :
 \end{itemize}
 
 \subsubsection{TimeTask}
-Cette table stocke toutes les informations concernant une tâche qui a été saisie par l'utilisateur..
-\begin{description}
- \item{timetask\_id} int(8) : C'est la clé primaire de la table.
- \item{timetask\_timeupdate} timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
- \item{timetask\_timecreate} timestamp(14) : Donne au format Unix la date de création du tuple.
- \item{timetask\_userupdate} int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
- \item{timetask\_usercreate} int(8) : Id de l'utilisateur qui à créé le tuple.
- \item{timetask\_user\_id} int(8) : Clé étrangère pointant vers UserObm indiquant l'utilisateur qui a effectué cette tâche.
- \item{timetask\_date} timestamp(14) : Date à laquelle a eu lieu cette tâche.
- \item{timetask\_projecttask\_id} int(8) : Clé étrangère pointant vers ProjectTask indiquant la tâche (et par ce biais le projet) ----
- \item{timetask\_length} int(2) : Durée de la tâche en fractions de journées.
- \item{timetask\_tasktype\_id} int(8) : Clé étrangère pointant vers TaskType indiquant le type de le tâche effectuée.
- \item{timetask\_label} varchar(255) : Commentaires saisis par l'utilisateur pour cette tâche.
- \item{timetask\_status} varchar(1) : Etat de validation de cette tâche.
-\end{description}
+Cette table stocke toutes les informations concernant une tâche qui a été saisie par l'utilisateur..\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_user\_id & int 8 & Id de l'utilisateur ayant effectué l'activité & \\
+\hline
+\_date & timestamp & date de l'activité & \\
+\hline
+\_projecttask\_id & int 8 & Id de la tâche du projet & \\
+\hline
+\_length & int 2 & Temps travaillé & \\
+\hline
+\_tasktype\_id & int 8 & Type de tâche du projet & \\
+\hline
+\_label & varchar 255 & Commentaire sur l'activité & \\
+\hline
+\_status & int 1 & Etat : validé 1 / non validé 0 & \\
+\hline
+\end{tabular}
+
+
 
 \clearpage
 
