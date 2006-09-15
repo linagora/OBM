@@ -328,10 +328,6 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
       <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"10\"
       value=\"$phone\" />
     </div>
-    $block_type
-    $block_cat
-    $block_activity
-    $block_naf
     <div class=\"searchLabel\">$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
@@ -343,6 +339,10 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
     <div class=\"searchLabel\">$l_country<br />
       $sel_ctry
     </div>
+    $block_type
+    $block_cat
+    $block_activity
+    $block_naf
     <div class=\"searchLabel\">$l_datasource<br />
       $sel_dsrc
     </div>

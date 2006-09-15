@@ -29,6 +29,7 @@ $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_commission"] = $l_commission_p;
 $fieldnames["deal_amount"] = $l_amount;
 $fieldnames["deal_hitrate"] = $l_hitrate;
+$fieldnames["deal_relation"] = $l_relation;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
@@ -187,6 +188,20 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $res["name"] = $datealarm;
   }
 
+  else if ($fieldname == "deal_relation") {
+    $d_id = $OD->data_set->f("deal_id");
+    $dc = get_deal_dealcompany_info($d_id);
+    $nl = "";
+    if (is_array($dc)) {
+      foreach ($dc as $relation) {
+	$name .= $nl . $relation["role_label"]." : ".$relation["company_name"];
+	$nl = "<br />";
+      }
+    }
+    $res["name"] = $name;
+  }
+  
+
   return $res;
 }
 
@@ -264,7 +279,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   $parent = $deal["parent"];
   $label = stripslashes($deal["label"]);
   $name = stripslashes($deal["company_name"]);
-  $zip = stripslashes($deal["company_zip"]);
+  $zip = stripslashes($deal["zip"]);
   $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
   $region = $deal["region"];
@@ -528,7 +543,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $parent = $deal["parent"];
   $label = urlencode(stripslashes($deal["label"]));
   $name = urlencode(stripslashes($deal["company_name"]));
-  $zip = urlencode(stripslashes($deal["company_zip"]));
+  $zip = urlencode(stripslashes($deal["zip"]));
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $region = $deal["region"];

@@ -147,10 +147,14 @@ $ico_minus_off = "ico_minus_off.png";
 $ico_plus_on = "ico_plus_on.png";
 $ico_plus_off = "ico_plus_off.png";
 $ico_update = "modify.png";
-//Portal Icons 
 
+//Portal Icons 
 $ico_agenda_portal = "ico_portal_agenda.gif";
 $ico_time_portal = "ico_portal_time.gif";
-$ico_contract_portal = "../images/1px.gif";
-$ico_incident_portal = "../images/1px.gif";
+$ico_deal_portal = "ico_portal_deal.gif";
+$ico_project_portal = "ico_portal_project.gif";
+$ico_invoice_portal = "ico_portal_invoice.gif";
+$ico_contract_portal = "ico_portal_contract.gif"; //"../images/1px.gif";
+$ico_incident_portal = "ico_portal_incident.gif"; //"../images/1px.gif";
+
 $ico_warning = "ico_warning.gif";

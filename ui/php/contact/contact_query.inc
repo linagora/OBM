@@ -31,6 +31,7 @@ function run_query_contact_search($contact) {
   $zip = sql_search_text_parse($contact["zip"]);
   $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
+  $dsrc = $contact["datasource"];
   $category1 = $contact["category1"];
   $category2 = $contact["category2"];
   $category3 = $contact["category3"];
@@ -148,6 +149,10 @@ function run_query_contact_search($contact) {
   // If a title has been specified, get it 
   if ($title != "") {
     $where .= " AND contact_title $like '$title%'";
+  }
+  // If a datasource has been specified, get it 
+  if (($dsrc != $c_all) && ($dsrc != "")) { 
+    $where .= " AND contact_datasource_id='$dsrc'";
   }
   // If a Category 1 has been set
   if (($category1 != $c_all) && ($category1 != "")) {

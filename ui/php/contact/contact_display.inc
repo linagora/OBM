@@ -326,12 +326,13 @@ function dis_contact_search_form($contact="") {
   }
   $funcs = of_category_get_ordered("contact", "function");
   $ctry_q = run_query_global_country_for_lang();
+  $dsrc_q = run_query_global_datasource();
   $cats1 = of_category_get_ordered("contact", "category1");
   $cats2 = of_category_get_ordered("contact", "category2");
   $cats3 = of_category_get_ordered("contact", "category3");
   $cats4 = of_category_get_ordered("contact", "category4");
   $cats5 = of_category_get_ordered("contact", "category5");
-  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5);
+  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $cats1, $cats2, $cats3, $cats4, $cats5);
 
   return $block;
 }
@@ -345,17 +346,18 @@ function dis_contact_search_form($contact="") {
 //   - $usr_q     : database object with userobm list
 //   - $funcs     : array with contact function list
 //   - $ctry_q    : database object with country list
+//   - $dsrc_q    : database object with datasource list
 //   - $cats1     : array with contact category 1 list
 //   - $cats2     : array with contact category 2 list
 //   - $cats3     : array with contact category 3 list
 //   - $cats4     : array with contact category 4 list
 //   - $cats5     : array with contact category 5 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
+function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $csearch_advanced_default, $l_fuzzy;
-  global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
-  global $l_after, $l_before, $l_mailing_ok_only;
+  global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
+  global $l_after, $l_before, $l_mailing_ok_only, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
 
   $lname = stripslashes($contact["lname"]);
@@ -366,6 +368,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
   $zip = stripslashes($contact["zip"]);
   $town = stripslashes($contact["town"]);
   $ctry = $contact["country"];
+  $dsrc = $contact["datasource"];
   $func = $contact["function"];
   $title = $contact["title"];
   $cat1 = $contact["category1"];
@@ -392,6 +395,17 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
   
   // Function select
   $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
+
+  // Data source select
+  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($dsrc_q->next_record()) {
+    $d_id = $dsrc_q->f("datasource_id");
+    $sel_dsrc .= "\n<option value=\"$d_id\"";
+    if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
+    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+  }
+  $sel_dsrc .= "</select>";
 
   // Title Block
   if ($show_title) {
@@ -484,6 +498,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $cats1, $ca
     </div>
     <div class=\"searchLabel\">$l_country<br />
       $sel_ctry
+    </div>
+    <div class=\"searchLabel\">$l_datasource<br />
+      $sel_dsrc
     </div>
     $block_category5
     $block_function

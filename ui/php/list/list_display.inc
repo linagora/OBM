@@ -693,7 +693,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
     }
 
     $query_limit = "$query $limit";
-    display_debug_msg($query_limit, $cdg_sql, "dynamic list()");
+    display_debug_msg($query_limit, $cdg_sql, "html_list_consult(dynamic)");
     $conq_q->query("$query_limit");
     $dis_infos = new OBM_DISPLAY("DATA", $prefs_con, "list", "list_contact", "dyn");
     $dis_infos->data_set = $conq_q;

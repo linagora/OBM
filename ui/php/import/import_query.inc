@@ -604,6 +604,10 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   } else {
     $ctry = substr(trim($fields["comp_ctry"]), 0, $field_size["comp_ctry"]);
   }
+  // If country still empty we set it to 0
+  if ($ctry == "") {
+    $ctry = "0";
+  }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
   $web = $fields["comp_web"];
@@ -736,6 +740,10 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     // else we get the entry as an iso code
   } else {
     $ctry = substr(trim($fields["comp_ctry"]), 0, $field_size["comp_ctry"]);
+  }
+  // If country still empty we set it to 0
+  if ($ctry == "") {
+    $ctry = "0";
   }
   $phone = $fields["comp_pho"];
   $fax = $fields["comp_fax"];
@@ -889,6 +897,10 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   } else {
     $ctry = trim($fields["con_ctry"]);
   }
+  // If country still empty we set it to 0
+  if ($ctry == "") {
+    $ctry = "0";
+  }
   $phone = $fields["con_pho"];
   $hphone = $fields["con_hpho"];
   $mphone = $fields["con_mpho"];
@@ -1027,6 +1039,10 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     // else we get the entry as an iso code
   } else {
     $ctry = trim($fields["con_ctry"]);
+  }
+  // If country still empty we set it to 0
+  if ($ctry == "") {
+    $ctry = "0";
   }
   $phone = $fields["con_pho"];
   $hphone = $fields["con_hpho"];

@@ -1290,7 +1290,7 @@ function make_list_query_from_db(&$list_q) {
     } else {
       $criteria = "";
     }
-    
+
     if ($criteria != "") {
       // Addslashes to all criteria elements
       $as_criteria = $criteria;
