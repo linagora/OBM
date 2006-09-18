@@ -791,7 +791,7 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["mode"])) { $mode = $list["mode"]; }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["mailing_ok"])) { $mailing_ok = $list["mailing_ok"]; }
-  if (isset($list["contact_arch"])) { $contact_arch = $list["contact_arch"]; }
+  if (isset($list["contact_archive"])) { $contact_arch = $list["contact_archive"]; }
   if (isset($list["info_pub"])) { $info_pub = $list["info_pub"]; }
   if (isset($list["criteria"])) { $criteria = $list["criteria"]; }
 	
@@ -860,7 +860,7 @@ function html_list_form($action, $list_q, $list) {
   <tr>
     <td class=\"detailLabel\">$l_contact_archive</td>
     <td class=\"detailForm\">
-      <input type=\"checkbox\" $dis_con_arch name=\"cba_contact_arch\" value=\"1\" /></td>
+      <input type=\"checkbox\" $dis_con_arch name=\"cba_contact_archive\" value=\"1\" /></td>
   </tr>  
   $dis_pub
   </table>
@@ -1525,7 +1525,7 @@ function dis_list_warn_insert($list_q, $list) {
   $subject = $list["subject"];
   $id_duplicated = $list["id_duplicated"];
   $mailing_ok = ($list["mailing_ok"] == "1" ? "1" : "0");
-  $contact_arch = ($list["contact_arch"] == "1" ? "1" : "0");
+  $contact_arch = ($list["contact_archive"] == "1" ? "1" : "0");
   $info_pub = ($list["info_pub"] == "1" ? "1" : "0");
   $mode = ($list["mode"] == "1" ? "1" : "0");
   $query = stripslashes($list["query"]);
@@ -1548,7 +1548,7 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
       <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
       <input type=\"hidden\" name=\"cba_mailing_ok\" value=\"$mailing_ok\" />
-      <input type=\"hidden\" name=\"cba_contact_arch\" value=\"$contact_arch\" />
+      <input type=\"hidden\" name=\"cba_contact_archive\" value=\"$contact_arch\" />
       <input type=\"hidden\" name=\"cba_info_pub\" value=\"$info_pub\" />
       <input type=\"hidden\" name=\"rd_mode\" value=\"$mode\" />
       <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" />

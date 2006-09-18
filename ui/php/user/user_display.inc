@@ -623,7 +623,7 @@ function html_user_group_consult($usr_q) {
 //   - $usr_q    : user database result (at least 1 row)
 //   - $user[]   : default values
 //     keys used : login, passwd, perms, lastname, firstname, archive, email
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_user_warn_insert($p_id, $usr_q, $user) {
   global $l_check_sameuser, $l_confirm, $l_back;
   global $display, $c_yes, $c_no;
@@ -633,11 +633,13 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $datebegin = $user["datebegin"];
   $phone = $user["phone"];
   $phone2 = $user["phone2"];
   $fax = $user["fax"];
   $fax2 = $user["fax2"];
   $email = $user["email"];
+  $desc = $user["desc"];
   $archive = $user["archive"];
 
   $display["msg"] .= display_warn_msg($l_check_sameuser);
@@ -656,11 +658,13 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
     <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+    <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_phone2\" value=\"$phone2\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_fax2\" value=\"$fax2\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
     <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />";
 
   $block = "

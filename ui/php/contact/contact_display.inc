@@ -1856,10 +1856,13 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $c_yes, $c_no;
 
   $comp_id = ($contact["company_new_id"] ? $contact["company_new_id"] : $contact["company_id"]);
-  $kind = $contact["kind"];
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
+  $kind = $contact["kind"];
   $dsrc = $contact["datasource"];
+  $privacy = $contact["privacy"];
+  $func = $contact["function"];
+  $title = stripslashes($contact["title"]);
   $mark = $contact["market"];
   $service = stripslashes($contact["service"]);
   $ad1 = stripslashes($contact["ad1"]);
@@ -1869,19 +1872,22 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $town = stripslashes($contact["town"]);
   $cdx = stripslashes($contact["cdx"]);
   $ctry = $contact["country"];
-  $func = $contact["function"];
-  $title = stripslashes($contact["title"]);
   $phone = stripslashes($contact["phone"]);
   $hphone = stripslashes($contact["hphone"]);
   $mphone = stripslashes($contact["mphone"]);
   $fax = stripslashes($contact["fax"]);
   $email = stripslashes($contact["email"]);
   $email2 = stripslashes($contact["email2"]);
+  $mailok = $contact["mailok"];
   $com = stripslashes($contact["comment"]);
   $com2 = stripslashes($contact["comment2"]);
   $com3 = stripslashes($contact["comment3"]);
-  $priv = $contact["privacy"];
-  $archive = ($contact["archive"] == 1 ? "1" : "0");
+  $archive = $contact["archive"];
+  $cat1 = $contact["category1"];
+  $cat2 = $contact["category2"];
+  $cat3 = $contact["category3"];
+  $cat4 = $contact["category4"];
+  $cat5 = $contact["category5"];
 
   $disp_same_cont = "
     <tr>
@@ -1905,13 +1911,14 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 
   $hidden = "
     <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
-    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
-    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
-    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
+    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+    <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
+    <input type=\"hidden\" name=\"sel_function\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
+    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_service\" value=\"$service\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
@@ -1926,11 +1933,17 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
+    <input type=\"hidden\" name=\"cba_mailok\" value=\"1\" $mailok />
     <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
     <input type=\"hidden\" name=\"ta_comment2\" value=\"$com2\" />
     <input type=\"hidden\" name=\"ta_comment3\" value=\"$com3\" />
-    <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
-    <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />";
+    <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
+    <input type=\"hidden\" name=\"sel_category1\" value=\"$cat1\" />
+    <input type=\"hidden\" name=\"sel_category2\" value=\"$cat2\" />
+    <input type=\"hidden\" name=\"sel_category3\" value=\"$cat3\" />
+    <input type=\"hidden\" name=\"sel_category4\" value=\"$cat4\" />
+    <input type=\"hidden\" name=\"sel_category5\" value=\"$cat5\" />
+";
 
   $block = "
     <table class=\"detail\">

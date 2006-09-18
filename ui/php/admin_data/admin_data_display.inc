@@ -465,6 +465,7 @@ function dis_admin_data_list($action, $mode) {
       </tr>";
   }
 
+  // Loop through each list
   while ($l_q->next_record()) {
     $cpt_l++;
 
@@ -484,14 +485,14 @@ function dis_admin_data_list($action, $mode) {
     }
 
     if ($new_query != "") {
-      $query_nb = get_admin_data_list_query_num_rows($dynlist, $l_q);
+      $query_nb = get_list_query_num_rows($dynlist, $l_q);
       $query_txt = $query_nb;
     } else {
       $query_nb = "0";
       $query_txt = "No";
     }
 
-    $new_sta_nb = get_admin_data_list_static_contact_nb($id);
+    $new_sta_nb = get_list_static_contact_nb($id);
     $new_dyn_nb = $query_nb;
 
     if (($sta_nb != $new_sta_nb) || ($query != $new_query)) {

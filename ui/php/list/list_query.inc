@@ -167,7 +167,7 @@ function run_query_list_insert($list) {
   $mode = $list["mode"];
   $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"] == 1) ? 1 : 0;
-  $contact_arch = ($list["contact_arch"] == 1 ) ? 1 : 0;
+  $contact_arch = ($list["contact_archive"] == 1 ) ? 1 : 0;
   $info_pub = ($list["info_pub"]==1)?1:0;
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
@@ -282,7 +282,7 @@ function run_query_list_update($list) {
   $mode = $list["mode"];
   $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
-  $contact_arch = ($list["contact_arch"]==1)?1:0;
+  $contact_arch = ($list["contact_archive"]==1)?1:0;
   $info_pub = ($list["info_pub"]==1)?1:0;
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
@@ -893,6 +893,7 @@ function get_list_info($id) {
 
   $query = "SELECT list_id,
       list_name,
+      list_mode,
       list_structure,
       list_mailing_ok,
       list_contact_archive,
@@ -907,9 +908,10 @@ function get_list_info($id) {
   
   $res["list_id"] = $obm_q->f("list_id");
   $res["name"] = $obm_q->f("list_name");
+  $res["mode"] = $obm_q->f("list_mode");
   $res["structure"] = $obm_q->f("list_structure");
   $res["mailing_ok"] = $obm_q->f("list_mailing_ok");
-  $res["contact_arch"] = $obm_q->f("list_contact_archive");
+  $res["contact_archive"] = $obm_q->f("list_contact_archive");
   $res["info_pub"] = $obm_q->f("list_info_publication");
 
   return $res;
@@ -935,7 +937,7 @@ function get_list_query_num_rows($dynquery="", $list_q) {
 
   // Case expert query, we try to find the correct num_rows
   if (! isset($dynquery["from"])) {
-    $query = $dynquery["query"];
+    $query = $list_q->f("list_query");
     // Distinguinsh simple queries to queries with sub-query for optimization
     $pos = strpos(strtolower($query), 'select', 5);
 
@@ -1300,7 +1302,7 @@ function make_list_query_from_db(&$list_q) {
       $list_info["criteria"] = $as_criteria;
       $list_info["list_id"] = $id;
       $list_info["mailing_ok"] = $mail_ok;
-      $list_info["contact_arch"] = $contact_arch;
+      $list_info["contact_archive"] = $contact_arch;
       $list_info["info_pub"] = $info_pub;
       $list_info["privacy"] = $privacy;
       $dynlist = make_list_query_from_criteria($list_info);
@@ -1327,7 +1329,7 @@ function make_list_query_from_criteria($list) {
   $boolean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
   $mailing_ok = $list["mailing_ok"];
-  $contact_arch = $list["contact_arch"];
+  $contact_arch = $list["contact_archive"];
   $privacy = $list["privacy"];
   $info_pub = $list["info_pub"];
   $lang = get_lang();
