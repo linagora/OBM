@@ -1605,7 +1605,7 @@ function html_agenda_event_consult($event_q, $entities) {
       $state = $entity["state"];
       if ($auth->auth["uid"] == $u_id) {
 	$$state = "checked=\"checked\"";
-	$dis_decision_radio = "  
+	$dis_decision_radio = "
       <div class=\"detailHead\">$l_change_state</div>
       <table class=\"detail\">  
       <tr>
@@ -2231,20 +2231,22 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
 // Display Waiting events
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_agenda_waiting_events($obm_wait) {
+function html_agenda_waiting_events2($obm_wait) {
   global $l_users, $l_title, $l_location, $l_priority, $l_category1,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$cagenda_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
    
+  print_r($obm_wait);
   while ($obm_wait->next_record()) {
     $current_user = $obm_wait->f("userobm_id");
     $current_lname = $obm_wait->f("userobm_lastname");
     $current_fname = $obm_wait->f("userobm_firstname");
+    echo "$current_user-";
     if ($current_user != $old_user) {
       $old_user = $current_user;
       if ($dis_events != "") {
-	if($is_repeat) {
+	if ($is_repeat) {
 	  $dis_kind = $l_repeatkind;
 	  $dis_day = $l_repeatdays2;
 	  $dis_end = $l_date_repeatend;
@@ -2337,6 +2339,7 @@ function html_agenda_waiting_events($obm_wait) {
     $dis_day = ""; 
     $dis_end = "";
   }
+
   // --- HTML Template --------------------------------------------------------
   $block .= "
   <p/>
@@ -2350,13 +2353,168 @@ function html_agenda_waiting_events($obm_wait) {
     <td class=\"detailText\">$l_from</td>
     <td class=\"detailText\">$dis_kind</td>
     <td class=\"detailText\">$dis_day</td>
-    <td class=\"detailText\">$dis_end</td>     
+    <td class=\"detailText\">$dis_end</td>
     <td class=\"detailText\">$l_datebegin</td>
     <td class=\"detailText\">$l_dateend</td>
     <td></td>
   </tr>
   $dis_events
   </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Waiting events
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_agenda_waiting_events($obm_wait) {
+  global $l_users, $l_title, $l_location, $l_priority, $l_category1,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$l_change_state,$l_validate,$l_from;
+  global $l_repeatkind,$l_repeatdays2,$l_date_repeatend,$l_daily,$l_weekly,$cagenda_weekstart,$l_wait;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+   
+  while ($obm_wait->next_record()) {
+    $old_user = $current_user;
+    $old_lname = $current_lname;
+    $old_fname = $current_fname;
+    $current_user = $obm_wait->f("userobm_id");
+
+    // If event for a new agenda (delegation), display the previous block
+    if ($current_user != $old_user) {
+
+      // if previous block had events (true except first block)
+      if ($dis_events != "") {
+
+	// set title row according to event content
+	if ($has_repeat) {
+	  $dis_kind = $l_repeatkind;
+	  $dis_day = $l_repeatdays2;
+	  $dis_end = $l_date_repeatend;
+	} else {
+	  $dis_kind = "";
+	  $dis_day = ""; 
+	  $dis_end = "";
+	}
+
+        $block .= "
+	<p/>
+	<div class=\"detailHead\">$current_fname $current_lname :</div>
+	<table class=\"detail\">
+	 <tr>
+	  <td class=\"detailText\">$l_title</td>
+	  <td class=\"detailText\">$l_location</td>
+	  <td class=\"detailText\">$l_category1</td>
+	  <td class=\"detailText\">$l_priority</td>
+	  <td class=\"detailText\">$l_from</td>
+	  <td class=\"detailText\">$dis_kind</td>
+	  <td class=\"detailText\">$dis_day</td>
+	  <td class=\"detailText\">$dis_end</td>     
+	  <td class=\"detailText\">$l_datebegin</td>
+	  <td class=\"detailText\">$l_dateend</td>
+	  <td></td>
+	</tr>
+        $dis_events
+        </table>";
+      }
+      $has_repeat = false;
+      $dis_events = "";
+    }
+
+    $current_lname = $obm_wait->f("userobm_lastname");
+    $current_fname = $obm_wait->f("userobm_firstname");
+
+    $kind = ${"l_".$obm_wait->f("calendarevent_repeatkind")};
+    switch ($obm_wait->f("calendarevent_priority") ) {
+      case 1 : 
+	$priority = $l_low;
+	break;
+      case 2 :
+	$priority = $l_medium;
+	break;
+      case 3 :
+	$priority = $l_high;
+	break;
+    }
+	
+    $start_week_day = strtotime($cagenda_weekstart);
+    $dis_repeat_days = "";
+    for ($i=0; $i<7; $i++) {
+      $day_num = date("w", $start_week_day);
+      $day = $l_daysofweekshort[$day_num];
+      if (strcmp(substr($obm_wait->f("calendarevent_repeatdays"),$i,1),"1")==0) {
+	$dis_repeat_days .= "$day ";
+      }
+      $start_week_day = strtotime("+1 day", $start_week_day); 
+    }
+    $user_create = $obm_wait->f("usercreate_firstname")." ".$obm_wait->f("usercreate_lastname");
+    $date_begin = datetime_format($obm_wait->f("calendarevent_date"));
+    $date_end = datetime_format($obm_wait->f("calendarevent_date") + $obm_wait->f("calendarevent_duration"));
+    $date_repeat = date_format($obm_wait->f("calendarevent_endrepeat"));
+    if ($obm_wait->f("calendarevent_repeatkind") != "none") {$is_repeat = true;}
+    $dis_events .= "
+    <tr>
+     <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
+     <td class=\"detailForm\">".$obm_wait->f("calendarevent_location")."</td>
+     <td class=\"detailForm\">".$obm_wait->f("calendarcategory1_label")."</td>
+     <td class=\"detailForm\">$priority</td>
+     <td class=\"detailForm\">$user_create</td>
+     <td class=\"detailForm\">$kind</td>
+     <td class=\"detailForm\">$dis_repeat_days</td>
+     <td class=\"detailForm\">$date_repeat</td>
+     <td class=\"detailForm\">$date_begin</td>
+     <td class=\"detailForm\">$date_end</td>
+     <td class=\"detailForm\">
+      <form method=\"get\" action=\"agenda_index.php\">
+       <input type=\"hidden\" name=\"action\" value=\"decision\" />      
+       <input type=\"hidden\" name=\"agenda_id\" value=\"".$obm_wait->f("calendarevent_id")."\" />
+       <input type=\"hidden\" name=\"user_id\" value=\"$current_user\" />
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept<br />
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait<br />
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
+      </form>
+     </td>
+    </tr>";
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  // Display the last block
+  if ($dis_events != "") {
+
+    // set title row according to event content
+    if ($has_repeat) {
+      $dis_kind = $l_repeatkind;
+      $dis_day = $l_repeatdays2;
+      $dis_end = $l_date_repeatend;
+    } else {
+      $dis_kind = "";
+      $dis_day = ""; 
+      $dis_end = "";
+    }
+    
+    $block .= "
+	<p/>
+	<div class=\"detailHead\">$current_fname $current_lname :</div>
+	<table class=\"detail\">
+	 <tr>
+	  <td class=\"detailText\">$l_title</td>
+	  <td class=\"detailText\">$l_location</td>
+	  <td class=\"detailText\">$l_category1</td>
+	  <td class=\"detailText\">$l_priority</td>
+	  <td class=\"detailText\">$l_from</td>
+	  <td class=\"detailText\">$dis_kind</td>
+	  <td class=\"detailText\">$dis_day</td>
+	  <td class=\"detailText\">$dis_end</td>     
+	  <td class=\"detailText\">$l_datebegin</td>
+	  <td class=\"detailText\">$l_dateend</td>
+	  <td></td>
+	</tr>
+        $dis_events
+        </table>";
+  }
+
   return $block;
 }
 

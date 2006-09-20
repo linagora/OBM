@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.4pre2";
+$obm_version = "1.2.4pre3";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -931,6 +931,7 @@ function beautify_comment($com, $p_order="") {
     $replace = "\\5";
     $tmp = $com;
     
+    $nb = 0;
     while (preg_match($pattern, $tmp, $matches)) {
       $nb++;
       $who = $matches[2];
@@ -943,6 +944,11 @@ function beautify_comment($com, $p_order="") {
     </tr>";
       $rows = $row . $rows;
       $tmp = preg_replace($pattern, $replace, $tmp, 1);
+    }
+
+    // If no time-user stamp match, we display the coment as is
+    if ($nb == 0) {
+      $rows = $tmp;
     }
 
     $result = "
