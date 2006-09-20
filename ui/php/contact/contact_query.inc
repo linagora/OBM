@@ -563,9 +563,9 @@ function run_query_contact_insert($contact) {
     contact_comment2,
     contact_comment3,
     contact_category5_id
-  ) VALUES (null,
+  ) VALUES ('$now',
     '$now',
-    null,
+    '$uid',
     '$uid',
     '$dsrc',
     '$comp_id',

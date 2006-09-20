@@ -153,9 +153,9 @@ function run_query_todo_insert($todo) {
         todo_title,
         todo_content)
       VALUES (
-        null,
         '$now',
-        null,
+        '$now',
+        '$uid',
         '$uid',
         '$user',
         '$now',

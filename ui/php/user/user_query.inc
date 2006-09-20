@@ -178,6 +178,8 @@ function run_query_user_detail($p_id) {
 function run_query_user_insert($user) {
   global $auth, $cdg_sql, $password_encryption;
 
+  $now = date("Y-m-d H:i:s");
+  $uid = $auth->auth["uid"];
   $login = $user["login"];
   $passwd = $user["passwd"];
   if ($passwd != "") {
@@ -220,10 +222,10 @@ function run_query_user_insert($user) {
     userobm_description,
     userobm_timelastaccess)
   VALUES (
-    null,
-    '" . date("Y-m-d H:i:s") . "',
-    null,
-    ". $auth->auth["uid"] . ",
+    '$now',
+    '$now',
+    '$uid',
+    '$uid',
     '$login',
     '$passwd_crypt',
     '$perms',
