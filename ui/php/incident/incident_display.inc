@@ -116,6 +116,7 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
   $lincident = stripslashes($incident["lincident"]);
   $reference = stripslashes($incident["reference"]);
   $i_id = $incident["incident_id"];
+  $contract_id = $incident["contract_id"];
   $lcontract = stripslashes($incident["lcontract"]);
   $priority = $incident["priority"];
   $company = $incident["company"];
@@ -201,6 +202,7 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
        </div>
        <div class=\"searchLabel\">&nbsp;<br />
          <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />     
+         <input name=\"contract_id\" id=\"contract_id\" type=\"hidden\" value=\"$contract_id\" />     
          <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
        </div>
        <div class=\"searchEnd\"></div>
@@ -253,14 +255,14 @@ function html_incident_search_list($in_q, $prefs, $incident) {
   $status = $incident["status"];
   $cat1 = $incident["category1"];
   $cat2 = $incident["category2"];
-  $param_contract = $incident["contract_id"];
+  $contract_id = $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
   $archive = $incident["archive"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;param_contract=$param_contract&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;contract_id=$contract_id&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;sel_owner=$owner&amp;sel_logger=$logger&amp;cba_archive=$archive");
 
   $dis_incidents_list=new OBM_DISPLAY("DATA", $prefs, "incident");
   $dis_incidents_list->data_set = $in_q;
