@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "1.2.4pre3";
+$obm_version = "1.2.4";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -815,6 +815,13 @@ function get_global_params($table="") {
     //      if (!in_array($value, array_keys($fieldnames)))
     //        $value = "";
     //    }
+
+    // XXXX SQL_order below can't access here $fieldnames...
+    // sql_order_field value control
+    if ($key == "sql_order_field") {
+      if (preg_match("/ /", $value))
+	$value = "";
+    }
 
     // auto decode urls
     if (preg_match('/_url$/', $key)) {
