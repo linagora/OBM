@@ -306,11 +306,12 @@ function run_query_agenda_add_event($agenda, $sel_entity_id, &$event_id) {
   $mail_title = stripslashes($agenda["title"]);
   $datebegin = $agenda["date_begin"];
   $dateend = $agenda["date_end"];
-  if($agenda["task_new_id"]) $task_id = $agenda["task_new_id"]; 
+  if ($agenda["task_new_id"]) $task_id = $agenda["task_new_id"]; 
   else $task_id = $agenda["task_id"];
   // Get the final user list (merge group)
   $users_array = $sel_entity_id["user"];
   if (is_array($groups)) {
+    $user_group_array = array();
     foreach($groups as $group_id) {
       $user_group_array = array_merge($user_group_array, get_all_users_id_from_group($group_id));
     }
