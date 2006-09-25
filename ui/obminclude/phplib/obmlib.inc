@@ -146,7 +146,7 @@ class OBM_Challenge_Auth extends Auth {
   function auth_loginform() {
     global $sess, $obminclude, $obm_version, $module, $path, $login_action;
     global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
-    global $params;
+    global $params, $c_multidomain;
 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
@@ -157,7 +157,7 @@ class OBM_Challenge_Auth extends Auth {
   
   function auth_validatelogin() {
     global $params, $login, $password, $challenge, $response;
-    global $auth_encryption, $password_encryption;
+    global $auth_encryption, $password_encryption, $c_multidomain;
 
     //    echo "auth_validatelogin";
 
@@ -165,7 +165,8 @@ class OBM_Challenge_Auth extends Auth {
     $password = $params["password"];
     $challenge = $params["challenge"];
     $response = $params["response"];
-
+		$domain = $params["domain"];
+		
     if (isset($login)) {
       $this->auth["uname"] = $login; // provides access for loginform.ihtml
     }
@@ -176,17 +177,27 @@ class OBM_Challenge_Auth extends Auth {
     $query_login = "SELECT
         userobm_id,
         userobm_perms,
-        userobm_password
+        userobm_password,
+        userobm_domain_id
       FROM $user_table
       WHERE userobm_login = '$user_login'
         AND userobm_archive = '0'";
 
     $this->db->query($query_login);
-    while ($this->db->next_record()) {
+    while ($this->db->next_record() && !$ok) {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
+      $udomain = $this->db->f("userobm_domain_id");
+			if($udomain == $domain)
+          $ok = true;
     }
+
+		// Test if selected domain fit with user domain
+		if($c_multidomain && isset($uid)) {
+			if(get_entity_domain_id($uid, "userobm", "UserObm") != $domain)
+				return false;
+		}
 
     if ($auth_encryption) {
       if ($password_encryption == "md5") {

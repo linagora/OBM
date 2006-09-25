@@ -34,7 +34,8 @@ function run_query_payment_search($payment) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-
+	$multidomain = sql_multidomain("payment");
+	
   $date = sql_date_format($db_type, "payment_date", "payment_date");
 
   // search criterias :
@@ -84,7 +85,7 @@ function run_query_payment_search($payment) {
     $and = "AND";
   }
 
-  $whereq = "WHERE $where";
+  $whereq = "WHERE $where $multidomain";
 
   // Order by clause
   $field = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "payment_date";
@@ -138,7 +139,8 @@ function run_query_payment_detail($p_id) {
   $timeupdate = sql_date_format($db_type, "payment_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "payment_timecreate", "timecreate");
   $date = sql_date_format($db_type, "payment_date", "date");
-
+	$multidomain = sql_multidomain("payment");
+	
   $query = "SELECT Payment.*,
       $timeupdate,
       $timecreate,
@@ -155,7 +157,7 @@ function run_query_payment_detail($p_id) {
          LEFT JOIN Account ON payment_account_id=account_id
          LEFT JOIN UserObm as c ON payment_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON payment_userupdate=u.userobm_id
-    WHERE payment_id='$p_id'";
+    WHERE payment_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_payment_detail()");
   $obm_q->query($query);
@@ -171,7 +173,7 @@ function run_query_payment_detail($p_id) {
 //   - $params[]: Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_payment_insert($params) {
-  global $auth, $cdg_sql;
+  global $auth, $obm, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
@@ -190,12 +192,14 @@ function run_query_payment_insert($params) {
   $inout = $params["inout"];
   $checked = ($params["checked"] == "1" ? "1" : "0");
   $comment = $params["comment"];
-
+	$domain_id = $obm["domain_id"];
+	
   $query = "INSERT INTO Payment (
     payment_timeupdate,
     payment_timecreate,
     payment_userupdate,
     payment_usercreate,
+		payment_domain_id,
     payment_company_id,
     payment_account_id,
     payment_paymentkind_id,    
@@ -209,6 +213,7 @@ function run_query_payment_insert($params) {
     '$now',
     null,
     '$uid',
+		'$domain_id',
     '$company_id',
     '$account_id',
     '$kind',
@@ -287,7 +292,8 @@ function run_query_payment_update($pid, $params) {
   $inout = $params["inout"];
   $checked = ($params["checked"] == "1" ? "1" : "0");
   $comment = $params["comment"];
-
+	$multidomain = sql_multidomain("payment");
+	
   $query = "UPDATE Payment SET
     payment_timeupdate='$now',
     payment_userupdate='$uid',
@@ -300,7 +306,7 @@ function run_query_payment_update($pid, $params) {
     payment_number='$number',
     payment_checked='$checked',
     payment_comment='$comment'
-  WHERE payment_id='$pid'";
+  WHERE payment_id='$pid' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_payment_update()");
   $obm_q = new DB_OBM;
@@ -320,6 +326,8 @@ function run_query_payment_update($pid, $params) {
 function get_payment_invoices($id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("paymentinvoice");
+
   $query = "SELECT
     invoice_id,
     PI1.paymentinvoice_amount,
@@ -334,7 +342,7 @@ function get_payment_invoices($id) {
     LEFT JOIN Company on invoice_company_id=company_id
     LEFT JOIN PaymentInvoice as PI2 on invoice_id=PI2.paymentinvoice_invoice_id
               and PI2.paymentinvoice_payment_id != '$id'
-  WHERE PI1.paymentinvoice_payment_id='$id'
+  WHERE PI1.paymentinvoice_payment_id='$id' $multidomain
   GROUP BY
     invoice_id,
     paymentinvoice_amount,
@@ -380,10 +388,12 @@ function get_payment_invoices($id) {
 function get_payment_amount_info($id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("payment");
+
   $query = "SELECT
     payment_amount
   FROM Payment
-  WHERE payment_id='$id'";
+  WHERE payment_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_payment_amount_info(1)");
   $obm_q = new DB_OBM;
@@ -415,17 +425,19 @@ function get_payment_amount_info($id) {
 //   - $params[]: Entry's values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_payment_invoice_insert($params) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
   $id = $params["payment_id"];
   $amount = $params["amount"];
   $invoice_id = $params["invoice_id"];
-
+	$domain_id = $obm["domain_id"];
+	
   $query = "INSERT INTO PaymentInvoice (
     paymentinvoice_invoice_id,
     paymentinvoice_payment_id,
+		paymentinvoice_domain_id,
     paymentinvoice_timeupdate,
     paymentinvoice_timecreate,
     paymentinvoice_userupdate,
@@ -433,6 +445,7 @@ function run_query_payment_invoice_insert($params) {
     paymentinvoice_amount)
    VALUES (
     '$invoice_id',
+		'$domain_id',
     '$id',
     null,
     '$now',
@@ -460,7 +473,8 @@ function run_query_payment_invoice_update($pid, $params) {
   $invs = $params["invoice"];
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
-
+	$multidomain = sql_multidomain("paymentinvoice");
+	
   foreach($invs as $i_id=>$amount) {
     $query = "UPDATE PaymentInvoice SET
     paymentinvoice_timeupdate = '$now',
@@ -468,7 +482,7 @@ function run_query_payment_invoice_update($pid, $params) {
     paymentinvoice_amount = '$amount'
   WHERE
     paymentinvoice_payment_id='$pid'
-    AND paymentinvoice_invoice_id='$i_id'";
+    AND paymentinvoice_invoice_id='$i_id' $multidomain";
   
     display_debug_msg($query, $cdg_sql, "run_query_payment_invoice_update()");
     $obm_q = new DB_OBM;
@@ -487,7 +501,9 @@ function run_query_payment_invoice_update($pid, $params) {
 function get_payment_kinds() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM PaymentKind ORDER BY paymentkind_label";
+	$multidomain = sql_multidomain("paymentkind");
+
+  $query = "SELECT * FROM PaymentKind WHERE 1=1 $multidomain ORDER BY paymentkind_label";
 
   display_debug_msg($query, $cdg_sql, "get_payment_kinds()");
   $obm_q = new DB_OBM;
@@ -512,7 +528,9 @@ function get_payment_kinds() {
 function get_accounts() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM Account ORDER BY account_label";
+	$multidomain = sql_multidomain("account");
+
+  $query = "SELECT * FROM Account WHERE 1=1 $multidomain ORDER BY account_label";
 
   display_debug_msg($query, $cdg_sql, "get_payment_accounts()");
   $obm_q = new DB_OBM;
@@ -577,10 +595,6 @@ function check_payment_data_form($id, $params) {
     $err_msg = $l_fill_kind;
     return false;
   }
-
-
-
-
 
   // MANDATORY: Invoice number, if state not "to be created"
   if ($status_created) {
@@ -680,12 +694,14 @@ function run_query_payment_delete($p_id) {
 
   $obm_q = new DB_OBM;
 
+	$multidomain_paymentinvoice = sql_multidomain("paymentinvoice");
   $query = "DELETE FROM PaymentInvoice
-    WHERE paymentinvoice_payment_id='$p_id'";
+    WHERE paymentinvoice_payment_id='$p_id' $multidomain_paymentinvoice";
   display_debug_msg($query, $cdg_sql, "run_query_payment_delete(invoice link)");
   $obm_q->query($query);
 
-  $query = "DELETE FROM Payment WHERE payment_id='$p_id'";
+	$multidomain = sql_multidomain("payment");
+  $query = "DELETE FROM Payment WHERE payment_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_payment_delete()");
   $retour = $obm_q->query($query);
 

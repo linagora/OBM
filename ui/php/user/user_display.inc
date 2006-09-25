@@ -102,7 +102,7 @@ function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
   global $l_email, $l_desc, $l_group, $l_add_users;
   global $display, $c_all, $profiles;
-
+  
   $login = $user["login"];
   $perms = $user["perms"];
   $lname = stripslashes($user["lastname"]);
@@ -306,7 +306,8 @@ function html_user_form($usr_q, $user) {
   global $l_user, $l_email, $l_archive, $l_insert, $l_update;
   global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc, $l_datebegin;
   global $action, $profiles;
-
+  global $c_multidomain, $obm, $c_default_domain, $l_domain;
+  
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
     $id = $usr_q->f("userobm_id");
@@ -341,7 +342,16 @@ function html_user_form($usr_q, $user) {
   if (isset($user["desc"])) { $desc = $user["desc"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
+	// Domain
+  if($c_multidomain && $obm["domain_id"] == $c_default_domain){
+    $domain_list = get_global_domain_list();
+    $sel_domain = "<tr><td class=\"detailLabel\">$l_domain</td><td class=\"detailForm\">
+      $domain_list </td></tr>";
+  }
+  
 
+
+	// Profiles
   foreach ($profiles as $profile => $one_profile) {
     if ($perms == $profile) {
       $selected = " selected";
@@ -378,7 +388,7 @@ function html_user_form($usr_q, $user) {
     </tr><tr>
       <td class=\"detailLabel\">$l_password</td>
       <td class=\"detailForm\"><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
-    </tr><tr>
+    </tr>$sel_domain<tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
     </tr><tr>

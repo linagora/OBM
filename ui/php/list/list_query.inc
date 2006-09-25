@@ -31,7 +31,8 @@ function run_query_list_search($list) {
   $limit = sql_limit($db_type);
   $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
-
+	$multidomain = sql_multidomain("list");
+	
   $where .= sql_obm_entity_privacy("list");
 
   if ($name != '') {
@@ -54,7 +55,7 @@ function run_query_list_search($list) {
     $where .= " AND (list_usercreate='$market')";
   }
 
-  $whereq = "WHERE $where";
+  $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "list_name";
@@ -98,7 +99,7 @@ function run_query_list_detail($id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-
+	$multidomain = sql_multidomain("list");
   $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
 
@@ -111,7 +112,7 @@ function run_query_list_detail($id) {
   FROM List
        LEFT JOIN UserObm as c ON list_usercreate=c.userobm_id
        LEFT JOIN UserObm as u ON list_userupdate=u.userobm_id
-  WHERE list_id = '$id'";
+  WHERE list_id = '$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_detail()");
   $obm_q->query($query) ;
@@ -158,7 +159,7 @@ function list_add_slashes_array(&$item, $key) {
 //   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_insert($list) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $priv = ($list["privacy"]==1) ? 1 : 0;
   $name = $list["name"];
@@ -176,11 +177,13 @@ function run_query_list_insert($list) {
     }
     $list_critery = addslashes(serialize($ss_criteria));
   }
-
+	$domain_id = $obm["domain_id"];
+	
   $query = "INSERT INTO List (list_timeupdate,
     list_timecreate,
     list_userupdate,
     list_usercreate,
+		list_domain_id,
     list_privacy,
     list_name,
     list_subject,
@@ -195,6 +198,7 @@ function run_query_list_insert($list) {
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
+		'$domain_id',
     '$priv',
     '$name',
     '$subject',
@@ -247,13 +251,14 @@ function get_list_id($list) {
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = addslashes($list["query"]);
-
+	$multidomain = sql_multidomain("list");
+	
   $query = "SELECT list_id
     FROM List
     WHERE list_name='$name'
       and list_subject='$subject'
       and list_email='$email'
-      and list_query='$list_query'";
+      and list_query='$list_query' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_list_id()");
   $obm_q = new DB_OBM;
@@ -291,6 +296,8 @@ function run_query_list_update($list) {
     }
     $list_critery = addslashes(serialize($ss_criteria));
   }
+  $multidomain = sql_multidomain("list");
+  
   $query = "UPDATE List SET
     list_timeupdate='". date("Y-m-d H:i:s")."',
     list_userupdate='".$auth->auth["uid"]."',
@@ -304,7 +311,7 @@ function run_query_list_update($list) {
     list_info_publication='$info_pub',
     list_query='$list_query',
     list_structure='$list_critery'
-  WHERE list_id='$id'";
+  WHERE list_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_update()");
   $obm_q = new DB_OBM;
@@ -322,8 +329,10 @@ function run_query_list_update($list) {
 function run_query_list_update_sql($id) {
   global $auth, $cdg_sql;
 
+	$multidomain = sql_multidomain("list");
+
   // Check that list has really a query (if not we do nothing)
-  $query = "SELECT list_structure FROM List WHERE list_id='$id'";
+  $query = "SELECT list_structure FROM List WHERE list_id='$id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_list_update_sql(1)");
   $list_q = new DB_OBM;
   $retour = $list_q->query($query);
@@ -364,7 +373,8 @@ function run_query_list_delete($p_id) {
   $retour = $obm_q->query($query);
 
   // Delete the List
-  $query = "DELETE FROM List WHERE list_id='$p_id'";
+	$multidomain = sql_multidomain("list");
+  $query = "DELETE FROM List WHERE list_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_list_delete(2)");
   $retour = $obm_q->query($query);
 
@@ -382,9 +392,11 @@ function run_query_list_contactlist_insert($list) {
   global $auth, $cdg_sql;
 
   $id = $list["list_id"];
+	
+	$multidomain = sql_multidomain("list");
 
   // We check the list still exist (in case popup windows here for long...)
-  $query = "SELECT list_id FROM List WHERE list_id = '$id'";
+  $query = "SELECT list_id FROM List WHERE list_id = '$id' $multidomain";
   display_debug_msg($query, $cdg_sql,"run_query_list_contactlist_insert()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -634,11 +646,13 @@ function get_list_name_exists($name, $id="") {
   if ($id != "") {
     $where_id = "AND list_id != '$id'";
   }
+	
+	$multidomain = sql_multidomain("list");
 
   $query = "SELECT list_id, list_name
     FROM List
     WHERE list_name='$name'
-      $where_id";
+      $where_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_list_name_exists()");
   $obm_q = new DB_OBM;
@@ -666,7 +680,8 @@ function run_query_list_check_list($id, $name, $subject) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-
+	$multidomain = sql_multidomain("list");
+	
   if ($id != "") {
     $where_id = "list_id != '$id' AND";
   }
@@ -684,7 +699,7 @@ function run_query_list_check_list($id, $name, $subject) {
   $query = "SELECT distinct list_id, list_name, list_subject
      FROM List
      WHERE $where_id
-       ($wname or $wsubject)";
+       ($wname or $wsubject) $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_check_list()");
   $obm_q->query($query);
@@ -891,6 +906,8 @@ function check_list_can_delete($p_id) {
 function get_list_info($id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("list");
+
   $query = "SELECT list_id,
       list_name,
       list_mode,
@@ -899,7 +916,7 @@ function get_list_info($id) {
       list_contact_archive,
       list_info_publication
     FROM List
-    WHERE list_id='$id'";
+    WHERE list_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_list_info()");
   $obm_q = new DB_OBM;
@@ -1185,7 +1202,10 @@ function sql_list_query_resource_high($query) {
 function run_query_list_contactcategory1() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM ContactCategory1 ORDER BY contactcategory1_code"; 
+	$multidomain = sql_multidomain("contactcategory1");
+
+  $query = "SELECT * FROM ContactCategory1 
+		WHERE 1=1 $multidomain ORDER BY contactcategory1_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql,"run_query_list_contactcategory1()");
@@ -1202,7 +1222,10 @@ function run_query_list_contactcategory1() {
 function run_query_list_contactcategory2() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM ContactCategory2 ORDER BY contactcategory2_code"; 
+	$multidomain = sql_multidomain("contactcategory2");
+
+  $query = "SELECT * FROM ContactCategory2 
+		WHERE 1=1 $multidomain ORDER BY contactcategory2_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql, "run_query_list_contactcategory2()");
@@ -1219,7 +1242,9 @@ function run_query_list_contactcategory2() {
 function run_query_list_language() {
   global $cdg_sql;
 
-  $query = "SELECT kind_lang FROM Kind
+	$multidomain = sql_multidomain("kind");
+
+  $query = "SELECT kind_lang FROM Kind WHERE 1=1 $multidomain
     GROUP BY kind_lang";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_language()");
@@ -1238,8 +1263,11 @@ function run_query_list_language() {
 function run_query_list_publication() {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("publication");
+
   $query = "SELECT publication_title, publication_id
     FROM Publication
+		WHERE 1=1 $multidomain
     ORDER by publication_year DESC, publication_type_id, publication_title";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_publication()");

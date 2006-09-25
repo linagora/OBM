@@ -167,6 +167,11 @@ class Auth {
             // OBM : if login successfull (valid auth)
             if ( $uid = $this->auth_validatelogin() ) {
               $this->auth["uid"] = $uid;
+
+				      // Domain is session	
+							$this->auth["domain_id"] = get_entity_domain_id($this->auth["uid"], "userobm", "UserObm");
+							$this->auth["domain_label"] = get_domain_label($this->auth["domain_id"]);
+							
               // OBM : in OBM each time is in seconds. this->lifetime too.
               $this->auth["exp"] = time() + $this->lifetime;
               $this->auth["refresh"] = time() + (60 * $this->refresh);
@@ -233,11 +238,11 @@ class Auth {
   }
 
   function is_authenticated() {
+  	global $c_multidomain;
     if (
-      $this->auth["uid"]
-        && 
-      (($this->lifetime <= 0) || (time() < $this->auth["exp"]))
-    ) {
+      $this->auth["uid"] && 
+      (($this->lifetime <= 0) || (time() < $this->auth["exp"]))) {
+      
       # If more than $this->refresh minutes are passed since last check,
       # perform auth data refreshing. Refresh is only done when current
       # session is valid (registered, not expired).
@@ -254,7 +259,7 @@ class Auth {
          return false;
         }
       }
-
+      
       return $this->auth["uid"];
     } else {
       return false;

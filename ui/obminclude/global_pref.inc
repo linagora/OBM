@@ -62,6 +62,10 @@ if ($set_debug == "") $set_debug = $set_debug_default;
 if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
 
 
+$obm["domain_id"] = $auth->auth["domain_id"];
+$obm["uid"] = $auth->auth["uid"];
+$obm["perm"] = $auth->auth["perm"];
+
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////
@@ -262,7 +266,11 @@ $modules["backup"] = array('Name'=> $l_module_backup,
                   'Ico' => "$ico_ref",
                   'Url' => "$path/backup/backup_index.php",
                   'Right'=> $cright_read_admin);
-
+$modules["domain"] = array('Name'=> $l_module_domain,
+									'Ico' => "$ico_ref",
+                   'Url' => "$path/domain/domain_index.php",
+                   'Right'=> $cright_read_admin);
+                   
 if ($cgp_show["module"]["account"]) {
   $modules["account"] = array('Name'=> $l_module_account,
                                'Ico' => "$ico_account",

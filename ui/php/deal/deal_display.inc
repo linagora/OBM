@@ -276,7 +276,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   // --- Var preparation ------------------------------------------------------
 
   $popup = $deal["popup"];
-  $parent = $deal["parent"];
+  $parent = $deal["parentdeal_id"];
   $label = stripslashes($deal["label"]);
   $name = stripslashes($deal["company_name"]);
   $zip = stripslashes($deal["zip"]);
@@ -540,7 +540,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   global $l_close;
 
   $popup = $deal["popup"];
-  $parent = $deal["parent"];
+  $parent = $deal["parentdeal_id"];
   $label = urlencode(stripslashes($deal["label"]));
   $name = urlencode(stripslashes($deal["company_name"]));
   $zip = urlencode(stripslashes($deal["zip"]));
@@ -1157,7 +1157,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
 
   // If parameters have been given, they supercede the default action value
   if (isset($deal["deal_id"])) { $id = $deal["deal_id"]; }
-  if (isset($deal["parent"])) { $pid = $deal["parent"]; }
+  if (isset($deal["parentdeal_id"])) { $pid = $deal["parentdeal_id"]; }
   if (isset($deal["usercreate"])) { $usercreate = $deal["usercreate"]; }
   if (isset($deal["num"])) { $num = stripslashes($deal["num"]); }
   if (isset($deal["label"])) { $label = stripslashes($deal["label"]); }
@@ -2525,7 +2525,7 @@ function html_deal_admin_form($kind_q, $status_q) {
   $sel_kind = "<select name=\"sel_kind\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
     pos = mytext.indexOf(' ');
-    forms.form_kind_update.tf_kind.value=mytext.substr(pos+1);
+    forms.form_kind_update.tf_kind_upd.value=mytext.substr(pos+1);
     pos = 0;
     sign = mytext.substr(0,1);
     if (sign == '+') { pos = 1; }
@@ -2604,7 +2604,7 @@ function html_deal_admin_form($kind_q, $status_q) {
           <td>
             <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
-            <input type=\"text\" name=\"tf_kind\" />
+            <input type=\"text\" name=\"tf_kind_upd\" />
           </td>
            <td rowspan=\"2\">
             <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
@@ -2632,7 +2632,7 @@ function html_deal_admin_form($kind_q, $status_q) {
       method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
       <table>
       <tr>
-        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind\" /></td>
+        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind_label\" /></td>
         <td>
           <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\" />$l_minus<br />
           <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus

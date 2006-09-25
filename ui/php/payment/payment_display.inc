@@ -145,6 +145,7 @@ function html_payment_search_form($params, $kinds, $accs) {
   $sel_kind ="
     <select name=\"sel_kind\">
      <option value=\"$c_all\">$l_all</option>";
+     if(is_array($kinds))
   foreach($kinds as $k_id => $one_kind) {
     $klabel = $one_kind["label"];
     $kselect = ($k_id == $kind) ? "selected" : "";
@@ -675,11 +676,12 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   $sel_account ="
     <select name=\"sel_account\">
      <option value=\"$c_undef\">$l_undef</option>\n";
-  foreach($accs as $a_id => $one_acc) {
-    $alabel = $one_acc["label"];
-    $aselect = ($a_id == $account) ? "selected" : "";
-    $sel_account .= "<option value=\"$a_id\" $aselect>$alabel</option>";
-  }
+     if(is_array($accs))
+			  foreach($accs as $a_id => $one_acc) {
+			    $alabel = $one_acc["label"];
+			    $aselect = ($a_id == $account) ? "selected" : "";
+			    $sel_account .= "<option value=\"$a_id\" $aselect>$alabel</option>";
+			  }
   $sel_account .= "</select>";
 
   // Type radio

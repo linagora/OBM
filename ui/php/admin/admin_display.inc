@@ -62,7 +62,7 @@ function dis_admin_index($mode, $lifetime) {
 function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
-  global $obm_version, $l_version, $l_date, $l_host;
+  global $obm_version, $l_version, $l_date, $l_host, $l_domain, $c_multidomain;
 
   $date = datetime_format();
   if ($lifetime > 0) {
@@ -92,7 +92,9 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       <td class=\"adminText\">$ip</td>
       </tr>";
   }
-
+  
+	$multidomain = $c_multidomain == true ? "Multi" : "Single";
+	 
   echo "
     <br />
     <table class=\"admin\">
@@ -101,7 +103,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     </tr><tr> 
       <td class=\"adminLabel\">$l_version</td>
       <td class=\"adminText\">$obm_version</td>
-    </tr><tr> 
+    </tr><tr>
       <td class=\"adminLabel\">$l_database_server</td>
       <td class=\"adminText\">". strtoupper($obm_u->type). "</td>
     </tr><tr>
@@ -110,6 +112,9 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     </tr><tr>
       <td class=\"adminLabel\">$l_host</td>
       <td class=\"adminText\">" . $obm_u->Host . "</td>
+    </tr><tr>
+      <td class=\"adminLabel\">$l_domain</td>
+      <td class=\"adminText\">$multidomain</td>
     </tr>
     </table>
 

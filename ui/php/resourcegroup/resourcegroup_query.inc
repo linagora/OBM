@@ -30,8 +30,9 @@ function run_query_resourcegroup_search($group) {
   $limit = sql_limit($db_type);
   $timeupdate = sql_date_format($db_type,"RGroup.rgroup_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"RGroup.rgroup_timecreate", "timecreate");
-
-  $where = "rgroup_name $like '$name%'";
+	$multidomain = sql_multidomain("rgroup");
+	
+  $where = "rgroup_name $like '$name%' $multidomain";
 
   if ($privacy == $c_public) {
     $where .= " AND rgroup_privacy = 0";
@@ -95,7 +96,8 @@ function run_query_resourcegroup_search_possible_children($group) {
   $resource = $group["resource"];
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
-
+	$multidomain = sql_multidomain("rgroup");
+	
   $parents = get_group_parents($id);
 
   $obm_q = new DB_OBM;
@@ -128,7 +130,7 @@ function run_query_resourcegroup_search_possible_children($group) {
       LEFT JOIN UserObm as B ON RGroup.rgroup_userupdate=B.userobm_id
     where rgroup_name $like '$name%'
       and rgroup_id != '$id'
-      $where";
+      $where $multidomain";
 
   // ORDER construction
 
@@ -151,7 +153,8 @@ function run_query_resourcegroup_detail($id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-
+  
+	$multidomain = sql_multidomain("rgroup");
   $timeupdate = sql_date_format($db_type,"RGroup.rgroup_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"RGroup.rgroup_timecreate", "timecreate");
 
@@ -164,8 +167,8 @@ function run_query_resourcegroup_detail($id) {
     from RGroup
          left join UserObm as c on rgroup_usercreate=c.userobm_id
          left join UserObm as u on rgroup_userupdate=u.userobm_id
-    where rgroup_id = '$id'";
-  display_debug_msg($query, $cdg_sql);
+    where rgroup_id = '$id' $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -179,19 +182,21 @@ function run_query_resourcegroup_detail($id) {
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resourcegroup_insert($group) {
-  global $uid, $cdg_sql, $ctype_resource;
+  global $uid, $cdg_sql, $ctype_resource, $obm;
 
   $id = $group["resourcegroup_id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $now = date("Y-m-d H:i:s");
-
+	$domain_id = $obm["domain_id"];
+	
   $query = "insert into RGroup (
     rgroup_timeupdate,
     rgroup_timecreate,
     rgroup_userupdate,
     rgroup_usercreate,
+		rgroup_domain_id,
     rgroup_privacy,
     rgroup_name,
     rgroup_desc
@@ -200,6 +205,7 @@ function run_query_resourcegroup_insert($group) {
     '$now',
     null,
     '$uid',
+		'$domain_id',
     '$priv',
     '$name',
     '$desc'
@@ -228,12 +234,13 @@ function run_query_resourcegroup_id($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
-
+	$multidomain = sql_multidomain("rgroup");
+	
   $query = "SELECT rgroup_id
     FROM RGroup
     WHERE
       rgroup_name='$name'
-      and rgroup_desc='$desc'";
+      and rgroup_desc='$desc' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -263,6 +270,7 @@ function run_query_resourcegroup_update($group) {
   $desc = $group["desc"];
   $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $now = date("Y-m-d H:i:s");
+  $multidomain = sql_multidomain("rgroup");
   
   $query = "update RGroup set
     rgroup_timeupdate='$now',
@@ -270,7 +278,7 @@ function run_query_resourcegroup_update($group) {
     rgroup_privacy='$priv',
     rgroup_name='$name',
     rgroup_desc='$desc'
-  where rgroup_id='$id'";
+  where rgroup_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -305,7 +313,8 @@ function run_query_resourcegroup_delete($p_id) {
 */
 
   // Delete the Group
-  $query = "delete from RGroup where rgroup_id='$p_id'";
+  $multidomain = sql_multidomain("rgroup");
+  $query = "delete from RGroup where rgroup_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql);
   $retour = $obm_q->query($query);
 
@@ -576,8 +585,9 @@ function get_resourcegroup_info($id) {
   if ($id == "") {
     return false;
   }
-
-  $query = "select * from RGroup where rgroup_id='$id'";
+	$multidomain = sql_multidomain("rgroup");
+		
+  $query = "select * from RGroup where rgroup_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -606,11 +616,13 @@ function get_resourcegroup_name_exists($name, $id="") {
     $where_id = "and rgroup_id!='$id'";
   }
 
+	$multidomain = sql_multidomain("rgroup");
+
   $query = "SELECT rgroup_id, rgroup_name
     FROM RGroup
     WHERE rgroup_name='$name'
       and (rgroup_privacy=0 OR rgroup_usercreate='$uid')
-      $where_id";
+      $where_id $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -660,12 +672,14 @@ function run_query_resourcegroup_check($id, $name, $desc) {
   }
   if ($wdesc != "") $wdesc = "or $wdesc";
 
+	$multidomain = sql_multidomain("rgroup");
+
   $query = "SELECT distinct rgroup_id, rgroup_name, rgroup_desc
      FROM RGroup
      WHERE
        (rgroup_privacy=0 OR rgroup_usercreate='$uid')
        and ($wname $wdesc)
-       $where_id";
+       $where_id $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

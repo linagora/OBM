@@ -30,7 +30,8 @@ function run_query_lead_search($params) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-
+	$multidomain = sql_multidomain("lead");
+	
   $date = sql_date_format($db_type, "lead_date", "date");
   $datealarm = sql_date_format($db_type, "lead_datealarm", "datealarm");
 
@@ -71,7 +72,7 @@ function run_query_lead_search($params) {
   }
 
   if ($where != "") {
-    $whereq = "WHERE $where";
+    $whereq = "WHERE $where $multidomain";
   }
 
   // Order by clause
@@ -132,7 +133,8 @@ function run_query_lead_detail($p_id) {
   $manager_name[] = array("type" => "string", "value" => " ");
   $manager_name[] = array("type" => "field", "value" => "m.userobm_firstname");
   $concat_manager = sql_string_concat($db_type, $manager_name);
-
+	$multidomain = sql_multidomain("lead");
+	
   $query = "SELECT Lead.*,
       $timeupdate,
       $timecreate,
@@ -150,7 +152,7 @@ function run_query_lead_detail($p_id) {
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
          LEFT JOIN UserObm as m ON lead_manager_id=m.userobm_id
-    WHERE lead_id='$p_id'";
+    WHERE lead_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_detail()");
   $obm_q->query($query);
@@ -170,7 +172,7 @@ function run_query_lead_insert($params) {
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
-
+	
   $company_id = $params["company_new_id"];
   if ($company_id < 1) {
     $company_id = $params["company_id"];
@@ -194,12 +196,15 @@ function run_query_lead_insert($params) {
     $usercomment = $params["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
-
+  
+	$domain_id = get_entity_domain_id($company_id, "company");
+	
   $query = "INSERT INTO Lead (
     lead_timeupdate,
     lead_timecreate,
     lead_userupdate,
     lead_usercreate,
+		lead_domain_id,
     lead_source_id,
     lead_manager_id,
     lead_company_id,
@@ -214,6 +219,7 @@ function run_query_lead_insert($params) {
     '$now',
     null,
     '$uid',
+		'$domain_id',
     '$source_id',
     '$manager_id',
     '$company_id',
@@ -239,7 +245,8 @@ function run_query_lead_insert($params) {
       AND lead_manager_id = '$manager_id'
       AND lead_date $datep
       AND lead_name = '$name'
-      AND lead_comment = '$comment'";
+      AND lead_comment = '$comment'
+			AND lead_domain_id='$domain_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_insert(2)");
   $obm_q->query($query);
@@ -287,10 +294,14 @@ function run_query_lead_update($pid, $params) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
 
+	$domain_id = get_entity_domain_id($company_id, "company");
+	$multidomain = sql_multidomain("lead");
+	
   $query = "UPDATE Lead SET
     lead_timeupdate='$now',
     lead_userupdate='$uid',
     lead_source_id='$source_id',
+		lead_domain_id='$domain_id',
     lead_company_id='$company_id',
     lead_manager_id='$manager_id',
     lead_name='$name',
@@ -300,7 +311,7 @@ function run_query_lead_update($pid, $params) {
     lead_archive='$archive',
     lead_privacy='$privacy',
     lead_comment='$comment'
-  WHERE lead_id='$pid'";
+  WHERE lead_id='$pid' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_lead_update()");
   $obm_q = new DB_OBM;
@@ -325,9 +336,13 @@ function get_lead_managers($archive = false) {
   }
 
   if ($where_arch != "") {
-    $where = "WHERE $where_arch";
+    $where = "WHERE $where_arch $multidomain";
+  } else {
+  	$where = "WHERE 1=1 $multidomain";
   }
-
+  
+	$multidomain = sql_multidomain("userobm");
+	
   $query = "SELECT DISTINCT
       userobm_id,
       userobm_lastname,
@@ -339,7 +354,7 @@ function get_lead_managers($archive = false) {
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, "get_deal_managers()");
+  display_debug_msg($query, $cdg_sql, "get_lead_managers()");
 
   while ($obm_q->next_record()) {
     $id = $obm_q->f("userobm_id");
@@ -417,8 +432,9 @@ function run_query_lead_delete($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-
-  $query = "DELETE FROM Lead WHERE lead_id='$p_id'";
+	$multidomain = sql_multidomain("lead");
+	
+  $query = "DELETE FROM Lead WHERE lead_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_lead_delete()");
   $retour = $obm_q->query($query);
 

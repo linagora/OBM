@@ -958,7 +958,8 @@ function html_publication_type_form($type_q) {
   global $l_type_checkdelete,$l_type_update,$l_type_new,$l_type_insert;
 
   $sel_type = "<select name=\"sel_type\" onChange=\"
-    forms.form_type_update.tf_type.value=this.options[this.selectedIndex].text;\"
+    forms.form_type_update.tf_type_label.value=this.options[this.selectedIndex].text;
+		forms.form_type_update.tf_type.value=this.options[this.selectedIndex].value;\"
     size=\"4\" >";
   while ($type_q->next_record()) {
     $id = $type_q->f("publicationtype_id");
@@ -1005,9 +1006,9 @@ function html_publication_type_form($type_q) {
           <td colspan=\"2\" class=\"adminLabel\">
             <form name=\"form_type_update\" method=\"get\"
               action=\"" . url_prepare("publication_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_type\" value=\"\" />
+            <input type=\"hidden\" name=\"tf_type\" />
             <input type=\"hidden\" name=\"action\" value=\"type_update\" />
-            <input type=\"text\" name=\"tf_type\" />
+            <input type=\"text\" name=\"tf_type_label\" />
             <input type=\"submit\" name=\"sub_type\" value=\"$l_type_update\"
               onclick=\"if (check_type_upd(this.form,document.form_type_delete)) return true; else return false;\" />
             </form>
@@ -1025,7 +1026,7 @@ function html_publication_type_form($type_q) {
         <table>
         <tr>
           <td class=\"adminLabel\">$l_type_new :
-            <input name=\"tf_type\" /></td>
+            <input name=\"tf_type_label\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
@@ -1137,7 +1138,8 @@ function html_publication_subscription_reception_form($recept_q) {
   global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
 
   $sel_recept = "<select name=\"sel_recept\" onChange=\"
-    forms.form_recept_update.tf_recept.value=this.options[this.selectedIndex].text;\"
+    forms.form_recept_update.tf_recept_label.value=this.options[this.selectedIndex].text;
+		forms.form_recept_update.tf_recept.value=this.options[this.selectedIndex].value;\"
     size=\"4\" >";
   while ($recept_q->next_record()) {
     $id = $recept_q->f("subscriptionreception_id");
@@ -1184,9 +1186,9 @@ function html_publication_subscription_reception_form($recept_q) {
           <td colspan=\"2\" class=\"adminLabel\">
             <form name=\"form_recept_update\" method=\"get\"
               action=\"" . url_prepare("publication_index.php") . "\">
-            <input type=\"hidden\" name=\"sel_recept\" value=\"\" />
+            <input type=\"hidden\" name=\"tf_recept\" />
             <input type=\"hidden\" name=\"action\" value=\"recept_update\" />
-            <input type=\"text\" name=\"tf_recept\" />
+            <input type=\"text\" name=\"tf_recept_label\" />
             <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_update\"
               onclick=\"if (check_recept_upd(this.form,document.form_recept_delete)) return true; else return false;\" />
             </form>
@@ -1204,7 +1206,7 @@ function html_publication_subscription_reception_form($recept_q) {
         <table>
         <tr>
           <td class=\"adminLabel\">$l_recept_new :
-            <input name=\"tf_recept\" /></td>
+            <input name=\"tf_recept_label\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"recept_insert\" />

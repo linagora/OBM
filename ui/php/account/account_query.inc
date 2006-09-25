@@ -25,7 +25,8 @@ function run_query_account_search ($account) {
   $label = sql_search_text_parse($account["label"]);
   $bank = sql_search_text_parse($account["bank"]);
   $number = sql_search_text_parse($account["number"]);
-
+	$multidomain = sql_multidomain("account");
+	
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
@@ -41,7 +42,7 @@ function run_query_account_search ($account) {
   if ($number != "") {
     $where .= " and account_number $like '%$number%'";
   }
-  $whereq = "where $where";
+  $whereq = "where $where $multidomain";
 
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "account_bank";
   $orderq = " order by $order $sql_order_dir";
@@ -82,7 +83,8 @@ function run_query_account_detail($id) {
   $datemodif = sql_date_format($db_type, "account_timeupdate", "datemodif");
   $timeupdate = sql_date_format($db_type, "account_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "account_timecreate", "timecreate");
-
+	$multidomain = sql_multidomain("account");
+	
   $query = "select *,
       $datemodif,
       $timeupdate,
@@ -92,7 +94,7 @@ function run_query_account_detail($id) {
     from Account
          LEFT JOIN UserObm as c on account_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on account_userupdate=u.userobm_id
-    where account_id ='$id'";
+    where account_id ='$id' $multidomain";
 
   display_debug_msg ($query, $cdg_sql, "run_query_account_detail()");
   $obm_q->query($query);
@@ -108,11 +110,12 @@ function run_query_account_detail($id) {
 //   - $account[] : Entry's values
 //////////////////////////////////////////////////////////////////////////////
 function run_query_account_insert ($account) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
-
+	$domain_id = $obm["domain_id"];
+	
   $label = $account["label"];
   $bank = $account["bank"];
   $number = $account["number"];
@@ -124,6 +127,7 @@ function run_query_account_insert ($account) {
     account_timecreate,
     account_userupdate,
     account_usercreate,
+		account_domain_id,
     account_bank,
     account_label,
     account_number,
@@ -135,6 +139,7 @@ function run_query_account_insert ($account) {
     '$now',
     null,
     '$uid',
+		'$domain_id',
     '$bank',
     '$label',
     '$number',
@@ -166,6 +171,8 @@ function run_query_account_update($account) {
   $comment = $account["comment"];
   $account_id = $account["account_id"];
 
+	$multidomain = sql_multidomain("account");
+
  $query = "UPDATE Account SET 
      account_label='$label',
      account_bank='$bank',
@@ -174,7 +181,7 @@ function run_query_account_update($account) {
      account_comment='$comment',
      account_userupdate='$uid',
      account_timeupdate='$now'
-   WHERE account_id='$account_id'";  
+   WHERE account_id='$account_id' $multidomain";  
 
   display_debug_msg ($query, $cdg_sql, "run_query_account_update()");
   $obm_q = new DB_OBM;
@@ -192,11 +199,13 @@ function run_query_account_update($account) {
 function run_query_account_search_payments ($p_account_id, $p_date_before = "") {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("payment");
+
   $query = "select *, payment_id as id,
       payment_expected_date as payment_expect_date,
       payment_amount
     from Payment
-    where payment_account_id='$p_account_id'";
+    where payment_account_id='$p_account_id' $multidomain";
 
   if ($p_date_before != "") {
     $query .= " and payment_date <= '$p_date_before'";
@@ -219,9 +228,11 @@ function run_query_account_search_payments ($p_account_id, $p_date_before = "") 
 function run_query_account_search_expected_payments($p_account_id, $p_date_before="") {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("payment");
+
   $query = "select *, payment_id as id,
       payment_expected_date as payment_expect_date
-      from Payment where payment_account_id='$p_account_id'";
+      from Payment where payment_account_id='$p_account_id' $multidomain";
   if ($p_date_before != "") {
     $query .= " and payment_expected_date <= '$p_date_before'";
   }
@@ -242,8 +253,10 @@ function run_query_account_search_expected_payments($p_account_id, $p_date_befor
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_account_delete($a_id) {
   global $cdg_sql;
-
-  $query = "delete from Account where account_id='$a_id'";
+	
+	$multidomain = sql_multidomain("account");
+	
+  $query = "DELETE FROM Account WHERE account_id='$a_id' $multidomain";
   display_debug_msg ("<b>run_query_account_delete() : </b>$query", $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -322,9 +335,11 @@ function account_compute_balance ($p_account_id, $p_date="") {
 function account_creation_balance ($p_account_id) {
   global $cdg_sql;
 
-  $query = "select account_balance
-            from Account
-            where account_id ='$p_account_id'";
+	$multidomain = sql_multidomain("account");
+
+  $query = "SELECT account_balance
+            FROM Account
+            WHERE account_id ='$p_account_id' $multidomain";
   display_debug_msg ($query, $cdg_sql, "account_creation_balance()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);

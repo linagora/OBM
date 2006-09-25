@@ -47,6 +47,7 @@ function run_query_contact_search($contact) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
+	$multidomain = sql_multidomain("contact");
 
   // only the one which are allowed (ie. publics )
   $where .= sql_obm_entity_privacy("contact");
@@ -197,7 +198,7 @@ function run_query_contact_search($contact) {
     $where .= " AND contact_archive=0";
   }
   
-  $whereq = "WHERE $where";
+  $whereq = "WHERE $where $multidomain";
   if ($where_name != "") {
     $whereq .= " AND $where_name";
   }
@@ -322,6 +323,7 @@ function run_query_contact_detail($p_id) {
   $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
   $lang = get_lang();
   $date = sql_date_format($db_type, "contact_date", "contact_date");
+	$multidomain = sql_multidomain("contact");
 
   if ($cgp_show["module"]["company"]) {
     $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
@@ -373,7 +375,7 @@ function run_query_contact_detail($p_id) {
         LEFT JOIN UserObm as c ON contact_usercreate=c.userobm_id
         LEFT JOIN UserObm as u ON contact_userupdate=u.userobm_id
       WHERE
-        contact_id='$p_id'";
+        contact_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -393,7 +395,8 @@ function run_query_contact_company($c_id) {
   global $cdg_sql;
 
   $lang = get_lang();
-
+	$multidomain = sql_multidomain("company");
+	
   $query = "SELECT company_id,
       company_name,
       company_phone,
@@ -409,8 +412,8 @@ function run_query_contact_company($c_id) {
     FROM Company
     LEFT JOIN Country ON company_country_iso3166 = country_iso3166
                          AND country_lang='$lang'
-    WHERE company_id='$c_id'";
-
+    WHERE company_id='$c_id' $multidomain";
+	
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
@@ -426,13 +429,16 @@ function run_query_contact_company($c_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_kind() {
   global $cdg_sql;
-
+  
+	$multidomain = sql_multidomain("kind");
+	
   $query = "SELECT kind_id,
       kind_minilabel,
       kind_header,
       kind_lang,
       kind_default
     FROM Kind
+		WHERE 1=1 $multidomain
     ORDER BY kind_lang, kind_minilabel, kind_header";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_kind()");
@@ -452,11 +458,11 @@ function run_query_contact_kind() {
 //               : com, com2, com3 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
-  global $auth, $cgp_show, $cdg_sql;
+  global $auth, $cgp_show, $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
-
+	
   $comp_id = $contact["company_new_id"];
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
@@ -465,7 +471,9 @@ function run_query_contact_insert($contact) {
   if ($comp_id == "") {
     $comp_id = "0";
   }
-
+  
+	$domain_id = $obm["domain_id"];
+	
   $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
@@ -530,6 +538,7 @@ function run_query_contact_insert($contact) {
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
+		contact_domain_id,
     contact_datasource_id,
     contact_company_id,
     contact_company,
@@ -567,6 +576,7 @@ function run_query_contact_insert($contact) {
     '$now',
     '$uid',
     '$uid',
+		'$domain_id',
     '$dsrc',
     '$comp_id',
     '$company',
@@ -617,7 +627,8 @@ function run_query_contact_insert($contact) {
       AND contact_company_id ='$comp_id'
       AND contact_email ='$email'
       AND contact_phone = '$phone'
-      AND contact_zipcode = '$zip'";
+      AND contact_zipcode = '$zip'
+			AND contact_domain_id='$domain_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -733,6 +744,7 @@ function run_query_contact_update($contact) {
   $category3 = $contact["category3"];
   $category4 = $contact["category4"];
   $category5 = ($contact["category5"] > 0 ? $contact["category5"] : '0');  
+  $multidomain = sql_multidomain("contact");
   
   $query = "UPDATE Contact SET
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -769,7 +781,7 @@ function run_query_contact_update($contact) {
     contact_comment2='$comment2',
     contact_comment3='$comment3',
     contact_category5_id='$category5'
-  WHERE contact_id='$id'";
+  WHERE contact_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_update()");
   $obm_q = new DB_OBM;
@@ -876,10 +888,12 @@ function run_query_contact_delete($p_id) {
 
   $c = get_contact_info($p_id);
   $comp_id = $c["company_id"];
+  $multidomain = sql_multidomain("contact");
+  
   run_query_global_delete_document_links($p_id, "contact");    
   run_query_contact_delete_subscription($p_id);    
 
-  $query = "DELETE FROM Contact WHERE contact_id='$p_id'";
+  $query = "DELETE FROM Contact WHERE contact_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_contact_delete(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -909,7 +923,7 @@ function run_query_contact_delete($p_id) {
 function run_query_contact_delete_subscription($p_id) {
   global $cdg_sql;
 
-  $query = "delete from Subscription where subscription_contact_id='$p_id'";
+  $query = "DELETE FROM Subscription WHERE subscription_contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_delete_subscription()");
   $obm_q = new DB_OBM;
@@ -930,7 +944,9 @@ function run_query_contact_delete_subscription($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   global $cdg_sql;
-
+	
+	$multidomain = sql_multidomain("contact");
+	
   $where_id = "";
   if ($cid != "") {
     $where_id = "contact_id!='$cid' AND";
@@ -944,7 +960,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
       LEFT JOIN Company ON contact_company_id=company_id
     WHERE $where_id
       ((contact_lastname='$lname' AND contact_firstname='$fname')
-        OR (contact_company_id='$comp_id' AND contact_lastname='$lname'))";
+        OR (contact_company_id='$comp_id' AND contact_lastname='$lname')) $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_check()");
   $obm_q = new DB_OBM;
@@ -1127,10 +1143,12 @@ function check_can_delete_contact($p_id) {
 function get_contact_info($con_id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("contact");
+
   $query = "SELECT
       contact_company_id
     FROM Contact
-    WHERE contact_id='$con_id'";
+    WHERE contact_id='$con_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_contact_info()");
   $obm_q = new DB_OBM;
@@ -1149,7 +1167,7 @@ function get_contact_info($con_id) {
 //                keys used : kind_label, kind_lang, kind_header
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_kind_insert($contact) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
@@ -1157,7 +1175,8 @@ function run_query_contact_kind_insert($contact) {
   $lang = $contact["lang"];
   $header = $contact["header"];
   $default = ($contact["default"] == 1 ? 1 : 0);
-
+	$domain_id = $obm["domain_id"];
+	
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
     run_query_contact_kind_clear_default($lang);
@@ -1166,6 +1185,7 @@ function run_query_contact_kind_insert($contact) {
   $query = "INSERT INTO Kind (
     kind_timecreate,
     kind_usercreate,
+		kind_domain_id,
     kind_minilabel,
     kind_header,
     kind_lang,
@@ -1173,6 +1193,7 @@ function run_query_contact_kind_insert($contact) {
   VALUES (
     '$timecreate',
     '$usercreate',
+		'$domain_id';
     '$label',
     '$header',
     '$lang',
@@ -1194,9 +1215,11 @@ function run_query_contact_kind_insert($contact) {
 function run_query_contact_kind_clear_default($lang) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("kind");
+
   $query = "UPDATE Kind
     SET kind_default=0
-    WHERE kind_lang = '$lang'";
+    WHERE kind_lang = '$lang' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_kind_clear_default()");
   $obm_q = new DB_OBM;
@@ -1222,7 +1245,8 @@ function run_query_contact_kind_update($contact) {
   $lang = $contact["lang"];
   $header = $contact["header"];
   $default = ($contact["default"] == 1 ? 1 : 0);
-
+	$multidomain = sql_multidomain("kind");
+	
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
     run_query_contact_kind_clear_default($lang);
@@ -1236,7 +1260,7 @@ function run_query_contact_kind_update($contact) {
       kind_lang='$lang',
       kind_default='$default'
     WHERE
-      kind_id='$id'";
+      kind_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_kind_update()");
   $obm_q = new DB_OBM;
@@ -1254,7 +1278,9 @@ function run_query_contact_kind_update($contact) {
 function run_query_contact_kind_delete($id) {
   global $cdg_sql;
 
-  $query = "DELETE FROM Kind WHERE kind_id='$id'";
+	$multidomain = sql_multidomain("kind");
+
+  $query = "DELETE FROM Kind WHERE kind_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_kind_delete()");
   $obm_q = new DB_OBM;
@@ -1272,12 +1298,14 @@ function run_query_contact_kind_delete($id) {
 function run_query_contact_kind_links($id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("contact");
+
   $query = "SELECT contact_lastname,
       contact_firstname,
       contact_id,
       contact_kind_id
-    FROM Contact
-    WHERE contact_kind_id='$id'";
+    FROM Contact 
+    WHERE contact_kind_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_kind_links()");
   $obm_q = new DB_OBM;
@@ -1295,9 +1323,11 @@ function run_query_contact_kind_links($id) {
 function get_contact_kind_label($id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("kind");	
+
   $query = "SELECT kind_lang, kind_minilabel, kind_header
     FROM Kind
-    WHERE kind_id='$id'";
+    WHERE kind_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_contact_kind_label()");
   $obm_q = new DB_OBM;

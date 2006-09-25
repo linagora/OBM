@@ -36,7 +36,8 @@ function run_query_incident_search($incident) {
   $datebefore = $incident["date_before"];
   $archive = $incident["archive"];
   $reference = $incident["reference"];
-
+	$multidomain = sql_multidomain("incident");
+	
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
@@ -106,7 +107,7 @@ function run_query_incident_search($incident) {
   if ($archive != "1") {
     $where .= " AND Incident.incident_archive = '0'";
   }
-  $whereq = "WHERE $where";
+  $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "incidentstatus_code";
@@ -179,7 +180,8 @@ function run_query_incident_detail($id) {
   $timecreate = sql_date_format($db_type, "incident_timecreate", "timecreate");
   $datebegin = sql_date_format($db_type, "contract_datebegin", "datebegin");
   $dateexp = sql_date_format($db_type, "contract_dateexp", "dateexp");
-
+	$multidomain = sql_multidomain("incident");
+	
   $query = "SELECT *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
@@ -217,7 +219,7 @@ function run_query_incident_detail($id) {
         LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
         LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
         LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
-      WHERE incident_id='$id'";
+      WHERE incident_id='$id' $multidomain";
  
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -235,12 +237,13 @@ function run_query_incident_detail($id) {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_insert($incident) {
-  global $auth, $cdg_sql, $cgp_host;
+  global $auth, $cdg_sql, $cgp_host, $obm;
   global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
 
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
-
+	$domain_id = $obm["domain_id"];
+	
   $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
     $contract_id = $incident["contract_id"];
@@ -272,6 +275,7 @@ function run_query_incident_insert($incident) {
     incident_timecreate,
     incident_userupdate,
     incident_usercreate,
+		incident_domain_id,
     incident_label,
     incident_reference,
     incident_contract_id,
@@ -290,6 +294,7 @@ function run_query_incident_insert($incident) {
     '$now',
     null,
     '$uid',
+		'$domain_id',
     '$lincident',
     '$reference',
     '$contract_id',
@@ -354,7 +359,8 @@ function run_query_incident_id($incident) {
   $date = $incident["date"];
   $call_date = "$date $hour:0:0";
   $archive = ($incident["archive"] ? $incident["archive"] : "0");
-
+	$multidomain = sql_multidomain("incident");
+	
   $query = "SELECT incident_id
     FROM Incident
     WHERE incident_contract_id='$contract_id'
@@ -364,7 +370,8 @@ function run_query_incident_id($incident) {
       AND incident_date='$call_date'
       AND incident_priority_id $pri
       AND incident_status_id $status
-      AND incident_archive='$archive'";
+      AND incident_archive='$archive'
+			$multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -419,6 +426,8 @@ function run_query_incident_update($incident) {
     $add_duration = $incident["add_duration"];
     $duration = $duration + $add_duration;
   }
+  $multidomain = sql_multidomain("incident");
+  
   $query = "UPDATE Incident SET
       incident_timeupdate='". date("Y-m-d H:i:s")."',
       incident_userupdate='".$auth->auth["uid"]."',
@@ -436,7 +445,7 @@ function run_query_incident_update($incident) {
       incident_comment='$comment',
       incident_archive='$archive',
       incident_contract_id = '$contract_id'
-    WHERE incident_id='$param_incident'";
+    WHERE incident_id='$param_incident' $multidomain";
 
   $inc_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
@@ -454,7 +463,9 @@ function run_query_incident_update($incident) {
 function run_query_incident_delete($i_id) {
   global $auth, $cdg_sql;
  
-  $query = "DELETE FROM Incident WHERE incident_id='$i_id'";
+ 	$multidomain = sql_multidomain("incident");
+  $query = "DELETE FROM Incident 
+		WHERE incident_id='$i_id' $multidomain";
 
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_incident_delete()");
@@ -478,10 +489,14 @@ function run_query_incident_owner($archive = false) {
     $where_arch .= " incident_archive=0";
   }
 
-  if ($where_arch != "") {
-    $where = "WHERE $where_arch";
-  }
+	$multidomain = sql_multidomain("incident");
 
+  if ($where_arch != "") {
+    $where = "WHERE $where_arch $multidomain";
+  } else {
+  	$where = "WHERE 1=1 $multidomain";
+  }
+	
   $query = "SELECT DISTINCT
       userobm_id,
       userobm_lastname,
@@ -513,10 +528,14 @@ function run_query_incident_logger($archive = false) {
     $where_arch .= " incident_archive=0";
   }
 
-  if ($where_arch != "") {
-    $where = "WHERE $where_arch";
-  }
+	$multidomain = sql_multidomain("incident");
 
+  if ($where_arch != "") {
+    $where = "WHERE $where_arch $multidomain";
+  } else {
+  	$where = "WHERE 1=1 $multidomain";
+  }
+	
   $query = "SELECT DISTINCT
       userobm_id,
       userobm_lastname,
@@ -542,6 +561,8 @@ function run_query_incident_logger($archive = false) {
 function get_incident_info($id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("incident");
+
   $query = "SELECT
       incident_id,
       incident_label,
@@ -552,7 +573,7 @@ function get_incident_info($id) {
       LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
       LEFT JOIN Contract on incident_contract_id=contract_id
       LEFT JOIN Company on contract_company_id=company_id
-    WHERE incident_id='$id'";
+    WHERE incident_id='$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

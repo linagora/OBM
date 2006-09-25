@@ -31,7 +31,8 @@ function run_query_resource_search($resource) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-
+	$multidomain = sql_multidomain("resource");
+	
   if ($restriction == "user") {
     $uid = $auth->auth["uid"];
     $rs = of_right_entity_for_consumer("resource", "user", $uid, "read");
@@ -48,7 +49,7 @@ function run_query_resource_search($resource) {
   $select = "SELECT Resource.*, resource_id as id
     FROM Resource";
 
-  $where = " 1=1";
+  $where = " 1=1 $multidomain";
 
   // If a name indication has been specified, get it
   if (trim($name) != "") {
@@ -100,7 +101,8 @@ function run_query_resource_detail($p_id) {
 
   $timeupdate = sql_date_format($db_type, "Resource.resource_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "Resource.resource_timecreate", "timecreate");
-
+	$multidomain = sql_multidomain("resource");
+	
   $query = "SELECT Resource.*,
       $timeupdate,
       $timecreate,
@@ -109,7 +111,7 @@ function run_query_resource_detail($p_id) {
     FROM Resource 
          LEFT JOIN UserObm as c ON Resource.resource_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON Resource.resource_userupdate=u.userobm_id
-    WHERE Resource.resource_id='$p_id'";
+    WHERE Resource.resource_id='$p_id' $multidomain";
 
   $obm_q->query($query);
   $obm_q->next_record();
@@ -126,7 +128,7 @@ function run_query_resource_detail($p_id) {
 //     keys used : name, desc 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_insert($resource) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $name = $resource["name"];
   $desc = $resource["desc"];
@@ -134,12 +136,14 @@ function run_query_resource_insert($resource) {
   if ($qty == "") {
     $qty = "0";
   }
-
+	$domain_id = $obm["domain_id"];
+	
   $query = "INSERT INTO Resource (
      resource_timeupdate,
      resource_timecreate,
      resource_userupdate,
      resource_usercreate,
+		 resource_domain_id,
      resource_name,
      resource_description,
      resource_qty
@@ -148,6 +152,7 @@ function run_query_resource_insert($resource) {
     '" . date("Y-m-d H:i:s") . "',
     null,
     ". $auth->auth["uid"] . ",
+		'$domain_id',
     '$name',
     '$desc',
     '$qty'
@@ -172,17 +177,19 @@ function run_query_resource_insert($resource) {
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_right_init($resource_id) {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
   $line_q = new DB_OBM;
-
+	$multidomain = sql_multidomain("entityright");
+	$domain_id = $obm["domain_id"];
+	
   $query = " DELETE
     FROM EntityRight 
     WHERE 
       entityright_entity = 'resource'
-      AND entityright_entity_id = '$resource_id'";
-  display_debug_msg($query, $cdg_sql);
+      AND entityright_entity_id = '$resource_id' $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_resource_right_init(1)");
   $line_q->query($query);
 
   //---------------------------------------------------------------------------
@@ -191,6 +198,7 @@ function run_query_resource_right_init($resource_id) {
   $query = "INSERT INTO EntityRight (
     entityright_entity,
     entityright_entity_id,
+		entityright_domain_id,
     entityright_consumer,
     entityright_consumer_id,
     entityright_read,
@@ -198,13 +206,14 @@ function run_query_resource_right_init($resource_id) {
   ) values (
     'resource',
     '$resource_id',
+		'$domain_id',
     'user',
     '0',
     '1',
     '1'
   )";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_right_init(2)");
   $line_q->query($query);
 
   return true;
@@ -224,14 +233,15 @@ function run_query_resource_update($p_id, $resource) {
   $name = $resource["name"];
   $desc = $resource["desc"];
   $qty = $resource["qty"];
-
+	$multidomain = sql_multidomain("resource");
+	
   $query = "UPDATE Resource SET
     resource_timeupdate='". date("Y-m-d H:i:s")."',
     resource_userupdate=". $auth->auth["uid"] .",
     resource_name='$name',
     resource_description='$desc',
     resource_qty='$qty'
-  WHERE resource_id='$p_id'";
+  WHERE resource_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -249,32 +259,34 @@ function run_query_resource_update($p_id, $resource) {
 function run_query_resource_delete($p_id) {
   global $cdg_sql;
 
-  $query = "DELETE FROM Resource WHERE resource_id='$p_id'";
+	$multidomain = sql_multidomain("resource");
 
-  display_debug_msg($query, $cdg_sql);
+  $query = "DELETE FROM Resource WHERE resource_id='$p_id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   if (!$retour) return $retour;
 
   // Delete Resource rights
+  $multidomain = sql_multidomain("entityright");
   $query = "DELETE FROM EntityRight 
     WHERE
       entityright_entity_id='$p_id'
-      AND entityright_entity = 'resource'
-";
+      AND entityright_entity = 'resource' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(2)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Delete Resource events
+  $multidomain = sql_multidomain("evententity");
   $query = "DELETE FROM EventEntity 
     WHERE
       evententity_entity_id='$p_id'
-      AND evententity_entity = 'resource'
-";
+      AND evententity_entity = 'resource' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(3)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -326,7 +338,8 @@ function check_resource_data_form($p_id, $resource) {
   /////////////////////////////////////////////////////////////////////////////
   // if a resource with the same name already exists  return false           //
   /////////////////////////////////////////////////////////////////////////////
-  $query = "SELECT * FROM Resource WHERE resource_name='$name'";
+  $multidomain = sql_multidomain("resource");
+  $query = "SELECT * FROM Resource WHERE resource_name='$name' $multidomain";
   if ($p_id > 0) {
     $query .= " AND resource_id!='$p_id'";
   }
@@ -369,8 +382,9 @@ function get_resource_id($name) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM ;
+  $multidomain = sql_multidomain("resource");
   if (isset($name)) {
-    $query = "SELECT resource_id FROM Resource WHERE resource_name='$name'";
+    $query = "SELECT resource_id FROM Resource WHERE resource_name='$name' $multidomain";
     display_debug_msg($query, $cdg_sql, "get_resource_id()");
     $obm_q->query($query);
     $obm_q->next_record();
@@ -392,10 +406,11 @@ function get_resource_infos($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM ;
+  $multidomain = sql_multidomain("resource");
   if (isset($id)) {
     $query = "SELECT *
       FROM Resource
-      WHERE resource_id='$id'";
+      WHERE resource_id='$id' $multidomain";
     display_debug_msg($query, $cdg_sql, "get_resource_infos()");
     $obm_q->query($query);
     $obm_q->next_record();

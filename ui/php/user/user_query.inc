@@ -37,7 +37,8 @@ function run_query_user_search($user) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
-
+	$multidomain = sql_multidomain("userobm");
+	
   if ($restriction == "calendar") {
     $uid = $auth->auth["uid"];
     $users = of_right_entity_for_consumer("calendar", "user", $uid, "read");
@@ -99,7 +100,7 @@ function run_query_user_search($user) {
   }
 
   if ((trim($where) != "") || (trim($where_restriction) != "")) {
-    $whereq = " WHERE $where $where_restriction";
+    $whereq = " WHERE $where $where_restriction $multidomain";
   }
 
   $select = "SELECT distinct UserObm.*,
@@ -124,7 +125,7 @@ function run_query_user_search($user) {
   }
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_user_search()");
     $obm_q->query($query);
   }
 
@@ -147,7 +148,8 @@ function run_query_user_detail($p_id) {
   $timecreate = sql_date_format($db_type, "UserObm.userobm_timecreate", "timecreate");
   $datebegin = sql_date_format($db_type, "UserObm.userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
-
+	$multidomain = sql_multidomain("UserObm.userobm");
+	
   $query = "SELECT UserObm.*,
       $timeupdate,
       $timecreate,
@@ -158,7 +160,7 @@ function run_query_user_detail($p_id) {
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON UserObm.userobm_userupdate=u.userobm_id
-    WHERE UserObm.userobm_id='$p_id'";
+    WHERE UserObm.userobm_id='$p_id' $multidomain";
 
   $obm_q->query($query);
   $obm_q->next_record();
@@ -177,6 +179,7 @@ function run_query_user_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_insert($user) {
   global $auth, $cdg_sql, $password_encryption;
+  global $obm;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
@@ -203,10 +206,17 @@ function run_query_user_insert($user) {
   $email = $user["email"];
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
 
+  if(isset($user["domain"])) {
+    $domain_id = $user["domain"];
+  } else {
+  	$domain_id = $obm["domain_id"];
+  }
+
   $query = "INSERT INTO UserObm (userobm_timeupdate,
     userobm_timecreate,
     userobm_userupdate,
     userobm_usercreate,
+    userobm_domain_id,
     userobm_login,
     userobm_password,
     userobm_perms,
@@ -226,6 +236,7 @@ function run_query_user_insert($user) {
     '$now',
     '$uid',
     '$uid',
+		'$domain_id',
     '$login',
     '$passwd_crypt',
     '$perms',
@@ -251,7 +262,8 @@ function run_query_user_insert($user) {
     FROM UserObm
     WHERE userobm_login = '$login'
       AND userobm_lastname='$lname'
-      AND userobm_firstname='$fname'";
+      AND userobm_firstname='$fname'
+			AND userobm_domain_id='$domain_id'";
   
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
@@ -298,7 +310,8 @@ function run_query_user_update($p_id, $user) {
   $fax2 = $user["fax2"];
   $email = $user["email"];
   $desc = $user["desc"];
-
+	$multidomain = sql_multidomain("userobm");
+	
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate=". $auth->auth["uid"] .",
@@ -315,7 +328,7 @@ function run_query_user_update($p_id, $user) {
     userobm_fax2='$fax2',
     userobm_email='$email',
     userobm_description='$desc'
-  WHERE userobm_id='$p_id'";
+  WHERE userobm_id='$p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -338,7 +351,9 @@ function run_query_user_update($p_id, $user) {
 function run_query_user_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
-  $query = "DELETE FROM UserObm WHERE userobm_id='$p_id'";
+	$multidomain = sql_multidomain("userobm");
+
+  $query = "DELETE FROM UserObm WHERE userobm_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -405,8 +420,11 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 function run_query_user_group() {
   global $cdg_sql, $uid;
 
+	$multidomain = sql_multidomain("group");
+
   $query = "SELECT *
     FROM UGroup
+		WHERE 1=1 $multidomain
     ORDER by group_name";
 
   display_debug_msg($query, $cdg_sql);
@@ -476,9 +494,10 @@ function check_user_context($p_id, $user) {
   $fname = $user["firstname"];
   $phone = $user["phone"];
   $email = $user["email"];
+  $domain_id = $user["domain"];
 
   // if a user with same name exists, return false
-  $co_q = run_query_user_check_user($p_id, $login);
+  $co_q = run_query_user_check_user($p_id, $user);
   return $co_q;
 }
 
@@ -489,13 +508,19 @@ function check_user_context($p_id, $user) {
 //   - $p_id  : user id
 //   - $login : login
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_check_user($p_id, $login) {
-  global $cdg_sql;
+function run_query_user_check_user($p_id, $user) {
+  global $cdg_sql, $c_multidomain;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
+	$login = $user["login"];
+	if($c_multidomain) {
+		$domain = $user["domain"];
+		$where_multidomain = " AND userobm_domain_id='$domain'";
+	}
+	
   if ($p_id) {
     $where_user = "AND userobm_id != '$p_id'";
   }
@@ -503,7 +528,7 @@ function run_query_user_check_user($p_id, $login) {
   $query = "SELECT distinct userobm_id, userobm_login
     FROM UserObm
     WHERE userobm_login $like '$login%'
-          $where_user";
+          $where_user $where_multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -522,7 +547,7 @@ function run_query_user_check_user($p_id, $login) {
 function check_user_data_form($p_id, $user) {
   global $l_exist_error, $l_login_error, $l_password_error, $l_email_error;
   global $l_lname_error, $php_regexp_email;
-  global $err_msg, $action, $cdg_sql;
+  global $err_msg, $action, $cdg_sql, $c_multidomain, $c_default_domain, $obm;
 
   $id = $user["user_id"];
   $login = $user["login"];
@@ -557,7 +582,15 @@ function check_user_data_form($p_id, $user) {
   /////////////////////////////////////////////////////////////////////////////
   // if a user with the same name already exists  return false               //
   /////////////////////////////////////////////////////////////////////////////
-  $query = "SELECT * FROM UserObm WHERE userobm_login='$login'";
+  if($c_multidomain) {
+  if(isset($user["domain"])) {
+    $domain_id = $user["domain"];
+  } else {
+  	$domain_id = $obm["domain_id"];
+  }
+  	$where_multidomain = "AND userobm_domain_id = $domain_id";
+  }
+  $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain";
   if ($p_id > 0) {
     $query .= " AND userobm_id!='$p_id'";
   }
@@ -582,12 +615,13 @@ function check_user_data_form($p_id, $user) {
 function get_linked_user_timetask_nb($p_id) {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("timetask");
+
   $obm_q = new DB_OBM;
   $query = "SELECT count(timetask_id) as nb
     FROM TimeTask
     WHERE timetask_user_id='$p_id'
-      AND timetask_projecttask_id > 0
-  ";
+      AND timetask_projecttask_id > 0 $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_linked_user_timetask_nb($p_id)");
   $obm_q->query($query);
@@ -638,11 +672,11 @@ function run_query_user_delete_profile($param_user)  {
 
   // Delete all user prefs
   $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$param_user'"; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(UserObmPref)");
   $obm_q->query($query);
 
   $query = "DELETE FROM DisplayPref WHERE display_user_id='$param_user'"; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(DisplayPref)");
   $obm_q->query($query);
 
   // Move all the user contact from private to public
@@ -650,7 +684,7 @@ function run_query_user_delete_profile($param_user)  {
       contact_privacy='0'
     WHERE contact_usercreate='$param_user'
       AND contact_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Contact)");
   $obm_q->query($query);
 
   // Move all the user deal from private to public
@@ -658,7 +692,7 @@ function run_query_user_delete_profile($param_user)  {
       deal_privacy='0'
     WHERE deal_usercreate='$param_user'
       AND deal_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Deal)");
   $obm_q->query($query);
 
   // Move all the user list from private to public
@@ -666,7 +700,7 @@ function run_query_user_delete_profile($param_user)  {
       list_privacy='0'
     WHERE list_usercreate='$param_user'
       AND list_privacy != '0'"; 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(List)");
   $obm_q->query($query);
 
   // Move all the user events from private to public

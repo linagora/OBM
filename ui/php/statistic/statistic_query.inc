@@ -14,13 +14,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_statistic_contact_per_resp() {
   global $cdg_sql;
+	
+	$multidomain = sql_multidomain("contact");
 
   $query = "SELECT userobm_id,
       userobm_lastname,
       userobm_firstname,
       COUNT(contact_id) as cont_stat 
     FROM Contact, UserObm
-    WHERE contact_marketingmanager_id = userobm_id
+    WHERE contact_marketingmanager_id = userobm_id $multidomain
     GROUP BY contact_marketingmanager_id,
       userobm_id, userobm_lastname,userobm_firstname
    ";
@@ -40,12 +42,14 @@ function run_query_statistic_contact_per_resp() {
 function run_query_statistic_company_per_resp() {
   global $cdg_sql;
 
+	$multidomain = sql_multidomain("company");
+
   $query = "SELECT userobm_id,
       userobm_lastname,
       userobm_firstname,
       COUNT(company_id) as comp_stat 
     FROM Company, UserObm
-    WHERE company_marketingmanager_id = userobm_id
+    WHERE company_marketingmanager_id = userobm_id $multidomain
     GROUP BY company_marketingmanager_id,userobm_id,userobm_firstname,
       userobm_lastname";
 
@@ -65,6 +69,7 @@ function run_query_statistic_company_per_country_per_cat() {
   global $cdg_sql;
 
   $lang = get_lang();
+	$multidomain = sql_multidomain("company");
 
   $query = "SELECT  
       country_iso3166,
@@ -78,6 +83,7 @@ function run_query_statistic_company_per_country_per_cat() {
                            AND country_lang='$lang'
       LEFT JOIN CompanyCategory1Link ON companycategory1link_company_id = company_id
       LEFT JOIN CompanyCategory1 ON companycategory1_id = companycategory1link_category_id
+		WHERE 1=1 $multidomain
     GROUP BY country_iso3166, country_name,
       companycategory1_id, companycategory1_code,companycategory1_label
     ORDER BY country_iso3166, companycategory1_id";
@@ -96,8 +102,9 @@ function run_query_statistic_company_per_country_per_cat() {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_statistic_nb_company() {
   global $cdg_sql;
- 
-  $query = "SELECT count(*) as nb FROM Company";
+ 	
+	$multidomain = sql_multidomain("company");
+  $query = "SELECT count(*) as nb WHERE 1=1 $multidomain FROM Company";
   
   display_debug_msg($query, $cdg_sql, "run_query_statistic_nb_company()");
   $obm_q= new DB_OBM;
@@ -115,7 +122,9 @@ function run_query_statistic_nb_company() {
 function run_query_statistic_get_lists() {
   global $cdg_sql;
  
-  $query = "SELECT list_id, list_name FROM List ORDER BY list_name";
+ 	$multidomain = sql_multidomain("list");
+  $query = "SELECT list_id, list_name FROM List 
+		WHERE 1=1 $multidomain ORDER BY list_name";
   
   display_debug_msg($query, $cdg_sql, "run_query_statistic_get_lists()");
   $obm_q= new DB_OBM;
@@ -131,7 +140,8 @@ function run_query_statistic_get_lists() {
 function run_query_statistic_get_list($id) {
   global $cdg_sql;
  
-  $query = "SELECT * FROM List WHERE list_id = '$id'";
+ 	$multidomain = sql_multidomain("list");
+  $query = "SELECT * FROM List WHERE list_id = '$id' $multidomain";
   
   display_debug_msg($query, $cdg_sql, "run_query_statistic_get_list()");
   $obm_q= new DB_OBM;
@@ -149,6 +159,8 @@ function run_query_statistic_selected_company_per_country_per_cat($obm_q) {
   global $cdg_sql;
 
   $lang = get_lang();
+  $multidomain = sql_multidomain("company");
+  
   if ($obm_q->nf()!= 0) {
     $where = " where company_id in(";
     while ($obm_q->next_record()) {
@@ -157,6 +169,7 @@ function run_query_statistic_selected_company_per_country_per_cat($obm_q) {
     }
     $where .= ")";
   }
+  
   $query = "SELECT  
       country_iso3166,
       country_name,
@@ -191,10 +204,16 @@ function get_statistic_contact_date_total() {
 
   $legend = array("Total");
 
+	$multidomain = sql_multidomain("contact");
+
   if ($obmdb_dbtype == $db_type_mysql) {
-    $query = "select count(*) as nb, YEAR(contact_date) as year, MONTH(contact_date) as month from Contact where contact_date !='0' group by YEAR(contact_date), MONTH(contact_date) order by YEAR(contact_date) , MONTH(contact_date)";
+    $query = "select count(*) as nb, YEAR(contact_date) as year, MONTH(contact_date) as month 
+			FROM Contact WHERE contact_date !='0' $multidomain 
+			GROUP BY YEAR(contact_date), MONTH(contact_date) order by YEAR(contact_date) , MONTH(contact_date)";
   } elseif ($obmdb_dbtype == $db_type_pgsql) {
-    $query = "select count(*) as nb, extract (year from  contact_date) as year, extract(month from contact_date) as month from Contact where contact_date is not null group by  extract (year from contact_date), extract(month from contact_date)";
+    $query = "select count(*) as nb, extract (year from  contact_date) as year, extract(month from contact_date) as month 
+			FROM Contact WHERE contact_date is not null $multidomain 
+			GROUP BY extract (year from contact_date), extract(month from contact_date)";
   }
   display_debug_msg($query, $cdg_sql, "get_statistic_contact_date_total()");
   $obm_q= new DB_OBM;

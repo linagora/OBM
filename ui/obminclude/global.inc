@@ -24,6 +24,9 @@ $c_focsys = 3;
 // OBM host
 $cgp_host = "http://obm/";
 
+// Multidomain
+$c_multidomain = true;
+
 // Todo lines to display
 $cgp_todo_nb = 5;
 
@@ -152,6 +155,9 @@ $tmp_path = "/tmp";
 // DST (Daily Saving Time) correction to avoid dates problems (2h)
 $c_dst_err = 7200;
 
+// Default domain id
+$c_default_domain = 0;
+
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings
 // 0 - read  : data
@@ -247,6 +253,11 @@ $cgp_show["module"]["admin_code"] = "admin";
 $cgp_show["module"]["admin_ref"] = "admin";
 $cgp_show["module"]["import"] = "admin";
 $cgp_show["module"]["backup"] = "admin";
+
+// Display domain module only when multidomain is activate
+if($c_multidomain) {
+  $cgp_show["module"]["domain"] = "admin";
+}
 
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");

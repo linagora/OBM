@@ -29,8 +29,8 @@ function run_query_todo_todolist($todo) {
   $limit = sql_limit($db_type);
   $date = sql_date_format($db_type, "todo_date", "date_todo");
   $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
-
-  $whereq = "WHERE todo_user = '$uid'";
+	$multidomain = sql_multidomain("todo");
+  $whereq = "WHERE todo_user = '$uid' $multidomain";
 
   // Order exceptions (order on calculated rows)
   if (strcmp($sql_order_field, "todo_update") == 0) {
@@ -84,7 +84,8 @@ function run_query_todo_detail($todo) {
   $timecreate = sql_date_format($db_type, "todo_timecreate", "timecreate");
   $date = sql_date_format($db_type, "todo_date", "date_todo");
   $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
-
+	$multidomain = sql_multidomain("todo");
+	
   $query = "
   SELECT
     Todo.*,
@@ -103,7 +104,7 @@ function run_query_todo_detail($todo) {
        LEFT JOIN UserObm as uu ON todo_userupdate = uu.userobm_id
        LEFT JOIN UserObm as u ON todo_user = u.userobm_id,
      UserObm as Author
-  WHERE todo_id = $t_id
+  WHERE todo_id = $t_id $multidomain
     AND Author.userobm_id = todo_usercreate";
 
   display_debug_msg($query, $cdg_sql);
@@ -121,7 +122,7 @@ function run_query_todo_detail($todo) {
 //     keys used       uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_insert($todo) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
@@ -134,6 +135,7 @@ function run_query_todo_insert($todo) {
   }
   $deadline = $todo["deadline"];
   $content = $todo["content"];
+	$domain_id = $obm["domain_id"];
 
   $obm_q = new DB_OBM;
 
@@ -145,6 +147,7 @@ function run_query_todo_insert($todo) {
         todo_timecreate,
         todo_userupdate,
         todo_usercreate,
+				todo_domain_id,
         todo_user,
         todo_date,
         todo_deadline,
@@ -157,6 +160,7 @@ function run_query_todo_insert($todo) {
         '$now',
         '$uid',
         '$uid',
+				'$domain_id',
         '$user',
         '$now',
         '$deadline',
@@ -198,6 +202,8 @@ function run_query_todo_update($todo) {
     $percent = "0";
   }
 
+	$multidomain = sql_multidomain("todo");
+		
   $query = "UPDATE Todo SET
     todo_timeupdate = '$now',
     todo_userupdate = '$uid',
@@ -207,7 +213,7 @@ function run_query_todo_update($todo) {
     todo_percent = '$percent',
     todo_title = '$title',
     todo_content = '$content'
-  WHERE todo_id = '$t_id'";
+  WHERE todo_id = '$t_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -224,7 +230,9 @@ function run_query_todo_update($todo) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_delete($parms) {
   global $cdg_sql, $c_use_connectors;
-
+  
+	$multidomain = sql_multidomain("todo");
+	
   foreach($parms as $key => $val) {
     $id_todo = strstr($key,"_");
 
@@ -232,7 +240,7 @@ function run_query_todo_delete($parms) {
       $id_todo = substr($id_todo, 1);
     
       if ($val == "on") {
-        $query = "DELETE FROM Todo WHERE todo_id = '$id_todo'";
+        $query = "DELETE FROM Todo WHERE todo_id = '$id_todo' $multidomain";
 	display_debug_msg($query, $cdg_sql, "run_query_todo_delete");
         $obm_q = new DB_OBM;
         $obm_q->query($query);
@@ -260,7 +268,9 @@ function run_query_todo_delete($parms) {
 function run_query_todo_delete_unique($t_id) {
   global $cdg_sql, $c_use_connectors;
 
-  $query = "DELETE FROM Todo WHERE todo_id = '$t_id'";
+	$multidomain = sql_multidomain("todo");
+
+  $query = "DELETE FROM Todo WHERE todo_id = '$t_id' $multidomain";
   
   display_debug_msg($query, $cdg_sql, "run_query_todo_delete_unique");
   $obm_q = new DB_OBM;

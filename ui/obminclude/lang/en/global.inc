@@ -134,6 +134,7 @@ $l_group = "Group";
 $l_resourcegroup = "Resources Group";
 $l_settings = "Settings";
 $l_backup = "Backup";
+$l_domain = "Domain";
 
 // Global display
 $l_last_visit = "Bookmarks";
@@ -208,6 +209,7 @@ $l_module_agenda = "Calendar";
 $l_module_todo    = "Todo";
 $l_module_publication = "Publications";
 $l_module_statistic = "Statistics";
+$l_module_domain = "Domain";
 
 $l_module_time = "Time management";
 $l_module_project = "Projects";

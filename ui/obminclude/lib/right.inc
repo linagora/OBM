@@ -292,6 +292,8 @@ function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="
   if ($right != "all") {
     $where_right = "AND entityright_$right = 1";
   }
+	
+	$multidomain = sql_multidomain("entityright");
 
   $query = "SELECT
       $e_id as id,
@@ -305,7 +307,7 @@ function of_right_entity_for_consumer($entity, $consumer, $consumer_id, $right="
       AND entityright_consumer = '$consumer'
       AND (entityright_consumer_id = '$consumer_id'
            OR entityright_consumer_id = 0)
-      $where_right
+      $where_right $multidomain
     ORDER BY $e_label";
 
   display_debug_msg($query, $cdg_sql, "of_right_entity_for_consumer()");
@@ -373,6 +375,8 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
     $where_right = "AND entityright_$right = 1";
   }
 
+	$multidomain = sql_multidomain("entityright");
+
   $query = "SELECT
       $c_id as id,
       $c_label as label,
@@ -384,7 +388,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
     WHERE entityright_entity = '$entity'
       AND entityright_consumer = '$consumer'
       AND entityright_entity_id = '$entity_id'
-      $where_right
+      $where_right $multidomain
     ORDER BY $c_label";
 
   display_debug_msg($query, $cdg_sql, "of_right_consumer_for_entity()");
@@ -427,7 +431,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer, $right="al
 //   - $entity : entity type to update
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_update_right($param, $entity) {
-  global $cdg_sql, $auth, $err_msg, $l_of_right_err_auth;
+  global $cdg_sql, $auth, $err_msg, $l_of_right_err_auth,$obm;
 
   $consumer = "user";
 
@@ -452,15 +456,17 @@ function of_right_update_right($param, $entity) {
       return false;
     }
   }
-
+	$multidomain = sql_multidomain("entityright");
+	
   $obm_q = new DB_OBM;
   $query = "DELETE
     FROM EntityRight
     WHERE entityright_entity_id = '$eid'
-      AND entityright_entity = '$entity'";
+      AND entityright_entity = '$entity' $multidomain";
   display_debug_msg($query, $cdg_sql, "of_right_update_right(1)");
   $obm_q->query($query);
-
+	$domain_id = $obm["domain_id"];
+	
   if ($public_read || $public_write) {
     $pr = ($public_read ? 1 : 0);
     $pw = ($public_write ? 1 : 0);
@@ -469,6 +475,7 @@ function of_right_update_right($param, $entity) {
       entityright_entity_id,
       entityright_consumer,
       entityright_consumer_id,
+			entityright_domain_id,
       entityright_read,
       entityright_write
     ) VALUES (
@@ -476,6 +483,7 @@ function of_right_update_right($param, $entity) {
       '$eid',
       '$consumer',
       '0',
+			'$domain_id',
       '$pr',
       '$pw')";
     display_debug_msg($query, $cdg_sql, "of_right_update_right(2)");
@@ -494,6 +502,7 @@ function of_right_update_right($param, $entity) {
           entityright_entity_id,
           entityright_consumer,
           entityright_consumer_id,
+					entityright_domain_id,
           entityright_read,
           entityright_write
         ) VALUES (
@@ -501,6 +510,7 @@ function of_right_update_right($param, $entity) {
           '$eid',
           '$consumer',
           '$id',
+					'$domain_id',
           '1',
           '$w')";
 	display_debug_msg($query, $cdg_sql, "of_right_update_right(3)");
@@ -522,12 +532,14 @@ function of_right_update_right($param, $entity) {
             entityright_consumer,
             entityright_consumer_id,
             entityright_read,
+						entityright_domain_id,
             entityright_write
           ) VALUES (
             '$entity',
             '$eid',
             '$consumer',
             '$id',
+						'$domain_id',
             '0',
             '1')";
 	  display_debug_msg($query, $cdg_sql, "of_right_update_right(4)");

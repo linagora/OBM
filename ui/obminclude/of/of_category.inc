@@ -875,16 +875,17 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
+	$multidomain = sql_multidomain(strtolower($table));
 
   // If an entity id is given, restrict categories to those of this entry
   if ( ($mode == "multi") && ($entity_id > 0)) {
     $query = "SELECT $table.*
       FROM $linktable
         LEFT JOIN $table ON $linkfield_cat = $field_id
-      WHERE $linkfield_ent = '$entity_id'
+      WHERE $linkfield_ent = '$entity_id' $multidomain
       ORDER BY $field_code, $field_label";
   } else {
-    $query = "SELECT * FROM $table ORDER BY $field_code, $field_label";
+    $query = "SELECT * FROM $table WHERE 1=1 $multidomain ORDER BY $field_code, $field_label";
   }
   $cat_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "of_category_get_ordered()");
@@ -930,7 +931,7 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_query_insert($entity, $catu, $param) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $obm;
 
   $cat = strtolower($catu);
   $timecreate = date("Y-m-d H:i:s");
@@ -943,15 +944,19 @@ function of_category_query_insert($entity, $catu, $param) {
   $field_usercreate = $field_prefix."usercreate";
   $field_label = $field_prefix."label";
   $field_code = $field_prefix."code";
-
+	$field_domain = $field_prefix."domain_id";
+	$domain_id = $obm["domain_id"];
+	
   $query = "INSERT INTO $table (
     $field_timecreate,
     $field_usercreate,
+		$field_domain,
     $field_label,
     $field_code)
   VALUES (
     '$timecreate',
     '$usercreate',
+		'$domain_id',
     '$cat_label',
     '$cat_code')";
 
@@ -980,7 +985,7 @@ function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
     $linktable = ucfirst($entity) . ucfirst($cat)."Link";
     $linkfield_ent = $entity.$cat."link_".$entity."_id";
     $linkfield_cat = $entity.$cat."link_category_id";
-
+		
     $query = "INSERT INTO $linktable (
        $linkfield_ent,
        $linkfield_cat)
@@ -1024,14 +1029,15 @@ function of_category_query_update($entity, $catu, $param) {
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
   $field_code = $field_prefix."code";
-
+	$multidomain = sql_multidomain(strtolower($table));
+	
   $query = "UPDATE $table SET
     $field_timeupdate = '$timeupdate',
     $field_userupdate = '$userupdate',
     $field_label = '$cat_label',
     $field_code = '$cat_code'
     WHERE
-      $field_id='$cat_id'";
+      $field_id='$cat_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "of_category_query_update()");
   $obm_q = new DB_OBM;
@@ -1062,8 +1068,10 @@ function of_category_query_delete($entity, $catu, $param) {
     $id = $param["${cat}"];
   }
 
+	$multidomain = sql_multidomain(strtolower($table));
+
   if ($id != '') {
-    $query = "DELETE FROM $table WHERE $field_id ='$id'";
+    $query = "DELETE FROM $table WHERE $field_id ='$id' $multidomain";
 
     display_debug_msg($query, $cdg_sql, "of_category_query_delete()");
     $obm_q = new DB_OBM;
@@ -1130,11 +1138,11 @@ function of_category_query_links($entity, $cat, $p_id, $mode="multi") {
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
-
+	
   if ($mode == "mono") {
     $query = "SELECT $entityfield_id
       FROM $entitytable
-      WHERE $entityfield_cat = '$p_id'";
+      WHERE $entityfield_cat = '$p_id' $multidomain";
   } else {
     $query = "SELECT $linkfield_ent
       FROM $linktable
@@ -1184,18 +1192,18 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
-
+	$multidomain = sql_multidomain(strtolower($table));
+	
   if ($mode == "mono") {
     $query = "SELECT $field_id, $field_label, $field_code 
       FROM $entitytable, $table 
       WHERE $entityfield_cat = $field_id
-        AND $entityfield_id = '$entity_id' 
-      ";
+        AND $entityfield_id = '$entity_id' $multidomain";
   } else {
     $query = "SELECT $field_id, $field_label, $field_code 
       FROM $linktable, $table 
       WHERE $linkfield_cat = $field_id 
-        AND $linkfield_ent = '$entity_id'
+        AND $linkfield_ent = '$entity_id' $multidomain
       ORDER BY $field_id";
   }
 
@@ -1239,10 +1247,11 @@ function of_category_get_label($entity, $cat, $id) {
   $field_prefix = strtolower($entity.$cat."_");
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
-
+	$multidomain = sql_multidomain(strtolower($table));
+	
   $query = "SELECT $field_label 
     FROM $table 
-    WHERE $field_id = '$id'";
+    WHERE $field_id = '$id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "of_category_get_label()");
   $obm_q = new DB_OBM;
@@ -1282,11 +1291,13 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
-
+	$multidomain = sql_multidomain(strtolower($table));
+	
   if ($mode == "mono") {
     $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
       FROM $table
         LEFT JOIN $entitytable ON $entityfield_cat = $field_id
+				WHERE 1=1 $multidomain
       GROUP BY $entityfield_cat, $field_id, $field_code, $field_label
       ORDER BY $field_code, $field_label";
   } else {
@@ -1294,6 +1305,7 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
       FROM $table
         LEFT JOIN $linktable ON $linkfield_cat = $field_id
         LEFT JOIN $entitytable ON $entityfield_id = $linkfield_ent
+			WHERE 1=1 $multidomain
       GROUP BY $linkfield_cat, $field_id, $field_code, $field_label
       ORDER BY $field_code, $field_label";
   }
@@ -1426,7 +1438,9 @@ function _of_category_get_entity_count($entity) {
     $entitytable = ucfirst($entity);
   }
 
-  $query = "SELECT count(*) as count_entity FROM $entitytable";
+	$multidomain = sql_multidomain(strtolower($entitytable));
+
+  $query = "SELECT count(*) as count_entity FROM $entitytable WHERE 1=1 $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

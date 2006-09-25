@@ -210,6 +210,7 @@ $l_module_agenda  = "Agenda";
 $l_module_todo    = "A faire";
 $l_module_publication  = "Publication";
 $l_module_statistic    = "Statistiques";
+$l_module_domain = "Domaine";
 
 $l_module_time = "Gestion des temps";
 $l_module_project = "Projets";
