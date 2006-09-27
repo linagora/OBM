@@ -37,7 +37,7 @@ function run_query_user_search($user) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
-	$multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain("userobm");
 	
   if ($restriction == "calendar") {
     $uid = $auth->auth["uid"];
@@ -148,7 +148,7 @@ function run_query_user_detail($p_id) {
   $timecreate = sql_date_format($db_type, "UserObm.userobm_timecreate", "timecreate");
   $datebegin = sql_date_format($db_type, "UserObm.userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
-	$multidomain = sql_multidomain("UserObm.userobm");
+  $multidomain = sql_multidomain("UserObm.userobm");
 	
   $query = "SELECT UserObm.*,
       $timeupdate,
@@ -206,10 +206,10 @@ function run_query_user_insert($user) {
   $email = $user["email"];
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
 
-  if(isset($user["domain"])) {
+  if (isset($user["domain"])) {
     $domain_id = $user["domain"];
   } else {
-  	$domain_id = $obm["domain_id"];
+    $domain_id = $obm["domain_id"];
   }
 
   $query = "INSERT INTO UserObm (userobm_timeupdate,
@@ -236,7 +236,7 @@ function run_query_user_insert($user) {
     '$now',
     '$uid',
     '$uid',
-		'$domain_id',
+    '$domain_id',
     '$login',
     '$passwd_crypt',
     '$perms',
@@ -263,7 +263,7 @@ function run_query_user_insert($user) {
     WHERE userobm_login = '$login'
       AND userobm_lastname='$lname'
       AND userobm_firstname='$fname'
-			AND userobm_domain_id='$domain_id'";
+      AND userobm_domain_id='$domain_id'";
   
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
@@ -310,7 +310,7 @@ function run_query_user_update($p_id, $user) {
   $fax2 = $user["fax2"];
   $email = $user["email"];
   $desc = $user["desc"];
-	$multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain("userobm");
 	
   $query = "UPDATE UserObm SET
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
@@ -330,7 +330,7 @@ function run_query_user_update($p_id, $user) {
     userobm_description='$desc'
   WHERE userobm_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -351,7 +351,7 @@ function run_query_user_update($p_id, $user) {
 function run_query_user_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
-	$multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain("userobm");
 
   $query = "DELETE FROM UserObm WHERE userobm_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql);
@@ -420,11 +420,11 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 function run_query_user_group() {
   global $cdg_sql, $uid;
 
-	$multidomain = sql_multidomain("group");
+  $multidomain = sql_multidomain("group");
 
   $query = "SELECT *
     FROM UGroup
-		WHERE 1=1 $multidomain
+    WHERE 1=1 $multidomain
     ORDER by group_name";
 
   display_debug_msg($query, $cdg_sql);
@@ -515,11 +515,11 @@ function run_query_user_check_user($p_id, $user) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
-	$login = $user["login"];
-	if($c_multidomain) {
-		$domain = $user["domain"];
-		$where_multidomain = " AND userobm_domain_id='$domain'";
-	}
+  $login = $user["login"];
+  if ($c_multidomain) {
+    $domain = $user["domain"];
+    $where_multidomain = " AND userobm_domain_id='$domain'";
+  }
 	
   if ($p_id) {
     $where_user = "AND userobm_id != '$p_id'";
@@ -528,9 +528,9 @@ function run_query_user_check_user($p_id, $user) {
   $query = "SELECT distinct userobm_id, userobm_login
     FROM UserObm
     WHERE userobm_login $like '$login%'
-          $where_user $where_multidomain";
+    $where_user $where_multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_user_check_user()");
   $obm_q->query($query);
 
   return $obm_q;
@@ -547,7 +547,7 @@ function run_query_user_check_user($p_id, $user) {
 function check_user_data_form($p_id, $user) {
   global $l_exist_error, $l_login_error, $l_password_error, $l_email_error;
   global $l_lname_error, $php_regexp_email;
-  global $err_msg, $action, $cdg_sql, $c_multidomain, $c_default_domain, $obm;
+  global $err_msg, $action, $cdg_sql, $c_multidomain, $obm;
 
   $id = $user["user_id"];
   $login = $user["login"];
@@ -580,21 +580,21 @@ function check_user_data_form($p_id, $user) {
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // if a user with the same name already exists  return false               //
+  // if a user with the same name already exists  return false
   /////////////////////////////////////////////////////////////////////////////
-  if($c_multidomain) {
-  if(isset($user["domain"])) {
-    $domain_id = $user["domain"];
-  } else {
-  	$domain_id = $obm["domain_id"];
-  }
-  	$where_multidomain = "AND userobm_domain_id = $domain_id";
+  if ($c_multidomain) {
+    if (isset($user["domain"])) {
+      $domain_id = $user["domain"];
+    } else {
+      $domain_id = $obm["domain_id"];
+    }
+    $where_multidomain = "AND userobm_domain_id = $domain_id";
   }
   $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain";
   if ($p_id > 0) {
     $query .= " AND userobm_id!='$p_id'";
   }
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "check_user_data_form()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
@@ -615,13 +615,14 @@ function check_user_data_form($p_id, $user) {
 function get_linked_user_timetask_nb($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("timetask");
+  $multidomain = sql_multidomain("timetask");
 
   $obm_q = new DB_OBM;
   $query = "SELECT count(timetask_id) as nb
     FROM TimeTask
     WHERE timetask_user_id='$p_id'
-      AND timetask_projecttask_id > 0 $multidomain";
+      AND timetask_projecttask_id > 0
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_linked_user_timetask_nb($p_id)");
   $obm_q->query($query);

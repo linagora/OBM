@@ -119,6 +119,7 @@ function display_menu($module) {
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
   $profil = $auth->auth["perm"];
+  $domain = $auth->auth["domain_label"];
   $section = $cgp_show["module"][$module];
   $display["section"] = display_sections($section);
   $display["module"] = display_modules($section, $module);
@@ -140,7 +141,7 @@ function display_menu($module) {
 <span id='version'>OBM v.".$obm_version." Aliacom</span> 
 <!-- Login -->
 <ul class='login'>
-<li><img src='".C_IMAGE_PATH."/".$set_theme."/login.gif' alt='' /> $l_login : $login</li>
+<li><img src='".C_IMAGE_PATH."/".$set_theme."/login.gif' alt='' /> $l_login : $login ($domain)</li>
 <li><img src='".C_IMAGE_PATH."/".$set_theme."/profil.gif' alt='' /> $l_profile : $profil</li>
 <li><img src='".C_IMAGE_PATH."/".$set_theme."/logout.gif' alt='' /> <a href='".$path."/obm.php?action=logout'>$l_logout</a></li>
 $dis_printer

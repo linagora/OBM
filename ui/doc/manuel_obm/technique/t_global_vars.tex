@@ -25,6 +25,8 @@
 \begin{itemize}
 \item[->auth[uid]] : id de l'utilisateur
 \item[->auth[perm]] : profil de l'utilisateur
+\item[->auth[domain\_id]] : domaine de l'utilisateur
+\item[->auth[domain\_lqbel]] : nom du domaine de l'utilisateur
 \end{itemize}
  & hérité de phplib. A faire évoluer \\ 
 \hline
@@ -49,10 +51,6 @@
 \$action & traitement à effectuer (ex: new, insert,...) & défini par programme \\ 
 \hline
 \$view & vue spécifique à afficher (action detailconsult) & Permet d'afficher différentes sous-vues d'une entité \\ 
-\hline
-\$new\_order & colonne de tri d'une vue of\_display & A modifier en of\_display\_order \\ 
-\hline
-\$order\_dir & ordre de tri d'une vue of\_display & A modifier en of\_display\_order\_dir \\ 
 \hline
 \$of\_display\_name & Nom du dataset of\_display concerné & Permet de gérer plusieurs dataset dans le même écran \\ 
 \hline

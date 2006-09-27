@@ -146,7 +146,7 @@ class OBM_Challenge_Auth extends Auth {
   function auth_loginform() {
     global $sess, $obminclude, $obm_version, $module, $path, $login_action;
     global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
-    global $params, $c_multidomain;
+    global $params, $c_multidomain, $c_default_domain;
 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
@@ -157,16 +157,25 @@ class OBM_Challenge_Auth extends Auth {
   
   function auth_validatelogin() {
     global $params, $login, $password, $challenge, $response;
-    global $auth_encryption, $password_encryption, $c_multidomain;
-
-    //    echo "auth_validatelogin";
+    global $auth_encryption, $password_encryption, $c_multidomain, $c_default_domain;
 
     $login = $params["login"];
     $password = $params["password"];
     $challenge = $params["challenge"];
     $response = $params["response"];
-		$domain = $params["domain"];
-		
+    $domain = $params["domain"];
+    // if no domain set, set the default domain
+    if ((! isset($domain)) || ($domain == "")) {
+      $domain = "$c_default_domain";
+    }
+
+    // If multidomain, add domain clause
+    if ($c_multidomain) {
+      $where_domain = "AND userobm_domain_id='$domain'";
+    }
+
+    echo "auth_validatelogin:domain=$domain, login=$login";
+
     if (isset($login)) {
       $this->auth["uname"] = $login; // provides access for loginform.ihtml
     }
@@ -181,23 +190,16 @@ class OBM_Challenge_Auth extends Auth {
         userobm_domain_id
       FROM $user_table
       WHERE userobm_login = '$user_login'
-        AND userobm_archive = '0'";
+        AND userobm_archive = '0'
+        $where_domain";
 
     $this->db->query($query_login);
-    while ($this->db->next_record() && !$ok) {
+    while ($this->db->next_record()) {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
       $udomain = $this->db->f("userobm_domain_id");
-			if($udomain == $domain)
-          $ok = true;
     }
-
-		// Test if selected domain fit with user domain
-		if($c_multidomain && isset($uid)) {
-			if(get_entity_domain_id($uid, "userobm", "UserObm") != $domain)
-				return false;
-		}
 
     if ($auth_encryption) {
       if ($password_encryption == "md5") {

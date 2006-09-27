@@ -36,7 +36,7 @@ function run_query_incident_search($incident) {
   $datebefore = $incident["date_before"];
   $archive = $incident["archive"];
   $reference = $incident["reference"];
-	$multidomain = sql_multidomain("incident");
+  $multidomain = sql_multidomain("incident");
 	
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -253,7 +253,7 @@ function run_query_incident_insert($incident) {
   $reference = $incident["reference"];
   $owner = ($incident["owner"] ? "'".$incident["owner"]."'" : "null");
   $logger = ($incident["logger"] ? "'".$incident["logger"]."'" : "null");
-  $archive = ($incident["archive"] ? $incident["archive"] : "0");
+  $archive = $incident["archive"];
   $solu = $incident["solution"];
   $priority = $incident["priority"];
   $status = $incident["status"];
@@ -262,7 +262,6 @@ function run_query_incident_insert($incident) {
   $date = $incident["date"];
   $hour = $incident["hour"];
   $add_duration = $incident["add_duration"];
-  $archive = ($incident["archive"] ? $incident["archive"] : "0");
   $call_date = "$date $hour:0:0";
   $add_comment = $incident["add_comment"];
   if ($add_comment != "") {

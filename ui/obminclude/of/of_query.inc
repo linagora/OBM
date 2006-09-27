@@ -249,6 +249,32 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the sql domain clause according to multidomain mode
+// Parameters:
+//   - $entity : entity to add clause
+// Returns:
+//   - sql where clause for domain (empty for superadmin)
+///////////////////////////////////////////////////////////////////////////////
+function sql_multidomain($entity) {
+  global $c_multidomain, $udomain_id;
+
+  $where = "";
+
+  if ($c_multidomain) {
+    // If user is multidomain, no restrictions on domain
+    if ($udomain_id == 0) {
+      return $where;
+    } else {
+      $domain_id = $udomain_id;
+    }
+    $where = "AND ${entity}_domain_id='$domain_id'";
+  }
+
+  return $where;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the count(*) of the query (the 1fst field)
 // Parameters:
 //   - $db_type  : DB type
@@ -259,12 +285,188 @@ function get_query_count($query) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  display_debug_msg("get_query_count() : $query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_query_count()");
   $obm_q->query($query);
   $obm_q->next_record();
   $count = $obm_q->f(0);
 
   return $count;
+}
+
+
+//--- Multi-domain handling -------------------------------------------------//
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the OBM domain list
+// Returns:
+//   - array with domains
+///////////////////////////////////////////////////////////////////////////////
+function of_domain_get_list() {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT domain_id,
+      domain_label,
+      domain_domain_name
+    FROM Domain";
+  display_debug_msg($query, $cdg_sql, "of_domain_get_list()");
+  $obm_q->query($query);
+
+  $domain = array();
+  $domain["0"]["id"] = "0";
+  $domain["0"]["label"] = "Global";
+  $domain["0"]["name"] = "";
+  while($obm_q->next_record()) {
+    $id = $obm_q->f("domain_id");
+    $domain[$id]["id"] = $id;
+    $domain[$id]["label"] = $obm_q->f("domain_label");
+    $domain[$id]["name"] = $obm_q->f("domain_name");
+  }
+
+  return $domain;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return a domain infos
+// Parameters:
+//   - $d_id : domain in
+// Returns:
+//   - array with domain infos
+///////////////////////////////////////////////////////////////////////////////
+function of_domain_get_domain_infos($d_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  if ($d_id > 0) {
+    $query = "SELECT domain_id,
+      domain_label,
+      domain_domain_name
+    FROM Domain
+    WHERE domain_id = '$d_id'";
+    display_debug_msg($query, $cdg_sql, "of_domain_get_domain_infos()");
+    $obm_q->query($query);
+    $obm_q->next_record();
+
+    $domain["id"] = $obm_q->f("domain_id");
+    $domain["label"] = $obm_q->f("domain_label");
+    $domain["name"] = $obm_q->f("domain_name");
+  } else {
+    $domain["id"] = "0";
+    $domain["label"] = "Global";
+  }
+
+  return $domain;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return one entity domain id
+// Parameters:
+//   - $id      : entity id
+//   - $entityu : entity name (u cause may be table name : first char uppercase)
+//   - $ptable  : table name (needed only if different from Entity)
+// Returns:
+//   - entity domain id
+///////////////////////////////////////////////////////////////////////////////
+function of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
+  global $cdg_sql, $c_multidomain;
+
+  // domain default value
+  $dom_id = 0;
+  
+  $entity = strtolower($entityu);
+  if ($ptable == "") {
+    $table = $entityu;
+  } else {
+    $table = $ptable;
+  }
+
+  if ($c_multidomain) {
+    $obm_q = new DB_OBM;
+    $query = "SELECT ${entity}_domain_id as domain_id
+      FROM $table
+      WHERE ${entity}_id = '$id'";
+    display_debug_msg($query, $cdg_sql, "of_domain_get_entity_domain_id()");
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $dom_id = $obm_q->f("domain_id");
+  }
+
+  return $dom_id;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: domain html select component
+// Parameters:
+//   - $domains       : Domain array
+//   - $domain_id     : selected domain
+//   - $first_element : scalar or array : (["all"|"none"])
+//   - $sel_append    : string (eg javascript code) to append at select
+///////////////////////////////////////////////////////////////////////////////
+function of_domain_dis_select($domain_id="", $first_element="", $sel_append="") {
+  $domains = of_domain_get_list();
+  $sel_dom = of_domain_html_select($domains, $domain_id, $first_element, $sel_append);
+
+  return $sel_dom;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: domain html select component
+// Parameters:
+//   - $domains       : Domain array
+//   - $domain_id     : selected domain
+//   - $first_element : scalar or array : (["all"|"none"])
+//   - $sel_append    : string (eg javascript code) to append at select
+///////////////////////////////////////////////////////////////////////////////
+function of_domain_html_select($domains, $domain_id="", $first_element="", $sel_append="") {
+
+  if (is_array($first_element)) {
+    foreach($first_element as $element) {
+      $l_element = "l_${element}";
+      $c_element = "c_${element}"; 
+      global $$l_element, $$c_element;
+      if ($$c_element == $domain_id) {
+	$first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+      } else {
+	$first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+      }
+    }
+  } else if ($first_element != "") {
+    $l_element = "l_${first_element}";
+    $c_element = "c_${first_element}"; 
+    global $$l_element, $$c_element;
+    if ($$c_element == $domain_id) {
+      $first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+    } else {
+      $first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+    }
+  }
+
+  // Domain select
+  $sel_dom = "<select id=\"sel_domain\" name=\"sel_domain\" $sel_append>
+      $first_option";
+  if (is_array($domains)) {
+    foreach ($domains as $one_domain) {
+      $d_id = $one_domain["id"];
+      $d_label = htmlentities($one_domain["label"]);
+      $d_name = htmlentities($one_domain["name"]);
+      $dis_name = ($d_name != "") ? " ($d_name)" : "";
+      $sel_dom .= "\n<option value=\"$d_id\"";
+      if ($d_id == $domain_id) { $sel_dom .= " selected=\"selected\""; }
+      $sel_dom .= ">$d_label$dis_name</option>";
+    }
+  }
+  $sel_dom .= "</select>";
+
+  return $sel_dom;
 }
 
 

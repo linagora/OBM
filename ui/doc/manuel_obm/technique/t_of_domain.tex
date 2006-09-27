@@ -1,0 +1,151 @@
+% Documentation technique d'OBM : Gestion du multi-domaine
+% AliaSource Pierre Baudracco
+% $Id$
+
+
+\subsection{Gestion du multi-domaine}
+\label{of_domain}
+
+\obm intègre la fonctionnalité multi-domaine depuis la version 2.0.
+Le multi-domaine permet de gérer dans une même instance d'\obm plusieurs espaces de données totalement cloisonnés.\\
+
+Le multi-domaine peut être activé ou désactivé. Il est intégré de la sorte qu'il n'y ait aucun impact pour les sites n'utilisant pas la fonctionnalité.\\
+
+Les fonctionalités de multi-domaine sont fournies par le fichier \fichier{of/of\_query.inc}.
+
+\subsubsection{Multi-domaine, données et utilisateurs}
+
+Chaque données dans \obm est soit globale, soit appartient à un domaine unique.\\
+
+Dans un fonctionnement mono-domaine, les données de domaine ne sont pas utilisées et sont renseignées soit à 0 soit à null (non renseignées).\\
+
+Dans un fonctionnement multi-domaine, le \textbf{domaine 0} est un domaine particulier.\\
+
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Donnée} & \textbf{Description}\\
+\hline
+Utilisateur domaine 0 & C'est un super-administrateur, il :
+\begin{itemize}
+\item peut gérer les domaines
+\item peut gérer les utilisateurs de tous les domaines
+\item peut voir toutes les données de tous les domaines
+\item peut gérer les données transverses de référence
+\item ne peut pas insérer de données
+\end{itemize}
+\\
+\hline
+Utilisateur domaine != 0 & C'est un utilisateur de son domaine :
+\begin{itemize}
+\item il est limité (consultation / modification) à son domaine
+\item toute donnée créée appartient à son domaine
+\end{itemize}
+\\
+\hline
+Entité domaine 0 & C'est une entité transverse, elle :
+\begin{itemize}
+\item est visible dans tous les domaines
+\item n'est gérée que par un super-administrateur
+\end{itemize}
+\\
+\hline
+Entité domaine != 0 & C'est une entité de son domaine :
+\begin{itemize}
+\item elle est accessible par les utilisateurs du domaine (selon droits) et super-administrateurs
+\item elle est modifiable par les utilisateurs du domaine (selon droits)
+\end{itemize}
+\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Il n'est pas possible à un super-administrateur d'insérer des données (autres que référence) ou d'avoir des entités de domaine 0 pour éviter les cas de données de domaines différents liées entre-elles (ex: contact d'un domaine ou public lié à une société de domaine différent).
+
+
+\subsubsection{Table Domain et stockage dans les données}
+
+
+\begin{tabular}{|p{3cm}|c|p{8cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & int 8 & Id du domaine \\
+\hline
+\_label & varchar 32 & Label du domaine \\
+\hline
+\_description & varchar 255 & Description du domaine \\
+\hline
+\_domain\_name & varchar 128 & Nom de domaine principal (messagerie) \\
+\hline
+\_alias & text & alias de noms de domaines (messagerie) \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Chaque table d'entité (hors tables de liaison) doit contenir un champ référençant le domaine :\\
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description}\\
+\hline
+\_domain\_id & int 8 & Id du domaine de l'entité\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\paragraph{Fonctions d'affichage} : \\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_domain_get_list() {
+\end{verbatim}
+\end{minipage}
+}
+Fonction qui retourne la liste des domaines dans un tableau. Le domaine ``0'' global est ajouté.\\
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_domain_get_domain_infos($d_id) {
+\end{verbatim}
+\end{minipage}
+}
+Fonction qui retourne les informations du domaine selon son id\\
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction qui récupère le domaine id d'une entité}\\
+\hline
+\$id & id de l'entité\\
+\hline
+\$entityu & entité (majuscule pour nom de table) (ex: ``Company'', ``contact'',..)\\
+\hline
+\$ptable & nom de table (si différent de \$entityu) (ex: ``UGroup'')\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_domain_dis_select($domain_id) {
+\end{verbatim}
+\end{minipage}
+}
+Affiche le selecteur de domaines

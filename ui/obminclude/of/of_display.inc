@@ -1209,39 +1209,37 @@ function display_debug() {
   global $global_dis_debug_msg, $global_dis_debug_param, $dis_session;
   global $cdg_param, $cdg_sql, $cdg_sess, $set_debug;
 
-    if (debug_level_isset($cdg_sql)) {
-      $dis_debug_sql = "
-        <div class=\"debugHead\">$l_dg_sql</div>
-        $global_dis_debug_msg
-      ";
+  if (debug_level_isset($cdg_sql)) {
+    $dis_debug_sql = "
+      <div class=\"debugHead\">$l_dg_sql</div>
+      $global_dis_debug_msg";
+  }
+    
+  if (debug_level_isset($cdg_param)) {
+    $dis_debug_param = "
+      <div class=\"debugHead\">$l_dg_param</div>
+      $global_dis_debug_param";
+  }
+    
+  if (debug_level_isset($cdg_sess)) {
+    $dis_session_content = "
+      <div class=\"debugHead\">$l_dg_sess</div>
+      $dis_session";
     }
     
-    if (debug_level_isset($cdg_param)) {
-      $dis_debug_param = "
-        <div class=\"debugHead\">$l_dg_param</div>
-        $global_dis_debug_param
-      ";
-    }
-    
-    if (debug_level_isset($cdg_sess)) {
-      $dis_session_content = "
-        <div class=\"debugHead\">$l_dg_sess</div>
-        $dis_session
-      ";
-    }
-    
-    if($set_debug > 0) {
-      return "
-        <div class=\"debug\">".
-        $dis_session_content.
-        $dis_debug_sql.
-        $dis_debug_param.
-        "</div>";
-    } else { 
-      return "";
-    }
-  
+  if ($set_debug > 0) {
+    return "
+      <div class=\"debug\">".
+      $dis_session_content.
+      $dis_debug_sql.
+      $dis_debug_param.
+      "</div>";
+  } else { 
+    return "";
+  }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display : title
 ///////////////////////////////////////////////////////////////////////////////

@@ -342,16 +342,14 @@ function html_user_form($usr_q, $user) {
   if (isset($user["desc"])) { $desc = $user["desc"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
-	// Domain
-  if($c_multidomain && $obm["domain_id"] == $c_default_domain){
+  // Domain
+  if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
     $domain_list = get_global_domain_list();
     $sel_domain = "<tr><td class=\"detailLabel\">$l_domain</td><td class=\"detailForm\">
       $domain_list </td></tr>";
   }
-  
 
-
-	// Profiles
+  // Profiles
   foreach ($profiles as $profile => $one_profile) {
     if ($perms == $profile) {
       $selected = " selected";

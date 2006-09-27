@@ -197,14 +197,14 @@ function run_query_lead_insert($params) {
     $comment = "$datecomment:$usercomment:$add_comment";
   }
   
-	$domain_id = get_entity_domain_id($company_id, "company");
+  $domain_id = of_domain_get_entity_domain_id($company_id, "Company");
 	
   $query = "INSERT INTO Lead (
+    lead_domain_id,
     lead_timeupdate,
     lead_timecreate,
     lead_userupdate,
     lead_usercreate,
-		lead_domain_id,
     lead_source_id,
     lead_manager_id,
     lead_company_id,
@@ -215,11 +215,12 @@ function run_query_lead_insert($params) {
     lead_archive,
     lead_todo,
     lead_comment)
-   VALUES (null,
+   VALUES (
+    '$domain_id',
+    null,
     '$now',
     null,
     '$uid',
-		'$domain_id',
     '$source_id',
     '$manager_id',
     '$company_id',
@@ -294,8 +295,8 @@ function run_query_lead_update($pid, $params) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
 
-	$domain_id = get_entity_domain_id($company_id, "company");
-	$multidomain = sql_multidomain("lead");
+  $domain_id = of_domain_get_entity_domain_id($company_id, "Company");
+  $multidomain = sql_multidomain("lead");
 	
   $query = "UPDATE Lead SET
     lead_timeupdate='$now',

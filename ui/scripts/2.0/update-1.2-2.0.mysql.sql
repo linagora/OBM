@@ -1,0 +1,135 @@
+-- ////////////////////////////////////////////////////////////////////////////
+-- // Update OBM MySQL Database from 1.2 to 2.0                              //
+-- ////////////////////////////////////////////////////////////////////////////
+-- // $Id$
+-- ////////////////////////////////////////////////////////////////////////////
+
+
+-------------------------------------------------------------------------------
+-- Global Information table
+-------------------------------------------------------------------------------
+UPDATE ObmInfo set obminfo_value='2.0' where obminfo_name='db_version';
+
+
+-------------------------------------------------------------------------------
+-- Add Domain info
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Domain'
+--
+CREATE TABLE Domain (
+  domain_id             int(8) auto_increment,
+  domain_timeupdate     timestamp(14),
+  domain_timecreate     timestamp(14),
+  domain_usercreate     int(8),
+  domain_userupdate     int(8),
+  domain_label          varchar(32) NOT NULL,
+  domain_description    varchar(255),
+  domain_domain_name    varchar(128),
+  domain_alias          text,
+  PRIMARY KEY (domain_id)
+);
+
+--
+-- Update All tables to include Domain info
+--
+ALTER TABLE UserObm ADD Column userobm_domain_id int(8) default 0 after userobm_id;
+ALTER TABLE DataSource ADD Column datasource_domain_id int(8) default 0 after datasource_id;
+ALTER TABLE Country ADD Column country_domain_id int(8) default 0 first;
+ALTER TABLE Region ADD Column region_domain_id int(8) default 0 after region_id;
+ALTER TABLE CompanyType ADD Column companytype_domain_id int(8) default 0 after companytype_id;
+ALTER TABLE CompanyActivity ADD Column companyactivity_domain_id int(8) default 0 after companyactivity_id;
+ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id int(8) default 0 after companynafcode_id;
+ALTER TABLE Company ADD Column company_domain_id int(8) default 0 after company_id;
+ALTER TABLE CompanyCategory1 ADD Column companycategory1_domain_id int(8) default 0 after companycategory1_id;
+ALTER TABLE Contact ADD Column contact_domain_id int(8) default 0 after contact_id;
+ALTER TABLE Kind ADD Column kind_domain_id int(8) default 0 after kind_id;
+ALTER TABLE ContactFunction ADD Column contactfunction_domain_id int(8) default 0 after contactfunction_id;
+ALTER TABLE ContactCategory1 ADD Column contactcategory1_domain_id int(8) default 0 after contactcategory1_id;
+ALTER TABLE ContactCategory2 ADD Column contactcategory2_domain_id int(8) default 0 after contactcategory2_id;
+ALTER TABLE ContactCategory3 ADD Column contactcategory3_domain_id int(8) default 0 after contactcategory3_id;
+ALTER TABLE ContactCategory4 ADD Column contactcategory4_domain_id int(8) default 0 after contactcategory4_id;
+ALTER TABLE ContactCategory5 ADD Column contactcategory5_domain_id int(8) default 0 after contactcategory5_id;
+ALTER TABLE LeadSource ADD Column leadsource_domain_id int(8) default 0 after leadsource_id;
+ALTER TABLE Lead ADD Column lead_domain_id int(8) default 0 after lead_id;
+ALTER TABLE ParentDeal ADD Column parentdeal_domain_id int(8) default 0 after parentdeal_id;
+ALTER TABLE Deal ADD Column deal_domain_id int(8) default 0 after deal_id;
+ALTER TABLE DealStatus ADD Column dealstatus_domain_id int(8) default 0 after dealstatus_id;
+ALTER TABLE DealType ADD Column dealtype_domain_id int(8) default 0 after dealtype_id;
+ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id int(8) default 0 after dealcompanyrole_id;
+ALTER TABLE DealCategory1 ADD Column dealcategory1_domain_id int(8) default 0 after dealcategory1_id;
+ALTER TABLE List ADD Column list_domain_id int(8) default 0 after list_id;
+ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id int(8) default 0 after calendarevent_id;
+ALTER TABLE EventEntity ADD Column evententity_domain_id int(8) default 0 first;
+ALTER TABLE CalendarException ADD Column calendarexception_domain_id int(8) default 0 first;
+ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id int(8) default 0 after calendarcategory1_id;
+ALTER TABLE EntityRight ADD Column entityright_domain_id int(8) default 0 first;
+ALTER TABLE Todo ADD Column todo_domain_id int(8) default 0 after todo_id;
+ALTER TABLE Publication ADD Column publication_domain_id int(8) default 0 after publication_id;
+ALTER TABLE PublicationType ADD Column publicationtype_domain_id int(8) default 0 after publicationtype_id;
+ALTER TABLE Subscription ADD Column subscription_domain_id int(8) default 0 after subscription_id;
+ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id int(8) default 0 after subscriptionreception_id;
+ALTER TABLE Document ADD Column document_domain_id int(8) default 0 after document_id;
+ALTER TABLE DocumentCategory1 ADD Column documentcategory1_domain_id int(8) default 0 after documentcategory1_id;
+ALTER TABLE DocumentCategory2 ADD Column documentcategory2_domain_id int(8) default 0 after documentcategory2_id;
+ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id int(8) default 0 after documentmimetype_id;
+ALTER TABLE DocumentEntity ADD Column documententity_domain_id int(8) default 0 first;
+ALTER TABLE Project ADD Column project_domain_id int(8) default 0 after project_id;
+ALTER TABLE ProjectTask ADD Column projecttask_domain_id int(8) default 0 after projecttask_id;
+ALTER TABLE ProjectRefTask ADD Column projectreftask_domain_id int(8) default 0 after projectreftask_id;
+ALTER TABLE ProjectUser ADD Column projectuser_domain_id int(8) default 0 after projectuser_id;
+ALTER TABLE ProjectStat ADD Column projectstat_domain_id int(8) default 0 first;
+ALTER TABLE TimeTask ADD Column timetask_domain_id int(8) default 0 after timetask_id;
+ALTER TABLE TaskType ADD Column tasktype_domain_id int(8) default 0 after tasktype_id;
+ALTER TABLE Contract ADD Column contract_domain_id int(8) default 0 after contract_id;
+ALTER TABLE ContractType ADD Column contracttype_domain_id int(8) default 0 after contracttype_id;
+ALTER TABLE ContractPriority ADD Column contractpriority_domain_id int(8) default 0 after contractpriority_id;
+ALTER TABLE ContractStatus ADD Column contractstatus_domain_id int(8) default 0 after contractstatus_id;
+ALTER TABLE Incident ADD Column incident_domain_id int(8) default 0 after incident_id;
+ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id int(8) default 0 after incidentpriority_id;
+ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id int(8) default 0 after incidentstatus_id;
+ALTER TABLE IncidentCategory1 ADD Column incidentcategory1_domain_id int(8) default 0 after incidentcategory1_id;
+ALTER TABLE IncidentCategory2 ADD Column incidentcategory2_domain_id int(8) default 0 after incidentcategory2_id;
+ALTER TABLE Invoice ADD Column invoice_domain_id int(8) default 0 after invoice_id;
+ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id int(8) default 0 after invoicestatus_id;
+ALTER TABLE Payment ADD Column payment_domain_id int(8) default 0 after payment_id;
+ALTER TABLE PaymentKind ADD Column paymentkind_domain_id int(8) default 0 after paymentkind_id;
+ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id int(8) default 0 first;
+ALTER TABLE Account ADD Column account_domain_id int(8) default 0 after account_id;
+ALTER TABLE UGroup ADD Column group_domain_id int(8) default 0 after group_id;
+ALTER TABLE Import ADD Column import_domain_id int(8) default 0 after import_id;
+ALTER TABLE Resource ADD Column resource_domain_id int(8) default 0 after resource_id;
+ALTER TABLE RGroup ADD Column rgroup_domain_id int(8) default 0 after rgroup_id;
+
+
+-------------------------------------------------------------------------------
+-- Global Category table
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Category'
+--
+CREATE TABLE Category (
+  category_id          int(8) auto_increment,
+  category_domain_id   int(8) default 0,
+  category_timeupdate  timestamp(14),
+  category_timecreate  timestamp(14),
+  category_userupdate  int(8) NOT NULL default 0,
+  category_usercreate  int(8) NOT NULL default 0,
+  category_category    varchar(24) NOT NULL default '',
+  category_code        varchar(10) NOT NULL default '',
+  category_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (companycategory1_id)
+);
+
+
+--
+-- Table structure for table 'CategoryLink'
+--
+CREATE TABLE CategoryLink (
+  categorylink_category_id int(8) NOT NULL default 0,
+  categorylink_entity_id   int(8) NOT NULL default 0,
+  categorylink_category    varchar(24) NOT NULL default '',
+  categorylink_entity      varchar(32) NOT NULL default '',
+  PRIMARY KEY (categorylink_category_id, categorylink_entity_id),
+  INDEX cat_idx_ent (categorylink_entity_id)
+);

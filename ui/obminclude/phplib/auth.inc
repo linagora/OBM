@@ -168,9 +168,11 @@ class Auth {
             if ( $uid = $this->auth_validatelogin() ) {
               $this->auth["uid"] = $uid;
 
-				      // Domain is session	
-							$this->auth["domain_id"] = get_entity_domain_id($this->auth["uid"], "userobm", "UserObm");
-							$this->auth["domain_label"] = get_domain_label($this->auth["domain_id"]);
+              // Domain in session
+              // XXXX 2 lines could avoid query as domain_id get in auth_vali
+	      $this->auth["domain_id"] = of_domain_get_entity_domain_id($this->auth["uid"], "UserObm");
+              $d = of_domain_get_domain_infos($this->auth["domain_id"]);
+	      $this->auth["domain_label"] = $d["label"];
 							
               // OBM : in OBM each time is in seconds. this->lifetime too.
               $this->auth["exp"] = time() + $this->lifetime;
@@ -238,7 +240,8 @@ class Auth {
   }
 
   function is_authenticated() {
-  	global $c_multidomain;
+    global $c_multidomain;
+
     if (
       $this->auth["uid"] && 
       (($this->lifetime <= 0) || (time() < $this->auth["exp"]))) {

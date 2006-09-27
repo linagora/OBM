@@ -58,12 +58,12 @@ function doChallengeResponse() {
 </script>";
 }
 
-if($c_multidomain) {
-  $domain_list = get_global_domain_list();
+if ($c_multidomain) {
+  $sel_domain = of_domain_dis_select();
   $sel_domain_list = "
     <tr><td><div align=\"right\"><font size=\"3\" face=\"sans-serif, Verdana, Arial\"><strong>DOMAIN
       :&nbsp;</strong></font></div></td>
-    <td>$domain_list</td></tr>";
+    <td>$sel_domain</td></tr>";
 }
 
 ?>

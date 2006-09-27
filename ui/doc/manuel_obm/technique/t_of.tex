@@ -6,11 +6,47 @@
 
 \subsection{Présentation du Framework}
 
-- principes (independance)
-- Normes de nommage
-- fichiers
-- fonctionnalites:
-of\_session
-of\_display
-sql,...
-right
+Le développement du framework OF (\obm framework) a pour objectif de simplifier les évolutions et la maintenance d'\obm en traitant de façon générique les problématiques ou fonctionnalités rencontrées.
+
+Son développement est empirique et le framework s'enrichit en suivant le développement d'\obm.
+
+Ce n'est donc pas un framework industrialisé général prêt à l'emploi pour toute application web, mais il propose de nombreuses fonctionnalités bien utiles notamment dans les applications web de type gestion.
+
+
+\subsubsection{Organisation et Principes de base}
+
+Les fichiers fournis par le framework sont situés dans le répertoire \fichier{obminclude/of/}.\\
+
+L'idée générale est que tout ce qui est traité dans le framework soit indépendant de l'application elle-même. Ceci se traduit par :\\
+\begin{itemize}
+\item Pas d'informations de modules en dur dans le framework (nom ``company'', ``contact'',.. ne doivent jamais apparaître)
+\item Pas d'utilisation de variables globales définies dans un module
+\end{itemize}
+
+
+\subsubsection{Fonctionnalités proposées}
+
+\begin{tabular}{|p{4cm}|p{3cm}|p{6.5cm}|}
+\hline
+\textbf{Fonctionnalité} & \textbf{Fichier} & \textbf{Description} \\
+\hline
+session & of\_session.inc & Gestion des sessions web \\
+\hline
+multi domaine & of\_query.inc & Gestion du multi-domaine dans \obm \\
+\hline
+SQL & of\_query.inc & Interface multi-bases de données de création de requêtes SQL \\
+\hline
+thèmes & of\_display.inc & Fonctions génériques d'affichage pouvant être surchargées par les thèmes \\
+\hline
+gestion des droits & ? & Gestion des droits et ACL sur une entité \\
+\hline
+appel modules externes & of\_extmod.inc & Fonctionnalités d'appel de modules externes (ex: ajouter un contact à un groupe) \\
+\hline
+préférences utilisateurs & of\_query.inc & Gestion des préférences des utilisateurs (paramètres + affichage) \\
+\hline
+résultats de recherche & of\_display.inc & Classe \variable{of\_display} : Navigation, tri des résultats de recherche \\
+\hline
+catégories & of\_category.inc & Gestion des catégories des modules \\
+\hline
+\end{tabular}
+\vspace{0.3cm}

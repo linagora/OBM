@@ -858,6 +858,79 @@ function of_category_dis_entity_stats($entity, $cat, $cat_q) {
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
+function of_category_get_ordered_new($entity, $catu, $mode="multi", $entity_id=0) {
+  global $cdg_sql, $cgp_hide;
+
+  $cat = strtolower($catu);
+  $cats = array();
+  if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
+    return $cats;
+  }
+
+  $multidomain = sql_multidomain(strtolower($table));
+
+  // If an entity id is given, restrict categories to those of this entry
+  if ( ($mode == "multi") && ($entity_id > 0)) {
+    $query = "SELECT category.*
+      FROM CategoryLink
+        LEFT JOIN Category ON categorylink_category_id = category_id
+      WHERE categorylink_entity_id = '$entity_id'
+        AND categorylink_entity = '$entity'
+        AND categorylink_category = '$cat'
+        $multidomain
+      ORDER BY category_code, category_label";
+  } else {
+    $query = "SELECT *
+      FROM Category
+      WHERE
+        categorylink_category = '$cat'
+        $multidomain
+      ORDER BY category_code, category_label";
+  }
+  $cat_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "of_category_get_ordered()");
+  $cat_q->query($query);
+  
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f($field_id);
+    $code = $cat_q->f($field_code);
+    $label = $cat_q->f($field_label);
+    $cat_info = array("id" => $id,
+		      "label" => $label,
+		      "code" => $code);
+    $cats[] = $cat_info;
+  }
+
+  if (is_array($cats)) {
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+
+    if ($has_code) {
+      if (count($cats) > 0) {
+	usort($cats, "_of_category_compare");
+      }
+    }
+  }
+
+  return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category query execution
+// Parameters:
+//   - $entity    : target entity
+//   - $catu      : target category (string, may have upper case)
+//   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
+//   - $entity_id : if not 0, get only cat referenced by this entry
+// Return:
+//   Array with orderer categories
+///////////////////////////////////////////////////////////////////////////////
 function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
   global $cdg_sql, $cgp_hide;
 
@@ -875,7 +948,7 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
   $linktable = ucfirst($entity) . ucfirst($cat)."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
   $linkfield_cat = $entity.$cat."link_category_id";
-	$multidomain = sql_multidomain(strtolower($table));
+  $multidomain = sql_multidomain(strtolower($table));
 
   // If an entity id is given, restrict categories to those of this entry
   if ( ($mode == "multi") && ($entity_id > 0)) {
@@ -944,19 +1017,19 @@ function of_category_query_insert($entity, $catu, $param) {
   $field_usercreate = $field_prefix."usercreate";
   $field_label = $field_prefix."label";
   $field_code = $field_prefix."code";
-	$field_domain = $field_prefix."domain_id";
-	$domain_id = $obm["domain_id"];
+  $field_domain = $field_prefix."domain_id";
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO $table (
     $field_timecreate,
     $field_usercreate,
-		$field_domain,
+    $field_domain,
     $field_label,
     $field_code)
   VALUES (
     '$timecreate',
     '$usercreate',
-		'$domain_id',
+    '$domain_id',
     '$cat_label',
     '$cat_code')";
 
@@ -1029,15 +1102,16 @@ function of_category_query_update($entity, $catu, $param) {
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
   $field_code = $field_prefix."code";
-	$multidomain = sql_multidomain(strtolower($table));
+  $multidomain = sql_multidomain(strtolower($table));
 	
   $query = "UPDATE $table SET
     $field_timeupdate = '$timeupdate',
     $field_userupdate = '$userupdate',
     $field_label = '$cat_label',
     $field_code = '$cat_code'
-    WHERE
-      $field_id='$cat_id' $multidomain";
+  WHERE
+    $field_id='$cat_id'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "of_category_query_update()");
   $obm_q = new DB_OBM;
@@ -1068,7 +1142,7 @@ function of_category_query_delete($entity, $catu, $param) {
     $id = $param["${cat}"];
   }
 
-	$multidomain = sql_multidomain(strtolower($table));
+  $multidomain = sql_multidomain(strtolower($table));
 
   if ($id != '') {
     $query = "DELETE FROM $table WHERE $field_id ='$id' $multidomain";
