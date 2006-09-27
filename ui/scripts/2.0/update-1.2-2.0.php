@@ -33,7 +33,6 @@ function get_companycategory1_list() {
     FROM CompanyCategory1
     ORDER BY companycategory_id";
 
-  display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -42,110 +41,95 @@ function get_companycategory1_list() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Process the List list, convert the stored structure
+// Process the CompanyCategory1 list
 // companycategory_code -> companycategory1_code
 // Parameters:
 //   - $l_q : DBO List list (with associated info)
 ///////////////////////////////////////////////////////////////////////////////
-function process_list_list_structure($l_q) {
+function process_companycategory1_list($c_q) {
 
-  $pattern = "20:\"companycategory_code";
-  $new_text = "21:\"companycategory1_code";
+  $cat = "companycategory1";
 
-  $nb_l = $l_q->num_rows();
+  $nb_c = $c_q->num_rows();
   $nb = 0;
-  $list_q = new DB_OBM;
+  $obm_q = new DB_OBM;
 
-  echo "** Processing List list (converting structure) : $nb_l entries\n";
+  echo "** Processing CompanyCategory1 list : $nb_c entries\n";
 
-  while ($l_q->next_record()) {
-    $id = $l_q->f("list_id");
-    $name = $l_q->f("list_name");
-    $structure = $l_q->f("list_structure");
+  while ($c_q->next_record()) {
+    $id = $c_q->f("companycategory1_id");
+    $tu = $c_q->f("companycategory1_timeupdate");
+    $tc = $c_q->f("companycategory1_timecreate");
+    $uu = $c_q->f("companycategory1_userupdate");
+    $uc = $c_q->f("companycategory1_usercreate");
+    $code = $c_q->f("companycategory1_code");
+    $label = $c_q->f("companycategory1_label");
 
-    echo "List $id";
+    $nb++;
+    $query = "INSERT INTO Category (
+      category_timeupdate,
+      category_timecreate,
+      category_userupdate,
+      category_usercreate,
+      category_category,
+      category_code,
+      category_label
+    ) VALUES (
+      '$tu',
+      '$tc',
+      '$uu',
+      '$uc',
+      '$cat',
+      '$code',
+      '$label')";
+    $obm_q->query($query);
 
-    if (preg_match("/$pattern/", $structure)) {
-      $nb++;
-      $new_structure = addslashes(preg_replace("/$pattern/", $new_text, $structure));
-      $query = "UPDATE List
-      SET list_structure='$new_structure'
-      WHERE list_id='$id'";
-      $list_q->query($query);
-      echo " - Corrected\n";
-    } else {
-      echo " - OK\n";
-    }
+    // Get the new id to create cats hash
+    $query = "SELECT category_id
+      FROM Category
+      WHERE category_category = '$cat'
+        AND category_timecreate = '$tc'
+        AND category_code = '$code'
+        AND category_label  ='$label'";
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $c_id = $obm_q->f("category_id");
+
+    $cats[$id] = $c_id;
+
+    // migrate links
+    $query = "SELECT *
+    FROM CompanyCategory1Link
+    WHERE companycategory1link_category_id='$id'";
+    $obm_q->query($query);
+
+    // XXXXXX
+    while ($obm_q->next_record()) {
+      $comp_id = $c_q->f("companycategory1link_company_id");
+      $query = "INSERT INTO Category (
+        category_timeupdate,
+        category_timecreate,
+        category_userupdate,
+        category_usercreate,
+        category_category,
+        category_code,
+        category_label
+      ) VALUES (
+        '$tu',
+        '$tc',
+        '$uu',
+        '$uc',
+        '$cat',
+        '$code',
+        '$label')";
+    $obm_q->query($query);
+    
   }
 
-  echo "** End Processing List list structure : $nb_l entries, $nb processed\n";
+  echo "** End Processing CompanyCategory1 list : $nb_c entries, $nb processed\n";
 
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Process the List list, convert the stored query
-// convert companycategory_code -> companycategory1_code
-// Function -> FontactFunction
-// function_ -> contactfunction_
-// Parameters:
-//   - $l_q : DBO List list (with associated info)
-///////////////////////////////////////////////////////////////////////////////
-function process_list_list_query($l_q) {
-
-  $pattern = " Function";
-  $new_text = " ContactFunction";
-  $pattern2 = " function_";
-  $new_text2 = " contactfunction_";
-  $pattern3 = " CompanyCategory ";
-  $new_text3 = " CompanyCategory1 ";
-  $pattern4 = "companycategory_";
-  $new_text4 = "companycategory1_";
-  $pattern5 = " CompanyCategoryLink ";
-  $new_text5 = " CompanyCategory1Link ";
-  $pattern6 = "companycategorylink";
-  $new_text6 = "companycategory1link";
-
-  $nb_l = $l_q->num_rows();
-  $nb = 0;
-  $list_q = new DB_OBM;
-
-  echo "** Processing List list (converting query) : $nb_l entries\n";
-
-  while ($l_q->next_record()) {
-    $id = $l_q->f("list_id");
-    $name = $l_q->f("list_name");
-    $structure = $l_q->f("list_structure");
-    $query = $l_q->f("list_query");
-
-    echo "List $id";
-
-    if ( (preg_match("/$pattern/", $query))
-	  || (preg_match("/$pattern2/", $query))
-	  || (preg_match("/$pattern3/", $query))
-	  || (preg_match("/$pattern4/", $query))
-	  || (preg_match("/$pattern5/", $query))
-	  || (preg_match("/$pattern6/", $query)) ) {
-      $nb++;
-      $new_query = preg_replace("/$pattern/", $new_text, $query);
-      $new_query = preg_replace("/$pattern2/", $new_text2, $new_query) ;
-      $new_query = preg_replace("/$pattern3/", $new_text3, $new_query) ;
-      $new_query = preg_replace("/$pattern4/", $new_text4, $new_query) ;
-      $new_query = preg_replace("/$pattern5/", $new_text5, $new_query) ;
-      $new_query = addslashes(preg_replace("/$pattern6/", $new_text6, $new_query));
-      $query = "UPDATE List
-      SET list_query='$new_query'
-      WHERE list_id='$id'";
-      $list_q->query($query);
-      echo " - Corrected\n";
-    } else {
-      echo " - OK\n";
-    }
-  }
-
-  echo "** End Processing List list query : $nb_l entries, $nb processed\n";
-
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
