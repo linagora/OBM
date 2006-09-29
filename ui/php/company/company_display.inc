@@ -1515,7 +1515,9 @@ function dis_company_admin_index() {
   }
 
   if (! $cgp_hide["company"]["category1"]) {
-    $cats1 = of_category_get_ordered("company", "category1");
+    //    $cats1 = of_category_get_ordered("company", "category1");
+    $cats1 = of_category_get_ordered_new("companycategory1");
+    print_r($cats1);
     $block .= of_category_dis_admin_form("company", "category1", $cats1);
   }
 

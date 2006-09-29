@@ -186,7 +186,7 @@ function check_contract_type_upd(form,formd)
     return false;
   }
   form.sel_type.value=formd.sel_type.options[formd.sel_type.selectedIndex].value;
-  if ((formd.sel_type.selectedIndex >= 0) && (form.tf_type.value != \"\"))
+  if ((formd.sel_type.selectedIndex >= 0) && (form.tf_label.value != \"\"))
     return true;
   else {
     alert(\"$l_j_type_update\");
@@ -213,7 +213,7 @@ function show_kind_contract(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_type_new(form)
 {
-  if (form.tf_type.value != \"\")
+  if (form.tf_label.value != \"\")
     return true;
   else
   {

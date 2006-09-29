@@ -1990,7 +1990,7 @@ function html_contract_admin_form($type_q) {
   global $l_type_update_error, $l_type_delete_error, $l_type_delete_ok;
 
   $dis_sel_type = "<select name=\"sel_type\" onChange=\"
-    forms.form_type_update.tf_type.value=this.options[this.selectedIndex].text;\"
+    forms.form_type_update.tf_label.value=this.options[this.selectedIndex].text;\"
     size=\"4\">";
   while ($type_q->next_record()) {
     $dis_sel_type .= "\n<option value=\"".$type_q->f("contracttype_id")."\">".$type_q->f("contracttype_label") .
@@ -2036,7 +2036,7 @@ function html_contract_admin_form($type_q) {
           <td>
 	    <input type=\"hidden\" name=\"sel_type\" value=\"\" />
 	    <input type=\"hidden\" name=\"action\" value=\"type_update\" />
-            <input type=\"text\" name=\"tf_type\" />
+            <input type=\"text\" name=\"tf_label\" />
 	  </td>
 	  <td rowspan=\"2\">
 	    <input type=\"submit\" name=\"sub_type\" value=\"$l_type_update\"
@@ -2056,7 +2056,7 @@ function html_contract_admin_form($type_q) {
      <table>
       <tr>
        <td class=\"adminLabel\">
-         $l_type_new : <input type=\"text\" name=\"tf_type\" />
+         $l_type_new : <input type=\"text\" name=\"tf_label\" />
        </td>
       </tr><tr>
        <td class=\"adminLabel\">

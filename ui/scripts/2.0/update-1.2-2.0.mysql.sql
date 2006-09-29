@@ -118,7 +118,7 @@ CREATE TABLE Category (
   category_category    varchar(24) NOT NULL default '',
   category_code        varchar(10) NOT NULL default '',
   category_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (companycategory1_id)
+  PRIMARY KEY (category_id)
 );
 
 

@@ -240,7 +240,6 @@ function run_query_document_insert(&$document) {
     // We create the document on disk
     if ($kind == $cdoc_kind_file) {
       if (! run_query_document_create_file($document)) {
-  echo "p2=$doc_id";
 	$err_msg = $l_create_file_error;
 	// If error, we delete The document infos to keep bd and rep on sync
 	run_query_document_delete($doc_id);

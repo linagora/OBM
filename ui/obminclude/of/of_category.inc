@@ -851,17 +851,16 @@ function of_category_dis_entity_stats($entity, $cat, $cat_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Category query execution
 // Parameters:
+//   - $cat       : category name
 //   - $entity    : target entity
-//   - $catu      : target category (string, may have upper case)
-//   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
 //   - $entity_id : if not 0, get only cat referenced by this entry
+//   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
 // Return:
 //   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_get_ordered_new($entity, $catu, $mode="multi", $entity_id=0) {
+function of_category_get_ordered_new($cat, $entity="", $entity_id=0, $mode="multi") {
   global $cdg_sql, $cgp_hide;
 
-  $cat = strtolower($catu);
   $cats = array();
   if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
     return $cats;
@@ -883,7 +882,7 @@ function of_category_get_ordered_new($entity, $catu, $mode="multi", $entity_id=0
     $query = "SELECT *
       FROM Category
       WHERE
-        categorylink_category = '$cat'
+        category_category = '$cat'
         $multidomain
       ORDER BY category_code, category_label";
   }
@@ -892,9 +891,9 @@ function of_category_get_ordered_new($entity, $catu, $mode="multi", $entity_id=0
   $cat_q->query($query);
   
   while ($cat_q->next_record()) {
-    $id = $cat_q->f($field_id);
-    $code = $cat_q->f($field_code);
-    $label = $cat_q->f($field_label);
+    $id = $cat_q->f("category_id");
+    $code = $cat_q->f("category_code");
+    $label = $cat_q->f("category_label");
     $cat_info = array("id" => $id,
 		      "label" => $label,
 		      "code" => $code);

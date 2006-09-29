@@ -12,15 +12,7 @@ include("$obminclude/global.inc");
 
 // Migrate all user categories to new model
 $c_q = get_companycategory1_list();
-process_list_list_structure($l_q);
-$l_q = get_list_list();
-process_list_list_query($l_q);
-$i_q = get_import_list();
-process_import_list($i_q);
-
-// Update List to set correct mode
-$l_q = get_list_list();
-process_list_list_mode($l_q);
+process_companycategory1_list($c_q);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,7 +23,7 @@ function get_companycategory1_list() {
 
   $query = "SELECT *
     FROM CompanyCategory1
-    ORDER BY companycategory_id";
+    ORDER BY companycategory1_id";
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -48,7 +40,7 @@ function get_companycategory1_list() {
 ///////////////////////////////////////////////////////////////////////////////
 function process_companycategory1_list($c_q) {
 
-  $cat = "companycategory1";
+  $category = "companycategory1";
 
   $nb_c = $c_q->num_rows();
   $nb = 0;
@@ -79,7 +71,7 @@ function process_companycategory1_list($c_q) {
       '$tc',
       '$uu',
       '$uc',
-      '$cat',
+      '$category',
       '$code',
       '$label')";
     $obm_q->query($query);
@@ -87,180 +79,42 @@ function process_companycategory1_list($c_q) {
     // Get the new id to create cats hash
     $query = "SELECT category_id
       FROM Category
-      WHERE category_category = '$cat'
+      WHERE category_category = '$category'
         AND category_timecreate = '$tc'
         AND category_code = '$code'
         AND category_label  ='$label'";
     $obm_q->query($query);
     $obm_q->next_record();
-    $c_id = $obm_q->f("category_id");
+    $c_new_id = $obm_q->f("category_id");
 
-    $cats[$id] = $c_id;
+    $cats[$id] = $c_new_id;
 
-    // migrate links
+    // migrate links for one category ------------------------------------------
     $query = "SELECT *
     FROM CompanyCategory1Link
     WHERE companycategory1link_category_id='$id'";
     $obm_q->query($query);
 
-    // XXXXXX
+    // For each link
     while ($obm_q->next_record()) {
       $comp_id = $c_q->f("companycategory1link_company_id");
-      $query = "INSERT INTO Category (
-        category_timeupdate,
-        category_timecreate,
-        category_userupdate,
-        category_usercreate,
-        category_category,
-        category_code,
-        category_label
+      $query = "INSERT INTO CategoryLink (
+        categorylink_category_id,
+        categorylink_entity_id,
+        categorylink_category,
+        categorylink_entity
       ) VALUES (
-        '$tu',
-        '$tc',
-        '$uu',
-        '$uc',
-        '$cat',
-        '$code',
-        '$label')";
-    $obm_q->query($query);
-    
+        '$c_new_id',
+        '$comp_id',
+        '$category',
+        'company')";
+      $obm_q->query($query);
+    }
   }
 
   echo "** End Processing CompanyCategory1 list : $nb_c entries, $nb processed\n";
 
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Import list
-///////////////////////////////////////////////////////////////////////////////
-function get_import_list() {
-  global $cdg_sql;
-
-  $query = "SELECT
-      import_id,
-      import_name,
-      import_desc
-    FROM Import
-    ORDER BY import_id";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Process the Import list (convert comp_cat -> comp_cat1)
-// Parameters:
-//   - $i_q : DBO Import list (with associated info)
-///////////////////////////////////////////////////////////////////////////////
-function process_import_list($i_q) {
-
-  $pattern = "comp_cat\"";
-  $new_text = "comp_cat1\"";
-  $pattern2 = "l_cat\"";
-  $new_text2 = "l_category1\"";
-
-  $nb_i = $i_q->num_rows();
-  $nb = 0;
-  $obm_q = new DB_OBM;
-
-  echo "** Processing Import list (converting desc) : $nb_i entries\n";
-
-  while ($i_q->next_record()) {
-    $id = $i_q->f("import_id");
-    $name = $i_q->f("import_name");
-    $desc = $i_q->f("import_desc");
-
-    echo "Import $id";
-
-    if ( (preg_match("/$pattern/", $desc))
-	 || (preg_match("/$pattern2/", $desc)) ) {
-      $nb++;
-      $new_desc = preg_replace("/$pattern/", $new_text, $desc);
-      $new_desc = addslashes(preg_replace("/$pattern2/", $new_text2, $new_desc));
-      $query = "UPDATE Import
-      SET import_desc='$new_desc'
-      WHERE import_id='$id'";
-      $obm_q->query($query);
-      echo " - Corrected\n";
-    } else {
-      echo " - OK\n";
-    }
-  }
-
-  echo "** End Processing Import list : $nb_i entries, $nb processed\n";
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return the current mode of a given list according to parameters
-// Parameters:
-//   - $query    : list query
-//   - $criteria : list criteria (unserialized from structureà or parameter
-// Returns:
-//   $clist_mode_expert || $clist_mode_normal
-///////////////////////////////////////////////////////////////////////////////
-function check_list_mode($query, $criteria) {
-  global $clist_mode_expert, $clist_mode_normal;
-
-  if ($criteria == "" && $query != "") {
-    $mode = $clist_mode_expert;
-  } else {
-    $mode = $clist_mode_normal;
-  }
-
-  return $mode;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Process the List list, to update mode
-// Parameters:
-//   - $l_q : DBO List list (with associated info)
-///////////////////////////////////////////////////////////////////////////////
-function process_list_list_mode($l_q) {
-
-  $nb_l = $l_q->num_rows();
-  $nb = 0;
-  $list_q = new DB_OBM;
-
-  echo "** Processing List list (setting Mode) : $nb_l entries\n";
-
-  while ($l_q->next_record()) {
-    $id = $l_q->f("list_id");
-    $name = $l_q->f("list_name");
-    $mode = $l_q->f("list_mode");
-    $structure = $l_q->f("list_structure");
-    $criteria = unserialize($structure);
-    $query = $l_q->f("list_query");
-
-    echo "List $id";
-
-    $new_mode = check_list_mode($query, $criteria);
-
-    echo ":$mode:$new_mode:";
-    if ("$mode" !== "$new_mode") {
-      $nb++;
-      $query = "UPDATE List
-      SET list_mode='$new_mode'
-      WHERE list_id='$id'";
-      $list_q->query($query);
-      echo " - Corrected\n";
-    } else {
-      echo " - OK\n";
-    }
-  }
-
-  echo "** End Processing List list Mode : $nb_l entries, $nb processed\n";
-
-}
-
 
 
 

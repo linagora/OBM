@@ -750,7 +750,7 @@ function run_query_contract_status_update($contract) {
 function run_query_contract_status_delete($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contractstatus");
+  $multidomain = sql_multidomain("contractstatus");
   $query = "DELETE FROM ContractStatus 
 		WHERE contractstatus_id='$id' $multidomain";
 
@@ -770,7 +770,7 @@ function run_query_contract_status_delete($id) {
 function run_query_contract_status_links($s_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contract");
+  $multidomain = sql_multidomain("contract");
 
   $query = "SELECT
       contract_id, 
@@ -794,7 +794,7 @@ function run_query_contract_status_links($s_id) {
 function get_contract_priority_label($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contractpriority");
+  $multidomain = sql_multidomain("contractpriority");
 
   $query = "SELECT
       contractpriority_label
@@ -819,7 +819,7 @@ function get_contract_priority_label($id) {
 function get_contract_status_label($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contractstatus");
+  $multidomain = sql_multidomain("contractstatus");
 
   $query = "SELECT
       contractstatus_label
@@ -842,8 +842,8 @@ function get_contract_status_label($id) {
 function run_query_contract_type() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contracttype");
-
+  $multidomain = sql_multidomain("contracttype");
+	
   $obm_q = new DB_OBM;
   $query = "SELECT contracttype_label, contracttype_id 
 		FROM ContractType WHERE 1=1 $multidomain";
@@ -888,7 +888,7 @@ function run_query_company_info($id) {
 function run_query_contact_contract($p_company_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain("contact");
 
   $query = "SELECT
       contact_id,
@@ -898,7 +898,7 @@ function run_query_contact_contract($p_company_id) {
     FROM Contact 
     WHERE contact_company_id='$p_company_id' $multidomain";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_contract()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -914,12 +914,12 @@ function run_query_contact_contract($p_company_id) {
 function run_query_contract($archive=false) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contract");
+  $multidomain = sql_multidomain("contract");
 
   if (! $archive) {
     $whereq = "WHERE contract_archive = 0 $multidomain";
   } else {
-  	$whereq = "WHERE 1=1 $multidomain";
+    $whereq = "WHERE 1=1 $multidomain";
   }
 
   $query = "SELECT *,
@@ -928,7 +928,7 @@ function run_query_contract($archive=false) {
     $whereq
     ORDER BY company_name";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract()");
   $con_q = new DB_OBM;
   $con_q->query($query);
 
@@ -944,22 +944,22 @@ function run_query_contract($archive=false) {
 function run_query_contract_type_insert($contract) {
   global $auth, $cdg_sql, $obm;
 	
-  $label = $contract["type_label"];
-	$domain_id = $obm["domain_id"];
+  $label = $contract["label"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO ContractType (
     contracttype_timeupdate,
     contracttype_timecreate,
     contracttype_usercreate,
-		contracttype_domain_id,
+    contracttype_domain_id,
     contracttype_label)
   VALUES (null,
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
-		'$domain_id',
+    '$domain_id',
     '$label')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_type_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -976,16 +976,17 @@ function run_query_contract_type_update($contract) {
   global $auth, $cdg_sql;
 
   $type = $contract["type"];
-  $label = $contract["type_label"];
-	$multidomain = sql_multidomain("contracttype");
+  $label = $contract["label"];
+  $multidomain = sql_multidomain("contracttype");
 
   $query = "UPDATE ContractType SET 
       contracttype_label='$label',
       contracttype_timeupdate='".date("Y-m-d H:i:s")."',
       contracttype_userupdate='".$auth->auth["uid"]."'
-    WHERE contracttype_id='$type' $multidomain";
+    WHERE contracttype_id='$type'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_type_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1001,11 +1002,11 @@ function run_query_contract_type_update($contract) {
 function run_query_contract_type_delete($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contracttype");
+  $multidomain = sql_multidomain("contracttype");
 	
   $query = "DELETE FROM ContractType WHERE contracttype_id='$id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_type_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1021,15 +1022,16 @@ function run_query_contract_type_delete($id) {
 function run_query_contract_type_links($t_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contract");
+  $multidomain = sql_multidomain("contract");
 
   $query = "SELECT
       contract_id, 
       contract_label
-    from Contract
-    where contract_type_id='$t_id' $multidomain";
+    FROM Contract
+    WHERE contract_type_id='$t_id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_type_links()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1045,14 +1047,15 @@ function run_query_contract_type_links($t_id) {
 function get_contract_type_label($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contracttype");
+  $multidomain = sql_multidomain("contracttype");
 
   $query = "SELECT
       contracttype_label
     FROM ContractType
-    WHERE contracttype_id='$id' $multidomain";
+    WHERE contracttype_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_contract_type_label()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1076,9 +1079,10 @@ function get_contract_info($id) {
       contract_id,
       contract_name,
     FROM Contract
-    WHERE contract_id='$id' $multidomain";
+    WHERE contract_id='$id'
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_contract_info()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1115,7 +1119,7 @@ function run_query_contract_id($contract) {
   $autorenewal =$contract["autorenewal"];
   $sel_type = $contract["type"];
   $com = $contract["comment"];
-	$multidomain = sql_multidomain("contract");
+  $multidomain = sql_multidomain("contract");
 	
   // comment not searched because processed before stored in db
   $query = "SELECT
@@ -1131,7 +1135,7 @@ function run_query_contract_id($contract) {
       and contract_priority_id = '$priority'
       and contract_status_id = '$status' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contract_id()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1171,7 +1175,7 @@ function run_query_check_contract($c_id, $name) {
     WHERE contract_label $like '$name%'
       $where_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_check_contract()");
   $obm_q->query($query);
 
   return $obm_q;
