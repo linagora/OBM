@@ -252,10 +252,11 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 // Return the sql domain clause according to multidomain mode
 // Parameters:
 //   - $entity : entity to add clause
+//   - $and    : if true (default) add AND before the clause
 // Returns:
 //   - sql where clause for domain (empty for superadmin)
 ///////////////////////////////////////////////////////////////////////////////
-function sql_multidomain($entity) {
+function sql_multidomain($entity, $and=true) {
   global $c_multidomain, $udomain_id;
 
   $where = "";
@@ -267,7 +268,10 @@ function sql_multidomain($entity) {
     } else {
       $domain_id = $udomain_id;
     }
-    $where = "AND ${entity}_domain_id='$domain_id'";
+    if ($and) {
+      $wand = "AND";
+    }
+    $where = "$wand ${entity}_domain_id='$domain_id'";
   }
 
   return $where;

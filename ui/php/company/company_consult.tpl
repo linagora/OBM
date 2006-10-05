@@ -43,7 +43,7 @@
     </tr>
   </table>
 
-$block_cat1
+$block_user
 
 <div class="detailHead">$l_comment</div>
   

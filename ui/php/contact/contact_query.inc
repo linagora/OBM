@@ -472,7 +472,7 @@ function run_query_contact_insert($contact) {
     $comp_id = "0";
   }
   
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $company = $contact["company"];
   $dsrc = $contact["datasource"];
@@ -531,14 +531,14 @@ function run_query_contact_insert($contact) {
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
 
-  $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
+  $archive = (isset($contact["archive"]) ? '1' : '0');
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
 
   $query = "INSERT INTO Contact (contact_timeupdate,
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
-		contact_domain_id,
+    contact_domain_id,
     contact_datasource_id,
     contact_company_id,
     contact_company,
@@ -576,7 +576,7 @@ function run_query_contact_insert($contact) {
     '$now',
     '$uid',
     '$uid',
-		'$domain_id',
+    '$domain_id',
     '$dsrc',
     '$comp_id',
     '$company',
@@ -603,7 +603,7 @@ function run_query_contact_insert($contact) {
     '$email',
     '$email2',
     '$mailok',
-    '$arch',
+    '$archive',
     '$priv',
     $date,
     '$comment',
@@ -628,7 +628,7 @@ function run_query_contact_insert($contact) {
       AND contact_email ='$email'
       AND contact_phone = '$phone'
       AND contact_zipcode = '$zip'
-			AND contact_domain_id='$domain_id'";
+      AND contact_domain_id='$domain_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -737,7 +737,7 @@ function run_query_contact_update($contact) {
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
 
-  $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
+  $archive = (isset($contact["archive"]) ? '1' : '0');
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
   $category1 = $contact["category1"];
   $category2 = $contact["category2"];
@@ -774,14 +774,15 @@ function run_query_contact_update($contact) {
     contact_email='$email',
     contact_email2='$email2',
     contact_mailing_ok='$mailok',
-    contact_archive='$arch',
+    contact_archive='$archive',
     contact_privacy='$priv',
     contact_date=$date,
     contact_comment='$comment',
     contact_comment2='$comment2',
     contact_comment3='$comment3',
     contact_category5_id='$category5'
-  WHERE contact_id='$id' $multidomain";
+  WHERE contact_id='$id'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_update()");
   $obm_q = new DB_OBM;

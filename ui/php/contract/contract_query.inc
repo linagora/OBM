@@ -266,7 +266,7 @@ function run_query_contract_insert($contract) {
     $usercomment = $contract["usercomment"];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
-  $archive = ($contract["archive"] ? $contract["archive"] : "0");
+  $archive = ($contract["archive"] == "1" ? "1" : "0");
 
   $query = "INSERT INTO Contract
      (contract_timeupdate,
@@ -393,8 +393,8 @@ function run_query_contract_update($contract) {
   if ($deal_id == "") {
     $deal_id = "0";
   }
-  $archive = ($contract["archive"] ? $contract["archive"] : "0");
-	$multidomain = sql_multidomain("contract");
+  $archive = ($contract["archive"] == "1" ? "1" : "0");
+  $multidomain = sql_multidomain("contract");
 	  
   $query = "UPDATE Contract SET
       contract_timeupdate = '". date("Y-m-d H:i:s")."',

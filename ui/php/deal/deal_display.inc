@@ -2493,12 +2493,12 @@ function dis_deal_admin_index() {
 
   $roles = of_category_get_ordered("DealCompany", "role");
   $block .= "<hr />";
-  $block .= of_category_dis_admin_form("DealCompany", "role", $roles);
+  $block .= of_category_dis_admin_form("role", $roles);
 
   if (! $cgp_hide["deal"]["dealcategory1"]) {
     $cats1 = of_category_get_ordered("deal", "category1");
     $block .= "<hr />";
-    $block .= of_category_dis_admin_form("deal", "category1", $cats1);
+    $block .= of_category_dis_admin_form("category1", $cats1);
   }
 
   return $block;

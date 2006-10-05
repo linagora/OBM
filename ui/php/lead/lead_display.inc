@@ -621,7 +621,7 @@ function dis_lead_admin_index() {
 
   $sources = of_category_get_ordered("lead", "source");
   $block .= "<hr />";
-  $block .= of_category_dis_admin_form("lead", "source", $sources);
+  $block .= of_category_dis_admin_form("source", $sources);
 
   return $block;
 }

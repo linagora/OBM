@@ -466,11 +466,10 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Admin Category section
 // Parameters:
-//   - $entity : target entity
 //   - $catu   : target category (string) can have Uppercase eg: CompanyRole
 //   - $cats   : Category array
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_admin_form($entity, $catu, $cats) {
+function of_category_dis_admin_form($catu, $cats) {
   global $l_c_manage, $l_code, $l_label;
   global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
@@ -851,78 +850,6 @@ function of_category_dis_entity_stats($entity, $cat, $cat_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Category query execution
 // Parameters:
-//   - $cat       : category name
-//   - $entity    : target entity
-//   - $entity_id : if not 0, get only cat referenced by this entry
-//   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
-// Return:
-//   Array with orderer categories
-///////////////////////////////////////////////////////////////////////////////
-function of_category_get_ordered_new($cat, $entity="", $entity_id=0, $mode="multi") {
-  global $cdg_sql, $cgp_hide;
-
-  $cats = array();
-  if ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"]) {
-    return $cats;
-  }
-
-  $multidomain = sql_multidomain(strtolower($table));
-
-  // If an entity id is given, restrict categories to those of this entry
-  if ( ($mode == "multi") && ($entity_id > 0)) {
-    $query = "SELECT category.*
-      FROM CategoryLink
-        LEFT JOIN Category ON categorylink_category_id = category_id
-      WHERE categorylink_entity_id = '$entity_id'
-        AND categorylink_entity = '$entity'
-        AND categorylink_category = '$cat'
-        $multidomain
-      ORDER BY category_code, category_label";
-  } else {
-    $query = "SELECT *
-      FROM Category
-      WHERE
-        category_category = '$cat'
-        $multidomain
-      ORDER BY category_code, category_label";
-  }
-  $cat_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "of_category_get_ordered()");
-  $cat_q->query($query);
-  
-  while ($cat_q->next_record()) {
-    $id = $cat_q->f("category_id");
-    $code = $cat_q->f("category_code");
-    $label = $cat_q->f("category_label");
-    $cat_info = array("id" => $id,
-		      "label" => $label,
-		      "code" => $code);
-    $cats[] = $cat_info;
-  }
-
-  if (is_array($cats)) {
-    $has_code = false;
-    foreach ($cats as $one_cat) {
-      if ($one_cat["code"] != "") {
-	$has_code = true;
-	break;
-      }
-    }
-
-    if ($has_code) {
-      if (count($cats) > 0) {
-	usort($cats, "_of_category_compare");
-      }
-    }
-  }
-
-  return $cats;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category query execution
-// Parameters:
 //   - $entity    : target entity
 //   - $catu      : target category (string, may have upper case)
 //   - $mode      : ([mono|multi]) : to retrieve cats when restricted to entry 
@@ -1176,7 +1103,7 @@ function of_category_query_delete_link($entity, $cat, $entity_id) {
     FROM $linktable 
     WHERE $linkfield_ent = '$entity_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_query_delete_link()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -1522,6 +1449,515 @@ function _of_category_get_entity_count($entity) {
 
   return $obm_q->f("count_entity");
 }
+
+
+//=============================================================================
+// OF USER Category API
+//=============================================================================
+
+
+// Display functions ----------------------------------------------------------
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Global User category search block 
+// Parameters:
+//   - $entity : user category for this entity
+//   - $params : parameters with search data
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_dis_search($entity, $params) {
+  global $cgp_user, $l_all, $l_cat_tree;
+
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $cats = of_category_user_get_ordered("$cat_name");
+      $cat_mode = $onet_cat["mode"];
+      $cat = $params["$cat_name"];
+      $cat_code = $params["${cat_name}_code"];
+      $cat_tree = ($params["${cat_name}_tree"] == "1" ? "checked = \"checked\"" : "");
+
+      $sel_append = "onchange=\"if (this.options[this.selectedIndex].value != '$c_all') {
+          mytext = this.options[this.selectedIndex].text;
+          pos = mytext.indexOf(' ');
+          code = mytext.substr(0, pos);
+          this.form.tf_${cat_name}_code.value = code + '.';
+       } \"";
+
+      $block_user .= of_category_user_dis_search_select($cat_name, $cats, $cat, array("all", "none"), $sel_append);
+
+      $block_user .= "
+    <div class=\"searchLabel\">$l_cat_tree<br />
+      <input type=\"checkbox\" name=\"cba_${cat_name}_tree\" value=\"1\" $cat_tree />
+      <input type=\"hidden\" name=\"tf_${cat_name}_code\" value=\"$cat_code\" />
+    </div>";
+    }
+  }
+
+  return $block_user;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: One User category search block 
+// Parameters:
+//   - $cat           : target category
+//   - $cats          : Category array
+//   - $cat_id        : selected target category id
+//   - $first_element : scalar or array : (["all"|"none"])
+//   - $sel_append    : string (eg javascript code) to append at select
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_dis_search_select($cat, $cats, $cat_id, $first_element="all", $sel_append="") {
+  global $l_all;
+
+  $l_cat = "l_${cat}"; 
+  global $$l_cat;
+
+  $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel_append);
+
+  $block_cat = "
+    <div class=\"searchLabel\">${$l_cat}<br />
+      $sel_cat
+    </div>";
+
+  return $block_cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: User category html select component
+// Parameters:
+//   - $cat           : target category
+//   - $cats          : Category array
+//   - $cat_id        : selected target category
+//   - $first_element : scalar or array : (["all"|"none"])
+//   - $sel_append    : string (eg javascript code) to append at select
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel_append="") {
+
+  if (is_array($first_element)) {
+    foreach($first_element as $element) {
+      $l_element = "l_${element}";
+      $c_element = "c_${element}"; 
+      global $$l_element, $$c_element;
+      if ($$c_element == $cat_id) {
+	$first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+      } else {
+	$first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+      }
+    }
+  } else if ($first_element != "") {
+    $l_element = "l_${first_element}";
+    $c_element = "c_${first_element}"; 
+    global $$l_element, $$c_element;
+    if ($$c_element == $cat_id) {
+      $first_option .= "
+	<option value=\"${$c_element}\" selected=\"selected\">${$l_element}</option>";
+    } else {
+      $first_option .= "
+	<option value=\"${$c_element}\">${$l_element}</option>";
+    }
+  }
+
+  // Category select
+  $sel_cat = "<select id=\"sel_${cat}\" name=\"sel_${cat}\" $sel_append>
+      $first_option";
+  if (is_array($cats)) {
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+    foreach ($cats as $one_cat) {
+      $c_id = $one_cat["id"];
+      if ($has_code) {
+	$c_code = str_pad($one_cat["code"] . " ", 10, ".");
+      }
+      $c_label = htmlentities($one_cat["label"]);
+      $sel_cat .= "\n<option value=\"$c_id\"";
+      if ($c_id == $cat_id) { $sel_cat .= " selected=\"selected\""; }
+      $sel_cat .= ">$c_code $c_label</option>";
+    }
+  }
+  $sel_cat .= "</select>";
+
+  return $sel_cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the USER category select (add and delete) for an entity form
+// Parameters:
+//   - $entity : target entity
+//   - $cat    : target category
+//   - $cats   : category to display
+//   - $mode   : ([mono|multi])
+//   - $cat_id : (mono mode) category selected
+//   - $first  : (mono mode) first element, scalar or array : (["all"|"none"])
+// Returns
+//   XHTML display of category form part
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
+  global $set_theme, $ico_add, $ico_crow, $popup_height, $popup_width, $l_none;
+  
+  if ($mode == "mono") {
+    $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first);
+    $class = "detailForm";
+  } else {
+    if (is_array($cats)) {
+      foreach ($cats as $one_cat) {
+	$c_id = $one_cat["id"];
+	$c_code = $one_cat["code"];
+	$c_label = htmlentities($one_cat["label"]);
+	$sel_name = "sel_${cat}";
+	$div_id = "$sel_name-data-$c_id";
+	$sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','$sel_name');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
+          </a>
+          $c_code $c_label
+          <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
+          </div>";
+      }
+    }
+    $url = "${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_target=sel_${cat}&amp;ext_title=${$l_cat}";
+    $link="<a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>";
+    $class = "detail";
+  }
+
+  $l_cat = "l_${cat}"; 
+  global $$l_cat;
+
+  $block_cat = "
+    <tr>
+      <td class=\"detailLabel\">$link ${$l_cat} </td>    
+      <td class=\"$class\" id=\"sel_${cat}\">$sel_cat</td>
+    </tr>";
+
+  return $block_cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display a USER category Tree (category with code like 1.4.10) with input
+// Input type is checkbox for ext_get_cat_ids else link
+// Parameters:
+//   - $entity : target entity
+//   - $cat    : target category
+//   - $params : hash of module values
+//   - $action : action called
+// Returns
+//   XHTML display of category tree with form if needed
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_dis_tree($entity, $cat, $params, $action) {
+  global $display, $l_close, $l_add, $l_cat_no;
+
+  $popup = $params["popup"];
+  $ext_title = $params["ext_title"];
+  $cats = of_category_user_get_ordered($cat);
+  $display["title"] = "<div class=\"title\">$ext_title</div>";
+
+  $block .= "
+  <div class=\"categoryTree\">";
+
+  $multi_select = false;
+  if (preg_match("/ext_get_category[1-9]?_ids/", $action) > 0) {
+    $multi_select = true;
+  }
+
+  // For multiple select we set a form
+  if ($multi_select) {
+    $block .= "
+    <form onsubmit=\"fill_ext_cat_element(this); window.close(); return false;\">";
+  }
+
+  if (is_array($cats)) {
+
+    // Check if code are there
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+    $cpt_no_code = 1;
+    foreach ($cats as $cat_info) {
+      if ($cat_info["code"] != "") {
+	$hash_code = explode(".",$cat_info["code"]);
+	$deep = count($hash_code);
+	switch ($deep) {
+        case 1:
+	  $tree[$hash_code[0]] = $cat_info;
+	  break;
+        case 2:
+	  $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
+	  break;
+        case 3:
+	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
+	  break;
+	}
+      } else {
+	// Handle categories where code is not filled (automatic numbering)
+	$no_code = "X";
+	$tree["$no_code"][$cpt_no_code] = $cat_info;
+	$tree["$no_code"]["code"] = "$no_code";
+	$tree["$no_code"]["label"] = "No code";
+	$tree["$no_code"][$cpt_no_code]["code"] = "$no_code.$cpt_no_code";
+	$cpt_no_code++;
+      }
+    }
+    if (is_array($tree)) {
+      $block .= _of_category_dis_tree_node($tree, 0, $multi_select);
+    }
+  } else {
+    $block .= "$l_cat_no";
+  }
+
+  if ($multi_select) {
+    $block .= "
+    <br />
+    <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+    <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp;
+    <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+    </form>";
+  }
+
+  $block .= "</div>";
+
+  return $block;
+}
+
+
+
+// Data functions -------------------------------------------------------------
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category query execution
+// Parameters:
+//   - $cat       : category name
+//   - $entity    : target entity
+//   - $entity_id : if not 0, get only cat referenced by this entry
+// Return:
+//   Array with orderer categories
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("Category");
+
+  // If an entity id is given, restrict categories to those of this entry
+  if ( $entity_id > 0) {
+    $query = "SELECT Category.*
+      FROM CategoryLink
+        LEFT JOIN Category ON categorylink_category_id = category_id
+      WHERE categorylink_entity_id = '$entity_id'
+        AND categorylink_entity = '$entity'
+        AND categorylink_category = '$cat'
+        $multidomain
+      ORDER BY category_code, category_label";
+  } else {
+    $query = "SELECT *
+      FROM Category
+      WHERE
+        category_category = '$cat'
+        $multidomain
+      ORDER BY category_code, category_label";
+  }
+  $cat_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "of_category_get_ordered()");
+  $cat_q->query($query);
+  
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f("category_id");
+    $code = $cat_q->f("category_code");
+    $label = $cat_q->f("category_label");
+    $cat_info = array("id" => $id,
+		      "label" => $label,
+		      "code" => $code);
+    $cats[] = $cat_info;
+  }
+
+  if (is_array($cats)) {
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+
+    if ($has_code) {
+      if (count($cats) > 0) {
+	usort($cats, "_of_category_compare");
+      }
+    }
+  }
+
+  return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the User categories attached to the entity
+// Parameters:
+//   - $entity    : target entity
+//   - $category  : target category
+//   - $entity_id : entity id 
+// Return:
+//   Array with orderer categories
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_entitycategories($entity, $category, $entity_id) {
+  global $cdg_sql;
+
+  $cats = array();
+  $multidomain = sql_multidomain("Category");
+
+  $query = "SELECT category_id, category_code, category_label 
+      FROM CategoryLink
+        JOIN Category on categorylink_category_id=category_id
+      WHERE categorylink_entity='$entity'
+        AND categorylink_category='$category'
+        AND categorylink_entity_id='$entity_id'
+        $multidomain
+      ORDER BY category_id";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_get_entitycategories()");
+  $cat_q = new DB_OBM;
+  if ($entity_id != "") {
+    $cat_q->query($query);
+  }
+
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f("category_id");
+    $code = $cat_q->f("category_code");
+    $label = $cat_q->f("category_label");
+    $cat_info = array("id" => $id,
+                      "label" => $label,
+                      "code" => $code);
+    $cats[] = $cat_info;
+  }
+
+  if (count($cats) > 0) {
+    usort($cats, "_of_category_compare");
+  }
+
+  return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category insertion query construction and execution
+// Parameters:
+//   - $entity  : target entity
+//   - $catu    : target category (string, may have upper case)
+//   - $param   : parameters 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_query_insert($entity, $catu, $param) {
+  global $auth, $cdg_sql, $obm;
+
+  $cat = strtolower($catu);
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $cat_label = $param["${cat}_label"];
+  $cat_code = $param["${cat}_code"];
+  $table = ucfirst($entity) . ucfirst($catu);
+  $field_prefix = strtolower($entity.$cat."_");
+  $field_timecreate = $field_prefix."timecreate";
+  $field_usercreate = $field_prefix."usercreate";
+  $field_label = $field_prefix."label";
+  $field_code = $field_prefix."code";
+  $field_domain = $field_prefix."domain_id";
+  $domain_id = $obm["domain_id"];
+	
+  $query = "INSERT INTO $table (
+    $field_timecreate,
+    $field_usercreate,
+    $field_domain,
+    $field_label,
+    $field_code)
+  VALUES (
+    '$timecreate',
+    '$usercreate',
+    '$domain_id',
+    '$cat_label',
+    '$cat_code')";
+
+  display_debug_msg($query, $cdg_sql, "of_category_query_insert()");
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// USER Category link insertion query construction and execution
+// Parameters:
+//   - $entity    : target entity
+//   - $cat       : target category
+//   - $entity_id : entity id 
+//   - $cat_id    : category id 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id) {
+  global $cdg_sql;
+
+  if ( ($entity_id > 0) && ($cat_id > 0) ) {
+    $query = "INSERT INTO CategoryLink (
+       categorylink_category_id,
+       categorylink_entity_id,
+       categorylink_category,
+       categorylink_entity
+     ) VALUES (
+       '$cat_id',
+       '$entity_id',
+       '$cat',
+       '$entity')";
+    display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link()");
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Delete ALL USER categories link for the entity
+// Parameters:
+//   - $entity    : target entity
+//   - $entity_id : entity id 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_query_delete_link($entity, $entity_id) {
+  global $cdg_sql;
+
+  $query = "DELETE
+    FROM CategoryLink
+    WHERE
+      categorylink_entity='$entity'
+      AND categorylink_entity_id='$entity_id'";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_query_delete_link()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
 
 
 ?>

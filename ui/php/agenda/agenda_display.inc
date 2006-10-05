@@ -3042,7 +3042,7 @@ function html_agenda_ressource_list($groupLabel,$resource_group,$free=false) {
 function dis_agenda_admin_index() {
 
   $cats1 = of_category_get_ordered("calendar", "category1");
-  $block = of_category_dis_admin_form("calendar", "category1", $cats1);;
+  $block = of_category_dis_admin_form("category1", $cats1);;
 
   return $block;
 

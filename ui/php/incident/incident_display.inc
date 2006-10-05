@@ -815,22 +815,22 @@ function dis_incident_admin_index() {
 
   $pri = of_category_get_ordered("incident", "priority");
   $block .= "<hr />";
-  $block .= of_category_dis_admin_form("incident", "priority", $pri);
+  $block .= of_category_dis_admin_form("priority", $pri);
 
   $sta = of_category_get_ordered("incident", "status");
   $block .= "<hr />";
-  $block .= of_category_dis_admin_form("incident", "status", $sta);
+  $block .= of_category_dis_admin_form("status", $sta);
 
   if (! $cgp_hide["incident"]["category1"]) {
     $cats1 = of_category_get_ordered("incident", "category1");
     $block .= "<hr />";
-    $block .= of_category_dis_admin_form("incident", "category1", $cats1);
+    $block .= of_category_dis_admin_form("category1", $cats1);
   }
 
   if (! $cgp_hide["incident"]["category2"]) {
     $cats2 = of_category_get_ordered("incident", "category2");
     $block .= "<hr />";
-    $block .= of_category_dis_admin_form("incident", "category2", $cats2);
+    $block .= of_category_dis_admin_form("category2", $cats2);
   }
 
   return $block;

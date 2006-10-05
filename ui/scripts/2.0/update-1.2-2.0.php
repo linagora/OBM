@@ -45,6 +45,7 @@ function process_companycategory1_list($c_q) {
   $nb_c = $c_q->num_rows();
   $nb = 0;
   $obm_q = new DB_OBM;
+  $l_q = new DB_OBM;
 
   echo "** Processing CompanyCategory1 list : $nb_c entries\n";
 
@@ -97,18 +98,20 @@ function process_companycategory1_list($c_q) {
 
     // For each link
     while ($obm_q->next_record()) {
-      $comp_id = $c_q->f("companycategory1link_company_id");
-      $query = "INSERT INTO CategoryLink (
+      $ent_id = $obm_q->f("companycategory1link_company_id");
+      if ($ent_id > 0) {
+	$query = "INSERT INTO CategoryLink (
         categorylink_category_id,
         categorylink_entity_id,
         categorylink_category,
         categorylink_entity
       ) VALUES (
         '$c_new_id',
-        '$comp_id',
+        '$ent_id',
         '$category',
         'company')";
-      $obm_q->query($query);
+	$l_q->query($query);
+      }
     }
   }
 

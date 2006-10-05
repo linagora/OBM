@@ -168,15 +168,15 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 //   - $company[] : hash with company values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_form($company="") {
+  global $cgp_user;
 
   $types = of_category_get_ordered("company", "type");
-  $cats1 = of_category_get_ordered("company", "category1");
   $acts = of_category_get_ordered("company", "activity");
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_global_country_for_lang();
   $dsrc_q = run_query_global_datasource();
-  $block .= html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
+  $block .= html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
 }
@@ -186,7 +186,6 @@ function dis_company_search_form($company="") {
 // XHTML Display Company search Form
 // Parameters:
 //   - $types     : array of company types
-//   - $cats1     : array of company categories
 //   - $acts      : array of company activities 
 //   - $naf_q     : database object with nafcode list
 //   - $usr_q     : database object with userobm list
@@ -195,7 +194,7 @@ function dis_company_search_form($company="") {
 //   - $company[] : default form values
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
+function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $action, $display, $c_all, $cgp_hide;
   global $csearch_advanced_default, $l_fuzzy;
   global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
@@ -208,9 +207,6 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
   $phone = stripslashes($company["phone"]);
   $town = stripslashes($company["town"]);
   $type = $company["type"];
-  $cat1 = $company["category1"];
-  $cat_code = $company["category1_code"];
-  $cat_tree = ($company["category1_tree"] == "1" ? "checked = \"checked\"" : "");
   $act = $company["activity"];
   $naf = $company["naf"];
   $ctry = $company["country"];
@@ -226,33 +222,15 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
     $fuzzy = "";
   }
 
-  // of: activity, type
-  $show_naf = (! $cgp_hide["company"]["nafcode"]);
-  $show_cat = (! $cgp_hide["company"]["category1"]);
+  // User defined categories
+  $block_user .= of_category_user_dis_search("company", $company);
 
-  // Type, category1, activity select
+  // Type, activity select
   $block_type = of_category_dis_search_select("company", "type", $types, $type);
   $block_activity = of_category_dis_search_select("company", "activity", $acts, $act);
 
-  if ($show_cat) {
-    $sel_append = "onchange=\"if (this.options[this.selectedIndex].value != '$c_all') {
-          mytext = this.options[this.selectedIndex].text;
-          pos = mytext.indexOf(' ');
-          code = mytext.substr(0, pos);
-          this.form.tf_category1_code.value = code + '.';
-       } \"";
-
-    $block_category1 = of_category_dis_search_select("company", "category1", $cats1, $cat1, array("all", "none"), $sel_append);
-
-    $block_cat = "
-    $block_category1
-    <div class=\"searchLabel\">$l_cat_tree<br />
-      <input type=\"checkbox\" name=\"cba_category1_tree\" value=\"1\" $cat_tree />
-      <input type=\"hidden\" name=\"tf_category1_code\" value=\"$cat_code\" />
-    </div>";
-  }
-
   // Naf Code select
+  $show_naf = (! $cgp_hide["company"]["nafcode"]);
   if ($show_naf) {
     $sel_naf = dis_select_company_nafcode($naf_q, "<option value=\"$c_all\">$l_all</option>", $naf);
 
@@ -340,7 +318,6 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
       $sel_ctry
     </div>
     $block_type
-    $block_cat
     $block_activity
     $block_naf
     <div class=\"searchLabel\">$l_datasource<br />
@@ -355,6 +332,7 @@ function html_company_search_form($types, $cats1, $acts, $naf_q, $usr_q, $ctry_q
     <div class=\"searchLabel\">$l_before<br />
       <script>calendar('tf_date_before','$datebefore')</script>
     </div>
+    $block_user
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </div>
@@ -673,8 +651,7 @@ function dis_company_consult($params) {
 	$ext_func = "ext_dis_${view}_list";
 	$block .= $ext_func($params, "company", $cid);
       } else {
-	$cats1 = of_category_get_ordered("company", "category1", "multi", $cid);
-	$block .= html_company_consult_address($comp_q, $cats1);
+	$block .= html_company_consult_address($comp_q);
       }
     } else {
       $display["msg"] .= display_err_msg($l_err_reference);
@@ -814,11 +791,10 @@ function html_company_consult($co_q) {
 // XHTML Display Company Consultation : Address sub view
 // Parameters:
 //   - $co_q : company database result 
-//   - $cats1 : array of compant categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult_address($co_q, $cats1) {
+function html_company_consult_address($co_q) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  global $l_name;
+  global $cgp_user, $l_name;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
   global $l_company, $l_coord;
@@ -840,8 +816,13 @@ function html_company_consult_address($co_q, $cats1) {
   $email = $co_q->f("company_email");
   $com = beautify_comment(nl2br($co_q->f("company_comment")));
 
-  $cats1 = of_category_get_entitycategories("company", "category1", $id);
-    
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cats = of_category_user_get_entitycategories("company", "$cat_name", $id);
+      $block_user .= of_category_dis_block_consult("company", $cat_name, $cats);
+    }
+  }
+
   // Conditionnal fields
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
@@ -915,9 +896,6 @@ function html_company_consult_address($co_q, $cats1) {
     $link_email = "&nbsp;";
   }
 
-  // Category1 field
-  $block_cat1 = of_category_dis_block_consult("company", "category1", $cats1);
-
   // Web link
   if ($web != "") {
     $link_web = "<a target=\"_blank\" href=\"";
@@ -961,7 +939,6 @@ function dis_company_form($action, $company) {
     $comp_q = run_query_company_detail($c_id);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $cats1 = of_category_get_ordered("company", "category1", "multi", $c_id);
     } else {
       $display["msg"] .= display_err_msg($l_err_reference);
     }
@@ -984,7 +961,7 @@ function dis_company_form($action, $company) {
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_global_country_for_lang();
 
-  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company);
+  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company);
 
   return $block;
 }
@@ -1000,15 +977,14 @@ function dis_company_form($action, $company) {
 //   - $acts      : array of activities referenced by the company
 //   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
-//   - $cats1     : array of category referenced by the company
 //   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $cats1, $ctry_q, $company) {
-  global $display, $auth, $cgp_hide, $set_dsrc, $c_undef, $l_undef, $ico_add;
-  global $set_theme,$ico_web,$ico_mail,$popup_height,$popup_width;
+function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
+  global $display, $auth, $cgp_hide, $cgp_user, $set_dsrc, $c_undef, $l_undef;
+  global $set_theme,$ico_web,$ico_mail,$ico_add,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
@@ -1083,10 +1059,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (isset($company["add_comment"])) { $add_comment = stripslashes($company["add_comment"]); }
   if (isset($company["usercomment"])) { $usercomment = $company["usercomment"]; }
   if (isset($company["datecomment"])) { $datecomment = $company["datecomment"]; }
-  if (isset($company["category1"])) { $cat1 = $company["category1"]; }
 
   // Conditionnal fields
-  // category1, activity, type
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_siret = (! $cgp_hide["company"]["company_siret"]);
@@ -1136,8 +1110,13 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type, "none");
   $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act, "none");
-  // Category select field
-  $block_cat1 = of_category_dis_entity_form("company", "category1", $cats1);
+
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cats = of_category_user_get_ordered($cat_name, "company", $id);
+      $block_user .= of_category_user_dis_entity_form("company", $cat_name, $cats);
+    }
+  }
 
   // Naf code select field
   if ($show_naf) {
@@ -1293,6 +1272,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     $block_type
     $block_cat1
+    $block_user
     $block_activity
     $block_naf
     </tr><tr>    
@@ -1507,28 +1487,28 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 // Display the company administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_admin_index() {
-  global $cgp_hide;
+  global $cgp_hide, $cgp_user;
 
   if (! $cgp_hide["company"]["type"]) {
     $types = of_category_get_ordered("company", "type");
-    $block .= of_category_dis_admin_form("company", "type", $types);
-  }
-
-  if (! $cgp_hide["company"]["category1"]) {
-    //    $cats1 = of_category_get_ordered("company", "category1");
-    $cats1 = of_category_get_ordered_new("companycategory1");
-    print_r($cats1);
-    $block .= of_category_dis_admin_form("company", "category1", $cats1);
+    $block .= of_category_dis_admin_form("type", $types);
   }
 
   if (! $cgp_hide["company"]["activity"]) {
     $acts = of_category_get_ordered("company", "activity");
-    $block .= of_category_dis_admin_form("company", "activity", $acts);
+    $block .= of_category_dis_admin_form("activity", $acts);
   }
 
   if (! $cgp_hide["company"]["nafcode"]) {
     $naf_q = run_query_companynafcode();
     $block .= html_company_nafcode_form($naf_q);
+  }
+
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cats = of_category_user_get_ordered("$cat_name");
+      $block .= of_category_dis_admin_form($cat_name, $cats);
+    }
   }
 
   return $block;

@@ -90,6 +90,13 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
 
+} elseif ($action == "ext_get_category_ids") {
+///////////////////////////////////////////////////////////////////////////////
+  $extra_css = "category.css";
+  require("company_js.inc");
+  $display["detail"] = of_category_user_dis_tree("company", $params["category"], $params, $action);
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -676,6 +683,14 @@ function get_company_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
+
+// Category Select 
+  $actions["company"]["ext_get_category_ids"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_category_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                     		 );
+
 // Company Select 
   $actions["company"]["ext_get_id"]  = array (
     'Url'      => "$path/company/company_index.php?action=ext_get_id",

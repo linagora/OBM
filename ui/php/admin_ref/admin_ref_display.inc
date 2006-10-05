@@ -908,7 +908,7 @@ function dis_admin_ref_region_index() {
 
   $regions = of_category_get_ordered("", "region");
   $block .= "<hr />";
-  $block .= of_category_dis_admin_form("", "region", $regions);
+  $block .= of_category_dis_admin_form("region", $regions);
 
   return $block;
 }

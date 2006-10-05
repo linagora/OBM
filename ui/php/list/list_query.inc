@@ -31,7 +31,7 @@ function run_query_list_search($list) {
   $limit = sql_limit($db_type);
   $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 	
   $where .= sql_obm_entity_privacy("list");
 
@@ -179,11 +179,12 @@ function run_query_list_insert($list) {
   }
 	$domain_id = $obm["domain_id"];
 	
-  $query = "INSERT INTO List (list_timeupdate,
+  $query = "INSERT INTO List (
+    list_domain_id,
+    list_timeupdate,
     list_timecreate,
     list_userupdate,
     list_usercreate,
-		list_domain_id,
     list_privacy,
     list_name,
     list_subject,
@@ -194,11 +195,12 @@ function run_query_list_insert($list) {
     list_info_publication,
     list_query,
     list_structure)
-  VALUES (null,
+  VALUES (
+    '$domain_id',
+    null,
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
-		'$domain_id',
     '$priv',
     '$name',
     '$subject',
@@ -251,14 +253,15 @@ function get_list_id($list) {
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = addslashes($list["query"]);
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 	
   $query = "SELECT list_id
     FROM List
     WHERE list_name='$name'
-      and list_subject='$subject'
-      and list_email='$email'
-      and list_query='$list_query' $multidomain";
+      AND list_subject='$subject'
+      AND list_email='$email'
+      AND list_query='$list_query'
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_list_id()");
   $obm_q = new DB_OBM;
@@ -311,7 +314,8 @@ function run_query_list_update($list) {
     list_info_publication='$info_pub',
     list_query='$list_query',
     list_structure='$list_critery'
-  WHERE list_id='$id' $multidomain";
+  WHERE list_id='$id'
+     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_update()");
   $obm_q = new DB_OBM;
@@ -329,7 +333,7 @@ function run_query_list_update($list) {
 function run_query_list_update_sql($id) {
   global $auth, $cdg_sql;
 
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 
   // Check that list has really a query (if not we do nothing)
   $query = "SELECT list_structure FROM List WHERE list_id='$id' $multidomain";
@@ -393,7 +397,7 @@ function run_query_list_contactlist_insert($list) {
 
   $id = $list["list_id"];
 	
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 
   // We check the list still exist (in case popup windows here for long...)
   $query = "SELECT list_id FROM List WHERE list_id = '$id' $multidomain";
@@ -647,12 +651,13 @@ function get_list_name_exists($name, $id="") {
     $where_id = "AND list_id != '$id'";
   }
 	
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 
   $query = "SELECT list_id, list_name
     FROM List
     WHERE list_name='$name'
-      $where_id $multidomain";
+      $where_id
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_list_name_exists()");
   $obm_q = new DB_OBM;
@@ -680,7 +685,7 @@ function run_query_list_check_list($id, $name, $subject) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 	
   if ($id != "") {
     $where_id = "list_id != '$id' AND";
@@ -699,7 +704,8 @@ function run_query_list_check_list($id, $name, $subject) {
   $query = "SELECT distinct list_id, list_name, list_subject
      FROM List
      WHERE $where_id
-       ($wname or $wsubject) $multidomain";
+       ($wname or $wsubject)
+       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_check_list()");
   $obm_q->query($query);
@@ -756,8 +762,8 @@ function check_list_context($id, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the query is is coherent (publication info should not be On if
-// same Publication field combined with AND 
+// Check if the query is coherent (publication info should not be On if
+// same Publication field combined with AND)
 // Parameters:
 //   - $list[]   : list search criteria
 //     keys used : $criteria.
@@ -906,7 +912,7 @@ function check_list_can_delete($p_id) {
 function get_list_info($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
 
   $query = "SELECT list_id,
       list_name,
@@ -1070,7 +1076,7 @@ function get_list_dynamic_company_nb($dynquery) {
     $pos = strpos(strtolower($query), 'select', 5);
 
     if ($pos > 1) {
-      // The query is has a sub-query
+      // The query has a sub-query
       if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
 	$query_c = "SELECT count(distinct(company_id)) as nb ". $matches[1];
       } else {
@@ -1202,10 +1208,12 @@ function sql_list_query_resource_high($query) {
 function run_query_list_contactcategory1() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contactcategory1");
+  $multidomain = sql_multidomain("contactcategory1");
 
   $query = "SELECT * FROM ContactCategory1 
-		WHERE 1=1 $multidomain ORDER BY contactcategory1_code"; 
+    WHERE 1=1
+      $multidomain
+    ORDER BY contactcategory1_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql,"run_query_list_contactcategory1()");
@@ -1222,10 +1230,12 @@ function run_query_list_contactcategory1() {
 function run_query_list_contactcategory2() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contactcategory2");
+  $multidomain = sql_multidomain("contactcategory2");
 
   $query = "SELECT * FROM ContactCategory2 
-		WHERE 1=1 $multidomain ORDER BY contactcategory2_code"; 
+    WHERE 1=1
+      $multidomain
+    ORDER BY contactcategory2_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql, "run_query_list_contactcategory2()");
@@ -1242,9 +1252,11 @@ function run_query_list_contactcategory2() {
 function run_query_list_language() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("kind");
+  $multidomain = sql_multidomain("kind");
 
-  $query = "SELECT kind_lang FROM Kind WHERE 1=1 $multidomain
+  $query = "SELECT kind_lang FROM Kind
+    WHERE 1=1
+      $multidomain
     GROUP BY kind_lang";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_language()");
@@ -1263,11 +1275,12 @@ function run_query_list_language() {
 function run_query_list_publication() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("publication");
+  $multidomain = sql_multidomain("publication");
 
   $query = "SELECT publication_title, publication_id
     FROM Publication
-		WHERE 1=1 $multidomain
+    WHERE 1=1
+      $multidomain
     ORDER by publication_year DESC, publication_type_id, publication_title";
 
   display_debug_msg($query, $cdg_sql, "run_query_list_publication()");

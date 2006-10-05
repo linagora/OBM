@@ -727,9 +727,9 @@ function dis_document_admin_index() {
   $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_document_mime();
 
-  $block = of_category_dis_admin_form("document", "category1", $cats1);
+  $block = of_category_dis_admin_form("category1", $cats1);
   $block .= "<hr />";
-  $block .= of_category_dis_admin_form("document", "category2", $cats2);
+  $block .= of_category_dis_admin_form("category2", $cats2);
   $block .= "<hr />";
   $block .= html_document_mime_form($mime_q);
 

@@ -180,7 +180,7 @@ function run_query_incident_detail($id) {
   $timecreate = sql_date_format($db_type, "incident_timecreate", "timecreate");
   $datebegin = sql_date_format($db_type, "contract_datebegin", "datebegin");
   $dateexp = sql_date_format($db_type, "contract_dateexp", "dateexp");
-	$multidomain = sql_multidomain("incident");
+  $multidomain = sql_multidomain("incident");
 	
   $query = "SELECT *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
@@ -221,7 +221,7 @@ function run_query_incident_detail($id) {
         LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
       WHERE incident_id='$id' $multidomain";
  
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_incident_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -242,7 +242,7 @@ function run_query_incident_insert($incident) {
 
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $contract_id = $incident["contract_new_id"];
   if ($contract_id < 1) {
@@ -253,7 +253,7 @@ function run_query_incident_insert($incident) {
   $reference = $incident["reference"];
   $owner = ($incident["owner"] ? "'".$incident["owner"]."'" : "null");
   $logger = ($incident["logger"] ? "'".$incident["logger"]."'" : "null");
-  $archive = $incident["archive"];
+  $archive = ($incident["archive"] == "1" ? "1" : "0");
   $solu = $incident["solution"];
   $priority = $incident["priority"];
   $status = $incident["status"];
@@ -270,11 +270,12 @@ function run_query_incident_insert($incident) {
     $comment = "$datecomment:$usercomment:$add_comment";
   }
 
-  $query = "INSERT INTO Incident (incident_timeupdate,
+  $query = "INSERT INTO Incident (
+    incident_domain_id,
+    incident_timeupdate,
     incident_timecreate,
     incident_userupdate,
     incident_usercreate,
-		incident_domain_id,
     incident_label,
     incident_reference,
     incident_contract_id,
@@ -289,11 +290,12 @@ function run_query_incident_insert($incident) {
     incident_duration,
     incident_archive,
     incident_resolution)
-  VALUES (null,
+  VALUES (
+    '$domain_id',
+    null,
     '$now',
     null,
     '$uid',
-		'$domain_id',
     '$lincident',
     '$reference',
     '$contract_id',
@@ -309,7 +311,7 @@ function run_query_incident_insert($incident) {
     '$archive',
     '$solu')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_incident_insert()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -357,8 +359,8 @@ function run_query_incident_id($incident) {
   $hour = $incident["hour"];
   $date = $incident["date"];
   $call_date = "$date $hour:0:0";
-  $archive = ($incident["archive"] ? $incident["archive"] : "0");
-	$multidomain = sql_multidomain("incident");
+  $archive = ($incident["archive"] == "1" ? "1" : "0");
+  $multidomain = sql_multidomain("incident");
 	
   $query = "SELECT incident_id
     FROM Incident
@@ -370,9 +372,9 @@ function run_query_incident_id($incident) {
       AND incident_priority_id $pri
       AND incident_status_id $status
       AND incident_archive='$archive'
-			$multidomain";
+      $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql,"run_query_incident_id()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -414,7 +416,7 @@ function run_query_incident_update($incident) {
   $date = $incident["date"];
   $hour = $incident["hour"];
   $duration = $incident["duration"];
-  $archive = $incident["archive"];
+  $archive = ($incident["archive"] == "1" ? "1" : "0");
   $call_date = "$date $hour:0:0";
   $comment = $incident["comment"];
   $add_comment = $incident["add_comment"];
@@ -447,7 +449,7 @@ function run_query_incident_update($incident) {
     WHERE incident_id='$param_incident' $multidomain";
 
   $inc_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_incident_update()");
   $ret = $inc_q->query($query);  
 
   return $ret;
@@ -462,9 +464,9 @@ function run_query_incident_update($incident) {
 function run_query_incident_delete($i_id) {
   global $auth, $cdg_sql;
  
- 	$multidomain = sql_multidomain("incident");
+  $multidomain = sql_multidomain("incident");
   $query = "DELETE FROM Incident 
-		WHERE incident_id='$i_id' $multidomain";
+    WHERE incident_id='$i_id' $multidomain";
 
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_incident_delete()");

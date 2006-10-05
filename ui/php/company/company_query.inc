@@ -15,7 +15,7 @@
 //     keys used       archive, name, phone, type, zip
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_search($company) {
-  global $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
+  global $cgp_user, $c_all, $c_none, $cdg_sql, $ctu_sql_limit;
 
   $sql_order_dir = $company["sql_order_dir"];
   $sql_order_field = $company["sql_order_field"];
@@ -27,9 +27,6 @@ function run_query_company_search($company) {
   $town = sql_search_text_parse($company["town"]);
   $ctry = $company["country"];
   $type = $company["type"];
-  $category1 = $company["category1"];
-  $category1_tree = $company["category1_tree"];
-  $category1_code = $company["category1_code"];
   $act = $company["activity"];
   $naf = $company["naf"];
   $market = $company["market"];
@@ -53,19 +50,6 @@ function run_query_company_search($company) {
   if (($type != $c_all) && ($type != "")) { 
     $where .= " $and company_type_id='$type'";
     $and = "and";
-  }
-  if (($category1 != $c_all) && ($category1 != $c_none) && ($category1 != "")) {
-    $join_category1 = "LEFT JOIN CompanyCategory1Link ON company_id=companycategory1link_company_id";
-    if ($category1_tree) {
-      $join_category1 .= " LEFT JOIN CompanyCategory1 ON companycategory1link_category_id=companycategory1_id";
-      $where_category1 = " OR companycategory1_code like '$category1_code%'";
-    }
-    $where .= " $and (companycategory1link_category_id='$category1'$where_category1)";
-    $and = "AND";
-  } else if ($category1 == $c_none) {
-    $join_category1 = "LEFT JOIN CompanyCategory1Link ON company_id=companycategory1link_company_id";
-    $where .= " $and companycategory1link_category_id IS NULL";
-    $and = "AND";
   }
   if (($act != $c_all) && ($act != "")) { 
     $where .= " $and company_activity_id='$act'";
@@ -115,6 +99,38 @@ function run_query_company_search($company) {
     $where .= " $and company_archive=0";
     $and = "AND";
   }
+
+  // User defined categories
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cat = $company[$cat_name];
+      $cat_tree = $company["${cat_name}_tree"];
+      $cat_code = $company["${cat_name}_code"];
+      $tlink = "${cat_name}_link";
+
+      if (($cat != $c_all) && ($cat != $c_none) && ($cat != "")) {
+	$where_cat_user = "";
+	$join_cat_user .= "LEFT JOIN CategoryLink AS $tlink
+          ON company_id=$tlink.categorylink_entity_id
+          AND $tlink.categorylink_entity='company'
+          AND $tlink.categorylink_category='$cat_name'";
+	if ($cat_tree) {
+	  $join_cat_user .= " LEFT JOIN Category AS $cat_name ON $tlink.categorylink_category_id=$cat_name.category_id";
+	  $where_cat_user = " OR $cat_name.category_code like '$cat_code%'";
+	}
+	$where .= " $and ($tlink.categorylink_category_id='$cat' $where_cat_user)";
+	$and = "AND";
+      } else if ($cat == $c_none) {
+	$join_cat_user = "LEFT JOIN CategoryLink AS $tlink
+          ON company_id=$tlink.categorylink_entity_id
+          AND $tlink.categorylink_entity='company'
+          AND $tlink.categorylink_category='$cat_name'";
+	$where .= " $and $tlink.categorylink_category_id IS NULL";
+	$and = "AND";
+      }
+    }
+  }
+
 
   if (($where != "") || ($where_name != "")) {
     $whereq = " WHERE $where_name $where $multidomain";
@@ -169,7 +185,7 @@ function run_query_company_search($company) {
 
   $left_join = "
          LEFT JOIN CompanyType ON company_type_id=companytype_id
-         $join_category1
+         $join_cat_user
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
          LEFT JOIN Country ON company_country_iso3166=country_iso3166
@@ -265,11 +281,11 @@ function run_query_company_detail($p_id) {
 //                : ctry, phone, fax, web, email, com, category1
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_insert($company) {
-  global $auth, $obm, $cdg_sql;
+  global $auth, $obm, $cdg_sql, $cgp_user;
 
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $num = $company["num"];
   $vat = $company["vat"];
@@ -312,14 +328,14 @@ function run_query_company_insert($company) {
     $usercomment = $company["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $category1 = $company["category1"];
   
-  $query = "INSERT INTO Company (company_timeupdate,
+  $query = "INSERT INTO Company (
+    company_domain_id,
+    company_timeupdate,
     company_timecreate,
     company_userupdate,
     company_usercreate,
     company_datasource_id,
-		company_domain_id,
     company_number,
     company_vat,
     company_siret,
@@ -343,12 +359,13 @@ function run_query_company_insert($company) {
     company_web,
     company_email,
     company_comment)
-  VALUES (null,
+  VALUES (
+    '$domain_id',
+    null,
     '$now',
     null,
     '$uid',
     '$dsrc',
-		'$domain_id',
     '$num',
     '$vat',
     '$siret',
@@ -403,9 +420,17 @@ function run_query_company_insert($company) {
   $obm_q->next_record();
   $id = $obm_q->f("id");
 
-  if ($retour && is_array($category1)) {
-    foreach($category1 as $categoryid) {
-      $retour = of_category_query_insert_link("company", "category1", $id, $categoryid);
+  if ($id > 0) {
+    // User defined categories
+    if (is_array($cgp_user["company"]["category"])) {
+      foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+	$cats = $company["$cat_name"];
+	if (is_array($cats)) {
+	  foreach($cats as $cat_id) {
+	    $retour = of_category_user_query_insert_link("company", $cat_name, $id, $cat_id);
+	  }
+	}
+      }
     }
   }
   
@@ -422,7 +447,7 @@ function run_query_company_insert($company) {
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_update($cid, $company) {
-  global $auth, $cdg_sql, $cgp_hide;
+  global $auth, $cdg_sql, $cgp_hide, $cgp_user;
 
   $num = $company["num"];
   $vat = $company["vat"];
@@ -465,7 +490,7 @@ function run_query_company_update($cid, $company) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $category1 = $company["category1"];
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
 	
   $query = "UPDATE Company SET
     company_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -494,17 +519,24 @@ function run_query_company_update($cid, $company) {
     company_web='$web',
     company_email='$email',
     company_comment='$comment'
-  WHERE company_id='$cid' $multidomain";
+  WHERE company_id='$cid'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_company_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $retour = of_category_query_delete_link("company", "category1", $cid);
-    if (is_array($category1)) {
-      foreach($category1 as $categoryid) {
-        $retour = of_category_query_insert_link("company", "category1", $cid, $categoryid);
+    // User defined categories
+    $retour = of_category_user_query_delete_link("company", $cid);
+    if (is_array($cgp_user["company"]["category"])) {
+      foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+	$cats = $company["$cat_name"];
+	if (is_array($cats)) {
+	  foreach($cats as $cat_id) {
+	    $retour = of_category_user_query_insert_link("company", $cat_name, $cid, $cat_id);
+	  }
+	}
       }
     }
   }
@@ -522,14 +554,11 @@ function run_query_company_delete($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
 	
   run_query_global_delete_document_links($p_id, "company");
 
-  display_debug_msg($query, $cdg_sql, "run_query_company_delete(cat1 links)");
-  $query = "DELETE FROM CompanyCategory1Link
-    WHERE companycategory1link_company_id='$p_id'";
-  $obm_q->query($query);
+  $ret = of_category_user_query_delete_link("company", $p_id);
 
   $query = "DELETE FROM Company WHERE company_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_company_delete()");
