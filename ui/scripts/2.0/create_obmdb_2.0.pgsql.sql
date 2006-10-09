@@ -95,6 +95,7 @@ CREATE TABLE UserObm (
   userobm_email           varchar(60),
   userobm_description     varchar(255),
   userobm_location        varchar(100),
+  userobm_education       varchar(255),
   userobm_timelastaccess  TIMESTAMP,
   PRIMARY KEY (userobm_id),
   UNIQUE (userobm_login)
@@ -1053,6 +1054,10 @@ CREATE TABLE Project (
   project_dateend        date,
   project_archive        char(1) DEFAULT '0',
   project_comment        text,
+  project_reference_date varchar(32),
+  project_reference_duration varchar(16),
+  project_reference_desc text,
+  project_reference_tech text,
   PRIMARY KEY (project_id)
 );
 create INDEX project_idx_comp ON Project (project_company_id);

@@ -95,6 +95,7 @@ CREATE TABLE UserObm (
   userobm_email             varchar(60),
   userobm_description       varchar(255),
   userobm_location          varchar(100),
+  userobm_education         varchar(255),
   userobm_timelastaccess    timestamp(14),
   PRIMARY KEY (userobm_id)
 );
@@ -1046,6 +1047,10 @@ CREATE TABLE Project (
   project_dateend        date,
   project_archive        char(1) DEFAULT '0',
   project_comment        text,
+  project_reference_date varchar(32),
+  project_reference_duration varchar(16),
+  project_reference_desc text,
+  project_reference_tech text,
   PRIMARY KEY (project_id),
   INDEX project_idx_comp (project_company_id),
   INDEX project_idx_deal (project_deal_id)
@@ -1643,3 +1648,44 @@ CREATE TABLE Domain (
   domain_alias          text,
   PRIMARY KEY (domain_id)
 );
+
+----------------------------------------------------------------------------
+--Create CV table
+----------------------------------------------------------------------------
+
+CREATE TABLE CV (
+  cv_id              int(8) auto_increment,
+  cv_timeupdate      timestamp(14),
+  cv_timecreate      timestamp(14),
+  cv_userupdate      int(8),
+  cv_usercreate      int(8),
+  cv_userobm_id      int(8) NOT NULL,
+  cv_title           varchar(255),
+  cv_additionnalrefs text,
+  cv_comment         text,
+  PRIMARY KEY(cv_id)
+);
+
+----------------------------------------------------------------------------
+--Create ProjectCV table
+----------------------------------------------------------------------------
+
+CREATE TABLE ProjectCV (
+  projectcv_project_id int(8) NOT NULL,
+  projectcv_cv_id      int(8) NOT NULL,
+  projectcv_role       varchar(128) DEFAULT '',
+  PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
+);
+
+----------------------------------------------------------------------------
+--Create DefaultOdtTemplate table
+----------------------------------------------------------------------------
+
+CREATE TABLE DefaultOdtTemplate (
+  defaultodttemplate_id                  int(8) auto_increment,
+  defaultodttemplate_entity              varchar(32),
+  defaultodttemplate_document_id         int(8) NOT NULL,
+  defaultodttemplate_label               varchar(64) DEFAULT '',
+  PRIMARY KEY(defaultodttemplate_id)
+);
+

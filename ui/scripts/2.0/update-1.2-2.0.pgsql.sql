@@ -18,11 +18,11 @@ UPDATE ObmInfo set obminfo_value='2.0' where obminfo_name='db_version';
 -- Table structure for table 'Domain'
 --
 CREATE TABLE Domain (
-  domain_id             int(8) auto_increment,
-  domain_timeupdate     timestamp(14),
-  domain_timecreate     timestamp(14),
-  domain_usercreate     int(8),
-  domain_userupdate     int(8),
+  domain_id             serial,
+  domain_timeupdate     timestamp,
+  domain_timecreate     timestamp,
+  domain_usercreate     integer,
+  domain_userupdate     integer,
   domain_label          varchar(32) NOT NULL,
   domain_description    varchar(255),
   domain_domain_name    varchar(128),
@@ -33,39 +33,39 @@ CREATE TABLE Domain (
 --
 -- Update All tables to include Domain info
 --
-ALTER TABLE UserObm ADD Column userobm_domain_id int(8) default 0 after userobm_id;
-ALTER TABLE DataSource ADD Column datasource_domain_id int(8) default 0 after datasource_id;
-ALTER TABLE Country ADD Column country_domain_id int(8) default 0 first;
-ALTER TABLE Region ADD Column region_domain_id int(8) default 0 after region_id;
-ALTER TABLE CompanyType ADD Column companytype_domain_id int(8) default 0 after companytype_id;
-ALTER TABLE CompanyActivity ADD Column companyactivity_domain_id int(8) default 0 after companyactivity_id;
-ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id int(8) default 0 after companynafcode_id;
-ALTER TABLE Company ADD Column company_domain_id int(8) default 0 after company_id;
-ALTER TABLE CompanyCategory1 ADD Column companycategory1_domain_id int(8) default 0 after companycategory1_id;
-ALTER TABLE Contact ADD Column contact_domain_id int(8) default 0 after contact_id;
-ALTER TABLE Kind ADD Column kind_domain_id int(8) default 0 after kind_id;
-ALTER TABLE ContactFunction ADD Column contactfunction_domain_id int(8) default 0 after contactfunction_id;
-ALTER TABLE ContactCategory1 ADD Column contactcategory1_domain_id int(8) default 0 after contactcategory1_id;
-ALTER TABLE ContactCategory2 ADD Column contactcategory2_domain_id int(8) default 0 after contactcategory2_id;
-ALTER TABLE ContactCategory3 ADD Column contactcategory3_domain_id int(8) default 0 after contactcategory3_id;
-ALTER TABLE ContactCategory4 ADD Column contactcategory4_domain_id int(8) default 0 after contactcategory4_id;
-ALTER TABLE ContactCategory5 ADD Column contactcategory5_domain_id int(8) default 0 after contactcategory5_id;
-ALTER TABLE LeadSource ADD Column leadsource_domain_id int(8) default 0 after leadsource_id;
-ALTER TABLE Lead ADD Column lead_domain_id int(8) default 0 after lead_id;
-ALTER TABLE ParentDeal ADD Column parentdeal_domain_id int(8) default 0 after parentdeal_id;
-ALTER TABLE Deal ADD Column deal_domain_id int(8) default 0 after deal_id;
-ALTER TABLE DealStatus ADD Column dealstatus_domain_id int(8) default 0 after dealstatus_id;
-ALTER TABLE DealType ADD Column dealtype_domain_id int(8) default 0 after dealtype_id;
-ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id int(8) default 0 after dealcompanyrole_id;
-ALTER TABLE DealCategory1 ADD Column dealcategory1_domain_id int(8) default 0 after dealcategory1_id;
-ALTER TABLE List ADD Column list_domain_id int(8) default 0 after list_id;
-ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id int(8) default 0 after calendarevent_id;
-ALTER TABLE EventEntity ADD Column evententity_domain_id int(8) default 0 first;
-ALTER TABLE CalendarException ADD Column calendarexception_domain_id int(8) default 0 first;
-ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id int(8) default 0 after calendarcategory1_id;
-ALTER TABLE EntityRight ADD Column entityright_domain_id int(8) default 0 first;
-ALTER TABLE Todo ADD Column todo_domain_id int(8) default 0 after todo_id;
-ALTER TABLE Publication ADD Column publication_domain_id int(8) default 0 after publication_id;
+ALTER TABLE UserObm ADD Column userobm_domain_id integer default 0 after userobm_id;
+ALTER TABLE DataSource ADD Column datasource_domain_id integer default 0 after datasource_id;
+ALTER TABLE Country ADD Column country_domain_id integer default 0 first;
+ALTER TABLE Region ADD Column region_domain_id integer default 0 after region_id;
+ALTER TABLE CompanyType ADD Column companytype_domain_id integer default 0 after companytype_id;
+ALTER TABLE CompanyActivity ADD Column companyactivity_domain_id integer default 0 after companyactivity_id;
+ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id integer default 0 after companynafcode_id;
+ALTER TABLE Company ADD Column company_domain_id integer default 0 after company_id;
+ALTER TABLE CompanyCategory1 ADD Column companycategory1_domain_id integer default 0 after companycategory1_id;
+ALTER TABLE Contact ADD Column contact_domain_id integer default 0 after contact_id;
+ALTER TABLE Kind ADD Column kind_domain_id integer default 0 after kind_id;
+ALTER TABLE ContactFunction ADD Column contactfunction_domain_id integer default 0 after contactfunction_id;
+ALTER TABLE ContactCategory1 ADD Column contactcategory1_domain_id integer default 0 after contactcategory1_id;
+ALTER TABLE ContactCategory2 ADD Column contactcategory2_domain_id integer default 0 after contactcategory2_id;
+ALTER TABLE ContactCategory3 ADD Column contactcategory3_domain_id integer default 0 after contactcategory3_id;
+ALTER TABLE ContactCategory4 ADD Column contactcategory4_domain_id integer default 0 after contactcategory4_id;
+ALTER TABLE ContactCategory5 ADD Column contactcategory5_domain_id integer default 0 after contactcategory5_id;
+ALTER TABLE LeadSource ADD Column leadsource_domain_id integer default 0 after leadsource_id;
+ALTER TABLE Lead ADD Column lead_domain_id integer default 0 after lead_id;
+ALTER TABLE ParentDeal ADD Column parentdeal_domain_id integer default 0 after parentdeal_id;
+ALTER TABLE Deal ADD Column deal_domain_id integer default 0 after deal_id;
+ALTER TABLE DealStatus ADD Column dealstatus_domain_id integer default 0 after dealstatus_id;
+ALTER TABLE DealType ADD Column dealtype_domain_id integer default 0 after dealtype_id;
+ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id integer default 0 after dealcompanyrole_id;
+ALTER TABLE DealCategory1 ADD Column dealcategory1_domain_id integer default 0 after dealcategory1_id;
+ALTER TABLE List ADD Column list_domain_id integer default 0 after list_id;
+ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id integer default 0 after calendarevent_id;
+ALTER TABLE EventEntity ADD Column evententity_domain_id integer default 0 first;
+ALTER TABLE CalendarException ADD Column calendarexception_domain_id integer default 0 first;
+ALTER TABLE CalendarCategory1 ADD Column calendarcategory1_domain_id integer default 0 after calendarcategory1_id;
+ALTER TABLE EntityRight ADD Column entityright_domain_id integer default 0 first;
+ALTER TABLE Todo ADD Column todo_domain_id integer default 0 after todo_id;
+ALTER TABLE Publication ADD Column publication_domain_id integer default 0 after publication_id;
 ALTER TABLE PublicationType ADD Column publicationtype_domain_id int(8) default 0 after publicationtype_id;
 ALTER TABLE Subscription ADD Column subscription_domain_id int(8) default 0 after subscription_id;
 ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id int(8) default 0 after subscriptionreception_id;
