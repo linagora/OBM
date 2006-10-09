@@ -184,6 +184,13 @@ if ($cgp_show["module"]["agenda"]) {
                                     'Url' => "$path/agenda/agenda_index.php",
                                     'Right'=> $cright_read);
 }
+if ($cgp_show["module"]["cv"]) {
+  $modules["cv"] = array('Name'=> $l_module_cv,
+                                  'Ico' => "$ico_cv",
+                                  'Url' => "$path/cv/cv_index.php",
+                                  'Right'=> $cright_read);
+                                    
+}
 if ($cgp_show["module"]["todo"]) {
   $modules["todo"] = array('Name'=> $l_module_todo,
                                   'Ico' => "$ico_todo",

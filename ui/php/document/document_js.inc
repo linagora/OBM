@@ -238,4 +238,17 @@ if (isset($ext_target)) {
   ";
 }
 
+if (isset($ext_widget) && isset($ext_widget_text)){
+  $extra_js .= "
+    function fill_ext_get_id_from_path(id, name){
+      var ext_field_id = window.opener.document.$ext_widget;
+      var ext_field_text = window.opener.document.$ext_widget_text;
+      ext_field_id.value = id;
+      ext_field_text.value = name;
+      window.close();
+      return;
+    }
+  ";
+}
+
 ?>

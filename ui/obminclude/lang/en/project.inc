@@ -36,6 +36,12 @@ $l_reftask_manage = "Manage reference tasks";
 $l_delete_reftask = "You're about to delete a Reference Task, do you want to continue?";
 $l_reftask = 'Reference Task';
 
+$l_ref = "Reference";
+$l_project_date = "Date";
+$l_project_duration = "Duration";
+$l_project_desc = "Description";
+$l_project_tech = "Technical description";
+
 // Titres
 $l_members_info = "Project members";
 $l_progressinfos = "Progress evaluation : time (used / missing / projected)";

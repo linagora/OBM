@@ -1017,7 +1017,7 @@ function html_document_tree($document, $display_file) {
     }
   }
   if ($display_file == "true") {
-    $block .= @display_document_tree($tree,'/','/',0,0);
+   $block .= @display_document_tree($tree,'/','/',0,0);
   } else {
     $block .= @display_document_popup_tree($tree,'/','/',0);
   }
@@ -1029,13 +1029,11 @@ $block.= "
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: Document Tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
+
+
 function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
-  global $ico_del_directory,$popup;
+  global $ico_del_directory,$popup, $action;
 
   $directories = $tree[$current_directory][0];
   $files = $tree[$current_directory][1];
@@ -1052,8 +1050,23 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
     $content.= 
     "<table class=\"document\">
        <tr>
+	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">";
+  if ($popup) {
+    if ($action == "ext_get_path"){
+      $fill_ext = "ext_get_path('".addslashes(get_document_disk_path($id).$id)."')";
+    }
+    else if ($action == "ext_get_id_from_path"){
+      $fill_ext = "fill_ext_get_id_from_path($id,'".$info["title"]."')";
+    }
+    $content.= "
+     <a class=\"documentFile\" href=\"\" onclick=\"$fill_ext;return false;\" > ".$info["name"]." </a>";
+  }
+  else {
+   $content.= "
+	 
 	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">
 	 <a  href=\"document_index.php?action=detailconsult&amp;document_id=$id\" >
+
 	  <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_file\" alt=\"\" />
 	 </a>
 	 <a class=\"documentFile\" 
@@ -1061,6 +1074,9 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 	  target=\"_blank\" >
 	  ".$info["name"]."
 	 </a>
+  }";
+  }
+  $content.= "
 	</td>
 	<td class=\"documentInfo\">&nbsp;".$info["title"]."</td>
 	<td class=\"documentInfo\">&nbsp;".$info["author"]."</td>
@@ -1113,7 +1129,6 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
   return $block;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Document Tree
 // Parameters:
@@ -1121,6 +1136,7 @@ function display_document_tree($tree,$current_directory,$name,$indent,$d_id) {
 function display_document_popup_tree($tree,$current_directory,$name,$indent) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $popup;
+  
   $indent_file = $indent + 15;
   $directories = $tree[$current_directory];
   foreach($directories as $id => $info) {
@@ -1134,7 +1150,7 @@ function display_document_popup_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentDir\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
+	<a href=\"\" onclick=\"show_hide_dir('$current_dir_id');return false;\"> 
 	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	 </a>
 	 <a class=\"documentDir\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">

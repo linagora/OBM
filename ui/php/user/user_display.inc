@@ -28,7 +28,6 @@ $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 $fieldnames["userobm_description"] = $l_desc;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display User specific dataset fields
 // Parameters:
@@ -39,11 +38,21 @@ $fieldnames["userobm_description"] = $l_desc;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_data(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail,$ext_element;
+  global $path, $set_theme, $ico_mail,$ext_element, $params;
 
-  if (($fieldname == "userobm_login") && $link_ok) {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
+  $ext_url = $params["ext_url"];
+
+  if (($fieldname == "userobm_login")) {
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_user_get_id(".$OD->data_set->f("userobm_id").",'".addslashes($OD->data_set->f("userobm_login"))."');";
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_user_get_id_url('$ext_url',".$OD->data_set->f("userobm_id").");";
+    } else {
+      if ($link_ok)
+        $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
+    }
   }
+
   if (($fieldname == "data_element") && $ext_element != "") {
     $res["name"] = "<span id=\"data-user-".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
     $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname").
@@ -243,6 +252,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
+    $ext_widget_text = $user["ext_widget_text"];
     $ext_element = $user["ext_element"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
@@ -251,6 +261,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
+    if ($ext_action == "ext_get_ids") {
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
@@ -276,6 +287,15 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
         </p>
       </p>
       </form>";
+    }
+    else if ($ext_action == "ext_get_id"){
+      $user_d->display_link = false;
+      if ($ext_url != "") {
+        $user_d->display_ext = "get_id_url";
+      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+        $user_d->display_ext = "get_id";
+      }
+    }
 
     $display_popup_end = "
       <p>
@@ -456,6 +476,8 @@ function dis_user_consult($user) {
   }
   return $block;
 }
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

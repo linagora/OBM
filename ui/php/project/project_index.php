@@ -75,6 +75,14 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+} elseif ($action == "ext_get_id_cv") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["search"] = dis_project_search_form($params);
+  if ($set_display == "yes") {
+    $display["result"] = dis_project_search_list($params);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
 
 } elseif ($action == "ext_get_task_id") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -331,6 +339,7 @@ if ($action == "ext_get_id") {
   }
 
 } elseif ($action == "planning") {
+
 ///////////////////////////////////////////////////////////////////////////////
   if ($params["project_id"] > 0) {
     $display["detail"] = dis_project_planning($params);
@@ -524,6 +533,13 @@ function get_project_action() {
 // External call : select one deal
   $actions["project"]["ext_get_id"] = array (
     'Url'      => "$path/project/project_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                     );
+                                     
+// External call (specific for CV) : select one project and update CV forms
+  $actions["project"]["ext_get_id_cv"] = array (
+    'Url'      => "$path/project/project_index.php?action=ext_get_id_cv",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );

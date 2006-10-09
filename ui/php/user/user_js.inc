@@ -29,9 +29,39 @@ function fill_ext_form(int_form) {
        }
      }
    }
+}";
 }
+
+if ($ext_widget != "" && $ext_widget_text != ""){
+
+  $extra_js .= "
+  function check_user_get_id(valeur,text) {
+    if ((valeur < 1) || (valeur == null)) {
+      alert (\"$l_j_select_user\");
+      return false;
+    } else {
+      window.opener.document.$ext_widget.value=valeur;
+      window.opener.document.$ext_widget_text.value=text;
+      window.close();
+      return true;
+    }
+  }";
+}
+
+$extra_js .="
+  function check_user_get_id_url(p_url, valeur) {
+    if ((valeur < 1) || (valeur == null)) {
+      alert (\"$l_j_select_user\");
+      return false;
+    } else {
+      new_url = p_url + valeur;
+      window.opener.location.href=new_url;
+      window.close();
+      return true;
+    }
+  }
 ";
-}
+
 
 if ($ext_element != "") {
   require_once("$obminclude/of/of_extmod.inc");

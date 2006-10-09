@@ -15,6 +15,7 @@ var tasks;";
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
 if (($ext_widget != "") || ($ext_widget_text != "")) {
+  
   $extra_js .= "
 
 function check_get_id(valeur,text) {
@@ -48,6 +49,18 @@ if ($ext_element != "") {
 }
 
 $extra_js .= "
+
+function check_get_id_cv(id, name) {
+  if ((id < 1) || (id == null)) {
+    alert (\"$l_select_project\");
+    return false;
+  } else {
+    window.opener.newRow(id, name)
+    window.close();
+    return true;
+    }
+}
+
 
 function check_get_id_url(p_url, valeur) {
   if ((valeur < 1) || (valeur == null)) {

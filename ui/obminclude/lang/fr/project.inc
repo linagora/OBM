@@ -26,6 +26,12 @@ $l_usedestimated = "Utilisation du temps prévu";
 $l_progress = "Avancement";
 $l_progeval = "Evaluation de l'avance/retard";
 
+$l_ref = "Référence";
+$l_project_date = "Date";
+$l_project_duration = "Durée";
+$l_project_desc = "Description";
+$l_project_tech = "Description technique";
+
 // Labels et textes
 $l_parent = "Tâche parent";
 $l_soldtime = "Temps vendu";

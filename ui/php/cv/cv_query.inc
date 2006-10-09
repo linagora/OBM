@@ -1,0 +1,623 @@
+<?php
+/**
+* @filesource cv_query.inc CV query File 
+* @author 2006-05-22  Vincent Coulette    
+*/
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+
+/**
+* CV Search query 
+* @param array $cv[] cv search criteria
+* @param string $p_new_order if it's set, replaces the default "order by" value
+* @param string $p_order_dir direction for order clause (asc, desc)
+* @return DB Object $obm_q
+*/
+
+function run_query_cv_search($cv, $p_new_order, $p_order_dir) {
+  global $cdg_sql, $c_all, $ctu_sql_limit;
+
+  $lastname = sql_search_text_parse($cv["lastname"]);
+  $firstname = sql_search_text_parse($cv["firstname"]);
+  $keyword_title = sql_search_text_parse($cv["keyword_title"]);
+  $keyword_education = sql_search_text_parse($cv["keyword_education"]);
+  $project_name = sql_search_text_parse($cv["project_name"]);
+  $deal_name = sql_search_text_parse($cv["deal_name"]);
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+  $limit = sql_limit($db_type);
+ // $where .= sql_obm_entity_privacy("cv");
+
+  if ($keyword_title != "") {
+    $where .= " AND cv_title $like '%$keyword_title%'";
+  }
+
+  $whereq = "WHERE 1=1 $where";
+  
+  $joinq = "";
+  
+  if ($lastname != "") {
+    $joinq .= " AND userobm_lastname = '$lastname' ";
+  }
+  
+  if ($firstname != "") {
+    $joinq .= " AND userobm_firstname = '$firstname' ";
+  }
+        
+  if ($keyword_education != "") {
+    $joinq .= " AND userobm_education $like '%$keyword_education%' ";
+  }
+            
+  if ($project_name != "" || $deal_name != "") {
+    $joinq .= " JOIN ProjectCV ON cv_id = projectcv_cv_id
+                JOIN Project ON projectcv_project_id = project_id ";
+    if ($project_name != "") {
+      $joinq .= " AND project_name $like '%$project_name%'";
+    }
+    if ($deal_name != "") {
+      $joinq .= " JOIN Deal ON project_deal_id = deal_id AND deal_label $like '%$deal_name%'";
+    }    
+  }
+
+  if ($p_new_order == "lastname") $p_new_order = "userobm_lastname";
+  if ($p_new_order == "firstname") $p_new_order = "userobm_firstname";  
+  if ($p_new_order == "timeupdate") $p_new_order = "cv_timeupdate";  
+  if ($p_new_order == "timecreate") $p_new_order = "cv_timecreate";  
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "cv_timecreate";
+  $orderq .= " ORDER BY $order $p_order_dir";
+  
+  
+  $timeupdate = sql_date_format($db_type, "cv_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "cv_timecreate", "timecreate");
+  
+  $query = "SELECT cv_title,
+      cv_id,
+      cv_id as id,
+      cv_userobm_id,
+      userobm_lastname,
+      userobm_firstname,
+      $timeupdate,
+      $timecreate
+    FROM CV
+     JOIN UserObm ON cv_userobm_id = userobm_id
+     $joinq
+    $whereq
+    $orderq
+    $limit
+";
+
+  if ($ctu_sql_limit) {
+    $cq = "SELECT count(*) FROM CV $join_comp $whereq";
+    $count = get_query_count($cq);
+    $obm_q->set_num_rows_total($count);
+  }
+  if (($count > 0)  || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+
+  return($obm_q);
+}
+
+
+/**
+CV detail query execution
+@param integer $id cv id
+@return DB Object $obm_q
+*/
+function run_query_cv_detail($id) {
+  global $cdg_sql;  
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $timeupdate = sql_date_format($db_type, "cv_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "cv_timecreate", "timecreate");
+
+  $query = "SELECT *,
+      p.userobm_lastname as lastname,
+      p.userobm_firstname as firstname,
+      p.userobm_location as location,
+      p.userobm_phone as phone,
+      p.userobm_education as education,
+      $timeupdate,
+      $timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    FROM CV
+         JOIN UserObm as p on cv_userobm_id=userobm_id
+         LEFT JOIN UserObm as c on cv_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u on cv_userupdate=u.userobm_id
+    WHERE cv_id = '$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
+/**
+* CV refs detail query execution
+* @param  integer $id cv id
+* @param $new_order
+* @param $order_dir
+* @return DB Object $obm_q
+*/
+function run_query_cv_refs_detail($id, $new_order="", $order_dir="") {
+  global $cdg_sql;  
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  if ($new_order != "" && $order_dir != "") {
+    $order = "$new_order $order_dir";
+  }
+  else {
+    $order = "project_name ASC";
+  }
+
+  $query = "SELECT cv_id,
+                   project_id, project_name, project_reference_desc, project_reference_tech,
+                   project_reference_duration, project_reference_date,
+                   projectcv_role
+            FROM CV
+            JOIN ProjectCV ON cv_id=projectcv_cv_id
+            JOIN Project ON projectcv_project_id=project_id
+            WHERE cv_id = '$id'
+            ORDER BY $order";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+/**
+* Insertion query construction
+* @param integer $cv
+* @return integer $cv_id
+*/
+
+function run_query_cv_insert($cv) {
+  global $display, $cdg_sql, $auth, $cgp_show;
+
+  // CV insertion
+  
+  $uid = $auth->auth["uid"];
+  $title = $cv["title"];
+  $user_id = $cv["user_id"];
+  $additionalrefs = $cv["additionalrefs"];
+  $comment = $cv["comment"];
+  $timecreate = date("Y-m-d H:i:s");
+  $query = "INSERT INTO CV
+     (cv_timeupdate,
+      cv_timecreate,
+      cv_userupdate,
+      cv_usercreate,
+      cv_title,
+      cv_userobm_id,
+      cv_additionnalrefs,
+      cv_comment)
+    VALUES (
+      null,
+      '$timecreate', 
+      '$uid',
+      '$uid',
+      '$title',
+      '$user_id',
+      '$additionalrefs',
+      '$comment')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  $cv_id = run_query_cv_id($cv, $timecreate, $uid);
+  
+  // ProjectCV insertion
+  
+  if ($cv_id > 0 ) {
+    $projects_id = $cv["project_id"];
+    $projects_role = $cv["project_role"];
+    if (is_array($projects_id) && count($projects_id) > 0){
+      foreach ($projects_id as $project_id){
+        $role = $projects_role[$project_id];
+        $ret = run_query_cv_insert_projectcv($project_id, $cv_id, $role);
+        if (!$ret)
+          return false;
+      }   
+    }
+    return $cv_id;
+  }
+  else
+    return -1;
+}
+
+/**
+* ProjectCV Insertion query construction
+* @param integer $project_id id of project
+* @param integer $cv_id id of CV
+* @param string $role role of the member working on the project 
+* @return string $retour insertion into table ProjectCV
+*/
+function run_query_cv_insert_projectcv($project_id, $cv_id, $role) {
+  global $cdg_sql;
+
+  $query = "INSERT INTO ProjectCV
+     (projectcv_project_id,
+      projectcv_cv_id,
+      projectcv_role)
+    VALUES (
+      '$project_id',
+      '$cv_id', 
+      '$role')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+/**
+* Update query construction
+* @param integer $cv
+* @return bool true or false
+*/
+function run_query_cv_update($cv) {
+  global $auth, $cdg_sql, $ccf_ticket, $ccf_duration;
+
+  $id = $cv["cv_id"];
+  $uid = $auth->auth["uid"];
+  $title = $cv["title"];
+  $user_id = $cv["user_id"];
+  $additionalrefs = $cv["additionalrefs"];
+  $comment = $cv["comment"];
+  
+  $query = "UPDATE CV SET
+      cv_timeupdate = '". date("Y-m-d H:i:s")."',
+      cv_userupdate = '$uid',
+      cv_title = '$title',
+      cv_additionnalrefs = '$additionalrefs',
+      cv_comment = '$comment'
+    WHERE cv_id = '$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);  
+  
+  // ProjectCV are deleted and reinserted
+  $query = "DELETE FROM ProjectCV WHERE projectcv_cv_id = '$id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query); 
+  
+  $projects_id = $cv["project_id"];
+  $projects_role = $cv["project_role"];
+  foreach ($projects_id as $key => $project_id){
+    $role = $projects_role[$project_id];
+    $ret = run_query_cv_insert_projectcv($project_id, $id, $role);
+    if (!$ret)
+      return false;
+  }   
+  return true;
+}
+
+
+/**
+* Delete query execution
+* @param $p_id cv id
+* @return string $ret delete the CV from CV and ProjectCV table
+*/
+function run_query_cv_delete($p_id) {
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  
+  // delete the projectcv
+  $query = "DELETE FROM ProjectCV WHERE projectcv_cv_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $ret = $obm_q->query($query);
+  
+  // delete the CV
+  $query = "DELETE FROM CV WHERE cv_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $ret = $obm_q->query($query);
+
+  return $ret;
+}
+
+
+/**
+* CV ID : Get the id of the cv inserted
+* @param array $cv[] cv hash info
+* @param date $timecreate creation time
+* @param integer $uid creator
+* @return integer $id if found else false
+*/
+function run_query_cv_id($cv, $timecreate, $uid) {
+  global $cdg_sql;
+
+  $title = $cv["title"];
+  $user_id = $cv["user_id"];
+  $additionalrefs = $cv["additionalrefs"];
+  $comment = $cv["comment"];
+
+  // comment and additionalrefs not searched because processed before stored in db
+  $query = "SELECT
+      cv_id
+    FROM CV
+    WHERE cv_title = '$title'
+      and cv_userobm_id = '$user_id'
+      and cv_timecreate = '$timecreate'
+      and cv_usercreate = '$uid' ";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+   $obm_q->next_record();
+    $id = $obm_q->f("cv_id");
+  } else {
+    $id = false;
+  }
+
+  return $id;
+}
+
+
+
+/**
+* CV Form Data checking and formatting
+* @param integer $cid  cv id : (empty on insertion)
+* @param array $cv[] values to check
+* @return bool true if check ok, else false
+*/
+function check_cv_form($cid, $cv) {
+  global $err_msg, $l_err_title_empty;
+
+  // Check if the title is filled
+  if (trim($cv["title"]) == "") {
+    $err_msg = $l_err_title_empty;
+    return false;
+  }
+
+  return true;
+}
+
+
+/**
+* Check if the cv can be deleted
+* @param integer $p_id cv id
+* @return bool true if the cv can be deleted, else false
+*/
+function check_can_delete_cv($p_id) {
+  global $err_msg, $ok_msg;
+
+  $delete_ok = true;
+  
+  // no links
+
+  return $delete_ok;
+}
+
+/**
+* Detail query execution
+* @param integer $user_id user id
+* @return DB object $obm_q
+*/
+function run_query_user_detail($user_id){
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  
+  $query = "SELECT userobm_login,
+                   userobm_lastname,
+                   userobm_firstname,
+                   userobm_location,
+                   userobm_phone,
+                   userobm_education
+            FROM UserObm
+            WHERE userobm_id='$user_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  return $obm_q;
+}
+
+/**
+* Default Odt template insert query execution
+* @param $cv cv hash info
+* keys used : defaultofttemplate_label, defaultofttemplate_document_id
+* @return string $retour
+*/
+function run_query_defaultodttemplate_insert($cv) {
+  global $auth, $cdg_sql;
+
+  $entity = "cv";
+  $document_id = $cv["defaultodttemplate_document_id"];
+  $label = $cv["defaultodttemplate_label"];
+
+  $query = "INSERT INTO DefaultOdtTemplate(defaultodttemplate_entity, defaultodttemplate_document_id, defaultodttemplate_label)
+            VALUES('$entity', '$document_id', '$label')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
+/**
+* Default Odt template update query execution
+* @param array $cv cv hash info : keys used : defaultofttemplate_label
+* @return string $retour 
+*/
+
+function run_query_defaultodttemplate_update($cv) {
+  global $auth, $cdg_sql;
+
+  $label = $cv["defaultodttemplate_label"];
+  $id = $cv["defaultodttemplate_id"];
+
+  $query = "UPDATE DefaultOdtTemplate SET
+      defaultodttemplate_label='$label'
+    WHERE
+      defaultodttemplate_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
+/**
+* Default Odt template deletion query execution
+* @param integer $id defaultodttemplate id
+* @return string $retour
+*/
+
+function run_query_defaultodttemplate_delete($id) {
+  global $cdg_sql;
+
+  $query = "DELETE FROM DefaultOdtTemplate WHERE defaultodttemplate_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+/**
+* Format CV data for export
+* @param object $cv_q 
+* @param object $refs_q 
+* @param $anonymous flag to hide personal details (just name initials)
+* @return string $data
+*/
+function format_cv_data_export($cv_q, $refs_q, $anonymous) {
+  global $l_refs, $l_comment, $l_education, $l_personal;
+  
+  $data_vars = array();
+  $data_blocks = array();
+  
+  // comment
+  $data_vars["title"] = $cv_q->f("cv_title");
+  
+  // personal details
+  $data_vars["l_personal"] = $l_personal;
+  
+  $lastname = $cv_q->f("lastname");
+  $firstname = $cv_q->f("firstname");
+  
+  $data_vars["lastname"] = $lastname;
+  $data_vars["firstname"] = $firstname;
+  $data_vars["address"] = "N/A"; // $cv_q->f("location");
+  $data_vars["phone"] = "N/A"; //$cv_q->f("phone");
+  
+  $the_personals[] = $a_personal;
+  $data_blocks["personal"] = $the_personals;
+
+  $initials = "";
+  if ($firstname != "" && $lastname != "") $initials .= $firstname{0}.".".$lastname{0}.".";
+  
+  $a_anonymous["initials"] = $initials;
+  $the_anonymous[] = $a_anonymous;
+  $data_blocks["anonymous"] = $the_anonymous;
+  
+  if ($anonymous) {
+    $data_vars["anonymous"] = 1;
+  }
+  else {
+    $data_vars["anonymous"] = 0;
+  }
+    
+  
+  $data_vars["l_education"] =  $l_education;
+  $data_vars["education"] = "N/A"; // $cv_q->f("education");
+  
+  // references
+  $data_vars["l_refs"] = $l_refs;
+  while ($refs_q->next_record()) {
+    $a_ref["date"] = $refs_q->f("project_reference_date");
+    $a_ref["duration"] = $refs_q->f("project_reference_duration");
+    $a_ref["role"] = $refs_q->f("projectcv_role");
+    $a_ref["project"] = $refs_q->f("project_name");
+    $a_ref["desc"] = $refs_q->f("project_reference_desc");
+    $a_ref["tech"] = $refs_q->f("project_reference_tech");
+    $the_refs[] = $a_ref; 
+  }
+  // additional refs
+  $additionalrefs = split_additionalrefs($cv_q->f("cv_additionalrefs"));
+  foreach($additionalrefs as $index => $ref) {
+    $a_ref["date"] = $ref[0];
+    $a_ref["duration"] = $ref[1];
+    $a_ref["role"] = $ref[2];
+    $a_ref["project"] = $ref[3];
+    $a_ref["desc"] = $ref[4];
+    $a_ref["tech"] = $ref[5];
+    $the_refs[] = $a_ref;
+  }
+  $data_blocks["refs"] = $the_refs;
+  
+  // comment
+  $data_vars["l_comment"] = $l_comment;
+  $data_vars["comment"] = $cv_q->f("cv_comment");
+  
+  $data = array("data_vars" => $data_vars, "data_blocks" => $data_blocks);
+
+  return $data;
+}
+
+/**
+* Split Additional refs text block into arrays (one array by ref)
+* @param array $additionalrefs
+* @return string $ret
+*/
+function split_additionalrefs($additionalrefs) {
+  $sep = "[|-sep-|]";
+  $bigsep = "[|-bigsep-|]";
+  $refs = explode($bigsep, $additionalrefs);
+  $ret = array();
+  for ($i = 0; $i < count($refs); $i++){
+    $one_ref = explode($sep, $refs[$i]);
+    $ret[] = $one_ref;
+  }
+  return $ret;
+}
+
+/**
+* Additionnalrefs DB text formatting 
+* @param string $dates date of project
+* @param string $durations duration of project
+* @param string $projects name of project
+* @param string $roles role of member
+* @param string $descs description of tasks member
+* @param string $techs technical description of tasks member
+* @return string $additionalrefs
+*/
+function format_additionalrefs($dates, $durations, $projects, $roles, $descs, $techs){
+  $additionalrefs = "";
+  $sep = "[|-sep-|]";
+  $bigsep = "[|-bigsep-|]";
+  if ($dates != "" && is_array($dates)) { 
+    foreach ($dates as $key => $value){
+      if ($dates[$key] != "" || $durations[$key] != "" || $projects[$key] != "" || $roles[$key] != "" || $descs[$key] != "" || $techs[$key] != ""){
+        if ($additionalrefs != "")
+          $additionalrefs .= $bigsep;
+        $additionalrefs .= $dates[$key].$sep.$durations[$key].$sep.$projects[$key].$sep.$roles[$key].$sep.$descs[$key].$sep.$techs[$key];
+      }
+    }
+  }
+  return $additionalrefs;
+}
+
+?>

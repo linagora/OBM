@@ -229,6 +229,7 @@ $cgp_show["module"]["lead"] = "com";
 $cgp_show["module"]["deal"] = "com";
 $cgp_show["module"]["list"] = "com";
 $cgp_show["module"]["agenda"] = "com";
+$cgp_show["module"]["cv"] = "com";
 $cgp_show["module"]["todo"] = "com";
 $cgp_show["module"]["publication"] = "com";
 $cgp_show["module"]["statistic"] = "com";
@@ -491,7 +492,6 @@ require_once("$obminclude/global_query.inc");
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_param($params) {
   global $cdg_param, $action, $global_dis_debug_param;
-
   if (debug_level_isset($cdg_param)) {
     $global_dis_debug_param .= "action=$action";
     if ( $params ) {

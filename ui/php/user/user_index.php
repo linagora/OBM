@@ -56,6 +56,13 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+}elseif ($action == "ext_get_id") {
+  $display["search"] = html_user_search_form($params);
+  if ($set_display == "yes") {
+    $display["result"] = dis_user_search_list($params);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
 
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -276,6 +283,14 @@ function get_user_action() {
 // Get Ids
   $actions["user"]["ext_get_ids"] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none'),
+    'popup' => 1
+                                    );
+                                    
+// Get Ids
+  $actions["user"]["ext_get_id"] = array (
+    'Url'      => "$path/user/user_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
     'popup' => 1

@@ -11,10 +11,6 @@
 // - search             -- search fields  -- show the result set of search
 ///////////////////////////////////////////////////////////////////////////////
 
-// vues (par societe,...)
-// migration ??? ou outil d'import d'un depot (repertoire classique)
-// acl
-
 $path = "..";
 $module = "document";
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -43,13 +39,22 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_path") {
+$display["detail"] = html_document_tree($params, $ext_disp_file);
+
+} elseif ($action == "ext_get_id_from_path") {
+///////////////////////////////////////////////////////////////////////////////  
+  
+  require("document_js.inc");
   $display["detail"] = html_document_tree($params, $ext_disp_file);
 
+//////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "accessfile") {
+
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params["document_id"] > 0) {
+    if ($params["document_id"] > 0) {
     $doc_q = run_query_document_detail($params["document_id"]);
-    if ($doc_q->num_rows() == 1) {
+
+if ($doc_q->num_rows() == 1) {
       dis_document_file($doc_q);
       exit();
     }
@@ -57,9 +62,11 @@ if ($action == "ext_get_path") {
     $display["msg"] .= display_err_msg("$l_no_document !");
   }  
 
-} elseif ($action == "ext_get_ids") {
-///////////////////////////////////////////////////////////////////////////////
+}
+elseif ($action == "ext_get_ids") {
+///////////////////////////////////////////////////////////////////////////////  
   $display["search"] = dis_document_search_form($params);
+
   if ($set_display == "yes") {
     $display["result"] = dis_document_search_list($params);
   } else {
@@ -99,7 +106,7 @@ if ($action == "ext_get_path") {
   
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_document_consult($params);
+  $display["detail"] = dis_document_consult($params["document_id"]);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -365,7 +372,6 @@ if (! $params["popup"]) {
   update_document_action();
   $display["header"] = display_menu($module);
 }
-
 display_page($display);
 
 
@@ -374,10 +380,8 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_params() {
-
-  // Get global params
+// Get global params
   $params = get_global_params("Document");
-
   if (isset ($params["path"])) $params["path"] = format_path(trim($params["path"]));
   if (isset ($_FILES['fi_file'])) {
     $params["file_tmp"] = $_FILES['fi_file']["tmp_name"];
@@ -385,7 +389,6 @@ function get_document_params() {
     $params["size"] = $_FILES['fi_file']['size'];
     $params["type"] = $_FILES['fi_file']['type'];
   }
-
   return $params;
 }
 
@@ -453,7 +456,7 @@ function get_document_action() {
     'Url'      => "$path/document/document_index.php?action=accessfile&amp;document_id=".$params["document_id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('None')
+    'Condition'=> array ('All')
                                      		 );
 
 // Detail Update
@@ -645,12 +648,19 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      		 );
 
-// External path view
+// External path view (get path)
   $actions["document"]["ext_get_path"]  = array (
     'Url'      => "$path/document/document_index.php?action=ext_get_path",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
+                                         
+// External path view (get id)
+  $actions["document"]["ext_get_id_from_path"]  = array (
+    'Url'      => "$path/document/document_index.php?action=ext_get_id_from_path",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                         );                                         
 
 // External view
   $actions["document"]["ext_get_ids"]  = array (
@@ -682,6 +692,5 @@ function update_document_action() {
     $actions["document"]["check_delete"]['Condition'][] = 'insert';
   }
 }
-
 
 ?>

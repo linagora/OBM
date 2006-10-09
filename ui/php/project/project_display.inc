@@ -39,6 +39,8 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
       $res["url"] = "javascript:check_get_id(".$OD->data_set->f("project_id").",'".addslashes($OD->data_set->f("project_name"))."');";
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("project_id").");";
+    } else if ($OD->display_ext == "get_id_cv") {
+      $res["url"] = "javascript:check_get_id_cv(".$OD->data_set->f("project_id").",'".addslashes($OD->data_set->f("project_name"))."');";
     } else {
       $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;project_id=".$OD->data_set->f("project_id");
     }
@@ -269,10 +271,15 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $proj_d = new OBM_DISPLAY("DATA", $prefs, "project");
   if ($popup) {
     $proj_d->display_link = false;
-    if ($ext_url != "") {
-      $proj_d->display_ext = "get_id_url";
-    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-      $proj_d->display_ext = "get_id";
+    if ($ext_action == "ext_get_id_cv"){
+      $proj_d->display_ext = "get_id_cv";
+    }
+    else {
+      if ($ext_url != "") {
+        $proj_d->display_ext = "get_id_url";
+      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+        $proj_d->display_ext = "get_id";
+      }
     }
    $display_popup_end = "
       <p>
@@ -596,6 +603,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
   global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
   global $l_alloproj, $l_usedproj, $l_no_tasks;
+  global $l_ref, $l_project_date, $l_project_duration, $l_project_desc, $l_project_tech;
 
   $cpt_t = 0;
   $cpt_m = 0;
@@ -614,6 +622,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $estimated = $project_q->f("project_estimatedtime");
   $datebegin = date_format($project_q->f("datebegin"), 1);
   $dateend = date_format($project_q->f("dateend"), 1);
+  $reference_date =  $project_q->f("project_reference_date");
+  $reference_duration =  $project_q->f("project_reference_duration");
+  $reference_desc =  nl2br($project_q->f("project_reference_desc"));
+  $reference_tech =  nl2br($project_q->f("project_reference_tech"));
   $comment = beautify_comment(nl2br($project_q->f("project_comment")));
 
   // Labels are different for sales and R&D projects
@@ -957,6 +969,28 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     </tr>";
 
   } 
+  
+  // Reference
+  $dis_reference = "
+  <div class=\"detailHead\"> $l_ref </div>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\"> $l_project_date </td>
+    <td class=\"detailText\">$reference_date</td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\"> $l_project_duration </td>
+    <td class=\"detailText\">$reference_duration</td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\"> $l_project_desc </td>
+    <td class=\"detailText\">$reference_desc</td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\"> $l_project_tech </td>
+    <td class=\"detailText\">$reference_tech</td>
+  </tr>
+  </table>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -995,6 +1029,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       <td class=\"detailText\">$arc_status</td>
     </tr>
     </table>
+
+    $dis_reference
  	
     <div class=\"detailHead\">$l_progress</div>
 
@@ -1057,6 +1093,10 @@ function html_project_form($action, $project_q, $project) {
     $deal_label = $project_q->f("deal_label");
     $datebegin = isodate_format($project_q->f("datebegin"), 1);
     $dateend = isodate_format($project_q->f("dateend"), 1);
+    $reference_date =  $project_q->f("project_reference_date");
+    $reference_duration =  $project_q->f("project_reference_duration");
+    $reference_desc =  $project_q->f("project_reference_desc");
+    $reference_tech =  $project_q->f("project_reference_tech");
     $comment = $project_q->f("project_comment");
     $shortname = $project_q->f("project_shortname");
     $usercomment = $uid;
@@ -1087,6 +1127,10 @@ function html_project_form($action, $project_q, $project) {
   if (isset($project["datebegin"])) { $datebegin = $project["datebegin"]; }
   if (isset($project["dateend"])) { $dateend = $project["dateend"]; }
   if (isset($project["archive"])) { $arc_val = ($project["archive"] == 1 ? "checked" : ""); }
+  if (isset($project["reference_date"])) { $reference_date = stripslashes($project["reference_date"]); }
+  if (isset($project["reference_duration"])) { $reference_duration = stripslashes($project["reference_duration"]); }
+  if (isset($project["reference_desc"])) { $reference_desc = stripslashes($project["reference_desc"]); }
+  if (isset($project["reference_tech"])) { $reference_tech = stripslashes($project["reference_tech"]); }
   if (isset($project["comment"])) { $comment = stripslashes($project["comment"]); }
   if (isset($project["add_comment"])) { $add_comment = stripslashes($project["add_comment"]); }
   if (isset($project["usercomment"])) { $usercomment = $project["usercomment"]; }
@@ -1189,6 +1233,28 @@ function html_project_form($action, $project_q, $project) {
     $sel_tt .= "</select>";
   }
 
+  // Reference
+  $dis_reference = "
+  <div class=\"detailHead\"> $l_ref </div>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\"> $l_project_date </td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_reference_date\" size=\"16\" maxlength=\"32\" value=\"$reference_date\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\"> $l_project_duration </td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_reference_duration\" size=\"16\" maxlength=\"16\" value=\"$reference_duration\"  /></td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\"> $l_project_desc </td>
+    <td class=\"detailForm\"><textarea name=\"ta_reference_desc\" rows=\"4\" cols=\"80\" >$reference_desc</textarea></td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\"> $l_project_tech </td>
+    <td class=\"detailForm\"><textarea name=\"ta_reference_tech\" rows=\"4\" cols=\"80\" >$reference_tech</textarea></td>
+  </tr>
+  </table>";
+
   // User comment select construction
   if ($usr_q->nf()>0) {
     $usr_q->seek(0);
@@ -1271,6 +1337,8 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $arc_val /></td>
     </tr>
     </table>
+
+    $dis_reference
 
     <div class=\"detailHead\">$l_comment</div>
 

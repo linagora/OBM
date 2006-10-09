@@ -153,6 +153,10 @@ function run_query_project_detail($p_id) {
       project_soldtime,
       project_estimatedtime,
       project_archive,
+      project_reference_date,
+      project_reference_duration,
+      project_reference_desc,
+      project_reference_tech,
       project_comment,
       $timeupdate,
       $timecreate,
@@ -288,9 +292,14 @@ function run_query_project_insert($params) {
   $member = $params["member"];
   $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
   $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
+  $project_reference_date = $params["reference_date"];
+  $project_reference_duration = $params["reference_duration"];
+  $project_reference_desc = $params["reference_desc"];
+  $project_reference_tech = $params["reference_tech"];
   $add_comment = $params["add_comment"];
   $ref_task = $params["reftask_id"];
   $shortname = $params["shortname"];
+
   if ($add_comment != "") {
     $datecomment = $params["datecomment"];
     $usercomment = $params["usercomment"];
@@ -313,6 +322,10 @@ function run_query_project_insert($params) {
     project_datebegin,
     project_dateend,
     project_archive,
+    project_reference_date,
+    project_reference_duration,
+    project_reference_desc,
+    project_reference_tech,
     project_comment)
   VALUES (null,
     '$date_now',
@@ -329,6 +342,10 @@ function run_query_project_insert($params) {
     $datebegin,
     $dateend,
     '0',
+    '$project_reference_date',
+    '$project_reference_duration',
+    '$project_reference_desc',
+    '$project_reference_tech',
     '$comment')";
 
   display_debug_msg($query, $cdg_sql, "run_query_project_insert");
@@ -480,14 +497,20 @@ function run_query_project_update($pid, $params) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
+
   $name = $params["name"];
   $soldtime = ($params["soldtime"] ? "'".$params["soldtime"]."'" : "null");
   $estimated = ($params["estimated"] ? "'".$params["estimated"]."'" : "null");
   $tt = $params["tt"];
   $datebegin = ($params["datebegin"] ? "'".$params["datebegin"]."'" : "null");
   $dateend = ($params["dateend"] ? "'".$params["dateend"]."'" : "null");
+  $reference_date = $params["reference_date"];
+  $reference_duration = $params["reference_duration"];
+  $reference_desc = $params["reference_desc"];
+  $reference_tech = $params["reference_tech"];
   $archive = $params["archive"];
   $shortname = $params["shortname"];
+
   if ($archive) {
     $arch = "1";
   } else {
@@ -511,6 +534,10 @@ function run_query_project_update($pid, $params) {
       project_estimatedtime=$estimated,
       project_datebegin=$datebegin,
       project_dateend=$dateend,
+      project_reference_date='$reference_date',
+      project_reference_duration='$reference_duration',
+      project_reference_desc='$reference_desc',
+      project_reference_tech='$reference_tech',
       project_archive='$arch',
       project_comment='$comment'
     WHERE project_id='$pid' $multidomain";
