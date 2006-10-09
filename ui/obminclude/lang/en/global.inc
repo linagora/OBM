@@ -120,6 +120,7 @@ $l_list = "List";
 $l_event = "Event";
 $l_publication = "Publication";
 $l_todo = "To Do";
+$l_stats = "Stats";
 $l_time = "Time management";
 $l_project = "Project";
 $l_contract = "Contract";

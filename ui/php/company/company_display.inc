@@ -1114,7 +1114,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if (is_array($cgp_user["company"]["category"])) {
     foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
       $cats = of_category_user_get_ordered($cat_name, "company", $id);
-      $block_user .= of_category_user_dis_entity_form("company", $cat_name, $cats);
+      $block_user .= of_category_user_dis_entity_form("company", $cat_name, $cats, $one_cat["mode"]);
     }
   }
 
@@ -1195,10 +1195,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\" alt=\"$web\" /></a>";
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
-
-  if (($action == "detailupdate") || ($action == "update")) {
-    $links = html_company_links($co_q);
-  }
 
   // User comment select construction
   if ($usr_q->nf()>0) {
@@ -1507,7 +1503,7 @@ function dis_company_admin_index() {
   if (is_array($cgp_user["company"]["category"])) {
     foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
       $cats = of_category_user_get_ordered("$cat_name");
-      $block .= of_category_dis_admin_form($cat_name, $cats);
+      $block .= of_category_dis_admin_form($cat_name, $cats, true);
     }
   }
 

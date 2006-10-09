@@ -241,7 +241,7 @@ function run_query_company_detail($p_id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
   $timeupdate = sql_date_format($db_type, "company_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "company_timecreate", "timecreate");
   $lang = get_lang();
@@ -585,7 +585,7 @@ function run_query_check_company($p_id, $name, $zip) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
 	
   $query = "SELECT DISTINCT company_id, company_name, company_zipcode 
             FROM Company
@@ -609,7 +609,7 @@ function run_query_companynafcode() {
 
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
   if ($show_naf) {
-  	$multidomain = sql_multidomain("companynafcode");
+    $multidomain = sql_multidomain("companynafcode");
   	
     $query = "SELECT * FROM CompanyNafCode WHERE 1=1 $multidomain ORDER BY companynafcode_code"; 
     $obm_q = new DB_OBM;

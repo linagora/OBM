@@ -123,6 +123,7 @@ $l_list = "Liste";
 $l_event = "Evénement";
 $l_publication = "Publication";
 $l_todo = "A faire";
+$l_stats = "Stats";
 $l_time = "Gestion du temps";
 $l_project = "Projet";
 $l_contract = "Contrat";

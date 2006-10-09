@@ -468,19 +468,28 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
 // Parameters:
 //   - $catu   : target category (string) can have Uppercase eg: CompanyRole
 //   - $cats   : Category array
+//   - $user   : User Category ? default false
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_admin_form($catu, $cats) {
+function of_category_dis_admin_form($catu, $cats, $user=false) {
   global $l_c_manage, $l_code, $l_label;
   global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
   global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
 
-  $cat = strtolower($catu);
-  $l_cat = "l_${cat}";
+  $cat_name = strtolower($catu);
+  $l_cat = "l_${cat_name}";
   global $$l_cat;
+
+  // cat_name is used for form names (to have differents ones)
+  // cat is used for fields (no problemes if 2 tf_category_label in 2 forms)
+  if ($user) {
+    $cat = "category";
+  } else {
+    $cat = $cat_name;
+  }
 
   $indent = 10;
   $flabel = $indent;
-  $sel_cat = "<select name=\"sel_${cat}\" onchange=\"
+  $sel_cat = "<select name=\"sel_${cat}_id\" onchange=\"
     mytext = this.options[this.selectedIndex].text;
     mytext = mytext.substr(0, mytext.length);
     pos = mytext.indexOf('...');
@@ -488,8 +497,8 @@ function of_category_dis_admin_form($catu, $cats) {
       ext = trim(mytext.substr(0, pos));
       mytext = mytext.substr($flabel);
     }
-    forms.form_${cat}_update.tf_${cat}_label.value=mytext;
-    forms.form_${cat}_update.tf_${cat}_code.value=ext;
+    forms.form_${cat_name}_update.tf_${cat}_label.value=mytext;
+    forms.form_${cat_name}_update.tf_${cat}_code.value=ext;
     \"
     size=\"8\" style=\"font-family:monospace;\">";
   if (is_array($cats)) {
@@ -525,7 +534,7 @@ function of_category_dis_admin_form($catu, $cats) {
     <tr>
       <td>
 <!-- Category Check Delete Section -->
-        <form name=\"form_${cat}_delete\" method=\"post\"
+        <form name=\"form_${cat_name}_delete\" method=\"post\"
           action=\"" . url_prepare("") . "\">
         <table>
         <tr>
@@ -537,7 +546,8 @@ function of_category_dis_admin_form($catu, $cats) {
         <tr>
           <td>
           <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
-          <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
+          <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
+          <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat}_id,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
           </td>
         </tr> 
         </table>
@@ -547,7 +557,7 @@ function of_category_dis_admin_form($catu, $cats) {
 
 <!-- Category Update Section -->
 
-          <form name=\"form_${cat}_update\" method=\"get\" action=\"" . url_prepare("") . "\">
+          <form name=\"form_${cat_name}_update\" method=\"get\" action=\"" . url_prepare("") . "\">
         <table heigth=\"100%\">
         <tr>
           <td class=\"adminLabel\">$l_code :</td>
@@ -557,28 +567,31 @@ function of_category_dis_admin_form($catu, $cats) {
           <td><input type=\"text\" name=\"tf_${cat}_label\" /></td>
         </tr><tr>
           <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"sel_${cat}\" value=\"\" />
+            <input type=\"hidden\" name=\"sel_${cat}_id\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
+            <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
             <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_update\"
-              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
+              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat}_id,document.form_${cat_name}_delete.sel_${cat}_id,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
           </td>
         </tr>
         </table>
           </form>
       </td>
-      <td>
+
 <!-- New Category Section -->
-        <form name=\"form_${cat}_new\" method=\"get\" action=\"" . url_prepare("") . "\">
+      <td>
+        <form name=\"form_${cat_name}_new\" method=\"get\" action=\"" . url_prepare("") . "\">
         <table>
         <tr>
           <td class=\"adminLabel\">$l_code :</td>
-          <td ><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
+          <td><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">$l_label :</td>
-          <td ><input type=\"text\" name=\"tf_${cat}_label\" /></td>
+          <td><input type=\"text\" name=\"tf_${cat}_label\" /></td>
         </tr><tr>
           <td class=\"adminLabel\" colspan=\"2\">
             <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
+            <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
             <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_insert\"
               onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
           </td>
@@ -589,75 +602,6 @@ function of_category_dis_admin_form($catu, $cats) {
       </td>
     </tr>
     </table>
-
-<!--
-    <table class=\"admin\">
-    <tr>
-      <td>
-
-        <table border=\"1\">
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_${cat}_delete\" method=\"post\"
-              action=\"" . url_prepare("") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">".ucfirst(${$l_cat})."</td>
-              <td class=\"adminLabel\">$sel_cat</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
-              <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_${cat}_update\" method=\"get\"
-              action=\"" . url_prepare("") . "\">
-            <input type=\"hidden\" name=\"sel_${cat}\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
-            <input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" />
-            <input type=\"text\" name=\"tf_${cat}_label\" />
-            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_update\"
-              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat},document.form_${cat}_delete.sel_${cat},'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-
-      </td>
-      <td>
-
-        <form name=\"form_${cat}_new\" method=\"get\"
-          action=\"" . url_prepare("") . "\">
-        <table>
-        <tr>
-        <td class=\"adminLabel\" colspan=\"2\">$l_c_new</td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_code :</td>
-          <td ><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-          <td ><input type=\"text\" name=\"tf_${cat}_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
-            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_insert\"
-              onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
--->
 
     </div>
 ";
@@ -1112,7 +1056,7 @@ function of_category_query_delete_link($entity, $cat, $entity_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Entity links query execution
+// Category - Entity links query execution
 // Parameters:
 //   - $entity : target entity
 //   - $cat    : target category
@@ -1192,7 +1136,7 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
-	$multidomain = sql_multidomain(strtolower($table));
+  $multidomain = sql_multidomain(strtolower($table));
 	
   if ($mode == "mono") {
     $query = "SELECT $field_id, $field_label, $field_code 
@@ -1247,7 +1191,7 @@ function of_category_get_label($entity, $cat, $id) {
   $field_prefix = strtolower($entity.$cat."_");
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
-	$multidomain = sql_multidomain(strtolower($table));
+  $multidomain = sql_multidomain(strtolower($table));
 	
   $query = "SELECT $field_label 
     FROM $table 
@@ -1291,13 +1235,13 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
-	$multidomain = sql_multidomain(strtolower($table));
+  $multidomain = sql_multidomain(strtolower($table));
 	
   if ($mode == "mono") {
     $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
       FROM $table
         LEFT JOIN $entitytable ON $entityfield_cat = $field_id
-				WHERE 1=1 $multidomain
+      WHERE 1=1 $multidomain
       GROUP BY $entityfield_cat, $field_id, $field_code, $field_label
       ORDER BY $field_code, $field_label";
   } else {
@@ -1305,12 +1249,12 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
       FROM $table
         LEFT JOIN $linktable ON $linkfield_cat = $field_id
         LEFT JOIN $entitytable ON $entityfield_id = $linkfield_ent
-			WHERE 1=1 $multidomain
+      WHERE 1=1 $multidomain
       GROUP BY $linkfield_cat, $field_id, $field_code, $field_label
       ORDER BY $field_code, $field_label";
   }
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "of_category_query_category_per_entity()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1438,7 +1382,7 @@ function _of_category_get_entity_count($entity) {
     $entitytable = ucfirst($entity);
   }
 
-	$multidomain = sql_multidomain(strtolower($entitytable));
+  $multidomain = sql_multidomain(strtolower($entitytable));
 
   $query = "SELECT count(*) as count_entity FROM $entitytable WHERE 1=1 $multidomain";
 
@@ -1736,6 +1680,90 @@ function of_category_user_dis_tree($entity, $cat, $params, $action) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: the USER category links
+// Parameters:
+//   - $params  : parameters array
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_dis_links($params) {
+  global $l_c_link, $l_c_link_no;
+  global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
+  global $l_back, $display;
+
+  $category = $params["category"]; 
+  $cat_id = $params["category_id"];
+
+  $l_cat = "l_${category}";
+  global $$l_cat;
+
+  $has_links = false;
+  $cat = of_category_user_get_infos($cat_id);
+  $cat_label = $cat["label"];
+
+  $cats = of_category_user_get_links($category, $cat_id);
+
+  if (is_array($cats)) {
+
+    foreach($cats as $entity => $one_cat) {
+      $l_entity = strtolower("l_${entity}");
+      global $$l_entity;
+      echo "ent=$entity";
+      $nb_links = count($one_cat);
+      if ($nb_links > 0) {
+	$has_links = true;
+        $url = url_prepare("?action=search&amp;sel_${category}=$cat_id&amp;cb_archive=1");
+
+	$dis_link .= "
+    <tr>
+      <td class=\"detailHead\">".ucfirst(${$l_cat})." ($cat_label) : $l_c_link : ${$l_entity} <a href=\"$url\">($nb_links)</a>.</td>
+    </tr>";
+      } else {
+	$dis_link .= "
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">
+          ".ucfirst(${$l_cat})."($cat_label) : $l_c_link_no (${$l_entity}). </td>
+    </tr>";
+      }
+    }
+  }
+
+  if ($has_links) {
+    $display["msg"] .= display_warn_msg(ucfirst(${$l_cat}).": $cat_label : $l_c_cant_delete.");
+  } else {
+    $display["msg"] .= display_ok_msg(ucfirst(${$l_cat}).": $cat_label : $l_c_can_delete.");
+
+    $dis_buttons .= "
+      <form name=\"form_cat_delete\"
+        method=post action=\"" . url_prepare("") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"category_delete\">
+      <input type=\"hidden\" name=\"sel_category_id\" value=\"$cat_id\">
+      <input type=\"hidden\" name=\"category\" value=\"$category\">
+      <input type=\"submit\" name=\"sub_cat\" value=\"$l_c_delete\">
+      </form>";
+  }
+
+  $dis_buttons .= "
+        <form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  $block = "
+    <table class=\"detail\">
+      $dis_link
+    </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+      $dis_buttons
+    </p>
+  </div>
+";
+
+  return $block;
+}
+
+
 
 // Data functions -------------------------------------------------------------
 
@@ -1773,7 +1801,7 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
       ORDER BY category_code, category_label";
   }
   $cat_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "of_category_get_ordered()");
+  display_debug_msg($query, $cdg_sql, "of_category_user_get_ordered()");
   $cat_q->query($query);
   
   while ($cat_q->next_record()) {
@@ -1855,49 +1883,113 @@ function of_category_user_get_entitycategories($entity, $category, $entity_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category insertion query construction and execution
+// User Category insertion query construction and execution
 // Parameters:
-//   - $entity  : target entity
-//   - $catu    : target category (string, may have upper case)
-//   - $param   : parameters 
+//   - $params : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_user_query_insert($entity, $catu, $param) {
+function of_category_user_query_insert($params) {
   global $auth, $cdg_sql, $obm;
 
-  $cat = strtolower($catu);
+  $category = $params["category"];
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $cat_label = $param["${cat}_label"];
-  $cat_code = $param["${cat}_code"];
-  $table = ucfirst($entity) . ucfirst($catu);
-  $field_prefix = strtolower($entity.$cat."_");
-  $field_timecreate = $field_prefix."timecreate";
-  $field_usercreate = $field_prefix."usercreate";
-  $field_label = $field_prefix."label";
-  $field_code = $field_prefix."code";
-  $field_domain = $field_prefix."domain_id";
+  $cat_label = $params["category_label"];
+  $cat_code = $params["category_code"];
   $domain_id = $obm["domain_id"];
 	
-  $query = "INSERT INTO $table (
-    $field_timecreate,
-    $field_usercreate,
-    $field_domain,
-    $field_label,
-    $field_code)
+  $query = "INSERT INTO Category (
+    category_domain_id,
+    Category_timeupdate,
+    Category_timecreate,
+    Category_userupdate,
+    Category_usercreate,
+    Category_category,
+    Category_code,
+    Category_label)
   VALUES (
+    '$domain_id',
+    null,
     '$timecreate',
     '$usercreate',
-    '$domain_id',
-    '$cat_label',
-    '$cat_code')";
+    '$usercreate',
+    '$category',
+    '$cat_code',
+    '$cat_label')";
 
-  display_debug_msg($query, $cdg_sql, "of_category_query_insert()");
+  display_debug_msg($query, $cdg_sql, "of_category_user_query_insert()");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
   return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User Category update query execution
+// Parameters:
+//   - $param  : parameters 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_query_update($params) {
+  global $auth, $cdg_sql, $obm;
+
+  $category = $params["category"];
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $cat_id = $params["category_id"];
+  $cat_label = $params["category_label"];
+  $cat_code = $params["category_code"];
+  $multidomain = sql_multidomain("Category");
+	
+  $query = "UPDATE Category SET
+    category_timeupdate = '$timeupdate',
+    category_userupdate = '$userupdate',
+    category_label = '$cat_label',
+    category_code = '$cat_code'
+  WHERE
+    category_id='$cat_id'
+    AND category_category = '$category'
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_query_update()");
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category deletion query execution
+// Parameters:
+//   - $params : parameters 
+// Return:
+//   - execution code
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_query_delete($params) {
+  global $cdg_sql;
+
+  $category_id = $params["category_id"];
+  $category = $params["category"];
+  $multidomain = sql_multidomain("Category");
+
+  if ($category_id > 0) {
+    $query = "DELETE FROM Category
+    WHERE category_id ='$category_id'
+      AND category_category = '$category'
+      $multidomain";
+
+    display_debug_msg($query, $cdg_sql, "of_category_user_query_delete()");
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  } else {
+    $retour = 1;
+  }
+
+  return $retour;
 }
 
 
@@ -1956,6 +2048,71 @@ function of_category_user_query_delete_link($entity, $entity_id) {
   $retour = $obm_q->query($query);
 
   return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// USER Category - Entity links query execution
+// Parameters:
+//   - $cat    : target category
+//   - $p_id   : category id
+// Return:
+//   - database handle
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_links($category, $p_id) {
+  global $cdg_sql;
+
+  $query = "SELECT categorylink_entity_id,
+        categorylink_entity
+      FROM CategoryLink
+      WHERE categorylink_category_id = '$p_id'
+        AND categorylink_category = '$category'
+      ORDER by categorylink_entity";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_get_links()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  $cats = array();
+  while ($obm_q->next_record()) {
+    $ent = $obm_q->f("categorylink_entity");
+    $ent_id = $obm_q->f("categorylink_entity_id");
+    $cats[$ent][] = $ent_id;
+  }
+
+  return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// USER Category - get ctegroy infos
+// Parameters:
+//   - $cat_id : category id
+// Return:
+//   - array with category infos
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_infos($cat_id) {
+  global $cdg_sql;
+
+  $cat = array();
+
+  if ($cat_id > 0) {
+    $query = "SELECT *
+      FROM Category
+      WHERE category_id = '$cat_id'";
+
+    display_debug_msg($query, $cdg_sql, "of_category_user_get_infos()");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    
+    $cat["category"] = $obm_q->f("category_category");
+    $cat["id"] = $cat_id;
+    $cat["code"] = $obm_q->f("category_code");
+    $cat["label"] = $obm_q->f("category_label");
+  }
+
+  return $cat;
 }
 
 

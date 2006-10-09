@@ -12,37 +12,72 @@
 // Parameters:
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_statistic_menu_stats() {
-  global $path, $set_theme;
-  global $set_theme, $action;
-  global $actions, $module, $perm;
-  global $l_statistic;
+function dis_statistic_index() {
+  global $path, $cgp_user, $set_theme, $action, $actions, $module, $perm;
+  global $l_stats, $l_company, $l_contact, $l_stats_manager;
+  global $l_stats_contact_date_evolution;
 
-  $ret = "
-  <div class=\"menusInner\">
-  <div class=\"block\">
-  <div class=\"blockTitle\">:: $l_statistic </div>
-  <ul class=\"blockItem\">";
-
-  if (is_array($actions[$module])) {
-    $module_right = $perm->get_module_rights($module); 
-    foreach ($actions[$module] as $key => $value) {
-      if (in_array("content", $value["Condition"])) {
-	if (($module_right & $value["Right"]) == $value["Right"]) {
-	    $ret .= "
-        <li class=\"blockItem\">
-	<a href=\"".$value["Url"]."\"><img src=\"".C_IMAGE_PATH."/$set_theme/".$value["Ico"]."\" alt=\"\"></a>
-         <a href=\"".$value["Url"]."\">".$value["Name"]."</a></li>";
-	}
-      }
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      global ${"l_$cat_name"};
+      $l_cat = ${"l_$cat_name"};
+      $block_company .= dis_statistic_category_index_item("company", $cat_name, $l_cat);
     }
   }
-   
-  $ret .= "</ul>
-        </div>
-	</div>";
 
-  return $ret;
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      global ${"l_$cat_name"};
+      $l_cat = ${"l_$cat_name"};
+      $block_contact .= dis_statistic_category_index_item("contact", $cat_name, $l_cat);
+    }
+  }
+
+  $block = "<div class=\"title\">$l_stats</div>
+    <div class=\"detailText\"><a href=\"$path/statistic/statistic_index.php?action=manager\">$l_stats_manager</a></div>
+    <div class=\"detailText\"><a href=\"$path/statistic/statistic_index.php?action=contact_date_evolution\">$l_stats_contact_date_evolution</a></div>
+    <p />
+    <div class=\"title\">$l_company</div>
+    $block_company
+    <p />
+    <div class=\"title\">$l_contact</div>
+    $block_contact
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display a category index item
+// Parameters:
+//   - $entity   : entity to calculate the stats
+//   - $category : category to calculate the stats
+//   - $title    : category name or title
+// Returns:
+///////////////////////////////////////////////////////////////////////////////
+function dis_statistic_category_index_item($entity, $category, $title) {
+  global $path, $popup_height, $popup_width, $c_all;
+  global $l_stats_from_list, $l_stats_from_all;
+
+  $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=stats_category&amp;category=$category&amp;entity=$entity&amp;list_id=")."&amp;ext_target=$l_statistc";
+  $block .= "
+  <form action=\"statistic_index.php\">
+  <div class=\"detailButton\">
+  <div class=\"detailHead\">$title</div>
+  <p class=\"detailButtons\">
+  <input type=\"button\"
+  onclick=\"window.open('$url','$l_statistc','height=$popup_height,width=$popup_width,scrollbars=yes'); return false; \" value=\"$l_stats_from_list\" />
+  <input type=\"hidden\" name=\"action\" value=\"stats_category\" />
+  <input type=\"hidden\" name=\"category\" value=\"$category\" />
+  <input type=\"hidden\" name=\"entity\" value=\"$entity\" />
+  <input type=\"hidden\" name=\"list_id\" value=\"$c_all\" />
+  <input type=\"submit\" value=\"$l_stats_from_all\" />
+  </p>
+  </div>
+  </form>";
+
+  return $block; 
 }
 
 
@@ -121,51 +156,23 @@ function dis_statistic_resp_stats($cont_q,$comp_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the companies 
 // Parameters:
-//  - $lisy_q : DB Object with all list
-// Returns:
-///////////////////////////////////////////////////////////////////////////////
-function dis_statistic_list_select($list_q) {
-  global $l_select_list, $c_all, $l_all,$l_generate_stats;
-  global $path,$popup_height,$popup_width;
-
-  $url = "$path/list/list_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_list)."&amp;ext_action=company&amp;ext_url=".urlencode($path."/statistic/statistic_index.php?action=company_statistic&amp;list_id=")."&amp;ext_target=$l_statistc";
-  $block .= "
-  <form action=\"statistic_index.php\">
-  <div class=\"detailButton\">
-  <p class=\"detailButtons\"> 
-  <input type=\"button\"
-  onclick=\"window.open('$url','$l_statistc','height=$popup_height,width=$popup_width,scrollbars=yes'); return false; \" value=\"$l_select_list\" />
-  <input type=\"hidden\" name=\"action\" value=\"company_statistic\" />
-  <input type=\"hidden\" name=\"list_id\" value=\"$c_all\" />
-  <input type=\"submit\" value=\"$l_generate_stats\" />
-  </p>
-  </div>
-  </form>";
-
-  return $block; 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Statistics About the companies 
-// Parameters:
 // - comp_q : DB Object with all companies datas
 // - tot : Total of companies... unused for now
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_statistic_cat_stats($comp_q,$tot) {
+function dis_statistic_cat_stats($comp_q, $tot) {
   global $path, $set_theme;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
 
   while ($comp_q->next_record()) {
-    if ($comp_q->f("companycategory1_id") == NULL) {
+    if ($comp_q->f("category_id") == NULL) {
       $cat_id = 0;
       $cat_c = $l_null;
     } else {
-      $code = $comp_q->f("companycategory1_code");
-      $cat_id = $comp_q->f("companycategory1_id");
+      $code = $comp_q->f("category_code");
+      $cat_id = $comp_q->f("category_id");
       $cat_c = $code; 
-      $cat_d = $comp_q->f("companycategory1_label");
+      $cat_d = $comp_q->f("category_label");
       $cat_major_code = substr($code,0,strpos($code,'.'));
       // If code is a major code (not .)
       if ($cat_major_code == "") {
@@ -269,6 +276,7 @@ function dis_statistic_cat_stats($comp_q,$tot) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the companies 
 // Parameters:
@@ -282,14 +290,14 @@ function export_statistic_cat_stats($comp_q,$tot) {
   global $set_csv_sep;
 
   while ($comp_q->next_record()) {
-    if ($comp_q->f("companycategory1_id") == NULL) {
+    if ($comp_q->f("category_id") == NULL) {
       $cat_id = 0;
       $cat_c = $l_null;
     } else {
-      $code = $comp_q->f("companycategory1_code");
-      $cat_id = $comp_q->f("companycategory1_id");
+      $code = $comp_q->f("category_code");
+      $cat_id = $comp_q->f("category_id");
       $cat_c = $code; 
-      $cat_d = $comp_q->f("companycategory1_label");
+      $cat_d = $comp_q->f("category_label");
       $cat_major_code = substr($code,0,strpos($code,'.'));
       // If code is a major code (not .)
       if ($cat_major_code == "") {
@@ -356,6 +364,7 @@ function export_statistic_cat_stats($comp_q,$tot) {
   echo $block;
   exit();
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics about Contact number evolution by date

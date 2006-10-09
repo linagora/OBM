@@ -6,38 +6,38 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-// Actions                 -- Parameter
-// - index (default)       -- search fields  -- show the company search form
-// - search                -- search fields  -- show the result set of search
-// - new                   --                -- show the new company form
-// - detailconsult         -- $company_id -- show the company detail
-// - detailupdate          -- $company_id -- show the company detail form
-// - insert                -- form fields    -- insert the company
-// - update                -- form fields    -- update the company
-// - check_delete          -- $company_id -- check links before delete
-// - delete                -- $company_id -- delete the company
-// - admin                 --                -- admin index (kind)
-// - type_insert           -- form fields    -- insert the  type
-// - type_update           -- form fields    -- update the type 
-// - type_checklink        --                -- check if type is used
-// - type_delete           -- $sel_type      -- delete the type 
-// - activity_insert       -- form fields    -- insert the activity
-// - activity_update       -- form fields    -- update the activity
-// - activity_checklink    --                -- check if activity is used
-// - activity_delete       -- $sel_kind      -- delete the activity
-// - nafcode_insert        -- form fields    -- insert the nafcode
-// - nafcode_update        -- form fields    -- update the nafcode
-// - nafcode_checklink     --                -- check if nafcode is used
-// - nafcode_delete        -- $sel_kind      -- delete the nafcode
-// - category1_insert      -- form fields    -- insert the category
-// - category1_update      -- form fields    -- update the category
-// - category1_checklink   --                -- check if category is used
-// - category1_delete      -- $sel_kind      -- delete the category
-// - display               --                -- display, set display parameters
-// - dispref_display       --                -- update one field display value
-// - dispref_level         --                -- update 1 field display position
+// Actions               -- Parameter
+// - index (default)     -- search fields  -- show the company search form
+// - search              -- search fields  -- show the result set of search
+// - new                 --                -- show the new company form
+// - detailconsult       -- $company_id -- show the company detail
+// - detailupdate        -- $company_id -- show the company detail form
+// - insert              -- form fields    -- insert the company
+// - update              -- form fields    -- update the company
+// - check_delete        -- $company_id -- check links before delete
+// - delete              -- $company_id -- delete the company
+// - admin               --                -- admin index (kind)
+// - type_insert         -- form fields    -- insert the  type
+// - type_update         -- form fields    -- update the type 
+// - type_checklink      --                -- check if type is used
+// - type_delete         -- $sel_type      -- delete the type 
+// - activity_insert     -- form fields    -- insert the activity
+// - activity_update     -- form fields    -- update the activity
+// - activity_checklink  --                -- check if activity is used
+// - activity_delete     -- $sel_kind      -- delete the activity
+// - nafcode_insert      -- form fields    -- insert the nafcode
+// - nafcode_update      -- form fields    -- update the nafcode
+// - nafcode_checklink   --                -- check if nafcode is used
+// - nafcode_delete      -- $sel_kind      -- delete the nafcode
+// - category_insert     -- form fields    -- insert the category
+// - category_update     -- form fields    -- update the category
+// - category_checklink  --                -- check if category is used
+// - category_delete     -- $sel_kind      -- delete the category
+// - display             --                -- display, set display parameters
+// - dispref_display     --                -- update one field display value
+// - dispref_level       --                -- update 1 field display position
 // External API ---------------------------------------------------------------
-// - ext_get_id         -- $title         -- select a company (return id) 
+// - ext_get_id          -- $title         -- select a company (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -53,6 +53,7 @@ require("company_display.inc");
 require("company_query.inc");
 include("$obminclude/of/of_category.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
+require("company_js.inc");
 
 $uid = $auth->auth["uid"];
 
@@ -70,7 +71,6 @@ page_close();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  require("company_js.inc");
   $display["search"] = dis_company_search_form($params);
   if ($set_display == "yes") {
     $display["result"] = dis_company_search_list($params);
@@ -81,19 +81,16 @@ if ($action == "ext_get_id") {
 } elseif ($action == "ext_get_category1_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  require("company_js.inc");
   $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
 
 } elseif ($action == "ext_get_category1_code") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  require("company_js.inc");
   $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
 
 } elseif ($action == "ext_get_category_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
-  require("company_js.inc");
   $display["detail"] = of_category_user_dis_tree("company", $params["category"], $params, $action);
 
 
@@ -111,23 +108,19 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
   $display["search"] = dis_company_search_form($params);
   $display["result"] = dis_company_search_list($params);
 
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
   $display["detail"] = dis_company_form($action, $params);
 
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
   $display["detail"] = dis_company_consult($params);
 
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
   $display["detail"] = dis_company_form($action, $params);
 
 } elseif ($action == "insert") {
@@ -143,7 +136,6 @@ if ($action == "ext_get_id") {
         $display["msg"] .= display_ok_msg("$l_company : $l_insert_ok");
       } else {
         $display["msg"] .= display_err_msg("$l_company : $l_insert_error");
-	require("company_js.inc");
 	$display["detail"] = dis_company_form($action, $params);
       }
     // If it is the first try, we warn the user if some companies seem similar
@@ -159,7 +151,6 @@ if ($action == "ext_get_id") {
           $display["msg"] .= display_ok_msg("$l_company : $l_insert_ok");
         } else {
           $display["msg"] .= display_err_msg("$l_company : $l_insert_error");
-	  require("company_js.inc");
 	  $display["detail"] = dis_company_form($action, $params);
         }
       }
@@ -180,7 +171,6 @@ if ($action == "ext_get_id") {
     } else {
       $display["msg"] .= display_err_msg("$l_company : $l_update_error");
     }
-    require("company_js.inc");
     $display["detail"] = dis_company_consult($params);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
@@ -190,7 +180,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_company($params["company_id"])) {
-    require("company_js.inc");
     $display["msg"] .= display_info_msg($ok_msg, false);
     $display["detail"] = dis_can_delete_company($params["company_id"]);
   } else {
@@ -217,7 +206,6 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
-  require("company_js.inc");
   $display["detail"] = dis_company_admin_index();
 
 } elseif ($action == "type_insert") {
@@ -228,7 +216,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_type : $l_insert_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "type_update") {
@@ -239,7 +226,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_type : $l_update_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "type_checklink") {
@@ -254,7 +240,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_type : $l_delete_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "activity_insert") {
@@ -265,7 +250,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_activity : $l_insert_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "activity_update") {
@@ -276,7 +260,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_activity : $l_update_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "activity_checklink") {
@@ -291,7 +274,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_activity : $l_delete_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "nafcode_insert") {
@@ -302,7 +284,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_nafcode : $l_insert_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "nafcode_update") {
@@ -313,7 +294,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_nafcode : $l_update_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 } elseif ($action == "nafcode_checklink") {
@@ -328,44 +308,46 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_nafcode : $l_delete_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
-} elseif ($action == "category1_insert") {
+} elseif ($action == "category_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("company", "category1", $params);
+  $category = $params["category"];
+  $l_cat = ${"l_$category"};
+  $retour = of_category_user_query_insert($params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_cat : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
+    $display["msg"] .= display_err_msg("$l_cat : $l_insert_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
-} elseif ($action == "category1_update") {
+} elseif ($action == "category_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("company", "category1", $params); 
+  $category = $params["category"];
+  $l_cat = ${"l_$category"};
+  $retour = of_category_user_query_update($params); 
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
+    $display["msg"] .= display_ok_msg("$l_cat : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
+    $display["msg"] .= display_err_msg("$l_cat : $l_update_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
-} elseif ($action == "category1_checklink") {
+} elseif ($action == "category_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("company", "category1", $params);
+  $display["detail"] .= of_category_user_dis_links($params);
 
-} elseif ($action == "category1_delete") {
+} elseif ($action == "category_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("company", "category1", $params); 
+  $category = $params["category"];
+  $l_cat = ${"l_$category"};
+  $retour = of_category_user_query_delete($params); 
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_cat : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
+    $display["msg"] .= display_err_msg("$l_cat : $l_delete_error");
   }
-  require("company_js.inc");
   $display["detail"] .= dis_company_admin_index();
 
 }  elseif ($action == "display") {
@@ -394,7 +376,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  require("company_js.inc");
   $display["detail"] = dis_company_consult($params);
 }
 
@@ -566,29 +547,25 @@ function get_company_action() {
                                      	       );
 
 // Category Insert
-  $actions["company"]["category1_insert"] = array (
-    'Url'      => "$path/company/company_index.php?action=category1_insert",
+  $actions["company"]["category_insert"] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["company"]["category1_update"] = array (
-    'Url'      => "$path/company/company_index.php?action=category1_update",
+  $actions["company"]["category_update"] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["company"]["category1_checklink"] = array (
-    'Url'      => "$path/company/company_index.php?action=category1_checklink",
+  $actions["company"]["category_checklink"] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["company"]["category1_delete"] = array (
-    'Url'      => "$path/company/company_index.php?action=category1_delete",
+  $actions["company"]["category_delete"] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
