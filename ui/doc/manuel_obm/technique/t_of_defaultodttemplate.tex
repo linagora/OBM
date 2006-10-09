@@ -1,0 +1,57 @@
+% Documentation technique d'OBM : Gestion des modèles Odt par défaut
+% ALIACOM Vincent Coulette
+% $Id$
+
+
+\subsection{Gestion des modèles Odt par défaut}
+\label{of_defaultodttemplate}
+
+La gestion des des modèles Odt par défaut a pour but de pouvoir définir des modèles OpenDocument (mais aussi swx) en tant que modèles par défaut utilisables pour l'export openOffice d'une entité. \\
+
+Les modèles par défaut sont des documents \obm (donc des fichiers swx ou odt précédemment ajoutés en tant que documents \obm) que l'on définit par défaut et de manière spécifique à un module (ou une entité). Ceci permet de proposer une liste de modèles par défaut parmi lesquels on peut choisir simplement et rapidement le modèle à utiliser dans le formulaire d'export. \\
+
+Dans la version courante (1.2), seul le module CV est concerné par cette fonctionnalité d'export et par conséquent par la gestion des modèles par défaut, mais d'autres modules sont appelés à implémenter cette fonctionnalité et donc à utiliser les modèles par défaut. \\
+
+Les fonctionnalités de gestion des modèles par défaut sont fournies par le fichier \fichier{of/of\_defaultodttemplate.inc}. \\
+
+\subsubsection{Modèle de stockage des modèles par défaut}
+
+Table des modèles définis par défaut.
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} \\
+\hline
+\_id & int 8 & Id du modèle par défaut & \\
+\hline
+\_entity & varchar 32 & Entité à laquelle est rattaché le modèle \\
+\hline
+\_document\_id & int 8 & Id du document \obm servant de modèle & \\
+\hline
+\_label & varchar 64 & Libellé décrivant le modèle & \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_get_defaultodttemplates($entity) {
+\end{verbatim}
+\end{minipage}
+}
+
+Requête de sélection de modèles définis par défaut pour l'entité \$entity. \\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_defaultodttemplates_dis_admin_form($entity, $defaults_q) {
+\end{verbatim}
+\end{minipage}
+}
+
+Affichage de l'écran de consultation, modification, ajout et suppression des modèles par défaut de l'entité \$entity.
+Le paramètre \$defaults\_q est le résultat base de données de la requête exécutée par la fonction \fonction{of\_defaultodttemplates\_dis\_admin\_form}. \\
