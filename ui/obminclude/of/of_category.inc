@@ -615,11 +615,11 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
 // Parameters:
 //   - $entities   : target entity : if an array, check for each entities
 //   - $cat        : target category
-//   - $param      : Entity parameters array
+//   - $params     : Entity parameters array
 //   - $mode       : ([mono|multi])
 //   - $link_table : [optionnal] to handle special
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_links($entities, $cat, $param, $mode="multi") {
+function of_category_dis_links($entities, $cat, $params, $mode="multi") {
   global $l_c_link, $l_c_link_no;
   global $l_c_delete, $l_c_can_delete, $l_c_cant_delete;
   global $l_back, $display;
@@ -628,9 +628,9 @@ function of_category_dis_links($entities, $cat, $param, $mode="multi") {
   global $$l_cat;
 
   $has_links = false;
-  $id = $param["${cat}_id"];
+  $id = $params["${cat}_id"];
   if (! ($id > 0)) {
-    $id = $param["${cat}"];
+    $id = $params["${cat}"];
   }
 
   // Category is multi-entities (check for each entity)
@@ -869,18 +869,18 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 // Parameters:
 //   - $entity  : target entity
 //   - $catu    : target category (string, may have upper case)
-//   - $param   : parameters 
+//   - $params  : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_insert($entity, $catu, $param) {
+function of_category_query_insert($entity, $catu, $params) {
   global $auth, $cdg_sql, $obm;
 
   $cat = strtolower($catu);
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $cat_label = $param["${cat}_label"];
-  $cat_code = $param["${cat}_code"];
+  $cat_label = $params["${cat}_label"];
+  $cat_code = $params["${cat}_code"];
   $table = ucfirst($entity) . ucfirst($catu);
   $field_prefix = strtolower($entity.$cat."_");
   $field_timecreate = $field_prefix."timecreate";
@@ -949,22 +949,22 @@ function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id) {
 // Parameters:
 //   - $entity : target entity
 //   - $catu   : target category (string, may have upper case)
-//   - $param  : parameters 
+//   - $params : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_update($entity, $catu, $param) {
+function of_category_query_update($entity, $catu, $params) {
   global $auth, $cdg_sql;
 
   $cat = strtolower($catu);
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $cat_id = $param["${cat}_id"];
+  $cat_id = $params["${cat}_id"];
   if (! ($cat_id > 0)) {
-    $cat_id = $param["${cat}"];
+    $cat_id = $params["${cat}"];
   }
-  $cat_label = $param["${cat}_label"];
-  $cat_code = $param["${cat}_code"];
+  $cat_label = $params["${cat}_label"];
+  $cat_code = $params["${cat}_code"];
   $table = ucfirst($entity) . ucfirst($catu);
   $field_prefix = $entity.$cat."_";
   $field_timeupdate = $field_prefix."timeupdate";
@@ -996,20 +996,20 @@ function of_category_query_update($entity, $catu, $param) {
 // Parameters:
 //   - $entity  : target entity
 //   - $catu    : target category (string, may have upper case)
-//   - $param   : parameters 
+//   - $params  : parameters 
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_query_delete($entity, $catu, $param) {
+function of_category_query_delete($entity, $catu, $params) {
   global $cdg_sql;
 
   $cat = strtolower($catu);
   $table = ucfirst($entity) . ucfirst($catu);
   $field_prefix = $entity.$cat."_";
   $field_id = $field_prefix."id";
-  $id = $param["${cat}_id"];
+  $id = $params["${cat}_id"];
   if (! ($id > 0)) {
-    $id = $param["${cat}"];
+    $id = $params["${cat}"];
   }
 
   $multidomain = sql_multidomain(strtolower($table));
@@ -1392,6 +1392,68 @@ function _of_category_get_entity_count($entity) {
   $obm_q->next_record();
 
   return $obm_q->f("count_entity");
+}
+
+
+//=============================================================================
+// OF USER API
+//=============================================================================
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Global User data form
+// Parameters:
+//   - $entity : user category for this entity
+//   - $id     : entity id
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_dis_entity_form($entity, $id) {
+  global $cgp_user;
+
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $mode = $one_cat["mode"];
+      if ($mode == "mono") {
+	$cats = of_category_user_get_ordered($cat_name, $entity);
+	$cats_sel = of_category_user_get_ordered($cat_name, $entity, $id);
+      } else {
+	$cats = of_category_user_get_ordered($cat_name, $entity, $id);
+      }
+      $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat["mode"], $cats_sel[0]["id"], "undef");
+    }
+  }
+
+  return $block_user;
+}
+
+
+// Data functions -------------------------------------------------------------
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User Data update query execution
+// Parameters:
+//   - $entity : user category for this entity
+//   - $ent_id : entity id
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_query_update($entity, $ent_id, $params) {
+  global $cgp_user;
+
+  // User categories update
+  $ret = of_category_user_query_delete_link($entity, $ent_id);
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $cats = $params["$cat_name"];
+      if (is_array($cats)) {
+	foreach($cats as $cat_id) {
+	  $ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cat_id);
+	}
+      } else if ($cats > 0) {
+	$ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cats);
+      }
+    }
+  }
+
+  return $ret;
 }
 
 

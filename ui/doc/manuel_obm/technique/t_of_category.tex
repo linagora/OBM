@@ -6,9 +6,13 @@
 \subsection{Gestion des catégories}
 \label{of_category}
 
-\obm gère des catégories multivaluées (n-n) pour plusieurs modules : \company, \contact, \deal... et il est souvent demandé d'ajouter des catégories lors de l'intégration de projets clients.
+révision : \obm 2.0.0
 
-Toutes ces catégories fonctionnent selon le même principe et possèdent le même format de stockage.
+\obm gère des catégories monovaluées ou multivaluées (n-n) pour plusieurs modules : \company, \contact, \deal... comme les secteurs d'activité, les rôles de société, les types de société...
+
+Toutes ces ``catégories'' fonctionnent selon le même principe et possèdent le même format de stockage.
+
+\paragraph{Remarque :} les ``catégories'' traitées ici sont les catégories intégrées à \obm générique. Les fonctionnalités listées ont pour objectif d'aider à la mutualisation de code. Les ``catégories'' définies et spécifiques aux clients sont traitées dans la section \ref{of_userdata}.
 
 Cette librairie propose une gestion générique des catégories avec liaisons 1-n -mode = mono) ou n-n (mode = multi) offrant :\\
 
@@ -33,22 +37,22 @@ Les fonctionalités de catégories sont fournies par le fichier \fichier{of/of\_ca
 
 \subsubsection{Modèle de stockage générique}
 
-Pour une catégorie ``mono'' d'un module, l'entité du module doit contenir un champ référençant la catégorie \variable{entite\_category1\_id} et 1 table doit être créée :\\
+Pour une catégorie ``mono'' d'un module, l'entité du module doit contenir un champ référençant la catégorie \variable{entite\_category\_id} (ex \variable{company\_type\_id})et 1 table doit être créée :\\
 
 \begin{itemize}
-\item ModuleCategory1 (ou ModuleCategory2 si plusieurs catégories pour le module)
+\item ModuleCategory (ex: CompanyType)
 \end{itemize}
 \vspace{0.3cm}
 
 Pour une catégorie ``multi'' d'un module, 2 tables doivent être créées :\\
 
 \begin{itemize}
-\item ModuleCategory1 (ou ModuleCategory2 si plusieurs catégories pour le module)
-\item ModuleCategory1Link (ou ModuleCategory2Link)
+\item ModuleCategory (si besoin d'une table catégorie)
+\item ModuleCategoryLink (ou table de liaison)
 \end{itemize}
 \vspace{0.3cm}
 
-Table des informations d'une catégorie, ModuleCategoryN (ex: CompanyCategory1) :\\
+Table des informations d'une catégorie, ModuleCategoryN (ex: CompanyType) :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
 \hline
@@ -119,7 +123,7 @@ String XHTML & Block de recherche <select> du champ catégorie pour l'entité\\
 \shadowbox{
 \begin{minipage}{14cm}
 \begin{verbatim}
-of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="") {
+of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $first="") {
 \end{verbatim}
 \end{minipage}
 }
@@ -139,6 +143,8 @@ of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="") {
 \$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
 \hline
 \$cat\_id & pour mode ``mono'' entrée catégorie sélectionnée\\
+\hline
+\$first & pour mode ``mono'' scalaire ou tableau (none|all) d'éléments à ajouter au <select>\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
@@ -215,7 +221,7 @@ String XHTML & Arborescence complète de la catégorie avec sélection\\
 \shadowbox{
 \begin{minipage}{14cm}
 \begin{verbatim}
-of_category_dis_admin_form($entity, $cat, $cats) {
+of_category_dis_admin_form($cat, $cats, $user=false) {
 \end{verbatim}
 \end{minipage}
 }
@@ -226,11 +232,11 @@ of_category_dis_admin_form($entity, $cat, $cats) {
 \hline
 \multicolumn{2}{|p{13cm}|}{Affichage du formulaire de gestion de la catégorie. Donne les possibilités d'ajouter, de modifier ou de supprimer une entrée.}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
-\hline
 \$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
 \hline
 \$cats & tableau des catégories à afficher\\
+\hline
+\$user & (utilisation interne pour signaler une categorie utilisateur : true)\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
@@ -246,7 +252,7 @@ String XHTML & Formulaire de gestio nde la catégorie\\
 \shadowbox{
 \begin{minipage}{14cm}
 \begin{verbatim}
-of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
+of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 \end{verbatim}
 \end{minipage}
 }
@@ -257,9 +263,9 @@ of_category_get_ordered($entity, $cat, $mode="multi", $entity_id=0) {
 \hline
 \multicolumn{2}{|c|}{Récupération de la liste des catégories ordonnées selon le code}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entité (ex: ``company'', ``contact'', ``DealCompany''..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\$catu & catégorie (ex: ``catégorie1, ``type'',..) can be uppercase\\
 \hline
 \$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
 \hline
@@ -273,4 +279,66 @@ Array & Tableau de catégories ordonnées selon le code : [id], [code], [label]\\
 \end{tabular}
 \vspace{0.4cm}
 
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_insert($entity, $catu, $params) {
+\end{verbatim}
+\end{minipage}
+}
 
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_insert_link($entity, $catu, $entity_id, $cat_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_update($entity, $catu, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_delete($entity, $catu, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_delete_link($entity, $cat, $entity_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_links($entity, $cat, $p_id, $mode=''multi'') {
+\end{verbatim}
+\end{minipage}
+}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_get_entitycategories($entity, $cat, $entity_id, $mode=''multi'') {
+\end{verbatim}
+\end{minipage}
+}
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_category_query_category_per_entity($entity, $cat, $mode=''multi'') {
+\end{verbatim}
+\end{minipage}
+}

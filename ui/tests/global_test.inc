@@ -1,0 +1,34 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : global_test.inc                                              //
+//     - Desc : Global common OBM tests include file                         //
+// 2006-09-17 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
+
+$path_results = "results";
+$path_logs = "results";
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Auto transform Town (should become a HOOK)
+// Parameters:
+//   - $name : town name
+// Returns:
+//   $name formatted
+///////////////////////////////////////////////////////////////////////////////
+function get2_format_town($name) {
+  global $caf_town;
+
+  $res = $name;
+  if ($caf_town) {
+    $res = strip_tags(format_name($res, 2, true, false));
+  }
+
+  return $res;
+}
+
+
+</script>

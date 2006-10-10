@@ -40,7 +40,7 @@ function run_query_company_search($company) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
 	
   $and = "";
   if ($name != "") {
@@ -447,7 +447,7 @@ function run_query_company_insert($company) {
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_update($cid, $company) {
-  global $auth, $cdg_sql, $cgp_hide, $cgp_user;
+  global $auth, $cdg_sql, $cgp_hide;
 
   $num = $company["num"];
   $vat = $company["vat"];
@@ -527,18 +527,7 @@ function run_query_company_update($cid, $company) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    // User defined categories
-    $retour = of_category_user_query_delete_link("company", $cid);
-    if (is_array($cgp_user["company"]["category"])) {
-      foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-	$cats = $company["$cat_name"];
-	if (is_array($cats)) {
-	  foreach($cats as $cat_id) {
-	    $retour = of_category_user_query_insert_link("company", $cat_name, $cid, $cat_id);
-	  }
-	}
-      }
-    }
+    $ret = of_userdata_query_update("company", $cid, $company);
   }
 
   return $retour;
@@ -588,9 +577,10 @@ function run_query_check_company($p_id, $name, $zip) {
   $multidomain = sql_multidomain("company");
 	
   $query = "SELECT DISTINCT company_id, company_name, company_zipcode 
-            FROM Company
-            WHERE company_name $like '$name%'
-              $where_id $multidomain";
+    FROM Company
+    WHERE company_name $like '$name%'
+      $where_id
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_check_company()");
   $obm_q->query($query);

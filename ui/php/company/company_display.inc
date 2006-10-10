@@ -168,7 +168,6 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 //   - $company[] : hash with company values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_form($company="") {
-  global $cgp_user;
 
   $types = of_category_get_ordered("company", "type");
   $acts = of_category_get_ordered("company", "activity");
@@ -983,7 +982,7 @@ function dis_company_form($action, $company) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_q, $ctry_q, $company) {
-  global $display, $auth, $cgp_hide, $cgp_user, $set_dsrc, $c_undef, $l_undef;
+  global $display, $auth, $cgp_hide, $set_dsrc, $c_undef, $l_undef;
   global $set_theme,$ico_web,$ico_mail,$ico_add,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
@@ -1111,12 +1110,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type, "none");
   $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act, "none");
 
-  if (is_array($cgp_user["company"]["category"])) {
-    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-      $cats = of_category_user_get_ordered($cat_name, "company", $id);
-      $block_user .= of_category_user_dis_entity_form("company", $cat_name, $cats, $one_cat["mode"]);
-    }
-  }
+  $block_user = of_userdata_dis_entity_form("company", $id);
 
   // Naf code select field
   if ($show_naf) {
