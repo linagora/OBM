@@ -1,0 +1,290 @@
+% Documentation technique d'OBM : module Contact
+% ALIASOURCE Nourdine Bouaghaz
+% $Id$
+
+
+\clearpage
+\section{Contact (module \contact)}
+
+révision : \obm 2.0
+Le module \contact d'\obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \contact utilise 12 tables :
+\begin{itemize}
+ \item Contact
+ \item ContactCategory1
+ \item ContactCategory1Link
+ \item ContactCategory2
+ \item ContactCategory2Link
+ \item ContactCategory3
+ \item ContactCategory3Link
+ \item ContactCategory4
+ \item ContactCategory4Link
+ \item ContactCategory5
+ \item ContactFunction
+ \item ContactList
+\end{itemize}
+
+\subsection{Contact}
+Table principale des informations d'un contact . \\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_domain\_id & int 8 & Date de mise à jour & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_datasource\_id & int 8 &  & \\
+\hline
+\_number & varchar 32 &  & \\
+\hline
+\_archive & char 1 & Indicateur d'archivage & (1=Oui) \\
+\hline
+\_lastname & varchar 64 & Nom du contact &  \\
+\hline
+\_firstname & varchar 64 & Prénom du contact &  \\
+\hline
+\_aka & varchar 255  &  & \\
+\hline
+\_sound & varchar 48  &  & \\
+\hline
+\_type\_id & int 8  &  & \\
+\hline
+\_marketing\_managerid & int 8  & Identifiant du responsable marketing  & \\
+\hline
+\_address1 & varchar 64 & Adresse 1 de la personne à contacter  & \\
+\hline
+\_address2 & varchar 64 & Adresse 2 de la personne à contacter & \\
+\hline
+\_address3 & varchar 64  & Adresse 3  de la personne à contacter & \\
+\hline
+\_zipcode & varchar 14 & Code postal du domicile de la personne à contacter  & \\
+\hline
+\_town & varchar 64 & Lieu du domicile de la personne à contacter  & \\
+\hline
+\_expressportal & varchar 16 &  & \\
+\hline
+\_country\_iso3166 & char 2 & Pays   & \\
+\hline
+\_phone & varchar 32 & Numéro de téléphone de la personne à contacter. & \\
+\hline
+\_homephone & varchar 32 & Numéro de téléphone du domicile de la personne à contacter . & \\
+\hline
+\_mobilephone & varchar 32 & Numéro de téléphone portable la personne à contacter. & \\
+\hline
+\_fax & varchar 32 & Numéro de fax de la personne à contacter. & \\
+\hline
+\_email & varchar 64  & Email de la personne à contacter. &\\
+\hline
+\_comment & text & Commentaire  &\\
+\hline
+\_comment2 & text & Commentaire 2  &\\
+\hline
+\_comment3 & text & Commentaire 3 &\\
+\hline
+\_category5\_id & int 8 &   &\\
+\hline
+\end{tabular}
+
+
+\subsection{ContactFunction}
+Table de référence de la fonction du contact.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_domain\_id & int 8 & Projet de la tâche & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_code & varchar 10 & Code de la fonction de la personne à contacter & \\
+\hline
+\_label & varchar 64 & Label de la fonction de la personne à contacter & \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+
+\subsection{ContactList}
+Table de référence de la liste de contact.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_list\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_contact\_id & timestamp 14 & Date de mise à jour & \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+
+\subsection{ContactCategory1}
+Table des catégories de contact. Un contact peut être relié à plusieurs catégories.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_domain\_id & int 8 & Domaine d'appartenance du contact & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_code & varchar 10 & Code de la catégorie & \\
+\hline
+\_label & varchar 100 & Label de la catégorie & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Remarques}
+
+Le module \contact dispose de 5 tables ContactCategory (ContactCategory1, ContactCategory2, ContactCategory3...) identiques à celle-ci et faisant référence aux 5 catégories de contact administrables dans l'interface d' ''Administration''.\\
+
+\subsection{ContactCategory1Link}
+Table de liaison entre les contacts et les catégories de contact.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_category\_id & int 8 & Référence à la catégorie du contact & \\
+\hline
+\_contact\_id & int 8 & Référence au contact & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Remarques}
+
+Le module \contact dispose de 5 tables ContactCategorieLink identiques à celle-ci faisant référence à 5 types de catégorie différentes paramétrable via l'interface d' ''Administration '' et que l'on peut masquer.\\  
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \contact, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+  index & read & (Défaut) formulaire de recherche de contact. \\ 
+ \hline
+  search & read & Résultat de recherche de contacts. \\
+ \hline
+  new & write & Formulaire de création d'un contact. \\
+ \hline
+  detailconsult & read & Fiche détail d'un contact. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'un contact. \\
+ \hline
+  insert & write & Insertion d'un contact. \\
+ \hline
+  update & write & Mise à jour d'un contact. \\
+ \hline
+  check\_delete & write & Vérification avant suppression d'une affaire. \\
+ \hline
+  delete & write & Suppression d'une affaire. \\
+ \hline
+  statistics & read  &   \\
+ \hline
+  admin & read\_admin & Ecran d'administration des affaires. \\
+ \hline
+  category1\_insert & write\_admin & Ajout d'une catégorie de contact. \\
+ \hline
+  category1\_update & write\_admin & Modification d'une catégorie de contact. \\
+ \hline
+  category1\_checklink & write\_admin & Vérification avant suppression d'une catégorie de contact. \\
+ \hline
+  category1\_delete & write\_admin & Suppression d'une catégorie de contact. \\
+ \hline
+  category2\_insert & write\_admin & Ajout d'une deuxième catégorie de contact. \\
+ \hline
+  category2\_update & write\_admin & Modification d'une deuxième catégorie de contact. \\
+ \hline
+  category2\_checklink & write\_admin & Vérification avant suppression d'une deuxième catégorie de contact. \\
+ \hline
+  category2\_delete & write\_admin & Suppression d'une deuxième catégorie de contact. \\
+ \hline
+  category3\_insert & write\_admin & Ajout d'une troisième catégorie de contact. \\
+ \hline
+  category3\_update & write\_admin & Modification d'une troisième catégorie de contact. \\
+ \hline
+  category3\_checklink & write\_admin & Vérification avant suppression d'une troisième catégorie de contact. \\
+ \hline
+  category3\_delete & write\_admin & Suppression d'une troisième catégorie de contact. \\
+ \hline
+  category4\_insert & write\_admin & Ajout d'une quatrième catégorie de contact. \\
+ \hline
+  category4\_update & write\_admin & Modification d'une quatrième catégorie de contact. \\
+ \hline
+  category4\_checklink & write\_admin & Vérification avant suppression d'une quatrième catégorie de contact. \\
+ \hline
+  category4\_delete & write\_admin & Suppression d'une quatrième catégorie de contact. \\
+ \hline
+  category5\_insert & write\_admin & Ajout d'une cinquième catégorie de contact. \\
+ \hline
+  category5\_update & write\_admin & Modification d'une cinquième catégorie de contact. \\
+ \hline
+  category5\_checklink & write\_admin & Vérification avant suppression d'une cinquième catégorie de contact. \\
+ \hline
+  category5\_delete & write\_admin & Suppression d'une cinquième catégorie de contact. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ \hline
+  kind\_insert & write\_admin & Insertion du genre. \\
+ \hline
+  kind\_update & write\_admin & Mise à jour du genre. \\
+ \hline
+  kind\_delete & write\_admin & Suppression du genre. \\
+ \hline
+  kind\_checklink & write\_admin & Vérification avant Suppression du genre. \\
+ \hline
+  ext\_get\_ids & read & Appel externe depuis le module contact \\
+ \hline
+  document\_add & write & . \\
+ \hline
+ \_ext\_get\_category1\_ids & &  \\
+ \hline
+ \_ext\_get\_category2\_ids & &  \\
+ \hline
+ \_ext\_get\_category3\_ids & &  \\
+ \hline
+ \_ext\_get\_category4\_ids & &  \\
+ \hline
+\end{tabular}

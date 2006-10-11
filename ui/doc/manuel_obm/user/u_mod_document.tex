@@ -1,0 +1,180 @@
+% Manuel d'utilisation d'OBM : module Document
+% ALIACOM Nourdine Bouaghaz
+% $Id$
+
+\clearpage
+\section{Le module \doc}
+ 
+révision: \obm 2.0
+ 
+\subsection{Présentation du module \doc}
+
+Ce module est une gestion de base documentaire, permettant l'indexation, la gestion et l'archivage de documents...\\
+
+Ce module est utilisé par le module \cv.\\
+
+Plusieurs format de documents sont gérés (pdf,jpg,word...). L'utilisateur peut déterminer le format du document de façon automatique ou manuelle en sélectionnant le type \textbf{mime} dans la liste déroulante.\\
+
+\subsection{Description d'un document}
+
+Composantes d'un document :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Titre & Titre du document\\
+\hline
+Auteur & Auteur du document. Il décrit la personne qui crée le document.\\
+\hline
+Privé & Visibilité du document (public ou privé).\\
+\hline
+Catégorie 1 & 1ère classification du document par catégories. Voir la description des catégories.\\
+\hline
+Catgégorie 2 & 2ème classification du document par catégories. Voir la description des catgéories.\\
+\hline
+Type MIME & Type MIME du fichier.\\
+\hline
+Type de document & Moyen utilisé pour télécharger (lien,répertoire,fichier).\\
+\hline
+Chemin & Chemin d'accès au document.\\
+\hline
+Fichier & Fichier à télécharger pour créer le document.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+
+Les attributs suivant peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
+
+\begin{itemize}
+\item Catégories 1
+\item Catégories 2
+\end{itemize}
+
+
+\subsubsection{Catégories d'un document}
+Les catégories d'un document permettent de classifier et organiser les documents.\\
+
+OBM gère 2 familles de catégories de documents.\\
+
+Un document peut référencer plusieurs catégories dans chacune des 2 familles.\\
+
+Les catégories sont administrables par le menu ``Administration'' du module \doc, et il est donc possible de les définir selon les besoins.\\
+
+Par exemple :\\ \textbf{Catégorie 1} Compte rendu de réunion, proposition commerciale, contrat ....\\
+              \textbf{Catégorie 2} Client, prospect ...\\
+
+
+\subsection{La gestion des types MIME}
+
+Les types MIME sont gérés via l'interface d'Administration (sous-menu Administration). Un fichier peut avoir un type MIME:\\
+- par défaut : dans ce cas,OBM essaie de déterminer automatiquement le type MIME associé au fichier en fonction de son extension\\
+- défini et choisi par l'utilisateur dans la liste déroulante : différents types de fichier sont présents dans la liste déroulante (document word, jpg...).\\
+
+OBM associe à chaque type MIME une application utilisée pour ouvrir le fichier.\\
+
+\subsection{La gestion du dépôt de documents}
+
+Le dépôt de document se fait :
+- via le bouton ''Chemin'' qui permet de détermine la racine du dépôt de document sur le disque.\\
+- via le bouton ''Parcourir'' afin de chercher où se trouve le fichier recherché à partir de la racine selectionnée.\\
+
+\subsection{Les sous-menus du module \doc}
+
+Le module \doc comporte 7 sous-menus (accessibles selon les droits d'accès et le contexte) :\\
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Chercher & Recherche multicritères des documents \\
+\hline
+Arborescence & Consulter l'organisation de l'arborescence des documents.\\
+\hline
+Nouveau & Créer un nouveau document.\\
+\hline
+Nouveau répertoire & Créer un nouveau répertoire dans l'arborescence des documents.\\
+\hline
+Consulter & Consulter les documents disponibles dans la base de documents.\\
+\hline
+Modifier & Modifier les informations d'un document.\\
+\hline
+Supprimer & Vérifier les liens du document puis si besoin supprimer le document.\\
+\hline
+Administrer & Administration des informations annexes (catégories 1 et catégories 2, type MIME).\\
+\hline
+Affichage & Personnalisation de l'affichage de la liste des documents (possibilité de masquer ou pas certains champs).\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Chercher}
+
+Ce menu permet d'effectuer une recherche selon différents critères :
+
+\begin{itemize}
+\item Titre
+\item Nom
+\item Catégorie 1
+\item Catégorie 2
+\item Auteur
+\item Type Mime
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Nouveau}
+
+Ce menu permet de créer un document dans la base documentaire.
+
+Pour insérer le document crée il faut cliquer sur le bouton ``Enregistrer le document''.
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de consulter la fiche d'un document présent dans la base documentaire.
+Cet écran est aussi accessible depuis les résultats de recherche ou depuis le module CV (administration des templates).
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations du document dans un formulaire.
+Toutes les informations sont modifiables.
+
+L'accès au changement du fichier est donné que si l'utilisateur le demande en cliquant sur le bouton radio ''Changer le fichier''.
+
+Une fois cette option choisie, un écran apparaît et permet à l'utilisateur de modifier les informations relatives au fichier (type MIME, type de document,chemin,fichier).
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton ''Modifier le Document''.
+
+
+\subsubsection{Le sous-menu : Supprimer}
+Ce menu permet la vérification des liens du document et d'indiquer si celui-ci est supprimable.
+Si le document peut être supprimé, un bouton ''Supprimer le document'' est alors affiché sinon un message d'avertissement montrant les liens existant avec ce document signale que la suppression est impossible.
+
+\paragraph{Pour être supprimé} un document ne doit pas :\\
+
+\begin{itemize}
+\item Etre utilisé en tant que template dans le module CV.
+\end{itemize}
+
+\subsubsection{Le sous-menu : Administration}
+
+Ce menu permet l'administration des informations annexes des documents :\\
+
+\begin{itemize}
+\item Catégorie 1
+\item Catégorie 2
+\item Type MIME
+\end{itemize}
+
+\paragraph{Gestion des types MIME : } Le type MIME d'un document est défini par 3 informations liées :\\
+
+\begin{itemize}
+\item Le label du type MIME, qui une fois choisie donne accès au type MIME du document
+\item L'extension, qui une fois choisi donne accès aux extensions de fichier (exemple : .doc,.odt,.gif...) 
+\item Le type MIME, qui une fois choisi donne accès à l'application utilisée pour ouvrir un document ayant le type d'extension donné.
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des documents. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.

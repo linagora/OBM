@@ -1,0 +1,84 @@
+% Documentation technique d'OBM : module To Do
+% ALIASOURCE Nourdine Bouaghaz
+% $Id$
+
+
+\clearpage
+\section{Todo}
+révision : \obm 2.0
+
+Le module \todo d'\obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \todo utilise 1 table :
+\begin{itemize}
+ \item Todo
+\end{itemize}
+
+\subsection{Todo}
+Table principale des informations d'une tâche planifiée .\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur de la tâche & \\
+\hline
+\_usercreate & int 8 & Id du créateur de la tâche & \\
+\hline
+\_user & int 8 & Id du créateur de la tâche & \\
+\hline
+\_date & timestamp & Date de création de la tâche & \\
+\hline
+\_dateend & timestamp & Date de fin de la tâche planifiée & \\
+\hline
+\_deadline & timestamp & Date limite de fin de tâche & \\
+\hline
+\_title & varchar 80 & Titre de la tâche & (de 1 à 5)\\
+\hline
+\_priority & int 8 & Priorité de la tâche & (de 1 à 5)\\
+\hline
+\_status & varchar 32 & Etat de la tâche & \\
+\hline
+\_webpage & varchar 255 & Date de fin de projet & \\
+\hline
+\_content & text & Commentaire &\\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \todo, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+  index & read & (Défaut) formulaire de recherche des tâches planifiées. \\ 
+ \hline
+  detailconsult & read & Fiche détail d'une tâche planifiée. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'une tâche planifiée. \\
+ \hline
+  insert & write & Insertion d'une tâche planifiée. \\
+ \hline
+  update & write & Mise à jour d'une tâche planifiée. \\
+ \hline
+  delete & write & Suppression d'une tâche planifiée. \\
+ \hline
+  dispref\_display & read &  Modification de l'affichage d'un élément.\\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_level & read & Modification de l'ordre d'affichage d'un élément. \\
+ \hline
+  delete\_unique & write &  \\
+\end{tabular}

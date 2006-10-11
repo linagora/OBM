@@ -1,0 +1,262 @@
+% Documentation technique d'OBM : module Company
+% ALIASOURCE Nourdine Bouaghaz
+% $Id$
+
+
+\clearpage
+\section{Organisation (module \company)}
+
+révision : \obm 2.0
+Le module \company d'\obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \company utilise 6 tables :
+\begin{itemize}
+ \item Company
+ \item CompanyActivity
+ \item CompanyCategory
+ \item CompanyCategory1Link
+ \item CompanyNafCode
+ \item CompanyType
+\end{itemize}
+
+\subsection{Company}
+Table principale des informations d'une organisation. \\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_domain\_id & int 8 & Date de mise à jour & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_datasource\_id & int 8 &  & \\
+\hline
+\_number & varchar 32 &  & \\
+\hline
+\_vat & varchar 20 &  & \\
+\hline
+\_siret & varchar 14  & Siret de l'organisation & \\
+\hline
+\_archive & char 1 & Indicateur d'archivage & (1=Oui) \\
+\hline
+\_name & varchar 96 &  Nom de l'organisation &  \\
+\hline
+\_aka & varchar 255  &  & \\
+\hline
+\_sound & varchar 48  &  & \\
+\hline
+\_type\_id & int 8  &  & \\
+\hline
+\_activity\_id & int 8 &  & \\
+\hline
+\_nafcode\_id & int 8  & & \\
+\hline
+\_marketing\_managerid & int 8  & Identifiant du responsable marketing  & \\
+\hline
+\_address1 & varchar 64 & Adresse  & \\
+\hline
+\_address2 & varchar 64 & Adresse  & \\
+\hline
+\_address3 & varchar 64  & Adresse  & \\
+\hline
+\_zipcode & varchar 14 & Code postal de l'organisation  & \\
+\hline
+\_town & varchar 64 & Ville de l'organisation  & \\
+\hline
+\_expressportal & varchar 16 &  & \\
+\hline
+\_country\_iso3166 & char 2 & Pays   & \\
+\hline
+\_phone & varchar 32 & Numéro de téléphone de l'organisation. & \\
+\hline
+\_fax & varchar 32 & Numéro de fax de l'organisation. & \\
+\hline
+\_web & varchar 64 & Adresse site web de l'organisation. &\\
+\hline
+\_email & varchar 64  & Email de l'organisation. &\\
+\hline
+\_contact\_number & int 5 & Nombre de contact appartenant à cette organisation. &\\
+\hline
+\_deal\_number & int 5 & Nombre affaire lié à cette organisation &\\
+\hline
+\_deal\_total & int 5 & Total des affaires lié à cette organisation &\\
+\hline
+\_comment & text & Commentaire  &\\
+\hline
+\end{tabular}
+
+
+\subsection{CompanyActivity}
+Table de référence des activités d'une organisation.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_activity\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_domain\_id & int 8 & Projet de la tâche & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_code & varchar 10 & Code de l'activité de l'organisation & \\
+\hline
+\_label & varchar 64 & Label de l'activité de l'organisation & \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+
+\subsection{CompanyType}
+Table de référence des types d'organisation.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_code & varchar 10 & Code du type & \\
+\hline
+\_label & char 12 & Label du type & \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+
+
+\subsection{CompanyCategory1}
+Table des catégories d'organisation. Une organisation peut être reliée à plusieurs catégories.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_code & int 10 & Code de la catégorie & \\
+\hline
+\_label & varchar 100 & Label de la catégorie & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{CompanyCategory1Link}
+Table de liaison entre les organisations et les catégories d'organisation.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_category\_id & int 8 & Référence à la catégorie & \\
+\hline
+\_company\_id & int 8 & Référence à l'organisation & \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \company, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche d'organisation. \\ 
+ \hline
+  search & read & Résultat de recherche d'organisations. \\
+ \hline
+  new & write & Formulaire de création d'une organisation. \\
+ \hline
+  detailconsult & read & Fiche détail d'une organisation. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'une organisation. \\
+ \hline
+  insert & write & Insertion d'une organisation. \\
+ \hline
+  update & write & Mise à jour d'une organisation. \\
+ \hline
+  check\_delete & write & Vérification avant suppression d'une affaire. \\
+ \hline
+  delete & write & Suppression d'une affaire. \\
+ \hline
+  admin & read\_admin & Ecran d'administration des affaires. \\
+ \hline
+  activity\_insert & write\_admin & Ajout d'une activity d'organisation. \\
+ \hline
+  activity\_update & write\_admin & Modification d'un état d'organisation. \\
+ \hline
+  activity\_checklink & write\_admin & Vérification avant suppression d'un état d'organisation. \\
+ \hline
+  activity\_delete & write\_admin & Suppression d'une activité d'organisation. \\
+ \hline
+  category\_insert & write\_admin & Ajout d'une catégorie d'organisation. \\
+ \hline
+  category\_update & write\_admin & Modification d'une catégorie d'organisation. \\
+ \hline
+  category\_checklink & write\_admin & Vérification avant suppression d'une catégorie d'organisation. \\
+ \hline
+  category\_delete & write\_admin & Suppression d'une catégorie d'organisation. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ \hline
+  nafcode\_insert & write\_admin & Insertion du nafcode. \\
+ \hline
+  nafcode\_update & write\_admin & Mise à jour du nafcode. \\
+ \hline
+  nafcode\_delete & write\_admin & Suppression du nafcode. \\
+ \hline
+  type\_insert & write\_admin & Insertion du type d'organisation. \\
+ \hline
+  type\_update & write\_admin & Mise à jour du type d'organisation. \\
+ \hline
+  type\_delete & write\_admin & Suppression du type d'organisation. \\
+ \hline
+  type\_checklink & write\_admin & Vérification avant suppresion d'un type d'organisation. \\
+ \hline
+  ext\_get\_id & read & Vérification avant suppresion d'un type d'organisation. \\
+ \hline
+  document\_add & write & Vérification avant suppresion d'un type d'organisation. \\
+ \hline
+\end{tabular}
