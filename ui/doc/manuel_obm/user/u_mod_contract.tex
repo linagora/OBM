@@ -5,6 +5,8 @@
 \clearpage
 \section{Le module \contract}
 
+révision : \obm 2.0
+
 \subsection{Présentation du module \contract}
 
 Ce module est une gestion de contracts, qui couplée avec le module \incident offre des fonctionnalités de support intéressantes, est souvent appelé ``Help Desk''.
@@ -12,58 +14,66 @@ Il permet de gérer toute forme de contrats : contrats clients ou fournisseurs, à
 
 \subsection{Description d'un contrat}
 
-Composantes d'un incident :\\
+Composantes d'un contrat :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Nom} & \textbf{Description} \\
 \hline
-Label\\
+Label & Label ou titre du contrat\\
 \hline
-Récepteur\\
+Numéro & Numéro de contrat\\ 
 \hline
-Responsable Technique.\\
+Privé & Visibilité d'un contrat qui peut être publique ou privée. Un contrat est alors visible par....\\
 \hline
-Archiver.\\
+Signature & Date de signature du contrat\\
 \hline
-Contrat.\\
+Début & Date de début du contrat \\
 \hline
-Priorité.\\
+Expiration & Date d'expiration du contrat \\
 \hline
-Etat.\\
+Renouvellement & Date de renouvellement du contrat \\
 \hline
-Type de solution.\\
+Résiliation & Date de résiliation du contrat \\
 \hline
-Date .\\
+Type & Type de contrat \\
 \hline
-Durée totale de résolution.\\
+Responsable commercial &  Responsable commercial du contrat\\
 \hline
-Solution apportée.\\
+Responsable technique & Responsable technique du contrat\\
 \hline
-Historique.\\
+Priorité &  Priorité de traitement(low,medium,high)\\
 \hline
-Ajouter un commentaire.\\
+Etat & Etat du contrat (open ou close) \\
 \hline
-Durée de résolution.\\
+Tacite reconduction &  Clause de tacite reconduction\\
 \hline
-
+Archive &  Archivage du contrat\\
+\hline
+Relation &  Type de relation entre la société et le signataire du contrat (client ou fournisseur)\\
+\hline
+Format & Format du contrat (période, durée, coupons)\\
+\hline
+Clauses & Clauses incluses dans le contrat\\
+\hline
+Commentaire & Commentaire horodaté sur le contrat\\
+\hline
 \end{tabular}
 \vspace{0.3cm}
 
 
 \subsubsection{Catégories d'un contrat}
-composantes d'un contrat\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline\textbf{Code catégorie} & \textbf{Label catégorie} \\
 \hline
-Kind & categorie ou on retrouvent les types des contrats qui ont ete insere dans le module administration\\
+Kind & Catégorie où l'on retrouve les types des contrats qui ont été inséré via l'interface d' ''Administration'' du module\\
 \hline
-Contract type & categorie ou on peut choisir entre les contrats de type Client ou Fournisseurs \\
+Contract type & Catégorie permettant de choisir entre les contrats de type Client ou Fournisseurs \\
 \hline
-Contract kind & categorie ou on peut choisir entre les contracts de type Coupons ou Duree
- pour la categorie Coupons on doit remplir aussi le champ avec le nombre de coupons du contract
- pour la categorie Duree on doit remplir aussi le champ avec la duree du suport (h)\\
+Contract kind & Catégorie permettant de choisir entre les contracts de type Coupons ou Durée.
+ Pour la catégorie Coupons, le champ avec le nombre de coupons du contract doit être renseigné.
+ Pour la catégorie Durée, le champ avec la durée du support (heures) doit être renseigné \\
 \hline
 \end{tabular}
 
@@ -113,16 +123,16 @@ Affichage & Personnalisation de l'affichage de la liste des contrats.\\
 Ce menu permet d'effectuer une recherche selon différents critères :
 
 \begin{itemize}
-\item Number
-\item Company
-\item Expiration date After
-\item Expiration date Before
-\item Key-word of the label
-\item Kind
-\item Manager
-\item Priority
-\item Status
-\item Contract kind
+\item Nunméro
+\item Société
+\item Date Expiration Avant
+\item Date Expiration Après
+\item Libellé
+\item Type
+\item Responsable
+\item Priorité
+\item Etat
+\item Relation
 \item Archive
 \end{itemize}
 
@@ -133,33 +143,35 @@ Il est possible d'inclure les contrats archivées dans les résultats de recherche
 
 Ce menu permet de créer un contrat.
 
-Pour insérer le contrat saisie, il faut cliquer sur le bouton ``Enregistrer le contrat''.
+Pour insérer le contrat saisi, il faut cliquer sur le bouton ``Enregistrer le contrat''.
 
 Si des contrats similaires existent déjà (possédant un nom ressemblant, même racine), avant d'insérer le nouveau contrat, \obm affiche une page d'alerte présentant les contrats similaires et permet de continuer l'insertion ou de l'annuler.
-Ceci est particulièrement utile lorsque un contrat déjà existante est créée à nouveau, et permet d'éviter la saisie de doublons.
+Ceci est particulièrement utile lorsque un contrat déjà existant est créé à nouveau, et permet d'éviter la saisie de doublons.
 
 
 \subsubsection{Le sous-menu : Consulter}
 
 Ce menu permet de consulter la fiche d'un contrat (accessible uniquement depuis la fiche de la société en mode mise à jour ou suppression).
-Cet écran est aussi accessible depuis les résultats de recherche ou les liens depuis d'autres modules en cliquant sur la société sélectionnée, ou immediatement apres l'insertion du nopuveau contrat.
+Cet écran est aussi accessible depuis les résultats de recherche ou depuis d'autres modules en cliquant sur la société sélectionnée, ou immédiatement apres l'insertion du nouveau contrat.
 
 \subsubsection{Le sous-menu : Modifier}
 
 L'écran de modification affiche les informations du contract dans un formulaire.
 Toutes les informations sont modifiables.
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton ``valider les modifications''.
+Pour valider les modifications effectuées, il faut cliquer sur le bouton ``Valider les modifications''.
 
 \subsubsection{Le sous-menu : Exporter}
-Ce menu permet l'export du contrat sur un format txt (l'export est aussi multi langue).
+
+Ce menu permet l'export du contrat sur un format txt (l'export est aussi multilangue).
 
 
 \subsubsection{Le sous-menu : Supprimer}
-Ce menu permet la vérification des liens du contrat et d'indiquer si celle-ci est supprimable.
-Si le contract peut être supprimée, un bouton ``Supprimer le contrat'' est alors affiché.
 
-\paragraph{Pour être supprimée} un contrat ne doit pas :\\
+Ce menu permet la vérification des liens du contrat et d'indiquer si celle-ci est supprimable.
+Si le contract peut être supprimé, un bouton ``Supprimer le contrat'' est alors affiché.
+
+\paragraph{Pour être supprimé}, un contrat ne doit pas :\\
 
 \begin{itemize}
 \item Avoir des incidents
@@ -178,4 +190,4 @@ Ce menu permet l'administration des informations annexes des contrats :\\
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des contrats. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramétrer l'affichage de la liste des contrats. Il est possible de choisir les champs à afficher et de définir leur ordre d'affichage.

@@ -6,6 +6,7 @@
 \clearpage
 \section{Contrat}
 
+révision : \obm 2.0
 Le module \contract \obm.
 
 
@@ -228,46 +229,44 @@ Voici la liste des actions du module \contract, avec le droit d'accès requis ain
 
 
 \subsubsection{Catégories d'un contrat}
-composantes d'un contrat\\
+
+Catégories d'un contrat.\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline\textbf{Code catégorie} & \textbf{Label catégorie} \\
 \hline
-Priorite & categorie ou on retrouvent les priorites des contrats qui ont ete insere dans le module administration\\
+Priorite & Catégorie où l'on retrouve les priorités des contrats qui ont été inséré dans le module Administration.\\
 \hline
-Etat & categorie ou on retrouvent les etats des contrats qui ont ete insere dans le module administration\\
+Etat & Catégorie où l'on retrouve les états des contrats qui ont été inséré dans le module Administration.\\
 \hline
-Type & categorie ou on retrouvent les types des contrats qui ont ete insere dans le module administration\\
+Type & Catégorie où l'on retrouve les types des contrats qui ont été inséré dans le module Administration.\\
 \hline
 
-Contract type & categorie ou on peut choisir entre les contrats de type Client ou Fournisseurs 
-Dans la base de donnee on a reserve le champ contract\_kind, ce champ peut avoir les valeurs
-1 (client) ou 2 (fournisseur) ou 0 pour les anciens contrat qui ont ete pas actualise.
-Dans le formulaire d'inscription d'un nouveau contrat on trouvent dans cette zone deux boutons de type radio
-avec le nom de la variable radio\_kind. On a utilise la variable contract\_kind pour garder la variable qui sort de la base de donnee. Si contract\_kind est egale a 2 alors le bouton avec l'etiquette fournisseur doit etre selecte, et dans le cas contraire le bouton avec l'etiquette client doit etre selecte. Donc le bouton client est selecte aussi 'par default'.
-Dans le module de consultation on trouve cette categorie ou dessus de module avec les informations de la company sous la forme d'une labelle 'client' ou 'fournisseur'.
- 
+Contract type & Catégorie permettant de choisir entre les contrats de type Client ou Fournisseurs 
+Dans la base de données on reserve le champ contract\_kind. Ce champ peut avoir les valeurs
+1 (client) ou 2 (fournisseur) ou 0 pour les anciens contrats qui ont été non-actualisé.
+Dans le formulaire d'inscription d'un nouveau contrat on trouve dans cette zone deux boutons de type radio
+avec le nom de la variable radio\_kind. On a utilise la variable contract\_kind pour garder la variable qui sort de la base de donnée. Si contract\_kind est égale à 2 alors le bouton avec l'etiquette fournisseur doit être selectionné, et dans le cas contraire le bouton avec l'etiquette client doit être selectionné. Le bouton client est selectionné  par ''default''.
+Dans le module de consultation on trouve cette catégorie au-dessus du module avec les informations de la société sous la forme d'un labelle 'client' ou 'fournisseur'.
 \\
 \hline
-Contract type & categorie ou on peut choisir entre les contracts de type Coupons ou Duree
- pour la categorie Coupons on doit remplir aussi le champ avec le nombre de coupons du contract
- pour la categorie Duree on doit remplir aussi le champ avec la duree du suport (h)
-On a considere que un coupon est egale avec une heure du support. Le temps du support du module incident est transformee
- en coupons ou en heures du support pour le module contrat.
-La duree disponible du support d'un contrat est egale avec la difference entre la duree du suport initiale (les nombres 
- des heures qui ont ete vendus) et la duree utilisee (le nombre d'heures qui ont ete necessaires pour resoudre les incidents)
-Le nombre des coupons disponible d'un contrat est egale avec la difference entre le nombre de coupons initiale ( qui ont ete vendus) et la duree utilisee (le nombre d'heures qui ont ete necessaires pour resoudre les incidents).
+Format & Catégorie où l'on peut choisir entre les contracts de type Coupons ou Durée.\\
+ Pour la catégorie Coupons, le champ avec le nombre de coupons du contract doit être renseigné.\\
+ Pour la catégorie Duree, le champ avec la duree du suport (h) doit être renseigné.\\
+On considere qu'un coupon est égal à une heure de support. Le temps du support du module incident est transformé
+ en coupons ou en heures de support pour le module contrat.\\
+La durée disponible du support d'un contrat est égale à la difference entre la durée du support initiale (le nombre 
+ d'heures qui ont été vendu) et la durée utilisée (le nombre d'heures qui ont été necessaires pour resoudre les incidents)
+Le nombre de coupons disponibles d'un contrat est égal à la difference entre le nombre de coupons initial ( qui ont été vendus) et la durée utilisée (nombre d'heures qui ont été nécessaires pour résoudre le(s) incident(s)).\\
 Pour gerer le type du contract (par coupons ou par duree) nous avons utilise dans la base de donnee le champ
-contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par duree.
-Pour garder les nombres des coupons ou le nombre des heures du support vendues on a utilise 2 champs dans la base de donnee:
-contract\_ticketnumber et contract\_supportduration. Les deux champs ne peuvent etre rempli dans le meme temps avec valeurs differents de zero. Pour le moment n'est pas vraiment necessaire d'utilise 2 champs dans la base de done pour la meme chose (parce que no coupons = no heures) mais sera utile quand on va decider qu'un coupon peut signifier plus ou moins d'une heure.
-Dans le formulaire d'inscription d'un nouveau contrat on trouvent un champ de type select avec deux radio buttons,
-avec les etiquettes 'Duree' et 'Coupons'. Le champ selecte au commencement est le champ 'Duree'. 
-Quand cet champ est selecte on 	a aussi un champ de type 'text' avec l'etiquette 'Duree du suport'.
-Si le champ 'Coupons' est selecte on 	a aussi un champ de type 'text' avec l'etiquette 'Nombre coupons'.
-Ces champs ('Duree du suport' et 'Nombre coupons') doivent etre rempli (les valeurs doivent etre superieure a zero).
-Dans le module de consultation on ces informations dans la zone 'etat'. On a aussi le nombre des 'coupons' ou des heures' consommees ou disponibles (en foction des heures necessaires pour la resolution des incidents).
-Si on a pas des incidents alors le nombre des heures ou des coupons consommee est egale a zero.
+contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par duree.\\
+Le nombre de coupons et le nombre d'heures de support vendues sont enregistrés dans la base de données dans les champs:
+contract\_ticketnumber et contract\_supportduration.\\
+Les deux champs ne peuvent pas être rempli en même temps avec des valeurs differentes de zéro.\\
+Dans le formulaire d'inscription d'un nouveau contrat on trouve un champ de type select avec trois boutons radios 'Période','Duree' et 'Coupons'. Le champ 'Période' est selectionné à l'état initial.\\ 
+Si le champ 'Coupons' est selectionné un champ texte permettant la saisie du 'Nombre coupons' apparaît.\\
+En mode consultation ces informations apparaissent dans la zone 'etat': nombre de 'coupons' ou heures' consommées ou disponibles (en foction des heures nécessaires pour la résolution des incidents).\\
+S'il n'y a pas d'incidents alors le nombre d'heures ou de coupons consommés est égal à zéro.\\
 
 \\
 \hline

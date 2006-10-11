@@ -6,8 +6,8 @@
 \clearpage
 \section{Incident}
 
-Le module \incident \obm.
-
+révision : \obm 2.0 \\
+Le module \incident \obm.\\
 
 \subsection{Organisation de la base de données}
 
@@ -39,13 +39,13 @@ Table principale des informations d'un incident.\\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_label & varchar 100 & Nom d'incident & \\
+\_label & varchar 100 & Nom de l'incident & \\
 \hline
 \_date & timestamp 14 & Date  & \\
 \hline
-\_logger & int 8 & Id d'user courant & \\
+\_logger & int 8 & Id du user courant & \\
 \hline
-\_owner  & int 8 & Id d'user qui a cree l'incident & \\
+\_owner  & int 8 & Id du user qui a cree l'incident & \\
 \hline
 \_duration & varchar 4 & Temps totale pour la resolution d'un incident & \\
 \hline
@@ -59,7 +59,8 @@ Table principale des informations d'un incident.\\
 \hline
 \_status\_id & int 8 & Etat & \\
 \hline
-\_contract\_id & int 8 & Contract  d'origine & \\
+\_contract\_id & int 8 & Id du contrat lié à cet incident & \\
+\hline
 \_archive  & int 2 & Indicateur d'archivage & \\
 \hline
 \end{tabular}
@@ -84,11 +85,11 @@ Table des informations de priorite des incidents.\\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_label & varchar 32 & Label d& \\
+\_label & varchar 32 & Label & \\
 \hline
-\_color & varchar 6 & Color \\
+\_color & varchar 6 & Couleur &\\
 \hline
-\_order & int 2 & Order & \\
+\_order & int 2 & Ordre & \\
 \hline
 \end{tabular}
 
@@ -107,11 +108,11 @@ Table des informations de priorite des incidents.\\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du createur & \\
+\_usercreate & int 8 & Id du créateur & \\
 \hline
-\_order & int 2 & Order & \\
+\_order & int 2 & Ordre & \\
 \hline
-\_label & varchar 32 & Label \\
+\_label & varchar 32 & Label &\\
 \hline
 \end{tabular}
 
@@ -134,7 +135,7 @@ Table des informations de priorite des incidents.\\
 \hline
 \_label & varchar 40 & Label & \\
 \hline
-\_order & int 2 & Order & \\
+\_order & int 2 & Ordre & \\
 \hline
 \end{tabular}
 
@@ -158,35 +159,35 @@ Voici la liste des actions du module \incident, avec le droit d'accès requis ain
  \hline
   detailupdate & write & Formulaire de modification d'un incident. \\
  \hline
-  insert & write & Insertion d'un incident. \\
+  insert & write & Insertion de l'incident. \\
  \hline
-  update & write & Mise à jour d'incident. \\
+  update & write & Mise à jour de l'incident. \\
  \hline
-  delete & write & Suppression d'incident. \\
+  delete & write & Suppression de l'incident. \\
  \hline
-  priorite & write & Liste des priorites définies et formulaire de nouvelle priorite. \\
+  priorite & write & Liste des priorités définies et formulaire de nouvelle priorité. \\
  \hline
-  priorite\_add & write & Ajout d'une priorite . \\
+  priorite\_add & write & Ajout d'une priorité . \\
  \hline
-  priorite\_update & write & Modification d'une priorite. \\
+  priorite\_update & write & Modification d'une priorité. \\
  \hline
-  priorite\_del & write & Suppression d'une priorite. \\
+  priorite\_del & write & Suppression d'une priorité. \\
  \hline
-  status & write & Liste des etats définies et formulaire de nouveau etat. \\
+  status & write & Liste des états définies et formulaire de nouveau état. \\
  \hline
-  status\_add & write & Ajout d'un etat . \\
+  status\_add & write & Ajout d'un état . \\
  \hline
-  status\_update & write & Modification d'un etat. \\
+  status\_update & write & Modification d'un état. \\
  \hline
-  status\_del & write & Suppression d'un etat. \\
+  status\_del & write & Suppression d'un état. \\
  \hline
-  solutiontype & write & Liste des solutiontype définies et formulaire de nouvelle solutiontype. \\
+  solutiontype & write & Liste des solutions type définies et formulaire de nouvelle solution type. \\
  \hline
-  solutiontype\_add & write & Ajout d'une solutiontype. \\
+  solutiontype\_add & write & Ajout d'une solution type. \\
  \hline
   solutiontype\_update & write & Modification d'une solutiontype. \\
  \hline
-  solutiontype\_del & write & Suppression d'une solutiontype. \\
+  solutiontype\_del & write & Suppression d'une solution type. \\
  \hline
   display & read & Ecran de modification des préférences d'affichage. \\
  \hline
