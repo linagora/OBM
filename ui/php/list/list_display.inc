@@ -1029,15 +1029,25 @@ function html_list_graphical_form($action, $list_q, $list) {
 	  if ($field_kind[$field] == "tf") {
 	    $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
 	  } else {
-	    $input = "<select name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">";
+            $vals = explode(",",$value);
+            $size = count($vals);
 	    $data = $field_data[$field];
-	    $data_q = $data[0];
-	    while ($data_q->next_record()) {
-	      if ("$value " == $data_q->f($data[1])." ") {
-	        $input .= "<option selected=\"selected\" value=\"$value\" $selected>".$data_q->f($data[2])."</option>";
-	      }
+            $data_q = $data[0];
+            $input = "";
+            $txt = "";
+            while ($data_q->next_record()) {
+              foreach($vals as $key) {
+                if ("$key " == $data_q->f($data[1])." ") {
+                  if($input == "") {
+                    $input = "<option selected=\"selected\" value=\"$value\" selected=\"selected\">".$data_q->f($data[2])."($size)</option>";
+                  } else {
+                    $txt .= ",";
+                  }
+                  $txt .= $data_q->f($data[2]);
+                }
+              } 
 	    }
-	    $input .= "</select>";
+	    $input = "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$input</select>";
 	    $data_q->seek(0);
 	  }
 	  $structure[$line] .= "<td>$input</td>";
@@ -1217,7 +1227,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
-    <td class=\"detailForm\"><select multiple=\"multiple\" name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
       <script>calendar('tf_company_timebefore','$company_timebefore')</script>
     </td> 
@@ -1230,7 +1240,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   <tr>    
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td> 
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-    <select  multiple=\"multiple\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory1_code\">$sel_cat</select>
+    <select  readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory1_code\">$sel_cat</select>
      <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_category1_code&amp;popup=1&amp;ext_target=f_new_criterion.sel_companycategory1_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />
 
@@ -1278,7 +1288,7 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q
     $dsr_q->seek(0);
   }
 
-  $sel_cat1 .= "\n<option value=\"\">$l_all</option>";
+//  $sel_cat1 .= "\n<option value=\"\">$l_all</option>";
   while ($cat1_q->next_record()) {
     $sel_cat1 .= "\n<option value=\"".$cat1_q->f("contactcategory1_id")."\">".$cat1_q->f("contactcategory1_label")."</option>";
   }
@@ -1286,7 +1296,7 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q
     $cat1_q->seek(0);
   }
 
-  $sel_cat2 .= "\n<option value=\"\">$l_all</option>";
+//  $sel_cat2 .= "\n<option value=\"\">$l_all</option>";
   while ($cat2_q->next_record()) {
     $sel_cat2 .= "\n<option value=\"".$cat2_q->f("contactcategory2_id")."\">".$cat2_q->f("contactcategory2_label")."</option>";
   }
@@ -1353,8 +1363,8 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q
     <td class=\"detailLabel\">$l_function</td>
   </tr> 
   <tr>  
-    <td class=\"detailForm\"><select name=\"sel_contactcategory1link_category_id\">$sel_cat1</select></td>    
-    <td class=\"detailForm\"><select name=\"sel_contactcategory2link_category_id\">$sel_cat2</select></td>    
+    <td class=\"detailForm\"><select multiple=\"multiple\" size=\"5\" name=\"sel_contactcategory1link_category_id\">$sel_cat1</select></td>    
+    <td class=\"detailForm\"><select multiple=\"multiple\" size=\"5\" name=\"sel_contactcategory2link_category_id\">$sel_cat2</select></td>    
     <td class=\"detailForm\"><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
   </tr>
   <tr> 

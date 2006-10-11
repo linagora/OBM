@@ -136,7 +136,22 @@ function get_values(form) {
   for (i=4;i<cells.length;i++) {
     name = cells.item(i).lastChild.name;
     field = eval('form.'+name.substr(0,name.length-2));
-    field.value = cells.item(i).lastChild.value;
+    try {
+      if(field.nodeName == 'SELECT') {
+        values = cells.item(i).lastChild.value.split(',$separator');
+        for(k=0; k < field.options.length; k++) {
+          for(j=0; j < values.length; j++) {
+            if(values[j] == field.options[k].value) {
+              field.options[k].selected = true;
+            }
+          }
+        }
+      } else {
+        field.value = cells.item(i).lastChild.value;
+      }
+    } catch (e) {
+
+    }
   }
 
 }
@@ -351,7 +366,22 @@ function contact_criterion(form,labels,values,i) {
     cell.innerHTML = '$l_contact: $l_contact_cat1';
     cell = values.insertCell(i);
     field = form.sel_contactcategory1link_category_id;
-    cell.innerHTML = '<select name=\"sel_contactcategory1link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    len = field.options.length;
+    val = '';
+    txt = '';
+    size = 0;
+    for(h = 0; h < len;h++){
+      if(field.options[h].selected == true){
+        if(val != '') {
+          val += ',';
+          txt += ',';
+        }
+        val +=field.options[h].value;
+        txt +=field.options[h].text;
+        size+=1;
+      }
+    }
+    cell.innerHTML = '<select title=\"'+txt+'\" name=\"sel_contactcategory1link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ val+'\">'+ field.options[field.selectedIndex].text+'('+size+')</option></select>';
     i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory1link_category_id[]\" value=\"\" />';
@@ -362,7 +392,22 @@ function contact_criterion(form,labels,values,i) {
     cell.innerHTML = '$l_contact: $l_contact_cat2';
     cell = values.insertCell(i);
     field = form.sel_contactcategory2link_category_id;
-    cell.innerHTML = '<select name=\"sel_contactcategory2link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    len = field.options.length;
+    val = '';
+    txt = '';
+    size = 0;
+    for(h = 0; h < len;h++){
+      if(field.options[h].selected == true){
+        if(val != '') {
+          val += ',';
+          txt += ',';
+        }
+        val +=field.options[h].value;
+        txt +=field.options[h].text;
+        size+=1;
+      }
+    }    
+    cell.innerHTML = '<select title=\"'+txt+'\" name=\"sel_contactcategory2link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ val+'\">'+ field.options[field.selectedIndex].text+'('+size+')</option></select>';
     i++;
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory2link_category_id[]\" value=\"\" />';

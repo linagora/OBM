@@ -1384,6 +1384,7 @@ function make_list_query_from_criteria($list) {
   $subscription_equal = "s%j.%f = '%v'";
   $category_equal = "(cc%j.%f $like '%v.%' OR cc%j.%f = '%v')";
   $connection_equal = "%j.%f = '%v'";
+  $connection_in = "%j.%f IN (%v)";
   $pub_lang_like = "p%j.%f $like '%%v%'";
   $comp_time_sup = "(company_timecreate >= '%v' OR company_timeupdate >= '%v')";
   $comp_time_inf = "(company_timecreate <= '%v' OR company_timeupdate <= '%v')";
@@ -1413,8 +1414,8 @@ function make_list_query_from_criteria($list) {
     "contact_datasource_id" => $common_equal,
     "contact_town"  => $common_like,
     "contact_zipcode"  => $common_like,
-    "contactcategory1link_category_id" => "cc1l".$connection_equal,
-    "contactcategory2link_category_id" => "cc2l".$connection_equal,
+    "contactcategory1link_category_id" => "cc1l".$connection_in,
+    "contactcategory2link_category_id" => "cc2l".$connection_in,
     "contact_function_id" => $common_equal,
     "subscription_publication_id"  => $subscription_equal,
     "publication_lang"  => $pub_lang_like,
