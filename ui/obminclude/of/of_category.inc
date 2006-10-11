@@ -1401,12 +1401,46 @@ function _of_category_get_entity_count($entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Global User data form
+// Display: Global User data search block 
 // Parameters:
-//   - $entity : user category for this entity
+//   - $entity : entity
+//   - $params : parameters with search data
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_dis_search($entity, $params) {
+
+  $block_user .= of_category_user_dis_search($entity, $params);
+
+  return $block_user;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Global User data for an entity in consult mode
+// Parameters:
+//   - $entity : entity
 //   - $id     : entity id
 ///////////////////////////////////////////////////////////////////////////////
-function of_userdata_dis_entity_form($entity, $id) {
+function of_userdata_dis_entity_consult($entity, $ent_id) {
+  global $cgp_user;
+
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $cats = of_category_user_get_entitycategories($entity, "$cat_name", $ent_id);
+      $block_user .= of_category_dis_block_consult($entity, $cat_name, $cats);
+    }
+  }
+
+  return $block_user;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Global User data form for an entity
+// Parameters:
+//   - $entity : entity
+//   - $id     : entity id
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_dis_entity_form($entity, $ent_id) {
   global $cgp_user;
 
   if (is_array($cgp_user[$entity]["category"])) {
@@ -1414,9 +1448,9 @@ function of_userdata_dis_entity_form($entity, $id) {
       $mode = $one_cat["mode"];
       if ($mode == "mono") {
 	$cats = of_category_user_get_ordered($cat_name, $entity);
-	$cats_sel = of_category_user_get_ordered($cat_name, $entity, $id);
+	$cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
       } else {
-	$cats = of_category_user_get_ordered($cat_name, $entity, $id);
+	$cats = of_category_user_get_ordered($cat_name, $entity, $ent_id);
       }
       $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat["mode"], $cats_sel[0]["id"], "undef");
     }

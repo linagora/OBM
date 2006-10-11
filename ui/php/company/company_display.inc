@@ -222,7 +222,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   }
 
   // User defined categories
-  $block_user .= of_category_user_dis_search("company", $company);
+  $block_user .= of_userdata_dis_search("company", $company);
 
   // Type, activity select
   $block_type = of_category_dis_search_select("company", "type", $types, $type);
@@ -814,13 +814,8 @@ function html_company_consult_address($co_q) {
   $web = $co_q->f("company_web");
   $email = $co_q->f("company_email");
   $com = beautify_comment(nl2br($co_q->f("company_comment")));
-
-  if (is_array($cgp_user["company"]["category"])) {
-    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-      $cats = of_category_user_get_entitycategories("company", "$cat_name", $id);
-      $block_user .= of_category_dis_block_consult("company", $cat_name, $cats);
-    }
-  }
+  
+  $block_user .= of_userdata_dis_entity_consult("company", $id);
 
   // Conditionnal fields
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
