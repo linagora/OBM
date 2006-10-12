@@ -100,37 +100,9 @@ function run_query_company_search($company) {
     $and = "AND";
   }
 
-  // User defined categories
-  if (is_array($cgp_user["company"]["category"])) {
-    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-      $cat = $company[$cat_name];
-      $cat_tree = $company["${cat_name}_tree"];
-      $cat_code = $company["${cat_name}_code"];
-      $tlink = "${cat_name}_link";
-
-      if (($cat != $c_all) && ($cat != $c_none) && ($cat != "")) {
-	$where_cat_user = "";
-	$join_cat_user .= "LEFT JOIN CategoryLink AS $tlink
-          ON company_id=$tlink.categorylink_entity_id
-          AND $tlink.categorylink_entity='company'
-          AND $tlink.categorylink_category='$cat_name'";
-	if ($cat_tree) {
-	  $join_cat_user .= " LEFT JOIN Category AS $cat_name ON $tlink.categorylink_category_id=$cat_name.category_id";
-	  $where_cat_user = " OR $cat_name.category_code like '$cat_code%'";
-	}
-	$where .= " $and ($tlink.categorylink_category_id='$cat' $where_cat_user)";
-	$and = "AND";
-      } else if ($cat == $c_none) {
-	$join_cat_user = "LEFT JOIN CategoryLink AS $tlink
-          ON company_id=$tlink.categorylink_entity_id
-          AND $tlink.categorylink_entity='company'
-          AND $tlink.categorylink_category='$cat_name'";
-	$where .= " $and $tlink.categorylink_category_id IS NULL";
-	$and = "AND";
-      }
-    }
-  }
-
+  $userdata = of_userdata_query_search("company", $company);
+  $where .= " $and ". $userdata["where"];
+  $join_cat_user = $userdata["join"];
 
   if (($where != "") || ($where_name != "")) {
     $whereq = " WHERE $where_name $where $multidomain";
@@ -281,7 +253,7 @@ function run_query_company_detail($p_id) {
 //                : ctry, phone, fax, web, email, com, category1
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_insert($company) {
-  global $auth, $obm, $cdg_sql, $cgp_user;
+  global $auth, $obm, $cdg_sql;
 
   $uid = $auth->auth["uid"];
   $now = date("Y-m-d H:i:s");
@@ -421,19 +393,9 @@ function run_query_company_insert($company) {
   $id = $obm_q->f("id");
 
   if ($id > 0) {
-    // User defined categories
-    if (is_array($cgp_user["company"]["category"])) {
-      foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-	$cats = $company["$cat_name"];
-	if (is_array($cats)) {
-	  foreach($cats as $cat_id) {
-	    $retour = of_category_user_query_insert_link("company", $cat_name, $id, $cat_id);
-	  }
-	}
-      }
-    }
+    $ret = of_userdata_query_update("company", $id, $company);
   }
-  
+
   return $id;
 }
 
@@ -547,9 +509,11 @@ function run_query_company_delete($p_id) {
 	
   run_query_global_delete_document_links($p_id, "company");
 
-  $ret = of_category_user_query_delete_link("company", $p_id);
+  $ret = of_userdata_query_delete("company", $p_id);
 
-  $query = "DELETE FROM Company WHERE company_id='$p_id' $multidomain";
+  $query = "DELETE FROM Company
+    WHERE company_id='$p_id'
+      $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_company_delete()");
   $retour = $obm_q->query($query);
 

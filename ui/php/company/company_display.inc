@@ -793,8 +793,7 @@ function html_company_consult($co_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult_address($co_q) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  global $cgp_user, $l_name;
-  global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
+  global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
   global $l_company, $l_coord;
   global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
@@ -1472,7 +1471,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 // Display the company administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_admin_index() {
-  global $cgp_hide, $cgp_user;
+  global $cgp_hide;
 
   if (! $cgp_hide["company"]["type"]) {
     $types = of_category_get_ordered("company", "type");
@@ -1489,12 +1488,7 @@ function dis_company_admin_index() {
     $block .= html_company_nafcode_form($naf_q);
   }
 
-  if (is_array($cgp_user["company"]["category"])) {
-    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-      $cats = of_category_user_get_ordered("$cat_name");
-      $block .= of_category_dis_admin_form($cat_name, $cats, true);
-    }
-  }
+  $block .= of_userdata_dis_admin_form("company");
 
   return $block;
 }

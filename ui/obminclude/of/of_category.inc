@@ -1460,7 +1460,73 @@ function of_userdata_dis_entity_form($entity, $ent_id) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Global User data admin form
+// Parameters:
+//   - $entity : entity
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_dis_admin_form($entity) {
+  global $cgp_user;
+
+  // User categories form
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $cats = of_category_user_get_ordered("$cat_name");
+      $block_user .= of_category_dis_admin_form($cat_name, $cats, true);
+    }
+  }
+
+  return $block_user;
+}
+
+
 // Data functions -------------------------------------------------------------
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User Data update query execution
+// Parameters:
+//   - $entity : user category for this entity
+//   - $params : array with parameters
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_query_search($entity, $params) {
+  global $cgp_user, $c_all, $c_none;
+
+  // User defined categories
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $cat = $params[$cat_name];
+      $cat_tree = $params["${cat_name}_tree"];
+      $cat_code = $params["${cat_name}_code"];
+      $tlink = "${cat_name}_link";
+
+      if (($cat != $c_all) && ($cat != $c_none) && ($cat != "")) {
+	$where_cat_user = "";
+	$join_cat_user .= "LEFT JOIN CategoryLink AS $tlink
+          ON ${entity}_id=$tlink.categorylink_entity_id
+          AND $tlink.categorylink_entity='$entity'
+          AND $tlink.categorylink_category='$cat_name'";
+	if ($cat_tree) {
+	  $join_cat_user .= " LEFT JOIN Category AS $cat_name ON $tlink.categorylink_category_id=$cat_name.category_id";
+	  $where_cat_user = " OR $cat_name.category_code like '$cat_code%'";
+	}
+	$where .= " $and ($tlink.categorylink_category_id='$cat' $where_cat_user)";
+	$and = "AND";
+      } else if ($cat == $c_none) {
+	$join_cat_user = "LEFT JOIN CategoryLink AS $tlink
+          ON ${entity}_id=$tlink.categorylink_entity_id
+          AND $tlink.categorylink_entity='$entity'
+          AND $tlink.categorylink_category='$cat_name'";
+	$where .= " $and $tlink.categorylink_category_id IS NULL";
+	$and = "AND";
+      }
+    }
+  }
+  $ret["where"] = $where;
+  $ret["join"] = $join_cat_user;
+
+  return $ret;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1491,8 +1557,24 @@ function of_userdata_query_update($entity, $ent_id, $params) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// User Data delete query execution
+// Parameters:
+//   - $entity : entity
+//   - $ent_id : entity id
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_query_delete($entity, $ent_id) {
+  global $cgp_user;
+
+  // User categories update
+  $ret = of_category_user_query_delete_link($entity, $ent_id);
+
+  return $ret;
+}
+
+
 //=============================================================================
-// OF USER Category API
+// OF User Category API
 //=============================================================================
 
 

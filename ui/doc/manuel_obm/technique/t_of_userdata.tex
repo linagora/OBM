@@ -1,0 +1,329 @@
+% Documentation technique d'OBM : Gestion des données utilisateur
+% AliaSource Pierre Baudracco
+% $Id$
+
+
+\subsection{Gestion des données spécifiques utilisateurs}
+\label{of_userdata}
+révision : \obm 2.0.0\\
+
+\obm permet la gestion de données spécifiques à un site, appelées données utilisateurs, sans modification du modèle de base de données.
+
+Les types de données pouvant être ajoutées sont :\\
+
+\begin{tabular}{|p{8cm}|c|}
+\hline
+\textbf{Type de données} & \textbf{Depuis version OBM} \\
+\hline
+Catégories multi-valuées & 2.0.0 \\
+\hline
+Catégories mono-valuées & 2.0.0 \\
+\hline
+Champs texte simple & futur \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Les fonctionalités de données utilisateurs sont fournies par le fichier \fichier{of/of\_category.inc} et les fonctions sont préfixées par \variable{of\_userdata\_}.
+
+
+\subsubsection{Définition de données utilisateurs}
+
+Les données utilisateurs sont déclarées et définies dans la tableau global \variable{\$cgp\_user}
+
+\paragraph{Ajout de catégorie multi-valuée} : ex : ajout de la catégorie ``cat1'' liée aux sociétés. Une même catégorie peut être liée à plusieurs modules.\\
+
+\variable{\$cgp\_user["company"]["category"]["cat1"] = array("mode"=>"multi");}
+
+\paragraph{Ajout de catégorie mono-valuée} : \\
+
+\variable{\$cgp\_user["company"]["category"]["cat2"] = array("mode"=>"mono");}
+
+
+\subsubsection{Implémentation : API fonctions publiques}
+
+Les fonctions de gestion des données utilisateurs sont celles à intégrer dans les modules d'\obm et proposent un appel unique (wrapper) pour gérer l'ensemble des données utilisateurs (catégories, champs,...).
+Les fonctions de gestion de catégories ou de champs utilisateurs ne doivent donc pas être utilisées directement dans les modules.\\
+
+L'implémentation dans un module nécessite en général l'appel des fonctions correspondantes dans les fonctions suivantes du module :\\
+
+\begin{tabular}{|p{6cm}|c|}
+\hline
+\textbf{Fonction du module} & \textbf{Fonction de données utilisateurs appelée} \\
+\hline
+\fonction{html\_module\_search\_form()} & \fonction{of\_userdata\_dis\_search()} \\
+\hline
+\fonction{html\_module\_consult()} & \fonction{of\_userdata\_dis\_entity\_consult()} \\
+\hline
+\fonction{html\_module\_form()} & \fonction{of\_userdata\_dis\_entity\_form()} \\
+\hline
+\fonction{dis\_module\_admin\_form()} & \fonction{of\_userdata\_dis\_admin\_form()} \\
+\hline
+\fonction{run\_query\_module\_search()} & \fonction{of\_userdata\_query\_search()} \\
+\hline
+\fonction{run\_query\_module\_insert()} & \fonction{of\_userdata\_query\_update()} \\
+\hline
+\fonction{run\_query\_module\_update()} & \fonction{of\_userdata\_query\_update()} \\
+\hline
+\fonction{run\_query\_module\_delete()} & \fonction{of\_userdata\_query\_delete()} \\
+\hline
+\end{tabular}
+
+
+\paragraph{Fonctions d'affichage} : \\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_dis_search($entity, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction d'affichage du champ de recherche de la catégorie pour le formulaire de recherche}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\hline
+\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Block de recherche des données utilisateurs\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_dis_entity_consult($entity, $ent_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Fonction d'affichage de la zone données utilisateurs (ensemble des champs utilisateurs) en mode consultation pour une entité}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$ent\_id & Id de l'entité affichée\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Block de données utilisateurs en affichage consultation\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_dis_entity_form($entity, $ent_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Fonction d'affichage de la zone données utilisateurs (ensemble des champs utilisateurs) en mode modification (formulaire) pour une entité}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$ent\_id & Id de l'entité affichée\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Block de données formulaire\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_dis_admin_form($entity) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Fonction d'affichage des formulaires d'administrations des données utilisateurs liées à une entité (catégories)}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Block de données formulaire\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\paragraph{Fonctions bases de données} : \\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_query_search($entity, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Construction des clauses de recherche pour les données utilisateurs (appelée dans la fonction recherche de l'entité : run\_query\_entity\_search())}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+array & (``where'', ``join'') : clauses WHERE et JOIN à ajouter \\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_query_update($entity, $ent_id, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Mise à jour des données utilisateurs pour une entité donnée selon les paramètres passés (appelée dans la fonction de mise à jour de l'entité : run\_query\_entity\_update())}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$ent\_id & Id de l'entité\\
+\hline
+\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+True | false & \\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_query_delete($entity, $ent_id) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Suppression des données utilisateurs pour une entité donnée (appelée suite à la suppression de l'entité)}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$ent\_id & Id de l'entité\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+True | false & \\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\subsubsection{Gestion des catégories utilisateurs mono ou multi-valuées}
+
+La gestion des catégories utilisateurs est facilitée par un ensemble de fonctions, similaires aux fonctions de gestion des catégories, permettant la gestion automatique de ces catégories utiisateurs.\\
+
+Les fonctionalités de catégories utilisateurs sont fournies par le fichier \fichier{of/of\_category.inc} et les fonctions sont préfixées par \variable{of\_category\_user\_}.
+
+\paragraph{Types de catégories}
+
+\obm distingue 2 types de catégories utilisateurs :\\
+\begin{itemize}
+\item \textbf{mono} : catégories avec liaisons 1-n. L'entité n'est liée qu'à 0 ou 1 des catégories
+\item \textbf{multi} : catégories avec liaisons n-n. L'entité peut être liée à 0, 1  ou n catégories.
+\end{itemize}
+
+\subsubsection{Modèle de stockage générique}
+
+La principale différence par rapport aux catégories standards d'\obm vient du modèle de stockage.
+Pour l'ensemble des catégories utilisateurs, uniquement 2 tables sont nécesaires et intégrées en standard à \obm, ce qui permet d'ajouter des catégories utilisateurs par simple configuration sans altérer le modèle de données.
+
+Afin de permettre l'ajout de catégories mono-valuées sans modification du modèle de données, les 2 types de catégories, mono ou multi, sont gérées par une liaison n-n (avec table de liaison, même pour les catégories mono-valuées).\\
+
+\textbf{Category} : Table des informations de catégories : \\
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Id de la catégorie & \\
+\hline
+\_domain\_id & int 8 & Id du domaine d'appartenance & \\
+\hline
+\_timeupdate & timestamp & date de mise à jour & \\
+\hline
+\_timecreate & timestamp & date de création & \\
+\hline
+\_userupdate & int 8 & utilisateur ayant effectué la mise à jour & \\
+\hline
+\_usercreate & int 8 & créateur & \\
+\hline
+\_category & varchar 24 & Nom de la catégorie & Tous les enregistrements de toutes les catégories sont stockées dans cette table\\
+\hline
+\_code & varchar 10 & Code de la catégorie & ex: 1.0, 1.1, 1.1.4 \\
+\hline
+\_label & varchar 100 & Label de la catégorie & \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+\textbf{CategoryLink} : Table des informations de liaison d'une catégorie avec une entité :\\
+
+\begin{tabular}{|p{3cm}|c|p{4cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description}\\
+\hline
+\_category\_id & int 8 & Id de la catégorie\\
+\hline
+\_entity\_id & int 8 & Id de l'entité\\
+\hline
+\_category & varchar 24 & Nom de ma catégorie\\
+\hline
+\_entity & varchar 32 & Nom de l'entité\\
+\hline
+\end{tabular}
