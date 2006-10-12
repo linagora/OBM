@@ -25,7 +25,7 @@ emacs scripts/0.8/update_0.8.1-0.8.2.pgsql.sql
      \item[*] Créer la table associée (scripts création et mise à jour bases de données)\\
      \item[*] (module\_index.php) Appeler la liste de valeurs run\_query\_fieldname() pour la passer aux fonctions formulaire (mise à jour voire recherche).\\
      \item[*] (module\_display.inc) Modifier la définition des fonctions formulaire afin d'inclure la liste de valeur (html\_module\_form(), html\_module\_search\_form()).\\
-     \item[*] (module\_query.php) Implémenter les fonctions run\_query\_fieldname(), run\_query\_fieldname\_insert(), run\_query\_fieldname\_update(), run\_query\_fieldname\_delete(), run\_query\_fieldname\_links().
+     \item[*] (module\_query.inc) Implémenter les fonctions run\_query\_fieldname(), run\_query\_fieldname\_insert(), run\_query\_fieldname\_update(), run\_query\_fieldname\_delete(), run\_query\_fieldname\_links().
       \begin{verbatim}
 function run_query_companynafcode()
 function run_query_nafcode_insert()
