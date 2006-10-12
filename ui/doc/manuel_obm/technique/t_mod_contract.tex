@@ -1,13 +1,13 @@
 % Documentation technique d'OBM : module Contrat
-% ALIACOM Pierre Baudracco
+% ALIASOURCE Nourdine Bouaghaz
 % $Id$
 
 
 \clearpage
 \section{Contrat}
 
-révision : \obm 2.0
-Le module \contract \obm.
+révision : \obm 2.0 \\
+Le module \contract \obm.\\
 
 
 \subsection{Organisation de la base de données}
@@ -250,23 +250,23 @@ avec le nom de la variable radio\_kind. On a utilise la variable contract\_kind 
 Dans le module de consultation on trouve cette catégorie au-dessus du module avec les informations de la société sous la forme d'un labelle 'client' ou 'fournisseur'.
 \\
 \hline
-Format & Catégorie où l'on peut choisir entre les contracts de type Coupons ou Durée.\\
- Pour la catégorie Coupons, le champ avec le nombre de coupons du contract doit être renseigné.\\
- Pour la catégorie Duree, le champ avec la duree du suport (h) doit être renseigné.\\
+Format & Catégorie où l'on peut choisir entre les contracts de type Coupons ou Durée.
+ Pour la catégorie Coupons, le champ avec le nombre de coupons du contract doit être renseigné.
+ Pour la catégorie Duree, le champ avec la duree du support (h) doit être renseigné.
 On considere qu'un coupon est égal à une heure de support. Le temps du support du module incident est transformé
- en coupons ou en heures de support pour le module contrat.\\
+ en coupons ou en heures de support pour le module contrat.
 La durée disponible du support d'un contrat est égale à la difference entre la durée du support initiale (le nombre 
  d'heures qui ont été vendu) et la durée utilisée (le nombre d'heures qui ont été necessaires pour resoudre les incidents)
-Le nombre de coupons disponibles d'un contrat est égal à la difference entre le nombre de coupons initial ( qui ont été vendus) et la durée utilisée (nombre d'heures qui ont été nécessaires pour résoudre le(s) incident(s)).\\
-Pour gerer le type du contract (par coupons ou par duree) nous avons utilise dans la base de donnee le champ
-contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par duree.\\
+Le nombre de coupons disponibles est égal à la difference entre le nombre de coupons initial ( qui ont été vendus) et la durée utilisée (nombre d'heures qui ont été nécessaires pour résoudre le(s) incident(s)).
+Pour gérer le type du contract (par coupons ou par duree) nous avons utilisé dans la base de donnée le champ
+contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par durée.
 Le nombre de coupons et le nombre d'heures de support vendues sont enregistrés dans la base de données dans les champs:
-contract\_ticketnumber et contract\_supportduration.\\
-Les deux champs ne peuvent pas être rempli en même temps avec des valeurs differentes de zéro.\\
-Dans le formulaire d'inscription d'un nouveau contrat on trouve un champ de type select avec trois boutons radios 'Période','Duree' et 'Coupons'. Le champ 'Période' est selectionné à l'état initial.\\ 
-Si le champ 'Coupons' est selectionné un champ texte permettant la saisie du 'Nombre coupons' apparaît.\\
-En mode consultation ces informations apparaissent dans la zone 'etat': nombre de 'coupons' ou heures' consommées ou disponibles (en foction des heures nécessaires pour la résolution des incidents).\\
-S'il n'y a pas d'incidents alors le nombre d'heures ou de coupons consommés est égal à zéro.\\
+contract\_ticketnumber et contract\_supportduration.
+Les deux champs ne peuvent pas être rempli en même temps avec des valeurs différentes de zéro.
+Dans le formulaire d'inscription d'un nouveau contrat, on trouve trois boutons radios 'Période','Duree' et 'Coupons'. Le champ 'Période' est selectionné à l'état initial.
+Si le champ 'Coupons' est sélectionné un champ texte permettant la saisie du 'Nombre coupons' apparaît.
+En mode consultation ces informations apparaissent dans la zone 'etat': nombre de 'coupons' ou heures' consommées ou disponibles (en foction des heures nécessaires pour la résolution des incidents).
+S'il n'y a pas d'incidents alors le nombre d'heures ou de coupons consommés est égal à zéro.
 
 \\
 \hline

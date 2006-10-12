@@ -4,10 +4,10 @@
 
 
 \clearpage
-\section{Organisation (module \company)}
+\section{Entreprise (module \company)}
 
-révision : \obm 2.0
-Le module \company d'\obm.
+révision : \obm 2.0.\\
+Le module \company d'\obm.\\
 
 \subsection{Organisation de la base de données}
 
@@ -22,7 +22,7 @@ Le module \company utilise 6 tables :
 \end{itemize}
 
 \subsection{Company}
-Table principale des informations d'une organisation. \\
+Table principale des informations d'une entreprise. \\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -46,11 +46,11 @@ Table principale des informations d'une organisation. \\
 \hline
 \_vat & varchar 20 &  & \\
 \hline
-\_siret & varchar 14  & Siret de l'organisation & \\
+\_siret & varchar 14  & Code Siret de l'entreprise & \\
 \hline
 \_archive & char 1 & Indicateur d'archivage & (1=Oui) \\
 \hline
-\_name & varchar 96 &  Nom de l'organisation &  \\
+\_name & varchar 96 &  Nom de l'entreprise &  \\
 \hline
 \_aka & varchar 255  &  & \\
 \hline
@@ -60,37 +60,37 @@ Table principale des informations d'une organisation. \\
 \hline
 \_activity\_id & int 8 &  & \\
 \hline
-\_nafcode\_id & int 8  & & \\
+\_nafcode\_id & int 8  & Code de la Nomenclature d'Activités Française & \\
 \hline
 \_marketing\_managerid & int 8  & Identifiant du responsable marketing  & \\
 \hline
 \_address1 & varchar 64 & Adresse  & \\
 \hline
-\_address2 & varchar 64 & Adresse  & \\
+\_address2 & varchar 64 & Complément d'adresse 1 & \\
 \hline
-\_address3 & varchar 64  & Adresse  & \\
+\_address3 & varchar 64  & Complément d'adresse 2  & \\
 \hline
-\_zipcode & varchar 14 & Code postal de l'organisation  & \\
+\_zipcode & varchar 14 & Code postal  & \\
 \hline
-\_town & varchar 64 & Ville de l'organisation  & \\
+\_town & varchar 64 & Ville & \\
 \hline
 \_expressportal & varchar 16 &  & \\
 \hline
 \_country\_iso3166 & char 2 & Pays   & \\
 \hline
-\_phone & varchar 32 & Numéro de téléphone de l'organisation. & \\
+\_phone & varchar 32 & Numéro de téléphone & \\
 \hline
-\_fax & varchar 32 & Numéro de fax de l'organisation. & \\
+\_fax & varchar 32 & Numéro de fax & \\
 \hline
-\_web & varchar 64 & Adresse site web de l'organisation. &\\
+\_web & varchar 64 & Adresse site web &\\
 \hline
-\_email & varchar 64  & Email de l'organisation. &\\
+\_email & varchar 64  & Email de contact &\\
 \hline
-\_contact\_number & int 5 & Nombre de contact appartenant à cette organisation. &\\
+\_contact\_number & int 5 & Nombre de contact appartenant à cette entreprise &\\
 \hline
-\_deal\_number & int 5 & Nombre affaire lié à cette organisation &\\
+\_deal\_number & int 5 & Nombre affaire lié à cette entreprise &\\
 \hline
-\_deal\_total & int 5 & Total des affaires lié à cette organisation &\\
+\_deal\_total & int 5 & Total des affaires lié à cette entreprise &\\
 \hline
 \_comment & text & Commentaire  &\\
 \hline
@@ -98,7 +98,8 @@ Table principale des informations d'une organisation. \\
 
 
 \subsection{CompanyActivity}
-Table de référence des activités d'une organisation.\\
+
+Table de référence des activités d'une entreprise.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -106,7 +107,7 @@ Table de référence des activités d'une organisation.\\
 \hline
 \_activity\_id & int 8 & Identifiant & Clé primaire \\
 \hline
-\_domain\_id & int 8 & Projet de la tâche & \\
+\_domain\_id & int 8 & Id du domaine choisi & \\
 \hline
 \_timeupdate & timestamp 14 & Date de mise à jour & \\
 \hline
@@ -116,9 +117,9 @@ Table de référence des activités d'une organisation.\\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_code & varchar 10 & Code de l'activité de l'organisation & \\
+\_code & varchar 10 & Code de l'activité de l'entreprise & \\
 \hline
-\_label & varchar 64 & Label de l'activité de l'organisation & \\
+\_label & varchar 64 & Label de l'activité de l'entreprise & \\
 \hline
 \end{tabular}
 
@@ -126,7 +127,8 @@ Table de référence des activités d'une organisation.\\
 
 
 \subsection{CompanyType}
-Table de référence des types d'organisation.
+
+Table de référence des types d'entreprise.
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -153,7 +155,7 @@ Table de référence des types d'organisation.
 
 
 \subsection{CompanyCategory1}
-Table des catégories d'organisation. Une organisation peut être reliée à plusieurs catégories.\\
+Table des catégories d'entreprise. Une entreprise peut être reliée à plusieurs catégories.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -177,7 +179,7 @@ Table des catégories d'organisation. Une organisation peut être reliée à plusieu
 
 
 \subsubsection{CompanyCategory1Link}
-Table de liaison entre les organisations et les catégories d'organisation.\\
+Table de liaison entre les entreprises et les catégories d'entreprise.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -185,7 +187,7 @@ Table de liaison entre les organisations et les catégories d'organisation.\\
 \hline
 \_category\_id & int 8 & Référence à la catégorie & \\
 \hline
-\_company\_id & int 8 & Référence à l'organisation & \\
+\_company\_id & int 8 & Référence à l'entreprise & \\
 \hline
 \end{tabular}
 
@@ -199,41 +201,41 @@ Voici la liste des actions du module \company, avec le droit d'accès requis ains
  \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche d'organisation. \\ 
+  index & read & (Défaut) formulaire de recherche d'entreprise. \\ 
  \hline
-  search & read & Résultat de recherche d'organisations. \\
+  search & read & Résultat de recherche d'entreprise. \\
  \hline
-  new & write & Formulaire de création d'une organisation. \\
+  new & write & Formulaire de création d'une entreprise. \\
  \hline
-  detailconsult & read & Fiche détail d'une organisation. \\
+  detailconsult & read & Fiche détail d'une entreprise. \\
  \hline
-  detailupdate & write & Formulaire de modification d'une organisation. \\
+  detailupdate & write & Formulaire de modification d'une entreprise. \\
  \hline
-  insert & write & Insertion d'une organisation. \\
+  insert & write & Insertion d'une entreprise. \\
  \hline
-  update & write & Mise à jour d'une organisation. \\
+  update & write & Mise à jour d'une entreprise. \\
  \hline
-  check\_delete & write & Vérification avant suppression d'une affaire. \\
+  check\_delete & write & Vérification avant suppression d'une entreprise. \\
  \hline
-  delete & write & Suppression d'une affaire. \\
+  delete & write & Suppression d'une entreprise. \\
  \hline
-  admin & read\_admin & Ecran d'administration des affaires. \\
+  admin & read\_admin & Ecran d'administration des entreprises. \\
  \hline
-  activity\_insert & write\_admin & Ajout d'une activity d'organisation. \\
+  activity\_insert & write\_admin & Ajout d'une activité. \\
  \hline
-  activity\_update & write\_admin & Modification d'un état d'organisation. \\
+  activity\_update & write\_admin & Modification d'une activité. \\
  \hline
-  activity\_checklink & write\_admin & Vérification avant suppression d'un état d'organisation. \\
+  activity\_checklink & write\_admin & Vérification avant suppression d'une activité. \\
  \hline
-  activity\_delete & write\_admin & Suppression d'une activité d'organisation. \\
+  activity\_delete & write\_admin & Suppression d'une activité. \\
  \hline
-  category\_insert & write\_admin & Ajout d'une catégorie d'organisation. \\
+  category\_insert & write\_admin & Ajout d'une catégorie d'entreprise. \\
  \hline
-  category\_update & write\_admin & Modification d'une catégorie d'organisation. \\
+  category\_update & write\_admin & Modification d'une catégorie d'entreprise. \\
  \hline
-  category\_checklink & write\_admin & Vérification avant suppression d'une catégorie d'organisation. \\
+  category\_checklink & write\_admin & Vérification avant suppression d'une catégorie d'entreprise. \\
  \hline
-  category\_delete & write\_admin & Suppression d'une catégorie d'organisation. \\
+  category\_delete & write\_admin & Suppression d'une catégorie d'entreprise. \\
  \hline
   display & read & Ecran de modification des préférences d'affichage. \\
  \hline
@@ -241,22 +243,22 @@ Voici la liste des actions du module \company, avec le droit d'accès requis ains
  \hline
   dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
  \hline
-  nafcode\_insert & write\_admin & Insertion du nafcode. \\
+  nafcode\_insert & write\_admin & Insertion du code NAF. \\
  \hline
-  nafcode\_update & write\_admin & Mise à jour du nafcode. \\
+  nafcode\_update & write\_admin & Mise à jour du code NAF. \\
  \hline
-  nafcode\_delete & write\_admin & Suppression du nafcode. \\
+  nafcode\_delete & write\_admin & Suppression du code NAF. \\
  \hline
-  type\_insert & write\_admin & Insertion du type d'organisation. \\
+  type\_insert & write\_admin & Insertion du type d'entreprise. \\
  \hline
-  type\_update & write\_admin & Mise à jour du type d'organisation. \\
+  type\_update & write\_admin & Mise à jour du type d'entreprise. \\
  \hline
-  type\_delete & write\_admin & Suppression du type d'organisation. \\
+  type\_delete & write\_admin & Suppression du type d'entreprise. \\
  \hline
-  type\_checklink & write\_admin & Vérification avant suppresion d'un type d'organisation. \\
+  type\_checklink & write\_admin & Vérification avant suppression d'un type d'entreprise. \\
  \hline
-  ext\_get\_id & read & Vérification avant suppresion d'un type d'organisation. \\
+  ext\_get\_id & read & Vérification avant suppression d'un type d'entreprise. \\
  \hline
-  document\_add & write & Vérification avant suppresion d'un type d'organisation. \\
+  document\_add & write & Vérification avant suppresion d'un type d'entreprise. \\
  \hline
 \end{tabular}

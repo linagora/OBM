@@ -21,9 +21,8 @@ Le module \incident utilise 4 tables :
 
 
 \subsection{Incident}
+
 Table principale des informations d'un incident.\\
-
-
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -37,25 +36,25 @@ Table principale des informations d'un incident.\\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du createur & \\
+\_usercreate & int 8 & Id du créateur & \\
 \hline
 \_label & varchar 100 & Nom de l'incident & \\
 \hline
 \_date & timestamp 14 & Date  & \\
 \hline
-\_logger & int 8 & Id du user courant & \\
+\_logger & int 8 & Id de l'utilisateur courant & \\
 \hline
-\_owner  & int 8 & Id du user qui a cree l'incident & \\
+\_owner  & int 8 & Id de l'utilisateur qui a crée l'incident & \\
 \hline
-\_duration & varchar 4 & Temps totale pour la resolution d'un incident & \\
+\_duration & varchar 4 & Temps totale pour la résolution d'un incident & \\
 \hline
-\_resolution & text & Solution trouvee.& \\
+\_resolution & text & Solution trouvée.& \\
 \hline
 \_comment  & text & Commentaire & \\
 \hline
 \_solutiontype\_id & int 8 & Type de solution & \\
 \hline
-\_priority\_id & int 8 & Priorite & \\
+\_priority\_id & int 8 & Priorité & \\
 \hline
 \_status\_id & int 8 & Etat & \\
 \hline
@@ -65,8 +64,6 @@ Table principale des informations d'un incident.\\
 \hline
 \end{tabular}
 	 
-	
-
 
 \subsection{IncidentPriority}
 Table des informations de priorite des incidents.\\
@@ -83,7 +80,7 @@ Table des informations de priorite des incidents.\\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du createur & \\
+\_usercreate & int 8 & Id du créateur & \\
 \hline
 \_label & varchar 32 & Label & \\
 \hline
@@ -131,7 +128,7 @@ Table des informations de priorite des incidents.\\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du createur & \\
+\_usercreate & int 8 & Id du créateur & \\
 \hline
 \_label & varchar 40 & Label & \\
 \hline
@@ -149,7 +146,7 @@ Voici la liste des actions du module \incident, avec le droit d'accès requis ain
  \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche des incident. \\ 
+  index & read & (Défaut) formulaire de recherche des incidents. \\ 
  \hline
   search & read & Résultat de recherche des incidents. \\
  \hline
@@ -167,11 +164,11 @@ Voici la liste des actions du module \incident, avec le droit d'accès requis ain
  \hline
   priorite & write & Liste des priorités définies et formulaire de nouvelle priorité. \\
  \hline
-  priorite\_add & write & Ajout d'une priorité . \\
+  priority\_add & write & Ajout d'une priorité . \\
  \hline
-  priorite\_update & write & Modification d'une priorité. \\
+  priority\_update & write & Modification d'une priorité. \\
  \hline
-  priorite\_del & write & Suppression d'une priorité. \\
+  priority\_delete & write & Suppression d'une priorité. \\
  \hline
   status & write & Liste des états définies et formulaire de nouveau état. \\
  \hline
@@ -185,9 +182,9 @@ Voici la liste des actions du module \incident, avec le droit d'accès requis ain
  \hline
   solutiontype\_add & write & Ajout d'une solution type. \\
  \hline
-  solutiontype\_update & write & Modification d'une solutiontype. \\
+  solutiontype\_update & write & Modification d'un type de solution. \\
  \hline
-  solutiontype\_del & write & Suppression d'une solution type. \\
+  solutiontype\_del & write & Suppression d'un type de solution. \\
  \hline
   display & read & Ecran de modification des préférences d'affichage. \\
  \hline

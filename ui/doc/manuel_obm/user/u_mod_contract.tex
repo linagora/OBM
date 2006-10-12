@@ -9,7 +9,7 @@ révision : \obm 2.0
 
 \subsection{Présentation du module \contract}
 
-Ce module est une gestion de contracts, qui couplée avec le module \incident offre des fonctionnalités de support intéressantes, est souvent appelé ``Help Desk''.
+Ce module est une gestion de contracts, qui couplée avec le module \incident offre des fonctionnalités de support intéressantes,souvent appelé ``Help Desk''.
 Il permet de gérer toute forme de contrats : contrats clients ou fournisseurs, à échéance, par durée ou par coupons...
 
 \subsection{Description d'un contrat}
@@ -24,7 +24,7 @@ Label & Label ou titre du contrat\\
 \hline
 Numéro & Numéro de contrat\\ 
 \hline
-Privé & Visibilité d'un contrat qui peut être publique ou privée. Un contrat est alors visible par....\\
+Privé & Visibilité du contrat (publique ou privée)\\
 \hline
 Signature & Date de signature du contrat\\
 \hline
@@ -71,9 +71,9 @@ Kind & Catégorie où l'on retrouve les types des contrats qui ont été inséré via 
 \hline
 Contract type & Catégorie permettant de choisir entre les contrats de type Client ou Fournisseurs \\
 \hline
-Contract kind & Catégorie permettant de choisir entre les contracts de type Coupons ou Durée.
- Pour la catégorie Coupons, le champ avec le nombre de coupons du contract doit être renseigné.
- Pour la catégorie Durée, le champ avec la durée du support (heures) doit être renseigné \\
+Contract kind & Catégorie permettant de choisir entre les contrats de type Période, Coupons ou Durée.
+ Pour la catégorie Coupons, le champ avec le nombre de coupons du contrat doit être renseigné.
+ Pour la catégorie Durée, le champ avec la durée de support (heures) doit être renseigné \\
 \hline
 \end{tabular}
 
@@ -101,11 +101,11 @@ Le module \contract comporte  sous-menus (accessibles selon les droits d'accès) 
 \hline
 Chercher & Recherche multicritère des contrats \\
 \hline
-Nouveau & Créer un nouveau contrat.\\
+Nouveau & Créer un nouveau contrat\\
 \hline
-Consulter & Consulter les informations d'un contrat.\\
+Consulter & Consulter les informations d'un contrat\\
 \hline
-Modifier & Modifier les informations d'un contrat.\\
+Modifier & Modifier les informations d'un contrat\\
 \hline
 Exporter & Exporter les informations d'un contrat.\\
 \hline
@@ -123,7 +123,7 @@ Affichage & Personnalisation de l'affichage de la liste des contrats.\\
 Ce menu permet d'effectuer une recherche selon différents critères :
 
 \begin{itemize}
-\item Nunméro
+\item Numéro
 \item Société
 \item Date Expiration Avant
 \item Date Expiration Après
@@ -136,17 +136,17 @@ Ce menu permet d'effectuer une recherche selon différents critères :
 \item Archive
 \end{itemize}
 
-Il est possible d'inclure les contrats archivées dans les résultats de recherche.
+Il est possible d'inclure les contrats archivés dans les résultats de recherche.
 
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer un contrat.
+Ce menu permet de créer un contrat.\\
 
-Pour insérer le contrat saisi, il faut cliquer sur le bouton ``Enregistrer le contrat''.
+Pour insérer le contrat saisi, il faut cliquer sur le bouton ``Enregistrer le contrat''.\\
 
-Si des contrats similaires existent déjà (possédant un nom ressemblant, même racine), avant d'insérer le nouveau contrat, \obm affiche une page d'alerte présentant les contrats similaires et permet de continuer l'insertion ou de l'annuler.
-Ceci est particulièrement utile lorsque un contrat déjà existant est créé à nouveau, et permet d'éviter la saisie de doublons.
+Si des contrats similaires existent déjà (possédant un nom ressemblant, même racine), avant d'insérer le nouveau contrat, \obm affiche une page d'alerte présentant les contrats similaires et permet de continuer l'insertion ou de l'annuler.\\
+Ceci est particulièrement utile lorsque un contrat déjà existant est créé à nouveau, et permet d'éviter la saisie de doublons.\\
 
 
 \subsubsection{Le sous-menu : Consulter}
@@ -163,7 +163,7 @@ Pour valider les modifications effectuées, il faut cliquer sur le bouton ``Valid
 
 \subsubsection{Le sous-menu : Exporter}
 
-Ce menu permet l'export du contrat sur un format txt (l'export est aussi multilangue).
+Ce menu permet l'export du contrat sur un format .txt (l'export est aussi multilangue).
 
 
 \subsubsection{Le sous-menu : Supprimer}
@@ -171,7 +171,7 @@ Ce menu permet l'export du contrat sur un format txt (l'export est aussi multila
 Ce menu permet la vérification des liens du contrat et d'indiquer si celle-ci est supprimable.
 Si le contract peut être supprimé, un bouton ``Supprimer le contrat'' est alors affiché.
 
-\paragraph{Pour être supprimé}, un contrat ne doit pas :\\
+\paragraph{Pour être supprimé},un contrat ne doit pas :\\
 
 \begin{itemize}
 \item Avoir des incidents

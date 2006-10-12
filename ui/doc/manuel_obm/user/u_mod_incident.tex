@@ -9,14 +9,12 @@ révision : \obm 2.0
 
 \subsection{Présentation du module \incident}
 
-Ce module est une gestion des incidents d'un contract, souvent appelée \textbf{....} permettant de gérer les incidents des contracts avec les clients, fournisseurs, partenaires...\\
+Ce module est une gestion d'incidents d'un contract, souvent appelée \textbf{tickets} permettant de gérer les incidents des contracts avec les clients, fournisseurs, partenaires...\\
 
-Ce module \incident est utilisé seulement par le module Contrat.
+Ce module \incident est utilisé seulement par le module Contrat.\\
 
-
-De nombreux attributs permettent de décrire un incident.
-Afin de couvrir des utilisations diverses plusieurs attributs peuvent être désactivés et ne pas apparaître dans l'application.
-
+De nombreux attributs permettent de décrire un incident.\\
+Afin de couvrir des utilisations diverses plusieurs attributs peuvent être désactivés et ne pas apparaître dans l'application.\\
 
 \subsection{Description d'un incident}
 
@@ -32,15 +30,15 @@ Récepteur & Personne prévenue de l'incident\\
 \hline
 Responsable Technique & Responsable technique de l'incident\\
 \hline
-Archiver (selection si un incident doit etre achiver ou pas) & Etat d'archivage de l'incident\\
+Archiver & Etat d'archivage de l'incident\\
 \hline
 Contrat (liaison avec le contrat , selection de label du contrat) & Contrat sur lequel est intervenu l'incident\\
 \hline
-Priorité &  Décrit le niveau d'importance de l'incident\\
+Priorité & Niveau de priorité dans le traitement de l'incident\\
 \hline
 Etat & Etat de l'incident\\
 \hline
-Type de solution.\\
+Type de solution & Solution trouvée pour régler l'incident\\
 \hline
 Date & Date à laquelle l'incident a été detecté\\
 \hline
@@ -48,7 +46,7 @@ Durée totale de résolution. & Durée estimée pour la résolution de l'incident\\
 \hline
 Solution apportée & Solution trouvée pour réparer l'incident\\
 \hline
-Historique\\
+Historique & Historique de l'incident\\
 \hline
 Ajouter un commentaire & Commentaire sur l'état de l'incident. Ce commentaire est daté et signé par son auteur\\
 \hline
@@ -59,11 +57,12 @@ Durée de résolution (partielle) & Durée de résolution d'une des parties de l'inc
 \vspace{0.3cm}
 
 
-Plusieurs attributs peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application 
+Plusieurs attributs peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application.\\ 
 
 
 \subsubsection{Catégories d'un incident}
-composantes d'un incident\\
+
+Catégories d'un incident\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline \textbf{Code catégorie} & \textbf{Label catégorie} \\
@@ -73,6 +72,7 @@ Type de solution & Catégorie où se trouve les types des solutions qui ont ete in
 Priorité & Catégorie où se trouve les priorités qui ont été inserées dans le module administration.\\
 \hline
 Etat & Catégorie où se trouve les états qui ont été inserés dans le module administration.\\
+\hline
 \end{tabular}
 
 
@@ -144,7 +144,7 @@ Pour insérer l'incident saisi, il faut cliquer sur le bouton ``Enregistrer l'inc
 \subsubsection{Le sous-menu : Consulter}
 
 Ce menu permet de consulter la fiche d'un incident .
-Cet écran est aussi accessible depuis les résultats de recherche ou les liens depuis d'autres modules en cliquant sur l'incident sélectionné, ou immédiatement après l'insertion du nouveau incident.
+Cet écran est aussi accessible depuis les résultats de recherche ou à partir de liens depuis d'autres modules en cliquant sur l'incident sélectionné, ou immédiatement après l'insertion du nouveau incident.
 
 
 \subsubsection{Le sous-menu : Modifier}
@@ -173,4 +173,4 @@ Ce menu permet l'administration des informations annexes des incidents :\\
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des contrats. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramétrer l'affichage de la liste des incidents. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
