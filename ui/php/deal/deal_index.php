@@ -290,11 +290,11 @@ if ($action == "ext_get_id") {
   
 } elseif ($action == "kind_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_kind_links($params["kind"]);
+  $display["detail"] = dis_deal_kind_links($params["kind_id"]);
   
 } elseif ($action == "kind_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_kind_delete($params["kind"]);
+  $retour = run_query_deal_kind_delete($params["kind_id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_kind : $l_delete_ok");
   } else {
@@ -324,11 +324,11 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "status_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_deal_status_links($params["status"]);
+  $display["detail"] = dis_deal_status_links($params["status_id"]);
 
 } elseif ($action == "status_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_deal_status_delete($params["status"]);
+  $retour = run_query_deal_status_delete($params["status_id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg("$l_status : $l_delete_ok");
   } else {
@@ -532,7 +532,7 @@ function get_deal_params() {
     $cpt++;
   }
 
-  $params["status_order"] = (isset($params["order"]) ? $params["order"] : "0");
+  $params["order"] = (isset($params["order"]) ? $params["order"] : "0");
   
   get_global_params_document($params);
   
@@ -788,7 +788,7 @@ function get_deal_action() {
                                           );
 
   // Status Insert 
-  $actions["deal"]["status_status"] = array (
+  $actions["deal"]["status_insert"] = array (
     'Url'      => "$path/deal/deal_index.php?action=status_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 

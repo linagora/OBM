@@ -25,12 +25,12 @@ function run_query_deal_search($deal, $all="") {
   $name = sql_search_text_parse($deal["company_name"]);
   $zip = sql_search_text_parse($deal["zip"]);
   $archive = $deal["archive"];
-  $kind = $deal["kind"];
+  $kind = $deal["kind_id"];
   $region = $deal["region"];
   $tt = $deal["tasktype"];
   $cat1 = $deal["category1"];
   $role = $deal["role"];
-  $status = $deal["status"];
+  $status = $deal["status_id"];
   $manager = $deal["manager"];
   $date_field = ( $deal["date_field"] ? $deal["date_field"] : "datealarm");
   $date_after = $deal["date_after"];
@@ -271,7 +271,7 @@ function run_query_deal_insert($deal) {
   $dateend = ($deal["dateend"] ? "'".$deal["dateend"]."'" : "null");
   $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
-  $kind = $deal["kind"]; 
+  $kind = $deal["kind_id"]; 
   $region = $deal["region"]; 
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
@@ -289,7 +289,7 @@ function run_query_deal_insert($deal) {
   }
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
-  $status = $deal["status"];
+  $status = $deal["status_id"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $category1 = $deal["category1"];
@@ -426,7 +426,7 @@ function run_query_deal_update($deal) {
   $dateprop = ($deal["dateproposal"] ? "'".$deal["dateproposal"]."'" : "null");
   $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
-  $kind = $deal["kind"]; 
+  $kind = $deal["kind_id"]; 
   $region = $deal["region"]; 
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
@@ -444,7 +444,7 @@ function run_query_deal_update($deal) {
   }
   $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
   $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
-  $status = $deal["status"];
+  $status = $deal["status_id"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $comment = $deal["comment"];
@@ -639,7 +639,7 @@ function run_query_deal_quick_update($deal) {
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
   $dateexp = ($deal["dateexpected"] ? "'".$deal["dateexpected"]."'" : "null");
   $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
-  $status = $deal["status"];
+  $status = $deal["status_id"];
   $todo = $deal["todo"];
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
@@ -690,7 +690,7 @@ function run_query_deal_id($deal) {
   $label = $deal["label"];
   $priv = $deal["privacy"];
   $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
-  $kind = $deal["kind"];
+  $kind = $deal["kind_id"];
   $region = $deal["region"];
   $tt = $deal["tasktype"];
   $comp = $deal["company_id"];
@@ -702,10 +702,10 @@ function run_query_deal_id($deal) {
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "0");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "0");
   $datealarm = ($deal["datealarm"] ? "='".$deal["datealarm"]."'" : "is null");
-  $status = $deal["status"];
+  $status = $deal["status_id"];
   $todo = $deal["todo"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   // comment not searched because processed before stored in db
 
@@ -756,7 +756,7 @@ function run_query_deal_delete($id) {
 
   $archive = get_deal_archive($id);
   $comp_id = get_deal_company_id($id);
- 	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
  	
   // If deal archive status is off (0), update the company deal number
   if ($archive == '0') {
@@ -1164,7 +1164,7 @@ function run_query_deal_dashboard_list($deal, $users_id="") {
       AND deal_archive = '0'
       $where_uid
       $where_date
-			$multidomain
+      $multidomain
       $where_tt
     $orderq
     $limit
@@ -1615,9 +1615,9 @@ function run_query_deal_type() {
 function run_query_deal_kind_insert($deal) {
   global $auth, $cdg_sql, $obm;
 	
-  $label = $deal["kind_label"];
-  $inout = $deal["kind_inout"];
-	$domain_id = $obm["domain_id"];
+  $label = $deal["label"];
+  $inout = $deal["inout"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO DealType (dealtype_timeupdate,
     dealtype_timecreate,
@@ -1628,7 +1628,7 @@ function run_query_deal_kind_insert($deal) {
   VALUES (null,
     '".date("Y-m-d H:i:s")."',
     '".$auth->auth["uid"]."',
-		'$domain_id',
+    '$domain_id',
     '$label',
     '$inout')";
 
@@ -1648,17 +1648,18 @@ function run_query_deal_kind_insert($deal) {
 function run_query_deal_kind_update($deal) {
   global $auth, $cdg_sql;  
 
-  $label = $deal["kind_upd"];
-  $kind = $deal["kind"];
-  $inout = $deal["kind_inout"];
-	$multidomain = sql_multidomain("deal");
+  $label = $deal["label"];
+  $kind = $deal["kind_id"];
+  $inout = $deal["inout"];
+  $multidomain = sql_multidomain("deal");
 	
   $query = "UPDATE DealType SET
       dealtype_label='$label',
       dealtype_timeupdate='" .date("Y-m-d H:i:s") . "',
       dealtype_userupdate='" .$auth->auth["uid"] ."',
       dealtype_inout='$inout'
-    WHERE dealtype_id='$kind' $multidomain";
+    WHERE dealtype_id='$kind'
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_deal_kind_update()");
   $kind_q = new DB_OBM;
@@ -1735,22 +1736,22 @@ function run_query_deal_status_list() {
 function run_query_deal_status_insert($deal) {
   global $auth, $cdg_sql, $obm;
 	
-  $label = $deal["status_label"];
-  $order = $deal["status_order"];
+  $label = $deal["label"];
+  $order = $deal["order"];
   $hitrate = $deal["hitrate"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO DealStatus (dealstatus_timeupdate,
     dealstatus_timecreate,
     dealstatus_usercreate,
-		dealstatus_domain_id,
+    dealstatus_domain_id,
     dealstatus_label,
     dealstatus_order,
     dealstatus_hitrate)
   VALUES (null,
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
-		'$domain_id',
+    '$domain_id',
     '$label',
     '$order',
     '$hitrate')";
@@ -1771,11 +1772,11 @@ function run_query_deal_status_insert($deal) {
 function run_query_deal_status_update($deal) {
   global $auth, $cdg_sql;
 
-  $status = $deal["status"];
-  $label = $deal["status_label"];
-  $order = $deal["status_order"];
+  $status = $deal["status_id"];
+  $label = $deal["label"];
+  $order = $deal["order"];
   $hitrate = $deal["hitrate"];
-	$multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain("dealstatus");
 	
   $query = "UPDATE DealStatus SET
     dealstatus_label='$label',
@@ -1783,7 +1784,8 @@ function run_query_deal_status_update($deal) {
     dealstatus_userupdate='".$auth->auth["uid"]."',
     dealstatus_order='$order',
     dealstatus_hitrate='$hitrate'
-  WHERE dealstatus_id='$status' $multidomain";
+  WHERE dealstatus_id='$status'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_deal_status_update()");
   $obm_q = new DB_OBM;
@@ -1801,7 +1803,7 @@ function run_query_deal_status_update($deal) {
 function run_query_deal_status_delete($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain("dealstatus");
 
   $query = "DELETE FROM DealStatus WHERE dealstatus_id='$id' $multidomain";
 
@@ -1821,7 +1823,7 @@ function run_query_deal_status_delete($id) {
 function run_query_deal_status_links($s_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("deal");
+  $multidomain = sql_multidomain("deal");
 	
   $query = "SELECT deal_id, deal_label FROM Deal WHERE deal_status_id='$s_id' $multidomain";
 
@@ -1853,7 +1855,7 @@ function check_deal_form($did, $deal) {
   }
 
   // Check if the kind is filled
-  if ($deal["kind"] < 1) {
+  if ($deal["kind_id"] < 1) {
     $err_msg = $l_err_kind_empty;
     return false;
   }
@@ -2454,7 +2456,7 @@ function get_deal_parent_label($p_id) {
 function get_deal_parent_status($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("dealstatus");
+  $multidomain = sql_multidomain("dealstatus");
 
   // We order by dealstatus_id to get the min
   $query = "SELECT dealstatus_order, dealstatus_label

@@ -140,7 +140,7 @@ function check_parentdeal(f_parent) {
 // Check if the Deal Kind deletion is possible                               //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_checkdel(form) {
-   if (form.sel_kind.selectedIndex >= 0)
+   if (form.sel_kind_id.selectedIndex >= 0)
    {
      return true;
    } else {
@@ -154,7 +154,7 @@ function check_kind_checkdel(form) {
 // Check if the Deal Status deletion is possible                            //
 ///////////////////////////////////////////////////////////////////////////////
 function check_status_checkdel(form) {  
-   if (form.sel_status.selectedIndex >= 0)
+   if (form.sel_status_id.selectedIndex >= 0)
    { 
      return true;
    }
@@ -170,9 +170,9 @@ function check_status_checkdel(form) {
 // Check if the kind update is possible                                      //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_upd(form,formd) {
-  kind_pos = formd.sel_kind.selectedIndex;
-  if ((kind_pos >= 0) && (form.tf_kind.value != \"\")) {
-    form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
+  kind_pos = formd.sel_kind_id.selectedIndex;
+  if ((kind_pos >= 0) && (form.tf_label.value != \"\")) {
+    form.sel_kind_id.value=formd.sel_kind_id.options[kind_pos].value;
     return true;
    } else {
      alert(\"$l_j_kind_update\");
@@ -185,9 +185,9 @@ function check_kind_upd(form,formd) {
 // Check if the status update is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_status_upd(form,formd) {
-  status_pos = formd.sel_status.selectedIndex;
-  if ((status_pos >= 0) && (form.tf_status.value != \"\")) {
-    form.sel_status.value=formd.sel_status.options[status_pos].value;
+  status_pos = formd.sel_status_id.selectedIndex;
+  if ((status_pos >= 0) && (form.tf_label.value != \"\")) {
+    form.sel_status_id.value=formd.sel_status_id.options[status_pos].value;
     return true;
   } else {
     alert(\"$l_j_status_update\");
@@ -200,7 +200,7 @@ function check_status_upd(form,formd) {
 // Check if the Kind creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_new(form) {
-   if (form.tf_kind.value != \"\")
+   if (form.tf_label.value != \"\")
       return true;
    else
    {
@@ -236,7 +236,7 @@ function fill_ext_form2(int_form) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_status_new(form)
 {
-   if (form.tf_status.value != \"\")
+   if (form.tf_label.value != \"\")
       return true;
    else
    {
