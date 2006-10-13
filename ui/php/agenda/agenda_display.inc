@@ -2212,7 +2212,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   <div class=\"detailHead\">$l_desc</div>
   <table class=\"detail\">     
   <tr>    
-    <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_event_description\" rows=\"3\" cols=\"72\">$desc</textarea></td> 
+    <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_description\" rows=\"3\" cols=\"72\">$desc</textarea></td> 
   </tr>     
   </table>
 

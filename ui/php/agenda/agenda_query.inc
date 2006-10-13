@@ -401,7 +401,7 @@ function run_query_agenda_insert_event_data($agenda) {
   $title = $agenda["title"];
   $category1_id = $agenda["category1"];
   $priority = $agenda["priority"];
-  $description = $agenda["event_description"];
+  $description = $agenda["description"];
   $location = $agenda["location"];
   ($agenda["all_day"] != 1)?$all_day= '0':$all_day = '1';
   $datebegin = $agenda["date_begin"];
@@ -883,7 +883,7 @@ function run_query_agenda_update_event_data($agenda) {
   $title = $agenda["title"];
   $category1_id = $agenda["category1"];
   $priority = $agenda["priority"];
-  $description = $agenda["event_description"];
+  $description = $agenda["description"];
   $location = $agenda["location"];
   $datebegin = $agenda["date_begin"];
   $event_duration = $agenda["event_duration"];
