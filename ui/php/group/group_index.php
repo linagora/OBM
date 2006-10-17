@@ -373,7 +373,7 @@ function get_group_action() {
 
 // Ext get Ids : external Group selection
   $actions["group"]["ext_get_ids"] = array (
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	  );
 

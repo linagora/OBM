@@ -106,38 +106,37 @@ ALTER TABLE Subscription ALTER Column subscription_domain_id SET default 0;
 ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id integer;
 ALTER TABLE SubscriptionReception ALTER Column subscriptionreception_domain_id SET default 0;
 ALTER TABLE Document ADD Column document_domain_id integer;
-ET default 0;
 ALTER TABLE Document ALTER Column document_domain_id SET default 0;
-ALTER TABLE DocumentCategory1 ADD Column documentcategory1_domain_id integer default 0 after documentcategory1_id;
-ALTER TABLE DocumentCategory2 ADD Column documentcategory2_domain_id integer default 0 after documentcategory2_id;
-ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id integer default 0 after documentmimetype_id;
-ALTER TABLE DocumentEntity ADD Column documententity_domain_id integer default 0 first;
-ALTER TABLE Project ADD Column project_domain_id integer default 0 after project_id;
-ALTER TABLE ProjectTask ADD Column projecttask_domain_id integer default 0 after projecttask_id;
-ALTER TABLE ProjectRefTask ADD Column projectreftask_domain_id integer default 0 after projectreftask_id;
-ALTER TABLE ProjectUser ADD Column projectuser_domain_id integer default 0 after projectuser_id;
-ALTER TABLE ProjectStat ADD Column projectstat_domain_id integer default 0 first;
-ALTER TABLE TimeTask ADD Column timetask_domain_id integer default 0 after timetask_id;
-ALTER TABLE TaskType ADD Column tasktype_domain_id integer default 0 after tasktype_id;
-ALTER TABLE Contract ADD Column contract_domain_id integer default 0 after contract_id;
-ALTER TABLE ContractType ADD Column contracttype_domain_id integer default 0 after contracttype_id;
-ALTER TABLE ContractPriority ADD Column contractpriority_domain_id integer default 0 after contractpriority_id;
-ALTER TABLE ContractStatus ADD Column contractstatus_domain_id integer default 0 after contractstatus_id;
-ALTER TABLE Incident ADD Column incident_domain_id integer default 0 after incident_id;
-ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id integer default 0 after incidentpriority_id;
-ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id integer default 0 after incidentstatus_id;
-ALTER TABLE IncidentCategory1 ADD Column incidentcategory1_domain_id integer default 0 after incidentcategory1_id;
-ALTER TABLE IncidentCategory2 ADD Column incidentcategory2_domain_id integer default 0 after incidentcategory2_id;
-ALTER TABLE Invoice ADD Column invoice_domain_id integer default 0 after invoice_id;
-ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id integer default 0 after invoicestatus_id;
-ALTER TABLE Payment ADD Column payment_domain_id integer default 0 after payment_id;
-ALTER TABLE PaymentKind ADD Column paymentkind_domain_id integer default 0 after paymentkind_id;
-ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id integer default 0 first;
-ALTER TABLE Account ADD Column account_domain_id integer default 0 after account_id;
-ALTER TABLE UGroup ADD Column group_domain_id integer default 0 after group_id;
-ALTER TABLE Import ADD Column import_domain_id integer default 0 after import_id;
-ALTER TABLE Resource ADD Column resource_domain_id integer default 0 after resource_id;
-ALTER TABLE RGroup ADD Column rgroup_domain_id integer default 0 after rgroup_id;
+ALTER TABLE DocumentCategory1 ADD Column documentcategory1_domain_id integer default 0;
+ALTER TABLE DocumentCategory2 ADD Column documentcategory2_domain_id integer default 0;
+ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id integer default 0;
+ALTER TABLE DocumentEntity ADD Column documententity_domain_id integer default 0;
+ALTER TABLE Project ADD Column project_domain_id integer default 0;
+ALTER TABLE ProjectTask ADD Column projecttask_domain_id integer default 0;
+ALTER TABLE ProjectRefTask ADD Column projectreftask_domain_id integer default 0;
+ALTER TABLE ProjectUser ADD Column projectuser_domain_id integer default 0;
+ALTER TABLE ProjectStat ADD Column projectstat_domain_id integer default 0;
+ALTER TABLE TimeTask ADD Column timetask_domain_id integer default 0;
+ALTER TABLE TaskType ADD Column tasktype_domain_id integer default 0;
+ALTER TABLE Contract ADD Column contract_domain_id integer default 0;
+ALTER TABLE ContractType ADD Column contracttype_domain_id integer default 0;
+ALTER TABLE ContractPriority ADD Column contractpriority_domain_id integer default 0;
+ALTER TABLE ContractStatus ADD Column contractstatus_domain_id integer default 0;
+ALTER TABLE Incident ADD Column incident_domain_id integer default 0;
+ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id integer default 0;
+ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id integer default 0;
+ALTER TABLE IncidentCategory1 ADD Column incidentcategory1_domain_id integer default 0;
+ALTER TABLE IncidentCategory2 ADD Column incidentcategory2_domain_id integer default 0;
+ALTER TABLE Invoice ADD Column invoice_domain_id integer default 0;
+ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id integer default 0;
+ALTER TABLE Payment ADD Column payment_domain_id integer default 0;
+ALTER TABLE PaymentKind ADD Column paymentkind_domain_id integer default 0;
+ALTER TABLE PaymentInvoice ADD Column paymentinvoice_domain_id integer default 0;
+ALTER TABLE Account ADD Column account_domain_id integer default 0;
+ALTER TABLE UGroup ADD Column group_domain_id integer default 0;
+ALTER TABLE Import ADD Column import_domain_id integer default 0;
+ALTER TABLE Resource ADD Column resource_domain_id integer default 0;
+ALTER TABLE RGroup ADD Column rgroup_domain_id integer default 0;
 
 
 -------------------------------------------------------------------------------
@@ -164,19 +163,21 @@ CREATE TABLE Category (
 -- Table structure for table 'CategoryLink'
 --
 CREATE TABLE CategoryLink (
-  categorylink_category_id serial,
+  categorylink_category_id integer,
   categorylink_entity_id   integer,
   categorylink_category    varchar(24) NOT NULL default '',
   categorylink_entity      varchar(32) NOT NULL default '',
-  PRIMARY KEY (categorylink_category_id, categorylink_entity_id),
-  INDEX cat_idx_ent (categorylink_entity_id)
+  PRIMARY KEY (categorylink_category_id, categorylink_entity_id, categorylink_category, categorylink_entity)
 );
+CREATE INDEX cat_idx_ent ON CategoryLink (categorylink_entity_id);
+
 
 ---------------------------------------------------------------------------
 -- Update UserObm table
 ---------------------------------------------------------------------------
 ALTER TABLE UserObm ADD COLUMN userobm_education varchar(255);
 ALTER TABLE UserObm ALTER COLUMN userobm_education SET DEFAULT '';
+
 
 ---------------------------------------------------------------------------
 --Update Project table
@@ -190,10 +191,10 @@ ALTER TABLE Project ALTER COLUMN project_reference_desc SET DEFAULT '';
 ALTER TABLE Project ADD COLUMN project_reference_tech text;
 ALTER TABLE Project ALTER COLUMN project_reference_tech SET DEFAULT '';
 
+
 ----------------------------------------------------------------------------
 --Create CV table
 ----------------------------------------------------------------------------
-
 CREATE TABLE CV (
   cv_id              serial,
   cv_timeupdate      TIMESTAMP,
@@ -207,16 +208,17 @@ CREATE TABLE CV (
   PRIMARY KEY(cv_id)
 );
 
+
 ----------------------------------------------------------------------------
 --Create ProjectCV table
 ----------------------------------------------------------------------------
-
 CREATE TABLE ProjectCV (
   projectcv_project_id serial,
   projectcv_cv_id      integer,
   projectcv_role       varchar(128),
   PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
 );
+
 
 ----------------------------------------------------------------------------
 --Create DefaultOdtTemplate table

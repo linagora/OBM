@@ -101,8 +101,10 @@ function run_query_company_search($company) {
   }
 
   $userdata = of_userdata_query_search("company", $company);
-  $where .= " $and ". $userdata["where"];
-  $join_cat_user = $userdata["join"];
+  if ($userdata["where"] != "") {
+    $where .= " $and ". $userdata["where"];
+    $join_cat_user = $userdata["join"];
+  }
 
   if (($where != "") || ($where_name != "")) {
     $whereq = " WHERE $where_name $where $multidomain";

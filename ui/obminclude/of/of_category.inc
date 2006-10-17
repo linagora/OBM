@@ -318,11 +318,11 @@ function of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, 
 function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
   global $cgp_hide;
 
-  $l_cat = "l_${cat}"; 
+  $l_cat = "l_${cat}";
   global $$l_cat;
 
   if (! ($cgp_hide["$entity"]["$cat"] || $cgp_hide["$entity"]["$entity$cat"])) {
-  
+
     // Mode mono
     if ($mode == "mono") {
       // Mono Link
@@ -1426,7 +1426,7 @@ function of_userdata_dis_entity_consult($entity, $ent_id) {
   if (is_array($cgp_user[$entity]["category"])) {
     foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
       $cats = of_category_user_get_entitycategories($entity, "$cat_name", $ent_id);
-      $block_user .= of_category_dis_block_consult($entity, $cat_name, $cats);
+      $block_user .= of_category_dis_block_consult($entity, $cat_name, $cats, $one_cat["mode"]);
     }
   }
 
@@ -1443,20 +1443,56 @@ function of_userdata_dis_entity_consult($entity, $ent_id) {
 function of_userdata_dis_entity_form($entity, $ent_id) {
   global $cgp_user;
 
+  $cats = array();
   if (is_array($cgp_user[$entity]["category"])) {
     foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
       $mode = $one_cat["mode"];
       if ($mode == "mono") {
 	$cats = of_category_user_get_ordered($cat_name, $entity);
-	$cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	if ($ent_id > 0) {
+	  $cats_sel = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	  $cat_id = $cats_sel[0]["id"];
+	} else {
+	  $cat_id = "";
+	}
+	print_r($cats_sel);
       } else {
-	$cats = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	if ($ent_id > 0) {
+	  $cats = of_category_user_get_ordered($cat_name, $entity, $ent_id);
+	}
       }
-      $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat["mode"], $cats_sel[0]["id"], "undef");
+      $block_user .= of_category_user_dis_entity_form($entity, $cat_name, $cats, $one_cat["mode"], $cat_id, "undef");
     }
   }
 
   return $block_user;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Global User data form for an entity
+// Parameters:
+//   - $entity : entity
+//   - $id     : entity id
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_dis_hidden_fields($entity, $params) {
+  global $cgp_user;
+
+  $cats = array();
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      if (is_array($params[$cat_name])) {
+	foreach ($params[$cat_name] as $cat) {
+	  $block .= "<input type=\"hidden\" name=\"sel_${cat_name}[]\" value=\"$cat\" />";
+	}
+      } else {
+	$cat = $params[$cat_name];
+	$block .= "<input type=\"hidden\" name=\"sel_${cat_name}[]\" value=\"$cat\" />";
+      }
+    }
+  }
+
+  return $block;
 }
 
 

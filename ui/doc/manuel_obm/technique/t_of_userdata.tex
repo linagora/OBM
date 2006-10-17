@@ -57,6 +57,8 @@ L'implémentation dans un module nécessite en général l'appel des fonctions corre
 \hline
 \fonction{html\_module\_form()} & \fonction{of\_userdata\_dis\_entity\_form()} \\
 \hline
+\fonction{dis\_module\_warn\_insert()} & \fonction{of\_userdata\_dis\_hidden\_fields()} \\
+\hline
 \fonction{dis\_module\_admin\_form()} & \fonction{of\_userdata\_dis\_admin\_form()} \\
 \hline
 \fonction{run\_query\_module\_search()} & \fonction{of\_userdata\_query\_search()} \\
@@ -144,6 +146,33 @@ of_userdata_dis_entity_form($entity, $ent_id) {
 \$entity & entité (ex: ``company'', ``contact'',..)\\
 \hline
 \$ent\_id & Id de l'entité affichée\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String XHTML & Block de données formulaire\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_dis_hidden_fields($entity, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|p{13cm}|}{Fonction qui retourne les champs utilisateurs sous forme de champs caches pour un formulaire. Utilisé pour faire passer les information utilisateurs sur des écrans intermédiaires, ex : warning avant insertion}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\

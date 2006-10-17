@@ -1413,7 +1413,10 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     }
   }
 
+  $userdata = of_userdata_dis_hidden_fields("company", $company);
+
   $hidden_fields = "
+    $userdata
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
     <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
     <input type=\"hidden\" name=\"tf_siret\" value=\"$siret\" />
