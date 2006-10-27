@@ -373,7 +373,9 @@ function get_agenda_params() {
   $params = get_global_params("Entity");
 
   // Get agenda specific params
-  $params["group_view"] = $params["group_id"];
+  if ($params["group_view"] == "") {
+    $params["group_view"] = $params["group_id"];
+  }
 
   if (! isset ($params["date"])) {
     $params["date"] = isodate_format();
@@ -591,7 +593,7 @@ function get_agenda_action() {
   // Planning
   $actions["agenda"]["planning"] = array (
     'Name'     => $l_header_planning,
-    'Url'      => "$path/agenda/agenda_index.php?action=planning",
+    'Url'      => "$path/agenda/agenda_index.php?action=planning&amp;date=$date",
     'Right'    => $cright_read, 
     'Condition'=> array ('all') 
                                     	 );
@@ -599,7 +601,7 @@ function get_agenda_action() {
   // View Year
   $actions["agenda"]["view_year"] = array (
     'Name'     => $l_header_year,
-    'Url'      => "$path/agenda/agenda_index.php?action=view_year",
+    'Url'      => "$path/agenda/agenda_index.php?action=view_year&amp;date=$date",
     'Right'    => $cright_read,  
     'Condition'=> array ('all') 
                                     	    );
@@ -607,25 +609,25 @@ function get_agenda_action() {
   // View Month
   $actions["agenda"]["view_month"] = array (
     'Name'     => $l_header_month,
-    'Url'      => "$path/agenda/agenda_index.php?action=view_month",
-    'Right'    => $cright_read,  
-    'Condition'=> array ('all') 
+    'Url'      => "$path/agenda/agenda_index.php?action=view_month&amp;date",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
                                     	    );
 
   // View Week
   $actions["agenda"]["view_week"] = array (
     'Name'     => $l_header_week,
-    'Url'      => "$path/agenda/agenda_index.php?action=view_week",
-    'Right'    => $cright_read, 
-    'Condition'=> array ('all') 
+    'Url'      => "$path/agenda/agenda_index.php?action=view_week&amp;date=$date",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
                                     	  );
 
   // View Day
   $actions["agenda"]["view_day"] = array (
     'Name'     => $l_header_day,
-    'Url'      => "$path/agenda/agenda_index.php?action=view_day",
-    'Right'    => $cright_read, 
-    'Condition'=> array ('all') 
+    'Url'      => "$path/agenda/agenda_index.php?action=view_day&amp;date=$date",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
                                     	 );
 
   // Update

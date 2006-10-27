@@ -219,7 +219,7 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     </tr>";
   }
 
-  $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;sel_user_id[]=$uid\">$l_back_mono</a>";
+  $dis_back_myview = "<a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$uid&amp;date=$iso_date\">$l_back_mono</a>";
 
   $block = "
     <div class=\"block\">
@@ -241,6 +241,9 @@ function html_agenda_select_calendar_entity($new_action, $agenda, $calendar_enti
     </table>
 
     <form action=\"agenda_index.php\" method=\"get\">
+    <input type=\"hidden\" name=\"date\" value=\"$iso_date\" />
+    <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
+    <input type=\"hidden\" name=\"new_group\" value=\"1\" />
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     <table class=\"agendaCal\">
@@ -636,8 +639,12 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
   $ts_date = strtotime($iso_date);  
   $this_month = get_month($ts_date);
   $this_year = get_year($ts_date);
-  $start_time = get_agenda_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
-  $end_time = strtotime("+1 month +6 days", $start_time);
+  $start_month = strtotime("$this_year-$this_month-01");
+  $start_time = get_agenda_date_day_of_week($start_month, $cagenda_weekstart);
+  // days to add to first day displayed to complete month view
+  // 6 (to have complete month) + first days of next month
+  $nb_days_next_month = 6 + (($start_month - $start_time) / 86400);
+  $end_time = strtotime("+1 month +$nb_days_next_month days", $start_time);
   $next_month = isodate_format(strtotime("+1 month",$ts_date));
   $prev_month = isodate_format(strtotime("-1 month",$ts_date));
 
@@ -649,7 +656,7 @@ function dis_agenda_month_planning($agenda, $calendar_entity) {
   $nb_ent = $nb_user + $nb_res;
   $td_width = floor(100 / $nb_ent)."px";
    
-  $events = agenda_events_model($start_time,$end_time, $calendar_entity);
+  $events = agenda_events_model($start_time, $end_time, $calendar_entity);
 
   // Display the day of a week
   for ($i=0; $i<7; $i++) {
@@ -1840,7 +1847,7 @@ function html_agenda_event_form($action, $agenda, $event_q, $users, $res, $group
   if (isset($agenda["category1"])) { $cat1 = $agenda["category1"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
   if (isset($agenda["description"])) { $desc = stripslashes($agenda["description"]); }
-  if (isset($agenda["allday"])) { $all_day = $agenda["allday"]; }
+  if (isset($agenda["all_day"])) { $all_day = $agenda["all_day"]; }
   if (isset($agenda["repeatfrequency"])) { $repeatfrequency = $agenda["repeatfrequency"]; }  
   if (isset($agenda["date_begin"])) {
     $ts = isodatetime_to_timestamp($agenda["date_begin"]);
@@ -2525,17 +2532,16 @@ function html_agenda_waiting_events($obm_wait) {
 //   - $agenda:
 ///////////////////////////////////////////////////////////////////////////////
 function html_agenda_dis_delete($agenda) {
-  global $uid, $auth, $set_theme, $ico_validate,$ico_cancel,$ico_confirm_mail;
+  global $uid, $perm, $set_theme, $ico_validate,$ico_cancel,$ico_confirm_mail;
   global $display, $l_confirm_delete,$l_confirm,$l_cancel,$l_confirm_mail;
-  global $l_event_cant_delete, $perms_admin;
+  global $l_event_cant_delete, $module, $cright_write_admin;
 
-  $perms = $auth->auth["perm"];
   $iso_date = $agenda["date"];
   $event_id = $agenda["agenda_id"];
   $e = get_agenda_event_info($event_id);
   $usercreate = $e["usercreate"];
 
-  if (($uid != $usercreate) && ($perms != $perms_admin)) {
+  if (($uid != $usercreate) && (! $perm->check_right($module, $cright_write_admin))) {
     $display["msg"] = display_warn_msg($l_event_cant_delete);
     return;
   }
@@ -2800,7 +2806,7 @@ function dis_agenda_free_interval($agenda, $entity_store) {
   global $cagenda_weekstart, $cagenda_first_hour, $cagenda_last_hour;
   global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;              
 
-  $iso_date = $agenda["date"];
+  $iso_date = $agenda["date_begin"];
   $ts_date = strtotime($iso_date);
   $time_unit = 60 / $set_cal_interval; 
   $time_unit_sec = 3600 / $set_cal_interval;; 
