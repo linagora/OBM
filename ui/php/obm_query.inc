@@ -60,6 +60,75 @@ function run_query_days_unfilled() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the number of leads according to date ranges and users
+// Parameters:
+//   - $date_ranges : ranges to return array(array("2006-10-18",2006-10-22")..
+//   - $user_ids    : array of User id
+// Returns:
+//     array : [total], [alarm], [no_alarm], [0]=#range 0, [n] = range[n]...
+///////////////////////////////////////////////////////////////////////////////
+function run_query_lead_time_range($date_ranges, $user_ids=array()) {
+  global $cdg_sql, $cdg_param;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $date = sql_date_format($db_type, "lead_date", "date");
+  $datealarm = sql_date_format($db_type, "lead_datealarm", "datealarm");
+
+  // Manager filter
+  if ((is_array($user_ids)) && (count($user_ids)>0)) {
+    $w_user .= " AND (";
+    $or = "";
+    foreach ($user_ids as $u_id) {
+      $w_user .= "$or lead_manager_id='$u_id'";
+      $or = " OR";
+    }
+    $w_user .= ")";
+  }
+
+  $query = "SELECT
+      lead_id,
+      $date,
+      $datealarm
+    FROM Lead
+    WHERE 1=1 $w_user
+";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_lead_time_range()");
+  $obm_q->query($query);
+  $today = strtotime(date("Ymd"));
+
+  foreach($date_ranges as $num => $range) {
+    $ts_date_ranges[$num] = array (strtotime($range[0]), strtotime($range[1]));
+  }
+
+  $res["alarm"] = 0;
+  $res["no_alarm"] = 0;
+  $res["total"] = 0;
+  while ($obm_q->next_record()) {
+    $date = $obm_q->f("date");
+    $datealarm = $obm_q->f("datealarm");
+    foreach($ts_date_ranges as $num => $range) {
+      if (($date >= $range[0]) && ($date <= $range[1])) {
+	$res["date"][$num]++;
+      }
+    }
+    if ($datealarm != "") {
+      if  ($datealarm <= $today) {
+	$res["alarm"]++;
+      }
+    } else {
+      $res["no_alarm"]++;
+    }
+  }
+
+  $res["total"] = $obm_q->num_rows();
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the number of active deal by status for one user
 // Parameters:
 //   - $user_id : User id

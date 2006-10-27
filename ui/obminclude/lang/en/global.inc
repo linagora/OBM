@@ -30,6 +30,7 @@ $l_all = "All";
 $l_all_f = "All";
 $l_none = "---";
 $l_undef = "---";
+$l_without = "Without";
 $l_id = "Id";
 $l_comment = "Comment";
 $l_add_comment = "Add a comment";
@@ -183,6 +184,11 @@ $l_tt_research = "Internal Projects";
 $l_tt_others = "Not Factured Tasks";
 
 // Days and months
+$l_day = "Day";
+$l_days = "days";
+$l_week = "Week";
+$l_month = "Month";
+$l_year = "Year";
 $l_today = "Today";
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
 $l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
@@ -212,7 +218,7 @@ $l_module_cv  = "CV";
 $l_module_todo    = "Todo";
 $l_module_publication = "Publications";
 $l_module_statistic = "Statistics";
-$l_module_domain = "Domain";
+$l_module_domain = "Domains";
 
 $l_module_time = "Time management";
 $l_module_project = "Projects";
@@ -346,6 +352,9 @@ $l_waiting_events = "Waiting event(s)";
 $l_unfilled = "Day(s) unfilled";
 $l_my_agenda = "My calendar";
 $l_my_time = "My time management";
+
+$l_my_lead = "My leads";
+$l_late = "Late";
 
 $l_my_deal_current = "My current deals";
 $l_my_deal = "My deals";

@@ -229,9 +229,9 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "statistics") {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lang/$set_lang/statistic.inc");
-  // Specific site statistics lang file
-  if ($cgp_site_include) {
-    $lang_file = "$obminclude/site/lang/$set_lang/statistic.inc";
+  // Specific conf statistics lang file
+  if ($conf_lang) {
+    $lang_file = "$obminclude/conf/lang/$set_lang/statistic.inc";
     if (file_exists("$path/../".$lang_file)) {
       include("$lang_file");
     }

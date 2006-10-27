@@ -109,7 +109,6 @@ $l_contact_display = "Options d'affichage des listes de contacts";
 $l_timecreate = "Date de Création";
 $l_timeupdate = "Date de Mise à jour";
 $l_publication_title = "Titre";
-$l_year = "Année";
 $l_renewal = "Renouvellement automatique";
 $l_quantity = "Quantité";
 $l_recept = "Mode de réception";

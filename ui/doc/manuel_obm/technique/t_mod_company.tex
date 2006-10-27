@@ -11,17 +11,15 @@ Le module \company d'\obm.\\
 
 \subsection{Organisation de la base de données}
 
-Le module \company utilise 6 tables :
+Le module \company utilise 4 tables :
 \begin{itemize}
  \item Company
  \item CompanyActivity
- \item CompanyCategory
- \item CompanyCategory1Link
  \item CompanyNafCode
  \item CompanyType
 \end{itemize}
 
-\subsection{Company}
+\subsubsection{Company}
 Table principale des informations d'une entreprise. \\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
@@ -97,7 +95,7 @@ Table principale des informations d'une entreprise. \\
 \end{tabular}
 
 
-\subsection{CompanyActivity}
+\subsubsection{CompanyActivity}
 
 Table de référence des activités d'une entreprise.\\
 
@@ -123,10 +121,8 @@ Table de référence des activités d'une entreprise.\\
 \hline
 \end{tabular}
 
-\subsubsection{Remarques}
 
-
-\subsection{CompanyType}
+\subsubsection{CompanyType}
 
 Table de référence des types d'entreprise.
 
@@ -147,47 +143,6 @@ Table de référence des types d'entreprise.
 \_code & varchar 10 & Code du type & \\
 \hline
 \_label & char 12 & Label du type & \\
-\hline
-\end{tabular}
-
-\subsubsection{Remarques}
-
-
-
-\subsection{CompanyCategory1}
-Table des catégories d'entreprise. Une entreprise peut être reliée à plusieurs catégories.\\
-
-\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
-\hline
-\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
-\hline
-\_id & int 8 & Identifiant & Clé primaire \\
-\hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
-\hline
-\_timecreate & timestamp 14 & Date de création & \\
-\hline
-\_userupdate & int 8 & Id du modificateur & \\
-\hline
-\_usercreate & int 8 & Id du createur & \\
-\hline
-\_code & int 10 & Code de la catégorie & \\
-\hline
-\_label & varchar 100 & Label de la catégorie & \\
-\hline
-\end{tabular}
-
-
-\subsubsection{CompanyCategory1Link}
-Table de liaison entre les entreprises et les catégories d'entreprise.\\
-
-\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
-\hline
-\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
-\hline
-\_category\_id & int 8 & Référence à la catégorie & \\
-\hline
-\_company\_id & int 8 & Référence à l'entreprise & \\
 \hline
 \end{tabular}
 

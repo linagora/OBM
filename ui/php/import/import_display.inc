@@ -460,7 +460,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 //   - $import[] : import hash values
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_file_import($import_q, $import) {
-  global $ccsvd_tab, $l_test_file, $l_import_file;
+  global $cgp_user, $ccsvd_tab, $l_test_file, $l_import_file;
   global $l_company, $l_contact, $l_info, $l_result;
   global $l_similar_company, $l_similar_contact, $l_contact_defaultname;
   global $l_company_defaultname, $ccsvd_tab;
@@ -497,9 +497,16 @@ function html_import_file_import($import_q, $import) {
     $title = "$l_import_file : $file_name";
     // Get the country hash : countries["name"] = $id
     $countries = get_import_country_hash();
-    $cats1 = get_import_companycategory1_hash();
     $kinds = get_import_kind_hash();
     $functions = get_import_function_hash();
+
+    // User data categories handling
+    if (is_array($cgp_user["company"]["category"])) {
+      foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+	$hash = get_import_category_user_hash($cat_name);
+	$userdata["company"]["category"][$cat_name] = $hash;
+      }
+    }
   }
     
   $map = get_import_field_mapping($import_q);
@@ -538,7 +545,7 @@ function html_import_file_import($import_q, $import) {
     // Test user decision
     // Insert the new company
     if ($conflict_action == "company_insert") {
-      $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats1);
+      $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $userdata);
       $nb_comp_ins++;
 
       // If contact, insert
@@ -552,7 +559,7 @@ function html_import_file_import($import_q, $import) {
               || ($conflict_action == "company_update")) {
 
       if ($conflict_action == "company_update") {
-	run_query_import_company_update($import_q, $fields, $map["default"], $countries, $cats1, $company_id);
+	run_query_import_company_update($import_q, $fields, $map["default"], $countries, $userdata, $company_id);
 	$nb_comp_upd++;
       }
 
@@ -697,7 +704,7 @@ function html_import_file_import($import_q, $import) {
 	  // Auto or Normal mode (Interactive)
 	} else {
 	  // Insert the company
-	  $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats1);
+	  $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $userdata);
 	  $nb_comp_ins++;
 	  // If row has a contact
 	  if (import_row_has_contact($fields)) {
@@ -948,11 +955,11 @@ function display_import_log_line($log, $fields, $comps) {
 //   - $usr_q    : database object with userobm list
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
-  global $display, $c_undef, $l_undef, $l_insert, $l_update, $l_back;
+  global $cgp_user, $display, $c_undef, $l_undef, $l_insert, $l_update, $l_back;
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
-  global $l_company, $l_number, $l_category1, $l_address, $l_postcode, $l_town;
+  global $l_company, $l_number, $l_address, $l_postcode, $l_town;
   global $l_expresspostal, $l_lang, $l_country, $l_mailing_ok_msg;
   global $l_phone, $l_fax, $l_web, $l_email, $l_mailing_ok, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_function, $l_title, $l_hphone, $l_mphone;
@@ -1004,6 +1011,27 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 
   if ($sep == $ccsvd_tab) $csvd_tab = "checked";
   else $csvd_sc = "checked";
+
+  // User data categories handling
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $field = "comp_${cat_name}";
+      $value = $$field;
+      $field_d = "comp_${cat_name}_d";
+      $value_d = $$field_d;
+      global ${"l_$cat_name"};
+      $cat_label = ${"l_$cat_name"};
+
+      $dis_userdata .= "
+  <tr>
+    <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_$field\" value=\"$value\" /></td>
+    <td class=\"detailLabel\">$cat_label</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_${field}_d\" value=\"$value_d\" /></td>
+  </tr>";
+    }
+  }
 
   $url = url_prepare("import_index.php");
   $display["title"] = "<div class=\"title\">$l_import : $name</div>";
@@ -1063,13 +1091,6 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td class=\"detailLabel\">$l_number</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_comp_num_d\" value=\"$comp_num_d\" /></td>
-  </tr>
-  <tr>
-    <td class=\"detailForm\">
-      <input type=\"text\" size=\"3\" name=\"tf_comp_cat1\" value=\"$comp_cat1\" /></td>
-    <td class=\"detailLabel\">$l_category1</td>
-    <td class=\"detailForm\">
-      <input type=\"text\" name=\"tf_comp_cat1_d\" value=\"$comp_cat1_d\" /></td>
   </tr>
   <tr>
     <td class=\"detailForm\">
@@ -1155,9 +1176,12 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_comp_com_d\" value=\"$comp_com_d\" /></td>
   </tr>
+  $dis_userdata
+
   <tr>
     <td class=\"detailHead\" colspan=\"3\">$l_contact</td>
   </tr>
+
   <tr>
     <td class=\"detailForm\">
       <input type=\"text\" size=\"3\" name=\"tf_con_ln\" value=\"$con_ln\" /></td>

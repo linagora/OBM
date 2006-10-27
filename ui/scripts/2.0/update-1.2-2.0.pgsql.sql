@@ -35,6 +35,7 @@ CREATE TABLE Domain (
 --
 ALTER TABLE UserObm ADD Column userobm_domain_id integer;
 ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET DEFAULT 0;
+UPDATE UserObm SET userobm_domain_id=0;
 ALTER TABLE DataSource ADD Column datasource_domain_id integer;
 ALTER TABLE DataSource ALTER COLUMN datasource_domain_id SET DEFAULT 0;
 ALTER TABLE Country ADD Column country_domain_id integer;

@@ -14,7 +14,6 @@ $l_renew = "Renovacion Automática";
 $l_recept = "Modo de Recepción";
 $l_reception = "Modo de Recepción"; 
 $l_publication_type = "Tipo de Publicación";
-$l_year= "Año";
 $l_quantity = "Cantidad";
 $l_header_new_auto = "Renovación";
 

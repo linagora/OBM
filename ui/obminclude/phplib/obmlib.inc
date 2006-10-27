@@ -148,11 +148,17 @@ class OBM_Challenge_Auth extends Auth {
     global $obmdb_dbtype, $challenge, $auth_encryption, $password_encryption;
     global $params, $c_multidomain, $c_default_domain;
 
-    $login_form = "$obminclude/auth/crloginform.ihtml";
+    $login_page = "$obminclude/auth/crloginform.ihtml";
+    $login_page = "$obminclude/themes/login.inc";
+    if (file_exists("$path/../$login_page")) {
+      echo "TTTTTTTTTTTTT";
+    } else {
+      echo "RRRRRRRRRR $path/$login_page";
+    }
     $challenge = md5(uniqid($this->magic));
     $sess->register("challenge");
     
-    include($login_form);
+    include($login_page);
   }
   
   function auth_validatelogin() {

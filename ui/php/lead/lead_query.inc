@@ -13,7 +13,7 @@
 //   - $lead[]       : lead search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_search($params) {
-  global $cdg_sql, $c_all, $ctu_sql_limit;
+  global $cdg_sql, $c_all, $c_null, $ctu_sql_limit;
 
   $sql_order_dir = $params["sql_order_dir"];
   $sql_order_field = $params["sql_order_field"];
@@ -22,6 +22,7 @@ function run_query_lead_search($params) {
   $company = sql_search_text_parse($params["company"]);
   $date_after = $params["date_after"];
   $date_before = $params["date_before"];
+  $date_field = $params["date_field"] ? $params["date_field"] : "date";
   $source = $params["source"];
   $manager = $params["manager_id"];
   $archive = $params["archive"];
@@ -30,7 +31,7 @@ function run_query_lead_search($params) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-	$multidomain = sql_multidomain("lead");
+  $multidomain = sql_multidomain("lead");
 	
   $date = sql_date_format($db_type, "lead_date", "date");
   $datealarm = sql_date_format($db_type, "lead_datealarm", "datealarm");
@@ -54,13 +55,17 @@ function run_query_lead_search($params) {
     $join_comp = "LEFT JOIN Company ON lead_company_id=company_id";
     $and = "AND";
   }
-  if ($date_after) {
-    $where .= " $and lead_date >= '$date_after'";
-    $and = "AND";
-  }
-  if ($date_before) {
-    $where .= " $and lead_date <= '$date_before'";
-    $and = "AND";
+  if (($date_after == "$c_null") || ($date_before == "$c_null")) {
+    $where .= " $and lead_$date_field is NULL";
+  } else {
+    if ($date_after) {
+      $where .= " $and lead_$date_field >= '$date_after'";
+      $and = "AND";
+    }
+    if ($date_before) {
+      $where .= " $and lead_$date_field <= '$date_before'";
+      $and = "AND";
+    }
   }
   if (($source != "") && ($source != "$c_all")) {
     $where .= " $and lead_source_id = '$source'";

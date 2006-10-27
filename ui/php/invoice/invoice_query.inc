@@ -39,7 +39,7 @@ function run_query_invoice_search ($invoice) {
   $limit = sql_limit($db_type);
   $date = sql_date_format($db_type, "invoice_date", "date");
   $dateexp = sql_date_format($db_type, "invoice_expiration_date", "expiration_date");
-	$multidomain = sql_multidomain("invoice");
+  $multidomain = sql_multidomain("invoice");
 	
   $where = "1=1 $multidomain";
   
@@ -167,7 +167,7 @@ function run_query_invoice_detail($p_invoice_id) {
   $datemodif = sql_date_format($db_type, "invoice_timeupdate", "datemodif");
   $timeupdate = sql_date_format($db_type, "invoice_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "invoice_timecreate", "timecreate");
-	$multidomain = sql_multidomain("invoice");
+  $multidomain = sql_multidomain("invoice");
 	
   // XXXXX ???? exporter le calcul des paiements a par (pour eviter group by)
   $query = "SELECT Invoice.*,
@@ -218,7 +218,7 @@ function run_query_invoice_insert($invoice) {
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -251,11 +251,11 @@ function run_query_invoice_insert($invoice) {
   $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');
 
   $query = "INSERT INTO Invoice (
+      invoice_domain_id,
       invoice_timeupdate,
       invoice_timecreate,
       invoice_userupdate,
       invoice_usercreate,
-			invoice_domain_id,
       invoice_company_id,
       invoice_deal_id,
       invoice_project_id,
@@ -271,11 +271,11 @@ function run_query_invoice_insert($invoice) {
       invoice_inout,
       invoice_archive)
     VALUES (
+     '$domain_id',
       null,
      '$now',
      null,
      '$uid',
-		 '$domain_id',
      '$comp_id',
      '$deal_id',
      '$project_new_id',
@@ -339,7 +339,7 @@ function run_query_invoice_update($invoice) {
   if ($project_new_id < 1) { $project_new_id = $invoice["project_id"]; }
   if ($project_new_id == "") { $project_new_id = "0"; }
 
-	$multidomain = sql_multidomain("invoice");
+  $multidomain = sql_multidomain("invoice");
 
   $query = "UPDATE Invoice SET
       invoice_timeupdate='$now',
@@ -430,7 +430,7 @@ function get_invoice_payment ($p_invoice, $not_paid=0) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, "payment_date", "payment_date");
-	$multidomain = sql_multidomain("paymentinvoice");
+  $multidomain = sql_multidomain("paymentinvoice");
 	
   $query = "SELECT
       paymentinvoice_amount,
@@ -621,7 +621,7 @@ function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $s
   $db_type = $obm_q->type;
   $da = sql_date_format($db_type, "invoice_date", "date");
   $de = sql_date_format($db_type, "invoice_expiration_date", "expiration_date");
-	$multidomain = sql_multidomain("invoice");
+  $multidomain = sql_multidomain("invoice");
 	
   if (is_array($date_ranges)) {
     $w_date = "AND ";

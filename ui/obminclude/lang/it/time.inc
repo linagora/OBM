@@ -15,7 +15,6 @@ $l_delete = "Elimina  Operazioni";
 $l_length = "Durata";
 $l_total_length = "Durata totale";
 $l_task_del = "Elimina.";
-$l_week = "Settimana";
 $l_user = "Utente";
 $l_see = "Vedi";
 $l_valid = "Conferma";

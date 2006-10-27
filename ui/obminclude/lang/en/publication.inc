@@ -10,7 +10,6 @@
 // Database fields
 $l_publication_title = "Publication Title";
 $l_type = "Type";
-$l_year= "Year";
 $l_market = "Marketing manager";
 $l_header_new_auto = "Renewal";
 // Labels and texts

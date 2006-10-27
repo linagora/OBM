@@ -171,7 +171,7 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_name[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_name.value+'\" />';
     i++;
   } else {
-    defaultCell.innerHTML +='<input type=\"hidden\" name=\"tf_company_name[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_name[]\" value=\"\" />';
   }
 
   if (form.sel_company_country_iso3166.value != '') {  
@@ -182,7 +182,7 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<select name=\"sel_company_country_iso3166[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_country_iso3166[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_company_country_iso3166[]\" value=\"\" />';
   }
 
   if (form.tf_company_zipcode.value != '') {    
@@ -192,7 +192,7 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_zipcode[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_zipcode.value+'\" />';
     i++;
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_zipcode[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_zipcode[]\" value=\"\" />';
   }
 
   if (form.tf_company_town.value != '') {    
@@ -202,7 +202,7 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_town[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_town.value+'\" />';
     i++;
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_town[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_town[]\" value=\"\" />';
   }
 
   if (form.tf_company_timeafter.value != '') {    
@@ -212,7 +212,7 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timeafter.value+'\" />';
     i++;
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timeafter[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_timeafter[]\" value=\"\" />';
   }
 
   if (form.tf_company_timebefore.value != '') {    
@@ -222,7 +222,7 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timebefore.value+'\" />';
     i++;
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timebefore[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_timebefore[]\" value=\"\" />';
   }
   
   if (form.sel_company_marketingmanager_id.value != '') {  
@@ -233,20 +233,9 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<select name=\"sel_company_marketingmanager_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_marketingmanager_id[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_company_marketingmanager_id[]\" value=\"\" />';
   }
-   
-  if (form.sel_companycategory1_code.value != '') {  
-    cell = labels.insertCell(i);
-    cell.innerHTML = '$l_company: $l_category'; 
-    cell = values.insertCell(i);
-    field = form.sel_companycategory1_code;
-    cell.innerHTML = '<select name=\"sel_companycategory1_code[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
-  } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_companycategory1_code[]\" value=\"\" />';
-  }   
-  
+
   if (form.sel_company_datasource_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_datasource'; 
@@ -255,8 +244,33 @@ function company_criterion(form,labels,values,i) {
     cell.innerHTML = '<select name=\"sel_company_datasource_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_datasource_id[]\" value=\"\" />';
-  }   
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_company_datasource_id[]\" value=\"\" />';
+  }
+";
+
+// User data categories handling
+if (is_array($cgp_user["company"]["category"])) {
+  foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+    $cat_code = "${cat_name}_code";
+    $cat_label = ${"l_$cat_name"};
+
+    $extra_js .= "
+
+  if (form.sel_$cat_code.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_company: $cat_label'; 
+    cell = values.insertCell(i);
+    field = form.sel_$cat_code;
+    cell.innerHTML = '<select name=\"sel_${cat_code}[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  } else {
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_${cat_code}[]\" value=\"\" />';
+  }
+";
+  }
+}
+
+$extra_js .= "
   return i;
 }
 

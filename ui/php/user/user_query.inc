@@ -353,7 +353,9 @@ function run_query_user_delete($p_id) {
 
   $multidomain = sql_multidomain("userobm");
 
-  $query = "DELETE FROM UserObm WHERE userobm_id='$p_id' $multidomain";
+  $query = "DELETE FROM UserObm
+    WHERE userobm_id='$p_id'
+      $multidomain";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -670,6 +672,9 @@ function run_query_user_delete_profile($param_user)  {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
+
+  // Unsubscribe from all groups
+  $retour = run_query_user_unsubscribe_all_groups($param_user);    
 
   // Delete all user prefs
   $query = "DELETE FROM UserObmPref WHERE userobmpref_user_id='$param_user'"; 

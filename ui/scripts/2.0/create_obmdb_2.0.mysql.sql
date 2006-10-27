@@ -270,33 +270,6 @@ CREATE TABLE Company (
 );
 
 
---
--- Table structure for table 'CompanyCategory1'
---
-CREATE TABLE CompanyCategory1 (
-  companycategory1_id          int(8) auto_increment,
-  companycategory1_domain_id   int(8) default 0,
-  companycategory1_timeupdate  timestamp(14),
-  companycategory1_timecreate  timestamp(14),
-  companycategory1_userupdate  int(8) NOT NULL default 0,
-  companycategory1_usercreate  int(8) NOT NULL default 0,
-  companycategory1_code        varchar(10) NOT NULL default '',
-  companycategory1_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (companycategory1_id)
-);
-
-
---
--- Table structure for table 'CompanyCategory1Link'
---
-CREATE TABLE CompanyCategory1Link (
-  companycategory1link_category_id  int(8) NOT NULL default 0,
-  companycategory1link_company_id   int(8) NOT NULL default 0,
-  PRIMARY KEY (companycategory1link_category_id,companycategory1link_company_id),
-  INDEX compcat1_idx_comp (companycategory1link_company_id)
-);
-
-
 -------------------------------------------------------------------------------
 -- Contact module tables
 -------------------------------------------------------------------------------

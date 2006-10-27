@@ -563,11 +563,11 @@ function get_import_similar_company($fields, $map) {
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $cats1[]      : CompanyCategory1 hash
+//   - $userdata[]  : Userdata hash array [company|contact][category][$cat_name]
 // Returns
 //   Id of the company inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$cats1) {
+function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$userdata) {
   global $auth, $cdg_sql, $field_size;
 
   $uid = $auth->auth["uid"];
@@ -614,7 +614,8 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $email = $fields["comp_mail"];
   $com = addslashes($fields["comp_com"]);
 
-  $query = "INSERT INTO Company (company_timeupdate,
+  $query = "INSERT INTO Company (
+    company_timeupdate,
     company_timecreate,
     company_userupdate,
     company_usercreate,
@@ -661,7 +662,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     '$email',
     '$com')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_company_insert(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -674,25 +675,21 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
         and company_zipcode = '$zip'
         and company_town = '$town'";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_company_insert(2)");
   $obm_q->query($query);
   $obm_q->next_record();
   $id = $obm_q->f("id");
 
-  // Set the category if given
-  $cat1 = $cats1[$fields["comp_cat1"]];
-  if ($cat1 != "") {
-
-    $query = "INSERT INTO CompanyCategory1Link (
-        companycategory1link_company_id,
-	companycategory1link_category_id)
-      VALUES (
-        '$id',
-        '$cat1')";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
+  if ($id > 0) {
+    // User data handling
+    if (is_array($userdata["company"]["category"])) {
+      foreach($userdata["company"]["category"] as $cat_name => $hash) {
+	$param_values[$cat_name] = $hash[$fields["comp_$cat_name"]];
+      }
+      $ret = of_userdata_query_update("company", $id, $param_values);
+    }
   }
-  
+
   return $id;
 }
 
@@ -704,10 +701,10 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
-//   - $cats1[]      : CompanyCategory1 hash
+//   - $userdata[]  : Userdata hash array [company|contact][category][$cat_name]
 //   - $company_id  : Company id to update
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$cats1, $company_id) {
+function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$userdata, $company_id) {
   global $auth, $cdg_sql, $field_size;
 
   $uid = $auth->auth["uid"];
@@ -772,31 +769,18 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     company_comment='$com'
   WHERE company_id='$company_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_import_company_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  // Set the category if given
-  $cat1 = $cats1[$fields["comp_cat1"]];
-  if ($cat1 != "") {
-
-    $query = "DELETE
-      FROM CompanyCategory1Link
-      WHERE companycategory1link_company_id='$company_id'
-        AND companycategory1link_category_id='$cat1'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
-  
-    $query = "INSERT INTO CompanyCategory1Link (
-        companycategory1link_company_id,
-        companycategory1link_category_id)
-      VALUES (
-          '$company_id',
-          '$cat1')";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
+  // User data handling
+  if (is_array($userdata["company"]["category"])) {
+    foreach($userdata["company"]["category"] as $cat_name => $hash) {
+      $param_values[$cat_name] = $hash[$fields["comp_$cat_name"]];
+    }
+    $ret = of_userdata_query_update("company", $company_id, $param_values, false);
   }
-  
+
   return $retour;
 }
 
@@ -1110,22 +1094,24 @@ function get_import_country_hash() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the companycategory1 hash : cats["code"] = id
+// Return the user category hash : cats["code"] = id
+// Parameters:
+//   - $cat : category
 ///////////////////////////////////////////////////////////////////////////////
-function get_import_companycategory1_hash() {
+function get_import_category_user_hash($cat) {
   global $cdg_sql;
 
-  $cat_q = run_query_global_companycategory1();
+  $cats = of_category_user_get_ordered($cat);
 
-  while ($cat_q->next_record()) {
-    $id = $cat_q->f("companycategory1_id");
-    $code = $cat_q->f("companycategory1_code");
-    $label = $cat_q->f("companycategory1_label");
-    $cats[$code] = $id;
-    $cats[$label] = $id;
+  foreach ($cats as $one_cat) {
+    $id = $one_cat["id"];
+    $code = $one_cat["code"];
+    $label = $one_cat["label"];
+    $hash[$code] = $id;
+    $hash[$label] = $id;
   }
 
-  return $cats;
+  return $hash;
 }
 
 

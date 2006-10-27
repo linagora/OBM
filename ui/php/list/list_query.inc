@@ -40,12 +40,12 @@ function run_query_list_search($list) {
   }
   if ($contact != '') {
     $where .= " AND contact_lastname $like '$contact%'";
-    $join_con = "LEFT JOIN ContactList ON list_id=contactlist_list_id
+    $join_contact = "LEFT JOIN ContactList ON list_id=contactlist_list_id
     LEFT JOIN Contact ON contactlist_contact_id=contact_id";
   }
   if ($contact_id > 0) {
     $where .= " AND contact_id = '$contact_id'";
-    $join_con = "LEFT JOIN ContactList ON list_id=contactlist_list_id
+    $join_contact = "LEFT JOIN ContactList ON list_id=contactlist_list_id
     LEFT JOIN Contact ON contactlist_contact_id=contact_id";
   }
   if ($email != '') {
@@ -68,16 +68,15 @@ function run_query_list_search($list) {
     A.userobm_login as usercreate,
     B.userobm_login as userupdate
   FROM List
-    LEFT JOIN ContactList ON list_id=contactlist_list_id
-    LEFT JOIN Contact ON ContactList.contactlist_contact_id=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
+    $join_contact
   $whereq
   $orderq
   $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM List $join_con $whereq");
+    $count = get_query_count("SELECT count(*) FROM List $join_contact $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
@@ -1232,7 +1231,7 @@ function run_query_list_contactcategory2() {
 
   $multidomain = sql_multidomain("contactcategory2");
 
-  $query = "SELECT * FROM ContactCategory2 
+  $query = "SELECT * FROM ContactCategory2
     WHERE 1=1
       $multidomain
     ORDER BY contactcategory2_code"; 
@@ -1363,7 +1362,7 @@ function make_list_query_from_db(&$list_q) {
 // $ret array [query] full query, [where] where clause, [from] from clause
 ///////////////////////////////////////////////////////////////////////////////
 function make_list_query_from_criteria($list) {
-  global $cdg_sql, $c_private, $uid;
+  global $cdg_sql, $c_private, $cgp_user, $uid;
 
   $id = $list["list_id"];
   $criteria = $list["criteria"]["modules"];
@@ -1378,11 +1377,16 @@ function make_list_query_from_criteria($list) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-  
+
+  // %f replaced by field
+  // %v replaced by value
+  // %j replaced by join number
+  // %t replaced by category table alias (before going to query generation)
   $common_like = "%f $like '%v%'";
   $common_equal = "%f = '%v'";
   $subscription_equal = "s%j.%f = '%v'";
   $category_equal = "(cc%j.%f $like '%v.%' OR cc%j.%f = '%v')";
+  $usercategory_equal = "(%t.category_code $like '%v.%' OR %t.category_code = '%v')";
   $connection_equal = "%j.%f = '%v'";
   $connection_in = "%j.%f IN (%v)";
   $pub_lang_like = "p%j.%f $like '%%v%'";
@@ -1404,7 +1408,6 @@ function make_list_query_from_criteria($list) {
     "company_marketingmanager_id" => $common_equal,
     "company_town"  => $common_like,
     "company_datasource_id" => $common_equal,
-    "companycategory1_code" => $category_equal,
     "contact_firstname"  => $common_like,
     "contact_country_iso3166" => $contact_country,
     "contact_timeafter"  => $cont_time_sup,
@@ -1450,14 +1453,43 @@ function make_list_query_from_criteria($list) {
     "subscription_timebefore" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "companycategory1_code" => "
-       LEFT JOIN CompanyCategory1Link ccl%j ON company_id = ccl%j.companycategory1link_company_id 
-       LEFT JOIN CompanyCategory1 cc%j ON cc%j.companycategory1_id = ccl%j.companycategory1link_category_id ",
     "contactcategory1link_category_id" => "
        LEFT JOIN ContactCategory1Link cc1l%j ON contact_id = cc1l%j.contactcategory1link_contact_id ",
     "contactcategory2link_category_id" => "
        LEFT JOIN ContactCategory2Link cc2l%j ON contact_id = cc2l%j.contactcategory2link_contact_id ",
   );
+
+  // User data categories handling
+  $cat_nb = 0;
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cat = "cat${cat_nb}comp%j";
+      $cat_link = "cat${cat_nb}compl%j";
+      $operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_equal); 
+      $add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
+         ON company_id = $cat_link.categorylink_entity_id
+           AND $cat_link.categorylink_entity = 'company'
+           AND $cat_link.categorylink_category = '$cat_name'
+       LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
+    }
+    $cat_nb++;
+  }
+
+  $cat_nb = 0;
+  if (is_array($cgp_user["contact2"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $cat = "cat${cat_nb}cont%j";
+      $cat_link = "cat${cat_nb}contl%j";
+      $operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_equal); 
+      $add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
+         ON contact_id = $cat_link.categorylink_entity_id
+           AND $cat_link.categorylink_entity = 'contact'
+           AND $cat_link.categorylink_category = '$cat_name'
+       LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
+    }
+    $cat_nb++;
+  }
+
 
   $select = "
         contact_id as id,

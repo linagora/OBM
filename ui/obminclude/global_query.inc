@@ -29,23 +29,6 @@ function get_obm_info($info) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// CompanyCategory1 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_companycategory1() {
-  global $cdg_sql;
-
-  $query = "SELECT * FROM CompanyCategory1 ORDER BY companycategory1_code"; 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query, "run_query_global_companycategory1()");
-  
-  return $obm_q;  
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Company contact update
 // Parameters:
 //   - $comp_id : company id

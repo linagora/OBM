@@ -7,8 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-
-$obm_version = "2.0pre5";
+$obm_version = "2.0pre6";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -16,7 +15,7 @@ $c_focsys = 3;
 
 //---------------------------------------------------------------------------//
 // OBM Default configurable Constants : Default values
-// To change site values => change these in obm_conf.inc 
+// To change these values => change these in conf/obm_conf.inc 
 //---------------------------------------------------------------------------//
 
 // Global parameters --------------------------------------------------------//
@@ -84,7 +83,7 @@ $cgp_cookie_name = "OBM_Session";
 $cgp_cookie_domain = "aliacom.local";
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
-// CAS specific parameters are in obm_conf.inc.
+// CAS specific parameters are in conf/obm_conf.inc.
 $auth_kind = "standalone"; 
 
 // Shall the login page encrypt authentication password
@@ -260,7 +259,7 @@ if($c_multidomain) {
   $cgp_show["module"]["domain"] = "admin";
 }
 
-require_once("$obminclude/obm_conf.inc");
+require_once("$obminclude/conf/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
 define("C_IMAGE_PATH",$cgp_host."images");
@@ -325,7 +324,7 @@ if ($auth_kind == "CAS") {
   $auth_class_name = "OBM_Challenge_Auth";
 } else {
   echo "unknown Authentication kind !<br/>";
-  echo "please edit \$auth_kind in obm_conf.inc";
+  echo "please edit \$auth_kind in conf/obm_conf.inc";
   exit;
 }
 
@@ -337,6 +336,7 @@ if ($auth_kind == "CAS") {
 $c_all = "_ALL_";           // Used in Form select
 $c_undef = "0";             // Used in Form select
 $c_none = "-1";             // Used in Form select
+$c_null = "NULL";           // Used in queries (date is null)
 $c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";

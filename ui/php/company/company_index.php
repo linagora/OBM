@@ -78,17 +78,12 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_category1_ids") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
-
-} elseif ($action == "ext_get_category1_code") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("company", "category1", $params, $action);
-
 } elseif ($action == "ext_get_category_ids") {
+///////////////////////////////////////////////////////////////////////////////
+  $extra_css = "category.css";
+  $display["detail"] = of_category_user_dis_tree("company", $params["category"], $params, $action);
+
+} elseif ($action == "ext_get_category_code") {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_css = "category.css";
   $display["detail"] = of_category_user_dis_tree("company", $params["category"], $params, $action);
@@ -649,21 +644,15 @@ function get_company_action() {
                                      		 );
 
 // Category Select 
-  $actions["company"]["ext_get_category1_ids"]  = array (
-    'Url'      => "$path/company/company_index.php?action=ext_get_category1_ids",
+  $actions["company"]["ext_get_category_ids"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_category_ids",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );
-// Category Select 
-  $actions["company"]["ext_get_category1_code"]  = array (
-    'Url'      => "$path/company/company_index.php?action=ext_get_category1_code",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      		 );
 
 // Category Select 
-  $actions["company"]["ext_get_category_ids"]  = array (
-    'Url'      => "$path/company/company_index.php?action=ext_get_category_ids",
+  $actions["company"]["ext_get_category_code"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_category_code",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      		 );

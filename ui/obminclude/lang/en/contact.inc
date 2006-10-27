@@ -108,7 +108,6 @@ $l_contact_display = "Display options for contacts list";
 $l_timecreate = "Creation";
 $l_timeupdate = "Last update";
 $l_publication_title = "Title";
-$l_year = "Year";
 $l_renewal = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";

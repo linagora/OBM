@@ -49,7 +49,6 @@ $l_letter = "Encabezado";
 //Publication
 $l_publication = "Publicación";
 $l_title = "Título";
-$l_year = "Año";
 $l_quantity = "Cantidad";
 
 //Logical

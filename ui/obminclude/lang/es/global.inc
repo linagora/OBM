@@ -171,6 +171,10 @@ $l_tt_research = "Proyecto Interno";
 $l_tt_others = "Otra tarea";
 
 // Days and months
+$l_day = "Dia";
+$l_week = "Semana";
+$l_month = "Mes";
+$l_year = "Año";
 $l_today = "Hoy";
 $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
 $l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic');

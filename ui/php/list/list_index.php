@@ -38,6 +38,7 @@ require_once("$obminclude/javascript/calendar_js.inc");
 require_once("$obminclude/of/of_extmod.inc");
 include("list_display.inc");
 include("list_query.inc");
+include("$obminclude/of/of_category.inc");
 
 $uid = $auth->auth["uid"];
 get_list_action();
@@ -277,6 +278,7 @@ exit(0);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_list_params() {
+  global $cgp_user;
   
   // Get global params
   $params = get_global_params("List");
@@ -294,8 +296,15 @@ function get_list_params() {
   if (isset ($params["company_marketingmanager_id"])) $params["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $params["company_marketingmanager_id"];
   if (isset ($params["company_town"])) $params["criteria"]["modules"]["company"]["company_town"] = $params["company_town"];
   if (isset ($params["company_datasource_id"])) $params["criteria"]["modules"]["company"]["company_datasource_id"] = $params["company_datasource_id"];
-  if (isset ($params["companycategory1_code"])) $params["criteria"]["modules"]["company"]["companycategory1_code"] = $params["companycategory1_code"];
-  
+
+  // User data categories handling
+  if (is_array($cgp_user["company"]["category"])) {
+    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cat_code = "${cat_name}_code";
+      if (isset ($params[$cat_code])) $params["criteria"]["modules"]["company"][$cat_code] = $params[$cat_code];
+    }
+  }
+
   // Contact
   if (isset ($params["contact_lastname"])) $params["criteria"]["modules"]["contact"]["contact_lastname"] = $params["contact_lastname"];
   if (isset ($params["contact_firstname"])) $params["criteria"]["modules"]["contact"]["contact_firstname"] = $params["contact_firstname"];
@@ -476,7 +485,7 @@ function get_list_action() {
    'Condition'=> array ('all') 
                                       );
 
-// Display Pr�f�rence
+// Display Preference
   $actions["list"]["dispref_display"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_display",
    'Right'    => $cright_read,

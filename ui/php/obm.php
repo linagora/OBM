@@ -67,6 +67,11 @@ if ($cgp_show["module"]["time"] && $perm->check_right("time", $cright_write)) {
   $block .= dis_time_portal();
 }
 
+if ($cgp_show["module"]["lead"] && $perm->check_right("lead", $cright_write)) { 
+  require_once("$path/lead/lead_query.inc");
+  $block .= dis_lead_portal();
+}
+
 if ($cgp_show["module"]["deal"] && $perm->check_right("deal", $cright_write)) { 
   require_once("$path/deal/deal_query.inc");
   $block .= dis_deal_portal();
@@ -173,13 +178,13 @@ function dis_calendar_portal() {
     $iso_day = isodate_format($current_time);
     $check_month = get_month($current_time);
     if ($check_month != $this_month) {
-      $day = "<a class=\"agendaLink2\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$iso_day)."\">$day</a>";
+      $day = "<a class=\"agendaLink2\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
     } else {
       if (isset($events_list[$iso_day]) && $dayObj = $events_list[$iso_day]) {
 	$events_data = $dayObj->get_events($id);
-        $day = "<a class=\"agendaLink3\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$iso_day)."\">$day</a>";
+        $day = "<a class=\"agendaLink3\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
       } else {
-        $day = "<a class=\"agendaLink\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$iso_day)."\">$day</a>";
+        $day = "<a class=\"agendaLink\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
       }
     }
     if ($i == 0) {
@@ -248,7 +253,84 @@ function dis_time_portal() {
    </div>
    <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_my_time</a></div>
   </div>
-  ";
+";
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display The Lead specific portal layer
+///////////////////////////////////////////////////////////////////////////////
+function dis_lead_portal() {
+  global $uid, $ico_lead_portal, $set_theme, $c_null;
+  global $l_module_lead, $l_my_lead, $l_days, $l_alarm, $l_late, $l_without;
+
+  $today = date("Y-m-d");
+  $ts_today = strtotime($today);
+  $ts_7 = strtotime("-7 day", $ts_today);
+  $ts_14 = strtotime("-14 day", $ts_today);
+  $ts_30 = strtotime("-30 day", $ts_today);
+  $ts_90 = strtotime("-90 day", $ts_today);
+  $iso_7 = isodate_format($ts_7);
+  $iso_14 = isodate_format($ts_14);
+  $iso_30 = isodate_format($ts_30);
+  $iso_90 = isodate_format($ts_90);
+  $date_ranges = array(array("$iso_7", "$today"),
+		       array("$iso_14", "$today"),
+		       array("$iso_30", "$today"),
+		       array("$iso_90", "$today"),
+);
+
+  $leads = run_query_lead_time_range($date_ranges, array($uid));
+  $leads_date = $leads["date"];
+  $block = "
+  <div class=\"portalModule\">
+   <div class=\"portalModuleLeft\">
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead_portal\" alt=\"\" />
+   </div>
+   <div class=\"portalTitle\">$l_module_lead</div>
+   <div class=\"portalContent\">
+    <div>
+    <table>
+    <tr>
+      <td><a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid")."\">$l_my_lead</a>&nbsp;</td>
+      <td class=\"number\">$leads[total]</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>- 7 $l_days</td>
+      <td class=\"number\">&nbsp; $leads_date[0]</td>
+    </tr>
+    <tr>
+      <td>- 14 $l_days</td>
+      <td class=\"number\">&nbsp; $leads_date[1]</td>
+    </tr>
+    <tr>
+      <td>- 30 $l_days</td>
+      <td class=\"number\">&nbsp; $leads_date[2]</td>
+    </tr>
+    <tr>
+      <td>- 90 $l_days</td>
+      <td class=\"number\">&nbsp; $leads_date[3]</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>$l_alarm (<a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;date_field=datealarm&amp;tf_date_before=$today")."\">$l_late</a> / <a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid&amp;tf_date_field=datealarm&amp;tf_date_after=$c_null")."\">$l_without</a>)&nbsp;</td>
+      <td class=\"number\">$leads[alarm] / $leads[no_alarm]</td>
+    </tr>
+    </table>
+
+    </div>
+   </div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("lead/lead_index.php?action=search&amp;sel_manager_id=$uid")."\">$l_my_lead</a></div>
+  </div>";
+
   return $block;
 }
 

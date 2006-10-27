@@ -11,15 +11,13 @@
 // domain query search query execution
 // Parameters:
 //   - $domain[] : domain search criteria
-//   - $p_new_order : infos for order clause
-//   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_domain_search($domain, $p_new_order, $p_order_dir, $restriction="") {
+function run_query_domain_search($domain, $restriction="") {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $label = sql_search_text_parse($domain["label"]);
-  $desc = sql_search_text_parse($domain["desc"]);
-  $archive = $domain["archive"];
+  $sql_order_dir = $domain["sql_order_dir"];
+  $sql_order_field = $domain["sql_order_field"];
+  $text = sql_search_text_parse($incident["text"]);
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -29,19 +27,9 @@ function run_query_domain_search($domain, $p_new_order, $p_order_dir, $restricti
   $where = "";
 
   // If a login indication has been specified, get it
-  if (trim($label) != "") {
-     $where .= " domain_label $like '$label%'";
-  }
-
-  // If a description indication has been specified, get it
-  if (trim($desc) != "") {
-     if (trim($where) != "") $where .= " AND";
-     $where .= " domain_description $like '%$desc%'";
-  }
-
-  if ($archive != "1") {
-    if (trim($where) != "") $where .= " AND";
-    $where .= " domain_archive = '0'";
+  if (trim($text) != "") {
+     $where .= " domain_label $like '$text%'
+       OR domain_description like '$text%'";
   }
 
   if ((trim($where) != "") || (trim($where_restriction) != "")) {
@@ -54,8 +42,8 @@ function run_query_domain_search($domain, $p_new_order, $p_order_dir, $restricti
 
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "domain_label";
-  $orderq .= " ORDER BY $order $p_order_dir";
+  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "domain_label";
+  $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "$select
     $whereq
@@ -63,7 +51,7 @@ function run_query_domain_search($domain, $p_new_order, $p_order_dir, $restricti
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct domain_id) FROM Domain $join_grp $whereq");
+    $count = get_query_count("SELECT count(distinct domain_id) FROM Domain $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -91,10 +79,9 @@ function run_query_domain_detail($p_id) {
     FROM Domain
     WHERE domain_id='$p_id'";
 
+  display_debug_msg($query, $cdg_sql, "run_query_domain_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
-  
-  display_debug_msg($query, $cdg_sql, "run_query_domain_detail()");
 
   return $obm_q;
 }
@@ -110,26 +97,30 @@ function run_query_domain_detail($p_id) {
 function run_query_domain_insert($domain) {
   global $uid, $cdg_sql, $c_cr;
   
-
+  $now = date("Y-m-d H:i:s");
   $label = $domain["label"];
-  $archive = ($domain["archive"] ? "1" : "0");
   $desc = $domain["desc"];
+  $domain_name = $domain["domain_name"];
+  $alias = $domain["alias"];
   
-  $query = "INSERT INTO Domain (domain_timeupdate,
+  $query = "INSERT INTO Domain (
+    domain_timeupdate,
     domain_timecreate,
     domain_userupdate,
     domain_usercreate,
     domain_label,
     domain_description,
-    domain_archive)
+    domain_domain_name,
+    domain_alias)
   VALUES (
     null,
-    '" . date("Y-m-d H:i:s") . "',
+    '$now',
     null,
     '$uid',
     '$label',
     '$desc',
-    '$archive')";
+    '$domain_name',
+    '$alias')";
     
   display_debug_msg($query, $cdg_sql, "run_query_domain_insert(1)");
   $obm_q = new DB_OBM;
@@ -161,21 +152,24 @@ function run_query_domain_insert($domain) {
 //   - $domain[]   : entry values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_update($d_id, $domain) {
-  global $uid, $cdg_sql, $password_encryption;
+  global $uid, $cdg_sql;
 
+  $now = date("Y-m-d H:i:s");
   $label = $domain["label"];
-  $archive = ($domain["archive"] ? "1" : "0");
   $desc = $domain["desc"];
+  $domain_name = $domain["domain_name"];
+  $alias = $domain["alias"];
   
   $query = "UPDATE Domain SET
-    domain_timeupdate='". date("Y-m-d H:i:s")."',
+    domain_timeupdate='$now',
     domain_userupdate='$uid',
     domain_label='$label',
-    domain_archive='$archive',
-    domain_description='$desc'
+    domain_description='$desc',
+    domain_domain_name='$domain_name',
+    domain_alias='$alias'
   WHERE domain_id='$d_id'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_domain_detail()");
+  display_debug_msg($query, $cdg_sql, "run_query_domain_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -200,6 +194,7 @@ function run_query_domain_delete($p_id) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Data checking and formatting
 // Parameters:
@@ -222,6 +217,7 @@ function check_domain_data_form($d_id, $domain) {
   return true;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the domain can be deleted
 // Parameters:
@@ -231,21 +227,22 @@ function check_domain_data_form($d_id, $domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_can_delete($p_id) {
   global $err_msg, $ok_msg;
-  global $l_link_timetask, $l_link_timetask_no;
+  global $l_link_user, $l_link_user_no;
 
   $delete_ok = true;
 
-  // Links from Time management (referencing projects)
+  // Links from Users
   $nb = get_linked_user_domain($p_id);
   if ($nb > 0) {
     $delete_ok = false;
-    $err_msg .= "$l_link_timetask";
+    $err_msg .= "$l_link_user";
   } else {
-    $ok_msg .= "$l_link_timetask_no";
+    $ok_msg .= "$l_link_user_no";
   }
 
   return $delete_ok;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Count number of domain in a domain
@@ -255,10 +252,13 @@ function check_domain_can_delete($p_id) {
 //   Number of users in a domain
 ///////////////////////////////////////////////////////////////////////////////
 function get_linked_user_domain($domain_id) {
-  $nb = get_query_count("SELECT count(userobm_id) as nb FROM UserObm WHERE userobm_domain_id='$domain_id'");
+
+  $nb = get_query_count("SELECT count(userobm_id) as nb
+    FROM UserObm
+    WHERE userobm_domain_id='$domain_id'");
+
   return $nb;
 }
-
 
 
 ?>

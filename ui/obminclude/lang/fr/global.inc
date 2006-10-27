@@ -31,6 +31,7 @@ $l_all = "Tout";
 $l_all_f = "Toutes";
 $l_none = "Aucun";
 $l_undef = "---";
+$l_without = "Sans";
 $l_id = "Id";
 $l_comment = "Commentaire";
 $l_add_comment = "Ajouter un commentaire";
@@ -117,7 +118,7 @@ $l_aduplicate = "Duplicata";
 // Entities
 $l_company = "Société";
 $l_contact = "Contact";
-$l_lead = "Opportunité";
+$l_lead = "Piste";
 $l_deal = "Affaire";
 $l_list = "Liste";
 $l_cv = "CV";
@@ -139,6 +140,7 @@ $l_group = "Groupe";
 $l_resourcegroup = "Groupe de ressources";
 $l_settings = "Configuration";
 $l_backup = "Sauvegarde";
+$l_domain = "Domaine";
 
 // OBM_DISPLAY
 $l_entries = "Entrées";
@@ -183,6 +185,11 @@ $l_tt_research = "Projets Internes";
 $l_tt_others = "Tâches Non Facturées";
 
 // Days and months
+$l_day = "Jour";
+$l_days = "Jours";
+$l_week = "Semaine";
+$l_month = "Mois";
+$l_year = "Année";
 $l_today = "Aujourd\'hui";
 $l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août', 'Septembre','Octobre','Novembre', 'Décembre');
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc');
@@ -202,10 +209,9 @@ $l_section_admin  = "ADMINISTRATION";
 $l_section_aliamin = "ALIAMIN";
 $l_section_settings = "PREFERENCES";
 
-
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";
-$l_module_lead    = "Opportunités";
+$l_module_lead    = "Pistes";
 $l_module_deal    = "Affaires";
 $l_module_list    = "Listes";
 $l_module_cv  = "CV";
@@ -213,7 +219,7 @@ $l_module_agenda  = "Agenda";
 $l_module_todo    = "A faire";
 $l_module_publication  = "Publication";
 $l_module_statistic    = "Statistiques";
-$l_module_domain = "Domaine";
+$l_module_domain = "Domaines";
 
 $l_module_time = "Gestion des temps";
 $l_module_project = "Projets";
@@ -356,6 +362,9 @@ $l_waiting_events = "Evénement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
 $l_my_agenda = "Mon agenda";
 $l_my_time = "Ma gestion du temps";
+
+$l_my_lead = "Mes pistes";
+$l_late = "Retard";
 
 $l_my_deal_current = "Mes affaires en cours";
 $l_my_deal = "Mes affaires";

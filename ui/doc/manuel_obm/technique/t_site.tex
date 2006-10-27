@@ -6,28 +6,28 @@
 
 révision : \obm 2.0.0\\
 
-Depuis la version 0.8, OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
+OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
 
 Pour ce faire les options de configurations et les données spécifiques d'un site sont situées dans un fichier et un répertoire dédiés.\\
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
-Fichier de configuration spécifique & obminclude/obm\_conf.inc \\
+Répertoire de configuration & obminclude/conf \\
 \hline
-Répertoire de configuration spécifique & obminclude/site \\
+Fichier de configuration & obminclude/conf/obm\_conf.inc \\
 \hline
 \end{tabular}
 
 
 \subsection{Les options de paramétrage}
 
-Ces paramètres sont définis en valeur par défaut dans le fichier global.inc mais peuvent être modifiées dans le fichier spécifique au site obm\_conf.inc :\\
+Ces paramètres se définissent dans le fichier de configuration conf/obm\_conf.inc. Les valeurs par défaut des paramètres sont positionnées dans le fichier obminclude/global.inc.
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
-Fichier de défintion des valeurs par défaut & obminclude/global.inc \\
+Fichier de configuration & obminclude/conf/obm\_conf.inc \\
 \hline
-Fichier de configuration spécifique & obminclude/obm\_conf.inc \\
+Fichier de défintion des valeurs par défaut & obminclude/global.inc \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
@@ -49,7 +49,7 @@ Liste des paramètres définis :\\
 \hline
 \$c\_multidomain & 2.0.0 & false & utilisation en mode multi-domaine \\ 
 \hline
-\$cgp\_site\_include & & false & Si vrai OBM utilise le répertoire spécifique obminclude/site pour les langues.\\ 
+\$conf\_lang & 2.0.0 & false & (anciennement \textbf{\$cgp\_site\_include}). Si vrai OBM surcharge les fichiers de langue standard par ceux spéciques définis dans l'arborescence conf/lang/.\\ 
 \hline
 \$cgp\_todo\_nb & & 5 & Nombre de Todo affichés \\ 
 \hline

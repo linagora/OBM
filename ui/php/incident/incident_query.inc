@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_search($incident) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
-  
+
   $sql_order_dir = $incident["sql_order_dir"];
   $sql_order_field = $incident["sql_order_field"];
   

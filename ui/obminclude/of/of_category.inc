@@ -1570,21 +1570,28 @@ function of_userdata_query_search($entity, $params) {
 // Parameters:
 //   - $entity : user category for this entity
 //   - $ent_id : entity id
+//   - $params : userdata parameters
+//   - $clear  : if true, clear previous link to the entity
 ///////////////////////////////////////////////////////////////////////////////
-function of_userdata_query_update($entity, $ent_id, $params) {
+function of_userdata_query_update($entity, $ent_id, $params, $clear=true) {
   global $cgp_user;
 
+  $check = ! $clear;
+
   // User categories update
-  $ret = of_category_user_query_delete_link($entity, $ent_id);
+  if ($clear) {
+    $ret = of_category_user_query_delete_link($entity, $ent_id);
+  }
+
   if (is_array($cgp_user[$entity]["category"])) {
     foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
       $cats = $params["$cat_name"];
       if (is_array($cats)) {
 	foreach($cats as $cat_id) {
-	  $ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cat_id);
+	  $ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cat_id, $check);
 	}
       } else if ($cats > 0) {
-	$ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cats);
+	$ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cats, $check);
       }
     }
   }
@@ -2017,7 +2024,8 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
   $cat_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "of_category_user_get_ordered()");
   $cat_q->query($query);
-  
+
+  $cats = array();
   while ($cat_q->next_record()) {
     $id = $cat_q->f("category_id");
     $code = $cat_q->f("category_code");
@@ -2214,13 +2222,34 @@ function of_category_user_query_delete($params) {
 //   - $cat       : target category
 //   - $entity_id : entity id 
 //   - $cat_id    : category id 
+//   - $check     : if true, check if link already exists first
 // Return:
 //   - execution code
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id) {
+function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, $check=false) {
   global $cdg_sql;
 
   if ( ($entity_id > 0) && ($cat_id > 0) ) {
+    $obm_q = new DB_OBM;
+
+    if ($check) {
+      $nb = 0;
+      $query = "SELECT count(*) as nb
+       FROM CategoryLink
+       WHERE categorylink_category_id='$cat_id'
+         AND categorylink_entity_id='$entity_id'
+         AND categorylink_category='$cat'
+         AND categorylink_entity='$entity'";
+
+      display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link(check)");
+      $obm_q->query($query);
+      $obm_q->next_record();
+      $nb = $obm_q->f("nb");
+      if ($nb > 0) {
+	return $nb;
+      }
+    }
+
     $query = "INSERT INTO CategoryLink (
        categorylink_category_id,
        categorylink_entity_id,

@@ -46,7 +46,6 @@ $l_letter = "L. Head";
 
 //Publication
 $l_title = "Title";
-$l_year = "Year";
 $l_quantity = "Quantity";
 
 // Actions

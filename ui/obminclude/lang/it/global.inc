@@ -24,6 +24,7 @@ $l_all = "Tutti";
 $l_all_f = "Tutti";
 $l_none = "Nessuno";
 $l_undef = "---";
+$l_without = "Sensa";
 $l_id = "Id";
 $l_comment = "Commento";
 $l_add_comment = "Nuovo commento";
@@ -152,6 +153,11 @@ $l_tt_research = "Operazione di richerca";
 $l_tt_others = "Operazione Interna";
 
 // Days and months
+$l_day = "Giorno";
+$l_days = "giorni";
+$l_week = "Settimana";
+$l_month = "Mese";
+$l_year = "Anno";
 $l_today = "Oggi";
 $l_monthsofyear = array ('Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug','Agosto', 'Settembre','Ottobre','Novembre', 'Dicembre');
 $l_monthsofyearshort = array ('Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic');
