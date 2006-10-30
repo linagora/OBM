@@ -79,7 +79,7 @@ function html_import_search_form ($import, $dsrc_q, $usr_q) {
   $market = $import["market"];
 
   // data source select
-  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_all\">$l_all</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
@@ -342,7 +342,7 @@ function html_import_consult_file($import_q) {
     <tr>
       <td class=\"detailLabel\">$l_sample_file</td>
       <td class=\"detailForm\">
-        <input type=\"file\" name=\"sample_file\" id=\"sample_file\" size=\"30\" value=\"\" />
+        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_check_file\" /></td>
     </tr>
@@ -356,7 +356,7 @@ function html_import_consult_file($import_q) {
     <tr>
       <td class=\"detailLabel\">$l_test_file</td>
       <td class=\"detailForm\">
-        <input type=\"file\" name=\"test_file\" id=\"test_file\" size=\"30\" value=\"\" />
+        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_test_file\" /></td>
     </tr>
@@ -370,7 +370,7 @@ function html_import_consult_file($import_q) {
     <tr>
       <td class=\"detailLabel\">$l_import_file</td>
       <td class=\"detailForm\">
-        <input type=\"file\" name=\"import_file\" id=\"import_file\" size=\"30\" value=\"\" />
+        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_import_file\" /></td>
     </tr>
@@ -461,7 +461,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_file_import($import_q, $import) {
   global $cgp_user, $ccsvd_tab, $l_test_file, $l_import_file;
-  global $l_company, $l_contact, $l_info, $l_result;
+  global $l_company, $l_contact, $l_info, $l_result, $l_used_company;
   global $l_similar_company, $l_similar_contact, $l_contact_defaultname;
   global $l_company_defaultname, $ccsvd_tab;
   global $l_invalid_row, $l_invalid_rows, $l_conflict_rows;
@@ -634,7 +634,8 @@ function html_import_file_import($import_q, $import) {
       // Same company exists : we use it ======================================
       if (is_array($comps["same"])) {
 	$company_id = $comps["same"][0]["comp_id"];
-	//	echo "<br>same_id=$company_id";
+	$log["res"] = $l_used_company;
+
 	// test for contact
 	if ( (import_row_has_contact($fields)) &&
 	     ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
@@ -843,7 +844,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       $con_id = $con["con_id"];
       $url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con_id");
       $line_log .= "<br />
-        <input type=\"radio\" name=\"rd_con\" value=\"$con_id\" $rd_check />
+        <input type=\"radio\" name=\"contact_id\" value=\"$con_id\" $rd_check />
         <a target=\"New\" href=\"$url\">".$con["con_lname"] . " ".$con["con_fname"] ."</a>";
     }
     $line_log .= "</td>
@@ -872,9 +873,9 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
     <table class=\"detail\">
     <tr>    
       <td class=\"detailLabel\">
-        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_nothing\" checked />$lab_nothing
-        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_insert\">$lab_insert</input>
-        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_update\" />$lab_update
+        <input type=\"radio\" name=\"rd_conflict_action\" value=\"$act_nothing\" checked />$lab_nothing
+        <input type=\"radio\" name=\"rd_conflict_action\" value=\"$act_insert\">$lab_insert</input>
+        <input type=\"radio\" name=\"rd_conflict_action\" value=\"$act_update\" />$lab_update
       </td>
     </tr>
     <tr colspan=\"3\">
@@ -928,12 +929,17 @@ function display_import_log_line($log, $fields, $comps) {
       <td class=\"detailForm\">$con_info</td>
       <td class=\"detailForm\">$res";
 
-    if (is_array($comps["similar"])) {
+    if (is_array($comps["same"])) {
+      list($num, $comp) = each($comps["same"]);
+      $cid = $comp["comp_id"];
+      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid");
+      $line_log .= "<br /><a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"] . "</td>
+      </tr>";
+    } else if (is_array($comps["similar"])) {
       while ( list($num, $comp) = each($comps["similar"]) ) {
 	$cid = $comp["comp_id"];
 	$url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$cid");
-	$line_log .= "<br />";
-	$line_log .= "<a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
+	$line_log .= "<br /><a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
       }
       $line_log .= "</td>
       </tr>";
@@ -988,7 +994,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   $enc = htmlspecialchars(trim($enc));
 
   // data source select
-  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
     <option value=\"$c_undef\">$l_undef</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
@@ -1419,7 +1425,7 @@ function dis_import_warn_insert($import_q, $import) {
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+      <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
     </form>
     </p>
@@ -1428,7 +1434,7 @@ function dis_import_warn_insert($import_q, $import) {
       action=\"" .url_prepare("import_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"new\" />
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-      <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+      <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
       <input type=\"submit\" value=\"$l_back\" />
     </form>
     </p>

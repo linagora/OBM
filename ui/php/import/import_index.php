@@ -465,132 +465,18 @@ function get_import_field_size() {
 // returns : $list hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_params() {
-  global $tf_name, $sel_dsrc, $sel_market, $rd_sep, $tf_enclosed,$cb_auto_mode;
-  global $param_import, $cdg_param;
   global $tmp_path, $action;
-  global $tf_comp_name, $tf_comp_name_d, $tf_comp_num, $tf_comp_num_d;
-  global $tf_comp_ad1, $tf_comp_ad1_d, $tf_comp_ad2, $tf_comp_ad2_d;
-  global $tf_comp_ad3, $tf_comp_ad3_d, $tf_comp_zip, $tf_comp_zip_d;
-  global $tf_comp_town, $tf_comp_town_d, $tf_comp_cdx, $tf_comp_cdx_d;
-  global $tf_comp_ctry, $tf_comp_ctry_d;
-  global $tf_comp_pho, $tf_comp_pho_d, $tf_comp_fax, $tf_comp_fax_d;
-  global $tf_comp_web, $tf_comp_web_d, $tf_comp_mail, $tf_comp_mail_d;
-  global $tf_comp_com, $tf_comp_com_d;
-  global $tf_con_ln, $tf_con_ln_d, $tf_con_fn, $tf_con_fn_d;
-  global $tf_con_lang, $tf_con_lang_d;
-  global $tf_con_func, $tf_con_func_d, $tf_con_tit, $tf_con_tit_d;
-  global $tf_con_ad1, $tf_con_ad1_d, $tf_con_ad2, $tf_con_ad2_d;
-  global $tf_con_ad3, $tf_con_ad3_d, $tf_con_zip, $tf_con_zip_d;
-  global $tf_con_town, $tf_con_town_d, $tf_con_cdx, $tf_con_cdx_d;
-  global $tf_con_ctry, $tf_con_ctry_d;
-  global $tf_con_pho, $tf_con_pho_d, $tf_con_hpho, $tf_con_hpho_d;
-  global $tf_con_mpho, $tf_con_mpho_d, $tf_con_fax, $tf_con_fax_d;
-  global $tf_con_mail, $tf_con_mail_d, $tf_con_mailok, $tf_con_mailok_d;
-  global $tf_con_com, $tf_con_com_d;
-  global $sample_file, $sample_file_name, $sample_file_size,$import_id;
-  global $test_file, $test_file_name, $test_file_size;
-  global $import_file, $import_file_name, $import_file_size, $file_saved;
-  global $row_start, $rd_conflict, $rd_comp, $rd_con, $company_id;
 
   // Get global params
   $params = get_global_params("Import");
 
-  // Import fields
-  if (isset ($import_id)) $params["import_id"] = $import_id;
-  if (isset ($tf_name)) $params["name"] = trim($tf_name);
-  if (isset ($sel_dsrc)) $params["datasource"] = $sel_dsrc;
-  if (isset ($sel_market)) $params["market"] = $sel_market;
-  if (isset ($rd_sep)) $params["sep"] = $rd_sep;
-  if (isset ($tf_enclosed)) $params["enclosed"] = $tf_enclosed;
-
-  if (isset ($row_start)) $params["row_start"] = $row_start;
-  if (isset ($rd_conflict)) $params["conflict_action"] = $rd_conflict;
-  if (isset ($company_id)) $params["company_id"] = $company_id;
-  if (isset ($rd_comp)) $params["company_id"] = $rd_comp;
-  if (isset ($rd_con)) $params["contact_id"] = $rd_con;
-
-  // Mapping : company
-  if (isset ($tf_comp_name)) $params["comp_name"] = trim($tf_comp_name);
-  if (isset ($tf_comp_name_d)) $params["comp_name_d"] = trim($tf_comp_name_d);
-  if (isset ($tf_comp_num)) $params["comp_num"] = trim($tf_comp_num);
-  if (isset ($tf_comp_num_d)) $params["comp_num_d"] = trim($tf_comp_num_d);
-  if (isset ($tf_comp_ad1)) $params["comp_ad1"] = trim($tf_comp_ad1);
-  if (isset ($tf_comp_ad1_d)) $params["comp_ad1_d"] = trim($tf_comp_ad1_d);
-  if (isset ($tf_comp_ad2)) $params["comp_ad2"] = trim($tf_comp_ad2);
-  if (isset ($tf_comp_ad2_d)) $params["comp_ad2_d"] = trim($tf_comp_ad2_d);
-  if (isset ($tf_comp_ad3)) $params["comp_ad3"] = trim($tf_comp_ad3);
-  if (isset ($tf_comp_ad3_d)) $params["comp_ad3_d"] = trim($tf_comp_ad3_d);
-  if (isset ($tf_comp_zip)) $params["comp_zip"] = trim($tf_comp_zip);
-  if (isset ($tf_comp_zip_d)) $params["comp_zip_d"] = trim($tf_comp_zip_d);
-  if (isset ($tf_comp_town)) $params["comp_town"] = trim($tf_comp_town);
-  if (isset ($tf_comp_town_d)) $params["comp_town_d"] = trim($tf_comp_town_d);
-  if (isset ($tf_comp_cdx)) $params["comp_cdx"] = trim($tf_comp_cdx);
-  if (isset ($tf_comp_cdx_d)) $params["comp_cdx_d"] = trim($tf_comp_cdx_d);
-  if (isset ($tf_comp_ctry)) $params["comp_ctry"] = trim($tf_comp_ctry);
-  if (isset ($tf_comp_ctry_d)) $params["comp_ctry_d"] = trim($tf_comp_ctry_d);
-  if (isset ($tf_comp_pho)) $params["comp_pho"] = trim($tf_comp_pho);
-  if (isset ($tf_comp_pho_d)) $params["comp_pho_d"] = trim($tf_comp_pho_d);
-  if (isset ($tf_comp_fax)) $params["comp_fax"] = trim($tf_comp_fax);
-  if (isset ($tf_comp_fax_d)) $params["comp_fax_d"] = trim($tf_comp_fax_d);
-  if (isset ($tf_comp_web)) $params["comp_web"] = trim($tf_comp_web);
-  if (isset ($tf_comp_web_d)) $params["comp_web_d"] = trim($tf_comp_web_d);
-  if (isset ($tf_comp_mail)) $params["comp_mail"] = trim($tf_comp_mail);
-  if (isset ($tf_comp_mail_d)) $params["comp_mail_d"] = trim($tf_comp_mail_d);
-  if (isset ($tf_comp_com)) $params["comp_com"] = trim($tf_comp_com);
-  if (isset ($tf_comp_com_d)) $params["comp_com_d"] = trim($tf_comp_com_d);
-  // Mapping : contact
-  if (isset ($tf_con_ln)) $params["con_ln"] = trim($tf_con_ln);
-  if (isset ($tf_con_ln_d)) $params["con_ln_d"] = trim($tf_con_ln_d);
-  if (isset ($tf_con_fn)) $params["con_fn"] = trim($tf_con_fn);
-  if (isset ($tf_con_fn_d)) $params["con_fn_d"] = trim($tf_con_fn_d);
-  if (isset ($tf_con_lang)) $params["con_lang"] = trim($tf_con_lang);
-  if (isset ($tf_con_lang_d)) $params["con_lang_d"] = trim($tf_con_lang_d);
-  if (isset ($tf_con_func)) $params["con_func"] = trim($tf_con_func);
-  if (isset ($tf_con_func_d)) $params["con_func_d"] = trim($tf_con_func_d);
-  if (isset ($tf_con_tit)) $params["con_tit"] = trim($tf_con_tit);
-  if (isset ($tf_con_tit_d)) $params["con_tit_d"] = trim($tf_con_tit_d);
-  if (isset ($tf_con_ad1)) $params["con_ad1"] = trim($tf_con_ad1);
-  if (isset ($tf_con_ad1_d)) $params["con_ad1_d"] = trim($tf_con_ad1_d);
-  if (isset ($tf_con_ad2)) $params["con_ad2"] = trim($tf_con_ad2);
-  if (isset ($tf_con_ad2_d)) $params["con_ad2_d"] = trim($tf_con_ad2_d);
-  if (isset ($tf_con_ad3)) $params["con_ad3"] = trim($tf_con_ad3);
-  if (isset ($tf_con_ad3_d)) $params["con_ad3_d"] = trim($tf_con_ad3_d);
-  if (isset ($tf_con_zip)) $params["con_zip"] = trim($tf_con_zip);
-  if (isset ($tf_con_zip_d)) $params["con_zip_d"] = trim($tf_con_zip_d);
-  if (isset ($tf_con_town)) $params["con_town"] = trim($tf_con_town);
-  if (isset ($tf_con_town_d)) $params["con_town_d"] = trim($tf_con_town_d);
-  if (isset ($tf_con_cdx)) $params["con_cdx"] = trim($tf_con_cdx);
-  if (isset ($tf_con_cdx_d)) $params["con_cdx_d"] = trim($tf_con_cdx_d);
-  if (isset ($tf_con_ctry)) $params["con_ctry"] = trim($tf_con_ctry);
-  if (isset ($tf_con_ctry_d)) $params["con_ctry_d"] = trim($tf_con_ctry_d);
-  if (isset ($tf_con_pho)) $params["con_pho"] = trim($tf_con_pho);
-  if (isset ($tf_con_pho_d)) $params["con_pho_d"] = trim($tf_con_pho_d);
-  if (isset ($tf_con_hpho)) $params["con_hpho"] = trim($tf_con_hpho);
-  if (isset ($tf_con_hpho_d)) $params["con_hpho_d"] = trim($tf_con_hpho_d);
-  if (isset ($tf_con_mpho)) $params["con_mpho"] = trim($tf_con_mpho);
-  if (isset ($tf_con_mpho_d)) $params["con_mpho_d"] = trim($tf_con_mpho_d);
-  if (isset ($tf_con_fax)) $params["con_fax"] = trim($tf_con_fax);
-  if (isset ($tf_con_fax_d)) $params["con_fax_d"] = trim($tf_con_fax_d);
-  if (isset ($tf_con_mail)) $params["con_mail"] = trim($tf_con_mail);
-  if (isset ($tf_con_mail_d)) $params["con_mail_d"] = trim($tf_con_mail_d);
-  if (isset ($tf_con_mailok)) $params["con_mailok"] = trim($tf_con_mailok);
-  if (isset ($tf_con_mailok_d)) $params["con_mailok_d"] = trim($tf_con_mailok_d);
-  if (isset ($tf_con_com)) $params["con_com"] = trim($tf_con_com);
-  if (isset ($tf_con_com_d)) $params["con_com_d"] = trim($tf_con_com_d);
-
   // File
-  if (isset ($sample_file)) $params["file"] = $sample_file;
-  if (isset ($sample_file_name)) $params["file_name"] = $sample_file_name;
-  if (isset ($sample_file_size)) $params["file_size"] = $sample_file_size;
-
-  if (isset ($test_file)) $params["file"] = $test_file;
-  if (isset ($test_file_name)) $params["file_name"] = $test_file_name;
-  if (isset ($test_file_size)) $params["file_size"] = $test_file_size;
-
-  if (isset ($import_file)) $params["file"] = $import_file;
-  if (isset ($import_file_name)) $params["file_name"] = $import_file_name;
-  if (isset ($import_file_size)) $params["file_size"] = $import_file_size;
-  if (isset ($file_saved)) $params["file_saved"] = $file_saved;
+  if (isset ($_FILES['fi_file'])) {
+    $params["file"] = $_FILES['fi_file']["tmp_name"];
+    $params["file_name"] = $_FILES['fi_file']['name'];
+    $params["file_size"] = $_FILES['fi_file']['size'];
+    $params["type"] = $_FILES['fi_file']['type'];
+  }
 
   if (($action == "file_import")  && ($params["file"] != "")
       && ($params["file_saved"] == "")) {
@@ -603,7 +489,7 @@ function get_import_params() {
   if ($action == "file_test") {
     $params["run_mode"] = "test";
   } else if ($action == "file_import") {
-    if (isset ($cb_auto_mode)) {
+    if (isset ($params["auto_mode"])) {
       $params["run_mode"] = "auto";
     } else {
       $params["run_mode"] = "run";

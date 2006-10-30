@@ -922,7 +922,7 @@ function display_sections($section) {
   
   // If a theme specif function is provided
   if (function_exists("display_sections_theme")) {
-    return display_sections_theme($p_module);
+    return display_sections_theme($section);
   }
 
   // Else

@@ -26,7 +26,6 @@ $l_contact_new = "Nouveau Contact";
 $l_deal_new = "Nouvelle Affaire";
 $l_project_new = "Nouveau Projet";
 $l_contract_new = "Nouveau Contrat";
-$l_cat_tree = "Sous Catégories";
 $l_internal = "Interne";
 $l_naf_manage = "Gestion des Codes NAF";
 $l_naf_exist = "Codes NAF existants";

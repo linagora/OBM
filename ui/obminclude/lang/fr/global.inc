@@ -111,6 +111,7 @@ $l_connection_end = "Fin de connexion";
 $l_reconnect = "Cliquer ici pour se reconnecter";
 $l_version = "Version";
 $l_aka = "Aussi connu comme";
+$l_cat_tree = "Sous Catégories";
 $l_category1 = "Catégorie 1";
 $l_category2 = "Catégorie 2";
 $l_aduplicate = "Duplicata";

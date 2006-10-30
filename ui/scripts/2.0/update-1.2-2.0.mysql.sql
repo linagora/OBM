@@ -34,6 +34,7 @@ CREATE TABLE Domain (
 -- Update All tables to include Domain info
 --
 ALTER TABLE UserObm ADD Column userobm_domain_id int(8) default 0 after userobm_id;
+UPDATE UserObm SET userobm_domain_id=0;
 ALTER TABLE DataSource ADD Column datasource_domain_id int(8) default 0 after datasource_id;
 ALTER TABLE Country ADD Column country_domain_id int(8) default 0 first;
 ALTER TABLE Region ADD Column region_domain_id int(8) default 0 after region_id;
@@ -137,6 +138,8 @@ CREATE TABLE CategoryLink (
 ---------------------------------------------------------------------------
 -- Update UserObm table
 ---------------------------------------------------------------------------
+-- Add existent column which had not been added
+ALTER TABLE UserObm ADD COLUMN userobm_location varchar(255) DEFAULT '' AFTER userobm_description;
 ALTER TABLE UserObm ADD COLUMN userobm_education varchar(255) DEFAULT '' AFTER userobm_location;
 
 ---------------------------------------------------------------------------

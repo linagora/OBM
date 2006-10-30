@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "2.0pre6";
+$obm_version = "2.0pre7";
 $l_obm_title = "OBM";
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -259,7 +259,7 @@ if($c_multidomain) {
   $cgp_show["module"]["domain"] = "admin";
 }
 
-require_once("$obminclude/conf/obm_conf.inc");
+require_once("conf/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
 define("C_IMAGE_PATH",$cgp_host."images");
@@ -338,7 +338,7 @@ $c_undef = "0";             // Used in Form select
 $c_none = "-1";             // Used in Form select
 $c_null = "NULL";           // Used in queries (date is null)
 $c_auto = "_AUTO_";
-$c_yes = "Yes";			// Maybe stored in database
+$c_yes = "Yes";	            // Maybe stored in database
 $c_no = "No";
 $c_public = "__PUBLIC__";
 $c_private = "__PRIVATE__";

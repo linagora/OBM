@@ -88,7 +88,7 @@ if (file_exists("$path/../".$lang_file)) {
 
 // Specific conf global lang file
 if ($conf_lang) {
-  $lang_file = "$obminclude/conf/lang/$set_lang/global.inc";
+  $lang_file = "conf/lang/$set_lang/global.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   }
@@ -109,11 +109,11 @@ if ($module != "") {
 
   // Specific conf module lang file
   if ($conf_lang) {
-    $lang_file = "$obminclude/conf/lang/$set_lang/$lc_module.inc";
+    $lang_file = "conf/lang/$set_lang/$lc_module.inc";
     if (file_exists("$path/../".$lang_file)) {
       include("$lang_file");
     } else {
-      $lang_file = "$obminclude/conf/lang/$set_lang_default/$lc_module.inc";
+      $lang_file = "conf/lang/$set_lang_default/$lc_module.inc";
       //      if (file_exists("$path/../".$lang_file)) {
       //	include("$lang_file");
       //      }

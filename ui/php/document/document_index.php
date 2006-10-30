@@ -380,8 +380,10 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_params() {
-// Get global params
+
+  // Get global params
   $params = get_global_params("Document");
+
   if (isset ($params["path"])) $params["path"] = format_path(trim($params["path"]));
   if (isset ($_FILES['fi_file'])) {
     $params["file_tmp"] = $_FILES['fi_file']["tmp_name"];

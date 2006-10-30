@@ -26,7 +26,6 @@ $l_deal_new = "New Deal";
 $l_project_new = "New Projet";
 $l_contract_new = "New Contract";
 $l_internal = "Internal";
-$l_cat_tree = "Category tree";
 $l_naf_manage = "Code Management";
 $l_naf_exist = "Existing codes";
 $l_naf_new = "New Code";

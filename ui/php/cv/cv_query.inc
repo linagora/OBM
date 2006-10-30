@@ -15,7 +15,6 @@
 * @param string $p_order_dir direction for order clause (asc, desc)
 * @return DB Object $obm_q
 */
-
 function run_query_cv_search($cv, $p_new_order, $p_order_dir) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
 

@@ -94,7 +94,7 @@ CREATE TABLE UserObm (
   userobm_fax2            varchar(32),
   userobm_email           varchar(60),
   userobm_description     varchar(255),
-  userobm_location        varchar(100),
+  userobm_location        varchar(255),
   userobm_education       varchar(255),
   userobm_timelastaccess  TIMESTAMP,
   PRIMARY KEY (userobm_id),

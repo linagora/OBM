@@ -355,7 +355,7 @@ function dis_contact_search_form($contact="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
-  global $csearch_advanced_default, $l_fuzzy;
+  global $csearch_advanced_default, $l_fuzzy, $l_cat_tree;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
   global $l_after, $l_before, $l_mailing_ok_only, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
@@ -392,6 +392,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $c
   $show_func = (! $cgp_hide["contact"]["function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
+
+  // User defined categories
+  $block_user .= of_userdata_dis_search("contact", $contact);
   
   // Function select
   $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
@@ -519,6 +522,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $c
     <div class=\"searchLabel\">$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
     </div>
+    $block_user
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </div>

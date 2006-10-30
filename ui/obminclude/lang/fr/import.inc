@@ -66,6 +66,7 @@ $l_no_found = "Aucun import ne correspond à ces critères !";
 
 $l_fill_name = "Le nom d'Import doit être saisi !";
 $l_similar_company = "Société similaire";
+$l_used_company = "Société utilisée";
 $l_similar_contact = "Contact similaire";
 $l_company_defaultname = "Société sans Nom";
 $l_contact_defaultname = "Contact sans Nom";

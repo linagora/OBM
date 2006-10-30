@@ -23,7 +23,6 @@ $l_deal_new = "Nuovo Deal";
 $l_project_new = "Nuovo Projet";
 $l_contract_new = "Nuovo Contratto";
 $l_internal = "Interno";
-$l_cat_tree = "Category tree";
 
 // Actions
 $l_insert = "Inserisci Azienda";

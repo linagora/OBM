@@ -91,6 +91,7 @@ $l_connection_end = "Connection end";
 $l_reconnect = "Click here to reconnect";
 $l_version = "Versione";
 $l_aka = "Altri nome";
+$l_cat_tree = "Entera Categoria";
 $l_category1 = "Categoria 1";
 $l_category2 = "Categoria 2";
 $l_aduplicate = "Copia";

@@ -25,7 +25,6 @@ $l_contact_new = "Nuevo Contacto";
 $l_deal_new = "Nuevo negocio";
 $l_project_new = "Nuevo Proyecto";
 $l_contract_new = "Nuevo Contrato";
-$l_cat_tree = "Arbol de Categorías";
 $l_internal = "Interno";
 $l_naf_manage = "Administración de Códigos";
 $l_naf_exist = "Códigos existentes";
