@@ -53,6 +53,8 @@ L'implémentation dans un module nécessite en général l'appel des fonctions corre
 \hline
 \fonction{html\_module\_search\_form()} & \fonction{of\_userdata\_dis\_search()} \\
 \hline
+\fonction{html\_module\_search\_list()} & \fonction{of\_userdata\_get\_url\_search\_params()} \\
+\hline
 \fonction{html\_module\_consult()} & \fonction{of\_userdata\_dis\_entity\_consult()} \\
 \hline
 \fonction{html\_module\_form()} & \fonction{of\_userdata\_dis\_entity\_form()} \\
@@ -97,6 +99,34 @@ of_userdata_dis_search($entity, $params) {
 \textbf{Retour} & \textbf{Description}\\
 \hline
 String XHTML & Block de recherche des données utilisateurs\\
+\hline
+\end{tabular}
+\vspace{0.4cm}
+
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+of_userdata_get_url_search_params($entity, $params) {
+\end{verbatim}
+\end{minipage}
+}
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Paramètres} & \textbf{Description}\\
+\hline
+\multicolumn{2}{|c|}{Fonction qui retourne la liste des paramètres de recherche des données utilisateurs sous forme d'url}\\
+\hline
+\$entity & entité (ex: ``company'', ``contact'',..)\\
+\hline
+\hline
+\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\hline
+\hline
+\textbf{Retour} & \textbf{Description}\\
+\hline
+String url & Block des paramètres utilisateurs : \&amp;sel_companycategory1=2&amp;...\\
 \hline
 \end{tabular}
 \vspace{0.4cm}

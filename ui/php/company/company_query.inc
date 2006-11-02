@@ -100,10 +100,11 @@ function run_query_company_search($company) {
     $and = "AND";
   }
 
+  // User defined data
   $userdata = of_userdata_query_search("company", $company);
   if ($userdata["where"] != "") {
     $where .= " $and ". $userdata["where"];
-    $join_cat_user = $userdata["join"];
+    $join_userdata = $userdata["join"];
   }
 
   if (($where != "") || ($where_name != "")) {
@@ -159,7 +160,7 @@ function run_query_company_search($company) {
 
   $left_join = "
          LEFT JOIN CompanyType ON company_type_id=companytype_id
-         $join_cat_user
+         $join_userdata
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
          LEFT JOIN Country ON company_country_iso3166=country_iso3166
@@ -252,7 +253,7 @@ function run_query_company_detail($p_id) {
 // Parameters:
 //   - $company[] : Entry's values
 //     keys used  : num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
-//                : ctry, phone, fax, web, email, com, category1
+//                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_insert($company) {
   global $auth, $obm, $cdg_sql;
@@ -453,7 +454,6 @@ function run_query_company_update($cid, $company) {
     $usercomment = $company["usercomment"];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
-  $category1 = $company["category1"];
   $multidomain = sql_multidomain("company");
 	
   $query = "UPDATE Company SET

@@ -19,7 +19,7 @@ emacs scripts/0.8/create_obmdb_0.8.pgsql.sql
 emacs scripts/0.8/update_0.8.1-0.8.2.mysql.sql
 emacs scripts/0.8/update_0.8.1-0.8.2.pgsql.sql
    \end{verbatim}
- \item (module\_index.php) Récolter le paramètre issu du formulaire (get\_param\_module)\\
+ \item (module\_index.php) Les paramètres sont récoltés automatiquement. Mais si le nouveau paramètre doit subir un traitement spécial, ceci doit être implémenté dans (\fonction{get\_module\_params()})\\
  \item Si champ sélection d'une liste déroulante :
     \begin{itemize}
      \item[*] Créer la table associée (scripts création et mise à jour bases de données)\\

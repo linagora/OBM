@@ -327,12 +327,7 @@ function dis_contact_search_form($contact="") {
   $funcs = of_category_get_ordered("contact", "function");
   $ctry_q = run_query_global_country_for_lang();
   $dsrc_q = run_query_global_datasource();
-  $cats1 = of_category_get_ordered("contact", "category1");
-  $cats2 = of_category_get_ordered("contact", "category2");
-  $cats3 = of_category_get_ordered("contact", "category3");
-  $cats4 = of_category_get_ordered("contact", "category4");
-  $cats5 = of_category_get_ordered("contact", "category5");
-  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $cats1, $cats2, $cats3, $cats4, $cats5);
+  $block .= html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q);
 
   return $block;
 }
@@ -347,15 +342,10 @@ function dis_contact_search_form($contact="") {
 //   - $funcs     : array with contact function list
 //   - $ctry_q    : database object with country list
 //   - $dsrc_q    : database object with datasource list
-//   - $cats1     : array with contact category 1 list
-//   - $cats2     : array with contact category 2 list
-//   - $cats3     : array with contact category 3 list
-//   - $cats4     : array with contact category 4 list
-//   - $cats5     : array with contact category 5 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $cats1, $cats2, $cats3, $cats4, $cats5) {
+function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   global $action, $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
-  global $csearch_advanced_default, $l_fuzzy, $l_cat_tree;
+  global $csearch_advanced_default, $l_fuzzy;
   global $l_title, $l_market, $l_town, $l_postcode, $l_country, $l_datasource;
   global $l_after, $l_before, $l_mailing_ok_only, $l_archive;
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
@@ -371,11 +361,6 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $c
   $dsrc = $contact["datasource"];
   $func = $contact["function"];
   $title = $contact["title"];
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];
-  $cat3 = $contact["category3"];
-  $cat4 = $contact["category4"];
-  $cat5 = $contact["category5"];
   $mark = $contact["market"];
   $dateafter = stripslashes($contact["date_after"]);
   $datebefore = stripslashes($contact["date_before"]);
@@ -393,7 +378,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $c
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
 
-  // User defined categories
+  // User defined data
   $block_user .= of_userdata_dis_search("contact", $contact);
   
   // Function select
@@ -449,13 +434,6 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $c
   }
   $sel_ctry .= "</select>";
 
-  // Category 1, 2, 3, 4, 5 select
-  $block_category1 = of_category_dis_search_select("contact", "category1", $cats1, $cat1);
-  $block_category2 = of_category_dis_search_select("contact", "category2", $cats2, $cat2);
-  $block_category3 = of_category_dis_search_select("contact", "category3", $cats3, $cat3);
-  $block_category4 = of_category_dis_search_select("contact", "category4", $cats4, $cat4);
-  $block_category5 = of_category_dis_search_select("contact", "category5", $cats5, $cat5);
-
   if ($popup) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
@@ -505,13 +483,8 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q, $c
     <div class=\"searchLabel\">$l_datasource<br />
       $sel_dsrc
     </div>
-    $block_category5
     $block_function
     $block_title
-    $block_category1
-    $block_category2
-    $block_category3
-    $block_category4
     $block_resp
     <div class=\"searchLabel\">$l_after<br />
       <script>calendar('tf_date_after','$dateafter')</script>
@@ -592,6 +565,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
 
   // we urlencode to avoid breakage for space char
   $archive = $contact["archive"];
+  $advanced = $contact["fuzzy"];
   $mailng_ok_only = $contact["mailng_ok_only"];
   $lname = urlencode(stripslashes($contact["lname"]));
   $fname = stripslashes($contact["fname"]);
@@ -607,13 +581,11 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $func = $contact["function"];
   $title = urlencode(stripslashes($contact["title"]));
   $mark = $contact["market"];
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];
-  $cat3 = $contact["category3"];
-  $cat4 = $contact["category4"];
-  $cat5 = $contact["category5"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark&amp;sel_category1=$cat1&amp;sel_category2=$cat2&amp;sel_category3=$cat3&amp;sel_category4=$cat4&amp;sel_category5=$cat5$url_ext");
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params("contact", $contact);
+
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY("DATA", $prefs, "contact");
   if ($popup) {
@@ -666,20 +638,15 @@ function dis_contact_consult($contact) {
   }
   $display["detailInfo"] = display_record_info($con_q);
   $display["link"] = html_contact_links($id);
-  $cats5 = of_category_get_entitycategories("contact", "category5", $id, "mono");
   $funcs = of_category_get_entitycategories("contact", "function", $id, "mono");
-  $block .= html_contact_header($con_q, $funcs, $cats5);
+  $block .= html_contact_header($con_q, $funcs);
 
   if ($view != "") {
     include("$path/$view/".$view."_display.inc");
     include("$path/$view/".$view."_query.inc");
     $block .= dis_publication_subscription_external_list($contact);
   } else {
-    $cats1 = of_category_get_entitycategories("contact", "category1", $id);
-    $cats2 = of_category_get_entitycategories("contact", "category2", $id);
-    $cats3 = of_category_get_entitycategories("contact", "category3", $id);
-    $cats4 = of_category_get_entitycategories("contact", "category4", $id);
-    $block .= html_contact_view_main($con_q, $cats1, $cats2, $cats3, $cats4);
+    $block .= html_contact_view_main($con_q);
   }
 
   return $block;
@@ -691,9 +658,8 @@ function dis_contact_consult($contact) {
 // Parameters:
 //   - $co_q : contact database result
 //   - $funcs     : array with contact function list
-//   - $cats5     : array with contact category 5 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_header($co_q, $funcs, $cats5) {
+function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
   global $cgp_show, $cgp_hide, $c_yes, $c_no, $set_theme;
@@ -728,16 +694,14 @@ function html_contact_header($co_q, $funcs, $cats5) {
   }
 
   // Conditionnal fields
-  // category, category, category, category, category, function
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
 
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
-  // Category 5
+  // Function
   $block_function = of_category_dis_block_consult("contact", "function", $funcs, "mono");
-  $block_category5 = of_category_dis_block_consult("contact", "category5", $cats5, "mono");
 
   // Company Display
   if ($cgp_show["module"]["company"]) {
@@ -792,7 +756,6 @@ function html_contact_header($co_q, $funcs, $cats5) {
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">$dis_company</td>
-    $block_category5
     $block_function
     $block_title
     $block_resp
@@ -809,7 +772,7 @@ function html_contact_header($co_q, $funcs, $cats5) {
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
+function html_contact_view_main($co_q) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
   global $l_town, $l_country, $l_email, $l_mailing_ok, $l_expresspostal;
   global $l_comment1, $l_comment2, $l_comment3, $l_email_other;
@@ -898,18 +861,14 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
   }
 
   // Conditionnal fields
-  // category1, category2, category3, category4, function
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
   $show_comment2 = (! $cgp_hide["contact"]["contact_comment2"]);
   $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
-  // Category 1, 2, 3, 4 field
-  $block_category1 = of_category_dis_block_consult("contact", "category1", $cats1);
-  $block_category2 = of_category_dis_block_consult("contact", "category2", $cats2);
-  $block_category3 = of_category_dis_block_consult("contact", "category3", $cats3);
-  $block_category4 = of_category_dis_block_consult("contact", "category4", $cats4);
+  // User defined data
+  $block_user .= of_userdata_dis_entity_consult("contact", $id);
 
   $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
   if (($title != "")  && (in_array("title", $cclipboard_address))) {
@@ -1073,10 +1032,7 @@ function html_contact_view_main($co_q, $cats1, $cats2, $cats3, $cats4) {
     </tr>
     </table>
 
-    $block_category1
-    $block_category2
-    $block_category3
-    $block_category4
+    $block_user
 
     <div class=\"detailHead\">$l_comment1</div>
     <table class=\"detail\">
@@ -1217,17 +1173,9 @@ function dis_contact_form($action, $co_q, $contact) {
   global $display, $cg_com, $cgp_hide, $uid;
 
   $cid = $contact["contact_id"];
-  if ($cid > 0) {
-    $cats1=array();$cats2=array();$cats3=array();$cats4=array();
-    $cats1 = of_category_get_ordered("contact", "category1", "multi", $cid);
-    $cats2 = of_category_get_ordered("contact", "category2", "multi", $cid);
-    $cats3 = of_category_get_ordered("contact", "category3", "multi", $cid);
-    $cats4 = of_category_get_ordered("contact", "category4", "multi", $cid);
-  }
   $dsrc_q = run_query_global_datasource();
   $kind_q = run_query_contact_kind();
   $funcs = of_category_get_ordered("contact", "function");
-  $cats5 = of_category_get_ordered("contact", "category5");
 
   $users = array($uid);
 
@@ -1239,7 +1187,7 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_global_country_for_lang();
-  $block = html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
+  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
@@ -1250,11 +1198,6 @@ function dis_contact_form($action, $co_q, $contact) {
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : contact database result (company detail on new)
-//   - $cats1     : Contact category1 array
-//   - $cats2     : Contact category2 array
-//   - $cats3     : Contact category3 array
-//   - $cats4     : Contact category4 array
-//   - $cats5     : Contact category5 array
 //   - $dsrc_q    : datasource database result 
 //   - $funcs     : Contact function array 
 //   - $kind_q    : kind database result 
@@ -1264,7 +1207,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats5, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
   global $cgp_mailing_default, $cgp_submit_form_begin_enabled, $ccontact_private_default;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
@@ -1279,7 +1222,6 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   global $popup_width, $popup_height;
   global $display, $path, $auth, $cgp_show, $cgp_hide, $c_undef, $l_undef;
 
-  $cat1 = array();$cat2 = array();$cat3 = array();$cat4 = array();$cat5 = array();
   $uid = $auth->auth["uid"];
 
   // if update mode and first time values are taken from database
@@ -1414,16 +1356,10 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   if (isset($contact["add_comment3"])) { $add_comment3 = stripslashes($contact["add_comment3"]); }
   if (isset($contact["usercomment3"])) { $usercomment3 = $contact["usercomment3"]; }
   if (isset($contact["datecomment3"])) { $datecomment3 = $contact["datecomment3"]; }
-  if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
-  if (isset($contact["category2"])) { $cat2 = $contact["category2"]; }  
-  if (isset($contact["category3"])) { $cat3 = $contact["category3"]; }  
-  if (isset($contact["category4"])) { $cat4 = $contact["category4"]; }  
-  if (isset($contact["category5"])) { $cat5 = $contact["category5"]; }  
   if (isset($contact["privacy"])) { $priv = stripslashes($contact["privacy"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
   // Conditionnal fields
-  // category1,category2,category3,category4,category5, function
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
@@ -1432,6 +1368,9 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
   $show_comment2 = (! $cgp_hide["contact"]["contact_comment2"]);
   $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
+
+  // User defined data
+  $block_user = of_userdata_dis_entity_form("contact", $id);
 
   // some constants
   $csize_add = "48";
@@ -1522,13 +1461,6 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
   $sel_kind_header = "<select name=\"sel_header\">";
   $sel_kind_lang = "<select name=\"sel_lang\">";
   $sel_kind_label = "<select name=\"sel_label\">";
-
-  // Category 1, 2, 3, 4, 5 select field
-  $block_category1 = of_category_dis_entity_form("contact", "category1", $cats1);
-  $block_category2 = of_category_dis_entity_form("contact", "category2", $cats2);
-  $block_category3 = of_category_dis_entity_form("contact", "category3", $cats3);
-  $block_category4 = of_category_dis_entity_form("contact", "category4", $cats4);
-  $block_category5 = of_category_dis_entity_form("contact", "category5", $cats5, "mono", $cat5, "none");
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
@@ -1767,15 +1699,11 @@ function html_contact_form($action, $co_q, $cats1, $cats2, $cats3, $cats4, $cats
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailForm\">$dis_company</td>
     </tr>
-    $block_category5
     $block_function
     $block_title
     $block_resp
     $block_date
-    $block_category1
-    $block_category2
-    $block_category3
-    $block_category4
+    $block_user
     </table>
 
     <div class=\"detailHead\">$l_coord</div>
@@ -1887,11 +1815,6 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $com2 = stripslashes($contact["comment2"]);
   $com3 = stripslashes($contact["comment3"]);
   $archive = $contact["archive"];
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];
-  $cat3 = $contact["category3"];
-  $cat4 = $contact["category4"];
-  $cat5 = $contact["category5"];
 
   $disp_same_cont = "
     <tr>
@@ -1911,7 +1834,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 
   }
 
-  // --- HTML Template --------------------------------------------------------
+  // User defined data
+  $userdata = of_userdata_dis_hidden_fields("contact", $contact);
 
   $hidden = "
     <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
@@ -1942,11 +1866,6 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"ta_comment2\" value=\"$com2\" />
     <input type=\"hidden\" name=\"ta_comment3\" value=\"$com3\" />
     <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
-    <input type=\"hidden\" name=\"sel_category1\" value=\"$cat1\" />
-    <input type=\"hidden\" name=\"sel_category2\" value=\"$cat2\" />
-    <input type=\"hidden\" name=\"sel_category3\" value=\"$cat3\" />
-    <input type=\"hidden\" name=\"sel_category4\" value=\"$cat4\" />
-    <input type=\"hidden\" name=\"sel_category5\" value=\"$cat5\" />
 ";
 
   $block = "
@@ -2029,35 +1948,8 @@ function dis_contact_admin_index() {
     $block .= of_category_dis_admin_form("function", $funcs);
   }
 
-  if (! $cgp_hide["contact"]["category1"]) {
-    $cats1 = of_category_get_ordered("contact", "category1");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("category1", $cats1);
-  }
-
-  if (! $cgp_hide["contact"]["category2"]) {
-    $cats2 = of_category_get_ordered("contact", "category2");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("category2", $cats2);
-  }
-
-  if (! $cgp_hide["contact"]["category3"]) {
-    $cats3 = of_category_get_ordered("contact", "category3");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("category3", $cats3);
-  }
-
-  if (! $cgp_hide["contact"]["category4"]) {
-    $cats4 = of_category_get_ordered("contact", "category4");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("category4", $cats4);
-  }
-
-  if (! $cgp_hide["contact"]["category5"]) {
-    $cats5 = of_category_get_ordered("contact", "category5");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("category5", $cats5);
-  }
+  // User defined data
+  $block .= of_userdata_dis_admin_form("contact");
 
   return $block;
 }
@@ -2517,28 +2409,19 @@ function dis_html_contact_date_graph_stats($entity) {
 // Parameters:
 //  - $cat1_q : DB Object for category1 stats
 //  - $cat2_q : DB Object for category2 stats
-//  - $cat3_q : DB Object for category3 stats
-//  - $cat4_q : DB Object for category4 stats
-//  - $cat5_q : DB Object for category5 stats
 //  - $func_q : DB Object for function stats
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q) {
+function dis_category_contact_stats($cat1_q,$cat2_q, $func_q) {
 
   $block1 = of_category_dis_entity_stats("contact", "category1", $cat1_q);
   $block2 = of_category_dis_entity_stats("contact", "category2", $cat2_q);
-  $block3 = of_category_dis_entity_stats("contact", "category3", $cat3_q);
-  $block4 = of_category_dis_entity_stats("contact", "category4", $cat4_q);
-  $block5 = of_category_dis_entity_stats("contact", "category5", $cat5_q);
   $block_func = of_category_dis_entity_stats("contact", "function", $func_q);
   $block_date = dis_html_contact_date_graph_stats("contact"); 
 
   $block ="
     $block1
     $block2
-    $block3
-    $block4
-    $block5
     $block_func
     $block_date
   ";

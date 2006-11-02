@@ -1415,6 +1415,25 @@ function of_userdata_dis_search($entity, $params) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display: Global User data search block 
+// Parameters:
+//   - $entity : entity
+//   - $params : parameters with search data
+///////////////////////////////////////////////////////////////////////////////
+function of_userdata_get_url_search_params($entity, $params) {
+  global $cgp_user;
+
+  if (is_array($cgp_user[$entity]["category"])) {
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+      $url .= "&amp;sel_$cat_name=".$params[$cat_name]."&amp;${cat_name}_code=".$params["${cat_name}_code"]."&amp;cba_${cat_name}_tree=".$params["${cat_name}_tree"];
+    }
+  }
+
+  return $url;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display: Global User data for an entity in consult mode
 // Parameters:
 //   - $entity : entity

@@ -115,6 +115,7 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_contact_search_form($params);
+  echo "11111";
   $display["result"] = dis_contact_search_list($params);
 
 } elseif ($action == "new") {

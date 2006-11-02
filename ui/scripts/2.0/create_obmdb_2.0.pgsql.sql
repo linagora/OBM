@@ -317,7 +317,6 @@ CREATE TABLE Contact (
   contact_comment              text,
   contact_comment2             text,
   contact_comment3             text,
-  contact_category5_id         integer DEFAULT 0,
   PRIMARY KEY (contact_id)
 );
 

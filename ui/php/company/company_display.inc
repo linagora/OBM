@@ -198,7 +198,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   global $csearch_advanced_default, $l_fuzzy;
   global $l_company_name, $l_postcode, $l_town, $l_archive, $l_phone;
   global $l_market, $l_country, $l_after, $l_before, $l_nafcode; 
-  global $l_all, $l_find, $l_datasource, $l_cat_tree, $l_select_company;
+  global $l_all, $l_find, $l_datasource, $l_select_company;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -221,7 +221,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
     $fuzzy = "";
   }
 
-  // User defined categories
+  // User defined data
   $block_user .= of_userdata_dis_search("company", $company);
 
   // Type, activity select
@@ -403,9 +403,6 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $town = stripslashes($company["town"]);
   $ctry = $company["country"];
   $type = $company["type"];
-  $cat1 = $company["category1"];
-  $cat_code = $company["category1_code"];
-  $cat_tree = $company["category1_tree"];
   $act = $company["activity"];
   $naf = $company["naf"];
   $zip = urlencode(stripslashes($company["zip"]));
@@ -416,7 +413,10 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_category1=$cat1&amp;tf_category1_code=$cat_code&amp;cba_category1_tree=$cat_tree&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_ext");
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params("company", $company);
+
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type$url_userdata&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -707,7 +707,7 @@ function html_company_consult($co_q) {
   }
 
   // Conditionnal fields
-  // of: activity, type, category1, activity
+  // of: activity, type, activity
   $show_number = (! $cgp_hide["company"]["company_number"]);
   $show_vat = (! $cgp_hide["company"]["company_vat"]);
   $show_siret = (! $cgp_hide["company"]["company_siret"]);
@@ -814,6 +814,7 @@ function html_company_consult_address($co_q) {
   $email = $co_q->f("company_email");
   $com = beautify_comment(nl2br($co_q->f("company_comment")));
   
+  // User defined data
   $block_user .= of_userdata_dis_entity_consult("company", $id);
 
   // Conditionnal fields
@@ -924,7 +925,7 @@ function html_company_consult_address($co_q) {
 function dis_company_form($action, $company) {
   global $display, $cg_com, $cgp_hide, $uid, $l_err_reference;
 
-  // of: type, activity, category1
+  // of: type, activity
   $show_naf = (! $cgp_hide["company"]["nafcode"]);
 
   $c_id = $company["company_id"];
@@ -1061,6 +1062,9 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
+  // User defined data
+  $block_user = of_userdata_dis_entity_form("company", $id);
+
   // some constants
   $csize_add = "48";
   $cmax_add = "64";
@@ -1103,8 +1107,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   $block_type = of_category_dis_entity_form("company", "type", $types, "mono", $type, "none");
   $block_activity = of_category_dis_entity_form("company", "activity", $acts, "mono", $act, "none");
-
-  $block_user = of_userdata_dis_entity_form("company", $id);
 
   // Naf code select field
   if ($show_naf) {
@@ -1394,7 +1396,6 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $web = $company["web"];
   $email = $company["email"];
   $com = $company["comment"];
-  $compcat = $company["cat"]; 
   $display["msg"] .= display_warn_msg($l_check_samecompany);
 
   while ($co_q->next_record()) {
@@ -1407,12 +1408,8 @@ function dis_company_warn_insert($cid, $co_q, $company) {
           $samename ($samezip)</a>
       </td></tr>";
   }
-  if (is_array($compcat)) {
-    foreach ($compcat as $cat) {
-    $dis_cat .= "<input type=\"hidden\" name=\"sel_cat[]\" value=\"$cat\" />";
-    }
-  }
 
+  // User defined data
   $userdata = of_userdata_dis_hidden_fields("company", $company);
 
   $hidden_fields = "
@@ -1438,7 +1435,6 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    $dis_cat
     <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
 ";
 
@@ -1491,6 +1487,7 @@ function dis_company_admin_index() {
     $block .= html_company_nafcode_form($naf_q);
   }
 
+  // User defined data
   $block .= of_userdata_dis_admin_form("company");
 
   return $block;

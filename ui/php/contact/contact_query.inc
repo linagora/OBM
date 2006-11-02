@@ -14,7 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
-  
+
   $sql_order_dir = $contact["sql_order_dir"];
   $sql_order_field = $contact["sql_order_field"];
 
@@ -32,11 +32,6 @@ function run_query_contact_search($contact) {
   $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
   $dsrc = $contact["datasource"];
-  $category1 = $contact["category1"];
-  $category2 = $contact["category2"];
-  $category3 = $contact["category3"];
-  $category4 = $contact["category4"];
-  $category5 = $contact["category5"];
   $dateafter = $contact["date_after"];
   $datebefore = $contact["date_before"];
   $mailing_ok_only = $contact["mailing_ok_only"];
@@ -47,7 +42,7 @@ function run_query_contact_search($contact) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-	$multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain("contact");
 
   // only the one which are allowed (ie. publics )
   $where .= sql_obm_entity_privacy("contact");
@@ -155,31 +150,6 @@ function run_query_contact_search($contact) {
   if (($dsrc != $c_all) && ($dsrc != "")) { 
     $where .= " AND contact_datasource_id='$dsrc'";
   }
-  // If a Category 1 has been set
-  if (($category1 != $c_all) && ($category1 != "")) {
-    $join_category1 = "LEFT JOIN ContactCategory1Link ON contact_id=contactcategory1link_contact_id";
-    $where .= " AND contactcategory1link_category_id='$category1'";
-  }
-  // If a Category 2 has been set
-  if (($category2 != $c_all) && ($category2 != "")) {
-    $join_category2 = "LEFT JOIN ContactCategory2Link ON contact_id=contactcategory2link_contact_id";
-    $where .= " AND contactcategory2link_category_id='$category2'";
-  }
-  // If a Category 3 has been set
-  if (($category3 != $c_all) && ($category3 != "")) {
-    $join_category3 = "LEFT JOIN ContactCategory3Link ON contact_id=contactcategory3link_contact_id";
-    $where .= " AND contactcategory3link_category_id='$category3'";
-  }
-  // If a Category 4 has been set
-  if (($category4 != $c_all) && ($category4 != "")) {
-    $join_category4 = "LEFT JOIN ContactCategory4Link ON contact_id=contactcategory4link_contact_id";
-    $where .= " AND contactcategory4link_category_id='$category4'";
-  }
-  // If a Category 5 has been set
-  if (($category5 != $c_all) && ($category5 != "")) {
-    $join_category5 = "LEFT JOIN ContactCategory5 ON contact_category5_id=contactcategory5_id";
-    $where .= " AND contactcategory5_id='$category5'";
-  }
   // Date
   $date = sql_date_format($db_type, "contact_date", "contact_date");
 
@@ -196,6 +166,13 @@ function run_query_contact_search($contact) {
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " AND contact_archive=0";
+  }
+
+  // User defined data
+  $userdata = of_userdata_query_search("contact", $contact);
+  if ($userdata["where"] != "") {
+    $where .= " AND ". $userdata["where"];
+    $join_userdata = $userdata["join"];
   }
   
   $whereq = "WHERE $where $multidomain";
@@ -257,22 +234,23 @@ function run_query_contact_search($contact) {
       contactfunction_label as function_label
     FROM Contact";
 
-  $left_join = "$join_comp
+  // XXX Really strange Postgres (8.1.5) behaviour here !
+  // if $join_userdata after join_comp, query is really slow (30s) with only
+  // criteria : contactcategory1 selected
+  $left_join = "
+        $join_userdata
+        $join_comp
         LEFT JOIN Kind ON contact_kind_id = kind_id
         LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
         LEFT JOIN Country as ctry1 ON
                   contact_country_iso3166 = ctry1.country_iso3166
                   AND ctry1.country_lang='$lang'
-        $join_ctry2
-        $join_category1
-        $join_category2
-        $join_category3
-        $join_category4
-        $join_category5";
+        $join_ctry2";
+
 
   if ((! $fuzzy) || ($lname == "")) {
     if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(*) FROM Contact $left_join $whereq");
+      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
     // If any results (from limited) or result not limited, we get the data
@@ -493,11 +471,6 @@ function run_query_contact_insert($contact) {
   $ad1 = $contact["ad1"];
   $ad2 = $contact["ad2"];
   $ad3 = $contact["ad3"];
-  $category1 = $contact["category1"];
-  $category2 = $contact["category2"];  
-  $category3 = $contact["category3"];  
-  $category4 = $contact["category4"];  
-  $category5 = ($contact["category5"] > 0 ? $contact["category5"] : '0');  
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -570,8 +543,7 @@ function run_query_contact_insert($contact) {
     contact_date,
     contact_comment,
     contact_comment2,
-    contact_comment3,
-    contact_category5_id
+    contact_comment3
   ) VALUES ('$now',
     '$now',
     '$uid',
@@ -608,11 +580,10 @@ function run_query_contact_insert($contact) {
     $date,
     '$comment',
     '$comment2',
-    '$comment3',
-    '$category5'
+    '$comment3'
   )";
 
-  display_debug_msg($query, $cdg_sql, "run_query_contact_insert()");
+  display_debug_msg($query, $cdg_sql, "run_query_contact_insert(1)");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -630,30 +601,13 @@ function run_query_contact_insert($contact) {
       AND contact_zipcode = '$zip'
       AND contact_domain_id='$domain_id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_insert(2)");
   $obm_q->query($query);
   $obm_q->next_record();
   $id = $obm_q->f("contact_id");
 
-  if ($retour && is_array($category1)) {
-    foreach($category1 as $categoryid) {
-      $retour = of_category_query_insert_link("contact", "category1", $id, $categoryid);
-    }
-  }
-  if ($retour && is_array($category2)) {
-    foreach($category2 as $categoryid) {
-      $retour = of_category_query_insert_link("contact", "category2", $id, $categoryid);
-    }
-  }
-  if ($retour && is_array($category3)) {
-    foreach($category3 as $categoryid) {
-      $retour = of_category_query_insert_link("contact", "category3", $id, $categoryid);
-    }
-  }
-  if ($retour && is_array($category4)) {
-    foreach($category4 as $categoryid) {
-      $retour = of_category_query_insert_link("contact", "category4", $id, $categoryid);
-    }
+  if ($id > 0) {
+    $ret = of_userdata_query_update("contact", $id, $contact);
   }
   
   return $id;
@@ -736,14 +690,8 @@ function run_query_contact_update($contact) {
     $usercomment3 = $contact["usercomment3"];
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
-
   $archive = (isset($contact["archive"]) ? '1' : '0');
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
-  $category1 = $contact["category1"];
-  $category2 = $contact["category2"];
-  $category3 = $contact["category3"];
-  $category4 = $contact["category4"];
-  $category5 = ($contact["category5"] > 0 ? $contact["category5"] : '0');  
   $multidomain = sql_multidomain("contact");
   
   $query = "UPDATE Contact SET
@@ -779,8 +727,7 @@ function run_query_contact_update($contact) {
     contact_date=$date,
     contact_comment='$comment',
     contact_comment2='$comment2',
-    contact_comment3='$comment3',
-    contact_category5_id='$category5'
+    contact_comment3='$comment3'
   WHERE contact_id='$id'
     $multidomain";
 
@@ -789,39 +736,7 @@ function run_query_contact_update($contact) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $retour = of_category_query_delete_link("contact", "category1", $id);
-    if (is_array($category1)) {
-      foreach($category1 as $categoryid) {
-        $retour = of_category_query_insert_link("contact", "category1", $id, $categoryid);
-      }
-    }
-  }
-
-  if ($retour) {
-    $retour = of_category_query_delete_link("contact", "category2", $id);
-    if (is_array($category2)) {
-      foreach($category2 as $categoryid) {
-        $retour = of_category_query_insert_link("contact", "category2", $id, $categoryid);
-      }
-    }
-  }
-
-  if ($retour) {
-    $retour = of_category_query_delete_link("contact", "category3", $id);
-    if (is_array($category3)) {
-      foreach($category3 as $categoryid) {
-        $retour = of_category_query_insert_link("contact", "category3", $id, $categoryid);
-      }
-    }
-  }
-
-  if ($retour) {
-    $retour = of_category_query_delete_link("contact", "category4", $id);
-    if (is_array($category4)) {
-      foreach($category4 as $categoryid) {
-        $retour = of_category_query_insert_link("contact", "category4", $id, $categoryid);
-      }
-    }
+    $ret = of_userdata_query_update("contact", $id, $contact);
   }
 
   if ($cgp_show["module"]["company"]) {
@@ -893,6 +808,7 @@ function run_query_contact_delete($p_id) {
   
   run_query_global_delete_document_links($p_id, "contact");    
   run_query_contact_delete_subscription($p_id);    
+  $ret = of_userdata_query_delete("contact", $p_id);
 
   $query = "DELETE FROM Contact WHERE contact_id='$p_id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_contact_delete(1)");
@@ -1021,10 +937,6 @@ function check_contact_data_form($cid, $contact) {
   $email2 = stripslashes($contact["email2"]);
   $c_id = $contact["company_id"];
   $c_new_id = $contact["company_new_id"];
-  $cat1 = $contact["category1"];
-  $cat2 = $contact["category2"];
-  $cat3 = $contact["category3"];
-  $cat4 = $contact["category4"];
   
   // MANDATORY: Contact name
   $lname = strtoupper($lname);
