@@ -29,10 +29,6 @@
 // - nafcode_update      -- form fields    -- update the nafcode
 // - nafcode_checklink   --                -- check if nafcode is used
 // - nafcode_delete      -- $sel_kind      -- delete the nafcode
-// - category_insert     -- form fields    -- insert the category
-// - category_update     -- form fields    -- update the category
-// - category_checklink  --                -- check if category is used
-// - category_delete     -- $sel_kind      -- delete the category
 // - display             --                -- display, set display parameters
 // - dispref_display     --                -- update one field display value
 // - dispref_level       --                -- update 1 field display position
@@ -77,17 +73,6 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] = display_info_msg($l_no_display);
   }
-
-} elseif ($action == "ext_get_category_ids") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_user_dis_tree("company", $params["category"], $params, $action);
-
-} elseif ($action == "ext_get_category_code") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_user_dis_tree("company", $params["category"], $params, $action);
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -305,46 +290,6 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] .= dis_company_admin_index();
 
-} elseif ($action == "category_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $category = $params["category"];
-  $l_cat = ${"l_$category"};
-  $retour = of_category_user_query_insert($params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_cat : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_cat : $l_insert_error");
-  }
-  $display["detail"] .= dis_company_admin_index();
-
-} elseif ($action == "category_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $category = $params["category"];
-  $l_cat = ${"l_$category"};
-  $retour = of_category_user_query_update($params); 
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_cat : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_cat : $l_update_error");
-  }
-  $display["detail"] .= dis_company_admin_index();
-
-} elseif ($action == "category_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_user_dis_links($params);
-
-} elseif ($action == "category_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $category = $params["category"];
-  $l_cat = ${"l_$category"};
-  $retour = of_category_user_query_delete($params); 
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_cat : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_cat : $l_delete_error");
-  }
-  $display["detail"] .= dis_company_admin_index();
-
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $prefs = get_display_pref($uid, "company", 1);
@@ -373,6 +318,8 @@ if ($action == "ext_get_id") {
   }
   $display["detail"] = dis_company_consult($params);
 }
+
+of_category_user_action_switch($module, $action, $params);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -436,6 +383,8 @@ function get_company_action() {
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display,$l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
+  of_category_user_module_action("company");
 
 // Index
   $actions["company"]["index"] = array (
@@ -541,30 +490,6 @@ function get_company_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-// Category Insert
-  $actions["company"]["category_insert"] = array (
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// Category Update
-  $actions["company"]["category_update"] = array (
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// Category Check Link
-  $actions["company"]["category_checklink"] = array (
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-// Category Delete
-  $actions["company"]["category_delete"] = array (
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	       );
-
 // Activity Insert
   $actions["company"]["activity_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_insert",
@@ -641,20 +566,6 @@ function get_company_action() {
     'Url'      => "$path/company/company_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                     		 );
-
-// Category Select 
-  $actions["company"]["ext_get_category_ids"]  = array (
-    'Url'      => "$path/company/company_index.php?action=ext_get_category_ids",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None')
-                                     		 );
-
-// Category Select 
-  $actions["company"]["ext_get_category_code"]  = array (
-    'Url'      => "$path/company/company_index.php?action=ext_get_category_code",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None')
                                      		 );
 
 // Company Select 

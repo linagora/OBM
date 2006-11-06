@@ -183,7 +183,7 @@ function contact_copy_clip(text)
     try {
       netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
     } catch (err) {   
-      alert('$l_j_copy_privilege_alert');;	   
+      alert('$l_j_copy_privilege_alert');
       return false;
     }
     

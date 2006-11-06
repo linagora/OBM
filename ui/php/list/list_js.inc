@@ -375,58 +375,6 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_datasource_id[]\" value=\"\" />';
   }
   
-  if (form.sel_contactcategory1link_category_id.value != '') {
-    cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_contact_cat1';
-    cell = values.insertCell(i);
-    field = form.sel_contactcategory1link_category_id;
-    len = field.options.length;
-    val = '';
-    txt = '';
-    size = 0;
-    for(h = 0; h < len;h++){
-      if(field.options[h].selected == true){
-        if(val != '') {
-          val += ',';
-          txt += ',';
-        }
-        val +=field.options[h].value;
-        txt +=field.options[h].text;
-        size+=1;
-      }
-    }
-    cell.innerHTML = '<select title=\"'+txt+'\" name=\"sel_contactcategory1link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ val+'\">'+ field.options[field.selectedIndex].text+'('+size+')</option></select>';
-    i++;
-  } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory1link_category_id[]\" value=\"\" />';
-  }
-
-  if (form.sel_contactcategory2link_category_id.value != '') {
-    cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_contact_cat2';
-    cell = values.insertCell(i);
-    field = form.sel_contactcategory2link_category_id;
-    len = field.options.length;
-    val = '';
-    txt = '';
-    size = 0;
-    for(h = 0; h < len;h++){
-      if(field.options[h].selected == true){
-        if(val != '') {
-          val += ',';
-          txt += ',';
-        }
-        val +=field.options[h].value;
-        txt +=field.options[h].text;
-        size+=1;
-      }
-    }    
-    cell.innerHTML = '<select title=\"'+txt+'\" name=\"sel_contactcategory2link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ val+'\">'+ field.options[field.selectedIndex].text+'('+size+')</option></select>';
-    i++;
-  } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory2link_category_id[]\" value=\"\" />';
-  }
-  
   if (form.sel_contact_function_id.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_function';
@@ -448,8 +396,47 @@ function contact_criterion(form,labels,values,i) {
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_kind_lang[]\" value=\"\" />';
   }
+";
 
-  
+// User data categories handling
+if (is_array($cgp_user["contact"]["category"])) {
+  foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+    $cat_id = "${cat_name}_id";
+    $cat_code = "${cat_name}_code";
+    $cat_label = ${"l_$cat_name"};
+
+    $extra_js .= "
+
+  if (form.sel_$cat_id.value != '') {
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $cat_label';
+    cell = values.insertCell(i);
+    field = form.sel_$cat_id;
+    len = field.options.length;
+    val = '';
+    txt = '';
+    size = 0;
+    for(h = 0; h < len;h++){
+      if(field.options[h].selected == true){
+        if(val != '') {
+          val += ',';
+          txt += ',';
+        }
+        val +=field.options[h].value;
+        txt +=field.options[h].text;
+        size+=1;
+      }
+    }
+    cell.innerHTML = '<select title=\"'+txt+'\" name=\"sel_${cat_id}[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ val+'\">'+ field.options[field.selectedIndex].text+'('+size+')</option></select>';
+    i++;
+  } else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_${cat_id}[]\" value=\"\" />';
+  }
+";
+  }
+}
+
+$extra_js .= "
   return i;
 }
 

@@ -107,6 +107,20 @@ function fill_ext_cat_element(int_form) {
   }
 }
 
+// Select the category with the code given
+function fill_category_ext_code_form(value) {
+  ext_field = window.opener.document.$ext_target;
+  ext_size = ext_field.length;
+  ext_field = window.opener.document.$ext_target;
+  bool= false;
+  for(j=0; j< ext_size && bool == false; j++) {
+    if (ext_field.options[j].value == value) {
+      ext_field.options[j].selected = true;
+      bool=true;
+    }
+  }
+  window.close();
+} 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add an element line in the list form
@@ -726,38 +740,69 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the category for one entity 
 // Parameters:
-//   - $entity       : target entity
-//   - $cat          : target category
-//   - $cat_q        : DB Object for category stats
+//   - $entity : target entity
+//   - $cat    : target category
+//   - $cats   : array for category stats
+//   - $order  : column to sort results
 // Returns:
-//   - $block        : html block
+//   - $block  : html block
 ///////////////////////////////////////////////////////////////////////////////
-function of_category_dis_entity_stats($entity, $cat, $cat_q) {
-  global $l_key, $l_totals;
+function of_category_dis_entity_stats($entity, $cat, $cats, $order) {
+  global $l_totals;
 
   $l_cat = "l_${cat}"; $l_entity = "l_${entity}";
   global $$l_cat,$$l_entity;
 
-  $field_prefix = $entity.$cat."_";
-  $field_id = $field_prefix."id";
-  $field_code = $field_prefix."code";
-  $field_label = $field_prefix."label";
-  $entityfield_prefix = $entity."_";
-  $entityfield_id = $entityfield_prefix."id";
+  $title = ucfirst(${$l_cat});
 
-  $count_entity = _of_category_get_entity_count($entity);
-  $max = 1;
-  while($cat_q->next_record()) {
-    $stat[$cat_q->f("$field_id")]["$cat"] = $cat_q->f("count_entity");
-     $stat[$cat_q->f("$field_id")]["name"] = $cat_q->f("$field_code")." - ".$cat_q->f("$field_label");
-    if ($cat_q->f("count_entity") > $max) {
-      $max = $cat_q->f("count_entity");
+  if (is_array($cats)) {
+    $has_code = false;
+    foreach ($cats as $one_cat) {
+      if ($one_cat["code"] != "") {
+	$has_code = true;
+	break;
+      }
+    }
+
+    if ($order == "code") {
+      if ($has_code) {
+	usort($cats, "_of_category_compare_code");
+      } else {
+	usort($cats, "_of_category_compare_label");
+      }
+    } else {
+      usort($cats, "_of_category_compare_nb");
+    }
+
+    $count_entity = _of_category_get_entity_count($entity);
+    $max = 1;
+    foreach($cats as $cat_id=>$one_cat) {
+      $stat[$cat_id]["$cat"] = $one_cat["nb"];
+      if ($has_code) {
+	$stat[$cat_id]["name"] = $one_cat["code"]." - ".$one_cat["label"];
+      } else {
+	$stat[$cat_id]["name"] = $one_cat["label"];
+      }
+      if ($one_cat["nb"] > $max) {
+	$max = $one_cat["nb"];
+      }
     }
   }
 
+  $block .= "<div class=\"detailHead\">$title</div>
+  <table class=\"detail\" >
+  <tr>
+    <td class=\"detailLabel\" class=\"detailLabel\"><a href=\"?action=statistics&amp;stat=$cat&amp;order=code\">$title</a><br/></td>
+    <td class=\"detailForm\">
+      <table>
+      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td>
+        <td><a href=\"?action=statistics&amp;stat=$cat&amp;order=nb\">${$l_entity}</a> ($l_totals : $count_entity)</td>
+      </tr>
+      </table>
+      <br/>
+    </td>
+  </tr>";
 
-  $block .= "<div class=\"detailHead\">".ucfirst(${$l_cat})."</div>
-   <table class=\"detail\" >";
   if (is_array($stat)) {
     foreach($stat as $id => $value) {
       $ents = round(($value["$cat"]/$max)*90);
@@ -774,14 +819,14 @@ function of_category_dis_entity_stats($entity, $cat, $cat_q) {
 
   $block .= "
   <tr>
-    <td class=\"detailLabel\" class=\"detailLabel\"><br/>$l_key</td>
+    <td class=\"detailLabel\" class=\"detailLabel\"><br/>$title</td>
     <td class=\"detailForm\">
      <br/>
      <table>
       <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>${$l_entity} ($l_totals : $count_entity)</td></tr>
      </table>
     </td>
-   </tr>
+  </tr>
   </table>";
 
   return $block;
@@ -855,7 +900,7 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 
     if ($has_code) {
       if (count($cats) > 0) {
-	usort($cats, "_of_category_compare");
+	usort($cats, "_of_category_compare_code");
       }
     }
   }
@@ -1168,7 +1213,7 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
   }
 
   if (count($cats) > 0) {
-    usort($cats, "_of_category_compare");
+    usort($cats, "_of_category_compare_code");
   }
 
   return $cats;
@@ -1238,14 +1283,14 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
   $multidomain = sql_multidomain(strtolower($table));
 	
   if ($mode == "mono") {
-    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
+    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as nb_category
       FROM $table
         LEFT JOIN $entitytable ON $entityfield_cat = $field_id
       WHERE 1=1 $multidomain
       GROUP BY $entityfield_cat, $field_id, $field_code, $field_label
       ORDER BY $field_code, $field_label";
   } else {
-    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as count_entity
+    $query = "SELECT $field_id, $field_code, $field_label, count($entityfield_id) as nb_category
       FROM $table
         LEFT JOIN $linktable ON $linkfield_cat = $field_id
         LEFT JOIN $entitytable ON $entityfield_id = $linkfield_ent
@@ -1257,8 +1302,16 @@ function of_category_query_category_per_entity($entity, $cat, $mode="multi") {
   display_debug_msg($query, $cdg_sql, "of_category_query_category_per_entity()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  $cats = array();
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f($field_id);
+    $code = $obm_q->f($field_code);
+    $label = $obm_q->f($field_label);
+    $nb = $obm_q->f("nb_category");
+    $cats[$id] = array("code" => $code, "label" => $label, "nb" => $nb);
+  }
 
-  return $obm_q;
+  return $cats;
 }
 
 
@@ -1306,7 +1359,7 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
         <span id=\"data$id\">$code - $label</span>";
     } else {
       $dis_cat = "
-        <a href=\"javascript: void(0);\" onclick=\"fill_company_ext_code_form('$code'); return false;\"><span id=\"data$id\">$code - $label</span></a>";
+        <a href=\"javascript: void(0);\" onclick=\"fill_category_ext_code_form('$code'); return false;\"><span id=\"data$id\">$code - $label</span></a>";
     }
 
     // If the node has children : link to open it, and icon is different
@@ -1345,18 +1398,50 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Compare 2 categories by their occurence number
+// Parameters: 
+//   - $m   : index of first category
+//   - $n   : index of second category
+///////////////////////////////////////////////////////////////////////////////
+function _of_category_compare_nb($m, $n) {
+
+  if ($m["nb"] >= $n["nb"]) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Compare 2 categories by their label
+// Parameters: 
+//   - $m   : index of first category
+//   - $n   : index of second category
+///////////////////////////////////////////////////////////////////////////////
+function _of_category_compare_label($m, $n) {
+
+  if ($m["label"] >= $n["label"]) {
+    return 1;
+  } else {
+    return -1;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Compare 2 categories with their code. Order 1.15 ans 1.2 correctly
 // Parameters: 
 //   - $m : index of first category
 //   - $n : index of second category
 ///////////////////////////////////////////////////////////////////////////////
-function _of_category_compare($m, $n) {
+function _of_category_compare_code($m, $n) {
 
   $code_1 = explode(".",$m["code"]);
   $code_2 = explode(".",$n["code"]);
   $i=0;
   while (isset($code_1[$i]) || isset($code_2[$i])) {
-    if ($code_1[$i] > $code_2[$i]){
+    if ($code_1[$i] > $code_2[$i]) {
       return 1;
     } elseif ($code_1[$i] < $code_2[$i]) {
       return -1;
@@ -1386,7 +1471,7 @@ function _of_category_get_entity_count($entity) {
 
   $query = "SELECT count(*) as count_entity FROM $entitytable WHERE 1=1 $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "_of_category_get_entity_count()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -1474,7 +1559,6 @@ function of_userdata_dis_entity_form($entity, $ent_id) {
 	} else {
 	  $cat_id = "";
 	}
-	print_r($cats_sel);
       } else {
 	if ($ent_id > 0) {
 	  $cats = of_category_user_get_ordered($cat_name, $entity, $ent_id);
@@ -1638,6 +1722,116 @@ function of_userdata_query_delete($entity, $ent_id) {
 //=============================================================================
 // OF User Category API
 //=============================================================================
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User category actions switch
+// Parameters:
+//   - $module : calling module
+//   - $action : action
+//   - $params : parameters hash
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_action_switch($module, $action, $params) {
+  global $display, $extra_css, $l_insert_ok, $l_insert_error;
+  global $l_update_ok,$l_update_error, $l_delete_ok, $l_delete_error;
+
+  $category = $params["category"];
+  global ${"l_$category"};
+  $l_cat = ${"l_$category"};
+
+  if ($action == "category_insert") {
+    $retour = of_category_user_query_insert($params);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg("$l_cat : $l_insert_ok");
+    } else {
+      $display["msg"] .= display_err_msg("$l_cat : $l_insert_error");
+    }
+    $func = "dis_${module}_admin_index";
+    $display["detail"] .= @$func();
+
+  } elseif ($action == "category_update") {
+    $retour = of_category_user_query_update($params); 
+    if ($retour) {
+      $display["msg"] .= display_ok_msg("$l_cat : $l_update_ok");
+    } else {
+      $display["msg"] .= display_err_msg("$l_cat : $l_update_error");
+    }
+    $func = "dis_${module}_admin_index";
+    $display["detail"] .= @$func();
+
+  } elseif ($action == "category_checklink") {
+    $display["detail"] .= of_category_user_dis_links($params);
+
+  } elseif ($action == "category_delete") {
+    $retour = of_category_user_query_delete($params); 
+    if ($retour) {
+      $display["msg"] .= display_ok_msg("$l_cat : $l_delete_ok");
+    } else {
+      $display["msg"] .= display_err_msg("$l_cat : $l_delete_error");
+    }
+    $func = "dis_${module}_admin_index";
+    $display["detail"] .= @$func();
+    
+  } elseif ($action == "ext_get_category_ids") {
+    $extra_css = "category.css";
+    $display["detail"] = of_category_user_dis_tree($module, $params["category"], $params, $action);
+
+  } elseif ($action == "ext_get_category_code") {
+    $extra_css = "category.css";
+    $display["detail"] = of_category_user_dis_tree($module, $params["category"], $params, $action);
+  }
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User category actions definition
+// Parameters:
+//   - $module : calling module
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_module_action($module) {
+  global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  global $actions;
+
+// Category Insert
+  $actions[$module]["category_insert"] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Category Update
+  $actions[$module]["category_update"] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Category Check Link
+  $actions[$module]["category_checklink"] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Category Delete
+  $actions[$module]["category_delete"] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Category Select 
+  $actions[$module]["ext_get_category_ids"] = array (
+    'Url'      => "$path/$module/${module}_index.php?action=ext_get_category_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                     		 );
+
+// Category Select 
+  $actions[$module]["ext_get_category_code"] = array (
+    'Url'      => "$path/$module/${module}_index.php?action=ext_get_category_code",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                     		 );
+
+}
 
 
 // Display functions ----------------------------------------------------------
@@ -1844,9 +2038,14 @@ function of_category_user_dis_tree($entity, $cat, $params, $action) {
   global $display, $l_close, $l_add, $l_cat_no;
 
   $popup = $params["popup"];
-  $ext_title = $params["ext_title"];
+  $title = $params["ext_title"];
+  if ($title == "") {
+    $label = "l_$cat";
+    global $$label;
+    $title = $$label;
+  }
   $cats = of_category_user_get_ordered($cat);
-  $display["title"] = "<div class=\"title\">$ext_title</div>";
+  $display["title"] = "<div class=\"title\">$title</div>";
 
   $block .= "
   <div class=\"categoryTree\">";
@@ -1910,7 +2109,7 @@ function of_category_user_dis_tree($entity, $cat, $params, $action) {
     <br />
     <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
     <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp;
-    <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+    <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>
     </form>";
   }
 
@@ -1947,7 +2146,6 @@ function of_category_user_dis_links($params) {
     foreach($cats as $entity => $one_cat) {
       $l_entity = strtolower("l_${entity}");
       global $$l_entity;
-      echo "ent=$entity";
       $nb_links = count($one_cat);
       if ($nb_links > 0) {
 	$has_links = true;
@@ -1961,7 +2159,7 @@ function of_category_user_dis_links($params) {
 	$dis_link .= "
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
-          ".ucfirst(${$l_cat})."($cat_label) : $l_c_link_no (${$l_entity}). </td>
+        ".ucfirst(${$l_cat})."($cat_label) : $l_c_link_no (${$l_entity}). </td>
     </tr>";
       }
     }
@@ -2066,7 +2264,7 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
 
     if ($has_code) {
       if (count($cats) > 0) {
-	usort($cats, "_of_category_compare");
+	usort($cats, "_of_category_compare_code");
       }
     }
   }
@@ -2092,7 +2290,7 @@ function of_category_user_get_entitycategories($entity, $category, $entity_id) {
 
   $query = "SELECT category_id, category_code, category_label 
       FROM CategoryLink
-        JOIN Category on categorylink_category_id=category_id
+        JOIN Category ON categorylink_category_id=category_id
       WHERE categorylink_entity='$entity'
         AND categorylink_category='$category'
         AND categorylink_entity_id='$entity_id'
@@ -2116,7 +2314,7 @@ function of_category_user_get_entitycategories($entity, $category, $entity_id) {
   }
 
   if (count($cats) > 0) {
-    usort($cats, "_of_category_compare");
+    usort($cats, "_of_category_compare_code");
   }
 
   return $cats;
@@ -2377,6 +2575,45 @@ function of_category_user_get_infos($cat_id) {
   return $cat;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Statistic Category Per Entity query execution
+// Parameters:
+//   - $entity    : target entity
+//   - $category  : target category
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_category_distribution($entity, $category) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("Category");
+	
+  $query = "SELECT
+      category_id,
+      category_code,
+      category_label,
+      count(category_id) as nb_category
+    FROM CategoryLink
+      LEFT JOIN Category ON categorylink_category_id = category_id
+    WHERE categorylink_entity='$entity'
+      AND categorylink_category='$category'
+      $multidomain
+    GROUP BY category_id, category_code, category_label
+    ORDER BY category_code, category_label";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_category_per_entity()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $cats = array();
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("category_id");
+    $code = $obm_q->f("category_code");
+    $label = $obm_q->f("category_label");
+    $nb = $obm_q->f("nb_category");
+    $cats[$id] = array("code" => $code, "label" => $label, "nb" => $nb);
+  }
+
+  return $cats;
+}
 
 
 ?>

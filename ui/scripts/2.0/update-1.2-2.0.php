@@ -26,6 +26,81 @@ process_category_list("ContactCategory3", "contact", $c_q);
 $c_q = get_category_list("ContactCategory4");
 process_category_list("ContactCategory4", "contact", $c_q);
 
+// Update list criteria (contactcategorylink_category_id => contactcategory_id)
+$l_q = get_list_list();
+process_list_list($l_q);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the List list
+///////////////////////////////////////////////////////////////////////////////
+function get_list_list() {
+  global $cdg_sql;
+
+  $query = "SELECT *
+    FROM List
+";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Process the list List (convert criteria)
+// contactcategory1link_category_id -> contactcategory1_id
+// Parameters:
+//   - $c_q    : DBO Category List
+///////////////////////////////////////////////////////////////////////////////
+function process_list_list($l_q) {
+  global $hash_c1, $hash_c2;
+
+  $obm_q = new DB_OBM;
+  $cpt = 0;
+  $nb = $l_q->num_rows();
+  echo "** Processing List list : $nb entries\n";
+
+  while ($l_q->next_record()) {
+    $id = $l_q->f("list_id");
+    $structure = $l_q->f("list_structure");
+    
+    if ($structure != "") {
+      $cpt++;
+      $criteria = unserialize($structure);
+      $vals = explode(",", $criteria["modules"]["contact"]["contactcategory1_id"]);
+      $coma = "";
+      foreach($vals as $value) {
+	$new_val = $hash_c1[$value];
+	$criteria["modules"]["contact"]["contactcategory1_id"] .= "$coma$new_val";
+	$coma = ",";
+      }
+
+      $vals = explode(",", $criteria["modules"]["contact"]["contactcategory2_id"]);
+      $coma = "";
+      foreach($vals as $value) {
+	$new_val = $hash_c2[$value];
+	$criteria["modules"]["contact"]["contactcategory2_id"] .= "$coma$new_val";
+	$coma = ",";
+      }
+      unset($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
+      unset($criteria["modules"]["contact"]["contactcategory2link_category_id"]);
+      $list_structure = addslashes(serialize($criteria));
+      
+      $query = "UPDATE List
+        SET list_structure='$list_structure'
+        WHERE list_id='$id'";
+      $retour = $obm_q->query($query);
+    }
+
+
+  }
+
+  echo "** End Processing List list : $nb entries, $cpt updated\n";
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the ContactCategory list
@@ -57,6 +132,7 @@ function get_category_list($table) {
 //   - $c_q    : DBO Category List
 ///////////////////////////////////////////////////////////////////////////////
 function process_category_list($table, $entity, $c_q) {
+  global $hash_c1, $hash_c2;
 
   $category = strtolower($table);
   $table_link = $table."Link";
@@ -146,6 +222,13 @@ function process_category_list($table, $entity, $c_q) {
 	$l_q->query($query);
       }
     }
+  }
+
+  // Save contact categories hash
+  if ($category == "contactcategory1") {
+    $hash_c1 = $cats;
+  } else if ($category == "contactcategory2") {
+    $hash_c2 = $cats;
   }
 
   echo "** End Processing $table list : $nb_c entries, $nb processed\n";

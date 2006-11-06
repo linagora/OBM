@@ -2396,7 +2396,7 @@ function dis_html_contact_date_graph_stats($entity) {
   $block = "<div class=\"detailHead\">".ucfirst($l_contact_date_evolution_graph)."</div>
    <table class=\"detail\" >
      <tr>
-       <td class=\"detailLabel\" class=\"detailForm\"> <img src=\"$url\" /></td>
+       <td class=\"detailLabel\" class=\"detailForm\"><img src=\"$url\" /></td>
      </tr>
    </table>";
  
@@ -2407,24 +2407,44 @@ function dis_html_contact_date_graph_stats($entity) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About Contact categories 
 // Parameters:
-//  - $cat1_q : DB Object for category1 stats
-//  - $cat2_q : DB Object for category2 stats
-//  - $func_q : DB Object for function stats
+//   - $params[] : parameters hash
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
-function dis_category_contact_stats($cat1_q,$cat2_q, $func_q) {
+function dis_category_contact_stats($params) {
+  global $cgp_user, $display, $l_stats, $l_function;
+  global $l_contact_date_evolution_graph;
 
-  $block1 = of_category_dis_entity_stats("contact", "category1", $cat1_q);
-  $block2 = of_category_dis_entity_stats("contact", "category2", $cat2_q);
-  $block_func = of_category_dis_entity_stats("contact", "function", $func_q);
-  $block_date = dis_html_contact_date_graph_stats("contact"); 
+  $order = $params["order"];
+  $stat = $params["stat"];
 
-  $block ="
-    $block1
-    $block2
-    $block_func
-    $block_date
-  ";
+  if (($stat == "") || ($stat == "index")) {
+
+  } elseif ($stat == "function") {
+    $cats = of_category_query_category_per_entity("contact","function","mono");
+    $block_stat = of_category_dis_entity_stats("contact", $stat, $cats,$order);
+  } elseif ($stat == "contact_date_evolution") {
+    $block_stat = dis_html_contact_date_graph_stats("contact"); 
+  } else {
+    $cats = of_category_user_get_category_distribution("contact", $stat);
+    $block_stat = of_category_dis_entity_stats("contact", $stat, $cats,$order);
+  }
+
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      global ${"l_$cat_name"};
+      $l_cat = ${"l_$cat_name"};
+      $block_contact .= "<div class=\"detailText\"><a href=\"?action=statistics&amp;stat=$cat_name\">$l_cat</a></div>";
+    }
+  }
+
+
+  $block = "
+    <div class=\"detailText\"><a href=\"?action=statistics&amp;stat=function\">$l_function</a></div>
+    <div class=\"detailText\"><a href=\"?action=statistics&amp;stat=contact_date_evolution\">$l_contact_date_evolution_graph;</a></div>
+    $block_contact
+    <p />
+    $block_stat
+";
 
   return $block;
 }

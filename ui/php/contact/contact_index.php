@@ -74,26 +74,6 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_category1_ids") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category1", $params, $action);
-
-} elseif ($action == "ext_get_category2_ids") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category2", $params, $action);
-
-} elseif ($action == "ext_get_category3_ids") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category3", $params, $action);
-
-} elseif ($action == "ext_get_category4_ids") {
-///////////////////////////////////////////////////////////////////////////////
-  $extra_css = "category.css";
-  $display["detail"] = of_category_dis_tree("contact", "category4", $params, $action);
-
 } elseif ($action == "vcard") {
 ///////////////////////////////////////////////////////////////////////////////
   dis_contact_vcard_export($params);
@@ -237,190 +217,12 @@ if ($action == "ext_get_ids") {
       include("$lang_file");
     }
   }
-
-  $cat1_q = of_category_query_category_per_entity("contact", "category1", "multi");
-  $cat2_q = of_category_query_category_per_entity("contact", "category2", "multi");
-  $cat3_q = of_category_query_category_per_entity("contact", "category3", "multi");
-  $cat4_q = of_category_query_category_per_entity("contact", "category4", "multi");
-  $cat5_q = of_category_query_category_per_entity("contact", "category5", "mono");
-  $func_q = of_category_query_category_per_entity("contact", "function", "mono");
-  $display["title"] = display_title($l_header_contact_stats);
-  $display["detail"] = dis_category_contact_stats($cat1_q,$cat2_q,$cat3_q,$cat4_q,$cat5_q, $func_q);
-//  $display["features"] = dis_menu_stats();
+  $display["title"] = display_title($l_stats);
+  $display["detail"] = dis_category_contact_stats($params);
 
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_contact_admin_index();
-
-} elseif ($action == "category1_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category1", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category1_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category1", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category1_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category1", $params);
-
-} elseif ($action == "category1_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category1", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category2_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_insert_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category2_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_update_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category2_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category2", $params);
-
- } elseif ($action == "category2_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_delete_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category3_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category3", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category3 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category3 : $l_insert_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category3_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category3", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category3 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category3 : $l_update_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category3_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category3", $params);
-
-} elseif ($action == "category3_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category3", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category3 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category3 : $l_delete_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category4_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category4", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category4 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category4 : $l_insert_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category4_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category4", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category4 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category4 : $l_update_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category4_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category4", $params);
-
-} elseif ($action == "category4_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category4", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category4 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category4 : $l_delete_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category5_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("contact", "category5", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category5 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category5 : $l_insert_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category5_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("contact", "category5", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category5 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category5 : $l_update_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
-
-} elseif ($action == "category5_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("contact", "category5", $params, "mono");
-
-} elseif ($action == "category5_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("contact", "category5", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category5 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category5 : $l_delete_error");
-  }
-  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -521,6 +323,8 @@ if ($action == "ext_get_ids") {
   }
 }
 
+of_category_user_action_switch($module, $action, $params);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -561,31 +365,14 @@ function get_contact_action() {
   global $l_header_consult,$l_header_vcard, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
+  of_category_user_module_action("contact");
+
 // ext_get_ids
   $actions["contact"]["ext_get_ids"] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
-// Category1 Select 
-  $actions["contact"]["ext_get_category1_ids"]  = array (
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );
-// Category2 Select 
-  $actions["contact"]["ext_get_category2_ids"]  = array (
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );						 
-// Category3 Select 
-  $actions["contact"]["ext_get_category3_ids"]  = array (
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );						 
-// Category4 Select 
-  $actions["contact"]["ext_get_category4_ids"]  = array (
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );						 
+
 // Index
   $actions["contact"]["index"] = array (
     'Name'     => $l_header_find,
@@ -746,144 +533,6 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-// Category Insert
-  $actions["contact"]["category1_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category1_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// Category Update
-  $actions["contact"]["category1_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category1_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// Category Check Link
-  $actions["contact"]["category1_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category1_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-// Category Delete
-  $actions["contact"]["category1_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category1_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	       );
-
-// Category Insert
-  $actions["contact"]["category2_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category2_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// Category Update
-  $actions["contact"]["category2_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category2_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// Category Check Link
-  $actions["contact"]["category2_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category2_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-// Category Delete
-  $actions["contact"]["category2_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category2_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	       );
-
-// Category Insert
-  $actions["contact"]["category3_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category3_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                             );
-
-// Category Update
-  $actions["contact"]["category3_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category3_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                              );
-
-// Category Check Link
-  $actions["contact"]["category3_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category3_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                                );
-
-// Category Delete
-  $actions["contact"]["category3_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category3_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                               );
-
-// Category Insert
-  $actions["contact"]["category4_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category4_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                             );
-
-// Category Update
-  $actions["contact"]["category4_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category4_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                              );
-
-// Category Check Link
-  $actions["contact"]["category4_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category4_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                                );
-
-// Category Delete
-  $actions["contact"]["category4_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category4_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                               );
-// Category Insert
-  $actions["contact"]["category5_insert"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category5_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                             );
-
-// Category Update
-  $actions["contact"]["category5_update"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category5_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                              );
-
-// Category Check Link
-  $actions["contact"]["category5_checklink"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category5_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                                );
-
-// Category Delete
-  $actions["contact"]["category5_delete"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=category5_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                               );
 
 // Display
   $actions["contact"]["display"] = array (

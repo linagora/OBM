@@ -70,7 +70,9 @@ if ($action == "ext_get_id") {
   }
 
 }
+
 else if ($action == "new_criterion") {
+///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_list_add_criterion_form($params);
 
 } elseif (($action == "index") || ($action == "")) {
@@ -315,10 +317,17 @@ function get_list_params() {
   if (isset ($params["contact_datasource_id"])) $params["criteria"]["modules"]["contact"]["contact_datasource_id"] = $params["contact_datasource_id"];
   if (isset ($params["contact_town"])) $params["criteria"]["modules"]["contact"]["contact_town"] = $params["contact_town"];
   if (isset ($params["contact_zipcode"])) $params["criteria"]["modules"]["contact"]["contact_zipcode"] = $params["contact_zipcode"];
-  if (isset ($params["contactcategory1link_category_id"])) $params["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $params["contactcategory1link_category_id"];
-  if (isset ($params["contactcategory2link_category_id"])) $params["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $params["contactcategory2link_category_id"];
   if (isset ($params["contact_function_id"])) $params["criteria"]["modules"]["contact"]["contact_function_id"] = $params["contact_function_id"];
   if (isset ($params["kind_lang"])) $params["criteria"]["modules"]["contact"]["kind_lang"] = $params["kind_lang"];
+
+  // User data categories handling
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $cat_id = "${cat_name}_id";
+      $cat_code = "${cat_name}_code";
+      if (isset ($params[$cat_id])) $params["criteria"]["modules"]["contact"][$cat_id] = $params[$cat_id];
+    }
+  }
 
   // Publication
   if (isset ($params["subscription_publication_id"])) $params["criteria"]["modules"]["publication"]["subscription_publication_id"] = $params["subscription_publication_id"];

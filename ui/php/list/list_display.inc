@@ -902,8 +902,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_and, $l_or, $l_not, $l_empty, $l_exclude;
   global $l_company, $l_country,$l_postcode,$l_town;
   global $l_contact,$l_lastname,$l_firstname;
-  global $l_timeafter,$l_timebefore,$l_market, $l_datasource,$l_contact_cat1;
-  global $l_contact_cat2,$l_function;
+  global $l_timeafter,$l_timebefore,$l_market, $l_datasource, $l_function;
   global $l_publication,$l_title,$l_lang,$l_year, $l_after, $l_before;
   global $l_update,$l_delete,$l_recept,$l_renew;
   global $clist_mode_expert, $clist_mode_normal;
@@ -951,8 +950,6 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contact_datasource_id" => "sel",
       "contact_town" => "tf",
       "contact_zipcode" => "tf",
-      "contactcategory1link_category_id" => "sel",
-      "contactcategory2link_category_id" => "sel",
       "contact_function_id" => "sel",
       "kind_lang" => "sel",
       "subscription_publication_id" => "sel",
@@ -967,11 +964,26 @@ function html_list_graphical_form($action, $list_q, $list) {
   // User data categories handling
   if (is_array($cgp_user["company"]["category"])) {
     foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+      $cat_id = "${cat_name}_id";
       $cat_code = "${cat_name}_code";
+      $field_kind[$cat_id] = "sel";
       $field_kind[$cat_code] = "sel";
       $cat_label = "l_$cat_name";
       global $$cat_label;
+      $fields_label[$cat_id] = "$l_company id: ${$cat_label}";
       $fields_label[$cat_code] = "$l_company: ${$cat_label}";
+    }
+  }
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $cat_id = "${cat_name}_id";
+      $cat_code = "${cat_name}_code";
+      $field_kind[$cat_id] = "sel";
+      $field_kind[$cat_code] = "sel";
+      $cat_label = "l_$cat_name";
+      global $$cat_label;
+      $fields_label[$cat_id] = "$l_contact id: ${$cat_label}";
+      $fields_label[$cat_code] = "$l_contact: ${$cat_label}";
     }
   }
 
@@ -992,8 +1004,6 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contact_timebefore"] = "$l_contact: $l_timebefore"; 
   $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_market"; 
   $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
-  $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
-  $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
   $fields_label["kind_lang"] = "$l_contact: $l_lang"; 
   $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
   $fields_label["subscription_publication_id"] = "$l_publication: $l_title"; 
@@ -1007,11 +1017,9 @@ function html_list_graphical_form($action, $list_q, $list) {
   if (is_array($criteria)) {
     $cty_q = run_query_global_country_for_lang();
     $dsr_q = run_query_global_datasource();
-    $cat1_q = run_query_list_contactcategory1();
-    $usr_q = run_query_userobm_active();  
-    $cat2_q = run_query_list_contactcategory2();
+    $usr_q = run_query_userobm_active();
     $fct_q = run_query_global_contactfunction();
-    $rec_q = run_query_list_subscriptionreception();  
+    $rec_q = run_query_list_subscriptionreception();
     $lag_q = run_query_list_language();
     $pub_q = run_query_list_publication();
 
@@ -1022,8 +1030,6 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contact_country_iso3166" => array($cty_q,"country_iso3166","country_name"),
       "contact_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "contact_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
-      "contactcategory1link_category_id" => array($cat1_q,"contactcategory1_id","contactcategory1_label"),
-      "contactcategory2link_category_id" => array($cat2_q,"contactcategory2_id","contactcategory2_label"),
       "contact_function_id" => array($fct_q,"contactfunction_id","contactfunction_label"),
       "kind_lang" => array($lag_q,"kind_lang","kind_lang"),
       "subscription_publication_id" => array($pub_q,"publication_id","publication_title"),
@@ -1038,29 +1044,45 @@ function html_list_graphical_form($action, $list_q, $list) {
 	$field_data[$cat_code] = array("", "", "", $cats);
       }
     }
+    if (is_array($cgp_user["contact"]["category"])) {
+      foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+	$cat_id = "${cat_name}_id";
+	$cat_code = "${cat_name}_code";
+        $cats = of_category_user_get_ordered($cat_name);
+	$field_data[$cat_id] = array("", "", "", $cats, "id");
+	$field_data[$cat_code] = array("", "", "", $cats);
+      }
+    }
 
 
     foreach($criteria as $module) {
       foreach($module as $field => $criterion) {
 	foreach($criterion as $line => $value) {
 	  if ($value != "") {
+
+	    // text field handling
 	    if ($field_kind[$field] == "tf") {
 	      $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
-	    } else {
+
+	    // Select field handling
+	    } elseif ($field_kind[$field] == "sel") {
 	      $vals = explode(",",$value);
 	      $size = count($vals);
 	      $data = $field_data[$field];
-	      $input = "";
+	      $option = "";
+	      // $txt : select title (to have full info in roll over)
 	      $txt = "";
 
 	      // if data given as array
 	      if (is_array($data[3])) {
 		$datas = $data[3];
+		// category olumn (code by default, could be id)
+		$column = ($data[4] != "" ? $data[4] : "code");
 		foreach ($datas as $one_data) {
 		  foreach($vals as $key) {
-		    if ("$key" == $one_data["code"]) {
-		      if ($input == "") {
-			$input = "<option selected=\"selected\" value=\"$value\" selected=\"selected\">".$one_data["label"]."($size)</option>";
+		    if ("$key" == $one_data[$column]) {
+		      if ($option == "") {
+			$option = "<option selected=\"selected\" value=\"$value\" selected=\"selected\">".$one_data["label"]."($size)</option>";
 		      } else {
 			$txt .= ",";
 		      }
@@ -1075,8 +1097,8 @@ function html_list_graphical_form($action, $list_q, $list) {
 		while ($data_q->next_record()) {
 		  foreach($vals as $key) {
 		    if ("$key" == $data_q->f($data[1])) {
-		      if ($input == "") {
-			$input = "<option selected=\"selected\" value=\"$value\" selected=\"selected\">".$data_q->f($data[2])."($size)</option>";
+		      if ($option == "") {
+			$option = "<option selected=\"selected\" value=\"$value\" selected=\"selected\">".$data_q->f($data[2])."($size)</option>";
 		      } else {
 			$txt .= ",";
 		      }
@@ -1087,7 +1109,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 		$data_q->seek(0);
 	      }
 
-	      $input = "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$input</select>";
+	      $input = "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$option</select>";
 	    }
 	    $structure[$line] .= "<td>$input</td>";
 	    $labels[$line] .= "<td>".$fields_label[$field]."</td>";
@@ -1100,7 +1122,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       }
     }
 
-    $del_cell= "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
+    $del_cell = "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"Delete\" /></a></td>";
     $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
@@ -1175,15 +1197,13 @@ function dis_list_add_criterion_form($list) {
   $cty_q = run_query_global_country_for_lang();
   $usr_q = run_query_userobm_active();
   $dsr_q = run_query_global_datasource();
-  $cat1_q = run_query_list_contactcategory1();
-  $cat2_q = run_query_list_contactcategory2();
   $fct_q = run_query_global_contactfunction();
   $lag_q = run_query_list_language();
     
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
 
   $block .= html_list_company_criterion($cty_q,$usr_q,$dsr_q);
-  $block .= html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
+  $block .= html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q);
 
   if ($cgp_show["module"]["publication"]) {
     $rec_q = run_query_list_subscriptionreception();
@@ -1224,20 +1244,20 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   while ($cty_q->next_record()) {
     $sel_cty .= "\n<option value=\"".$cty_q->f("country_iso3166")."\">".$cty_q->f("country_name")."</option>";
   }
-  if ($cty_q->nf()!=0) { 
+  if ($cty_q->nf()!=0) {
     $cty_q->seek(0);
   }
   $sel_usr .= "\n<option value=\"\">$l_all</option>";
   while ($usr_q->next_record()) {
     $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
   }
-  if ($usr_q->nf()!=0) 
+  if ($usr_q->nf()!=0)
     $usr_q->seek(0);
   $sel_dsr .= "\n<option value=\"\">$l_all</option>";
   while($dsr_q->next_record()) {
     $sel_dsr .= "\n<option value=\"".$dsr_q->f("datasource_id")."\">".$dsr_q->f("datasource_name")."</option>";
-  }  
-  if ($dsr_q->nf()!=0) 
+  }
+  if ($dsr_q->nf()!=0)
     $dsr_q->seek(0);
 
   // User data categories handling
@@ -1264,19 +1284,19 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   }
 
   $block .= "
-  <div class=\"detailHead\">$l_company</div>    
+  <div class=\"detailHead\">$l_company</div>
   <table class=\"search\">
   <tr>
     <td class=\"detailLabel\">$l_company</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_timeafter</td>  
+    <td class=\"detailLabel\">$l_timeafter</td>
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_country_iso3166\">$sel_cty</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
       <script>calendar('tf_company_timeafter','$company_timeafter')</script>
-    </td>    
+    </td>
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_postcode</td>
@@ -1285,23 +1305,23 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_company_zipcode\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
       <script>calendar('tf_company_timebefore','$company_timebefore')</script>
-    </td> 
+    </td>
   </tr>
-  <tr>   
+  <tr>
     <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailLabel\">$l_company_cat1</td>    
+    <td class=\"detailLabel\">$l_company_cat1</td>
     <td class=\"detailLabel\">$l_datasource</td>
   </tr>
-  <tr>    
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td> 
+  <tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
 $dis_cat
     </td>
-    <td class=\"detailForm\"><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>        
-  </tr>  
+    <td class=\"detailForm\"><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>
+  </tr>
   </table>
 ";
   return $block;
@@ -1312,12 +1332,12 @@ $dis_cat
 // Display the Contact Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q) {
+function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
-  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
+  global $l_function,$l_lang;
   global $l_yes,$l_no;
-  global $set_theme,$ico_mini_cal;  
+  global $cgp_user,$set_theme,$ico_mini_cal;  
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while ($cty_q->next_record()) {
@@ -1343,22 +1363,6 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q
     $dsr_q->seek(0);
   }
 
-//  $sel_cat1 .= "\n<option value=\"\">$l_all</option>";
-  while ($cat1_q->next_record()) {
-    $sel_cat1 .= "\n<option value=\"".$cat1_q->f("contactcategory1_id")."\">".$cat1_q->f("contactcategory1_label")."</option>";
-  }
-  if ($cat1_q->nf() != 0) {
-    $cat1_q->seek(0);
-  }
-
-//  $sel_cat2 .= "\n<option value=\"\">$l_all</option>";
-  while ($cat2_q->next_record()) {
-    $sel_cat2 .= "\n<option value=\"".$cat2_q->f("contactcategory2_id")."\">".$cat2_q->f("contactcategory2_label")."</option>";
-  }
-  if ($cat2_q->nf() != 0) {
-    $cat2_q->seek(0);
-  }
-
   if ($fct_q != "") {
     $sel_fct .= "\n<option value=\"\">$l_all</option>";
     while ($fct_q->next_record()) {
@@ -1373,11 +1377,35 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q
   while($lag_q->next_record()) {
     $sel_lag .= "\n<option value=\"".$lag_q->f("kind_lang")."\">".$lag_q->f("kind_lang")."</option>";
   }   
-  if($lag_q->nf()!=0) 
+  if ($lag_q->nf()!=0) {
     $lag_q->seek(0);
+  }
+
+  // User data categories handling
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $cat_id = "${cat_name}_id";
+      $cat_code = "${cat_name}_code";
+      $cat_label = "l_$cat_name";
+      global $$cat_label;
+      $cats = of_category_user_get_ordered($cat_name);
+      $sel_cat = "<option value=\"\">$l_all</option>";
+      if (is_array($cats)) {
+	foreach($cats as $one_entry) {
+	  $entry_id = $one_entry["id"];
+	  $entry_code = $one_entry["code"];
+	  $entry_label = substr($one_entry["label"],0,30);
+	  $sel_cat .= "
+  <option value=\"$entry_id\">$entry_code $entry_label</option>";
+	}
+      }
+      $dis_cat .= "<p>
+    ${$cat_label}<br/><select multiple=\"multiple\" size=\"5\" name=\"sel_$cat_id\">$sel_cat</select>";
+    }
+  }
  
   $block = "
-  <div class=\"detailHead\">$l_contact</div>    
+  <div class=\"detailHead\">$l_contact</div>
   <table class=\"search\">
   <tr>
     <td class=\"detailLabel\">$l_lastname</td>
@@ -1386,41 +1414,41 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_contact_country_iso3166\">$sel_cty</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
       <script>calendar('tf_contact_timeafter','$contact_timeafter')</script>
-    </td>    
-  <tr>  
+    </td>
+  <tr>
     <td class=\"detailLabel\">$l_firstname</td>
     <td class=\"detailLabel\">$l_market</td>
-    <td class=\"detailLabel\">$l_timebefore</td>    
+    <td class=\"detailLabel\">$l_timebefore</td>
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
-    <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
       <script>calendar('tf_contact_timebefore','$contact_timebefore')</script>
-    </td>     
+    </td>
   </tr>
-  <tr>  
+  <tr>
     <td class=\"detailLabel\">$l_datasource</td>
-    <td class=\"detailLabel\">$l_town</td>   
+    <td class=\"detailLabel\">$l_town</td>
     <td class=\"detailLabel\">$l_postcode</td>
   </tr>
-  <tr>    
-    <td class=\"detailForm\"><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>        
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>    
+  <tr>
+    <td class=\"detailForm\"><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>
     <td class=\"detailForm\"><input type=\"text\" size=\"10\" name=\"tf_contact_zipcode\" value=\"\" /></td>
-  </tr>  
-  <tr>  
-    <td class=\"detailLabel\">$l_contact_cat1</td>
-    <td class=\"detailLabel\">$l_contact_cat2</td>   
+  </tr>
+  <tr>
     <td class=\"detailLabel\">$l_function</td>
-  </tr> 
-  <tr>  
-    <td class=\"detailForm\"><select multiple=\"multiple\" size=\"5\" name=\"sel_contactcategory1link_category_id\">$sel_cat1</select></td>    
-    <td class=\"detailForm\"><select multiple=\"multiple\" size=\"5\" name=\"sel_contactcategory2link_category_id\">$sel_cat2</select></td>    
+    <td class=\"detailLabel\"></td>   
+    <td class=\"detailLabel\"></td>
+  </tr>
+  <tr>
     <td class=\"detailForm\"><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
+    <td class=\"detailForm\">$dis_cat</td>
+    <td class=\"detailForm\"></td>    
   </tr>
   <tr> 
     <td class=\"detailLabel\">$l_lang</td>

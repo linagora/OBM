@@ -290,8 +290,6 @@ function get_query_count($query) {
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "get_query_count()");
-  echo $query;
-  //  exit;
   $obm_q->query($query);
   $obm_q->next_record();
   $count = $obm_q->f(0);
@@ -641,7 +639,7 @@ function update_display_pref($entity, $fieldname, $new_status, $sql_order_field=
         AND display_entity='$entity'
         AND display_fieldname='$fieldname'";
 
-      display_debug_msg($query, $cdg_sql);
+      display_debug_msg($query, $cdg_sql, "update_display_pref()");
       $obm_q = new DB_OBM; 
       $obm_q->query($query);
     } else {
@@ -733,7 +731,7 @@ function run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $ord
       '$order',
       '$status')";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_display_pref_insert()");
   $obm_q = new DB_OBM; 
   $obm_q->query($query);
 }
@@ -987,7 +985,7 @@ function update_user_pref($user_id, $option, $new_value="") {
     $query = "DELETE FROM UserObmPref
       WHERE userobmpref_user_id='$user_id'
         AND userobmpref_option='$option'";
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "update_user_pref()");
     $obm_q = new DB_OBM; 
     $obm_q->query($query);
 
@@ -1343,7 +1341,7 @@ function get_user_info($id="") {
     FROM UserObm
     WHERE userobm_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "get_user_info()");
   $obm_q->query($query);
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {

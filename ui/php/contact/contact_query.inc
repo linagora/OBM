@@ -301,7 +301,7 @@ function run_query_contact_detail($p_id) {
   $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
   $lang = get_lang();
   $date = sql_date_format($db_type, "contact_date", "contact_date");
-	$multidomain = sql_multidomain("contact");
+  $multidomain = sql_multidomain("contact");
 
   if ($cgp_show["module"]["company"]) {
     $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
@@ -373,7 +373,7 @@ function run_query_contact_company($c_id) {
   global $cdg_sql;
 
   $lang = get_lang();
-	$multidomain = sql_multidomain("company");
+  $multidomain = sql_multidomain("company");
 	
   $query = "SELECT company_id,
       company_name,
