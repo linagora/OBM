@@ -69,19 +69,15 @@ function process_list_list($l_q) {
     if ($structure != "") {
       $cpt++;
       $criteria = unserialize($structure);
-      $vals = explode(",", $criteria["modules"]["contact"]["contactcategory1_id"]);
-      $coma = "";
-      foreach($vals as $value) {
+      print_r($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
+      foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
 	$new_val = $hash_c1[$value];
-	$criteria["modules"]["contact"]["contactcategory1_id"] .= "$coma$new_val";
-	$coma = ",";
+	$criteria["modules"]["contact"]["contactcategory1_id"][] = $new_val;
       }
 
-      $vals = explode(",", $criteria["modules"]["contact"]["contactcategory2_id"]);
-      $coma = "";
-      foreach($vals as $value) {
+      foreach($criteria["modules"]["contact"]["contactcategory2link_category_id"] as $value) {
 	$new_val = $hash_c2[$value];
-	$criteria["modules"]["contact"]["contactcategory2_id"] .= "$coma$new_val";
+	$criteria["modules"]["contact"]["contactcategory2_id"][] = $new_val;
 	$coma = ",";
       }
       unset($criteria["modules"]["contact"]["contactcategory1link_category_id"]);

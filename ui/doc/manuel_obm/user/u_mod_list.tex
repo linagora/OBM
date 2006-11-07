@@ -5,7 +5,7 @@
 \clearpage
 \section{Le module \List}
 
-révision : \obm 1.1.0
+révision : \obm 2.0.0
 
 \subsection{Présentation du module \List}
 
@@ -74,11 +74,22 @@ La fenêtre de critères comporte 3 parties : \\
 \end{itemize}
 \vspace{0.3cm}
 
-Les critères de la même fenêtre sont cumulés et liés par des ET logiques.\\
+\paragraph{Règles de gestion des critères graphiques}.\\
 
-Entre 2 lignes (ou fenêtre de critères) il est possible de choisir le mode de combinaison logique (OU ou ET) et d'inverser le critère (opérateur NOT).\\
-
+\begin{tabular}{|p{14cm}|}
+\hline
+Les critères de la même fenêtre sont cumulés et liés par des \textbf{ET} logiques.\\
+\hline
+Pour les critères à choix multiples (à partir de \obm 1.2.5), les choix sélectionnés pour ce critère sont combinés par des \textbf{OU} logiques (valeur parmis celles sélectionnées).\\
+\hline
+Entre 2 lignes (ou fenêtre de critères) il est possible de choisir le mode de combinaison logique (\textbf{OU} ou \textbf{ET}) et d'inverser le critère (opérateur \textbf{NOT}).\\
+\hline
 Un opérateur spécial \textbf{"Exclude"} permet d'ajouter des critères d'exclusions globaux, c'est à dire qui s'appliquent à l'ensemble des critères, peut importe sa position dans la liste des critères.
+Lorsque l'opérateur \textbf{Exclude} est sélectionné, l'opérateur logique de la ligne (\textbf{OU}, \textbf{ET}) n'est plus pris en compte.
+\\
+\hline
+\end{tabular}
+
 
 \paragraph{Exemple :} Si à une requête comprenant plusieurs critères, les contacts appartenant à la société X ne doivent pas faire partie du résultat, il suffit de rajouter la ligne de critères d'exclusion (opérateur "Exclude") avec le critère société X, n'importe ou dans la liste des critères.
 
