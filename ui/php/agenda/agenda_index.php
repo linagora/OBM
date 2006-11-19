@@ -378,7 +378,7 @@ function get_agenda_params() {
   }
 
   if (! isset ($params["date"])) {
-    $params["date"] = isodate_format();
+    $params["date"] = of_isodate_format();
   }
   
   // New meeting event duration
@@ -644,7 +644,7 @@ function get_agenda_action() {
     'Condition'=> array ('None') 
                                          );
 
-//Waiting events.
+  // Waiting events
   $actions["agenda"]["waiting_events"] = array (
     'Name'     => $l_header_waiting_events,
     'Url'      => "$path/agenda/agenda_index.php?action=waiting_events",
@@ -667,7 +667,7 @@ function get_agenda_action() {
     'Condition'=> array ('None') 
                                          );
 
-  // Right admin.					 
+  // Right admin
   $actions["agenda"]["rights_admin"] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/agenda/agenda_index.php?action=rights_admin",

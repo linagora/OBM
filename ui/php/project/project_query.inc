@@ -35,7 +35,7 @@ function run_query_project_search($params) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, "project_datebegin", "project_datebegin");
   $dateend = sql_date_format($db_type, "project_dateend", "project_dateend");
-	$multidomain = sql_multidomain("project");
+  $multidomain = sql_multidomain("project");
 	
   $where = "1=1 $multidomain";
 
@@ -138,7 +138,7 @@ function run_query_project_detail($p_id) {
   $dateend = sql_date_format($db_type, "project_dateend", "dateend");
   $timeupdate = sql_date_format($db_type, "project_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "project_timecreate", "timecreate");
-	$multidomain = sql_multidomain("project");
+  $multidomain = sql_multidomain("project");
 	
   $query = "SELECT
       project_id,
@@ -1445,7 +1445,7 @@ function get_project_info($id) {
   $db_type = $obm_q->type;
   $datebegin = sql_date_format($db_type, "project_datebegin", "project_datebegin");
   $dateend = sql_date_format($db_type, "project_dateend", "project_dateend");
-	$multidomain = sql_multidomain("project");
+  $multidomain = sql_multidomain("project");
 
   $query = "SELECT
       project_id,
@@ -1813,7 +1813,7 @@ function run_query_project_month_planning($params) {
   $db_type = $obm_q->type;
 
   $date = sql_date_format($db_type, "timetask_date", "date");
-	$multidomain = sql_multidomain("project");
+  $multidomain = sql_multidomain("project");
 
   $query = "
     SELECT
@@ -2047,8 +2047,8 @@ function project_send_mail($params, $p_id) {
   $company = $p["company"];
   $deal = $p["deal"];
   $tasktype = $p["tasktype"];
-  $datebegin = date_format($p["datebegin"], true);
-  $dateend = date_format($p["dateend"], true);
+  $datebegin = of_date_format($p["datebegin"], true);
+  $dateend = of_date_format($p["dateend"], true);
   $sold = $p["soldtime"];
   $estimated = $p["estimatedtime"];
   $comment = $p["comment"];

@@ -102,11 +102,11 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "invoice_date") {
-    $res["name"] = date_format($OD->data_set->f("date"));
+    $res["name"] = of_date_format($OD->data_set->f("date"));
   }
 
   else if ($fieldname == "payment_date") {
-    $res["name"] = date_format($OD->data_set->f("payment_date"));
+    $res["name"] = of_date_format($OD->data_set->f("payment_date"));
   }
 
   else if ($fieldname == "payment_amount") {
@@ -571,9 +571,9 @@ function dis_invoice_detail($inv_q) {
 
   $label = $inv_q->f("invoice_label");
   $num = $inv_q->f("invoice_number");
-  $date = date_format($inv_q->f("date"), 1);
-  $expiration_date = date_format($inv_q->f("expiration_date"), 1);
-  $payment_date = date_format($inv_q->f("payment_date"), 1);
+  $date = of_date_format($inv_q->f("date"), 1);
+  $expiration_date = of_date_format($inv_q->f("expiration_date"), 1);
+  $payment_date = of_date_format($inv_q->f("payment_date"), 1);
   $status = $inv_q->f("invoicestatus_label");
   $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
   $title = $inout;
@@ -727,9 +727,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $archive = ($inv_q->f("invoice_archive") == 1 ? " checked" : "");
     $comment = $inv_q->f("invoice_comment");
     $status = $inv_q->f("invoice_status_id");
-    $date = isodate_format($inv_q->f("date"), 1);
-    $expiration_date = isodate_format($inv_q->f("expiration_date"), 1);
-    $payment_date = isodate_format($inv_q->f("payment_date"), 1);
+    $date = of_isodate_format($inv_q->f("date"), 1);
+    $expiration_date = of_isodate_format($inv_q->f("expiration_date"), 1);
+    $payment_date = of_isodate_format($inv_q->f("payment_date"), 1);
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
@@ -740,7 +740,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     $p_id = $inv_q->f("invoice_project_id");
     $p_name = $inv_q->f("project_name");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
 
   // New form and first time
   } elseif ($action == "new") {
@@ -753,13 +753,13 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       $inout = run_query_invoice_deal_get_inout ($d_id);
     }
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   }
 
   // if we duplicate we have to modify some fields :
   if ($action == "duplicate") {
     $comment = "duplicata de <$label>\n".$comment;
-    $date = isodate_format();
+    $date = of_isodate_format();
     $label .= "-".date("Y-m-d");
   }
 

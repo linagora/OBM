@@ -36,7 +36,7 @@ function get_backup_list($backup) {
 	$b_version = $matches[0];
 	if (preg_match("/^$version/", $b_version)) {
 	  $b_date = filemtime($fullname);
-	  if (preg_match("/^$date/", datetime_format($b_date))) {
+	  if (preg_match("/^$date/", of_datetime_format($b_date))) {
 	    $files[$file]["version"] = $b_version;
 	    $files[$file]["date"] = $b_date;
 	    $files[$file]["size"] = filesize($fullname);

@@ -162,8 +162,8 @@ function dis_calendar_portal() {
   $num = $obm_q->num_rows();
 
   $ts_date = time();  
-  $this_month = get_month($ts_date);
-  $this_year = get_year($ts_date);
+  $this_month = of_date_get_month($ts_date);
+  $this_year = of_date_get_year($ts_date);
   $start_time = get_agenda_date_day_of_week(strtotime("$this_year-$this_month-01"), $cagenda_weekstart);
   $end_time = strtotime("+1 month +6 days", $start_time);
 
@@ -175,8 +175,8 @@ function dis_calendar_portal() {
   $i = 0;
   do {
     $day = date ("j", $current_time);
-    $iso_day = isodate_format($current_time);
-    $check_month = get_month($current_time);
+    $iso_day = of_isodate_format($current_time);
+    $check_month = of_date_get_month($current_time);
     if ($check_month != $this_month) {
       $day = "<a class=\"agendaLink2\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;date=".$iso_day)."\">$day</a>";
     } else {
@@ -196,7 +196,7 @@ function dis_calendar_portal() {
     if ($i == 7) { 
       $dis_minical .= "</tr>\n";
       $i = 0;
-      $checkagain = get_month($current_time);
+      $checkagain = of_date_get_month($current_time);
       if ($checkagain != $this_month) $whole_month = FALSE;	
     }
   } while ($whole_month == TRUE);
@@ -271,10 +271,10 @@ function dis_lead_portal() {
   $ts_14 = strtotime("-14 day", $ts_today);
   $ts_30 = strtotime("-30 day", $ts_today);
   $ts_90 = strtotime("-90 day", $ts_today);
-  $iso_7 = isodate_format($ts_7);
-  $iso_14 = isodate_format($ts_14);
-  $iso_30 = isodate_format($ts_30);
-  $iso_90 = isodate_format($ts_90);
+  $iso_7 = of_isodate_format($ts_7);
+  $iso_14 = of_isodate_format($ts_14);
+  $iso_30 = of_isodate_format($ts_30);
+  $iso_90 = of_isodate_format($ts_90);
   $date_ranges = array(array("$iso_7", "$today"),
 		       array("$iso_14", "$today"),
 		       array("$iso_30", "$today"),

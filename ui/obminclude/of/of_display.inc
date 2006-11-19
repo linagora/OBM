@@ -417,13 +417,13 @@ class OBM_DISPLAY {
 	  //--------------------------------------------------
 	  // Format dates
 	  if (substr($fieldname,0,4) == "date") {
-	    $name = date_format($this->data_set->f($fieldname), 1);
+	    $name = of_date_format($this->data_set->f($fieldname), 1);
 	  }
 	  elseif ($fieldname == "timeupdate") {
-	    $name = datetime_format($this->data_set->f($fieldname), 1);
+	    $name = of_datetime_format($this->data_set->f($fieldname), 1);
 	  }
 	  else if ($fieldname == "timecreate") {
-	    $name = datetime_format($this->data_set->f($fieldname), 1);
+	    $name = of_datetime_format($this->data_set->f($fieldname), 1);
 	  }
 	  
 	  //--------------------------------------------------
@@ -811,13 +811,13 @@ class OBM_DISPLAY {
 	  //--------------------------------------------------
 	  // Format dates
 	  if (substr($fieldname,0,5) == "date_") {
-	    $txt_name = date_format($this->data_set->f($fieldname));
+	    $txt_name = of_date_format($this->data_set->f($fieldname));
 	  }
 	  elseif ($fieldname == "timeupdate") {
-	    $txt_name = datetime_format($this->data_set->f($fieldname));
+	    $txt_name = of_datetime_format($this->data_set->f($fieldname));
 	  }
 	  else if ($fieldname == "timecreate") {
-	    $txt_name = datetime_format($this->data_set->f($fieldname));
+	    $txt_name = of_datetime_format($this->data_set->f($fieldname));
 	  }
 	  
 	  //--------------------------------------------------
@@ -1165,8 +1165,8 @@ function display_record_info($obm_q) {
   if (is_object($obm_q)) {
     $usercreate = $obm_q->f("usercreate");
     $userupdate = $obm_q->f("userupdate");
-    $timecreate = datetime_format($obm_q->f("timecreate"), 1);
-    $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
+    $timecreate = of_datetime_format($obm_q->f("timecreate"), 1);
+    $timeupdate = of_datetime_format($obm_q->f("timeupdate"), 1);
     $datasource = $obm_q->f("datasource_name");
     $privacy = ($obm_q->f("privacy") == 0 ? $l_public : $l_private);
     

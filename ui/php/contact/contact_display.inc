@@ -302,7 +302,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "contact_date") {
     if ($show_date) {
       $date = $OD->data_set->f("contact_date");
-      $res["name"] = ($date) ? date_format($date) : " ";
+      $res["name"] = ($date) ? of_date_format($date) : " ";
       $res["align"] = "center";
     }
   }
@@ -680,7 +680,7 @@ function html_contact_header($co_q, $funcs) {
   $aka = $co_q->f("contact_aka");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
   $date = $co_q->f("contact_date");
-  $date = ($date != 0) ? date_format($date) : $l_no_date; 
+  $date = ($date != 0) ? of_date_format($date) : $l_no_date; 
  
   // Display Aka only if non empty
   if ($aka != "") {
@@ -1234,7 +1234,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $kind = $co_q->f("contact_kind_id");
     $mark = $co_q->f("contact_marketingmanager_id");
     $date = $co_q->f("contact_date");
-    $date = ($date != 0) ? date_format($date, 1) : "";
+    $date = ($date != 0) ? of_date_format($date, 1) : "";
     $lname = $co_q->f("contact_lastname");
     $fname = $co_q->f("contact_firstname");
     $aka = $co_q->f("contact_aka");
@@ -1259,13 +1259,13 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $priv = $co_q->f("privacy");
     $comment = $co_q->f("contact_comment");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
     $comment2 = $co_q->f("contact_comment2");
     $usercomment2 = $uid;
-    $datecomment2 = isodate_format();
+    $datecomment2 = of_isodate_format();
     $comment3 = $co_q->f("contact_comment3");
     $usercomment3 = $uid;
-    $datecomment3 = isodate_format();
+    $datecomment3 = of_isodate_format();
     $c_phone = $co_q->f("company_phone");
     $c_fax = $co_q->f("company_fax");
     $c_ad1 = $co_q->f("company_address1");
@@ -1283,11 +1283,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $mark = $auth->auth["uid"];
     $date = date("Y-m-d");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
     $usercomment2 = $uid;
-    $datecomment2 = isodate_format();
+    $datecomment2 = of_isodate_format();
     $usercomment3 = $uid;
-    $datecomment3 = isodate_format();
+    $datecomment3 = of_isodate_format();
     if ($ccontact_private_default) {
       $private_c = " checked";
     }

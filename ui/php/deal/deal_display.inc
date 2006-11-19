@@ -123,25 +123,25 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
   }
   
   else if ($fieldname == "deal_datebegin") {
-    $date = date_format( $OD->data_set->f($fieldname), 1);
+    $date = of_date_format( $OD->data_set->f($fieldname), 1);
     $res["name"] = $date;
   }
 
   else if ($fieldname == "deal_dateproposal") {
-    $date = date_format($OD->data_set->f($fieldname), 1);
+    $date = of_date_format($OD->data_set->f($fieldname), 1);
     $res["name"] = $date;
   }
 
   else if ($fieldname == "deal_dateexpected") {
-    $date = date_format($OD->data_set->f($fieldname), 1);
+    $date = of_date_format($OD->data_set->f($fieldname), 1);
     $res["name"] = $date;
   }
 
   else if ($fieldname == "expected_quarter") {
     $date = $OD->data_set->f("deal_dateexpected");
     if ($date != "") {
-      $year = get_year($date);
-      $month = get_month($date);
+      $year = of_date_get_year($date);
+      $month = of_date_get_month($date);
       $q = floor(($month-1) / 3) + 1;
       $quarter = "$year$l_quarter$q";
       $res["align"] = "center";
@@ -160,14 +160,14 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "deal_dateend") {
-    $date = date_format($OD->data_set->f($fieldname), 1);
+    $date = of_date_format($OD->data_set->f($fieldname), 1);
     $res["name"] = $date;
   }
 
   else if ($fieldname == "end_quarter") {
     $date = $OD->data_set->f("deal_dateend");
     if ($date != "") {
-      $month = get_month($date);
+      $month = of_date_get_month($date);
       $q = floor(($month-1) / 3) + 1;
       $quarter = "$l_quarter$q";
       $res["align"] = "center";
@@ -177,7 +177,7 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "deal_datealarm") {
     $date = $OD->data_set->f($fieldname);
-    $datealarm = date_format($date);
+    $datealarm = of_date_format($date);
     $time = time();
     if ($time > ($date + 86400)) {
       $col = $col_error;
@@ -793,11 +793,11 @@ function html_deal_consult($deal_q, $dc="") {
   $usercreate = $deal_q->f("deal_usercreate");
   $label = $deal_q->f("deal_label");
   $num = $deal_q->f("deal_number");
-  $datebegin = date_format($deal_q->f("datebegin"), 1);
-  $dateexpected = date_format($deal_q->f("dateexpected"), 1);
+  $datebegin = of_date_format($deal_q->f("datebegin"), 1);
+  $dateexpected = of_date_format($deal_q->f("dateexpected"), 1);
   if ($dateexpected != "") {
-    $month_exp = get_month($deal_q->f("dateexpected"));
-    $year_exp = get_year($deal_q->f("dateexpected"));
+    $month_exp = of_date_get_month($deal_q->f("dateexpected"));
+    $year_exp = of_date_get_year($deal_q->f("dateexpected"));
     $q = floor(($month_exp-1) / 3) + 1;
     $quarter_exp = "($year_exp$l_quarter$q)";
   }
@@ -805,10 +805,10 @@ function html_deal_consult($deal_q, $dc="") {
     $sale_delay = floor(($deal_q->f("dateexpected") - $deal_q->f("datebegin")) / 86400);
   }
 
-  $dateend = date_format($deal_q->f("dateend"), 1);
+  $dateend = of_date_format($deal_q->f("dateend"), 1);
   if ($dateend != "") {
-    $month_end = get_month($deal_q->f("dateend"));
-    $year_end = get_year($deal_q->f("dateend"));
+    $month_end = of_date_get_month($deal_q->f("dateend"));
+    $year_end = of_date_get_year($deal_q->f("dateend"));
     $q = floor(($month_end-1) / 3) + 1;
     $quarter_end = "($year_end$l_quarter$q)";
   }
@@ -820,10 +820,10 @@ function html_deal_consult($deal_q, $dc="") {
   $source_label = $deal_q->f("leadsource_label");
   $source = $deal_q->f("deal_source");
   $commission = $deal_q->f("deal_commission");
-  $datepro = date_format($deal_q->f("dateproposal"), 1);
+  $datepro = of_date_format($deal_q->f("dateproposal"), 1);
   $amount = $deal_q->f("deal_amount");
   $hitrate = $deal_q->f("deal_hitrate");
-  $datealarm = date_format($deal_q->f("datealarm"), 1);
+  $datealarm = of_date_format($deal_q->f("datealarm"), 1);
   $status = $deal_q->f("dealstatus_label");
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
@@ -1114,11 +1114,11 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
     $usercreate = $deal_q->f("deal_usercreate");
     $label = $deal_q->f("deal_label");
     $num = $deal_q->f("deal_number");
-    $datebegin = isodate_format($deal_q->f("datebegin"), 1);
-    $dateend = isodate_format($deal_q->f("dateend"), 1);
-    $dateprop = isodate_format($deal_q->f("dateproposal"), 1);
-    $dateexpected = isodate_format($deal_q->f("dateexpected"), 1);
-    $datealarm = isodate_format($deal_q->f("datealarm"), 1);
+    $datebegin = of_isodate_format($deal_q->f("datebegin"), 1);
+    $dateend = of_isodate_format($deal_q->f("dateend"), 1);
+    $dateprop = of_isodate_format($deal_q->f("dateproposal"), 1);
+    $dateexpected = of_isodate_format($deal_q->f("dateexpected"), 1);
+    $datealarm = of_isodate_format($deal_q->f("datealarm"), 1);
     $kind = $deal_q->f("deal_type_id");
     $region = $deal_q->f("deal_region_id");
     $tt = $deal_q->f("deal_tasktype_id");
@@ -1137,7 +1137,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
     $todo = $deal_q->f("deal_todo");
     $comment = $deal_q->f("deal_comment");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
     $comp = $deal_q->f("company_name");
     $ad1 = $deal_q->f("company_address1");
     $zip = $deal_q->f("company_zipcode");
@@ -1149,7 +1149,7 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
     $town = $comp_q->f("company_town");
     $market = $comp_q->f("company_marketingmanager_id");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
     // We pre-fill datebegin and datealarm with current date
     $datebegin = date($c_php_isodate_format); 
     $datealarm = $datebegin;
@@ -1649,17 +1649,17 @@ function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
 
   // if update mode and first time, values are taken from db
   if ($action == "quick_detail") {
-    $dateexp = isodate_format($deal_q->f("dateexpected"), 1);
-    $datealarm = isodate_format($deal_q->f("datealarm"), 1);
+    $dateexp = of_isodate_format($deal_q->f("dateexpected"), 1);
+    $datealarm = of_isodate_format($deal_q->f("datealarm"), 1);
     $status = $deal_q->f("deal_status_id");
     $hitrate = $deal_q->f("deal_hitrate");
     $todo = $deal_q->f("deal_todo");
     $comment = $deal_q->f("deal_comment");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   } elseif ($action == "quick_update") {
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -3390,9 +3390,9 @@ function html_deal_subscription_list_result($sub_q,$nb_subscription) {
     $lang = $sub_q->f("publication_lang");
     $rec_label = $sub_q->f("subscriptionreception_label");
     $quantity = $sub_q->f("subscription_quantity");
-    $timecreate = datetime_format($sub_q->f("timecreate"));
+    $timecreate = of_datetime_format($sub_q->f("timecreate"));
     if ($sub_q->f("timeupdate") != "") {
-      $timeupdate = datetime_format($sub_q->f("timeupdate"));
+      $timeupdate = of_datetime_format($sub_q->f("timeupdate"));
     } else {
       $timeupdate = "&nbsp;";
     }

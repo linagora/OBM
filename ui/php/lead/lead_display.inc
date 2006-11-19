@@ -286,8 +286,8 @@ function html_lead_consult($l_q) {
   $c_name = $l_q->f("company_name");
   $source_label = $l_q->f("leadsource_label");
   $manager = $l_q->f("manager");
-  $date = date_format($l_q->f("date"));
-  $datealarm = date_format($l_q->f("datealarm"));
+  $date = of_date_format($l_q->f("date"));
+  $datealarm = of_date_format($l_q->f("datealarm"));
   $name = $l_q->f("lead_name");
   $archive = ($l_q->f("lead_archive") == 1 ? $c_yes : $c_no);
   $todo = $l_q->f("lead_todo");
@@ -404,21 +404,21 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
     $c_name = $l_q->f("company_name");
     $name = $l_q->f("lead_name");
     $date = $l_q->f("date");
-    $date = ($date != 0) ? date_format($date, 1) : "";
+    $date = ($date != 0) ? of_date_format($date, 1) : "";
     $datealarm = $l_q->f("datealarm");
-    $datealarm = ($datealarm != 0) ? date_format($datealarm, 1) : "";
+    $datealarm = ($datealarm != 0) ? of_date_format($datealarm, 1) : "";
     $todo = $l_q->f("lead_todo");
     $archive = $l_q->f("lead_archive");
     $comment = $l_q->f("lead_comment");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
 
   // New form and first time
   } elseif ($action == "new") {
     $title = $l_header_new;
     $date = date("Y-m-d");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value

@@ -109,7 +109,7 @@ function html_backup_search_list($files, $nb_files) {
   foreach ($files as $file => $one_file) {
     $cpt++;
     $data = "data" . ($cpt % 2);
-    $date = datetime_format($one_file["date"]);
+    $date = of_datetime_format($one_file["date"]);
     $version = $one_file["version"];
     $size = $one_file["size"];
 

@@ -569,7 +569,7 @@ function debug_level_isset($debug) {
 // Returns:
 //   date formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
-function date_format($timestamp="", $null_empty="") {
+function of_date_format($timestamp="", $null_empty="") {
   global $set_date_default, $set_date;
 
   $format = $set_date;
@@ -601,7 +601,7 @@ function date_format($timestamp="", $null_empty="") {
 // Returns:
 //   datetime formated iso
 ///////////////////////////////////////////////////////////////////////////////
-function isodate_format($timestamp="", $null_empty="", $time_flag=false) {
+function of_isodate_format($timestamp="", $null_empty="", $time_flag=false) {
   global $c_php_isodate_format, $c_php_isodatetime_format;
 
   if ($time_flag) {
@@ -635,7 +635,7 @@ function isodate_format($timestamp="", $null_empty="", $time_flag=false) {
 // Returns:
 //   datetime formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
-function datetime_format($timestamp="", $null_empty="") {
+function of_datetime_format($timestamp="", $null_empty="") {
   global $set_date_default, $set_date;
 
   $format = $set_date;
@@ -681,7 +681,7 @@ function isodatetime_to_timestamp($iso) {
 // Returns:
 //   year (1900-9999)
 ///////////////////////////////////////////////////////////////////////////////
-function get_year($timestamp="") {
+function of_date_get_year($timestamp="") {
 
   if ($timestamp != "")
     $date = date("Y", $timestamp);
@@ -699,7 +699,7 @@ function get_year($timestamp="") {
 // Returns:
 //   month (1-12)
 ///////////////////////////////////////////////////////////////////////////////
-function get_month($timestamp="") {
+function of_date_get_month($timestamp="") {
 
   if ($timestamp != "")
     $date = date("m", $timestamp);
@@ -717,7 +717,7 @@ function get_month($timestamp="") {
 // Returns:
 //   day (1-31)
 ///////////////////////////////////////////////////////////////////////////////
-function get_day($timestamp="") {
+function of_date_get_day($timestamp="") {
 
   if ($timestamp != "")
     $date = date("d", $timestamp);
@@ -735,7 +735,7 @@ function get_day($timestamp="") {
 // Returns:
 //   hour (0-23)
 ///////////////////////////////////////////////////////////////////////////////
-function get_hour($timestamp="") {
+function of_date_get_hour($timestamp="") {
 
   if ($timestamp != "")
     $date = date("H", $timestamp);
@@ -753,7 +753,7 @@ function get_hour($timestamp="") {
 // Returns:
 //   min (0-59)
 ///////////////////////////////////////////////////////////////////////////////
-function get_min($timestamp="") {
+function of_date_get_min($timestamp="") {
 
   if ($timestamp != "")
     $date = date("i", $timestamp);

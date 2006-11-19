@@ -457,7 +457,7 @@ function get_invoice_payment ($p_invoice, $not_paid=0) {
     $id = $obm_q->f("payment_id");
     $number = $obm_q->f("payment_number");
     $company = $obm_q->f("company_name");
-    $date = date_format($obm_q->f("payment_date"));
+    $date = of_date_format($obm_q->f("payment_date"));
     $amount = $obm_q->f("payment_amount");
     $affected_amount = $obm_q->f("paymentinvoice_amount");
     $p[$id] = array ("id" => $id,
@@ -676,8 +676,8 @@ function run_query_invoice_amounts($date_ranges, $target_date="invoice_date", $s
     $ah = $obm_q->f("invoice_amount_ht");
     $at = $obm_q->f("invoice_amount_ttc");
     $inout = $obm_q->f("invoice_inout");
-    $date = isodate_format($obm_q->f("date"));
-    $exp_date = isodate_format($obm_q->f("expiration_date"));
+    $date = of_isodate_format($obm_q->f("date"));
+    $exp_date = of_isodate_format($obm_q->f("expiration_date"));
     if ($target_date == "invoice_expiration_date") {
       $month = substr($exp_date, 0, 7);
     } else {

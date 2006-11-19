@@ -81,7 +81,8 @@ function show ( name ) {
 
 ";
 
-if (isset($ext_target) && $ext_target!="") {
+if ( (isset($ext_target) && $ext_target!="")
+     || (isset($ext_element) && $ext_element!="") ) {
   $extra_js .= "
 
 function fill_ext_form(dir_path) {
@@ -1486,7 +1487,7 @@ function _of_category_get_entity_count($entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Global User data search block 
+// Display: Global User data search block
 // Parameters:
 //   - $entity : entity
 //   - $params : parameters with search data
@@ -1500,7 +1501,7 @@ function of_userdata_dis_search($entity, $params) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Global User data search block 
+// Display: Global User data search block
 // Parameters:
 //   - $entity : entity
 //   - $params : parameters with search data
@@ -1573,7 +1574,7 @@ function of_userdata_dis_entity_form($entity, $ent_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Global User data form for an entity
+// Display: hidden form fields for each userdata
 // Parameters:
 //   - $entity : entity
 //   - $id     : entity id
@@ -1771,12 +1772,13 @@ function of_category_user_action_switch($module, $action, $params) {
     }
     $func = "dis_${module}_admin_index";
     $display["detail"] .= @$func();
-    
+
   } elseif ($action == "ext_get_category_ids") {
     $extra_css = "category.css";
     $display["detail"] = of_category_user_dis_tree($module, $params["category"], $params, $action);
 
-  } elseif ($action == "ext_get_category_code") {
+  } elseif ( ($action == "ext_get_category_code")
+	     || ($action == "ext_get_category_codes") ) {
     $extra_css = "category.css";
     $display["detail"] = of_category_user_dis_tree($module, $params["category"], $params, $action);
   }
@@ -1817,16 +1819,23 @@ function of_category_user_module_action($module) {
     'Condition'=> array ('None') 
                                      	       );
 
-// Category Select 
+// Category Select
   $actions[$module]["ext_get_category_ids"] = array (
     'Url'      => "$path/$module/${module}_index.php?action=ext_get_category_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      		 );
 
-// Category Select 
+// Category Select
   $actions[$module]["ext_get_category_code"] = array (
     'Url'      => "$path/$module/${module}_index.php?action=ext_get_category_code",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                     		 );
+
+// Category Select
+  $actions[$module]["ext_get_category_codes"] = array (
+    'Url'      => "$path/$module/${module}_index.php?action=ext_get_category_codes",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                      		 );
@@ -2002,7 +2011,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
       }
     }
     $url = "${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_target=sel_${cat}&amp;ext_title=${$l_cat}";
-    $link="<a href=\"javascript: return false;\" style=\"float:right;\"
+    $link = "<a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
@@ -2051,7 +2060,8 @@ function of_category_user_dis_tree($entity, $cat, $params, $action) {
   <div class=\"categoryTree\">";
 
   $multi_select = false;
-  if (preg_match("/ext_get_category[1-9]?_ids/", $action) > 0) {
+  if ( (preg_match("/ext_get_category[1-9]?_ids/", $action) > 0)
+       || (preg_match("/ext_get_category_codes/", $action) > 0) ) {
     $multi_select = true;
   }
 

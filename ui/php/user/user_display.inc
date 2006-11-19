@@ -90,11 +90,11 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "timelastaccess") {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = datetime_format($date, 1);
+    $res["name"] = of_datetime_format($date, 1);
   }
   else if ($fieldname == "datebegin") {
     $datebegin = $OD->data_set->f($fieldname);
-    $res["name"] = date_format($datebegin, 1);
+    $res["name"] = of_date_format($datebegin, 1);
   }
 
   return $res;
@@ -506,7 +506,7 @@ function html_user_consult($obm_q) {
   $email = $obm_q->f("userobm_email");
   $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
-  $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"), 1);
+  $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
 
   // Liste des groupes de l'utilisateur

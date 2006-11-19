@@ -12,20 +12,14 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 
-
 //cv
-
-
 $fieldnames["cv_title"] = $l_title;
 $fieldnames["lastname"] = $l_lastname;
 $fieldnames["firstname"] = $l_firstname;
 $fieldnames["timeupdate"] = $l_timeupdate;
 $fieldnames["timecreate"] = $l_timecreate;
 
- 
 //cv_reference
-
-
 $fieldnames["project_name"] = $l_ref;
 $fieldnames["projectcv_role"] = $l_role;
 $fieldnames["project_reference_date"] = $l_project_date;
@@ -72,17 +66,15 @@ function dis_data_cv(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "timeupdate") {
-    $res["name"] = date_format($OD->data_set->f("userobm_education"));
+    $res["name"] = of_date_format($OD->data_set->f("userobm_education"));
   }
 
   else if ($fieldname == "timecreate") {
-    $res["name"] = date_format($OD->data_set->f("userobm_timecreate"));
+    $res["name"] = of_date_format($OD->data_set->f("userobm_timecreate"));
   }
   
 
-//Cv_reference
-
-
+  // Cv_reference
   else if ($fieldname == "project_name") {
     $res["name"] = $OD->data_set->f("project_name");
     $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;project_id=".$OD->data_set->f("project_id");

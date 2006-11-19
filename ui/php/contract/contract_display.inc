@@ -94,7 +94,7 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
   else if ( ($fieldname == "contract_datebegin")
 	    || ($fieldname == "contract_dateexp") ) {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = date_format($date);
+    $res["name"] = of_date_format($date);
   }
 
   else if ($fieldname == "contract_archive") {
@@ -532,11 +532,11 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   $tech_id = $contract_q->f("contract_techmanager_id");
   $com = beautify_comment(nl2br($contract_q->f("contract_comment")));
   $clause = nl2br($contract_q->f("contract_clause"));
-  $datebegin = date_format($contract_q->f("datebegin"), 1);
-  $dateexp = date_format($contract_q->f("dateexp"), 1);
-  $daterenew = date_format($contract_q->f("daterenew"), 1);
-  $datecancel = date_format($contract_q->f("datecancel"), 1);
-  $datesignature = date_format($contract_q->f("datesignature"), 1);
+  $datebegin = of_date_format($contract_q->f("datebegin"), 1);
+  $dateexp = of_date_format($contract_q->f("dateexp"), 1);
+  $daterenew = of_date_format($contract_q->f("daterenew"), 1);
+  $datecancel = of_date_format($contract_q->f("datecancel"), 1);
+  $datesignature = of_date_format($contract_q->f("datesignature"), 1);
   $comp_id = $contract_q->f("contract_company_id");
   $deal_id = $contract_q->f("contract_deal_id");
   $deal_label = $contract_q->f("deal_label");
@@ -821,11 +821,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $duration = $contract_q->f("contract_duration");
     $format = $contract_q->f("contract_format");
     $autorenewal = $contract_q->f("contract_autorenewal");
-    $datebegin = isodate_format($contract_q->f("datebegin"), 1);
-    $dateexp = isodate_format($contract_q->f("dateexp"), 1);
-    $daterenew = isodate_format($contract_q->f("daterenew"), 1);
-    $datecancel = isodate_format($contract_q->f("datecancel"), 1);
-    $datesignature = isodate_format($contract_q->f("datesignature"), 1);
+    $datebegin = of_isodate_format($contract_q->f("datebegin"), 1);
+    $dateexp = of_isodate_format($contract_q->f("dateexp"), 1);
+    $daterenew = of_isodate_format($contract_q->f("daterenew"), 1);
+    $datecancel = of_isodate_format($contract_q->f("datecancel"), 1);
+    $datesignature = of_isodate_format($contract_q->f("datesignature"), 1);
     $type_id = $contract_q->f("contract_type_id");
     $con1_id = $contract_q->f("contract_contact1_id");
     $con2_id = $contract_q->f("contract_contact2_id");
@@ -834,7 +834,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
     $archive = $contract_q->f("contract_archive");
    
     $comp_name = $contract_q->f("company_name");
@@ -858,7 +858,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $dateexp = date($c_php_isodate_format, time() + 31536000);
 
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value

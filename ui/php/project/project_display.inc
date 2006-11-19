@@ -58,12 +58,12 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "project_datebegin") {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = date_format($date);
+    $res["name"] = of_date_format($date);
   }
 
   else if ($fieldname == "project_dateend") {
     $date = $OD->data_set->f($fieldname);
-    $res["name"] = date_format($date);
+    $res["name"] = of_date_format($date);
   }
 
   return $res;
@@ -620,8 +620,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
   $estimated = $project_q->f("project_estimatedtime");
-  $datebegin = date_format($project_q->f("datebegin"), 1);
-  $dateend = date_format($project_q->f("dateend"), 1);
+  $datebegin = of_date_format($project_q->f("datebegin"), 1);
+  $dateend = of_date_format($project_q->f("dateend"), 1);
   $reference_date =  $project_q->f("project_reference_date");
   $reference_duration =  $project_q->f("project_reference_duration");
   $reference_desc =  nl2br($project_q->f("project_reference_desc"));
@@ -1091,8 +1091,8 @@ function html_project_form($action, $project_q, $project) {
     $arc_val = ($project_q->f("project_archive")) ? "checked" : "";
     $company_name = $project_q->f("company_name");
     $deal_label = $project_q->f("deal_label");
-    $datebegin = isodate_format($project_q->f("datebegin"), 1);
-    $dateend = isodate_format($project_q->f("dateend"), 1);
+    $datebegin = of_isodate_format($project_q->f("datebegin"), 1);
+    $dateend = of_isodate_format($project_q->f("dateend"), 1);
     $reference_date =  $project_q->f("project_reference_date");
     $reference_duration =  $project_q->f("project_reference_duration");
     $reference_desc =  $project_q->f("project_reference_desc");
@@ -1100,7 +1100,7 @@ function html_project_form($action, $project_q, $project) {
     $comment = $project_q->f("project_comment");
     $shortname = $project_q->f("project_shortname");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   } else {
     if ($action == "new") {
       $name = $project["deal_label"];
@@ -1108,7 +1108,7 @@ function html_project_form($action, $project_q, $project) {
       $datebegin = date($c_php_isodate_format); 
       $dateend = $datebegin;
       $usercomment = $uid;
-      $datecomment = isodate_format();
+      $datecomment = of_isodate_format();
     }
   }
 

@@ -937,7 +937,7 @@ function get_last_payment_text($id) {
     display_debug_msg($query, $cdg_sql, "get_last_payment_text()");
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_q->f("payment_amount")." (".date_format($obm_q->f("date")).")";
+    return $obm_q->f("payment_amount")." (".of_date_format($obm_q->f("date")).")";
   }
   return;
 }

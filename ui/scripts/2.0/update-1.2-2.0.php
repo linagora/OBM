@@ -10,6 +10,8 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 
+echo "**** OBM : data migration 1.2 -> 2.0 : DB $obmdb_db ($obmdb_host)\n";
+
 // Migrate all user categories to new model
 $c_q = get_category_list("CompanyCategory1");
 process_category_list("CompanyCategory1", "company", $c_q);
@@ -69,7 +71,7 @@ function process_list_list($l_q) {
     if ($structure != "") {
       $cpt++;
       $criteria = unserialize($structure);
-      print_r($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
+      //      print_r($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
       foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
 	$new_val = $hash_c1[$value];
 	$criteria["modules"]["contact"]["contactcategory1_id"][] = $new_val;

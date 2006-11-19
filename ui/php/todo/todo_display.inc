@@ -34,7 +34,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "date_deadline") {
     $deadline = $OD->data_set->f("date_deadline");
-    $res["name"] = ($deadline) ? date_format($deadline) : " ";
+    $res["name"] = ($deadline) ? of_date_format($deadline) : " ";
     $res["align"] = "center";
   }
 
@@ -159,9 +159,9 @@ function dis_todo_detail($todo, $todo_q) {
   $priority = $todo_q->f("todo_priority");
   $percent = $todo_q->f("todo_percent");
 
-  $date = date_format($todo_q->f("date_todo"));
+  $date = of_date_format($todo_q->f("date_todo"));
   $deadline = $todo_q->f("date_deadline");
-  $deadline = ($deadline != 0) ? date_format($deadline) : $l_no_deadline;
+  $deadline = ($deadline != 0) ? of_date_format($deadline) : $l_no_deadline;
 
   $content = $todo_q->f("todo_content");
 
@@ -226,7 +226,7 @@ function dis_todo_form($todo, $todo_q = 0) {
     $priority = $todo_q->f("todo_priority");
     $percent = $todo_q->f("todo_percent");
     $deadline = $todo_q->f("date_deadline");
-    $deadline = ($deadline != 0) ? date_format($deadline, 1) : $l_no_deadline;
+    $deadline = ($deadline != 0) ? of_date_format($deadline, 1) : $l_no_deadline;
   } else {
     $u_id = $auth->auth["uid"];
     $priority = intval(($max_priority+1)/2);

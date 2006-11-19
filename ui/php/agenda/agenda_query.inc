@@ -775,8 +775,8 @@ function run_query_agenda_event_update($agenda, $sel_entity_id, &$event_id) {
   }    
 
   $event_data = run_query_agenda_detail($event_id);
-  $old_begin = isodate_format($event_data->f("calendarevent_date"),"", 1);
-  $old_end = isodate_format($event_data->f("calendarevent_date") + $event_data->f("calendarevent_duration"),"",1);
+  $old_begin = of_isodate_format($event_data->f("calendarevent_date"),"", 1);
+  $old_end = of_isodate_format($event_data->f("calendarevent_date") + $event_data->f("calendarevent_duration"),"",1);
 
   // Handle Connectors data
   if ($c_use_connectors) {
@@ -965,7 +965,7 @@ function run_query_agenda_delete($agenda) {
   $obm_q->query($query);
   $resources = array();
   while ($obm_q->next_record()) {
-     array_push($resources, $obm_q->f("evententity_entity_id"));
+    array_push($resources, $obm_q->f("evententity_entity_id"));
   }
   $resources_address = array();
   if (count($resources) > 0 && ($cagenda_resource_admin != "")) {
@@ -1528,7 +1528,7 @@ function get_agenda_date_day_of_week($timestamp, $day) {
   $ret_ts = strtotime($day,$start_day_time);
   // we correct the value to eliminate DST pbs
   $ret_ts = strtotime('+12 hours', $ret_ts);
-  $ret_ts = strtotime(isodate_format($ret_ts));
+  $ret_ts = strtotime(of_isodate_format($ret_ts));
 
   return $ret_ts;
 }
@@ -2124,7 +2124,7 @@ function store_agenda_event($date, &$event, &$day_events,$user_id,$all_day,$end_
   $temp_date = $date;
   $event_end = $date + $event->duration;
   do {
-    $iso_date = isodate_format($temp_date);
+    $iso_date = of_isodate_format($temp_date);
     $day = &$day_events[$iso_date];
     if (!is_object($day) || !$day->is_same_day($temp_date)) {
       $day = &new Day($temp_date);
@@ -2148,15 +2148,15 @@ function agenda_daily_repeatition($date,$start_time,$end_date,$end_time,$repeatf
   $temp_date = $date;
   if ($temp_date < $start_time) {
     $temp_date = ceil(($start_time - $date) / $day_duration);
-    $hour_diff = get_hour($date) - get_hour($start_time);
-    $min_diff = get_min($date) - get_min($start_time);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
     if ($temp_date > 0) {
       $temp_date = ($temp_date % $repeatfrequence);
     }	    
     $temp_date = strtotime("+$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
   while ($temp_date <= $end_date ) {
-    $iso_date = isodate_format($temp_date);
+    $iso_date = of_isodate_format($temp_date);
     $day = &$day_events[$iso_date];
     if(!is_object($day)) {
       $day = &new Day($temp_date);
@@ -2180,10 +2180,10 @@ function agenda_weekly_repeatition($date,$start_time,$end_date,$end_time,$repeat
 
   $return = false;
   $temp_date = get_agenda_date_day_of_week($date, $cagenda_weekstart);
-  $temp_date = strtotime("+".get_hour($date)." hours +".date("i",$date)." minutes",$temp_date);
+  $temp_date = strtotime("+".of_date_get_hour($date)." hours +".date("i",$date)." minutes",$temp_date);
   if ($temp_date < $start_time) {
     $temp_date = ceil(($start_time - $temp_date) / $day_duration);
-    $hour_diff = get_hour($date) - get_hour($start_time);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
     $min_diff = date("i",$date) - date("i",$start_time);
     $temp_date = ($temp_date % ($repeatfrequence * 7));
     if ($temp_date == "") $temp_date = 0;
@@ -2198,7 +2198,7 @@ function agenda_weekly_repeatition($date,$start_time,$end_date,$end_time,$repeat
     foreach ($repeat_days as $delta_day => $repeatition) {	  
       if ($repeatition == 1) {
 	$current_date = strtotime("+$delta_day days",$temp_date);
-        $iso_date = isodate_format($current_date);
+        $iso_date = of_isodate_format($current_date);
 	if ($current_date >= $start_time && $current_date <= $end_date) {
 	  $day = &$day_events[$iso_date];
 	  if (!is_object($day)) {
@@ -2231,18 +2231,18 @@ function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$end
   $monthlybyday = ceil(date('d',$date) / 7);
   $event_end = $date + $event->duration;
   if ($event_end < $start_time) {
-    $month_diff = (get_year($start_time) - get_year($temp_date)) * 12;
-    $month_diff += get_month($start_time) - get_month($temp_date);
-    $hour_diff = get_hour($date) - get_hour($start_time);
-    $min_diff = get_min($date) - get_min($start_time);
+    $month_diff = (of_date_get_year($start_time) - of_date_get_year($temp_date)) * 12;
+    $month_diff += of_date_get_month($start_time) - of_date_get_month($temp_date);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
     $month_diff = $month_diff % ($repeatfrequence);
     if ($month_diff > 0) {
       $month_diff = $repeatfrequence - $month_diff;
     }
     $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $start_time);
   }
-  $hour_diff = get_hour($date);
-  $min_diff = get_min($date);
+  $hour_diff = of_date_get_hour($date);
+  $min_diff = of_date_get_min($date);
   $ts_cur = strtotime(date("Y-m-01",$temp_date));
   while ($ts_cur <= $end_date) {
     $start_num = (date('w', $ts_cur) - $start_week +7)%7;
@@ -2250,10 +2250,10 @@ function agenda_agenda_monthlybyday_repeatition($date,$start_time,$end_date,$end
     $day_diff += 7*($monthlybyday-1);
     $current_date = strtotime("+ $day_diff days +$hour_diff hours +$min_diff minutes",$ts_cur);
     $event_end = $current_date + $event->duration;
-    if (get_month($ts_cur) == get_month($current_date)
+    if (of_date_get_month($ts_cur) == of_date_get_month($current_date)
        && $event_end >= $start_time
        && $current_date <= $end_date) {
-      $iso_date = isodate_format($current_date);
+      $iso_date = of_isodate_format($current_date);
       $day = &$day_events[$iso_date];
       if (!is_object($day)) {
 	$day = &new Day($current_date);
@@ -2280,10 +2280,10 @@ function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$end_time,
   $temp_date = $date;
   if ($temp_date < $start_time) {
     $temp_date = strtotime(date("Y-m-01",$start_time));
-    $month_diff = (get_year($start_time) - get_year($date)) * 12;
-    $month_diff += get_month($start_time) - get_month($date);
-    $hour_diff = get_hour($date) - get_hour($start_time);
-    $min_diff = get_min($date) - get_min($start_time);
+    $month_diff = (of_date_get_year($start_time) - of_date_get_year($date)) * 12;
+    $month_diff += of_date_get_month($start_time) - of_date_get_month($date);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
     $month_diff = $month_diff % ($repeatfrequence);
     if ($month_diff > 0) {
       $month_diff = $repeatfrequence - $month_diff;
@@ -2291,13 +2291,13 @@ function agenda_monthlybydate_repeatition($date,$start_time,$end_date,$end_time,
 
     $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
   }	
-  $hour_diff = get_hour($date);
-  $min_diff = get_min($date);  	
+  $hour_diff = of_date_get_hour($date);
+  $min_diff = of_date_get_min($date);
   $ts_date = strtotime(date("Y-m-".date("d",$date),$temp_date));
   $ts_date = strtotime("+$hour_diff hours +$min_diff minutes",$ts_date);
 
   while ($ts_date <= $end_date) {
-    $iso_date = isodate_format($ts_date);
+    $iso_date = of_isodate_format($ts_date);
     $day = &$day_events[$iso_date];
     if (!is_object($day)) {
       $day = &new Day($ts_date);
@@ -2323,22 +2323,22 @@ function agenda_yearly_repeatition($date,$start_time,$end_date,$end_time,$repeat
   $temp_date = $date;    
   if ($temp_date < $start_time) {
     $temp_date = strtotime(date("Y-m-01",$start_time));
-    $month_diff = (get_year($start_time) - get_year($date)) * 12;
-    $month_diff += get_month($start_time) - get_month($date);
-    $hour_diff = get_hour($date) - get_hour($start_time);
-    $min_diff = get_min($date) - get_min($start_time);
+    $month_diff = (of_date_get_year($start_time) - of_date_get_year($date)) * 12;
+    $month_diff += of_date_get_month($start_time) - of_date_get_month($date);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
     $month_diff = $month_diff % ($repeatfrequence*12);
     if ($month_diff > 0) {
       $month_diff = $repeatfrequence*12 - $month_diff;
     }
     $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
   }
-  $hour_diff = get_hour($date);
-  $min_diff = get_min($date);
+  $hour_diff = of_date_get_hour($date);
+  $min_diff = of_date_get_min($date);
   $ts_date = strtotime(date("Y-m-".date("d",$date),$temp_date));
   $ts_date = strtotime("+$hour_diff hours +$min_diff minutes",$ts_date);
   while ($ts_date <= $end_date) {
-    $iso_date = isodate_format($ts_date);
+    $iso_date = of_isodate_format($ts_date);
     $day = &$day_events[$iso_date];
     if (!is_object($day)) {
       $day = &new Day($ts_date);

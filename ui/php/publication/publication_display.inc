@@ -1392,9 +1392,9 @@ function html_publication_subscription_list_result($sub_q,$nb_subscription) {
     $lang = $sub_q->f("publication_lang");
     $rec_label = $sub_q->f("subscriptionreception_label");
     $quantity = $sub_q->f("subscription_quantity");
-    $timecreate = datetime_format($sub_q->f("timecreate"));
+    $timecreate = of_datetime_format($sub_q->f("timecreate"));
     if ($sub_q->f("timeupdate") != "") {
-      $timeupdate = datetime_format($sub_q->f("timeupdate"));
+      $timeupdate = of_datetime_format($sub_q->f("timeupdate"));
     } else {
       $timeupdate = "&nbsp;";
     }

@@ -58,7 +58,7 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "incident_date") {
-    $res["name"] = date_format($OD->data_set->f("date"));
+    $res["name"] = of_date_format($OD->data_set->f("date"));
   }
 
   else if ($fieldname == "incident_priority") {
@@ -324,7 +324,7 @@ function html_incident_consult($inc_q) {
   $reference = $inc_q->f("incident_reference");
   $priority = $inc_q->f("incidentpriority_label");
   $status = $inc_q->f("incidentstatus_label");
-  $date = datetime_format($inc_q->f("date"), 1);
+  $date = of_datetime_format($inc_q->f("date"), 1);
   $inc_id = $inc_q->f("incident_id");
   $inc_dur = nl2br($inc_q->f("incident_duration"));
   $resolution = $inc_q->f("incident_resolution");
@@ -335,8 +335,8 @@ function html_incident_consult($inc_q) {
   $con_status = $inc_q->f("contractstatus_label");
   $con_label = $inc_q->f("contract_label");
   $con_num = $inc_q->f("contract_number");
-  $con_debut = date_format($inc_q->f("datebegin"));
-  $con_exp = date_format($inc_q->f("dateexp"));
+  $con_debut = of_date_format($inc_q->f("datebegin"));
+  $con_exp = of_date_format($inc_q->f("dateexp"));
   $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
   $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
   $dis_con1 = $inc_q->f("lname_c1") . " " . $inc_q->f("fname_c1") . " - " . $inc_q->f("phone_c1");
@@ -569,16 +569,16 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $status = $inc_q->f("incident_status_id");
     $cat1 = $inc_q->f("incident_category1_id");
     $cat2 = $inc_q->f("incident_category2_id");
-    $datecomment = isodate_format();
-    $date = isodate_format($inc_q->f("date"));
-    $hour = get_hour($inc_q->f("date"));
+    $datecomment = of_isodate_format();
+    $date = of_isodate_format($inc_q->f("date"));
+    $hour = of_date_get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
     $c_label = $inc_q->f("contract_label");
   } elseif ($action == "new") {
     // We pre-fill date with current date
     $date = date($c_php_isodate_format);
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value

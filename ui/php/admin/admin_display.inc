@@ -64,7 +64,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
   global $obm_version, $l_version, $l_date, $l_host, $l_domain, $c_multidomain;
 
-  $date = datetime_format();
+  $date = of_datetime_format();
   if ($lifetime > 0) {
     $nb_sess_to_clear = run_query_admin_count_passive_sess($lifetime);
     $d_lifetime = $lifetime;
@@ -76,9 +76,9 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   $nbua = $obm_u->nf();
   $list_user = "";
   while ($obm_u->next_record()) {
-    $last_acces = datetime_format($obm_u->f("timeupdate"));
+    $last_acces = of_datetime_format($obm_u->f("timeupdate"));
     $login = $obm_u->f("userobm_login");
-    $login_date = datetime_format($obm_u->f("timecreate"));
+    $login_date = of_datetime_format($obm_u->f("timecreate"));
     $nb_con = $obm_u->f("activeuserobm_nb_connexions");
     $lastpage = $obm_u->f("activeuserobm_lastpage");
     $ip = $obm_u->f("activeuserobm_ip");

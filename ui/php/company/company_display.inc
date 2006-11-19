@@ -1017,12 +1017,12 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     $deal_num = $co_q->f("company_deal_number");
     $comment = $co_q->f("company_comment");
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   } else if ($action == "new") {
     $mark = $auth->auth["uid"];
     $dsrc = $set_dsrc;
     $usercomment = $uid;
-    $datecomment = isodate_format();
+    $datecomment = of_isodate_format();
   }
 
   // If parameters have been given, they supercede the default action value

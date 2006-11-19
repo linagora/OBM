@@ -831,7 +831,7 @@ function html_list_form($action, $list_q, $list) {
     $normal_checked = " checked=\"checked\" ";
     $style_query = "style=\"display:none;\"";
   }
-  $dis_query = html_list_graphical_form($action, $list_q, $list);
+  $dis_query = html_list_normal_criteria_form($action, $list_q, $list);
 
   $block = "
   <div class=\"detailHead\">$l_list</div>
@@ -896,7 +896,7 @@ function html_list_form($action, $list_q, $list) {
 //   - $list[]    : default or transmitted values
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_list_graphical_form($action, $list_q, $list) {
+function html_list_normal_criteria_form($action, $list_q, $list) {
   global $cgp_user,$popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
   global $l_add_criterion, $l_criterion;
   global $l_and, $l_or, $l_not, $l_empty, $l_exclude;
@@ -1232,6 +1232,100 @@ function dis_list_add_criterion_form($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Form to add a Criterion
+// Parameters:
+//   - $list[]    : default or transmitted values
+///////////////////////////////////////////////////////////////////////////////
+function dis_list_add_criterion_userdata_form($entity) {
+  global $cgp_user, $set_theme, $ico_add, $popup_height, $popup_width, $l_all;
+  global $ico_add, $ico_crow, $l_none;
+
+  // User data categories handling
+  if (is_array($cgp_user["$entity"]["category"])) {
+    foreach($cgp_user["$entity"]["category"] as $cat_name => $one_cat) {
+      $cat_code = "${cat_name}_code";
+      $cat_label = "l_$cat_name";
+      global $$cat_label;
+      $cats = of_category_user_get_ordered($cat_name);
+      $sel_cat = "<option value=\"\">$l_all</option>";
+      if (is_array($cats)) {
+	foreach($cats as $one_entry) {
+	  $entry_code = $one_entry["code"];
+	  $entry_label = substr($one_entry["label"],0,30);
+	  $sel_cat .= "
+  <option value=\"$entry_code\">$entry_code $entry_label</option>";
+	}
+      }
+      $dis_cat .= "<p>
+    ${$cat_label} <select readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_$cat_code\">$sel_cat</select>
+     <a href=\"javascript: void(0);\" onclick=\"window.open('../$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_target=f_new_criterion.sel_$cat_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />";
+    }
+  }
+
+  // User data categories handling
+  if (is_array($cgp_user["$entity"]["category"])) {
+    foreach($cgp_user["$entity"]["category"] as $cat_name => $one_cat) {
+      $cat_code = "${cat_name}_code";
+      $cat_label = "l_$cat_name";
+      global $$cat_label;
+      $cats = array();
+      //      $cats = of_category_user_get_ordered($cat_name);
+      $sel_cat = "";
+      $sel_name = "sel_${cat_name}";
+      if (is_array($cats)) {
+	foreach ($cats as $one_cat) {
+	  $c_id = $one_cat["id"];
+	  $c_code = $one_cat["code"];
+	  $c_label = htmlentities($one_cat["label"]);
+	  $div_id = "$sel_name-data-$c_id";
+	  $sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','$sel_name');\">
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
+          </a>
+          $c_code $c_label
+          <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
+          </div>";
+	}
+      }
+      $url_cat = "$path/$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_target=$sel_name";
+      $block_cat .= of_extmod_dis_search_select($cats, "$cat_name", $url_cat);
+
+    }
+  }
+
+  return $block_cat;
+
+
+
+  // User data categories handling
+  if (is_array($cgp_user["contact"]["category"])) {
+    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
+      $cat_id = "${cat_name}_id";
+      $cat_code = "${cat_name}_code";
+      $cat_label = "l_$cat_name";
+      global $$cat_label;
+      $cats = of_category_user_get_ordered($cat_name);
+      $sel_cat = "<option value=\"\">$l_all</option>";
+      if (is_array($cats)) {
+	foreach($cats as $one_entry) {
+	  $entry_id = $one_entry["id"];
+	  $entry_code = $one_entry["code"];
+	  $entry_label = substr($one_entry["label"],0,30);
+	  $sel_cat .= "
+  <option value=\"$entry_id\">$entry_code $entry_label</option>";
+	}
+      }
+      $dis_cat .= "<p>
+    ${$cat_label}<br/><select multiple=\"multiple\" size=\"5\" name=\"sel_$cat_id\">$sel_cat</select>";
+    }
+  }
+
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the Company Criterion Form
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
@@ -1282,6 +1376,8 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />";
     }
   }
+
+  $dis_cat = dis_list_add_criterion_userdata_form("company");
 
   $block .= "
   <div class=\"detailHead\">$l_company</div>

@@ -764,7 +764,7 @@ function dis_admin_ref_tasktype_links($ref) {
       $cpt++;
       $tid = $obm_q->f("timetask_user_id");
       $tname = $obm_q->f("lastname") . " " . $obm_q->f("firstname");
-      $tdate = date_format($obm_q->f("date"), 1);
+      $tdate = of_date_format($obm_q->f("date"), 1);
       $dis_link_time .= "
     <tr>
       <td class=\"detailLabel\">
