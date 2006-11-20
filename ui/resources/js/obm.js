@@ -2,6 +2,7 @@ var obm = Obm = {};
 obm.vars = new Object();
 obm.vars.labels = new Object();
 obm.vars.images = new Object();
+obm.vars.regexp = new Object();
 
 Obm.Menu = new Class({
   
@@ -61,13 +62,13 @@ Obm.Portlets = new Class({
   
   initialize: function() {
     img = document.createElement('img');
-    img.src = obm.vars.upArrow;
+    img.src = obm.vars.images.upArrow;
     this.upArrow = img.src;
-    img.src = obm.vars.downArrow;
+    img.src = obm.vars.images.downArrow;
     this.downArrow = img.src; 
-    img.src = obm.vars.leftArrow;
+    img.src = obm.vars.images.leftArrow;
     this.leftArrow = img.src; 
-    img.src = obm.vars.rightArrow;
+    img.src = obm.vars.images.rightArrow;
     this.rightArrow = img.src; 
     
     // 
@@ -98,8 +99,8 @@ Obm.Portlets = new Class({
       title = el.getFirst();
       content = title.getNext();
       this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
-
-      img = $(document.createElement('img'));
+      
+      img = document.createElement('img');
       if(Cookie.get(el.id + "Hidden")  == "true") {
         this.portlets[el.id].hide();
         img.src = this.downArrow;
@@ -113,7 +114,7 @@ Obm.Portlets = new Class({
           this.setAttribute("src", obm.portlets.downArrow);
         else 
           this.setAttribute("src", obm.portlets.upArrow);
-        obm.portlets.toggleElement(el.id);
+        obm.portlets.toggleElement(this.parentNode.parentNode.id);
       });
     }
   },
@@ -161,14 +162,13 @@ function datePickerGenerator() {
   elements = $S('.datePicker');
   elements.each(function(element){
     img = $(document.createElement('img'));
-    img.setAttribute("src", obm.vars.datePicker);
+    img.setAttribute("src", obm.vars.images.datePicker);
     img.injectAfter(element);
     img.addEvent('click', function(e){
       displayDatePicker(element.name);
     });
   });
 }
-
 
 function formValidator() {
   $S('[alt=\"require\"]');

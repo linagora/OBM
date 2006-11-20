@@ -25,4 +25,4 @@ $ico_update         = "$theme_path/ico_modify.gif";
 $ico_ok             = "$theme_path/ico_ok.gif";
 $ico_nok            = "$theme_path/ico_delete.gif";
 $ico_lock           = "$theme_path/ico_lock.gif";
-
+$ico_obm            = "$theme_path/logo_obm.gif";

@@ -57,7 +57,8 @@ function display_page(&$display) {
       <img id='portletsHandler' src='$ico_arrow_left' alt='Hide this bar' />
       <div id=\"portlets\">
         " .
-        $display["last"] . 
+        $display["last"] .
+        $display["link"] .
         $display["detailInfo"] ." 
       </div>
     </div>
@@ -88,7 +89,7 @@ function display_page(&$display) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
   global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
-  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login;
+  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm;
 
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
@@ -107,7 +108,7 @@ function display_menu($module) {
   $block = "
 <!-- Bandeau -->
 <div id='banner'>
-<img src='".C_IMAGE_PATH."/".$set_theme."/logoOBM.gif' alt='Logo OBM'/>
+<img src='$ico_obm' alt='Logo OBM'/>
 ".
 $display["section"]
 ."
@@ -208,7 +209,7 @@ function display_modules_theme($section) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////div////////////////////////////////////////
 // Theme specific : Display the action block
 // Parameters:
 //   - $section : selected section
@@ -293,12 +294,12 @@ function display_head_theme($p_module) {
   <script language=\"JavaScript\" type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/datepicker.js\" ></script>
   <script language=\"JavaScript\" type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/obm.js\" ></script>
   <script type=\"text/javascript\">
-  obm.vars.upArrow = '$ico_arrow_up';
-  obm.vars.downArrow = '$ico_arrow_down';
-  obm.vars.leftArrow = '$ico_arrow_left';
-  obm.vars.rightArrow = '$ico_arrow_right';
-  obm.vars.datePicker = '$ico_datepicker';
-  obm.vars.dateFormat = '$set_date_upd';
+  obm.vars.images.upArrow = '$ico_arrow_up';
+  obm.vars.images.downArrow = '$ico_arrow_down';
+  obm.vars.images.leftArrow = '$ico_arrow_left';
+  obm.vars.images.rightArrow = '$ico_arrow_right';
+  obm.vars.images.datePicker = '$ico_datepicker';
+  obm.vars.regexp.dateFormat = '$set_date_upd';
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;

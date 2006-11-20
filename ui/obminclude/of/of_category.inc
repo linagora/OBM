@@ -178,9 +178,9 @@ function of_category_dis_search_select($entity, $cat, $cats, $cat_id, $first_ele
     $sel_cat = of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, $sel_append);
 
     $block_cat = "
-    <div class=\"searchLabel\">${$l_cat}<br />
+    <label>${$l_cat}<br />
       $sel_cat
-    </div>";
+    </label>";
   }
 
   return $block_cat;
@@ -634,16 +634,9 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
 	$has_links = true;
         $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cb_archive=1");
 
-	$dis_link .= "
-    <tr>
-      <td class=\"detailHead\">".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
-    </tr>";
+	$dis_link .= "<h1>".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a></h1>";
       } else {
-	$dis_link .= "
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-          ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
-    </tr>";
+	$dis_link .= "<h1>".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}).</h1>";
       }
     }
 
@@ -660,17 +653,9 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
       $has_links = true;
       $url = url_prepare("?action=search&amp;sel_${cat}=$id&amp;cb_archive=1");
 
-      $dis_link .= "
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        ".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a>.</td>
-    </tr>";
+      $dis_link .= "<h1>".ucfirst(${$l_cat})."($label) : $l_c_link ${$l_entity} <a href=\"$url\">($nb_cat)</a></h1>";
     } else {
-      $dis_link .= "
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-          ".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity}). </td>
-    </tr>";
+      $dis_link .= "<h1>".ucfirst(${$l_cat})."($label) : $l_c_link_no (${$l_entity})</h1>";
     }
   }
 
@@ -679,30 +664,17 @@ function of_category_dis_links($entities, $cat, $params, $mode="multi") {
   } else {
     $display["msg"] .= display_ok_msg(ucfirst(${$l_cat}).": $l_c_can_delete.");
 
-    $dis_buttons .= "
-      <form name=\"form_cat_delete\"
-        method=post action=\"" . url_prepare("") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"${cat}_delete\">
-      <input type=\"hidden\" name=\"sel_${cat}\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_c_delete\">
-      </form>";
+    $dis_buttons .= "<a href=\"?action=${cat}_delete&amp;sel_${cat}=$id\">$l_c_delete</a>";
   }
 
-  $dis_buttons .= "
-        <form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
+  $dis_buttons .= "<a href=\"?action=admin\">$l_back</a>";
 
   $block = "
-    <table class=\"detail\">
-      $dis_link
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-      $dis_buttons
-    </p>
+  <div class=\"detail\">
+  $dis_link
+  </div>
+  <div class=\"buttons\">
+    $dis_buttons
   </div>
 ";
 
@@ -1845,10 +1817,10 @@ function of_category_user_dis_search($entity, $params) {
       $block_user .= of_category_user_dis_search_select($cat_name, $cats, $cat, array("all", "none"), $sel_append);
 
       $block_user .= "
-    <div class=\"searchLabel\">$l_cat_tree<br />
+    <label>$l_cat_tree<br />
       <input type=\"checkbox\" name=\"cba_${cat_name}_tree\" value=\"1\" $cat_tree />
       <input type=\"hidden\" name=\"tf_${cat_name}_code\" value=\"$cat_code\" />
-    </div>";
+    </label>";
     }
   }
 
@@ -1874,9 +1846,9 @@ function of_category_user_dis_search_select($cat, $cats, $cat_id, $first_element
   $sel_cat = of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel_append);
 
   $block_cat = "
-    <div class=\"searchLabel\">${$l_cat}<br />
+    <label>${$l_cat}<br />
       $sel_cat
-    </div>";
+    </label";
 
   return $block_cat;
 }

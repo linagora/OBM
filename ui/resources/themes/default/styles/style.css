@@ -139,7 +139,7 @@ C {
   height: 2.2em;
   line-height: 2.2em;
   background-color: #e1e1e1;
-  background-image: url('banner_border.png');
+  background-image: url('../images/banner_border.png');
   background-repeat: repeat-x;
   background-position: bottom;
 }
@@ -206,7 +206,7 @@ C {
   text-align: center;
   border: 1px solid #358399;
   background: #509cbc;
-  background-image: url('tab_border.png');
+  background-image: url('../images/tab_border.png');
   background-repeat: repeat-x;
   cursor: pointer;
   background-position: 0 0.9em;
@@ -216,7 +216,7 @@ C {
 #section li.hover {
   color: #368397;
   background: #e0e1e3;
-  background-image: url('tab_current_border.png');
+  background-image: url('../images/tab_current_border.png');
   background-repeat: repeat-x;
   background-position: 0 0.9em;
 }
@@ -268,7 +268,7 @@ C {
   color: #368397;  
   border: 1px solid #358399;
   border-left: 0;
-  background-image: url('tab_border.png');
+  background-image: url('../images/tab_border.png');
   background-repeat: repeat-x;
   background-position: 0 0.8em;
 }
@@ -283,7 +283,7 @@ C {
 
 #action li.hover {
   background: #3c899f;
-  background-image: url('tab_over_border.png');
+  background-image: url('../images/tab_over_border.png');
   background-repeat: repeat-x;
   background-position: 0 0.8em;  
 }
@@ -467,6 +467,41 @@ fieldset.detail {
   display: block;
 }
 
+.buttons {
+  text-align: center;
+  padding-top : 1em;
+  border: 0;
+}
+
+.buttons form {
+  display: inline;
+}
+
+.buttons a {
+  color: #fff;
+  font-weight: bold;
+  border: 1px solid #d2d2d2;
+  background-color: #509cbc;
+  margin: 0 4em;
+  padding: 3px;
+}
+
+.buttons a:hover {
+  background-color: #35839a;
+  text-decoration: none;
+}
+
+.buttons input {
+  margin: 0 4em;
+  color: #fff;
+  font-weight: bold;
+  background-color: #509cbc;
+}
+
+.buttons input:hover {
+  background-color: #35839a;
+  cursor: pointer;
+}
 
 /* ------------------------------------------------------------------------- */
 /* Comments layout */
@@ -514,7 +549,7 @@ fieldset.detail {
   background-color: #b3b2b2;
   font-weight: bold;
   text-align: center;
-  background-image: url('background_tableHead.gif');
+  background-image: url('../images/background_tableHead.gif');
   background-repeat: repeat-x;
   background-position: top;
   border-bottom: 1px solid #929292; 
@@ -557,30 +592,19 @@ fieldset.detail {
 /* ------------------------------------------------------------------------- */
 
 .search {
-	font-size: 100%;
-	height: 100%;
-	width: auto;
-	margin-top: 10px;
-	margin-bottom: 20px;
-	font-style: italic;
+  font-size: 100%;
+  width: auto;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-style: italic;
 }
 
-.searchLabel {
-	float: left;
-	margin: 0px;
-	padding: 3px;
+.search label {
+  float: left;
+  margin: 0;
+  padding: 3px;
+  display: block;
 }
-
-.searchButton {
-	float: left;
-	margin: 0px;
-	padding: 3px;
-}
-
-.searchEnd {
-	clear: both;
-}
-
 
 /* ------------------------------------------------------------------------- */
 /* Search results table */
@@ -622,7 +646,7 @@ fieldset.detail {
   background-color: #b3b2b2;
   font-weight: bold;
   text-align: center;
-  background-image: url('background_tableHead.gif');
+  background-image: url('../images/background_tableHead.gif');
   background-repeat: repeat-x;
   background-position: top;
   border-bottom: 1px solid #929292; 
@@ -631,7 +655,7 @@ fieldset.detail {
 .result thead .hover {
   cursor: pointer;
   background-color: #929292;
-  background-image: url('background_over_tableHead.gif');
+  background-image: url('../images/background_over_tableHead.gif');
 
 }
 
@@ -672,24 +696,26 @@ fieldset.detail {
   font-style: italic;
   margin:0;
   line-height: 1.8em;
-  background-image: url('hatch.gif');
+  background-image: url('../images/hatch.gif');
 }
 
 .ok {
-  color: #47c134;
-  background-color: #d4e4e9;
+  color: #589835;
+  background-color: #d1e8c9;
 }
 
 .error {
-  color: #f42742;
+  color: #c62a2a;
+  background-color: #fcd9d9;
 }
 
 .warning {
-  color: #ee9b00;
+  color: #e99a11;
+  background-color: #f1e1ce;
 }
 
 .info {
-  color: #0052e0;
+  color: #1276c3;
   background-color: #d4e4e9;
 }
 
@@ -718,7 +744,7 @@ fieldset.detail {
   background-color: #b3b2b2;
   font-weight: bold;
   text-align: center;
-  background-image: url('background_tableHead.gif');
+  background-image: url('../images/background_tableHead.gif');
   background-repeat: repeat-x;
   background-position: top;
   border-bottom: 1px solid #929292; 
