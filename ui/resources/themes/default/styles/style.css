@@ -123,6 +123,7 @@ C {
   min-width: 120px;
   margin: 0px 0px 20px 16em;
   padding: 10px;
+/*IE workaround*/
   _height: 1px;
 }
 
@@ -180,7 +181,6 @@ C {
 }
 
 /*IE workaround*/
-/*All IE browsers*/
 * html #information li {
   border-left: 1px solid black;
   padding: 0 0.4em 0 0.4em;
@@ -338,61 +338,36 @@ C {
   margin: 0;
   padding: 2px 0 0 3px;
 }
-
-/* TODO: VIRER CA !!!!!
-.block {
-  background-color: #eff0f2;
-  color: #368397;
-  list-style-type: none;
-}
+/* ------------------------------------------------------------------------- */
+/* Debug */
+/* ------------------------------------------------------------------------- */
 
 .debug {
   height: 200px;
   overflow: scroll;
-	position : relative; 
-	width : auto;
-  margin : 2px;
-	z-index : 2; 
-	background-color : #FFF;
-	border:			1px solid #009ec6; 
-	font-size: 12px;
+  position: relative; 
+  margin: 2px;
+  z-index: 2; 
+  background-color: #FFF;
+  border: 1px solid #009ec6; 
+  font-size: 100%;
 }
 
 .debug hr {
-	border : 1px dashed #CCC; 
+  border: 1px dashed #CCC; 
 }
 
-.debugHead {
-	width : auto;
-	z-index : 2; 
-	background-color : #009ec6;
-	font-size: 14px;
-	color :  #FFF;
-	font-weight:		bold;
-	text-align: center;
+.debug h1 {
+  z-index: 2; 
+  background-color: #009ec6;
+  font-size: 120%;
+  color:  #FFF;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
 }
 
-.block form {
-        padding:                0;
-        margin:                 2px 0;
-}
 
-.blockTitle {
-	font-weight:		bold;
-	color:			#646567;
-	background-color:       #d2d2d2;
-}
-
-.blockItem {
-  font-size: 80%;
-	list-style-type: none;
-	margin: 0px;
-	padding: 3px 0;
-}
-.blockItem li {
-        margin: 1px;
-}
-*/
 /* ------------------------------------------------------------------------- */
 /* Page context title */
 /* ------------------------------------------------------------------------- */
@@ -656,6 +631,8 @@ fieldset.detail {
   cursor: pointer;
   background-color: #929292;
   background-image: url('../images/background_over_tableHead.gif');
+  background-repeat: repeat-x;
+  background-position: top;
 
 }
 
@@ -778,60 +755,37 @@ fieldset.detail {
   padding: 2px 0 0 4px;
   margin: 1em 0 5px ;
 }
-/*
-.resultIndex {
-	color: #666666;
-	background-color: #eff3f7;
-	width: 100%;
-	text-align: center;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	font-size: 12px;
-	font-weight: bold;
-	font-family: Arial, Helvetica, sans-serif;
-	vertical-align: middle;
-	border: 1px solid #009ec6;
+
+/* TODO: VIRER CA !!!!!
+.block {
+  background-color: #eff0f2;
+  color: #368397;
+  list-style-type: none;
 }
 
-.resultIndexIcon {
-	vertical-align: middle;
-	border: 0px;
+.block form {
+        padding:                0;
+        margin:                 2px 0;
 }
 
-td.resultHead	 {
-	font-family:		sans-serif;
-	font-size:		12px;
+.blockTitle {
 	font-weight:		bold;
-	color:			#ffffff;
-	text-align:		center;
-	background-color:	#009ec6;
+	color:			#646567;
+	background-color:       #d2d2d2;
 }
 
-td.resultLabel	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#ffff00;
-	text-align:		center;
-	background-color:	#93919c;
+.blockItem {
+  font-size: 80%;
+	list-style-type: none;
+	margin: 0px;
+	padding: 3px 0;
 }
-
-td.resultText  	{
-	font-family:		sans-serif;
-	font-size:		10px;
-	text-align:		left;
-	color:			#000000;
-	background-color:	#ffffff;
+.blockItem li {
+        margin: 1px;
 }
-
-td.resultTextC  {
-	font-family:		sans-serif;
-	font-size:		10px;
-	text-align:		center;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-
-  
+*/
+/* A PARTIR D'ICI CE SONT DES CLASSES QUE JE N'AI PAS ENCORE RENCOTREES
+ * DANS LE CODE....
 .link {
 	font-size: 13px;
 	width: 170px;
@@ -878,94 +832,6 @@ td.resultTextC  {
 	background-color:	#fbf7db;
 }
 
-table.resultPref	 {
-        margin-left:		auto;
-	margin-right:		auto;
-	background-color:	#93919c;
-	color:			#000000;
-	width:			auto;
-}
-
-td.resultPrefHide  {
-	font-family:		sans-serif;
-	font-size:		10px;
-	text-align:		center;
-	color:			#000000;
-	background-color:	#55aaff;
-}
-
-
-a.resultHead:link	{ color: #ffffff; background-color: transparent;}
-a.resultHead:active	{ color: #ffffff; background-color: transparent;}
-a.resultHead:visited 	{ color: #ffffff; background-color: transparent;}
-
-a.resultText:link 	{ color: #0ba589; background-color: transparent;}
-a.resultText:active  	{ color: #0ba589; background-color: transparent;}
-a.resultText:visited 	{ color: #0ba589; background-color: transparent;}
-*/
-
-/* ------------------------------------------------------------------------- */
-/* detail */
-/* ------------------------------------------------------------------------- */
-/*
-
-a.detail:link 		{ color: #000000; background-color: transparent;}
-a.detail:active 	{ color: #000000; background-color: transparent;}
-a.detail:visited 	{ color: #000000; background-color: transparent;}
-
-
-.detailHead {
-	font-size: 17px;
-	font-weight: bold;
-	color: #7B9EAD;
-	text-align: center;
-	margin-top: 10px;
-}
-
-.detailLabel {
-	font-size: 12px;
-  	text-align: center;
-	font-style: italic;
-	color: #7B9EAD;
-	width: 35%;
-}
-
-.detailText {
-	font-size: 12px;
-	text-align: left;
-	font-weight: bold;
-	color: #666666;
-}
-
-.detailForm {
-  	padding-left: 5px;
-	text-align: left;
-	font-weight: bold;
-	color: #666666;
-	background-color: #EEEEEE;
-}
-
-.detailInfo {
-	float: right;
-	font-size: 10px;
-	text-align: right;
-	color: #7B9EAD;
-	margin-top: 0px;
-	margin-bottom: 10px;
-}
-
-.detailButton {
-	position: relative;
-	top: 16px;
-	text-align: center;
-	background-color: #FFFFFF;
-}
-
-.detailButtons {
-	display: inline;
-	text-align: center;
-}
-
 .elementRow {
 	font-size:         10px;
 	color:             #666666;
@@ -982,130 +848,12 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
         width:             150px;
         float:             left; 
 }
-/* ------------------------------------------------------------------------- */
-/* link */
-/* ------------------------------------------------------------------------- */
-
-
-
-/* ------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------- */
-
-
-/* ////////////////LOGO MENU///////////////// */
-/* //// Logo menu items style definition //// */
-/* ////////////////////////////////////////// */
-
-table.logo		{
-	vertical-align:		text-top;
-	color:			#ffffff;
-	border-spacing:		0;
-	padding:		0;
-	margin:			0;
-	border:			0;
-	background-color:	#d7d6e0;
-}
-
-td.logoInside		{
-	background-color:	#ffffff;	
-	color:			#555555;
-	padding:		0;
-	margin:			0;
-       
-}
-
-td.logoBottom		{
-	vertical-align:		text-top;
-	padding:		0;
-	margin:			0;
-}
-
-td.logoVersion		{
-	font-family:		sans-serif;
-	font-weight:		bold;
-	font-size:		10px;
-	color:			#555555;
-	text-align:		right;
-	background-color:	#ffffff;
-	padding:		0;
-	margin:			0;		
-}
-
-
-/* //////////////////ADMIN/////////////////// */
-/* /////  Admin table style definition  ///// */
-/* ////////////////////////////////////////// */
-/*
-.admin {
-        clear: both;
-        font-size: 10px;
-        border: 1px solid #009EC6;
-        height: 100%;
-        width: 90%;
-        margin-bottom: 20px;
-        font-style: italic;
-        color: #ffffff;
-        background-color: #cccccc;
-}
-
-table.admin		{
-        margin-left:		auto;
-	margin-right:		auto;
-        border:                 0;
-	background-color:	#cccccc;
-}
-
-td.adminHead		{
-	font-family:		sans-serif;
-	font-style:		italic;
-	font-size:		12px;
-	color:			#37ff00;
-	text-align:		center;
-	background-color:	#666666;
-}
-
-td.adminLabel		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	font-weight:		bold;
-        font-style: 		normal;
-	color:			#59519e;
-	text-align:		center;
-	background-color:	transparent;
-}
-
-td.adminText		{
-	font-family:		sans-serif;
-	font-size:		12px;
-        font-style: 		normal;
-	vertical-align:		top;
-	text-align:		center;
-	color:			#000000;
-        font-style: 		normal;
-	background-color:	transparent;
-}
-
-td.adminTextLeft	{
-	font-family:		sans-serif;
-	font-size:		12px;
-	vertical-align:		top;
-	text-align:		left;
-	color:			#000000;
-	background-color:	transparent;
-}
-
-td.adminTextRight	{
-	font-family:		sans-serif;
-	font-size:		12px;
-	vertical-align:		top;
-	text-align:		right;
-	color:			#000000;
-	background-color:	transparent;
-}
-
 */
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+
 
 /* /////////////////////////////////////////////////////////////////////////
 // Classes divers

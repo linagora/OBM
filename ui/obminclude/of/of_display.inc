@@ -1180,19 +1180,19 @@ function display_debug() {
 
   if (debug_level_isset($cdg_sql)) {
     $dis_debug_sql = "
-      <div class=\"debugHead\">$l_dg_sql</div>
+      <h1>$l_dg_sql</h1>
       $global_dis_debug_msg";
   }
     
   if (debug_level_isset($cdg_param)) {
     $dis_debug_param = "
-      <div class=\"debugHead\">$l_dg_param</div>
+      <h1>$l_dg_param</h1>
       $global_dis_debug_param";
   }
     
   if (debug_level_isset($cdg_sess)) {
     $dis_session_content = "
-      <div class=\"debugHead\">$l_dg_sess</div>
+      <h1>$l_dg_sess</h1>
       $dis_session";
     }
     
