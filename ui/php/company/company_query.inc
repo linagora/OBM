@@ -629,6 +629,7 @@ function run_query_company_nafcode_update($company) {
   $userupdate = $auth->auth["uid"];
   $id = $company["naf"];
   $code = $company["naf_code"];
+  $title = (isset($company["naf_title"]) ? $company["naf_title"] : '0');
   $label = $company["naf_label"];
 	$multidomain = sql_multidomain("companynafcode");
 	
@@ -636,7 +637,8 @@ function run_query_company_nafcode_update($company) {
       companynafcode_code='$code',
       companynafcode_label='$label',
       companynafcode_timeupdate='$timeupdate',
-      companynafcode_userupdate='$userupdate'
+      companynafcode_userupdate='$userupdate',
+      companynafcode_title=$title
     WHERE
       companynafcode_id='$id' $multidomain";
 

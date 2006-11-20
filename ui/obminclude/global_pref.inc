@@ -69,11 +69,11 @@ $obm["perm"] = $auth->auth["perm"];
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////
-$theme_file = "$obminclude/themes/$set_theme/theme.inc";
+$theme_file = "resources/themes/$set_theme/theme.inc";
 if (file_exists("$path/../$theme_file")) {
   include("$theme_file");
 } else {
-  include ("$obminclude/themes/$set_theme_default/theme.inc");
+  include ("resources/themes/$set_theme_default/theme.inc");
 }
 
 
@@ -125,7 +125,7 @@ if ($module != "") {
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Display file (global display functions)          //
 ///////////////////////////////////////////////////////////////////////////////
-$display_include_file = "$obminclude/themes/$set_theme/display.inc";
+$display_include_file = "resources/themes/$set_theme/display.inc";
 include("$display_include_file");
 
 

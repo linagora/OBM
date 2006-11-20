@@ -1,55 +1,51 @@
-<div class="detailHead">$l_coord</div>
-  
-  <table class="detail">
+<div class="detail infos">
+<h1>$l_coord</h1>
+  <table>
     <tr>
-      <td class="detailLabel">$l_address 1
-        <a href="javascript: return false;" onclick="company_copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="/images/$set_theme/$ico_clipboard" /></a>
-      </td>
-      <td class="detailText">$ad1</td>
+      <th>$l_address 1
+        <a href="#" onclick="company_copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="/images/$set_theme/$ico_clipboard" /></a>
+        :</th>
+      <td>$ad1</td>
     </tr>
     <tr>
-      <td class="detailLabel">$l_address 2</td>
-      <td class="detailText">$ad2</td>
+      <th>$l_address 2 :</th>
+      <td>$ad2</td>
     </tr>
     $block_ad3
     <tr>
-      <td class="detailLabel">$l_postcode</td>
-      <td class="detailText">$zip</td>
+      <th>$l_postcode :</th>
+      <td>$zip</td>
     </tr>
     <tr>
-      <td class="detailLabel">$l_town</td>
-      <td class="detailText">$town</td>
+      <th>$l_town :</th>
+      <td>$town</td>
     </tr>
     $block_cdx
     <tr>
-      <td class="detailLabel">$l_country</td>
-      <td class="detailText">$ctry_name</td>
+      <th>$l_country :</th>
+      <td>$ctry_name</td>
     </tr>
     <tr>
-      <td class="detailLabel">$l_phone</td>
-      <td class="detailText">$phone</td>
+      <th>$l_phone :</th>
+      <td>$phone</td>
     </tr>
     <tr>
-      <td class="detailLabel">$l_fax</td>
-      <td class="detailText">$fax</td>
+      <th>$l_fax :</th>
+      <td>$fax</td>
     </tr>
     <tr>
-      <td class="detailLabel">$l_email</td>
-      <td class="detailText">$email $link_email</td>
+      <th>$l_email :</th>
+      <td>$email $link_email</td>
     </tr>
     <tr>
-      <td class="detailLabel">$l_web</td>
-      <td class="detailText">$web $link_web</td>
+      <th>$l_web :</th>
+      <td>$web $link_web</td>
     </tr>
   </table>
-
+</div>
+<div class="detail extra">
 $block_user
 
-<div class="detailHead">$l_comment</div>
-  
-  <table class="detail">
-    <tr> 
-      <td class="detailText">$com
-      </td>
-    </tr>
-  </table>
+<h1>$l_comment</h1>
+  $com
+</div>

@@ -8,13 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
+// TODO : Ce fichier devrait etre appellé limite en src.
 
 $extra_js .= "
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_category_new(label,category) {
+function check_category(label,category) {
    if (label.value != \"\") {
       return true;
    } else {
@@ -25,32 +25,18 @@ function check_category_new(label,category) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the Category check or deletion is possible                       //
+// Fill the content of the table line into the update form
 ///////////////////////////////////////////////////////////////////////////////
-function check_category_checkdel(sel,category) {
-   if (sel.selectedIndex >= 0) {
-      return true;
-   } else {
-      msg = category+' : $l_c_j_delete';
-      alert(msg);
-      return false;
-   }
-}
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if the Category update is possible
-///////////////////////////////////////////////////////////////////////////////
-function check_category_upd(label,sel,sel_d,category) {
-   cat1_pos = sel_d.selectedIndex;
-   if ((cat1_pos >= 0) && (label.value != \"\")) {
-     sel.value=sel_d.options[cat1_pos].value;
-     return true;
-   } else {
-      msg = category+' : $l_c_j_update';
-      alert(msg);
-      return false;
-   }
+function updateLine(id,category) {
+  form = \$('form_' + category + '_update');
+  for(i=0;i<form.elements.length;i++) {
+    elem = $(form.elements[i].name + '_' + id);
+    if(elem)
+      form.elements[i].value = elem.getValue();
+  }
+  form.submit();
+  return false;
 }
-
 ";
 </script>

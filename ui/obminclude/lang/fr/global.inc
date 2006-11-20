@@ -202,13 +202,13 @@ $l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 // Theme headers lang files
 //---------------------------------------------------------------------------//
 
-$l_section_com    = "COMMERCIAL";
-$l_section_prod   = "PRODUCTION";
-$l_section_compta = "COMPTABILITE";
-$l_section_user   = "UTILISATEUR";
-$l_section_admin  = "ADMINISTRATION";
-$l_section_aliamin = "ALIAMIN";
-$l_section_settings = "PREFERENCES";
+$l_section_com    = "Commercial";
+$l_section_prod   = "Production";
+$l_section_compta = "Comptabilité";
+$l_section_user   = "Utilisateur";
+$l_section_admin  = "Administration";
+$l_section_aliamin = "Aliamin";
+$l_section_settings = "Préférences";
 
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";

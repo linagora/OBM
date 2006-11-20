@@ -487,10 +487,10 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     $block_title
     $block_resp
     <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_date_after','$dateafter')</script>
+      <input type=\"text\" name=\"tf_date_after\" class=\"datePicker\" value=\"$dateafter\" />
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_date_before','$datebefore')</script>
+      <input type=\"text\" name=\"tf_date_before\" class=\"datePicker\" value=\"$datebefore\" />
     </div>
     <div class=\"searchLabel\">$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />

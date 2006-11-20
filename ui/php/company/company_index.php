@@ -48,7 +48,6 @@ include("$obminclude/global_pref.inc");
 require("company_display.inc");
 require("company_query.inc");
 include("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 require("company_js.inc");
 
 $uid = $auth->auth["uid"];

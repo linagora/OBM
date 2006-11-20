@@ -117,8 +117,8 @@ class OBM_DISPLAY {
     global $l_default, $l_displayed, $l_order, $l_field, $l_move, $l_mandatory;
     global $l_display_no, $l_display_yes, $l_down, $l_up;
     // Images
-    global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
-    global $fieldnames, $cgp_hide;
+    global $ico_arrow_mount, $ico_arrow_umount, $ico_nok;
+    global $fieldnames, $cgp_hide, $ico_ok, $ico_lock;
     
     $nb_field = count($this->display_pref) - 1;
 
@@ -135,17 +135,19 @@ class OBM_DISPLAY {
     }
 
     $block = "
-    <table class=\"resultPref\" >
+    <div class=\"displayPref\">
+    <h1>".$this->pref_title."</h1>
+    <table >
+    <thead>
     <tr>
-      <td class=\"resultHead\" colspan=\"5\">".$this->pref_title."</td>
+      <td>$l_default</td>
+      <td>$l_displayed</td>
+      <td>$l_order</td>
+      <td>$l_field</td>
+      <td>$l_move</td>
     </tr>
-    <tr>
-      <td class=\"resultLabel\">$l_default</td>
-      <td class=\"resultLabel\">$l_displayed</td>
-      <td class=\"resultLabel\">$l_order</td>
-      <td class=\"resultLabel\">$l_field</td>
-      <td class=\"resultLabel\">$l_move</td>
-    </tr>";
+    </thead>
+      ";
 
     $i = 0;
     $nb_field_hidden = 0;
@@ -175,9 +177,13 @@ class OBM_DISPLAY {
       } else {
 	$td_class = "resultTextC";
       }
-
+      if($i%2 == 0) {
+        $class = "class=\"pair\"";
+      } else {
+        $class = "";
+      }
       $block .= "
-    <tr>
+    <tr $class>
     <td class=\"$td_class\">$dis_default</td>
     <td class=\"$td_class\">";
 
@@ -186,15 +192,15 @@ class OBM_DISPLAY {
 	$nb_field_hidden++;
 	$block .= "
       <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldstatus=$new_status")."\">
-      <img alt=\"$l_display_yes\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" /></a>";
+      <img alt=\"$l_display_yes\" src=\"$ico_nok\" /></a>";
       } else if ($fieldstatus == 1) {
 	$new_status = 0;
 	$block .= "
       <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldstatus=$new_status")."\">
-      <img alt=\"$l_display_no\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_ball\" /></a>";
+      <img alt=\"$l_display_no\" src=\"$ico_ok\" /></a>";
       } else if ($fieldstatus == 2) {
 	$block .= "
-      <img alt=\"$l_mandatory\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_forbidden\" />";
+      <img alt=\"$l_mandatory\" src=\"$ico_lock\" />";
       }
 
       $block .= "
@@ -209,35 +215,23 @@ class OBM_DISPLAY {
       }
       $block .= "</td>
     <td class=\"$td_class\">".$fieldnames[$fieldname]."</td>
-    <td class=\"$td_class\">
-      <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">
-      <tr>";
-      
+    <td class=\"$td_class\">";
       // If last field we doesn't display the down arrow
-      if ($i == $nb_field) {
-	$block .= "
-        <td>&nbsp;</td>";
-      } else {
+      if ($i != $nb_field) {
         $sql_order_field = $fieldorder + 1;
 	$block .= "
-        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
-          <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
+        <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
+        <img alt=\"$l_down\" src=\"$ico_arrow_umount\" /></a>";
       }
       
       // If first field we don't display the up arrow
-      if ($i == 0) {
-	$block .= "
-        <td >&nbsp;</td>";
-      } else {
+      if ($i != 0) {
         $sql_order_field = $fieldorder - 1;
 	$block .= "
-        <td>
           <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field")."\">
-          <img alt=\"$l_up\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" /></a></td>";
+          <img alt=\"$l_up\" src=\"$ico_arrow_mount\" /></a>";
       }
       $block .= "
-      </tr>
-      </table>   
     </td>
   </tr>";
       $i++;
@@ -250,6 +244,7 @@ class OBM_DISPLAY {
     if ($this->pref_dis_help == 1) {
       $block .= $this->dis_pref_help();
     }
+    $block .= "</div>";
 
     return $block;
   }
@@ -259,57 +254,22 @@ class OBM_DISPLAY {
   // Function that display the preference help screen
   /////////////////////////////////////////////////////////////////////////////
   function dis_pref_help() {
-    global $l_help, $l_help_display_yes, $l_help_display_no, $l_help_mandatory, $l_help_down, $l_help_up;
+    global $l_help, $l_help_display_yes, $l_help_display_no, $l_help_mandatory;
+    global $l_help_down, $l_help_up;
     // Images
-    global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
+    global $ico_arrow_mount, $ico_arrow_umount, $ico_ok;
+    global $ico_nok, $ico_lock;
 
-    $block = "<hr />
-      <table class=\"resultPref\">
-      <tr>
-        <td class=\"resultHead\" colspan=\"2\">
-        $l_help</td>
-      </tr>
-      <tr>
-        <td class=\"resultLabel\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_ball\" alt=\"\" />
-        </td>
-        <td class=\"resultText\">
-          $l_help_display_yes
-        </td>
-      </tr>
-      <tr>
-        <td class=\"resultLabel\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"\" />
-        </td>
-        <td class=\"resultText\">
-          $l_help_display_no
-        </td>
-      </tr>
-      <tr>
-        <td class=\"resultLabel\">
-         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_forbidden\" alt=\"\" />
-        </td>
-        <td class=\"resultText\">
-          $l_help_mandatory
-        </td>
-      </tr>
-      <tr>
-        <td class=\"resultLabel\">
-         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" alt=\"\" />
-        </td>
-        <td class=\"resultText\">
-          $l_help_down
-        </td>
-      </tr>
-      <tr>
-        <td class=\"resultLabel\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" alt=\"\" />
-        </td>
-        <td class=\"resultText\">
-          $l_help_up
-        </td>
-      </tr>
-    </table>";
+    $block = "
+    <h1>$l_help</h1>
+    <p>
+    <img src=\"$ico_ok\" alt=\"$l_help_display_yes\" /> $l_help_display_yes<br />
+    <img src=\"$ico_nok\" alt=\"$l_help_display_no\" /> $l_help_display_no<br />
+    <img src=\"$ico_lock\" alt=\"$l_help_mandatory\" /> $l_help_mandatory<br />
+    <img src=\"$ico_arrow_mount\" alt=\"$l_help_down\" /> $l_help_down<br />
+    <img src=\"$ico_arrow_umount\" alt=\"$l_help_down\" /> $l_help_up<br />
+    </p>
+    ";
 
     return $block;
   }
@@ -321,7 +281,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
   function dis_data($dis_data_entity) {
-    global $path, $cgp_hide, $cdg_id, $set_debug, $set_theme, $set_rows;
+    global $path, $cgp_hide, $cdg_id, $set_debug, $set_rows;
 
     $link_ok = $this->display_link;
     $entity = $this->display_entity;
@@ -336,10 +296,10 @@ class OBM_DISPLAY {
     }
 
     $block .= $this->data_form_head;
-    $block .= "<table class=\"resultTable\">";
+    $block .= "<table>";
     $block_header = $this->dis_data_header($this->data_url);
     $block .= $block_header;
-
+    $block .= "<tbody>";
     reset($this->display_pref);
     $cpt = 0;
 
@@ -350,7 +310,10 @@ class OBM_DISPLAY {
       if (function_exists($dis_data_entity)) {
 	$res = $dis_data_entity($this, "row_style", $link_ok);
 	$rowstyle = $res["style"];
-      }	  
+      }
+      if (!$rowstyle && $cpt%2 == 0) {
+        $rowstyle = "class='pair'";
+      } 
       
       $cpt++;
       $block .= "<tr $rowstyle>";
@@ -454,14 +417,14 @@ class OBM_DISPLAY {
 	  } else if ($align == "center") {
 	    $td = "<td class=\"resultTextC\">";
 	  } else {
-	    $td = "<td class=\"resultText\">";
+	    $td = "<td>";
 	  }
 	  
 	  // Pre cell display (open popup, link)
 	  if ($popup) {
-	    $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	    $content = "<a class=\"resultText\" href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
 	  } else if ($window) {
-	    $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes'); return false;\">";
+	    $content = "<a class=\"resultText\" href=\"#\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes'); return false;\">";
 	  } else if ($url != "") {
 	    $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
 	  }
@@ -505,16 +468,17 @@ class OBM_DISPLAY {
     //--------------------------------------------------------
     // Data Set end : if header set to both, display an header
     //--------------------------------------------------------
+    $block .= "</tbody>";
     if ($this->data_header == "both") {
       $block .= $block_header;
     }
     $block .= "</table>
       " . $this->data_form_end . "
-      </div>";
+      ";
     if ($this->data_header == "both") {
       $block .= $block_page;
     }
-
+    $block .= "</div>";
     return $block;
   }
 
@@ -564,11 +528,36 @@ class OBM_DISPLAY {
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
-    $content = "<div class=\"resultIndex\">$l_entries # $nb_rows &nbsp; &nbsp; &nbsp; $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
+    $content = "<div >
+     <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
+      <input type=\"hidden\" name=\"action\" value=\"export_page\" />
+      <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
+      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
+      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
+      <input type=\"hidden\" name=\"first_row\" value=\"$first_row\" />
+      <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
+      <input type=\"hidden\" name=\"query\" value=\"$query\" />
+      <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
+      <a href='#' onclick='document.forms.export_page.submit();return false;'>$l_export</a>
+      </form>
+
+      <form style=\"display: inline;\" method=\"post\" action=\"$export_url\">
+      <input type=\"hidden\" name=\"action\" value=\"export_page\" />
+      <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
+      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
+      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
+      <input type=\"hidden\" name=\"first_row\" value=\"0\" />
+      <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
+      <input type=\"hidden\" name=\"query\" value=\"$query\" />
+      <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
+      <a href='#' onclick='document.forms.export_all.submit();return false;'>$l_export_all</a>
+      </form>   
+      
+      $l_entries # $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">|&lt;&lt;</a>&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
@@ -580,7 +569,7 @@ class OBM_DISPLAY {
     // Previous page
     if ($lpage > 1) {
       $tmppage = $lpage - 1;
-      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&lt;</a>&nbsp;&nbsp;";
     }
 
     $i = $start_page;
@@ -597,7 +586,7 @@ class OBM_DISPLAY {
     // Next page
     if ($lpage < $nb_page) {
       $tmppage = $lpage + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&gt;</a>";
     }
 
     // Go to next $nb_page_dis pages
@@ -609,7 +598,7 @@ class OBM_DISPLAY {
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;sql_order_field=$sql_order_field&amp;sql_order_dir=$sql_order_dir&amp;of_display_name=$this_name&amp;entity=$this_entity\">&gt;&gt;|</a>";
     }
 
     // Export - Uses forms to allow big queries to be transmitted
@@ -617,30 +606,7 @@ class OBM_DISPLAY {
     $query = $this->data_set->obm_query;
     $export_url = "$path/exportcsv/exportcsv_index.php";
 
-    $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
-      <form style=\"display: inline;\" name=\"export_page\" method=\"post\" action=\"$export_url\">
-      <input type=\"hidden\" name=\"action\" value=\"export_page\" />
-      <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
-      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
-      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
-      <input type=\"hidden\" name=\"first_row\" value=\"$first_row\" />
-      <input type=\"hidden\" name=\"nb_rows\" value=\"$set_rows\" />
-      <input type=\"hidden\" name=\"query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
-      <input type=\"image\" style=\"border: 0px; vertical-align: bottom;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_export\" alt=\"$l_export\" />
-      </form>
-
-      <form style=\"display: inline;\" name=\"export_page\" method=\"post\" action=\"$export_url\">
-      <input type=\"hidden\" name=\"action\" value=\"export_page\" />
-      <input type=\"hidden\" name=\"call_module\" value=\"$module\" />
-      <input type=\"hidden\" name=\"of_display_name\" value=\"$this_name\" />
-      <input type=\"hidden\" name=\"entity\" value=\"$this_entity\" />
-      <input type=\"hidden\" name=\"first_row\" value=\"0\" />
-      <input type=\"hidden\" name=\"nb_rows\" value=\"$nb_rows\" />
-      <input type=\"hidden\" name=\"query\" value=\"$query\" />
-      <input type=\"hidden\" name=\"func_data\" value=\"$dis_data_entity\" />
-      <input type=\"image\" style=\"border: 0px; vertical-align: bottom;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_export_all\" alt=\"$l_export_all\" />
-      </form>
+    $content .= "
     </div>
 ";
 
@@ -661,6 +627,7 @@ class OBM_DISPLAY {
   function dis_data_header($url) {
     global $of_display_name, $page, $sql_order_dir, $sql_order_field;
     global $fieldnames, $cgp_hide, $cdg_id, $set_debug, $l_id;
+    global $ico_arrow_up, $ico_arrow_down, $ico_arrow_off;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
@@ -670,17 +637,18 @@ class OBM_DISPLAY {
     $entity = $this->display_entity;
     $this_name = $this->display_name;
     $block = "
+      <thead>
     <tr>";
     
     // If debug level Id is set, display the entity id
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
-      $block .= "<td class=\"resultHead\">$l_id</td>";
+      $block .= "<td>$l_id</td>";
     }
 
     // Display the checkbox title if needed (exists and left side)
     if (($this->data_cb_side == "left")
           && ($this->data_cb_text != "")) {
-      $block .= "<td class=\"resultHead\">".$this->data_cb_text."</td>";
+      $block .= "<td>".$this->data_cb_text."</td>";
     }
 
     reset($this->display_pref);
@@ -700,35 +668,37 @@ class OBM_DISPLAY {
 	$label = $fieldnames[$fieldname];
   
   $order = ($sql_order_dir == "DESC" ? "ASC" : "DESC");
-  
-	$block .= "
-        <td class=\"resultHead\">";
+        $img = "";
+        $onclick = ""; 
 	if ($this->data_order) {
-	  $block .= "<a class=\"resultHead\" href=\"".$url;
-	  if ($url != "") {
+	  $furl = $url;
+          if ($url != "") {
+            if($sql_order_field == $fieldname) {
+              if($sql_order_dir == "DESC") {
+                $img = "<img src='$ico_arrow_up' alt='sort' />";
+              } else {
+                $img = "<img src='$ico_arrow_down' alt='sort' />";
+              }
+            }
 	    // If action on this dataset
 	    if ($this_name == $of_display_name) {
-	      $block .= "&amp;page=$page&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $furl .= "&amp;page=$page&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
 	    } else {
-	      $block .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
+	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$order&amp;of_display_name=$this_name&amp;entity=$entity";
 	    }
-	  }
-	  $block .= "\">";
+          }
+          $onclick = "onclick=\"window.location.href='$furl'\" onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" ";
 	}
-	$block .= $label;
-	if ($this->data_order) {
-	  $block .= "</a>";
-	}
-	$block .= "</td>";
+	$block .= "<td $onclick>$label $img</td>";
       }
     }
 
     // Display the checkbox title if needed (exists and right side)
     if (($this->data_cb_side == "right")
          && ($this->data_cb_text != "")) {
-      $block .= "<td class=\"resultHead\">".$this->data_cb_text."</td>";
+      $block .= "<td>".$this->data_cb_text."</td>";
     }
-    $block .= "</tr>";
+    $block .= "</tr></thead>";
 
     return $block;
   }
@@ -1049,7 +1019,7 @@ function display_actions($section, $module) {
 	      $wtarget = "window.name='" . $value['Target'] . "';";
 	    }
 	    $ret .= "
-              <a href=\"\" class=\"action\" 
+              <a href=\"#\" class=\"action\" 
               onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
 	  } else {
@@ -1092,15 +1062,14 @@ function display_last_visited($path="..") {
       global ${$l_ico};
       $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
       $dis_last .= "
-        <li class=\"blockItem; lastItem\"><a href=\"$mod_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"\" /></a>
-          <a href=\"$mod_url\">$text</a></li>";
+        <li><a href=\"$mod_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"$module\" /> $text</a></li>";
     }
   }
 
   $block .= "
-  <div class=\"block\" class=\"last\"> 
-  <div class=\"blockTitle\" class=\"lastTitle\">:: $l_last_visit</div>
-    <ul class=\"blockItem\" class=\"lastItem\">
+  <div class=\"portlet\" id=\"lastVisitPortlet\"> 
+    <h1>$l_last_visit</h1>
+    <ul>
     $dis_last
     </ul>
   </div>";
@@ -1261,7 +1230,7 @@ function display_ok_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"messageOk\">$msg</p>";
+    $ret = "<p class=\"message ok\">$msg</p>";
   }
   
   return $ret;
@@ -1280,7 +1249,7 @@ function display_info_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"messageInfo\">$msg</p>";
+    $ret = "<p class=\"message info\">$msg</p>";
   }
   
   return $ret;
@@ -1299,7 +1268,7 @@ function display_warn_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"messageWarning\">$msg</p>";
+    $ret = "<p class=\"message warning\">$msg</p>";
   }
   
   return $ret;
@@ -1318,7 +1287,7 @@ function display_err_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"messageError\">$msg</p>";
+    $ret = "<p class=\"message error\">$msg</p>";
   }
   
   return $ret;

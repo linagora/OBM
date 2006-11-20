@@ -242,8 +242,8 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
 
     $block_cat = "
     <tr>
-      <td class=\"detailLabel\">$link ${$l_cat} </td>    
-      <td class=\"$class\" id=\"sel_${cat}\">$sel_cat</td>
+      <th>$link ${$l_cat} :</th>    
+      <td id=\"sel_${cat}\">$sel_cat</td>
     </tr>";
   }
 
@@ -344,8 +344,8 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
       $label = htmlentities($cats[0]["label"]); 
       $block_cat = "
         <tr>
-          <td class=\"detailLabel\">".ucfirst(${$l_cat})."</td>
-          <td class=\"detailText\">$label</td>
+          <th>".ucfirst(${$l_cat})." :</th>
+          <td>$label</td>
          </tr>";
 
     } else {
@@ -486,9 +486,8 @@ function of_category_dis_tree($entity, $cat, $params, $action) {
 //   - $user   : User Category ? default false
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_dis_admin_form($catu, $cats, $user=false) {
-  global $l_c_manage, $l_code, $l_label;
-  global $l_c_checkdelete, $l_c_update, $l_c_upd, $l_c_new, $l_c_insert;
-  global $l_c_j_create, $l_c_j_insert, $l_c_j_update;
+  global $l_c_manage, $l_c_update, $l_c_new, $l_code, $l_label, $ico_delete;
+  global   $l_c_insert, $l_c_j_create, $l_c_j_insert, $l_c_j_update, $ico_ok;
 
   $cat_name = strtolower($catu);
   $l_cat = "l_${cat_name}";
@@ -502,20 +501,7 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
     $cat = $cat_name;
   }
 
-  $indent = 10;
-  $flabel = $indent;
-  $sel_cat = "<select name=\"sel_${cat}_id\" onchange=\"
-    mytext = this.options[this.selectedIndex].text;
-    mytext = mytext.substr(0, mytext.length);
-    pos = mytext.indexOf('...');
-    if (pos != -1) {
-      ext = trim(mytext.substr(0, pos));
-      mytext = mytext.substr($flabel);
-    }
-    forms.form_${cat_name}_update.tf_${cat}_label.value=mytext;
-    forms.form_${cat_name}_update.tf_${cat}_code.value=ext;
-    \"
-    size=\"8\" style=\"font-family:monospace;\">";
+  $jslabel = addslashes(ucfirst(${$l_cat}));
   if (is_array($cats)) {
     $has_code = false;
     foreach ($cats as $one_cat) {
@@ -524,102 +510,88 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
 	break;
       }
     }
-    foreach ($cats as $one_cat) {
+    foreach ($cats as $key => $one_cat) {
       $c_id = $one_cat["id"];
       if ($has_code) {
-	$c_code = str_pad($one_cat["code"] . " ", $indent, ".");
+	$c_code = $one_cat["code"];
+      }
+      if($key%2 == 0) {
+        $class = "class=\"pair\"";
+      } else {
+        $class = "";
       }
       $c_label = htmlentities($one_cat["label"]);
-      $sel_cat .= "\n<option value=\"$c_id\">$c_code $c_label</option>";
+      $cat_list .= "
+        <tr $class>
+        <td>
+        <input type=\"hidden\" id=\"${cat}_id_$c_id\" value=\"$c_id\" />
+        <a href=\"?action=${cat}_checklink&amp;category=$cat_name&amp;${cat}_id=$c_id\">
+        <img src=\"$ico_delete\" alt=\"$l_c_checkdelete\" title=\"$l_c_checkdelete\" />
+        </a></td>
+        <td> <input type=\"text\" id=\"tf_${cat}_code_$c_id\" value=\"$c_code\" size=\"6\"/></td>
+        <td> <input type=\"text\" id=\"tf_${cat}_label_$c_id\" value=\"$c_label\" /></td>
+        <td>
+        <a href=\"#\" onclick=\"updateLine($c_id,'${cat}')\">
+        <img src=\"$ico_ok\" alt=\"$l_c_update\" title=\"$l_c_update\" />
+        </td>
+        </tr>
+        ";
     }
   }
   $sel_cat .= "</select>";
 
-  // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"admin\">
-    <div class=\"adminTitle\">:: $l_c_manage ${$l_cat}</div>
-    <table class=\"admin\" width=\"100%\">
+    <div class=\"detail admin\" >
+    <form id=\"form_${cat}_update\" action=\"?action=${cat}_update\" method=\"post\">
+    <input type=\"hidden\" name=\"tf_${cat}_code\" value=\"\" size=\"6\"/>
+    <input type=\"hidden\" name=\"tf_${cat}_label\" value=\"\" />
+    <input type=\"hidden\" name=\"${cat}_id\" value=\"\" />
+    </form>    
+    <h1>$l_c_manage ${$l_cat}</h1>
+    <div class=\"overflow\">
+    <table>
+    <thead>
     <tr>
-      <td>&nbsp;</td>
-      <td class=\"adminLabel\">$l_c_upd</td>
-      <td class=\"adminLabel\">$l_c_new</td>
-    </tr>
-    <tr>
-      <td>
-<!-- Category Check Delete Section -->
-        <form name=\"form_${cat_name}_delete\" method=\"post\"
-          action=\"" . url_prepare("") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">".ucfirst(${$l_cat})."</td>
-        </tr>
-        <tr>
-          <td class=\"adminText\">$sel_cat</td>
-        </tr>
-        <tr>
-          <td>
-          <input type=\"hidden\" name=\"action\" value=\"${cat}_checklink\" />
-          <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
-          <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_checkdelete\" onclick=\"if (check_category_checkdel(this.form.sel_${cat}_id,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
-          </td>
-        </tr> 
-        </table>
-        </form>
-      </td>
-      <td>
-
-<!-- Category Update Section -->
-
-          <form name=\"form_${cat_name}_update\" method=\"get\" action=\"" . url_prepare("") . "\">
-        <table heigth=\"100%\">
-        <tr>
-          <td class=\"adminLabel\">$l_code :</td>
-          <td><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-          <td><input type=\"text\" name=\"tf_${cat}_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"sel_${cat}_id\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"${cat}_update\" />
-            <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
-            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_update\"
-              onclick=\"if (check_category_upd(this.form.tf_${cat}_label,this.form.sel_${cat}_id,document.form_${cat_name}_delete.sel_${cat}_id,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-          </form>
-      </td>
-
-<!-- New Category Section -->
-      <td>
-        <form name=\"form_${cat_name}_new\" method=\"get\" action=\"" . url_prepare("") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_code :</td>
-          <td><input type=\"text\" maxlength=\"10\" size=\"10\" name=\"tf_${cat}_code\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_label :</td>
-          <td><input type=\"text\" name=\"tf_${cat}_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
-            <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
-            <input type=\"submit\" name=\"sub_${cat}\" value=\"$l_c_insert\"
-              onclick=\"if (check_category_new(this.form.tf_${cat}_label,'".addslashes(ucfirst(${$l_cat}))."')) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-
-      </td>
-    </tr>
+    <td>&nbsp;</td>
+    <td>$l_code</td>
+    <td>$l_label</td>
+    <td>&nbsp;</td>        
+    </tr>    
+    </thead>
+    <tbody>
+    $cat_list
+    </tbody>
     </table>
-
     </div>
-";
+    <form id=\"form_${cat}_new\" action=\"\" method=\"post\"
+    onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+    <table>
+    <thead>
+    <tr>
+    <td colspan=\"2\">$l_c_new</td>
+    </tr>
+    <tbody>   
+    <tr>
+    <td>$l_code</td>
+    <td>$l_label</td>    
+    </tr>       
+    <tr>
+    <td><input type=\"text\" name=\"tf_${cat}_code\" value=\"\" size=\"6\"/></td>
+    <td><input type=\"text\" name=\"tf_${cat}_label\" value=\"\" /></td>    
+    </tr>  
+    </tbody>
+    <tfoot>
+    <tr>
+    <td colspan=\"2\"><input type=\"submit\" value=\"$l_c_insert\" /></td>
+    </tr>
+    </tfoot>
+    </table>
+    <input type=\"hidden\" name=\"action\" value=\"${cat}_insert\" />
+    <input type=\"hidden\" name=\"category\" value=\"$cat_name\" />
+    </form>
+    </div>
+      ";
 
   return $block;
 }
@@ -2024,8 +1996,8 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
 
   $block_cat = "
     <tr>
-      <td class=\"detailLabel\">$link ${$l_cat} </td>    
-      <td class=\"$class\" id=\"sel_${cat}\">$sel_cat</td>
+      <th>$link ${$l_cat} :</th>    
+      <td id=\"sel_${cat}\">$sel_cat</td>
     </tr>";
 
   return $block_cat;

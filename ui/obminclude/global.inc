@@ -919,26 +919,17 @@ function beautify_comment($com, $p_order="") {
   if ($order == $cco_chro) {
 
     $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]( [012][0-9]:[0-5][0-9]:[0-5][0-9])?:.*:)/U";
-    $replace = "</td>
-    </tr>
-    <tr>
-      <td bgcolor=\"#$col1\">\\2</td>
-    </tr><tr>
-      <td bgcolor=\"#$col0\">";
+    $replace = "<h1>\\2</h1>";
 
     $res = preg_replace($pattern, $replace, $com, 1);
     while (preg_match($pattern, $res)) {
       $nb++;
       $res = preg_replace($pattern, $replace, $res, 1);
     }
-    
     $result = "
-    <table border=\"1\" width=\"100%\">
-    <tr>
-      <td>$res</td>
-    </tr>
-    </table>";
-
+    <div class=\"comments\">  
+      $res
+    </div>";    
   } else {
   // reverse Chronological Order
     // pattern modifiers :
@@ -954,12 +945,8 @@ function beautify_comment($com, $p_order="") {
       $nb++;
       $who = $matches[2];
       $text = $matches[4];
-      $row = "
-    <tr>
-      <td bgcolor=\"#$col1\">$who</td>
-    </tr><tr>
-      <td bgcolor=\"#$col0\">$text</td>
-    </tr>";
+      $row = "<h1>$who</h1>
+              <p>$text</p>";
       $rows = $row . $rows;
       $tmp = preg_replace($pattern, $replace, $tmp, 1);
     }
@@ -970,9 +957,9 @@ function beautify_comment($com, $p_order="") {
     }
 
     $result = "
-    <table border=\"1\" width=\"100%\">
-    $rows
-    </table>";
+    <div class=\"comments\">  
+      $rows
+    </div>";
   }
 
   return $result;
@@ -1158,6 +1145,24 @@ function phonetic_key($name) {
 
   return $res;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Convert a php array to a javascript array
+////////////////////////////////////////////////////////////////////////////////
+function phpArrayToJsArray($var) {
+
+  $jsArray = "new Array(";
+  if(is_array($var)) {
+   foreach($var as $val) {
+      $jsArray .= "'$val',";
+    }
+  $jsArray = substr($jsArray, 0, -1);
+  }
+  $jsArray .= ")";
+
+  return $jsArray;
+}
+
 
 
 </script>

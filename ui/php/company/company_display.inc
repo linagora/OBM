@@ -240,7 +240,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   }
 
   // Country select
-  $sel_ctry = "<select id=\"sel_country\" name=\"sel_country\">
+  $sel_ctry = "<select name=\"sel_country\">
     <option value=\"$c_all\">$l_all</option>";
   while ($ctry_q->next_record()) {
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
@@ -251,7 +251,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   $sel_ctry .= "</select>";
 
   // Marketing manager select
-  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+  $sel_market = "<select name=\"sel_market\">
     <option value=\"$c_all\">$l_all</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
@@ -262,7 +262,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   $sel_market .= "</select>";
 
   // Data source select
-  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
+  $sel_dsrc = "<select name=\"sel_datasource\">
     <option value=\"$c_all\">$l_all</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
@@ -295,27 +295,26 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
-  <div class=\"search\">
+  <form class=\"search\" method=\"get\" name=\"f_search\" action=\"$url\">
     <div class=\"searchLabel\">$l_company_name<br />
-      <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"24\"
+      <input type=\"text\" name=\"tf_name\" size=\"24\"
       value=\"$name\" />
     </div>
     <div class=\"searchLabel\">$l_phone<br />
-      <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"10\"
+      <input type=\"text\" name=\"tf_phone\" size=\"10\"
       value=\"$phone\" />
     </div>
     <div class=\"searchLabel\">$l_postcode<br />
-      <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
+      <input type=\"text\" name=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
     </div>
     <div class=\"searchLabel\">$l_town<br />
-      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"8\"
+      <input type=\"text\" name=\"tf_town\" size=\"8\"
       value=\"$town\" />
     </div>
     <div class=\"searchLabel\">$l_country<br />
       $sel_ctry
-    </div>
+      </div>
     $block_type
     $block_activity
     $block_naf
@@ -326,10 +325,10 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
       $sel_market
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_date_after','$dateafter')</script>
+      <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
     </div>
     <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_date_before','$datebefore')</script>
+      <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
     </div>
     $block_user
     <div class=\"searchLabel\">$l_archive<br />
@@ -339,13 +338,12 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
       <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
-      <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext
     </div>
     <div class=\"searchEnd\"></div>
-  </div>
   </form>";
 
   return $block;
@@ -699,8 +697,8 @@ function html_company_consult($co_q) {
   if ($aka != "") {
     $dis_aka = "
     <tr> 
-      <td class=\"detailLabel\">$l_aka</td>
-      <td class=\"detailText\">$aka</td>
+      <th>$l_aka :</th>
+      <td>$aka</td>
     </tr>";
   } else {
     $dis_aka = "";
@@ -717,8 +715,8 @@ function html_company_consult($co_q) {
   if ($show_number) {
     $block_num = "
     <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$num</td>
+      <th>$l_number</th>
+      <td>$num</td>
     </tr>";
   }
 
@@ -726,8 +724,8 @@ function html_company_consult($co_q) {
   if ($show_vat) {
     $block_vat = "
     <tr>
-      <td class=\"detailLabel\">$l_vat</td>
-      <td class=\"detailText\">$vat</td>
+      <th>$l_vat :</th>
+      <td>$vat</td>
     </tr>";
   }
 
@@ -735,8 +733,8 @@ function html_company_consult($co_q) {
   if ($show_siret) {
     $block_siret = "
     <tr>
-      <td class=\"detailLabel\">$l_siret</td>
-      <td class=\"detailText\">$siret</td>
+      <th>$l_siret  :</th>
+      <td>$siret</td>
     </tr>";
   }
 
@@ -748,12 +746,12 @@ function html_company_consult($co_q) {
   if ($show_naf) {
     $block_naf = "
     <tr> 
-      <td class=\"detailLabel\">$l_nafcode</td>
-      <td class=\"detailText\">$naf</td>
+      <th>$l_nafcode :</th>
+      <td>$naf</td>
     </tr>";
   }
   
-  $display["title"] = "<div class=\"title\">$l_company : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_company : $name</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -762,7 +760,7 @@ function html_company_consult($co_q) {
 
   <table class=\"detail\">
     <tr> 
-      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailLabel\">$l_name :</td>
       <td class=\"detailText\">$name</td>
     </tr>
     $dis_aka
@@ -770,18 +768,47 @@ function html_company_consult($co_q) {
     $block_vat
     $block_siret
     <tr> 
-      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailLabel\">$l_archive :</td>
       <td class=\"detailText\">$archive</td>
     </tr>
     $block_type
     $block_activity
     $block_naf
     <tr>
-      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailLabel\">$l_market :</td>
       <td class=\"detailText\">$lmarket</td>
     </tr>
   </table>";
 
+  //return $block;
+
+  $block = "
+  <div class=\"detail infos\">
+    <h1>$l_company</h1>
+    <table>
+      <tr>
+        <th>$l_name :</th><td>$name</td>
+      </tr>
+      $dis_aka
+      $block_num
+      $block_vat
+      $block_siret 
+      <tr> 
+        <th>$l_archive :</th>
+        <td>$archive</td>
+      </tr>
+      $block_type
+      $block_activity
+      $block_naf      
+      <tr>
+        <th>$l_market :</th>
+        <td>$lmarket</td>
+      </tr>
+      
+    </table>
+  </div>
+
+  ";
   return $block;
 }
 
@@ -867,8 +894,8 @@ function html_company_consult_address($co_q) {
   if ($show_ad3) {
     $block_ad3 = "
     <tr>
-      <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailText\">$ad3</td>
+      <th>$l_address 3 :</th>
+      <td>$ad3</td>
     </tr>";
   }
 
@@ -876,7 +903,7 @@ function html_company_consult_address($co_q) {
   if ($show_cdx) {
     $block_cdx = "
     <tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
+      <th>$l_expresspostal</th>
       <td class=\"detailText\">$cdx</td>
     </tr>";
   }
@@ -1074,24 +1101,24 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if ($show_number) {
     $block_num = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>";
+      <th>$l_number</th>
+      <td><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>";
   }
 
   // Vat field
   if ($show_vat) {
     $block_vat = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_vat</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_vat\" name=\"tf_vat\" value=\"$vat\" size=\"20\" maxlength=\"20\" /></td>";
+      <th>$l_vat</th>
+      <td><input type=\"text\" id=\"tf_vat\" name=\"tf_vat\" value=\"$vat\" size=\"20\" maxlength=\"20\" /></td>";
   }
 
   // Siret field
   if ($show_siret) {
     $block_siret = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_siret</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_siret\" name=\"tf_siret\" value=\"$siret\" size=\"14\" maxlength=\"14\" /></td>";
+      <th>$l_siret</th>
+      <td><input type=\"text\" id=\"tf_siret\" name=\"tf_siret\" value=\"$siret\" size=\"14\" maxlength=\"14\" /></td>";
   }
 
   // data source select
@@ -1114,8 +1141,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
     $block_naf = "
     </tr><tr>      
-      <td class=\"detailLabel\">$l_nafcode</td>
-      <td class=\"detailForm\">$sel_naf</td>";
+      <th>$l_nafcode</th>
+      <td>$sel_naf</td>";
   }
 
   // Marketing manager select
@@ -1133,16 +1160,16 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   if ($show_ad3) {
     $block_ad3 = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
+      <th>$l_address 3</th>
+      <td><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
   }
 
   // Cedex field
   if ($show_cdx) {
     $block_cdx = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"16\" size=\"16\" value=\"$cdx\" /></td>";
+      <th>$l_expresspostal</th>
+      <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"16\" size=\"16\" value=\"$cdx\" /></td>";
   }
 
   // Country select
@@ -1205,11 +1232,8 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+      $l_upd_comment
+      <textarea name=\"ta_comment\" rows=\"6\">$comment</textarea>
     ";
   }
 
@@ -1228,7 +1252,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
       ";
   }
 
-  $display["title"] = "<div class=\"title\">$l_company : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_company : $name</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1238,86 +1262,81 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     <form method=\"post\" name=\"f_entity\"
     onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
-    <div class=\"detailHead\">$l_company</div>
+    <fieldset class=\"detail infos\">  
+    <legend>$l_company</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"96\" size=\"50\" value=\"$name\" /></td>
+      <th>$l_name :</th>
+      <td><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"96\" size=\"50\" value=\"$name\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_aka</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
+      <th>$l_aka :</th>
+      <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     $block_num
     $block_vat
     $block_siret
     </tr><tr>
-      <td class=\"detailLabel\">$l_datasource</td> 
-      <td class=\"detailForm\">$sel_dsrc</td>
+      <th>$l_datasource :</th> 
+      <td>$sel_dsrc</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+      <th>$l_archive :</th>
+      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     $block_type
     $block_cat1
     $block_user
     $block_activity
     $block_naf
     </tr><tr>    
-      <td class=\"detailLabel\">$l_market</td> 
-      <td class=\"detailForm\">$sel_market</td>
+      <th>$l_market :</th> 
+      <td>$sel_market</td>
     </tr>
     </table>
+    </fieldset>
+    <fieldset class=\"detail infos\">  
+    <legend>$l_coord</legend>    
 
-    <div class=\"detailHead\">$l_coord</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_address 1</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad1\" /></td>
+      <th>$l_address 1 :</th>
+      <td><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad1\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_address 2</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad2\" /></td>
+      <th>$l_address 2 :</th>
+      <td><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad2\" /></td>
     $block_ad3
     </tr><tr>
-      <td class=\"detailLabel\">$l_postcode</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
+      <th>$l_postcode :</th>
+      <td><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_town</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
+      <th>$l_town :</th>
+      <td><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
     $block_cdx
     </tr><tr>
-      <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailForm\">$sel_ctry</td>
+      <th>$l_country :</th>
+      <td>$sel_ctry</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"$csize_phone\" size=\"$csize_phone\" value=\"$phone\" /></td>
+      <th>$l_phone :</th>
+      <td><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"$csize_phone\" size=\"$csize_phone\" value=\"$phone\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_fax</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"24\" size=\"$csize_phone\" value=\"$fax\" /></td>
+      <th>$l_fax :</th>
+      <td><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"24\" size=\"$csize_phone\" value=\"$fax\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
+      <th>$l_email :</th>
+      <td><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_web</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
+      <th>$l_web :</th>
+      <td><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
     </tr>
     </table>
-
-    <div class=\"detailHead\">$l_comment</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\">
-      <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-      $dis_comment
-    </tr>
-    </table>
-
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    </fieldset>
+    <fieldset class=\"detail extra\">    
+    <legend>$l_comment</legend>
+      $l_add_comment
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+      $sel_usercomment
+      <textarea name=\"ta_add_comment\" rows=\"6\">$add_comment</textarea>
+    $dis_comment
+    </fieldset>
+    <fieldset class=\"detailButtons\">$dis_button</fieldset>
     </form>";
 
   return $block;
@@ -1502,44 +1521,106 @@ function dis_company_admin_index() {
 function html_company_nafcode_form($naf_q) {
   global $l_naf_manage,$l_naf_exist,$l_naf_code,$l_naf_label,$l_naf_istitle;
   global $l_naf_checkdelete,$l_naf_update,$l_naf_new,$l_naf_insert,$l_naf_no;
+  global $ico_delete,$ico_ok;
 
   $char_title = '=';
-
-  if ($naf_q->num_rows() > 0) {
-    $sel_naf = "<select name=\"sel_naf\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    title = mytext.substr(0, 1);
-    pos = mytext.indexOf('-');
-    code = mytext.substr(1, pos-1);
-    mytext = mytext.substr(pos+2); 
-    if (title == '$char_title') {
-     forms.form_naf_update.cba_naf_title.checked=true;
+  $key = 0;
+  while ($naf_q->next_record()) {
+    $id = $naf_q->f("companynafcode_id");
+    $title = ($naf_q->f("companynafcode_title"))?"checked=\"checked\"":"";
+    if ($title) {
+      $pre = "$char_title";
     } else {
-     forms.form_naf_update.cba_naf_title.checked=false;
+      $pre = ".";
     }
-    forms.form_naf_update.tf_naf_label.value=mytext;
-    forms.form_naf_update.tf_naf_code.value=code;\"
-    size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
-    while ($naf_q->next_record()) {
-      $id = $naf_q->f("companynafcode_id");
-      $title = $naf_q->f("companynafcode_title");
-      if ($title) {
-	$pre = "$char_title";
-      } else {
-	$pre = ".";
-      }
-      $code = $naf_q->f("companynafcode_code");
-      $label = $naf_q->f("companynafcode_label");
-      $sel_naf .= "\n<option value=\"$id\">$pre$code - $label</option>";
+    $code = $naf_q->f("companynafcode_code");
+    $label = $naf_q->f("companynafcode_label");
+
+    if($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
     }
-    $sel_naf .= "</select>";
-  } else {
-    $sel_naf = $l_naf_no;
+    $c_label = htmlentities($one_cat["label"]);
+    $nafcode_list .= "
+      <tr $class>
+      <td>
+      <input type=\"hidden\" id=\"naf_$id\" value=\"$id\" />
+      <a href=\"?action=nafcode_checklink&amp;category=nafcode&amp;naf=$id\">
+      <img src=\"$ico_delete\" alt=\"$l_naf_checkdelete\" title=\"$l_naf_checkdelete\" />
+      </a></td>
+      <td> <input type=\"checkbox\" $title id=\"cba_naf_title_$id\" value=\"1\"/></td>
+      <td> <input type=\"text\" id=\"tf_naf_code_$id\" value=\"$code\" size=\"6\"/></td>
+      <td> <input type=\"text\" id=\"tf_naf_label_$id\" value=\"$label\" /></td>
+      <td>
+      <a href=\"#\" onclick=\"return updateLine($id,'nafcode');\">
+      <img src=\"$ico_ok\" alt=\"$l_naf_update\" title=\"$l_naf_update\" />
+      </a>
+      </td>
+      </tr>
+      ";    
   }
 
   // --- HTML Template --------------------------------------------------------
-
   $block = "
+    <div class=\"detail admin\" >
+    <form id=\"form_nafcode_update\" action=\"?action=nafcode_update\" method=\"post\">
+    <input type=\"hidden\" name=\"cba_naf_title\" value=\"\" />
+    <input type=\"hidden\" name=\"tf_naf_code\" value=\"\" />
+    <input type=\"hidden\" name=\"tf_naf_label\" value=\"\" />
+    <input type=\"hidden\" name=\"naf\" value=\"\" />
+    </form>    
+    <h1>$l_naf_manage</h1>
+    <div class=\"overflow\">
+    <table>
+    <thead>
+    <tr>
+    <td>&nbsp;</td>
+    <td>$l_naf_istitle</td>
+    <td>$l_naf_code</td>
+    <td>$l_naf_label</td>
+    <td>&nbsp;</td>        
+    </tr>    
+    </thead>
+    <tbody>
+    $nafcode_list
+    </tbody>
+    </table>
+    </div>    
+    <form id=\"form_nafcode_new\" action=\"\" method=\"post\"
+    onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+    <table>
+    <thead>
+    <tr>
+    <td colspan=\"3\">$l_c_new</td>
+    </tr>
+    <tbody>   
+    <tr>
+    <td>$l_naf_istitle</td>    
+    <td>$l_naf_code</td>
+    <td>$l_naf_label</td>    
+    </tr>       
+    <tr>
+    <td><input type=\"checkbox\" name=\"cba_naf_title\" value=\"1\" /></td>
+    <td><input type=\"text\" name=\"tf_naf_code\" value=\"\" size=\"6\"/></td>
+    <td><input type=\"text\" name=\"tf_naf_label\" value=\"\" /></td>    
+    </tr>  
+    </tbody>
+    <tfoot>
+    <tr>
+    <td colspan=\"3\"><input type=\"submit\" value=\"$l_naf_insert\" /></td>
+    </tr>
+    </tfoot>
+    </table>
+    <input type=\"hidden\" name=\"action\" value=\"nafcode_insert\" />
+    <input type=\"hidden\" name=\"category\" value=\"nafcode\" />
+    </form>
+    </div>
+    ";
+
+
+
+  $b = "
     <table class=\"admin\">
     <tr>
       <td colspan=\"5\" class=\"adminHead\">
