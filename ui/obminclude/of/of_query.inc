@@ -1255,7 +1255,7 @@ function get_last_group_text($id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get users infos from the uid array given
-// Used by: Agenda, todo
+// Used by: agenda, todo
 // Parameters:
 //   - users : array of users id
 // Returns:

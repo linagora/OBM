@@ -17,7 +17,7 @@
 // - check_delete    -- $param_resource    -- check links before delete
 // - delete          -- $param_resource    -- delete the resource 
 // - rights_admin    -- access rights screen
-// - rights_update   -- Update resource agenda access rights
+// - rights_update   -- Update resource calendar access rights
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position

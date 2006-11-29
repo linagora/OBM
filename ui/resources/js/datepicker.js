@@ -141,7 +141,7 @@ function drawDatePicker(targetDateField, x, y)
     //document.body.innerHTML += "<div id='" + datePickerDivID + "' class='dpDiv'></div>";
     var newNode = document.createElement("div");
     newNode.setAttribute("id", datePickerDivID);
-    newNode.setAttribute("class", "dpDiv");
+    newNode.setAttribute("class", "datePickerWidget");
     newNode.setAttribute("style", "visibility: hidden;");
     document.body.appendChild(newNode);
   }
@@ -180,22 +180,29 @@ function refreshDatePicker(dateFieldName, year, month, day)
   // you can customize the table elements with a global CSS style sheet,
   // or by hardcoding style and formatting elements below
   var crlf = "\r\n";
-  var TABLE = "<table cols=7 class='dpTable'>" + crlf;
+  var TABLE = "<table>" + crlf;
   var xTABLE = "</table>" + crlf;
-  var TR = "<tr class='dpTR'>";
-  var TR_title = "<tr class='dpTitleTR'>";
-  var TR_days = "<tr class='dpDayTR'>";
-  var TR_todaybutton = "<tr class='dpTodayButtonTR'>";
+  var THEAD = "<thead>"
+  var xTHEAD = "</thead>" + crlf;
+  var TBODY = "<tbody>"
+  var xTBODY = "</tbody>" + crlf;
+  var TFOOT = "<tfoot>"
+  var xTFOOT = "</tfoot>" + crlf;
+  var TR = "<tr>";
+
+  var TR_days = "<tr>";
   var xTR = "</tr>" + crlf;
-  var TD = "<td class='dpTD' onMouseOut='this.className=\"dpTD\";' onMouseOver=' this.className=\"dpTDHover\";' ";    // leave this tag open, because we'll be adding an onClick event
-  var TD_title = "<td colspan=5 class='dpTitleTD'>";
-  var TD_buttons = "<td class='dpButtonTD'>";
-  var TD_todaybutton = "<td colspan=7 class='dpTodayButtonTD'>";
-  var TD_days = "<td class='dpDayTD'>";
-  var TD_selected = "<td class='dpDayHighlightTD' onMouseOut='this.className=\"dpDayHighlightTD\";' onMouseOver='this.className=\"dpTDHover\";' ";    // leave this tag open, because we'll be adding an onClick event
+
+  
+  var TD = "<td onmouseout='this.className=\"\";' onmouseover=' this.className=\"hover\";' ";    // leave this tag open, because we'll be adding an onClick event
+  var TH_title = "<td colspan=5 >";
+  var TD_foot = "<td colspan=7 >";
+  var TH = "<th>";
+  var xTH = "</th>" + crlf;
+  var TD_selected = "<td class='highlight' onmouseout='this.className=\"highlight\";' onmouseover='this.className=\"hover\";' ";    // leave this tag open, because we'll be adding an onClick event
   var xTD = "</td>" + crlf;
-  var DIV_title = "<div class='dpTitleText'>";
-  var DIV_selected = "<div class='dpDayHighlight'>";
+  var DIV_title = "<div>";
+  var DIV_selected = "<div class='highlight'>";
   var xDIV = "</div>";
 
   // start generating the code for the calendar table
@@ -203,17 +210,17 @@ function refreshDatePicker(dateFieldName, year, month, day)
 
   // this is the title bar, which displays the month and the buttons to
   // go back to a previous month or forward to the next month
-  html += TR_title;
-  html += TD_buttons + getButtonCode(dateFieldName, thisDay, -1, "&lt;") + xTD;
-  html += TD_title + DIV_title + obm.vars.labels.months[ thisDay.getMonth()] + " " + thisDay.getFullYear() + xDIV + xTD;
-  html += TD_buttons + getButtonCode(dateFieldName, thisDay, 1, "&gt;") + xTD;
-  html += xTR;
+  html += THEAD + TR;
+  html += TH + getButtonCode(dateFieldName, thisDay, -1, "&lt;") + xTH;
+  html += TH_title + DIV_title + obm.vars.labels.months[ thisDay.getMonth()] + " " + thisDay.getFullYear() + xDIV + xTH;
+  html += TH + getButtonCode(dateFieldName, thisDay, 1, "&gt;") + xTH;
+  html += xTR + xTHEAD;
 
   // this is the row that indicates which day of the week we're on
-  html += TR_days;
+  html += TBODY + TR;
   for(i = 0; i < obm.vars.labels.dayShort.length; i++)
-    html += TD_days + obm.vars.labels.dayShort[i] + xTD;
-  html += xTR;
+    html += TH + obm.vars.labels.dayShort[i] + xTH;
+  html += xTR ;
 
   // now we'll start populating the table with days of the month
   html += TR;
@@ -245,17 +252,17 @@ function refreshDatePicker(dateFieldName, year, month, day)
     for (i = 6; i > thisDay.getDay(); i--)
       html += TD + "&nbsp;" + xTD;
   }
-  html += xTR;
+  html += xTR + xTBODY;
 
   // add a button to allow the user to easily return to today, or close the calendar
   var today = new Date();
   var todayString = "Today is " + obm.vars.labels.dayMedium[today.getDay()] + ", " + obm.vars.labels.monthsShort[ today.getMonth()] + " " + today.getDate();
-  html += TR_todaybutton + TD_todaybutton;
-  html += "<button class='dpTodayButton' onClick='refreshDatePicker(\"" + dateFieldName + "\");'>"+obm.vars.labels.today+"</button> ";
+  html += TFOOT + TR + TD_foot;
+  html += "<button onclick='refreshDatePicker(\"" + dateFieldName + "\");'>"+obm.vars.labels.today+"</button> ";
   html += xTD + xTR;
 
   // and finally, close the table
-  html += xTABLE;
+  html += xTFOOT + xTABLE;
 
   document.getElementById(datePickerDivID).innerHTML = html;
   // add an "iFrame shim" to allow the datepicker to display above selection lists
@@ -276,7 +283,7 @@ function getButtonCode(dateFieldName, dateVal, adjust, label)
     newYear += -1;
   }
 
-  return "<button class='dpButton' onClick='refreshDatePicker(\"" + dateFieldName + "\", " + newYear + ", " + newMonth + ");'>" + label + "</button>";
+  return "<button onclick='refreshDatePicker(\"" + dateFieldName + "\", " + newYear + ", " + newMonth + ");'>" + label + "</button>";
 }
 
 

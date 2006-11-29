@@ -201,7 +201,7 @@ $l_module_contact = "Contactos";
 $l_module_lead = "Leads";
 $l_module_deal = "Negocios";
 $l_module_list = "Listas";
-$l_module_agenda = "Calendario";
+$l_module_calendar = "Calendario";
 $l_module_todo    = "Tareas";
 $l_module_publication = "Publicaciones";
 $l_module_statistic = "Estadísticas";
@@ -339,7 +339,7 @@ $l_of_right_err_auth = "Permisos insuficientes para actualizar permisos !";
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Esperando evento(s)";
 $l_unfilled = "Dia(s) no llenado";
-$l_my_agenda = "Mi calendario";
+$l_my_calendar = "Mi calendario";
 $l_my_time = "Mi control de tiempo";
 
 $l_my_deal_current = "Mis negocios actuales";

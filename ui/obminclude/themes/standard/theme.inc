@@ -58,7 +58,7 @@ $ico_clipboard      = "$theme_path/clipoard.jpg";
 
 $ico_time           = "$theme_path/ico_time.gif";
 $ico_project        = "$theme_path/ico_project.png";
-$ico_contract       = "$theme_path/ico_phone.gif";
+$ico_contract       = "$theme_path/ico_incident.png";
 $ico_incident       = "$theme_path/ico_incident.gif";
 
 $ico_account        = "$theme_path/ico_account.gif";

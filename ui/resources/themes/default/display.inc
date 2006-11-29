@@ -21,31 +21,41 @@ function display_page(&$display) {
   if ($output_target == "print") {
     echo $display["head"] . "
       <!-- left panel -->
-      <div class=\"leftpanel\">
+      <div  id=\"portlets\">
 " .
       $display["features"] ."
       </div>
-      <div class=\"detailpanelalone\">
+      <div id=\"mainPanel\"
+      
 " .
       $display["title"] .
       $display["msg"] .
+      "<div id=\"mainContent\">".
       $display["detail"] . "
-      </div>" .
+      </div>
+      </div>
+      <script type=\"text/javascript\">
+        obm.initialize.chain(function() {
+          obm.portlets = new Obm.Portlets();
+        });
+      </script>
+      " .
       $display["end"];
     return;
   }
 
   // If header is null, display only the detail (Popup windows)
   if ($display["header"] == "") {
-    echo $display["head"] . "
-      <div class=\"detailpanelalone\">
-" .
+    echo $display["head"] . 
       $display["title"] .
-      $display["msg"] .
+      $display["msg"] . 
+      "<div id=\"mainContent\">".
       $display["search"] .
-      $display["result"] .
-      $display["detail"] . "
-      </div>" .
+      $display["detail"]." 
+       <p class=\"LC\" />
+       </div>
+      ".
+      $display["result"] . 
       $display["end"];
 
     return;
@@ -58,6 +68,7 @@ function display_page(&$display) {
       <div id=\"portlets\">
         " .
         $display["last"] .
+        $display["features"] .
         $display["link"] .
         $display["detailInfo"] ." 
       </div>
@@ -67,7 +78,7 @@ function display_page(&$display) {
     $display["title"].
     $display["action"] .
     $display["msg"] .
-    "<div class=\"mainContent\">".
+    "<div id=\"mainContent\">".
     $display["search"] .
     $display["detail"] . "
     <p class=\"LC\" />
@@ -75,6 +86,9 @@ function display_page(&$display) {
      ".$display["result"] ."
     </div>
     <script type=\"text/javascript\">
+      obm.initialize.chain(function() {
+        obm.portlets = new Obm.Portlets();
+      });
     </script>  
     <!-- center zone end -->  
     ".$display["end"];
@@ -108,7 +122,7 @@ function display_menu($module) {
   $block = "
 <!-- Bandeau -->
 <div id='banner'>
-<img src='$ico_obm' alt='Logo OBM'/>
+<a href=\"$path/obm.php\"><img src='$ico_obm' alt='Logo OBM'/></a>
 ".
 $display["section"]
 ."
@@ -144,8 +158,7 @@ function display_sections_theme($section) {
       if ($section_right) {
         $module_block = display_modules_theme($key);        
         $mods .= $module_block;
-        $js .= "
-          obm.menu.addItem('section-$key');";
+        $js .= "obm.menu.addItem('section-$key');\n";
         $ret .= "<li id=\"section-$key\">$section_name</li>\n";
       }
     }
@@ -154,9 +167,11 @@ function display_sections_theme($section) {
   $ret .= "
     $mods
     <script type=\"text/javascript\">
-    $js
+      obm.menu = new Obm.Menu();
+      $js
     </script>
   ";
+
 
   return $ret;
 }
@@ -260,15 +275,15 @@ function display_actions_theme($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_head_theme($p_module) { 
-  global $l_obm_title, $set_theme, $extra_css, $extra_js, $extra_file_js;
+  global $l_obm_title, $extra_css, $extra_js_include;
   global $ico_arrow_up,$ico_arrow_down,$ico_arrow_left,$ico_arrow_right;
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort;
-  global $l_today, $l_close,$css_obm;
+  global $l_today, $l_close, $css_obm, $popup_height,$popup_width;
 
   // Else
   if (isset($extra_css)) {
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";
   }
   $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
   $monthLong = phpArrayToJsArray($l_monthsofyear);
@@ -280,9 +295,11 @@ function display_head_theme($p_module) {
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
 <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
 
-  //  if ($extra_file_js) {
-  //    $file_js = "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$extra_file_js\" />";
-  //  }
+  if (is_array($extra_js_include)) {
+    foreach($extra_js_include as $js_file) {
+      $js_include = "<script type=\"text/javascript\" src=\"$js_file\" ></script>\n";
+    }
+  }
 
   return "$headers_e
 <head>
@@ -290,9 +307,11 @@ function display_head_theme($p_module) {
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
   $dis_extra_css
-  <script language=\"JavaScript\" type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/mootools.js\" ></script>
-  <script language=\"JavaScript\" type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/datepicker.js\" ></script>
-  <script language=\"JavaScript\" type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/mootools.js\" ></script>
+  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/datepicker.js\" ></script>
+  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/calendar.js\" ></script>
+  $js_include
   <script type=\"text/javascript\">
   obm.vars.images.upArrow = '$ico_arrow_up';
   obm.vars.images.downArrow = '$ico_arrow_down';
@@ -300,6 +319,8 @@ function display_head_theme($p_module) {
   obm.vars.images.rightArrow = '$ico_arrow_right';
   obm.vars.images.datePicker = '$ico_datepicker';
   obm.vars.regexp.dateFormat = '$set_date_upd';
+  obm.vars.consts.popupHeight = '$popup_height';
+  obm.vars.consts.popupWidth = '$popup_width';
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;
@@ -307,9 +328,12 @@ function display_head_theme($p_module) {
   obm.vars.labels.dayLong = $dayLong;
   obm.vars.labels.today = '$l_today';
 
+
+  obm.initialize.chain(datePickerGenerator);
   Window.onDomReady( function () {
-    obm.portlets = new Obm.Portlets();
-    datePickerGenerator();
+    while(obm.initialize.chains.length > 0) {
+      obm.initialize.callChain();
+    }
   });
 
 //<!--

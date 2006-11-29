@@ -111,22 +111,22 @@ $cgp_mailing_default = true;
 $ccontact_private_default = false;
 
 // Calendar : show public groups
-$cagenda_public_groups = true;
+$ccalendar_public_groups = true;
 // Calendar : First day of the week
 $phpversion = substr(phpversion(),0,1);
 if($phpversion >= 5) {
-  $cagenda_weekstart = "monday";
+  $ccalendar_weekstart = "monday";
 } else {
-  $cagenda_weekstart = "monday + 2 hours"; // +2h to fix a DST php4 bug //
+  $ccalendar_weekstart = "monday + 2 hours"; // +2h to fix a DST php4 bug //
 }
 // Calendar : First day of the week (+2h to fix a DST php bug)
-//$cagenda_weekstart = "monday + 2 hours";
+//$ccalendar_weekstart = "monday + 2 hours";
 
 // Calendar first and last hour display
-$cagenda_first_hour = 8;
-$cagenda_last_hour = 20;
+$ccalendar_first_hour = 8;
+$ccalendar_last_hour = 20;
 // Calendar Resource usage
-$cagenda_resource = true;
+$ccalendar_resource = true;
 
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
@@ -227,7 +227,7 @@ $cgp_show["module"]["contact"] = "com";
 $cgp_show["module"]["lead"] = "com";
 $cgp_show["module"]["deal"] = "com";
 $cgp_show["module"]["list"] = "com";
-$cgp_show["module"]["agenda"] = "com";
+$cgp_show["module"]["calendar"] = "com";
 $cgp_show["module"]["cv"] = "com";
 $cgp_show["module"]["todo"] = "com";
 $cgp_show["module"]["publication"] = "com";
@@ -476,6 +476,17 @@ function display_debug_msg($msg, $debug=0, $function_name="") {
     $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr>";
   }
   return $global_dis_debug_msg;
+}  
+
+
+function display_debug_variables() {
+  global  $global_dis_debug_custom;
+  $vars = func_get_args();
+  foreach($vars as $var) {
+    $global_dis_debug_custom .="<pre>".var_export($var,true)."</pre><hr />";
+  }
+
+  return $global_dis_debug_custom;
 }  
 
 

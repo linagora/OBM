@@ -216,7 +216,7 @@ $l_module_lead    = "Pistes";
 $l_module_deal    = "Affaires";
 $l_module_list    = "Listes";
 $l_module_cv  = "CV";
-$l_module_agenda  = "Agenda";
+$l_module_calendar  = "Agenda";
 $l_module_todo    = "A faire";
 $l_module_publication  = "Publication";
 $l_module_statistic    = "Statistiques";
@@ -361,7 +361,7 @@ $l_of_right_err_empty = "La référence de l'objet à afficher est manquante !";
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Evénement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
-$l_my_agenda = "Mon agenda";
+$l_my_calendar = "Mon agenda";
 $l_my_time = "Ma gestion du temps";
 
 $l_my_lead = "Mes pistes";

@@ -178,10 +178,10 @@ if ($cgp_show["module"]["list"]) {
                                   'Url' => "$path/list/list_index.php",
                                   'Right'=> $cright_read);
 }
-if ($cgp_show["module"]["agenda"]) {
-  $modules["agenda"] = array('Name'=> $l_module_agenda,
-                                    'Ico' => "$ico_agenda",
-                                    'Url' => "$path/agenda/agenda_index.php",
+if ($cgp_show["module"]["calendar"]) {
+  $modules["calendar"] = array('Name'=> $l_module_calendar,
+                                    'Ico' => "$ico_calendar",
+                                    'Url' => "$path/calendar/calendar_index.php",
                                     'Right'=> $cright_read);
 }
 if ($cgp_show["module"]["cv"]) {

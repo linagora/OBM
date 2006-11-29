@@ -1174,7 +1174,7 @@ function display_end() {
 // Display : debug
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug() {
-  global $l_dg_sql, $l_dg_param, $l_dg_sess;
+  global $l_dg_sql, $l_dg_param, $l_dg_sess,$global_dis_debug_custom;
   global $global_dis_debug_msg, $global_dis_debug_param, $dis_session;
   global $cdg_param, $cdg_sql, $cdg_sess, $set_debug;
 
@@ -1194,14 +1194,20 @@ function display_debug() {
     $dis_session_content = "
       <h1>$l_dg_sess</h1>
       $dis_session";
-    }
-    
+  }
+  if ($set_debug > 0) {
+    $dis_debug_custom = "
+      <h1>=>$l_dg_custom</h1>
+      $global_dis_debug_custom";
+  }
+  
   if ($set_debug > 0) {
     return "
       <div class=\"debug\">".
       $dis_session_content.
       $dis_debug_sql.
       $dis_debug_param.
+      $dis_debug_custom.
       "</div>";
   } else { 
     return "";

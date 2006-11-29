@@ -880,11 +880,9 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
         $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
         $goto = "calendar_index.php?action=new&amp;tf_date_begin=".of_isodate_format($current_time,"",1)."&amp;tf_date_end=".of_isodate_format($current_time + $time_unit_sec,"",1);
         $iso_date = of_isodate_format($current_time);
-        /*
-        if (isset($events[$iso_date])) {
-          $day = $events[$iso_date];
-
-	  // loop through ["user"], ["resource"]
+    
+          // loop through ["user"], ["resource"]
+          /*
 	  $indice = 0;
 	  foreach ($calendar_entity as $type => $entity) {
 	    foreach($entity as $id => $properties) {
@@ -943,16 +941,48 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
         } else {*/
           $week_cal .= "<td id=\"time-$current_time\" onclick=\"window.location.href='$goto'\"
              onmouseover=\"this.className='hover';this.style.cursor = 'pointer'\"
-             onmouseout=\"this.className =''\">&nbsp;</td>";
+             onmouseout=\"this.className =''\">$display_events&nbsp;</td>";
+          $display_events = '';
         //}
       }
       $week_cal .= "</tr>";
     }
 
   }
-
-  foreach($events as $date => $calendar) {
-
+          if (isset($events[$iso_date])) {
+          $day = $events[$iso_date];
+          $events_data = $day->get_all_events_beginning_between($current_time, $current_time + $time_unit_sec);
+          if (is_array($events_data)) {
+            foreach($events_data as $event) {
+              $title = $event["event"]->title;
+              $duration = $event["event"]->duration;
+              $overlap = floor($duration / ($time_unit * 60)) *18;
+              $overlap = $overlap."px";
+             $display_events .= "
+            <div id=\"\" class=\"event\" style=\"height:$overlap;\">
+              <h1>$title</h1>
+            </div>
+            ";
+            }
+          }
+        }
+  if(is_array($events)) {
+    foreach($events as $date => $day) {
+      foreach($day->events as $event) {
+        display_debug_variables($event);
+        $title = $event["event"]->title;
+        $duration = $event["event"]->duration;
+        $date = $event["date"];
+        $id = $event["event"]->id;
+        $js .= "obm.calendarManager.newEvent($id,$date,$duration,'$title');\n" ;
+        $display_events .= "
+          <div id=\"event-$id-$date\" class=\"event\">
+            <h1>$title</h1>
+          </div>
+          ";
+        
+      }
+    }
   }
   $col_span = (7 * $nb_ent) - 1;
   $block = "
@@ -970,7 +1000,10 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
     </thead>
     $week_cal
   </table>
-  $hidden_div";
+  $display_events
+  <script type=\"text/javascript\">
+  $js
+  </script>";
   return $block;
 }
 

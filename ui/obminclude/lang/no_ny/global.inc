@@ -118,7 +118,7 @@ $l_module_account = "Word to define";
 $l_module_invoice = "Word to define";
 $l_module_payment = "Word to define";
 $l_module_time = "Word to define";
-$l_module_agenda = "Word to define";
+$l_module_calendar = "Word to define";
 
 $l_header_new_f = "Ny";
 $l_header_new = "Ny";
@@ -145,7 +145,7 @@ $l_header_func_unused = "Functions";
 $l_header_clear_sess = "Clear sessions";
 $l_header_pref_update = "Reset users preferences";
 
-$l_header_agenda = "Agenda";
+$l_header_calendar = "Agenda";
 $l_header_day = "Jour";
 $l_header_week = "Semaine";
 $l_header_month = "Mois";

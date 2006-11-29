@@ -77,7 +77,7 @@ function of_right_dis_admin($entity, $entity_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User selection for agenda management admin panel
+// User selection for calendar management admin panel
 // Parameters:
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,13 +105,13 @@ function html_entitywritable_bar($writable_entity,$entity_id, $entity) {
     ";
 
     $block = "
-    <div class=\"agendaBar\">
-    <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+    <div class=\"calendarBar\">
+    <table cellpadding=\"0\" cellspacing=\"0\" class=\"calendarCal\">
     <tr>
-      <td class=\"agendaHead2\">$l_entity_right</td>
+      <td class=\"calendarHead2\">$l_entity_right</td>
     </tr>
     <tr>
-      <td class=\"agendaNoEvent\" align=\"left\">
+      <td class=\"calendarNoEvent\" align=\"left\">
       <form action=\"".$_SERVER["PHP_SELF"]."\" method=\"get\" $check_sel_user>
       $dis_sel
       </form>

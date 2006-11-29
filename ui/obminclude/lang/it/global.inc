@@ -199,7 +199,7 @@ $l_module_account = "Accounts";
 $l_module_invoice = "Fatture";
 $l_module_payment = "Pagamenti";
 $l_module_time = "Gestione del Tempo" ;
-$l_module_agenda = "Calendario";
+$l_module_calendar = "Calendario";
 
 $l_header_admin = "Amministrazione";
 $l_header_new_f = "Nuovo";

@@ -9,6 +9,9 @@
 include("obminclude/themes/standard/theme.inc");
 $theme_path = C_IMAGE_PATH."/default/images";
 $css_obm = C_IMAGE_PATH."/default/styles/style.css";
+$css_calendar = C_IMAGE_PATH."/default/styles/calendar.css";
+
+
 
 $ico_arrow_up       = "$theme_path/arrow_up.gif";       
 $ico_arrow_down     = "$theme_path/arrow_down.gif";  

@@ -313,7 +313,7 @@ if ($set_mail == "yes") $display["detail"] .= "checked";
 $display["detail"] .= " /></td>
   </tr>";
 
-if ($cgp_show["module"]["agenda"]) {
+if ($cgp_show["module"]["calendar"]) {
   $display["detail"] .= "
   <tr>
     <td class=\"adminLabel\">$l_set_cal_interval</td>

@@ -3,6 +3,8 @@ obm.vars = new Object();
 obm.vars.labels = new Object();
 obm.vars.images = new Object();
 obm.vars.regexp = new Object();
+obm.vars.consts = new Object();
+obm.initialize = new Chain();
 
 Obm.Menu = new Class({
   
@@ -61,6 +63,8 @@ Obm.Menu = new Class({
 Obm.Portlets = new Class({
   
   initialize: function() {
+    if(!$('portlets'))
+      return false;
     img = document.createElement('img');
     img.src = obm.vars.images.upArrow;
     this.upArrow = img.src;
@@ -108,7 +112,6 @@ Obm.Portlets = new Class({
         img.src = this.upArrow;
       }
       title.insertBefore(img,title.firstChild);
-
       img.addEvent('click', function(e){
         if(this.getAttribute("src") == obm.portlets.upArrow) 
           this.setAttribute("src", obm.portlets.downArrow);
@@ -174,5 +177,12 @@ function formValidator() {
   $S('[alt=\"require\"]');
 }
 
-obm.menu = new Obm.Menu();
+function popup(url,name,height,width) {
+  if(!width)
+    width = obm.vars.consts.popupWidth;
+  if(!height)
+    height = obm.vars.consts.popupHeight;
+  window.open(url,name,'height='+height+',width='+width+',scrollbars=yes');
+  return false;
+}
 

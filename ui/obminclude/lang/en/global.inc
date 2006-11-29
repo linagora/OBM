@@ -214,7 +214,7 @@ $l_module_contact = "Contacts";
 $l_module_lead = "Leads";
 $l_module_deal = "Deals";
 $l_module_list = "Lists";
-$l_module_agenda = "Calendar";
+$l_module_calendar = "Calendar";
 $l_module_cv  = "CV";
 $l_module_todo    = "Todo";
 $l_module_publication = "Publications";
@@ -351,7 +351,7 @@ $l_of_right_err_empty = "The object reference is missing !";
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Waiting event(s)";
 $l_unfilled = "Day(s) unfilled";
-$l_my_agenda = "My calendar";
+$l_my_calendar = "My calendar";
 $l_my_time = "My time management";
 
 $l_my_lead = "My leads";

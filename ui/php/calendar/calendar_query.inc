@@ -2666,15 +2666,45 @@ class Day {
           $ev_end = $event["event"]->duration + $event["date"];
 	  if ($ev_end > $end) {
 	    $end = $ev_end;
-	  }
+          }
 	}
       }
     }
-    
+    return $return;
     if ($return != null) {
       $return = array("duration"=>$end - $start,"events"=>$return);
     }
 
+    return $return;
+  }
+
+    function get_all_events_beginning_between($start, $end) {
+    if (count($this->events) > 0) {
+      foreach($this->events as $event) {
+
+        $case = $event["event"]->match_period($event["date"],$start,$end);
+	
+	if ($case == -2) {
+	  continue;
+	}
+	
+	if ($case == -1) {
+	  break;
+	}
+
+	if (!is_array($event)) {
+	  continue;
+        }
+        
+	if ($case == 2) {
+	  return NULL;
+	}
+              
+	if ($case == 1) {
+          $return[] = $event;
+	}
+      }
+    }
     return $return;
   }
 }
