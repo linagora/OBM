@@ -784,17 +784,11 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
 //    - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_week_planning($calendar, $calendar_entity) {
-  global $path, $set_theme, $ico_left_day, $ico_right_day, $ico_new_event;
-  global $ico_calendar;
-  global $ico_cal_user1, $ico_cal_user2, $ico_cal_user3, $ico_cal_user4;
-  global $ico_cal_user5, $ico_cal_user6;
-  global $ico_cal_resource1, $ico_cal_resource2, $ico_cal_resource3;
-  global $ico_cal_resource4, $ico_cal_resource5, $ico_cal_resource6;
+  global $path, $set_theme, $ico_next, $ico_previous,$ico_resize;
   global $ccalendar_weekstart, $set_cal_interval;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private, $l_all_day;
 
-  $cell_width = "72"; // calendar.css update needed too if changed
  
   $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
@@ -818,7 +812,6 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
   $nb_user = count($calendar_entity["user"]);
   $nb_res = count($calendar_entity["resource"]);
   $nb_ent = $nb_user + $nb_res;
-  $td_width = floor(($cell_width-2)/$nb_ent)."px"; 
  
   $day_duration = 86400; 
   // Week Days headers : loop day by day
@@ -835,137 +828,31 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
 
     $day = $events[$iso_date];
     $days_events = $day->day_events;
-    
-    // loop through ["user"], ["resource"]
- /*   $indice = 0;
-    foreach ($calendar_entity as $type => $entity) {
-      foreach($entity as $id => $properties) {
-	$indice++;
-	$ico = "ico_cal_${type}$indice";
-        $list_events = $days_events[$type][$id];
-	if ($list_events != null) {
-	  // we store the ALL DAY event for further display
-	  $all_days[$iso_date][$type][$id] = true;
-	  $days_cal .= "<td class=\"".$properties["class"]."\">";
-	  foreach($list_events as $event) {
-	    dis_calendar_event_allday_planning($days_cal, $hidden_div, $event, $nb_ent, $properties);
-	  }
-	  $days_cal .= "</td>";
-	} else {
-	  $days_cal .= "<td><img src=\"".C_IMAGE_PATH."/$set_theme/${$ico}\" alt=\"$type\" /></td>";
-	}
-      }
-    }
-  */
   }
-/*
-  $week_cal .= "
-    <tr>
-      <td class=\"calendarHour\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar\" alt=\"$l_all_day\" /></td>
-      $days_cal
-    </tr>";
- */
   // Week Calendar content
-  for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
-    
-    $delta = $j - $ccalendar_first_hour;
-    for ($k=0; $k<$set_cal_interval; $k++) {
-      if ($k==0) {
-        $week_cal .= "\n<tr><th>".($j).":00</th>";
-      } else {
-        $week_cal .= "\n<tr><th></th>";
-      }
-      $delta2 = $k * $time_unit;
-      for ($i=0; $i<7; $i ++) {
-        $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
-        $goto = "calendar_index.php?action=new&amp;tf_date_begin=".of_isodate_format($current_time,"",1)."&amp;tf_date_end=".of_isodate_format($current_time + $time_unit_sec,"",1);
-        $iso_date = of_isodate_format($current_time);
-    
-          // loop through ["user"], ["resource"]
-          /*
-	  $indice = 0;
-	  foreach ($calendar_entity as $type => $entity) {
-	    foreach($entity as $id => $properties) {
-              $indice ++;
-              if ($j == $ccalendar_first_hour && $delta2 == 0) {
-                $events_data =  $day->get_events_before($current_time,$current_time + $time_unit_sec , $id,$type);
-	      } else {
-		$events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id,$type);
-              }
-              $duration = $events_data["duration"];
-
-              $delta_duration = $duration % $time_unit_sec;
-              $stime = $current_time + $duration;
-              $etime = $stime + $delta_duration;    
-              while($delta_duration != 0) {
-                $temp_data = $day->get_events_between($stime, $etime, $id,$type);
-                if($temp_data == NULL) {
-                  break;
-                }
-                $duration = $events_data["duration"] + $temp_data["duration"];
-                $events_data["duration"] = $duration;
-                $events_data["events"] = array_merge( $events_data["events"], $temp_data["events"]);
-                $delta_duration = $duration % $time_unit_sec;
-                $stime = $stime + $duration;
-                $etime = $stime + $delta_duration;                
-              }          
-              if ($events_data != null) { 
-		if (is_array($events_data)) {
-		  $duration = $events_data["duration"];
-		  $list_events = $events_data["events"];
-
-		  $week_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;text-align:left;\" rowspan=\"".ceil($duration/($time_unit_sec))."\">";
-		  foreach($list_events as $event) {
-		    dis_calendar_event_planning("week", $week_cal,$hidden_div,$event,$nb_ent,$properties);	
-		  }
-		  $week_cal .= "</td>";
-		}
-	      } else {
-		if ($indice == 1) {
-		  $class = " border";
-		} else {
-		  $class = "";
-		}
-		if ($all_days[$iso_date][$type][$id]) {
-		  $cell_class = "calendarNoEvent$class calendarAllDay$indice";
-		} else {
-		  $cell_class = "calendarNoEvent$class";
-		}
-		$week_cal .= "<td width=\"$td_width\" class=\"$cell_class\" onclick=\"window.location='$goto'\"
-                onmouseover=\"this.className='calendarNoEventHover$class';this.style.cursor = 'pointer'\"
-                onmouseout=\"this.className ='$cell_class'\">&nbsp;</td>";
-	      }
-	    }
-	  }
-
-        } else {*/
-          $week_cal .= "<td id=\"time-$current_time\" onclick=\"window.location.href='$goto'\"
-             onmouseover=\"this.className='hover';this.style.cursor = 'pointer'\"
-             onmouseout=\"this.className =''\">$display_events&nbsp;</td>";
-          $display_events = '';
-        //}
-      }
-      $week_cal .= "</tr>";
-    }
-
-  }
-          if (isset($events[$iso_date])) {
-          $day = $events[$iso_date];
-          $events_data = $day->get_all_events_beginning_between($current_time, $current_time + $time_unit_sec);
-          if (is_array($events_data)) {
-            foreach($events_data as $event) {
-              $title = $event["event"]->title;
-              $duration = $event["event"]->duration;
-              $overlap = floor($duration / ($time_unit * 60)) *18;
-              $overlap = $overlap."px";
-             $display_events .= "
-            <div id=\"\" class=\"event\" style=\"height:$overlap;\">
-              <h1>$title</h1>
-            </div>
-            ";
-            }
-          }
+    for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
+      
+      $delta = $j - $ccalendar_first_hour;
+      for ($k=0; $k<$set_cal_interval; $k++) {
+        if ($k==0) {
+          $week_cal .= "\n<tr><th>".($j).":00</th>";
+        } else {
+          $week_cal .= "\n<tr><th></th>";
         }
+        $delta2 = $k * $time_unit;
+        for ($i=0; $i<7; $i ++) {
+          $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
+          $goto = "calendar_index.php?action=new&amp;tf_date_begin=".of_isodate_format($current_time,"",1)."&amp;tf_date_end=".of_isodate_format($current_time + $time_unit_sec,"",1);
+          $iso_date = of_isodate_format($current_time);
+      
+            $week_cal .= "<td id=\"time-$current_time\" onclick=\"window.location.href='$goto'\"
+               onmouseover=\"this.className='hover';this.style.cursor = 'pointer'\"
+               onmouseout=\"this.className =''\">$display_events&nbsp;</td>";
+            $display_events = '';
+        }
+        $week_cal .= "</tr>";
+      }
+    }
   if(is_array($events)) {
     foreach($events as $date => $day) {
       foreach($day->events as $event) {
@@ -978,6 +865,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
         $display_events .= "
           <div id=\"event-$id-$date\" class=\"event\">
             <h1>$title</h1>
+            <img class=\"resizeHandler\" src=\"$ico_resize\" alt=\"Resize Handler\" />
           </div>
           ";
         
@@ -987,9 +875,9 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
   $col_span = (7 * $nb_ent) - 1;
   $block = "
   <h1>
-    <a href=\"calendar_index.php?action=view_week&amp;date=$prev_week\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" /></a>     
+    <a href=\"calendar_index.php?action=view_week&amp;date=$prev_week\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
     $display_date
-    <a href=\"calendar_index.php?action=view_week&amp;date=$next_week\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" /></a>     
+    <a href=\"calendar_index.php?action=view_week&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
   </h1> 
   <table class=\"calendar week\">
     <thead>
@@ -1002,7 +890,10 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
   </table>
   $display_events
   <script type=\"text/javascript\">
-  $js
+    obm.vars.consts.timeUnit = $time_unit_sec;
+    obm.calendarManager = new Obm.CalendarManager($start_week_time);
+    $js
+    obm.calendarManager.redrawAllEvents();
   </script>";
   return $block;
 }

@@ -328,10 +328,15 @@ function display_head_theme($p_module) {
   obm.vars.labels.dayLong = $dayLong;
   obm.vars.labels.today = '$l_today';
 
+  window.onresize= function() {
+    while(obm.resize.chains && obm.resize.chains.length > 0) {
+      obm.resize.callChain();
+    }
+  }
 
   obm.initialize.chain(datePickerGenerator);
   Window.onDomReady( function () {
-    while(obm.initialize.chains.length > 0) {
+    while(obm.initialize.chains && obm.initialize.chains.length > 0) {
       obm.initialize.callChain();
     }
   });
