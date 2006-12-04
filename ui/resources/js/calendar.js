@@ -100,8 +100,8 @@ Obm.CalendarManager = new Class({
     this.startTime = startTime;
     this.defaultWidth = $('time-'+this.startTime).clientWidth;
     this.defaultHeight = $('time-'+this.startTime).offsetHeight;
-    this.events = new Object();
-    this.times = new Object();
+    this.events = new Hash();
+    this.times = new Hash();
     this.context = new Object();
     ctx = $S('.calendar tbody')[0];
     this.context.top = ctx.getTop();
@@ -124,7 +124,7 @@ Obm.CalendarManager = new Class({
     obmEvent.setOrigin(delta);
     obmEvent.setSize(size);
     obmEvent.show();
-    this.events[elId] = obmEvent;
+    this.events.put(elId,obmEvent);
     this.register(elId);
   },
 
@@ -132,102 +132,107 @@ Obm.CalendarManager = new Class({
     xDelta = Math.round((left-this.context.left)/this.defaultWidth);
     yDelta = Math.round((top-this.context.top)/this.defaultHeight);
     time = this.startTime + xDelta*3600*24 + yDelta*obm.vars.consts.timeUnit;
-    oldTime = this.events[id].time
+    event = this.events.get(id);
+    oldTime = event.time
     this.unregister(id);
-    this.events[id].setTime(time);
-    this.events[id].setOrigin(time);
+    event.setTime(time);
+    event.setOrigin(time);
     this.register(id);    
-    this.redrawDayEvents(this.events[id].time);
+    this.redrawDayEvents(event.time);
 
   },
 
   resizeEventTo: function(id,size) {
     size = Math.round(size/this.defaultHeight);
-    this.events[id].setSize(size);
+    event = this.events.get(id);
+    event.setSize(size);
     this.unregister(id);
-    this.events[id].setDuration(size*obm.vars.consts.timeUnit);
+    event.setDuration(size*obm.vars.consts.timeUnit);
     this.register(id);   
-    this.redrawDayEvents(this.events[id].time);
+    this.redrawDayEvents(event.time);
   },
 
   register: function(id) {
-    delta = (this.events[id].time - this.startTime)%obm.vars.consts.timeUnit;
-    delta = this.events[id].time - delta;
-    size = Math.floor(this.events[id].duration/obm.vars.consts.timeUnit);
+    event = this.events.get(id);
+    delta = (event.time - this.startTime)%obm.vars.consts.timeUnit;
+    delta = event.time - delta;
+    size = Math.floor(event.duration/obm.vars.consts.timeUnit);
     for(i=0;i < size;i++) {
       t = delta + i*obm.vars.consts.timeUnit;
-      if(!this.times[t]) {
-        this.times[t] = new Array();
+      if(!this.times.get(t)) {
+        this.times.put(t,new Array());
       }
-      this.times[t].push(this.events[id]);
+      this.times.get(t).push(event);
     }    
   },
 
   unregister: function(id) {
-    delta = (this.events[id].time - this.startTime)%obm.vars.consts.timeUnit;
-    delta = this.events[id].time - delta;
-    size = Math.floor(this.events[id].duration/obm.vars.consts.timeUnit);
+    delta = (event.time - this.startTime)%obm.vars.consts.timeUnit;
+    delta = event.time - delta;
+    size = Math.floor(event.duration/obm.vars.consts.timeUnit);
     for(i=0;i < size;i++) {
       t = delta + i*obm.vars.consts.timeUnit;
-      this.times[t].remove(this.events[id]);
+      this.times.get(t).remove(event);
     }
   },
 
   redrawAllEvents: function() {
-    toResize = new Object();
-    for(t in this.times) {
-      size = this.times[t].length;
-      position = new Array();
-      for(i=0;i<this.times[t].length;i++) {
-        event = this.times[t][i]
-        if(!toResize[event.element.id]) {
-          toResize[event.element.id] = new Object();
-          toResize[event.element.id].size = this.times[t].length;
-        } else if(toResize[event.element.id].size < this.times[t].length) {
-          toResize[event.element.id].size = this.times[t].length;
-        }    
-      }
-    }
-    for(i in toResize) {
-      this.events[i].setWidth(this.defaultWidth/toResize[i].size);
-    }    
-  },
+    keys = this.times.keys().sort();
+    this.redrawEvents(keys);
+  }, 
 
   redrawDayEvents: function(dayStart) {
-    resize = new Object();
+    //TODO Ca doit pouvoir s'ameliorer
+
     date = new Date();
     date.setTime(dayStart * 1000);
-    //TODO
     date.setHours(8);
     date.setMinutes(0);
     date.setSeconds(0);
     ts = date.getTime()/1000;
     date.setHours(20)
     te = date.getTime()/1000;
+
+    keys = this.times.keys().sort();
+    while(keys[0] < ts) {
+      keys.shift();
+    }
+    k = 0;
+    while(keys[(keys.length -1)] > te) {
+      keys.pop();
+    }
+    this.redrawEvents(keys);
+  },
+
+  redrawEvents: function(key) {
+    resize = new Object();
     end = 0;
     
-    for(t=ts;t<=te;t+=obm.vars.consts.timeUnit) {
-      if(!this.times[t])
+    for(k=0;k < keys.length; k++) {
+      time = this.times.get(keys[k]);
+      if(time.length == 0)
         continue;
+
       if(end == 0) {
         unit = new Object()
         unit.size = 1;
       }
-      if(unit.size < this.times[t].length) {
-        unit.size = this.times[t].length;
+      if(unit.size < time.length) {
+        unit.size = time.length;
       }
-      
-      this.times[t].sort(this.compareEvent);
-
+      time.sort(this.compareEvent);
+      //TODO Revoir la gestion de la premiere 
+      //place disponible
       free = new Array;
-      for(i=0;i<this.times[t].length;i++) {
+      for(i=0;i<time.length;i++) {
         free.push(i);
       }
-
-      for(i=0;i<this.times[t].length;i++) {
-        event = this.times[t][i];
+      
+      // PERFORMING Event position
+      for(i=0;i<time.length;i++) {
+        event = time[i];
         id = event.element.id;        
-        if(t == event.origin) {
+        if(keys[k] == event.origin) {
           size = Math.floor(event.duration/obm.vars.consts.timeUnit);
           resize[id] = new Object;
           resize[id].position = free.splice(0, 1)[0];
@@ -241,15 +246,14 @@ Obm.CalendarManager = new Class({
       }
       end --;
     }
-
     // REDRAWING EVENTS
-
     for(i in resize) {
+      event = this.events.get(i);
       if(resize[i].unit.size > 1)
-        this.events[i].setWidth(this.defaultWidth/resize[i].unit.size);
+        event.setWidth(this.defaultWidth/resize[i].unit.size);
       else
-        this.events[i].setWidth(this.defaultWidth);
-      this.events[i].setMargin((this.defaultWidth/resize[i].unit.size)*resize[i].position);
+        event.setWidth(this.defaultWidth);
+      event.setMargin((this.defaultWidth/resize[i].unit.size)*resize[i].position);
     }
   }
 
