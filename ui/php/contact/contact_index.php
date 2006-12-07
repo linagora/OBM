@@ -128,7 +128,7 @@ if ($action == "ext_get_ids") {
   if (check_contact_data_form("", $params)) {
 
     // If the context (same contacts) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params["confirm"] == $c_yes) {
       $id = run_query_contact_insert($params);
       if ($id > 0) {
         $params["contact_id"] = $id;

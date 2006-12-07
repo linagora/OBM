@@ -1150,7 +1150,7 @@ $hidden_div
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_plain_month_planning($calendar, $calendar_entity) { 
-  global $set_theme,$ico_left_day,$ico_right_day;
+  global $auth, $set_theme,$ico_left_day,$ico_right_day;
   global $ccalendar_weekstart, $ico_new_event,$l_all_day;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_daysofweekfirst,$l_daysofweek;
@@ -1211,10 +1211,10 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
               }
             }            
           }
-          if(is_array($events_data)) {
+          if (is_array($events_data)) {
             $haveevent = true;
             foreach ($events_data as $event) {
-              if ($event->privacy == 1 && $auth->auth["uid"] != $id) {
+              if ($event["event"]->privacy == 1 && $auth->auth["uid"] != $id) {
                 $today_events[] = "$l_private : ".date("H:i",$event["date"])."-".date("H:i",$event["date"] + $event["event"]->duration);
               } else {
                 $today_events[] = $event["event"]->title." : ".date("H:i",$event["date"])."-".date("H:i",$event["date"] + $event["event"]->duration);

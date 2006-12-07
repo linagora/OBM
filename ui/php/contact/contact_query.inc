@@ -504,7 +504,7 @@ function run_query_contact_insert($contact) {
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
 
-  $archive = (isset($contact["archive"]) ? '1' : '0');
+  $archive = $contact["archive"];
   $priv = (isset($contact["privacy"]) ? $contact["privacy"] : '0');
 
   $query = "INSERT INTO Contact (contact_timeupdate,
@@ -594,6 +594,7 @@ function run_query_contact_insert($contact) {
   $query = "SELECT contact_id
     FROM Contact
     WHERE contact_lastname = '$lname'
+      AND contact_timecreate = '$now'
       AND contact_kind_id ='$kind'
       AND contact_company_id ='$comp_id'
       AND contact_email ='$email'
