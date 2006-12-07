@@ -94,9 +94,10 @@ Obm.CalendarDayEvent = new Class({
   redraw: function() {
     hr = $(this.options.type+'-'+this.origin);
     this.element.setStyles({
-      'top':  hr.getTop() + 'px',
+      'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
     });
+
     this.setWidth(this.size * obm.calendarManager.defaultWidth);
     if(this.options.draggable) {
       this.drag.options.xMin = this.options.context.left;

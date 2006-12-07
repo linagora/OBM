@@ -682,11 +682,12 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
       $dis_month_cal .= "
       <tr>
         <th>
-        <a class=\"calendarLink\" href=\"calendar_index.php?action=view_week&amp;date=$iso_day\" >$week_num</a>
+        <a href=\"calendar_index.php?action=view_week&amp;date=$iso_day\" >$week_num</a>
         </th>";
     }
 
-    $dis_month_cal .= "<td id=\"day-".($current_time - $start_time)."\" $bgclass><a href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$this_day</a>";
+    $dis_month_cal .= "<td id=\"day-".($current_time - $start_time)."\" $bgclass>
+      <h1><a href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$this_day</a></h1>";
     $dis_month_cal .= "</td>";
     $current_time = strtotime("+1 day", $current_time); 
     $i++;
@@ -1033,58 +1034,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
       $delta2 = $k * $time_unit;
       $current_time = strtotime("+$i hours +$delta2 minutes",$ts_date);   
 
-     /* if (is_object($day)) {
-	$indice = 0;
-	// loop through ["user"], ["resource"]
-	foreach ($calendar_entity as $type => $entity) {
-	  foreach ($entity as $id => $properties) {
-	    $indice ++;
-	    if ($i == $ccalendar_first_hour && $delta2 == 0) {
-	      $events_data = $day->get_events_before($current_time,$current_time + $time_unit_sec, $id, $type);
-	    } else {
-	      $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id,$type);	  ;
-            }
-            $duration = $events_data["duration"];
-
-            $delta_duration = $duration % $time_unit_sec;
-            $stime = $current_time + $duration;
-            $etime = $stime + $delta_duration;    
-            while($delta_duration != 0) {
-              $temp_data = $day->get_events_between($stime, $etime, $id,$type);
-              if($temp_data == NULL) {
-                break;
-              }
-              $duration = $events_data["duration"] + $temp_data["duration"];
-              $events_data["duration"] = $duration;
-              $events_data["events"] = array_merge( $events_data["events"], $temp_data["events"]);
-              $delta_duration = $duration % $time_unit_sec;
-              $stime = $stime + $duration;
-              $etime = $stime + $delta_duration;                
-            }               
-	    if ($events_data != null) {
-	      if (is_array($events_data)) {
-		$duration = $events_data["duration"];
-		$list_events = $events_data["events"];
-		$day_cal .= "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\" rowspan=\"".ceil($duration/($time_unit_sec))."\" >";
-		foreach ($list_events as $event) {
-		  dis_calendar_event_planning("day", $day_cal,$hidden_div,$event,$nb_ent,$properties);	
-		}
-		$day_cal .= "</td>";
-	      }
-	    } else {
-	      if ($all_days[$iso_date][$type][$id]) {
-		$cell_class = "calendarNoEvent calendarAllDay$indice";
-	      } else {
-		$cell_class = "calendarNoEvent";
-              }
-	      $day_cal .= "<td style=\"width:$td_width;\" class=\"$cell_class\">&nbsp;</td>";
-	    }
-	  }
-        }
-     } else {*/
-	$day_cal .= "<td id=\"time-$current_time\"></td>";
-     // }      
-      $day_cal .= "</tr>";
+      $day_cal .= "<td id=\"time-$current_time\"></td></tr>";
     }
   }
 
