@@ -310,6 +310,8 @@ function display_head_theme($p_module) {
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/mootools.js\" ></script>
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/datepicker.js\" ></script>
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/utils.js\" ></script>
+
   <script type=\"text/javascript\" src=\"".C_IMAGE_PATH."/../js/calendar.js\" ></script>
   $js_include
   <script type=\"text/javascript\">
@@ -327,7 +329,7 @@ function display_head_theme($p_module) {
   obm.vars.labels.dayMedium = $dayMedium;
   obm.vars.labels.dayLong = $dayLong;
   obm.vars.labels.today = '$l_today';
-
+  console.log(new Date().getTime());
   window.onresize= function() {
     while(obm.resize.chains && obm.resize.chains.length > 0) {
       obm.resize.callChain();
@@ -339,6 +341,7 @@ function display_head_theme($p_module) {
     while(obm.initialize.chains && obm.initialize.chains.length > 0) {
       obm.initialize.callChain();
     }
+  console.log(new Date().getTime());
   });
 
 <!--

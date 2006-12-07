@@ -17,7 +17,6 @@
   border: 1px solid #aaa; 
   border-collapse: collapse;	
   border-spacing: 0;
-  empty-cells: hide;
 }
 
 .calendar tbody td {
@@ -40,6 +39,9 @@
 .week tbody td{
   height: 1.8em;
   width: 13%;
+  overflow: visible;
+  margin:0;
+  padding: 0;
 }
 
 .week thead td {
@@ -47,24 +49,30 @@
 }
 
 .week thead th {
-  font-size: 180%;
-  vertical-align: top;
-  white-space: nowrap;	
+  background-color: #fff;
+  background-image: url('../images/ico_calendar_head_border.png');
+  background-repeat: repeat-x;
+  background-position: bottom;
+  border-left: 1px dotted #ddd; 
+  border-top: 1px solid #ccc;
 }
 
 .event {
   position: absolute;
-  background-color: #d1e8c9;
-  color: #86b177;
-  display: none;
+  color: #fff;
+  overflow: hidden;
 }
 
 .event h1 {
-  background: #bad5b1;
-  font-size: 80%;
+  font-size: 90%;
   font-weight: bold;
   margin: 0;
   padding: 0;
+}
+
+.event img {
+  vertical-align: middle;
+  margin-right: 1px;
 }
 
 .event .resizeHandler {
@@ -73,10 +81,55 @@
   right: 0px;
 }
 
+.eventOwner0 {
+  background-color: #83B6E6;
+}
 
+.eventOwner0 h1 {
+  background-color: #639CDA;
+  border-top: 1px solid #81B2E3;
+  border-bottom: 1px solid #447DCA;
+}
 
+.eventOwner1 {
+  background-color: #F2CB76;
+}
 
+.eventOwner1 h1 {
+  background-color: #EBB13B;
+  border-top: 1px solid #F4D175;
+  border-bottom: 1px solid #E29624;
+}
 
+.eventOwner2 {
+  background-color: #98BF5E;
+}
+
+.eventOwner2 h1 {
+  background-color: #79A740;
+  border-top: 1px solid #95BB60;
+  border-bottom: 1px solid #598A28;
+}
+
+.eventOwner3 {
+  background-color: #E7AB9E;
+}
+
+.eventOwner3 h1 {
+  background-color: #DC8F80;
+  border-top: 1px solid #D6AC8F;
+  border-bottom: 1px solid #CD6F60;
+}
+
+.eventOwner4 {
+  background-color: #BBACC4;
+}
+
+.eventOwner4 h1 {
+  background-color: #A290AD;
+  border-top: 1px solid #B7A8C0;
+  border-bottom: 1px solid #B7A8C0;
+}
 
 
 /* //////////////////AGENDA////////////////// */

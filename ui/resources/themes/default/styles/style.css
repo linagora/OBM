@@ -67,6 +67,9 @@ abbr {
 textarea {
   width: 95%;
   margin-top: 5px;
+  font-weight: bold;  
+  color: #636466;
+  font-size: 110%;  
 }
 
 input {

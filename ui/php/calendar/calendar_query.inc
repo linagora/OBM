@@ -1195,7 +1195,7 @@ function store_calendar_entities($entities_q) {
       $name = $user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname");
       $entity_tab["user"][$id] = array(
         "name"  => $name,
-        "class" => "calendarEventBg$i",
+        "class" => "eventOwner$i",
         "image" => ${"ico_calendar_user".$i},
         "type"  => "user",
         "id"    => $user_q->f("userobm_id"));
@@ -2503,7 +2503,11 @@ class Day {
    * @return void
    */
   function add_day_event(&$event,$uid,$entity) {
-    $this->day_events[$entity][$uid][] = &$event;
+    if (!isset($this->day_events[$date.".".$event->id])) {
+      $this->day_events[$date.".".$event->id] = array("event"=>&$event,"date"=>$this->day,$entity=>array($uid));
+    } else {
+      $this->day_events[$date.".".$event->id][$entity][] = $uid;
+    }
   }
 
   /**
