@@ -8,6 +8,9 @@
 
 
 
+/* ------------------------------------------------------------------------- */
+/* Calendar common styles */
+/* ------------------------------------------------------------------------- */
 
 .calendar {
   width: 100%;
@@ -18,23 +21,26 @@
   border-collapse: collapse;	
   border-spacing: 0;
 }
+.calendar tbody {
+}
 
 .calendar tbody td {
   border-top: 1px dotted #ddd; 
   border-left: 1px solid #aaa; 
-  background-color: #fff;
 }
 
 .calendar tbody th {
+  background-color: #eee;
   border-top: 1px solid #ddd; 
 }
 
-.calendar .hover {
-  background-color: #fdffbf; 
+.calendar thead td {
+  text-align: center;
 }
 
-.week {
-}
+/* ------------------------------------------------------------------------- */
+/* Week view styles */
+/* ------------------------------------------------------------------------- */
 
 .week tbody td{
   height: 1.8em;
@@ -42,10 +48,7 @@
   overflow: visible;
   margin:0;
   padding: 0;
-}
-
-.week thead td {
-  text-align: center;
+  background-color: #fff;
 }
 
 .week thead th {
@@ -55,7 +58,45 @@
   background-position: bottom;
   border-left: 1px dotted #ddd; 
   border-top: 1px solid #ccc;
+  padding-bottom: 9px;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Month view styles */
+/* ------------------------------------------------------------------------- */
+.month tbody td{
+  height: 10.5em;
+  width: 13%;
+  overflow: visible;
+  margin:0;
+  padding: 0;
+  background-color: #fff;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Month view styles */
+/* ------------------------------------------------------------------------- */
+.day tbody td{
+  height: 1.8em;
+  width: 90%;
+  overflow: visible;
+  margin:0;
+  padding: 0;
+  background-color: #fff;
+}
+
+.day thead th {
+  background-color: #fff;
+  background-image: url('../images/ico_calendar_head_border.png');
+  background-repeat: repeat-x;
+  background-position: bottom;
+  border-left: 1px dotted #ddd; 
+  border-top: 1px solid #ccc;
+  padding-bottom: 9px;
+}
+/* ------------------------------------------------------------------------- */
+/* Events styles */
+/* ------------------------------------------------------------------------- */
 
 .event {
   position: absolute;
@@ -131,6 +172,28 @@
   border-bottom: 1px solid #B7A8C0;
 }
 
+/* ------------------------------------------------------------------------- */
+/* Free/Busy view styles */
+/* ------------------------------------------------------------------------- */
+
+
+.calendarPossible 	{ 
+  background-color: #97bdec; 
+  border-top: 1px dashed #6a90c3;
+  border-right: 1px dashed #6a90c3;    
+}
+
+.calendarFree { 
+  background-color: #cee1ed;  
+  border-top: 1px dashed #a0b3c4;
+  border-right: 1px dashed #a0b3c4;     
+}
+
+.freeBusy tbody td.hover 	{ 
+  background-color: #ffde01; 
+  border-top: 1px dashed #6a90c3;
+  border-right: 1px dashed #6a90c3;    
+}
 
 /* //////////////////AGENDA////////////////// */
 /* ////// Agenda table style definition ///// */

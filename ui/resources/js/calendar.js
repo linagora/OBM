@@ -1,3 +1,7 @@
+/******************************************************************************
+ * Calendar event object, can be dragged but have no graphical representation
+ * of it's duration.
+ ******************************************************************************/
 Obm.CalendarDayEvent = new Class({
   
   setOptions: function(options){
@@ -37,7 +41,6 @@ Obm.CalendarDayEvent = new Class({
       onStart:function() {
         this.element.setStyle('width', obm.calendarManager.defaultWidth + 'px');
         this.element.setStyle('margin-left', '0');
-        this.element.setStyle('margin-top', '0');
         this.element.setOpacity(.7);
       },
 
@@ -71,13 +74,16 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setOrigin: function(origin) {
-    if(this.origin >= 0) {
+    head = $('calendarHead');
+    if(this.origin >= 0 && head) {
       tr = $(this.options.type+'-'+this.origin).parentNode;
       tr.setStyle('height', (tr.offsetHeight - this.element.offsetHeight) + 'px');
     }        
     this.origin = origin;
     hr = $(this.options.type+'-'+this.origin);
-    hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
+    if(head) {
+      hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
+    }
     this.redraw();
     if(obm.calendarManager.lock()) {
       obm.calendarManager.resize();
@@ -250,10 +256,12 @@ Obm.CalendarManager = new Class({
     body = $('calendarBody');
 
     this.headContext = new Object();
-    this.headContext.top = head.getTop();
-    this.headContext.right = ctx.getLeft() + ctx.offsetWidth;
-    this.headContext.left = ctx.getLeft();
-    this.headContext.bottom = head.getTop() + head.offsetHeight;    
+    if(head) {
+      this.headContext.top = head.getTop();
+      this.headContext.right = ctx.getLeft() + ctx.offsetWidth;
+      this.headContext.left = ctx.getLeft();
+      this.headContext.bottom = head.getTop() + head.offsetHeight;    
+    }
 
     this.bodyContext = new Object();
     this.bodyContext.top = body.getTop();
@@ -302,10 +310,12 @@ Obm.CalendarManager = new Class({
       head = $('calendarHead');
       body = $('calendarBody');
 
-      this.headContext.top = head.getTop();
-      this.headContext.right = ctx.getLeft() + ctx.offsetWidth;
-      this.headContext.left = ctx.getLeft();
-      this.headContext.bottom = head.getTop() + head.offsetHeight;    
+      if(head) {
+        this.headContext.top = head.getTop();
+        this.headContext.right = ctx.getLeft() + ctx.offsetWidth;
+        this.headContext.left = ctx.getLeft();
+        this.headContext.bottom = head.getTop() + head.offsetHeight;    
+      }
 
       this.bodyContext.top = body.getTop();
       this.bodyContext.right = ctx.getLeft() + ctx.offsetWidth;
@@ -327,14 +337,21 @@ Obm.CalendarManager = new Class({
 
 
   compareEvent: function(event1, event2) {
-      return event1.origin - event2.origin ;
+    diff = event1.time - event2.time;
+    if(diff != 0)
+      return diff;
+    diff = event1.id - event2.id;
+    if(diff != 0)
+      return diff;
+    diff = event1.uid - event2.uid;
   },
 
 
   moveEventTo: function(id,left,top) {
     evt = this.events.get(id);
+
     xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
-    yDelta = Math.round((top-evt.options.context.top)/this.defaultHeight);
+    yDelta = Math.floor((top-evt.options.context.top)/this.defaultHeight);
     time = this.startTime + xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
     this.unregister(id);
     evt.setTime(time);

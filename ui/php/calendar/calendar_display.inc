@@ -628,8 +628,8 @@ function dis_calendar_year_planning($calendar, $calendar_entity) {
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_month_planning($calendar, $calendar_entity) { 
-  global $set_theme,$ico_left_day,$ico_right_day;
-  global $ccalendar_weekstart, $ico_new_event;
+  global $set_theme,$ico_previous, $ico_next;
+  global $ccalendar_weekstart,$ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_daysofweek;
 
@@ -660,8 +660,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);
     $day = $l_daysofweek[$day_num];
-    $dis_day_head .= "
-      <td style=\"width:105px;\" class=\"calendarHead2\">$day</td>";
+    $dis_day_head .= "<td>$day</td>";
     $start_week_day = strtotime("+1 day", $start_week_day);
   }
 
@@ -682,55 +681,12 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
       $week_num = get_calendar_week_num($current_time); 
       $dis_month_cal .= "
       <tr>
-        <td class=\"calendarHead3\">
-        <a class=\"calendarLink\" href=\"".url_prepare("calendar_index.php?action=view_week&amp;date=$iso_day")."\" >$week_num</a>
-        </td>";
-    }
-    $daylink_begin = urlencode(of_isodate_format(strtotime("+$ccalendar_first_hour hours",$current_time),"",1));
-    $daylink_end = urlencode(of_isodate_format(strtotime("+$ccalendar_last_hour hours",$current_time),"",1));
-
-    $dis_month_cal .= "
-      <td $bgclass style=\"width:105px;height:105px\">
-      <a style=\"float:right;\" class=\"calendarLink\" href=\"".url_prepare("calendar_index.php?action=view_day&amp;date=$iso_day")."\">$this_day</a>
-      <a href=\"".url_prepare("calendar_index.php?action=new&amp;tf_date_begin=$daylink_begin&amp;tf_date_end=$daylink_end")."\" />
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
-      </a>";
-
-    if (isset($events[$iso_day])) {      
-      $dis_month_cal .= "<table style=\"height:100%;width:100%;\"><tr>";
-      $day = $events[$iso_day];
-      $days_events = $day->day_events;
-
-      // loop through ["user"], ["resource"]
-      foreach ($calendar_entity as $type => $entity) {
-	foreach ($entity as $id => $properties) {
-	  $dis_month_cal .= "
-            <td><table style=\"height:10%;width:$td_width;\">";
-	  $list_events = $days_events[$type][$id];
-	  if ($list_events != null) {
-	    $dis_month_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
-	    foreach ($list_events as $event) {
-	      dis_calendar_event_allday_planning($dis_month_cal, $hidden_div,$event,$nb_ent,$properties);
-	    }
-	    $dis_month_cal .= "</td>";
-	  }
-	  $events_data = $day->get_events($id,$type);
-	  if (is_array($events_data)) {
-	    foreach ($events_data as $event) {
-	      $dis_month_cal .= "<tr><td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
-	      dis_calendar_event_planning("month", $dis_month_cal,$hidden_div,$event,$nb_ent,$properties);	   
-	      $dis_month_cal .= "</td></tr>";
-	    }
-	    
-	  } else {
-	    $dis_month_cal .= "<tr><td width=\"$td_width\">&nbsp;</td></tr>";
-	  }
-	  $dis_month_cal .= "</table></td>";	
-	}
-      }
-      $dis_month_cal .= "</tr></table>";
+        <th>
+        <a class=\"calendarLink\" href=\"calendar_index.php?action=view_week&amp;date=$iso_day\" >$week_num</a>
+        </th>";
     }
 
+    $dis_month_cal .= "<td id=\"day-".($current_time - $start_time)."\" $bgclass><a href=\"calendar_index.php?action=view_day&amp;date=$iso_day\">$this_day</a>";
     $dis_month_cal .= "</td>";
     $current_time = strtotime("+1 day", $current_time); 
     $i++;
@@ -740,9 +696,82 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
       $checkagain = of_date_get_month($current_time);
       if ($checkagain != $this_month) $whole_month = FALSE;	
     }
-  } while ($whole_month == TRUE);    
+  } while ($whole_month == TRUE);   
+
+  if(is_array($events)) {
+    $week_duration = 86400*7;
+    $options = "{draggable:true,xUnit:86400,yUnit:$week_duration,context: obm.calendarManager.bodyContext,type: 'day'}";
+
+    foreach($events as $date => $day) {
+      if(is_array($day->events))
+      foreach($day->events as $event) {
+        $title = $event["event"]->title;
+        $duration = $event["event"]->duration;
+        $date = $event["date"];
+        $id = $event["event"]->id;
+        $users = $event["user"];
+        $head = date("H:i",$date);
+        if(count($event["event"]->attendee["user"]) > 1)
+          $head = "<img src=\"$ico_meeting\" alt=\"Meeting\" />$head";
+        foreach($users as $uid) {
+          $userClass = $calendar_entity["user"][$uid]["class"];
+          $js .= "obm.calendarManager.newDayEvent($id,$uid,$date,$duration,'$title',$options);\n" ;
+          $display_events .= "
+            <div id=\"event-$id-$uid-$date\" class=\"event $userClass\">
+            <h1 id=\"moveHandler-$id-$uid-$date\">$head</h1>
+            </div>
+            ";
+        }
+      }
+      if(is_array($day->day_events))
+        foreach($day->day_events as $day_event) {
+          $title = $day_event["event"]->title;
+          $duration = $day_event["event"]->duration;
+          $date = $day_event["date"];
+          $id = $day_event["event"]->id;          
+          $users = $day_event["user"];
+          if(count($event["event"]->attendee["user"]) > 1)
+            $head = "<img src=\"$ico_meeting\" alt=\"Meeting\" />$head";
+          foreach($users as  $uid) {
+            $userClass = $calendar_entity["user"][$uid]["class"];
+            $js .= "obm.calendarManager.newDayEvent($id,$uid,$date, $duration,'$title',$options);\n" ;
+            $display_events .= "        
+              <div id=\"event-$id-$uid-$date\" class=\"event $userClass\">
+                <h1 id=\"moveHandler-$id-$uid-$date\">$title</h1>
+              </div>";
+          }
+      }
+    }
+  }
   
-  $block = "
+   $block = "
+  <h1>
+    <a href=\"calendar_index.php?action=view_month&amp;date=$prev_month\"><img src=\"$ico_previous\" alt=\"[Previous Month]\" /></a>     
+    $display_date
+    <a href=\"calendar_index.php?action=view_month&amp;date=$next_week\"><img src=\"$ico_next\" alt=\"[Next Month]\" /></a>     
+  </h1> 
+  <table class=\"calendar month\">
+    <colgroup span=\"1\" />
+    <colgroup span=\"7\" id=\"calendarEventContext\" />
+    <thead>
+    <tr><td></td>$dis_day_head</tr>
+    </tr>    
+    </thead>
+    <tbody id=\"calendarBody\">
+    $dis_month_cal
+    </tbody>
+  </table>
+  $display_events
+  <script type=\"text/javascript\">
+    obm.calendarManager = new Obm.CalendarManager($start_time);
+    if(obm.calendarManager.lock()) {
+      $js
+      obm.calendarManager.unlock();
+    }
+    obm.calendarManager.resize();
+  </script>";
+
+  $block2 = "
   <div class=\"calendarMain\">
    <table class=\"calendarCalMonth calendarMonth\">
     <tr>
@@ -868,7 +897,6 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
         if(count($event["event"]->attendee["user"]) > 1)
           $head = "<img src=\"$ico_meeting\" alt=\"Meeting\" />$head";
         foreach($users as $uid) {
-          display_debug_variables($event);
           $userClass = $calendar_entity["user"][$uid]["class"];
           $js .= "obm.calendarManager.newEvent($id,$uid,$date,$duration,'$title',$event_options);\n" ;
           $display_events .= "
@@ -907,7 +935,6 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
   <table class=\"calendar week\">
     <colgroup span=\"1\" />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
-    </colgroup
     <thead>
     <tr>
     <td>$week_num</td>
@@ -943,20 +970,15 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
 //   - $calendar_entity : array of entities to display ["user"] ["resource"] 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_day_planning($calendar, $calendar_entity) {
-  global $set_theme,$ico_left_day,$ico_right_day, $ico_new_event;
-  global $ico_calendar;
-  global $ico_cal_user1, $ico_cal_user2, $ico_cal_user3, $ico_cal_user4;
-  global $ico_cal_user5, $ico_cal_user6;
-  global $ico_cal_resource1, $ico_cal_resource2, $ico_cal_resource3;
-  global $ico_cal_resource4, $ico_cal_resource5, $ico_cal_resource6;
+  global $set_theme, $ico_previous, $ico_next,$ico_resize,$ico_meeting;
   global $ccalendar_first_hour, $ccalendar_last_hour,$set_cal_interval;
   global $l_private, $l_all_day;
 
   $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
 
-  $tomorrows_date = of_isodate_format(strtotime("+1 day", $ts_date));
-  $yesterdays_date = of_isodate_format(strtotime("-1 day", $ts_date));
+  $tomorrow_date = of_isodate_format(strtotime("+1 day", $ts_date));
+  $yesterday_date = of_isodate_format(strtotime("-1 day", $ts_date));
 
   $time_unit = 60 / $set_cal_interval;
   $time_unit_sec = 3600 / $set_cal_interval;
@@ -974,12 +996,10 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
   
   $day = $events[$iso_date];
 
-  $td_width = floor(460 / $nb_ent)."px";
   $days_events = $day->day_events;
 
   // Display Header row (all day)
-  $hour_day_list .= "<tr><td class=\"calendarHour\" ><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar\" alt=\"$l_all_day\" /></td>";
-
+/*
   // loop through ["user"], ["resource"]
   $indice = 0;
   foreach ($calendar_entity as $type => $entity) {
@@ -990,30 +1010,30 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
       if ($list_events != null) {
 	// we store the ALL DAY event for further display
 	$all_days[$iso_date][$type][$id] = true;
-	$hour_day_list .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
+	$day_cal .= "<td class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	foreach ($list_events as $event) {
-	  dis_calendar_event_allday_planning($hour_day_list, $hidden_div,$event,$nb_ent,$properties);	
+	  dis_calendar_event_allday_planning($day_cal, $hidden_div,$event,$nb_ent,$properties);	
 	}
-	$hour_day_list .= "</td>";
+	$day_cal .= "</td>";
       } else {
-	$hour_day_list .= "<td style=\"width:$td_width;\" class=\"calendarHead\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$ico}\" alt=\"$type\" /></td>";
+	$day_cal .= "<td style=\"width:$td_width;\" class=\"calendarHead\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$ico}\" alt=\"$type\" /></td>";
       }
     }
   }
-  $hour_day_list .= "</tr>";
-
+  $day_cal .= "</tr>";
+ */
   // Display Calendar
   for ($i = $ccalendar_first_hour; $i < $ccalendar_last_hour; $i++) {
     for ($k=0; $k<$set_cal_interval; $k++) {
       if ($k==0) {
-	$hour_day_list .= "\n<tr><td class=\"calendarHour\"  style=\"height:".($set_cal_interval*18)."px;\"  rowspan=\"$set_cal_interval\" >$i:00</td>"; 
+	$day_cal .= "\n<tr><th>$i:00</th>"; 
       } else {
-	$hour_day_list .= "\n<tr>"; 
+	$day_cal .= "\n<tr><th></th>"; 
       }
       $delta2 = $k * $time_unit;
       $current_time = strtotime("+$i hours +$delta2 minutes",$ts_date);   
 
-      if (is_object($day)) {
+     /* if (is_object($day)) {
 	$indice = 0;
 	// loop through ["user"], ["resource"]
 	foreach ($calendar_entity as $type => $entity) {
@@ -1045,11 +1065,11 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
 	      if (is_array($events_data)) {
 		$duration = $events_data["duration"];
 		$list_events = $events_data["events"];
-		$hour_day_list .= "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\" rowspan=\"".ceil($duration/($time_unit_sec))."\" >";
+		$day_cal .= "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\" rowspan=\"".ceil($duration/($time_unit_sec))."\" >";
 		foreach ($list_events as $event) {
-		  dis_calendar_event_planning("day", $hour_day_list,$hidden_div,$event,$nb_ent,$properties);	
+		  dis_calendar_event_planning("day", $day_cal,$hidden_div,$event,$nb_ent,$properties);	
 		}
-		$hour_day_list .= "</td>";
+		$day_cal .= "</td>";
 	      }
 	    } else {
 	      if ($all_days[$iso_date][$type][$id]) {
@@ -1057,27 +1077,98 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
 	      } else {
 		$cell_class = "calendarNoEvent";
               }
-	      $hour_day_list .= "<td style=\"width:$td_width;\" class=\"$cell_class\">&nbsp;</td>";
+	      $day_cal .= "<td style=\"width:$td_width;\" class=\"$cell_class\">&nbsp;</td>";
 	    }
 	  }
         }
-      } else {
-	$hour_day_list .= "<td class=\"calendarNoEvent\" colspan=\"$nb_ent\">&nbsp;</td>";
-      }      
-      $hour_day_list .= "</tr>";
+     } else {*/
+	$day_cal .= "<td id=\"time-$current_time\"></td>";
+     // }      
+      $day_cal .= "</tr>";
     }
   }
 
-  $daylink_begin = urlencode(of_isodate_format(strtotime("+$ccalendar_first_hour hours",$ts_date),"",1));
-  $daylink_end = urlencode(of_isodate_format(strtotime("+$ccalendar_last_hour hours",$ts_date),"",1));
+    if(is_array($events)) {
+    $event_options = "{resizable:true,draggable:true,xUnit:0}";
+    $day_event_options = "{}";
+
+    foreach($events as $date => $day) {
+      if(is_array($day->events))
+      foreach($day->events as $event) {
+        $title = $event["event"]->title;
+        $duration = $event["event"]->duration;
+        $date = $event["date"];
+        $id = $event["event"]->id;
+        $users = $event["user"];
+        $head = date("H:i",$date);
+
+        if(count($event["event"]->attendee["user"]) > 1)
+          $head = "<img src=\"$ico_meeting\" alt=\"Meeting\" />$head";
+        foreach($users as $uid) {
+          $userClass = $calendar_entity["user"][$uid]["class"];
+          $js .= "obm.calendarManager.newEvent($id,$uid,$date,$duration,'$title',$event_options);\n" ;
+          $display_events .= "
+            <div id=\"event-$id-$uid-$date\" class=\"event $userClass\">
+            <h1 id=\"moveHandler-$id-$uid-$date\">$head</h1>
+            $title
+            <img class=\"resizeHandler\" id=\"resizeHandler-$id-$uid-$date\" src=\"$ico_resize\" alt=\"Resize Handler\" />
+            </div>
+            ";
+        }
+      }
+      if(is_array($day->day_events))
+        foreach($day->day_events as $day_event) {
+          $title = $day_event["event"]->title;
+          $duration = $day_event["event"]->duration;
+          $date = $day_event["date"];
+          $id = $day_event["event"]->id;          
+          $users = $day_event["user"];
+          foreach($users as  $uid) {
+            $userClass = $calendar_entity["user"][$uid]["class"];
+            $js .= "obm.calendarManager.newDayEvent($id,$uid,$date, $duration,'$title',$day_event_options);\n" ;
+            $display_events .= "        
+              <div id=\"event-$id-$uid-$date\" class=\"event $userClass\">
+                <h1 id=\"moveHandler-$id-$uid-$date\">$title</h1>
+              </div>";
+          }
+      }
+    }
+  }
   $block = "
+  <h1>
+    <a href=\"calendar_index.php?action=view_day&amp;date=$yesterday_date\"<img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
+    $display_date
+    <a href=\"calendar_index.php?action=view_day&amp;date=$tomorrow_date\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
+  </h1> 
+  <table class=\"calendar day\">
+    <colgroup span=\"1\" />
+    <colgroup span=\"1\" id=\"calendarEventContext\" />
+    <thead>
+    <tr id=\"calendarHead\">
+    <td>$week_num</td><th id=\"day-0\"></th>
+    </tr>    
+    </thead>
+    <tbody id=\"calendarBody\">
+    $day_cal
+    </tbody>
+  </table>
+  $display_events
+  <script type=\"text/javascript\">
+    obm.vars.consts.timeUnit = $time_unit_sec;
+    obm.calendarManager = new Obm.CalendarManager($start_time);
+    if(obm.calendarManager.lock()) {
+      $js
+      obm.calendarManager.unlock();
+    }
+    obm.calendarManager.resize();
+  </script>";
+
+  $block2 = "
 
   <div class=\"calendarMain\">
   <table class=\"calendarCalDay\">
   <tr>
     <td colspan=\"".($nb_ent +1)."\" class=\"calendarHead\">
-      <a style=\"float:left;\" href=\"".url_prepare("calendar_index.php?action=view_day&amp;date=$yesterdays_date")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" /></a>     
-      <a style=\"float:right;\" href=\"".url_prepare("calendar_index.php?action=view_day&amp;date=$tomorrows_date")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" /></a>      
       $display_date
     </td>
   </tr>
@@ -1093,7 +1184,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
       </a>
     </td>
   </tr> 
-  $hour_day_list
+  $day_cal
   </table>
   </div>
 $hidden_div
@@ -2759,11 +2850,11 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($calendar, $entity_store) {
   global $set_theme,$ico_left_day,$ico_right_day;
-  global $set_cal_interval,$cal_entity_id;
+  global $set_cal_interval,$cal_entity_id,$ico_previous,$ico_next;
   global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_private_description,$display,$l_free_resources,$l_all_f;              
 
-  $iso_date = $calendar["date_begin"];
+  $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);
   $time_unit = 60 / $set_cal_interval; 
   $time_unit_sec = 3600 / $set_cal_interval;; 
@@ -2798,7 +2889,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   for ($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
     $this_date_l = calendar_localizeDate("week_list", $i);
     $week_day_list .= "
-     <td class=\"calendarCell\" colspan=\"$nb_user\" style=\"width:72px\">
+     <td>
       $this_date_l 
      </td>";
   } 
@@ -2807,9 +2898,9 @@ function dis_calendar_free_interval($calendar, $entity_store) {
     $delta = $j - $ccalendar_first_hour;
     for ($k=0; $k<$set_cal_interval; $k++) {
       if ($k==0) {
-	$week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"calendarHour\" >".($j).":00</td>";
+	$week_cal .= "\n<tr><th>".($j).":00</td>";
       } else {
-	$week_cal .= "\n<tr>";
+	$week_cal .= "\n<tr><th></th>";
       }
       $delta2 = $k * $time_unit;
       for ($i = 0; $i <7; $i ++) {
@@ -2881,11 +2972,11 @@ function dis_calendar_free_interval($calendar, $entity_store) {
           } elseif ($will_have_event) {
             if($have_resource_grp) {
               $week_cal .= "<td class=\"calendarFree\" onclick=\"window.location='$goto'\"
-               onmouseover=\"this.className='calendarFreeHover';this.style.cursor = 'pointer';calendar_show(event,'ressource-$current_time');\"
+               onmouseover=\"this.className='hover';this.style.cursor = 'pointer';calendar_show(event,'ressource-$current_time');\"
                onmouseout=\"this.className ='calendarFree';calendar_hide('ressource-$current_time');\">&nbsp;</td>\n";
             } else {
               $week_cal .= "<td class=\"calendarFree\" onclick=\"window.location='$goto'\"
-               onmouseover=\"this.className='calendarFreeHover';this.style.cursor = 'pointer';\"
+               onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
                onmouseout=\"this.className ='calendarFree';\">&nbsp;</td>\n";
             }
           } else {
@@ -2895,18 +2986,18 @@ function dis_calendar_free_interval($calendar, $entity_store) {
                onmouseout=\"this.className='calendarPossible';calendar_hide('ressource-$current_time');\">&nbsp;</td>\n";
             } else {
               $week_cal .= "<td class=\"calendarPossible\" onclick=\"window.location='$goto'\"
-               onmouseover=\"this.className='calendarPossibleHover';this.style.cursor = 'pointer';\"
+               onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
                onmouseout=\"this.className='calendarPossible';\">&nbsp;</td>\n";
             }            
 	  }
         } else {
           if($have_resource_grp) {    
             $week_cal .= "<td class=\"calendarPossible\" onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='calendarPossibleHover';this.style.cursor = 'pointer';calendar_show(event,'ressource-default');\"
+             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';calendar_show(event,'ressource-default');\"
              onmouseout=\"this.className='calendarPossible';calendar_hide('ressource-default');\">&nbsp;</td>\n";
           } else {
             $week_cal .= "<td class=\"calendarPossible\" onclick=\"window.location='$goto'\"
-             onmouseover=\"this.className='calendarPossibleHover';this.style.cursor = 'pointer';\"
+             onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
              onmouseout=\"this.className='calendarPossible';\">&nbsp;</td>\n";
           }
         }
@@ -2914,31 +3005,25 @@ function dis_calendar_free_interval($calendar, $entity_store) {
       $week_cal .= "</tr>";
     }
   }
-  $col_span = 6;
-  $block = "
-  <div class=\"calendarMain\">
-   <table class=\"calendarCalWeek\">
+  $block = "  
+  <h1>
+    <a href=\"calendar_index.php?action=perform_meeting&amp;date=$prev_week&amp;meeting_duration=$param_duration\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
+    $display_date
+    <a href=\"calendar_index.php?action=perform_meeting&amp;date=$next_week&amp;meeting_duration=$param_duration\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
+  </h1> 
+  <table class=\"calendar freeBusy\">
+    <thead>
     <tr>
-     <td class=\"calendarHead\">
-      <a href=\"".url_prepare("calendar_index.php?action=perform_meeting&amp;date=$prev_week&amp;meeting_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" /></a>
-     </td>
-     <td colspan=\"$col_span\" class=\"calendarHead\">
-      $display_date
-     </td>
-     <td class=\"calendarHead\">
-      <a href=\"".url_prepare("calendar_index.php?action=perform_meeting&amp;date=$next_week&amp;meeting_duration=$param_duration")."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" /></a>     
-     </td>
-    </tr>
-    <tr>
-    <td class=\"calendarCell\">$week_num</td>
+    <td>$week_num</td>
     $week_day_list
     </tr>
+    </thead>
+    <tbody>
     $week_cal
-   </table>
-   <div>
-   $resource_div
-";
-
+    </tbody>
+  </table>
+  $resource_div";
+  
   return  $block;
 }
 
