@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : calendar_display.inc                                           //
-//     - Desc : Calendar Display File                                          //
+// OBM - File : calendar_display.inc                                         //
+//     - Desc : Calendar Display File                                        //
 // 2002-11-26 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -36,7 +36,9 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
   } else if ($p_view == "week") {
     $block = dis_calendar_week_planning($calendar, $calendar_entity);
   } else if ($p_view == "day") {
-    $block = dis_calendar_day_planning($calendar, $calendar_entity);
+    $block = dis_agenda_day_planning($calendar, $calendar_entity);
+  } else if ($p_view == "planning") {
+    $block = dis_agenda_plain_month_planning($calendar, $calendar_entity);
   }
   $display["print_url"] = "$path/calendar/calendar_index.php?action=view_$p_view&amp;date=".$calendar["date"];
 
@@ -1152,6 +1154,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
   global $ccalendar_weekstart, $ico_new_event,$l_all_day;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $l_private,$l_daysofweekfirst,$l_daysofweek;
+
   $iso_date = $calendar["date"];
   $ts_date = strtotime($iso_date);  
   $this_month = of_date_get_month($ts_date);
@@ -1187,7 +1190,7 @@ function dis_calendar_plain_month_planning($calendar, $calendar_entity) {
       $empty = true;
     }
     $line0 .= "<th>$day_label</th>\n";
-    $line1 .= "<td>$this_day</td>\n";
+    $line1 .= "<td><a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;date=$iso_day")."\">$this_day</a></td>\n";
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
         $line_id = $type." ".$id;

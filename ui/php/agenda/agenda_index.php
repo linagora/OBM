@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : calendar_index.php                                             //
-//     - Desc : Calendar Index File                                            //
+// OBM - File : calendar_index.php                                           //
+//     - Desc : Calendar Index File                                          //
 // 2002-11-26 - Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -192,6 +192,10 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_calendar_calendar_view($params, $cal_entity_id, "year");
 
+} elseif ($action == "planning") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_agenda_calendar_view($params, $cal_entity_id, "planning");
+
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_calendar_event_form($action, $params, "", $cal_entity_id);
@@ -306,14 +310,6 @@ if ($action == "index") {
   $entity_store = store_calendar_entities($ret);
   $display["features"] = html_calendar_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable);
   $display["detail"] = dis_calendar_free_interval($params, $entity_store);
-
-} elseif ($action == "planning") {
-///////////////////////////////////////////////////////////////////////////////
-  $entity_readable = get_calendar_entity_readable();
-  $cal_entity_id["group_view"] =  $params["entity"]["group_view"];
-  $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
-  $display["features"] = html_calendar_planning_bar($params, $calendar_entity, $entity_readable);
-  $display["detail"] = dis_calendar_plain_month_planning($params, $calendar_entity);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////

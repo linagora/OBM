@@ -14,6 +14,7 @@
 // EntityCategoryNLink (category_id, entity_id)
 
 require_once("$obminclude/javascript/category_js.inc");
+require_once("$obminclude/of/of_select.inc");
 
 $extra_js .= "
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,38 +82,39 @@ function show ( name ) {
 
 ";
 
-if ( (isset($ext_target) && $ext_target!="")
-     || (isset($ext_element) && $ext_element!="") ) {
+if (isset($ext_element) && $ext_element!="") {
   $extra_js .= "
 
-function fill_ext_form(dir_path) {
-  ext_field = window.opener.document.$ext_target;
+/*function fill_ext_form(dir_path) {
+  ext_field = window.opener.document.$ext_element;
   ext_field.value = dir_path;
   window.close();
-} 
-  
+} */
+
 function fill_ext_cat_element(int_form) {
   size = int_form.length;
   for (i=0; i <size; i++) {
     if (int_form.elements[i].type == 'checkbox') {
       if (int_form.elements[i].checked == true) {
         id = int_form.elements[i].name;
-	elemid = '$ext_target-data-'+id;
-        if (!get_elem(window.opener.document, elemid )) {
+	elemid = '$ext_element-data-'+id;
+        if (!get_elem(window.opener.document, elemid)) {
           elemid = 'data'+id;
 	  span = get_elem(window.document,elemid);
-	  add_element('$ext_target' + '[]', id, span.innerHTML);
+	  of_select_add_element(window.opener.document, '$ext_element', id, span.innerHTML);
         }
       }
     }
   }
 }
 
+
 // Select the category with the code given
+/*
 function fill_category_ext_code_form(value) {
-  ext_field = window.opener.document.$ext_target;
+  ext_field = window.opener.document.$ext_element;
   ext_size = ext_field.length;
-  ext_field = window.opener.document.$ext_target;
+  ext_field = window.opener.document.$ext_element;
   bool= false;
   for(j=0; j< ext_size && bool == false; j++) {
     if (ext_field.options[j].value == value) {
@@ -121,33 +123,9 @@ function fill_category_ext_code_form(value) {
     }
   }
   window.close();
-} 
+}
+*/
 
-///////////////////////////////////////////////////////////////////////////////
-// Add an element line in the list form
-///////////////////////////////////////////////////////////////////////////////
-function add_element(fieldName,fieldValue,fieldLabel) {
-  target = window.opener.document;
-  container = get_elem(target, '$ext_target' );
-  row = target.createElement('div');
-  row.id = '$ext_target'+fieldValue;
-  row.className = 'elementRow';
-  field = target.createElement('input');
-  field.type = 'hidden';
-  field.name = fieldName;
-  field.value = fieldValue;
-  link = target.createElement('a');
-  link.href = 'javascript: remove_element(\'$ext_target'+fieldValue+'\',\'$ext_target\');';
-  link.onclick = '';
-  image = target.createElement('img');
-  image.src = '".C_IMAGE_PATH."/$set_theme/$ico_crow';
-  link.appendChild(image);
-  content = target.createTextNode(fieldLabel);
-  row.appendChild(link);
-  row.appendChild(content);
-  row.appendChild(field);
-  container.appendChild(row);
-} 
 ";
 }
 
@@ -228,7 +206,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
           </div>";
         }
       }
-      $url = "${entity}_index.php?action=ext_get_${cat}_ids&amp;popup=1&amp;ext_target=sel_${cat}&amp;ext_title=${$l_cat}";
+      $url = "${entity}_index.php?action=ext_get_${cat}_ids&amp;popup=1&amp;ext_element=sel_${cat}&amp;ext_title=${$l_cat}";
       $link="<a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
@@ -1283,6 +1261,7 @@ function _of_category_dis_tree_node($tree, $indent, $multi=false) {
     $indent_file = $indent + 15;
   } else {
     $node_to_display = false;
+    $indent_file = $indent;
   }
 
   // Display the node children if it has any
@@ -1954,7 +1933,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
           </div>";
       }
     }
-    $url = "${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_target=sel_${cat}&amp;ext_title=${$l_cat}";
+    $url = "${entity}_index.php?action=ext_get_category_ids&amp;category=$cat&amp;popup=1&amp;ext_element=sel_${cat}&amp;ext_title=${$l_cat}";
     $link = "<a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
@@ -2009,6 +1988,7 @@ function of_category_user_dis_tree($entity, $cat, $params, $action) {
     $multi_select = true;
   }
 
+  echo "of_category_user_dis_tree";
   // For multiple select we set a form
   if ($multi_select) {
     $block .= "
@@ -2499,7 +2479,7 @@ function of_category_user_get_links($category, $p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// USER Category - get ctegroy infos
+// USER Category - get category infos
 // Parameters:
 //   - $cat_id : category id
 // Return:
@@ -2527,6 +2507,37 @@ function of_category_user_get_infos($cat_id) {
   }
 
   return $cat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// USER Category - get category hash [id]->code
+// Parameters:
+//   - $category : category
+// Return:
+//   - array with category hash
+///////////////////////////////////////////////////////////////////////////////
+function of_category_user_get_code_hash($category) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain("Category");
+
+  $query = "SELECT category_id, category_code
+      FROM Category
+      WHERE category_category = '$category'
+        $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "of_category_user_get_code_hash()");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $cat = array();
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("category_id");
+    $code = $obm_q->f("category_code");
+    $cats[$id] = $code;
+  }
+
+  return $cats;
 }
 
 

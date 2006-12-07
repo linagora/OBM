@@ -73,10 +73,15 @@ function get_elem(doc, name) {
 // Remove an element line from the list form
 ///////////////////////////////////////////////////////////////////////////////
 function remove_element(elemId,parentId) {
+
   target = window.document;
   content = target.getElementById(elemId);
   container = target.getElementById(parentId);
-  container.removeChild(content);
+  try {
+    container.removeChild(content);
+  } catch (e) {
+    // what to do if element does not exists
+  }
 }
 
 

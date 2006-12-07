@@ -225,7 +225,7 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
     if ($ext_element != "") {
       $dis_group->data_cb_name = "";
       $form_attr = "
-      onsubmit=\"of_extmod_fill_ext_element(this); return false;\" ";
+      onsubmit=\"of_select_fill_from_checkbox(this); return false;\" ";
     }
     elseif ($widget == "") {
       $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";

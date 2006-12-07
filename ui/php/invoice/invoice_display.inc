@@ -180,16 +180,17 @@ function html_invoice_search_form($invoice, $sta, $tts) {
 
   $sel_status = "<select name=\"sel_status\">
       <option value=\"$c_all\">$l_all</option>";
-  foreach ($sta as $s_id => $s_status) {
-     $s_label = $s_status["label"];
-     $sel_status .= "<option value=\"$s_id\"";
-     if ($status == $s_id) $sel_status .= " selected = \"selected\"";
-     $sel_status .= ">$s_label</option>";
+  if (is_array($sta)) {
+    foreach ($sta as $s_id => $s_status) {
+      $s_label = $s_status["label"];
+      $sel_status .= "<option value=\"$s_id\"";
+      if ($status == $s_id) $sel_status .= " selected = \"selected\"";
+      $sel_status .= ">$s_label</option>";
+    }
   }
   $sel_status .= "</select>";
 
-
-  //     $block_status = of_extmod_dis_search_select($sta, "status", $url_tt);
+  //     $block_status = of_select_dis_search_select($sta, "status", $url_tt);
 
   if (($inout == "$c_all") || ($inout == "")) {
     $rb_both = "checked";
@@ -202,7 +203,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   }
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
 
   if ($popup) {
     $ext_action = $invoice["ext_action"];
@@ -1085,7 +1086,7 @@ function dis_invoice_dashboard($invoice) {
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
 
   // Table header
   for ($month = 1; $month < 13; $month++) {
@@ -1464,7 +1465,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
 
   // Billed infos Year-1 and Year ----------------------------------------------
 

@@ -2526,7 +2526,7 @@ function html_project_reftask_selector($project,$projectreftask_q) {
 
   $block .= "
     <form method=\"post\ name=\"f_add_task\" action=\"$url\"  
-    onsubmit=\"of_extmod_fill_ext_element(this,'task');window.close();return false\">
+    onsubmit=\"of_select_fill_from_checkbox(this,'task');window.close();return false\">
     <table class=\"detail\" width=\"100%\">
     <tr>
       <td class=\"detailLabel\">$l_header_tasktype :</td>

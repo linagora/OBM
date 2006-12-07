@@ -275,7 +275,7 @@ function display_actions_theme($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_head_theme($p_module) { 
-  global $l_obm_title, $extra_css, $extra_js_include;
+  global $l_obm_title, $extra_css, $extra_js, $extra_js_include;
   global $ico_arrow_up,$ico_arrow_down,$ico_arrow_left,$ico_arrow_right;
   global $ico_datepicker,$set_date_upd,$l_monthsofyear,$l_daysofweekfirst;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort;
@@ -341,9 +341,9 @@ function display_head_theme($p_module) {
     }
   });
 
-//<!--
+<!--
 $extra_js
-//-->
+-->
   </script>
 </head>
 

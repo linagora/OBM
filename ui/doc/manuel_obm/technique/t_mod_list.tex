@@ -6,14 +6,13 @@
 \clearpage
 \section{List}
 
-révision : \obm 1.1.0
+révision : \obm 2.0.0
 
 Le module \List \obm.
 
 .\\
 Todo\\
 tests des requetes (correction + limites ressources)\\
-génération de la requete : addslashes dans elements du tableau criteria\\
 
 \subsection{Organisation de la base de données}
 
@@ -117,9 +116,81 @@ A noter que les critères graphiques sont conservés lorsque la liste bascule en é
 Ce qui permet de revenir en mode ``normal'' en retrouvant les critères du moment de la bascule.
 
 
+\subsection{Gestion des formulaires de critères}
+
+En mode normal, les critères sont gérés graphiquement. Il y a 2 formulaires de gestion des critètes :\\
+
+\begin{itemize}
+\item Le formulaire (non modifiable directement) d'affichage et stockage des critères d'une liste
+\item Le formulaire d'ajout / modification d'une ligne de critères
+\end{itemize}
+\vspace{0.3cm}
+
+Ces formulaires bénéficient d'interfaces d'échange d'informations et gèrent les données utilisateurs (cf \ref{of_userdata}):\\
+
+\begin{tabular}{|c|p{4.5cm}|p{6.5cm}|}
+ \hline
+ \textbf{Sens} & \textbf{Description} & \textbf{Effectué par} \\
+ \hline
+nouveau => liste
+&
+La création d'un nouveau bloc de critères ajoute une ligne de critères dans le formulaire global de liste
+&
+Javascript : \fonction{list\_add\_criteria\_line()} qui ajoute (ou remplace) une ligne de critères.
+Insertion des opérateurs (liens vers suppression et modification, opérateur logique et d'exclusion), puis insertion des critères ``société'', ``contact'' et ``publication'' chacun par une fonction respective (ex: \fonction{list\_add\_company\_criteria\_line()}).
+Pour chaque critère (renseigné ou non) une cellule est remplie (avec un input hidden si le critère est non renseigné).Le cas spécial \variable{of\_select} est géré (checkbox puis select).
+\\
+\hline
+liste => nouveau
+&
+La modification d'une ligne de critère ouvre le formulaire d'ajout de critère en édition sur les critères de la ligne sélectionnée.
+&
+javascript : \fonction{get\_list\_criteria\_from\_query()} qui parcourt les lignes de critères, récupère le type de champ (SELECT, INPUT ou exception => of\_select) et récupère les données en conséquence (lastChild,...).
+L'object \variable{of\_select} est géré (cas particulier d'un champ contenant 2 obejts : 1 checkbox en premier puis un select).
+\\
+\hline
+\end{tabular}
+
+
+\subsection{Gestion des paramètres de critères}
+
+Les critères sont passés sous formes de paramètres de tableau (indexés par la ligne de critère).
+Chaque paramètre est dont backslashé individuellement.\\
+
+La fonction de récupération des paramètres (\fonction{get\_list\_params()}) regroupe tous les paramètres dans un tableau unique \variable{\$params[criteria]} afin de faciliter les manipulations et les transferts.\\
+
+Certains traitements nécessitent les paramètres non backslashés, ou au contraire backslashés (par exemple la liste des critères est sérialisée avant stockage en base, il faut donc stripslasher tous les critères individuellement puis backslasher le résultat de la sérialisation).
+2 fonctions sont donc prévues pour traiter ceci globalement par la fonction PHP \fonction{array\_walk} :\\
+
+\begin{itemize}
+\item \fonction{list\_strip\_slashes\_array()}
+\item \fonction{list\_add\_slashes\_array()}
+\end{itemize}
+
+
+\subsection{Gestion des données utilisateurs}
+
+Le module \List gère les données utilisateurs en proposant ces données dans les critères.
+
+Les catégories utilisateurs peuvent contenir des codes hiérarchiques (1.2.6,...). La sélection de ces catégories propose pour chaque catégorie un indicateur (case à cocher) qui permet de ne demander que la ou les catégories sélectionnées, ou l'ensemble de la hiérarchie des codes sélectionnés.
+
+La sélection de la catégorie ``1.3 catégorie troisième'' donnera :\\
+
+\begin{itemize}
+\item Si la case arborescance est cochée : toutes les catégories 1.3 et 1.3.*
+\item Sinon uniquement la catégorie de code 1.3
+\end{itemize}
+\vspace{0.3cm}
+
+Les critères stockés sont toujours les Ids des catégories sélectionnées, ainsi que l'état de l'indicateur d'arborescence.
+Avant la génération de la requête, la fonction \fonction{prepare\_list\_criteria()} va ajuster les critères pour transformer les critères d'Ids en codes si l'indicateur d'arborescence est sélectionné.
+
+En fonction des critères (id ou code) la procédure de génération effectuera la construction adéquate (Join et where sur les codes ou Id).
+
+
 \subsection{Construction des requètes dynamiques}
 
-La construction de la requète selon les critères demandés est effectuée par la fonction \fonction{maque\_query\_from\_criteria()}.
+La construction de la requète selon les critères demandés est effectuée par la fonction \fonction{make\_list\_query\_from\_criteria()}.
 
 
 \subsubsection{Informations de publication}

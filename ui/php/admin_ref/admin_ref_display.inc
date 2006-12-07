@@ -851,7 +851,7 @@ function html_admin_ref_tasktype_select_list($ref) {
 
     if ($ext_element != "") {
       $form_head = "
-      <form onsubmit=\"of_extmod_fill_ext_element(this, 'tt'); window.close(); return false;\">";
+      <form onsubmit=\"of_select_fill_from_checkbox(this, 'tt'); window.close(); return false;\">";
     } elseif ($ext_widget != "") {
       $form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";

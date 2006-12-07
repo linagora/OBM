@@ -34,7 +34,7 @@ include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
 require_once("invoice_js.inc");
-require_once("$obminclude/of/of_extmod.inc");
+require_once("$obminclude/of/of_select.inc");
 require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];

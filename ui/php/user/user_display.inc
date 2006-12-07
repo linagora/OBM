@@ -261,7 +261,8 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
-    if ($ext_action == "ext_get_ids") {
+    //    if ($ext_action == "ext_get_ids") {
+    echo "pop=$popup";
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
@@ -269,9 +270,8 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     if ($ext_element != "") {
       $user_d->data_cb_name = "";
       $user_d->data_form_head = "
-      <form onsubmit=\"of_extmod_fill_ext_element(this); return false;\">";
-    }
-    elseif ($ext_widget != "") {
+      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\">";
+    } elseif ($ext_widget != "") {
       $user_d->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
     } else {
@@ -287,17 +287,17 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
         </p>
       </p>
       </form>";
-    }
-    else if ($ext_action == "ext_get_id"){
-      $user_d->display_link = false;
-      if ($ext_url != "") {
-        $user_d->display_ext = "get_id_url";
-      } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
-        $user_d->display_ext = "get_id";
-      }
-    }
 
-    $display_popup_end = "
+  /*  else if ($ext_action == "ext_get_id"){
+    $user_d->display_link = false;
+    if ($ext_url != "") {
+      $user_d->display_ext = "get_id_url";
+    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $user_d->display_ext = "get_id";
+    }
+  }*/
+
+  $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";

@@ -57,7 +57,8 @@ my_url = '&action=new_criterion&popup=1&row_index=';
 ///////////////////////////////////////////////////////////////////////////////
 // Add a criteria line in the list form
 ///////////////////////////////////////////////////////////////////////////////
-function add_criterion(form,index) {
+function list_add_criteria_line(form,index) {
+
   target = window.opener.document;
   if (W3C) {
     criteria = target.getElementById('list_criterion');
@@ -71,28 +72,28 @@ function add_criterion(form,index) {
   } else {
     del_row(criteria.rows.item(index+1));
   }
-  labels = criteria.insertRow(index); 
-  labels.className = 'detailLabel'; 
-  values = criteria.insertRow(index+1); 
+  labels = criteria.insertRow(index);
+  labels.className = 'detailLabel';
+  values = criteria.insertRow(index+1);
   labels.insertCell(0);
-  labels.insertCell(1); 
-  cell = labels.insertCell(2); 
-  cell = labels.insertCell(3); 
+  labels.insertCell(1);
+  cell = labels.insertCell(2);
+  cell = labels.insertCell(3);
   values.insertCell(0);
   cell = values.insertCell(1);
   cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
-  cell = values.insertCell(2);  
+  cell = values.insertCell(2);
   cell.style.borderRight = '1px solid #7B9EAD';
   cell.style.paddingRight = '5px';
   cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
   cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option><option value=\"Exclude\">$l_exclude</option></select>';
-  i=company_criterion(form,labels,values,4);
-  i=contact_criterion(form,labels,values,i);";
+  i = list_add_company_criteria_line(form,labels,values,4);
+  i = list_add_contact_criteria_line(form,labels,values,i);";
   if ($cgp_show["module"]["publication"]) {
     $extra_js .= "
-  i=publication_criterion(form,labels,values,i);
+  i = list_add_publication_criteria_line(form,labels,values,i);
 ";
   }
 $extra_js .= "
@@ -100,9 +101,10 @@ $extra_js .= "
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  delete a criteria line in the list form                                  //
+// delete a criteria line in the list form
 ///////////////////////////////////////////////////////////////////////////////
 function del_row(row) {
+
   i = row.rowIndex;
   table = row.parentNode;
   table.deleteRow(i-1);
@@ -111,18 +113,22 @@ function del_row(row) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Open the update criteria line form
+// Open the update criteria line form
 ///////////////////////////////////////////////////////////////////////////////
 function open_window(row) {
+
   i = row.rowIndex-1;
   window.open(window.location+my_url+i,'','height=650,width=$popup_width,scrollbars=yes,status=yes');
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the values to update into the update form                             //
+// Get the values from the list form to initialize the update criterion form
+// After displaying the form, values are picked up from the list query form
+// List normal query form => Add criterion form
 ///////////////////////////////////////////////////////////////////////////////
-function get_values(form) {
+function get_list_critria_from_query(form) {
+
   target = window.opener.document;
   if (W3C) {
     criteria = target.getElementById('list_criterion');
@@ -137,7 +143,7 @@ function get_values(form) {
     name = cells.item(i).lastChild.name;
     field = eval('form.'+name.substr(0,name.length-2));
     try {
-      if(field.nodeName == 'SELECT') {
+      if (field.nodeName == 'SELECT') {
         values = cells.item(i).lastChild.value.split(',$separator');
         for(k=0; k < field.options.length; k++) {
           for(j=0; j < values.length; j++) {
@@ -146,11 +152,25 @@ function get_values(form) {
             }
           }
         }
-      } else {
+      } else if (field.nodeName == 'INPUT') {
         field.value = cells.item(i).lastChild.value;
       }
-    } catch (e) {
 
+    } catch (e) {
+      // last child is an of_select : cell has a checbox + a select
+
+      // handle the checkbox value
+      cb = cells.item(i).firstChild.value;
+      if (cb == 'true') {
+        of_select_set_tree(window.document, name.substr(0,name.length-2), cb);
+      }
+
+      // of_select objects (field.nodeName undefined)
+      values = cells.item(i).lastChild.value.split(',$separator');
+      labels = cells.item(i).lastChild.title.split(',$separator');
+      for (j=0; j < values.length; j++) {
+        of_select_add_element(window.document, name.substr(0,name.length-2), values[j], labels[j]);
+      }
     }
   }
 
@@ -159,14 +179,17 @@ function get_values(form) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the Company Criteria's insertion
+// Add criterion => List query form
+// Parameters:
+//   - i : column index
 ///////////////////////////////////////////////////////////////////////////////
-function company_criterion(form,labels,values,i) {
+function list_add_company_criteria_line(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
 
-  if (form.tf_company_name.value != '') {  
+  if (form.tf_company_name.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_company'; 
+    cell.innerHTML = '$l_company';
     cell = values.insertCell(i);
     cell.innerHTML = '<input type=\"text\" name=\"tf_company_name[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_name.value+'\" />';
     i++;
@@ -174,9 +197,9 @@ function company_criterion(form,labels,values,i) {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_company_name[]\" value=\"\" />';
   }
 
-  if (form.sel_company_country_iso3166.value != '') {  
+  if (form.sel_company_country_iso3166.value != '') {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_company: $l_country'; 
+    cell.innerHTML = '$l_company: $l_country';
     cell = values.insertCell(i);
     field = form.sel_company_country_iso3166;
     cell.innerHTML = '<select name=\"sel_company_country_iso3166[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
@@ -251,20 +274,36 @@ function company_criterion(form,labels,values,i) {
 // User data categories handling
 if (is_array($cgp_user["company"]["category"])) {
   foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-    $cat_code = "${cat_name}_code";
     $cat_label = ${"l_$cat_name"};
 
     $extra_js .= "
-
-  if (form.sel_$cat_code.value != '') {  
+  el = of_select_get_element_array('sel_$cat_name');
+  nb_el = el.length;
+  el_title = '';
+  el_id = '';
+  cb_value = el[cb];
+  if (nb_el > 0) {
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_company: $cat_label'; 
+    cell.innerHTML = '$l_company: $cat_label';
     cell = values.insertCell(i);
-    field = form.sel_$cat_code;
-    cell.innerHTML = '<select name=\"sel_${cat_code}[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
-    i++;  
+    // display the 1st value as selected
+    id = el[0]['id'];
+    label = el[0]['text'];
+    // Construct the title and id with all the selection as coma sep values
+    for (cp=0; cp < nb_el; cp++) {
+      if ((el_title != '') || (el_id != '')) {
+        el_title += ', ';
+        el_id += ',';
+      }
+      el_id += el[cp]['id'];
+      el_title += el[cp]['text'];
+    }
+    // add firstchild : cb input, lastchild : select
+    cell.innerHTML = '<input type=\"text\" name=\"sel_${cat_name}_tree[]\" value=\"'+cb_value+'\"><select title=\"'+el_title+'\" name=\"sel_${cat_name}[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ el_id +'\">'+ label +'('+ nb_el +')</option></select>';
+    i++;
+
   } else {
-    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_${cat_code}[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_${cat_name}_tree[]\" value=\"\"><input type=\"hidden\" name=\"sel_${cat_name}[]\" value=\"\" />';
   }
 ";
   }
@@ -278,7 +317,7 @@ $extra_js .= "
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the Contact Criteria's insertion
 ///////////////////////////////////////////////////////////////////////////////
-function contact_criterion(form,labels,values,i) {
+function list_add_contact_criteria_line(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
 
@@ -402,7 +441,6 @@ function contact_criterion(form,labels,values,i) {
 if (is_array($cgp_user["contact"]["category"])) {
   foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
     $cat_id = "${cat_name}_id";
-    $cat_code = "${cat_name}_code";
     $cat_label = ${"l_$cat_name"};
 
     $extra_js .= "
@@ -416,8 +454,8 @@ if (is_array($cgp_user["contact"]["category"])) {
     val = '';
     txt = '';
     size = 0;
-    for(h = 0; h < len;h++){
-      if(field.options[h].selected == true){
+    for(h = 0; h < len;h++) {
+      if(field.options[h].selected == true) {
         if(val != '') {
           val += ',';
           txt += ',';
@@ -442,9 +480,9 @@ $extra_js .= "
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Perform the Publication Criteria's insertion                              //
+// Perform the Publication Criteria's insertion
 ///////////////////////////////////////////////////////////////////////////////
-function publication_criterion(form,labels,values,i) {
+function list_add_publication_criteria_line(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
 

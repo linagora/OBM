@@ -1310,6 +1310,70 @@ function make_list_query_from_db(&$list_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Prepare the list criteria to be handled automatically by the query generator
+// Some criteria are interdependant and are translated to other criteria
+// eg : usercategory : if tree set -> category_code, else category_id
+// Parameters
+//   - $criteria : global criteria array
+// Returns:
+//   new criteria array with final fields
+///////////////////////////////////////////////////////////////////////////////
+function prepare_list_criteria(&$criteria) {
+  global $cdg_sql, $cgp_user;
+  
+  $target_fields = array();
+
+  // User data categories handling
+  // We stamp each category
+  foreach ($cgp_user as $entity => $entity_info) {
+    if (is_array($cgp_user[$entity]["category"])) {
+      foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+	$target_fields[$cat_name] = "category";
+      }
+    }
+  }
+
+  if (is_array($criteria)) {
+    foreach($criteria as $module => $module_criteria) {
+      if (is_array($module_criteria)) {
+        foreach($module_criteria as $field => $criterion) {
+
+	  // If field is a user category, not empty
+          if (array_key_exists($field, $target_fields)
+	      && (is_array($criterion)) ) {
+	    $cats_code_hash = of_category_user_get_code_hash($field);
+
+	    // loop through lines for this criterion
+            foreach($criterion as $line => $value) {
+	      if (($value != "")
+		  && ($module_criteria["${field}_tree"][$line] == "true")) {
+		$values = explode(",", $value);
+		$new_value = "";
+		foreach ($values as $id) {
+		  $code = $cats_code_hash[$id];
+		  if ($new_value != "") {
+		    $new_value .= ",$code";
+		  } else {
+		    $new_value .= $code;
+		  }
+		}
+		$criteria[$module]["${field}_code"][$line] = $new_value;
+		$criteria[$module]["${field}"][$line] = "";
+	      }
+
+	    }
+	  }
+	}
+      }
+    }
+
+  }
+
+  return $criteria;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Make an SQL Query with the list of criteria
 // Parameters:
 //   - $list[]   : list search criteria
@@ -1322,6 +1386,7 @@ function make_list_query_from_criteria($list) {
 
   $id = $list["list_id"];
   $criteria = $list["criteria"]["modules"];
+  $criteria = prepare_list_criteria($criteria);
   $boolean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
   $mailing_ok = $list["mailing_ok"];
@@ -1413,15 +1478,26 @@ function make_list_query_from_criteria($list) {
   // User data categories handling
   $cat_nb = 0;
   if (is_array($cgp_user["company"]["category"])) {
-    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
+    $entity = "company";
+    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
       $cat = "cat${cat_nb}comp%j";
       $cat_link = "cat${cat_nb}compl%j";
+      $operateurs["$cat_name"] = str_replace('%t',"$cat_link",$usercategory_id_in); 
       $operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_code_equal); 
-      $add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
-         ON company_id = $cat_link.categorylink_entity_id
-           AND $cat_link.categorylink_entity = 'company'
+      $add_join["$cat_name"] = " LEFT JOIN CategoryLink $cat_link
+         ON ${entity}_id = $cat_link.categorylink_entity_id
+           AND $cat_link.categorylink_entity = '$entity'
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
+
+      $add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
+         ON ${entity}_id = $cat_link.categorylink_entity_id
+           AND $cat_link.categorylink_entity = '$entity'
+           AND $cat_link.categorylink_category = '$cat_name'
+       LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
+      $multi_criteria["${cat_name}_code"] = "OR";
+      // cat_code field equiv to cat for join count
+      $field_join_equiv["${cat_name}_code"] = "${cat_name}";
       $cat_nb++;
     }
   }
@@ -1527,6 +1603,12 @@ function make_list_query_from_criteria($list) {
     foreach($criteria as $module => $module_criteria) {
       if (is_array($module_criteria)) {
         foreach($module_criteria as $field => $criterion) {
+	  // set default field join equivalence
+	  if (isset($field_join_equiv[$field])) {
+	    $field_join = $field_join_equiv[$field];
+	  } else {
+	    $field_join = $field;
+	  }
           if (is_array($criterion)) {
             foreach($criterion as $line => $value) {
 	      
@@ -1538,25 +1620,71 @@ function make_list_query_from_criteria($list) {
 		  $operation = $operateurs[$field];
 		  $operation = str_replace('%j',"",$operation);
 		  $operation = str_replace('%f',$field,$operation);
-		  $operation = str_replace('%v',$value,$operation);
-		  if ($cond_andnotn_where[$line] != "") {
-		    $cond_andnotn_where[$line] .= " AND $operation";
+
+		  // handle multi-criteria that need a loop
+		  // eg : multi category by code. c=code or c like code.*
+		  if (isset($multi_criteria[$field])) {
+		    $op_multi = "";
+		    $values = explode(",", $value);
+		    foreach ($values as $one_value) {
+		      $one_op = str_replace('%v',$one_value,$operation);
+		      if ($op_multi != "") {
+			$op_multi .= " ".$multi_criteria[$field]." $one_op";
+		      } else {
+			$op_multi .= $one_op;
+		      }
+		    }
+		    $operation = $op_multi;
+		    // other criteria (normal)
 		  } else {
-		    $cond_andnotn_where[$line] = " $operation";
+		    $operation = str_replace('%v',$value,$operation);
+		  }
+
+		  // Some fields have no operation associated (eg cat_tree)
+		  // so before adding the line with operator, we check
+		  if ($operation != "") {
+		    if ($cond_andnotn_where[$line] != "") {
+		      $cond_andnotn_where[$line] .= " AND ($operation)";
+		    } else {
+		      $cond_andnotn_where[$line] = " ($operation)";
+		    }
 		  }
 
 		  // Case Exclusion
 		} else if ($boolean_criterion[$line] == "Exclude") {
 		  $has_exclusion = true;
-		  $exclusion_join[$line] = str_replace('%j',"",$add_join[$field]);
+		  $exclusion_join[$line] .= " " . str_replace('%j',"",$add_join[$field]);
 		  $operation = $operateurs[$field];
 		  $operation = str_replace('%j',"",$operation);
 		  $operation = str_replace('%f',$field,$operation);
-		  $operation = str_replace('%v',$value,$operation);
-		  if ($exclusion_where[$line] != "") {
-		    $exclusion_where[$line] .= " AND ($operation)";
+
+		  // handle multi-criteria that need a loop
+		  // eg : multi category by code. c=code or c like code.*
+		  if (isset($multi_criteria[$field])) {
+		    $op_multi = "";
+		    $values = explode(",", $value);
+		    foreach ($values as $one_value) {
+		      $one_op = str_replace('%v',$one_value,$operation);
+		      if ($op_multi != "") {
+			$op_multi .= " ".$multi_criteria[$field]." $one_op";
+		      } else {
+			$op_multi .= $one_op;
+		      }
+		    }
+		    $operation = $op_multi;
+		    // other criteria (normal)
 		  } else {
-		    $exclusion_where[$line] = " ($operation)";
+		    $operation = str_replace('%v',$value,$operation);
+		  }
+
+		  // Some fields have no operation associated (eg cat_tree)
+		  // so before adding the line with operator, we check
+		  if ($operation != "") {
+		    if ($exclusion_where[$line] != "") {
+		      $exclusion_where[$line] .= " AND ($operation)";
+		    } else {
+		      $exclusion_where[$line] = " ($operation)";
+		    }
 		  }
 
 		  // Case Normal criteria line
@@ -1565,14 +1693,14 @@ function make_list_query_from_criteria($list) {
 		  $select .= $add_select[$field];
 
 		  // If field has not already create a join
-		  if (!isset($join_nb[$field])) {
-		    $join_nb[$field] = 0;
+		  if (!isset($join_nb[$field_join])) {
+		    $join_nb[$field_join] = 0;
 		    // If module nb is set And module = publication, do nothing
 		    // else add a join
 		    if ( (! isset($join_nb[$module]))
 			 || ($module != "publication") ) {
 		      $join_nb[$module] = 0;
-		      $from .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field]);
 		    }
 		    
 		    // XXXX not optimal as same criteria not tested
@@ -1582,19 +1710,45 @@ function make_list_query_from_criteria($list) {
 		  } elseif ($logical_criterion[$line] == "AND"
 			    && $line == $old_line + 1) {
 		    // AND on same criteria, increment the join cpt associated
-		    $join_nb[$field] ++;
-		    if ($join_nb[$field] > $join_nb[$module]) {
-		      $join_nb[$module] = $join_nb[$field];
-		      $from .= str_replace('%j',$join_nb[$field],$add_join[$field]);
+		    $join_nb[$field_join] ++;
+		    if ($join_nb[$field_join] > $join_nb[$module]) {
+		      $join_nb[$module] = $join_nb[$field_join];
+		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field]);
 		    }
 		  }
+
+		  // tag the module has having criteria
 		  $module_fill[$module] = true;
+
 		  $operation = $operateurs[$field];
-		  $operation = str_replace('%j',$join_nb[$field],$operation);
+		  $operation = str_replace('%j',$join_nb[$field_join],$operation);
 		  $operation = str_replace('%f',$field,$operation);
-		  $operation = str_replace('%v',$value,$operation);
-		  $condition[$line] .= $and[$line]." ". $operation;
-		  $and[$line] = " AND";	
+
+		  // handle multi-criteria that need a loop
+		  // eg : multi category by code. c=code or c like code.*
+		  if (isset($multi_criteria[$field])) {
+		    $op_multi = "";
+		    $values = explode(",", $value);
+		    foreach ($values as $one_value) {
+		      $one_op = str_replace('%v',$one_value,$operation);
+		      if ($op_multi != "") {
+			$op_multi .= " ".$multi_criteria[$field]." $one_op";
+		      } else {
+			$op_multi .= $one_op;
+		      }
+		    }
+		    $operation = $op_multi;
+		    // other criteria (normal)
+		  } else {
+		    $operation = str_replace('%v',$value,$operation);
+		  }
+
+		  // Some fields have no operation associated (eg cat_tree)
+		  // so before adding the line with operator, we check
+		  if ($operation != "") {
+		    $condition[$line] .= $and[$line]." ($operation)";
+		    $and[$line] = " AND";	
+		  }
 		}
 
 	      }
@@ -1663,7 +1817,7 @@ function make_list_query_from_criteria($list) {
 
   // Handle the contact archive flag
   if ($contact_arch == 0) {
-    $where = " contact_archive != 1 AND ($where) ";
+    $where = " (contact_archive != 1) AND ($where) ";
   }
 
   // Handle the privacy

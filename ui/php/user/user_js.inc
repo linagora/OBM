@@ -64,7 +64,7 @@ $extra_js .="
 
 
 if ($ext_element != "") {
-  require_once("$obminclude/of/of_extmod.inc");
+  require_once("$obminclude/of/of_select.inc");
 }
 
 

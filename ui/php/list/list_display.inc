@@ -889,7 +889,7 @@ function html_list_form($action, $list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Graphical List Form
+// Display Graphical (normal) List criteria Form
 // Parameters :
 //   - $action    : action called
 //   - $list_q    : DBO : information about the list (null for new list)
@@ -964,14 +964,12 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
   // User data categories handling
   if (is_array($cgp_user["company"]["category"])) {
     foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-      $cat_id = "${cat_name}_id";
-      $cat_code = "${cat_name}_code";
-      $field_kind[$cat_id] = "sel";
-      $field_kind[$cat_code] = "sel";
+      $cat_id = "${cat_name}";
+      $cat_tree = "${cat_name}_tree";
+      $field_kind[$cat_id] = "of_sel";
       $cat_label = "l_$cat_name";
       global $$cat_label;
       $fields_label[$cat_id] = "$l_company id: ${$cat_label}";
-      $fields_label[$cat_code] = "$l_company: ${$cat_label}";
     }
   }
   if (is_array($cgp_user["contact"]["category"])) {
@@ -987,29 +985,29 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     }
   }
 
-  $fields_label["company_name"] = $l_company; 
-  $fields_label["company_country_iso3166"] = "$l_company: $l_country"; 
-  $fields_label["company_zipcode"] = "$l_company: $l_postcode"; 
-  $fields_label["company_town"] = "$l_company: $l_town"; 
-  $fields_label["company_timeafter"] = "$l_company: $l_timeafter"; 
-  $fields_label["company_timebefore"] = "$l_company: $l_timebefore"; 
+  $fields_label["company_name"] = $l_company;
+  $fields_label["company_country_iso3166"] = "$l_company: $l_country";
+  $fields_label["company_zipcode"] = "$l_company: $l_postcode";
+  $fields_label["company_town"] = "$l_company: $l_town";
+  $fields_label["company_timeafter"] = "$l_company: $l_timeafter";
+  $fields_label["company_timebefore"] = "$l_company: $l_timebefore";
   $fields_label["company_marketingmanager_id"] = "$l_company: $l_market";
   $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
-  $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
-  $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
-  $fields_label["contact_country_iso3166"]= "$l_contact: $l_country";  
-  $fields_label["contact_zipcode"] = "$l_contact: $l_postcode";  
-  $fields_label["contact_town"] = "$l_contact: $l_town"; 
-  $fields_label["contact_timeafter"] = "$l_contact: $l_timeafter"; 
-  $fields_label["contact_timebefore"] = "$l_contact: $l_timebefore"; 
-  $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_market"; 
-  $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
-  $fields_label["kind_lang"] = "$l_contact: $l_lang"; 
-  $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
-  $fields_label["subscription_publication_id"] = "$l_publication: $l_title"; 
-  $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
-  $fields_label["publication_year"] = "$l_publication: $l_year"; 
-  $fields_label["subscription_reception_id"] = "$l_publication: $l_recept"; 
+  $fields_label["contact_lastname"] = "$l_contact: $l_lastname";
+  $fields_label["contact_firstname"] = "$l_contact: $l_firstname";
+  $fields_label["contact_country_iso3166"]= "$l_contact: $l_country";
+  $fields_label["contact_zipcode"] = "$l_contact: $l_postcode";
+  $fields_label["contact_town"] = "$l_contact: $l_town";
+  $fields_label["contact_timeafter"] = "$l_contact: $l_timeafter";
+  $fields_label["contact_timebefore"] = "$l_contact: $l_timebefore";
+  $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_market";
+  $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid";
+  $fields_label["kind_lang"] = "$l_contact: $l_lang";
+  $fields_label["contact_function_id"] = "$l_contact: $l_function";
+  $fields_label["subscription_publication_id"] = "$l_publication: $l_title";
+  $fields_label["publication_lang"] = "$l_publication: $l_lang";
+  $fields_label["publication_year"] = "$l_publication: $l_year";
+  $fields_label["subscription_reception_id"] = "$l_publication: $l_recept";
   $fields_label["subscription_renewal"] = "$l_publication: $l_renew";
   $fields_label["subscription_timeafter"] = "$l_publication: $l_after";
   $fields_label["subscription_timebefore"] = "$l_publication: $l_before";
@@ -1039,9 +1037,10 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     // User data categories handling
     if (is_array($cgp_user["company"]["category"])) {
       foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-	$cat_code = "${cat_name}_code";
+	$cat_id = "${cat_name}";
+	$cat_tree = "${cat_name}_tree";
         $cats = of_category_user_get_ordered($cat_name);
-	$field_data[$cat_code] = array("", "", "", $cats);
+	$field_data[$cat_id] = array("", "", "", $cats, "id");
       }
     }
     if (is_array($cgp_user["contact"]["category"])) {
@@ -1050,7 +1049,6 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	$cat_code = "${cat_name}_code";
         $cats = of_category_user_get_ordered($cat_name);
 	$field_data[$cat_id] = array("", "", "", $cats, "id");
-	$field_data[$cat_code] = array("", "", "", $cats);
       }
     }
 
@@ -1059,6 +1057,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
       foreach($module as $field => $criterion) {
 	foreach($criterion as $line => $value) {
 	  if ($value != "") {
+	    $input = "";
 
 	    // text field handling
 	    if ($field_kind[$field] == "tf") {
@@ -1066,6 +1065,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 
 	    // Select field handling
 	    } elseif ($field_kind[$field] == "sel") {
+
 	      $vals = explode(",",$value);
 	      $size = count($vals);
 	      $data = $field_data[$field];
@@ -1076,8 +1076,8 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	      // if data given as array
 	      if (is_array($data[3])) {
 		$datas = $data[3];
-		// category olumn (code by default, could be id)
-		$column = ($data[4] != "" ? $data[4] : "code");
+		// category column (id by default, could be id)
+		$column = ($data[4] != "" ? $data[4] : "id");
 		foreach ($datas as $one_data) {
 		  foreach($vals as $key) {
 		    if ("$key" == $one_data[$column]) {
@@ -1104,19 +1104,63 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 		      }
 		      $txt .= $data_q->f($data[2]);
 		    }
-		  } 
+		  }
 		}
 		$data_q->seek(0);
 	      }
-
 	      $input = "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$option</select>";
+
+	    } elseif ($field_kind[$field] == "of_sel") {
+	      // special of_select (handle a checkbox first)
+
+	      $vals = explode(",",$value);
+	      $size = count($vals);
+	      $data = $field_data[$field];
+	      $option = "";
+	      // $txt : select title (to have full info in roll over)
+	      $txt = "";
+
+	      // if data given as array (always with of_select)
+	      if (is_array($data[3])) {
+		$datas = $data[3];
+		// category column (id by default, could be id)
+		$column = ($data[4] != "" ? $data[4] : "id");
+		foreach ($datas as $one_data) {
+		  foreach($vals as $key) {
+		    if ("$key" == $one_data[$column]) {
+		      if ($option == "") {
+			$option = "<option selected=\"selected\" value=\"$value\" selected=\"selected\">".$one_data["label"]."($size)</option>";
+		      } else {
+			$txt .= ",";
+		      }
+		      $txt .= $one_data["label"];
+		    }
+		  }
+		}
+	      }
+
+	      // We add the cb input first
+	      $input = "<input type=\"text\" name=\"sel_".$field."_tree[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"".$module["${field}_tree"][$line]."\" />";
+	      $input .= "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$option</select>";
+
 	    }
+
 	    $structure[$line] .= "<td>$input</td>";
 	    $labels[$line] .= "<td>".$fields_label[$field]."</td>";
-	  }
-	  else {
+
+	  } else {
+	    // No value (no data), we display hidden input
+
+	    // handle special of_select case : prefix is "sel", add checkbox
+	    if ($field_kind[$field] == "of_sel") {
+	      $prefix = "sel";
+	      $hid_cell[$line] .= "<input type=\"hidden\" name=\"sel_${field}_tree[]\" value=\"\" />";
+	    } else {
+	      $prefix = $field_kind[$field];
+	    }
+
 	    $structure[$line] .= "";
-	    $hid_cell[$line] .= "<input type=\"hidden\" name=\"".$field_kind[$field]."_".$field."[]\" value=\"\" />";
+	    $hid_cell[$line] .= "<input type=\"hidden\" name=\"${prefix}_${field}[]\" value=\"\" />";
 	  }
 	}
       }
@@ -1162,7 +1206,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     }
   }
 
-  $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]";
+  $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_element=forms[0].elements[5]";
 
   if ($mode == $clist_mode_expert) {
     $display = "style=\"display:none\"";
@@ -1183,7 +1227,7 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Form to add a Criterion
 // Parameters:
-//   - $list[]    : default or transmitted values
+//   - $list[] : default or transmitted values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_add_criterion_form($list) {
   global $cgp_show, $l_list_display, $l_contact_display,$l_add_criterion;
@@ -1200,7 +1244,7 @@ function dis_list_add_criterion_form($list) {
   $fct_q = run_query_global_contactfunction();
   $lag_q = run_query_list_language();
     
-  $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
+  $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"list_add_criteria_line(this,$row_index);window.close();return false;\">";
 
   $block .= html_list_company_criterion($cty_q,$usr_q,$dsr_q);
   $block .= html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q);
@@ -1217,13 +1261,14 @@ function dis_list_add_criterion_form($list) {
   <input type=\"submit\" value=\"$l_add_criterion\"/>
   </p>
   </div>
-";
-  $block.="<input type=\"hidden\" name=\"ext_target\" value=\"$ext_target\" />";
-  $block .= "</form>";
+
+  <input type=\"hidden\" name=\"ext_element\" value=\"$ext_element\" />
+</form>";
+
   if ($row_index != -1) {
     $block .= "
     <script type=\"text/javascript\">
-      get_values(window.document.f_new_criterion);
+      get_list_critria_from_query(window.document.f_new_criterion);
     </script>
 ";
   }
@@ -1243,54 +1288,11 @@ function dis_list_add_criterion_userdata_form($entity) {
   // User data categories handling
   if (is_array($cgp_user["$entity"]["category"])) {
     foreach($cgp_user["$entity"]["category"] as $cat_name => $one_cat) {
-      $cat_code = "${cat_name}_code";
-      $cat_label = "l_$cat_name";
-      global $$cat_label;
-      $cats = of_category_user_get_ordered($cat_name);
-      $sel_cat = "<option value=\"\">$l_all</option>";
-      if (is_array($cats)) {
-	foreach($cats as $one_entry) {
-	  $entry_code = $one_entry["code"];
-	  $entry_label = substr($one_entry["label"],0,30);
-	  $sel_cat .= "
-  <option value=\"$entry_code\">$entry_code $entry_label</option>";
-	}
-      }
-      $dis_cat .= "<p>
-    ${$cat_label} <select readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_$cat_code\">$sel_cat</select>
-     <a href=\"javascript: void(0);\" onclick=\"window.open('../$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_target=f_new_criterion.sel_$cat_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />";
-    }
-  }
-
-  // User data categories handling
-  if (is_array($cgp_user["$entity"]["category"])) {
-    foreach($cgp_user["$entity"]["category"] as $cat_name => $one_cat) {
-      $cat_code = "${cat_name}_code";
-      $cat_label = "l_$cat_name";
       global $$cat_label;
       $cats = array();
-      //      $cats = of_category_user_get_ordered($cat_name);
-      $sel_cat = "";
       $sel_name = "sel_${cat_name}";
-      if (is_array($cats)) {
-	foreach ($cats as $one_cat) {
-	  $c_id = $one_cat["id"];
-	  $c_code = $one_cat["code"];
-	  $c_label = htmlentities($one_cat["label"]);
-	  $div_id = "$sel_name-data-$c_id";
-	  $sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','$sel_name');\">
-          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
-          </a>
-          $c_code $c_label
-          <input value=\"$c_id\" name=\"${sel_name}[]\" type=\"hidden\" />
-          </div>";
-	}
-      }
-      $url_cat = "$path/$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_target=$sel_name";
-      $block_cat .= of_extmod_dis_search_select($cats, "$cat_name", $url_cat);
-
+      $url_cat = "$path/$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_element=$sel_name";
+      $block_cat .= of_select_dis_search_select($cats, "$cat_name", $url_cat, true);
     }
   }
 
@@ -1354,29 +1356,7 @@ function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   if ($dsr_q->nf()!=0)
     $dsr_q->seek(0);
 
-  // User data categories handling
-  if (is_array($cgp_user["company"]["category"])) {
-    foreach($cgp_user["company"]["category"] as $cat_name => $one_cat) {
-      $cat_code = "${cat_name}_code";
-      $cat_label = "l_$cat_name";
-      global $$cat_label;
-      $cats = of_category_user_get_ordered($cat_name);
-      $sel_cat = "<option value=\"\">$l_all</option>";
-      if (is_array($cats)) {
-	foreach($cats as $one_entry) {
-	  $entry_code = $one_entry["code"];
-	  $entry_label = substr($one_entry["label"],0,30);
-	  $sel_cat .= "
-  <option value=\"$entry_code\">$entry_code $entry_label</option>";
-	}
-      }
-      $dis_cat .= "<p>
-    ${$cat_label} <select readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_$cat_code\">$sel_cat</select>
-     <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_category_code&amp;category=$cat_name&amp;popup=1&amp;ext_target=f_new_criterion.sel_$cat_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />";
-    }
-  }
-
+  // Userdata
   $dis_cat = dis_list_add_criterion_userdata_form("company");
 
   $block .= "

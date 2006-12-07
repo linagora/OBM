@@ -2098,7 +2098,7 @@ function dis_deal_dashboard_year_detail($deal) {
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
 
   $url_tt = "$path/admin_ref/admin_ref_index.php?action=tt_ext_get_ids&amp;popup=1&amp;ext_element=sel_tt&amp;tt_target=$ctt_sales";
-  $block_tt = of_extmod_dis_search_select($tts, "tt", $url_tt);
+  $block_tt = of_select_dis_search_select($tts, "tt", $url_tt);
 
   // Table header
   for ($month = 1; $month < 13; $month++) {

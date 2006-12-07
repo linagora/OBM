@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-include("$obminclude/global.inc");
+include("../../obminclude/global.inc");
 
 echo "**** OBM : data migration 1.2 -> 2.0 : DB $obmdb_db ($obmdb_host)\n";
 
@@ -72,18 +72,23 @@ function process_list_list($l_q) {
       $cpt++;
       $criteria = unserialize($structure);
       //      print_r($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
-      foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
-	$new_val = $hash_c1[$value];
-	$criteria["modules"]["contact"]["contactcategory1_id"][] = $new_val;
+      if (is_array($criteria["modules"]["contact"]["contactcategory1link_category_id"])) {
+	foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
+	  $new_val = $hash_c1[$value];
+	  $criteria["modules"]["contact"]["contactcategory1_id"][] = $new_val;
+	}
+	unset($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
       }
 
-      foreach($criteria["modules"]["contact"]["contactcategory2link_category_id"] as $value) {
-	$new_val = $hash_c2[$value];
-	$criteria["modules"]["contact"]["contactcategory2_id"][] = $new_val;
-	$coma = ",";
+      if (is_array($criteria["modules"]["contact"]["contactcategory2link_category_id"])) {
+
+	foreach($criteria["modules"]["contact"]["contactcategory2link_category_id"] as $value) {
+	  $new_val = $hash_c2[$value];
+	  $criteria["modules"]["contact"]["contactcategory2_id"][] = $new_val;
+	  $coma = ",";
+	}
+	unset($criteria["modules"]["contact"]["contactcategory2link_category_id"]);
       }
-      unset($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
-      unset($criteria["modules"]["contact"]["contactcategory2link_category_id"]);
       $list_structure = addslashes(serialize($criteria));
       
       $query = "UPDATE List

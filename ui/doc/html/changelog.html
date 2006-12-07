@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. 2.0 ChangeLog</h1>
-version 2.0.0 - 2006-11-30
+version 2.0.0 - 2006-12-31
 <p>
 </center>
 
@@ -21,7 +21,6 @@ To do
 <UL>
 <LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> how to detect doublons ?
-<li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
 <li> tenir compte contacts prives dans les listes (liste privee =>+ contact prives)!
 </UL>
@@ -36,11 +35,23 @@ To do
 
 - cb_ => cba_: ok company - resourcegroup + admin_ref + import
 
+list : remplacer category_code par category (moulinette)
+list_query : prepare_list_criteria et make_list_query_from_criteria : traiter cas usercategory_equal_code : boucle sur operation sur les valeurs (a,b,c) ?
+list: doc : multi_criteria
+list :  travail sur $operation (gestion multi) partout : andnn, exclusion,...
+list: traiter cat de contact
+- migrer contenu des listes (cat_code, et cat_id=> cat), ajout cat_tree
+list: quand ok, tester upgrade adco/fr (ajout de critere category company) car actuellement sur liste existante, si erreur, affiche dans 1ere ligne
+
 2006-11-30 : version 2.0.0<br>
 
 <ul>
+<li> BUG#610 : Duplicate of #582
 <li> BUG#607 : incident date search are OK
-<li> BUG#122 : event description now preserved on the insert conflict form 
+<li> BUG#586 : Calendar : day links from planning view added
+<li> BUG#582 : Calendar : add rights restrictions to planning view
+<li> BUG#537 : script to migrate document (from 0.9 to 1.0) in bugzilla
+<li> BUG#122 : event description now preserved on the insert conflict form
 <li> Agenda : fixed a warning whith group membership on a new event on PHP5
 <li> Contract : fixed inserting / updating contract type
 <li> Incident : fixed wrong message (and bogus email) when inserting incident
@@ -58,6 +69,8 @@ To do
 <li> Agenda : fixed cases where month view last days events where not displayed
 <li> Import : automatically manage same companies (!= similar)
 <li> Contact : statistics enhancements
+<li> Fixed some SQL error with PostgreSQL (contact, company insertion)
+<li> Change some date handling to allow PHP 5.2 compatibility
 </ul>
 
 2006-09-21 : version 1.2.4<br>

@@ -1,18 +1,19 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : of_extmod.inc                                                //
-//     - Desc : OBM Framework External modules call helpers functions        //
+// OBM - File : of_select.inc                                                //
+//     - Desc : OBM Framework Rich Select helpers functions                  //
 // 2005-10-04 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 
-if ($ext_element != "") {
+if (($ext_element != "")
+    || (true)) {
   $extra_js .= "
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fill the source form with checked values from a result set
+// Fill the of_select from checked checkboxes from a form result set
 // Parameters:
 //   - int_form : source form where to get values (eg: from popup windows)
 //   - entity   : [optionnal] entity to select [default to $module]
@@ -35,7 +36,7 @@ function of_select_fill_from_checkbox(int_form, entity) {
           // Get the label associated to the id from the int_form row
           // hidden in an hidden span
 	  span = get_elem(window.document, sel_id);
-	  of_extmod_add_element('$ext_element', sel_id, span.innerHTML);
+	  of_select_add_element(window.opener.document, '$ext_element', sel_id, span.innerHTML);
         }
       }
     }
@@ -50,13 +51,13 @@ function of_select_fill_from_checkbox(int_form, entity) {
 //   - sel_id       : id to register in the input field value
 //   - fieldLabel   : Label to display
 ///////////////////////////////////////////////////////////////////////////////
-function of_extmod_add_element(element_name, sel_id, fieldLabel) {
-  target = window.opener.document;
-  container = get_elem(target, '$ext_element');
+function of_select_add_element(target, element_name, sel_id, fieldLabel) {
+
+  container = get_elem(target, element_name);
 
   // Create the div row
   row = target.createElement('div');
-  row.id = '$ext_element-'+sel_id;
+  row.id = element_name+sel_id;
   row.className = 'elementRow';
 
   // Create the input field
@@ -64,11 +65,11 @@ function of_extmod_add_element(element_name, sel_id, fieldLabel) {
   field.type = 'hidden';
   field.name = element_name+'[]';
   field.value = sel_id;
+  field.text = fieldLabel;
 
-  // Create the link associated to the div
+  // Create the delete link associated to the div
   link = target.createElement('a');
-  link.href = 'javascript: remove_element(\'$ext_element-'+sel_id+'\',\'$ext_element\');';
-//alert (link.href);
+  link.href = 'javascript: remove_element(\''+element_name+sel_id+'\',\''+element_name+'\');';
   link.onclick = '';
 
   // Create the icon image
@@ -88,30 +89,88 @@ function of_extmod_add_element(element_name, sel_id, fieldLabel) {
   container.appendChild(row);
 } 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Add an element (div with img, name and hidden input) target given
+// Parameters:
+//   - element_name : parent element where to add the div, an input name []
+//   - sel_id       : id to register in the input field value
+//   - fieldLabel   : Label to display
+///////////////////////////////////////////////////////////////////////////////
+function of_select_set_tree(target, element_name, value) {
+
+  checkbox = get_elem(target, element_name+'_tree');
+
+  checkbox.checked = value;
+} 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the of_select element list in an array
+// Returns:
+// el[cb] = checkbox status, el[0]=item0 ([id],[text])
+///////////////////////////////////////////////////////////////////////////////
+function of_select_get_element_array(elementName) {
+
+  target = window.document;
+  cb = target.getElementById(elementName+'_tree');
+
+  el = Array();
+  try {
+    el[cb] = cb.checked;
+  } catch(e) {
+    el[cb] = false;
+  }
+
+  container = target.getElementById(elementName);
+
+  nb_child = 0;
+  while (container.firstChild) {
+    div = container.firstChild;
+    while (div.firstChild) {
+      if (div.firstChild.name == elementName+'[]') {
+        el[nb_child] = new Array();
+        el[nb_child]['id'] = div.firstChild.value;
+        el[nb_child]['text'] = div.firstChild.text;
+        nb_child++;
+      }
+      div.removeChild(div.firstChild);
+    }
+    container.removeChild(container.firstChild);
+  }
+
+  return el;
+} 
+
 ";
 }
 
 
 //=============================================================================
-// OF Extmod API
+// OF Select API
 //=============================================================================
 
 // Display functions ----------------------------------------------------------
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: extmod select block 
+// Display: global select block 
 // Parameters:
 //   - $data_array : data array $data_array[id]=[label]
 //   - $data_name  : data name to construct the fields
 //   - $url        : url to access external select data
+//   - $tree       : display the tree option
 ///////////////////////////////////////////////////////////////////////////////
-function of_extmod_dis_search_select($data_array, $data_name, $url) {
-  global $set_theme, $ico_add, $ico_delete;
+function of_select_dis_search_select($data_array, $data_name, $url, $tree=false) {
+  global $set_theme, $ico_add, $ico_delete, $l_cat_tree;
 
   $l_name = "l_${data_name}"; 
   global $$l_name;
 
-  $sel = _of_extmod_select($data_array, $data_name);
+  $sel = _of_select_select($data_array, $data_name);
+
+  if ($tree) {
+    $dis_tree = "<input type=\"checkbox\" id=\"sel_${data_name}_tree\" name=\"cb_$data_name\" value=\"1\">$l_cat_tree</input>";
+  }
 
   $block = "
     <div class=\"searchLabel\">${$l_name}
@@ -119,13 +178,13 @@ function of_extmod_dis_search_select($data_array, $data_name, $url) {
       onclick=\"window.open('$url','','height=360,width=240,scrollbars=yes');
       return false;\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" /></a>
-      &nbsp;
+      &nbsp;$dis_tree&nbsp;
       <a href=\"javascript: return false;\"
         onclick=\"remove_all_element('sel_${data_name}');
         return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\" alt=\"[Clear]\" /></a>
       <br />
-      <div class=\"elementRow\" id=\"sel_$data_name\">$sel</div>
+      <div class=\"elementRow\" id=\"sel_$data_name\"><div class=\"elementRowEmpty\"></div>$sel</div>
     </div>";
 
   return $block;
@@ -133,7 +192,7 @@ function of_extmod_dis_search_select($data_array, $data_name, $url) {
 
 
 //=============================================================================
-// OF Extmod internal helper API
+// OF Select internal helper API
 //=============================================================================
 
 
@@ -143,7 +202,7 @@ function of_extmod_dis_search_select($data_array, $data_name, $url) {
 //   - $data_array : data array $data_array[id]=[label]
 //   - $data_name  : data name to construct the fields
 ///////////////////////////////////////////////////////////////////////////////
-function _of_extmod_select($data_array, $data_name) {
+function _of_select_select($data_array, $data_name) {
   global $set_theme, $ico_delete;
 
   if (is_array($data_array)) {

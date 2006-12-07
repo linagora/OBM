@@ -15,15 +15,15 @@
         background-color: #ffffff;
         border: 1px solid #009ec6;
         width: 90%;
-	padding : 10px;
+	padding: 10px;
       }
 
 .category {
         background-color: #ffffff;
         width: 100%;
-	padding-left : 0px;
+	padding-left: 0px;
 	margin-left: 0px;
-	border-bottom :		1px dashed #009ec6;	
+	border-bottom:		1px dashed #009ec6;	
  }
 
 .categoryDir {

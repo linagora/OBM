@@ -197,7 +197,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     } elseif ($ext_element != "") {
       $resource_d->data_cb_name = "";
       $resource_d->data_form_head = "
-      <form onsubmit=\"of_extmod_fill_ext_element(this); return false;\">";
+      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\">";
     } else {
       $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
