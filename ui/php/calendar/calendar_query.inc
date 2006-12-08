@@ -919,6 +919,31 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q->query($query);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Event Data Update Execution
+// Parameters: 
+//   - $calendar : Calendar params
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_quick_event_update($calendar) {
+  global $cdg_sql, $uid;
+
+  $now = date("Y-m-d H:i:s");
+  $title = $calendar["title"];
+  $datebegin = $calendar["date_begin"];
+  $event_duration = $calendar["event_duration"];
+  $event_id = $calendar["calendar_id"]; 
+  $obm_q = new DB_OBM;
+  $query = "UPDATE CalendarEvent SET
+    calendarevent_timeupdate = '$now',
+    calendarevent_userupdate = '$uid', 
+    calendarevent_title = '$title', 
+    calendarevent_date = '$datebegin',     
+    calendarevent_duration = '$event_duration'
+  WHERE
+  calendarevent_id = '$event_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_update_event_data()");
+  $obm_q->query($query);  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the event can be deleted

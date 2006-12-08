@@ -248,7 +248,14 @@ if ($action == "index") {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $display["detail"] = dis_calendar_event_form($action, $params, "", $cal_entity_id);
   }
-
+} elseif ($action == "quick_update") {
+///////////////////////////////////////////////////////////////////////////////
+  if (1==1 || check_calendar_data_form($params)) {
+      run_query_calendar_quick_event_update($params, $cal_entity_id, $event_id);
+      $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
+  } else {
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+  }
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_calendar_update_occurence_state($params["calendar_id"],$uid,$params["decision_event"]);
@@ -357,9 +364,11 @@ if ($action == "index") {
 $sess->register("cal_entity_id");
 //echo "<p>";
 //print_r($cal_entity_id);
-$display["head"] = display_head($l_calendar);
-$display["header"] = display_menu($module);
-$display["end"] = display_end();
+if(!$params["ajax"]) {
+  $display["head"] = display_head($l_calendar);
+  $display["header"] = display_menu($module);
+  $display["end"] = display_end();
+}
 display_page($display);
 
 
@@ -637,7 +646,14 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
-					 
+
+  // Update
+  $actions["calendar"]["quick_update"] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=quick_update",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+  );
+
   // Update
   $actions["calendar"]["update_decision"] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=update",

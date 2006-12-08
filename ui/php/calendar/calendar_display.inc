@@ -28,15 +28,15 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") 
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
   $display["features"] = html_calendar_planning_bar($calendar, $calendar_entity, $entity_readable);
-
+  $block = "<div id=\"ajaxMessage\" style=\"height:3em;\"></div>";
   if ($p_view == "year") {
-    $block = dis_calendar_year_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_year_planning($calendar, $calendar_entity);
   } else if ($p_view == "month") {
-    $block = dis_calendar_month_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_month_planning($calendar, $calendar_entity);
   } else if ($p_view == "week") {
-    $block = dis_calendar_week_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_week_planning($calendar, $calendar_entity);
   } else if ($p_view == "day") {
-    $block = dis_calendar_day_planning($calendar, $calendar_entity);
+    $block .= dis_calendar_day_planning($calendar, $calendar_entity);
   }
   $display["print_url"] = "$path/calendar/calendar_index.php?action=view_$p_view&amp;date=".$calendar["date"];
 
@@ -954,6 +954,8 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
     $week_cal
     </tbody>
   </table>
+  <div id='retour'>
+  </div>
   $display_events
   <script type=\"text/javascript\">
     obm.vars.consts.timeUnit = $time_unit_sec;

@@ -54,6 +54,13 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTime: function(time) {
+    if(this.time) {
+      time = new Date(time * 1000);
+      d = new Date(this.time * 1000);
+      time.setHours(d.format('H'));
+      time.setMinutes(d.format('i'));
+      time = time.getTime()/1000;
+    };
     this.time = time;
     origin = (time - obm.calendarManager.startTime) - (time - obm.calendarManager.startTime)%this.options.xUnit;
     this.setOrigin(origin);
@@ -61,7 +68,7 @@ Obm.CalendarDayEvent = new Class({
 
   setDuration: function(duration) {
     this.duration = duration;
-    size = Math.ceil(duration/(24*3600));
+    size = Math.floor(duration/(24*3600)) + 1;
     this.setSize(size);
   },
 
@@ -82,7 +89,7 @@ Obm.CalendarDayEvent = new Class({
     this.origin = origin;
     hr = $(this.options.type+'-'+this.origin);
     if(head) {
-      hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
+       hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
     }
     this.redraw();
     if(obm.calendarManager.lock()) {
@@ -97,7 +104,6 @@ Obm.CalendarDayEvent = new Class({
       'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
     });
-
     this.setWidth(this.size * obm.calendarManager.defaultWidth);
     if(this.options.draggable) {
       this.drag.options.xMin = this.options.context.left;
@@ -206,7 +212,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     hr = $(this.options.type+'-'+this.origin);
     this.element.remove();
     hr.adopt(this.element);
-    this.redraw()
+    this.redraw();
   },
 
   redraw: function() {
@@ -344,29 +350,34 @@ Obm.CalendarManager = new Class({
     diff = event1.id - event2.id;
     if(diff != 0)
       return diff;
-    diff = event1.uid - event2.uid;
+    return event1.uid - event2.uid;
   },
 
 
   moveEventTo: function(id,left,top) {
     evt = this.events.get(id);
-
     xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
     yDelta = Math.floor((top-evt.options.context.top)/this.defaultHeight);
     time = this.startTime + xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
-    this.unregister(id);
-    evt.setTime(time);
-    this.register(id);    
-    this.redrawAllEvents(evt.time);
+    if(evt.time != time) {
+      this.unregister(id);
+      evt.setTime(time);
+      this.register(id);    
+      this.serverStore(id);
+      this.redrawAllEvents(evt.time);
+    }
   },
 
   resizeEventTo: function(id,size) {
     size = Math.round(size/this.defaultHeight);
     evt = this.events.get(id);
-    this.unregister(id);
-    evt.setDuration(size*evt.options.yUnit);
-    this.register(id);   
-    this.redrawAllEvents(evt.time);
+    if(size != evt.size) {
+      this.unregister(id);
+      evt.setDuration(size*evt.options.yUnit);
+      this.register(id);   
+      this.serverStore(id);
+      this.redrawAllEvents(evt.time);
+    }
   },
 
   register: function(id) {
@@ -461,7 +472,20 @@ Obm.CalendarManager = new Class({
       evt = this.events.get(i);
       evt.conflict(resize[i].unit.size,resize[i].position);
     }
-  }
+  },
+  
+  serverStore: function(id) {
+    evt = this.events.get(id);
+    date_begin = new Date(evt.time * 1000);
+    date_end = new Date(evt.time * 1000 + evt.duration * 1000);
+    ajax = new Ajax('calendar_index.php',
+    {postBody:'ajax=true&action=quick_update&calendar_id='+evt.id+'&date_begin='+date_begin.format('Y-m-d H:i:s')+'&date_end='+date_end.format('Y-m-d H:i:s')+'&title='+evt.title, onComplete: this.serverComplete,update:'ajaxMessage',method: 'post'});
+    ajax.request();
+  },
 
+  serverComplete: function() {
+    setTimeout(function () {$('ajaxMessage').innerHTML = ''}, 2000);
+    ;
+  }
 });
 

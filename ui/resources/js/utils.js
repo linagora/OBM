@@ -102,4 +102,33 @@ var Observer = new Class({
     }
     this.options.onChange(this.el, v);
   }
-});    
+});
+
+String.prototype.pad = function(l, s, t){
+    return s || (s = " "), (l -= this.length) > 0 ? (s = new Array(Math.ceil(l / s.length)
+        + 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
+        + this + s.substr(0, l - t) : this;
+};
+
+
+Number.prototype.pad = function(l,s,t) { 
+  return this.toString().pad(l,s,t);
+}
+
+Date.prototype.format = function(pattern) {    
+  if (!this.valueOf())
+    return ;
+  var d = this;
+
+  return pattern.replace(/(Y|m|d|H|i|s)/gi,
+    function($1) {
+      switch ($1.toLowerCase()) {
+      case 'y':   return d.getFullYear();
+      case 'm':   return (d.getMonth() + 1).pad(2,'0');
+      case 'd':   return d.getDate().pad(2,'0');
+      case 'h':   return h = d.getHours().pad(2,'0');
+      case 'i':   return d.getMinutes().pad(2,'0');
+      case 's':   return d.getSeconds().pad(2,'0');
+    }
+  });
+}
