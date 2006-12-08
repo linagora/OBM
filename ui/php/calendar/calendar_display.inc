@@ -709,6 +709,8 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
         $title = $event["event"]->title;
         $duration = $event["event"]->duration;
         $date = $event["date"];
+          if($date > $current_time)
+            continue;
         $id = $event["event"]->id;
         $users = $event["user"];
         $head = date("H:i",$date);
@@ -729,6 +731,8 @@ function dis_calendar_month_planning($calendar, $calendar_entity) {
           $title = $day_event["event"]->title;
           $duration = $day_event["event"]->duration;
           $date = $day_event["date"];
+          if($date > $current_time)
+            continue;
           $id = $day_event["event"]->id;          
           $users = $day_event["user"];
           if(count($event["event"]->attendee["user"]) > 1)
