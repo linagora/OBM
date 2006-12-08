@@ -61,8 +61,8 @@ function run_query_project_search($params) {
   }
 
   if ($date != "") {
-    $where .= " AND project_datebegin < '$date'
-                  AND (project_dateend < '$date' OR project_dateend is null)";
+    $where .= " AND project_datebegin <= '$date'
+                  AND (project_dateend >= '$date' OR project_dateend is null)";
   }
 
   if ($archive != "1") {
