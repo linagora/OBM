@@ -1360,7 +1360,6 @@ function prepare_list_criteria(&$criteria) {
 		$criteria[$module]["${field}_code"][$line] = $new_value;
 		$criteria[$module]["${field}"][$line] = "";
 	      }
-
 	    }
 	  }
 	}
@@ -1495,7 +1494,7 @@ function make_list_query_from_criteria($list) {
            AND $cat_link.categorylink_entity = '$entity'
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
-      $multi_criteria["${cat_name}_code"] = "OR";
+      $field_multi_op["${cat_name}_code"] = "OR";
       // cat_code field equiv to cat for join count
       $field_join_equiv["${cat_name}_code"] = "${cat_name}";
       $cat_nb++;
@@ -1622,14 +1621,14 @@ function make_list_query_from_criteria($list) {
 		  $operation = str_replace('%f',$field,$operation);
 
 		  // handle multi-criteria that need a loop
-		  // eg : multi category by code. c=code or c like code.*
-		  if (isset($multi_criteria[$field])) {
+		  // eg : multi category by code. (c=1 or c like 1.*) OR ...
+		  if (isset($field_multi_op[$field])) {
 		    $op_multi = "";
 		    $values = explode(",", $value);
 		    foreach ($values as $one_value) {
 		      $one_op = str_replace('%v',$one_value,$operation);
 		      if ($op_multi != "") {
-			$op_multi .= " ".$multi_criteria[$field]." $one_op";
+			$op_multi .= " ".$field_multi_op[$field]." $one_op";
 		      } else {
 			$op_multi .= $one_op;
 		      }
@@ -1660,13 +1659,13 @@ function make_list_query_from_criteria($list) {
 
 		  // handle multi-criteria that need a loop
 		  // eg : multi category by code. c=code or c like code.*
-		  if (isset($multi_criteria[$field])) {
+		  if (isset($field_multi_op[$field])) {
 		    $op_multi = "";
 		    $values = explode(",", $value);
 		    foreach ($values as $one_value) {
 		      $one_op = str_replace('%v',$one_value,$operation);
 		      if ($op_multi != "") {
-			$op_multi .= " ".$multi_criteria[$field]." $one_op";
+			$op_multi .= " ".$field_multi_op[$field]." $one_op";
 		      } else {
 			$op_multi .= $one_op;
 		      }
@@ -1726,13 +1725,13 @@ function make_list_query_from_criteria($list) {
 
 		  // handle multi-criteria that need a loop
 		  // eg : multi category by code. c=code or c like code.*
-		  if (isset($multi_criteria[$field])) {
+		  if (isset($field_multi_op[$field])) {
 		    $op_multi = "";
 		    $values = explode(",", $value);
 		    foreach ($values as $one_value) {
 		      $one_op = str_replace('%v',$one_value,$operation);
 		      if ($op_multi != "") {
-			$op_multi .= " ".$multi_criteria[$field]." $one_op";
+			$op_multi .= " ".$field_multi_op[$field]." $one_op";
 		      } else {
 			$op_multi .= $one_op;
 		      }

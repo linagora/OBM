@@ -268,6 +268,21 @@ Une exclusion est une ligne de critères positionnée avec l'opérateur ``Exclude''
 Ces lignes sont traitées de façon spéciale dans la clause WHERE, pour ne pas tenir compte de la chaine d'opérateurs logiques, en les combinant avec un AND à l'ensemble des critères, afin que l'exclusion soit effective peu importe ou est placée la ligne de critères.
 
 
+\subsubsection{Les champs multiples (critères multi-valués)}
+
+Certains critères, comme les catégories permettent un choix multiple.
+Lorsqu'il s'agit d'Id ou de valeurs directes, cela peut être traité par une simple clause WHERE du type ID in (liste d'id).
+
+Pour d'autres cela nécessite une boucle de clauses, comme pour les codes de catégories :
+WHERE (code=1 ou code like '1.*') OR (code=2 ou code like '2.*')...
+
+Pour ce cas, la variable \variable{\$field\_multi\_op[field]} si positionnée indique que le champ ``field'' est multiple nécessitant une boucle de critère et sa valeur indique l'opération logique entre les critères (OR, AND).
+
+\subsubsection{Equivalence de jointure}
+
+
+
+
 \subsection{Interface publique externe}
 
 Le module \List propose des fonctions utilisables par les autres modules pour exporter le contenu d'une liste.

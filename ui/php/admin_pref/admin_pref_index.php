@@ -33,7 +33,12 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
-   include("$obminclude/global_pref.inc"); 
+   // Check that this is not a fake txt attempt from a browser
+   if (isset($_SERVER["SERVER_PROTOCOL"]) && ($_SERVER["SERVER_PROTOCOL"] != "")) {
+     echo "TXT mode can only be used from CLI !!";
+     exit;
+   }
+   include("$obminclude/global_pref.inc");
    $retour = parse_admin_pref_arg($argv);
    if (! $retour) { end; }
    $pref = get_admin_pref_param_pref();

@@ -375,30 +375,28 @@ function html_list_search_form ($list, $usr_q) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\"
+  <form class=\"search\" method=\"get\" name=\"f_search\"
     action=\"".url_prepare("list_index.php")."\">
 
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_name<br />
+    <label>$l_name<br />
       <input type=\"text\" name=\"tf_name\" size=\"16\" value=\"$name\" />
-    </div>
-    <div class=\"searchLabel\">$l_list_contact<br />
+    </label>
+    <label>$l_list_contact<br />
       <input type=\"text\" name=\"tf_contact\" size=\"16\" value=\"$contact\" />
-    </div>
-    <div class=\"searchLabel\">$l_email<br />
+    </label>
+    <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"20\" value=\"$email\" />
-    </div>
-    <div class=\"searchLabel\">$l_market<br />
+    </label>
+    <label>$l_market<br />
       $sel_market
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;

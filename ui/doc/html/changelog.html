@@ -38,7 +38,6 @@ To do
 list : remplacer category_code par category (moulinette)
 list_query : prepare_list_criteria et make_list_query_from_criteria : traiter cas usercategory_equal_code : boucle sur operation sur les valeurs (a,b,c) ?
 list: doc : multi_criteria
-list :  travail sur $operation (gestion multi) partout : andnn, exclusion,...
 list: traiter cat de contact
 - migrer contenu des listes (cat_code, et cat_id=> cat), ajout cat_tree
 list: quand ok, tester upgrade adco/fr (ajout de critere category company) car actuellement sur liste existante, si erreur, affiche dans 1ere ligne
@@ -72,6 +71,7 @@ list: quand ok, tester upgrade adco/fr (ajout de critere category company) car a
 <li> Contact : statistics enhancements
 <li> Fixed some SQL error with PostgreSQL (contact, company insertion)
 <li> Change some date handling to allow PHP 5.2 compatibility
+<li> Security : prevent admin script to being called in txt mode from a browser
 </ul>
 
 2006-09-21 : version 1.2.4<br>
