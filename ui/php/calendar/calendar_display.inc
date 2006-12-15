@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : calendar_display.inc                                           //
-//     - Desc : Calendar Display File                                          //
+// OBM - File : calendar_display.inc                                         //
+//     - Desc : Calendar Display File                                        //
 // 2002-11-26 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //

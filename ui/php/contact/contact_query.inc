@@ -861,24 +861,32 @@ function run_query_contact_delete_subscription($p_id) {
 //   - $fname   : firstname
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_check($cid, $comp_id, $lname, $fname) {
-  global $cdg_sql;
-	
-	$multidomain = sql_multidomain("contact");
+  global $cdg_sql, $cgp_show;
+
+  $multidomain = sql_multidomain("contact");
 	
   $where_id = "";
   if ($cid != "") {
     $where_id = "contact_id!='$cid' AND";
   }
+
+  if ($cgp_show["module"]["company"]) {
+    $join_comp = "LEFT JOIN Company ON contact_company_id=company_id";
+    $where_comp = "OR (contact_company_id='$comp_id' AND contact_lastname='$lname')";
+    $select_comp = ", company_name";
+  }
+
   $query = "SELECT DISTINCT contact_id,
       contact_company_id,
       contact_lastname,
-      contact_firstname,
-      company_name 
+      contact_firstname
+      $select_comp
     FROM Contact
-      LEFT JOIN Company ON contact_company_id=company_id
+      $join_comp
     WHERE $where_id
       ((contact_lastname='$lname' AND contact_firstname='$fname')
-        OR (contact_company_id='$comp_id' AND contact_lastname='$lname')) $multidomain";
+      $where_comp)
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_check()");
   $obm_q = new DB_OBM;

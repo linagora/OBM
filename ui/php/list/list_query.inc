@@ -1365,7 +1365,6 @@ function prepare_list_criteria(&$criteria) {
 	}
       }
     }
-
   }
 
   return $criteria;
@@ -1476,50 +1475,32 @@ function make_list_query_from_criteria($list) {
 
   // User data categories handling
   $cat_nb = 0;
-  if (is_array($cgp_user["company"]["category"])) {
-    $entity = "company";
-    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
-      $cat = "cat${cat_nb}comp%j";
-      $cat_link = "cat${cat_nb}compl%j";
-      $operateurs["$cat_name"] = str_replace('%t',"$cat_link",$usercategory_id_in); 
-      $operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_code_equal); 
-      $add_join["$cat_name"] = " LEFT JOIN CategoryLink $cat_link
+  $entities = array ("company", "contact");
+  foreach ($entities as $entity) {
+    if (is_array($cgp_user[$entity]["category"])) {
+      foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+	$cat = "cat${cat_nb}$entity%j";
+	$cat_link = "cat${cat_nb}${entity}l%j";
+	$operateurs["$cat_name"] = str_replace('%t',"$cat_link",$usercategory_id_in); 
+	$operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_code_equal); 
+	$add_join["$cat_name"] = " LEFT JOIN CategoryLink $cat_link
          ON ${entity}_id = $cat_link.categorylink_entity_id
            AND $cat_link.categorylink_entity = '$entity'
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
-
-      $add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
+	
+	$add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
          ON ${entity}_id = $cat_link.categorylink_entity_id
            AND $cat_link.categorylink_entity = '$entity'
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
-      $field_multi_op["${cat_name}_code"] = "OR";
-      // cat_code field equiv to cat for join count
-      $field_join_equiv["${cat_name}_code"] = "${cat_name}";
-      $cat_nb++;
+	$field_multi_op["${cat_name}_code"] = "OR";
+	// cat_code field equiv to cat for join count
+	$field_join_equiv["${cat_name}_code"] = "${cat_name}";
+	$cat_nb++;
+      }
     }
   }
-
-  if (is_array($cgp_user["contact"]["category"])) {
-    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
-      $cat = "cat${cat_nb}cont%j";
-      $cat_link = "cat${cat_nb}contl%j";
-      $operateurs["${cat_name}_id"] = str_replace('%t',"$cat_link",$usercategory_id_in); 
-      $operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_code_equal); 
-      $add_join["${cat_name}_id"] = " LEFT JOIN CategoryLink $cat_link
-         ON contact_id = $cat_link.categorylink_entity_id
-           AND $cat_link.categorylink_entity = 'contact'
-           AND $cat_link.categorylink_category = '$cat_name'";
-      $add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
-         ON contact_id = $cat_link.categorylink_entity_id
-           AND $cat_link.categorylink_entity = 'contact'
-           AND $cat_link.categorylink_category = '$cat_name'
-       LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
-      $cat_nb++;
-    }
-  }
-
 
   $select = "
         contact_id as id,

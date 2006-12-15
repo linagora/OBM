@@ -280,7 +280,22 @@ Pour ce cas, la variable \variable{\$field\_multi\_op[field]} si positionnée ind
 
 \subsubsection{Equivalence de jointure}
 
+Plusieurs critères lorsqu'ils sont sélectionnés nécessitent d'ajouter une jointure sur une table annexe. Un compteur de jointure est donc établi pour numéroter la table jointe lorsque celle-ci doit être jointe plusieurs fois.
+Le tableau \variable{\$add\_join} permet de déterminer si et quelle jointure est associée à un critère.
 
+Différents critères peuvent nécessiter la même jointure, dans ce cas la variable \variable{\$field\_join\_equiv} permet de faire la correspondance.
+Exemple, pour une catégorie, les critères category et category\_code entrainnent tous deux la jointure de la table CategoryLink.
+On note l'équivalenc de jointure de la forme :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+$field_join_equiv["${cat_name}_code"] = "${cat_name}";
+\end{verbatim}
+\end{minipage}
+}
+
+Et on rend les jointures identiques (on joint aussi la table Category pour le critère Category alors que cela n'était pas nécessaire car la jointure avec la table de liaison suffirait pour le critère id de la catégorie).
 
 
 \subsection{Interface publique externe}

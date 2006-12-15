@@ -398,10 +398,10 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   // Title Block
   if ($show_title) {
     $block_title = "
-    <div class=\"searchLabel\">$l_title<br />
+    <label>$l_title<br />
       <input type=\"text\" name=\"tf_title\" id=\"tf_town\" size=\"16\"
       value=\"$title\" />
-    </div>";
+    </label>";
   }
 
   // Marketing manager select
@@ -418,9 +418,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     $sel_market .= "</select>";
 
     $block_resp = "
-    <div class=\"searchLabel\">$l_market<br />
+    <label>$l_market<br />
       $sel_market
-    </div>";
+    </label>";
   }
 
   // Country select
@@ -450,67 +450,65 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"get\" name=\"f_search\" 
+  <form class=\"search\" method=\"get\" name=\"f_search\" 
   action=\"".url_prepare("contact_index.php")."\">
-  <div class=\"search\">
 
-    <div class=\"searchLabel\">$l_contact_name<br />
+    <label>$l_contact_name<br />
       <input type=\"text\" name=\"tf_lname\" size=\"12\" value=\"$lname\" />
-    </div>
-    <div class=\"searchLabel\">$l_firstname<br />
+    </label>
+    <label>$l_firstname<br />
       <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
-    </div>
-    <div class=\"searchLabel\">$l_phone<br />
+    </label>
+    <label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
-    </div>
-    <div class=\"searchLabel\">$l_email<br />
+    </label>
+    <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
-    </div>
-    <div class=\"searchLabel\">$l_from_company<br />
+    </label>
+    <label>$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
-    </div>
-    <div class=\"searchLabel\">$l_postcode<br />
+    </label>
+    <label>$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
-    </div>
-    <div class=\"searchLabel\">$l_town<br />
+    </label>
+    <label>$l_town<br />
       <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"8\"
       value=\"$town\" />
-    </div>
-    <div class=\"searchLabel\">$l_country<br />
+    </label>
+    <label>$l_country<br />
       $sel_ctry
-    </div>
-    <div class=\"searchLabel\">$l_datasource<br />
+    </label>
+    <label>$l_datasource<br />
       $sel_dsrc
-    </div>
+    </label>
     $block_function
     $block_title
     $block_resp
-    <div class=\"searchLabel\">$l_after<br />
+    <label>$l_after<br />
       <input type=\"text\" name=\"tf_date_after\" class=\"datePicker\" value=\"$dateafter\" />
-    </div>
-    <div class=\"searchLabel\">$l_before<br />
+    </label>
+    <label>$l_before<br />
       <input type=\"text\" name=\"tf_date_before\" class=\"datePicker\" value=\"$datebefore\" />
-    </div>
-    <div class=\"searchLabel\">$l_mailing_ok_only<br />
+    </label>
+    <label>$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
-    </div>
+    </label>
     $block_user
-    <div class=\"searchLabel\">$l_archive<br />
+    <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
-    </div>
-    <div class=\"searchLabel\">$l_fuzzy<br />
+    </label>
+    <label>$l_fuzzy<br />
       <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext &nbsp;
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;

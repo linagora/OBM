@@ -92,7 +92,7 @@ CREATE TABLE UserObm (
   userobm_phone2          varchar(32),
   userobm_fax             varchar(32),
   userobm_fax2            varchar(32),
-  userobm_email           varchar(60),
+  userobm_email           varchar(64),
   userobm_description     varchar(255),
   userobm_location        varchar(255),
   userobm_education       varchar(255),

@@ -28,6 +28,12 @@ process_category_list("ContactCategory3", "contact", $c_q);
 $c_q = get_category_list("ContactCategory4");
 process_category_list("ContactCategory4", "contact", $c_q);
 
+// Mono categories
+$c_q = get_category_list("ContactCategory5");
+process_category_list("ContactCategory5", "contact", $c_q);
+
+$hash_cat_code = get_companycategory1_code_hash();
+
 // Update list criteria (contactcategorylink_category_id => contactcategory_id)
 $l_q = get_list_list();
 process_list_list($l_q);
@@ -53,11 +59,13 @@ function get_list_list() {
 ///////////////////////////////////////////////////////////////////////////////
 // Process the list List (convert criteria)
 // contactcategory1link_category_id -> contactcategory1_id
+// contactcategory2link_category_id -> contactcategory2_id
+// companycategory1_code -> companycategory1
 // Parameters:
 //   - $c_q    : DBO Category List
 ///////////////////////////////////////////////////////////////////////////////
 function process_list_list($l_q) {
-  global $hash_c1, $hash_c2;
+  global $hash_c1, $hash_c2, $hash_cat_code;
 
   $obm_q = new DB_OBM;
   $cpt = 0;
@@ -71,24 +79,38 @@ function process_list_list($l_q) {
     if ($structure != "") {
       $cpt++;
       $criteria = unserialize($structure);
-      //      print_r($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
+      // Convert contactcategory1link_category_id => contactcategory1
       if (is_array($criteria["modules"]["contact"]["contactcategory1link_category_id"])) {
 	foreach($criteria["modules"]["contact"]["contactcategory1link_category_id"] as $value) {
 	  $new_val = $hash_c1[$value];
-	  $criteria["modules"]["contact"]["contactcategory1_id"][] = $new_val;
+	  $criteria["modules"]["contact"]["contactcategory1"][] = $new_val;
+	  $criteria["modules"]["contact"]["contactcategory1_tree"][] = "false";
 	}
 	unset($criteria["modules"]["contact"]["contactcategory1link_category_id"]);
       }
 
+      // Convert contactcategory2link_category_id => contactcategory1
       if (is_array($criteria["modules"]["contact"]["contactcategory2link_category_id"])) {
 
 	foreach($criteria["modules"]["contact"]["contactcategory2link_category_id"] as $value) {
 	  $new_val = $hash_c2[$value];
-	  $criteria["modules"]["contact"]["contactcategory2_id"][] = $new_val;
-	  $coma = ",";
+	  $criteria["modules"]["contact"]["contactcategory2"][] = $new_val;
+	  $criteria["modules"]["contact"]["contactcategory2_tree"][] = "false";
 	}
 	unset($criteria["modules"]["contact"]["contactcategory2link_category_id"]);
       }
+
+      // Convert companycategory1_code => companycategory1
+      if (is_array($criteria["modules"]["company"]["companycategory1_code"])) {
+
+	foreach($criteria["modules"]["company"]["companycategory1_code"] as $value) {
+	  $new_val = $hash_cat_code[$value];
+	  $criteria["modules"]["company"]["companycategory1"][] = $new_val;
+	  $criteria["modules"]["company"]["companycategory1_tree"][] = "true";
+	}
+	unset($criteria["modules"]["company"]["companycategory1_code"]);
+      }
+
       $list_structure = addslashes(serialize($criteria));
       
       $query = "UPDATE List
@@ -123,6 +145,31 @@ function get_category_list($table) {
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the ContactCategory list
+// Parameters:
+//   - $table : category table name
+///////////////////////////////////////////////////////////////////////////////
+function get_companycategory1_code_hash() {
+  global $cdg_sql;
+
+  $hash = array();
+
+  $query = "SELECT category_code, category_id
+    FROM Category
+    WHERE category_category = 'companycategory1'";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f("category_id");
+    $code = $obm_q->f("category_code");
+    $hash[$code] = $id;
+  }
+  return $hash;
 }
 
 

@@ -328,8 +328,10 @@ function get_list_params() {
   if (is_array($cgp_user["contact"]["category"])) {
     foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
       $cat_id = "${cat_name}_id";
-      $cat_code = "${cat_name}_code";
+      $cat_tree = "${cat_name}_tree";
       if (isset ($params[$cat_id])) $params["criteria"]["modules"]["contact"][$cat_id] = $params[$cat_id];
+      if (isset ($params[$cat_name])) $params["criteria"]["modules"]["contact"][$cat_name] = $params[$cat_name];
+      if (isset ($params[$cat_tree])) $params["criteria"]["modules"]["contact"][$cat_tree] = $params[$cat_tree];
     }
   }
 

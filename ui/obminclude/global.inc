@@ -988,14 +988,19 @@ function beautify_comment($com, $p_order="") {
 //   - $p_uid  : user id to check access
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_privacy($module, $table, $action, $id, $p_uid="") {
+function check_privacy($module, $table, $action, $id="", $p_uid="") {
   global $actions, $auth, $cdg_sql;
 
   // If action does not require privacy, grant access
   if (! $actions[$module][$action]["Privacy"]) {
     return true;
   }
- 
+
+  // If id not set, grant access
+  if ($id == "") {
+    return true;
+  }
+
   // Set uid if not given
   if ($p_uid == "") {
     $uid = $auth->auth["uid"];

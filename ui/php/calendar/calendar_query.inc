@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : calendar_query.inc                                             //
-//     - Desc : Calendar query File                                            //
+// OBM - File : calendar_query.inc                                           //
+//     - Desc : Calendar query File                                          //
 // 2001-06-27 : Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -1837,8 +1837,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity) {
       calendarevent_title,
       calendarevent_privacy,
       calendarevent_description,
-      calendarevent_repeatfrequence,
       calendarevent_location,
+      calendarevent_repeatfrequence,
       evententity_entity_id,
       evententity_entity,
       calendarcategory1_label,

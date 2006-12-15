@@ -440,35 +440,36 @@ function list_add_contact_criteria_line(form,labels,values,i) {
 // User data categories handling
 if (is_array($cgp_user["contact"]["category"])) {
   foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
-    $cat_id = "${cat_name}_id";
     $cat_label = ${"l_$cat_name"};
 
     $extra_js .= "
-
-  if (form.sel_$cat_id.value != '') {
+  el = of_select_get_element_array('sel_$cat_name');
+  nb_el = el.length;
+  el_title = '';
+  el_id = '';
+  cb_value = el[cb];
+  if (nb_el > 0) {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $cat_label';
     cell = values.insertCell(i);
-    field = form.sel_$cat_id;
-    len = field.options.length;
-    val = '';
-    txt = '';
-    size = 0;
-    for(h = 0; h < len;h++) {
-      if(field.options[h].selected == true) {
-        if(val != '') {
-          val += ',';
-          txt += ',';
-        }
-        val +=field.options[h].value;
-        txt +=field.options[h].text;
-        size+=1;
+    // display the 1st value as selected
+    id = el[0]['id'];
+    label = el[0]['text'];
+    // Construct the title and id with all the selection as coma sep values
+    for (cp=0; cp < nb_el; cp++) {
+      if ((el_title != '') || (el_id != '')) {
+        el_title += ', ';
+        el_id += ',';
       }
+      el_id += el[cp]['id'];
+      el_title += el[cp]['text'];
     }
-    cell.innerHTML = '<select title=\"'+txt+'\" name=\"sel_${cat_id}[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ val+'\">'+ field.options[field.selectedIndex].text+'('+size+')</option></select>';
+    // add firstchild : cb input, lastchild : select
+    cell.innerHTML = '<input type=\"text\" name=\"sel_${cat_name}_tree[]\" value=\"'+cb_value+'\"><select title=\"'+el_title+'\" name=\"sel_${cat_name}[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ el_id +'\">'+ label +'('+ nb_el +')</option></select>';
     i++;
+
   } else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_${cat_id}[]\" value=\"\" />';
+    defaultCell.innerHTML += '<input type=\"hidden\" name=\"sel_${cat_name}_tree[]\" value=\"\"><input type=\"hidden\" name=\"sel_${cat_name}[]\" value=\"\" />';
   }
 ";
   }

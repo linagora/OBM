@@ -382,64 +382,61 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\"
-  action=\"$url\">
+  <form class=\"search\" method=\"get\" name=\"f_search\" action=\"$url\">
   <div class=\"detailHead\">$l_deal</div>
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_label_start<br />
+    <label>$l_label_start<br />
       <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
-    </div>
-    <div class=\"searchLabel\">$l_company<br />
+    </label>
+    <label>$l_company<br />
       <input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" />
-    </div>
-    <div class=\"searchLabel\">$l_postcode<br />
+    </label>
+    <label>$l_postcode<br />
       <input name=\"tf_zip\" size=\"14\" value=\"$zip\" />
-    </div>
-    <div class=\"searchLabel\">$l_date<br />
+    </label>
+    <label>$l_date<br />
       <select name=\"sel_date_field\">
         <option value=\"datealarm\" $s_date_field[datealarm]>$l_alarm</option>
         <option value=\"datebegin\" $s_date_field[datebegin]>$l_begin</option>
         <option value=\"dateexpected\" $s_date_field[dateexpected]>$l_expected</option>
         <option value=\"dateend\" $s_date_field[dateend]>$l_end</option>
       </select>
-    </div>
-    <div class=\"searchLabel\">$l_after<br />
+    </label>
+    <label>$l_after<br />
       <script>calendar('tf_date_after','$date_after')</script>
-    </div>
-    <div class=\"searchLabel\">$l_before<br />
+    </label>
+    <label>$l_before<br />
       <script>calendar('tf_date_before','$datebefore')</script>
-    </div>
-    <div class=\"searchLabel\">$l_kind<br />
+    </label>
+    <label>$l_kind<br />
       $sel_kind
-    </div>
-    <div class=\"searchLabel\">$l_tt<br />
+    </label>
+    <label>$l_tt<br />
       $sel_tt
-    </div>
+    </label>
     $block_region 
     $block_category1 
     $block_role 
-    <div class=\"searchLabel\">$l_relation<br />
+    <label>$l_relation<br />
       <input name=\"tf_role_company\" size=\"12\" value=\"$role_company\" />
-    </div>
-    <div class=\"searchLabel\">$l_status<br />
+    </label>
+    <label>$l_status<br />
       $sel_status
-    </div>
-    <div class=\"searchLabel\">$l_manager<br />
+    </label>
+    <label>$l_manager<br />
       $sel_manager
-    </div>
-    <div class=\"searchLabel\">$l_show_archive<br />
+    </label>
+    <label>$l_show_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
-    </div>
-    <div class=\"searchButton\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"parentdeal_id\" type=\"hidden\" value=\"$parent\" />
       <input name=\"company_id\" type=\"hidden\" value=\"$company_id\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;

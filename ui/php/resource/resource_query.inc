@@ -259,24 +259,23 @@ function run_query_resource_update($p_id, $resource) {
 function run_query_resource_delete($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("resource");
-
-  $query = "DELETE FROM Resource WHERE resource_id='$p_id' $multidomain";
-
-  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(1)");
   $obm_q = new DB_OBM;
+
+  // Delete ResourceGroup
+  $query = "DELETE FROM ResourceGroup 
+    WHERE
+      resourcegroup_resource_id='$p_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(resourcegroup)");
   $retour = $obm_q->query($query);
-  if (!$retour) return $retour;
 
   // Delete Resource rights
   $multidomain = sql_multidomain("entityright");
   $query = "DELETE FROM EntityRight 
     WHERE
       entityright_entity_id='$p_id'
-      AND entityright_entity = 'resource' $multidomain";
-
-  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(2)");
-  $obm_q = new DB_OBM;
+      AND entityright_entity = 'resource'
+      $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(entityright)");
   $retour = $obm_q->query($query);
 
   // Delete Resource events
@@ -284,11 +283,18 @@ function run_query_resource_delete($p_id) {
   $query = "DELETE FROM EventEntity 
     WHERE
       evententity_entity_id='$p_id'
-      AND evententity_entity = 'resource' $multidomain";
-
-  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(3)");
-  $obm_q = new DB_OBM;
+      AND evententity_entity = 'resource'
+      $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(resource event)");
   $retour = $obm_q->query($query);
+
+  // Delete the resource
+  $multidomain = sql_multidomain("resource");
+  $query = "DELETE FROM Resource WHERE resource_id='$p_id' $multidomain";
+  display_debug_msg($query, $cdg_sql, "run_query_resource_delete(resource)");
+  $retour = $obm_q->query($query);
+
+  if (!$retour) return $retour;
 
   return $retour;
 }

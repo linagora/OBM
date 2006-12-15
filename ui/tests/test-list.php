@@ -19,6 +19,7 @@ $path = "../php";
 $obminclude = "../obminclude";
 include("../obminclude/global.inc");
 include("global_test.inc");
+include("../obminclude/of/of_category.inc");
 require("$path/list/list_query.inc");
 
 $params = parse_arg($argv);

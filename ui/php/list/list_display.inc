@@ -539,8 +539,7 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   if ($cgp_show["module"]["publication"]) {
     $dis_pub = "
     <tr>
-      <td class=\"detailLabel\">$l_info_pub</td>
-      <td class=\"detailText\">$dis_info_pub</td>
+      <th>$l_info_pub</th><td>$dis_info_pub</td>
     </tr>";
   }
 
@@ -600,38 +599,34 @@ function html_list_consult($list_q, $prefs_con, $con_q) {
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   $block = "
-    <div class=\"detailHead\">$l_list</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_mailing</td>
-      <td class=\"detailText\">$dis_mailing</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_contact_archive</td>
-      <td class=\"detailText\">$dis_con_arch</td>
-    </tr>
+<div class=\"detail infos\">
+  <h1>$l_list</h1>
+  <table>
+  <tr>
+    <th>$l_name</th><td>$name</td>
+  </tr><tr>
+    <th>$l_mailing</th><td>$dis_mailing</td>
+  </tr><tr>
+    <th>$l_contact_archive</th><td>$dis_con_arch</td>
+  </tr>
     $dis_pub
-    <tr>
-      <td class=\"detailLabel\">$l_subject</td>
-      <td class=\"detailText\">$subject</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">$email</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_query</td>
-      <td class=\"detailText\">$lmode</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\"># $l_contact : $l_static / $l_query</td>
-      <td class=\"detailText\">$static_nb / $con_query_nb</td>
-    </tr>
-      <td class=\"detailLabel\"># $l_company : $l_static / $l_query</td>
-      <td class=\"detailText\">$comp_static_nb / $comp_query_nb</td>
-    </tr>
+  <tr>
+    <th>$l_subject</th><td>$subject</td>
+  </tr><tr>
+    <th>$l_email</th><td>$email</td>
+  </tr><tr>
+    <th>$l_query</th><td>$lmode</td>
+  </tr>
+  <tr>
+    <th># $l_contact : $l_static / $l_query</th>
+    <td>$static_nb / $con_query_nb</td>
+  </tr>
+    <th># $l_company : $l_static / $l_query</td>
+    <td>$comp_static_nb / $comp_query_nb</td>
+  </tr>
     $dis_query
-    </table>";
+  </table>
+</div>";
 
   // Static Contacts
   $nb_con = $con_q->num_rows_total();
@@ -967,19 +962,17 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
       $field_kind[$cat_id] = "of_sel";
       $cat_label = "l_$cat_name";
       global $$cat_label;
-      $fields_label[$cat_id] = "$l_company id: ${$cat_label}";
+      $fields_label[$cat_id] = "$l_company : ${$cat_label}";
     }
   }
   if (is_array($cgp_user["contact"]["category"])) {
     foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
-      $cat_id = "${cat_name}_id";
-      $cat_code = "${cat_name}_code";
-      $field_kind[$cat_id] = "sel";
-      $field_kind[$cat_code] = "sel";
+      $cat_id = "${cat_name}";
+      $cat_tree = "${cat_name}_tree";
+      $field_kind[$cat_id] = "of_sel";
       $cat_label = "l_$cat_name";
       global $$cat_label;
-      $fields_label[$cat_id] = "$l_contact id: ${$cat_label}";
-      $fields_label[$cat_code] = "$l_contact: ${$cat_label}";
+      $fields_label[$cat_id] = "$l_contact : ${$cat_label}";
     }
   }
 
@@ -1043,13 +1036,12 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
     }
     if (is_array($cgp_user["contact"]["category"])) {
       foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
-	$cat_id = "${cat_name}_id";
-	$cat_code = "${cat_name}_code";
+	$cat_id = "${cat_name}";
+	$cat_tree = "${cat_name}_tree";
         $cats = of_category_user_get_ordered($cat_name);
 	$field_data[$cat_id] = array("", "", "", $cats, "id");
       }
     }
-
 
     foreach($criteria as $module) {
       foreach($module as $field => $criterion) {
@@ -1140,12 +1132,13 @@ function html_list_normal_criteria_form($action, $list_q, $list) {
 	      // We add the cb input first
 	      $input = "<input type=\"text\" name=\"sel_".$field."_tree[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"".$module["${field}_tree"][$line]."\" />";
 	      $input .= "<select title=\"$txt\" name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\">$option</select>";
-
 	    }
 
-	    $structure[$line] .= "<td>$input</td>";
-	    $labels[$line] .= "<td>".$fields_label[$field]."</td>";
-
+	    // Exclude fields that have no value (eg: category_tree)
+	    if ($input != "") {
+	      $structure[$line] .= "<td>$input</td>";
+	      $labels[$line] .= "<td>".$fields_label[$field]."</td>";
+	    }
 	  } else {
 	    // No value (no data), we display hidden input
 
@@ -1332,7 +1325,7 @@ function dis_list_add_criterion_userdata_form($entity) {
 function html_list_company_criterion($cty_q,$usr_q,$dsr_q) {
   global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
   global $l_all,$l_market,$l_datasource;
-  global $cgp_user,$set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
+  global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while ($cty_q->next_record()) {
@@ -1411,7 +1404,7 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
   global $l_function,$l_lang;
   global $l_yes,$l_no;
-  global $cgp_user,$set_theme,$ico_mini_cal;  
+  global $set_theme,$ico_mini_cal;  
 
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while ($cty_q->next_record()) {
@@ -1455,28 +1448,8 @@ function html_list_contact_criterion($cty_q,$usr_q,$dsr_q,$fct_q,$lag_q) {
     $lag_q->seek(0);
   }
 
-  // User data categories handling
-  if (is_array($cgp_user["contact"]["category"])) {
-    foreach($cgp_user["contact"]["category"] as $cat_name => $one_cat) {
-      $cat_id = "${cat_name}_id";
-      $cat_code = "${cat_name}_code";
-      $cat_label = "l_$cat_name";
-      global $$cat_label;
-      $cats = of_category_user_get_ordered($cat_name);
-      $sel_cat = "<option value=\"\">$l_all</option>";
-      if (is_array($cats)) {
-	foreach($cats as $one_entry) {
-	  $entry_id = $one_entry["id"];
-	  $entry_code = $one_entry["code"];
-	  $entry_label = substr($one_entry["label"],0,30);
-	  $sel_cat .= "
-  <option value=\"$entry_id\">$entry_code $entry_label</option>";
-	}
-      }
-      $dis_cat .= "<p>
-    ${$cat_label}<br/><select multiple=\"multiple\" size=\"5\" name=\"sel_$cat_id\">$sel_cat</select>";
-    }
-  }
+  // Userdata
+  $dis_cat = dis_list_add_criterion_userdata_form("contact");
  
   $block = "
   <div class=\"detailHead\">$l_contact</div>

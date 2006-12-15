@@ -22,8 +22,8 @@ function run_query_contract_search($contract) {
 
   $label = sql_search_text_parse($contract["label"]);
   $type = $contract["type"];
-  $dateafter = $contract["dateafter"];
-  $datebefore = $contract["datebefore"];
+  $dateafter = $contract["date_after"];
+  $datebefore = $contract["date_before"];
   $comp = sql_search_text_parse($contract["company"]);
   $num = sql_search_text_parse($contract["number"]);
   $manager = $contract["manager"];
@@ -688,18 +688,18 @@ function run_query_contract_status_insert($contract) {
   $usercreate = $auth->auth["uid"];
   $label = $contract["label"];
   $code = $contract["code"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO ContractStatus (
     contractstatus_timecreate,
     contractstatus_usercreate,
-		contractstatus_domain_id,
+    contractstatus_domain_id,
     contractstatus_label,
     contractstatus_code)
-	values (
+  values (
     '$timecreate',
     '$usercreate',
-		'$domain_id',
+    '$domain_id',
     '$label',
     '$code')";
 
@@ -1073,7 +1073,7 @@ function get_contract_type_label($id) {
 function get_contract_info($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contract");
+  $multidomain = sql_multidomain("contract");
 
   $query = "SELECT
       contract_id,
@@ -1118,7 +1118,6 @@ function run_query_contract_id($contract) {
   $duration = $contract["duration"];
   $autorenewal =$contract["autorenewal"];
   $sel_type = $contract["type"];
-  $com = $contract["comment"];
   $multidomain = sql_multidomain("contract");
 	
   // comment not searched because processed before stored in db
@@ -1129,7 +1128,6 @@ function run_query_contract_id($contract) {
       and contract_label = '$label'
       and contract_datebegin ='$datebegin'
       and contract_dateexp = '$dateexp'
-      and contract_comment = '$com'
       and contract_clause = '$clause'
       and contract_company_id = '$comp_id'
       and contract_priority_id = '$priority'
