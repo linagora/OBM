@@ -113,7 +113,7 @@ function html_resourcegroup_search_form ($group) {
     if ($ext_title == "") {
       $ext_title = $l_add_resourcegroup;
     }
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -127,27 +127,25 @@ function html_resourcegroup_search_form ($group) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("resourcegroup_index.php")."\">
-  <div class=\"search\">
+  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("resourcegroup_index.php")."\" class=\"search\">
 
-    <div class=\"searchLabel\">$l_name<br />
+    <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"16\" value=\"$name\" />
-    </div>
-    <div class=\"searchLabel\">$l_resourcegroup_resource<br />
+    </label>
+    <label>$l_resourcegroup_resource<br />
       <input name=\"tf_resource\" size=\"16\" maxlength=\"16\" value=\"$resource\" />
-    </div>
-    <div class=\"searchLabel\">$l_visibility<br />
+    </label>
+    <label>$l_visibility<br />
       $sel_privacy
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $child_res
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -235,14 +233,12 @@ function html_resourcegroup_search_resourcegroup($obm_q, $pref_q, $group) {
     }
     $dis_group->data_form_head = "<form $form_attr>";
     $dis_group->data_form_end = "
-    <p class=\"detailButton\">
-    <p class=\"detailButtons\">
+    <fieldset class=\"buttons\">
       <input type=\"submit\" value=\"$l_add\" />
       <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
       $input_target
-    </p>
-    </p>
+    </fieldset>
     </form>";
     $display_popup_end = "
     <p><a href=\"\" onclick='window.close();'>$l_close</a></p>";
@@ -300,39 +296,37 @@ function html_resourcegroup_form($action, $group_q, $group) {
     }
     $dis_private = "
   <tr>
-    <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />
+    <th>$l_private</th>
+    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>";
   } 
 
   $block = "<center>
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">
+ <fieldset class=\"detail extra\">
+  <legend>$l_resourcegroup</legend>
 
-  <div class=\"detailHead\">$l_resourcegroup</div>
-
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailForm\">
-      <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
+    <th>$l_name</th>
+    <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
   <tr>
-    <td class=\"detailLabel\">$l_desc</td>
-    <td class=\"detailForm\">
-      <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
+    <th>$l_desc</th>
+    <td><input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
 <!--      
   </tr><tr>
-    <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\">
-      <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
+    <th>$l_email</th>
+    <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
   </tr><tr>
-    <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
+    <th>$l_private</th>
+    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
 -->    
   </tr>
-  </table>";
+  </table>
+  </fieldset>";
 
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -346,11 +340,9 @@ function html_resourcegroup_form($action, $group_q, $group) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  $block .= "<fieldset class=\"buttons\">
     $dis_but
-    </p>
-    </div>
+    </fieldset>
     </form>";
 
   return $block;
@@ -410,20 +402,22 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   $desc = $group_q->f("rgroup_desc");
 
   $display["detailInfo"] = display_record_info($group_q);
-  $display["title"] = "<div class=\"title\">$l_resourcegroup : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_resourcegroup : $name</h1>";
 
   $block = "
-    <div class=\"detailHead\">$l_resourcegroup</div>
+  <div class=\"detail infos\">
+    <h1>$l_resourcegroup</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailText\">$desc</td>
+      <th>$l_desc</th>
+      <td>$desc</td>
     </tr>
-    </table>";
+    </table>
+    </div>";
 
   // registered Resources display
   $nb_r = $r_q->num_rows();
@@ -454,13 +448,12 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
 
     if ($perm->check_right($module, $cright_write)) {
       $block .= "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_resource_sel\" />
         <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"resource_del\" />
-        </p>
-      </p>
+      
+      </div>
       </form>";
     }
   }
@@ -483,7 +476,7 @@ function dis_resourcegroup_display_pref($pref_group_q, $pref_r_q) {
   $dis_pref->pref_dis_help = 0;
 
   $block = "
-    <table class=\"detail\">
+    <table>
     <tr>
       <td>" . $dis_pref->display() . "</td>";
 
@@ -521,28 +514,26 @@ function dis_resourcegroup_warn_delete($id) {
     $display["msg"] .= display_warn_msg("$nb_r $l_warn_delete");
 
     $dis_delete = "
-    <p class=\"detailButtons\">
       <form method=\"get\" name=\"form_delete\"
       action=\"" .url_prepare("resourcegroup_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
       <input type=\"hidden\" name=\"hd_resourcegroup_id\" value=\"$id\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
       </form>
-    </p>";
+    ";
   }
 
   $dis_back = "
-    <p class=\"detailButtons\">
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("resourcegroup_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
       <input type=\"hidden\" name=\"resourcegroup_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
-    </p>";
+    ";
 
   $block = "
-  <div class=\"detailButton\">
+  <div class=\"buttons\">
     $dis_delete
     $dis_back
   </div>";
@@ -573,17 +564,16 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
     $samename = $g_q->f("rgroup_name");
     $samedesc = $g_q->f("rgroup_desc");
     $dis_same_group .= "
-      <tr><td class=\"detailLabel\">
+      <tr><th>
         <a href=\"" .url_prepare("resourcegroup_index.php?action=detailconsult&amp;resourcegroup_id=$id") . "\">$samename ($samedesc)</a>
-      </td></tr>";
+      </th></tr>";
   }
 
   $block = "
-  <table class=\"detail\">
+  <table>
     $dis_same_group
   </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  <div class=\"buttons\">
       <form method=\"post\" name=\"form_insert\"
       action=\"" .url_prepare("resourcegroup_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -592,8 +582,6 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
       <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
       </form>
-    </p>
-    <p class=\"detailButtons\">
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("resourcegroup_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"new\" />
@@ -601,7 +589,6 @@ function dis_resourcegroup_warn_insert($id, $g_q, $group) {
       <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
-    </p>
   </div>";
 
   return $block;

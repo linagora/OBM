@@ -126,40 +126,37 @@ function html_lead_search_form($params, $sources, $managers) {
   $sel_manager .= "</select>";
 
   $block = "
-    <form method=\"get\" name=\"f_search\" action=\"lead_index.php?action=search\">
-     <div class=\"search\">
+    <form method=\"get\" name=\"f_search\" action=\"lead_index.php?action=search\" class=\"search\">
 
-      <div class=\"searchLabel\">$l_text<br />
+      <label>$l_text<br />
        <input name=\"tf_text\" size=\"24\" value=\"$text\">
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_company<br />
+      <label>$l_company<br />
        <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_date $l_after<br />
-        <script>calendar('tf_date_after','$date_after')</script>
-      </div>
+      <label>$l_date $l_after<br />
+        <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+      </label>
 
-      <div class=\"searchLabel\">$l_date $l_before<br />
-        <script>calendar('tf_date_before','$date_before')</script>
-      </div>
+      <label>$l_date $l_before<br />
+         <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+      </label>
 
-      <div class=\"searchLabel\">$l_source<br />
+      <label>$l_source<br />
        $sel_source
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_manager<br />
+      <label>$l_manager<br />
        $sel_manager
-      </div>
+      </label>
 
-      <div class=\"searchLabel\"><br />
+      <label><br />
        <input type=\"hidden\" name=\"action\" value=\"search\">
        <input type=\"submit\" name=\"submit\" value=\"$l_find\">  
-      </div>
-
-      <div class=\"searchEnd\"></div>
-     </div>
+      </label>
+    <p class=\"CL\" />
     </form>
 ";
 
@@ -299,50 +296,50 @@ function html_lead_consult($l_q) {
   $display["title"] = "<div class=\"title\">$l_lead : $date $c_name</div>";
 
   $block = "
-<div class=\"detailHead\">$title</div>
-
-  <div class=\"detailHead\">$l_lead</div>
+<h1>$title</h1>
+<div class=\"detail infos\"> 
+  <h1>$l_lead</h1>
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_company 
+      <th>$l_company 
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
-      </td>
-      <td class=\"detailText\">$c_name<br />$ad1<br/>$zip $town</td>
+      </th>
+      <td>$c_name<br />$ad1<br/>$zip $town</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_source</td>
-      <td class=\"detailText\">$source_label</td>
+      <th>$l_source</th>
+      <td>$source_label</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_manager</td>
-      <td class=\"detailText\">$manager</td>
+      <th>$l_manager</th>
+      <td>$manager</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
+      <th>$l_date</th>
+      <td>$date</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_alarm</td>
-      <td class=\"detailText\">$datealarm</td>
+      <th>$l_alarm</th>
+      <td>$datealarm</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_todo</td>
-      <td class=\"detailText\">$todo</td>
+      <th>$l_todo</th>
+      <td>$todo</td>
     </tr>
     </table>
+</div>
 
-  <div class=\"detailHead\">$l_comment</div>
+<div class=\"detail extra\">
 
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailText\">$comment</td>
-    </tr>
-   </table>
+  <h1>$l_comment</h1>
+
+   $comment
+</div>
 ";
 
   return $block;
@@ -493,10 +490,10 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
       <tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
+        <th>$l_upd_comment</th>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
       </tr>";
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
@@ -516,65 +513,61 @@ function html_lead_form($action, $l_q, $sources, $managers, $params) {
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_lead(this)) return true; else return false;\" action=\"".url_prepare("lead_index.php")."\">
 
-    <div class=\"detailHead\">$l_lead</div>
-
-    <table class=\"detail\">
+<fieldset class=\"detail infos\">
+    <legend>$l_lead</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailForm\">$dis_company</td>
+      <th>$l_company</th>
+      <td>$dis_company</td>
     </tr>
     $block_source
     <tr>
-      <td class=\"detailLabel\">$l_manager</td>
-      <td class=\"detailForm\">$sel_manager</td>
+      <th>$l_manager</th>
+      <td>$sel_manager</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"32\" maxlength=\"64\" value=\"$name\" /></td>
+      <th>$l_name</th>
+      <td><input type=\"text\" name=\"tf_name\" size=\"32\" maxlength=\"64\" value=\"$name\" /></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailForm\">
-        <script>calendar('tf_date','$date')</script>
+      <th>$l_date</th>
+     <td>
+       <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
+     </td>
+    </tr>
+    <tr>
+      <th>$l_alarm</th>
+      <td>
+       <input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/>
       </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_alarm</td>
-      <td class=\"detailForm\">
-        <script>calendar('tf_datealarm','$datealarm')</script>
-      </td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_todo</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"32\" maxlength=\"128\" value=\"$todo\" /></td>
+      <th>$l_todo</th>
+      <td><input type=\"text\" name=\"tf_todo\" size=\"32\" maxlength=\"128\" value=\"$todo\" /></td>
     </tr>
     </table>
+</fieldset>
 
-  <div class=\"detailHead\">$l_comment</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\">
-        <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_mail_comment</td>
-      <td class=\"detailForm\">
+<fieldset class=\"detail extra\">
+  <legend>$l_comment</legend>
+      $l_add_comment
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+      $sel_usercomment
+      $l_mail_comment
+      
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-      </td>
-    </tr>
-    <tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-    </tr>
+      
+   <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
     $dis_comment
-    </table>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
-    </form>";
+
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
+    </form>
+</fieldset>";
 
   return $block;
 }
@@ -604,9 +597,9 @@ function dis_can_delete_lead($p_id) {
 
   $display["msg"] .= display_ok_msg($l_can_delete);
   $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_delete</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_delete
+        $dis_back
       </div>";
 
   return $block;
@@ -620,7 +613,6 @@ function dis_lead_admin_index() {
   global $cgp_hide;
 
   $sources = of_category_get_ordered("lead", "source");
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("source", $sources);
 
   return $block;

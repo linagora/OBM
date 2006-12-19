@@ -87,43 +87,41 @@ function html_resource_search_form($resource) {
     if ($ext_title == "") {
       $ext_title = $l_add_resources;
     }
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   $block = "
   <form method=\"get\" name=\"f_search\"
-    action=\"". url_prepare("resource_index.php")."\">
+    action=\"". url_prepare("resource_index.php")."\" class=\"search\">
 
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_name<br />
+    <label>$l_name<br />
       <input type=\"text\" name=\"tf_name\" size=\"30\" maxlength=\"120\"
       value=\"$lname\" />
-    </div>
-    <div class=\"searchLabel\">$l_desc<br />
+    </label>
+    <label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
       value=\"$ldesc\" />
-    </div>
-    <div class=\"searchLabel\">&nbsp;&nbsp;<br />
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input type=\"text\" name=\"tf_qtyinf\" size=\"4\" maxlength=\"8\" value=\"$qtyinf\" /> 
-    </div>
-    <div class=\"searchLabel\"><br />
+    </label>
+    <label><br />
       &nbsp;&lt;=&nbsp;$l_qty&nbsp;&lt;=&nbsp; 
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input type=\"text\" name=\"tf_qtysup\" size=\"4\" maxlength=\"8\" value=\"$qtysup\" /> 
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\">
       <input name=\"submit\" type=\"submit\" value=\"$l_find\">
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_restriction
       $ext&nbsp;
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
-  </form>";
+    </label>
+    <p class=\"CL\" />
+    </form>";
 
   return $block;
 }
@@ -203,13 +201,11 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
     $resource_d->data_form_end = "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </p>
-      </p>
+      </fieldset>
       </form>";
 
     $display_popup_end = "
@@ -270,25 +266,25 @@ function html_resource_form($usr_q, $resource) {
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_resource(this)) return true; else return false;\"
       action=\"" . url_prepare("resource_index.php") . "\">
+<fieldset class=\"detail infos\">
+    <legend>$l_resource</legend>
 
-    <div class=\"detailHead\">$l_resource</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"120\" value=\"$name\" /></td>
+      <th>$l_name</th>
+      <td><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"120\" value=\"$name\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_qty</td>
-      <td class=\"detailForm\"><input id=\"tf_qty\" name=\"tf_qty\" size=\"4\" maxlength=\"8\" value=\"$qty\" /></td>
+      <th>$l_qty</th>
+      <td><input id=\"tf_qty\" name=\"tf_qty\" size=\"4\" maxlength=\"8\" value=\"$qty\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailForm\"><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea></td>
+      <th>$l_desc</th>
+      <td><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea></td>
     </tr>
     </table>
-
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+</fieldset>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -334,24 +330,26 @@ function html_resource_consult($obm_q) {
   $desc = $obm_q->f("resource_description");
   $qty = $obm_q->f("resource_qty");
 
-  $display["detailInfo"] = display_record_info($obm_q);
+  $display["deta"] = display_record_info($obm_q);
   $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
 
   $block = "
-  <div class=\"detailHead\">$l_resource</div>
+  <div class=\"detail infos\">
+  <h1>$l_resource</h1>
  
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_qty</td>
-      <td class=\"detailText\">$qty</td>
+      <th>$l_qty</th>
+      <td>$qty</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailText\">$desc</td>
+      <th>$l_desc</th>
+      <td>$desc</td>
     </tr>
     </table>
+    </div>
 ";
 
   return $block;
@@ -382,9 +380,9 @@ function dis_resource_can_delete($p_id) {
 
   $display["msg"] .= display_ok_msg($l_can_delete);
   $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_delete</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_delete
+        $dis_back
       </div>";
 
   return $block;
@@ -401,7 +399,7 @@ function dis_resource_right_dis_admin($id) {
 
   $infos = get_resource_infos($id);
   $name = $infos["name"];
-  $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
+  $display["title"] = "<h1>$l_resource : $name</h1>";
   $block = of_right_dis_admin("resource", $id);
 
   return $block;

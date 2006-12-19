@@ -65,20 +65,20 @@ function html_publication_search_form ($type_q,$publication) {
 
   if (!$popup) {
     $dis_title = "
-    <div class=\"searchLabel\">$l_publication_title<br />
+    <label>$l_publication_title<br />
       <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"24\" value=\"$title\" />
-    </div>";
+    </label>";
 
     $dis_year = "
-    <div class=\"searchLabel\">$l_year<br />
+    <label>$l_year<br />
       <input type=\"text\" name=\"tf_year\" id=\"tf_year\" size=\"4\" value=\"$year\" />
-    </div>";
+    </label>";
 
     $dis_button = "    
-    <div class=\"searchLabel\">&nbsp;<br />
+    <label>&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </div>";
+      </label>";
   }
   else {
     $sel_js = " onchange=\"this.form.submit();\" ";
@@ -113,20 +113,17 @@ function html_publication_search_form ($type_q,$publication) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
-  <div class=\"search\">
+  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\" class=\"search\">
     $dis_title
-    <div class=\"searchLabel\">$l_publication_type<br />
+    <label>$l_publication_type<br />
       $sel_type
-    </div>
+    </label>
     $dis_year
-    <div class=\"searchLabel\">$l_lang<br />
-      <input type=\"text\" name=\"tf_lang\" id=\"tf_lang\" size=\"15\" 
-      value=\"$lang\" />
-    </div>
+    <label>$l_lang<br />
+    <input type=\"text\" name=\"tf_lang\" id=\"tf_lang\" size=\"15\" value=\"$lang\" />
+    </label>
     $dis_button
-    <div class=\"searchEnd\"></div>
-  </div>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -293,37 +290,36 @@ function html_publication_consult($pub_q) {
   $desc = $pub_q->f("publication_desc");
 
   $ldesc = nl2br($desc);
-  $display["title"] = "<div class=\"title\">$l_publication : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
 
 
   // --- HTML Template --------------------------------------------------------
-  $block .= "<div class=\"detailHead\">$l_publication</div>
+  $block .= "<h1>$l_publication</h1>
 
-<table class=\"detail\">
+<table>
   <tr> 
-      <td class=\"detailLabel\">$l_publication_title</td>
-      <td class=\"detailText\">$title</td>
+      <th>$l_publication_title</th>
+      <td>$title</td>
     </tr>
     <tr> 
-      <td class=\"detailLabel\">$l_year</td>
-      <td class=\"detailText\">$year</td>
+      <th>$l_year</th>
+      <td>$year</td>
     </tr>
     <tr> 
-      <td class=\"detailLabel\">$l_lang</td>
-      <td class=\"detailText\">$lang</td>
+      <th>$l_lang</th>
+      <td>$lang</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_type</td>
-      <td class=\"detailText\">$type</td>
+      <th>$l_type</th>
+      <td>$type</td>
     </tr>
   </table>
 
-<div class=\"detailHead\">$l_desc</div>
+<h1>$l_desc</h1>
   
-  <table class=\"detail\">
+  <table>
     <tr> 
-      <td class=\"detailText\">$ldesc
-      </td>
+      <th>$ldesc</th>
     </tr>
   </table>";
 
@@ -452,33 +448,29 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
     }
     $sel_list .= "</select>";
 
-    $dis_auto_sub = "<div class=\"detailHead\">$l_auto_sub</div>
-
-    <table class=\"detail\">
+    $dis_auto_sub = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_auto_sub</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_contact_category1</td>
-      <td class=\"detailForm\">
-       $sel_contcat1
-      </td>
+      <th>$l_contact_category1</th>
+      <td>$sel_contcat1</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_list</td>
-      <td class=\"detailForm\">
-       $sel_list
-      </td>
+      <th>$l_list</th>
+      <td>$sel_list</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\"></td>
-      <td class=\"detailForm\">
-      $sel_recept
-      </td>
+      <th></td>
+      <td>$sel_recept</td>
     </tr>
-    </table>";      
+    </table>
+    </fieldset>";      
   }
 
   $url = "publication_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
-  $display["title"] = "<div class=\"title\">$l_publication : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -487,37 +479,37 @@ function html_publication_form($action, $pub_q,$type_q,$recept_q, $publication,$
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
 
-    <div class=\"detailHead\">$l_publication</div>
-
-    <table class=\"detail\">
+<fieldset class=\"detail infos\"> 
+    <legend>$l_publication</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_publication_title</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"30\" size=\"30\" value=\"$title\" /></td>
+      <th>$l_publication_title</th>
+      <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"30\" size=\"30\" value=\"$title\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_type</td>
-      <td class=\"detailForm\">$sel_type</td>
+      <th>$l_type</th>
+      <td>$sel_type</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_lang</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_lang\" name=\"tf_lang\" maxlength=\"20\" size=\"20\" value=\"$lang\" /></td>
+      <th>$l_lang</th>
+      <td><input type=\"text\" id=\"tf_lang\" name=\"tf_lang\" maxlength=\"20\" size=\"20\" value=\"$lang\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_year</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_year\" name=\"tf_year\" maxlength=\"4\" size=\"4\" value=\"$year\" /></td>
+      <th>$l_year</th>
+      <td><input type=\"text\" id=\"tf_year\" name=\"tf_year\" maxlength=\"4\" size=\"4\" value=\"$year\" /></td>
     </tr>
     </table>
-    
+</fieldset>    
     $dis_auto_sub
-    
-    <div class=\"detailHead\">$l_desc</div>
+ <fieldset class=\"detail extra\"> 
+    <legend>$l_desc</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"8\" cols=\"80\">$desc</textarea></td>
+      <td colspan=\"2\"><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"8\" cols=\"80\">$desc</textarea></td>
     </tr>
     </table>
-
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+</fieldset>
+<fieldset class=\"buttons\">
+    $dis_button
+</fieldset>
     </form>";
 
   return $block;
@@ -567,7 +559,7 @@ function html_publication_group_subscription_form($action,$pub_q, $cat1_q, $publ
   }
   $sel_contcat1 .= "</select>";
 
-  $display["title"] = "<div class=\"title\">$l_publication : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_publication : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -575,29 +567,29 @@ function html_publication_group_subscription_form($action,$pub_q, $cat1_q, $publ
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_publication(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
+<fieldset class=\"detail infos\">
+    <legend>$l_publication</legend>
 
-    <div class=\"detailHead\">$l_publication</div>
-
-    <div class=\"detailHead\">$l_auto_sub</div>
+    <legend>$l_auto_sub</legend>
    
-    <table class=\"detail\">
+    <table>
      <tr>
-      <td class=\"detailLabel\">$l_contact_category1</td>
-      <td class=\"detailForm\">
+      <th>$l_contact_category1</th>
+      <td>
        $sel_contcat1
       </td>
      </tr>   
      <tr>
-      <td class=\"detailLabel\"></td>
-      <td class=\"detailForm\">
+      <th></td>
+      <td>
       $sel_recept
       </td>
      </tr>       
     </table>    
-
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+</fieldset>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -693,47 +685,48 @@ function html_publication_subscription_form($action,$sub_q, $recept_q, $publicat
     <form method=\"get\" name=\"form_subscription\"
       onsubmit=\"if (check_subscription(this)) return true; else return false;\"
       action=\"".url_prepare("publication_index.php")."\">
+<fieldset class=\"detail infos\">
+    <legend>$l_subscription</legend>
 
-    <div class=\"detailHead\">$l_subscription</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_publication 
-      </td>
-      <td class=\"detailForm\">
+      </th>
+      <td>
 	$block_publi
       </td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_quantity</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_quantity\" name=\"tf_quantity\" maxlength=\"8\" size=\"4\" value=\"$quantity\" /></td>
+      <th>$l_quantity</th>
+      <td><input type=\"text\" id=\"tf_quantity\" name=\"tf_quantity\" maxlength=\"8\" size=\"4\" value=\"$quantity\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_renew</td>
-      <td class=\"detailForm\">
+      <th>$l_renew</th>
+      <td>
       <input type=\"checkbox\" $renew name=\"cba_renewal\" value=\"1\" />
       </td>      
     </tr><tr>
-      <td class=\"detailLabel\">$l_recept</td>
-      <td class=\"detailForm\">$sel_recept</td>
+      <th>$l_recept</th>
+      <td>$sel_recept</td>
     </tr>
     </table>
+</fieldset>
    <!-- 
-    <div class=\"detailHead\" style=\"display:none;\">$l_subscription_dates</div>
+    <legend style=\"display:none;\">$l_subscription_dates</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\"></td>
-      <td class=\"detailForm\"></td>
+      <th></th>
+      <td></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$</td>
-      <td class=\"detailForm\"></td>
+      <th>$</th>
+      <td></td>
     </tr>    
     </table>
    -->
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -787,7 +780,7 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
       ";
      	
 
-  $display["title"] = "<div class=\"title\">$l_renew : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_renew : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -796,34 +789,36 @@ function html_publication_auto_subscription_form($action,$pub_q,$recept_q, $publ
 
     <form method=\"get\" name=\"form_auto_subscription\"
             action=\"".url_prepare("publication_index.php")."\">
+<fieldset class=\"detail infos\">
+    <legend>$l_subscription</legend>
 
-    <div class=\"detailHead\">$l_subscription</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_publication_orig 
-      </td>
-      <td class=\"detailForm\">
+      </th>
+      <td>
 	$block_publi_orig
       </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_publication_dest 
-      </td>
-      <td class=\"detailForm\">
+      </th>
+      <td>
       $block_publi_dest
       </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_recept</td>
-      <td class=\"detailForm\">$sel_recept</td>
+      <th>$l_recept</th>
+      <td>$sel_recept</td>
     </tr><tr>
     </table>
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+</fieldset>
+
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -857,10 +852,10 @@ function dis_publication_can_delete($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
-    </div>";
+    <fieldset class=\"buttons\">
+    $dis_delete
+    $dis_back
+    </fieldset>";
 
   return $block;
 }
@@ -891,18 +886,19 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
     $sametitle = $pub_q->f("publication_title");
     $samelang = $pub_q->f("publication_lang");
     $dis_same_pub .= "
-      <tr><td colspan =\"2\" class=\"detailText\">
+      <li>     
          <a class=\"detail\" href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;publication_id=$id") . "\">
           $sametitle ($samelang)</a>
-      </td></tr>";
+      </li>";
   }
 
   $block = "
-  <table class=\"detail\">
+  <div class=\"detail\">
+  <ul>
     $dis_same_pub
-  </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  </ul>
+  </div>
+  <div class=\"buttons\">
     <form method=\"post\" name=\"form_insert\"
     action=\"" .url_prepare("publication_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -914,8 +910,6 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
-    </p>
-    <p class=\"detailButtons\">
     <form name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("publication_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
@@ -927,8 +921,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
-    </p>
-  </div>";
+   </div>";
 
   return $block;
 }
@@ -941,7 +934,6 @@ function dis_publication_admin_index() {
 
   $type_q = run_query_publication_type();
   $block = html_publication_type_form($type_q);
-  $block .= "<hr />";
   $recept_q = run_query_publication_subscription_reception();
   $block .= html_publication_subscription_reception_form($recept_q);  
   return $block;

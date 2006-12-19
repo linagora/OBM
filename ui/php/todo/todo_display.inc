@@ -127,12 +127,8 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
     "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $todo_d->data_form_end = "
-  <p class=\"detailButton\">
-    <p class=\"detailButtons\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />
-    </p>
-  </p>
   </form>";
 
   $block .= $todo_d->display("dis_data_todo");
@@ -165,36 +161,38 @@ function dis_todo_detail($todo, $todo_q) {
 
   $content = $todo_q->f("todo_content");
 
-  $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_todo : $title</h1>";
 
   $block = "
-    <table class=\"detail\">
+  <div class=\"detail infos\">
+    <table>
      <tr>
-      <td class=\"detailLabel\">$l_todotitle</td>
-      <td class=\"detailText\">$title</td>
+      <th>$l_todotitle</th>
+      <td>$title</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_user</td>
-      <td class=\"detailText\">$user</td>
+      <th>$l_user</th>
+      <td>$user</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_author</td>
-      <td class=\"detailText\">$author</td>
+      <th>$l_author</th>
+      <td>$author</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_priority</td>
-      <td class=\"detailText\">$priority</td>
+      <th>$l_priority</th>
+      <td>$priority</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_percent</td>
-      <td class=\"detailText\">$percent</td>
+      <th>$l_percent</th>
+      <td>$percent</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
+      <th>$l_date</th>
+      <t>$date</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_deadline</td>
-      <td class=\"detailText\">$deadline</td>
+      <th>$l_deadline</th>
+      <td>$deadline</td>
      </tr><tr>
-      <td class=\"detailLabel\">$l_content</td>
-      <td class=\"detailText\">$content</td>
+      <th>$l_content</th>
+      <td>$content</td>
      </tr>
     </table>
+  </div>
     ";
   
   return $block;
@@ -269,19 +267,19 @@ function dis_todo_form($todo, $todo_q = 0) {
    
   $block_user = "
   </tr><tr>
-    <td class=\"detailLabel\">
+    <th>
       $l_users
       <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
-    </td>    
-    <td class=\"detailForm\" id=\"sel_user_id\">
+    </th>    
+    <td id=\"sel_user_id\">
       $dis_sel_user
     </td>";
 
-  $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_todo : $title</h1>";
 
   // Priority select
   $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">";
@@ -309,44 +307,35 @@ function dis_todo_form($todo, $todo_q = 0) {
     $dis_button .=  "<input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
 
   $block = "
+  <fieldset class=\"detail extra\">
   <form method=\"post\" name=\"f_entity\"
     onsubmit=\"if (check_addtodoform(this)) return true; else return false;\"
     action=\"".url_prepare("todo_index.php")."\">
-
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_todotitle</td>
-    <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" />
-    </td>
+    <th>$l_todotitle</th>
+    <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" /></td>
   $block_user
   </tr><tr>
-    <td class=\"detailLabel\">$l_priority</td>
-    <td class=\"detailForm\">$sel_priority</td>
+    <th>$l_priority</th>
+    <td>$sel_priority</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_percent</td>
-    <td class=\"detailForm\"><input type=\"text\" id=\"tf_percent\" name=\"tf_percent\" maxlength=\"3\" size=\"3\" value=\"$percent\" />%</td>
+    <th>$l_percent</th>
+    <td><input type=\"text\" id=\"tf_percent\" name=\"tf_percent\" maxlength=\"3\" size=\"3\" value=\"$percent\" />%</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_deadline</td>
-    <td class=\"detailForm\">
-      <script>calendar('tf_deadline','$deadline')</script>
-    </td>
+    <th>$l_deadline</th>
+    <td><input type=\"text\" name=\"tf_deadline\" value=\"$deadline\" class=\"datePicker\"/></td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_content</td>
-    <td class=\"detailForm\">
-      <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
-    </td>
+    <th>$l_content</th>
+    <td><textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea></td>
   </tr>
   </table>
-
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  </fieldset>
+  <fieldset class=\"buttons\">
     $dis_button
-    </p>
-  </div>
-
+  </fieldset>
   </form>
-  <p /> <br />";
+  ";
 
   return $block;
 }
