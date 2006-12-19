@@ -159,55 +159,53 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $cats1, $cats
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"f_search\" action=\"" .
+    <form  class=\"search\" method=\"get\" name=\"f_search\" action=\"" .
     url_prepare("incident_index.php") . " \">
 
-    <div class=\"search\">
-       <div class=\"searchLabel\">$l_text<br />
+       <label>$l_text<br />
          <input type=\"text\" name=\"tf_text\" size=\"16\" value=\"$text\" />
-       </div>
-       <div class=\"searchLabel\">$l_label<br />
+       </label>
+       <label>$l_label<br />
          <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
-       </div>
-       <div class=\"searchLabel\">$l_reference<br />
+       </label>
+       <label>$l_reference<br />
          <input type=\"text\" name=\"tf_reference\" size=\"16\" value=\"$reference\" />
-       </div>
-       <div class=\"searchLabel\">$l_id<br />
+       </label>
+       <label>$l_id<br />
          <input type=\"text\" name=\"tf_incident_id\" size=\"10\" value=\"$i_id\" />
-       </div>
-       <div class=\"searchLabel\">$l_company<br />
+       </label>
+       <label>$l_company<br />
          <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
-       </div>
-       <div class=\"searchLabel\">$l_contract<br />
+       </label>
+       <label>$l_contract<br />
          <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
-       </div>
-       <div class=\"searchLabel\">$l_date_after<br />
-        <script>calendar('tf_date_after','$dateafter')</script>
-       </div>
-       <div class=\"searchLabel\">$l_date_before<br />
-        <script>calendar('tf_date_before','$datebefore')</script>
-       </div>
+       </label>
+       <label>$l_date_after<br />
+        <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+       </label>
+       <label>$l_date_before<br />
+       <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+       </label>
        $block_priority
        $block_status
        $block_category1
        $block_category2
-       <div class=\"searchLabel\">$l_logger<br />
+       <label>$l_logger<br />
          $dis_sel_logger
-       </div>
-       <div class=\"searchLabel\">$l_owner<br />
+       </label>
+       <label>$l_owner<br />
          $dis_sel_owner
-       </div>
-       <div class=\"searchLabel\">$l_archive<br />
+       </label>
+       <label>$l_archive<br />
          <input name=\"cba_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
-       </div>
-       <div class=\"searchLabel\">&nbsp;<br />
+       </label>
+       <label>&nbsp;<br />
          <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />     
          <input name=\"contract_id\" id=\"contract_id\" type=\"hidden\" value=\"$contract_id\" />     
          <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-       </div>
-       <div class=\"searchEnd\"></div>
-       </div>
-   </form>
+       </label>
+       <p class=\"CL\" />
+       </form>
 ";
 
   return $block;
@@ -353,92 +351,101 @@ function html_incident_consult($inc_q) {
   $block_category2 = of_category_dis_block_consult("incident", "category2", $cats2, "mono");
 
   if ($inc_q->f("incident_archive") == 1) {
-    $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
+    $dis_lab_archive ="<tr><th colspan=\"2\">$l_archive_consult</th></tr>";
   }
-  $display["title"] = "<div class=\"title\">$l_incident : $label</div>";
+  $display["title"] = "<h1 class=\"title\">$l_incident : $label</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <div class=\"detailHead\">$l_contract</div>
-  <table class=\"detail\">
+  
+  <div class=\"detail infos\">
+  <h1>$l_contract</h1>
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_company
+    <th>$l_company
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-    </td>
-    <td class=\"detailText\">$comp_name</td>
+    </th>
+    <td>$comp_name</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_client_manager 1</td>
-    <td class=\"detailText\">$dis_con1</td>
+    <th>$l_client_manager 1</th>
+    <td>$dis_con1</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_client_manager 2</td>
-    <td class=\"detailText\">$dis_con2</td>
+    <th>$l_client_manager 2</th>
+    <td>$dis_con2</td>
   </tr><tr>
-    <td class=\"detailLabel\">
+    <th>
       <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contract_id=$con_cli2")."\"></a> 
       $con_label
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$con_id") . "\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
-    </td>
-    <td class=\"detailText\">
+    </th>
+    <td>
       # $con_num ($con_debut - $con_exp)
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_status</td>
-    <td class=\"detailText\">$con_status</td>
+    <th>$l_status</th>
+    <td>$con_status</td>
   </tr>
   </table>
+  </div>
 
-  <div class=\"detailHead\">$l_incident (# $id)</div>
-  <table class=\"detail\"> 
+<div class=\"detail infos\">
+  <h1>$l_incident (# $id)</h1>
+  <table> 
   <tr>
-    <td class=\"detailLabel\">$l_label</td>
-    <td class=\"detailText\">$label</td>
+    <th>$l_label</th>
+    <td>$label</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_reference</td>
-    <td class=\"detailText\">$reference</td>
+    <th>$l_reference</th>
+    <td>$reference</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_logger</td>
-    <td class=\"detailText\">$logger</td>
+    <th>$l_logger</th>
+    <td>$logger</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_owner</td>
-    <td class=\"detailText\">$owner</td>
+    <th>$l_owner</th>
+    <td>$owner</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_priority</td>
-    <td class=\"detailText\">$priority</td>
+    <th>$l_priority</th>
+    <td>$priority</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_status</td>
-    <td class=\"detailText\">$status</td>
+    <th>$l_status</th>
+    <td>$status</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_date</td>
-    <td class=\"detailText\">$date</td>
+    <th>$l_date</th>
+    <td>$date</td>
   </tr>
   $block_category1
   $block_category2
   <tr>
-    <td class=\"detailLabel\">$l_duration</td>
-    <td class=\"detailText\">$inc_dur</td>
+    <th>$l_duration</th>
+    <td>$inc_dur</td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_archive</td>
-    <td class=\"detailText\">$archive</td>
+    <th>$l_archive</th>
+    <td>$archive</td>
   </tr>
   </table>
-
-  <div class=\"detailHead\">$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
 </div>
-  <table class=\"detail\"> 
-  <tr>
-    <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
-  </tr>
-  </table>
 
-  <div class=\"detailHead\">$l_comment</div>
-  <table class=\"detail\">
+<div class=\"detail infos\">
+  <h1>$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
+</h1>
+  <table> 
   <tr>
-    <td colspan=\"2\" class=\"detailText\">$com</td>
+    <td colspan=\"2\">$inc_reso</td>
   </tr>
   </table>
+ </div>
+
+<div class=\"detail extra\">
+  <h1>$l_comment</h1>
+  <table>
+  <tr>
+    <td colspan=\"2\">$com</td>
+  </tr>
+  </table>
+</div>
 ";
 
   return $block;
@@ -672,10 +679,10 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
       </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
+        <th>$l_upd_comment</th>
         <td>&nbsp;</td>
       </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   }
 
@@ -691,32 +698,33 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }
-  $display["title"] = "<div class=\"title\">$l_incident : $lincident</div>";
+  $display["title"] = "<h1 class=\"title\">$l_incident : $lincident</h1>";
 
   // --- html template --------------------------------------------------------
 
   $block = "
     <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
-      <div class=\"detailHead\">$l_incident</div>
-        <table class=\"detail\">
+      <fieldset class=\"detail infos\">  
+      <legend>$l_incident</legend>
+        <table>
           <tr>
-            <td class=\"detailLabel\">$l_label</td>
-            <td class=\"detailForm\"><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
+            <th>$l_label</th>
+            <td><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
           </tr><tr>
-            <td class=\"detailLabel\">$l_reference</td>
-            <td class=\"detailForm\"><input name=\"tf_reference\" size=\"10\" value=\"$reference\" /></td>
+            <th>$l_reference</th>
+            <td><input name=\"tf_reference\" size=\"10\" value=\"$reference\" /></td>
           </tr><tr>
-            <td class=\"detailLabel\">$l_logger</td>
-            <td class=\"detailForm\">$dis_sel_logger</td>
+            <th>$l_logger</th>
+            <td>$dis_sel_logger</td>
           </tr><tr>
-            <td class=\"detailLabel\">$l_owner</td>
-            <td class=\"detailForm\">$dis_sel_owner</td>
+            <th>$l_owner</th>
+            <td>$dis_sel_owner</td>
           </tr><tr>
-            <td class=\"detailLabel\">$l_archive_new</td>
-            <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
+            <th>$l_archive_new</th>
+            <td><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
           </tr><tr>
-            <td class=\"detailLabel\">$l_contract</td>
-            <td class=\"detailForm\">
+            <th>$l_contract</th>
+            <td>
               <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
               <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
               <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
@@ -730,40 +738,36 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           $block_category1
           $block_category2
           <tr>
-            <td class=\"detailLabel\">$l_date</td>
-            <td class=\"detailForm\">
-            <script>calendar('tf_date','$date')</script>
-                H $sel_hour
-            </td>
+            <th>$l_date</th>
+            <td><table><tr><td><input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/></td><td>H</td><td>$sel_hour</td></tr></table></td>
           </tr><tr>
-            <td class=\"detailLabel\">$l_duration</td>
-            <td class=\"detailForm\"><input type=\"text\" name=\"tf_duration\" size=\"6\" maxlength=\"6\" value=\"$duration\" readonly=\"readonly\" />H</td>
+            <th>$l_duration</th>
+            <td><input type=\"text\" name=\"tf_duration\" size=\"6\" maxlength=\"6\" value=\"$duration\" readonly=\"readonly\" />H</td>
           </tr>
         </table>
-      <div class=\"detailHead\">$l_solution</div>
-        <table class=\"detail\">
+</fieldset>
+
+  <fieldset class=\"detail extra\">  
+      <legend>$l_solution</legend>
+        <table>
           <tr>
-            <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_solution\" rows=\"6\" cols=\"60\">$solu</textarea></td>
+            <td colspan=\"2\"><textarea name=\"ta_solution\" rows=\"6\" cols=\"60\">$solu</textarea></td>
           </tr>
         </table>
-      <div class=\"detailHead\">$l_comment</div>
-        <table class=\"detail\">
-          <tr>
-            <td class=\"detailLabel\">$l_add_comment</td>
-            <td class=\"detailForm\">
-              <script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment
-            </td> 
-          </tr><tr>
-            <td class=\"detailLabel\">$l_res_duration</td>
-            <td class=\"detailForm\">$sel_dur</td> 
-          </tr><tr>
-            <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-              $dis_comment
-          </tr>
-        </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_button</p>
-      </div>
+</fieldset>
+<fieldset class=\"detail extra\">  
+      <legend>$l_comment</legend>
+       $l_add_comment
+       <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+       $sel_usercomment
+       $l_res_duration
+      $sel_dur 
+     <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
+      $dis_comment
+      </fielset>
+      <fieldset class=\"buttons\">
+       $dis_button
+      </fieldset>
     </form>
 ";
 
@@ -796,9 +800,9 @@ function dis_can_delete_incident($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+    $dis_delete
+    $dis_back
     </div>";
 
   return $block;
