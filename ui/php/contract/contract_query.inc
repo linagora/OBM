@@ -571,9 +571,9 @@ function run_query_contract_status() {
 function run_query_contract_priority_insert($contract) {
   global $auth, $cdg_sql, $obm;
 	
-  $code = $contract["code"];
-  $color = $contract["color"];
-  $label = $contract["label"];
+  $code = $contract["priority_code"];
+  $color = $contract["priority_color"];
+  $label = $contract["priority_label"];
 	$domain_id = $obm["domaini_id"];
 	
   $query = "INSERT INTO ContractPriority (
@@ -610,9 +610,9 @@ function run_query_contract_priority_update($contract) {
   global $auth, $cdg_sql;
 
   $priority = $contract["priority"];
-  $code = $contract["code"];
-  $color = $contract["color"];
-  $label = $contract["label"];
+  $code = $contract["priority_code"];
+  $color = $contract["priority_color"];
+  $label = $contract["priority_label"];
 	$multidomain = sql_multidomain("contractpriority");
 	
   $query = "UPDATE ContractPriority SET
@@ -639,7 +639,7 @@ function run_query_contract_priority_update($contract) {
 function run_query_contract_priority_delete($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contractpriority");
+  $multidomain = sql_multidomain("contractpriority");
 	
   $query = "DELETE FROM ContractPriority 
 		WHERE contractpriority_id='$id' $multidomain";
@@ -686,8 +686,8 @@ function run_query_contract_status_insert($contract) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $label = $contract["label"];
-  $code = $contract["code"];
+  $label = $contract["status_label"];
+  $code = $contract["status_code"];
   $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO ContractStatus (
@@ -723,8 +723,8 @@ function run_query_contract_status_update($contract) {
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
   $status = $contract["status"];
-  $label = $contract["label"];
-  $code = $contract["code"];
+  $label = $contract["status_label"];
+  $code = $contract["status_code"];
 	$multidomain = sql_multidomain("contractstatus");
 	
   $query = "UPDATE ContractStatus SET
@@ -944,7 +944,7 @@ function run_query_contract($archive=false) {
 function run_query_contract_type_insert($contract) {
   global $auth, $cdg_sql, $obm;
 	
-  $label = $contract["label"];
+  $label = $contract["type_label"];
   $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO ContractType (
@@ -976,7 +976,7 @@ function run_query_contract_type_update($contract) {
   global $auth, $cdg_sql;
 
   $type = $contract["type"];
-  $label = $contract["label"];
+  $label = $contract["type_label"];
   $multidomain = sql_multidomain("contracttype");
 
   $query = "UPDATE ContractType SET 

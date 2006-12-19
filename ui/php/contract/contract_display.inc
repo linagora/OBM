@@ -242,56 +242,54 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
             <input name=\"popup\" type=\"hidden\" value=\"$popup\" />";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" 
+  <form class=\"search\" method=\"get\" name=\"f_search\" 
   action=\"".url_prepare("contract_index.php")."\">
 
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_number<br />
+    <label>$l_number<br />
       <input type=\"text\" name=\"tf_number\" size=\"20\" value=\"$num\" />
-    </div>
-    <div class=\"searchLabel\">$l_company<br />
+    </label>
+    <label>$l_company<br />
       <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
-    </div>
-    <div class=\"searchLabel\">$l_after<br />
-      <script>calendar('tf_date_after','$dateafter')</script>
-   </div>
-    <div class=\"searchLabel\">$l_before<br />
-      <script>calendar('tf_date_before','$datebefore')</script>
-    </div>
-    <div class=\"searchLabel\">$l_label_libelle<br />
+    </label>
+    <label>$l_after<br />
+    <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+   </label>
+    <label>$l_before<br />
+    <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+    </label>
+    <label>$l_label_libelle<br />
       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
-    </div>
-    <div class=\"searchLabel\">$l_type<br />
+    </label>
+    <label>$l_type<br />
       $dis_cont_typ
-    </div>
-    <div class=\"searchLabel\">$l_manager<br />
+    </label>
+    <label>$l_manager<br />
       $sel_manager
-    </div>
-    <div class=\"searchLabel\">$l_priority<br />
+    </label>
+    <label>$l_priority<br />
       $sel_pri
-    </div>
-    <div class=\"searchLabel\">$l_status<br />
+    </label>
+    <label>$l_status<br />
       $sel_sta
-     </div>
-    <div class=\"searchLabel\">$l_contract_kind<br />
+     </label>
+    <label>$l_contract_kind<br />
       $sel_kind
-     </div>
-    <div class=\"searchLabel\">$l_archive<br />
+     </label>
+    <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
-    </div>
-    <div class=\"searchButton\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-</div>
+    </label>
+    <p class=\"CL\" />
  </form>";
 
   return $block;
@@ -570,17 +568,17 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
     $format_data = "";
   } else if ($format == $ccf_ticket) {
     $label_format = $l_ccf_ticket;
-    $format_data = "<td class=\"detailLabel\">$l_ticket_nb</td>
-      <td class=\"detailText\">$ticket_nb</td>";
+    $format_data = "<th>$l_ticket_nb</th>
+      <td>$ticket_nb</td>";
   } else {
     $label_format = $l_ccf_duration;
-    $format_data = "<td class=\"detailLabel\">$l_duration</td>
-      <td class=\"detailText\">$duration</td>";
+    $format_data = "<th>$l_duration</th>
+      <td>$duration</td>";
   }
   
   $dis_format = "
-      <td class=\"detailLabel\">$l_format</td>
-      <td class=\"detailText\">$label_format</td>
+      <th>$l_format</th>
+      <td>$label_format</td>
     </tr><tr>
       $format_data";
 
@@ -601,135 +599,137 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   // --- HTML Template --------------------------------------------------------
 
   $display["link"] = html_contract_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
-  $display["title"] = "<div class=\"title\">$l_contract : $label</div>";
+  $display["title"] = "<h1 class=\"title\">$l_contract : $label</h1>";
 
 
   $block = "
   <table width=\"100%\">
   <tr>
     <td valign=\"top\" width=\"50%\">
-
-      <div class=\"detailHead\">$dis_kind</div>
-      <table class=\"detail\">
+<div class=\"detail infos\">
+      <h1>$dis_kind</h1>
+      <table>
       <tr>
-        <td class=\"detailLabel\">$l_company
+        <th>$l_company
           <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id")."\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-        </td>
-        <td class=\"detailText\">$comp_name</td>
+        </th>
+        <td>$comp_name</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_client_manager 1
+        <th>$l_client_manager 1
           <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con1_id") . "\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
-        </td>
-        <td class=\"detailText\">$con1</td> 
+        </th>
+        <td>$con1</td> 
       </tr><tr>
-        <td class=\"detailLabel\">$l_client_manager 2
+        <th>$l_client_manager 2
           <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$con2_id") . "\">
           <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
-        </td>
-        <td class=\"detailText\">$con2</td>
+        </th>
+        <td>$con2</td>
       </tr>
       </table>   
+
+</div>
 
     </td>
     <td valign=\"top\" width=\"50%\">
 
-      <div class=\"detailHead\">$l_manager</div>
-      <table class=\"detail\">
+<div class=\"detail infos\">
+      <h1>$l_manager</h1>
+      <table>
       <tr>
-        <td class=\"detailLabel\">$l_marketing_manager</td>
-        <td class=\"detailText\">$market</td>
+        <th>$l_marketing_manager</th>
+        <td>$market</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_technical_manager</td>
-        <td class=\"detailText\">$tech</td>
+        <th>$l_technical_manager</th>
+        <td>$tech</td>
       </tr>
       </table>
-
-    </td>
+</div>
+  </td>
   </tr>
   </table>
 
   <table width=\"100%\">
   <tr>
     <td valign=\"top\" width=\"50%\">
-
-    <div class=\"detailHead\">$l_contract</div>
-    <table class=\"detail\">
+<div class=\"detail infos\">
+    <h1>$l_contract</h1>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
+      <th>$l_label</th>
+      <td>$label</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$number</td>
+      <th>$l_number</th>
+      <td>$number</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_type</td>
-      <td class=\"detailText\">$type</td>
+      <th>$l_type</th>
+      <td>$type</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_priority</td>
-      <td class=\"detailText\">$priority</td>
+      <th>$l_priority</th>
+      <td>$priority</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$archive</td>
+      <th>$l_archive</th>
+      <td>$archive</td>
     </tr>
     </table>
-
+</div>
     </td>
     <td valign=\"top\" width = 50%>
-
-    <div class=\"detailHead\">$l_dates</div>
-    <table class=\"detail\">
+<div class=\"detail infos\">
+    <h1>$l_dates</h1>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_autorenewal</td>
-      <td class=\"detailText\">$autorenewal</td>
+      <th>$l_autorenewal</th>
+      <td>$autorenewal</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_signature</td>
-      <td class=\"detailText\">$datesignature</td>
+      <th>$l_signature</th>
+      <td>$datesignature</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_begin</td>
-      <td class=\"detailText\">$datebegin</td>
+      <th>$l_begin</th>
+      <td>$datebegin</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_exp</td>
-      <td class=\"detailText\">$dateexp</td>
+      <th>$l_exp</th>
+      <td>$dateexp</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_renew</td>
-      <td class=\"detailText\">$daterenew</td>
+      <th>$l_renew</th>
+      <td>$daterenew</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_date_cancel</td>
-      <td class=\"detailText\">$datecancel</td>
+      <th>$l_date_cancel</th>
+      <td>$datecancel</td>
     </tr>
     </table>
-
+</div>
     </td>
   </tr>
   </table>
-
-  <div class=\"detailHead\">$l_status</div>
-  <table class=\"detail\">
+<div class=\"detail infos\">
+  <h1>$l_status</h1>
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_status</td>
-    <td class=\"detailText\">$status</td>
+    <th>$l_status</th>
+    <td>$status</td>
   </tr><tr>
     $dis_format
   </tr><tr>
-    <td class=\"detailLabel\">$l_duration_used</td>
-    <td class=\"detailText\">$duration_used</td>
+    <th>$l_duration_used</th>
+    <td>$duration_used</td>
   </tr>
   </table>
-
-  <div class=\"detailHead\">$l_clause</div>
-  <table class=\"detail\">
+</div>
+<div class=\"detail infos\">
+ <h1>$l_clause</h1>
+  <table>
   <tr>
-    <td class=\"detailText\">$clause</td>
+    <td>$clause</td>
   </tr> 
   </table>
-
-  <div class=\"detailHead\">$l_comment</div>
-  <table class=\"detail\">
-  <tr>
-    <td class=\"detailText\">$com</td>
-  </tr>
-  </table>
+</div>
+<div class=\"detail extra\">
+  <h1>$l_comment</h1>
+    $com
+</div>
 ";
 
   return $block;
@@ -905,8 +905,8 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
     $dis_vis = "<tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input name=\"cba_vis\" type=\"checkbox\" value=\"1\" ";
+      <th>$l_private</th>
+      <td><input name=\"cba_vis\" type=\"checkbox\" value=\"1\" ";
     if ($vis == 1) $dis_vis .= "checked = \"checked\"";
       $dis_vis .= " /></td></tr>";
   }
@@ -914,11 +914,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($cgp_show["module"]["deal"] && $deal_id > 0) {
     $block_deal = "
     <tr>
-      <td class=\"detailLabel\">$l_deal
+      <th>$l_deal
         <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
-      </td>
-      <td class=\"detailForm\">
+      </th>
+      <td>
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
@@ -1037,11 +1037,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
 
   $dis_format_detail = "
     <tr>
-      <td class=\"detailLabel\">
+      <th>
         <div id=\"label_ticket\" $style_ticket>$l_ticket_nb</div>
         <div id=\"label_duration\" $style_duration>$l_duration</div>
-      </td>
-      <td class=\"detailForm\">
+      </th>
+      <td>
         <input type=\"textbox\" $style_ticket name=\"tf_ticket_nb\" value =\"$ticket_nb\" />
         <input type=\"textbox\" $style_duration name=\"tf_duration\" value =\"$duration\" />
       </td>
@@ -1127,11 +1127,8 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <input type=\"hidden\" name=\"contract_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
     $dis_comment = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        $l_upd_comment
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
     ";
   } else {
     $dis_sub .= "
@@ -1143,11 +1140,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($cgp_show["module"]["deal"] && $deal_id > 0) {
     $block_deal = "
     <tr>
-      <td class=\"detailLabel\">$l_deal
+      <th>$l_deal
         <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
-      </td>
-      <td class=\"detailForm\">
+      </th>
+      <td>
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
@@ -1162,104 +1159,110 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     onsubmit=\"if (check_contract(this)) return true; else return false;\" 
     action=\"".url_prepare("contract_index.php")."\">
 
-  <div class=\"detailHead\">$l_company</div>
-    <table class=\"detail\">
+<fieldset class=\"detail infos\">
+  <legend>$l_company</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">
+      <th>
         <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id"). "\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
         $comp_name
-      </td>
-      <td class=\"detailText\">$ad1
+      </th>
+      <td>$ad1
         <br />$zip $town
       </td> 
     </tr><tr>
-      <td class=\"detailLabel\">$l_client_manager 1 $dis_con1</td>
-      <td class=\"detailForm\">$dis_sel_con1</td>
+      <th>$l_client_manager 1 $dis_con1</th>
+      <td>$dis_sel_con1</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_client_manager 2 $dis_con2</td>
-      <td class=\"detailForm\">$dis_sel_con2</td>
+      <th>$l_client_manager 2 $dis_con2</th>
+      <td>$dis_sel_con2</td>
     </tr>
     $block_deal
     </table>
-  <div class=\"detailHead\">$l_contract</div>
-    <table class=\"detail\">
+</fieldset>
+
+
+  <fieldset class=\"detail infos\">
+  <legend>$l_contract</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" maxlength=\"40\" value=\"$label\" /></td>
+      <th>$l_label</th>
+      <td><input name=\"tf_label\" type=\"text\" size=\"40\" maxlength=\"40\" value=\"$label\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input name=\"tf_number\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
+      <th>$l_number</th>
+      <td><input name=\"tf_number\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
     </tr>
       $dis_vis
     <tr>
-      <td class=\"detailLabel\">$l_signature</td>
-      <td class=\"detailForm\"><script>calendar('tf_datesignature','$datesignature')</script></td>
+      <th>$l_signature</th>
+    <td><input type=\"text\" name=\"tf_datesignature\" value=\"$datesignature\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_begin</td>
-      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
+      <th>$l_begin</th>
+     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_exp</td>
-      <td class=\"detailForm\"><script>calendar('tf_dateexp','$dateexp')</script></td>
+      <th>$l_exp</th>
+   <td><input type=\"text\" name=\"tf_dateexp\" value=\"$dateexp\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_renew</td>
-      <td class=\"detailForm\"><script>calendar('tf_daterenew','$daterenew')</script></td>
+      <th>$l_renew</th>
+    <td><input type=\"text\" name=\"tf_daterenew\" value=\"$daterenew\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_date_cancel</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecancel','$datecancel')</script></td>
+      <th>$l_date_cancel</th>
+   <td><input type=\"text\" name=\"tf_datecancel\" value=\"$datecancel\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_type</td>
-      <td class=\"detailForm\">$dis_type</td>
+      <th>$l_type</th>
+      <td>$dis_type</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_marketing_manager</td>
-      <td class=\"detailForm\">$sel_market</td>
+      <th>$l_marketing_manager</th>
+      <td>$sel_market</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_technical_manager</td>
-      <td class=\"detailForm\">$sel_tech</td>    
+      <th>$l_technical_manager</th>
+      <td>$sel_tech</td>    
     </tr><tr>
-      <td class=\"detailLabel\">$l_priority</td>
-      <td class=\"detailForm\">$sel_pri</td> 
+      <th>$l_priority</th>
+      <td>$sel_pri</td> 
     </tr><tr>
-      <td class=\"detailLabel\">$l_status</td>
-      <td class=\"detailForm\">$sel_sta</td>
+      <th>$l_status</th>
+      <td>$sel_sta</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_autorenewal</td>
-      <td class=\"detailForm\">$autorenewal_display</td>
+      <th>$l_autorenewal</th>
+      <td>$autorenewal_display</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
+      <th>$l_archive</th>
+      <td><input name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_contract_kind</td>
-      <td class=\"detailForm\">$radio_kind</td>
+      <th>$l_contract_kind</th>
+      <td>$radio_kind</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_format</td>
-      <td class=\"detailForm\">$dis_format</td>
+      <th>$l_format</th>
+      <td>$dis_format</td>
     </tr>
 $dis_format_detail
     </table>
+</fieldset>
 
-  <div class=\"detailHead\">$l_clause</div>
-    <table class=\"detail\">
+<fieldset class=\"detail infos\">
+  <legend>$l_clause</legend>
+    <table>
     <tr>
-      <td class=\"detailForm\"><textarea name=\"ta_clause\" rows=\"6\" cols=\"72\">$clause</textarea></td>
+      <td><textarea name=\"ta_clause\" rows=\"6\" cols=\"72\">$clause</textarea></td>
     </tr>
     </table>
+</fieldset>
 
-  <div class=\"detailHead\">$l_comment</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+
+<fieldset class=\"detail extra\">
+  <legend>$l_comment</legend>
+      $l_add_comment
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+      <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment
-    </tr>
-    </table>
+</fieldset>
 
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_sub</p>
-  </div>
+  <fieldset class=\"buttons\">
+    $dis_sub
+  </fieldset>
   </form>
 ";
 
@@ -1447,10 +1450,10 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
     $samename = $co_q->f("contract_label");
    
     $dis_same_cont .= "
-      <tr><td colspan =\"2\" class=\"detailText\">
+      <li>
          <a class=\"detail\" href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$id") . "\">
           $samename </a>
-      </td></tr>";
+      </li>";
   }
 
   $hidden_fields = "<input type=\"hidden\" name=\"tf_label\" value=\"$name\" />
@@ -1482,27 +1485,23 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
 ";
 
   $block = "
-  <table class=\"detail\">
+  <div class=\"detail\">
+  <ul>
     $dis_same_cont
-  </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <form method=\"post\" name=\"form_insert\"
-    action=\"" .url_prepare("contract_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-      $hidden_fields
-      <input type=\"submit\"  value=\"$l_confirm\" />
-    </form>
-    </p>
-    <p class=\"detailButtons\">
-    <form name=\"form_back\" method=\"post\"
-    action=\"" .url_prepare("contract_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"new\" />
-      $hidden_fields
-      <input type=\"submit\" value=\"$l_back\" />
-    </form>
-    </p>
+  </ul>
+  </div>
+  <div class=\"buttons\">
+  <form method=\"post\" name=\"form_insert\" action=\"" .url_prepare("contract_index.php") . "\">
+  <input type=\"hidden\" name=\"action\" value=\"insert\" />
+  <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+  $hidden_fields
+  <input type=\"submit\"  value=\"$l_confirm\" />
+  </form>
+  <form name=\"form_back\" method=\"post\" action=\"" .url_prepare("contract_index.php") . "\">
+  <input type=\"hidden\" name=\"action\" value=\"new\" />
+  $hidden_fields
+  <input type=\"submit\" value=\"$l_back\" />
+  </form>
   </div>";
 
   return $block;
@@ -1536,9 +1535,9 @@ function dis_can_delete_contract($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+    $dis_delete
+    $dis_back
     </div>";
 
   return $block;
@@ -1552,128 +1551,98 @@ function dis_can_delete_contract($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_priority_form($pri_q) {
   global $l_pri_manage,$l_pri_exist, $l_label, $l_code, $l_color;
-  global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
+  global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert,$ico_ok,$ico_delete,$l_c_new;
 
-  // Priority select construction
-  $sel_pri = "<select name=\"sel_priority\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('(');
-    col = mytext.substr(pos+1);
-    pos2 = col.indexOf(')');
-    col = col.substr(0,pos2);
-    mytext = mytext.substr(0, pos-1);
-    pos = mytext.indexOf('-');
-    forms.form_pri_update.tf_label.value=mytext.substr(pos+1);
-    forms.form_pri_update.tf_code.value=mytext.substr(0,pos);
-    forms.form_pri_update.tf_color.value=col;\"
-    size=\"4\" >";
-  while ($pri_q->next_record()) {
-    $id = $pri_q->f("contractpriority_id");
-    $code = $pri_q->f("contractpriority_code");
-    $color = $pri_q->f("contractpriority_color");
-    $label = $pri_q->f("contractpriority_label");
-    $sel_pri .= "\n<option value=\"$id\">$code-$label ($color)</option>";
+ 
+$char_title = '=';
+$key = 0;
+while ($pri_q->next_record()) {
+  $id = $pri_q->f("contractpriority_id");
+  $code = $pri_q->f("contractpriority_code");
+  $label = $pri_q->f("contractpriority_label");
+  $color = $pri_q->f("contractpriority_color");
+
+  if($key%2 == 0) {
+    $class = "class=\"pair\"";
+  } else {
+    $class = "";
   }
-  $sel_pri .= "</select>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $r = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_pri_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Priority Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_pri_delete\" method=\"post\"
-              action=\"" . url_prepare("contract_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_pri_exist</td>
-              <td class=\"adminLabel\">$sel_pri</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"priority_checklink\" />
-              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_contract_priority_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Priority Update Section -->
-
-        <tr>
-          <td colspan=\"2\">
-            <form name=\"form_pri_update\" method=\"get\"
-              action=\"" . url_prepare("contract_index.php") . "\">
-           
-            <input type=\"hidden\" name=\"action\" value=\"priority_update\" />
-            <input type=\"hidden\" name=\"sel_priority\" value=\"\" />
-          <table>
-          <tr>
-            <td class=\"adminLabel\">$l_label: </td>
-            <td><input type=\"text\" name=\"tf_label\" /></td>
-            <td rowspan=\"3\">
-              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_update\"
-              onclick=\"if (check_contract_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
-            </td>
-          </tr>
-          <tr>
-            <td class=\"adminLabel\">$l_code : </td>
-            <td>
-	      <input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" />
-	    </td>
-          </tr>
-          <tr>
-            <td class=\"adminLabel\">$l_color : </td>
-            <td>
-	      <input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" />
-	    </td>
-          </tr>
-          </table>
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Priority Section -->
-
-        <form name=\"form_pri_new\" method=\"get\"
-          action=\"" . url_prepare("contract_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_pri_new : </td>
-          <td><input name=\"tf_label\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_code : </td>
-          <td><input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" /></td>
-        </tr><tr>
-          <td class=\"adminLabel\">$l_color : </td>
-          <td><input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" /></td>
-        </tr><tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
-            <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_insert\"
-              onclick=\"if (check_contract_priority_new(this.form)) return true; else return false;\" />
-          </td>
-
-        </tr>
-        </table>
-        </form>
-      </td>
+  $c_label = htmlentities($one_cat["label"]);
+  $priority_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"priority_$id\" value=\"$id\" />
+    <a href=\"?action=priority_checklink&amp;category=priority&amp;priority=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_pri_checkdelete\" title=\"$l_pri_checkdelete\" />
+    </a></td>
+    <td><input type=\"text\" id=\"tf_priority_color_$id\" value=\"$color\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_priority_code_$id\" value=\"$code\" size=\"6\"/></td>
+    <td><input type=\"text\" id=\"tf_priority_label_$id\" value=\"$label\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'priority');\">
+    <img src=\"$ico_ok\" alt=\"$l_pri_update\" title=\"$l_pri_update\" />
+    </a>
+    </td>
     </tr>
-    </table>
+    ";    
+}
+
+// --- HTML Template --------------------------------------------------------
+$r = "
+  <div class=\"detail admin\" >
+  <form id=\"form_priority_update\" action=\"?action=priority_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_priority_color\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_priority_code\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_priority_label\" value=\"\" />
+  <input type=\"hidden\" name=\"priority\" value=\"\" />
+  </form>    
+  <h1>$l_pri_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_pri_color</td>
+  <td>$l_pri_code</td>
+  <td>$l_pri_label</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $priority_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_priority_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_color</td>
+  <td>$l_code</td>
+  <td>$l_label</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_priority_color\" value=\"\" size=\"6\"/></td>
+  <td><input type=\"text\" name=\"tf_priority_code\" value=\"\" size=\"6\"/></td>
+  <td><input type=\"text\" name=\"tf_priority_label\" value=\"\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_pri_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"priority\" />
+  </form>
+  </div>
+
 ";
 
   return $r;
@@ -1693,8 +1662,7 @@ function dis_contract_priority_links($id) {
   $label = get_contract_priority_label($id);
   $obm_q = run_query_contract_priority_links($id);
 
-  $dis_back = "<form name=\"form_back\" method=\"post\"
-        action=\"" .url_prepare("contract_index.php") . "\">
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"" .url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
@@ -1702,59 +1670,32 @@ function dis_contract_priority_links($id) {
   $nb_pri = $obm_q->num_rows();
   if ($nb_pri > 0) {
     $display["msg"] = display_warn_msg($l_pri_cant_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\"> $label : $l_pri_link_contract ($nb_pri)</td>
-    </tr>";
+    $dis_link = "<h1> $label : $l_pri_link_contract ($nb_pri)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("contract_id");
       $cname = $obm_q->f("contract_label");
-      $dis_link .="
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $dis_link .="<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$cname</a>";
     }
     if ($cpt < $nb_pri) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "...";
     }
 
-    $dis_link .="
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
+    $dis_link .="<div class=\"buttons\">$dis_back</div>";
 
   } else {
     $display["msg"] = display_ok_msg($l_pri_can_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-      $l_pri_link_contract_no $label</td>
-    </tr><tr>
-      <td>
-      </td>
-    </table>
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">
-        <form name=\"form_pri_delete\"
-          method=post action=\"" . url_prepare("contract_index.php") . "\">
+    $dis_link = "<h1>$label : $l_pri_link_contract_no</h1>
+     <div class=\"buttons\">
+         <form name=\"form_pri_delete\" method=post action=\"" . url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"priority_delete\">
         <input type=\"hidden\" name=\"sel_priority\" value=\"$id\">
         <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_delete\">
         </form>
         $dis_back
-     </p>
-    </div>";
+     </div>";
 
   }
   return $dis_link;
@@ -1769,115 +1710,93 @@ function dis_contract_priority_links($id) {
 function html_contract_status_form($sta_q) {
   global $l_label, $l_code;
   global $l_sta_manage,$l_sta_exist,$l_sta_new;
-  global $l_sta_checkdelete, $l_sta_update, $l_sta_insert;
+  global $l_sta_checkdelete, $l_sta_update, $l_sta_insert,$l_c_new,$ico_ok,$ico_delete;
 
-  // Status select construction
-  $sel_sta = "<select name=\"sel_status\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('-');
-    forms.form_status_update.tf_label.value=mytext.substr(pos+1);
-    forms.form_status_update.tf_code.value=mytext.substr(0,pos);\"
-   size=\"4\">";
-  while ($sta_q->next_record()) {
-    $id = $sta_q->f("contractstatus_id");
-    $code = $sta_q->f("contractstatus_code");
-    $label = $sta_q->f("contractstatus_label");
-    $sel_sta .= "<option value=\"$id\">$code-$label</option>\n";
+
+
+$char_title = '=';
+$key = 0;
+while ($sta_q->next_record()) {
+  $id = $sta_q->f("contractstatus_id");
+  $code = $sta_q->f("contractstatus_code");
+  $label = $sta_q->f("contractstatus_label");
+
+  if($key%2 == 0) {
+    $class = "class=\"pair\"";
+  } else {
+    $class = "";
   }
-  $sel_sta .= "</select>";
+  $c_label = htmlentities($one_cat["label"]);
+  $sta_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"status_$id\" value=\"$id\" />
+    <a href=\"?action=status_checklink&amp;category=status&amp;status=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_sta_checkdelete\" title=\"$l_sta_checkdelete\" />
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_status_code_$id\" value=\"$code\" size=\"6\"/></td>
+    <td> <input type=\"text\" id=\"tf_status_label_$id\" value=\"$label\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'status');\">
+    <img src=\"$ico_ok\" alt=\"$l_sta_update\" title=\"$l_sta_update\" />
+    </a>
+    </td>
+    </tr>
+    ";    
+}
 
   // --- HTML Template --------------------------------------------------------
 
   $r = "
-<!-- Status section -->
-
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_sta_manage</td>
-    </tr>
-    <tr>
-      <td>
-
-<!-- status delete section -->
-
-        <table>
-        <tr>
-         <td colspan=\"3\">
-          <form name=\"form_status_delete\"
-          method=\"post\" action=\"" . url_prepare("contract_index.php")."\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_sta_exist</td>
-        <td class=\"adminLabel\">$sel_sta</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"status_checklink\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_checkdelete\"
-          onclick=\"if (check_contract_status_checkdel(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-         </form>
-        </td>
-      </tr>
-
-<!-- status update section -->
-
-      <tr>
-        <td colspan=\"2\">
-          <form name=\"form_status_update\" method=\"get\"
-            action=\"" . url_prepare("contract_index.php") . "\">
-          <input type=\"hidden\" name=\"sel_status\" value=\"\" />
-          <input type=\"hidden\" name=\"action\" value=\"status_update\" />
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_label : </td>
-          <td><input type=\"text\" name=\"tf_label\" /></td>
-          <td rowspan=\"2\">
-            <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_update\"
-            onclick=\"if (check_contract_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
-          </td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_code : </td>
-          <td>
-	    <input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" />
-	  </td>
-        </tr>
-        </table>
-        </form>
-        </td>
-        <td>&nbsp;</td>
-      </tr>
-      </table>
-      </td>
-      <td>
-
-<!-- new status section -->
-
-      <form name=\"form_status_new\"
-        method=\"post\" action=\"" . url_prepare("contract_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_sta_new : </td>
-          <td><input type=\"text\" name=\"tf_label\" /></td>
-        </tr>
-        <tr>
-          <td class=\"adminLabel\">$l_code : </td>
-          <td><input type=\"text\" name=\"tf_code\" size=\"3\" maxlength=\"2\" /></td>
-        </tr>
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
-          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_insert\"
-            onclick=\"if (check_contract_status_new(this.form)) return true; " .
-            "else return false;\" />
-        </td>
-      </tr>
-     </table>
-    </form>
-    </td>
-    </tr>
-    </table>
+  <div class=\"detail admin\" >
+  <form id=\"form_status_update\" action=\"?action=status_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_status_code\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_status_label\" value=\"\" />
+  <input type=\"hidden\" name=\"status\" value=\"\" />
+  </form>    
+  <h1>$l_sta_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_code</td>
+  <td>$l_label</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $sta_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_status_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_code</td>
+  <td>$l_label</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_status_code\" value=\"\" size=\"6\"/></td>
+  <td><input type=\"text\" name=\"tf_status_label\" value=\"\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_sta_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"status\" />
+  </form>
+  </div>
 ";
 
   return $r;
@@ -1904,47 +1823,27 @@ function dis_contract_status_links($id) {
   $nb_stat = $obm_q->num_rows();
   if ($nb_stat > 0) {
     $display["msg"] = display_warn_msg($l_sta_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_sta_link_incident ($nb_stat)</td>
-    </tr>";
+    $dis_link = "<h1>$label : $l_sta_link_incident ($nb_stat)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $stid = $obm_q->f("contract_id");
       $stlabel = $obm_q->f("contract_label");
-      $dis_link.= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;incident_id=$stid") . "\">$stlabel</a>
-      </td>
-    </tr>";
+      $dis_link.= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;incident_id=$stid") . "\">$stlabel</a>";
     }
     if ($cpt < $nb_stat) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "...";
     }
 
-    $dis_link .="
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
+    $dis_link .="<div class=\"buttons\">$dis_back</div>";
 
   } else {
     $display["msg"] = display_ok_msg($l_sta_can_delete); 
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">$label : $l_sta_link_incident_no</td>
-    </tr>
-    </table>
-    <div class=\"detailButton\">
-        <p class=\"detailButtons\">
+    $dis_link = "<h1>$label : $l_sta_link_incident_no</h1>
+    
+       <div class=\"buttons\">
+       
         <form name=\"form_kind_delete\".
           method=post action=\"" . url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
@@ -1973,7 +1872,7 @@ function dis_contract_admin_index() {
   $pri_q = run_query_contract_priority();
   $sta_q = run_query_contract_status();
   
-  return html_contract_priority_form($pri_q) . "<hr />" .html_contract_status_form($sta_q)."<hr />" .html_contract_admin_form(run_query_contract_type());
+  return html_contract_priority_form($pri_q) . html_contract_status_form($sta_q) .html_contract_admin_form(run_query_contract_type());
 }
 
 
@@ -1987,90 +1886,85 @@ function html_contract_admin_form($type_q) {
   global $l_type_manage, $l_type_new, $l_type_exist;
   global $l_type_checkdelete, $l_type_delete, $l_type_update, $l_type_insert;
   global $l_type_insert_ok, $l_type_insert_error, $l_type_update_ok;
-  global $l_type_update_error, $l_type_delete_error, $l_type_delete_ok;
+  global $l_type_update_error, $l_type_delete_error, $l_type_delete_ok,$l_c_new,$ico_ok,$ico_delete;
 
-  $dis_sel_type = "<select name=\"sel_type\" onChange=\"
-    forms.form_type_update.tf_label.value=this.options[this.selectedIndex].text;\"
-    size=\"4\">";
-  while ($type_q->next_record()) {
-    $dis_sel_type .= "\n<option value=\"".$type_q->f("contracttype_id")."\">".$type_q->f("contracttype_label") .
-           "</option>";
+$char_title = '=';
+$key = 0;
+while ($type_q->next_record()) {
+  $id = $type_q->f("contracttype_id");
+  $label = $type_q->f("contracttype_label");
+
+  if($key%2 == 0) {
+    $class = "class=\"pair\"";
+  } else {
+    $class = "";
   }
-  $dis_sel_type .= "</select>";
-
-  // --- html template --------------------------------------------------------
-
-  $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_type_manage</td>
+  $c_label = htmlentities($one_cat["label"]);
+  $type_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"type_$id\" value=\"$id\" />
+    <a href=\"?action=type_checklink&amp;category=type&amp;type=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_type_checkdelete\" title=\"$l_type_checkdelete\" />
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_type_label_$id\" value=\"$label\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'type');\">
+    <img src=\"$ico_ok\" alt=\"$l_type_update\" title=\"$l_type_update\" />
+    </a>
+    </td>
     </tr>
-    <tr>
-      <td>
-<!-- type delete section -->
-        <table>
-        <tr>
-         <td colspan=\"3\">
-     <form name=\"form_type_delete\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
-       <table>
-        <tr>
-          <td class=\"adminLabel\">$l_type_exist</td>
-          <td class=\"adminLabel\">$dis_sel_type</td>
-          <td>
-            <input type=\"hidden\" name=\"action\" value=\"type_checklink\" />
-            <input type=\"submit\" name=\"sub_type\" value=\"$l_type_checkdelete\"
-              onclick=\"if (check_contract_type_del(this.form)) return true;
-              else return false;\" />
-          </td>
-         </tr>
-        </table>
-       </form>
-      </td>
-     </tr>
-<!--  type update section -->
-     <tr>
-      <td colspan=\"2\" class=\"adminLabel\">
-       <form name=\"form_type_update\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
-       <table>
-         <tr>
-          <td>
-	    <input type=\"hidden\" name=\"sel_type\" value=\"\" />
-	    <input type=\"hidden\" name=\"action\" value=\"type_update\" />
-            <input type=\"text\" name=\"tf_label\" />
-	  </td>
-	  <td rowspan=\"2\">
-	    <input type=\"submit\" name=\"sub_type\" value=\"$l_type_update\"
-	    onclick=\"if (check_contract_type_upd(this.form,document.form_type_delete)) return true; else return false;\" />
-	  </td>
-	</tr>
-       </table>
-       </form>
-      </td>
-      <td>&nbsp;</td>
-     </tr>
-    </table>
-<!-- new type section -->
-   </td>
-   <td>
-    <form name=\"form_type_new\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
-     <table>
-      <tr>
-       <td class=\"adminLabel\">
-         $l_type_new : <input type=\"text\" name=\"tf_label\" />
-       </td>
-      </tr><tr>
-       <td class=\"adminLabel\">
-         <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
-         <input type=\"submit\" name=\"sub_type\" value=\"$l_type_insert\"
-         onclick=\"if (check_contract_type_new(this.form)) return true;else return false;\" />
-       </td>
-      </tr>
-     </table>
-    </form>
-   </td>
+    ";    
+}
+
+// --- HTML Template --------------------------------------------------------
+$block = "
+  <div class=\"detail admin\" >
+  <form id=\"form_type_update\" action=\"?action=type_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_type_label\" value=\"\" />
+  <input type=\"hidden\" name=\"type\" value=\"\" />
+  </form>    
+  <h1>$l_type_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_type_label</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $type_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_type_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_c_new</td>
   </tr>
- </table>
-";
+  <tbody>   
+  <tr>
+  <td>$l_label</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_type_label\" value=\"\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_type_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"type_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"type\" />
+  </form>
+  </div>
+  ";
 
   return $block;
 }
@@ -2092,67 +1986,49 @@ function dis_contract_type_links($id) {
   $nb_type = $obm_q->num_rows();
   if ($nb_type > 0) {
     $display["msg"] .= display_warn_msg("$label : $l_type_cant_delete");
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_type_link_contract ($nb_type)</td>
-    </tr>";
+    $dis_link = "<h1>$label : $l_type_link_contract ($nb_type)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $cid = $obm_q->f("contract_id");
       $clabel = $obm_q->f("contract_label");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$clabel</a>
-      </td>
-    </tr>";
+      $dis_link .= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$clabel</a>";
     }
     if ($cpt < $nb_type) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "...";
     }
 
-    $dis_link .= "
-    </table>
-
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-        <form name=\"form_back\" method=\"post\"
-          action=\"" .url_prepare("contract_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-    </p>
-    </div>";
-
   } else {
-    $display["msg"] .= display_ok_msg("$label : $l_type_can_delete");
-    $dis_link = "
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-        <form name=\"form_type_delete\".
-          method=\"post\" action=\"" . url_prepare("contract_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"type_delete\" />
-        <input type=\"hidden\" name=\"sel_type\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
-        </form>
-    </p>
-    <p class=\"detailButtons\">
-        <form name=\"form_back\" method=\"post\"
-          action=\"" .url_prepare("contract_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-    </p>
-    </div>";
-  }
 
-  return $dis_link;
+  $dis_link = "<h1>$label : $l_type_link_contract</h1>";
+}
+
+$block .= "
+    <div class=\"detail\">
+    <ul>
+    $dis_link
+    </ul>
+    </div>";
+
+  $dis_back = "<a href=\"$path/contract/contract_index.php?action=admin\"> $l_back</a>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_type_can_delete);
+    $dis_del = "<a href=\"$path/contract/contract_index.php?action=type_delete&amp;sel_type=$id\" >$l_type_delete</a>";
+    $block .= "
+      <div class=\"buttons\">
+      $dis_del
+      $dis_back
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_type_cant_delete);
+    $block .= "
+      <div class=\"buttons\">
+        $dis_back
+      </div>";
+  }
+  return $block;
 }
 
 
@@ -2203,7 +2079,7 @@ function html_select_contract($con_q, $title, $url="") {
   }
   $display_cont.="</select>";
 
-  $display["title"] = "<div class=\"title\">$title</div>";
+  $display["title"] = "<h1 class=\"title\">$title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -2211,19 +2087,17 @@ function html_select_contract($con_q, $title, $url="") {
   <form method=\"get\" name=\"f_entity\"
     onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
 
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"detailLabel\">
+    <th>
     $display_cont
-    </td>
+    </th>
   </tr>
   </table>
 
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  <div class=\"buttons\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"submit\" value=\"$l_select_contract\" />
-    </p>
   </div>
   </form>
 

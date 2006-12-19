@@ -36,7 +36,7 @@ include("$obminclude/global.inc");
 $params = get_contract_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
+include("$obminclude/of/of_category.inc");
 require("contract_query.inc");
 require("contract_display.inc");
 require("contract_js.inc");
