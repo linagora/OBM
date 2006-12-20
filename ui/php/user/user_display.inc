@@ -142,7 +142,7 @@ function html_user_search_form($user) {
     if ($ext_title == "") {
       $ext_title = $l_add_users;
     }
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   foreach ($profiles as $profile => $one_profile) {
@@ -152,48 +152,46 @@ function html_user_search_form($user) {
 
   $block = "
   <form method=\"get\" name=\"f_search\"
-    action=\"". url_prepare("user_index.php")."\">
+    action=\"". url_prepare("user_index.php")."\" class=\"search\"> 
 
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_login<br />
+    <label>$l_login<br />
       <input type=\"text\" name=\"tf_login\" size=\"16\" maxlength=\"32\"
       value=\"$login\" />
-    </div>
-    <div class=\"searchLabel\">$l_lastname<br />
+    </label>
+    <label>$l_lastname<br />
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
-    </div>
-    <div class=\"searchLabel\">$l_user_perms<br />
+    </label>
+    <label>$l_user_perms<br />
       <select type=\"text\" name=\"sel_perms\">
         <option value=\"$c_all\" /> $l_all
         $block_pro
       </select>
-    </div>
-    <div class=\"searchLabel\">$l_email<br />
+    </label>
+    <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
-    </div>
-    <div class=\"searchLabel\">$l_desc<br />
+    </label>
+    <label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
       value=\"$desc\" />
-    </div>
-    <div class=\"searchLabel\">$l_group<br />
+    </label>
+    <label>$l_group<br />
       <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
       value=\"$group\" />
-    </div>
-    <div class=\"searchLabel\">$l_archive<br />
+    </label>
+    <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive>
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\">
       <input name=\"submit\" type=\"submit\" value=\"$l_find\">
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_restriction
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
-  </form>";
+    </label>
+    <p class=\"CL\" />
+   </form>";
 
   return $block;
 }
@@ -279,13 +277,11 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
     $user_d->data_form_end = "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </p>
-      </p>
+      </div>
       </form>";
 
   /*  else if ($ext_action == "ext_get_id"){
@@ -365,7 +361,7 @@ function html_user_form($usr_q, $user) {
   // Domain
   if ($c_multidomain && $obm["domain_id"] == $c_default_domain) {
     $domain_list = get_global_domain_list();
-    $sel_domain = "<tr><td class=\"detailLabel\">$l_domain</td><td class=\"detailForm\">
+    $sel_domain = "<tr><th>$l_domain</th><td>
       $domain_list </td></tr>";
   }
 
@@ -397,57 +393,59 @@ function html_user_form($usr_q, $user) {
       onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
-    <div class=\"detailHead\">$l_user</div>
+<fieldset class=\"detail infos\">
+    <legend>$l_user</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_login</td>
-      <td class=\"detailForm\"><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
+      <th>$l_login</th>
+      <td><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_password</td>
-      <td class=\"detailForm\"><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
+      <th>$l_password</th>
+      <td><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
     </tr>$sel_domain<tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
+      <th>$l_archive</th>
+      <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_user_perms</td>
-      <td class=\"detailForm\"><select name=\"sel_perms\">
+      <th>$l_user_perms</th>
+      <td><select name=\"sel_perms\">
         $block_pro
         </select>
       </td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailForm\"><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
+      <th>$l_lastname</th>
+      <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailForm\"><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
+      <th>$l_firstname</th>
+      <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailForm\"><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
+      <th>$l_phone</th>
+      <td><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_phone2</td>
-      <td class=\"detailForm\"><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
+      <th>$l_phone2</th>
+      <td><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_fax</td>
-      <td class=\"detailForm\"><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
+      <th>$l_fax</th>
+      <td><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_fax2</td>
-      <td class=\"detailForm\"><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
+      <th>$l_fax2</th>
+      <td><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailForm\"><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
+      <th>$l_email</th>
+      <td><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_datebegin</td>
-      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
+      <th>$l_datebegin</th>
+      <td><script>calendar('tf_datebegin','$datebegin')</script></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailForm\"><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
+      <th>$l_desc</th>
+      <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
     </tr>
     </table>
+ </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -513,16 +511,16 @@ function html_user_consult($obm_q) {
   $g_q = run_query_user_user_group($id);
   if ($g_q->num_rows() > 0) {
     $dis_group = "
-    <div class=\"detailHead\">$l_group_member</div>
-    <table class=\"detail\">
+    <h1>$l_group_member</h1>
+    <table>
     <tr>";
     while ($g_q->next_record()) {
       $grp_id = $g_q->f("group_id");
       $grp_name = $g_q->f("group_name");
       $dis_group .= "
     </tr><tr>
-      <td class=\"detailLabel\">$l_group</td>
-      <td class=\"detailText\"><a href=\"$path/group/group_index.php?action=detailconsult&amp;group_id=$grp_id\">$grp_name</a></td>";
+      <th>$l_group</th>
+      <td><a href=\"$path/group/group_index.php?action=detailconsult&amp;group_id=$grp_id\">$grp_name</a></td>";
     }
     $dis_group .= "
     </tr>
@@ -530,60 +528,68 @@ function html_user_consult($obm_q) {
   }
 
   $display["detailInfo"] = display_record_info($obm_q);
-  $display["title"] = "<div class=\"title\">$l_user : $fname $lname</div>";
+  $display["title"] = "<h1 class=\"title\">$l_user : $fname $lname</h1>";
 
   $block = "
-  <div class=\"detailHead\">$l_user</div>
+<div class=\"detail infos\">
+  <h1>$l_user</h1>
  
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$archive</td>
+      <th>$l_archive</th>
+      <td>$archive</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_login</td>
-      <td class=\"detailText\">$login</td>
+      <th>$l_login</th>
+      <td>$login</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_local</td>
-      <td class=\"detailText\">$local</td>
+      <th>$l_local</th>
+      <td>$local</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_ext_id</td>
-      <td class=\"detailText\">$ext_id</td>
+      <th>$l_ext_id</th>
+      <td>$ext_id</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_user_perms</td>
-      <td class=\"detailText\">$perms</td>
+      <th>$l_user_perms</th>
+      <td>$perms</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailText\">$lname</td>
+      <th>$l_lastname</th>
+      <td>$lname</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailText\">$fname</td>
+      <th>$l_firstname</th>
+      <td>$fname</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailText\">$phone</td>
+      <th>$l_phone</th>
+      <td>$phone</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_phone2</td>
-      <td class=\"detailText\">$phone2</td>
+      <th>$l_phone2</th>
+      <td>$phone2</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_fax</td>
-      <td class=\"detailText\">$fax</td>
+      <th>$l_fax</th>
+      <td>$fax</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_fax2</td>
-      <td class=\"detailText\">$fax2</td>
+      <th>$l_fax2</th>
+      <td>$fax2</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">$email</td>
+      <th>$l_email</th>
+      <td>$email</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_datebegin</td>
-      <td class=\"detailText\">$datebegin</td>
+      <th>$l_datebegin</th>
+      <td>$datebegin</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_lastaccess</td>
-      <td class=\"detailText\">$lastaccess</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailText\">$desc</td>
+      <th>$l_lastaccess</th>
+      <td>$lastaccess</td>
+    </tr>
+</table>
+</div>
+
+<div class=\"detail infos\">
+  <h1>$l_desc</h1>
+  <table>
+   <tr>
+     <th>$l_desc</th>
+      <td>$desc</td>
     </tr>
     </table>
-
+</div>
     $dis_group
 ";
 
@@ -621,8 +627,8 @@ function html_user_group_consult($usr_q) {
     $checked = (in_array($grp_id, $groups) ? " checked" : "" );
     $dis_group .= "
     <tr>
-      <td class=\"detailLabel\">$grp_name</td>
-      <td class=\"detailForm\"><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked></td>
+      <th>$grp_name</th>
+      <td><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked></td>
     </tr>";
   }
 
@@ -630,8 +636,8 @@ function html_user_group_consult($usr_q) {
     <form method=\"post\" name=\"f_entity\"
       action=\"" . url_prepare("user_index.php") . "\">
 
-  <div class=\"detailHead\">$l_user $login ($lname $fname) $l_group_member</div>
-  <table class=\"detail\">
+  <h1>$l_user $login ($lname $fname) $l_group_member</h1>
+  <table>
   $dis_group
   </table>
 
@@ -677,9 +683,9 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     $id = $usr_q->f("userobm_id");
     $samename = $usr_q->f("userobm_login");
     $dis_same_user .= "
-        <tr><td colspan =\"2\" class=\"detailLabel\">
+        <li>
           <a href=\"" . url_prepare("user_index.php?action=detailconsult&amp;user_id=$id") . "\">$samename</a>
-        </td></tr>";
+        </li>";
   }
 
   $hidden_fields = "
@@ -698,11 +704,12 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />";
 
   $block = "
-  <table class=\"detail\">
+  <div class=\"detail\">
+    <ul>
     $dis_same_user
-  </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+    </ul>
+  </div>
+  <div class=\"buttons\">
     <form method=\"post\" name=\"form_insert\"
     action=\"" . url_prepare("user_index.php") . "\">
     $hidden_fields
@@ -710,16 +717,13 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
     </form>
-    </p>
-    <p class=\"detailButtons\">
     <form name=\"form_back\" method=\"post\"
     action=\"" . url_prepare("user_index.php") . "\">
     $hidden_fields
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
-    </p>
-  </div>";
+ </div>";
 
   return $block;
 }
@@ -793,35 +797,34 @@ function dis_user_can_delete($p_id) {
       }
       if ($fieldexist_uc || $fieldexist_uu) {
 	$dis_user .= "
-      <tr>
-        <td class=\"detailHead\" rowspan=\"2\">$table</td>
-        <td class=\"detailText\"><b>$nbc</b> $l_check_usercreate</td>
-      </tr><tr>
-        <td class=\"detailText\"><b>$nbu</b> $l_check_userupdate</td>
-      </tr>";
+       <h1>$table</h1>
+       <ul>
+        <li><b>$nbc</b> $l_check_usercreate</li>
+        <li><b>$nbu</b> $l_check_userupdate</li>
+	</ul>
+      ";
       } else {
 	$dis_user .= "
-      <tr>
-        <td class=\"detailHead\">$table</td>
-        <td class=\"detailText\">$l_no_user</td>
-      </tr>";
+        <h1>$table</h1>
+	<ul>
+        <li>$l_no_user</li>
+	</ul>
+	";
       }
-      $dis_user .= "<tr>
-      <td colspan=\"2\"><hr /></td>
-    </tr>";
+      $dis_user .= "<hr />";
     }
     $i++;
   }
  
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+    $dis_delete
+    $dis_back
     </div>
     <br />
-    <div class=\"detailHead\">$l_user : $l_infos</div>
+    <h1>$l_user : $l_infos</h1>
 
-    <table class=\"detail\">
+    <table>
       $dis_user
     </table>";
 
