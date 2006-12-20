@@ -222,57 +222,56 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $block = "
     <form method=\"post\" name=\"f_search\"
         onSubmit=\"if (check_search_form(this) == false) return false;
-        else return true;\" action=\"$url_form\">
-    <div class=\"search\">
+        else return true;\" action=\"$url_form\" class=\"search\">
 
-    <div class=\"searchLabel\">$l_label_start<br />
+    <label>$l_label_start<br />
       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">$l_number<br />
+    <label>$l_number<br />
       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"$number\" />
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">$l_amount_ht<br />
+    <label>$l_amount_ht<br />
       <input type=\"text\" name=\"tf_amount_ht\" size=\"15\" value=\"$ht\" />
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">$l_amount_ttc<br />
+    <label>$l_amount_ttc<br />
       <input type=\"text\" name=\"tf_amount_ttc\" size=\"15\" value=\"$ttc\" />
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">$l_status<br />
+    <label>$l_status<br />
       $sel_status
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">$l_date $l_after<br />
-      <script>calendar('tf_date_after','$date_after')</script>
-    </div>
+    <label>$l_date $l_after<br />
+    <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+    </label>
 
-    <div class=\"searchLabel\">$l_date $l_before<br />
-      <script>calendar('tf_date_before','$date_before')</script>
-    </div>
+    <label>$l_date $l_before<br />
+    <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+    </label>
 
-    <div class=\"searchLabel\">$l_include_archive<br />
+    <label>$l_include_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive> 
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">$l_inout<br />
+    <label>$l_inout<br />
       <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $rb_both />
       $l_both &nbsp;
       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
       $l_client &nbsp;
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $rb_four />
       $l_supplier &nbsp;
-    </div>
+    </label>
 
     $block_tt
 
-    <div class=\"searchLabel\">$l_company<br />
+    <label>$l_company<br />
       <input type=\"text\" name=\"tf_company\" value=\"$company\" />
-    </div>
+    </label>
 
-    <div class=\"searchLabel\">&nbsp;<br>
+    <label>&nbsp;<br>
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
       <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"project_id\" value=\"$project_new_id\" />
@@ -280,11 +279,8 @@ function html_invoice_search_form($invoice, $sta, $tts) {
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
-    </div>
-
-    <div class=\"searchEnd\"></div>
-
-    </div>
+    </label>
+    <p class=\"CL\" />
     </form>";
 
   return $block;
@@ -589,7 +585,7 @@ function dis_invoice_detail($inv_q) {
   $project = $inv_q->f("project_name");
   $archive = ($inv_q->f("invoice_archive") == 1 ? $l_yes : $l_no);
 
-  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
+  $display["title"] = "<h1 class=\"title\">$l_invoice : $label</h1>";
 
   $url_comp = url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id");
   if ($deal_id > 0) {
@@ -602,72 +598,76 @@ function dis_invoice_detail($inv_q) {
   }
 
   $block .= "
-    <div class=\"detailHead\">$title</div>
+<div class=\"detail infos\">
+    <h1>$title</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_company <a href=\"$url_comp\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"\" /></a></td>
-      <td class=\"detailText\">$company</td>
+      <th>$l_company <a href=\"$url_comp\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"\" /></a></th>
+      <td>$company</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_deal $deal_link</td>
-      <td class=\"detailText\">$deal</td>
+      <th>$l_deal $deal_link</th>
+      <td>$deal</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_project $project_new_link</td>
-      <td class=\"detailText\">$project</td>
+      <th>$l_project $project_new_link</th>
+      <td>$project</td>
     </tr>
     </table>
- 
-    <div class=\"detailHead\">$l_invoice</div>
+</div>
 
-    <table class=\"detail\">
+<div class=\"detail infos\">
+    <h1>$l_invoice</h1>
+
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
+      <th>$l_label</th>
+      <td>$label</td>
     </tr>
     <tr>
       $dis_company
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$num</td>
+      <th>$l_number</th>
+      <td>$num</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$archive</td>
+      <th>$l_archive</th>
+      <td>$archive</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
+      <th>$l_date</th>
+      <td>$date</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_expiration_date</td>
-      <td class=\"detailText\">$expiration_date</td>
+      <th>$l_expiration_date</th>
+      <td>$expiration_date</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_payment_date</td>
-      <td class=\"detailText\">$payment_date</td>
+      <th>$l_payment_date</th>
+      <td>$payment_date</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_status</td>
-      <td class=\"detailText\">$status</td>
+      <th>$l_status</th>
+      <td>$status</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailText\">$inout</td>
+      <th>$l_inout</th>
+      <td>$inout</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_amount_ht</td>
-      <td class=\"detailText\">$ht</td>
+      <th>$l_amount_ht</th>
+      <td>$ht</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_amount_ttc</td>
-      <td class=\"detailText\">$ttc</td>
+      <th>$l_amount_ttc</th>
+      <td>$ttc</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailText\">$comment</td>
+      <th>$l_comment</th>
+      <td>$comment</td>
     </tr>
-    </table>";
+    </table>
+    </div>";
 
   return $block;
 } 
@@ -813,19 +813,16 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
   $inout_s = ($inout == "-") ? "checked" : "";
 
   $dis_inout = "
-    <td class=\"detailLabel\">$l_inout</td>
-    <td class=\"detailForm\">
+    <th>$l_inout</th>
+    <td>
       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier
       </td>";
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+      $l_upd_comment
+      <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
     ";
   }
 
@@ -861,17 +858,17 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     <input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
-  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
+  $display["title"] = "<h1 class=\"title\">$l_invoice : $label</h1>";
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"invoice_index.php\">
+<fieldset class=\"detail infos\">
+  <legend>$title</legend>
 
-  <div class=\"detailHead\">$title</div>
-
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_company</td>
-    <td class=\"detailForm\">
+    <th>$l_company</th>
+    <td>
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
       $c_name
       </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
@@ -882,8 +879,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_deal</td>
-    <td class=\"detailForm\">
+    <th>$l_deal</th>
+    <td>
       <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$d_id") . "\">
       $d_label
       </a><input type=\"hidden\" name=\"deal_id\" value=\"$d_id\" />
@@ -894,8 +891,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
       <input type=\"text\" size=\"32\" name=\"deal_new_label\" value=\"$d_new_label\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_project</td>
-    <td class=\"detailForm\">
+    <th>$l_project</th>
+    <td>
       <a href=\"". url_prepare("$path/project/project_index.php?action=detailconsult&amp;project_id=$d_id") . "\">
       $p_name
       </a><input type=\"hidden\" name=\"project_id\" value=\"$p_id\" />
@@ -907,76 +904,77 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q) {
     </td>
   </tr>
   </table>
+  </fieldset>
 
-  <div class=\"detailHead\">$l_invoice</div>
+<fieldset class=\"detail infos\">
+  <legend>$l_invoice</legend>
 
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_label</td>
-    <td class=\"detailForm\">
+    <th>$l_label</th>
+    <td>
       <input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" />
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_number</td>
-    <td class=\"detailForm\">
+    <th>$l_number</th>
+    <td>
       <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\" />
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_archive</td>
-    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+    <th>$l_archive</th>
+    <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_date</td>
-    <td class=\"detailForm\">
-      <script>calendar('tf_date','$date')</script>
+    <th>$l_date</th>
+    <td>
+      <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_expiration_date</td>
-    <td class=\"detailForm\">
-      <script>calendar('tf_expiration_date','$expiration_date')</script>
+    <th>$l_expiration_date</th>
+    <td>
+      <input type=\"text\" name=\"tf_expiration_date\" value=\"$expiration_date\" class=\"datePicker\"/>
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_payment_date</td>
-    <td class=\"detailForm\">
-      <script>calendar('tf_payment_date','$payment_date')</script>
+    <th>$l_payment_date</th>
+    <td>
+    <input type=\"text\" name=\"tf_payment_date\" value=\"$payment_date\" class=\"datePicker\"/>
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_status</td>
-    <td class=\"detailForm\">$sel_status</td>
+    <th>$l_status</th>
+    <td>$sel_status</td>
   </tr><tr>
     $dis_inout
   </tr><tr>
-    <td class=\"detailLabel\">$l_amount_ht</td>
-    <td class=\"detailForm\">
+    <th>$l_amount_ht</th>
+    <td>
       <input name=\"tf_amount_ht\" type=\"text\" size=\"15\" value=\"$ht\" onChange=\"compute_tax(this.form, true);\" />
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_tax_rate</td>
-    <td class=\"detailForm\"><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" />
+    <th>$l_tax_rate</th>
+    <td><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" />
       <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\" onClick=\"compute_tax(this.form);\" />
     </td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_amount_ttc</td>
-    <td class=\"detailForm\">
+    <th>$l_amount_ttc</th>
+    <td>
       <input name=\"tf_amount_ttc\" type=\"text\" size=\"15\" value=\"$ttc\" />
     </td>
   </tr>
   </table>
+</fieldset>
 
-    <div class=\"detailHead\">$l_comment</div>
+<fieldset class=\"detail extra\">
 
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+    <legend>$l_comment</legend>
+      $l_add_comment
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+      $sel_usercomment
+      <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment
-    </tr>
-    </table>
+</fieldset>
 
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-  </div>
+  <fieldset class=\"buttons\">
+    $dis_button
+  </fieldset>
 
   </form>";
 
@@ -1011,9 +1009,9 @@ function dis_can_delete_invoice($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+      $dis_delete
+      $dis_back
     </div>";
 
   return $block;

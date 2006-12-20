@@ -146,7 +146,7 @@ function html_group_search_form ($group) {
     if ($ext_title == "") {
       $ext_title = $l_add_groups;
     }
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -161,30 +161,28 @@ function html_group_search_form ($group) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("group_index.php")."\">
-  <div class=\"search\">
+  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("group_index.php")."\" class=\"search\">
 
-    <div class=\"searchLabel\">$l_name<br />
+    <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"16\" value=\"$name\" />
-    </div>
-    <div class=\"searchLabel\">$l_group_user<br />
+    </label>
+    <label>$l_group_user<br />
       <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
-    </div>
-    <div class=\"searchLabel\">$l_email<br />
+    </label>
+    <label>$l_email<br />
       <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"$email\" />
-    </div>
-    <div class=\"searchLabel\">$l_visibility<br />
+    </label>
+    <label>$l_visibility<br />
       $sel_privacy
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $child_res
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -272,14 +270,12 @@ function html_group_search_group($obm_q, $prefs, $group) {
     }
     $dis_group->data_form_head = "<form $form_attr>";
     $dis_group->data_form_end = "
-    <p class=\"detailButton\">
-    <p class=\"detailButtons\">
+    <div class=\"buttons\">
       <input type=\"submit\" value=\"$l_add\" />
       <input type=\"hidden\" name=\"group_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
       $input_target
-    </p>
-    </p>
+    </div>
     </form>";
 
     $display_popup_end = "
@@ -340,33 +336,34 @@ function html_group_form($action, $group_q, $group) {
     }
     $dis_private = "
   <tr>
-    <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\"><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />
+    <th>$l_private</th>
+    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />
   </tr>";
   } 
 
   $block = "<center>
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
+<fieldset class=\"detail infos\">
+  <legend>$l_group</legend>
 
-  <div class=\"detailHead\">$l_group</div>
-
-  <table class=\"detail\">
+  <table>
   <tr>
-    <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailForm\">
+    <th>$l_name</th>
+    <td>
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
   <tr>
-    <td class=\"detailLabel\">$l_desc</td>
-    <td class=\"detailForm\">
+    <th>$l_desc</th>
+    <td>
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
   </tr><tr>
-    <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\">
+    <th>$l_email</th>
+    <td>
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
-  </table>";
+  </table>
+  </fieldset>";
 
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -380,11 +377,9 @@ function html_group_form($action, $group_q, $group) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
+  $block .= "<fieldset class=\"buttons\">
     $dis_but
-    </p>
-    </div>
+    </fieldset>
     </form>";
 
   return $block;
@@ -460,32 +455,42 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   //$main_domain = $mail["main_domain"];
 
   $display["detailInfo"] = display_record_info($group_q);
-  $display["title"] = "<div class=\"title\">$l_group : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_group : $name</h1>";
 
   $block = "
-    <div class=\"detailHead\">$l_group</div>
+  <div class=\"detail infos\">
+    <h1>$l_group</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_system</td>
-      <td class=\"detailText\">$system</td>
+      <th>$l_system</th>
+      <td>$system</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_local</td>
-      <td class=\"detailText\">$local</td>
+      <th>$l_local</th>
+      <td>$local</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_ext_id</td>
-      <td class=\"detailText\">$ext_id</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_desc</td>
-      <td class=\"detailText\">$desc</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">$email</td>
+      <th>$l_ext_id</th>
+      <td>$ext_id</td>
     </tr>
-    </table>";
+    </table>
+    </div>
+  
+  <div class=\"detail infos\">
+    <h1>$l_desc</h1>
+   
+    <table>
+    <tr>
+      <th>$l_desc</th>
+      <td>$desc</td>
+    </tr><tr>
+      <th>$l_email</th>
+      <td>$email</td>
+    </tr>
+    </table>
+  </div>";
 
 
   // Affichage des groupes membres 
@@ -518,13 +523,11 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 
     if ($perm->check_right($module, $cright_write)) {
       $block .= "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_group_sel\" /> 
         <input type=\"hidden\" name=\"group_id\" value=\"$id\" /> 
         <input type=\"hidden\" name=\"action\" value=\"group_del\" /> 
-        </p>
-      </p>
+      </div>
       </form>";
     }
   }
@@ -559,13 +562,11 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 
     if ($perm->check_right($module, $cright_write)) {
       $block .= "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_del_user_sel\" />
         <input type=\"hidden\" name=\"group_id\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"user_del\" />
-        </p>
-      </p>
+      </div>
       </form>";
     }
   }
@@ -600,9 +601,9 @@ function dis_group_can_delete($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+     $dis_delete
+     $dis_back
     </div>";
 
   return $block;
@@ -631,17 +632,18 @@ function dis_group_warn_insert($id, $g_q, $group) {
     $samename = $g_q->f("group_name");
     $samedesc = $g_q->f("group_desc");
     $dis_same_group .= "
-      <tr><td class=\"detailLabel\">
+      <li>
         <a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;group_id=$id") . "\">$samename ($samedesc)</a>
-      </td></tr>";
+      </li>";
   }
 
   $block = "
-  <table class=\"detail\">
+  <div class=\"detail\">
+    <ul>
     $dis_same_group
-  </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+    </ul> 
+  </div>
+  <div class=\"buttons\">
       <form method=\"post\" name=\"form_insert\"
       action=\"" .url_prepare("group_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -650,8 +652,6 @@ function dis_group_warn_insert($id, $g_q, $group) {
       <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
       </form>
-    </p>
-    <p class=\"detailButtons\">
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("group_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"new\" />
@@ -659,7 +659,6 @@ function dis_group_warn_insert($id, $g_q, $group) {
       <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
-    </p>
   </div>";
 
   return $block;
@@ -680,7 +679,7 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
   $dis_pref->pref_dis_help = 0;
 
   $block = "
-    <table class=\"detail\">
+    <table>
     <tr>
       <td>" . $dis_pref->display() . "</td>";
 

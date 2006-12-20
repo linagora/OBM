@@ -19,7 +19,6 @@ require("payment_display.inc");
 require("payment_query.inc");
 require("payment_js.inc");
 require_once("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 get_payment_action();
 $perm->check_permissions($module, $action);

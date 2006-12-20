@@ -606,7 +606,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   <table width=\"100%\">
   <tr>
     <td valign=\"top\" width=\"50%\">
-<div class=\"detail infos\">
+<div class=\"detail extra\">
       <h1>$dis_kind</h1>
       <table>
       <tr>
@@ -635,7 +635,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
     </td>
     <td valign=\"top\" width=\"50%\">
 
-<div class=\"detail infos\">
+<div class=\"detail extra\">
       <h1>$l_manager</h1>
       <table>
       <tr>
@@ -654,7 +654,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   <table width=\"100%\">
   <tr>
     <td valign=\"top\" width=\"50%\">
-<div class=\"detail infos\">
+<div class=\"detail extra\">
     <h1>$l_contract</h1>
     <table>
     <tr>
@@ -677,7 +677,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
 </div>
     </td>
     <td valign=\"top\" width = 50%>
-<div class=\"detail infos\">
+<div class=\"detail extra\">
     <h1>$l_dates</h1>
     <table>
     <tr>
@@ -718,7 +718,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   </tr>
   </table>
 </div>
-<div class=\"detail infos\">
+<div class=\"detail extra\">
  <h1>$l_clause</h1>
   <table>
   <tr>

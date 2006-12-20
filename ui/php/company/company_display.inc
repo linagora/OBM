@@ -491,7 +491,7 @@ function html_company_links($co_q) {
     $block_deal = "
 <div  class=\"portlet\" id=\"companyDeal\">
 <h1>$l_module_deal</h1>
-<ul class=\"linkList\">
+<ul>
   <li><a href=\"$url_deal_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
       $l_module_deal (
       <a href=\"$url_deal_list\">$deal_num</a> /

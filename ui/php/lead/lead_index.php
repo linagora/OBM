@@ -19,7 +19,6 @@ require("lead_display.inc");
 require("lead_query.inc");
 require_once("lead_js.inc");
 require_once("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 get_lead_action();
 $perm->check_permissions($module, $action);

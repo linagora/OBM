@@ -154,56 +154,53 @@ function html_payment_search_form($params, $kinds, $accs) {
   $sel_kind .= "</select>";
 
   $block = "
-    <form method=\"get\" name=\"f_search\" action=\"payment_index.php?action=search\">
-     <div class=\"search\">
+    <form method=\"get\" name=\"f_search\" action=\"payment_index.php?action=search\" class=\"search\">
 
-      <div class=\"searchLabel\">$l_comment<br />
+      <label>$l_comment<br />
        <input name=\"tf_comment\" size=\"16\" value=\"$comment\">
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_number<br />
+      <label>$l_number<br />
        <input name=\"tf_number\" size=\"16\" maxlength=\"24\" value=\"$number\">
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_amount<br />
+      <label>$l_amount<br />
        <input name=\"tf_amount\" size=\"12\" value=\"$amount\">
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_date $l_after<br />
-        <script>calendar('tf_date_after','$date_after')</script>
-      </div>
+      <label>$l_date $l_after<br />
+	<input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
+      </label>
 
-      <div class=\"searchLabel\">$l_date $l_before<br />
-        <script>calendar('tf_date_before','$date_before')</script>
-      </div>
+      <label>$l_date $l_before<br />
+       <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
+      </label>
 
-      <div class=\"searchLabel\">$l_inout<br />
+      <label>$l_inout<br />
        $rd_inout
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_company<br />
+      <label>$l_company<br />
        <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_account<br />
+      <label>$l_account<br />
        $sel_account
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_kind<br />
+      <label>$l_kind<br />
        $sel_kind
-      </div>
+      </label>
 
-      <div class=\"searchLabel\">$l_include_checked<br />
+      <label>$l_include_checked<br />
        <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $ichecked>
-      </div>
+      </label>
 
-      <div class=\"searchLabel\"><br />
+      <label><br />
        <input type=\"hidden\" name=\"action\" value=\"search\">
        <input type=\"submit\" name=\"submit\" value=\"$l_find\">  
-      </div>
-
-      <div class=\"searchEnd\"></div>
-     </div>
+      </label>
+    <p class=\"CL\" />
     </form>
 ";
 
@@ -406,58 +403,62 @@ function html_payment_consult($p_q, $invs) {
     $l_invoice_title = $l_no_invoice;
   }
 
-  $display["title"] = "<div class=\"title\">$l_payment : $date $c_name $amount</div>";
+  $display["title"] = "<h1 class=\"title\">$l_payment : $date $c_name $amount</h1>";
 
   $block = "
-<div class=\"detailHead\">$title</div>
-
-  <div class=\"detailHead\">$l_company</div>
-    <table class=\"detail\">
+<h1>$title</h1>
+<div class=\"detail infos\">
+  <h1>$l_company</h1>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_company 
+      <th>$l_company 
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
-      </td>
-      <td class=\"detailText\">$c_name<br />$ad1<br/>$zip $town</td>
+      </th>
+      <td>$c_name<br />$ad1<br/>$zip $town</td>
     </tr>
     </table>
+</div>
 
-  <div class=\"detailHead\">$l_payment</div>
+<div class=\"detail infos\">
+  <h1>$l_payment</h1>
 
-  <table class=\"detail\">
+  <table>
     <tr>
-      <td class=\"detailLabel\">$l_amount</td>
-      <td class=\"detailText\">$amount</td>
+      <th>$l_amount</th>
+      <td>$amount</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
+      <th>$l_date</th>
+      <td>$date</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailText\">$inout $dis_inout</td>
+      <th>$l_inout</th>
+      <td>$inout $dis_inout</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
+      <th>$l_kind</th>
+      <td>$kind</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$number</td>
+      <th>$l_number</th>
+      <td>$number</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_account</td>
-      <td class=\"detailText\">$account</td>
+      <th>$l_account</th>
+      <td>$account</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailText\">$comment</td>
+      <th>$l_comment</th>
+      <td>$comment</td>
     </tr>
    </table>
-
-  <div class=\"detailHead\">$l_invoice_title</div>
-
+</div>
+  
+<div class=\"detail infos\">  
+  <h1>$l_invoice_title</h1>
   $block_invoice
+  </div>
 ";
 
   return $block;
@@ -667,8 +668,8 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   if (isset($invoice_id)) {
     $dis_invoice = "
     <tr>
-      <td class=\"detailLabel\">$l_invoice</td>
-      <td class=\"detailForm\">".$params["invoice_name"]."</td>
+      <th>$l_invoice</th>
+      <td>".$params["invoice_name"]."</td>
     </tr>";
   }
 
@@ -717,57 +718,55 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<div class=\"title\">$l_payment : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_payment : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_payment(this)) return true; else return false;\" action=\"".url_prepare("payment_index.php")."\">
+ <fieldset class=\"detail infos\"> 
+    <legend>$l_payment</legend>
 
-    <div class=\"detailHead\">$l_payment</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailForm\">$dis_company</td>
+      <th>$l_company</th>
+      <td>$dis_company</td>
     </tr>
     $dis_invoice
     <tr>
-      <td class=\"detailLabel\">$l_amount</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" /></td>
+      <th>$l_amount</th>
+      <td><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" /></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailForm\">
-        <script>calendar('tf_date','$date')</script>
+      <th>$l_date</th>
+      <td>
+       <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
       </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailForm\">$rd_type</td>
+      <th>$l_inout</th>
+      <td>$rd_type</td>
     </tr>
     $block_kind
     <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_number\" size=\"24\" maxlength=\"24\" value=\"$number\" /></td>
+      <th>$l_number</th>
+      <td><input type=\"text\" name=\"tf_number\" size=\"24\" maxlength=\"24\" value=\"$number\" /></td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_account</td> 
-      <td class=\"detailForm\">$sel_account</td>
+      <th>$l_account</th> 
+      <td>$sel_account</td>
     </tr>
     </table>
+</fieldset>
 
-    <div class=\"detailHead\">$l_comment</div>
+<fieldset class=\"detail extra\"> 
+    <legend>$l_comment</legend>
 
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailForm\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
-    </tr>
-    </table>
+$l_comment
+<textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -798,9 +797,9 @@ function dis_can_delete_payment($p_id) {
 
   $display["msg"] .= display_ok_msg($l_can_delete);
   $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_delete</p>
-        <p class=\"detailButtons\">$dis_back</p>
+      <div class=\"buttons\">
+        $dis_delete
+        $dis_back
       </div>";
 
   return $block;
