@@ -28,7 +28,6 @@ function run_query_deal_search($deal, $all="") {
   $kind = $deal["kind_id"];
   $region = $deal["region"];
   $tt = $deal["tasktype"];
-  $cat1 = $deal["category1"];
   $role = $deal["role"];
   $status = $deal["status_id"];
   $manager = $deal["manager"];
@@ -61,10 +60,6 @@ function run_query_deal_search($deal, $all="") {
   }
   if (($tt != $c_all) && ($tt != "")) {
     $where .= " AND deal_tasktype_id='$tt'";
-  }
-  if (($cat1 != $c_all) && ($cat1 != "")) {
-    $join_cat1 = "LEFT JOIN DealCategory1Link ON deal_id=dealcategory1link_deal_id";
-    $where .= " AND dealcategory1link_category_id='$cat'";
   }
   if (($role != $c_all) && ($role != "")) {
     $join_role = "LEFT JOIN DealCompany ON deal_id=dealcompany_deal_id";
@@ -111,6 +106,13 @@ function run_query_deal_search($deal, $all="") {
     $where .= " AND deal_parentdeal_id='$parent'";
   }
 
+  // User defined data
+  $userdata = of_userdata_query_search("deal", $deal);
+  if ($userdata["where"] != "") {
+    $where .= " AND ". $userdata["where"];
+    $join_userdata = $userdata["join"];
+  }
+
   $whereq = "WHERE $where $multidomain";
 
 
@@ -127,7 +129,7 @@ function run_query_deal_search($deal, $all="") {
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
 
-  $query = "SELECT DISTINCT
+  $select = "SELECT DISTINCT
       deal_id as id,
       deal_id,
       deal_label,
@@ -158,7 +160,9 @@ function run_query_deal_search($deal, $all="") {
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
-    FROM Deal
+    FROM Deal";
+
+  $left_join = "
         LEFT JOIN Company as Company ON deal_company_id=Company.company_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
         LEFT JOIN Region ON deal_region_id=region_id
@@ -166,14 +170,13 @@ function run_query_deal_search($deal, $all="") {
         LEFT JOIN DealStatus ON deal_status_id=dealstatus_id
         LEFT JOIN LeadSource ON deal_source_id=leadsource_id
         LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
-        $join_cat1
         $join_role
-    $whereq
-    $orderq
-    $limit";
+        $join_userdata";
+
+  $query = "$select $left_join $whereq $orderq $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(DISTINCT deal_id) FROM Deal $join_comp $join_cat1 $join_role $whereq");
+    $count = get_query_count("SELECT count(DISTINCT deal_id) FROM Deal $left_join $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {
@@ -292,7 +295,6 @@ function run_query_deal_insert($deal) {
   $status = $deal["status_id"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
-  $category1 = $deal["category1"];
   $comment = $deal["comment"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
@@ -305,13 +307,13 @@ function run_query_deal_insert($deal) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $mail_comment = $deal["mail_comment"];
-	$domain_id = $obm["domain_id"];
+  $domain_id = $obm["domain_id"];
 	
   $query = "INSERT INTO Deal (deal_timeupdate,
     deal_timecreate,
     deal_userupdate,
     deal_usercreate,
-		deal_domain_id,
+    deal_domain_id,
     deal_number,
     deal_label,
     deal_datebegin,
@@ -342,7 +344,7 @@ function run_query_deal_insert($deal) {
     '$now',
     null,
     '" . $auth->auth["uid"] . "',
-		'$domain_id',
+    '$domain_id',
     '$num',
     '$label',
     $datebegin,
@@ -377,12 +379,6 @@ function run_query_deal_insert($deal) {
   $d_id = run_query_deal_id($deal);
   $deal["deal_id"] = $d_id;
 
-  if ($retour && is_array($category1)) {
-    foreach($category1 as $categoryid) {
-      $retour = of_category_query_insert_link("deal", "category1", $d_id, $categoryid);
-    }
-  }
-
   // if the deal inserted is not archived, we increment the company deal number
   if (($d_id) && ($archive == '0')) {
     run_query_deal_company_active_deal_inc($comp);
@@ -396,6 +392,10 @@ function run_query_deal_insert($deal) {
   // DealCompany relations handling
   if ( ($retour) && (is_array($deal["dc"]) )) {
     $ret = run_query_deal_dealcompany_update($d_id, $deal["dc"]);
+  }
+
+  if ($d_id > 0) {
+    $ret = of_userdata_query_update("deal", $d_id, $deal);
   }
 
   // If mail comment activated, send the updates by mail
@@ -459,7 +459,6 @@ function run_query_deal_update($deal) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $mail_comment = $deal["mail_comment"];
-  $category1 = $deal["category1"];
   $multidomain = sql_multidomain("deal");
   
   $query = "UPDATE Deal SET
@@ -490,7 +489,8 @@ function run_query_deal_update($deal) {
     deal_archive='$archive',
     deal_privacy='$priv',
     deal_todo='$todo'
-  WHERE deal_id='$id' $multidomain";
+  WHERE deal_id='$id'
+    $multidomain";
 
   $archive_old = get_deal_archive($id);
 
@@ -498,14 +498,8 @@ function run_query_deal_update($deal) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  // Category handling
   if ($retour) {
-    $retour = of_category_query_delete_link("deal", "category1", $id);
-    if (is_array($category1)) {
-      foreach($category1 as $categoryid) {
-        $retour = of_category_query_insert_link("deal", "category1", $id, $categoryid);
-      }
-    }
+    $ret = of_userdata_query_update("deal", $id, $deal);
   }
 
   // If deal archive status has changed, update the company deal number
@@ -649,7 +643,6 @@ function run_query_deal_quick_update($deal) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $mail_comment = $deal["mail_comment"];
-  $cat_m = $deal["category"];
   $multidomain = sql_multidomain("deal");
   
   $query = "UPDATE Deal SET
@@ -661,7 +654,8 @@ function run_query_deal_quick_update($deal) {
     deal_datealarm=$datealarm,
     deal_comment='$comment',
     deal_todo='$todo'
-  WHERE deal_id='$id' $multidomain";
+  WHERE deal_id='$id'
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_deal_quick_update()");
   $obm_q = new DB_OBM;
@@ -729,7 +723,7 @@ function run_query_deal_id($deal) {
     AND deal_archive='$archive'
     AND deal_privacy='$priv'
     AND deal_todo='$todo'
-		AND deal_domain_id='$domain_id'";
+    AND deal_domain_id='$domain_id'";
 
   display_debug_msg($query, $cdg_sql, "run_query_deal_id()");
   $obm_q = new DB_OBM;
@@ -766,8 +760,10 @@ function run_query_deal_delete($id) {
   // update the company total deal number
   run_query_deal_company_total_deal_dec($comp_id);
   run_query_global_delete_document_links($id, "deal");
-  $query = "DELETE FROM Deal WHERE deal_id='$id' $multidomain";
 
+  $ret = of_userdata_query_delete("deal", $id);
+
+  $query = "DELETE FROM Deal WHERE deal_id='$id' $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_deal_delete()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -1516,87 +1512,12 @@ function get_deal_company_id($deal_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_category1() {
-  global $cdg_sql, $cgp_hide;
-
-	$multidomain = sql_multidomain("dealcategory1");	
-
-  if (! $cgp_hide["deal"]["category1"]) {
-    $query = "SELECT * FROM DealCategory1 WHERE 1=1 $multidomain ORDER BY dealcategory1_code"; 
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    display_debug_msg($query, $cdg_sql, "run_query_deal_category1()");
-  } else {
-    $obm_q = "";
-  }
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the deal
-// Parameters:
-//   - $d_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_get_dealcategory1($d_id) {
-  global $cdg_sql;
-
-	$multidomain = sql_multidomain("dealcategory1");	
-
-  $query = "SELECT dealcategory1_id
-    FROM DealCategory1Link, DealCategory1
-    WHERE dealcategory1link_category_id = dealcategory1_id
-      AND dealcategory1link_deal_id = '$d_id' $multidomain
-    ORDER by dealcategory1_code";     
-
-  display_debug_msg($query, $cdg_sql, "run_query_deal_get_dealcategory1()");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $categories = array();
-  while ($obm_q->next_record()) {
-    $id = $obm_q->f("dealcategory1_id");
-    $categories[] = $id;
-  }
-
-  return $categories;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the deal
-// Parameters:
-//   - $d_id : deal Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_get_dealcategory1_info($d_id) {
-    global $cdg_sql;
-
-	$multidomain = sql_multidomain("dealcategory1");
-
-  $query = "SELECT dealcategory1_label, dealcategory1_code
-    FROM DealCategory1Link, DealCategory1
-    WHERE dealcategory1link_category_id = dealcategory1_id
-      AND dealcategory1link_deal_id = '$d_id' $multidomain
-    ORDER by dealcategory1_code";     
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Query execution : Deal Kind list
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_type() {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("dealtype");
+  $multidomain = sql_multidomain("dealtype");
 
   $query = "SELECT * FROM DealType WHERE 1=1 $multidomain";
 

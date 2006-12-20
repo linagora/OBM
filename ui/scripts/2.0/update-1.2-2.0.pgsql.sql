@@ -50,24 +50,12 @@ ALTER TABLE CompanyNafCode ADD Column companynafcode_domain_id integer;
 ALTER TABLE CompanyNafCode ALTER COLUMN companynafcode_domain_id SET DEFAULT 0;
 ALTER TABLE Company ADD Column company_domain_id integer;
 ALTER TABLE Company ALTER COLUMN company_domain_id SET DEFAULT 0;
-ALTER TABLE CompanyCategory1 ADD Column companycategory1_domain_id integer;
-ALTER TABLE CompanyCategory1 ALTER COLUMN companycategory1_domain_id SET DEFAULT 0;
 ALTER TABLE Contact ADD Column contact_domain_id integer;
 ALTER TABLE Contact ALTER COLUMN contact_domain_id SET DEFAULT 0;
 ALTER TABLE Kind ADD Column kind_domain_id integer;
 ALTER TABLE Kind ALTER COLUMN kind_domain_id SET DEFAULT 0;
 ALTER TABLE ContactFunction ADD Column contactfunction_domain_id integer;
 ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET DEFAULT 0;
-ALTER TABLE ContactCategory1 ADD Column contactcategory1_domain_id integer;
-ALTER TABLE ContactCategory1 ALTER COLUMN contactcategory1_domain_id SET DEFAULT 0;
-ALTER TABLE ContactCategory2 ADD Column contactcategory2_domain_id integer;
-ALTER TABLE ContactCategory2 ALTER COLUMN contactcategory2_domain_id SET DEFAULT 0;
-ALTER TABLE ContactCategory3 ADD Column contactcategory3_domain_id integer;
-ALTER TABLE ContactCategory3 ALTER COLUMN contactcategory3_domain_id SET DEFAULT 0;
-ALTER TABLE ContactCategory4 ADD Column contactcategory4_domain_id integer;
-ALTER TABLE ContactCategory4 ALTER COLUMN contactcategory4_domain_id SET DEFAULT 0;
-ALTER TABLE ContactCategory5 ADD Column contactcategory5_domain_id integer;
-ALTER TABLE ContactCategory5 ALTER COLUMN contactcategory5_domain_id SET DEFAULT 0;
 ALTER TABLE LeadSource ADD Column leadsource_domain_id integer;
 ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET DEFAULT 0;
 ALTER TABLE Lead ADD Column lead_domain_id integer;
@@ -82,8 +70,6 @@ ALTER TABLE DealType ADD Column dealtype_domain_id integer;
 ALTER TABLE DealType ALTER COLUMN dealtype_domain_id SET DEFAULT 0;
 ALTER TABLE DealCompanyRole ADD Column dealcompanyrole_domain_id integer;
 ALTER TABLE DealCompanyRole ALTER COLUMN dealcompanyrole_domain_id SET DEFAULT 0;
-ALTER TABLE DealCategory1 ADD Column dealcategory1_domain_id integer;
-ALTER TABLE DealCategory1 ALTER COLUMN dealcategory1_domain_id SET DEFAULT 0;
 ALTER TABLE List ADD Column list_domain_id integer;
 ALTER TABLE List ALTER COLUMN list_domain_id SET DEFAULT 0;
 ALTER TABLE CalendarEvent ADD Column calendarevent_domain_id integer;
@@ -108,8 +94,6 @@ ALTER TABLE SubscriptionReception ADD Column subscriptionreception_domain_id int
 ALTER TABLE SubscriptionReception ALTER Column subscriptionreception_domain_id SET default 0;
 ALTER TABLE Document ADD Column document_domain_id integer;
 ALTER TABLE Document ALTER Column document_domain_id SET default 0;
-ALTER TABLE DocumentCategory1 ADD Column documentcategory1_domain_id integer default 0;
-ALTER TABLE DocumentCategory2 ADD Column documentcategory2_domain_id integer default 0;
 ALTER TABLE DocumentMimeType ADD Column documentmimetype_domain_id integer default 0;
 ALTER TABLE DocumentEntity ADD Column documententity_domain_id integer default 0;
 ALTER TABLE Project ADD Column project_domain_id integer default 0;
@@ -126,8 +110,6 @@ ALTER TABLE ContractStatus ADD Column contractstatus_domain_id integer default 0
 ALTER TABLE Incident ADD Column incident_domain_id integer default 0;
 ALTER TABLE IncidentPriority ADD Column incidentpriority_domain_id integer default 0;
 ALTER TABLE IncidentStatus ADD Column incidentstatus_domain_id integer default 0;
-ALTER TABLE IncidentCategory1 ADD Column incidentcategory1_domain_id integer default 0;
-ALTER TABLE IncidentCategory2 ADD Column incidentcategory2_domain_id integer default 0;
 ALTER TABLE Invoice ADD Column invoice_domain_id integer default 0;
 ALTER TABLE InvoiceStatus ADD Column invoicestatus_domain_id integer default 0;
 ALTER TABLE Payment ADD Column payment_domain_id integer default 0;
@@ -148,7 +130,7 @@ ALTER TABLE RGroup ADD Column rgroup_domain_id integer default 0;
 --
 CREATE TABLE Category (
   category_id          serial,
-  category_domain_id   integer,
+  category_domain_id   integer NOT NULL DEFAULT 0,
   category_timeupdate  TIMESTAMP,
   category_timecreate  TIMESTAMP,
   category_userupdate  integer,
@@ -158,6 +140,7 @@ CREATE TABLE Category (
   category_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (category_id)
 );
+CREATE INDEX cat_idx_cat ON Category (category_category);
 
 
 --
@@ -170,7 +153,53 @@ CREATE TABLE CategoryLink (
   categorylink_entity      varchar(32) NOT NULL default '',
   PRIMARY KEY (categorylink_category_id, categorylink_entity_id, categorylink_category, categorylink_entity)
 );
-CREATE INDEX cat_idx_ent ON CategoryLink (categorylink_entity_id);
+CREATE INDEX catl_idx_entid ON CategoryLink (categorylink_entity_id);
+CREATE INDEX catl_idx_cat ON CategoryLink (categorylink_category);
+
+
+-------------------------------------------------------------------------------
+-- Move IncidentCategory1 to IncidentResolutionType
+-------------------------------------------------------------------------------
+--
+-- New table 'IncidentResolutionType'
+--
+CREATE TABLE IncidentResolutionType (
+  incidentresolutiontype_id          serial,
+  incidentresolutiontype_domain_id   integer default 0,
+  incidentresolutiontype_timeupdate  timestamp,
+  incidentresolutiontype_timecreate  timestamp,
+  incidentresolutiontype_userupdate  integer DEFAULT NULL,
+  incidentresolutiontype_usercreate  integer DEFAULT NULL,
+  incidentresolutiontype_code        varchar(10) default '',
+  incidentresolutiontype_label       varchar(32) DEFAULT NULL,
+  PRIMARY KEY (incidentresolutiontype_id)
+);
+
+INSERT INTO IncidentResolutionType (
+  incidentresolutiontype_id,
+  incidentresolutiontype_domain_id,
+  incidentresolutiontype_timeupdate,
+  incidentresolutiontype_timecreate,
+  incidentresolutiontype_userupdate,
+  incidentresolutiontype_usercreate,
+  incidentresolutiontype_code,
+  incidentresolutiontype_label)
+SELECT
+  incidentcategory1_id,
+  0,
+  incidentcategory1_timeupdate,
+  incidentcategory1_timecreate,
+  incidentcategory1_userupdate,
+  incidentcategory1_usercreate,
+  incidentcategory1_code,
+  incidentcategory1_label
+FROM IncidentCategory1;
+
+
+ALTER TABLE Incident ADD COLUMN incident_resolutiontype_id int(8) DEFAULT 0 after incident_status_id;
+UPDATE Incident set incident_resolutiontype_id=incident_category1_id;
+ALTER TABLE Incident DROP COLUMN incident_category1_id;
+DROP TABLE IncidentCategory1;
 
 
 ---------------------------------------------------------------------------

@@ -16,11 +16,15 @@
 //   - $p_view        : view selected "year", "month", "week" or "day"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view="week") {
-  global $display, $path;
+  global $display, $path, $max_display;
 
   $group_view = $calendar["entity"]["group_view"];
   $entity_readable = get_calendar_entity_readable();
-  $visible_entities_id = slice_calendar_entities($sel_entity_id, $entity_readable);
+  if ($p_view == "planning") {
+    $visible_entities_id = slice_agenda_entities($sel_entity_id, 500, $entity_readable);
+  } else {
+    $visible_entities_id = slice_agenda_entities($sel_entity_id, $max_display, $max_display, $entity_readable);
+  }
 
   $sel_entity_id = $visible_entities_id;
   // we restore the selected group for session storage

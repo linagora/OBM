@@ -19,6 +19,7 @@ $l_date_after ="Date Après";
 $l_archive_new = "Archiver";
 $l_res_duration = "Durée de résolution";
 $l_reference = "Référence";
+$l_resolutiontype = "Type de résolution";
 
 // Title 
 $l_redhot = "Très Urgent";

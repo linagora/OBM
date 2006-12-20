@@ -126,6 +126,38 @@ CREATE TABLE DisplayPref (
 ) TYPE=MyISAM;
 
 
+--
+-- Table structure for table 'Category'
+--
+CREATE TABLE Category (
+  category_id          int(8) auto_increment,
+  category_domain_id   int(8) NOT NULL default 0,
+  category_timeupdate  timestamp(14),
+  category_timecreate  timestamp(14),
+  category_userupdate  int(8) NOT NULL default 0,
+  category_usercreate  int(8) NOT NULL default 0,
+  category_category    varchar(24) NOT NULL default '',
+  category_code        varchar(10) NOT NULL default '',
+  category_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (category_id),
+  INDEX cat_idx_cat (category_category)
+);
+
+
+--
+-- Table structure for table 'CategoryLink'
+--
+CREATE TABLE CategoryLink (
+  categorylink_category_id int(8) NOT NULL default 0,
+  categorylink_entity_id   int(8) NOT NULL default 0,
+  categorylink_category    varchar(24) NOT NULL default '',
+  categorylink_entity      varchar(32) NOT NULL default '',
+  PRIMARY KEY (categorylink_category_id, categorylink_entity_id),
+  INDEX catl_idx_ent (categorylink_entity_id),
+  INDEX catl_idx_cat (categorylink_category)
+);
+
+
 -------------------------------------------------------------------------------
 -- References Tables
 -------------------------------------------------------------------------------
@@ -353,128 +385,6 @@ CREATE TABLE ContactFunction (
 );
 
 
---
--- Table structure for table 'ContactCategory1'
---
-CREATE TABLE ContactCategory1 (
-  contactcategory1_id          int(8) auto_increment,
-  contactcategory1_domain_id   int(8) default 0,
-  contactcategory1_timeupdate  timestamp(14),
-  contactcategory1_timecreate  timestamp(14),
-  contactcategory1_userupdate  int(8) default 0,
-  contactcategory1_usercreate  int(8) default 0,
-  contactcategory1_code        varchar(10) default '',
-  contactcategory1_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory1_id)
-);
-
-
---
--- Table structure for table 'ContactCategory1Link'
---
-CREATE TABLE ContactCategory1Link (
-  contactcategory1link_category_id  int(8) NOT NULL default 0,
-  contactcategory1link_contact_id   int(8) NOT NULL default 0,
-  PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id),
-  INDEX contcat1_idx_cont (contactcategory1link_contact_id)
-);
-
-
---
--- Table structure for table 'ContactCategory2'
---
-CREATE TABLE ContactCategory2 (
-  contactcategory2_id          int(8) auto_increment,
-  contactcategory2_domain_id   int(8) default 0,
-  contactcategory2_timeupdate  timestamp(14),
-  contactcategory2_timecreate  timestamp(14),
-  contactcategory2_userupdate  int(8) default 0,
-  contactcategory2_usercreate  int(8) default 0,
-  contactcategory2_code        varchar(10) default '',
-  contactcategory2_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory2_id)
-);
-
-
---
--- Table structure for table 'ContactCategory2Link'
---
-CREATE TABLE ContactCategory2Link (
-  contactcategory2link_category_id  int(8) NOT NULL default 0,
-  contactcategory2link_contact_id   int(8) NOT NULL default 0,
-  PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id),
-  INDEX contcat2_idx_cont (contactcategory2link_contact_id)
-);
-
-
---
--- Table structure for table 'ContactCategory3'
---
-CREATE TABLE ContactCategory3 (
-  contactcategory3_id          int(8) auto_increment,
-  contactcategory3_domain_id   int(8) default 0,
-  contactcategory3_timeupdate  timestamp(14),
-  contactcategory3_timecreate  timestamp(14),
-  contactcategory3_userupdate  int(8) default 0,
-  contactcategory3_usercreate  int(8) default 0,
-  contactcategory3_code        varchar(10) default '',
-  contactcategory3_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory3_id)
-);
-
-
---
--- Table structure for table 'ContactCategory3Link'
---
-CREATE TABLE ContactCategory3Link (
-  contactcategory3link_category_id  int(8) NOT NULL default 0,
-  contactcategory3link_contact_id   int(8) NOT NULL default 0,
-  PRIMARY KEY (contactcategory3link_category_id,contactcategory3link_contact_id),
-  INDEX contcat3_idx_cont (contactcategory3link_contact_id)
-);
-
---
--- Table structure for table 'ContactCategory4'
---
-CREATE TABLE ContactCategory4 (
-  contactcategory4_id          int(8) auto_increment,
-  contactcategory4_domain_id   int(8) default 0,
-  contactcategory4_timeupdate  timestamp(14),
-  contactcategory4_timecreate  timestamp(14),
-  contactcategory4_userupdate  int(8) default 0,
-  contactcategory4_usercreate  int(8) default 0,
-  contactcategory4_code        varchar(10) default '',
-  contactcategory4_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory4_id)
-);
-
-
---
--- Table structure for table 'ContactCategory4Link'
---
-CREATE TABLE ContactCategory4Link (
-  contactcategory4link_category_id  int(8) NOT NULL default 0,
-  contactcategory4link_contact_id   int(8) NOT NULL default 0,
-  PRIMARY KEY (contactcategory4link_category_id,contactcategory4link_contact_id),
-  INDEX contcat4_idx_cont (contactcategory4link_contact_id)
-);
-
---
--- Table structure for table 'ContactCategory5'
---
-CREATE TABLE ContactCategory5 (
-  contactcategory5_id          int(8) auto_increment,
-  contactcategory5_domain_id   int(8) default 0,
-  contactcategory5_timeupdate  timestamp(14),
-  contactcategory5_timecreate  timestamp(14),
-  contactcategory5_userupdate  int(8) default 0,
-  contactcategory5_usercreate  int(8) default 0,
-  contactcategory5_code        varchar(10) default '',
-  contactcategory5_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory5_id)
-);
-
-
 -------------------------------------------------------------------------------
 -- Lead module tables
 -------------------------------------------------------------------------------
@@ -643,31 +553,6 @@ CREATE TABLE DealCompany (
   dealcompany_role_id     int(8) NOT NULL default 0,
   PRIMARY KEY (dealcompany_id),
   INDEX dealcompany_idx_deal (dealcompany_deal_id)
-);
-
-
---
--- Table structure for table 'DealCategory1'
---
-CREATE TABLE DealCategory1 (
-  dealcategory1_id          int(8) auto_increment,
-  dealcategory1_domain_id   int(8) default 0,
-  dealcategory1_timeupdate  timestamp(14),
-  dealcategory1_timecreate  timestamp(14),
-  dealcategory1_userupdate  int(8) default 0,
-  dealcategory1_usercreate  int(8) default 0,
-  dealcategory1_code        varchar(10) default '',
-  dealcategory1_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (dealcategory1_id)
-);
-
-
--- Table structure for table 'DealCategory1Link'
---
-CREATE TABLE DealCategory1Link (
-  dealcategory1link_category_id  int(8) NOT NULL default 0,
-  dealcategory1link_deal_id      int(8) NOT NULL default 0,
-  PRIMARY KEY (dealcategory1link_category_id,dealcategory1link_deal_id)
 );
 
 
@@ -923,46 +808,12 @@ CREATE TABLE Document (
   document_name        	 varchar(255) default NULL,
   document_kind        	 int(2) default NULL,
   document_mimetype_id	 int(8) not null default 0,
-  document_category1_id  int(8) not null default 0,
-  document_category2_id  int(8) not null default 0,
   document_privacy     	 int(2) not null default 0,
   document_size        	 int(15) default NULL,
   document_author      	 varchar(255) default NULL,
   document_path        	 text default NULL,
   document_acl        	 text default NULL,
   PRIMARY KEY (document_id)
-);
-
-
---
--- Table structure for table 'DocumentCategory1'
---
-CREATE TABLE DocumentCategory1 (
-  documentcategory1_id          int(8) auto_increment,
-  documentcategory1_domain_id   int(8) default 0, 
-  documentcategory1_timeupdate  timestamp(14),
-  documentcategory1_timecreate  timestamp(14),
-  documentcategory1_userupdate  int(8) default NULL,
-  documentcategory1_usercreate  int(8) default NULL,
-  documentcategory1_code        varchar(10) default '',
-  documentcategory1_label       varchar(255) default NULL,
-  PRIMARY KEY (documentcategory1_id)
-);
-
-
---
--- Table structure for table 'DocumentCategory2'
---
-CREATE TABLE DocumentCategory2 (
-  documentcategory2_id          int(8) auto_increment,
-  documentcategory2_domain_id   int(8) default 0,
-  documentcategory2_timeupdate  timestamp(14),
-  documentcategory2_timecreate  timestamp(14),
-  documentcategory2_userupdate  int(8) default NULL,
-  documentcategory2_usercreate  int(8) default NULL,
-  documentcategory2_code        varchar(10) default '',
-  documentcategory2_label       varchar(255) default NULL,
-  PRIMARY KEY (documentcategory2_id)
 );
 
 
@@ -1237,26 +1088,25 @@ PRIMARY KEY (contractstatus_id)
 -- New table 'Incident'
 --
 CREATE TABLE Incident (
-  incident_id               int(8) auto_increment,
-  incident_domain_id        int(8) default 0,
-  incident_timeupdate       timestamp(14),
-  incident_timecreate       timestamp(14),
-  incident_userupdate       int(8) default NULL,
-  incident_usercreate       int(8) default NULL,
-  incident_contract_id      int(8) NOT NULL,
-  incident_label            varchar(100) default NULL,
-  incident_reference        varchar(32) default NULL,
-  incident_date             date default NULL,
-  incident_priority_id      int(8) default NULL,
-  incident_status_id        int(8) default NULL,
-  incident_category1_id     int(8) default 0,
-  incident_category2_id     int(8) default 0,
-  incident_logger           int(8) default NULL,
-  incident_owner            int(8) default NULL,
-  incident_duration         char(4) default '0',
-  incident_archive          char(1) NOT NULL default '0',
-  incident_comment          text, 
-  incident_resolution       text,
+  incident_id                 int(8) auto_increment,
+  incident_domain_id          int(8) DEFAULT 0,
+  incident_timeupdate         timestamp(14),
+  incident_timecreate         timestamp(14),
+  incident_userupdate         int(8) DEFAULT NULL,
+  incident_usercreate         int(8) DEFAULT NULL,
+  incident_contract_id        int(8) NOT NULL,
+  incident_label              varchar(100) DEFAULT NULL,
+  incident_reference          varchar(32) DEFAULT NULL,
+  incident_date               date default NULL,
+  incident_priority_id        int(8) DEFAULT 0,
+  incident_status_id          int(8) DEFAULT 0,
+  incident_resolutiontype_id  integer DEFAULT 0,
+  incident_logger             int(8) DEFAULT NULL,
+  incident_owner              int(8) DEFAULT NULL,
+  incident_duration           char(4) DEFAULT '0',
+  incident_archive            char(1) NOT NULL DEFAULT '0',
+  incident_comment            text, 
+  incident_resolution         text,
   PRIMARY KEY (incident_id)
 ) TYPE=MyISAM;
 
@@ -1295,34 +1145,18 @@ CREATE TABLE IncidentStatus (
 
 
 --
--- New table 'IncidentCategory1'
+-- New table 'IncidentResolutionType'
 --
-CREATE TABLE IncidentCategory1 (
-  incidentcategory1_id          int(8) auto_increment,
-  incidentcategory1_domain_id   int(8) default 0,
-  incidentcategory1_timeupdate  timestamp(14),
-  incidentcategory1_timecreate  timestamp(14),
-  incidentcategory1_userupdate  int(8) default NULL,
-  incidentcategory1_usercreate  int(8) default NULL,
-  incidentcategory1_code        varchar(10) default '',
-  incidentcategory1_label       varchar(32) default NULL,
-PRIMARY KEY (incidentcategory1_id)
-);
-
-
---
--- New table 'IncidentCategory2'
---
-CREATE TABLE IncidentCategory2 (
-  incidentcategory2_id          int(8) auto_increment,
-  incidentcategory2_domain_id   int(8) default 0,
-  incidentcategory2_timeupdate  timestamp(14),
-  incidentcategory2_timecreate  timestamp(14),
-  incidentcategory2_userupdate  int(8) default NULL,
-  incidentcategory2_usercreate  int(8) default NULL,
-  incidentcategory2_code        varchar(10) default '',
-  incidentcategory2_label       varchar(32) default NULL,
-PRIMARY KEY (incidentcategory2_id)
+CREATE TABLE IncidentResolutionType (
+  incidentresolutiontype_id          int(8) auto_increment,
+  incidentresolutiontype_domain_id   int(8) default 0,
+  incidentresolutiontype_timeupdate  timestamp(14),
+  incidentresolutiontype_timecreate  timestamp(14),
+  incidentresolutiontype_userupdate  int(8) default NULL,
+  incidentresolutiontype_usercreate  int(8) default NULL,
+  incidentresolutiontype_code        varchar(10) default '',
+  incidentresolutiontype_label       varchar(32) default NULL,
+PRIMARY KEY (incidentresolutiontype_id)
 );
 
 

@@ -1452,8 +1452,8 @@ function make_list_query_from_criteria($list) {
   $add_join = array (
     "subscription_publication_id" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
-       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
-    "publication_lang" => "
+       LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ");
+  /*    "publication_lang" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id ",
     "publication_year" => "
@@ -1471,7 +1471,14 @@ function make_list_query_from_criteria($list) {
     "subscription_timebefore" => "
        LEFT JOIN Subscription s%j ON s%j.subscription_contact_id = contact_id
        LEFT JOIN Publication p%j ON s%j.subscription_publication_id = p%j.publication_id "
-  );
+    );
+  */
+  $field_join_equiv["publication_lang"] = "subscription_publication_id";
+  $field_join_equiv["publication_year"] = "subscription_publication_id";
+  $field_join_equiv["subscription_renewal"] = "subscription_publication_id";
+  $field_join_equiv["subscription_reception_id"] = "subscription_publication_id";
+  $field_join_equiv["subscription_timeafter"] = "subscription_publication_id";
+  $field_join_equiv["subscription_timebefore"] = "subscription_publication_id";
 
   // User data categories handling
   $cat_nb = 0;
@@ -1489,11 +1496,12 @@ function make_list_query_from_criteria($list) {
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
 	
-	$add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
+	/*	$add_join["${cat_name}_code"] = " LEFT JOIN CategoryLink $cat_link
          ON ${entity}_id = $cat_link.categorylink_entity_id
            AND $cat_link.categorylink_entity = '$entity'
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
+	*/
 	$field_multi_op["${cat_name}_code"] = "OR";
 	// cat_code field equiv to cat for join count
 	$field_join_equiv["${cat_name}_code"] = "${cat_name}";
@@ -1558,10 +1566,16 @@ function make_list_query_from_criteria($list) {
     foreach($criteria as $module => $module_criteria) {
       if (is_array($module_criteria)) {
         foreach($module_criteria as $field => $criterion) {
+	  // set default field join equivalence
+	  if (isset($field_join_equiv[$field])) {
+	    $field_join = $field_join_equiv[$field];
+	  } else {
+	    $field_join = $field;
+	  }
           if (is_array($criterion)) {
             foreach($criterion as $line => $value) {
 	      if ($value != "") {
-		if ($add_join[$field] != "") {
+		if ($add_join[$field_join] != "") {
 		  $has_join_nn[$line] = true;
 		  if ( ($logical_criterion[$line] == "AND")
 		       && ($boolean_criterion[$line] == "NOT") ) {
@@ -1596,7 +1610,15 @@ function make_list_query_from_criteria($list) {
 
 		// case AND NOT to n-n criteria line
 		if ($cond_andnotn[$line]) {
-		  $cond_andnotn_join[$line] .= " " .str_replace('%j',"",$add_join[$field]);
+
+		  // Add the join only if needed (not already done)
+		  if (! isset($cond_andnotn_join_field[$line][$field_join])) {
+		    $cond_andnotn_join_field[$line][$field_join] = 0;
+		    $cond_andnotn_join[$line] .= " " . str_replace('%j',"",$add_join[$field_join]);
+		  } else {
+		    $cond_andnotn_join_field[$line][$field_join]++;
+		  }
+
 		  $operation = $operateurs[$field];
 		  $operation = str_replace('%j',"",$operation);
 		  $operation = str_replace('%f',$field,$operation);
@@ -1633,7 +1655,13 @@ function make_list_query_from_criteria($list) {
 		  // Case Exclusion
 		} else if ($boolean_criterion[$line] == "Exclude") {
 		  $has_exclusion = true;
-		  $exclusion_join[$line] .= " " . str_replace('%j',"",$add_join[$field]);
+		  // Add the join only if needed (not already done)
+		  if (! isset($exclusion_join_field[$line][$field_join])) {
+		    $exclusion_join_field[$line][$field_join] = 0;
+		    $exclusion_join[$line] .= " " . str_replace('%j',"",$add_join[$field_join]);
+		  } else {
+		    $exclusion_join_field[$line][$field_join]++;
+		  }
 		  $operation = $operateurs[$field];
 		  $operation = str_replace('%j',"",$operation);
 		  $operation = str_replace('%f',$field,$operation);
@@ -1680,7 +1708,7 @@ function make_list_query_from_criteria($list) {
 		    if ( (! isset($join_nb[$module]))
 			 || ($module != "publication") ) {
 		      $join_nb[$module] = 0;
-		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field]);
+		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field_join]);
 		    }
 		    
 		    // XXXX not optimal as same criteria not tested
@@ -1693,7 +1721,7 @@ function make_list_query_from_criteria($list) {
 		    $join_nb[$field_join] ++;
 		    if ($join_nb[$field_join] > $join_nb[$module]) {
 		      $join_nb[$module] = $join_nb[$field_join];
-		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field]);
+		      $from .= str_replace('%j',$join_nb[$field_join],$add_join[$field_join]);
 		    }
 		  }
 

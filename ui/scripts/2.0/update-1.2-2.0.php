@@ -12,6 +12,8 @@ include("../../obminclude/global.inc");
 
 echo "**** OBM : data migration 1.2 -> 2.0 : DB $obmdb_db ($obmdb_host)\n";
 
+clean_category_tables();
+
 // Migrate all user categories to new model
 $c_q = get_category_list("CompanyCategory1");
 process_category_list("CompanyCategory1", "company", $c_q);
@@ -28,15 +30,117 @@ process_category_list("ContactCategory3", "contact", $c_q);
 $c_q = get_category_list("ContactCategory4");
 process_category_list("ContactCategory4", "contact", $c_q);
 
-// Mono categories
 $c_q = get_category_list("ContactCategory5");
-process_category_list("ContactCategory5", "contact", $c_q);
+process_category_list("ContactCategory5", "Contact", $c_q, "mono", "category5_id");
 
-$hash_cat_code = get_companycategory1_code_hash();
+$c_q = get_category_list("DealCategory1");
+process_category_list("DealCategory1", "Deal", $c_q);
+
+$c_q = get_category_list("DocumentCategory1");
+process_category_list("DocumentCategory1", "Document", $c_q, "mono", "category1_id");
+
+$c_q = get_category_list("DocumentCategory2");
+process_category_list("DocumentCategory2", "Document", $c_q, "mono", "category2_id");
+
+$c_q = get_category_list("IncidentCategory2");
+process_category_list("IncidentCategory2", "Incident", $c_q, "mono", "category2_id");
+
+$hash_compcat_code = get_companycategory1_code_hash();
 
 // Update list criteria (contactcategorylink_category_id => contactcategory_id)
 $l_q = get_list_list();
 process_list_list($l_q);
+
+// purge database
+remove_deprecated_category_infos();
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Clean Category tables before doing anything to allow re-run the script
+///////////////////////////////////////////////////////////////////////////////
+function clean_category_tables() {
+  global $cdg_sql;
+
+  echo "* Clean Category and CategoryLink tables\n";
+
+  $obm_q = new DB_OBM;
+
+  $query = "DELETE FROM Category";
+  $obm_q->query($query);
+
+  $query = "DELETE FROM CategoryLink";
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Clean Database from Deprecated category tables (after update !)
+///////////////////////////////////////////////////////////////////////////////
+function remove_deprecated_category_infos() {
+  global $cdg_sql;
+
+  echo "* Remove Deprecated Category tables\n";
+
+  remove_one_table("CompanyCategory1");
+  remove_one_table("CompanyCategory1Link");
+  remove_one_table("ContactCategory1");
+  remove_one_table("ContactCategory1Link");
+  remove_one_table("ContactCategory2");
+  remove_one_table("ContactCategory2Link");
+  remove_one_table("ContactCategory3");
+  remove_one_table("ContactCategory3Link");
+  remove_one_table("ContactCategory4");
+  remove_one_table("ContactCategory4Link");
+  remove_one_table("ContactCategory5");
+  remove_one_table("DealCategory1");
+  remove_one_table("DealCategory1Link");
+  remove_one_table("DocumentCategory1");
+  remove_one_table("DocumentCategory2");
+  remove_one_table("IncidentCategory2");
+
+  echo "* Remove Deprecated Category fields\n";
+
+  remove_one_field("Contact", "contact_category5_id");
+  remove_one_field("Incident", "incident_category2_id");
+  remove_one_field("Document", "document_category1_id");
+  remove_one_field("Document", "document_category2_id");
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Remove One table
+///////////////////////////////////////////////////////////////////////////////
+function remove_one_table($table) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+
+  echo "$table\n";
+  $query = "DROP TABLE $table";
+  $ret = $obm_q->query($query);
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Remove One field
+///////////////////////////////////////////////////////////////////////////////
+function remove_one_field($table, $field) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+
+  echo "$table : $field\n";
+  $query = "ALTER TABLE $table DROP COLUMN $field";
+  $ret = $obm_q->query($query);
+
+  return $ret;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,7 +169,7 @@ function get_list_list() {
 //   - $c_q    : DBO Category List
 ///////////////////////////////////////////////////////////////////////////////
 function process_list_list($l_q) {
-  global $hash_c1, $hash_c2, $hash_cat_code;
+  global $hash_c1, $hash_c2, $hash_compcat_code;
 
   $obm_q = new DB_OBM;
   $cpt = 0;
@@ -104,7 +208,7 @@ function process_list_list($l_q) {
       if (is_array($criteria["modules"]["company"]["companycategory1_code"])) {
 
 	foreach($criteria["modules"]["company"]["companycategory1_code"] as $value) {
-	  $new_val = $hash_cat_code[$value];
+	  $new_val = $hash_compcat_code[$value];
 	  $criteria["modules"]["company"]["companycategory1"][] = $new_val;
 	  $criteria["modules"]["company"]["companycategory1_tree"][] = "true";
 	}
@@ -118,7 +222,6 @@ function process_list_list($l_q) {
         WHERE list_id='$id'";
       $retour = $obm_q->query($query);
     }
-
 
   }
 
@@ -177,14 +280,17 @@ function get_companycategory1_code_hash() {
 // Process the given Category list
 // companycategory_code -> companycategory1_code
 // Parameters:
-//   - $table  : category table name
-//   - $entity : category table name
-//   - $c_q    : DBO Category List
+//   - $table     : category table name
+//   - $entityu   : entity name (whith upper case)
+//   - $c_q       : DBO Category List
+//   - $mode      : "multi" or "mono"
+//   - $cat_field : category field name in entity table (eg : categiory5_id)
 ///////////////////////////////////////////////////////////////////////////////
-function process_category_list($table, $entity, $c_q) {
+function process_category_list($table, $entityu, $c_q, $mode="multi", $cat_field="") {
   global $hash_c1, $hash_c2;
 
   $category = strtolower($table);
+  $entity = strtolower($entityu);
   $table_link = $table."Link";
   $prefix_link = strtolower($table_link);
 
@@ -193,7 +299,7 @@ function process_category_list($table, $entity, $c_q) {
   $obm_q = new DB_OBM;
   $l_q = new DB_OBM;
 
-  echo "** Processing $table list : $nb_c entries\n";
+  echo "* Processing $table list : $nb_c entries...";
 
   $now = date("Y-m-d H:i:s");
   while ($c_q->next_record()) {
@@ -219,6 +325,7 @@ function process_category_list($table, $entity, $c_q) {
 
     $nb++;
     $query = "INSERT INTO Category (
+      category_domain_id,
       category_timeupdate,
       category_timecreate,
       $uu_into
@@ -227,6 +334,7 @@ function process_category_list($table, $entity, $c_q) {
       category_code,
       category_label
     ) VALUES (
+      0,
       '$tu',
       '$tc',
       $uu_value
@@ -249,29 +357,40 @@ function process_category_list($table, $entity, $c_q) {
 
     $cats[$id] = $c_new_id;
 
-    // migrate links for one category ------------------------------------------
-    $query = "SELECT *
-    FROM $table_link
-    WHERE ${prefix_link}_category_id='$id'";
-    $obm_q->query($query);
+    // migrate links for one category -----------------------------------------
+
+    if ($mode == "multi") {
+      $query = "SELECT *, ${prefix_link}_${entity}_id as ent_id
+      FROM $table_link
+      WHERE ${prefix_link}_category_id='$id'";
+      $obm_q->query($query);
+
+    } else {
+      // "mono" mode
+      $query = "SELECT ${entity}_id as ent_id, ${entity}_${cat_field}
+      FROM $entityu
+      WHERE ${entity}_${cat_field}='$id'";
+      $obm_q->query($query);
+    }
 
     // For each link
     while ($obm_q->next_record()) {
-      $ent_id = $obm_q->f("${prefix_link}_${entity}_id");
+      $ent_id = $obm_q->f("ent_id");
       if ($ent_id > 0) {
 	$query = "INSERT INTO CategoryLink (
-        categorylink_category_id,
-        categorylink_entity_id,
-        categorylink_category,
-        categorylink_entity
-      ) VALUES (
-        '$c_new_id',
-        '$ent_id',
-        '$category',
-        '$entity')";
+          categorylink_category_id,
+          categorylink_entity_id,
+          categorylink_category,
+          categorylink_entity
+        ) VALUES (
+          '$c_new_id',
+          '$ent_id',
+          '$category',
+          '$entity')";
 	$l_q->query($query);
       }
     }
+
   }
 
   // Save contact categories hash
@@ -281,7 +400,7 @@ function process_category_list($table, $entity, $c_q) {
     $hash_c2 = $cats;
   }
 
-  echo "** End Processing $table list : $nb_c entries, $nb processed\n";
+  echo " $nb processed : OK\n";
 
 }
 

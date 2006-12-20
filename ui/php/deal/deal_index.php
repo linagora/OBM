@@ -468,8 +468,9 @@ if ($action == "ext_get_id") {
   $prefs = get_display_pref($uid,"deal",1);
   $prefs_parent = get_display_pref($uid,"parentdeal",1);
   $display["detail"] = dis_deal_display_pref($prefs, $prefs_parent);
-  
 }
+
+of_category_user_action_switch($module, $action, $params);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,6 +551,8 @@ function get_deal_action() {
   global $l_header_new_child, $l_header_new_parent, $l_header_quickupdate;
   global $l_header_dashboard, $l_deal_select_company;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
+  of_category_user_module_action("deal");
 
   // Index
   $actions["deal"]["index"] = array (

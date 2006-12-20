@@ -44,7 +44,7 @@
   </table>
 </div>
 <div class="detail extra">
-$block_user
+$block_userdata
 
 <h1>$l_comment</h1>
   $com

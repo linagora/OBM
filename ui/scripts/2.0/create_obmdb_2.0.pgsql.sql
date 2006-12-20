@@ -128,6 +128,38 @@ create INDEX DisplayPref_user_id_index ON DisplayPref (display_user_id);
 create INDEX DisplayPref_entity_index ON DisplayPref (display_entity);
 
 
+--
+-- Table structure for table 'Category'
+--
+CREATE TABLE Category (
+  category_id          serial,
+  category_domain_id   integer NOT NULL DEFAULT 0,
+  category_timeupdate  TIMESTAMP,
+  category_timecreate  TIMESTAMP,
+  category_userupdate  integer,
+  category_usercreate  integer,
+  category_category    varchar(24) NOT NULL default '',
+  category_code        varchar(10) NOT NULL default '',
+  category_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (category_id)
+);
+CREATE INDEX cat_idx_cat ON Category (category_category);
+
+
+--
+-- Table structure for table 'CategoryLink'
+--
+CREATE TABLE CategoryLink (
+  categorylink_category_id integer,
+  categorylink_entity_id   integer,
+  categorylink_category    varchar(24) NOT NULL default '',
+  categorylink_entity      varchar(32) NOT NULL default '',
+  PRIMARY KEY (categorylink_category_id, categorylink_entity_id, categorylink_category, categorylink_entity)
+);
+CREATE INDEX catl_idx_entid ON CategoryLink (categorylink_entity_id);
+CREATE INDEX catl_idx_cat ON CategoryLink (categorylink_category);
+
+
 -------------------------------------------------------------------------------
 -- References Tables
 -------------------------------------------------------------------------------
@@ -355,129 +387,6 @@ CREATE TABLE ContactFunction (
 );
 
 
---
--- Table structure for table 'ContactCategory1'
---
-CREATE TABLE ContactCategory1 (
-  contactcategory1_id          serial,
-  contactcategory1_domain_id   integer default 0,
-  contactcategory1_timeupdate  timestamp,
-  contactcategory1_timecreate  timestamp,
-  contactcategory1_userupdate  integer default 0,
-  contactcategory1_usercreate  integer default 0,
-  contactcategory1_code        varchar(10) default '',
-  contactcategory1_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory1_id)
-);
-
-
---
--- Table structure for table 'ContactCategory1Link'
---
-CREATE TABLE ContactCategory1Link (
-  contactcategory1link_category_id  integer NOT NULL default 0,
-  contactcategory1link_contact_id   integer NOT NULL default 0,
-  PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id)
-);
-CREATE INDEX contcat1_idx_cont ON ContactCategory1Link (contactcategory1link_contact_id);
-
-
---
--- Table structure for table 'ContactCategory2'
---
-CREATE TABLE ContactCategory2 (
-  contactcategory2_id          serial,
-  contactcategory2_domain_id   integer default 0,
-  contactcategory2_timeupdate  timestamp,
-  contactcategory2_timecreate  timestamp,
-  contactcategory2_userupdate  integer default 0,
-  contactcategory2_usercreate  integer default 0,
-  contactcategory2_code        varchar(10) default '',
-  contactcategory2_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory2_id)
-);
-
-
---
--- Table structure for table 'ContactCategory2Link'
---
-CREATE TABLE ContactCategory2Link (
-  contactcategory2link_category_id  integer NOT NULL default 0,
-  contactcategory2link_contact_id   integer NOT NULL default 0,
-  PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
-);
-CREATE INDEX contcat2_idx_cont ON ContactCategory2Link (contactcategory2link_contact_id);
-
-
---
--- Table structure for table 'ContactCategory3'
---
-CREATE TABLE ContactCategory3 (
-  contactcategory3_id          serial,
-  contactcategory3_domain_id   integer default 0,
-  contactcategory3_timeupdate  timestamp,
-  contactcategory3_timecreate  timestamp,
-  contactcategory3_userupdate  integer default 0,
-  contactcategory3_usercreate  integer default 0,
-  contactcategory3_code        varchar(10) default '',
-  contactcategory3_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory3_id)
-);
-
-
---
--- Table structure for table 'ContactCategory3Link'
---
-CREATE TABLE ContactCategory3Link (
-  contactcategory3link_category_id  integer NOT NULL default 0,
-  contactcategory3link_contact_id   integer NOT NULL default 0,
-  PRIMARY KEY (contactcategory3link_category_id,contactcategory3link_contact_id)
-);
-CREATE INDEX contcat3_idx_cont ON ContactCategory3Link (contactcategory3link_contact_id);
-
-
---
--- Table structure for table 'ContactCategory4'
---
-CREATE TABLE ContactCategory4 (
-  contactcategory4_id          serial,
-  contactcategory4_domain_id   integer default 0,
-  contactcategory4_timeupdate  timestamp,
-  contactcategory4_timecreate  timestamp,
-  contactcategory4_userupdate  integer default 0,
-  contactcategory4_usercreate  integer default 0,
-  contactcategory4_code        varchar(10) default '',
-  contactcategory4_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory4_id)
-);
-
---
--- Table structure for table 'ContactCategory4Link'
---
-CREATE TABLE ContactCategory4Link (
-  contactcategory4link_category_id  integer NOT NULL default 0,
-  contactcategory4link_contact_id   integer NOT NULL default 0,
-  PRIMARY KEY (contactcategory4link_category_id,contactcategory4link_contact_id)
-);
-CREATE INDEX contcat4_idx_cont ON ContactCategory4Link (contactcategory4link_contact_id);
-
-
---
--- Table structure for table 'ContactCategory5'
---
-CREATE TABLE ContactCategory5 (
-  contactcategory5_id          serial,
-  contactcategory5_domain_id   integer default 0,
-  contactcategory5_timeupdate  timestamp,
-  contactcategory5_timecreate  timestamp,
-  contactcategory5_userupdate  integer default 0,
-  contactcategory5_usercreate  integer default 0,
-  contactcategory5_code        varchar(10) default '',
-  contactcategory5_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (contactcategory5_id)
-);
-
-
 -------------------------------------------------------------------------------
 -- Lead module tables
 -------------------------------------------------------------------------------
@@ -645,32 +554,6 @@ CREATE TABLE DealCompany (
   PRIMARY KEY (dealcompany_id)
 );
 CREATE INDEX dealcompany_idx_deal ON DealCompany (dealcompany_deal_id);
-
-
---
--- Table structure for table 'DealCategory1'
---
-CREATE TABLE DealCategory1 (
-  dealcategory1_id          serial,
-  dealcategory1_domain_id   integer default 0,
-  dealcategory1_timeupdate  timestamp,
-  dealcategory1_timecreate  timestamp,
-  dealcategory1_userupdate  integer default 0,
-  dealcategory1_usercreate  integer default 0,
-  dealcategory1_code        varchar(10) default '',
-  dealcategory1_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (dealcategory1_id)
-);
-
-
--- Table structure for table 'DealCategory1Link'
---
-CREATE TABLE DealCategory1Link (
-  dealcategory1link_category_id  integer NOT NULL default 0,
-  dealcategory1link_deal_id      integer NOT NULL default 0,
-  PRIMARY KEY (dealcategory1link_category_id,dealcategory1link_deal_id)
-);
-CREATE INDEX dealcat1_idx_deal ON DealCategory1Link (dealcategory1link_deal_id);
 
 
 -------------------------------------------------------------------------------
@@ -930,46 +813,12 @@ CREATE TABLE Document (
   document_name        	 varchar(255) DEFAULT NULL,
   document_kind        	 integer DEFAULT NULL,
   document_mimetype_id	 integer NOT NULL DEFAULT 0,
-  document_category1_id  integer NOT NULL DEFAULT 0,
-  document_category2_id  integer NOT NULL DEFAULT 0,
   document_privacy     	 integer NOT NULL DEFAULT 0,
   document_size        	 integer DEFAULT NULL,
   document_author      	 varchar(255) DEFAULT NULL,
   document_path        	 text DEFAULT NULL,
   document_acl        	 text DEFAULT NULL,
   PRIMARY KEY (document_id)
-);
-
-
---
--- Table structure for table 'DocumentCategory1'
---
-CREATE TABLE DocumentCategory1 (
-  documentcategory1_id          serial,
-  documentcategory1_domain_id   integer default 0,
-  documentcategory1_timeupdate  timestamp,
-  documentcategory1_timecreate  timestamp,
-  documentcategory1_userupdate  integer DEFAULT NULL,
-  documentcategory1_usercreate  integer DEFAULT NULL,
-  documentcategory1_code        varchar(10) NOT NULL default '',
-  documentcategory1_label       varchar(255) DEFAULT NULL,
-  PRIMARY KEY (documentcategory1_id)
-);
-
-
---
--- Table structure for table 'DocumentCategory2'
---
-CREATE TABLE DocumentCategory2 (
-  documentcategory2_id          serial,
-  documentcategory2_domain_id   integer default 0,
-  documentcategory2_timeupdate  timestamp,
-  documentcategory2_timecreate  timestamp,
-  documentcategory2_userupdate  integer DEFAULT NULL,
-  documentcategory2_usercreate  integer DEFAULT NULL,
-  documentcategory2_code        varchar(10) NOT NULL default '',
-  documentcategory2_label       varchar(255) DEFAULT NULL,
-  PRIMARY KEY (documentcategory2_id)
 );
 
 
@@ -1247,26 +1096,25 @@ PRIMARY KEY (contractstatus_id)
 -- New table 'Incident'
 --
 CREATE TABLE Incident (
-  incident_id               serial,
-  incident_domain_id        integer default 0,
-  incident_timeupdate       timestamp,
-  incident_timecreate       timestamp,
-  incident_userupdate       integer DEFAULT NULL,
-  incident_usercreate       integer DEFAULT NULL,
-  incident_contract_id      integer NOT NULL,
-  incident_label            varchar(100) DEFAULT NULL,
-  incident_reference        varchar(32) default NULL,
-  incident_date             timestamp,
-  incident_priority_id      integer DEFAULT NULL,
-  incident_status_id        integer DEFAULT NULL,
-  incident_category1_id     integer DEFAULT 0,
-  incident_category2_id     integer DEFAULT 0,
-  incident_logger           integer DEFAULT NULL,
-  incident_owner            integer DEFAULT NULL,
-  incident_duration         char(4) DEFAULT '0',
-  incident_archive          char(1) NOT NULL DEFAULT '0',
-  incident_comment          text,
-  incident_resolution       text,
+  incident_id                 serial,
+  incident_domain_id          integer default 0,
+  incident_timeupdate         timestamp,
+  incident_timecreate         timestamp,
+  incident_userupdate         integer DEFAULT NULL,
+  incident_usercreate         integer DEFAULT NULL,
+  incident_contract_id        integer NOT NULL,
+  incident_label              varchar(100) DEFAULT NULL,
+  incident_reference          varchar(32) default NULL,
+  incident_date               timestamp,
+  incident_priority_id        integer DEFAULT 0,
+  incident_status_id          integer DEFAULT 0,
+  incident_resolutiontype_id  integer DEFAULT 0,
+  incident_logger             integer DEFAULT NULL,
+  incident_owner              integer DEFAULT NULL,
+  incident_duration           char(4) DEFAULT '0',
+  incident_archive            char(1) NOT NULL DEFAULT '0',
+  incident_comment            text,
+  incident_resolution         text,
   PRIMARY KEY (incident_id)
 );
 
@@ -1305,34 +1153,18 @@ CREATE TABLE IncidentStatus (
 
 
 --
--- New table 'IncidentCategory1'
+-- New table 'IncidentResolutionType'
 --
-CREATE TABLE IncidentCategory1 (
-  incidentcategory1_id          serial,
-  incidentcategory1_domain_id   integer default 0,
-  incidentcategory1_timeupdate  timestamp,
-  incidentcategory1_timecreate  timestamp,
-  incidentcategory1_userupdate  integer DEFAULT NULL,
-  incidentcategory1_usercreate  integer DEFAULT NULL,
-  incidentcategory1_code        varchar(10) default '',
-  incidentcategory1_label       varchar(32) DEFAULT NULL,
-  PRIMARY KEY (incidentcategory1_id)
-);
-
-
---
--- New table 'IncidentCategory2'
---
-CREATE TABLE IncidentCategory2 (
-  incidentcategory2_id          serial,
-  incidentcategory2_domain_id   integer default 0,
-  incidentcategory2_timeupdate  timestamp,
-  incidentcategory2_timecreate  timestamp,
-  incidentcategory2_userupdate  integer DEFAULT NULL,
-  incidentcategory2_usercreate  integer DEFAULT NULL,
-  incidentcategory2_code        varchar(10) default '',
-  incidentcategory2_label       varchar(32) DEFAULT NULL,
-  PRIMARY KEY (incidentcategory2_id)
+CREATE TABLE IncidentResolutionType (
+  incidentresolutiontype_id          serial,
+  incidentresolutiontype_domain_id   integer default 0,
+  incidentresolutiontype_timeupdate  timestamp,
+  incidentresolutiontype_timecreate  timestamp,
+  incidentresolutiontype_userupdate  integer DEFAULT NULL,
+  incidentresolutiontype_usercreate  integer DEFAULT NULL,
+  incidentresolutiontype_code        varchar(10) default '',
+  incidentresolutiontype_label       varchar(32) DEFAULT NULL,
+  PRIMARY KEY (incidentresolutiontype_id)
 );
 
 

@@ -222,7 +222,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
   }
 
   // User defined data
-  $block_user .= of_userdata_dis_search("company", $company);
+  $block_userdata .= of_userdata_dis_search("company", $company);
 
   // Type, activity select
   $block_type = of_category_dis_search_select("company", "type", $types, $type);
@@ -330,7 +330,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
     <label>$l_before<br />
       <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
     </label>
-    $block_user
+    $block_userdata
     <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>
@@ -414,7 +414,7 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params("company", $company);
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type$url_userdata&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_activity=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_country=$ctry&amp;sel_datasource=$dsrc&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_fuzzy=$fuzzy$url_userdata$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $prefs, "company");
   if ($popup) {
@@ -829,7 +829,7 @@ function html_company_consult_address($co_q) {
   $com = beautify_comment(nl2br($co_q->f("company_comment")));
 
   // User defined data
-  $block_user .= of_userdata_dis_entity_consult("company", $id);
+  $block_userdata .= of_userdata_dis_entity_consult("company", $id);
 
   // Conditionnal fields
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
@@ -1077,7 +1077,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
   $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
   // User defined data
-  $block_user = of_userdata_dis_entity_form("company", $id);
+  $block_userdata = of_userdata_dis_entity_form("company", $id);
 
   // some constants
   $csize_add = "48";
@@ -1267,8 +1267,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $usr_
     <th>$l_archive :</th>
     <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
   $block_type
-  $block_cat1
-  $block_user
+  $block_userdata
   $block_activity
   $block_naf
   </tr><tr>    

@@ -19,6 +19,7 @@ $l_lastupdate = "Date of last update";
 $l_archive_new = "To File";
 $l_res_duration = "Resolution duration";
 $l_reference = "Reference";
+$l_resolutiontype = "Resolution type";
 
 // Title 
 $l_redhot = "Redhot";

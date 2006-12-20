@@ -220,11 +220,10 @@ function dis_deal_index($deal="") {
   $type_q = run_query_deal_type();
   $regions = of_category_get_ordered("", "region");
   $tts = get_global_tasktype($ctt_sales);
-  $cats1 = of_category_get_ordered("deal", "category1");
   $roles = of_category_get_ordered("DealCompany", "role");
   $status_q = run_query_deal_status_list();
   $block .= html_deal_parentdeal_search_form($deal, $usr_q);
-  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $cats1, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $roles, $status_q, $usr_q);
 
   return $block;
 }
@@ -244,10 +243,9 @@ function dis_deal_search_form($deal="") {
   $type_q = run_query_deal_type();
   $regions = of_category_get_ordered("", "region");
   $tts = get_global_tasktype($ctt_sales);
-  $cats1 = of_category_get_ordered("deal", "category1");
   $roles = of_category_get_ordered("DealCompany", "role");
   $status_q = run_query_deal_status_list();
-  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $cats1, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $regions, $tts, $roles, $status_q, $usr_q);
 
   return $block;
 }
@@ -260,12 +258,11 @@ function dis_deal_search_form($deal="") {
 //   - $kind_q     : DB result object (deal kind list)
 //   - $regions    : regions array
 //   - $tts        : tasktype array
-//   - $cats1      : array with deal category 1 list 
 //   - $roles      : array with dealcompany roles list 
 //   - $stat_q     : DB result object (deal status list)
 //   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $stat_q, $manager_q) {
+function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, $manager_q) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_status;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_relation;
   global $l_postcode, $l_region;
@@ -284,7 +281,6 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   $kind = $deal["kind"];
   $region = $deal["region"];
   $tt = $deal["tasktype"];
-  $cat1 = $deal["category1"];
   $role = $deal["role"];
   $status = $deal["status_id"];
   $manager = $deal["manager"];
@@ -293,6 +289,9 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
   $date_before = stripslashes($deal["date_before"]);
   $company_id = $deal["company_id"];
   $role_company = $deal["role_company"];
+
+  // User defined data
+  $block_userdata .= of_userdata_dis_search("deal", $deal);
 
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind_id\">
@@ -319,9 +318,6 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
     }
     $sel_tt .= "</select>";
   }
-
-  // Category select construction
-  $block_category1 = of_category_dis_search_select("deal", "category1", $cats1, $cat1);
 
   // Role select construction
   $block_role = of_category_dis_search_select("DealCompany", "role", $roles, $role);
@@ -414,7 +410,7 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $cats1, $roles, $
       $sel_tt
     </label>
     $block_region 
-    $block_category1 
+    $block_userdata 
     $block_role 
     <label>$l_relation<br />
       <input name=\"tf_role_company\" size=\"12\" value=\"$role_company\" />
@@ -545,7 +541,6 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $kind = $deal["kind"];
   $region = $deal["region"];
   $tt = $deal["tasktype"];
-  $cat1 = $deal["category1"];
   $role = $deal["role"];
   $role_company = urlencode(stripslashes($deal["role_company"]));
   $status = $deal["status_id"];
@@ -553,6 +548,9 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $date_after = stripslashes($deal["date_after"]);
   $date_before = stripslashes($deal["date_before"]);
   $param_comp = $deal["company_id"];
+
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params("deal", $deal);
   
   if ($popup) {
     $ext_action = $deal["ext_action"];
@@ -564,7 +562,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_kind_id=$kind&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_category1=$cat1&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cba_archive=$archive&amp;sel_kind_id=$kind&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_userdata$url_ext");
 
   $deal_d = new OBM_DISPLAY("DATA", $prefs, "deal");
   if ($popup) {
@@ -801,7 +799,6 @@ function html_deal_consult($deal_q, $dc="") {
   if (($datebegin != "") && ($dateexpected != "")) {
     $sale_delay = floor(($deal_q->f("dateexpected") - $deal_q->f("datebegin")) / 86400);
   }
-
   $dateend = of_date_format($deal_q->f("dateend"), 1);
   if ($dateend != "") {
     $month_end = of_date_get_month($deal_q->f("dateend"));
@@ -841,7 +838,9 @@ function html_deal_consult($deal_q, $dc="") {
   $con2 = $deal_q->f("deal_contact2_id");
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
-  $cats1 = of_category_get_entitycategories("deal", "category1", $id);
+
+  // User defined data
+  $block_userdata .= of_userdata_dis_entity_consult("deal", $id);
 
   $display["link"] = html_deal_links($deal_q);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
@@ -860,9 +859,6 @@ function html_deal_consult($deal_q, $dc="") {
     }
   }
 
-
-  // Category 1 field
-  $block_category1 = of_category_dis_block_consult("deal", "category1", $cats1);
 
   $block = "
     <table width=\"100%\">
@@ -986,7 +982,7 @@ function html_deal_consult($deal_q, $dc="") {
     </tr><tr>
    <td colspan=\"2\">
       
-      $block_category1
+      $block_userdata
       
       <tr>
     <td colspan=\"2\">
@@ -1022,7 +1018,6 @@ function dis_deal_form($deal) {
     $deal["company_id"] = $deal_q->f("deal_company_id");
     $users = array($uid, $deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"), );
     $dc = get_deal_dealcompany_info($deal["deal_id"]);
-    $cats1 = of_category_get_ordered("deal", "category1", "multi", $deal["deal_id"]);
   } else if ($action == "update") {
     $users = array($uid, $deal["market"], $deal["tech"]);
     $deal_q = "";
@@ -1060,7 +1055,7 @@ function dis_deal_form($deal) {
   $regions = of_category_get_ordered("", "region");
   $roles = of_category_get_ordered("DealCompany", "role");
 
-  $block = html_deal_form($action, $deal_q, $type_q, $regions, $tts, $sources, $cats1, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
+  $block = html_deal_form($action, $deal_q, $type_q, $regions, $tts, $sources, $usrc_q, $usrp_q, $comp_q, $con_q, $dc, $roles, $sta_q, $deal);
 
   return $block;
 }
@@ -1075,7 +1070,6 @@ function dis_deal_form($deal) {
 //   - $regions   : Regions array
 //   - $tts       : TaskType array
 //   - $sources   : Lead Sources array
-//   - $cats1     : array with deal category 1 list 
 //   - $usrc_q    : DBO : list of userobm from system group Commercial
 //   - $usrp_q    : DBO : list of userobm from system group Production
 //   - $comp_q    : DBO : deal company infos (name, ad1, zip, town when new)
@@ -1087,9 +1081,9 @@ function dis_deal_form($deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
+function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources, $usrc_q,$usrp_q,$comp_q, $con_q, $dc, $roles, $sta_q, $deal) {
   global $set_theme,$ico_company,$ico_contact,$ico_add;
-  global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private, $l_cat;
+  global $c_php_isodate_format,$l_deal,$l_update,$l_insert, $l_private;
   global $l_dates, $l_company, $l_other_relation, $l_relation, $l_label;
   global $l_number, $l_kind, $l_region;
   global $l_tt, $l_marketing_manager, $l_technical_manager, $l_commission_p;
@@ -1167,7 +1161,6 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
   if (isset($deal["kind"])) { $kind = $deal["kind"]; }
   if (isset($deal["region"])) { $region = $deal["region"]; }
   if (isset($deal["tasktype"])) { $tt = $deal["tasktype"]; }
-  if (isset($deal["category1"])) { $cat1 = $deal["category1"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
   if (isset($deal["tech"])) { $tech = $deal["tech"]; }
   if (isset($deal["source_id"])) { $source_id = $deal["source_id"]; }
@@ -1191,6 +1184,9 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
   if (isset($deal["company_zip"])) { $zip = stripslashes($deal["company_zip"]); }
   if (isset($deal["company_town"])) { $town = stripslashes($deal["company_town"]); }
   if (isset($deal["ext_target"])) { $ext_target = $deal["ext_target"]; }
+
+  // User defined data
+  $block_userdata = of_userdata_dis_entity_form("deal", $id);
  
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind_id\">
@@ -1330,9 +1326,6 @@ function html_deal_form($action,$deal_q,$kind_q,$regions,$tts,$sources,$cats1, $
       <input type=\"text\" name=\"data_dccnewname_$cpt\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </div>";
 
-
-  // Category select field
-  $block_category1 = of_category_dis_entity_form("deal", "category1", $cats1);
 
   // status select construction
   $sel_status = "<select name=\"sel_status_id\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
@@ -1547,7 +1540,7 @@ $js_status_loop
       <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
     </tr>
     <tr>
-     $block_category1
+     $block_userdata
     </tr>
     </table>
    </table>
@@ -2481,7 +2474,6 @@ function dis_deal_dashboard_list($deal) {
 // Display Deal Administration Index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_admin_index() {
-  $cgp_hide;
 
   $kind_q = run_query_deal_type();
   $status_q = run_query_deal_status_list();
@@ -2492,11 +2484,8 @@ function dis_deal_admin_index() {
   $block .= "<hr />";
   $block .= of_category_dis_admin_form("role", $roles);
 
-  if (! $cgp_hide["deal"]["dealcategory1"]) {
-    $cats1 = of_category_get_ordered("deal", "category1");
-    $block .= "<hr />";
-    $block .= of_category_dis_admin_form("category1", $cats1);
-  }
+  // User defined data
+  $block .= of_userdata_dis_admin_form("deal");
 
   return $block;
 }
@@ -3032,11 +3021,10 @@ function dis_deal_parentdeal_consult($deal) {
   $num_rows = $deal_q->num_rows();
   $kind_q = run_query_deal_type();
   $tts = get_global_tasktype($ctt_sales);
-  $cat_q = run_query_deal_category1();
   $status_q = run_query_deal_status_list();
   $usr_q = run_query_deal_manager($archive);
 
-  $block = html_deal_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tts, $cat_q, $status_q, $usr_q);
+  $block = html_deal_parentdeal_consult($obm_q, $deal_q, $deal, $prefs, $num_rows, $kind_q, $tts, $status_q, $usr_q);
 
   return $block;
 }
@@ -3057,7 +3045,7 @@ function dis_deal_parentdeal_consult($deal) {
 //   - $status_q : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$cat_q,$status_q,$usr_q) {
+function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$kind_q,$tts,$status_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_proposal,$l_alarm,$l_amount_in,$l_amount_out,$l_potential_balanced,$l_comment,$l_marketing_manager,$l_status;
@@ -3146,7 +3134,7 @@ function html_deal_parentdeal_consult($parent_q,$deal_q,$deal,$prefs,$nb_deals,$
   $block .= display_info_msg($l_parentdeal_deals);
 
   //----- deal search form 
-  $block .= html_deal_search_form($deal, $kind_q, $regions, $tts, $cat_q, $roles, $status_q, $usr_q);
+  $block .= html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $status_q, $usr_q);
 
   //-----> deal list
   // if no record found, display it and stop
@@ -3310,10 +3298,9 @@ function html_deal_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Subscription search result in an external module
-// Parameters:
-//   - $publication[] : publication search criteria
-//     keys used  : name, type, zip
+// TEST :: (from company, see view)
+// Deprecated will be handled by ajax
+// Display the deal list from an externam module
 ///////////////////////////////////////////////////////////////////////////////
 function ext_dis_deal_list($params, $entity, $id) {
   global $path;
@@ -3341,96 +3328,6 @@ function ext_dis_deal_list($params, $entity, $id) {
   $display["msg"] .= display_info_msg("$nb_deal $l_found");
   $block = $deal_d->display("dis_data_deal");
 
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Task  result
-// Parameters : 
-//   - $sub_q   : subscription list
-//   - $nb_sub  : nb subscriptions
-///////////////////////////////////////////////////////////////////////////////
-function html_deal_subscription_list_result($sub_q,$nb_subscription) {
-  global $set_theme, $ico_update, $ico_delete, $ico_crow;
-  global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
-  global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
-  global $path, $auth, $popup_height, $popup_width;
-  global $cright_write, $module, $perm;
-
-  if ($perm->check_right($module, $cright_write)) {  
-    $has_write_right = true;
-    $display_write .= "<td class=\"resultHead\"></td>
-    <td class=\"resultHead\"></td>";
-  }
-  
-  $block = " 
-  <div class=\"result\"><table class=\"resultTable\">
-   <tr>
-    <td class=\"resultHead\">$l_publication_title</td>
-    <td class=\"resultHead\">$l_year</td>
-    <td class=\"resultHead\">$l_lang</td>
-    <td class=\"resultHead\">$l_renewal</td>
-    <td class=\"resultHead\">$l_recept</td>
-    <td class=\"resultHead\">$l_quantity</td>
-    <td class=\"resultHead\">$l_timecreate</td>    
-    <td class=\"resultHead\">$l_timeupdate</td>
-    $display_write
-   </tr>
-   ";
-  while($sub_q->next_record()) {
-    $c_id = $sub_q->f("subscription_contact_id");
-    $p_id = $sub_q->f("subscription_publication_id");
-    $s_id = $sub_q->f("subscription_id");
-    $title = $sub_q->f("publication_title");
-    $year = $sub_q->f("publication_year");
-    $lang = $sub_q->f("publication_lang");
-    $rec_label = $sub_q->f("subscriptionreception_label");
-    $quantity = $sub_q->f("subscription_quantity");
-    $timecreate = of_datetime_format($sub_q->f("timecreate"));
-    if ($sub_q->f("timeupdate") != "") {
-      $timeupdate = of_datetime_format($sub_q->f("timeupdate"));
-    } else {
-      $timeupdate = "&nbsp;";
-    }
-    $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;publication_id=$p_id");
-    $ext_url = urlencode(url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$c_id&amp;view=publication"));
-
-    if ($has_write_right) {
-      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;contact_id=$c_id&amp;param_subscription=$s_id&amp;popup=1&amp;ext_url=$ext_url");
-      $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
-
-      $display_write = "
-    <td class=\"resultText\">
-      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_update\" />
-      </a>
-    </td>    
-    <td class=\"resultText\">
-      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" />
-      </a>
-      </td>";
-    }
-
-    if ($sub_q->f("subscription_renewal") == "1") {
-      $dis_renew = $l_yes;
-    } else {
-      $dis_renew = $l_no;
-    }
-    $block .= "
-    <tr>
-    <td class=\"resultText\"><a href=\"$url_publication_consult\">$title</a></td>
-    <td class=\"resultText\">$year</td>
-    <td class=\"resultText\">$lang</td>
-    <td class=\"resultText\">$dis_renew</td>
-    <td class=\"resultText\">$rec_label</td>
-    <td class=\"resultText\">$quantity</td>
-    <td class=\"resultText\">$timecreate</td>
-    <td class=\"resultText\">$timeupdate</td>    
-    $display_write
-    </tr>";
-  }
   return $block;
 }
 

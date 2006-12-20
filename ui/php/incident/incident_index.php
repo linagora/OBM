@@ -23,14 +23,10 @@
 // - status_update       -- form fields    -- update the category
 // - status_checklink    --                -- check if category is used
 // - status_delete       -- $sel_cat1      -- delete the category
-// - category1_insert    -- form fields    -- insert the category
-// - category1_update    -- form fields    -- update the category
-// - category1_checklink --                -- check if category is used
-// - category1_delete    -- $sel_cat1      -- delete the category
-// - category2_insert    -- form fields    -- insert the category
-// - category2_update    -- form fields    -- update the category
-// - category2_checklink --                -- check if category is used
-// - category2_delete    -- $sel_cat2      -- delete the category
+// - resolutiontype_insert    -- form fields    -- insert the category
+// - resolutiontype_update    -- form fields    -- update the category
+// - resolutiontype_checklink --                -- check if category is used
+// - resolutiontype_delete    -- $sel_cat1      -- delete the category
 // - display             --                -- display, set display parameters
 // - dispref_display     --                -- update one field display value
 // - dispref_level       --                -- update one field display position
@@ -234,71 +230,37 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category1_insert") {
+} elseif ($action == "resolutiontype_insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("incident", "category1", $params);
+  $retour = of_category_query_insert("incident", "resolutiontype", $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
+    $display["msg"] .= display_ok_msg("$l_resolutiontype : $l_insert_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
+    $display["msg"] .= display_err_msg("$l_resolutiontype : $l_insert_error");
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category1_update") {
+} elseif ($action == "resolutiontype_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("incident", "category1", $params);
+  $retour = of_category_query_update("incident", "resolutiontype", $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
+    $display["msg"] .= display_ok_msg("$l_resolutiontype : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
+    $display["msg"] .= display_err_msg("$l_resolutiontype : $l_update_error");
   }
   $display["detail"] .= dis_incident_admin_index();
 
-} elseif ($action == "category1_checklink") {
+} elseif ($action == "resolutiontype_checklink") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("incident", "category1", $params, "mono");
+  $display["detail"] .= of_category_dis_links("incident", "resolutiontype", $params, "mono");
 
-} elseif ($action == "category1_delete") {
+} elseif ($action == "resolutiontype_delete") {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("incident", "category1", $params);
+  $retour = of_category_query_delete("incident", "resolutiontype", $params);
   if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
+    $display["msg"] .= display_ok_msg("$l_resolutiontype : $l_delete_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
-  }
-  $display["detail"] .= dis_incident_admin_index();
-
-} elseif ($action == "category2_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("incident", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_insert_error");
-  }
-  $display["detail"] .= dis_incident_admin_index();
-
-} elseif ($action == "category2_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("incident", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_update_error");
-  }
-  $display["detail"] .= dis_incident_admin_index();
-
-} elseif ($action == "category2_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("incident", "category2", $params, "mono");
-
-} elseif ($action == "category2_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("incident", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_delete_error");
+    $display["msg"] .= display_err_msg("$l_resolutiontype : $l_delete_error");
   }
   $display["detail"] .= dis_incident_admin_index();
 
@@ -330,6 +292,8 @@ if ($action == "index" || $action == "") {
   $prefs = get_display_pref($uid, "incident", 1);
   $display["detail"] = dis_incident_display_pref($prefs);
 }
+
+of_category_user_action_switch($module, $action, $params);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -365,6 +329,8 @@ function get_incident_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_admin, $l_header_display;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
+  of_category_user_module_action("incident");
 
 //  Index
   $actions["incident"]["index"] = array (
@@ -498,58 +464,30 @@ function get_incident_action() {
     'Condition'=> array ('None') 
                                      		);
 
-//  Category1 insert
-  $actions["incident"]["category1_insert"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category1_insert",
+//  Resolutiontype insert
+  $actions["incident"]["resolutiontype_insert"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=resolutiontype_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-//  Category1 update
-  $actions["incident"]["category1_update"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category1_update",
+//  Resolutiontype update
+  $actions["incident"]["resolutiontype_update"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=resolutiontype_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-//  Category1 Check Link
-  $actions["incident"]["category1_checklink"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category1_checklink",
+//  Resolutiontype Check Link
+  $actions["incident"]["resolutiontype_checklink"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=resolutiontype_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
-//  Category1 delete
-  $actions["incident"]["category1_delete"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category1_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-//  Category2 insert
-  $actions["incident"]["category2_insert"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category2_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-//  Category2 update
-  $actions["incident"]["category2_update"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category2_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-//  Category2 Check Link
-  $actions["incident"]["category2_checklink"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category2_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-//  Category2 delete
-  $actions["incident"]["category2_delete"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=category2_delete",
+//  Resolutiontype delete
+  $actions["incident"]["resolutiontype_delete"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=resolutiontype_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);

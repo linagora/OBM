@@ -28,7 +28,6 @@ function run_query_incident_search($incident) {
   $priority = $incident["priority"];
   $status = $incident["status"];
   $category1 = $incident["category1"];
-  $category2 = $incident["category2"];
   $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
@@ -99,21 +98,25 @@ function run_query_incident_search($incident) {
     $where .= " AND Incident.incident_category1_id = '$category1'";
   }
 
-  $join_category2 = "LEFT JOIN IncidentCategory2 ON incident_category2_id=incidentcategory2_id";
-  if (($category2 != $c_all) && ($category2 != "")) {
-    $where .= " AND Incident.incident_category2_id = '$category2'";
-  }
-
   if ($archive != "1") {
     $where .= " AND Incident.incident_archive = '0'";
   }
+
+  // User defined data
+  $userdata = of_userdata_query_search("incident", $incident);
+  if ($userdata["where"] != "") {
+    $where .= " AND ". $userdata["where"];
+    $join_userdata = $userdata["join"];
+  }
+
+
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "incidentstatus_code";
   $orderq .= " ORDER BY $order $sql_order_dir, incidentpriority_code";
 
-  $req = "SELECT
+  $select = "SELECT
       Incident.incident_id as id,
       incident_id,
       incident_timeupdate,
@@ -127,7 +130,6 @@ function run_query_incident_search($incident) {
       incident_status_id,
       incidentstatus_label as incident_status,
       incidentcategory1_label as category1_label,
-      incidentcategory2_label as category2_label,
       incident_logger,
       incident_owner,
       incident_archive,
@@ -137,7 +139,9 @@ function run_query_incident_search($incident) {
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
-    FROM Incident
+    FROM Incident";
+
+  $left_join = "
          LEFT JOIN Contract ON incident_contract_id=contract_id
          LEFT JOIN Company ON contract_company_id=company_id
          LEFT JOIN UserObm as u1 ON incident_logger=u1.userobm_id
@@ -145,20 +149,18 @@ function run_query_incident_search($incident) {
          $join_priority
          $join_status
          $join_category1
-         $join_category2
-    $whereq
-    $orderq
-    $limit
-";
+         $join_userdata";
+
+  $query = "$select $left_join $whereq $orderq $limit";
 
   if ($ctu_sql_limit) {
-    $cq = "SELECT count(*) FROM Incident $join_contr $join_comp $whereq";
+    $cq = "SELECT count(*) FROM Incident $left_join $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($req, $cdg_sql, "run_query_incident_search()");
-    $obm_q->query($req);
+    $obm_q->query($query);
   }
 
   return $obm_q;

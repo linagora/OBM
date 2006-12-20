@@ -1564,10 +1564,11 @@ function get_calendar_date_day_of_week($timestamp, $day) {
 // really readable by the user, and limit to a max (=6) for display
 // Parameters:
 //   - $sel_entity_id   : ["user"] ["resource"] ids
+//   - $nb_max          : nb max entities to display
 //   - $entity_readable : if given, entities eligibles
 ///////////////////////////////////////////////////////////////////////////////
-function slice_calendar_entities($sel_entity_id, $entity_readable="") {
-  global $auth, $max_display;
+function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable="") {
+  global $auth;
 
   $sel_user_id = $sel_entity_id["user"];
   $sel_group_id = $sel_entity_id["group"];
@@ -1588,8 +1589,8 @@ function slice_calendar_entities($sel_entity_id, $entity_readable="") {
       }
     }
   }
-  if (count($res_user_id) > $max_display) {
-    $res_user_id = array_slice ($res_user_id, 0, $max_display);
+  if (count($res_user_id) > $nb_max) {
+    $res_user_id = array_slice ($res_user_id, 0, $nb_max);
   }
   $nb_user = count($res_user_id);
 
@@ -1608,7 +1609,7 @@ function slice_calendar_entities($sel_entity_id, $entity_readable="") {
       }
     }
   }
-  $max_res = $max_display - $nb_user;
+  $max_res = $nb_max - $nb_user;
   $nb_res = count($res_resource_id);
   if ($nb_res > $max_res) {
     $res_resource_id = array_slice ($res_resource_id, 0, $max_res);
