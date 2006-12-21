@@ -820,10 +820,8 @@ function dis_calendar_week_planning($calendar, $calendar_entity) {
   $occurrences = calendar_events_model($start_week_day,$end_week_time,$calendar_entity);
   
   if(is_array($occurrences)) {
-    $event_options = "{resizable:true,draggable:true}";
-    $day_event_options = "{draggable:true}";
     foreach($occurrences as $occurrence) {
-      $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity, $options);
+      $dis_event .= dis_calendar_event($occurrence, "hour",$calendar_entity);
     }
   }
   
@@ -916,7 +914,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity) {
     }
   }
 
-    if(is_array($events)) {
+  if(is_array($events)) {
     $event_options = "{resizable:true,draggable:true,xUnit:0}";
     $day_event_options = "{}";
 
@@ -1037,45 +1035,62 @@ $hidden_div
  * @access public
  * @return event HTML and javascript code
  */
-function dis_calendar_event($occurrence, $unit, $calendar_entity, $options="") {
+function dis_calendar_event($occurrence, $unit, $calendar_entity, $options=array()) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
-  global $ico_resize, $ico_periodic, $ico_meeting;
+  global $ico_resize, $ico_periodic, $ico_meeting, $auth;
   $event = $occurrence->event;
   $title = $event->title;
   $duration = $event->duration;
   $date = $occurrence->date;
   $id = $event->id;
   $entity_id = $occurrence->id;
+  $entity = $occurrence->entity;
+  
   $all_day = $event->all_day;
-
-  $head = date("H:i",$date);
-
-  if($event->isMeeting()) {
-    $head = "<img src=\"$ico_meeting\" alt=\"Meeting\" />$head";
-  }
-  if($event->isPeriodic()) {
-    $head = "<img src=\"$ico_periodic\" alt=\"Periodic\" />$head";
-  }
-
+  
   switch($unit)  {
     case "day" :
       $day = true;
+      if($updatable) {
+        $options[] = "draggable:true"; 
+      }
       break;
     case "hour" :
       $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date + $duration) <  $ccalendar_first_hour);
       $day = $day || (date('H',$date) >  $ccalendar_last_hour );
+      if($updatable) {
+        $options[] = "draggable:true"; 
+        $options[] = "resizable:true"; 
+      }
       break;
   }
 
+  if($entity == "user" && $entity_id == $auth->auth["uid"]) {
+    $updatable = true;
+  }
+
+  if($event->isMeeting()) {
+    $head .= "<img src=\"$ico_meeting\" alt=\"Meeting\" />";
+  }
+  if($event->isPeriodic()) {
+    $head .= "<img src=\"$ico_periodic\" alt=\"Periodic\" />";
+  }
+  if($all_day) {
+    $head .= $title;
+  } else {
+    $head .= date("H:i",$date);
+  }
+
   $userClass = $calendar_entity["user"][$entity_id]["class"];
+  $opt = "{".implode(',',$options)."}";
   if($day) {
     $display_events = "        
       <div id=\"event-$id-$entity_id-$date\" class=\"event $userClass\">
-        <h1 id=\"moveHandler-$id-$entity_id-$date\">$title</h1>
+        <h1 id=\"moveHandler-$id-$entity_id-$date\">$head</h1>
       </div>
       <script type=\"text/javascript\">
-        obm.calendarManager.newDayEvent($id,$entity_id,$date, $duration,'$title',{draggable:true});
+        obm.calendarManager.newDayEvent($id,$entity_id,$date, $duration,'$title',$opt);
       </script>
         ";
   } else {
@@ -1086,7 +1101,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity, $options="") {
       <img class=\"handle\" id=\"resizeHandler-$id-$entity_id-$date\" src=\"$ico_resize\" alt=\"Resize Handler\" />
       </div>
       <script type=\"text/javascript\">
-        obm.calendarManager.newEvent($id,$entity_id,$date,$duration,'$title',{resizable:true,draggable:true});
+        obm.calendarManager.newEvent($id,$entity_id,$date,$duration,'$title',$opt);
       </script>
       ";
   }

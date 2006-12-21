@@ -84,10 +84,6 @@ Obm.CalendarDayEvent = new Class({
     hr = $(this.options.type+'-'+origin);
     this.origin = origin;
     head = $('calendarHead');
-    if(this.origin >= 0 && head) {
-      tr = $(this.options.type+'-'+this.origin).parentNode;
-      tr.setStyle('height', (tr.offsetHeight - this.element.offsetHeight) + 'px');
-    }        
     if(head) {
        hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
     }
