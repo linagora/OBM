@@ -41,7 +41,6 @@ require("calendar_display.inc");
 require_once("calendar_js.inc");
 require("$obminclude/lib/right.inc");
 require_once("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 get_calendar_action();
 $perm->check_permissions($module, $action);

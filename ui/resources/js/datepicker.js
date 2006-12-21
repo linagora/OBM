@@ -104,7 +104,8 @@ function displayDatePicker(dateFieldName, displayBelowThisObject, dtFormat)
   if (dtFormat)
     dateFormat = dtFormat;
   else
-    dateFormat = obm.vars.regexp.dateFormat;
+    dateFormat = 'ymd';
+//    dateFormat = obm.vars.regexp.dateFormat;
 
   var x = displayBelowThisObject.offsetLeft;
   var y = displayBelowThisObject.offsetTop + displayBelowThisObject.offsetHeight ;

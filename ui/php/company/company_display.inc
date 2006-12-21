@@ -289,7 +289,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<h1 class=\"title\">$ext_title</h1";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   // --- HTML Template --------------------------------------------------------

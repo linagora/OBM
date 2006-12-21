@@ -130,7 +130,7 @@
   margin-right: 1px;
 }
 
-.event .resizeHandler {
+.event .handle {
   position: absolute;
   bottom: 0px;
   right: 0px;

@@ -33,4 +33,4 @@ $ico_resize         = "$theme_path/ico_resize.gif";
 $ico_previous       = "$theme_path/ico_previous.gif";
 $ico_next           = "$theme_path/ico_next.gif";
 $ico_meeting        = "$theme_path/ico_meeting.gif";
-$ico_calendar_repeat= "$theme_path/ico_calendar_repeat.gif";
+$ico_periodic       = "$theme_path/ico_calendar_repeat.gif";

@@ -328,10 +328,9 @@ C {
   padding: 2px 4px 0 4px;
 }
 
-.portlet h1 img {
+.portlet .handle{
   float: right;
 }
-
 
 .portlet ul {
   list-style-type: none;
@@ -758,7 +757,7 @@ input.datePicker {
   text-align: center;
   font-style: italic;
   margin:0;
-  line-height: 1.8em;
+  line-height: 1.5em;
   background-image: url('../images/hatch.gif');
 }
 

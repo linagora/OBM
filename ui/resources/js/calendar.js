@@ -10,6 +10,7 @@ Obm.CalendarDayEvent = new Class({
       type: 'day',
       yUnit: 0,
       xUnit: 24*3600,
+      unit : 24*3600,
       context: obm.calendarManager.headContext
     }, options || {});
   },
@@ -22,7 +23,8 @@ Obm.CalendarDayEvent = new Class({
     this.uid = uid
     this.title = title;
     this.time = time;
-
+    this.size = 1;
+    this.head = $ES('h1',this.element);
     if(this.options.draggable)
       this.makeDraggable();
     
@@ -54,47 +56,61 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTime: function(time) {
-    if(this.time) {
-      time = new Date(time * 1000);
-      d = new Date(this.time * 1000);
-      time.setHours(d.format('H'));
-      time.setMinutes(d.format('i'));
-      time = time.getTime()/1000;
-    };
-    this.time = time;
     origin = (time - obm.calendarManager.startTime) - (time - obm.calendarManager.startTime)%this.options.xUnit;
-    this.setOrigin(origin);
-  },
-
-  setDuration: function(duration) {
-    this.duration = duration;
-    size = Math.floor(duration/(24*3600)) + 1;
-    this.setSize(size);
-  },
-
-  setSize: function(size) {
-    this.size = size;
-    this.setWidth(this.size * obm.calendarManager.defaultWidth);
-    if(this.drag) {
-      this.drag.options.xMax = this.options.context.right - this.size * obm.calendarManager.defaultWidth;
+    if(this.setOrigin(origin)) {
+      if(this.time) {
+        time = new Date(time * 1000);
+        d = new Date(this.time * 1000);
+        time.setHours(d.format('H'));
+        time.setMinutes(d.format('i'));
+        time = time.getTime()/1000;
+      };
+      this.time = time;
+    } else {
+      this.redraw();
     }
+
   },
 
   setOrigin: function(origin) {
+    if(origin < 0) {   
+      this.hiddenSize = origin / this.options.xUnit;
+      console.log(this.hiddenSize);
+      origin = 0;
+    } else if(this.hidden != 0) {
+        this.hidden = 0;
+        this.setSize(this.size);
+    }
+    hr = $(this.options.type+'-'+origin);
+    this.origin = origin;
     head = $('calendarHead');
     if(this.origin >= 0 && head) {
       tr = $(this.options.type+'-'+this.origin).parentNode;
       tr.setStyle('height', (tr.offsetHeight - this.element.offsetHeight) + 'px');
     }        
-    this.origin = origin;
-    hr = $(this.options.type+'-'+this.origin);
     if(head) {
        hr.parentNode.setStyle('height', (hr.parentNode.offsetHeight + this.element.offsetHeight) + 'px');
     }
     this.redraw();
     if(obm.calendarManager.lock()) {
-      obm.calendarManager.resize();
+      obm.calendarManager.resizeWindow();
       obm.calendarManager.unlock()
+    }    
+    return true;
+  },
+
+  setDuration: function(duration) {
+    this.duration = duration;
+    date_begin = new Date(this.time * 1000);
+    date_end = new Date((this.time + this.duration) * 1000);
+    this.setSize(date_end.format('d') - date_begin.format('d') + 1);
+  },
+
+  setSize: function(size) {
+    this.size = size + this.hidden;
+    this.setWidth(this.size * obm.calendarManager.defaultWidth);
+    if(this.drag) {
+      this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
     }
   },
 
@@ -114,12 +130,15 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setWidth: function(width) {
+    if( (this.element.offsetLeft + width) > this.options.context.right ) {
+      width = this.options.context.right - this.element.offsetLeft;
+    }
     this.element.setStyle('width',width + 'px');
   },
 
   conflict: function(nb, position) {
-      this.element.setStyle('margin-top',position * this.element.offsetHeight + 'px');
-  },
+    this.element.setStyle('margin-top',position * this.element.offsetHeight + 'px');
+  }
 
 })
 
@@ -136,6 +155,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       type: 'time',
       yUnit: obm.vars.consts.timeUnit,
       xUnit: 3600*24,
+      unit : obm.vars.consts.timeUnit,
       context: obm.calendarManager.bodyContext
     }, options || {});
   },
@@ -164,13 +184,20 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   setSize: function(size) {
     this.size = size;
     height = size * obm.calendarManager.defaultHeight;
-    this.element.setStyle('height',height + 'px');
+    this.setHeight(height);
     if(this.resize) {
       this.resize.options.yMax = this.options.context.bottom - this.element.getTop();
     }
     if(this.drag) {
       this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
     }
+  },
+
+  setHeight: function(height) {
+    if((this.element.offsetTop + height) > this.options.context.bottom) {
+      height = this.options.context.bottom - this.element.offsetTop;
+    }
+    this.element.setStyle('height',height + 'px');
   },
 
   makeResizable: function() {
@@ -182,7 +209,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       yMax: this.options.context.bottom - this.element.getTop(),
 
       onStart:function() {
-        this.element.setStyle('width', obm.calendarManager.defaultWidth + 'px');
+        //this.element.setStyle('width', obm.calendarManager.defaultWidth + 'px');
         this.element.setStyle('margin-left', '0');
         this.element.setOpacity(.7);
       },
@@ -202,17 +229,25 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
  
 
   setTime: function(time) {
-    this.time = time;
     origin = time - (time - obm.calendarManager.startTime)%this.options.yUnit;
-    this.setOrigin(origin);
+    if(this.setOrigin(origin)) {
+      this.time = time;
+    } else {
+      this.redraw();
+    }
   },
 
   setOrigin: function(origin) {
-    this.origin = origin;
-    hr = $(this.options.type+'-'+this.origin);
-    this.element.remove();
-    hr.adopt(this.element);
-    this.redraw();
+    hr = $(this.options.type+'-'+origin);
+    if(hr) {
+      this.origin = origin;
+      this.element.remove();
+      hr.adopt(this.element);
+      this.redraw();
+      return true;
+    } else {
+      return false;
+    }
   },
 
   redraw: function() {
@@ -221,6 +256,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       'top':  hr.getTop() + 'px',
       'left': hr.getLeft()  + 'px'      
     });
+    this.setHeight(this.size * obm.calendarManager.defaultHeight);
     if(this.options.draggable) {
       this.drag.options.xMin = this.options.context.left;
       this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
@@ -278,8 +314,8 @@ Obm.CalendarManager = new Class({
     
     this.evidence = $E('td',body);
   
-    this.evidence.observe({onStop:this.resize.bind(this)});
-    this.evidence.observe({onStop:this.resize.bind(this), property:'offsetTop'});
+    this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetWidth'});
+    this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetTop'});
 
     this.defaultWidth = this.evidence.clientWidth;
     this.defaultHeight = this.evidence.offsetHeight; 
@@ -310,7 +346,7 @@ Obm.CalendarManager = new Class({
     this.register(elId);
   },
 
-  resize: function() {
+  resizeWindow: function() {
     if(this.lock()) {
 
       ctx = $('calendarEventContext');
@@ -353,6 +389,9 @@ Obm.CalendarManager = new Class({
     return event1.uid - event2.uid;
   },
 
+  compareTime: function(time1, time2) {
+    return time1.toInt() - time2.toInt();
+  },
 
   moveEventTo: function(id,left,top) {
     evt = this.events.get(id);
@@ -365,6 +404,8 @@ Obm.CalendarManager = new Class({
       this.register(id);    
       this.serverStore(id);
       this.redrawAllEvents(evt.time);
+    } else {
+      evt.redraw();
     }
   },
 
@@ -384,9 +425,9 @@ Obm.CalendarManager = new Class({
     evt = this.events.get(id);
     size = evt.size;
     for(i=0;i < size;i++) {
-      t = evt.origin + i*evt.options.yUnit;
+      t = evt.origin + i*evt.options.unit;
       if(!this.times.get(t)) {
-        this.times.put(t,new Array());
+        this.times.put(t.toInt(),new Array());
       }
       this.times.get(t).push(evt);
     }   
@@ -395,13 +436,13 @@ Obm.CalendarManager = new Class({
   unregister: function(id) {
     size = evt.size;
     for(i=0;i < size;i++) {
-      t = evt.origin + i*evt.options.yUnit;
+      t = evt.origin + i*evt.options.unit;
       this.times.get(t).remove(evt);
     }
   },
 
   redrawAllEvents: function() {
-    keys = this.times.keys().sort();
+    keys = this.times.keys().sort(this.compareTime);
     this.redrawEvents(keys);
   }, 
 
@@ -457,7 +498,7 @@ Obm.CalendarManager = new Class({
           size = evt.size;
           resize[id] = new Object;
           resize[id].position = free.splice(0, 1)[0];
-          resize[id].unit = unit;       
+          resize[id].unit = unit;      
           if(size > end) {
             end = size;
           }

@@ -113,6 +113,7 @@ Obm.Portlets = new Class({
         img.src = this.upArrow;
       }
       title.insertBefore(img,title.firstChild);
+      img.className = 'handle';
       img = $(img);
       img.addEvent('click', function(e){
         if(this.getAttribute("src") == obm.portlets.upArrow) 

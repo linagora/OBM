@@ -62,10 +62,10 @@ var Observer = new Class({
   setOptions: function(options) {
     this.options = Object.extend({
       property: 'width',
-      frequency: '1000',
+      frequency: '500',
       onStart: Class.empty,
       onChange: Class.empty,
-      onStop: Class.empty,
+      onStop: Class.empty
     }, options || {});
 
   },
