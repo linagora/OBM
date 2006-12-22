@@ -344,7 +344,12 @@ function html_resource_consult($obm_q) {
     </tr><tr>
       <th>$l_qty</th>
       <td>$qty</td>
-    </tr><tr>
+    </tr>
+    </table>
+    </div>
+  <div class=\"detail infos\">
+  <h1>$l_desc</h1>
+    <tr>
       <th>$l_desc</th>
       <td>$desc</td>
     </tr>

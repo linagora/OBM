@@ -341,7 +341,7 @@ function html_group_form($action, $group_q, $group) {
   </tr>";
   } 
 
-  $block = "<center>
+  $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
 <fieldset class=\"detail infos\">
   <legend>$l_group</legend>
@@ -353,14 +353,22 @@ function html_group_form($action, $group_q, $group) {
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
-  <tr>
-    <th>$l_desc</th>
-    <td>
-      <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
-  </tr><tr>
+ <tr>
     <th>$l_email</th>
     <td>
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
+  </tr>
+  </table>
+  </fieldset>
+
+<fieldset class=\"detail infos\">
+  <legend>$l_desc</legend>
+
+<table>
+ <tr>
+    <th>$l_desc</th>
+    <td>
+      <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
   </tr>
   </table>
   </fieldset>";

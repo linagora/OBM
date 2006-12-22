@@ -44,7 +44,6 @@ require("incident_query.inc");
 require("incident_display.inc");
 require_once("incident_js.inc");
 require_once("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 

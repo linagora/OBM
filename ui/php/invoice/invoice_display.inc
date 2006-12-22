@@ -253,7 +253,7 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     </label>
 
     <label>$l_include_archive<br />
-      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive> 
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /> 
     </label>
 
     <label>$l_inout<br />
@@ -271,12 +271,11 @@ function html_invoice_search_form($invoice, $sta, $tts) {
       <input type=\"text\" name=\"tf_company\" value=\"$company\" />
     </label>
 
-    <label>&nbsp;<br>
+    <label>&nbsp;<br />
       <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
       <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"project_id\" value=\"$project_new_id\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
     </label>

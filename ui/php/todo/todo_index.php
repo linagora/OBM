@@ -24,7 +24,6 @@ page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "
 include("$obminclude/global_pref.inc");
 require("todo_query.inc");
 require("todo_display.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 require_once("todo_js.inc");
 
 $uid = $auth->auth["uid"];

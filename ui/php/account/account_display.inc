@@ -92,28 +92,26 @@ function html_account_search_form ($p_action, $account) {
   $url = url_prepare("account_index.php");
 
   $block .= "
-  <form method=\"get\" name=\"f_search\"
+  <form class=\"search\" method=\"get\" name=\"f_search\"
     onsubmit=\"if (check_account_form(this) == false) return false; else return true;\"
     action=\"$url\">
-  <div class=\"search\">
-   <div class=\"searchLabel\">$l_label_start<br />
+   <label>$l_label_start<br />
     <input name=\"tf_label\" size=\"20\" value=\"$label\" />
-   </div>
+   </label>
 
-   <div class=\"searchLabel\">$l_bank<br />
+   <label>$l_bank<br />
     <input name=\"tf_bank\" size=\"20\" value=\"$bank\" />
-   </div>
+   </label>
 
-   <div class=\"searchLabel\">$l_number<br />
+   <label>$l_number<br />
     <input name=\"tf_number\" size=\"12\" value=\"$number\" />
-   </div>
+   </label>
 
-   <div class=\"searchLabel\">&nbsp;<br />
+   <label>&nbsp;<br />
     <input name=\"action\" type=\"hidden\" value=\"search\" />
     <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-   </div>
-  <div class='searchEnd'></div>
-  </div>
+   </label>
+    <p class=\"CL\" />
   </form>";
 
   return $block;

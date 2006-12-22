@@ -78,10 +78,14 @@ $l_select_company = "Select the company";
 // Messages
 $l_pri_can_delete = "The Priority can be deleted";
 $l_pri_cant_delete = "The Priority can't be deleted";
-$l_pri_link_contract = "The Priority is referenced by these incidents";
+$l_pri_link_contract = "The Priority is referenced by these contracts";
 $l_pri_link_contract_no = "The Priority isn't referenced";
 $l_sta_can_delete = "The Status can be deleted";
 $l_sta_cant_delete = "The Status can't be deleted";
+$l_sta_link_contract = "The Status is referenced by these contracts";
+$l_sta_link_contract_no = "The Status isn't referenced";
+$l_type_link_contract = "The Type is referenced by these contracts";
+$l_type_link_contract_no = "The Type isn't referenced";
 $l_sta_link_incident = "The Status is referenced by these incidents";
 $l_sta_link_incident_no = "The Status isn't referenced";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the contracts";

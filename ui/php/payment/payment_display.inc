@@ -448,15 +448,19 @@ function html_payment_consult($p_q, $invs) {
       <th>$l_account</th>
       <td>$account</td>
     </tr>
+
+   </table>
+</div>
+ 
+<div class=\"detail extra\">
+<h1>$l_comment</h1>
+
+ <table>
     <tr>
       <th>$l_comment</th>
       <td>$comment</td>
     </tr>
-   </table>
-</div>
-  
-<div class=\"detail infos\">  
-  <h1>$l_invoice_title</h1>
+    </table>
   $block_invoice
   </div>
 ";
@@ -699,7 +703,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
       </a><input type=\"hidden\" name=\"company_id\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
@@ -723,14 +727,22 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   // --- HTML Template --------------------------------------------------------
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_payment(this)) return true; else return false;\" action=\"".url_prepare("payment_index.php")."\">
+ 
  <fieldset class=\"detail infos\"> 
-    <legend>$l_payment</legend>
-
-    <table>
-    <tr>
+    <legend>$l_company</legend>
+ <table>
+ <tr>
       <th>$l_company</th>
       <td>$dis_company</td>
     </tr>
+ </table>
+ </fieldset>
+
+
+
+ <fieldset class=\"detail infos\"> 
+    <legend>$l_payment</legend>
+    <table>
     $dis_invoice
     <tr>
       <th>$l_amount</th>
@@ -760,13 +772,13 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
 
 <fieldset class=\"detail extra\"> 
     <legend>$l_comment</legend>
+    $l_comment
+    <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
+</fieldset>
 
-$l_comment
-<textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
-
-    <fieldset class=\"buttons\">
+<fieldset class=\"buttons\">
     $dis_button
-    </fieldset>
+</fieldset>
     </form>";
 
   return $block;

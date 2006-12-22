@@ -35,7 +35,6 @@ require("user_display.inc");
 require("user_query.inc");
 require("user_js.inc");
 require("$obminclude/lib/right.inc"); // needed by call from calendar
-require_once("$obminclude/javascript/calendar_js.inc");
 
 get_user_action();
 $perm->check_permissions($module, $action);

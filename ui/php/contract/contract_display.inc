@@ -160,7 +160,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $datebefore = $contract["date_before"];
   $manager = $contract["manager"];
   $num = $contract["number"]; 
-  $archive = ($contract["archive"] == "1" ? "checked = \"checked\"" : ""); 
+  $archive = ($contract["archive"] == "1" ? "checked=\"checked\"" : ""); 
   $kind = $contract["kind"]; 
   
   $dis_cont_typ  = "<select name=\"sel_type\">
@@ -416,13 +416,15 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   if ($cgp_show["module"]["deal"] && $deal_id > 0) {
     $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id");
     $block_deal = "
-    <div class=\"linkTitle\">:: $l_module_deal</div>
-    <ul class=\"linkList\">
+    <div  class=\"portlet\" id=\"contractDeal\">
+    <h1>$l_module_deal</h1>
+    <ul>
     <li>
       <a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
       <a href=\"$url_deal\">$l_deal</a>
     </li>
-    </ul>";
+    </ul>
+    </div>";
   }
 
   // Document  
@@ -433,8 +435,9 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 
     $nb_document = run_query_global_document_nb ($id,"Contract");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
+    <div  class=\"portlet\" id=\"contractDocument\">
+  <h1>$l_module_document</h1>
+  <ul>
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
@@ -444,12 +447,14 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
 	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contract'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
-  $block = "<div class=\"link\">
-  <div class=\"linkTitle\">:: $l_module_incident</div>
-  <ul class=\"linkList\">
+  $block = "
+  <div  class=\"portlet\" id=\"contractIncident\">
+  <h1>$l_module_incident</h1>
+  <ul>
   <li>
     <a href=\"$url_inc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc\">$l_incident_list ($inc_nb)</a>
@@ -459,9 +464,10 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
     <a href=\"$url_inc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc_new\">$l_incident_new</a></li>
   </ul>
+  </div>
   $block_deal
-  $block_doc  
-  </div>";
+  $block_doc
+  ";
 
   return $block;
 }
@@ -579,7 +585,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   $dis_format = "
       <th>$l_format</th>
       <td>$label_format</td>
-    </tr><tr>
+    
       $format_data";
 
   $con1 = $contract_q->f("clname1") . " " . $contract_q->f("cfname1") .
@@ -607,7 +613,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
   <tr>
     <td valign=\"top\" width=\"50%\">
 <div class=\"detail extra\">
-      <h1>$dis_kind</h1>
+      <h1>$l_company</h1>
       <table>
       <tr>
         <th>$l_company
@@ -795,8 +801,8 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   global $uid, $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $c_undef, $l_undef, $l_update,$l_insert;
   global $l_label, $l_begin, $l_type, $l_marketing_manager, $l_archive;
-  global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel;
-  global $l_technical_manager;
+  global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel,$l_dates;
+  global $l_technical_manager,$l_manager;
   global $popup_height,$popup_width,$l_number,$l_clause,$l_priority, $l_status;
   global $l_comment,$l_add_comment,$l_upd_comment;
   global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
@@ -907,7 +913,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $dis_vis = "<tr>
       <th>$l_private</th>
       <td><input name=\"cba_vis\" type=\"checkbox\" value=\"1\" ";
-    if ($vis == 1) $dis_vis .= "checked = \"checked\"";
+    if ($vis == 1) $dis_vis .= "checked=\"checked\"";
       $dis_vis .= " /></td></tr>";
   }
 
@@ -985,30 +991,30 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   $sel_tech .= "</select>";
 
   if ($autorenewal == 1) { 
-    $autorenew_c = "checked";
+    $autorenew_c = "checked=\"checked\"";
   }
   $autorenewal_display = "<input type=\"checkbox\" name=\"cba_autorenew\" value=\"1\" $autorenew_c />";
 
   // Contract kind : customer or supplier
   if ($kind == "$cck_customer") {
-    $kind_customer_c = "checked";
+    $kind_customer_c = "checked=\"checked\"";
   } else {
-    $kind_supplier_c = "checked";
+    $kind_supplier_c = "checked=\"checked\"";
   }
   
   $radio_kind = "<input type=\"radio\" name=\"rd_kind\" value=\"$cck_customer\" $kind_customer_c/> $l_cck_customer ";
   $radio_kind .= "<input type=\"radio\" name=\"rd_kind\" value=\"$cck_supplier\" $kind_supplier_c/> $l_cck_supplier<br /> ";
 
   if ($format == $ccf_period) {
-    $cb_period_c = "checked";
+    $cb_period_c = "checked=\"checked\"";
     $style_ticket = "style=\"display:none;\"";
     $style_duration = "style=\"display:none;\"";
   } else if ($format == $ccf_ticket) {
-    $cb_ticket_c = "checked";
+    $cb_ticket_c = "checked=\"checked\"";
     $style_ticket = "style=\"display:block;\"";
     $style_duration = "style=\"display:none;\"";
   } else {
-    $cb_duration_c = "checked";
+    $cb_duration_c = "checked=\"checked\"";
     $style_ticket = "style=\"display:none;\"";
     $style_duration = "style=\"display:block;\"";
   }
@@ -1182,6 +1188,21 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </table>
 </fieldset>
 
+<fieldset class=\"detail infos\">
+  <legend>$l_manager</legend>
+  <table>
+  <tr>   
+  <th>$l_marketing_manager</th>
+      <td>$sel_market</td>
+    </tr><tr>
+      <th>$l_technical_manager</th>
+      <td>$sel_tech</td>    
+   </tr>
+   </table>
+</fieldset>
+
+
+
 
   <fieldset class=\"detail infos\">
   <legend>$l_contract</legend>
@@ -1194,7 +1215,31 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td><input name=\"tf_number\" type=\"text\" size=\"20\" maxlength=\"20\" value=\"$number\" /></td>
     </tr>
       $dis_vis
-    <tr>
+   <tr>
+      <th>$l_type</th>
+      <td>$dis_type</td>
+    </tr><tr>
+      <th>$l_priority</th>
+      <td>$sel_pri</td> 
+    </tr><tr>
+      <th>$l_autorenewal</th>
+      <td>$autorenewal_display</td>
+    </tr><tr>
+      <th>$l_archive</th>
+      <td><input name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
+    </tr><tr>
+      <th>$l_contract_kind</th>
+      <td>$radio_kind</td>
+    </tr>
+    </table>
+</fieldset>
+
+
+  <fieldset class=\"detail infos\">
+  <legend>$l_dates</legend>
+ 
+ <table>
+ <tr>
       <th>$l_signature</th>
     <td><input type=\"text\" name=\"tf_datesignature\" value=\"$datesignature\" class=\"datePicker\"/></td>
     </tr><tr>
@@ -1209,40 +1254,29 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <th>$l_date_cancel</th>
    <td><input type=\"text\" name=\"tf_datecancel\" value=\"$datecancel\" class=\"datePicker\"/></td>
-    </tr><tr>
-      <th>$l_type</th>
-      <td>$dis_type</td>
-    </tr><tr>
-      <th>$l_marketing_manager</th>
-      <td>$sel_market</td>
-    </tr><tr>
-      <th>$l_technical_manager</th>
-      <td>$sel_tech</td>    
-    </tr><tr>
-      <th>$l_priority</th>
-      <td>$sel_pri</td> 
-    </tr><tr>
-      <th>$l_status</th>
-      <td>$sel_sta</td>
-    </tr><tr>
-      <th>$l_autorenewal</th>
-      <td>$autorenewal_display</td>
-    </tr><tr>
-      <th>$l_archive</th>
-      <td><input name=\"cba_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
     </tr>
-    <tr>
-      <th>$l_contract_kind</th>
-      <td>$radio_kind</td>
-    </tr><tr>
-      <th>$l_format</th>
-      <td>$dis_format</td>
-    </tr>
-$dis_format_detail
-    </table>
+  </table>
 </fieldset>
 
+
 <fieldset class=\"detail infos\">
+<legend>$l_status</legend>
+
+<table>
+<tr>
+ <th>$l_status</th>
+ <td>$sel_sta</td>
+ </tr><tr>
+ <th>$l_format</th>
+ <td>$dis_format</td>
+</tr>$dis_format_detail
+  </table>
+</fieldset>
+
+
+
+
+<fieldset class=\"detail extra\">
   <legend>$l_clause</legend>
     <table>
     <tr>
@@ -1809,7 +1843,7 @@ while ($sta_q->next_record()) {
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_status_links($id) {
-  global $l_sta_link_incident,$l_sta_link_incident_no, $l_sta_can_delete, $l_sta_cant_delete;
+  global $l_sta_link_contract,$l_sta_link_contract_no, $l_sta_can_delete, $l_sta_cant_delete;
   global $l_sta_delete, $l_back,$display;
 
   $label = get_contract_status_label($id);
@@ -1823,14 +1857,14 @@ function dis_contract_status_links($id) {
   $nb_stat = $obm_q->num_rows();
   if ($nb_stat > 0) {
     $display["msg"] = display_warn_msg($l_sta_cant_delete);
-    $dis_link = "<h1>$label : $l_sta_link_incident ($nb_stat)</h1>";
+    $dis_link = "<h1>$label : $l_sta_link_contract ($nb_stat)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
       $stid = $obm_q->f("contract_id");
       $stlabel = $obm_q->f("contract_label");
-      $dis_link.= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;incident_id=$stid") . "\">$stlabel</a>";
+      $dis_link.= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$stid") . "\">$stlabel</a>";
     }
     if ($cpt < $nb_stat) {
       $dis_link .= "...";
@@ -1840,18 +1874,16 @@ function dis_contract_status_links($id) {
 
   } else {
     $display["msg"] = display_ok_msg($l_sta_can_delete); 
-    $dis_link = "<h1>$label : $l_sta_link_incident_no</h1>
+    $dis_link = "<h1>$label : $l_sta_link_contract_no</h1>
     
        <div class=\"buttons\">
        
-        <form name=\"form_kind_delete\".
-          method=post action=\"" . url_prepare("contract_index.php") . "\">
+        <form name=\"form_status_delete\" method= \"post\" action=\"" . url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
         <input type=\"hidden\" name=\"sel_status\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_delete\" />
         </form>
-        <form name=\"form_back\" method=\"post\"
-          action=\"" .url_prepare("contract_index.php") . "\">
+        <form name=\"form_back\" method=\"post\" action=\"" .url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
@@ -1905,11 +1937,11 @@ while ($type_q->next_record()) {
     <td>
     <input type=\"hidden\" id=\"type_$id\" value=\"$id\" />
     <a href=\"?action=type_checklink&amp;category=type&amp;type=$id\">
-    <img src=\"$ico_delete\" alt=\"$l_type_checkdelete\" title=\"$l_type_checkdelete\" />
-    </a></td>
-    <td> <input type=\"text\" id=\"tf_type_label_$id\" value=\"$label\" /></td>
-    <td>
-    <a href=\"#\" onclick=\"return updateLine($id,'type');\">
+<img src=\"$ico_delete\" alt=\"$l_type_checkdelete\" title=\"$l_type_checkdelete\" />
+</a></td>
+<td> <input type=\"text\" id=\"tf_type_label_$id\" value=\"$label\" /></td>
+<td>
+<a href=\"#\" onclick=\"return updateLine($id,'type');\">
     <img src=\"$ico_ok\" alt=\"$l_type_update\" title=\"$l_type_update\" />
     </a>
     </td>
@@ -1977,58 +2009,57 @@ $block = "
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_type_links($id) {
   global $l_type_link_contract, $l_type_can_delete, $l_type_cant_delete;
-  global $l_type_delete, $l_back;
+  global $l_type_delete, $l_back,$l_type_link_contract_no;
   global $display;
+
 
   $label = get_contract_type_label($id);
   $obm_q = run_query_contract_type_links($id);
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+        action=\"" .url_prepare("contract_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
 
   $nb_type = $obm_q->num_rows();
   if ($nb_type > 0) {
-    $display["msg"] .= display_warn_msg("$label : $l_type_cant_delete");
+    $display["msg"] = display_warn_msg($l_type_cant_delete);
     $dis_link = "<h1>$label : $l_type_link_contract ($nb_type)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q->f("contract_id");
-      $clabel = $obm_q->f("contract_label");
-      $dis_link .= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$cid") . "\">$clabel</a>";
+      $typeid = $obm_q->f("contract_id");
+      $typelabel = $obm_q->f("contract_label");
+      $dis_link.= "<a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;contract_id=$typeid") . "\">$typelabel</a>";
     }
     if ($cpt < $nb_type) {
       $dis_link .= "...";
     }
 
+    $dis_link .="<div class=\"buttons\">$dis_back</div>";
+
   } else {
-
-  $dis_link = "<h1>$label : $l_type_link_contract</h1>";
-}
-
-$block .= "
-    <div class=\"detail\">
-    <ul>
-    $dis_link
-    </ul>
+    $display["msg"] = display_ok_msg($l_type_can_delete); 
+    $dis_link = "<h1>$label : $l_type_link_contract_no</h1>
+    
+       <div class=\"buttons\">
+       
+        <form name=\"form_status_delete\" method= \"post\" action=\"" . url_prepare("contract_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"type_delete\" />
+        <input type=\"hidden\" name=\"sel_type\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
+        </form>
+        <form name=\"form_back\" method=\"post\" action=\"" .url_prepare("contract_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+	
+	</p>
     </div>";
 
-  $dis_back = "<a href=\"$path/contract/contract_index.php?action=admin\"> $l_back</a>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_type_can_delete);
-    $dis_del = "<a href=\"$path/contract/contract_index.php?action=type_delete&amp;sel_type=$id\" >$l_type_delete</a>";
-    $block .= "
-      <div class=\"buttons\">
-      $dis_del
-      $dis_back
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_type_cant_delete);
-    $block .= "
-      <div class=\"buttons\">
-        $dis_back
-      </div>";
   }
-  return $block;
+  return $dis_link;
 }
 
 

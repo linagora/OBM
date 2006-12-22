@@ -147,7 +147,7 @@ function html_user_search_form($user) {
 
   foreach ($profiles as $profile => $one_profile) {
     $block_pro .= "
-      <option value=\"$profile\" /> $profile";
+      <option value=\"$profile\"> $profile</option>";
   }
 
   $block = "
@@ -164,7 +164,7 @@ function html_user_search_form($user) {
     </label>
     <label>$l_user_perms<br />
       <select type=\"text\" name=\"sel_perms\">
-        <option value=\"$c_all\" /> $l_all
+        <option value=\"$c_all\"> $l_all</option>
         $block_pro
       </select>
     </label>
@@ -181,11 +181,11 @@ function html_user_search_form($user) {
       value=\"$group\" />
     </label>
     <label>$l_archive<br />
-      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive>
+      <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>
     <label>&nbsp;<br />
-      <input name=\"action\" type=\"hidden\" value=\"search\">
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\">
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_restriction
       $ext
