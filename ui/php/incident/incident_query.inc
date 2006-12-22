@@ -27,7 +27,7 @@ function run_query_incident_search($incident) {
   $company = sql_search_text_parse($incident["company"]);
   $priority = $incident["priority"];
   $status = $incident["status"];
-  $category1 = $incident["category1"];
+  $resolutiontype = $incident["resolutiontype"];
   $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
@@ -92,10 +92,9 @@ function run_query_incident_search($incident) {
   if (($status != $c_all) && ($status != "")) { 
     $where .= " AND Incident.incident_status_id = '$status'";
   }
-
-  $join_category1 = "LEFT JOIN IncidentCategory1 ON incident_category1_id=incidentcategory1_id";
-  if (($category1 != $c_all) && ($category1 != "")) {
-    $where .= " AND Incident.incident_category1_id = '$category1'";
+  $join_resolutiontype = "LEFT JOIN IncidentResolutionType ON incident_resolutiontype_id=incidentresolutiontype_id";
+  if (($resolutiontype != $c_all) && ($resolutiontype != "")) {
+    $where .= " AND Incident.incident_resolutiontype_id = '$resolutiontype'";
   }
 
   if ($archive != "1") {
@@ -129,7 +128,7 @@ function run_query_incident_search($incident) {
       incidentpriority_color,
       incident_status_id,
       incidentstatus_label as incident_status,
-      incidentcategory1_label as category1_label,
+      incidentresolutiontype_label as resolutiontype_label,
       incident_logger,
       incident_owner,
       incident_archive,
@@ -148,7 +147,7 @@ function run_query_incident_search($incident) {
          LEFT JOIN UserObm as u2 ON incident_owner=u2.userobm_id
          $join_priority
          $join_status
-         $join_category1
+         $join_resolutiontype
          $join_userdata";
 
   $query = "$select $left_join $whereq $orderq $limit";
@@ -189,8 +188,7 @@ function run_query_incident_detail($id) {
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         incidentpriority_label,
         incidentstatus_label,
-        incidentcategory1_label,
-        incidentcategory2_label,
+        incidentresolutiontype_label,
         $date,
         $timeupdate,
         $timecreate,
@@ -215,8 +213,7 @@ function run_query_incident_detail($id) {
         LEFT JOIN UserObm u2 on incident_owner=u2.userobm_id
         LEFT JOIN IncidentPriority on incident_priority_id=incidentpriority_id
         LEFT JOIN IncidentStatus on incident_status_id=incidentstatus_id
-        LEFT JOIN IncidentCategory1 on incident_category1_id=incidentcategory1_id
-        LEFT JOIN IncidentCategory2 on incident_category2_id=incidentcategory2_id
+        LEFT JOIN IncidentResolutionType on incident_resolutiontype_id=incidentresolutiontype_id
         LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
         LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
         LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
@@ -259,8 +256,7 @@ function run_query_incident_insert($incident) {
   $solu = $incident["solution"];
   $priority = $incident["priority"];
   $status = $incident["status"];
-  $cat1 = $incident["category1"];
-  $cat2 = $incident["category2"];
+  $reso = $incident["resolutiontype"];
   $date = $incident["date"];
   $hour = $incident["hour"];
   $add_duration = $incident["add_duration"];
@@ -284,8 +280,7 @@ function run_query_incident_insert($incident) {
     incident_date,
     incident_priority_id,
     incident_status_id,
-    incident_category1_id,
-    incident_category2_id,
+    incident_resolutiontype_id,
     incident_comment,
     incident_logger,
     incident_owner,
@@ -304,8 +299,7 @@ function run_query_incident_insert($incident) {
     '$call_date',
     '$priority',
     '$status',
-    '$cat1',
-    '$cat2',
+    '$reso',
     '$comment',
     $logger,
     $owner,
@@ -318,6 +312,10 @@ function run_query_incident_insert($incident) {
   $obm_q->query($query);
 
   $i_id = run_query_incident_id($incident);
+
+  if ($i_id > 0) {
+    $ret = of_userdata_query_update("incident", $i_id, $incident);
+  }
 
   if ($cmail_incident != "") {
     $inc = get_incident_info($i_id);
@@ -405,7 +403,7 @@ function run_query_incident_update($incident) {
   if ($contract_id < 1) {
     $contract_id = $incident["contract_id"];
   }
-  $param_incident = $incident["incident_id"];
+  $id = $incident["incident_id"];
   $lincident = $incident["lincident"];
   $reference = $incident["reference"];
   $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : "is null");
@@ -413,8 +411,7 @@ function run_query_incident_update($incident) {
   $solu = $incident["solution"];
   $priority = $incident["priority"];
   $status = $incident["status"];
-  $cat1 = $incident["category1"];
-  $cat2 = $incident["category2"];
+  $reso = $incident["resolutiontype"];
   $date = $incident["date"];
   $hour = $incident["hour"];
   $duration = $incident["duration"];
@@ -441,18 +438,21 @@ function run_query_incident_update($incident) {
       incident_date='$call_date', 
       incident_priority_id='$priority',
       incident_status_id='$status',
-      incident_category1_id='$cat1',
-      incident_category2_id='$cat2',
+      incident_resolutiontype_id='$reso',
       incident_resolution = '$solu',
       incident_duration = '$duration',
       incident_comment='$comment',
       incident_archive='$archive',
       incident_contract_id = '$contract_id'
-    WHERE incident_id='$param_incident' $multidomain";
+    WHERE incident_id='$id' $multidomain";
 
   $inc_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_incident_update()");
   $ret = $inc_q->query($query);  
+
+  if ($ret) {
+    $ret = of_userdata_query_update("incident", $id, $incident);
+  }
 
   return $ret;
 }
@@ -466,6 +466,8 @@ function run_query_incident_update($incident) {
 function run_query_incident_delete($i_id) {
   global $auth, $cdg_sql;
  
+  $ret = of_userdata_query_delete("incident", $i_id);
+
   $multidomain = sql_multidomain("incident");
   $query = "DELETE FROM Incident 
     WHERE incident_id='$i_id' $multidomain";

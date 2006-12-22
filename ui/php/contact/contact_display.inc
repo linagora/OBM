@@ -379,7 +379,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
 
   // User defined data
-  $block_user .= of_userdata_dis_search("contact", $contact);
+  $block_userdata .= of_userdata_dis_search("contact", $contact);
   
   // Function select
   $block_function = of_category_dis_search_select("contact", "function", $funcs, $func);
@@ -494,7 +494,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_mailing_ok_only<br />
       <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
     </label>
-    $block_user
+    $block_userdata
     <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>
@@ -866,7 +866,7 @@ function html_contact_view_main($co_q) {
   $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
   // User defined data
-  $block_user .= of_userdata_dis_entity_consult("contact", $id);
+  $block_userdata .= of_userdata_dis_entity_consult("contact", $id);
 
   $copy = addslashes("$kind_minilabel $fname $lname") . $newline;
   if (($title != "")  && (in_array("title", $cclipboard_address))) {
@@ -1030,7 +1030,7 @@ function html_contact_view_main($co_q) {
     </tr>
     </table>
 
-    $block_user
+    $block_userdata
 
     <div class=\"detailHead\">$l_comment1</div>
     <table class=\"detail\">
@@ -1039,8 +1039,7 @@ function html_contact_view_main($co_q) {
       </tr>
     </table>
     $block_comment2 
-    $block_comment3 
-    ";
+    $block_comment3 ";
 
   return $block;
 }
@@ -1368,7 +1367,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   $show_comment3 = (! $cgp_hide["contact"]["contact_comment3"]);
 
   // User defined data
-  $block_user = of_userdata_dis_entity_form("contact", $id);
+  $block_userdata = of_userdata_dis_entity_form("contact", $id);
 
   // some constants
   $csize_add = "48";
@@ -1701,7 +1700,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $block_title
     $block_resp
     $block_date
-    $block_user
+    $block_userdata
     </table>
 
     <div class=\"detailHead\">$l_coord</div>
