@@ -357,7 +357,7 @@ function run_query_contact_detail($p_id) {
       WHERE
         contact_id='$p_id' $multidomain";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -392,9 +392,10 @@ function run_query_contact_company($c_id) {
     FROM Company
     LEFT JOIN Country ON company_country_iso3166 = country_iso3166
                          AND country_lang='$lang'
-    WHERE company_id='$c_id' $multidomain";
+    WHERE company_id='$c_id'
+      $multidomain";
 	
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_contact_company()");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -410,7 +411,7 @@ function run_query_contact_company($c_id) {
 function run_query_contact_kind() {
   global $cdg_sql;
   
-	$multidomain = sql_multidomain("kind");
+  $multidomain = sql_multidomain("kind");
 	
   $query = "SELECT kind_id,
       kind_minilabel,
@@ -418,7 +419,8 @@ function run_query_contact_kind() {
       kind_lang,
       kind_default
     FROM Kind
-		WHERE 1=1 $multidomain
+    WHERE 1=1
+      $multidomain
     ORDER BY kind_lang, kind_minilabel, kind_header";
 
   display_debug_msg($query, $cdg_sql, "run_query_contact_kind()");

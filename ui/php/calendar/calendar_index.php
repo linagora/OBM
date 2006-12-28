@@ -426,8 +426,12 @@ function get_calendar_params() {
     $params["date_end"] .= " $end_hour:$end_min:00";
   }
   
-  $params["event_duration"] =  strtotime($params["date_end"]) - strtotime($params["date_begin"]);
-  
+  if (($params["date_end"] != "") && ($params["date_begin"] != "")) {
+    $params["event_duration"] = strtotime($params["date_end"]) - strtotime($params["date_begin"]);
+  } else {
+    $params["event_duration"] = 0;
+  }
+
   // repeat days
   for ($i=0; $i<7; $i++) {
     if (isset($params["repeatday_$i"])) {

@@ -64,7 +64,7 @@ if ($doc_q->num_rows() == 1) {
 
 }
 elseif ($action == "ext_get_ids") {
-///////////////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_document_search_form($params);
 
   if ($set_display == "yes") {
@@ -160,7 +160,7 @@ elseif ($action == "ext_get_ids") {
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_document_data_form($params["document_id"], $params)) {
-    $retour = run_query_document_update($params["document_id"], $params);
+    $retour = run_query_document_update($params);
     if ($retour) {
       $display["msg"] .= display_ok_msg("$l_document : $l_update_ok");
     } else {
@@ -243,74 +243,6 @@ elseif ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_document_admin_index();
 
-} elseif ($action == "category1_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("document", "category1", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_insert_error");
-  }
-  $display["detail"] .= dis_document_admin_index();
-
-} elseif ($action == "category1_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("document", "category1", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_update_error");
-  }
-  $display["detail"] .= dis_document_admin_index();
-
-} elseif ($action == "category1_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("document", "category1", $params, "mono");
-
-} elseif ($action == "category1_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("document", "category1", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category1 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category1 : $l_delete_error");
-  }
-  $display["detail"] .= dis_document_admin_index();
-
-} elseif ($action == "category2_insert") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert("document", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_insert_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_insert_error");
-  }
-  $display["detail"] .= dis_document_admin_index();
-
-} elseif ($action == "category2_update") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update("document", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_update_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_update_error");
-  }
-  $display["detail"] .= dis_document_admin_index();
-
-} elseif ($action == "category2_checklink") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= of_category_dis_links("document", "category2", $params, "mono");
-
- } elseif ($action == "category2_delete") {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete("document", "category2", $params);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg("$l_category2 : $l_delete_ok");
-  } else {
-    $display["msg"] .= display_err_msg("$l_category2 : $l_delete_error");
-  }
-  $display["detail"] .= dis_document_admin_index();
-
 } elseif ($action == "mime_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_document_mime_insert($params);
@@ -363,6 +295,9 @@ elseif ($action == "ext_get_ids") {
   $display["detail"] = dis_document_display_pref($prefs);
 }
 
+of_category_user_action_switch($module, $action, $params);
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,6 +339,8 @@ function get_document_action() {
   global $l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_new_dir;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
+  of_category_user_module_action("document");
 
 // Index  
   $actions["document"]["index"] = array (
@@ -544,62 +481,6 @@ function get_document_action() {
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
    					);
-
-// Category Insert
-  $actions["document"]["category1_insert"] = array (
-    'Url'      => "$path/document/document_index.php?action=category1_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// Category Update
-  $actions["document"]["category1_update"] = array (
-    'Url'      => "$path/document/document_index.php?action=category1_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// Category Check Link
-  $actions["document"]["category1_checklink"] = array (
-    'Url'      => "$path/document/document_index.php?action=category1_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-// Category Delete
-  $actions["document"]["category1_delete"] = array (
-    'Url'      => "$path/document/document_index.php?action=category1_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	       );
-
-// Category Insert
-  $actions["document"]["category2_insert"] = array (
-    'Url'      => "$path/document/document_index.php?action=category2_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// Category Update
-  $actions["document"]["category2_update"] = array (
-    'Url'      => "$path/document/document_index.php?action=category2_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// Category Check Link
-  $actions["document"]["category2_checklink"] = array (
-    'Url'      => "$path/document/document_index.php?action=category2_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-// Category Delete
-  $actions["document"]["category2_delete"] = array (
-    'Url'      => "$path/document/document_index.php?action=category2_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	       );
 
 // Mime Insert
   $actions["document"]["mime_insert"] = array (

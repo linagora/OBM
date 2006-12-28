@@ -18,8 +18,6 @@ $fieldnames["document_size"] = $l_size;
 $fieldnames["timecreate"] = $l_createtime;
 $fieldnames["timeupdate"] = $l_updatetime;
 // Calculated or indirect fields
-$fieldnames["documentcategory1_label"] = $l_category1;
-$fieldnames["documentcategory2_label"] = $l_category2;
 $fieldnames["documentmimetype_label"] = $l_mimetype;
 
 
@@ -49,11 +47,9 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_search_form($document="") {
 
-  $cats1 = of_category_get_ordered("document", "category1");
-  $cats2 = of_category_get_ordered("document", "category2");
   $mime_q = run_query_document_mime();
 
-  $block .= html_document_search_form($document, $cats1, $cats2, $mime_q);
+  $block .= html_document_search_form($document, $mime_q);
 
   return $block;
 }
@@ -62,22 +58,21 @@ function dis_document_search_form($document="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: XHTML Document search Form
 // Parameters:
-//   - $cats1      : array with document category 1 list
-//   - $cats2      : array with document category 2 list
-//   - $document[] : default form values
+//   - $document : default form values
+//   - $mime_q   : mime type list
 ///////////////////////////////////////////////////////////////////////////////
-function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
+function html_document_search_form ($document, $mime_q) {
   global $display, $l_title, $l_mimetype, $l_name;
-  global $l_all, $l_find, $l_author, $l_document_add; 
-  global $c_all;
+  global $c_all, $l_all, $l_find, $l_author, $l_document_add; 
 
   $title = stripslashes($document["title"]);
-  $cat1 = $document["category1"];
-  $cat2 = $document["category2"];
   $author = stripslashes($document["author"]);
   $mime = $document["mime"];
   $name = stripslashes($document["name"]);
   $popup = $document["popup"];
+
+  // User defined data
+  $block_userdata .= of_userdata_dis_search("document", $document);
 
   if ($popup) {
     $ext_action = $document["ext_action"];
@@ -93,9 +88,6 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
     $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
   
-  $block_category1 = of_category_dis_search_select("document", "category1", $cats1, $cat1);
-  $block_category2 = of_category_dis_search_select("document", "category2", $cats2, $cat2);
-
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">
     <option value=\"$c_all\">$l_all</option>";
@@ -120,8 +112,7 @@ function html_document_search_form ($document, $cats1, $cats2, $mime_q) {
     <div class=\"searchLabel\">$l_name<br />
       <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\" value=\"$name\" />
     </div>
-    $block_category1 
-    $block_category2
+    $block_userdata
     <div class=\"searchLabel\">$l_author<br />
       <input type=\"text\" name=\"tf_author\" id=\"tf_author\" size=\"8\" value=\"$author\" />
     </div>
@@ -178,14 +169,15 @@ function html_document_search_list($doc_q, $prefs, $document) {
 
   // we urlencode to avoid breakage for space char
   $title = stripslashes($document["title"]);
-  $category1 = $document["category1"];
-  $category2 = $document["category2"];
   $author = stripslashes($document["author"]);
   $mime = $document["mime"];
   $name = stripslashes($document["name"]);
-  $entity =$document["entity"];
+  $entity = $document["entity"];
   $entity_id = $document["entity_id"];
   $popup = $document["popup"];
+
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params("document", $document);
   
  if ($popup) {
     $ext_action = $document["ext_action"];
@@ -193,8 +185,12 @@ function html_document_search_list($doc_q, $prefs, $document) {
     $ext_id = $document["ext_id"];
     $ext_target = $document["ext_target"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
-  }  
-  $url = url_prepare("document_index.php?tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;entity_id=$entity_id&amp;action=search$url_ext");
+  }
+ if ($entity != "document") {
+   $url_ent = "&amp;entity=$entity&amp;entity_id=$entity_id";
+ }
+   
+  $url = url_prepare("document_index.php?action=search$url_userdata&amp;tf_title=$title&sel_category1=$category1&sel_category2=$category2&tf_author=$author&tf_name=$name&sel_mime=$mime$url_ent$url_ext");
 
   $doc_d = new OBM_DISPLAY("DATA", $prefs, "document");
 
