@@ -2087,7 +2087,7 @@ function run_query_deal_search_parentdeal($deal) {
     $and = "AND";
   }
 
-  $whereq = "WHERE $where $multidomain";
+  $whereq = "WHERE 1=1 $where $multidomain";
 
   // Order by clause
   $order=(strcmp($sql_order_field,"") != 0) ? $sql_order_field : "parentdeal_timecreate"; 

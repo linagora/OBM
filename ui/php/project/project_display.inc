@@ -1176,9 +1176,11 @@ function html_project_form($action, $project_q, $project) {
     <td class=\"detailForm\" id=\"sel_task_id\">$dis_sel_tasks</td>";
   }
 
-  // We select the task list depending on task category (or if company filled)
-  if ($company > 0) {
-    $tts = get_global_tasktype($ctt_sales);
+  // Task list depend on task category (eg : if company not filled)
+  if (! ($company > 0)) {
+    $tts = get_global_tasktype($ctt_research);
+  } else {
+    $tts = get_global_tasktype();
     if ($deal > 0) {
       $dis_deal = "
     </tr><tr>
@@ -1199,10 +1201,6 @@ function html_project_form($action, $project_q, $project) {
     </tr><tr>
       <td class=\"detailLabel\">$l_soldtime</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
-
-  } else {
-    $tts = get_global_tasktype();
-    $dis_comp = "";
   }
 
   // TaskType select construction

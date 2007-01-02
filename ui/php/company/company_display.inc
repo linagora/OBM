@@ -513,7 +513,7 @@ function html_company_links($co_q) {
 <ul>
   <li><a href=\"$url_lead_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead\" /></a>
       $l_module_lead (<a href=\"$url_lead_list\">$nb_lead</a>)</li>
-  <li><a href=\"$url_lead_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead_new\" /></a>
+  <li><a href=\"$url_lead_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_lead\" /></a>
       <a href=\"$url_lead_new\">$l_new</a></li>
 </ul>
 </div>";
