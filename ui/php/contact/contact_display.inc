@@ -503,7 +503,6 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     </label>
     <label>&nbsp;<br />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
-      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext &nbsp;
