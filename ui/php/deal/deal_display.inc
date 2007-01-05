@@ -365,21 +365,21 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
     $ext_target = $deal["ext_target"];
     $ext_widget = $deal["ext_widget"];
     $ext_widget_text = $deal["ext_widget_text"];
-    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
-            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
-            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
-            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
-            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
-            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\" />
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\" />
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\" />
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\" />
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\" />
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
   <form class=\"search\" method=\"get\" name=\"f_search\" action=\"$url\">
-  <div class=\"detailHead\">$l_deal</div>
+  <h1>$l_deal</h1>
     <label>$l_label_start<br />
       <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
     </label>
@@ -398,10 +398,10 @@ function html_deal_search_form($deal, $kind_q, $regions, $tts, $roles, $stat_q, 
       </select>
     </label>
     <label>$l_after<br />
-      <script>calendar('tf_date_after','$date_after')</script>
+      <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
     </label>
     <label>$l_before<br />
-      <script>calendar('tf_date_before','$datebefore')</script>
+     <input type=\"text\" name=\"tf_date_before\" value=\"$datebefore\" class=\"datePicker\"/>
     </label>
     <label>$l_kind<br />
       $sel_kind
@@ -474,25 +474,21 @@ function html_deal_parentdeal_search_form($deal, $pmanager_q) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"form_search_parentdeal\"
+  <form method=\"get\" class=\"search\" name=\"form_search_parentdeal\"
     action=\"" . url_prepare("deal_index.php") . "\">
-  <div class=\"detailHead\">$l_parentdeal</div>
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_label_start<br />
+  <h1>$l_parentdeal</h1>
+    <label>$l_label_start<br />
       <input type=\"text\" name=\"tf_plabel\" size=\"20\" value=\"$plabel\" />
-    </div>
-    <div class=\"searchLabel\">$l_manager<br />
+    </label>
+    <label>$l_manager<br />
       $sel_pmanager
-    </div>
-    <div class=\"searchLabel\">$l_show_archive<br />
+    </label>
+    <label>$l_show_archive<br />
       <input type=\"checkbox\" name=\"cba_parchive\" value=\"1\" $parchive />
-    </div>
-    <div class=\"searchButton\">&nbsp;<br />
+    </label>
       <input name=\"action\" type=\"hidden\" value=\"parent_search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
+    <p class=\"CL\" />
   </form>";
 
   return $block;
@@ -648,8 +644,8 @@ function html_deal_links($deal_q) {
     }
     
     $block_project = "
-     <div class=\"linkTitle\">:: $l_module_project</div>
-     <ul class=\"linkList\">
+     <h1>$l_module_project</h1>
+     <ul>
        $dis_ico_project
      </ul>";
   }
@@ -674,8 +670,8 @@ function html_deal_links($deal_q) {
         <a href=\"$url_contract_new\">$l_new</a></li>";
     }
     $block_contract = "
-     <div class=\"linkTitle\">:: $l_module_contract</div>
-     <ul class=\"linkList\">
+     <h1> $l_module_contract</h1>
+     <ul>
        $dis_contract
      </ul>";
   }
@@ -699,8 +695,8 @@ function html_deal_links($deal_q) {
         <a href=\"$url_inv_new\">$l_new</a></li>";
     }
     $block_invoice = "
-  <div class=\"linkTitle\">:: $l_module_invoice</div>
-  <ul class=\"linkList\">
+  <h1> $l_module_invoice</h1>
+  <ul>
     $dis_invoice
   </ul>";
   }
@@ -712,8 +708,8 @@ function html_deal_links($deal_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
     $nb_document = run_query_global_document_nb($id, "deal");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
+  <h1> $l_module_document</h1>
+  <ul>
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
@@ -727,19 +723,28 @@ function html_deal_links($deal_q) {
   }
 
   // Links Template  
-  $block = "<div class=\"link\">
-  <div class=\"linkTitle\">:: $l_parentdeal</div>
-  <ul class=\"linkList\">
+  $block = "
+  <div id=\"dealParentdeal\" class=\"portlet\">
+  <h1> $l_parentdeal</h1>
+  <ul>
     $dis_pdeal
     <li><a href=\"$url_pdeal_upd\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"\" /></a>
         <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
   </ul>
+  </div>
+  <div id=\"dealProject\" class=\"portlet\">
   $block_project
+  </div>
+  <div id=\"dealContract\" class=\"portlet\">
   $block_contract
+  </div>
+  <div id=\"dealInvoice\" class=\"portlet\">
   $block_invoice
+  </div>
+  <div id=\"dealDocument\" class=\"portlet\">
   $block_doc
-       
- </div>
+  </div>      
+ 
 ";
 
   return $block;
@@ -843,7 +848,7 @@ function html_deal_consult($deal_q, $dc="") {
   $block_userdata .= of_userdata_dis_entity_consult("deal", $id);
 
   $display["link"] = html_deal_links($deal_q);
-  $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
+  $display["title"] = "<h1 class=\"title\">$l_deal : $label</h1>";
 
   // DealCompany infos
   if ( (is_array($dc)) && (count($dc) > 0) ) {
