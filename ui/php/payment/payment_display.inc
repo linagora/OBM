@@ -157,15 +157,15 @@ function html_payment_search_form($params, $kinds, $accs) {
     <form method=\"get\" name=\"f_search\" action=\"payment_index.php?action=search\" class=\"search\">
 
       <label>$l_comment<br />
-       <input name=\"tf_comment\" size=\"16\" value=\"$comment\">
+       <input name=\"tf_comment\" size=\"16\" value=\"$comment\" />
       </label>
 
       <label>$l_number<br />
-       <input name=\"tf_number\" size=\"16\" maxlength=\"24\" value=\"$number\">
+       <input name=\"tf_number\" size=\"16\" maxlength=\"24\" value=\"$number\" />
       </label>
 
       <label>$l_amount<br />
-       <input name=\"tf_amount\" size=\"12\" value=\"$amount\">
+       <input name=\"tf_amount\" size=\"12\" value=\"$amount\" />
       </label>
 
       <label>$l_date $l_after<br />
@@ -193,12 +193,12 @@ function html_payment_search_form($params, $kinds, $accs) {
       </label>
 
       <label>$l_include_checked<br />
-       <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $ichecked>
+       <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $ichecked />
       </label>
 
       <label><br />
-       <input type=\"hidden\" name=\"action\" value=\"search\">
-       <input type=\"submit\" name=\"submit\" value=\"$l_find\">  
+       <input type=\"hidden\" name=\"action\" value=\"search\" />
+       <input type=\"submit\" name=\"submit\" value=\"$l_find\" />  
       </label>
     <p class=\"CL\" />
     </form>
@@ -406,7 +406,6 @@ function html_payment_consult($p_q, $invs) {
   $display["title"] = "<h1 class=\"title\">$l_payment : $date $c_name $amount</h1>";
 
   $block = "
-<h1>$title</h1>
 <div class=\"detail infos\">
   <h1>$l_company</h1>
     <table>
@@ -704,7 +703,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-      <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
+     <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
 
   // UPDATE
