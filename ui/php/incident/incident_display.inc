@@ -198,7 +198,6 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incid
          <input name=\"cba_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
        </label>
        <label>&nbsp;<br />
-         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />     
          <input name=\"contract_id\" id=\"contract_id\" type=\"hidden\" value=\"$contract_id\" />     
          <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
        </label>
@@ -429,7 +428,7 @@ function html_incident_consult($inc_q) {
   $block_userdata
 </div>
 
-<div class=\"detail infos\">
+<div class=\"detail extra\">
   <h1>$l_solution <a href=\"mailto:$email_con?subject=$l_incident $label : $l_solution&cc=$cmail_incident&body=$inc_reso\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"[Mail]\" /></a>
 </h1>
   <table> 
@@ -475,8 +474,9 @@ function html_incident_links($inc_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/incident/incident_index.php")."&amp;ext_id=$id&amp;ext_target=$l_incident";
     $nb_document = run_query_global_document_nb ($id, "incident");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
+  <div class=\"portlet\" id=\"incidentDocument\">
+  <h1>$l_module_document</h1>
+  <ul>
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
@@ -486,14 +486,11 @@ function html_incident_links($inc_q) {
 	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_incident'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>";
+  </ul></div>";
   }
 
   // Links Template  
-  $block = "
-<div class=\"link\"> 
-  $block_doc
-</div>";
+  $block = " $block_doc ";
 
   return $block;
 }
@@ -637,7 +634,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
   $block_reso = of_category_dis_entity_form("incident", "resolutiontype", $resos, "mono", $reso);
 
   // Hour select
-  $sel_hour = "<select name=\"sel_hour\">";
+  $sel_hour = "<select name=\"sel_hour\" style=\"width:4em;\">";
   for ($cpt = 0; $cpt < 24; $cpt++) {
     $sel_hour .= "\n<option value=\"$cpt\"";
     if ($cpt == $hour) 
@@ -702,6 +699,25 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
 
   $block = "
     <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
+      
+      <fieldset class=\"detail infos\">  
+      <legend>$l_contract</legend>
+      <table>
+      <tr>
+      <th>$l_contract</th>
+      <td>
+      <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
+      <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
+      <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
+      <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
+      <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+      </td>
+      </tr>
+      </table>
+      </fieldset>
+      
+      
       <fieldset class=\"detail infos\">  
       <legend>$l_incident</legend>
         <table>
@@ -720,16 +736,6 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           </tr><tr>
             <th>$l_archive_new</th>
             <td><input name=\"cba_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
-          </tr><tr>
-            <th>$l_contract</th>
-            <td>
-              <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;contract_id=$param_contract")."\">$c_label</a>
-              <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
-              <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-              <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
-              <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
-              <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-            </td>
           </tr>
           $block_priority
           $block_status
@@ -737,7 +743,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
           $block_userdata
           <tr>
             <th>$l_date</th>
-            <td><table><tr><td><input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/></td><td>H</td><td>$sel_hour</td></tr></table></td>
+            <td><input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>  $sel_hour H</td>
           </tr><tr>
             <th>$l_duration</th>
             <td><input type=\"text\" name=\"tf_duration\" size=\"6\" maxlength=\"6\" value=\"$duration\" readonly=\"readonly\" />H</td>
