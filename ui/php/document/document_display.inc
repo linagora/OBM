@@ -85,7 +85,7 @@ function html_document_search_form ($document, $mime_q) {
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
   
   // Mime-type select
@@ -104,30 +104,27 @@ function html_document_search_form ($document, $mime_q) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_title<br />
+  <form method=\"get\" class=\"search\" name=\"f_search\" id=\"f_search\" action=\"$url\">
+      <label>$l_title<br />
       <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"16\" value=\"$title\" />
-    </div>
-    <div class=\"searchLabel\">$l_name<br />
+    </label>
+    <label>$l_name<br />
       <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\" value=\"$name\" />
-    </div>
+    </label>
     $block_userdata
-    <div class=\"searchLabel\">$l_author<br />
+    <label>$l_author<br />
       <input type=\"text\" name=\"tf_author\" id=\"tf_author\" size=\"8\" value=\"$author\" />
-    </div>
-    <div class=\"searchLabel\">$l_mimetype<br />
+    </label>
+    <label>$l_mimetype<br />
       $sel_mime
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext&nbsp; 
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
-  </form>";
+    </label>
+    <p class=\"CL\"></p>
+   </form>";
 
   return $block;
 }
@@ -202,13 +199,11 @@ function html_document_search_list($doc_q, $prefs, $document) {
     $doc_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $doc_d->data_form_end = "
-      <p class=\"detailButton\">
-        <p class=\"detailButtons\">
+      <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </p>
-      </p>
+      </fieldset>
       </form>";
     $display_popup_end = "
       <p>
@@ -283,52 +278,60 @@ function html_document_consult($doc_q) {
   $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
   $url = "document_index.php?action=accessfile&amp;document_id=$id&amp;popup=1";
 
-  $display["title"] = "<div class=\"title\">$l_document : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_document : $title</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detailHead\">$l_document</div>
+    <div class=\"detail infos\">
+   <h1>$l_document</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailText\">$title</td>
+      <th>$l_title</th>
+      <td>$title</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_author</td>
-      <td class=\"detailText\">$author</td>
+      <th>$l_author</th>
+      <td>$author</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailText\">$privacy</td>
+      <th>$l_private</th>
+      <td>$privacy</td>
     </tr>
     $block_category1
     $block_category2
     </table>
+    </div>
 
-    <div class=\"detailHead\">$l_file</div>
+    <div class=\"detail infos\"> 
+    <h1>$l_file</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_mimetype</td>
-      <td class=\"detailText\">$mimetype</td>
+      <th>$l_mimetype</th>
+      <td>$mimetype</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_path</td>
-      <td class=\"detailText\">$path</td>
+      <th>$l_path</th>
+      <td>$path</td>
     </tr>    
     <tr>
-      <td class=\"detailLabel\">$l_size</td>
-      <td class=\"detailText\">$size $l_bytes</td>
+      <th>$l_size</th>
+      <td>$size $l_bytes</td>
      </tr>    
     </table>
-    <div class=\"detailHead\">
+    </div>
+    
+   
+   <div class=\"detail infos\">
+    <h1>
     <a target=\"_blank\" href=\"$url\">
      $l_consult
     </a>
+    </h1>
     </div>
 ";
 
@@ -398,16 +401,16 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
       $fi_path = $doc_q->f("document_path");
     }
     $update_file = "
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\" colspan=\"2\">
+      <th colspan=\"2\">
        <input checked=\"checked\" onclick=\"basic_hide('file_update')\" type=\"radio\" name=\"rd_file_update\" id=\"no\" value=\"no\"/><label for=\"no\">$l_noupdate_file</label>
        <input onclick=\"basic_show('file_update')\" type=\"radio\" name=\"rd_file_update\" id=\"yes\" value=\"yes\"/><label for=\"yes\">$l_update_file</label>
-      </td>
+      </th>
     </tr>
     </table>
     <div id=\"file_update\" style=\"display: none\">";
@@ -509,64 +512,66 @@ function html_document_form($action, $document, $doc_q, $cats1, $cats2, $mime_q)
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\"
       onsubmit=\"if (check_document(this)){this.tf_url.value= this.preurl.value + this.tf_url.value; return true;} else return false;\"
       action=\"document_index.php\">
+   
+   <fieldset class=\"detail infos\">
+    <legend>$l_document</legend>
 
-    <div class=\"detailHead\">$l_document</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"30\" value=\"$title\" /></td>
+      <th>$l_title</th>
+      <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"30\" value=\"$title\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_author</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
+      <th>$l_author</th>
+      <td><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> 
+      <th>$l_private</th>
+      <td><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> 
     </tr>
     $block_category1
     $block_category2
     </table>
+   </fieldset>
 
-    <div class=\"detailHead\">$l_file</div>
+    <fieldset class=\"detail infos\">
+    <legend>$l_file</legend>
     $update_file
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_mimetype</td>
-      <td class=\"detailForm\">$sel_mime</td>
+      <th>$l_mimetype</th>
+      <td>$sel_mime</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\">$rd_kind</td>
+      <th>$l_kind</th>
+      <td>$rd_kind</td>
     </tr> 
     <tr>
-      <td class=\"detailLabel\">$l_path</td>
-      <td class=\"detailForm\">
+      <th>$l_path</th>
+      <td>
       <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
       <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a></span>
       </td>
     </tr> 
     <tr id=\"browse_field\" $dis_field>
-      <td class=\"detailLabel\">$l_file</td>
-      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
+      <th>$l_file</th>
+      <td><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
     </tr>
     <tr id=\"url_field\" $dis_url>
-      <td class=\"detailLabel\">$l_url</td>
-      <td class=\"detailForm\"><input type=\"text\" disabled=\"true\" name=\"preurl\" value=\"$tp\" size=\"5\" /><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
+      <th>$l_url</th>
+      <td><input type=\"text\" disabled=\"true\" name=\"preurl\" value=\"$tp\" size=\"5\" /><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
    </table>
-   </div>
-   $update_file_ende
-   <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\">
-    <input type=\"hidden\" name=\"upload\" value=\"yes\">
+   $update_file_end
+   </fieldset>
+   
+   <fieldset class=\"buttons\">
+    <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\" />
+    <input type=\"hidden\" name=\"upload\" value=\"yes\" />
     $dis_button
     <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"entity\" value=\"$entity\" />
-    </p>
-    </div>
+    </fieldset>
     </form>
 ";
 
@@ -654,28 +659,15 @@ function html_document_dir_form($action, $document,$doc_q=null) {
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_can_delete($p_id) {
-  global $display, $l_delete, $l_can_delete, $l_back;
-
-  $url = url_prepare("document_index.php");
-
-  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-    <input type=\"hidden\" name=\"document_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
-
-  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"document_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\" />
-    </form>";
+  global $display, $l_delete, $l_can_delete, $l_back,$path;
 
   $display["msg"] .= display_ok_msg($l_can_delete);
-  $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_delete</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
+  
+  $block .="
+  <div class=\"buttons\">
+  <a href=\"$path/document/document_index.php?action=delete&amp;document_id=$p_id\" >$l_delete</a>
+  <a href=\"$path/document/document_index.php?action=detailconsult&amp;document_id=$p_id\">$l_back</a>
+  </div>";
 
   return $block;
 }
@@ -687,29 +679,17 @@ function dis_document_can_delete($p_id) {
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_document_can_delete_dir($p_id) {
-  global $display, $l_dir_can_delete, $l_dir_delete, $l_back;
+  global $display,$path,$l_dir_can_delete,$l_dir_delete,$l_back;
 
-  $url = url_prepare("document_index.php");
-
-  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
-    <input type=\"hidden\" name=\"action\" value=\"tree\" />
-    <input type=\"submit\" value=\"$l_back\" />
-    </form>";
-
+  
   $display["msg"] .= display_ok_msg($l_dir_can_delete);
 
-  $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">
-        <form name=\"form_delete\" method=\"post\" action=\"$url\">
-        <input type=\"hidden\" name=\"action\" value=\"dir_delete\" />
-        <input type=\"hidden\" name=\"document_id\" value=\"$p_id\" />
-        <input type=\"submit\" value=\"$l_dir_delete\" />
-        </form>
-      </p>
-      <p class=\"detailButtons\">$dis_back</p>
-    </div>";
-
+  $block .="
+  <div class=\"buttons\">
+    <a href=\"$path/document/document_index.php?action=dir_delete&amp;document_id=$p_id\" >$l_dir_delete</a>
+     <a href=\"$path/document/document_index.php?action=tree\">$l_back</a>
+   </div>";
+	      
   return $block;
 }
 
@@ -724,9 +704,7 @@ function dis_document_admin_index() {
   $mime_q = run_query_document_mime();
 
   $block = of_category_dis_admin_form("category1", $cats1);
-  $block .= "<hr />";
   $block .= of_category_dis_admin_form("category2", $cats2);
-  $block .= "<hr />";
   $block .= html_document_mime_form($mime_q);
 
   return $block;
@@ -740,120 +718,101 @@ function dis_document_admin_index() {
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_mime_form($mime_q) {
   global $l_mime_manage,$l_mime_exist,$l_label,$l_extension,$l_mimetype;
-  global $l_mime_checkdelete,$l_mime_update,$l_mime_new,$l_mime_insert,$l_mime_label;
+  global $l_mime_checkdelete,$l_mime_update,$l_mime_new,$l_mime_insert,$l_mime_label,$l_new,$l_c_insert;
+  global $ico_ok, $ico_delete;
 
-  $sel_mime = "<select name=\"sel_mime\" onChange=\"
-    mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('-');
-    ext = mytext.substr(pos + 2);
-    mytext = mytext.substr(0, pos-1); 
-    pos = mytext.indexOf('(');
-    hit = mytext.substr(pos+1);
-    pos2 = hit.indexOf(')');
-    hit = hit.substr(0,pos2);
-    forms.form_mime_update.tf_mime.value=mytext.substr(pos2+3);
-    forms.form_mime_update.tf_mimetype.value=ext;
-    forms.form_mime_update.tf_extension.value=hit;
-    \"
-    size=\"4\" >";
+  
+
+  $char_title = '=';
+  $key = 0;
   while ($mime_q->next_record()) {
     $id = $mime_q->f("documentmimetype_id");
+    $extension = $mime_q->f("documentmimetype_extension");
     $label = $mime_q->f("documentmimetype_label");
-    $extends = $mime_q->f("documentmimetype_extension");
-    $mime = $mime_q->f("documentmimetype_mime");
-    $sel_mime .= "\n<option value=\"$id\">($extends) $label - $mime</option>";
+    $type = $mime_q->f("documentmimetype_mime");
+
+    if ($key%2 == 0) {
+      $class = "class=\"pair\"";
+    } else {
+      $class = "";
+    }
+    $c_label = htmlentities($one_cat["label"]);
+    $mime_list .= "
+    <tr $class>
+    <td>
+    <input type=\"hidden\" id=\"mime_$id\" value=\"$id\" />
+    <a href=\"?action=mime_checklink&amp;category=mime&amp;mime=$id\">
+    <img src=\"$ico_delete\" alt=\"$l_mime_checkdelete\" title=\"$l_mime_checkdelete\" />
+    </a></td>
+    <td> <input type=\"text\" id=\"tf_mime_label_$id\" value=\"$label\" size=\"14\"/></td>
+    <td> <input type=\"text\" id=\"tf_extension_$id\" value=\"$extension\" size=\"6\"/></td>
+    <td> <input type=\"text\" id=\"tf_mimetype_$id\" value=\"$type\" /></td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($id,'mime');\">
+    <img src=\"$ico_ok\" alt=\"$l_mime_update\" title=\"$l_mime_update\" />
+    </a>
+    </td>
+    </tr>";
   }
-  $sel_mime .= "</select>";
+
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_mime_manage
-      </td>
-    </tr><tr>
-      <td>
-
-<!-- Mime-type Check Delete Section -->
-
-        <table>
-        <tr>
-          <td colspan=\"3\">
-            <form name=\"form_mime_delete\" method=\"post\"
-              action=\"" . url_prepare("document_index.php") . "\">
-            <table>
-            <tr>
-              <td class=\"adminLabel\">$l_mime_exist</td>
-              <td class=\"adminLabel\">$sel_mime</td>
-              <td>
-              <input type=\"hidden\" name=\"action\" value=\"mime_checklink\" />
-              <input type=\"submit\" name=\"sub_mime\" value=\"$l_mime_checkdelete\" onclick=\"if (check_mime_checkdel(this.form)) return true; else return false;\" />
-              </td>
-            </tr>
-            </table>
-            </form>
-          </td>
-        </tr>
-
-<!-- Mime-type Update Section -->
-        <tr>
-	  <form name=\"form_mime_update\" method=\"get\"
-              action=\"" . url_prepare("document_index.php") . "\">	
-          <td class=\"adminLabel\">$l_mime_label :</td>
-            <td><input type=\"text\" name=\"tf_mime\" /></td>
-        </tr><tr>
-        <tr>
-          <td class=\"adminLabel\">$l_extension :</td>
-            <td><input type=\"text\" name=\"tf_extension\" /></td>
-        </tr><tr>
-        <tr>
-          <td class=\"adminLabel\">$l_mimetype :</td>
-            <td><input type=\"text\" name=\"tf_mimetype\" /></td>
-        </tr><tr>	
-        <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
-            <input type=\"hidden\" name=\"sel_mime\" value=\"\" />
-            <input type=\"hidden\" name=\"action\" value=\"mime_update\" />
-            <input type=\"submit\" name=\"sub_mime\" value=\"$l_mime_update\"
-              onclick=\"if (check_mime_upd(this.form,document.form_mime_delete)) return true; else return false;\" />
-            </form>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      <td>
-
-<!-- New Mime-type Section -->
-
-        <form name=\"form_mime_new\" method=\"get\"
-          action=\"" . url_prepare("document_index.php") . "\">
-        <table>
-        <tr>
-          <td class=\"adminLabel\">$l_mime_new :</td>
-            <td><input type=\"text\" name=\"tf_mime\" /></td>
-        </tr><tr>
-        <tr>
-          <td class=\"adminLabel\">$l_extension :</td>
-            <td><input type=\"text\" name=\"tf_extension\" /></td>
-        </tr><tr>
-        <tr>
-          <td class=\"adminLabel\">$l_mimetype :</td>
-            <td><input type=\"text\" name=\"tf_mimetype\" /></td>
-        </tr><tr>	
-          <td class=\"adminLabel\" colspan=\"2\">
-            <input type=\"hidden\" name=\"action\" value=\"mime_insert\" />
-            <input type=\"submit\" name=\"sub_mime\" value=\"$l_mime_insert\"
-              onclick=\"if (check_mime_new(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-        </form>
-      </td>
-    </tr>
-    </table>
+ <div class=\"detail admin\" >
+  <form id=\"form_mime_update\" action=\"?action=mime_update\" method=\"post\">
+  <input type=\"hidden\" name=\"tf_mime_label\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_extension\" value=\"\" />
+  <input type=\"hidden\" name=\"tf_mimetype\" value=\"\" />
+  <input type=\"hidden\" name=\"mime\" value=\"\" />
+  </form>    
+  <h1>$l_mime_manage</h1>
+  <div class=\"overflow\">
+  <table>
+  <thead>
+  <tr>
+  <td>&nbsp;</td>
+  <td>$l_mime_label</td>
+  <td>$l_extension</td>
+  <td>$l_mimetype</td>
+  <td>&nbsp;</td>        
+  </tr>    
+  </thead>
+  <tbody>
+  $mime_list
+  </tbody>
+  </table>
+  </div>    
+  <form id=\"form_mime_new\" action=\"\" method=\"post\"
+  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <table>
+  <thead>
+  <tr>
+  <td colspan=\"3\">$l_new</td>
+  </tr>
+  <tbody>   
+  <tr>
+  <td>$l_mime_label</td>    
+  <td>$l_extension</td>
+  <td>$l_mime_new</td>    
+  </tr>       
+  <tr>
+  <td><input type=\"text\" name=\"tf_mime_label\" value=\"\" size=\"6\"/></td>
+  <td><input type=\"text\" name=\"tf_extension\" value=\"\" size=\"6\"/></td>
+  <td><input type=\"text\" name=\"tf_mimetype\" value=\"\" /></td>    
+  </tr>  
+  </tbody>
+  <tfoot>
+  <tr>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_c_insert\" /></td>
+  </tr>
+  </tfoot>
+  </table>
+  <input type=\"hidden\" name=\"action\" value=\"mime_insert\" />
+  <input type=\"hidden\" name=\"category\" value=\"mime\" />
+  </form>
+  </div>  
+   
 ";
 
   return $block;
@@ -867,82 +826,60 @@ function html_document_mime_form($mime_q) {
 function dis_document_mime_links($document) {
   global $l_mime_link_document, $l_mime_link_document_no;
   global $l_mime_delete, $l_mime_can_delete, $l_mime_cant_delete;
-  global $l_back,$display;
+  global $l_back, $display;
 
+  $delete_ok = true;
   $id = $document["mime"];
   $label = get_document_mime_label($id);
   $obm_q = run_query_document_mime_links($id);
 
   $nb_mime = $obm_q->num_rows();
   if ($nb_mime > 0) {
-    $display["msg"] .= display_warn_msg($l_mime_cant_delete);
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$label : $l_mime_link_document ($nb_mime)</td>
-    </tr>";
+    $delete_ok = false;
+    $dis_link = "<li><h1>$label : $l_mime_link_document ($nb_mime)</h1>";
 
     $cpt = 0;
     while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q->f("document_id");
-      $cname = $obm_q->f("document_title");
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;document_id=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
+      $did = $obm_q->f("document_id");
+      $dtitle = $obm_q->f("document_title");
+      $dis_link .= "<a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;document_id=$did") . "\">$dtitle</a></li>";
     }
     if ($cpt < $nb_mime) {
-      $dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">...</td>
-    </tr>";
+      $dis_link .= "...";
     }
 
-    $dis_link .="
-    </table>
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">
-	  <form name=\"form_back\" method=\"get\"
-	    action=\"" .url_prepare("document_index.php") . "\">
-	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
-	  <input type=\"submit\" value=\"$l_back\" />
-	  </form>
-	</p>
-      </div>";
-
   } else {
-    $display["msg"] .= display_ok_msg($l_mime_can_delete);
-
-    $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_mime_link_document_no </td>
-    </tr>
-    </table>
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">    
-      <form name=\"form_act_delete\"
-	method=post action=\"" . url_prepare("document_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"mime_delete\">
-      <input type=\"hidden\" name=\"sel_mime\" value=\"$id\">
-      <input type=\"submit\" name=\"sub_act\" value=\"$l_mime_delete\">
-      </form>
-      
-      <form name=\"form_back\" method=\"get\"
-	action=\"" .url_prepare("document_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"admin\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>
-    </p>
-  </div>";
-
+    $dis_link = "<h1><li>$label : $l_mime_link_document_no</li></h1>";
   }
 
-  return $dis_link;
+  $block .= "
+    <div class=\"detail\">
+    <ul>
+    $dis_link
+    </ul>
+    </div>";
+
+  $dis_back = "<a href=\"$path/document/document_index.php?action=admin\">$l_back</a>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_mime_can_delete);
+    $dis_del = "<a href=\"$path/document/document_index.php?action=mime_delete&amp;sel_mime=$id\" >$l_mime_delete</a>";
+    $block .= "
+      <div class=\"buttons\">
+      $dis_del 
+      $dis_back
+      </div>";
+     } else {
+     $display["msg"] .= display_warn_msg($l_mime_cant_delete);
+     $block .= "
+      <div class=\"buttons\">
+        $dis_back
+      </div>";
+  }
+
+
+  return $block;
 }
 
 
