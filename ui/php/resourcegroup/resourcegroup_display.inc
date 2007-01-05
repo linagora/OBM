@@ -301,7 +301,7 @@ function html_resourcegroup_form($action, $group_q, $group) {
   </tr>";
   } 
 
-  $block = "<center>
+  $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("resourcegroup_index.php")."\">
  <fieldset class=\"detail extra\">
   <legend>$l_resourcegroup</legend>
@@ -312,7 +312,13 @@ function html_resourcegroup_form($action, $group_q, $group) {
     <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $dis_private
-  <tr>
+  </table>
+  </fieldset>
+  
+  <fieldset class=\"detail extra\">
+   <legend>$l_desc</legend>
+   <table>
+    <tr>
     <th>$l_desc</th>
     <td><input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
 <!--      
@@ -405,14 +411,20 @@ function html_resourcegroup_consult($group_q, $prefs_r, $r_q) {
   $display["title"] = "<h1 class=\"title\">$l_resourcegroup : $name</h1>";
 
   $block = "
-  <div class=\"detail infos\">
+  <div class=\"detail extra\">
     <h1>$l_resourcegroup</h1>
 
     <table>
     <tr>
       <th>$l_name</th>
       <td>$name</td>
-    </tr><tr>
+    </tr>
+    </table>
+  </div>
+  <div class=\"detail extra\">
+    <h1>$l_desc</h1>
+    <table>
+    <tr>
       <th>$l_desc</th>
       <td>$desc</td>
     </tr>

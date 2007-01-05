@@ -124,7 +124,7 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
   $todo_d->data_header = "both";
   $todo_d->data_form_head = "
      <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
-    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >";
+    "\" onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $todo_d->data_form_end = "
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
@@ -165,13 +165,11 @@ function dis_todo_detail($todo, $todo_q) {
 
   $block = "
   <div class=\"detail infos\">
+    <h1>$l_todo</h1>
     <table>
      <tr>
       <th>$l_todotitle</th>
       <td>$title</td>
-     </tr><tr>
-      <th>$l_user</th>
-      <td>$user</td>
      </tr><tr>
       <th>$l_author</th>
       <td>$author</td>
@@ -183,11 +181,28 @@ function dis_todo_detail($todo, $todo_q) {
       <td>$percent</td>
      </tr><tr>
       <th>$l_date</th>
-      <t>$date</td>
+      <td>$date</td>
      </tr><tr>
       <th>$l_deadline</th>
       <td>$deadline</td>
-     </tr><tr>
+     </tr>
+     </table>
+   </div>
+
+   <div class=\"detail infos\">
+    <h1>$l_user</h1>
+    <table>
+     <tr>
+      <th>$l_user</th>
+      <td>$user</td>
+     </tr>
+    </table>
+   </div>
+  
+  <div class=\"detail extra\">
+    <h1>$l_content</h1> 
+     <table>
+     <tr>
       <th>$l_content</th>
       <td>$content</td>
      </tr>
@@ -255,7 +270,7 @@ function dis_todo_form($todo, $todo_q = 0) {
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\" />
       </a>
       $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
@@ -266,7 +281,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
   $block_user = "
-  </tr><tr>
+  <tr>
     <th>
       $l_users
       <a href=\"javascript: return false;\" 
@@ -277,7 +292,7 @@ function dis_todo_form($todo, $todo_q = 0) {
     </th>    
     <td id=\"sel_user_id\">
       $dis_sel_user
-    </td>";
+    </td></tr>";
 
   $display["title"] = "<h1 class=\"title\">$l_todo : $title</h1>";
 
@@ -307,16 +322,18 @@ function dis_todo_form($todo, $todo_q = 0) {
     $dis_button .=  "<input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
 
   $block = "
-  <fieldset class=\"detail extra\">
+ 
   <form method=\"post\" name=\"f_entity\"
     onsubmit=\"if (check_addtodoform(this)) return true; else return false;\"
     action=\"".url_prepare("todo_index.php")."\">
+ 
+ <fieldset class=\"detail infos\">
+ <legend>$l_todo</legend>
   <table>
   <tr>
     <th>$l_todotitle</th>
     <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" /></td>
-  $block_user
-  </tr><tr>
+    </tr><tr>
     <th>$l_priority</th>
     <td>$sel_priority</td>
   </tr><tr>
@@ -325,15 +342,33 @@ function dis_todo_form($todo, $todo_q = 0) {
   </tr><tr>
     <th>$l_deadline</th>
     <td><input type=\"text\" name=\"tf_deadline\" value=\"$deadline\" class=\"datePicker\"/></td>
-  </tr><tr>
+  </tr>
+  </table>
+  </fieldset>
+
+  
+ <fieldset class=\"detail infos\">
+ <legend>$l_todo</legend>
+  <table>
+  $block_user
+  </table>
+ </fieldset>
+
+
+  <fieldset class=\"detail extra\">
+  <legend>$l_content</legend>
+  <table>
+  <tr>
     <th>$l_content</th>
     <td><textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea></td>
   </tr>
   </table>
   </fieldset>
+  
   <fieldset class=\"buttons\">
     $dis_button
   </fieldset>
+  
   </form>
   ";
 
