@@ -83,7 +83,6 @@ var Observer = new Class({
     if(!v) 
       v = this.el.getStyle(this.options.property);
     return v;
-    console.log(this.options.property + " : " +this.lastValue);
   },
   
   check: function() {

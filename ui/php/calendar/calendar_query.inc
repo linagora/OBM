@@ -1234,7 +1234,7 @@ function store_calendar_entities($entities_q) {
       $id = $resource_q->f("resource_id");
       $entity_tab["resource"][$id] = array(
         "name"  => $resource_q->f("resource_name"),
-        "class" => "calendarEventBg$i",
+        "class" => "eventOwner$i",
         "image" => ${"ico_calendar_user".$i},
         "type"  => "resource",
         "id"    => $id
@@ -1409,6 +1409,52 @@ function get_calendar_event_entity($calendar_id) {
   return $entities;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Calendar Quick Form Data checking and formatting
+// Parameters:
+//   - $calendar[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_calendar_data_quick_form($calendar) {
+  global $err_msg, $php_regexp_isodate, $php_regexp_isodatetime;
+  global $l_fill_title, $l_fill_dateend,$l_fill_datebegin,$l_err_begin_end;
+
+  $title = $calendar["title"];
+  $datebegin = $calendar["date_begin"];
+  $dateend = $calendar["date_end"];
+
+  if (trim($title) == "") {
+    $err_msg = $l_fill_title;
+    return false;
+  }
+  
+  // Begin Date check
+  if (trim($datebegin) == "") {
+    $err_msg = $l_fill_datebegin;
+    return false;
+  } else if (preg_match($php_regexp_isodatetime, $datebegin) == 0) {
+    $err_msg = "$l_datebegin : $l_invalid_date"; 
+    return false;
+  }
+  
+  // End Date check
+  if (trim($dateend) == "") {
+    $err_msg = $l_fill_dateend;
+    return false;
+  } else if (preg_match($php_regexp_isodatetime, $dateend) == 0) {
+    $err_msg = "$l_dateend : $l_invalid_date"; 
+    return false;
+  }
+  
+  if ($dateend<$datebegin) {
+    $err_msg = $l_err_begin_end;
+    return false;
+  }
+
+  return true;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Calendar Form Data checking and formatting

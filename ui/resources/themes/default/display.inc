@@ -103,7 +103,7 @@ function display_page(&$display) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
   global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
-  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm;
+  global $l_logout, $l_profile,$ico_logout,$modules,$ico_login, $ico_obm,$ico_print;
 
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
@@ -116,7 +116,7 @@ function display_menu($module) {
   $display["todo"] = display_todos();
   $display["action"] = display_actions($section, $module);
   if ($display["print_url"] != "") {
-    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"".C_IMAGE_PATH."/$set_theme/ico_printer.gif\" alt=\"Print\" id='print' /></a></li>";
+    $dis_printer = "<li><a target=\"top\" href=\"".$display["print_url"]."&amp;output_target=print\"><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
 
   $block = "
@@ -209,7 +209,7 @@ function display_modules_theme($section) {
         if ($fico) {
           $ico = $modules[$mod]["Ico"];
           if ($ico) {
-            $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+            $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='$ico' alt='$module_name' /></a> ";
           }
         }
         $block .= "<a href='".$modules[$mod]["Url"]."'>";

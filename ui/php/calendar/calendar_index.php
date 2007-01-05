@@ -249,7 +249,7 @@ if ($action == "index") {
   }
 } elseif ($action == "quick_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (1==1 || check_calendar_data_form($params)) {
+  if (check_calendar_data_quick_form($params)) {
       run_query_calendar_quick_event_update($params, $cal_entity_id, $event_id);
       $display["msg"] .= display_ok_msg("$l_event : $l_update_ok");
   } else {

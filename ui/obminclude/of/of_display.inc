@@ -1062,7 +1062,7 @@ function display_last_visited($path="..") {
       global ${$l_ico};
       $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
       $dis_last .= "
-        <li><a href=\"$mod_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"$module\" /> $text</a></li>";
+        <li><a href=\"$mod_url\"><img src=\"${$l_ico}\" alt=\"$module\" /> $text</a></li>";
     }
   }
 
