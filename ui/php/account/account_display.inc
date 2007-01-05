@@ -191,34 +191,42 @@ function html_account_consult($obm_q_account, $p_action){
 
   // $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
 
-  $display["title"] = "<div class=\"title\">$l_account : $label</div>";
+  $display["title"] = "<h1 class=\"title\">$l_account : $label</h1>";
   
   // number and label
   $block .= "
-    <div class=\"detailHead\">$l_account</div>
+  <div class=\"detail extra\">
+    <h1>$l_account</h1>
 
-    <table class=\"detail\">
+    <table>
      <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
+      <th>$l_label</th>
+      <td>$label</td>
      </tr>
      <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$number</td>
+      <th>$l_number</th>
+      <td>$number</td>
      </tr>
      <tr>
-      <td class=\"detailLabel\">$l_bank</td>
-      <td class=\"detailText\">$bank</td>
+      <th>$l_bank</th>
+      <td>$bank</td>
      </tr>
      <tr>
-      <td class=\"detailLabel\">$l_balance</td>
-      <td class=\"detailText\">$today</td>
+      <th>$l_balance</th>
+      <td>$today</td>
      </tr>
+     </table>
+     </div>
+  
+  <div class=\"detail extra\">
+    <h1>$l_comment</h1>     
+     <table>
      <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailText\">$comment</td>
+      <th>$l_comment</th>
+      <td>$comment</td>
      </tr>
-    </table>";
+    </table>
+    </div>";
 
 //   // we display buttons only if we need them :
 //   if ($p_action == "detailconsult") {
@@ -273,7 +281,7 @@ function html_account_form($obm_q_account, $action) {
   // - Themes :
   global $set_theme,$col_label,$col_ok,$ico_company,$ico_contact;
   // -- Labels
-  global $l_label, $l_owner, $l_bank, $l_number;
+  global $l_label, $l_owner, $l_bank, $l_number, $l_account;
   global $l_initial_balance, $l_comment;
   global $l_insert,$l_update, $l_delete;
   global $obm_q_company;
@@ -362,32 +370,36 @@ function html_account_form($obm_q_account, $action) {
   $block .= "
    <form method=\"post\" name=\"f_entity\" action=\"account_index.php\"
          onsubmit=\"if (check_account_cpte(this)) return true; else return false;\" >
-    <table class=\"detail\">
+    <fieldset class=\"detail extra\">
+    <legend>$l_account</legend>
+    <table>
      <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_label\" size=\"40\" value=\"$label\"></td>
+      <th>$l_label</th>
+      <td><input name=\"tf_label\" size=\"40\" value=\"$label\" /></td>
      <tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input name=\"tf_number\" size=\"12\" value=\"$number\"></td>
+      <th>$l_number</th>
+      <td><input name=\"tf_number\" size=\"12\" value=\"$number\" /></td>
      </tr>
-      <td class=\"detailLabel\">$l_initial_balance</td>
-      <td class=\"detailForm\"><input name=\"tf_balance\" size=\"20\" value=\"$balance\" $bal_state></td>
+     <tr>
+      <th>$l_initial_balance</th>
+      <td><input name=\"tf_balance\" size=\"20\" value=\"$balance\" $bal_state /></td>
      </tr>
+     <tr>
+      <th>$l_bank</th>
+      <td><input name=\"tf_bank\" size=\"60\" value=\"$bank\" /></td>
      </tr>
-      <td class=\"detailLabel\">$l_bank</td>
-      <td class=\"detailForm\"><input name=\"tf_bank\" size=\"60\" value=\"$bank\"></td>
-     </tr>
-     </tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailForm\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea></td>
-     </tr>
-    </table>
+     </table>
+     </fieldset>
 
-    <div class=\"detailButton\">
-     <p class=\"detailButtons\">
+     <fieldset class=\"detail extra\">
+      <legend>$l_comment</legend>
+      $l_comment
+      <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
+      </fieldset>
+     
+    <fieldset class=\"buttons\">
       $dis_button
-     </p>
-    </div>
+    </fieldset>
    </form>
   ";
 
@@ -439,7 +451,6 @@ function html_account_impossible_deletion ($p_account_id, $q_related_payments) {
   global $l_impossible_deletion, $l_cancel;
 
   $block .= "
-   <center>
     <font color=\"#$FF00FF\">".$q_related_payments->nf()." ".$l_impossible_deletion." : </font><br>";
   while ($q_related_payments->next_record()) {
     $block .= "
@@ -451,7 +462,7 @@ function html_account_impossible_deletion ($p_account_id, $q_related_payments) {
      <form name=form_cancel_delete method=post action=\"".url_prepare("account_index.php?action=index")."\">
       <input type=submit name=\"sub_cancel_del\" value=\"$l_cancel\">
      </form>
-     <center>";
+    ";
   
   return $block;
 
@@ -506,7 +517,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   </form>
  </table>
 </center>
- <br><br><hr>";
+ <br><br><hr />";
      
   // we display the result :
   $block .= "
