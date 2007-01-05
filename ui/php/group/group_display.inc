@@ -337,7 +337,7 @@ function html_group_form($action, $group_q, $group) {
     $dis_private = "
   <tr>
     <th>$l_private</th>
-    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />
+    <td><input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>";
   } 
 
@@ -462,45 +462,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   //$mail = get_mail_info();
   //$main_domain = $mail["main_domain"];
 
-  $display["detailInfo"] = display_record_info($group_q);
-  $display["title"] = "<h1 class=\"title\">$l_group : $name</h1>";
-
-  $block = "
-  <div class=\"detail infos\">
-    <h1>$l_group</h1>
-
-    <table>
-    <tr>
-      <th>$l_name</th>
-      <td>$name</td>
-    </tr><tr>
-      <th>$l_system</th>
-      <td>$system</td>
-    </tr><tr>
-      <th>$l_local</th>
-      <td>$local</td>
-    </tr><tr>
-      <th>$l_ext_id</th>
-      <td>$ext_id</td>
-    </tr>
-    </table>
-    </div>
-  
-  <div class=\"detail infos\">
-    <h1>$l_desc</h1>
-   
-    <table>
-    <tr>
-      <th>$l_desc</th>
-      <td>$desc</td>
-    </tr><tr>
-      <th>$l_email</th>
-      <td>$email</td>
-    </tr>
-    </table>
-  </div>";
-
-
   // Affichage des groupes membres 
   $nb_g = $g_q->num_rows_total();
   if ($nb_g == 0) {
@@ -509,7 +470,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $message = "$nb_g $l_group_member";
   }
 
-  $block .= display_info_msg($message);
+  $block = display_info_msg($message);
+
 
   if ($nb_g != 0) {
     $url = url_prepare("group_index.php?action=detailconsult&amp;group_id=$id");
@@ -539,6 +501,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       </form>";
     }
   }
+
 
   // registered Users display
   $nb_u = $u_q->num_rows_total();
@@ -578,6 +541,45 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       </form>";
     }
   }
+
+  $display["detailInfo"] = display_record_info($group_q);
+  $display["title"] = "<h1 class=\"title\">$l_group : $name</h1>";
+
+  $block .= "
+  <div class=\"detail infos\">
+    <h1>$l_group</h1>
+
+    <table>
+    <tr>
+      <th>$l_name</th>
+      <td>$name</td>
+    </tr><tr>
+      <th>$l_system</th>
+      <td>$system</td>
+    </tr><tr>
+      <th>$l_local</th>
+      <td>$local</td>
+    </tr><tr>
+      <th>$l_ext_id</th>
+      <td>$ext_id</td>
+    </tr>
+    </table>
+    </div>
+  
+  <div class=\"detail infos\">
+    <h1>$l_desc</h1>
+   
+    <table>
+    <tr>
+      <th>$l_desc</th>
+      <td>$desc</td>
+    </tr><tr>
+      <th>$l_email</th>
+      <td>$email</td>
+    </tr>
+    </table>
+  </div>";
+
 
   return $block;
 }
