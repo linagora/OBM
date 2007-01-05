@@ -114,8 +114,7 @@ function html_resource_search_form($resource) {
       <input type=\"text\" name=\"tf_qtysup\" size=\"4\" maxlength=\"8\" value=\"$qtysup\" /> 
     </label>
     <label>&nbsp;<br />
-      <input name=\"action\" type=\"hidden\" value=\"search\">
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\">
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_restriction
       $ext&nbsp;
@@ -252,13 +251,13 @@ function html_resource_form($usr_q, $resource) {
 
   // Buttons
   if (($action == "new") || ($action == "insert")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\">
-          <input type=\"submit\" value=\"$l_insert\">";
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+          <input type=\"submit\" value=\"$l_insert\" />";
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
-          <input type=\"hidden\" name=\"resource_id\" value=\"$id\">
-          <input type=\"submit\" value=\"$l_update\">";
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
+          <input type=\"hidden\" name=\"resource_id\" value=\"$id\" />
+          <input type=\"submit\" value=\"$l_update\" />";
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -266,9 +265,9 @@ function html_resource_form($usr_q, $resource) {
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_resource(this)) return true; else return false;\"
       action=\"" . url_prepare("resource_index.php") . "\">
-<fieldset class=\"detail infos\">
+    
+    <fieldset class=\"detail extra\">
     <legend>$l_resource</legend>
-
     <table>
     <tr>
       <th>$l_name</th>
@@ -276,15 +275,24 @@ function html_resource_form($usr_q, $resource) {
     </tr><tr>
       <th>$l_qty</th>
       <td><input id=\"tf_qty\" name=\"tf_qty\" size=\"4\" maxlength=\"8\" value=\"$qty\" /></td>
-    </tr><tr>
+    </tr>
+    </table>
+    </fieldset>
+
+    <fieldset class=\"detail extra\">
+    <legend>$l_desc</legend>
+    <table>	  
+    <tr>
       <th>$l_desc</th>
       <td><textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea></td>
     </tr>
     </table>
-</fieldset>
+    </fieldset>
+    
     <fieldset class=\"buttons\">
     $dis_button
     </fieldset>
+    
     </form>";
 
   return $block;
@@ -334,9 +342,8 @@ function html_resource_consult($obm_q) {
   $display["title"] = "<div class=\"title\">$l_resource : $name</div>";
 
   $block = "
-  <div class=\"detail infos\">
+  <div class=\"detail extra\">
   <h1>$l_resource</h1>
- 
     <table>
     <tr>
       <th>$l_name</th>
@@ -347,10 +354,11 @@ function html_resource_consult($obm_q) {
     </tr>
     </table>
     </div>
-  <div class=\"detail infos\">
+
+  <div class=\"detail extra\">
   <h1>$l_desc</h1>
+    <table>
     <tr>
-      <th>$l_desc</th>
       <td>$desc</td>
     </tr>
     </table>
