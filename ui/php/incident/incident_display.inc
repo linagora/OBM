@@ -710,7 +710,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri, $
       <input type=\"hidden\" name=\"contract_id\" value=\"$param_contract\" />
       <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."&amp;ext_widget=f_entity.contract_new_id&amp;ext_widget_text=f_entity.contract_new_name','contract','height=$popup_height,width=$popup_width'); return false;\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
+      <img src=\"$ico_contract\" alt=\"[Contract]\" /></a>
       <input type=\"text\" name=\"contract_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
       </tr>
