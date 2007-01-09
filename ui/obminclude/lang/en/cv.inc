@@ -46,7 +46,7 @@ $l_template_selection = "Template selection";
 
 $l_defaultodttemplate_document = "Document";
 $l_defaultodttemplate_label = "Label";
-$l_defaultodttemplate_manage = "Defaut Odt templates managementt";
+$l_defaultodttemplate_manage = "Defaut Odt templates management";
 $l_defaultodttemplate_exist = "Existing Default templates";
 
 $l_cv_display = "Display options for CV list";
