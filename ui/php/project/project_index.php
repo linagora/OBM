@@ -47,7 +47,6 @@ include("$obminclude/global.inc");
 $params = get_project_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 require("project_query.inc");
 require("project_display.inc");
