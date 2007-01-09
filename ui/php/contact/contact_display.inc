@@ -399,7 +399,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   if ($show_title) {
     $block_title = "
     <label>$l_title<br />
-      <input type=\"text\" name=\"tf_title\" id=\"tf_town\" size=\"16\"
+      <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"16\"
       value=\"$title\" />
     </label>";
   }
@@ -683,8 +683,8 @@ function html_contact_header($co_q, $funcs) {
   if ($aka != "") {
     $dis_aka = "
     <tr> 
-      <td class=\"detailLabel\">$l_aka</td>
-      <td class=\"detailText\">$aka</td>
+      <th>$l_aka</th>
+      <td>$aka</td>
     </tr>";
   } else {
     $dis_aka = "";
@@ -695,14 +695,14 @@ function html_contact_header($co_q, $funcs) {
   $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_date = (! $cgp_hide["contact"]["contact_date"]);
 
-  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+  $display["title"] = "<h1 class=\"title\">$l_contact : $lname $fname</h1>";
 
   // Function
   $block_function = of_category_dis_block_consult("contact", "function", $funcs, "mono");
 
   // Company Display
   if ($cgp_show["module"]["company"]) {
-    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\"> $c_name</a>";
+    $dis_company = "<a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id")."\"> $c_name</a>";
   } else {
     $dis_company = $c_name;
   }
@@ -710,55 +710,58 @@ function html_contact_header($co_q, $funcs) {
   // Title field
   if ($show_title) {
     $block_title = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailText\">$title</td>";
+    <tr>
+      <th>$l_title</th>
+      <td>$title</td>";
   }
 
   // Responsible field
   if ($show_resp) {
     $block_resp = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_market</td>
-      <td class=\"detailText\">$market</td>";
+      <th>$l_market</th>
+      <td>$market</td>";
   }
 
   // Date field
   if ($show_date) {
     $block_date = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>";
+      <th>$l_date</th>
+      <td>$date</td>";
   }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detailHead\">$l_contact</div>
-    <table class=\"detail\">
+    <div class=\"detail infos\">
+    <h1>$l_contact</h1>
+    
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailText\">$lname</td>
+      <th>$l_lastname</th>
+      <td>$lname</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailText\">$fname</td>
+      <th>$l_firstname</th>
+      <td>$fname</td>
     </tr>
     $dis_aka
     <tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
+      <th>$l_kind</th>
+      <td>$kind</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$archive</td>
+      <th>$l_archive</th>
+      <td>$archive</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">$dis_company</td>
+      <th>$l_company</th>
+      <td>$dis_company</td>
     $block_function
     $block_title
     $block_resp
     $block_date
     </tr>
-    </table>"; 
+    </table>
+    </div>"; 
 
   return $block;
 }
@@ -924,119 +927,114 @@ function html_contact_view_main($co_q) {
   if ($show_service) {
     $block_service = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_service</td>
-      <td class=\"detailText\">$service</td>";
+      <th>$l_service</th>
+      <td>$service</td>";
   }
 
   // Address3 field
   if ($show_ad3) {
     $block_ad3 = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailText\">$ad3</td>";
+      <th>$l_address 3</th>
+      <td>$ad3</td>";
   }
 
   // Cedex field
   if ($show_cdx) {
     $block_cdx = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailText\">$cdx</td>";
+      <th>$l_expresspostal</th>
+      <td>$cdx</td>";
   }
 
   if ($email != "") {
     $link_email = "
       <a href=\"mailto:$email\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"C\" />
+      <img src=\"$ico_mail\" alt=\"C\" />
       </a>";
   }
 
   if ($email2 != "") {
     $link_email2 = "
       <a href=\"mailto:$email2\">
-      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"C\" />
+      <img src=\"$ico_mail\" alt=\"C\" />
       </a>";
   }
   
   if ($show_comment2) {
     $block_comment2 = "
-    <div class=\"detailHead\">$l_comment2</div>
-    <table class=\"detail\">
-      <tr>
-        <td class=\"detailText\" colspan=\"2\">$com2</td>
-      </tr>
-    </table>";
+    <div class=\"detail extra\"> 
+    <h1>$l_comment2</h1>
+    $com2
+    </div>";
   }
   if ($show_comment3) {
     $block_comment3 = "
-    <div class=\"detailHead\">$l_comment3</div>
-    <table class=\"detail\">
-      <tr>
-        <td class=\"detailText\" colspan=\"2\">$com3</td>
-      </tr>
-    </table>";
+    <div class=\"detail extra\">
+    <h1>$l_comment3</h1>
+    $com3
+    </div>";
   }
 
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detailHead\">$l_coord</div>
+    <div class=\"detail infos\">
+    <h1>$l_coord</h1>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailText\">$phone</td>
+      <th>$l_phone</th>
+      <td>$phone</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_hphone</td>
-      <td class=\"detailText\">$hphone</td>
+      <th>$l_hphone</th>
+      <td>$hphone</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_fax</td>
-      <td class=\"detailText\">$fax</td>
+      <th>$l_fax</th>
+      <td>$fax</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_mphone</td>
-      <td class=\"detailText\">$mphone</td>
+      <th>$l_mphone</th>
+      <td>$mphone</td>
     $block_service
     </tr><tr>
-      <td class=\"detailLabel\">
+      <th>
       $l_address 1
       <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"Copy\" ><img alt=\"Copy\" src=\"/images/$set_theme/$ico_clipboard\" /></a>
-      </td>
-      <td class=\"detailText\">$ad1</td>
+      </th>
+      <td>$ad1</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_address 2</td>
-      <td class=\"detailText\">$ad2</td>
+      <th>$l_address 2</th>
+      <td>$ad2</td>
     $block_ad3
     </tr><tr>
-      <td class=\"detailLabel\">$l_postcode</td>
-      <td class=\"detailText\">$zip</td>
+      <th>$l_postcode</th>
+      <td>$zip</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_town</td>
-      <td class=\"detailText\">$town</td>
+      <th>$l_town</th>
+      <td>$town</td>
     $block_cdx
     </tr><tr>
-      <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailText\">$ctry_name</td>
+      <th>$l_country</th>
+      <td>$ctry_name</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">$link_email $email</td>
+      <th>$l_email</th>
+      <td>$link_email $email</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_email_other</td>
-      <td class=\"detailText\">$link_email2 $email2</td>
+      <th>$l_email_other</th>
+      <td>$link_email2 $email2</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_mailing_ok</td>
-      <td class=\"detailText\">$mailok</td>
+      <th>$l_mailing_ok</th>
+      <td>$mailok</td>
     </tr>
     </table>
+    </div>
 
     $block_userdata
-
-    <div class=\"detailHead\">$l_comment1</div>
-    <table class=\"detail\">
-      <tr>
-        <td class=\"detailText\" colspan=\"2\">$com</td>
-      </tr>
-    </table>
+    <div class=\"detail extra\">
+    <h1>$l_comment1</h1>
+    $com
+    </div>
     $block_comment2 
     $block_comment3 ";
 
@@ -1067,13 +1065,15 @@ function html_contact_links($id) {
     $deal_active = get_global_linked_deal_nb($id, "contact1", false, "contact2");
     $deal_total = get_global_linked_deal_nb($id, "contact1", true, "contact2");
     $block_deal = "
-  <div class=\"linkTitle\">:: $l_module_deal</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_deal_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
+  <div  class=\"portlet\" id=\"contactDeal\">
+  <h1>$l_module_deal</h1>
+  <ul>
+    <li><a href=\"$url_deal_list\"><img src=\"$ico_deal\" /></a>
         $l_module_deal (
         <a href=\"$url_deal_list\">$deal_active</a> /
         <a href=\"$url_deal_total\">$deal_total</a> )</li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // List
@@ -1081,11 +1081,13 @@ function html_contact_links($id) {
     $url_list = url_prepare("$path/list/list_index.php?action=search&amp;contact_id=$id");
     $list_nb = get_linked_contact_list_nb($id);
     $block_list = "
-  <div class=\"linkTitle\">:: $l_module_list</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_list\" /></a>
+  <div  class=\"portlet\" id=\"contactList\">  
+  <h1>$l_module_list</h1>
+  <ul>
+    <li><a href=\"$url_list\"><img src=\"$ico_list\" /></a>
         $l_module_list ( <a href=\"$url_list\">$list_nb</a> )</li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Contract
@@ -1095,13 +1097,15 @@ function html_contact_links($id) {
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id&amp;cba_archive=1");
     $block_contract = "
-  <div class=\"linkTitle\">:: $l_module_contract</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
+  <div  class=\"portlet\" id=\"contactContract\">  
+  <h1>$l_module_contract</h1>
+  <ul>
+    <li><a href=\"$url_contract\"><img src=\"$ico_contract\" alt=\"\" /></a>
         $l_module_contract (
         <a href=\"$url_contract\">$contract_active</a> /
         <a href=\"$url_contract_total\">$contract_total</a> )</li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Document  
@@ -1111,18 +1115,20 @@ function html_contact_links($id) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
     $nb_document = run_query_global_document_nb ($id, "contact");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
+  <div  class=\"portlet\" id=\"contactDocument\">  
+  <h1>$l_module_document</h1>
+  <ul>
+    <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Publication  
@@ -1132,24 +1138,24 @@ function html_contact_links($id) {
     $url = urlencode($url_subscription);
     $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;contact_id=$id&amp;popup=1&amp;ext_url=$url");
     $block_publi = "
-  <div class=\"linkTitle\">:: $l_subscription</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_subscription\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication\" alt=\"\" /></a>
+  <div  class=\"portlet\" id=\"contactPublication\">  
+  <h1>$l_subscription</h1>
+  <ul>
+    <li><a href=\"$url_subscription\"><img src=\"$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription_list ($nb_subscription)</a></li>
-    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"\" /></a>
+    <li><a href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"$ico_publication_new\" alt=\"\" /></a>
 	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
   
   // Links Template  
   $block = "
-<div class=\"link\">
   $block_deal
   $block_list
   $block_contract
   $block_doc
   $block_publi
-</div>
 ";
 
   return $block;
@@ -1380,8 +1386,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if ($show_title) {
     $block_title = "
     <tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>
+      <th>$l_title</th>
+      <td><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>
     </tr>";
   }
 
@@ -1400,8 +1406,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
     $block_resp = "
     <tr>
-      <td class=\"detailLabel\">$l_market</td>
-      <td class=\"detailForm\">$sel_market</td>
+      <th>$l_market</th>
+      <td>$sel_market</td>
     </tr>";
   }
 
@@ -1409,9 +1415,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if ($show_date) {
     $block_date = "
     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailForm\">
-        <script>calendar('tf_date','$date')</script>
+      <th>$l_date</th>
+      <td>
+        <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
       </td>
     </tr>";
   }
@@ -1511,8 +1517,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if ($show_service) {
     $block_service = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_service</td>
-      <td class=\"detailForm\">
+      <th>$l_service</th>
+      <td>
       <input type=\"text\" id=\"tf_service\" name=\"tf_service\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$service\" />
       </td>";
   }
@@ -1521,8 +1527,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if ($show_ad3) {
     $block_ad3 = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailForm\">
+      <th>$l_address 3</th>
+      <td>
       <input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /> $c_ad3
       </td>";
   }
@@ -1531,8 +1537,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if ($show_cdx) {
     $block_cdx = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /> $c_cdx</td>";
+      <th>$l_expresspostal</th>
+      <td><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /> $c_cdx</td>";
   }
 
   // User comment select construction
@@ -1555,28 +1561,19 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
 
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_comment = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment1</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        $l_upd_comment1
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
     ";
     if ($show_comment2) {
       $dis_comment2 = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment2</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment2\" rows=\"6\" cols=\"78\">$comment2</textarea></td>
+        $l_upd_comment2
+        <textarea name=\"ta_comment2\" rows=\"6\" cols=\"78\">$comment2</textarea>
       ";
     }
     if ($show_comment3) {
       $dis_comment3 = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment3</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment3\" rows=\"6\" cols=\"78\">$comment3</textarea></td>
+        $l_upd_comment3
+        <textarea name=\"ta_comment3\" rows=\"6\" cols=\"78\">$comment3</textarea>
       ";
     }
   }
@@ -1584,31 +1581,27 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if ($show_comment2) {
     $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
     $block_comment2 = "
-    <div class=\"detailHead\">$l_comment2</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment2</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecomment2','$datecomment2')</script>$sel_usercomment2</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment2\" rows=\"6\" cols=\"78\">$add_comment2</textarea></td>
+    <fieldset class=\"detail extra\">
+    <legend>$l_comment2</legend>
+      $l_add_comment2
+      <input type=\"text\" name=\"tf_datecomment2\" value=\"$datecomment2\" class=\"datePicker\"/>
+      $sel_usercomment2
+      <textarea name=\"ta_add_comment2\" rows=\"6\" cols=\"78\">$add_comment2</textarea>
       $dis_comment2
-    </tr>
-    </table>";
+      </fieldset>";
   }
 
   if ($show_comment3) {
     $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";
     $block_comment3 = "
-    <div class=\"detailHead\">$l_comment3</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment3</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecomment3','$datecomment3')</script>$sel_usercomment3</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment3\" rows=\"6\" cols=\"78\">$add_comment3</textarea></td>
+    <fieldset class=\"detail extra\">
+    <legend>$l_comment3</legend>
+      $l_add_comment3
+      <input type=\"text\" name=\"tf_datecomment3\" value=\"$datecomment3\" class=\"datePicker\"/>
+      $sel_usercomment3
+      <textarea name=\"ta_add_comment3\" rows=\"6\" cols=\"78\">$add_comment3</textarea>
       $dis_comment3
-    </tr>
-    </table>";
+      </fieldset>";
   }
 
   // Company Display
@@ -1619,7 +1612,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_entity.company_new_id&amp;ext_widget_text=f_entity.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
-      <img src=\"". C_IMAGE_PATH . "/$set_theme/$ico_company\" alt=\"\" /></a>
+      <img src=\"$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
   } else {
     $dis_company = "<input type=\"text\" name=\"tf_company\" size=\"30\" maxlength=\"64\" value=\"$c_name\" />";
@@ -1639,7 +1632,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   if (($action == "detailupdate") || ($action == "update")) {
     if ($cgp_submit_form_begin_enabled) {
       $dis_begin_button = "<input type=\"submit\" value=\"$l_update\" />";
-      $block_begin_button = "<div class=\"detailButton\"><p class=\"detailButtons\">$dis_begin_button</p></div><br><p></p>";
+      $block_begin_button = "<fieldset class=\"buttons\">$dis_begin_button</fieldset>";
     }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
@@ -1651,49 +1644,49 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
   } elseif (($action=="new") || ($action=="insert")) {
     if ($cgp_submit_form_begin_enabled){
       $dis_begin_button = "<input type=\"submit\" value=\"$l_insert\" />";
-      $block_begin_button = "<div class=\"detailButton\"><p class=\"detailButtons\">$dis_begin_button</p></div><br><p></p>";
+      $block_begin_button = "<fieldset class=\"buttons\">$dis_begin_button</fieldset><br>";
     }
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+  $display["title"] = "<h1 class=\"title\">$l_contact : $lname $fname</h1>";
 
   // --- HTML Template --------------------------------------------------------
   $block = "$script";
 
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
-
-    <div class=\"detailHead\">$l_contact</div>
+    <fieldset class=\"detail infos\">
+    <legend>$l_contact</legend>
     $block_begin_button
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_lastname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_lname\" size=\"30\" maxlength=\"64\" value=\"$lname\" /></td>
+      <th>$l_lastname</th>
+      <td><input type=\"text\" name=\"tf_lname\" size=\"30\" maxlength=\"64\" value=\"$lname\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_firstname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" maxlength=\"64\" value=\"$fname\" /></td>
+      <th>$l_firstname</th>
+      <td><input type=\"text\" name=\"tf_fname\" size=\"30\" maxlength=\"64\" value=\"$fname\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_aka</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
+      <th>$l_aka</th>
+      <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\"> $sel_kind_lang $sel_kind_label $l_letter : $sel_kind_header </td>
+      <th>$l_kind</th>
+      <td> $sel_kind_lang $sel_kind_label $l_letter : $sel_kind_header </td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_datasource</td> 
-      <td class=\"detailForm\">$sel_dsrc</td>
+      <th>$l_datasource</th> 
+      <td>$sel_dsrc</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\">$display_private</td>
+      <th>$l_private</th>
+      <td>$display_private</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+      <th>$l_archive</th>
+      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailForm\">$dis_company</td>
+      <th>$l_company</th>
+      <td>$dis_company</td>
     </tr>
     $block_function
     $block_title
@@ -1701,68 +1694,69 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $usr_q, $ct
     $block_date
     $block_userdata
     </table>
+    </fieldset>
+   
+    <fieldset class=\"detail infos\">
+    <legend>$l_coord</legend>
 
-    <div class=\"detailHead\">$l_coord</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-    <td class=\"detailLabel\">$l_phone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /> $c_phone</td>
+    <th>$l_phone</th>
+    <td><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /> $c_phone</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_hphone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
+    <th>$l_hphone</th>
+    <td><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_fax</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /> $c_fax</td>
+    <th>$l_fax</th>
+    <td><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /> $c_fax</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_mphone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
+    <th>$l_mphone</th>
+    <td><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
     $block_service
     </tr><tr>
-    <td class=\"detailLabel\">$l_address 1</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /> $c_ad1</td>
+    <th>$l_address 1</th>
+    <td><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /> $c_ad1</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_address 2</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /> $c_ad2</td>
+    <th>$l_address 2</th>
+    <td><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /> $c_ad2</td>
     $block_ad3
     </tr><tr>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /> $c_zip</td>
+    <th>$l_postcode</th>
+    <td><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /> $c_zip</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /> $c_town</td>
+    <th>$l_town</th>
+    <td><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /> $c_town</td>
     $block_cdx
     </tr><tr>
-    <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailForm\">$sel_ctry $c_ctry_name</td>
+    <th>$l_country</th>
+    <td>$sel_ctry $c_ctry_name</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_email\" size=\"52\" maxlength=\"128\" value=\"$email\" /></td>
+    <th>$l_email</th>
+    <td><input type=\"text\" name=\"tf_email\" size=\"52\" maxlength=\"128\" value=\"$email\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_email_other</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_email2\" size=\"52\" maxlength=\"128\" value=\"$email2\" /></td>
+    <th>$l_email_other</th>
+    <td><input type=\"text\" name=\"tf_email2\" size=\"52\" maxlength=\"128\" value=\"$email2\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_mailing_ok</td>
-    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
+    <th>$l_mailing_ok</th>
+    <td><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailHead\">$l_comment1</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_add_comment1</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
-    </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+    <fieldset class=\"detail extra\">
+    <legend>$l_comment1</legend>
+      $l_add_comment1
+      
+      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>$sel_usercomment
+      <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment
-    </tr>
-    </table>
     $block_comment2
     $block_comment3
+    </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
     </form>";
 
   return $block;
@@ -1920,9 +1914,9 @@ function dis_can_delete_contact($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+      $dis_delete
+      $dis_back
     </div>";
 
   return $block;
@@ -1940,7 +1934,6 @@ function dis_contact_admin_index() {
 
   if (! $cgp_hide["contact"]["function"]) {
     $funcs = of_category_get_ordered("contact", "function");
-    $block .= "<hr />";
     $block .= of_category_dis_admin_form("function", $funcs);
   }
 
