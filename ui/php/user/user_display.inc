@@ -373,18 +373,18 @@ function html_user_form($usr_q, $user) {
       $selected = "";
     }
     $block_pro .= "
-      <option value=\"$profile\"$selected /> $profile";
+      <option value=\"$profile\"$selected> $profile</option>";
   }
 
   // Buttons
   if (($action == "new") || ($action == "insert")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\">
-          <input type=\"submit\" value=\"$l_insert\">";
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+          <input type=\"submit\" value=\"$l_insert\" />";
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
-          <input type=\"hidden\" name=\"user_id\" value=\"$id\">
-          <input type=\"submit\" value=\"$l_update\">";
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
+          <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
+          <input type=\"submit\" value=\"$l_update\" />";
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -393,7 +393,7 @@ function html_user_form($usr_q, $user) {
       onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
-<fieldset class=\"detail infos\">
+<fieldset class=\"detail extra\">
     <legend>$l_user</legend>
 
     <table>
@@ -435,7 +435,8 @@ function html_user_form($usr_q, $user) {
       <td><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
     </tr><tr>
       <th>$l_datebegin</th>
-      <td><script>calendar('tf_datebegin','$datebegin')</script></td>
+      <td>
+      <input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/>
     </tr><tr>
       <th>$l_desc</th>
       <td><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
