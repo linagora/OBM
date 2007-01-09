@@ -170,43 +170,40 @@ function html_project_search_form ($tts, $member_q, $project) {
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
+    <form method=\"get\" class=\"search\" name=\"f_search\" id=\"f_search\" action=\"$url\">
 
-    <div class=\"search\">
-      <div class=\"searchLabel\">$l_name<br />
+      <label>$l_name<br />
         <input type=\"text\" name=\"tf_name\" size=\"20\" value=\"$name\" />
-      </div>
-      <div class=\"searchLabel\">$l_company<br />
+      </label>
+      <label>$l_company<br />
         <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
-      </div>
-      <div class=\"searchLabel\">$l_tasktype<br />
+      </label>
+      <label>$l_tasktype<br />
         $sel_tt
-      </div>
-      <div class=\"searchLabel\">$l_member<br />
+      </label>
+      <label>$l_member<br />
         $sel_member
-      </div>
-      <div class=\"searchLabel\">$l_date<br />
-        <script>calendar('tf_datebegin','$date')</script>
-      </div>
-      <div class=\"searchLabel\">$l_archive<br />
+      </label>
+      <label>$l_date<br />
+      <input type=\"text\" name=\"tf_datebegin\" value=\"$date\" class=\"datePicker\"/>
+      </label>
+      <label>$l_archive<br />
         $cb_archive
-      </div>
-      <div class=\"searchLabel\">&nbsp;<br />
-        <input name=\"action\" type=\"hidden\" value=\"search\" />
+      </label>
+      <label>&nbsp;<br />
         <input name=\"company_id\" type=\"hidden\" value=\"$company_id\" />
         <input name=\"deal_id\" type=\"hidden\" value=\"$deal_id\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
         <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
        $ext
-      </div>
-      <div class=\"searchEnd\"></div>
-    </div>
+      </label>
+      <p class=\"CL\"></p>
 
     </form>";
 
@@ -315,7 +312,7 @@ function dis_project_planning($project) {
   if ($shortname != "") {
     $title .= " ($shortname)";
   }
-  $display["title"] = "<div class=\"title\">$l_project : $title</div>";
+  $display["title"] = "<h1 class=\"title\">$l_project : $title</h1>";
 
   return $block;
 }
@@ -518,8 +515,9 @@ function html_project_links($p_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=$id&amp;ext_target=$l_project";
     $nb_document = run_query_global_document_nb ($id, "project");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_module_document</div>
-  <ul class=\"linkList\">
+ <div  class=\"portlet\" id=\"projectDocument\">
+ <h1>$l_module_document</h1>
+  <ul>
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
         <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
@@ -529,7 +527,8 @@ function html_project_links($p_q) {
 	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Invoice
@@ -540,22 +539,22 @@ function html_project_links($p_q) {
     $nb_inv_tot = get_global_linked_invoice_nb($id, "project", 1);
     $nb_inv = get_global_linked_invoice_nb($id, "project");
     $block_invoice = "
-  <div class=\"linkTitle\">:: $l_module_invoice</div>
-  <ul class=\"linkList\">
+ <div  class=\"portlet\" id=\"projectInvoice\"> 
+  <h1>$l_module_invoice</h1>
+  <ul>
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
     <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
-  </ul>";
+  </ul>
+  </div>";
   }
 
   // Links Template  
   $block = "
-<div class=\"link\"> 
   $block_doc
-  $block_invoice
-</div>";
+  $block_invoice";
 
   return $block;
 }
@@ -642,26 +641,28 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     if ($deal > 0) {
       $dis_deal = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_deal</td>
-      <td class=\"detailText\">
+      <th>$l_deal</th>
+      <td>
         <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal")."\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"[details]\" /></a>
         $deal_label
       </td>";
     }
     $dis_comp = "
-    <div class=\"detailHead\">$l_company</div>
-    <table class=\"detail\">
+    <div class=\"detail infos\">
+    <h1>$l_company</h1>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">
+      <th>$l_company</th>
+      <td>
         <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$company")."\">
         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         $company_name
       </td>
     $dis_deal
     </tr>
-    </table>";
+    </table>
+    </div>";
   }
 
   if (($members_q != 0) && ($members_q->num_rows() != 0)){
@@ -682,21 +683,20 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   // tasks or members not defined, we just display task or member list
   //---------------------------------------------------------------------------
   if (!($has_tasks) or !($has_members)) {
-    $tab_style = "class=\"detail\"";
     $dis_progress = "
      <tr>
-       <td class=\"detailLabel\">&nbsp;$l_sold / $l_estimated&nbsp;</td>
-       <td class=\"detailText\" align=\"right\">$soldtime / $estimated</td>
+       <th>&nbsp;$l_sold / $l_estimated&nbsp;</th>
+       <td align=\"right\">$soldtime / $estimated</td>
        <td width=\"10%\">&nbsp;&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;$l_allosold&nbsp;</td>
-       <td class=\"detailText\" align=\"right\">0 %</td>
+       <th>&nbsp;$l_allosold&nbsp;</th>
+       <td align=\"right\">0 %</td>
       </tr>";    
 
     // we display the task list
     if ($has_tasks) { 
       $dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_task_list :</td>
+        <th colspan=\"2\">$l_task_list :</th>
        </tr>";
 
       while ($tasks_q->next_record()) {
@@ -704,41 +704,41 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />" : "";
 	$dis_member .= "
        <tr>
-        <td class=\"detailLabel\">&nbsp;</td>
-        <td class=\"detailText\">$img $tsk_name</td>
+        <th>&nbsp;</th>
+        <td>$img $tsk_name</td>
        </tr>";
 	}
     } else {
       $dis_member .= "
         <tr>
-         <td class=\"detailLabel\" colspan=\"2\">$l_no_tasks</td>
+         <th colspan=\"2\">$l_no_tasks</th>
         </tr>";
     }
       
     $dis_member .= "
      <tr>
       <td>&nbsp;</td>
-     <tr>";
+     </tr>";
 
     if ($has_members) {
       $dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_members_info :</td>
+        <th colspan=\"2\">$l_members_info :</th>
        </tr>";
       
       while (list($key,$val) = each($array_mem)) {
 	$mem_name = $val["firstname"] ." ". $val["name"];
 	$dis_member .= "
        <tr>
-        <td class=\"detailLabel\">&nbsp;</td>
-        <td class=\"detailText\">- $mem_name</td>
+        <th>&nbsp;</th>
+        <td>- $mem_name</td>
        </tr>";
       }
 
     } else {
       $dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_no_members</td>
+        <th colspan=\"2\">$l_no_members</th>
        </tr>";
     }
 
@@ -940,122 +940,124 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     //advance array
     $dis_progress = "
     <tr>
-     <td class=\"detailLabel\">&nbsp;$text_time&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$value_time</td>
+     <th>&nbsp;$text_time&nbsp;</th>
+     <td align=\"right\">$value_time</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_alloestimated&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_alloestimated %</td>
+     <th>&nbsp;$l_alloestimated&nbsp;</th>
+     <td align=\"right\">$ratio_alloestimated %</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_allotted&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$allotted</td>
+     <th>&nbsp;$l_allotted&nbsp;</th>
+     <td align=\"right\">$allotted</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_usedestimated&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_usedestimated %</td>
+     <th>&nbsp;$l_usedestimated&nbsp;</th>
+     <td align=\"right\">$ratio_usedestimated %</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_used&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$usedtime</td>
+     <th>&nbsp;$l_used&nbsp;</th>
+     <td align=\"right\">$usedtime</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_progress&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_progress %</td>
+     <th>&nbsp;$l_progress&nbsp;</th>
+     <td align=\"right\">$ratio_progress %</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_missing&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$missingtime</td>
+     <th>&nbsp;$l_missing&nbsp;</th>
+     <td align=\"right\">$missingtime</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_progeval&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$symbol_progeval</td>
+     <th>&nbsp;$l_progeval&nbsp;</th>
+     <td align=\"right\">$symbol_progeval</td>
     </tr>";
 
   } 
   
   // Reference
   $dis_reference = "
-  <div class=\"detailHead\"> $l_ref </div>
-  <table class=\"detail\">
+  <h1> $l_ref </h1>
+  <table>
   <tr>
-    <td class=\"detailLabel\"> $l_project_date </td>
-    <td class=\"detailText\">$reference_date</td>
+    <th> $l_project_date </th>
+    <td>$reference_date</td>
   </tr>
   <tr>
-    <td class=\"detailLabel\"> $l_project_duration </td>
-    <td class=\"detailText\">$reference_duration</td>
+    <th> $l_project_duration </th>
+    <td>$reference_duration</td>
   </tr>
   <tr>
-    <td class=\"detailLabel\"> $l_project_desc </td>
-    <td class=\"detailText\">$reference_desc</td>
+    <th> $l_project_desc </th>
+    <td>$reference_desc</td>
   </tr>
   <tr>
-    <td class=\"detailLabel\"> $l_project_tech </td>
-    <td class=\"detailText\">$reference_tech</td>
+    <th> $l_project_tech </th>
+    <td>$reference_tech</td>
   </tr>
   </table>";
 
   // --- HTML Template --------------------------------------------------------
 
   $display["link"] = html_project_links($project_q);
-  $display["title"] = "<div class=\"title\">$l_project : $name</div>";
+  $display["title"] = "<h1 class=\"title\">$l_project : $name</h1>";
 
   $block = "
     $dis_comp
+    
+   <div class=\"detail infos\">
+    <h1>$l_project</h1>
 
-    <div class=\"detailHead\">$l_project</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
+      <th>$l_name</th>
+      <td>$name</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_shortname</td>
-      <td class=\"detailText\">$shortname</td>
+      <th>$l_shortname</th>
+      <td>$shortname</td>
     </tr>      
     <tr>
-      <td class=\"detailLabel\">$l_tasktype</td>
-      <td class=\"detailText\">$tt</td>
+      <th>$l_tasktype</th>
+      <td>$tt</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_datebegin</td>
-      <td class=\"detailText\">$datebegin</td>
+      <th>$l_datebegin</th>
+      <td>$datebegin</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_dateend</td>
-      <td class=\"detailText\">$dateend</td>
+      <th>$l_dateend</th>
+      <td>$dateend</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_resume</td>
-      <td class=\"detailText\"># $l_tasks : $nb_tsk / # $l_members : $cpt_m</td>
+      <th>$l_resume</th>
+      <td># $l_tasks : $nb_tsk / # $l_members : $cpt_m</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$arc_status</td>
+      <th>$l_archive</th>
+      <td>$arc_status</td>
     </tr>
     </table>
+    </div>
 
+   <div class=\"detail infos\">
     $dis_reference
- 	
-    <div class=\"detailHead\">$l_progress</div>
-
-    <table class=\"detail\">
+   </div>
+ 
+   <div class=\"detail infos\">
+    <h1>$l_progress</h1>
+    <table>
       $dis_progress
     </table>
+    </div>
 
-    <div class=\"detailHead\">$l_progressinfos</div>
-
-    <div class=\"projectCenter\">
-    <table $tab_style>
+    <div class=\"detail infos\">
+    <h1>$l_progressinfos</h1>
+    <table>
     <tr>
       $dis_memhead
     </tr>
       $dis_member
     </table>
     </div>
-
-    <div class=\"detailHead\">$l_comment</div>
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailText\">$comment</td>
-    </tr>
-    </table>
-";
+    
+    <div class=\"detail extra\">
+    <h1>$l_comment</h1>
+      $comment
+    </div>
+    ";
 
   return $block;
 }
@@ -1071,7 +1073,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
-  global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
+  global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive,$l_project_date,$l_project_duration,$l_project_tech,$l_project_desc;
   global $l_datebegin, $l_dateend, $c_undef, $l_undef,$l_tasks;
   global $l_comment, $l_add_comment, $l_upd_comment,$ico_project,$popup_width;
   global $uid, $cg_prod, $c_php_isodate_format,$l_shortname,$popup_height;
@@ -1155,25 +1157,25 @@ function html_project_form($action, $project_q, $project) {
 
     $dis_member = "
   </tr><tr>
-    <td class=\"detailLabel\">$l_member</td>
-    <td class=\"detailForm\">$sel_member</td>";
+    <th>$l_member</th>
+    <td>$sel_member</td>";
 
 
     $url = "$path/project/project_index.php?action=ext_get_reftask_ids&amp;popup=1&amp;ext_element=sel_task_id";
   // task
   $dis_task = "
   </tr><tr>
-    <td class=\"detailLabel\">$l_task</td>
-    <td class=\"detailForm\"><input name=\"tf_tasklabel\" size=\"40\" maxlength=\"128\" value=\"$task\" /></td>
+    <th>$l_task</th>
+    <td><input name=\"tf_tasklabel\" size=\"40\" maxlength=\"128\" value=\"$task\" /></td>
   </tr><tr>
-  <td class=\"detailLabel\">$l_tasks
+  <th>$l_tasks
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"[Add]\" />
       </a>  
-  </td>
-    <td class=\"detailForm\" id=\"sel_task_id\">$dis_sel_tasks</td>";
+  </th>
+    <td id=\"sel_task_id\">$dis_sel_tasks</td>";
   }
 
   // Task list depend on task category (eg : if company not filled)
@@ -1184,23 +1186,25 @@ function html_project_form($action, $project_q, $project) {
     if ($deal > 0) {
       $dis_deal = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_deal</td>
-      <td class=\"detailText\">$deal_label</td>";
+      <th>$l_deal</th>
+      <td>$deal_label</td>";
     }
     $dis_comp = "
-    <div class=\"detailHead\">$l_company</div>
-    <table class=\"detail\">
+     <fieldset class=\"detail infos\">
+    <legend>$l_company</legend>
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">$company_name</td>
+      <th>$l_company</th>
+      <td>$company_name</td>
     $dis_deal
     </tr>
-    </table>";
+    </table>
+    </fieldset>";
 
     $dis_sold = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_soldtime</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
+      <th>$l_soldtime</th>
+      <td><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
   }
 
   // TaskType select construction
@@ -1233,25 +1237,28 @@ function html_project_form($action, $project_q, $project) {
 
   // Reference
   $dis_reference = "
-  <div class=\"detailHead\"> $l_ref </div>
-  <table class=\"detail\">
+  <fieldset class=\"detail infos\">
+    <legend>$l_project_desc</legend>
+
+  <table>
   <tr>
-    <td class=\"detailLabel\"> $l_project_date </td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_reference_date\" size=\"16\" maxlength=\"32\" value=\"$reference_date\" /></td>
+    <th> $l_project_date </th>
+    <td><input type=\"text\" name=\"tf_reference_date\" size=\"16\" maxlength=\"32\" value=\"$reference_date\" /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\"> $l_project_duration </td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_reference_duration\" size=\"16\" maxlength=\"16\" value=\"$reference_duration\"  /></td>
+    <th> $l_project_duration </th>
+    <td><input type=\"text\" name=\"tf_reference_duration\" size=\"16\" maxlength=\"16\" value=\"$reference_duration\"  /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\"> $l_project_desc </td>
-    <td class=\"detailForm\"><textarea name=\"ta_reference_desc\" rows=\"4\" cols=\"80\" >$reference_desc</textarea></td>
+    <th> $l_project_desc </th>
+    <td><textarea name=\"ta_reference_desc\" rows=\"4\" cols=\"80\" >$reference_desc</textarea></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\"> $l_project_tech </td>
-    <td class=\"detailForm\"><textarea name=\"ta_reference_tech\" rows=\"4\" cols=\"80\" >$reference_tech</textarea></td>
+    <th> $l_project_tech </th>
+    <td><textarea name=\"ta_reference_tech\" rows=\"4\" cols=\"80\" >$reference_tech</textarea></td>
   </tr>
-  </table>";
+  </table>
+  </fieldset>";
 
   // User comment select construction
   if ($usr_q->nf()>0) {
@@ -1272,14 +1279,11 @@ function html_project_form($action, $project_q, $project) {
 
   // target action
   if (($action == "detailupdate") || ($action == "update")) {
-    $display["title"] = "<div class=\"title\">$l_project : $name</div>";
+    $display["title"] = "<h1 class=\"title\">$l_project : $name</h1>";
 
     $dis_comment = "
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        $l_upd_comment
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>
     ";
 
     $dis_action = "
@@ -1303,56 +1307,56 @@ function html_project_form($action, $project_q, $project) {
     <form method=\"post\" name=\"f_entity\" 
       onsubmit=\"if (check_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
-
+   
     $dis_comp
+    <fieldset class=\"detail infos\">
+    <legend>$l_project</legend>
 
-    <div class=\"detailHead\">$l_project</div>
-
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" /></td>
+      <th>$l_name</th>
+      <td><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_shortname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_shortname\" size=\"10\" maxlength=\"10\" value=\"$shortname\" /></td>
+      <th>$l_shortname</th>
+      <td><input type=\"text\" name=\"tf_shortname\" size=\"10\" maxlength=\"10\" value=\"$shortname\" /></td>
     </tr><tr>      
-      <td class=\"detailLabel\">$l_tasktype</td>
-      <td class=\"detailForm\">$sel_tt</td>
+      <th>$l_tasktype</th>
+      <td>$sel_tt</td>
     $dis_sold
     </tr><tr>
-      <td class=\"detailLabel\">$l_projtime</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_estimated\" size=\"10\" maxlength=\"8\" value=\"$estimated\" /></td>
+      <th>$l_projtime</th>
+      <td><input type=\"text\" name=\"tf_estimated\" size=\"10\" maxlength=\"8\" value=\"$estimated\" /></td>
     $dis_task
     $dis_member
-    </tr><tr>
-      <td class=\"detailLabel\">$l_datebegin</td>
-      <td class=\"detailForm\"><script>calendar('tf_datebegin','$datebegin')</script></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_dateend</td>
-      <td class=\"detailForm\"><script>calendar('tf_dateend','$dateend')</script></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $arc_val /></td>
     </tr>
-    </table>
-
-    $dis_reference
-
-    <div class=\"detailHead\">$l_comment</div>
-
-    <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_add_comment</td>
-      <td class=\"detailForm\"><script>calendar('tf_datecomment','$datecomment')</script>$sel_usercomment</td>
+      <th>$l_datebegin</th>
+      <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
     </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-      $dis_comment
+      <th>$l_dateend</th>
+      <td><input type=\"text\" name=\"tf_dateend\" value=\"$dateend\" class=\"datePicker\"/></td>
+    </tr><tr>
+      <th>$l_archive</th>
+      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $arc_val /></td>
     </tr>
     </table>
+    </fieldset>
 
-   <div class=\"detailButton\">
-   <p class=\"detailButtons\">$dis_button</p>
-   </div>
+      $dis_reference
+
+    <fieldset class=\"detail extra\">
+    <legend>$l_comment</legend>
+
+    $l_add_comment
+    <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>
+    $sel_usercomment
+    <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>$dis_comment
+    </fieldset>
+
+   <fieldset class=\"buttons\">
+   $dis_button
+   </fieldset>
+
    </form>";
 
   return $block;
@@ -1386,9 +1390,9 @@ function dis_can_delete_project($p_id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_delete</p>
-    <p class=\"detailButtons\">$dis_back</p>
+    <div class=\"buttons\">
+    $dis_delete
+    $dis_back
     </div>";
 
   return $block;
@@ -1472,7 +1476,7 @@ function html_project_task_form($ptask_q, $project) {
       $js_task
     </script>\n";
 
-  $display["title"] = "<div class=\"title\">$l_project : $pname</div>";
+  $display["title"] = "<h1 class=\"title\">$l_project : $pname</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1484,73 +1488,70 @@ function html_project_task_form($ptask_q, $project) {
    <form method=\"post\" name=\"f_entity\"
      onsubmit=\"if (check_taskadd(this)) return true; else return false;\"
      action=\"". url_prepare("project_index.php") ."\">
- 
-    <div class=\"detailHead\">$l_task_new</div>
+    
+    <fieldset class=\"detail infos\"> 
+    <legend>$l_task_new</legend>
 
-    <table class=\"detail\">
+    <table>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
+      <th>$l_name</th>
+      <td><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_tasks
+    <th>$l_tasks
       <a href=\"javascript: return false;\" 
         onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
         return false;\">
          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"[Add]\" />
         </a>  
-    </td>
-    <td class=\"detailForm\" id=\"sel_task_id\">$dis_sel_tasks</td>      
+    </th>
+    <td id=\"sel_task_id\">$dis_sel_tasks</td>      
     </tr><tr>
-      <td class=\"detailLabel\">$l_parent</td>
-      <td class=\"detailForm\">
+      <th>$l_parent</th>
+      <td>
       $sel_ptask
       </td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+    <fieldset class=\"buttons\">
      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_add\" />
      <input type=\"submit\" value=\"$l_task_add\" />
-    </p>
-    </div>
+    </fieldset>
   </form>    
 
   <form method=\"post\" name=\"form_taskupd\"
      onsubmit=\"if (check_taskupd(this)) return true; else return false;\"
      action=\"". url_prepare("project_index.php") ."\">
 
-    <p class=\"detailButtons\">&nbsp;</p>
-
-    <div class=\"detailHead\">$l_task_update</div>
-
-    <table class=\"detail\">
+   <fieldset class=\"detail infos\">  
+   <legend>$l_task_update</legend>
+   <table>
     <tr>
-      <td class=\"detailLabel\">$l_task</td>
-      <td class=\"detailForm\">
+      <th>$l_task</th>
+      <td>
       $sel_task
       </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_parent</td>
-      <td class=\"detailForm\">
+      <th>$l_parent</th>
+      <td>
       $sel_ptask
       </td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
+      <th>$l_name</th>
+      <td><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"\" /></td>
     </tr>
     </table>
+    </fieldset>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">
+    <fieldset class=\"buttons\">
      <input type=\"hidden\" name=\"project_id\" value=\"$pid\" />
      <input type=\"hidden\" name=\"action\" value=\"task_update\" />
      <input type=\"submit\" value=\"$l_task_upd\" />
-    </p>
-    </div>
+    </fieldset>
 
    </form>
    ";
@@ -1612,20 +1613,20 @@ function html_project_tasklist($tasks_q, $project) {
   }
   
   $block = "
-    <p class=\"detailButtons\">&nbsp;</p>
-
-    <div class=\"detailHead\">$l_task_list</div>
+    <fieldset class=\"detail infos\">
+    <legend>$l_task_list</legend>
 
     <form name=\"form_tasklist\" method=\"post\">
-     <table class=\"detail\">
+     <table>
       $dis_task
      </table>
 
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
-    </div>
+    <fieldset class=\"buttons\">
+    $dis_button
+    </fieldset>
 
     </form>
+    </fieldset>
   ";
 
   return $block;
@@ -1692,32 +1693,33 @@ function html_project_member_form($members_q, $project) {
 
   } else {
 
-    $class = "detail";
 
     $dis_member  = "
       <tr>
-       <td class=\"detailLabel\">$l_no_members</td>
+       <th>$l_no_members</th>
       </tr>";
 
     $span = 1;
   }
 
-  $display["title"] = "<div class=\"title\">$l_project : $pname</div>";
+  $display["title"] = "<h1 class=\"title\">$l_project : $pname</h1>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
    <form name=\"f_entity\" method=\"post\"
          action=\"".url_prepare("project_index.php")."\">
+    
+   <div class=\"detail extra\"> 
+    <h1>$l_members_info</h1>
 
-    <div class=\"detailHead\">$l_members_info</div>
-
-    <table class=\"$class\">
+    <table>
        $dis_member
     </table>
+    </div>
 
-    <div class=\"detailButton\">
-     <p class=\"detailButtons\">$dis_button</p>
+    <div class=\"buttons\">
+     $dis_button
     </div>
 
    </form>
