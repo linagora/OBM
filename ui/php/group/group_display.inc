@@ -343,7 +343,7 @@ function html_group_form($action, $group_q, $group) {
 
   $block = "
   <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
-<fieldset class=\"detail infos\">
+<fieldset class=\"detail extra\">
   <legend>$l_group</legend>
 
   <table>
@@ -361,7 +361,7 @@ function html_group_form($action, $group_q, $group) {
   </table>
   </fieldset>
 
-<fieldset class=\"detail infos\">
+<fieldset class=\"detail extra\">
   <legend>$l_desc</legend>
 
 <table>
