@@ -132,39 +132,37 @@ function html_cv_search_form($cv) {
             <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
             <input name=\"popup\" type=\"hidden\" value=\"$popup\" />";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
+    $display["title"] = "<h1 class=\"title\">$ext_title</h1>";
   }
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" action=\"cv_index.php\">
-  <div class=\"search\">
-    <div class=\"searchLabel\">$l_lastname<br />
-      <input type=\"text\" name=\"tf_lastname\" size=\"20\" size=\"30\" value=\"$lastname\" />
-    </div>
-    <div class=\"searchLabel\">$l_firstname<br />
+  <form method=\"get\" class=\"search\" name=\"f_search\" action=\"cv_index.php\">
+    <label>$l_lastname<br />
+      <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"30\" value=\"$lastname\" />
+    </label>
+    <label>$l_firstname<br />
       <input name=\"tf_firstname\" size=\"20\" maxlength=\"30\" value=\"$firstname\" />
-    </div>
-    <div class=\"searchLabel\">$l_keyword_title<br />
+    </label>
+    <label>$l_keyword_title<br />
       <input type=\"text\" name=\"tf_keyword_title\" size=\"20\" value=\"$keyword_title\" />
-    </div>
-    <div class=\"searchLabel\">$l_keyword_education<br />
+    </label>
+    <label>$l_keyword_education<br />
       <input type=\"text\" name=\"tf_keyword_education\" size=\"20\" value=\"$keyword_education\" />
-    </div>
-    <div class=\"searchLabel\">$l_project_name<br />
+    </label>
+    <label>$l_project_name<br />
       <input name=\"tf_project_name\" size=\"20\" maxlength=\"30\" value=\"$project_name\" />
-   </div>
-    <div class=\"searchLabel\">$l_deal_name<br />
+   </label>
+    <label>$l_deal_name<br />
       <input name=\"tf_deal_name\" size=\"20\" maxlength=\"30\" value=\"$deal_name\" />
-    </div>
-    <div class=\"searchButton\">&nbsp;<br />
+    </label>
+    <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-</div>
+    </label>
+    <p class=\"CL\"></p>
  </form>";
   return $block;
   
