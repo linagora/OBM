@@ -48,7 +48,6 @@ require("contact_display.inc");
 require("contact_query.inc");
 require_once("contact_js.inc");
 require_once("$obminclude/of/of_category.inc");
-require_once("$obminclude/javascript/calendar_js.inc");
 
 $uid = $auth->auth["uid"];
 
