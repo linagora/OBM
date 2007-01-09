@@ -927,7 +927,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td>
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=f_entity.deal_new_id&amp;ext_widget_text=f_entity.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
+        <img src=\"$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
     </tr>";
@@ -1074,7 +1074,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($action == "detailupdate") {
     if ($con1_id > 0) {
       $dis_con1 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con1_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con1_id)."\"><img src=\"$ico_contact\" alt=\"[contact\" /></a>";    
     }
   }
 
@@ -1115,7 +1115,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ($action == "detailupdate") {
     if ($con2_id > 0) {
       $dis_con2 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$con2_id)."\"><img src=\"$ico_contact\" alt=\"[contact]\" /></a>";    
     }
   }
 
@@ -1171,7 +1171,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     <tr>
       <th>
         <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$comp_id"). "\">
-        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+        <img src=\"$ico_company\" alt=\"[Company]\" /></a>
         $comp_name
       </th>
       <td>$ad1
